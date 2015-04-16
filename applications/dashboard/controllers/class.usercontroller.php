@@ -14,6 +14,13 @@ class UserController extends DashboardController {
    public $Uses = array('Database', 'Form');
 
    /**
+    * The number of users when certain optimizations kick in.
+    *
+    * @var int Returns the number of users we need before optimizing.
+    */
+   public $UserThreshold = 2500;
+
+   /**
     * @var Gdn_Form
     */
    public $Form;
@@ -27,8 +34,10 @@ class UserController extends DashboardController {
    public function Initialize() {
       parent::Initialize();
       Gdn_Theme::Section('Dashboard');
-      if ($this->Menu)
+      if ($this->Menu) {
          $this->Menu->HighlightRoute('/dashboard/settings');
+      }
+      $this->FireEvent('Init');
    }
 
    /**
@@ -86,8 +95,9 @@ class UserController extends DashboardController {
       if ($Filter) {
          $Filter['Keywords'] = $Keywords;
       } else {
-         $Filter = $Keywords;
+         $Filter = array('Keywords' => (string)$Keywords);
       }
+      $Filter['Optimize'] = $this->PastUserThreshold();
 
       // Sorting
       if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
@@ -826,6 +836,15 @@ class UserController extends DashboardController {
       $Get = Gdn::Request()->Get();
       $Get['order'] = $Field;
       return '/dashboard/user?'.http_build_query($Get);
+   }
+
+   /**
+    * Whether or not we are past the user threshold.
+    */
+   protected function PastUserThreshold() {
+      $px = Gdn::Database()->DatabasePrefix;
+      $countEstimate = Gdn::Database()->Query("show table status like '{$px}User'")->Value('Rows', 0);
+      return $countEstimate > $this->UserThreshold;
    }
 
    /**

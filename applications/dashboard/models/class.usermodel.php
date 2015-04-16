@@ -1974,17 +1974,23 @@ class UserModel extends Gdn_Model {
       }
    }
 
-   public function Search($Keywords, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      if (C('Garden.Registration.Method') == 'Approval')
+   public function Search($Filter, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      if (C('Garden.Registration.Method') === 'Approval') {
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      else
+      } else {
          $ApplicantRoleID = 0;
-
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
-         $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
       }
+      $Optimize = FALSE;
+
+      if (is_array($Filter)) {
+         $Where = $Filter;
+         $Keywords = $Where['Keywords'];
+         $Optimize = val('Optimize', $Filter);
+         unset($Where['Keywords'], $Where['Optimize']);
+      } else {
+         $Keywords = $Filter;
+      }
+      $Keywords = trim($Keywords);
 
       // Check for an IP address.
       if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
@@ -2007,22 +2013,34 @@ class UserModel extends Gdn_Model {
       if (isset($Where))
          $this->SQL->Where($Where);
 
-      if (isset($RoleID) && $RoleID) {
+      if (!empty($RoleID)) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
       } elseif (isset($IPAddress)) {
          $this->SQL
             ->OrOp()
             ->BeginWhereGroup()
-            ->OrWhere('u.InsertIPAddress', $IPAddress)
-            ->OrWhere('u.LastIPAddress', $IPAddress)
-            ->EndWhereGroup();
+            ->OrWhere('u.LastIPAddress', $IPAddress);
+
+         // An or is expensive so only do it if the query isn't optimized.
+         if (!$Optimize) {
+            $this->SQL->OrWhere('u.InsertIPAddress', $IPAddress);
+         }
+
+         $this->SQL->EndWhereGroup();
       } elseif (isset($UserID)) {
          $this->SQL->Where('u.UserID', $UserID);
-      } else {
-         // Search on the user table.
-         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+      } elseif ($Keywords) {
+         if ($Optimize) {
+            // An optimized search should only be done against name OR email.
+            if (strpos($Keywords, '@') !== FALSE) {
+               $this->SQL->Like('u.Email', $Keywords, 'right');
+            } else {
+               $this->SQL->Like('u.Name', $Keywords, 'right');
+            }
+         } else {
+            // Search on the user table.
+            $Like = array('u.Name' => $Keywords, 'u.Email' => $Keywords);
 
-         if (is_array($Like)) {
             $this->SQL
                ->OrOp()
                ->BeginWhereGroup()
@@ -2031,8 +2049,9 @@ class UserModel extends Gdn_Model {
          }
       }
 
-      if ($ApplicantRoleID != 0)
+      if ($ApplicantRoleID != 0) {
          $this->SQL->Where('ur.RoleID is null');
+      }
 
       $Data = $this->SQL
          ->Where('u.Deleted', 0)

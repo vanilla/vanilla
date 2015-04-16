@@ -50,9 +50,9 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    ?>
 <li id="Activity_<?php echo $Activity->ActivityID; ?>" class="<?php echo $CssClass; ?>">
    <?php
-   if (ActivityController::canDelete($Activity->ActivityID, $Session->TransientKey(),  $Sender->ProfileUserID, $Activity->InsertUserID))
-      echo '<div class="Options">'.Anchor('×', 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl).'&profileUserId='.$Sender->ProfileUserID.'&insertUserId='.$Activity->InsertUserID, 'Delete').'</div>';
-
+   if (ActivityModel::canDelete($Activity)) {
+      echo '<div class="Options">'.Anchor('×', 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
+   }
    if ($PhotoAnchor != '') {
    ?>
    <div class="Author Photo"><?php echo $PhotoAnchor; ?></div>
@@ -102,7 +102,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    if (count($Comments) > 0) {
       echo '<ul class="DataList ActivityComments">';
       foreach ($Comments as $Comment) {
-         WriteActivityComment($Comment, $Sender, $Session);
+         WriteActivityComment($Comment, $Activity);
       }
    } else {
       echo '<ul class="DataList ActivityComments Hidden">';
@@ -137,7 +137,8 @@ function WriteActivity($Activity, &$Sender, &$Session) {
 
 if (!function_exists('WriteActivityComment')):
 
-function WriteActivityComment($Comment, &$Sender, &$Session) {
+function WriteActivityComment($Comment, $Activity) {
+   $Session = Gdn::Session();
    $Author = UserBuilder($Comment, 'Insert');
    $PhotoAnchor = UserPhoto($Author, 'Photo');
    $CssClass = 'Item ActivityComment ActivityComment';
@@ -155,8 +156,8 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
       <div class="Meta">
          <span class="DateCreated"><?php echo Gdn_Format::Date($Comment['DateInserted'], 'html'); ?></span>
          <?php
-            if (ActivityController::canDelete($Comment['ActivityCommentID'], $Session->TransientKey(), $Sender->ProfileUserID, val('InsertUserID', $Comment))) {
-               echo Anchor(T('Delete'), "dashboard/activity/deletecomment?id={$Comment['ActivityCommentID']}&tk=".$Session->TransientKey().'&target='.urlencode(Gdn_Url::Request()).'&profileUserId='.$Sender->ProfileUserID.'&insertUserId='.val('InsertUserID', $Comment), 'DeleteComment');
+            if (ActivityModel::canDelete($Activity)) {
+               echo Anchor(T('Delete'), "dashboard/activity/deletecomment?id={$Comment['ActivityCommentID']}&tk=".$Session->TransientKey().'&target='.urlencode(Gdn_Url::Request()), 'DeleteComment');
             }
          ?>
       </div>

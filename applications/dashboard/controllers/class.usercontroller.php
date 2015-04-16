@@ -89,8 +89,6 @@ class UserController extends DashboardController {
          $Filter = $Keywords;
       }
 
-      $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
-
       // Sorting
       if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
          $Order = 'u.'.$Order;
@@ -103,6 +101,8 @@ class UserController extends DashboardController {
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       $this->SetData('Users', $this->UserData);
+      $this->SetData('_CurrentRecords', $this->UserData->count());
+
       RoleModel::SetUserRoles($this->UserData->Result());
 
       // Deliver json data if necessary

@@ -190,14 +190,14 @@ class CategoriesController extends VanillaController {
                switch($Layout) {
                   case 'mixed':
                      $this->View = 'discussions';
-                     $this->Discussions($CategoryIdentifier, FALSE);
+                     $this->Discussions($CategoryIdentifier);
                      break;
                   case 'table':
-                     $this->Table($CategoryIdentifier, FALSE);
+                     $this->Table($CategoryIdentifier);
                      break;
                   default:
                      $this->View = 'all';
-                     $this->All($CategoryIdentifier, FALSE);
+                     $this->All($CategoryIdentifier);
                      break;
                }
                return;
@@ -329,6 +329,7 @@ class CategoriesController extends VanillaController {
    /**
     * Show all (nested) categories.
     *
+    * @param string $Category The url code of the parent category.
     * @since 2.0.17
     * @access public
     */
@@ -383,16 +384,16 @@ class CategoriesController extends VanillaController {
    /**
     * Show all categories and few discussions from each.
     *
+    * @param string $Category The url code of the parent category.
     * @since 2.0.0
     * @access public
     */
    public function Discussions($Category = '') {
       // Setup head
       $this->AddCssFile('vanilla.css');
-      $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('discussions.js');
-
       $this->Menu->HighlightRoute('/discussions');
+
       if (!$this->Title()) {
          $Title = C('Garden.HomepageTitle');
          if ($Title)

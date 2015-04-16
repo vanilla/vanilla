@@ -488,7 +488,6 @@ class ActivityModel extends Gdn_Model {
       $session = Gdn::Session();
 
       $profileUserId = val('ActivityUserID', $activity);
-//      $insertUserId = val('InsertUserID', $activity);
       $notifyUserId = val('NotifyUserID', $activity);
 
       // User can delete any activity
@@ -510,7 +509,8 @@ class ActivityModel extends Gdn_Model {
          return true;
       }
 
-      // The user inserted the activity
+      // The user inserted the activity --- may be added in later
+//      $insertUserId = val('InsertUserID', $activity);
 //      if ($insertUserId && $insertUserId == $session->UserID) {
 //         return true;
 //      }

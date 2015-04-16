@@ -151,23 +151,32 @@ class ActivityController extends Gdn_Controller {
    }
 
    public function DeleteComment($ID, $TK, $Target = '') {
-      $Session = Gdn::Session();
-
-      if (!$Session->ValidateTransientKey($TK))
-         throw PermissionException();
-
-      $Comment = $this->ActivityModel->GetComment($ID);
-      if (!$ID)
-         throw NotFoundException();
-
-      if ($Session->CheckPermission('Garden.Activity.Delete') || $Comment['InsertUserID'] = $Session->UserID) {
-         $this->ActivityModel->DeleteComment($ID);
-      } else {
+      $session = Gdn::Session();
+      if (!$session->ValidateTransientKey($TK)) {
          throw PermissionException();
       }
 
-      if ($this->DeliveryType() === DELIVERY_TYPE_ALL)
+      if (!is_numeric($ID)) {
+         throw Gdn_UserException('Invalid ID');
+      }
+
+      $comment = $this->ActivityModel->GetComment($ID);
+      if (!$comment) {
+         throw NotFoundException('Comment');
+      }
+
+      $activity = $this->ActivityModel->GetID(val('ActivityID', $comment));
+      if (!$activity) {
+         throw NotFoundException('Activity');
+      }
+
+      if (!$this->ActivityModel->canDelete($activity)) {
+         throw PermissionException();
+      }
+      $this->ActivityModel->DeleteComment($ID);
+      if ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
          Redirect($Target);
+      }
 
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
@@ -182,23 +191,18 @@ class ActivityController extends Gdn_Controller {
     * @param string $TransientKey Verify intent.
     */
    public function Delete($ActivityID = '', $TransientKey = '') {
-      $Session = Gdn::Session();
-      if (!$Session->ValidateTransientKey($TransientKey))
+      $session = Gdn::Session();
+      if (!$session->ValidateTransientKey($TransientKey)) {
          throw PermissionException();
-
-      if (!is_numeric($ActivityID))
-         throw Gdn_UserException('Invalid activity ID');
-
-
-      $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
-      if (!$HasPermission) {
-         $Activity = $this->ActivityModel->GetID($ActivityID);
-         if (!$Activity)
-            throw NotFoundException('Activity');
-         $HasPermission = $Activity['InsertUserID'] == $Session->UserID;
       }
-      if (!$HasPermission)
+
+      if (!is_numeric($ActivityID)) {
+         throw Gdn_UserException('Invalid ID');
+      }
+
+      if (!$this->ActivityModel->canDelete($this->ActivityModel->GetID($ActivityID))) {
          throw PermissionException();
+      }
 
       $this->ActivityModel->Delete($ActivityID);
 

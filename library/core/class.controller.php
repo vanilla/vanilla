@@ -1659,6 +1659,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
+               if (!is_array($CssInfo['Options'])) {
+                  $CssInfo['Options'] = array();
+               }
 
                // style.css and admin.css deserve some custom processing.
                if (in_array($CssFile, array('style.css', 'admin.css'))) {

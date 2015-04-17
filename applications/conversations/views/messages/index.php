@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1 class="H"><?php echo $this->Participants; ?></h1>
+<span class="page-title">
+	<h1 class="H page-title"><?php echo $this->Participants; ?></h1>
+</span>
 <?php
 if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
    echo '<h2 class="Subject">'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';

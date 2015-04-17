@@ -11,8 +11,11 @@ if (!$CancelUrl) {
 ?>
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
    <?php
-		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-			echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
+		if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         echo '<span class="page-title">';
+			echo Wrap($this->Data('Title'), 'h1', array('class' => 'H page-title'));
+         echo '</span>';
+      }
 	
       echo '<div class="FormWrapper">';
       echo $this->Form->Open();
@@ -64,13 +67,13 @@ if (!$CancelUrl) {
 
       echo '<div class="Buttons">';
       $this->FireEvent('BeforeFormButtons');
-      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button Primary DiscussionButton'));
+      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'button Button Primary DiscussionButton'));
       if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
-         echo $this->Form->Button('Save Draft', array('class' => 'Button DraftButton'));
+         echo $this->Form->Button('Save Draft', array('class' => 'button secondary Button DraftButton'));
       }
-      echo $this->Form->Button('Preview', array('class' => 'Button PreviewButton'));
+      echo $this->Form->Button('Preview', array('class' => 'button secondary Button PreviewButton'));
       $this->FireEvent('AfterFormButtons');
-      echo Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
+      echo Anchor(T('Cancel'), $CancelUrl, 'button secondary Button Cancel');
       echo '</div>';
       
       

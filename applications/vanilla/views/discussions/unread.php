@@ -2,10 +2,10 @@
 $Session = Gdn::Session();
 include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
-echo '<h1 class="H HomepageTitle">'.
+echo '<span class="page-title"><h1 class="H HomepageTitle page-title">'.
    AdminCheck(NULL, array('', ' ')).
    $this->Data('Title').
-   '</h1>';
+   '</h1></span>';
 
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));

@@ -18,7 +18,7 @@ if (!is_array($this->SearchResults) || count($this->SearchResults) == 0) {
 } else {
    $ViewLocation = $this->FetchViewLocation('results');
    include($ViewLocation);
-   echo '<div class="PageControls Bottom">';
+   echo '<div class="PageControls Bottom self-clearing">';
    PagerModule::Write();
    echo '</div>';
 }

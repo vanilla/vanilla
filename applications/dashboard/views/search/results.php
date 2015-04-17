@@ -8,7 +8,7 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 		$Row = (object)$Row;
 		$this->EventArguments['Row'] = $Row;
 ?>
-	<li class="Item">
+	<li class="Item self-clearing">
 		<?php $this->FireEvent('BeforeItemContent'); ?>
 		<div class="ItemContent">
 			<?php echo Anchor(Gdn_Format::Text($Row->Title), $Row->Url, 'Title'); ?>

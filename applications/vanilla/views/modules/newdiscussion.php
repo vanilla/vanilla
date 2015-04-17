@@ -6,7 +6,7 @@ $Url = '/post/discussion/'.$UrlCode;
 if ($this->QueryString) {
    $Url .= (strpos($Url, '?') !== FALSE ? '&' : '?').$this->QueryString;
 }
-$Css = 'Button Primary Action NewDiscussion';
+$Css = 'Button Primary Action NewDiscussion button';
 $Css .= strpos($this->CssClass, 'Big') !== FALSE ? ' BigButton' : '';
 if (count($this->Buttons) == 0) {
    echo Anchor($Text, $Url, $Css);

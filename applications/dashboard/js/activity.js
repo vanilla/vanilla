@@ -146,7 +146,7 @@ jQuery(document).ready(function($) {
                      // Make sure that empty rows are removed
                      $('div.EmptyInfo').slideUp('fast');
                      // And add the activity list
-                     $(frm).after('<ul class="Activities"></ul>');
+                     $(frm).after('<ul class="Activities self-clearing"></ul>');
                   }
                   $('ul.Activities').prepend(json.Data);
                   // Make sure that hidden items appear

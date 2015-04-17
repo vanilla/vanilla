@@ -14,7 +14,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
          $Activity->PhotoUrl, 'PhotoWrap');
    }
    
-   $CssClass = 'Item Activity Activity-'.$ActivityType;
+   $CssClass = 'Item self-clearing Activity Activity-'.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
    
@@ -144,7 +144,7 @@ if (!function_exists('WriteActivityComment')):
 function WriteActivityComment($Comment, &$Sender, &$Session) {
    $Author = UserBuilder($Comment, 'Insert');
    $PhotoAnchor = UserPhoto($Author, 'Photo');
-   $CssClass = 'Item ActivityComment ActivityComment';
+   $CssClass = 'Item self-clearing ActivityComment ActivityComment';
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
    

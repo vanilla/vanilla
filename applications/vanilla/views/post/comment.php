@@ -10,15 +10,6 @@ $this->FireEvent('BeforeCommentForm');
    <h2 class="H"><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
    <div class="CommentFormWrap">
       <?php if (Gdn::Session()->IsValid()): ?>
-      <div class="Form-HeaderWrap">
-         <div class="Form-Header">
-            <span class="Author">
-               <?php
-               WriteCommentFormHeader();
-               ?>
-            </span>
-         </div>
-      </div>
       <?php endif; ?>
       <div class="Form-BodyWrap">
          <div class="Form-Body">
@@ -56,7 +47,7 @@ $this->FireEvent('BeforeCommentForm');
 
                echo '</span>';
 
-               $ButtonOptions = array('class' => 'Button Primary CommentButton');
+               $ButtonOptions = array('class' => 'button Button Primary CommentButton');
                $ButtonOptions['tabindex'] = 2;
                /*
                Caused non-root users to not be able to add comments. Must take categories
@@ -66,10 +57,10 @@ $this->FireEvent('BeforeCommentForm');
                */
 
                if (!$Editing && $Session->IsValid()) {
-                  echo ' '.Anchor(T('Preview'), '#', 'Button PreviewButton')."\n";
-                  echo ' '.Anchor(T('Edit'), '#', 'Button WriteButton Hidden')."\n";
+                  echo ' '.Anchor(T('Preview'), '#', 'button secondary Button PreviewButton')."\n";
+                  echo ' '.Anchor(T('Edit'), '#', 'button secondary Button WriteButton Hidden')."\n";
                   if ($NewOrDraft)
-                     echo ' '.Anchor(T('Save Draft'), '#', 'Button DraftButton')."\n";
+                     echo ' '.Anchor(T('Save Draft'), '#', 'button secondary Button DraftButton')."\n";
                }
                if ($Session->IsValid())
                   echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
@@ -80,7 +71,7 @@ $this->FireEvent('BeforeCommentForm');
                      $Attributes['target'] = '_parent';
 
                   $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', '/'));
-                  $CssClass = 'Button Primary Stash';
+                  $CssClass = 'button Button Primary Stash';
                   if ($AllowSigninPopup)
                      $CssClass .= ' SignInPopup';
 

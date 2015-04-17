@@ -33,6 +33,6 @@ function DiscussionPollAnswerForm($PollForm, $Poll, $PartialAnswers) {
     $m++;
   }
   echo '</ol>';
-  echo $PollForm->Close('Submit');
+  echo $PollForm->Close('Submit', '', array('class' => 'button'));
   echo '</div>';
 }

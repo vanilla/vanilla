@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) return; ?>
-<h1 class="H HomepageTitle"><?php echo $this->Data('Title'); ?></h1>
+<span class="page-title">
+   <h1 class="H HomepageTitle"><?php echo $this->Data('Title'); ?></h1>
+</span>
 <div class="P PageDescription"><?php echo $this->Description(); ?></div>
 <?php
 $Categories = CategoryModel::MakeTree($this->Data('Categories'), $this->Data('Category', NULL));

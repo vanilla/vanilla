@@ -13,7 +13,7 @@ foreach ($this->DraftData->Result() as $Draft) {
    $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/discussion/'.$Draft->DiscussionID.'/'.$Offset.'/#Form_Comment';
    $Alt = $Alt == ' Alt' ? '' : ' Alt';
    ?>
-   <li class="Item Draft<?php echo $Alt; ?>">
+   <li class="Item Draft self-clearing<?php echo $Alt; ?>">
       <div class="Options"><?php echo Anchor(T('Draft.Delete', 'Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?></div>
       <div class="ItemContent">
          <?php echo Anchor(Gdn_Format::Text($Draft->Name, FALSE), $EditUrl, 'Title DraftLink'); ?>

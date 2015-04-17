@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<span class="page-title"><h1 class="H HomepageTitle">'.$this->Data('Title').'</h1></span>';
 $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
 ?>
 <div class="Categories">

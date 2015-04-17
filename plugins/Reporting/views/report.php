@@ -38,5 +38,5 @@ echo $this->Form->Errors();
          $this->FireEvent('ReportContentAfter');
       ?>
    </ul>
-   <?php echo $this->Form->Close('Report this!'); ?>
+   <?php echo $this->Form->Close('Report this!', '', array('class' => 'button self-clearing')); ?>
 </div>

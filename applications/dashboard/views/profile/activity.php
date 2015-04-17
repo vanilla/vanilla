@@ -13,10 +13,11 @@ if ($Session->IsValid() && CheckPermission('Garden.Profiles.Edit')) {
    echo $this->Form->Errors();
    echo Wrap($this->Form->BodyBox('Comment'), 'div', array('class' => 'TextBoxWrapper'));
    echo '<div class="Buttons">';
-   echo $this->Form->Button($ButtonText, array('class' => 'Button Primary'));
+   echo $this->Form->Button($ButtonText, array('class' => 'Button Primary button self-clearing'));
    echo '</div>';
    echo $this->Form->Close();
    echo '</div>';
+   echo '<div class="self-clearing"></div>';
 }
 
 // Include the activities

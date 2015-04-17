@@ -15,7 +15,7 @@ class NewDiscussionModule extends Gdn_Module {
    
    public $DefaultButton;
    
-   public $CssClass = 'Button Action Big Primary';
+   public $CssClass = 'Button Action Big Primary button';
    public $QueryString = '';
    
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {

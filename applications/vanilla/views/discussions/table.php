@@ -16,7 +16,7 @@ if ($this->Data('_PagerUrl')) {
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 }
 
-echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<span class="page-title"><h1 class="H HomepageTitle">'.$this->Data('Title').'</h1></span>';
 
 if ($Description = $this->Data('_Description')) {
    echo '<div class="P PageDescription">';
@@ -26,9 +26,9 @@ if ($Description = $this->Data('_Description')) {
 
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
-echo '<div class="PageControls Top">';
+echo '<div class="PageControls Top self-clearing">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'button Button Action Primary')));
 echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
@@ -61,9 +61,9 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </div>
 <?php
 
-   echo '<div class="PageControls Bottom">';
+   echo '<div class="PageControls Bottom self-clearing">';
       PagerModule::Write($PagerOptions);
-      echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')) );
+      echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'button Button Action Primary')) );
    echo '</div>';
    
 } else {

@@ -4,7 +4,7 @@ function WriteConnection($Row) {
    $c = Gdn::Controller();
    $Connected = GetValue('Connected', $Row);
 ?>
-   <li id="<?php echo "Provider_{$Row['ProviderKey']}"; ?>" class="Item">
+   <li id="<?php echo "Provider_{$Row['ProviderKey']}"; ?>" class="Item self-clearing">
       <div class="Connection-Header">
          <span class="IconWrap">
             <?php

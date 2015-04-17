@@ -32,8 +32,6 @@
 
 						{literal}
 						<script>
-							//Change "Home" breadcrumb to "DAZ3D Forums"
-							$( ".HomeCrumb a span" ).replaceWith( "<span itemprop='title'>DAZ3D Forums</span>" );
 
 							//variables for crumb styling
 							var forumThreadTitle = $( "#Item_0 h1" ).text();

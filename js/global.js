@@ -956,8 +956,9 @@ jQuery(document).ready(function($) {
 					message = '<span class="InformSprite '+sprite+'"></span>' + message;
 				
 				// If the message is dismissable, add a close button
+            // Added "button" and "secondary" to apply Daz button styling 
 				if (css.indexOf('Dismissable') > 0)
-					message = '<a class="Close"><span>×</span></a>' + message;
+					message = '<a class="Close button secondary"><span>×</span></a>' + message;
 
 				message = '<div class="InformMessage">'+message+'</div>';
 				// Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).

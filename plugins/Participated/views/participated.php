@@ -3,7 +3,9 @@ $this->Title(T('Participated Discussions'));
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $ViewLocation = $this->FetchViewLocation('discussions');
 ?>
+<span class="page-title">
 <h1 class="HomepageTitle"><?php echo T('ParticipatedHomepageTitle', 'Participated Discussions'); ?></h1>
+</span>
 <?php
 if ($this->DiscussionData->NumRows() > 0) {
 ?>

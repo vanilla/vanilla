@@ -776,7 +776,7 @@ class EntryController extends Gdn_Controller {
 			   $sign_in_url = substr($sign_in_url, 0, strpos($sign_in_url, 'referer/') + strlen('referer/'));
 		   }
 
-		   $referer = urldecode($_GET['Target']);
+		   $referer = urldecode(ArrayValue('Target', $_GET, ''));
 		   $referer = preg_replace('%^/'.Gdn::Request()->WebRoot().'/%i', '', $referer);
 		   $referer = Gdn::Request()->Url($referer, TRUE);
 		   $referer = strtr(base64_encode($referer), '+/=', '-_,');

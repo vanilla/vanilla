@@ -1104,8 +1104,9 @@ class UserModel extends Gdn_Model {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
 
          // We want to cache a non-existant user no-matter what.
-         if (!$User)
+         if (!$User) {
             $User = NULL;
+         }
 
          $this->UserCache($User, $ID);
       } elseif (!$User) {

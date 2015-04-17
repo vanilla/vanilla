@@ -349,7 +349,7 @@
           if (obj.value.length) {
             // selectionStart is implied 0
             obj.selectionEnd = obj.value.length;
-            obj.focus();
+            obj.select();
           }
        };
 

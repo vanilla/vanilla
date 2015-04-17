@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.0',
+   'Version' => '1.7.1',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -157,7 +157,7 @@ class EditorPlugin extends Gdn_Plugin {
          'sep-media' => true, // separator
           'emoji' => true,
           'links' => true,
-          'images' => false,
+          'images' => true,
           'uploads' => false,
 
           'sep-align' => true, // separator
@@ -394,6 +394,7 @@ class EditorPlugin extends Gdn_Plugin {
       $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
       if (val('FileUpload', $attributes)) {
          $allowedEditorActions['uploads'] = true;
+         $allowedEditorActions['images'] = false;
       }
       $fontColorList        = $this->getFontColorList();
       $fontFormatOptions = $this->getFontFormatOptions();
@@ -672,8 +673,8 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
+      // Set canUpload definition here, but not Data (set in BeforeBodyBox) because it overwrites.
       $c->AddDefinition('canUpload', $this->canUpload);
-      $c->SetData('_canUpload', $this->canUpload);
    }
 
    /**
@@ -732,6 +733,9 @@ class EditorPlugin extends Gdn_Plugin {
             // Set data for view
             $c->SetData('_EditorToolbar', $editorToolbar);
          }
+
+         $c->AddDefinition('canUpload', $this->canUpload);
+         $c->SetData('_canUpload', $this->canUpload);
 
          // Determine which controller (post or discussion) is invoking this.
          // At the moment they're both the same, but in future you may want

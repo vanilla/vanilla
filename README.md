@@ -110,7 +110,7 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 We've adopted the [git flow branching model](http://nvie.com/posts/a-successful-git-branching-model) in our projects.
 The creators of git flow released a [short intro video](http://vimeo.com/16018419) to explain the model.
 
-The `master` branch is production-ready for a our cloud product but is not yet vetted for open source release (alternate platforms).
+The `master` branch is production-ready for our cloud product but is not yet vetted for open source release (alternate platforms).
 Reviewed, stable changes land against `master`.
 
 The `stage` branch is pre-production and are where we land riskier changesets for further integration testing. We typically aim to merge `stage` into `master` on a monthly basis.

@@ -190,7 +190,7 @@ class CategoriesController extends VanillaController {
                switch($Layout) {
                   case 'mixed':
                      $this->View = 'discussions';
-                     $this->Discussions();
+                     $this->Discussions($CategoryIdentifier);
                      break;
                   case 'table':
                      $this->Table($CategoryIdentifier);
@@ -329,6 +329,7 @@ class CategoriesController extends VanillaController {
    /**
     * Show all (nested) categories.
     *
+    * @param string $Category The url code of the parent category.
     * @since 2.0.17
     * @access public
     */
@@ -344,7 +345,9 @@ class CategoriesController extends VanillaController {
       }
       Gdn_Theme::Section('CategoryList');
 
-      $this->Description(C('Garden.Description', NULL));
+      if (!$Category) {
+         $this->Description(C('Garden.Description', NULL));
+      }
 
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $this->Data('Category'))));
 
@@ -381,32 +384,48 @@ class CategoriesController extends VanillaController {
    /**
     * Show all categories and few discussions from each.
     *
+    * @param string $Category The url code of the parent category.
     * @since 2.0.0
     * @access public
     */
-   public function Discussions() {
+   public function Discussions($Category = '') {
       // Setup head
       $this->AddCssFile('vanilla.css');
-      $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('discussions.js');
-      $Title = C('Garden.HomepageTitle');
-      if ($Title)
-         $this->Title($Title, '');
-      else
-         $this->Title(T('All Categories'));
-      $this->Description(C('Garden.Description', NULL));
+      $this->Menu->HighlightRoute('/discussions');
+
+      if (!$this->Title()) {
+         $Title = C('Garden.HomepageTitle');
+         if ($Title)
+            $this->Title($Title, '');
+         else
+            $this->Title(T('All Categories'));
+      }
+
+      if (!$Category) {
+         $this->Description(C('Garden.Description', NULL));
+      }
+
       Gdn_Theme::Section('CategoryDiscussionList');
 
       // Set the category follow toggle before we load category data so that it affects the category query appropriately.
       $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
       $CategoryFollowToggleModule->SetToggle();
 
+      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
+
+      if ($Category) {
+         $Subtree = CategoryModel::GetSubtree($Category, false);
+         $CategoryIDs = ConsolidateArrayValuesByKey($Subtree, 'CategoryID');
+         $Categories = $this->CategoryModel->GetFull($CategoryIDs)->ResultArray();
+      } else {
+         $Categories = $this->CategoryModel->GetFull()->ResultArray();
+      }
+      $this->SetData('Categories', $Categories);
+
       // Get category data and discussions
       $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
-      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
-      $this->CategoryData = $this->CategoryModel->GetFull();
-      $this->SetData('Categories', $this->CategoryData);
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
          if ($Category->CategoryID > 0)
@@ -425,8 +444,15 @@ class CategoriesController extends VanillaController {
 
       $this->CanonicalUrl(Url('/categories', TRUE));
       $Path = $this->FetchViewLocation('helper_functions', 'discussions', FALSE, FALSE);
-      if ($Path)
+      if ($Path) {
          include_once $Path;
+      }
+
+      // For GetOptions function
+      $Path2 = $this->FetchViewLocation('helper_functions', 'categories', FALSE, FALSE);
+      if ($Path2) {
+         include_once $Path2;
+      }
       $this->Render();
    }
 

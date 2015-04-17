@@ -1030,13 +1030,18 @@ class Gdn_Format {
     * @return string
     */
    public static function Links($Mixed) {
-      if (!C('Garden.Format.Links', TRUE))
+      if (!C('Garden.Format.Links', TRUE)) {
             return $Mixed;
+      }
 
-      if (!is_string($Mixed))
+      if (!is_string($Mixed)) {
          return self::To($Mixed, 'Links');
-      else {
-         $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+      } else {
+         if (unicodeRegexSupport()) {
+            $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`iu";
+         } else {
+            $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         }
 
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
 //         echo '<pre>', print_r($Parts, TRUE), '</pre>';
@@ -1148,7 +1153,7 @@ class Gdn_Format {
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
-      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
+      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d-]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
       $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
@@ -1397,7 +1402,7 @@ EOT;
             // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
             $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
             $Mixed = preg_replace(
-               '/(^|[\s,\.>])@('.$Pattern.'{1,64})\b/i', //{3,20}
+               '/(^|[\s,\.>\)])@('.$Pattern.'{1,64})\b/i', //{3,20}
                '\1'.Anchor('@$2', $urlFormat),
                $Mixed
             );
@@ -1608,7 +1613,9 @@ EOT;
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (($TestTime = strtotime($DateTime)) !== FALSE) {
+      if ($DateTime === '0000-00-00 00:00:00') {
+         return false;
+      } elseif (($TestTime = strtotime($DateTime)) !== FALSE) {
          return $TestTime;
       } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];

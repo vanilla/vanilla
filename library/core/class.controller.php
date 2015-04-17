@@ -1739,14 +1739,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                   $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
                }
 
-               if ($AppFolder && !array_key_exists('Version', $CssInfo['Options']) && !StringBeginsWith($AppFolder, 'plugins/')) {
-                  $AppInfo = Gdn::applicationManager()->GetApplicationInfo($AppFolder);
-                  $AppVersion = val('Version', $AppInfo, null);
-                  if ($AppVersion) {
-                     $CssInfo['Options']['Version'] = $AppVersion;
-                  }
-               }
-
                // Find the first file that matches the path.
                $CssPath = FALSE;
                foreach($CssPaths as $Glob) {

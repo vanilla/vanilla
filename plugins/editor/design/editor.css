@@ -17,7 +17,6 @@
 
 .editor-upload-progress.fade-out {
   opacity: 0 !important;
-  -webkit-transition: opacity 0.7s ease;
   transition: opacity 0.7s ease; }
 
 .editor-drop-cue .BodyBox, .editor-drop-cue iframe.wysihtml5-sandbox {
@@ -81,7 +80,6 @@
   /* This is for the transition when removing/reattaching files. Height
    is necessary due to floated elements and width, which cause them to
    occupy space under image until width is full. */
-  -webkit-transition: all 0.1s ease;
   transition: all 0.1s ease;
   -webkit-animation-duration: 0.8s;
   animation-duration: 0.8s;
@@ -288,7 +286,7 @@
   cursor: pointer;
   border: 1px solid #fff;
   box-shadow: inset 0 0 0 1px #fff;
-  -webkit-transition: -webkit-transform 0.2s ease;
+  transition: -webkit-transform 0.2s ease;
   transition: transform 0.2s ease;
   margin: 1px; }
 
@@ -386,11 +384,13 @@
   .editor-file-image.drag-passthrough {
     opacity: 0;
     pointer-events: none;
-    -webkit-transition: all 200ms ease;
     transition: all 200ms ease;
     -webkit-transform: scale(0);
     -ms-transform: scale(0);
     transform: scale(0); }
+
+.editor-dropdown-image .editor-file-image .image-input {
+  border-top: 0; }
 
 /* If uploads disabled entirely, hide some options in the dropdown */
 .editor-uploads-disabled .file-drop, .editor-uploads-disabled .file-input {
@@ -415,7 +415,6 @@
       color: #000;
       -moz-box-sizing: border-box !important;
       box-sizing: border-box !important;
-      -webkit-transition: background-color 400ms ease, color 400ms ease;
       transition: background-color 400ms ease, color 400ms ease; }
     .editor-fullpage .TextBoxWrapper .BodyBox {
       min-height: 400px; }
@@ -434,7 +433,6 @@
     padding: 0;
     overflow-y: auto;
     background-color: #fff;
-    -webkit-transition: background-color 400ms ease;
     transition: background-color 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate input {
       -moz-box-sizing: border-box !important;
@@ -450,7 +448,6 @@
       background-color: rgba(255, 255, 255, 0.95);
       border: 1px solid transparent;
       box-shadow: 0 2px 5px -5px #000;
-      -webkit-transition: all 400ms ease;
       transition: all 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
       padding: 50px 0 10px 0;
@@ -521,6 +518,9 @@ directly on the iframe's bodybox contenteditable. */
   display: none !important; }
 
 .editor-format-text .editor-sep, .editor-format-text .icon-bold, .editor-format-text .icon-italic, .editor-format-text .icon-strikethrough, .editor-format-text .icon-list-ol, .editor-format-text .icon-list-ul, .editor-format-text .editor-dropdown-link, .editor-format-text .editor-action-headers, .editor-format-text .icon-align-left, .editor-format-text .icon-align-center, .editor-format-text .icon-align-right, .editor-format-text .editor-toggle-source, .editor-format-text .editor-toggle-fullpage-button, .editor-format-textex .editor-sep, .editor-format-textex .icon-bold, .editor-format-textex .icon-italic, .editor-format-textex .icon-strikethrough, .editor-format-textex .icon-list-ol, .editor-format-textex .icon-list-ul, .editor-format-textex .editor-dropdown-link, .editor-format-textex .editor-action-headers, .editor-format-textex .icon-align-left, .editor-format-textex .icon-align-center, .editor-format-textex .icon-align-right, .editor-format-textex .editor-toggle-source, .editor-format-textex .editor-toggle-fullpage-button {
+  display: none !important; }
+
+.editor-format-text .editor-dropdown-image, .editor-format-text .editor-dropdown-upload {
   display: none !important; }
 
 /**
@@ -853,7 +853,6 @@ pre.CodeBlock {
   padding: 20px;
   font-size: inherit;
   margin: 5px 0;
-  -webkit-transition: padding 0.1s ease;
   transition: padding 0.1s ease; }
 
 .AlignLeft {

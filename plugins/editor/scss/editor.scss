@@ -280,6 +280,11 @@ $emoji-width: 34px;
       transform: scale(0);
    }
 }
+.editor-dropdown-image .editor-file-image .image-input {
+   border-top :0;
+}
+
+
 /* If uploads disabled entirely, hide some options in the dropdown */
 .editor-uploads-disabled {
    .file-drop,
@@ -491,6 +496,13 @@ directly on the iframe's bodybox contenteditable. */
    .icon-align-right,
    .editor-toggle-source,
    .editor-toggle-fullpage-button {
+      display: none !important;
+   }
+}
+
+.editor-format-text {
+   .editor-dropdown-image,
+   .editor-dropdown-upload {
       display: none !important;
    }
 }

@@ -1804,16 +1804,16 @@ class ImportModel extends Gdn_Model {
 	 */
 	public function VerifyImport() {
 		// When was the latest discussion posted?
-		$LatestDiscussion = $this->SQL->Get('Discussion', 'DateInserted', 'desc', 1);
+      $LatestDiscussion = $this->SQL->Select('DateInserted', 'max', 'LatestDiscussion')->From('Discussion')->Get();
 		if ($LatestDiscussion->count()) {
 			$this->Stat(
 				'Last Discussion',
-				$LatestDiscussion->Value('DateInserted')
+				$LatestDiscussion->Value('LatestDiscussion')
 			);
 		} else {
 			$this->Stat(
 				'Last Discussion',
-				'None'
+				'-'
 			);
 		}
 
@@ -1824,16 +1824,16 @@ class ImportModel extends Gdn_Model {
 		);
 
 		// When was the latest comment posted?
-		$LatestComment = $this->SQL->Get('Comment', 'DateInserted', 'desc', 1);
+      $LatestComment = $this->SQL->Select('DateInserted', 'max', 'LatestComment')->From('Comment')->Get();
 		if ($LatestComment->count()) {
 			$this->Stat(
 				'Last Comment',
-				$LatestComment->Value('DateInserted')
+				$LatestComment->Value('LatestComment')
 			);
 		} else {
 			$this->Stat(
 				'Last Comment',
-				'None'
+				'-'
 			);
 		}
 

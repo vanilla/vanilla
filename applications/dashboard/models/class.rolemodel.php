@@ -12,10 +12,22 @@ class RoleModel extends Gdn_Model {
    public static $Roles = NULL;
 
    /**
+    * @var array A list of permissions that define an increasing ranking of permissions.
+    */
+   public $RankPermissions = array(
+      'Garden.Moderation.Manage',
+      'Garden.Community.Manage',
+      'Garden.Users.Add',
+      'Garden.Settings.Manage',
+      'Conversations.Moderation.Manage'
+   );
+
+   /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Role');
+      $this->FireEvent('Init');
    }
 
    public function ClearCache() {
@@ -75,16 +87,71 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Get all of the roles including their ranking permissions.
+    *
+    * @return Gdn_DataSet Returns all of the roles with the ranking permissions.
+    */
+   public function GetWithRankPermissions() {
+      $this->SQL
+         ->Select('r.*')
+         ->From('Role r')
+         ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null')
+         ->OrderBy('Sort', 'asc');
+
+      foreach ($this->RankPermissions as $Permission) {
+         $this->SQL->Select("`$Permission`", '', $Permission);
+      }
+
+      $Result = $this->SQL->Get();
+      return $Result;
+   }
+
+   /**
     * Returns an array of RoleID => RoleName pairs.
     *
     * @return array
     */
    public function GetArray() {
-      // $RoleData = $this->GetEditablePermissions();
-      $RoleData = $this->Get();
-      $RoleIDs = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'RoleID');
-      $RoleNames = ConsolidateArrayValuesByKey($RoleData->ResultArray(), 'Name');
-      return ArrayCombine($RoleIDs, $RoleNames);
+      $RoleData = $this->Get()->ResultArray();
+      $Result = array_column($RoleData, 'Name', 'RoleID');
+
+      return $Result;
+   }
+
+   /**
+    * Get the roles that the current user is allowed to assign to another user.
+    *
+    * @return array Returns an array in the format `[RoleID => 'Role Name']`.
+    */
+   public function GetAssignable() {
+      // Administrators can assign all roles.
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         return $this->GetArray();
+      }
+      // Users that can't edit other users can't assign any roles.
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
+         return array();
+      }
+
+      $Sql = Gdn::SQL();
+
+      $Sql->Select('r.RoleID, r.Name')
+         ->From('Role r')
+         ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
+
+      // Community managers can assign permissions they have,
+      // but other users can't assign any ranking permissions.
+      $CM = Gdn::Session()->CheckPermission('Garden.Community.Manage');
+      foreach ($this->RankPermissions as $Permission) {
+         if (!$CM || !Gdn::Session()->CheckPermission($Permission)) {
+            $Sql->Where("coalesce(`$Permission`, 0)", '0', FALSE, FALSE);
+         }
+      }
+
+      $Roles = $Sql->Get()->ResultArray();
+      $Roles = array_column($Roles, 'Name', 'RoleID');
+
+      return $Roles;
    }
 
    /**

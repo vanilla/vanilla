@@ -154,10 +154,6 @@ class Gdn_Form extends Gdn_Pluggable {
       TouchValue('class', $Attributes, '');
       $Attributes['class'] .= ' TextBox BodyBox';
 
-      $Attributes['format'] = htmlspecialchars($Attributes['format']);
-      $this->SetValue('Format', $Attributes['format']);
-
-      $IncludeFormat = true;
       $Result = '<div class="bodybox-wrap">';
 
       // BeforeBodyBox
@@ -170,8 +166,10 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $Result .= $this->TextBox($Column, $Attributes);
 
-      // Allow plugins to opt out of default Format field.
-      if ($IncludeFormat) {
+      // Allow plugins to opt out of Format field.
+      if ($Attributes['format']) {
+         $Attributes['format'] = htmlspecialchars($Attributes['format']);
+         $this->SetValue('Format', $Attributes['format']);
          $Result .= $this->Hidden('Format');
       }
 

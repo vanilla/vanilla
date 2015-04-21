@@ -135,7 +135,7 @@ class ProfileController extends Gdn_Controller {
       $this->ActivityModel->JoinComments($Activities);
       $this->SetData('Activities', $Activities);
       if (count($Activities) > 0) {
-         $LastActivity = $Activities[0];
+         $LastActivity = reset($Activities);
          $LastModifiedDate = Gdn_Format::ToTimestamp($this->User->DateUpdated);
          $LastActivityDate = Gdn_Format::ToTimestamp($LastActivity['DateInserted']);
          if ($LastModifiedDate < $LastActivityDate)

@@ -92,14 +92,14 @@ class InvitationModel extends Gdn_Model {
 
          // Make sure that the email does not already belong to an invitation in the application.
          $TestData = $this->GetWhere(array('Email' => $Email));
+         $DeleteID = false;
          if ($TestData->NumRows() > 0) {
             if (!$Resend) {
                $this->Validation->AddValidationResult('Email', 'An invitation has already been sent to the email you entered.');
                return false;
             } else {
-               // Remove the old invitation.
+               // Mark the old invitation for deletion.
                $DeleteID = val('InvitationID', $TestData->FirstRow(DATASET_TYPE_ARRAY));
-               $this->Delete($DeleteID);
             }
          }
 
@@ -108,6 +108,11 @@ class InvitationModel extends Gdn_Model {
 
          // Call the base model for saving
          $InvitationID = $this->Insert($Fields);
+
+         // Delete an old invitation.
+         if ($InvitationID && $DeleteID) {
+            $this->Delete($DeleteID);
+         }
 
          // Now that saving has succeeded, update the user's invitation settings
          if ($InviteCount > 0) {

@@ -593,7 +593,7 @@ class PostController extends VanillaController {
                if (in_array($this->DeliveryType(), array(DELIVERY_TYPE_ALL, DELIVERY_TYPE_DATA))) {
                   $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
                } else {
-                  $this->JsonTarget('', Url("/vanilla/post/comment2.json?commentid=$CommentID&inserted=$Inserted"), 'Ajax');
+                  $this->JsonTarget('', Url("/post/comment2.json?commentid=$CommentID&inserted=$Inserted"), 'Ajax');
                }
 
                // $Discussion = $this->DiscussionModel->GetID($DiscussionID);

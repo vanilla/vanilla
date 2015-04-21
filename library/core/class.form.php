@@ -157,15 +157,27 @@ class Gdn_Form extends Gdn_Pluggable {
       $Attributes['format'] = htmlspecialchars($Attributes['format']);
       $this->SetValue('Format', $Attributes['format']);
 
-      $Result = $this->TextBox($Column, $Attributes).$this->Hidden('Format');
+      $IncludeFormat = true;
+      $Result = '<div class="bodybox-wrap">';
 
+      // BeforeBodyBox
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
       $this->EventArguments['Column'] = $Column;
       $this->EventArguments['Attributes'] = $Attributes;
+      $this->EventArguments['IncludeFormat'] =& $IncludeFormat;
       $this->EventArguments['BodyBox'] =& $Result;
       $this->FireEvent('BeforeBodyBox');
 
-      return '<div class="bodybox-wrap">'.$Result.'</div>';
+      $Result .= $this->TextBox($Column, $Attributes);
+
+      // Allow plugins to opt out of default Format field.
+      if ($IncludeFormat) {
+         $Result .= $this->Hidden('Format');
+      }
+
+      $Result .= '</div>';
+
+      return $Result;
    }
 
    /**

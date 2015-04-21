@@ -302,11 +302,8 @@ BLOCKQUOTE;
 
    protected function FormatQuote($Type, $ID, &$QuoteData, $Format = FALSE) {
       // Temporarily disable Emoji parsing (prevent double-parsing to HTML)
-      $undoEmoji = false;
-      if (Emoji::instance()->enabled) {
-         $undoEmoji = true;
-         Emoji::instance()->enabled = false;
-      }
+      $emojiEnabled = Emoji::instance()->enabled;
+      Emoji::instance()->enabled = false;
 
       if (!$Format) {
          $Format = C('Garden.InputFormatter');
@@ -427,9 +424,7 @@ BLOCKQUOTE;
       }
 
       // Undo Emoji disable.
-      if ($undoEmoji) {
-         Emoji::instance()->enabled = true;
-      }
+      Emoji::instance()->enabled = $emojiEnabled;
    }
 
    public function Setup() {

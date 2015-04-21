@@ -1755,16 +1755,18 @@ class CategoryModel extends Gdn_Model {
       $Categories = Gdn::Cache()->Get(self::CACHE_KEY);
       self::$Categories = NULL;
 
-      if (!$Categories)
+      if (!$Categories) {
          return;
+      }
 
-      // Extract actual category list
+      // Extract actual category list, remove key if malformed
       if (!$ID || !is_array($Categories) || !array_key_exists('categories', $Categories)) {
          Gdn::Cache()->Remove(self::CACHE_KEY);
          return;
       }
       $Categories = $Categories['categories'];
 
+      // Check for category in list, otherwise remove key if not found
       if (!array_key_exists($ID, $Categories)) {
          Gdn::Cache()->Remove(self::CACHE_KEY);
          return;

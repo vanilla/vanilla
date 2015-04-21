@@ -149,29 +149,29 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function BodyBox($Column = 'Body', $Attributes = array()) {
       TouchValue('MultiLine', $Attributes, TRUE);
-      TouchValue('format', $Attributes, $this->GetValue('Format', Gdn_Format::DefaultFormat()));
       TouchValue('Wrap', $Attributes, TRUE);
       TouchValue('class', $Attributes, '');
       $Attributes['class'] .= ' TextBox BodyBox';
 
-      $Result = '<div class="bodybox-wrap">';
+      $this->SetValue('Format', val('Format', $Attributes, $this->GetValue('Format', Gdn_Format::DefaultFormat())));
+
+         $Result = '<div class="bodybox-wrap">';
 
       // BeforeBodyBox
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
       $this->EventArguments['Column'] = $Column;
       $this->EventArguments['Attributes'] = $Attributes;
-      $this->EventArguments['IncludeFormat'] =& $IncludeFormat;
       $this->EventArguments['BodyBox'] =& $Result;
       $this->FireEvent('BeforeBodyBox');
 
-      $Result .= $this->TextBox($Column, $Attributes);
-
-      // Allow plugins to opt out of Format field.
-      if ($Attributes['format']) {
-         $Attributes['format'] = htmlspecialchars($Attributes['format']);
+      // Only add the format if it was set on the form. This allows plugins to remove the format.
+      if ($format = $this->GetValue('Format')) {
+         $Attributes['format'] = htmlspecialchars($format);
          $this->SetValue('Format', $Attributes['format']);
          $Result .= $this->Hidden('Format');
       }
+
+      $Result .= $this->TextBox($Column, $Attributes);
 
       $Result .= '</div>';
 

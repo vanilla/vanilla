@@ -12,12 +12,11 @@ if ($Session->IsValid() && CheckPermission('Garden.Profiles.Edit')) {
    echo $this->Form->Open(array('action' => Url("/activity/post/{$this->User->UserID}?Target=".urlencode(UserUrl($this->User))), 'class' => 'Activity'));
    echo $this->Form->Errors();
    echo Wrap($this->Form->BodyBox('Comment'), 'div', array('class' => 'TextBoxWrapper'));
-   echo '<div class="Buttons">';
+   echo '<div class="Buttons self-clearing">';
    echo $this->Form->Button($ButtonText, array('class' => 'Button Primary button self-clearing'));
    echo '</div>';
    echo $this->Form->Close();
-   echo '</div>';
-   echo '<div class="self-clearing"></div>';
+   echo '</div><div class="self-clearing"></div>';
 }
 
 // Include the activities

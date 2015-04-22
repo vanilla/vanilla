@@ -15,7 +15,7 @@ if ($Session->CheckPermission('Garden.Profiles.Edit')) {
    echo Wrap($this->Form->TextBox('Comment', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    
    echo '<div class="Buttons">';
-   echo $this->Form->Button('Share', array('class' => 'Button Primary'));
+   echo $this->Form->Button('Share', array('class' => 'button Button Primary'));
    echo '</div>';
    
    echo $this->Form->Close();

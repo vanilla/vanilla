@@ -1048,10 +1048,10 @@ class Gdn_Format {
 
          self::LinksCallback(NULL);
 
-         $Mixed = preg_replace_callback(
+         $Mixed = Gdn_Format::ReplaceButProtectCodeBlocks(
             $Regex,
          array('Gdn_Format', 'LinksCallback'),
-         $Mixed);
+         $Mixed, TRUE);
 
          Gdn::PluginManager()->FireAs('Format')->FireEvent('Links', array(
             'Mixed' => &$Mixed
@@ -1401,7 +1401,7 @@ EOT;
 
             // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
             $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
-            $Mixed = preg_replace(
+            $Mixed = Gdn_Format::ReplaceButProtectCodeBlocks(
                '/(^|[\s,\.>\)])@('.$Pattern.'{1,64})\b/i', //{3,20}
                '\1'.Anchor('@$2', $urlFormat),
                $Mixed
@@ -1410,7 +1410,7 @@ EOT;
 
          // Handle #hashtag searches
 			if(C('Garden.Format.Hashtags')) {
-				$Mixed = preg_replace(
+				$Mixed = Gdn_Format::ReplaceButProtectCodeBlocks(
 					'/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
 					'\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
 					$Mixed
@@ -1419,7 +1419,7 @@ EOT;
 
 			// Handle "/me does x" action statements
          if(C('Garden.Format.MeActions')) {
-            $Mixed = preg_replace(
+            $Mixed = Gdn_Format::ReplaceButProtectCodeBlocks(
                '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                '\1'.Wrap(Wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),
                $Mixed
@@ -1428,6 +1428,52 @@ EOT;
 
          return $Mixed;
       }
+   }
+
+   /** Do a preg_replace, but don't affect things inside <code> tags.
+    * The three parameters are identical to the ones you'd pass
+    * preg_replace.
+    *
+    * @param mixed $Pattern
+    * @param mixed $Replacement
+    * @param mixed $Subject
+    * @param bool $IsCallback If true, do preg_replace_callback. Do
+    *             preg_replace otherwise.
+    * @return string
+    */
+   public static function ReplaceButProtectCodeBlocks($Pattern, $Replacement, $Subject, $IsCallback = FALSE) {
+     // Take the code blocks out, replace with something unlikely to
+     // appear in the string, and keep track of what substring got
+     // replaced with what code.
+     $Replacements = array();
+     $Subject = preg_replace_callback(
+       '/<code>.*?<\/code>/i',
+       function($Matches) use (&$Replacements) {
+         // Random string and replacement index, surrounded by
+         // whitespace to try to prevent the characters from being
+         // picked up by $Pattern.
+         $ReplacementString = ' 5z9Ah9Y2sX5xnzUx8wSq'.count($Replacements).' ';
+         $Replacements[$ReplacementString] = $Matches[0];
+         return $ReplacementString;
+       },
+       $Subject
+     );
+
+
+     // Do the requested replacement.
+     if ($IsCallback) {
+       $Subject = preg_replace_callback($Pattern, $Replacement, $Subject);
+     } else {
+       $Subject = preg_replace($Pattern, $Replacement, $Subject);
+     }
+
+     // Put back the code blocks. First in, last out so that e.g.
+     // random10 is not replaced by random1.
+     foreach (array_reverse($Replacements) as $Placeholder => $Original) {
+       $Subject = str_replace($Placeholder, $Original, $Subject);
+     }
+
+     return $Subject;
    }
 
    /** Return the input without any operations performed at all.

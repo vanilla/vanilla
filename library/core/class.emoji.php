@@ -603,7 +603,7 @@ class Emoji {
          $emojiFilePath  = $this->getEmojiPath($emojiCanonical);
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
-				$Text = preg_replace(
+				$Text = Gdn_Format::ReplaceButProtectCodeBlocks(
                '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                $this->img($emojiFilePath, $emojiAlias),
 					$Text
@@ -616,7 +616,7 @@ class Emoji {
       $rdelim = preg_quote($this->rdelim, '`');
       $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
+      $Text = Gdn_Format::ReplaceButProtectCodeBlocks("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
          $emoji_path = $emoji->getEmojiPath($emoji_name);
          if ($emoji_path) {
@@ -624,7 +624,7 @@ class Emoji {
          } else {
             return $m[0];
          }
-      }, $Text);
+      }, $Text, TRUE);
 
 		return substr($Text, 1, -1);
 	}

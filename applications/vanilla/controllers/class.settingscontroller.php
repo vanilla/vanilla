@@ -56,7 +56,9 @@ class SettingsController extends Gdn_Controller {
          'Garden.EditContentTimeout',
          'Vanilla.AdminCheckboxes.Use',
          'Vanilla.Discussions.SortField' => 'd.DateLastComment',
-         'Vanilla.Discussions.UserSortField'
+         'Vanilla.Discussions.UserSortField',
+         'Vanilla.Comment.MaxLength',
+         'Vanilla.Comment.MinLength'
       ));
 
       // Set the model on the form.
@@ -75,6 +77,8 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
          $ConfigurationModel->Validation->ApplyRule('Garden.EditContentTimeout', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Integer');
 
          // Grab old config values to check for an update.
          $ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
@@ -190,9 +194,7 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Discussion.SpamLock',
          'Vanilla.Comment.SpamCount',
          'Vanilla.Comment.SpamTime',
-         'Vanilla.Comment.SpamLock',
-         'Vanilla.Comment.MaxLength',
-         'Vanilla.Comment.MinLength'
+         'Vanilla.Comment.SpamLock'
       );
       if ($IsConversationsEnabled) {
          $ConfigurationFields = array_merge(
@@ -234,8 +236,7 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamTime', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Integer');
+
 
          if ($IsConversationsEnabled) {
 

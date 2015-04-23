@@ -28,7 +28,7 @@
 							</div>
 
 						</div><div class="clearfloat"></div>
-						<div class="Column ContentColumn page_content" id="Content">{asset name="Content"}</div>
+						<div class="Column ContentColumn page_content self-clearing" id="Content">{asset name="Content"}</div>
 
 						{literal}
 						<script>

@@ -55,7 +55,7 @@ function ConnectButton($Row) {
 
    $Result = '<span class="ActivateSlider ActivateSlider-'.$CssClass.'">';
    if ($Connected) {
-      $Result .= Anchor(T('Connected'), $DisconnectUrl, 'Button Primary Hijack');
+      $Result .= Anchor(T('Connected'), $DisconnectUrl, 'button Button Primary Hijack');
    } else {
       $Result .= Anchor(T('Connect'), $ConnectUrl, 'Button');
    }

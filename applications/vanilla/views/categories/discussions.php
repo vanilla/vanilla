@@ -13,7 +13,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       if ($this->DiscussionData->NumRows() > 0) : ?>
       
    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">      
-      <h2 class="H"><?php
+      <h2 class="H self-clearing"><?php
             echo Anchor(htmlspecialchars($Category->Name), CategoryUrl($Category));
             Gdn::Controller()->EventArguments['Category'] = $Category;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 

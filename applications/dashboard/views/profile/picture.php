@@ -27,9 +27,9 @@ if ($Thumbnail && !IsUrl($Thumbnail))
 $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
 ?>
 <div class="SmallPopup">
-<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H self-clearing"><?php echo $this->Data('Title'); ?></h2>
 <?php
-echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->Open(array('enctype' => 'multipart/form-data','class' => 'ten columns'));
 echo $this->Form->Errors();
 ?>
 <ul>
@@ -39,20 +39,28 @@ echo $this->Form->Errors();
          <thead>
             <tr>
                <td><?php echo T('Picture'); ?></td>
-               <td><?php echo T('Thumbnail'); ?></td>
+               <td ><?php echo T('Thumbnail'); ?></td>
             </tr>
          </thead>
          <tbody>
             <tr>
                <td><?php
                echo $Picture;
-               if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-                  echo Wrap(Anchor(T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), 'Button Danger PopConfirm'), 'p');
                ?>
                </td>
                <td><?php
                echo $Thumbnail;
-               echo Wrap(Anchor(T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Button'), 'p');
+               ?>
+               </td>
+            </tr>
+            <tr>
+               <td><?php
+               if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
+                  echo Wrap(Anchor(T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), 'button secondary Button Danger PopConfirm'), 'p');
+               ?>
+               </td>
+               <td><?php
+               echo Wrap(Anchor(T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'button secondary Button'), 'p');
                }
                ?>
                </td>
@@ -67,5 +75,5 @@ echo $this->Form->Errors();
    </li>
 </ul>
 <div class="Warning"><?php echo T('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
-<?php echo $this->Form->Close('Upload', '', array('class' => 'Button Primary')); ?>
+<?php echo $this->Form->Close('Upload', '', array('class' => 'button Button Primary')); ?>
 </div>

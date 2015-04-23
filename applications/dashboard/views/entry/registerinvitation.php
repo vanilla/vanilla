@@ -53,7 +53,7 @@
          ?>
       </li>
       <li class="Buttons">
-         <?php echo $this->Form->Button('Sign Up', array('class' => 'Button Primary')); ?>
+         <?php echo $this->Form->Button('Sign Up', array('class' => 'button Button Primary')); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

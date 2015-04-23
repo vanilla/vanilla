@@ -1,11 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H self-clearing"><?php echo $this->Data('Title'); ?></h2>
 <?php
-echo $this->Form->Open();
+echo $this->Form->Open(array('class' => 'ten columns'));
 echo $this->Form->Errors();
 ?>
-
-<ul>
+<ul class="self-clearing">
    <li class="Gender User-Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');
@@ -34,5 +33,5 @@ echo $this->Form->Errors();
    <?php
       $this->FireEvent('EditMyAccountAfter');
    ?>
-</ul>
-<?php echo $this->Form->Close('Save', '', array('class' => 'button Button Primary'));
+</ul><br>
+<?php echo $this->Form->Close('Save', '', array('class' => 'button Button Primary self-clearing'));

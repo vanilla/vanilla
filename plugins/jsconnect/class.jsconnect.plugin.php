@@ -77,7 +77,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">';
 
          if (!GetValue('IsDefault', $Provider))
-            $Result .= '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>';
+            $Result .= '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'button Button Primary SignInLink').$RegisterLink.'</div>';
 
          $Result .=
             '<div class="JsConnect-Connect"><a class="ConnectLink">'.Img('https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
@@ -87,7 +87,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Result .= '</div>';
       } else {
          if (!GetValue('IsDefault', $Provider))
-            $Result = '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>';
+            $Result = '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'button Button Primary SignInLink').$RegisterLink.'</div>';
       }
 
       return $Result;

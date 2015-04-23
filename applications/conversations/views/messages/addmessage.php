@@ -4,7 +4,7 @@ $this->EventArguments['FormCssClass'] = 'MessageForm CommentForm';
 $this->FireEvent('BeforeMessageForm');
 ?>
 <div id="MessageForm" class="<?php echo $this->EventArguments['FormCssClass']; ?>">
-   <h2 class="H"><?php echo T("Add a Message"); ?></h2>
+   <h2 class="H self-clearing"><?php echo T("Add a Message"); ?></h2>
    <div class="MessageFormWrap">
       <div class="Form-HeaderWrap">
          <div class="Form-Header">

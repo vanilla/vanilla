@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <style>
    table.PreferenceGroup {
-      width: 500px;
+
    }
    thead td {
       vertical-align: bottom;
@@ -24,8 +24,8 @@
       width: 486px;
    }
 </style>
-<h2 class="H"><?php echo $this->Data('Title');  ?></h2>
-<div class="Preferences">
+<h2 class="H self-clearing"><?php echo $this->Data('Title');  ?></h2>
+<div class="Preferences ten columns">
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -99,7 +99,7 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
 <?php
 }
 $this->FireEvent('CustomNotificationPreferneces');
-echo $this->Form->Close('Save Preferences', '', array('class' => 'Button Primary'));
+echo $this->Form->Close('Save Preferences', '', array('class' => 'button Button Primary'));
 $this->FireEvent("AfterPreferencesRender");
 ?>
 </div>

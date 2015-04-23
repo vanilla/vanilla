@@ -278,7 +278,7 @@ class UserController extends DashboardController {
 
       // Check the password.
       $PasswordHash = new Gdn_PasswordHash();
-      $Password = $this->Form->GetFormValue('Password');
+      $Password = GetValue('password', $Args);
       try {
          $PasswordChecked = $PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User));
 

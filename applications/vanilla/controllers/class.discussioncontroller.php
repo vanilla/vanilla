@@ -198,7 +198,7 @@ class DiscussionController extends VanillaController {
 
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');
-      $this->Form->Action = Url('/vanilla/post/comment/');
+      $this->Form->Action = Url('/post/comment/');
       $this->DiscussionID = $this->Discussion->DiscussionID;
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
@@ -859,7 +859,7 @@ body { background: transparent !important; }
 
       // Define the form for the comment input
       $this->Form = Gdn::Factory('Form', 'Comment');
-      $this->Form->Action = Url('/vanilla/post/comment/');
+      $this->Form->Action = Url('/post/comment/');
       $this->Form->AddHidden('CommentID', '');
       $this->Form->AddHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).
       $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
@@ -877,7 +877,7 @@ body { background: transparent !important; }
       foreach ($ForeignSource as $Key => $Val) {
          // Drop the foreign source information into the form so it can be used if creating a discussion
          $this->Form->AddHidden($Key, $Val);
-         
+
          // Also drop it into the definitions so it can be picked up for stashing comments
          $this->AddDefinition($Key, $Val);
       }

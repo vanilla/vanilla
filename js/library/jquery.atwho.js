@@ -448,6 +448,8 @@
         var _ref;
         switch (e.keyCode) {
           case KEY_CODE.ESC:
+          case KEY_CODE.TAB:
+          case KEY_CODE.ENTER:
             e.preventDefault();
             if ((_ref = this.controller()) != null) {
               _ref.view.hide();

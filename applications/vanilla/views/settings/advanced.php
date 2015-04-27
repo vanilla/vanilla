@@ -59,8 +59,8 @@ echo $this->Form->Errors();
    <li>
       <?php
          $Options = array('0' => T('Authors may never edit'),
-                        '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')), 
-                        '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')), 
+                        '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')),
+                        '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')),
                        '3600' => sprintf(T('Authors may edit for %s'), T('1 hour')),
                       '14400' => sprintf(T('Authors may edit for %s'), T('4 hours')),
                       '86400' => sprintf(T('Authors may edit for %s'), T('1 day')),
@@ -75,7 +75,7 @@ echo $this->Form->Errors();
    </li>
 <!--   <li>
       <?php
-         $Options2 = array('0' => T('Never - Users Must Refresh Page'), 
+         $Options2 = array('0' => T('Never - Users Must Refresh Page'),
                            '5' => T('Every 5 seconds'),
                           '10' => T('Every 10 seconds'),
                           '30' => T('Every 30 seconds'),
@@ -106,8 +106,6 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
-<<<<<<< HEAD
-=======
 <ul>
    <li>
       <div class="Info"><?php echo T("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
@@ -124,5 +122,4 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
->>>>>>> master
 <?php echo $this->Form->Close('Save');

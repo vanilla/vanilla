@@ -1226,18 +1226,19 @@ jQuery(document).ready(function($) {
       var width = $preview.width(), height = $preview.height(), videoid = '';
 
       try {
-         videoid = $container.attr('id').replace('youtube-', '');
+         videoid = $container.attr('data-youtube').replace('youtube-', '');
       } catch (e) {
-         console.log("YouTube parser found invalid id attribute.");
+         console.log("YouTube parser found invalid id attribute: "+videoid);
       }
 
+
       // Verify we have a valid videoid
-      var pattern = /^[a-zA-Z0-9_-]+$/;
+      var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?$/;
       if (videoid.match(pattern) == null) {
          return false;
       }
 
-      var html = '<iframe width="'+width+'" height="'+height+'" src="//www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+      var html = '<iframe width="'+width+'" height="'+height+'" src="//www.youtube.com/embed/'+videoid+'" frameborder="0" allowfullscreen></iframe>';
       $player.html(html);
 
       $preview.hide();

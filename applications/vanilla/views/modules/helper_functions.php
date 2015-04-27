@@ -91,7 +91,7 @@ function WritePromotedContent($Content, $Sender) {
       <div class="Body">
       <?php
          echo Anchor(strip_tags(Gdn_Format::To(SliceString($Content['Body'], $Sender->BodyLimit), $Content['Format'])), $ContentURL, 'BodyLink');
-         $Sender->FireEvent('AfterBody'); // seperate event to account for less space.
+         $Sender->FireEvent('AfterPromotedBody'); // separate event to account for less space.
       ?>
       </div>
    </div>

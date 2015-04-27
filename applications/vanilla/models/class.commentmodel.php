@@ -46,7 +46,7 @@ class CommentModel extends VanillaModel {
     */
    public function __construct() {
       parent::__construct('Comment');
-      $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', true);
+      $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', false);
       $this->FireEvent('AfterConstruct');
    }
 
@@ -294,6 +294,9 @@ class CommentModel extends VanillaModel {
 
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID', 'UpdateUserID'));
 
+      $this->EventArguments['Comments'] =& $Data;
+      $this->FireEvent('AfterGet');
+
       return $Data;
    }
 
@@ -446,7 +449,7 @@ class CommentModel extends VanillaModel {
 
             if ($CountWatch < $Discussion->CountCommentWatch)
                $CountWatch = $Discussion->CountCommentWatch;
-               
+
             if (isset($Discussion->DateLastViewed))
                $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 

@@ -479,6 +479,45 @@ class ActivityModel extends Gdn_Model {
       return $Result;
    }
 
+
+   /**
+    * @param $activity
+    * @return bool
+    */
+   public static function canDelete($activity) {
+      $session = Gdn::Session();
+
+      $profileUserId = val('ActivityUserID', $activity);
+      $notifyUserId = val('NotifyUserID', $activity);
+
+      // User can delete any activity
+      if ($session->CheckPermission('Garden.Activity.Delete')) {
+         return true;
+      }
+
+      $notifyUserIds = array(ActivityModel::NOTIFY_PUBLIC);
+      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $notifyUserIds[] = ActivityModel::NOTIFY_MODS;
+      }
+
+      // Is this a wall post?
+      if (!in_array(val('ActivityType', $activity), array('Status', 'WallPost')) || !in_array($notifyUserId, $notifyUserIds)) {
+         return false;
+      }
+      // Is this on the user's wall?
+      if ($profileUserId && $session->UserID == $profileUserId && $session->CheckPermission('Garden.Profiles.Edit')) {
+         return true;
+      }
+
+      // The user inserted the activity --- may be added in later
+//      $insertUserId = val('InsertUserID', $activity);
+//      if ($insertUserId && $insertUserId == $session->UserID) {
+//         return true;
+//      }
+
+      return false;
+   }
+
    /**
     * Get notifications for a user since designated ActivityID.
     *
@@ -934,6 +973,11 @@ class ActivityModel extends Gdn_Model {
                   $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $_ActivityID));
                }
             }
+
+            // Send a notification to the original person.
+            if (val('ActivityType', $Activity) === 'WallPost') {
+               $this->NotifyWallComment($Comment, $Activity);
+            }
          }
 
          return $ID;
@@ -1366,6 +1410,30 @@ class ActivityModel extends Gdn_Model {
 //      decho($NewActivity, 'MergedActivity');
 //      die();
       return $NewActivity;
+   }
+
+   /**
+    * Notify the user of wall comments.
+    *
+    * @param $WallPost
+    */
+   protected function NotifyWallComment($Comment, $WallPost) {
+      $NotifyUser = Gdn::UserModel()->GetID($WallPost['ActivityUserID']);
+
+      $Activity = array(
+         'ActivityType' => 'WallComment',
+         'ActivityUserID' => $Comment['InsertUserID'],
+         'Format' => $Comment['Format'],
+         'NotifyUserID' => $WallPost['ActivityUserID'],
+         'RecordType' => 'ActivityComment',
+         'RecordID' => $Comment['ActivityCommentID'],
+         'RegardingUserID' => $WallPost['ActivityUserID'],
+         'Route' => UserUrl($NotifyUser, ''),
+         'Story' => $Comment['Body'],
+         'HeadlineFormat' => T('HeadlineFormat.NotifyWallComment', '{ActivityUserID,User} commented on your <a href="{Url,url}">wall</a>.')
+      );
+
+      $this->Save($Activity, 'WallComment');
    }
 
    protected function NotifyWallPost($WallPost) {

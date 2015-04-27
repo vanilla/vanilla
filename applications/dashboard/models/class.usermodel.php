@@ -775,6 +775,12 @@ class UserModel extends Gdn_Model {
     * @param array $Options Optionally pass list of user data to collect with key 'Join'.
     */
    public function JoinUsers(&$Data, $Columns, $Options = array()) {
+      if ($Data instanceof Gdn_DataSet) {
+         $Data2 = $Data->Result();
+      } else {
+         $Data2 =& $Data;
+      }
+
       // Grab all of the user fields that need to be joined.
       $UserIDs = array();
       foreach ($Data as $Row) {
@@ -798,7 +804,7 @@ class UserModel extends Gdn_Model {
       $Join = GetValue('Join', $Options, array('Name', 'Email', 'Photo'));
       $UserPhotoDefaultUrl = function_exists('UserPhotoDefaultUrl');
 
-      foreach ($Data as &$Row) {
+      foreach ($Data2 as &$Row) {
          foreach ($Prefixes as $Px) {
             $ID = GetValue($Px.'UserID', $Row);
             if (is_numeric($ID)) {
@@ -1098,8 +1104,9 @@ class UserModel extends Gdn_Model {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
 
          // We want to cache a non-existant user no-matter what.
-         if (!$User)
+         if (!$User) {
             $User = NULL;
+         }
 
          $this->UserCache($User, $ID);
       } elseif (!$User) {

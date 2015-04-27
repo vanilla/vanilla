@@ -876,11 +876,12 @@ class Gdn_Format {
             }
 
             // Allow the code tag to keep all enclosed HTML encoded.
-            $Mixed = preg_replace(
-               array('/<code([^>]*)>(.+?)<\/code>/sei'),
-               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
-               $Mixed
-            );
+            $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function($Matches) {
+               $Result = "<code{$Matches[1]}>".
+                  htmlspecialchars($Matches[2]).
+                  '</code>';
+               return $Result;
+            }, $Mixed);
 
             // Do HTML filtering before our special changes.
             $Result = $Formatter->Format($Mixed);
@@ -1029,13 +1030,18 @@ class Gdn_Format {
     * @return string
     */
    public static function Links($Mixed) {
-      if (!C('Garden.Format.Links', TRUE))
+      if (!C('Garden.Format.Links', TRUE)) {
             return $Mixed;
+      }
 
-      if (!is_string($Mixed))
+      if (!is_string($Mixed)) {
          return self::To($Mixed, 'Links');
-      else {
-         $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+      } else {
+         if (unicodeRegexSupport()) {
+            $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`iu";
+         } else {
+            $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         }
 
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
 //         echo '<pre>', print_r($Parts, TRUE), '</pre>';
@@ -1128,30 +1134,80 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
+      // Supported youtube embed urls:
+      //
+      // http://www.youtube.com/playlist?list=PL4CFF79651DB8159B
+      // https://www.youtube.com/playlist?list=PL4CFF79651DB8159B
+      // https://www.youtube.com/watch?v=sjm_gBpJ63k&list=PL4CFF79651DB8159B&index=1
+      // http://youtu.be/sjm_gBpJ63k
+      // https://www.youtube.com/watch?v=sjm_gBpJ63k
+      // http://YOUTU.BE/sjm_gBpJ63k?list=PL4CFF79651DB8159B
+      // http://youtu.be/GUbyhoU81sQ?t=1m8s
+      // https://m.youtube.com/watch?v=iAEKPcz9www
+      // https://youtube.com/watch?v=iAEKPcz9www
+      // https://www.youtube.com/watch?v=p5kcBxL7-qI
+      // https://www.youtube.com/watch?v=bG6b3V2MNxQ#t=33
+
+      $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]*)))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
-      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
+      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d-]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
       $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
       $HitboxUrlMatch = 'http://www.hitbox.tv/([\w\d]+)';
 
-      // Youtube
-      if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
-         || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches))
+      // YouTube
+      if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
          && C('Garden.Format.YouTube', true)
          && !C('Garden.Format.DisableUrlEmbeds')) {
-         $ID = $Matches['ID'];
-         $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
-         $Result = '<span class="VideoWrap">';
-            $Result .= '<span class="Video YouTube" id="youtube-'.$ID.'">';
-               $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$ID.'"><img src="//img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
-               $Result .= '<span class="VideoPlayer"></span>';
+
+         $videoId = val('videoId', $Matches);
+         $listId = val('listId', $Matches);
+
+         if (!empty($listId)) {
+            // Playlist.
+            if (empty($videoId)) {
+               // Playlist, no video.
+               $Result = <<<EOT
+   <iframe width="{$Width}" height="{$Height}" src="//www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
+EOT;
+            } else {
+               // Video in a playlist.
+               $Result = <<<EOT
+   <iframe width="{$Width}" height="{$Height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen></iframe>
+EOT;
+            }
+         }
+         else  {
+            // Regular ol' youtube video embed.
+            $minutes = val('minutes', $Matches);
+            $seconds = val('seconds', $Matches);
+            $fullUrl = $videoId.'?autoplay=1';
+            if (!empty($minutes)||!empty($seconds)) {
+               $time = $minutes*60+$seconds;
+               $fullUrl .= '&start='.$time;
+            }
+
+            // Jump to start time.
+            if ($start = val('start', $Matches)) {
+               $fullUrl .= '&start='.$start;
+               $start = '#t='.$start;
+            }
+
+            $Result = '<span class="VideoWrap">';
+            $Result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
+
+            $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$videoId.$start.'">';
+            $Result .= '<img src="//img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+            $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
+
+         }
          $Result .= '</span>';
+
 
       // Vimeo
       } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
@@ -1343,8 +1399,10 @@ EOT;
          if(C('Garden.Format.Mentions')) {
             $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
 
+            // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
+            $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
             $Mixed = preg_replace(
-               '/(^|[\s,\.>])@(\w{1,50})\b/i', //{3,20}
+               '/(^|[\s,\.>\)])@('.$Pattern.'{1,64})\b/i', //{3,20}
                '\1'.Anchor('@$2', $urlFormat),
                $Mixed
             );
@@ -1555,7 +1613,9 @@ EOT;
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (($TestTime = strtotime($DateTime)) !== FALSE) {
+      if ($DateTime === '0000-00-00 00:00:00') {
+         return false;
+      } elseif (($TestTime = strtotime($DateTime)) !== FALSE) {
          return $TestTime;
       } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];
@@ -1646,12 +1706,8 @@ EOT;
       $Mixed = strtr($Mixed, self::$_UrlTranslations);
       $Mixed = preg_replace('`[\']`', '', $Mixed);
 
-      // Test for Unicode PCRE support
-      // On non-UTF8 systems this will result in a blank string.
-      $UnicodeSupport = (preg_replace('`[\pP]`u', '', 'P') != '');
-
       // Convert punctuation, symbols, and spaces to hyphens
-      if ($UnicodeSupport) {
+      if (unicodeRegexSupport()) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
       } else {
          $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);

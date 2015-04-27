@@ -40,14 +40,22 @@ if (!function_exists('ValidateRegex')) {
 
 if (!function_exists('ValidateRequired')) {
    function ValidateRequired($Value, $Field = '') {
-      if (is_array($Value) === TRUE)
-         return count($Value) > 0 ? TRUE : FALSE;
+      if (is_array($Value) === TRUE) {
+         return count($Value) > 0;
+      }
 
-      if (is_string($Value))
+      if (is_string($Value)) {
+         // Empty strings should pass if the default value of the field is an empty string.
+         if ($Value === '' && val('Default', $Field, NULL) === '') {
+            return TRUE;
+         }
+
          return trim($Value) == '' ? FALSE : TRUE;
+      }
 
-      if (is_numeric($Value))
+      if (is_numeric($Value)) {
          return TRUE;
+      }
 
       return FALSE;
    }
@@ -150,9 +158,13 @@ if (!function_exists('ValidateUsernameRegex')) {
       static $ValidateUsernameRegex;
 
       if (is_null($ValidateUsernameRegex)) {
+         // Set our default ValidationRegex based on Unicode support.
+         // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
+         $DefaultPattern = (unicodeRegexSupport()) ? '\pN\pL\pM\pPc' : '\w';
+
          $ValidateUsernameRegex = sprintf("[%s]%s",
-            C("Garden.User.ValidationRegex","\d\w_"),
-            C("Garden.User.ValidationLength","{3,20}"));
+            C("Garden.User.ValidationRegex", $DefaultPattern),
+            C("Garden.User.ValidationLength", "{3,20}"));
       }
 
       return $ValidateUsernameRegex;

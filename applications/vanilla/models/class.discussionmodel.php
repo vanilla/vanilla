@@ -46,6 +46,42 @@ class DiscussionModel extends VanillaModel {
       parent::__construct('Discussion');
    }
 
+   /**
+    * Determines whether or not the current user can edit a discussion.
+    *
+    * @param object|array $discussion The discussion to examine.
+    * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
+    * @return bool Returns true if the user can edit or false otherwise.
+    */
+   public static function canEdit($discussion, &$timeLeft = 0) {
+      if (!($permissionCategoryID = val('PermissionCategoryID', $discussion))) {
+         $category = CategoryModel::Categories(val('CategoryID', $discussion));
+         $permissionCategoryID = val('PermissionCategoryID', $category);
+      }
+
+      // Users with global edit permission can edit.
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $permissionCategoryID)) {
+         return true;
+      }
+
+      // Non-mods can't edit if they aren't the author.
+      if (Gdn::Session()->UserID != val('InsertUserID', $discussion)) {
+         return false;
+      }
+
+      // Determine if we still have time to edit.
+      $timeInserted = strtotime(val('DateInserted', $discussion));
+      $editContentTimeout = C('Garden.EditContentTimeout', -1);
+
+      $canEdit = $editContentTimeout == -1 || $timeInserted + $editContentTimeout > time();
+
+      if ($canEdit && $editContentTimeout > 0) {
+         $timeLeft = $timeInserted + $editContentTimeout - time();
+      }
+
+      return $canEdit;
+   }
+
    public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
       $Result = array('Complete' => TRUE);
       switch ($Column) {
@@ -942,6 +978,9 @@ class DiscussionModel extends VanillaModel {
          $this->AddDenormalizedViews($Data);
       }
 
+      $this->EventArguments['Data'] =& $Data;
+      $this->FireEvent('AfterAddColumns');
+
       return $Data;
    }
 
@@ -1539,11 +1578,10 @@ class DiscussionModel extends VanillaModel {
             $Fields = $this->Validation->SchemaValidationFields();
 
             // Get DiscussionID if one was sent
-            $DiscussionID = intval(ArrayValue('DiscussionID', $Fields, 0));
+            $DiscussionID = intval(val('DiscussionID', $Fields, 0));
 
-            // Remove the primary key from the fields for saving
-            $Fields = RemoveKeyFromArray($Fields, 'DiscussionID');
-
+            // Remove the primary key from the fields for saving.
+            unset($Fields['DiscussionID']);
             $StoredCategoryID = FALSE;
 
             if ($DiscussionID > 0) {
@@ -1670,7 +1708,7 @@ class DiscussionModel extends VanillaModel {
                   $Activity['Story'] = $Story;
 
                // Notify all of the users that were mentioned in the discussion.
-               $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
+               $Usernames = GetMentions($DiscussionName.' '.$Story);
                $Usernames = array_unique($Usernames);
 
                // Use our generic Activity for events, not mentions

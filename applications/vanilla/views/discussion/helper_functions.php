@@ -41,7 +41,7 @@ function WriteBookmarkLink() {
    $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
    echo Anchor(
       $Title,
-      '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
+      '/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
       'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
       array('title' => $Title)
    );
@@ -189,26 +189,19 @@ function GetDiscussionOptions($Discussion = NULL) {
 		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
    $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion, GetValue('PermissionCategoryID', $Discussion));
 
-   // Determine if we still have time to edit
-   $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-	$CanEdit = $EditContentTimeout == -1 || strtotime($Discussion->DateInserted) + $EditContentTimeout > time();
-   $CanEdit = ($CanEdit && $Session->UserID == $Discussion->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID);
-
-	$TimeLeft = '';
-
-	if ($CanEdit && $EditContentTimeout > 0 && !$Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
-		$TimeLeft = strtotime($Discussion->DateInserted) + $EditContentTimeout - time();
-		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
-	}
-
 	// Build the $Options array based on current user's permission.
    // Can the user edit the discussion?
-   if ($CanEdit)
-      $Options['EditDiscussion'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/vanilla/post/editdiscussion/'.$Discussion->DiscussionID);
+   $CanEdit = DiscussionModel::canEdit($Discussion, $TimeLeft);
+   if ($CanEdit) {
+      if ($TimeLeft) {
+         $TimeLeft = ' ('.Gdn_Format::Seconds($TimeLeft).')';
+      }
+      $Options['EditDiscussion'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/post/editdiscussion/'.$Discussion->DiscussionID);
+   }
 
    // Can the user announce?
    if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-      $Options['AnnounceDiscussion'] = array('Label' => T('Announce'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'AnnounceDiscussion Popup');
+      $Options['AnnounceDiscussion'] = array('Label' => T('Announce'), 'Url' => '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'AnnounceDiscussion Popup');
 
    // Can the user sink?
    if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID)) {
@@ -320,12 +313,12 @@ function GetCommentOptions($Comment) {
 
 	// Can the user edit the comment?
 	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
-		$Options['EditComment'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
+		$Options['EditComment'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
 	$SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && C('Vanilla.Comments.AllowSelfDelete'));
    if ($SelfDeleting || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
+		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => '/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
 
    // DEPRECATED (as of 2.1)
    $Sender->EventArguments['Type'] = 'Comment';

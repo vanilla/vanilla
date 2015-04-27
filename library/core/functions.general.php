@@ -12,8 +12,6 @@
  * @since 2.0
  */
 
-include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
-
 if (!function_exists('AbsoluteSource')) {
    /**
     * Takes a source path (ie. an image src from an html page), and an
@@ -1521,11 +1519,9 @@ if (!function_exists('GetMentions')) {
          return $Formatter->GetMentions($String);
       }
 
-      $Mentions = array();
-
       // This one grabs mentions that start at the beginning of $String
       preg_match_all(
-         '/(?:^|[\s,\.>])@(\w{3,20})\b/i',
+         '/(?:^|[\s,\.>\)])@(\w{3,20})\b/i',
          $String,
          $Matches
       );
@@ -2770,8 +2766,6 @@ if (!function_exists('ReflectArgs')) {
     * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
     */
    function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
-      $Result = array();
-
       if (is_string($Callback) && !function_exists($Callback))
          throw new Exception("Function $Callback does not exist");
 
@@ -3359,6 +3353,17 @@ if (!function_exists('TrustedDomains')) {
       $Result[] = Gdn::Request()->Host();
 
       return array_unique($Result);
+   }
+}
+
+if (!function_exists('unicodeRegexSupport')) {
+   /**
+    * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.
+    *
+    * @return bool
+    */
+   function unicodeRegexSupport() {
+      return (preg_replace('`[\pP]`u', '', 'P') != '');
    }
 }
 

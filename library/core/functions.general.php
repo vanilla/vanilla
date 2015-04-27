@@ -440,7 +440,7 @@ if (!function_exists('Attribute')) {
             continue;
 
          if ($Val != '' && $Attribute != 'Standard') {
-            $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
+            $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"';
          }
       }
       return $Return;

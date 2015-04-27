@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
    'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -62,8 +62,14 @@ class OpenIDPlugin extends Gdn_Plugin {
 
       $OpenID = new LightOpenID();
 
-      if (isset($_GET['url']))
-         $OpenID->identity = $_GET['url'];
+      if ($url = Gdn::Request()->Get('url')) {
+         $scheme = parse_url($url, PHP_URL_SCHEME);
+         if (!in_array($scheme, array('http', 'https'))) {
+            throw new Gdn_UserException(sprintf(T('Invalid url scheme: %s.'), $scheme), 400);
+         }
+
+         $OpenID->identity = $url;
+      }
 
       $Url = Url('/entry/connect/openid', TRUE);
       $UrlParts = explode('?', $Url);

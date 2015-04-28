@@ -1605,6 +1605,10 @@ class UserModel extends Gdn_Model {
       if (array_key_exists('Gender', $FormPostValues))
          $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
 
+      if (array_key_exists('DateOfBirth', $FormPostValues) && $FormPostValues['DateOfBirth'] == '0-00-00') {
+         $FormPostValues['DateOfBirth'] = NULL;
+      }
+
       $UserID = GetValue('UserID', $FormPostValues);
       $User = array();
       $Insert = $UserID > 0 ? FALSE : TRUE;

@@ -545,6 +545,8 @@ class TaggingPlugin extends Gdn_Plugin {
 
    /**
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
+    *
+    * @param PostController $Sender
     */
    public function PostController_Render_Before($Sender) {
       $Sender->AddJsFile('jquery.tokeninput.js');
@@ -553,10 +555,34 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));
 
       // Make sure that detailed tag data is available to the form.
-      $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
       $TagModel = TagModel::instance();
-      $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
-      $Sender->SetData($Tags);
+
+      $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
+
+      if ($DiscussionID) {
+         $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
+         $Sender->SetData($Tags);
+      } elseif (!$Sender->Request->IsPostBack() && $tagString = $Sender->Request->Get('tags')) {
+         $tags = explodeTrim(',', $tagString);
+         $types = array_column(TagModel::instance()->defaultTypes(), 'key');
+
+         // Look up the tags by name.
+         $tagData = Gdn::SQL()->GetWhere(
+            'Tag',
+            array('Name' => $tags, 'Type' => $types)
+         )->ResultArray();
+
+         // Add any missing tags.
+         $tagNames = array_change_key_case(array_column($tagData, 'Name', 'Name'));
+         foreach ($tags as $tag) {
+            $tagKey = strtolower($tag);
+            if (!isset($tagNames[$tagKey])) {
+               $tagData[] = array('TagID' => $tag, 'Name' => $tagKey, 'FullName' => $tag, 'Type' => '');
+            }
+         }
+
+         $Sender->SetData('Tags', $tagData);
+      }
    }
 
    /**

@@ -3174,10 +3174,11 @@ class UserModel extends Gdn_Model {
 
       foreach ($Meta as $Name => $Value) {
          $Name = $Prefix.$Name;
-         if ($Value === NULL)
+         if ($Value === NULL || $Value == '') {
             $Deletes[] = $Name;
-         else
+         } else {
             Gdn::Database()->Query($Sql, array(':UserID' => $UserID, ':Name' => $Name, ':Value' => $Value, ':Value1' => $Value));
+         }
       }
       if (count($Deletes))
          Gdn::SQL()->WhereIn('Name', $Deletes)->Where('UserID',$UserID)->Delete('UserMeta');

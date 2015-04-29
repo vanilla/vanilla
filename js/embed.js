@@ -130,7 +130,7 @@ window.vanilla.initialize = function (host) {
 			window.scrollTo(0, iframe.offsetTop - 40 + (message[1] * 1));
 		} else if (message[0] == 'unembed') {
 			//document.location = 'http://' + host + window.location.hash.substr(1);
-			document.location = 'http://' + host + this.currentPath;
+			document.location = 'http://' + host + frame.currentPath;
 		}
 	};
 
@@ -388,6 +388,8 @@ window.vanilla.initialize = function (host) {
 		path = path.replace('/index.php?p=', ''); // 1
 		path = stripParam(path, 'remote='); // 2
 		path = stripParam(path, 'locale='); // 3
+
+		console.log (path);
 
 		this.currentPath = path;
 

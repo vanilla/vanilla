@@ -328,7 +328,7 @@ window.vanilla.initialize = function (host) {
          +'&locale=' +encodeURIComponent(embed_locale);
       }
 
-      if (window.vanilla_sso) {
+      if (this.getSetting ('sso')) {
          result += '&sso='+encodeURIComponent(this.getSetting ('sso'));
       }
 
@@ -454,6 +454,10 @@ window.vanilla.initialize = function (host) {
          'path' : path,
          'update_path' : true
       };
+
+	  if (typeof (window.vanilla_sso) != 'undefined') {
+		  options.sso = window.vanilla_sso;
+	  }
 
       window.vanilla.embed (container, options);
    }

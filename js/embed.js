@@ -319,6 +319,13 @@ window.vanilla.initialize = function (host) {
 				result += '&title=' + encodeURIComponent(this.getSetting('title'));
 		}
 
+		else if (this.getSetting('category_id')) {
+			result = '//' + host + '/categories/' + this.getSetting('category_id')
+			+ '&embed=' + this.id
+			+ '&remote=' + encodeURIComponent(embedUrl)
+			+ '&vanilla_discussion_id= ' + this.getSetting('category_id');
+		}
+
 		else {
 			result = '//' + host + path
 			+ '&embed=' + this.id
@@ -332,9 +339,6 @@ window.vanilla.initialize = function (host) {
 		if (this.getSetting('sso')) {
 			result += '&sso=' + encodeURIComponent(this.getSetting('sso'));
 		}
-
-		if (this.getSetting('category_id'))
-			result += '&vanilla_category_id=' + encodeURIComponent(this.getSetting('category_id'));
 
 		return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
 	};

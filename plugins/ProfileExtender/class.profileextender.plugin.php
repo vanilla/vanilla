@@ -325,7 +325,20 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          $Sender->SetData('Title', T('Edit Profile Field'));
       }
 
-      $Sender->SetData('FormTypes', $this->FormTypes);
+      $CurrentFields = $this->GetProfileFields();
+      $FormTypes = $this->FormTypes;
+
+      /**
+       * We only allow one DateOfBirth field, since it is a special case.  Remove it as an option if we already
+       * have one, unless we're editing the one instance we're allowing.
+       */
+      if (array_key_exists('DateOfBirth', $CurrentFields) && $Sender->Form->GetValue('FormType') != 'DateOfBirth') {
+         unset($FormTypes['DateOfBirth']);
+      }
+
+      $Sender->SetData('FormTypes', $FormTypes);
+      $Sender->SetData('CurrentFields', $CurrentFields);
+
       $Sender->Render('addedit', '', 'plugins/ProfileExtender');
    }
 

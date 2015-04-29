@@ -389,8 +389,6 @@ window.vanilla.initialize = function (host) {
 		path = stripParam(path, 'remote='); // 2
 		path = stripParam(path, 'locale='); // 3
 
-		console.log (path);
-
 		this.currentPath = path;
 
 		if (this.getSetting('update_path', true)) {

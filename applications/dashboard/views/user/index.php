@@ -22,6 +22,9 @@ $ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
       echo '<div>';
       echo $this->Form->TextBox('Keywords');
       echo ' ', $this->Form->Button(T('Go'));
+      if ($this->Data('RecordCount', NULL) !== NULL) {
+         echo ' ', sprintf(T('%s user(s) found.'), $this->Data('RecordCount'));
+      }
       echo '</div>';
 
    ?>

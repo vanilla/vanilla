@@ -18,7 +18,7 @@ class UserController extends DashboardController {
     *
     * @var int Returns the number of users we need before optimizing.
     */
-   public $UserThreshold = 2500;
+   public $UserThreshold = 10000;
 
    /**
     * @var Gdn_Form
@@ -111,7 +111,11 @@ class UserController extends DashboardController {
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       $this->SetData('Users', $this->UserData);
-      $this->SetData('_CurrentRecords', $this->UserData->count());
+      if ($this->PastUserThreshold()) {
+         $this->SetData('_CurrentRecords', $this->UserData->count());
+      } else {
+         $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
+      }
 
       RoleModel::SetUserRoles($this->UserData->Result());
 

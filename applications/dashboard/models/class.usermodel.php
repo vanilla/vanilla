@@ -2081,17 +2081,20 @@ class UserModel extends Gdn_Model {
       return $Data;
    }
 
-   public function SearchCount($Keywords = FALSE) {
+   public function SearchCount($Filter = FALSE) {
       if (C('Garden.Registration.Method') == 'Approval')
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
       else
          $ApplicantRoleID = 0;
 
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
+      if (is_array($Filter)) {
+         $Where = $Filter;
          $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
+         unset($Where['Keywords'], $Where['Optimize']);
+      } else {
+         $Keywords = $Filter;
       }
+      $Keywords = trim($Keywords);
 
       // Check to see if the search exactly matches a role name.
       $RoleID = FALSE;

@@ -830,13 +830,14 @@ class Gdn_Request {
     * - //: Include the domain name, but use the // schemeless notation.
     * - /: Just return the path.
     * @param bool $SSL set to true to implement SSL
+    * @param bool $IncludeGlobalParameters set to false to not include global parameters (like embed=1 etc)
     * @return string
     *
     * @changes
     *    2.1   Added the // option to $WithDomain.
     *    2.2   Added the / option to $WithDomain.
     */
-   public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
+   public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL, $IncludeGlobalParameters = true) {
       static $AllowSSL = NULL; if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
       static $RewriteUrls = NULL; if ($RewriteUrls === NULL) $RewriteUrls = C('Garden.RewriteUrls', FALSE);
 
@@ -924,16 +925,18 @@ class Gdn_Request {
          }
       }
 
-      // Is embed?
-      // @TODO should this be placed here?
-      if (IsEmbed ()) {
-         if (!empty ($Query)) {
-            $Query .= '&embed=' . (isset ($_GET['embed']) ? $_GET['embed'] : 1);
-         }
-         else {
-            $Query = '?embed=' . (isset ($_GET['embed']) ? $_GET['embed'] : 1);
-         }
-      }
+	   if ($IncludeGlobalParameters) {
+
+		   // Is embed?
+		   // @TODO should this be placed here?
+		   if (IsEmbed ()) {
+			   if (!empty ($Query)) {
+				   $Query .= '&embed=' . (isset ($_GET['embed']) ? $_GET['embed'] : 1);
+			   } else {
+				   $Query = '?embed=' . (isset ($_GET['embed']) ? $_GET['embed'] : 1);
+			   }
+		   }
+	   }
 
       if (isset($Query))
          $Result .= $Query;

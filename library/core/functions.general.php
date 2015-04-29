@@ -3394,7 +3394,7 @@ if (!function_exists('unicodeRegexSupport')) {
 // Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
 if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
-      $Result = Gdn::Request()->Url($Path, $WithDomain);
+      $Result = Gdn::Request()->Url($Path, $WithDomain, null, false);
       return $Result;
    }
 }

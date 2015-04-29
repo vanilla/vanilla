@@ -302,8 +302,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $CategoryID = GetValueR('Fields.CategoryID', $Sender->EventArguments, 0);
 //      $IsInsert = GetValue('Insert', $Sender->EventArguments);
       $RawFormTags = GetValue('Tags', $FormPostValues, '');
-      $FormTags = trim(strtolower($RawFormTags));
-      $FormTags = TagModel::SplitTags($FormTags);
+      $FormTags = TagModel::SplitTags($RawFormTags);
 
       // If we're associating with categories
       $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);

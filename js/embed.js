@@ -322,7 +322,7 @@ window.vanilla.initialize = function (host) {
          result = '//' +host +path
          +'&embed=' + this.id
          +'&remote=' +encodeURIComponent(embedUrl)
-         +'&locale=' +encodeURIComponent(embed_locale);
+         +'&locale=' +encodeURIComponent(this.getSetting ('embed_locale'));
       }
 
       if (this.getSetting ('sso')) {

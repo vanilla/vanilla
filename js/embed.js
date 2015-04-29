@@ -129,7 +129,8 @@ window.vanilla.initialize = function (host) {
 		} else if (message[0] == 'scrollto') {
 			window.scrollTo(0, iframe.offsetTop - 40 + (message[1] * 1));
 		} else if (message[0] == 'unembed') {
-			document.location = 'http://' + host + window.location.hash.substr(1);
+			//document.location = 'http://' + host + window.location.hash.substr(1);
+			document.location = 'http://' + host + this.currentPath;
 		}
 	};
 
@@ -195,6 +196,7 @@ window.vanilla.initialize = function (host) {
 		this.container = container;
 		this.id = Math.floor(Math.random() * 100000);
 		this.settings = settings || {};
+		this.currentPath = null;
 
 		this.register();
 		this.initialize();
@@ -313,9 +315,6 @@ window.vanilla.initialize = function (host) {
 			if (this.getSetting('discussion_id'))
 				result += '&vanilla_discussion_id=' + encodeURIComponent(this.getSetting('discussion_id'));
 
-			if (this.getSetting('category_id'))
-				result += '&vanilla_category_id=' + encodeURIComponent(this.getSetting('category_id'));
-
 			if (this.getSetting('title'))
 				result += '&title=' + encodeURIComponent(this.getSetting('title'));
 		}
@@ -333,6 +332,9 @@ window.vanilla.initialize = function (host) {
 		if (this.getSetting('sso')) {
 			result += '&sso=' + encodeURIComponent(this.getSetting('sso'));
 		}
+
+		if (this.getSetting('category_id'))
+			result += '&vanilla_category_id=' + encodeURIComponent(this.getSetting('category_id'));
 
 		return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
 	};
@@ -374,7 +376,6 @@ window.vanilla.initialize = function (host) {
 
 	VanillaFrame.prototype.updatePath = function (path) {
 
-
 		if (path != '') {
 			this.iframe.style.visibility = "visible";
 		}
@@ -383,14 +384,17 @@ window.vanilla.initialize = function (host) {
 			//currentPath = cmd[1];
 		}
 
-		else if (this.getSetting('update_path', true)) {
+		// Strip off the values that this script added
+		path = path.replace('/index.php?p=', ''); // 1
+		path = stripParam(path, 'remote='); // 2
+		path = stripParam(path, 'locale='); // 3
+
+		this.currentPath = path;
+
+		if (this.getSetting('update_path', true)) {
 			var currentPath = window.location.hash.substr(1);
 			if (currentPath != path) {
 				currentPath = path;
-				// Strip off the values that this script added
-				currentPath = currentPath.replace('/index.php?p=', ''); // 1
-				currentPath = stripParam(currentPath, 'remote='); // 2
-				currentPath = stripParam(currentPath, 'locale='); // 3
 				window.location.hash = this.getSetting('base_path', '') + currentPath;
 			}
 		}

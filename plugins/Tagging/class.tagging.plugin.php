@@ -365,7 +365,7 @@ class TaggingPlugin extends Gdn_Plugin {
          ->Where('DiscussionID',$DiscussionID)
          ->Get()->ResultArray();
 
-      $RemovedTagIDs = ConsolidateArrayValuesByKey($TagDataSet, 'TagID');
+      $RemovedTagIDs = array_column($TagDataSet, 'TagID');
 
       // Check if there are even any tags to delete
       if (count($RemovedTagIDs) > 0) {
@@ -456,7 +456,7 @@ class TaggingPlugin extends Gdn_Plugin {
          ->WhereIn('Name', $Tags)
          ->Get()->ResultArray();
 
-      $TagIDs = ConsolidateArrayValuesByKey($TagIDs, 'TagID');
+      $TagIDs = array_column($TagIDs, 'TagID');
 
       if ($Op == 'and' && count($Tags) > 1) {
          $DiscussionIDs = $TagSql
@@ -472,7 +472,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Limit = '';
          $Offset = 0;
 
-         $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+         $DiscussionIDs = array_column($DiscussionIDs, 'DiscussionID');
 
          $Sql->WhereIn('d.DiscussionID', $DiscussionIDs);
          $SortField = 'd.DiscussionID';
@@ -511,14 +511,14 @@ class TaggingPlugin extends Gdn_Plugin {
          if ($Sender->Request->IsPostBack()) {
             $tag_ids = TagModel::SplitTags($Sender->Form->GetFormValue('Tags'));
             $tags = TagModel::instance()->GetWhere(array('TagID' => $tag_ids))->ResultArray();
-            $tags = ConsolidateArrayValuesByKey($tags, 'FullName', 'TagID');
+            $tags = array_column($tags, 'TagID', 'FullName');
          } else {
             // The tags should be set on the data.
-            $tags = ConsolidateArrayValuesByKey($Sender->Data('Tags', array()), 'TagID', 'FullName');
+            $tags = array_column($Sender->Data('Tags', array()), 'FullName', 'TagID');
             $xtags = $Sender->Data('XTags', array());
             foreach (TagModel::instance()->defaultTypes() as $key => $row) {
                if (isset($xtags[$key])) {
-                  $xtags2 = ConsolidateArrayValuesByKey($xtags[$key], 'TagID', 'FullName');
+                  $xtags2 = array_column($xtags[$key], 'FullName', 'TagID');
                   foreach ($xtags2 as $id => $name) {
                      $tags[$id] = $name;
                   }

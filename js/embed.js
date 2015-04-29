@@ -10,12 +10,9 @@ window.vanilla.initialize = function (host) {
       currentPath = window.location.hash.substr(1),
       disablePath = (window != top);
 
-   var optStr = function(name, defaultValue, definedValue) {
-      if (window['vanilla_'+name]) {
-         if (definedValue == undefined)
-            return window['vanilla_'+name];
-         else
-            return definedValue.replace('%s', window['vanilla_'+name]);
+   var getGlobalConfigVariable = function(name, defaultValue) {
+      if (typeof (window['vanilla_'+name]) != 'undefined') {
+		return window['vanilla_'+name];
       }
       return defaultValue;
    };
@@ -400,7 +397,7 @@ window.vanilla.initialize = function (host) {
    };
 
    // Now embed the iframe.
-   if (! (optStr ('no_embed', false))) {
+   if (! (getGlobalConfigVariable ('no_embed', false))) {
 
       var container = document.getElementById('vanilla-comments');
       // Couldn't find the container, so dump it out and try again.
@@ -410,16 +407,16 @@ window.vanilla.initialize = function (host) {
       }
 
       /**
-       * OPTIONS!
+       * Globally defined options, to be used in the "first" embedding
        */
       // What type of embed are we performing?
-      var embed_type = optStr ('embed_type', 'standard');
+      var embed_type = getGlobalConfigVariable ('embed_type', 'standard');
 
       // Are we loading a particular discussion based on discussion_id?
-      var discussion_id = optStr ('discussion_id', 0);
+      var discussion_id = getGlobalConfigVariable ('discussion_id', 0);
 
       // Are we loading a particular discussion based on foreign_id?
-      var foreign_id = optStr ('identifier', '');
+      var foreign_id = getGlobalConfigVariable ('identifier', '');
 
       // Force type based on incoming variables
       if (discussion_id != 0 || foreign_id != '')
@@ -428,20 +425,22 @@ window.vanilla.initialize = function (host) {
       // Is there a foreign type defined? Possibly used to render the discussion
       // body a certain way in the forum? Also used to filter down to foreign
       // types so that matching foreign_id's across type don't clash.
-      var foreign_type = optStr ('type', 'page');
+      var foreign_type = getGlobalConfigVariable ('type', 'page');
 
       // If embedding comments, should the newly created discussion be placed in a specific category?
-      var category_id = optStr ('category_id', '');
+      var category_id = getGlobalConfigVariable ('category_id', '');
 
       // If embedding comments, this value will be used to reference the foreign content. Defaults to the url of the page this file is included in.
-      var foreign_url = optStr ('url', document.URL.split('#')[0]);
+      var foreign_url = getGlobalConfigVariable ('url', document.URL.split('#')[0]);
 
       // Are we forcing a locale via Multilingual plugin?
-      var embed_locale = optStr ('embed_locale', '');
+      var embed_locale = getGlobalConfigVariable ('embed_locale', '');
 
       // If path was defined, and we're sitting at app root, use the defined path instead.
+	   /*
       if (typeof(vanilla_path) != 'undefined' && path == '/')
-         var path = vanilla_path;
+         path = vanilla_path;
+         */
 
       var options = {
          'embed_type' : embed_type,

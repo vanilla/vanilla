@@ -556,7 +556,7 @@ class ImportModel extends Gdn_Model {
          ini_set('auto_detect_line_endings', TRUE);
 
          if (!is_readable($this->ImportPath)) {
-            throw new Gdn_UserException(T('The input file is not readable.  Please check permissions and try again.'));
+            throw new Gdn_UserException(T('The input file is not readable.', 'The input file is not readable.  Please check permissions and try again.'));
          }
 
          $fpin = gzopen($this->ImportPath, 'rb');
@@ -1247,7 +1247,7 @@ class ImportModel extends Gdn_Model {
       $Tables = array();
 
       if (!is_readable($Path)) {
-         throw new Gdn_UserException(T('The input file is not readable.  Please check permissions and try again.'));
+         throw new Gdn_UserException(T('The input file is not readable.', 'The input file is not readable.  Please check permissions and try again.'));
       }
 
       // Open the import file.

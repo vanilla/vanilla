@@ -792,7 +792,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          $fileExtension = strtolower($Upload->GetUploadedFileExtension());
          $fileName = $Upload->GetUploadedFileName();
-         list($tmpwidth, $tmpheight) = getimagesize($tmpFilePath);
+         list($tmpwidth, $tmpheight, $imageType) = getimagesize($tmpFilePath);
 
          // This will return the absolute destination path, including generated
          // filename based on md5_file, and the full path. It
@@ -806,7 +806,13 @@ class EditorPlugin extends Gdn_Plugin {
          // Save original file to uploads, then manipulate from this location if
          // it's a photo. This will also call events in Vanilla so other
          // plugins can tie into this.
-         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
+         if (empty($imageType)) {
+            $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
+         } else {
+            $filePathParsed = Gdn_UploadImage::SaveImageAs($tmpFilePath, $absoluteFileDestination);
+            $tmpwidth = $filePathParsed['Width'];
+            $tmpheight = $filePathParsed['Height'];
+         }
 
          // Determine if image, and thus requires thumbnail generation, or
          // simply saving the file.

@@ -1605,6 +1605,10 @@ class UserModel extends Gdn_Model {
       if (array_key_exists('Gender', $FormPostValues))
          $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
 
+      if (array_key_exists('DateOfBirth', $FormPostValues) && $FormPostValues['DateOfBirth'] == '0-00-00') {
+         $FormPostValues['DateOfBirth'] = NULL;
+      }
+
       $UserID = GetValue('UserID', $FormPostValues);
       $User = array();
       $Insert = $UserID > 0 ? FALSE : TRUE;
@@ -1974,25 +1978,33 @@ class UserModel extends Gdn_Model {
       }
    }
 
-   public function Search($Keywords, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      if (C('Garden.Registration.Method') == 'Approval')
+   public function Search($Filter, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      if (C('Garden.Registration.Method') === 'Approval') {
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      else
+      } else {
          $ApplicantRoleID = 0;
-
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
-         $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
       }
+      $Optimize = FALSE;
+
+      if (is_array($Filter)) {
+         $Where = $Filter;
+         $Keywords = $Where['Keywords'];
+         $Optimize = val('Optimize', $Filter);
+         unset($Where['Keywords'], $Where['Optimize']);
+      } else {
+         $Keywords = $Filter;
+      }
+      $Keywords = trim($Keywords);
 
       // Check for an IP address.
       if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
          $IPAddress = $Keywords;
       } elseif (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+         $Keywords = '';
       } elseif (preg_match('/^\d+$/', $Keywords)) {
          $UserID = $Keywords;
+         $Keywords = '';
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
@@ -2007,22 +2019,34 @@ class UserModel extends Gdn_Model {
       if (isset($Where))
          $this->SQL->Where($Where);
 
-      if (isset($RoleID) && $RoleID) {
+      if (!empty($RoleID)) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
       } elseif (isset($IPAddress)) {
          $this->SQL
             ->OrOp()
             ->BeginWhereGroup()
-            ->OrWhere('u.InsertIPAddress', $IPAddress)
-            ->OrWhere('u.LastIPAddress', $IPAddress)
-            ->EndWhereGroup();
+            ->OrWhere('u.LastIPAddress', $IPAddress);
+
+         // An or is expensive so only do it if the query isn't optimized.
+         if (!$Optimize) {
+            $this->SQL->OrWhere('u.InsertIPAddress', $IPAddress);
+         }
+
+         $this->SQL->EndWhereGroup();
       } elseif (isset($UserID)) {
          $this->SQL->Where('u.UserID', $UserID);
-      } else {
-         // Search on the user table.
-         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+      } elseif ($Keywords) {
+         if ($Optimize) {
+            // An optimized search should only be done against name OR email.
+            if (strpos($Keywords, '@') !== FALSE) {
+               $this->SQL->Like('u.Email', $Keywords, 'right');
+            } else {
+               $this->SQL->Like('u.Name', $Keywords, 'right');
+            }
+         } else {
+            // Search on the user table.
+            $Like = array('u.Name' => $Keywords, 'u.Email' => $Keywords);
 
-         if (is_array($Like)) {
             $this->SQL
                ->OrOp()
                ->BeginWhereGroup()
@@ -2031,8 +2055,15 @@ class UserModel extends Gdn_Model {
          }
       }
 
-      if ($ApplicantRoleID != 0)
+      // Optimized searches need at least some criteria before performing a query.
+      if ($Optimize && $this->SQL->WhereCount() == 0 && !$RoleID) {
+         $this->SQL->Reset();
+         return new Gdn_DataSet(array());
+      }
+
+      if ($ApplicantRoleID != 0) {
          $this->SQL->Where('ur.RoleID is null');
+      }
 
       $Data = $this->SQL
          ->Where('u.Deleted', 0)
@@ -2054,17 +2085,20 @@ class UserModel extends Gdn_Model {
       return $Data;
    }
 
-   public function SearchCount($Keywords = FALSE) {
+   public function SearchCount($Filter = FALSE) {
       if (C('Garden.Registration.Method') == 'Approval')
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
       else
          $ApplicantRoleID = 0;
 
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
+      if (is_array($Filter)) {
+         $Where = $Filter;
          $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
+         unset($Where['Keywords'], $Where['Optimize']);
+      } else {
+         $Keywords = $Filter;
       }
+      $Keywords = trim($Keywords);
 
       // Check to see if the search exactly matches a role name.
       $RoleID = FALSE;
@@ -2459,11 +2493,11 @@ class UserModel extends Gdn_Model {
       if (!is_array($AllIPs))
          $AllIPs = array();
       if ($IP = GetValue('InsertIPAddress', $User))
-         $AllIPs[] = ForceIPv4($IP);
+         array_unshift($AllIPs, ForceIPv4($IP));
       if ($IP = GetValue('LastIPAddress', $User))
-         $AllIPs[] = $IP;
+         array_unshift($AllIPs, $IP);
+      // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
       $AllIPs = array_unique($AllIPs);
-      sort($AllIPs);
       $Fields['AllIPAddresses'] = $AllIPs;
 
       // Set the hour offset based on the client's clock.
@@ -3505,97 +3539,97 @@ class UserModel extends Gdn_Model {
       return $this->GetID($UserID);
    }
 
-   /**
+    /**
     * Check and apply login rate limiting
     *
     * @param array $User
     * @param boolean $PasswordOK
     */
-   public static function RateLimit($User, $PasswordOK) {
-      if (!Gdn::Cache()->ActiveEnabled()) return FALSE;
-//      $CoolingDown = FALSE;
-//
-//      // 1. Check if we're in userid cooldown
-//      $UserCooldownKey = FormatString(self::LOGIN_COOLDOWN_KEY, array('Source' => $User['UserID']));
-//      if (!$CoolingDown) {
-//         $InUserCooldown = Gdn::Cache()->Get($UserCooldownKey);
-//         if ($InUserCooldown) {
-//            $CoolingDown = $InUserCooldown;
-//            $CooldownError = T('LoginUserCooldown', "Your account is temporarily locked due to failed login attempts. Try again in %s.");
-//         }
-//      }
-//
-//      // 2. Check if we're in source IP cooldown
-//      $SourceCooldownKey = FormatString(self::LOGIN_COOLDOWN_KEY, array('Source' => Gdn::Request()->IpAddress()));
-//      if (!$CoolingDown) {
-//         $InSourceCooldown = Gdn::Cache()->Get($SourceCooldownKey);
-//         if ($InSourceCooldown) {
-//            $CoolingDown = $InUserCooldown;
-//            $CooldownError = T('LoginSourceCooldown', "Your IP is temporarily blocked due to failed login attempts. Try again in %s.");
-//         }
-//      }
-//
-//      // Block cooled down people
-//      if ($CoolingDown) {
-//         $Timespan = $InUserCooldown;
-//         $Timespan -= 3600 * ($Hours = (int) floor($Timespan / 3600));
-//         $Timespan -= 60 * ($Minutes = (int) floor($Timespan / 60));
-//         $Seconds = $Timespan;
-//
-//         $TimeFormat = array();
-//         if ($Hours) $TimeFormat[] = "{$Hours} ".Plural($Hours, 'hour', 'hours');
-//         if ($Minutes) $TimeFormat[] = "{$Minutes} ".Plural($Minutes, 'minute', 'minutes');
-//         if ($Seconds) $TimeFormat[] = "{$Seconds} ".Plural($Seconds, 'second', 'seconds');
-//         $TimeFormat = implode(', ', $TimeFormat);
-//         throw new Exception(sprintf($CooldownError, $TimeFormat));
-//      }
-//
-//      // Logged in OK
-//      if ($PasswordOK) {
-//         Gdn::Cache()->Remove($UserCooldownKey);
-//         Gdn::Cache()->Remove($SourceCooldownKey);
-//      }
+    public static function RateLimit($User, $PasswordOK) {
+        if (Gdn::Cache()->ActiveEnabled()) {
 
-      // Rate limiting
-      $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
-      $UserRate = (int)Gdn::Cache()->Get($UserRateKey);
-      $UserRate += 1;
-      Gdn::Cache()->Store($UserRateKey, 1, array(
-         Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
-      ));
+            // Rate limit using Gdn_Cache.
+            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRate = (int)Gdn::Cache()->Get($UserRateKey);
+            $UserRate += 1;
+            Gdn::Cache()->Store($UserRateKey, 1, array(
+                Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+            ));
 
-      $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
-      $SourceRate = (int)Gdn::Cache()->Get($SourceRateKey);
-      $SourceRate += 1;
-      Gdn::Cache()->Store($SourceRateKey, 1, array(
-         Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
-      ));
+            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRate = (int)Gdn::Cache()->Get($SourceRateKey);
+            $SourceRate += 1;
+            Gdn::Cache()->Store($SourceRateKey, 1, array(
+                Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+            ));
 
-      // Put user into cooldown mode
-      if ($UserRate > 1)
-         throw new Gdn_UserException(T('LoginUserCooldown', "You are trying to log in too often. Slow down!."));
+        } elseif (C('Garden.Apc', false) && function_exists('apc_store')) {
 
-      if ($SourceRate > 1)
-         throw new Gdn_UserException(T('LoginSourceCooldown', "Your IP is trying to log in too often. Slow down!"));
+            // Rate limit using the APC data store.
+            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRate = (int)apc_fetch($UserRateKey);
+            $UserRate += 1;
+            apc_store($UserRateKey, 1, self::LOGIN_RATE);
 
-      return TRUE;
-   }
+            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRate = (int)apc_fetch($SourceRateKey);
+            $SourceRate += 1;
+            apc_store($SourceRateKey, 1, self::LOGIN_RATE);
+
+        } else {
+
+            // Rate limit using user attributes.
+            $Now = time();
+            $UserModel = Gdn::UserModel();
+            $LastLoginAttempt = $UserModel->GetAttribute($User->UserID, 'LastLoginAttempt', 0);
+            $UserRate = $UserModel->GetAttribute($User->UserID, 'LoginRate', 0);
+            $UserRate += 1;
+
+            if ($LastLoginAttempt + self::LOGIN_RATE < $Now) {
+                $UserRate = 0;
+            }
+
+            $UserModel->SaveToSerializedColumn('Attributes', $User->UserID,
+                array('LastLoginAttempt' => $Now, 'LoginRate' => 1)
+            );
+
+            // IP rate limiting is not available without an active cache.
+            $SourceRate = 0;
+
+        }
+
+        // Put user into cooldown mode.
+        if ($UserRate > 1) {
+            throw new Gdn_UserException(T('LoginUserCooldown', 'You are trying to log in too often. Slow down!.'));
+        }
+        if ($SourceRate > 1) {
+            throw new Gdn_UserException(T('LoginSourceCooldown', 'Your IP is trying to log in too often. Slow down!'));
+        }
+
+        return true;
+    }
 
 	public function SetField($RowID, $Property, $Value = FALSE) {
       if (!is_array($Property))
          $Property = array($Property => $Value);
 
-      // Convert IP addresses to long.
+      $this->DefineSchema();
+      $Fields = $this->Schema->Fields();
+
       if (isset($Property['AllIPAddresses'])) {
          if (is_array($Property['AllIPAddresses'])) {
             $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
             $IPs = array_unique($IPs);
             $Property['AllIPAddresses'] = implode(',', $IPs);
+            // Ensure this isn't too big for our column
+            while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {
+              array_pop($IPs);
+              $Property['AllIPAddresses'] = implode(',', $IPs);
+            }
          }
       }
 
-      $this->DefineSchema();
-      $Set = array_intersect_key($Property, $this->Schema->Fields());
+      $Set = array_intersect_key($Property, $Fields);
       self::SerializeRow($Set);
 
 		$this->SQL

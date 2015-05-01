@@ -151,12 +151,11 @@ class QuotesPlugin extends Gdn_Plugin {
       $QuoteData = array(
           'status' => 'failed'
       );
-//      array_shift($Sender->RequestArgs);
-//      if (sizeof($Sender->RequestArgs)) {
+
       $QuoteData['selector'] = $Selector;
       list($Type, $ID) = explode('_', $Selector);
       $this->FormatQuote($Type, $ID, $QuoteData, $Format);
-//      }
+
       $Sender->SetJson('Quote', $QuoteData);
       $Sender->Render('GetQuote', '', 'plugins/Quotes');
    }
@@ -302,6 +301,10 @@ BLOCKQUOTE;
    }
 
    protected function FormatQuote($Type, $ID, &$QuoteData, $Format = FALSE) {
+      // Temporarily disable Emoji parsing (prevent double-parsing to HTML)
+      $emojiEnabled = Emoji::instance()->enabled;
+      Emoji::instance()->enabled = false;
+
       if (!$Format) {
          $Format = C('Garden.InputFormatter');
       }
@@ -419,6 +422,9 @@ BLOCKQUOTE;
              'typeid' => $ID
          ));
       }
+
+      // Undo Emoji disable.
+      Emoji::instance()->enabled = $emojiEnabled;
    }
 
    public function Setup() {

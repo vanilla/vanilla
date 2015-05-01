@@ -219,7 +219,15 @@ class AssetModel extends Gdn_Model {
       return -1;
    }
 
-   public static function CssPath($ThemeType, $Filename, $Folder, $CurrentFolder = null) {
+   /**
+    * Lookup the path to a CSS file and return its info array
+    *
+    * @param string $ThemeType mobile or desktop
+    * @param string $Filename name/relative path to css file
+    * @param string $Folder optional. app or plugin folder to search
+    * @return array|boolean
+    */
+   public static function CssPath($ThemeType, $Filename, $Folder = false) {
       if (!$ThemeType) {
          $ThemeType = IsMobile() ? 'mobile' : 'desktop';
       }
@@ -253,9 +261,24 @@ class AssetModel extends Gdn_Model {
 
       // 4. Static, Plugin, or App relative file
       if ($Folder) {
-         self::folderRules($Filename, $Folder, $Paths);
-      } else if ($CurrentFolder) {
-         self::folderRules($Filename, $CurrentFolder, $Paths);
+         if (in_array($Folder, array('resources', 'static'))) {
+            $Path = "/resources/css/{$Filename}";
+            $Paths[] = array(PATH_ROOT.$Path, $Path);
+
+         // A plugin-relative path was given
+         } else if (stringBeginsWith($Folder, 'plugins/')) {
+            $Folder = substr($Folder, strlen('plugins/'));
+            $Path = "/{$Folder}/design/{$Filename}";
+            $Paths[] = array(PATH_PLUGINS.$Path, $Path);
+
+            // Allow direct-to-file links for plugins
+            $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}");
+
+         // An app-relative path was given
+         } else {
+            $Path = "/{$Folder}/design/{$Filename}";
+            $Paths[] = array(PATH_APPLICATIONS.$Path, "/applications{$Path}");
+         }
       }
 
       // 5. Check the default application.
@@ -270,34 +293,6 @@ class AssetModel extends Gdn_Model {
       }
 
       return false;
-   }
-
-   /**
-    * Get path lookups for a given folder
-    *
-    * @param string $Filename
-    * @param string $Folder
-    * @param array $Paths
-    */
-   public static function folderRules($Filename, $Folder, &$Paths) {
-      if (in_array($Folder, array('resources', 'static'))) {
-         $Path = "/resources/css/{$Filename}";
-         $Paths[] = array(PATH_ROOT.$Path, $Path);
-
-      // A plugin-relative path was given
-      } else if (stringBeginsWith($Folder, 'plugins/')) {
-         $Folder = substr($Folder, strlen('plugins/'));
-         $Path = "/{$Folder}/design/{$Filename}";
-         $Paths[] = array(PATH_PLUGINS.$Path, $Path);
-
-         // Allow direct-to-file links for plugins
-        $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}");
-
-      // An app-relative path was given
-      } else {
-         $Path = "/{$Folder}/design/{$Filename}";
-         $Paths[] = array(PATH_APPLICATIONS.$Path, "/applications{$Path}");
-      }
    }
 
    /** Generate an e-tag for the application from the versions of all of its enabled applications/plugins. **/

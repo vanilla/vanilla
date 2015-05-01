@@ -269,7 +269,7 @@ class AssetModel extends Gdn_Model {
          } else if (stringBeginsWith($Folder, 'plugins/')) {
             $Folder = substr($Folder, strlen('plugins/'));
             $Path = "/{$Folder}/design/{$Filename}";
-            $Paths[] = array(PATH_PLUGINS.$Path, $Path);
+            $Paths[] = array(PATH_PLUGINS.$Path, "/plugins/$Path");
 
             // Allow direct-to-file links for plugins
             $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}");

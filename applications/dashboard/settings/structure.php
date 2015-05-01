@@ -67,7 +67,7 @@ $Construct
    ->Column('Title', 'varchar(100)', NULL)
    ->Column('Location', 'varchar(100)', NULL)
    ->Column('About', 'text', TRUE)
-   ->Column('Email', 'varchar(200)', FALSE, 'index')
+   ->Column('Email', 'varchar(100)', FALSE, 'index')
    ->Column('ShowEmail', 'tinyint(1)', '0')
    ->Column('Gender', array('u', 'm', 'f'), 'u')
    ->Column('CountVisits', 'int', '0')
@@ -157,7 +157,7 @@ if (!$UserRoleExists) {
 // User Meta Table
 $Construct->Table('UserMeta')
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('Name', 'varchar(255)', FALSE, array('primary', 'index'))
+   ->Column('Name', 'varchar(100)', FALSE, array('primary', 'index'))
    ->Column('Value', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
@@ -173,7 +173,7 @@ $Construct->Table('UserPoints')
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
-	->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
+	->Column('ForeignUserKey', 'varchar(100)', FALSE, 'primary')
 	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
@@ -197,7 +197,7 @@ $Construct->Table('UserAuthenticationProvider')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationNonce')
-   ->Column('Nonce', 'varchar(200)', FALSE, 'primary')
+   ->Column('Nonce', 'varchar(100)', FALSE, 'primary')
    ->Column('Token', 'varchar(128)', FALSE)
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Set($Explicit, $Drop);
@@ -372,7 +372,7 @@ $PermissionModel->ClearPermissions();
 // Invitation Table
 $Construct->Table('Invitation')
 	->PrimaryKey('InvitationID')
-   ->Column('Email', 'varchar(200)', FALSE, 'index')
+   ->Column('Email', 'varchar(100)', FALSE, 'index')
    ->Column('Name', 'varchar(50)', TRUE)
    ->Column('RoleIDs', 'text', TRUE)
    ->Column('Code', 'varchar(50)', FALSE, 'unique.code')
@@ -639,8 +639,8 @@ if ($Construct->TableExists('Tag') && $TagCategoryColumnExists) {
 
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
-   ->Column('Name', 'varchar(255)', FALSE, 'unique')
-   ->Column('FullName', 'varchar(255)', !$FullNameColumnExists, 'index')
+   ->Column('Name', 'varchar(100)', FALSE, 'unique')
+   ->Column('FullName', 'varchar(100)', !$FullNameColumnExists, 'index')
    ->Column('Type', 'varchar(20)', '', 'index')
    ->Column('ParentTagID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', TRUE, 'key')
@@ -682,7 +682,7 @@ $Construct->Table('Log')
 
 $Construct->Table('Regarding')
    ->PrimaryKey('RegardingID')
-   ->Column('Type', 'varchar(255)', FALSE, 'key')
+   ->Column('Type', 'varchar(100)', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE)
    ->Column('DateInserted', 'datetime', FALSE)
    ->Column('ForeignType', 'varchar(32)', FALSE)

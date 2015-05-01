@@ -823,14 +823,18 @@ class ProfileController extends Gdn_Controller {
       $MetaPrefs = UserModel::GetMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
 
       // Define the preferences to be managed
-      $this->Preferences = array(
-         'Notifications' => array(
+      $Notifications = array();
+
+      if (C('Garden.Profile.ShowActivities', TRUE)) {
+         $Notifications = array(
             'Email.WallComment' => T('Notify me when people write on my wall.'),
             'Email.ActivityComment' => T('Notify me when people reply to my wall comments.'),
             'Popup.WallComment' => T('Notify me when people write on my wall.'),
             'Popup.ActivityComment' => T('Notify me when people reply to my wall comments.')
-         )
-      );
+         );
+      }
+
+      $this->Preferences = array('Notifications' => $Notifications);
 
       // Allow email notification of applicants (if they have permission & are using approval registration)
       if (CheckPermission('Garden.Users.Approve') && C('Garden.Registration.Method') == 'Approval')

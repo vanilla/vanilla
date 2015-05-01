@@ -260,7 +260,7 @@ class AssetModel extends Gdn_Model {
 
       // 5. Check the default application.
       if ($Folder != 'dashboard') {
-         $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/$Filename");
+         $Paths[] = array(PATH_APPLICATIONS."/dashboard/design/$Filename", "/applications/dashboard/design/$Filename");
       }
 
       foreach ($Paths as $Info) {

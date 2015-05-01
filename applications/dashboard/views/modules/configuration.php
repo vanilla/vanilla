@@ -5,7 +5,9 @@ $Form = $Sf->Form();
 
 if ($Sf->RenderAll) {
    echo '<h1>', $Sf->Controller()->Data('Title'), '</h1>';
-   echo '<div class="Info">', $Sf->Controller()->Data('Description'), '</div>';
+   if ($Sf->Controller()->Data('Description')) {
+      echo '<div class="Info">', $Sf->Controller()->Data('Description'), '</div>';
+   }
 }
 
 $Options = array();

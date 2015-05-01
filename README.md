@@ -77,6 +77,7 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 To upgrade to **2.1 from 2.0.18**, add this step:
 
 * Delete the file [`/themes/mobile/views/discussions/helper_functions.php`](https://github.com/vanillaforums/Garden/blob/2.0/themes/mobile/views/discussions/helper_functions.php)
+* Delete the file [`/applications/dashboard/views/default.master.php`](https://github.com/vanilla/vanilla/blob/2.0/applications/dashboard/views/default.master.php)
 
 To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Porter as if it were a migration. Your theme and any customizations will need to be recreated. Backup your Vanilla 1 data and files completely, then delete them from your server before attempting to install Vanilla 2.
 
@@ -109,7 +110,7 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 We've adopted the [git flow branching model](http://nvie.com/posts/a-successful-git-branching-model) in our projects.
 The creators of git flow released a [short intro video](http://vimeo.com/16018419) to explain the model.
 
-The `master` branch is production-ready for a our cloud product but is not yet vetted for open source release (alternate platforms).
+The `master` branch is production-ready for our cloud product but is not yet vetted for open source release (alternate platforms).
 Reviewed, stable changes land against `master`.
 
 The `stage` branch is pre-production and are where we land riskier changesets for further integration testing. We typically aim to merge `stage` into `master` on a monthly basis.

@@ -37,7 +37,7 @@ foreach ($this->Data('Roles') as $Role) {
    <tr id="<?php echo $Role['RoleID']; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
       <td class="Info">
          <strong><?php echo $Role['Name']; ?></strong>
-         <?php if ($Advanced) { ?>
+         <?php if ($Advanced && $Role['CanModify']) { ?>
          <div>
             <?php
             echo Anchor(T('Edit'), "/role/edit/{$Role['RoleID']}", 'SmallButton');

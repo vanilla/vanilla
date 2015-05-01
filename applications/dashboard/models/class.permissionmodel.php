@@ -9,7 +9,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class PermissionModel extends Gdn_Model {
-
    /**
     * Class constructor. Defines the related database table name.
     */

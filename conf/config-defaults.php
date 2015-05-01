@@ -110,6 +110,7 @@ $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 $Configuration['Garden']['Embed']['CommentsPerPage']            = 50;
 $Configuration['Garden']['Embed']['SortComments']               = 'desc';
 $Configuration['Garden']['Embed']['PageToForum']                = TRUE;
+$Configuration['Garden']['BannedPhoto']                         = 'https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/banned_large.png';
 
 
 // Formatting

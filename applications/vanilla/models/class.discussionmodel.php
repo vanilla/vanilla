@@ -54,8 +54,13 @@ class DiscussionModel extends VanillaModel {
     * @return bool Returns true if the user can edit or false otherwise.
     */
    public static function canEdit($discussion, &$timeLeft = 0) {
+      if (!($permissionCategoryID = val('PermissionCategoryID', $discussion))) {
+         $category = CategoryModel::Categories(val('CategoryID', $discussion));
+         $permissionCategoryID = val('PermissionCategoryID', $category);
+      }
+
       // Users with global edit permission can edit.
-      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', val('PermissionCategoryID', $discussion))) {
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $permissionCategoryID)) {
          return true;
       }
 
@@ -1715,7 +1720,7 @@ class DiscussionModel extends VanillaModel {
                   $Activity['Story'] = $Story;
 
                // Notify all of the users that were mentioned in the discussion.
-               $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
+               $Usernames = GetMentions($DiscussionName.' '.$Story);
                $Usernames = array_unique($Usernames);
 
                // Use our generic Activity for events, not mentions

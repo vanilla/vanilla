@@ -11,7 +11,7 @@ $this->FireEvent('AfterPageTitle');
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
-$MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
+$MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth') + $this->Data('Category')->Depth;
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = count($this->Data('Categories'));
 

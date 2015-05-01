@@ -62,19 +62,9 @@
             case 'image':
                $html_toolbar .= Wrap(
                   Wrap($html_arrow_down, 'span', $button['attr']) .''.
-                  '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage">
-                     <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" value="http://">
-                     <div class="MenuButtons">
-                     <label class="editor-image-align">
-                      Align:
-                      <select data-wysihtml5-dialog-field="className">
-                        <option value="">default</option>
-                        <option value="wysiwyg-float-left">left</option>
-                        <option value="wysiwyg-float-right">right</option>
-                      </select>
-                     </label>
-                     <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="'.T('OK').'"/>
-                     <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="'.T('Cancel').'"/>
+                  '<div class="editor-insert-dialog Flyout MenuItems editor-file-image editor-insert-image" data-wysihtml5-dialog="insertImage">
+                      <div class="drop-section image-input" title="'. T('Paste the URL of an image to quickly embed it.') .'">
+                        <input class="InputBox editor-input-image" placeholder="'. T('Image URL') .'" />
                      </div>
                   </div>'
                 , 'div', array('class' => 'editor-dropdown editor-dropdown-image'));

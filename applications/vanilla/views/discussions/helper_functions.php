@@ -57,7 +57,7 @@ if (!function_exists('BookmarkButton')) {
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       return Anchor(
          $Title,
-         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey(),
+         '/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey(),
          'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
@@ -397,11 +397,6 @@ function OptionsList($Discussion) {
       // Dismiss an announcement
       if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
          $Sender->Options .= '<li>'.Anchor(T('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack') . '</li>';
-
-      // Determine if we still have time to edit
-      $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-      $CanEdit = $EditContentTimeout == -1 || strtotime($Discussion->DateInserted) + $EditContentTimeout > time();
-      $CanEdit = ($CanEdit && $Session->UserID == $Discussion->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
       // Edit discussion
       if (DiscussionModel::canEdit($Discussion)) {

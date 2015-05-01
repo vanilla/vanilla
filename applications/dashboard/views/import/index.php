@@ -13,7 +13,7 @@ $this->AddSideMenu();
 <h1><?php echo T('Import'); ?></h1>
 <?php
 echo '<div class="Info">'
-	.sprintf(T('Garden.Import.Description', 'Use this page to import data from another forum that was exported using Vanilla\'s exporter. For more information <a href="%s">see our importing documentation</a>.'), 'http://vanillaforums.com/blog/help-topics/importing-data/')
+	.sprintf(T('Garden.Import.Description', 'Use this page to import data from another forum that was exported using Vanilla Porter. For more information <a href="%s">see our importing documentation</a>.'), 'http://docs.vanillaforums.com/developers/importing/')
    .Wrap(T('You can place files in your /uploads folder.', 'If your file is too
 		large to upload directly to this page you can place it in your /uploads
 		folder. Make sure the filename begins with the word <b>export</b> and ends

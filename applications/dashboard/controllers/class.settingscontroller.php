@@ -1019,7 +1019,7 @@ class SettingsController extends DashboardController {
          $this->Form->AddError($Ex);
       }
 
-      $this->Render();
+      $this->Render('themeoptions');
    }
 
    /**

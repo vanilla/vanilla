@@ -36,6 +36,6 @@ div.GettingStarted ul li strong {
 	padding: 3px 0;
 }
 div.GettingStarted ul li.Done strong {
-	background: url('../check.png') no-repeat center left;
+	background: url('check.png') no-repeat center left;
 	padding-left: 36px;
 }

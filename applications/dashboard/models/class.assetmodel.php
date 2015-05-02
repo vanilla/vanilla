@@ -247,6 +247,7 @@ class AssetModel extends Gdn_Model {
          $Filename = "/{$Filename}";
          $Path = PATH_ROOT.$Filename;
          if (file_exists($Path)) {
+            Deprecated("AssetModel::CssPath() with direct paths.");
             return array($Path, $Filename);
          }
          return false;
@@ -272,7 +273,7 @@ class AssetModel extends Gdn_Model {
             $Paths[] = array(PATH_PLUGINS.$Path, "/plugins/$Path");
 
             // Allow direct-to-file links for plugins
-            $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}");
+            $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}", true); // deprecated
 
          // An app-relative path was given
          } else {
@@ -283,11 +284,17 @@ class AssetModel extends Gdn_Model {
 
       // 5. Check the default application.
       if ($Folder != 'dashboard') {
-         $Paths[] = array(PATH_APPLICATIONS."/dashboard/design/$Filename", "/applications/dashboard/design/$Filename");
+         $Paths[] = array(PATH_APPLICATIONS."/dashboard/design/$Filename", "/applications/dashboard/design/$Filename", true); // deprecated
       }
 
       foreach ($Paths as $Info) {
          if (file_exists($Info[0])) {
+            if (!empty($Info[2])) {
+               // This path is deprecated.
+               unset($Info[2]);
+               Deprecated("The css file '$Filename', path '$Folder'");
+            }
+
             return $Info;
          }
       }

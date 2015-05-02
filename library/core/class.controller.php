@@ -1683,7 +1683,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                $AppFolder = $CssInfo['AppFolder'];
                $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-               $Search = AssetModel::CssPath($ThemeType, $CssFile, $LookupFolder);
+               $Search = AssetModel::CssPath($CssFile, $LookupFolder, $ThemeType);
                if (!$Search) {
                   continue;
                }

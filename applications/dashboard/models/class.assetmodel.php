@@ -191,7 +191,7 @@ class AssetModel extends Gdn_Model {
 
          } else {
 
-            list($Path, $UrlPath) = self::CssPath($ThemeType, $Filename, $Folder);
+            list($Path, $UrlPath) = self::CssPath($Filename, $Folder, $ThemeType);
             if ($Path) {
                $Paths[] = array($Path, $UrlPath, $Options);
             } else {
@@ -222,12 +222,12 @@ class AssetModel extends Gdn_Model {
    /**
     * Lookup the path to a CSS file and return its info array
     *
-    * @param string $ThemeType mobile or desktop
     * @param string $Filename name/relative path to css file
     * @param string $Folder optional. app or plugin folder to search
-    * @return array|boolean
+    * @param string $ThemeType mobile or desktop
+    * @return array|bool
     */
-   public static function CssPath($ThemeType, $Filename, $Folder = false) {
+   public static function CssPath($Filename, $Folder = '', $ThemeType = '') {
       if (!$ThemeType) {
          $ThemeType = IsMobile() ? 'mobile' : 'desktop';
       }

@@ -342,7 +342,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
          'fetchviewlocation', 'finalize', 'getasset', 'getimports', 'getjson', 'getstatusmessage', 'image',
          'informmessage', 'intitialize', 'isinternal', 'jsfiles', 'json', 'jsontarget', 'masterview', 'pagename',
-         'permission', 'removecssfile', 'render', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
+         'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
          'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson', 'setlastmodified', 'statuscode', 'title'
       );
       $this->MasterView = '';

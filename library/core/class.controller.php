@@ -337,7 +337,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Data = array();
       $this->Head = Gdn::Factory('Dummy');
       $this->internalMethods = array(
-         '__construct', 'addasset', 'addbreadcrumb', 'addcssfile', 'adddefinition', 'addinternalmethod', 'addjsfile', 'addmodule',
+         'addasset', 'addbreadcrumb', 'addcssfile', 'adddefinition', 'addinternalmethod', 'addjsfile', 'addmodule',
          'allowjsonp', 'canonicalurl', 'clearcssfiles', 'clearjsfiles', 'contenttype', 'cssfiles', 'data',
          'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
          'fetchviewlocation', 'finalize', 'getasset', 'getimports', 'getjson', 'getstatusmessage', 'image',
@@ -1095,7 +1095,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @return bool Returns true if the method is internal or false otherwise.
     */
    public function isInternal($methodName) {
-      $result = in_array(strtolower($methodName), $this->internalMethods);
+      $result = substr($methodName, 0, 1) === '_' || in_array(strtolower($methodName), $this->internalMethods);
       return $result;
    }
 

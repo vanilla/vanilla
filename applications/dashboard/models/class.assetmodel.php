@@ -263,7 +263,7 @@ class AssetModel extends Gdn_Model {
       // 4. Static, Plugin, or App relative file
       if ($Folder) {
          if (in_array($Folder, array('resources', 'static'))) {
-            $Path = "/resources/css/{$Filename}";
+            $Path = "/resources/design/{$Filename}";
             $Paths[] = array(PATH_ROOT.$Path, $Path);
 
          // A plugin-relative path was given
@@ -292,12 +292,13 @@ class AssetModel extends Gdn_Model {
             if (!empty($Info[2])) {
                // This path is deprecated.
                unset($Info[2]);
-               Deprecated("The css file '$Filename', path '$Folder'");
+               Deprecated("The css file '$Filename' in folder '$Folder'");
             }
 
             return $Info;
          }
       }
+      Trace("Could not find file '$Filename' in folder '$Folder'.");
 
       return false;
    }

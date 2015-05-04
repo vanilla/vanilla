@@ -1883,6 +1883,10 @@ EOT;
 
          // Only allow external redirects to trusted domains.
          $TrustedDomains = C('Garden.TrustedDomains', TRUE);
+         // Trusted domains were previously saved in config as an array.
+         if ($TrustedDomains && $TrustedDomains !== TRUE && !is_array($TrustedDomains)) {
+            $TrustedDomains = explode("\n", $TrustedDomains);
+         }
 
          if (is_array($TrustedDomains)) {
             // Add this domain to the trusted hosts.

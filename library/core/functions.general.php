@@ -3347,7 +3347,10 @@ if (!function_exists('TrustedDomains')) {
     * @return array
     */
    function TrustedDomains() {
-      $Result = (array)C('Garden.TrustedDomains', array());
+      $Result = C('Garden.TrustedDomains', array());
+      if (!is_array($Result)) {
+         $Result = explode("\n", $Result);
+      }
 
       // This domain is safe.
       $Result[] = Gdn::Request()->Host();

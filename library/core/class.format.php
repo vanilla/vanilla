@@ -182,7 +182,7 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'ForAlphaNumeric');
       else
-         return preg_replace('/([^\w\d_-])/', '', $Mixed);
+         return preg_replace('/([^\w-])/', '', $Mixed);
    }
 
    /**

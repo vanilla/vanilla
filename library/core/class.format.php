@@ -182,7 +182,7 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'ForAlphaNumeric');
       else
-         return preg_replace('/([^\w\d_-])/', '', $Mixed);
+         return preg_replace('/([^\w-])/', '', $Mixed);
    }
 
    /**
@@ -1710,7 +1710,7 @@ EOT;
       if (unicodeRegexSupport()) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
       } else {
-         $Mixed = preg_replace('`[\W_]`', '-', $Mixed);
+         $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);
       }
 
       // Lowercase, no trailing or repeat hyphens

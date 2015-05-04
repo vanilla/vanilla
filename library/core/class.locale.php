@@ -184,7 +184,7 @@ class Gdn_Locale extends Gdn_Pluggable {
    }
 
    public function GetLocaleSources($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
-      $SafeLocaleName = preg_replace('/([^\w\d_-])/', '', $LocaleName); // Removes everything from the string except letters, numbers, dashes, and underscores
+      $SafeLocaleName = preg_replace('/([^\w-])/', '', $LocaleName); // Removes everything from the string except letters, numbers, dashes, and underscores
       $LocaleSources = array();
       if (!is_array($ApplicationWhiteList)) $ApplicationWhiteList = array();
       if (!is_array($PluginWhiteList)) $PluginWhiteList = array();

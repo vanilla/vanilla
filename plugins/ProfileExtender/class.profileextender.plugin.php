@@ -359,6 +359,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Display custom fields on Profile.
     */
    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
+      if ($Sender->User->Banned) {
+         return;
+      }
+
       try {
          // Get the custom fields
          $ProfileFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile.%', 'Profile.');

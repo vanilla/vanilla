@@ -112,8 +112,8 @@ class EmbedController extends DashboardController {
       } else {
          // Format the trusted domains as an array based on newlines & spaces
          $TrustedDomains = $this->Form->GetValue('Garden.TrustedDomains');
-         $TrustedDomains = explode(' ', str_replace("\n", ' ', $TrustedDomains));
-         $TrustedDomains = array_unique(array_map('trim', $TrustedDomains));
+         $TrustedDomains = explode("\n", $TrustedDomains);
+         $TrustedDomains = array_unique(array_filter(array_map('trim', $TrustedDomains)));
          $TrustedDomains = implode("\n", $TrustedDomains);
          $this->Form->SetFormValue('Garden.TrustedDomains', $TrustedDomains);
          if ($this->Form->Save() !== FALSE) {

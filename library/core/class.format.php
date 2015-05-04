@@ -1710,7 +1710,7 @@ EOT;
       if (unicodeRegexSupport()) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
       } else {
-         $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);
+         $Mixed = preg_replace('`[\W_]`', '-', $Mixed);
       }
 
       // Lowercase, no trailing or repeat hyphens

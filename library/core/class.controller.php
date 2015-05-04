@@ -891,7 +891,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ViewPaths = array();
          
          // 1. An explicitly defined path to a view
-         if (strpos($View, DS) !== FALSE)
+         if (strpos($View, DS) !== FALSE && StringBeginsWith($View, PATH_ROOT))
             $ViewPaths[] = $View;
          
          if ($this->Theme) {
@@ -1358,20 +1358,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
       }
-   }
-
-   /**
-    * Undocumented method.
-    *
-    * @param string $AltAppFolder
-    * @param string $AltController
-    * @param string $AltMethod
-    * @todo Method RenderAlternate() and $AltAppFolder, $AltController and $AltMethod needs descriptions.
-    */
-   public function RenderAlternate($AltAppFolder, $AltController, $AltMethod) {
-      $this->AddAsset('Content', $this->FetchView($AltMethod, $AltController, $AltAppFolder));
-      $this->RenderMaster();
-      return;
    }
 
    /**

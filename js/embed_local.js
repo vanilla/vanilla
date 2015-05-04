@@ -6,6 +6,26 @@ jQuery(document).ready(function($) {
       }
    }
 
+   function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split('&');
+      for (var i = 0; i < vars.length; i++) {
+         var pair = vars[i].split('=');
+         if (decodeURIComponent(pair[0]) == variable) {
+            return decodeURIComponent(pair[1]);
+         }
+      }
+      console.log('Query variable %s not found', variable);
+   }
+
+   function getEmbedId () {
+      return parseInt (getQueryVariable ('embed'));
+   }
+
+   function getMessage (message) {
+      return message = getEmbedId () + ':' + message;
+   }
+
    var currentHeight = null,
       minHeight = 100,
       remotePostMessage = function(message, target) {},
@@ -41,7 +61,7 @@ jQuery(document).ready(function($) {
 
       if ("postMessage" in parent) {
          remotePostMessage = function(message, target) {
-            return parent.postMessage(message, target);
+            return parent.postMessage(getMessage (message), target);
          }
          setLocation = function(newLocation) {
             parent.window.frames[0].location.replace(newLocation);
@@ -68,7 +88,7 @@ jQuery(document).ready(function($) {
                   }
                }
             }
-            messages.push(message);
+            messages.push(getMessage (message));
          }
 
          setLocation = function(newLocation) {
@@ -114,6 +134,12 @@ jQuery(document).ready(function($) {
       }
    }
 
+   function removeEmbedParameter (href) {
+      var url = href.attr ('href');
+      url = url.replace ('embed=1', '');
+      href.attr ('href', url);
+   }
+
    // If not embedded and we should be, redirect to the embedded version.
    if (!inIframe && !inPopup && !inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
       document.location = remoteUrl + '#' + path;
@@ -138,7 +164,7 @@ jQuery(document).ready(function($) {
             currentHeight = newHeight;
             remotePostMessage('height:'+currentHeight, '*');
          }
-      }
+      };
 
       setInterval(setHeight, 300);
 
@@ -173,8 +199,10 @@ jQuery(document).ready(function($) {
                noTop = true;
 
             // Target the top of the page if clicking an anchor in a list of embedded comments
-            if (!noTop)
+            if (!noTop) {
                $(this).attr('target', '_top');
+               removeEmbedParameter ($(this));
+            }
 
             // Change the post-registration target to the page that is currently embedded.
             if ($(this).parents('.CreateAccount').length > 0) {

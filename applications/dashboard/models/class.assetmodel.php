@@ -209,8 +209,15 @@ class AssetModel extends Gdn_Model {
    }
 
    public static function CssPath($ThemeType, $Filename, $Folder) {
-      if (!$ThemeType)
-         $ThemeType = IsMobile() ? 'mobile' : 'desktop';
+      if (!$ThemeType) {
+         if (IsEmbed()) {
+            $ThemeType = 'embed';
+         } else if (IsMobile()) {
+            $ThemeType = 'mobile';
+         } else {
+            $ThemeType = 'desktop';
+         }
+      }
 
       // 1. Check for a url.
       if (IsUrl($Filename)) {

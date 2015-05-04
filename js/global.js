@@ -594,7 +594,22 @@ jQuery(document).ready(function($) {
       if (urlFormat.indexOf("?") >= 0)
          path = path.replace("?", "&");
 
-      return urlFormat.replace("{Path}", path);
+	   if (urlFormat.indexOf ('?') > urlFormat.indexOf ('{Path}')) {
+		   // Seems like there is a ?parameter= part after the {Path}...
+		   var finalQuery = '';
+		   var finalPath = path;
+
+		   if (path.indexOf ('&') >= 0) {
+			   finalPath = path.slice (0, path.indexOf ('&'));
+			   finalQuery = path.slice (path.indexOf ('&'));
+		   }
+
+		   return urlFormat.replace("{Path}", finalPath) + finalQuery;
+	   }
+
+	   else {
+		   return urlFormat.replace("{Path}", path);
+	   }
    };
 
    // Fill in placeholders.

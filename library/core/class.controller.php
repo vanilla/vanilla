@@ -1667,7 +1667,18 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $ETag = AssetModel::ETag();
             $CombineAssets = C('Garden.CombineAssets');
-            $ThemeType = IsMobile() ? 'mobile' : 'desktop';
+
+            if (IsEmbed ()) {
+               $ThemeType = 'embed';
+            }
+
+            else if (IsMobile ()) {
+               $ThemeType = 'mobile';
+            }
+
+            else {
+               $ThemeType = 'desktop';
+            }
 
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {

@@ -357,15 +357,20 @@ class BanModel extends Gdn_Model {
          return;
       }
 
+      Gdn::UserModel()->SetField($User['UserID'], 'Banned', $BannedValue);
+
       $NewBanned = static::setBanned($Banned, $BannedValue, self::BAN_AUTOMATIC);
+      $BanningUser = Gdn::Session()->UserID;
       Gdn::UserModel()->SetField($User['UserID'], 'Banned', $NewBanned);
+	 $BanningUser = Gdn::UserModel()->GetSystemUserID();
+      }
 
       // Add the activity.
       $ActivityModel = new ActivityModel();
       $Activity = array(
           'ActivityType' => 'Ban',
           'ActivityUserID' => $User['UserID'],
-          'RegardingUserID' => Gdn::Session()->UserID,
+	  'RegardingUserID' => $BanningUser,
           'NotifyUserID' => ActivityModel::NOTIFY_MODS
           );
 

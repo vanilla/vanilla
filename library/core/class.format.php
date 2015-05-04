@@ -1158,7 +1158,7 @@ class Gdn_Format {
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
       $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
       $HitboxUrlMatch = 'http://www.hitbox.tv/([\w\d]+)';
-      $SoundcloudUrlMatch = 'https://soundcloud.com/([\w\d=?&;+-_]*)/([\w\d=?&;+-_]*)';
+      $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)
 
       // YouTube
       if ((preg_match($YoutubeUrlMatch, $Url, $Matches))

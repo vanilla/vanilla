@@ -1086,7 +1086,7 @@ class Gdn_Format {
             $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
          }
          if (C('Garden.Format.Getty', TRUE)) {
-            $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w\d=?&+-_]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
+            $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
          }
       }
 
@@ -1151,13 +1151,13 @@ class Gdn_Format {
       $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]*)))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
-      $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
-      $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
-      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d-]+)';
+      $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w]{40})';
+      $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w]+)';
+      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w-]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
-      $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
-      $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
-      $HitboxUrlMatch = 'http://www.hitbox.tv/([\w\d]+)';
+      $GettyUrlMatch = 'http://embed.gettyimages.com/([\w=?&;+-_]*)/([\d]*)/([\d]*)';
+      $TwitchUrlMatch = 'http://www.twitch.tv/([\w]+)';
+      $HitboxUrlMatch = 'http://www.hitbox.tv/([\w]+)';
 
       // YouTube
       if ((preg_match($YoutubeUrlMatch, $Url, $Matches))

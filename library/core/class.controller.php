@@ -290,6 +290,11 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_Headers;
 
    /**
+    * @var array An array of internal methods that cannot be dispatched.
+    */
+   protected $internalMethods;
+
+   /**
     * A collection of "inform" messages to be displayed to the user.
     *
     * @since 2.0.18
@@ -339,6 +344,15 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->ControllerFolder = '';
       $this->CssClass = '';
       $this->Head = Gdn::Factory('Dummy');
+      $this->internalMethods = array(
+         'addasset', 'addbreadcrumb', 'addcssfile', 'adddefinition', 'addinternalmethod', 'addjsfile', 'addmodule',
+         'allowjsonp', 'canonicalurl', 'clearcssfiles', 'clearjsfiles', 'contenttype', 'cssfiles', 'data',
+         'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
+         'fetchviewlocation', 'finalize', 'getasset', 'getimports', 'getjson', 'getstatusmessage', 'image',
+         'informmessage', 'intitialize', 'isinternal', 'jsfiles', 'json', 'jsontarget', 'masterview', 'pagename',
+         'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
+         'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson', 'setlastmodified', 'statuscode', 'title'
+      );
       $this->MasterView = '';
       $this->ModuleSortContainer = '';
       $this->OriginalRequestMethod = '';
@@ -460,6 +474,15 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions[$Term] = $Definition;
       }
       return ArrayValue($Term, $this->_Definitions);
+   }
+
+   /**
+    * Add an method to the list of internal methods.
+    *
+    * @param string $methodName The name of the internal method to add.
+    */
+   public function addInternalMethod($methodName) {
+      $this->internalMethods[] = strtolower($methodName);
    }
 
    /**
@@ -868,7 +891,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ViewPaths = array();
          
          // 1. An explicitly defined path to a view
-         if (strpos($View, DS) !== FALSE)
+         if (strpos($View, DS) !== FALSE && StringBeginsWith($View, PATH_ROOT))
             $ViewPaths[] = $View;
          
          if ($this->Theme) {
@@ -1084,6 +1107,17 @@ class Gdn_Controller extends Gdn_Pluggable {
       return $this->_JsFiles;
    }
    
+   /**
+    * Determines whether a method on this controller is internal and can't be dispatched.
+    *
+    * @param string $methodName The name of the method.
+    * @return bool Returns true if the method is internal or false otherwise.
+    */
+   public function isInternal($methodName) {
+      $result = substr($methodName, 0, 1) === '_' || in_array(strtolower($methodName), $this->internalMethods);
+      return $result;
+   }
+
    /**
     * If JSON is going to be sent to the client, this method allows you to add
     * extra values to the JSON array.
@@ -1324,20 +1358,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
       }
-   }
-
-   /**
-    * Undocumented method.
-    *
-    * @param string $AltAppFolder
-    * @param string $AltController
-    * @param string $AltMethod
-    * @todo Method RenderAlternate() and $AltAppFolder, $AltController and $AltMethod needs descriptions.
-    */
-   public function RenderAlternate($AltAppFolder, $AltController, $AltMethod) {
-      $this->AddAsset('Content', $this->FetchView($AltMethod, $AltController, $AltAppFolder));
-      $this->RenderMaster();
-      return;
    }
 
    /**

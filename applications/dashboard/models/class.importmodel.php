@@ -209,8 +209,6 @@ class ImportModel extends Gdn_Model {
 
 	}
 
-   }
-
    public function CustomFinalization() {
       $this->SetRoleDefaults();
 

@@ -38,16 +38,6 @@ class BanModel extends Gdn_Model {
    protected static $instance;
 
    /**
-    * @var array An array that maps ban reasons to their bit position.
-    */
-   protected $reasons = array(
-      self::BAN_MANUAL => 'manual',
-      self::BAN_AUTOMATIC => 'automatic',
-      self::BAN_TEMPORARY => 'temporary',
-      self::BAN_WARNING => 'warning'
-   );
-
-   /**
     * Defines the related database table name.
     */
    public function  __construct() {
@@ -138,8 +128,9 @@ class BanModel extends Gdn_Model {
 
       // Check users that need to be banned.
       foreach ($NewUsers as $User) {
-         if ($User['Banned'])
+         if (self::isBanned($User['Banned'], BanModel::BAN_AUTOMATIC)) {
             continue;
+         }
          $this->SaveUser($User, TRUE, $NewBan);
       }
    }
@@ -268,6 +259,25 @@ class BanModel extends Gdn_Model {
 
 
    /**
+    * Explode a banned bit mask into an array of ban constants.
+    * @param int $banned The banned bit mask to explode.
+    * @return array Returns an array of the set bits.
+    */
+   public static function explodeBans($banned) {
+      $result = array();
+
+      for ($i = 1; $i <= 8; $i++) {
+         $bit = pow(2, $i - 1);
+         if (($banned &  $bit) === $bit) {
+            $result[] = $bit;
+         }
+      }
+
+      return $result;
+   }
+
+
+   /**
     * Check whether or not a banned value is banned for a given reason.
     *
     * @param int $banned The banned value.
@@ -279,7 +289,7 @@ class BanModel extends Gdn_Model {
       if (!$reason) {
          return (bool)$banned;
       } else {
-         return ($banned & $reason) === $reason;
+         return ($banned & $reason) > 0;
       }
    }
 

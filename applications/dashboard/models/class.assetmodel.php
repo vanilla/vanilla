@@ -27,7 +27,7 @@ class AssetModel extends Gdn_Model {
 
    public function ServeCss($ThemeType, $Filename) {
       // Split the filename into filename and etag.
-      if (preg_match('`([\w_-]+?)-(\w+).css$`', $Filename, $Matches)) {
+      if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
          $Basename = $Matches[1];
          $ETag = $Matches[2];
       } else {

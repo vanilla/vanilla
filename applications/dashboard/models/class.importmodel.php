@@ -1818,7 +1818,7 @@ class ImportModel extends Gdn_Model {
       // Any discussions without a user associated with them?
       $this->Stat(
          'Orphaned Discussions',
-         $this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+         $this->SQL->GetCount('Discussion', array('InsertUserID' => '0'))
       );
 
       // When was the latest comment posted?
@@ -1838,7 +1838,7 @@ class ImportModel extends Gdn_Model {
       // Any comments without a user associated with them?
       $this->Stat(
          'Orphaned Comments',
-         $this->SQL->GetCount('Comment', array('InsertUserID', '0'))
+         $this->SQL->GetCount('Comment', array('InsertUserID' => '0'))
       );
 
       // Any users without roles?

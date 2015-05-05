@@ -16,7 +16,12 @@
    $Info = array_merge($Header, $Stats);
 	foreach($Info as $Name => $Value) {
       switch ($Name) {
-         case '':
+         case 'Orphaned Comments':
+         case 'Orphaned Discussions':
+            $Value .= ' ' . Anchor(
+               T('Click here to fix.'),
+               Gdn::Request()->Url('dba/fixinsertuserid')
+            );
             break;
          default:
             $Name = htmlspecialchars($Name);

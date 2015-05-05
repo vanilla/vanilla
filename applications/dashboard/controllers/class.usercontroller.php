@@ -333,16 +333,18 @@ class UserController extends DashboardController {
       if (!$User)
          throw NotFoundException($User);
 
-//      $this->Form = new Gdn_Form();
-
       $UserModel = Gdn::UserModel();
 
-      // Block banning the superadmin or System accounts
+      // Block banning the super admin or system accounts.
       $User = $UserModel->GetID($UserID);
-      if (GetValue('Admin', $User) == 2)
-         throw ForbiddenException("@You may not ban a System user.");
-      elseif (GetValue('Admin', $User))
-         throw ForbiddenException("@You may not ban a user with the Admin flag set.");
+      if (GetValue('Admin', $User) == 2) {
+         throw ForbiddenException("@You may not ban a system user.");
+      } elseif (GetValue('Admin', $User)) {
+         throw ForbiddenException("@You may not ban a super admin.");
+      }
+
+      // Is the user banned for other reasons?
+      $this->SetData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_AUTOMATIC));
 
 
       if ($this->Form->AuthenticatedPostBack()) {

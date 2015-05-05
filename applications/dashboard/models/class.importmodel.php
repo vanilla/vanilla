@@ -23,7 +23,7 @@ class ImportModel extends Gdn_Model {
 
    public $CurrentStep = 0;
 
-	public $Data = array();
+   public $Data = array();
 
    public $ErrorType = '';
 
@@ -44,7 +44,7 @@ class ImportModel extends Gdn_Model {
       10 => 'CustomFinalization',
       11 => 'AddActivity',
       12 => 'VerifyImport'
-	);
+   );
 
    protected $_OverwriteSteps = array(
       0 => 'Initialize',
@@ -204,10 +204,10 @@ class ImportModel extends Gdn_Model {
       if(!$Result) {
          $this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
          $this->ErrorType = 'Credentials';
-		}
-		return $Result;
+      }
+      return $Result;
 
-	}
+   }
 
    public function CustomFinalization() {
       $this->SetRoleDefaults();
@@ -311,7 +311,7 @@ class ImportModel extends Gdn_Model {
          if(GetValue('Skip', $TableInfo))
             continue;
 
-			$St->Table(self::TABLE_PREFIX.$Table);
+         $St->Table(self::TABLE_PREFIX.$Table);
          $Columns = $TableInfo['Columns'];
 
          $DestStructure->Reset()->Get($Table);
@@ -383,7 +383,7 @@ class ImportModel extends Gdn_Model {
 
          $this->Data['CurrentStepMessage'] = $Table;
 
-			if($Table == 'Permission')
+         if($Table == 'Permission')
             $this->SQL->Delete($Table, array('RoleID <>' => 0));
          else
             $this->SQL->Truncate($Table);
@@ -1795,65 +1795,65 @@ class ImportModel extends Gdn_Model {
       $this->SetCategoryPermissionIDs();
 
       return TRUE;
-	}
+   }
 
-	/**
-	 * Verify imported data
-	 */
-	public function VerifyImport() {
-		// When was the latest discussion posted?
+   /**
+    * Verify imported data
+    */
+   public function VerifyImport() {
+      // When was the latest discussion posted?
       $LatestDiscussion = $this->SQL->Select('DateInserted', 'max', 'LatestDiscussion')->From('Discussion')->Get();
-		if ($LatestDiscussion->count()) {
-			$this->Stat(
-				'Last Discussion',
-				$LatestDiscussion->Value('LatestDiscussion')
-			);
-		} else {
-			$this->Stat(
-				'Last Discussion',
-				'-'
-			);
-		}
+      if ($LatestDiscussion->count()) {
+         $this->Stat(
+            'Last Discussion',
+            $LatestDiscussion->Value('LatestDiscussion')
+         );
+      } else {
+         $this->Stat(
+            'Last Discussion',
+            '-'
+         );
+      }
 
-		// Any discussions without a user associated with them?
-		$this->Stat(
-			'Orphaned Discussions',
-			$this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
-		);
+      // Any discussions without a user associated with them?
+      $this->Stat(
+         'Orphaned Discussions',
+         $this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+      );
 
-		// When was the latest comment posted?
+      // When was the latest comment posted?
       $LatestComment = $this->SQL->Select('DateInserted', 'max', 'LatestComment')->From('Comment')->Get();
-		if ($LatestComment->count()) {
-			$this->Stat(
-				'Last Comment',
-				$LatestComment->Value('LatestComment')
-			);
-		} else {
-			$this->Stat(
-				'Last Comment',
-				'-'
-			);
-		}
+      if ($LatestComment->count()) {
+         $this->Stat(
+            'Last Comment',
+            $LatestComment->Value('LatestComment')
+         );
+      } else {
+         $this->Stat(
+            'Last Comment',
+            '-'
+         );
+      }
 
-		// Any comments without a user associated with them?
-		$this->Stat(
-			'Orphaned Comments',
-			$this->SQL->GetCount('Comment', array('InsertUserID', '0'))
-		);
+      // Any comments without a user associated with them?
+      $this->Stat(
+         'Orphaned Comments',
+         $this->SQL->GetCount('Comment', array('InsertUserID', '0'))
+      );
 
-		// Any users without roles?
-		$UsersWithoutRoles = $this->SQL
-			->From('User u')
-			->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')
-			->LeftJoin('Role r', 'ur.RoleID = r.RoleID')
-			->Where('r.Name', NULL)
-			->Get()
-			->Count();
-		$this->Stat(
-			'Users Without a Valid Role',
-			$UsersWithoutRoles
-		);
+      // Any users without roles?
+      $UsersWithoutRoles = $this->SQL
+         ->From('User u')
+         ->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')
+         ->LeftJoin('Role r', 'ur.RoleID = r.RoleID')
+         ->Where('r.Name', NULL)
+         ->Get()
+         ->Count();
+      $this->Stat(
+         'Users Without a Valid Role',
+         $UsersWithoutRoles
+      );
 
-		return TRUE;
-	}
+      return TRUE;
+   }
 }

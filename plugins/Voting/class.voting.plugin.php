@@ -187,7 +187,7 @@ class VotingPlugin extends Gdn_Plugin {
 		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
 		if ($Type == 'Comment' && !GetValue('VoteHeaderWritten', $Sender)) { //$Type != 'Comment' && $AnswerCount > 0) {
 		?>
-		<li class="Item">
+		<li class="Item self-clearing">
 			<div class="VotingSort">
 			<?php
 			echo

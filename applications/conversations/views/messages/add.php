@@ -1,7 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="ConversationForm" class="FormTitleWrapper ConversationForm">
    <?php
+   echo '<span class="page-title">';
    echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
+   echo '<span>';
    $this->FireEvent('BeforeMessageAdd');
    
    echo '<div class="FormWrapper">'; 
@@ -28,7 +30,7 @@
 //      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
    
-   echo $this->Form->Close('Start Conversation', '', array('class' => 'Button Primary'));
+   echo $this->Form->Close('Start Conversation', '', array('class' => 'button Button Primary'));
    echo '</div>';
    ?>
 </div>

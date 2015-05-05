@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<span class="page-title"><h1 class="H HomepageTitle">'.$this->Data('Title').'</h1></span>';
 $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
 ?>
 <div class="Categories">
@@ -13,7 +13,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       if ($this->DiscussionData->NumRows() > 0) : ?>
       
    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">      
-      <h2 class="H"><?php
+      <h2 class="H self-clearing"><?php
             echo Anchor(htmlspecialchars($Category->Name), CategoryUrl($Category));
             Gdn::Controller()->EventArguments['Category'] = $Category;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 

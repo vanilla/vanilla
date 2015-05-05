@@ -239,8 +239,8 @@ class DiscussionPolls extends Gdn_Plugin {
     $Sender->AddDefinition('DP_EmptyQuestion', $DefaultQuestionString);
 
     // Translated definitions
-    $Sender->AddDefinition('DP_NextQuestion', T('Next Question'));
-    $Sender->AddDefinition('DP_PrevQuestion', T('Previous Question'));
+    $Sender->AddDefinition('DP_NextQuestion', T(''));
+    $Sender->AddDefinition('DP_PrevQuestion', T(''));
   }
 
   /**

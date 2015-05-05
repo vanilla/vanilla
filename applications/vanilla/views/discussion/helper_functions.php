@@ -134,7 +134,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             ?>
          </div>
       </div>
-      <div class="Item-BodyWrap">
+      <div class="Item-BodyWrap self-clearing">
          <div class="Item-Body">
             <div class="Message">
                <?php 
@@ -473,13 +473,13 @@ function WriteEmbedCommentForm() {
             'div',
             array('class' => 'Author')
          );
-         echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
+         echo $Controller->Form->Button('Post Comment', array('class' => 'button Button CommentButton'));
       } else {
          $AuthenticationUrl = SignInUrl($ReturnUrl); 
          if ($AllowSigninPopup) {
-            $CssClass = 'SignInPopup Button Stash';
+            $CssClass = 'SignInPopup button secondary Button Stash';
          } else {
-            $CssClass = 'Button Stash';
+            $CssClass = 'button secondary Button Stash';
          }
          
          echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);

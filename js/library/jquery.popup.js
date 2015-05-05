@@ -347,8 +347,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         <div class="Body"> \
           <div class="Content"> \
           </div> \
-          <div class="Footer"> \
-            <a href="#" class="Close"><span>×</span></a> \
+          <div class="Footer self-clearing"> \
+            <a href="#" class="Close button secondary"><span>×</span></a> \
           </div> \
         </div> \
       </div> \
@@ -357,12 +357,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       confirmHtml:       '\
   <div class="Overlay"> \
     <div id="{popup.id}" class="Popup"> \
-      <div class="Border"> \
+      <div class="Border self-clearing"> \
         <div class="Body"> \
           <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
           <div class="Buttons Footer"> \
-            <input type="button" class="Button Primary Okay" value="OK" /> \
-            <input type="button" class="Button Cancel" value="Cancel" /> \
+            <input type="button" class="Button Primary Okay button" value="OK" /> \
+            <input type="button" class="Button Cancel button secondary" value="Cancel" /> \
           </div> \
         </div> \
       </div> \

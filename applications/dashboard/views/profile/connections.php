@@ -44,7 +44,7 @@
    }
 </style>
 
-<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H self-clearing"><?php echo $this->Data('Title'); ?></h2>
 
 <div class="Hero">
    <h3><?php echo T("What's This?"); ?></h3>

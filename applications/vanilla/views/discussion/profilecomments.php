@@ -4,7 +4,7 @@ foreach ($this->Data('Comments') as $Comment) {
 	$User = UserBuilder($Comment, 'Insert');
 	$this->EventArguments['User'] = $User;
 ?>
-<li id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="Item">
+<li id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="Item self-clearing">
 	<?php $this->FireEvent('BeforeItemContent'); ?>
 	<div class="ItemContent">
 		<div class="Message"><?php

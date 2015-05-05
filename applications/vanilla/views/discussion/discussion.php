@@ -68,7 +68,7 @@ $this->FireEvent('BeforeDiscussionDisplay');
          </div>
       </div>
       <?php $this->FireEvent('BeforeDiscussionBody'); ?>
-      <div class="Item-BodyWrap">
+      <div class="Item-BodyWrap self-clearing">
          <div class="Item-Body">
             <div class="Message">   
                <?php

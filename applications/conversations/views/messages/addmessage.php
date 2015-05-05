@@ -4,7 +4,7 @@ $this->EventArguments['FormCssClass'] = 'MessageForm CommentForm';
 $this->FireEvent('BeforeMessageForm');
 ?>
 <div id="MessageForm" class="<?php echo $this->EventArguments['FormCssClass']; ?>">
-   <h2 class="H"><?php echo T("Add a Message"); ?></h2>
+   <h2 class="H self-clearing"><?php echo T("Add a Message"); ?></h2>
    <div class="MessageFormWrap">
       <div class="Form-HeaderWrap">
          <div class="Form-Header">
@@ -30,7 +30,7 @@ $this->FireEvent('BeforeMessageForm');
 //               echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
                echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage'));
                echo '<div class="Buttons">',
-                  $this->Form->Button('Send Message', array('class' => 'Button Primary')),
+                  $this->Form->Button('Send Message', array('class' => 'button Button Primary')),
                   '</div>';
                echo $this->Form->Close();
                ?>

@@ -1165,7 +1165,7 @@ class ProfileController extends Gdn_Controller {
          $this->AddModule('UserBoxModule');
          $this->BuildEditMenu($SideMenu, $CurrentUrl);
          $this->FireEvent('AfterAddSideMenu');
-         $this->AddModule($SideMenu, 'Panel');
+         $this->AddModule($SideMenu, 'Content');
       } else {
          // Make sure the userphoto module gets added to the page
          $this->AddModule('UserPhotoModule');
@@ -1188,7 +1188,7 @@ class ProfileController extends Gdn_Controller {
       $Module->AutoLinkGroups = FALSE;
       $Session = Gdn::Session();
       $ViewingUserID = $Session->UserID;
-      $Module->AddItem('Options', '', FALSE, array('class' => 'SideMenu'));
+      $Module->AddItem('Options', '', FALSE, array('class' => 'SideMenu two columns'));
 
       // Check that we have the necessary tools to allow image uploading
       $AllowImages = C('Garden.Profile.EditPhotos', TRUE) && Gdn_UploadImage::CanUploadImages();
@@ -1226,16 +1226,20 @@ class ProfileController extends Gdn_Controller {
          // password in Vanilla, they will then be able to log into Vanilla using
          // Vanilla's login form regardless of the state of their membership in the
          // external app.
-         if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
 
+       if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
+            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+          }
+
+         //Disabling password editing through Vanilla. -JG
+/*  
             // No password may have been set if they have only signed in with a connect plugin
             $PasswordLabel = T('Change My Password');
             if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
                $PasswordLabel = T('Set A Password');
             $Module->AddLink('Options', Sprite('SpPassword').' '.$PasswordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
          }
-
+*/
          $Module->AddLink('Options', Sprite('SpPreferences').' '.T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), FALSE, array('class' => 'Popup PreferencesLink'));
          if ($AllowImages) {
             $Module->AddLink('Options', Sprite('SpPicture').' '.T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));

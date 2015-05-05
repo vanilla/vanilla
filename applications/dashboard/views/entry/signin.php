@@ -60,7 +60,7 @@ echo '</div>';
 ?>
 <div class="Buttons">
    <?php
-      echo $this->Form->Button('Sign In', array('class' => 'Button Primary'));
+      echo $this->Form->Button('Sign In', array('class' => 'button Button Primary'));
       echo $this->Form->CheckBox('RememberMe', T('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
    ?>
 <?php if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0): ?>
@@ -92,7 +92,7 @@ echo $this->Form->Open(array('Action' => Url('/entry/passwordrequest'), 'id' => 
    </li>
    <li class="Buttons">
       <?php
-         echo $this->Form->Button('Request a new password', array('class' => 'Button Primary'));
+         echo $this->Form->Button('Request a new password', array('class' => 'button Button Primary'));
          echo Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword');
       ?>
    </li>

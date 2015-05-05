@@ -2,6 +2,7 @@
 $Session = Gdn::Session();
 ?>
 <div class="User" itemscope itemtype="http://schema.org/Person">
+   <span class="page-title">
    <h1 class="H"><?php 
       echo htmlspecialchars($this->User->Name);
       
@@ -12,6 +13,7 @@ $Session = Gdn::Session();
          $this->FireEvent('UsernameMeta');
       echo '</span>';
    ?></h1>
+   </span>
    <?php
    if ($this->User->Admin == 2) {
       echo '<div class="Info">', T('This is a system account and does not represent a real person.'), '</div>';

@@ -7,7 +7,7 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
    
    <ul id="" class="DataList Conversations PanelInfo">
       <?php foreach ($this->Data('Conversations') as $Row): ?>
-      <li id="Conversation_<?php echo $Row['ConversationID']; ?>" class="Item">
+      <li id="Conversation_<?php echo $Row['ConversationID']; ?>" class="Item self-clearing">
          <?php
          $JumpToItem = $Row['CountMessages'] - $Row['CountNewMessages'];
          $Url = "/messages/{$Row['ConversationID']}/#Item_$JumpToItem";

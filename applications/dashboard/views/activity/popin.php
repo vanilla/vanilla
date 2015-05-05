@@ -3,12 +3,12 @@
 <?php
 if (count($this->Data('Activities'))):
 ?>
-   <li class="Item Title"><?php 
+   <li class="Item Title self-clearing"><?php 
       echo Anchor(T('Notification Preferences'), 'profile/preferences');
       echo Wrap(T('Notifications'), 'strong'); 
    ?></li>
    <?php foreach ($this->Data('Activities') as $Activity): ?>
-   <li class="Item">
+   <li class="Item self-clearing">
       <?php
       if ($Activity['Photo']) {
          $PhotoAnchor = Anchor(
@@ -27,12 +27,12 @@ if (count($this->Data('Activities'))):
       </div>
    </li>
    <?php endforeach; ?>
-   <li class="Item Center">
+   <li class="Item Center self-clearing">
       <?php
       echo Anchor(sprintf(T('All %s'), T('Notifications')), '/profile/notifications'); 
       ?>
    </li>
 <?php else: ?>
-   <li class="Item Empty Center"><?php echo T('You do not have any notifications yet.'); ?></li>
+   <li class="Item Empty Center self-clearing"><?php echo T('You do not have any notifications yet.'); ?></li>
 <?php endif; ?>
 </ul>

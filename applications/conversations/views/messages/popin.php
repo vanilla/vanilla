@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <ul class="PopList Conversations">
-   <li class="Item Title">
+   <li class="Item Title self-clearing">
       <?php
       if (CheckPermission('Conversations.Conversations.Add'))
          echo Anchor(T('New Message'), 'messages/add');
@@ -24,7 +24,7 @@ if (count($this->Data('Conversations'))):
    }
    $PhotoUser = UserBuilder($Row, 'LastInsert');
    ?>
-   <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#latest"); ?>">
+   <li class="Item self-clearing" rel="<?php echo Url("/messages/{$Row['ConversationID']}#latest"); ?>">
       <div class="Author Photo"><?php echo UserPhoto($PhotoUser); ?></div>
       <div class="ItemContent">
          <b class="Subject"><?php echo Anchor($Subject, "/messages/{$Row['ConversationID']}#latest"); ?></b>
@@ -46,12 +46,12 @@ if (count($this->Data('Conversations'))):
       </div>
    </li>
    <?php endforeach; ?>
-   <li class="Item Center">
+   <li class="Item Center self-clearing">
       <?php
       echo Anchor(sprintf(T('All %s'), T('Messages')), '/messages/inbox'); 
       ?>
    </li>
 <?php else: ?>
-<li class="Item Empty Center"><?php echo sprintf(T('You do not have any %s yet.'), T('messages')); ?></li>
+<li class="Item Empty Center self-clearing"><?php echo sprintf(T('You do not have any %s yet.'), T('messages')); ?></li>
 <?php endif; ?>
 </ul>

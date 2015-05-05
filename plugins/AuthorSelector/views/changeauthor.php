@@ -12,7 +12,7 @@
    echo Wrap($this->Form->TextBox('Author', array('class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
 
-   echo $this->Form->Close('Change Author', '', array('class' => 'Button Primary'));
+   echo $this->Form->Close('Change Author', '', array('class' => 'button Button Primary'));
    echo '</div>';
    ?>
 </div>

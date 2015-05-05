@@ -4,7 +4,7 @@ function WriteConnection($Row) {
    $c = Gdn::Controller();
    $Connected = GetValue('Connected', $Row);
 ?>
-   <li id="<?php echo "Provider_{$Row['ProviderKey']}"; ?>" class="Item">
+   <li id="<?php echo "Provider_{$Row['ProviderKey']}"; ?>" class="Item self-clearing">
       <div class="Connection-Header">
          <span class="IconWrap">
             <?php
@@ -55,7 +55,7 @@ function ConnectButton($Row) {
 
    $Result = '<span class="ActivateSlider ActivateSlider-'.$CssClass.'">';
    if ($Connected) {
-      $Result .= Anchor(T('Connected'), $DisconnectUrl, 'Button Primary Hijack');
+      $Result .= Anchor(T('Connected'), $DisconnectUrl, 'button Button Primary Hijack');
    } else {
       $Result .= Anchor(T('Connect'), $ConnectUrl, 'Button');
    }

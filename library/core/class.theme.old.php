@@ -43,7 +43,7 @@ class Gdn_Theme {
       if ($HomeLink) {
          $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE), 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
-            $Row['Name'] = T('DAZ3D Forums'); //Changing home crumb from "Home" to "DAZ3D Forums"
+            $Row['Name'] = T('Home');
          
          array_unshift($Data, $Row);
       }
@@ -63,7 +63,7 @@ class Gdn_Theme {
          $Row['Url'] = Url($Row['Url']);
          $CssClass = GetValue('CssClass', $Row, 'CrumbLabel');
          $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
-         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '>').'</span> ', $Result, $Label);
+         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
          
          $Count++;
       }

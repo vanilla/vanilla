@@ -19,19 +19,3 @@ foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
       $SortOrder[] = $TabCode;
 }
 ?>
-<div class="BoxFilter BoxProfileFilter">
-   <ul class="FilterMenu">
-   <?php
-   // Get sorted filter links
-   foreach ($SortOrder as $TabCode) {
-      $CssClass = $TabCode == $Controller->CurrentTab ? 'Active ' : '';
-      // array_key_exists: Just in case a method was removed but is still present in sortorder
-      if (array_key_exists($TabCode, $Controller->ProfileTabs)) {
-         $TabInfo = GetValue($TabCode, $Controller->ProfileTabs, array());
-         $CssClass .= GetValue('CssClass', $TabInfo, '');
-         echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.Anchor(GetValue('TabHtml', $TabInfo, $TabCode), GetValue('TabUrl', $TabInfo))."</li>\r\n";
-      }
-   }
-   ?>
-   </ul>
-</div>

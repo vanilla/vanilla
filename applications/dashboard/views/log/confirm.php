@@ -100,10 +100,10 @@
       echo '<div class="ConfirmText">'.$AfterHtml.'</div>';
 
       echo '<div class="Buttons">',
-         $this->Form->Button('Yes, continue', array('class' => 'Button ConfirmYes')),
+         $this->Form->Button('Yes, continue', array('class' => 'button Button ConfirmYes')),
 //         Anchor(T('Yes'), '#', array('class' => 'Button ConfirmYes', 'style' => 'display: inline-block; width: 50px')),
          ' ',
-         Anchor(T("No, get me outta here!"), '#', array('class' => 'ConfirmNo')),
+         Anchor(T("No, get me outta here!"), '#', array('class' => 'button secondary ConfirmNo')),
          '</div>';
       
       

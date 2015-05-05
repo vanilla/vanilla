@@ -2,10 +2,10 @@
 $Session = Gdn::Session();
 include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
-echo '<h1 class="H HomepageTitle">'.
+echo '<span class="page-title"><h1 class="H HomepageTitle page-title">'.
    AdminCheck(NULL, array('', ' ')).
    $this->Data('Title').
-   '</h1>';
+   '</h1></span>';
 
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
@@ -18,9 +18,9 @@ $PagerOptions = array('Wrapper' => '<span class="PagerNub">&#160;</span><div %1$
 if ($this->Data('_PagerUrl'))
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 
-echo '<div class="PageControls Top">';
+echo '<div class="PageControls Top self-clearing">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'button Button Action Primary')));
 echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
@@ -30,9 +30,9 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </ul>
 <?php
    
-echo '<div class="PageControls Bottom">';
+echo '<div class="PageControls Bottom self-clearing">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'button Button Action Primary')));
 echo '</div>';
 
 } else {

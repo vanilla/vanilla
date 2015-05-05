@@ -10,8 +10,8 @@
 
 
 ?>
-<h1 class="H"><?php echo T('Signatures'); ?></h1>
-<h2 class="H"><?php echo T('My Signature'); ?></h2>
+<span class="page-title"><h1 class="H"><?php echo T('Signatures'); ?></h1></span>
+<h2 class="H self-clearing"><?php echo T('My Signature'); ?></h2>
    <?php echo $this->Form->Errors(); ?>
    <ul>
       <?php
@@ -53,7 +53,7 @@
       $this->FireEvent('EditMySignatureAfter');
    ?>
 </ul>
-<h2 class="H"><?php echo T('Forum Signature Settings'); ?></h2>
+<h2 class="H self-clearing"><?php echo T('Forum Signature Settings'); ?></h2>
 <ul>
    <li>
       <?php
@@ -63,5 +63,5 @@
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary')); ?>
+<?php echo $this->Form->Close('Save', '', array('class' => 'button Button Primary')); ?>
 </div>

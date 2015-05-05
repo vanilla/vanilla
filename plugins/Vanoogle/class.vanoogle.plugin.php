@@ -97,7 +97,7 @@ class Vanoogle extends Gdn_Plugin {
 			<div id="hidden" style="display:none;">
 				<div id="VanoogleSearch"><?php echo T('Loading Search...');?></div>
 				<div id="vanoogle_webResult">
-					<li class="Item gs-webResult gs-result" 
+					<li class="Item gs-webResult gs-result self-clearing" 
 					  data-vars="{longUrl:function(){var i = unescapedUrl.indexOf(visibleUrl); return i &lt; 1 ? visibleUrl : unescapedUrl.substring(i);},trimmedTitle:function(){return html(title.replace(/[-][^-]+$/, ''));}}">
 						<div class="ItemContent">
 							<div data-if="Vars.richSnippet" data-attr="0" data-body="render('thumbnail',richSnippet,{url:unescapedUrl,target:target})"></div>

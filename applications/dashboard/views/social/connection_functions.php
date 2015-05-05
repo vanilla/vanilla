@@ -23,7 +23,7 @@ function WriteConnection($Connection) {
    $Index = GetValue('Index', $Connection, GetValue('ProviderKey', $Connection));
    
 ?>
-   <li id="<?php echo "Provider_$Index"; ?>" class="Item <?php echo $CssClasses; ?>">
+   <li id="<?php echo "Provider_$Index"; ?>" class="Item self-clearing <?php echo $CssClasses; ?>">
       <div class="Connection-Header">
          <span class="IconWrap">
             <?php echo Img(Asset(GetValue('Icon', $Connection,'/applications/dashboard/design/images/connection-64.png'), '//')); ?>

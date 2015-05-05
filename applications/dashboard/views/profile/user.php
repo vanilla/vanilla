@@ -27,6 +27,9 @@ $Session = Gdn::Session();
 
       echo '</div>';
    }
+
+   echo Gdn_Theme::Module('UserBanModule', array('UserID' => $this->User->UserID));
+
    $this->FireEvent('BeforeUserInfo');
    echo Gdn_Theme::Module('UserInfoModule');
    $this->FireEvent('AfterUserInfo');

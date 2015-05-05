@@ -23,8 +23,8 @@ $Definition['Apply for Membership'] = 'Register';
 
 $Definition['BanReason.1'] = 'Banned by a community manager.';
 $Definition['BanReason.2'] = 'Banned by IP address, email, or name.';
-$Definition['BanReason.3'] = 'Temporarily banned by a community manager.';
-$Definition['BanReason.4'] = 'Banned by warnings.';
+$Definition['BanReason.4'] = 'Temporarily banned by a community manager.';
+$Definition['BanReason.8'] = 'Banned by warnings.';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';

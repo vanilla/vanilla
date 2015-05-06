@@ -118,7 +118,7 @@ class RoleController extends DashboardController {
 
          // Get the guest roles.
          $GuestRolesData = $RoleModel->GetByUserID(0);
-         $GuestRoles = ConsolidateArrayValuesByKey($GuestRolesData, 'RoleID');
+         $GuestRoles = array_column($GuestRolesData, 'RoleID');
          $this->Form->SetValue('GuestRoles', $GuestRoles);
 
          // The applicant role.

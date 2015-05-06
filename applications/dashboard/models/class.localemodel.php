@@ -31,10 +31,10 @@ class LocaleModel {
 
    public function AvailableLocales() {
       // Get the list of locales that are supported.
-      $Locales = array_unique(ConsolidateArrayValuesByKey($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
+      $Locales = array_unique(array_column($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
       asort($Locales);
       $Locales = array_combine($Locales, $Locales);
-   
+
       return $Locales;
    }
 
@@ -157,10 +157,10 @@ class LocaleModel {
 
       // Grab all of the definition files from the locale.
       $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
-      
+
       // Unload the dynamic config
       Gdn::Locale()->Unload();
-      
+
       // Load each locale file, checking for errors
       foreach ($Paths as $Path) {
          Gdn::Locale()->Load($Path, FALSE);

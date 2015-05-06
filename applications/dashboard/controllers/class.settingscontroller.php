@@ -725,7 +725,7 @@ class SettingsController extends DashboardController {
       // Load roles with sign-in permission
       $RoleModel = new RoleModel();
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
-      $this->SetData('_Roles', ConsolidateArrayValuesByKey($this->RoleData->ResultArray(), 'RoleID', 'Name'));
+      $this->SetData('_Roles', array_column($this->RoleData->ResultArray(), 'Name', 'RoleID'));
 
       // Get the currently selected default roles
       // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');

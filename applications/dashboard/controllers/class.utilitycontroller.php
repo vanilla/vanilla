@@ -293,7 +293,7 @@ class UtilityController extends DashboardController {
 			// Load all application structure files.
 			$ApplicationManager = new Gdn_ApplicationManager();
 			$Apps = $ApplicationManager->EnabledApplications();
-			$AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
+			$AppNames = array_column($Apps, 'Folder');
 			foreach ($AppNames as $AppName) {
 				$Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
 			}

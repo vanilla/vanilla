@@ -259,6 +259,45 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       return $Result;
    }
 
+   /**
+    * Get the character set for a  collation.
+    * @param string $collation The name of the collation.
+    * @return string Returns the name of the character set or an empty string if the collation was not found.
+    */
+   protected function getCharsetFromCollation($collation) {
+      static $cache = array();
+
+      $collation = strtolower($collation);
+
+      if (!isset($cache[$collation])) {
+         $collationRow = $this->Database->Query('show collation where Collation = :c', array(':c' => $collation))->FirstRow(DATASET_TYPE_ARRAY);
+         $cache[$collation] = val('Charset', $collationRow, '');
+      }
+
+      return $cache[$collation];
+   }
+
+   /**
+    * Get the high-level table information for a given table.
+    *
+    * @param string $tableName The name of the table to get the information for.
+    * @return array? Returns an array of table information.
+    */
+   protected function getTableInfo($tableName) {
+      $pxName = $this->_DatabasePrefix.$tableName;
+      $status = $this->Database->Query("show table status where name = '$pxName'")->FirstRow(DATASET_TYPE_ARRAY);
+
+      if (!$status) {
+         return null;
+      }
+
+      $result = ArrayTranslate($status, array('Engine' => 'engine', 'Rows' => 'rows', 'Collation' => 'collation'));
+
+      // Look up the encoding for the collation.
+      $result['charset'] = $this->getCharsetFromCollation($result['collation']);
+      return $result;
+   }
+
    protected function _IndexSql($Columns, $KeyType = FALSE) {
 //      if ($this->TableName() != 'Comment')
 //         return array();

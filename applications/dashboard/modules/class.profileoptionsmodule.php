@@ -40,7 +40,7 @@ class ProfileOptionsModule extends Gdn_Module {
          // Ban/Unban
          $MayBan = CheckPermission('Garden.Moderation.Manage') || CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Users.Ban');
          if ($MayBan && $UserID != $Session->UserID) {
-            if ($Controller->User->Banned) {
+            if (BanModel::isBanned($Controller->User->Banned, BanModel::BAN_MANUAL)) {
                $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
             } elseif (!$Controller->User->Admin) {
                $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');

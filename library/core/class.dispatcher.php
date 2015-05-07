@@ -246,6 +246,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
+         /* @var Gdn_Controller $Controller */
          $Controller = new $ControllerName();
          Gdn::Controller($Controller);
 
@@ -286,7 +287,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          // Take enabled plugins into account, as well
          $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);
-         if (!$PluginReplacement && ($this->ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
+         if (!$PluginReplacement && ($this->ControllerMethod == '' || !method_exists($Controller, $ControllerMethod)) && !$Controller->isInternal($ControllerMethod)) {
             // Check to see if there is an 'x' version of the method.
             if (method_exists($Controller, 'x' . $ControllerMethod)) {
                // $PluginManagerHasReplacementMethod = TRUE;
@@ -344,7 +345,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
             }
-         } elseif (method_exists($Controller, $ControllerMethod)) {
+         } elseif (method_exists($Controller, $ControllerMethod) && !$Controller->isInternal($ControllerMethod)) {
             $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $ReflectionArguments);
             $this->_ControllerMethodArgs = $Args;
             $Controller->ReflectArgs = $Args;

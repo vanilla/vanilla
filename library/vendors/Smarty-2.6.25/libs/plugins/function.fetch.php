@@ -35,7 +35,7 @@ function smarty_function_fetch($params, &$smarty)
             $smarty->_trigger_fatal_error('[plugin] (secure mode) fetch \'' . $params['file'] . '\' is not allowed');
             return;
         }
-        
+
         // fetch the file
         if($fp = @fopen($params['file'],'r')) {
             while(!feof($fp)) {
@@ -95,7 +95,7 @@ function smarty_function_fetch($params, &$smarty)
                             break;
                         case "header":
                             if(!empty($param_value)) {
-                                if(!preg_match('![\w\d-]+: .+!',$param_value)) {
+                                if(!preg_match('![\w-]+: .+!',$param_value)) {
                                     $smarty->_trigger_fatal_error("[plugin] invalid header format '".$param_value."'");
                                     return;
                                 } else {

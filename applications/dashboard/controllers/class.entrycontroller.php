@@ -455,7 +455,7 @@ EOT;
       $UserID = GetValue('UserID', $Auth);
 
       // Check to synchronise roles upon connecting.
-      if (($this->Data('Trusted') || C('Garden.SSO.SynchRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
+      if (($this->Data('Trusted') || C('Garden.SSO.SyncRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
          $SaveRoles = TRUE;
 
          // Translate the role names to IDs.

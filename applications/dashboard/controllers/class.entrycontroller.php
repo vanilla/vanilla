@@ -468,7 +468,7 @@ EOT;
             $RoleIDs = $this->UserModel->NewUserRoleIDs();
          }
 
-         if (C('Garden.SSO.SyncRolesBehaviour') === 'register') {
+         if (C('Garden.SSO.SyncRolesBehavior') === 'register') {
             $SaveRolesRegister = TRUE;
             $SaveRoles = FALSE;
          }

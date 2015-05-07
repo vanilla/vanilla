@@ -468,9 +468,15 @@ EOT;
             $RoleIDs = $this->UserModel->NewUserRoleIDs();
          }
 
+         if (C('Garden.SSO.SyncRolesBehaviour') === 'register') {
+            $SaveRolesRegister = TRUE;
+            $SaveRoles = FALSE;
+         }
+
          $this->Form->SetFormValue('RoleID', $RoleIDs);
       } else {
          $SaveRoles = FALSE;
+         $SaveRolesRegister = FALSE;
       }
 
       if ($UserID) {
@@ -615,8 +621,7 @@ EOT;
             $User['Attributes'] = $this->Form->GetFormValue('Attributes', NULL);
             $User['Email'] = $this->Form->GetFormValue('ConnectEmail', $this->Form->GetFormValue('Email', NULL));
 
-//            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRolesRegister));
 
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
@@ -709,7 +714,7 @@ EOT;
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRolesRegister));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

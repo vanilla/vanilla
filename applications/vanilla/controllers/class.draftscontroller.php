@@ -32,7 +32,6 @@ class DraftsController extends VanillaController {
 
       // Setup head
       $this->Permission('Garden.SignIn.Allow');
-      $this->AddCssFile('vanilla.css');
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('discussions.js');
       $this->Title(T('My Drafts'));

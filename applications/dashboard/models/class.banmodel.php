@@ -360,9 +360,14 @@ class BanModel extends Gdn_Model {
       Gdn::UserModel()->SetField($User['UserID'], 'Banned', $BannedValue);
 
       $NewBanned = static::setBanned($Banned, $BannedValue, self::BAN_AUTOMATIC);
-      $BanningUser = Gdn::Session()->UserID;
       Gdn::UserModel()->SetField($User['UserID'], 'Banned', $NewBanned);
-	 $BanningUser = Gdn::UserModel()->GetSystemUserID();
+      $BanningUserID = Gdn::Session()->UserID;
+      // This is true when a session is started and the session user has a new ip address and it matches a banning rule ip address
+      if ($User['UserID'] == $BanningUserID) {
+         $BanningUserID = val('UpdateUserID', $Ban);
+         if (!isset($BanningUserID)) {
+            $BanningUserID = val('InsertUserID', $Ban, Gdn::UserModel()->GetSystemUserID());
+         }
       }
 
       // Add the activity.
@@ -370,7 +375,7 @@ class BanModel extends Gdn_Model {
       $Activity = array(
           'ActivityType' => 'Ban',
           'ActivityUserID' => $User['UserID'],
-	  'RegardingUserID' => $BanningUser,
+          'RegardingUserID' => $BanningUserID,
           'NotifyUserID' => ActivityModel::NOTIFY_MODS
           );
 

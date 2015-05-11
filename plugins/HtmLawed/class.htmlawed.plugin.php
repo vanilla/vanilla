@@ -51,10 +51,10 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'direct_list_nest' => 1,
        'balance' => 1
       );
-      
+
       // Turn embedded videos into simple links (legacy workaround)
       $Html = Gdn_Format::UnembedContent($Html);
-      
+
       // We check the flag within Gdn_Format to see
       // if htmLawed should place rel="nofollow" links
       // within output or not.
@@ -72,7 +72,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
       if ($this->SafeStyles) {
          // Deny all class and style attributes.
          // A lot of damage can be done by hackers with these attributes.
-         $Config['deny_attribute'] .= ',style';
+         $Config['deny_attribute'] .= ',style,class';
 //      } else {
 //         $Config['hook_tag'] = 'HTMLawedHookTag';
       }
@@ -97,7 +97,9 @@ class HTMLawedPlugin extends Gdn_Plugin {
          'Status' => 1,
       );
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Dismiss|MorePager/nomatch=%pop[in|up|down]|flyout|ajax%i)';
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); ';
+      //$Spec .= 'a=class(noneof=Hijack|Dismiss|MorePager/nomatch=%pop[in|up|down]|flyout|ajax%i); ';
+      $Spec .= 'a,span,div,p,li,i,b,strong,em,code,blockquote,dd,dt,img,pre,h1,h2,h3,h4,h5,h6,s,del,sup,sub,q,small,cite,ins=class(oneof=Quote|Spoiler|CodeBlock|Spoiled|P|ImageResized|AuthorAction|MeAction/match=%^(post-|Align)%i)';
 
       $Result = htmLawed($Html, $Config, $Spec);
 
@@ -109,10 +111,10 @@ class HTMLawedPlugin extends Gdn_Plugin {
 }
 
 if (!function_exists('FormatRssCustom')):
-   
+
 function FormatRssHtmlCustom($Html) {
    require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
-   
+
    $Config = array(
        'anti_link_spam' => array('`.`', ''),
        'comment' => 1,
@@ -129,17 +131,17 @@ function FormatRssHtmlCustom($Html) {
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
 
       $Result = htmLawed($Html, $Config, $Spec);
-      
+
       return $Result;
 }
 endif;
 
 function HTMLawedHookTag($Element, $Attributes = 0) {
-   // If second argument is not received, it means a closing tag is being handled 
-   if($Attributes === 0){ 
-      return "</$Element>"; 
+   // If second argument is not received, it means a closing tag is being handled
+   if($Attributes === 0){
+      return "</$Element>";
    }
-   
+
    $Attribs = '';
    foreach ($Attributes as $Key => $Value) {
       if (strcasecmp($Key, 'style') == 0) {
@@ -149,8 +151,8 @@ function HTMLawedHookTag($Element, $Attributes = 0) {
 
       $Attribs .= " {$Key}=\"{$Value}\"";
    }
-   
-   static $empty_elements = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1); 
-   
+
+   static $empty_elements = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1);
+
    return "<{$Element}{$Attribs}". (isset($empty_elements[$Element]) ? ' /' : ''). '>';
 }

@@ -282,6 +282,11 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_Headers;
 
    /**
+    * @var array An array of internal methods that cannot be dispatched.
+    */
+   protected $internalMethods;
+
+   /**
     * A collection of "inform" messages to be displayed to the user.
     *
     * @since 2.0.18
@@ -331,6 +336,15 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->CssClass = '';
       $this->Data = array();
       $this->Head = Gdn::Factory('Dummy');
+      $this->internalMethods = array(
+         'addasset', 'addbreadcrumb', 'addcssfile', 'adddefinition', 'addinternalmethod', 'addjsfile', 'addmodule',
+         'allowjsonp', 'canonicalurl', 'clearcssfiles', 'clearjsfiles', 'contenttype', 'cssfiles', 'data',
+         'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
+         'fetchviewlocation', 'finalize', 'getasset', 'getimports', 'getjson', 'getstatusmessage', 'image',
+         'informmessage', 'intitialize', 'isinternal', 'jsfiles', 'json', 'jsontarget', 'masterview', 'pagename',
+         'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
+         'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson', 'setlastmodified', 'statuscode', 'title'
+      );
       $this->MasterView = '';
       $this->ModuleSortContainer = '';
       $this->OriginalRequestMethod = '';
@@ -449,6 +463,15 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions[$Term] = $Definition;
       }
       return ArrayValue($Term, $this->_Definitions);
+   }
+
+   /**
+    * Add an method to the list of internal methods.
+    *
+    * @param string $methodName The name of the internal method to add.
+    */
+   public function addInternalMethod($methodName) {
+      $this->internalMethods[] = strtolower($methodName);
    }
 
    /**
@@ -848,8 +871,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ViewPaths = array();
 
          // 1. An explicitly defined path to a view
-         if (strpos($View, DS) !== FALSE)
+         if (strpos($View, DS) !== FALSE && StringBeginsWith($View, PATH_ROOT)) {
             $ViewPaths[] = $View;
+         }
 
          if ($this->Theme) {
             // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
@@ -1062,6 +1086,17 @@ class Gdn_Controller extends Gdn_Pluggable {
 
    public function JsFiles() {
       return $this->_JsFiles;
+   }
+
+   /**
+    * Determines whether a method on this controller is internal and can't be dispatched.
+    *
+    * @param string $methodName The name of the method.
+    * @return bool Returns true if the method is internal or false otherwise.
+    */
+   public function isInternal($methodName) {
+      $result = substr($methodName, 0, 1) === '_' || in_array(strtolower($methodName), $this->internalMethods);
+      return $result;
    }
 
    /**
@@ -1324,20 +1359,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
       }
-   }
-
-   /**
-    * Undocumented method.
-    *
-    * @param string $AltAppFolder
-    * @param string $AltController
-    * @param string $AltMethod
-    * @todo Method RenderAlternate() and $AltAppFolder, $AltController and $AltMethod needs descriptions.
-    */
-   public function RenderAlternate($AltAppFolder, $AltController, $AltMethod) {
-      $this->AddAsset('Content', $this->FetchView($AltMethod, $AltController, $AltAppFolder));
-      $this->RenderMaster();
-      return;
    }
 
    /**
@@ -1672,6 +1693,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
+               if (!is_array($CssInfo['Options'])) {
+                  $CssInfo['Options'] = array();
+               }
+               $Options = &$CssInfo['Options'];
 
                // style.css and admin.css deserve some custom processing.
                if (in_array($CssFile, array('style.css', 'admin.css'))) {
@@ -1690,75 +1715,33 @@ class Gdn_Controller extends Gdn_Pluggable {
                   continue;
                }
 
-               if (StringBeginsWith($CssFile, 'http')) {
-                  $this->Head->AddCss($CssFile, 'all', GetValue('AddVersion', $CssInfo, TRUE), $CssInfo['Options']);
+               $AppFolder = $CssInfo['AppFolder'];
+               $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
+               $Search = AssetModel::CssPath($CssFile, $LookupFolder, $ThemeType);
+               if (!$Search) {
                   continue;
-               } elseif (strpos($CssFile, '/') !== FALSE) {
-                  $CssPaths = array();
-
-                  $AppFolder = $CssInfo['AppFolder'];
-                  if (empty($AppFolder)) {
-                     // A direct path to the file was given.
-                     $CssPaths[] = paths(PATH_ROOT, str_replace('/', DS, $CssFile));
-                  } else if (StringBeginsWith($AppFolder, 'plugins/')) {
-                     // A plugin-relative path was given
-                     $AppFolder = substr($AppFolder, strlen('plugins/'));
-                     $CssPaths[] = paths(PATH_PLUGINS, $AppFolder, "design", $CssFile);
-                  } else {
-                     $CssPaths[] = paths(PATH_APPLICATIONS, $AppFolder, 'design', $CssFile);
-                  }
-               } else {
-//                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
-                  $AppFolder = $CssInfo['AppFolder'];
-                  if ($AppFolder == '')
-                     $AppFolder = $this->ApplicationFolder;
-
-                  // CSS comes from one of four places:
-                  $CssPaths = array();
-                  if ($this->Theme) {
-                     // Use the default filename.
-                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
-                  }
-
-
-                  // 3. Application or plugin.
-                  if (StringBeginsWith($AppFolder, 'plugins/')) {
-                     // The css is coming from a plugin.
-                     $AppFolder = substr($AppFolder, strlen('plugins/'));
-                     $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
-                     $CssPaths[] = PATH_PLUGINS . "/$AppFolder/$CssFile";
-                  } elseif (in_array($AppFolder, array('static', 'resources'))) {
-                     // This is a static css file.
-                     $CssPaths[] = PATH_ROOT."/resources/css/$CssFile";
-                  } else {
-                     // Application default. eg. root/applications/app_name/design/
-                     $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
-                  }
-
-                  // 4. Garden default. eg. root/applications/dashboard/design/
-                  $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
                }
 
-               // Find the first file that matches the path.
-               $CssPath = FALSE;
-               foreach($CssPaths as $Glob) {
-                  $Paths = SafeGlob($Glob);
-                  if(is_array($Paths) && count($Paths) > 0) {
-                     $CssPath = $Paths[0];
-                     break;
-                  }
-               }
+               list($Path, $UrlPath) = $Search;
+
+               if (IsUrl($Path)) {
+
+                  $this->Head->AddCss($Path, 'all', val('AddVersion', $Options, TRUE), $Options);
+                  continue;
+
+                  } else {
 
                // Check to see if there is a CSS cacher.
                $CssCacher = Gdn::Factory('CssCacher');
-               if(!is_null($CssCacher)) {
-                  $CssPath = $CssCacher->Get($CssPath, $AppFolder);
+                  if (!is_null($CssCacher)) {
+                     $Path = $CssCacher->Get($Path, $AppFolder);
                }
 
-               if ($CssPath !== FALSE) {
-                  $CssPath = substr($CssPath, strlen(PATH_ROOT));
-                  $CssPath = str_replace(DS, '/', $CssPath);
-                  $this->Head->AddCss($CssPath, 'all', TRUE, $CssInfo['Options']);
+                  if ($Path !== FALSE) {
+                     $Path = substr($Path, strlen(PATH_ROOT));
+                     $Path = str_replace(DS, '/', $Path);
+                     $this->Head->AddCss($Path, 'all', TRUE, $Options);
+                  }
                }
             }
 

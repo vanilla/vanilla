@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.1',
+   'Version' => '1.7.2',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -636,7 +636,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       // If user wants to modify styling of Wysiwyg content in editor,
       // they can override the styles with this file.
-      $CssInfo = AssetModel::CssPath(false, 'wysiwyg.css', 'plugins/editor');
+      $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
       if ($CssInfo) {
         $CssPath = Asset($CssInfo[1]);
       }
@@ -742,7 +742,7 @@ class EditorPlugin extends Gdn_Plugin {
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
 
-         $Args['BodyBox'] = $View.$Args['BodyBox'];
+         $Args['BodyBox'] .= $View;
       }
    }
 

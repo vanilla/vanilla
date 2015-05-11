@@ -235,6 +235,10 @@ class RoleModel extends Gdn_Model {
    }
 
    public function GetApplicantCount($Force = FALSE) {
+      if (C('Garden.Registration.Method') != 'Approval') {
+         return 0;
+      }
+
       $CacheKey = 'Moderation.ApplicantCount';
 
       if ($Force)

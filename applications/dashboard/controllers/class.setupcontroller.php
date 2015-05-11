@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
- 
+
 /**
  * Manages installation of Dashboard.
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -12,7 +12,7 @@
 class SetupController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form', 'Database');
-   
+
    /**
     * Add CSS & module, set error master view. Automatically run on every use.
     *
@@ -26,19 +26,17 @@ class SetupController extends DashboardController {
       // Make sure all errors are displayed.
       SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => FALSE));
    }
-   
+
    /**
-    * The summary of all settings available. 
+    * The summary of all settings available.
     *
-    * The menu items displayed here are collected from each application's 
+    * The menu items displayed here are collected from each application's
     * application controller and all plugin's definitions.
     *
     * @since 2.0.0
     * @access public
     */
    public function Index() {
-      $this->AddJsFile('setup.js');
-      
       $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
@@ -48,20 +46,20 @@ class SetupController extends DashboardController {
          $this->Render();
          return;
       }
-      
+
       if (!$this->_CheckPrerequisites()) {
          $this->View = 'prerequisites';
       } else {
          $this->View = 'configure';
-         
+
          // Make sure the user has copied the htaccess file over.
          if (!file_exists(PATH_ROOT.'/.htaccess') && !$this->Form->GetFormValue('SkipHtaccess')) {
             $this->SetData('NoHtaccess', TRUE);
             $this->Form->AddError(T('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
          }
-         
+
          $ApplicationManager = new Gdn_ApplicationManager();
-         
+
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
             // Get list of applications to enable during install
@@ -83,7 +81,7 @@ class SetupController extends DashboardController {
                $Config = array('Garden.Installed' => TRUE);
                SaveToConfig($Config);
                $this->FireEvent('Installed');
-               
+
                // Go to the dashboard
                Redirect('/settings/gettingstarted');
             }
@@ -91,7 +89,7 @@ class SetupController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Allows the configuration of basic setup information in Garden. This
     * should not be functional after the application has been set up.
@@ -104,25 +102,25 @@ class SetupController extends DashboardController {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
-      
+      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
+
       // Set the models on the forms.
       $this->Form->SetModel($ConfigurationModel);
-      
+
       // Load the locales for the locale dropdown
       // $Locale = Gdn::Locale();
       // $AvailableLocales = $Locale->GetAvailableLocaleSources();
       // $this->LocaleData = array_combine($AvailableLocales, $AvailableLocales);
-      
+
       // If seeing the form for the first time...
       if (!$this->Form->IsPostback()) {
          // Force the webroot using our best guesstimates
          $ConfigurationModel->Data['Database.Host'] = 'localhost';
          $this->Form->SetData($ConfigurationModel->Data);
-      } else {         
+      } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Database.Name', 'Required', 'You must specify the name of the database in which you want to set up Vanilla.');
-			
+
          // Let's make some user-friendly custom errors for database problems
          $DatabaseHost = $this->Form->GetFormValue('Database.Host', '~~Invalid~~');
          $DatabaseName = $this->Form->GetFormValue('Database.Name', '~~Invalid~~');
@@ -154,9 +152,9 @@ class SetupController extends DashboardController {
                break;
             }
          }
-			
+
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
-         
+
          $ConfigurationFormValues = $this->Form->FormValues();
          if ($ConfigurationModel->Validate($ConfigurationFormValues) !== TRUE || $this->Form->ErrorCount() > 0) {
             // Apply the validation results to the form(s)
@@ -174,7 +172,7 @@ class SetupController extends DashboardController {
             $ConfigurationFormValues['Garden.Email.SupportName'] = $ConfigurationFormValues['Garden.Title'];
 
             $ConfigurationModel->Save($ConfigurationFormValues, TRUE);
-                    
+
             // If changing locale, redefine locale sources:
             $NewLocale = 'en-CA'; // $this->Form->GetFormValue('Garden.Locale', FALSE);
             if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
@@ -193,7 +191,7 @@ class SetupController extends DashboardController {
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
             }
-         
+
             if ($this->Form->ErrorCount() > 0)
                return FALSE;
 
@@ -206,7 +204,7 @@ class SetupController extends DashboardController {
             $UserModel->Validation->ApplyRule('Password', 'Required', T('You must specify an admin password.'));
             $UserModel->Validation->ApplyRule('Password', 'Match');
             $UserModel->Validation->ApplyRule('Email', 'Email');
-            
+
             if (!($AdminUserID = $UserModel->SaveAdminUser($ConfigurationFormValues))) {
                $this->Form->SetValidationResults($UserModel->ValidationResults());
             } else {
@@ -215,23 +213,19 @@ class SetupController extends DashboardController {
                Gdn::Session()->Start($AdminUserID, TRUE);
                SaveToConfig('Garden.Installed', FALSE, array('Save' => FALSE));
             }
-            
+
             if ($this->Form->ErrorCount() > 0)
                return FALSE;
-            
+
             // Assign some extra settings to the configuration file if everything succeeded.
             $ApplicationInfo = array();
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
-            
-            // Detect rewrite abilities
-            $CanRewrite = (bool)$this->Form->GetFormValue('RewriteUrls');
 
             // Detect Internet connection for CDNs
             $Disconnected = !(bool)@fsockopen('ajax.googleapis.com',80);
 
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-               'Garden.RewriteUrls' => $CanRewrite,
                'Garden.Cdns.Disable' => $Disconnected,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
@@ -241,7 +235,7 @@ class SetupController extends DashboardController {
       }
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
    }
-   
+
    /**
     * Check minimum requirements for Garden.
     *
@@ -268,16 +262,16 @@ class SetupController extends DashboardController {
       $ProblemDirectories = array();
       if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF))
          $ProblemDirectories[] = PATH_CONF;
-         
+
       if (!is_readable(PATH_UPLOADS) || !IsWritable(PATH_UPLOADS))
          $ProblemDirectories[] = PATH_UPLOADS;
-         
+
       if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE))
          $ProblemDirectories[] = PATH_CACHE;
 
       if (count($ProblemDirectories) > 0) {
          $PermissionProblem = TRUE;
-         
+
          $PermissionError = T(
             'Some folders don\'t have correct permissions.',
             '<p>Some of your folders do not have the correct permissions.</p><p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>');
@@ -286,13 +280,13 @@ class SetupController extends DashboardController {
 
          $this->Form->AddError($PermissionError.$PermissionHelp);
       }
-      
+
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
          $ConfigFile = Gdn::Config()->DefaultPath();
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
-         
+
          // Make sure the config file is writeable
          if (!is_readable($ConfigFile) || !IsWritable($ConfigFile)) {
             $this->Form->AddError(sprintf(T('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
@@ -306,10 +300,10 @@ class SetupController extends DashboardController {
          if (!file_exists(PATH_CACHE.'/Smarty/cache')) mkdir(PATH_CACHE.'/Smarty/cache');
          if (!file_exists(PATH_CACHE.'/Smarty/compile')) mkdir(PATH_CACHE.'/Smarty/compile');
       }
-			
+
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
    }
-   
+
    public function TestUrlRewrites() {
       die('ok');
    }

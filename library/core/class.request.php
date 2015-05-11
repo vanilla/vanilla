@@ -435,7 +435,7 @@ class Gdn_Request {
             SafeParseStr($Get, $Get, $Original);
          }
 
-         if (isset($_SERVER['X_REWRITE'])) {
+         if (!empty($_SERVER['X_REWRITE'])) {
             $Path = $_SERVER['PATH_INFO'];
          } elseif (isset($Get['_p'])) {
             $Path = $Get['_p'];
@@ -818,7 +818,7 @@ class Gdn_Request {
    /**
     * This method allows safe creation of URLs that need to reference the application itself
     *
-    * Taking the server's RewriteUrls ability into account, and using information from the
+    * Taking the server's Rewrite ability into account, and using information from the
     * actual Request data, this method can construct a trustworthy URL that will point to
     * Garden's dispatcher. Examples:
     *    - Default port, no rewrites, subfolder:      http://www.forum.com/vanilla/index.php?/
@@ -840,7 +840,7 @@ class Gdn_Request {
     */
    public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
       static $AllowSSL = NULL; if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
-      static $RewriteUrls = NULL; if ($RewriteUrls === NULL) $RewriteUrls = C('Garden.RewriteUrls', FALSE);
+      static $Rewrite = NULL; if ($Rewrite === NULL) $Rewrite = !empty($_SERVER['X_REWRITE']);
 
       if (!$AllowSSL) {
          $SSL = NULL;
@@ -894,7 +894,7 @@ class Gdn_Request {
       if (strlen($Query) > 0)
          $Path = substr($Path, 0, -strlen($Query));
 
-      if (!$RewriteUrls) {
+      if (!$Rewrite) {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
          $Query = str_replace('?', '&', $Query);
       }
@@ -907,7 +907,7 @@ class Gdn_Request {
          if (!$Query) {
             $Query = $this->GetRequestArguments(self::INPUT_GET);
             if (count($Query) > 0)
-               $Query = ($RewriteUrls ? '?' : '&amp;').http_build_query($Query);
+               $Query = ($Rewrite ? '?' : '&amp;').http_build_query($Query);
             else
                unset($Query);
          }

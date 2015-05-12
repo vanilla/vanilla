@@ -99,7 +99,10 @@ class HTMLawedPlugin extends Gdn_Plugin {
 
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); ';
       //$Spec .= 'a=class(noneof=Hijack|Dismiss|MorePager/nomatch=%pop[in|up|down]|flyout|ajax%i); ';
-      $Spec .= 'a,span,div,p,li,i,b,strong,em,code,blockquote,dd,dt,img,pre,h1,h2,h3,h4,h5,h6,s,del,sup,sub,q,small,cite,ins=class(oneof=Quote|Spoiler|CodeBlock|Spoiled|P|ImageResized|AuthorAction|MeAction/match=%^(post-|Align)%i)';
+      // Define elements allowed to have a `class`.
+      $Spec .= 'a,span,div,p,li,ul,ol,dl,dd,dt,i,b,strong,em,code,blockquote,img,pre,h1,h2,h3,h4,h5,h6';
+      // Whitelist classes we allow.
+      $Spec .= '=class(match="%^((post-.*)|(.*Spoil.*)|(.*Quote)|(Code.*)|(.*Action)|(Align.*)|(ImageResized))$%i")';
 
       $Result = htmLawed($Html, $Config, $Spec);
 

@@ -522,13 +522,23 @@ class FacebookPlugin extends Gdn_Plugin {
 
    public function AuthorizeUri($Query = FALSE, $RedirectUri = FALSE) {
       $AppID = C('Plugins.Facebook.ApplicationID');
-      $FBScope = C('Plugins.Facebook.Scope', Array('email','public_profile'));
+      $FBScope = C('Plugins.Facebook.Scope', 'email,publish_actions');
+
+      if(is_array($FBScope))
+      {
+         $Scopes = implode(',', $FBScope);
+      } else {
+         $Scopes = $FBScope;
+      }
+
       if (!$RedirectUri)
          $RedirectUri = $this->RedirectUri();
+
       if ($Query)
          $RedirectUri .= '&'.$Query;
+
       $RedirectUri = urlencode($RedirectUri);
-      $Scopes = implode(',', $FBScope);
+
       $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=$Scopes";
       if ($Query)
          $SigninHref .= '&'.$Query;

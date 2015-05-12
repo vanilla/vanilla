@@ -144,7 +144,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          $Sender->FireEvent('AfterDiscussionTitle'); 
       ?>
       </div>
-      <div class="Meta Meta-Discussion">
+      <div class="Meta Meta-Discussion self-clearing">
          <?php 
          WriteTags($Discussion);
          ?>

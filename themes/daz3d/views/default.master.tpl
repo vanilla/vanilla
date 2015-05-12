@@ -27,7 +27,7 @@
 								{breadcrumbs}
 							</div>
 
-						</div><div class="clearfloat"></div>
+						</div><div class="clear"></div>
 						<div class="Column ContentColumn page_content self-clearing" id="Content">{asset name="Content"}</div>
 
 						{literal}

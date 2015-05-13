@@ -440,6 +440,22 @@ if (!function_exists('ValidatePhoneInt')) {
    }
 }
 
+if (!function_exists('ValidateUrl')) {
+   /**
+    * Check to see if a value represents a valid url.
+    *
+    * @param string $Value The value to validate.
+    * @return bool Returns true if the value is a value url or false otherwise.
+    */
+   function ValidateUrl($Value) {
+      if (empty($Value)) {
+         return true;
+      }
+      $Valid = (bool)filter_var($Value, FILTER_VALIDATE_URL);
+      return $Valid;
+   }
+}
+
 /**
  * Validate US zip code (5-digit or 9-digit with hyphen).
  */

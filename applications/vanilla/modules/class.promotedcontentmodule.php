@@ -619,7 +619,7 @@ class PromotedContentModule extends Gdn_Module {
          $ContentItem = $Replacement;
 
 
-         $UserFields = array('UserID', 'Name', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
+         $UserFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
 
          // Attach User
          $UserID = GetValue('InsertUserID', $ContentItem);

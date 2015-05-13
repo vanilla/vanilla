@@ -595,30 +595,52 @@ class PromotedContentModule extends Gdn_Module {
          $ContentType = val('RecordType', $ContentItem);
 
          $Replacement = array();
-         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'RecordType');
+         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'RecordType', 'Url');
 
          switch (strtolower($ContentType)) {
             case 'comment':
                $Fields = array_merge($Fields, array('CommentID'));
 
                // Comment specific
-               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem, val('Name', $ContentItem));
+               $Replacement['Name'] = sprintf(T('Re: %s'), GetValueR('Discussion.Name', $ContentItem, val('Name', $ContentItem)));
+               $url = CommentUrl($ContentItem);
                break;
 
             case 'discussion':
                $Fields = array_merge($Fields, array('Name', 'Type'));
+               $url = DiscussionUrl($ContentItem);
                break;
          }
 
+         $ContentItem['Url'] = $url;
          $Fields = array_fill_keys($Fields, TRUE);
          $Common = array_intersect_key($ContentItem, $Fields);
          $Replacement = array_merge($Replacement, $Common);
          $ContentItem = $Replacement;
 
+
+         $UserFields = array('UserID', 'Name', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
+
          // Attach User
          $UserID = GetValue('InsertUserID', $ContentItem);
          $User = Gdn::UserModel()->GetID($UserID);
-         $ContentItem['Author'] = $User;
+         $RoleModel = new RoleModel();
+         $Roles = $RoleModel->GetByUserID($UserID)->ResultArray();
+         $RoleNames = '';
+         foreach($Roles as $Role) {
+            $RoleNames[] = val('Name', $Role);
+         }
+         $Replacement = array(
+            'Url' => Url(UserUrl($User), true),
+            'PhotoUrl' => UserPhotoUrl($User),
+            'RankName' => val('Name', RankModel::Ranks(val('RankID', $User))),
+            'RoleNames' => $RoleNames
+         );
+         $User = (array) $User;
+         $UserFields = array_fill_keys($UserFields, TRUE);
+         $Common = array_intersect_key($User, $UserFields);
+         $Replacement = array_merge($Common, $Replacement);
+         $ContentItem['Author'] = $Replacement;
       }
    }
 

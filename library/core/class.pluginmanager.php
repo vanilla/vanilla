@@ -1053,6 +1053,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_PLUGIN, $Plugin);
 
+      $enabled = $this->IsEnabled($PluginName);
+
       // 1. Check to make sure that no other enabled plugins rely on this one
       // Get all available plugins and compile their requirements
       foreach ($this->EnabledPlugins() as $CheckingName => $Trash) {
@@ -1069,12 +1071,14 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       // 3. Disable it.
       SaveToConfig("EnabledPlugins.{$PluginName}", false);
       unset($this->EnabledPlugins[$PluginName]);
-      Logger::event(
-         'addon_disabled',
-         LogLevel::NOTICE,
-         'The {addonName} plugin was disabled.',
-         array('addonName' => $PluginName)
-      );
+      if ($enabled) {
+         Logger::event(
+            'addon_disabled',
+            LogLevel::NOTICE,
+            'The {addonName} plugin was disabled.',
+            array('addonName' => $PluginName)
+         );
+      }
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       Gdn::Locale()->Refresh();

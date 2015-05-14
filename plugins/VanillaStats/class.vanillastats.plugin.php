@@ -19,7 +19,7 @@
 $PluginInfo['VanillaStats'] = array(
    'Name' => 'Vanilla Statistics',
    'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
-   'Version' => '2.0.4.1',
+   'Version' => '2.0.5',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE,
@@ -107,9 +107,9 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       if (!Gdn_Statistics::CheckIsEnabled() && Gdn_Statistics::CheckIsLocalhost()) {
          $Sender->Render('dashboardlocalhost', '', 'plugins/VanillaStats');
       } else {
-         $Sender->AddJsFile('plugins/VanillaStats/js/vanillastats.js');
-         $Sender->AddJsFile('plugins/VanillaStats/js/picker.js');
-         $Sender->AddCSSFile('plugins/VanillaStats/design/picker.css');
+         $Sender->AddJsFile('vanillastats.js', 'plugins/VanillaStats');
+         $Sender->AddJsFile('picker.js', 'plugins/VanillaStats');
+         $Sender->AddCSSFile('picker.css', 'plugins/VanillaStats');
 
          $this->ConfigureRange($Sender);
 

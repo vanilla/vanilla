@@ -240,14 +240,14 @@ class AssetModel extends Gdn_Model {
       $Paths = array();
 
       // 2. Check for a full path.
-      if (strpos($Filename, '/') !== false && empty($Folder)) {
+      if (strpos($Filename, '/') !== false) {
          $Filename = ltrim($Filename, '/');
 
          // Direct path was given
          $Filename = "/{$Filename}";
          $Path = PATH_ROOT.$Filename;
          if (file_exists($Path)) {
-            Deprecated("AssetModel::CssPath() with direct paths.");
+            Deprecated("AssetModel::CssPath() with direct paths");
             return array($Path, $Filename);
          }
          return false;

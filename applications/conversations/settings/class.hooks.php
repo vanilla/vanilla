@@ -160,6 +160,35 @@ class ConversationsHooks implements Gdn_IPlugin {
    }
 
    /**
+    * Provide default permissions for roles, based on the value in their Type column.
+    *
+    * @param PermissionModel $Sender Instance of permission model that fired the event
+    */
+   public function PermissionModel_ResetPermissionsWithRoleTypeDefaults_Handler($Sender) {
+      switch ($Sender->EventArguments['RoleType']) {
+         case 'Guest':
+         case 'Unconfirmed':
+         case 'Applicant':
+            $Permissions = array(
+               'Conversations.Moderation.Manage' => 0,
+               'Conversations.Conversations.Add' => 0
+            );
+            break;
+         case 'Member':
+         case 'Moderator':
+         case 'Administrator':
+         default:
+            $Permissions = array(
+               'Conversations.Moderation.Manage' => 0,
+               'Conversations.Conversations.Add' => 1
+            );
+            break;
+      }
+
+      $Sender->EventArguments['Permissions'] = array_merge($Sender->EventArguments['Permissions'], $Permissions);
+   }
+
+   /**
     * Load some information into the BuzzData collection (for Dashboard report).
     *
     * @since 2.0.?

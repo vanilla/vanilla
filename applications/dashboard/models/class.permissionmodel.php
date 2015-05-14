@@ -820,6 +820,118 @@ class PermissionModel extends Gdn_Model {
    }
 
    /**
+    * Reset permissions for all roles, based on the value in their Type column.
+    */
+   public static function ResetAllWithTypeDefaults() {
+      // Retrieve an array containing all available roles.
+      $RoleModel = new RoleModel();
+      $AllRoles = $RoleModel->GetArray();
+
+      // Iterate through our roles and reset their permissions.
+      $Permissions = Gdn::PermissionModel();
+      foreach ($AllRoles as $RoleID => $Role) {
+         $Permissions->ResetWithTypeDefaults($Role);
+      }
+   }
+
+   /**
+    * Reset permissions for a role, based on the value in its Type column.
+    *
+    * @param string $Role Name of the role to reset permissions for.
+    * @throws Exception
+    */
+   public function ResetWithTypeDefaults($Role) {
+      // Grab the value of Type for this role.
+      $RoleType = $this->SQL->GetWhere('Role', array('Name' => $Role))->Value('Type');
+
+      // Depending on the value of Type, determine default Garden.* permissions.
+      switch($RoleType) {
+         case 'Guest':
+            $Permissions = array(
+               'Garden.Activity.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 0
+            );
+            break;
+         case 'Unconfirmed':
+            $Permissions = array(
+               'Garden.SignIn.Allow' => 1,
+               'Garden.Activity.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 0,
+               'Garden.Email.View' => 1
+            );
+            break;
+         case 'Applicant':
+            $Permissions = array(
+               'Garden.SignIn.Allow' => 1,
+               'Garden.Activity.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 0,
+               'Garden.Email.View' => 1
+            );
+            break;
+         case 'Moderator':
+            $Permissions = array(
+               'Garden.SignIn.Allow' => 1,
+               'Garden.Activity.View' => 1,
+               'Garden.Curation.Manage' => 1,
+               'Garden.Moderation.Manage' => 1,
+               'Garden.PersonalInfo.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 1,
+               'Garden.Email.View' => 1
+            );
+            break;
+         case 'Administrator':
+            $Permissions = array(
+               'Garden.SignIn.Allow' => 1,
+               'Garden.Settings.View' => 1,
+               'Garden.Settings.Manage' => 1,
+               'Garden.Community.Manage' => 1,
+               'Garden.Users.Add' => 1,
+               'Garden.Users.Edit' => 1,
+               'Garden.Users.Delete' => 1,
+               'Garden.Users.Approve' => 1,
+               'Garden.Activity.Delete' => 1,
+               'Garden.Activity.View' => 1,
+               'Garden.Messages.Manage' => 1,
+               'Garden.PersonalInfo.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 1,
+               'Garden.AdvancedNotifications.Allow' => 1,
+               'Garden.Email.View' => 1,
+               'Garden.Curation.Manage' => 1,
+               'Garden.Moderation.Manage' => 1
+            );
+            break;
+         case 'Member':
+         default:
+            $Permissions = array(
+               'Garden.SignIn.Allow' => 1,
+               'Garden.Activity.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 1,
+               'Garden.Email.View' => 1
+            );
+            break;
+      }
+
+      // Should a junction permission to the global permissions also be saved?
+      $SaveGlobal = FALSE;
+
+      // Allow the ability for other applications and plug-ins to speakup with their own default permissions.
+      $this->EventArguments['Permissions'] =& $Permissions;
+      $this->EventArguments['RoleType'] = $RoleType;
+      $this->EventArguments['SaveGlobal'] =& $SaveGlobal;
+      $this->FireEvent('ResetPermissionsWithRoleTypeDefaults');
+
+      // Save the permission.
+      $Permissions['Role'] = $Role;
+      $this->Save($Permissions, $SaveGlobal);
+   }
+
+   /**
     * Split a permission name into its constituant parts.
     *
     * @param string $PermissionName The name of the permission.

@@ -1430,48 +1430,47 @@ EOT;
       }
    }
 
-   /** Do a preg_replace, but don't affect things inside <code> tags.
+   /**
+    * Do a preg_replace, but don't affect things inside <code> tags.
     * The three parameters are identical to the ones you'd pass
     * preg_replace.
     *
-    * @param mixed $Pattern
-    * @param mixed $Replacement
-    * @param mixed $Subject
+    * @param mixed $Search The value being searched for, just like in
+    *              preg_replace or preg_replace_callback.
+    * @param mixed $Replace The replacement value, just like in
+    *              preg_replace or preg_replace_callback.
+    * @param mixed $Subject The string being searched.
     * @param bool $IsCallback If true, do preg_replace_callback. Do
     *             preg_replace otherwise.
     * @return string
     */
-   public static function ReplaceButProtectCodeBlocks($Pattern, $Replacement, $Subject, $IsCallback = FALSE) {
-     // Take the code blocks out, replace with something unlikely to
-     // appear in the string, and keep track of what substring got
-     // replaced with what code.
-     $Replacements = array();
+   public static function ReplaceButProtectCodeBlocks($Search, $Replace, $Subject, $IsCallback = FALSE) {
+     // Take the code blocks out, replace with a hash of the string, and
+     // keep track of what substring got replaced with what hash.
+     $CodeBlockContents = array();
+     $CodeBlockHashes = array();
      $Subject = preg_replace_callback(
        '/<code>.*?<\/code>/i',
-       function($Matches) use (&$Replacements) {
-         // Random string and replacement index, surrounded by
-         // whitespace to try to prevent the characters from being
-         // picked up by $Pattern.
-         $ReplacementString = ' 5z9Ah9Y2sX5xnzUx8wSq'.count($Replacements).' ';
-         $Replacements[$ReplacementString] = $Matches[0];
+       function($Matches) use (&$CodeBlockContents, &$CodeBlockHashes) {
+         // Surrounded by whitespace to try to prevent the characters
+         // from being picked up by $Pattern.
+         $ReplacementString = ' '.sha1($Matches[0]).' ';
+         $CodeBlockContents[] = $Matches[0];
+         $CodeBlockHashes[] = $ReplacementString;
          return $ReplacementString;
        },
        $Subject
      );
 
-
      // Do the requested replacement.
      if ($IsCallback) {
-       $Subject = preg_replace_callback($Pattern, $Replacement, $Subject);
+       $Subject = preg_replace_callback($Search, $Replace, $Subject);
      } else {
-       $Subject = preg_replace($Pattern, $Replacement, $Subject);
+       $Subject = preg_replace($Search, $Replace, $Subject);
      }
 
-     // Put back the code blocks. First in, last out so that e.g.
-     // random10 is not replaced by random1.
-     foreach (array_reverse($Replacements) as $Placeholder => $Original) {
-       $Subject = str_replace($Placeholder, $Original, $Subject);
-     }
+     // Put back the code blocks.
+     $Subject = str_replace($CodeBlockHashes, $CodeBlockContents, $Subject);
 
      return $Subject;
    }

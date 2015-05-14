@@ -174,7 +174,7 @@ class TagModule extends Gdn_Module {
             <?php if ($Tag['Name'] != ''): ?>
             <li><?php
                echo Anchor(TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
-                  TagUrl($Tag),
+                  TagUrl($Tag, '', '/'),
                   array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
                );
             ?></li>

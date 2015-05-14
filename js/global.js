@@ -676,7 +676,7 @@ jQuery(document).ready(function($) {
          data: { DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey') },
          dataType: 'json',
          complete: function() {
-            gdn.enable($elem);
+            gdn.enable($elem.get(0));
             $elem.removeClass(progressClass);
             $elem.attr('href', href);
 

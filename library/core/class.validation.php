@@ -124,6 +124,7 @@ class Gdn_Validation {
       $this->AddRule('PhoneInt', 'function:ValidatePhoneInt');
       $this->AddRule('ZipCode', 'function:ValidateZipCode');
       $this->AddRule('Format', 'function:ValidateFormat');
+      $this->AddRule('Url', 'function:ValidateUrl');
    }
 
 

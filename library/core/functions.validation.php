@@ -33,7 +33,7 @@ if (!function_exists('ValidateCaptcha')) {
 
 if (!function_exists('ValidateRegex')) {
    function ValidateRegex($Value, $Regex) {
-      return (!filter_var($Value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $Regex))) === false);
+      return (filter_var($Value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $Regex))) !== false);
    }
 }
 
@@ -138,7 +138,7 @@ if (!function_exists('ValidateEmail')) {
          return true;
       }
 
-      return (!filter_var($Value, FILTER_VALIDATE_EMAIL) === false);
+      return (filter_var($Value, FILTER_VALIDATE_EMAIL) !== false);
    }
 }
 
@@ -243,7 +243,7 @@ if (!function_exists('ValidateMinimumAge')) {
 
 if (!function_exists('ValidateInteger')) {
    function ValidateInteger($Value, $Field = NULL) {
-      return (!$Value || filter_var($Value, FILTER_VALIDATE_INT) === 0 || !filter_var($Value, FILTER_VALIDATE_INT) === false);
+      return (!$Value || filter_var($Value, FILTER_VALIDATE_INT) !== false);
    }
 }
 

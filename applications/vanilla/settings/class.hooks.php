@@ -152,81 +152,87 @@ class VanillaHooks implements Gdn_IPlugin {
     *
     * @param PermissionModel $Sender Instance of permission model that fired the event
     */
-   public function PermissionModel_ResetPermissionsWithRoleTypeDefaults_Handler($Sender) {
-      switch ($Sender->EventArguments['RoleType']) {
-         case 'Guest':
-            $Permissions = array(
-               'JunctionTable' => 'Category',
-               'JunctionColumn' => 'PermissionCategoryID',
-               'JunctionID' => -1,
-               'Vanilla.Discussions.View' => 1
-            );
-            break;
-         case 'Unconfirmed':
-            $Permissions = array(
-               'JunctionTable' => 'Category',
-               'JunctionColumn' => 'PermissionCategoryID',
-               'JunctionID' => -1,
-               'Vanilla.Discussions.View' => 1
-            );
-            break;
-         case 'Applicant':
-            $Permissions = array(
-               'JunctionTable' => 'Category',
-               'JunctionColumn' => 'PermissionCategoryID',
-               'JunctionID' => -1,
-               'Vanilla.Discussions.View' => 1
-            );
-            break;
-         case 'Moderator':
-            $Permissions = array(
-               'JunctionTable' => 'Category',
-               'JunctionColumn' => 'PermissionCategoryID',
-               'JunctionID' => -1,
-               'Vanilla.Discussions.Add' => 1,
-               'Vanilla.Discussions.Edit' => 1,
-               'Vanilla.Discussions.Announce' => 1,
-               'Vanilla.Discussions.Sink' => 1,
-               'Vanilla.Discussions.Close' => 1,
-               'Vanilla.Discussions.Delete' => 1,
-               'Vanilla.Discussions.View' => 1,
-               'Vanilla.Comments.Add' => 1,
-               'Vanilla.Comments.Edit' => 1,
-               'Vanilla.Comments.Delete' => 1
-            );
-            break;
-         case 'Administrator':
-            $Permissions = array(
-               'JunctionTable' => 'Category',
-               'JunctionColumn' => 'PermissionCategoryID',
-               'JunctionID' => -1,
-               'Vanilla.Discussions.Add' => 1,
-               'Vanilla.Discussions.Edit' => 1,
-               'Vanilla.Discussions.Announce' => 1,
-               'Vanilla.Discussions.Sink' => 1,
-               'Vanilla.Discussions.Close' => 1,
-               'Vanilla.Discussions.Delete' => 1,
-               'Vanilla.Discussions.View' => 1,
-               'Vanilla.Comments.Add' => 1,
-               'Vanilla.Comments.Edit' => 1,
-               'Vanilla.Comments.Delete' => 1
-            );
-            break;
-         case 'Member':
-         default:
-            $Permissions = array(
-               'JunctionTable' => 'Category',
-               'JunctionColumn' => 'PermissionCategoryID',
-               'JunctionID' => -1,
-               'Vanilla.Discussions.Add' => 1,
-               'Vanilla.Discussions.View' => 1,
-               'Vanilla.Comments.Add' => 1
-            );
-            break;
-      }
-
-      $Sender->EventArguments['SaveGlobal'] = TRUE;
-      $Sender->EventArguments['Permissions'] = array_merge($Sender->EventArguments['Permissions'], $Permissions);
+   public function PermissionModel_DefaultPermissions_Handler($Sender) {
+      $Sender->AddDefault(
+         PermissionModel::TYPE_GUEST,
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            'Vanilla.Discussions.View' => 1
+         ),
+         TRUE
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_UNCONFIRMED,
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            'Vanilla.Discussions.View' => 1
+         ),
+         TRUE
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_APPLICANT,
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            'Vanilla.Discussions.View' => 1
+         ),
+         TRUE
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_MEMBER,
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1
+         ),
+         TRUE
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_MODERATOR,
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         ),
+         TRUE
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_ADMINISTRATOR,
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         ),
+         TRUE
+      );
    }
 
 	/**

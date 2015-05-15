@@ -9,6 +9,43 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class PermissionModel extends Gdn_Model {
+
+   /**
+    * Slug for Guest role type
+    */
+   const TYPE_GUEST = 'guest';
+
+   /**
+    * Slug for Unconfirmed role type
+    */
+   const TYPE_UNCONFIRMED = 'unconfirmed';
+
+   /**
+    * Slug for Applicant role type
+    */
+   const TYPE_APPLICANT = 'applicant';
+
+   /**
+    * Slug for Member role type
+    */
+   const TYPE_MEMBER = 'member';
+
+   /**
+    * Slug for Moderator role type
+    */
+   const TYPE_MODERATOR = 'moderator';
+
+   /**
+    * Slug for Administrator role type
+    */
+   const TYPE_ADMINISTRATOR = 'administrator';
+
+   /**
+    * Default role permissions
+    * @var array
+    */
+   protected $_DefaultPermissions = array();
+
    /**
     * Class constructor. Defines the related database table name.
     */
@@ -22,6 +59,114 @@ class PermissionModel extends Gdn_Model {
          $NewValues['`'.$Key.'`'] = $Value;
       }
       return $NewValues;
+   }
+
+   /**
+    * Add an entry into the list of default permissions.
+    *
+    * @param string $Type Type of role the permissions should be added for.
+    * @param array $Permissions List of permissions to include.
+    * @param bool $SaveGlobal Save a junction permission to the global permissions.
+    */
+   public function AddDefault($Type, $Permissions, $SaveGlobal = FALSE) {
+      if (!array_key_exists($Type, $this->_DefaultPermissions)) {
+         $this->_DefaultPermissions[$Type] = array();
+      }
+
+      $this->_DefaultPermissions[$Type][] = array($Permissions, $SaveGlobal);
+   }
+
+   /**
+    * Populate a list of default permissions, per type.
+    *
+    * @param bool $ResetDefaults If we already have defaults, should they be discarded?
+    */
+   public function AssignDefaults($ResetDefaults = FALSE) {
+      if (count($this->_DefaultPermissions)) {
+         if ($ResetDefaults) {
+            $this->_DefaultPermissions = array();
+         } else {
+            return;
+         }
+      }
+
+      $this->AddDefault(
+         self::TYPE_GUEST,
+         array(
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 0
+         )
+      );
+      $this->AddDefault(
+         self::TYPE_UNCONFIRMED,
+         $Permissions = array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 0,
+            'Garden.Email.View' => 1
+         )
+      );
+      $this->AddDefault(
+         self::TYPE_APPLICANT,
+         $Permissions = array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 0,
+            'Garden.Email.View' => 1
+         )
+      );
+      $this->AddDefault(
+         self::TYPE_MODERATOR,
+         $Permissions = array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Curation.Manage' => 1,
+            'Garden.Moderation.Manage' => 1,
+            'Garden.PersonalInfo.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 1,
+            'Garden.Email.View' => 1
+         )
+      );
+      $this->AddDefault(
+         self::TYPE_ADMINISTRATOR,
+         array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Settings.View' => 1,
+            'Garden.Settings.Manage' => 1,
+            'Garden.Community.Manage' => 1,
+            'Garden.Users.Add' => 1,
+            'Garden.Users.Edit' => 1,
+            'Garden.Users.Delete' => 1,
+            'Garden.Users.Approve' => 1,
+            'Garden.Activity.Delete' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Messages.Manage' => 1,
+            'Garden.PersonalInfo.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 1,
+            'Garden.AdvancedNotifications.Allow' => 1,
+            'Garden.Email.View' => 1,
+            'Garden.Curation.Manage' => 1,
+            'Garden.Moderation.Manage' => 1
+         )
+      );
+      $this->AddDefault(
+         self::TYPE_MEMBER,
+         array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 1,
+            'Garden.Email.View' => 1
+         )
+      );
+
+      // Allow the ability for other applications and plug-ins to speakup with their own default permissions.
+      $this->FireEvent('DefaultPermissions');
    }
 
    public function ClearPermissions() {
@@ -822,7 +967,7 @@ class PermissionModel extends Gdn_Model {
    /**
     * Reset permissions for all roles, based on the value in their Type column.
     */
-   public static function ResetAllWithTypeDefaults() {
+   public static function ResetAllRoles() {
       // Retrieve an array containing all available roles.
       $RoleModel = new RoleModel();
       $AllRoles = $RoleModel->GetArray();
@@ -830,7 +975,7 @@ class PermissionModel extends Gdn_Model {
       // Iterate through our roles and reset their permissions.
       $Permissions = Gdn::PermissionModel();
       foreach ($AllRoles as $RoleID => $Role) {
-         $Permissions->ResetWithTypeDefaults($Role);
+         $Permissions->ResetRole($Role);
       }
    }
 
@@ -840,95 +985,24 @@ class PermissionModel extends Gdn_Model {
     * @param string $Role Name of the role to reset permissions for.
     * @throws Exception
     */
-   public function ResetWithTypeDefaults($Role) {
+   public function ResetRole($Role) {
       // Grab the value of Type for this role.
       $RoleType = $this->SQL->GetWhere('Role', array('Name' => $Role))->Value('Type');
 
-      // Depending on the value of Type, determine default Garden.* permissions.
-      switch($RoleType) {
-         case 'Guest':
-            $Permissions = array(
-               'Garden.Activity.View' => 1,
-               'Garden.Profiles.View' => 1,
-               'Garden.Profiles.Edit' => 0
-            );
-            break;
-         case 'Unconfirmed':
-            $Permissions = array(
-               'Garden.SignIn.Allow' => 1,
-               'Garden.Activity.View' => 1,
-               'Garden.Profiles.View' => 1,
-               'Garden.Profiles.Edit' => 0,
-               'Garden.Email.View' => 1
-            );
-            break;
-         case 'Applicant':
-            $Permissions = array(
-               'Garden.SignIn.Allow' => 1,
-               'Garden.Activity.View' => 1,
-               'Garden.Profiles.View' => 1,
-               'Garden.Profiles.Edit' => 0,
-               'Garden.Email.View' => 1
-            );
-            break;
-         case 'Moderator':
-            $Permissions = array(
-               'Garden.SignIn.Allow' => 1,
-               'Garden.Activity.View' => 1,
-               'Garden.Curation.Manage' => 1,
-               'Garden.Moderation.Manage' => 1,
-               'Garden.PersonalInfo.View' => 1,
-               'Garden.Profiles.View' => 1,
-               'Garden.Profiles.Edit' => 1,
-               'Garden.Email.View' => 1
-            );
-            break;
-         case 'Administrator':
-            $Permissions = array(
-               'Garden.SignIn.Allow' => 1,
-               'Garden.Settings.View' => 1,
-               'Garden.Settings.Manage' => 1,
-               'Garden.Community.Manage' => 1,
-               'Garden.Users.Add' => 1,
-               'Garden.Users.Edit' => 1,
-               'Garden.Users.Delete' => 1,
-               'Garden.Users.Approve' => 1,
-               'Garden.Activity.Delete' => 1,
-               'Garden.Activity.View' => 1,
-               'Garden.Messages.Manage' => 1,
-               'Garden.PersonalInfo.View' => 1,
-               'Garden.Profiles.View' => 1,
-               'Garden.Profiles.Edit' => 1,
-               'Garden.AdvancedNotifications.Allow' => 1,
-               'Garden.Email.View' => 1,
-               'Garden.Curation.Manage' => 1,
-               'Garden.Moderation.Manage' => 1
-            );
-            break;
-         case 'Member':
-         default:
-            $Permissions = array(
-               'Garden.SignIn.Allow' => 1,
-               'Garden.Activity.View' => 1,
-               'Garden.Profiles.View' => 1,
-               'Garden.Profiles.Edit' => 1,
-               'Garden.Email.View' => 1
-            );
-            break;
+      if ($RoleType == '') {
+         $RoleType = self::TYPE_MEMBER;
       }
 
-      // Should a junction permission to the global permissions also be saved?
-      $SaveGlobal = FALSE;
+      $this->AssignDefaults();
+      print_r($this->_DefaultPermissions);
 
-      // Allow the ability for other applications and plug-ins to speakup with their own default permissions.
-      $this->EventArguments['Permissions'] =& $Permissions;
-      $this->EventArguments['RoleType'] = $RoleType;
-      $this->EventArguments['SaveGlobal'] =& $SaveGlobal;
-      $this->FireEvent('ResetPermissionsWithRoleTypeDefaults');
-
-      // Save the permission.
-      $Permissions['Role'] = $Role;
-      $this->Save($Permissions, $SaveGlobal);
+      if (array_key_exists($RoleType, $this->_DefaultPermissions)) {
+         foreach ($this->_DefaultPermissions[$RoleType] as $Defaults) {
+            list($Permissions, $SaveGlobal) = $Defaults;
+            $Permissions['Role'] = $Role;
+            $this->Save($Permissions, $SaveGlobal);
+         }
+      }
    }
 
    /**

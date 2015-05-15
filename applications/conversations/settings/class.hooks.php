@@ -164,28 +164,49 @@ class ConversationsHooks implements Gdn_IPlugin {
     *
     * @param PermissionModel $Sender Instance of permission model that fired the event
     */
-   public function PermissionModel_ResetPermissionsWithRoleTypeDefaults_Handler($Sender) {
-      switch ($Sender->EventArguments['RoleType']) {
-         case 'Guest':
-         case 'Unconfirmed':
-         case 'Applicant':
-            $Permissions = array(
-               'Conversations.Moderation.Manage' => 0,
-               'Conversations.Conversations.Add' => 0
-            );
-            break;
-         case 'Member':
-         case 'Moderator':
-         case 'Administrator':
-         default:
-            $Permissions = array(
-               'Conversations.Moderation.Manage' => 0,
-               'Conversations.Conversations.Add' => 1
-            );
-            break;
-      }
-
-      $Sender->EventArguments['Permissions'] = array_merge($Sender->EventArguments['Permissions'], $Permissions);
+   public function PermissionModel_DefaultPermissions_Handler($Sender) {
+      $Sender->AddDefault(
+         PermissionModel::TYPE_GUEST,
+         array(
+            'Conversations.Moderation.Manage' => 0,
+            'Conversations.Conversations.Add' => 0
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_UNCONFIRMED,
+         array(
+            'Conversations.Moderation.Manage' => 0,
+            'Conversations.Conversations.Add' => 0
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_APPLICANT,
+         array(
+            'Conversations.Moderation.Manage' => 0,
+            'Conversations.Conversations.Add' => 0
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_MEMBER,
+         array(
+            'Conversations.Moderation.Manage' => 0,
+            'Conversations.Conversations.Add' => 1
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_MODERATOR,
+         array(
+            'Conversations.Moderation.Manage' => 0,
+            'Conversations.Conversations.Add' => 1
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_ADMINISTRATOR,
+         array(
+            'Conversations.Moderation.Manage' => 0,
+            'Conversations.Conversations.Add' => 1
+         )
+      );
    }
 
    /**

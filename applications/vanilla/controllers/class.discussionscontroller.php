@@ -627,6 +627,9 @@ class DiscussionsController extends VanillaController {
          // Good parameters.
          $PromotedModule->GetData();
          $this->SetData('Content', $PromotedModule->Data('Content'));
+         $this->SetData('Title', T('Promoted Content'));
+         $this->SetData('View', C('Vanilla.Discussions.Layout'));
+         $this->SetData('EmptyMessage', T('No discussions were found.'));
 
          // Pass display properties to the view.
          $this->Group = $PromotedModule->Group;
@@ -637,6 +640,7 @@ class DiscussionsController extends VanillaController {
       }
 
       $this->DeliveryMethod();
-      $this->Render('promotedcontent', 'modules', 'vanilla');
+      Gdn_Theme::Section('PromotedContent');
+      $this->Render('promoted', 'modules', 'vanilla');
    }
 }

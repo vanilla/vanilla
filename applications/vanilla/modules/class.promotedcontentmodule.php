@@ -16,6 +16,12 @@
 class PromotedContentModule extends Gdn_Module {
 
    /**
+    * Max number of records to be fetched
+    * @var integer
+    */
+   const MAX_LIMIT = 50;
+
+   /**
     * How should we choose the content?
     *  - role        Author's Role
     *  - rank        Author's Rank
@@ -107,6 +113,9 @@ class PromotedContentModule extends Gdn_Module {
             if (isset($Parameters[$key])) {
                $this->$Property = $Parameters[$key];
             }
+         }
+         if (isset($Parameters['limit'])) {
+            $this->Limit = min($this->Limit, self::MAX_LIMIT);
          }
          return true;
       } else {
@@ -593,9 +602,9 @@ class PromotedContentModule extends Gdn_Module {
 
       foreach ($Content as &$ContentItem) {
          $ContentType = val('RecordType', $ContentItem);
-
+         $UserID = GetValue('InsertUserID', $ContentItem);
          $Replacement = array();
-         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'RecordType', 'Url');
+         $Fields = array('DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl', );
 
          switch (strtolower($ContentType)) {
             case 'comment':
@@ -613,16 +622,21 @@ class PromotedContentModule extends Gdn_Module {
          }
 
          $ContentItem['Url'] = $url;
+         if ($categoryId = val('CategoryID', $ContentItem)) {
+            $Category = CategoryModel::Categories($categoryId);
+            $ContentItem['CategoryName'] = val('Name', $Category);
+            $ContentItem['CategoryUrl'] = CategoryUrl($Category);
+         }
          $Fields = array_fill_keys($Fields, TRUE);
          $Common = array_intersect_key($ContentItem, $Fields);
          $Replacement = array_merge($Replacement, $Common);
          $ContentItem = $Replacement;
 
 
-         $UserFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
+
+         $UserFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', '_CssClass', 'Url', 'Roles', 'RoleNames');
 
          // Attach User
-         $UserID = GetValue('InsertUserID', $ContentItem);
          $User = Gdn::UserModel()->GetID($UserID);
          $RoleModel = new RoleModel();
          $Roles = $RoleModel->GetByUserID($UserID)->ResultArray();
@@ -633,7 +647,7 @@ class PromotedContentModule extends Gdn_Module {
          $Replacement = array(
             'Url' => Url(UserUrl($User), true),
             'PhotoUrl' => UserPhotoUrl($User),
-            'RankName' => val('Name', RankModel::Ranks(val('RankID', $User))),
+            'RankName' => val('Name', RankModel::Ranks(val('RankID', $User)), null),
             'RoleNames' => $RoleNames
          );
          $User = (array) $User;

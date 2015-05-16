@@ -353,10 +353,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
         if (isset($Sender->Data['Methods'])) {
             $Url = $this->AuthorizeUri();
 
-            // Add the twitter method to the controller.
+            // Add the Google method to the controller.
             $Method = array(
                 'Name' => 'Google',
-                'SignInHtml' => $this->SignInButton() //SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern'))
+                'SignInHtml' => $this->SignInButton() //SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern', 'rel' => 'nofollow'))
             );
 
             $Sender->Data['Methods'][] = $Method;

@@ -357,7 +357,7 @@ class FacebookPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       $Url = $this->AuthorizeUri();
 
-      return SocialSigninButton('Facebook', $Url, 'icon');
+      return SocialSigninButton('Facebook', $Url, 'icon', array('rel' => 'nofollow'));
    }
 
    public function SocialController_Facebook_Create($Sender, $Args) {

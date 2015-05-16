@@ -228,7 +228,7 @@ class OpenIDPlugin extends Gdn_Plugin {
          // Add the OpenID method to the controller.
          $Method = array(
             'Name' => 'OpenID',
-            'SignInHtml' => SocialSigninButton('OpenID', $Url, 'button', array('class' => 'js-extern', 'rel' => 'nofollow'))
+            'SignInHtml' => SocialSigninButton('OpenID', $Url, 'button', array('class' => 'js-extern'))
         );
 
          $Sender->Data['Methods'][] = $Method;
@@ -254,7 +254,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       if ($this->SignInAllowed()) {
          $Url = $this->_AuthorizeHref();
-         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
+         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern', 'rel' => 'nofollow'));
       }
 	}
 

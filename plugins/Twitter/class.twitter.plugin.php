@@ -226,7 +226,7 @@ class TwitterPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       $Url = $this->_AuthorizeHref();
 
-      return SocialSigninButton('Twitter', $Url, 'icon', array('class' => 'js-extern'));
+      return SocialSigninButton('Twitter', $Url, 'icon', array('class' => 'js-extern'), 'rel' => 'nofollow'));
    }
 
 	public function Authorize($Query = FALSE) {

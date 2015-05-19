@@ -456,7 +456,7 @@ EOT;
 
       // Check to synchronise roles upon connecting.
       if (($this->Data('Trusted') || C('Garden.SSO.SyncRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
-         $SaveRoles = TRUE;
+         $SaveRoles = $SaveRolesRegister = TRUE;
 
          // Translate the role names to IDs.
          $Roles = $this->Form->GetFormValue('Roles', NULL);
@@ -469,7 +469,6 @@ EOT;
          }
 
          if (C('Garden.SSO.SyncRolesBehavior') === 'register') {
-            $SaveRolesRegister = TRUE;
             $SaveRoles = FALSE;
          }
 

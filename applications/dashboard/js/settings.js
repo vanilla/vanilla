@@ -1,14 +1,14 @@
 jQuery(document).ready(function($) {
-   
+
    // Load news & tutorials from Vanilla
    var lists = $('div.Column div.List'),
       newsColumn = $('div.NewsColumn div.List'),
-      helpColumn = $('div.HelpColumn div.List');
+      releasesColumn = $('div.ReleasesColumn div.List');
 
-   loadFeed = function(container, type, rows, format) {
+   loadFeed = function(container, feedUrl) {
       $.ajax({
          type: "GET",
-         url: gdn.url('/dashboard/utility/getfeed/'+type+'/'+rows+'/'+format+'/'),
+         url: gdn.url(feedUrl),
          success: function(data) {
             container.removeClass('Loading');
             container.html(data);
@@ -21,6 +21,12 @@ jQuery(document).ready(function($) {
    };
 
    lists.addClass('Loading');
-   loadFeed(newsColumn, 'news', 3, 'extended');
-   loadFeed(helpColumn, 'help', 3, 'extended');   
+   var newsUrl = gdn.definition("DashboardNewsFeed", "/dashboard/utility/getfeed/news/5/extended");
+   var releasesUrl = gdn.definition("DashboardReleasesFeed", "/dashboard/utility/getfeed/releases/2/extended");
+   if (newsUrl) {
+      loadFeed(newsColumn, newsUrl);
+   }
+   if (releasesUrl) {
+      loadFeed(releasesColumn, releasesUrl);
+   }
 });

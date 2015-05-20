@@ -298,7 +298,7 @@ class AssetModel extends Gdn_Model {
             return $Info;
          }
       }
-      if (!StringEndsWith($Filename, 'custom.css')) {
+      if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
          Trace("Could not find file '$Filename' in folder '$Folder'.");
       }
 

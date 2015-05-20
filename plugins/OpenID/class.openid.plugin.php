@@ -254,7 +254,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       if ($this->SignInAllowed()) {
          $Url = $this->_AuthorizeHref();
-         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
+         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern', 'rel' => 'nofollow'));
       }
 	}
 

@@ -222,7 +222,6 @@ class CategoriesController extends VanillaController {
          $this->SetData('Categories', $Categories);
 
          // Setup head
-         $this->AddCssFile('vanilla.css');
          $this->Menu->HighlightRoute('/discussions');
          if ($this->Head) {
             $this->AddJsFile('discussions.js');
@@ -390,7 +389,6 @@ class CategoriesController extends VanillaController {
     */
    public function Discussions($Category = '') {
       // Setup head
-      $this->AddCssFile('vanilla.css');
       $this->AddJsFile('discussions.js');
       $this->Menu->HighlightRoute('/discussions');
 

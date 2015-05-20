@@ -30,10 +30,13 @@
       <li class="CreateAccount">
          <?php
             $Target = $this->Target();
-            if ($Target != '')
-               $Target = '?Target='.urlencode($Target);
+            if ($Target != '') {
+               $Target = '?Target=' . urlencode($Target);
+            }
 
-            printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
+            if (Gdn::Config('Garden.Registration.Method') != 'Invitation') {
+               printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register' . $Target));
+            }
          ?>
       </li>
       <?php endif; ?>

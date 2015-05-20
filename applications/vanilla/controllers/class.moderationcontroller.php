@@ -329,6 +329,7 @@ class ModerationController extends VanillaController {
       $Session = Gdn::Session();
       $this->Form = new Gdn_Form();
       $DiscussionModel = new DiscussionModel();
+      $CategoryModel = new CategoryModel();
 
       $this->Title(T('Confirm'));
 
@@ -410,6 +411,8 @@ class ModerationController extends VanillaController {
             }
 
             $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
+            $CategoryModel->SetRecentPost($Discussion['CategoryID']);
+            $CategoryModel->SetRecentPost($CategoryID);
          }
 
          // Clear selections.

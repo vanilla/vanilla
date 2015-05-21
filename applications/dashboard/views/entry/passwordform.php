@@ -34,7 +34,7 @@
                $Target = '?Target=' . urlencode($Target);
             }
 
-            if (Gdn::Config('Garden.Registration.Method') != 'Invitation') {
+            if (C('Garden.Registration.Method') != 'Invitation') {
                printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register' . $Target));
             }
          ?>

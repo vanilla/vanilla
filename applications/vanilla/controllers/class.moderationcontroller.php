@@ -372,6 +372,8 @@ class ModerationController extends VanillaController {
             throw ForbiddenException('@'.T('You do not have permission to add discussions to this category.'));
          }
 
+         $AffectedCategories = array();
+
          // Iterate and move.
          foreach ($AllowedDiscussions as $DiscussionID) {
             // Create the shadow redirect.
@@ -411,8 +413,26 @@ class ModerationController extends VanillaController {
             }
 
             $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
-            $CategoryModel->SetRecentPost($Discussion['CategoryID']);
+
+            if (!isset($AffectedCategories[$Discussion['CategoryID']])) {
+                $AffectedCategories[$Discussion['CategoryID']] = -1;
+            } else {
+                $AffectedCategories[$Discussion['CategoryID']] -= 1;
+            }
+            if (!isset($AffectedCategories[$CategoryID])) {
+                $AffectedCategories[$CategoryID] = 1;
+            } else {
+                $AffectedCategories[$CategoryID] += 1;
+            }
+         }
+
+         foreach ($AffectedCategories as $CategoryID => $Count) {
             $CategoryModel->SetRecentPost($CategoryID);
+            $CategoryModel->SQL
+               ->Update('Category')
+               ->Set('CountDiscussions', 'CountDiscussions'.($Count < 0 ? '-' : '+').' '.abs($Count), false)
+               ->Where('CategoryID', $CategoryID)
+               ->Put();
          }
 
          // Clear selections.

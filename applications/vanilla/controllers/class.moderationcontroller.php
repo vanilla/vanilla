@@ -426,11 +426,12 @@ class ModerationController extends VanillaController {
             }
          }
 
+         // Update recent posts and counts on all affected categories.
          foreach ($AffectedCategories as $CategoryID => $Count) {
             $CategoryModel->SetRecentPost($CategoryID);
             $CategoryModel->SQL
                ->Update('Category')
-               ->Set('CountDiscussions', 'CountDiscussions'.($Count < 0 ? '-' : '+').' '.abs($Count), false)
+               ->Set('CountDiscussions', 'CountDiscussions'.($Count < 0 ? ' - ' : ' + ').abs($Count), false)
                ->Where('CategoryID', $CategoryID)
                ->Put();
          }

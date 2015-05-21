@@ -35,7 +35,7 @@ echo '<div class="Entry'.$CssClass.'">';
       </li>
    </ul>
    <?php
-   
+
 //   echo $this->Data('MainForm');
 
    echo '</div>';
@@ -67,10 +67,13 @@ echo '</div>';
 <div class="CreateAccount">
    <?php
       $Target = $this->Target();
-      if ($Target != '')
-         $Target = '?Target='.urlencode($Target);
+      if ($Target != '') {
+         $Target = '?Target=' . urlencode($Target);
+      }
 
-      printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
+      if (C('Garden.Registration.Method') != 'Invitation') {
+         printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register' . $Target));
+      }
    ?>
 </div>
 <?php endif; ?>

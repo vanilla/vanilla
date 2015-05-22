@@ -44,7 +44,7 @@ class PermissionModel extends Gdn_Model {
     * Default role permissions
     * @var array
     */
-   protected $_DefaultPermissions = array();
+   protected $DefaultPermissions = array();
 
    /**
     * Class constructor. Defines the related database table name.
@@ -69,11 +69,11 @@ class PermissionModel extends Gdn_Model {
     * @param bool $SaveGlobal Save a junction permission to the global permissions.
     */
    public function AddDefault($Type, $Permissions, $SaveGlobal = FALSE) {
-      if (!array_key_exists($Type, $this->_DefaultPermissions)) {
-         $this->_DefaultPermissions[$Type] = array();
+      if (!array_key_exists($Type, $this->DefaultPermissions)) {
+         $this->DefaultPermissions[$Type] = array();
       }
 
-      $this->_DefaultPermissions[$Type][] = array($Permissions, $SaveGlobal);
+      $this->DefaultPermissions[$Type][] = array($Permissions, $SaveGlobal);
    }
 
    /**
@@ -82,9 +82,9 @@ class PermissionModel extends Gdn_Model {
     * @param bool $ResetDefaults If we already have defaults, should they be discarded?
     */
    public function AssignDefaults($ResetDefaults = FALSE) {
-      if (count($this->_DefaultPermissions)) {
+      if (count($this->DefaultPermissions)) {
          if ($ResetDefaults) {
-            $this->_DefaultPermissions = array();
+            $this->DefaultPermissions = array();
          } else {
             return;
          }
@@ -256,6 +256,19 @@ class PermissionModel extends Gdn_Model {
       if(!is_null($RoleID)) {
          // Rebuild the permission cache.
       }
+   }
+
+   /**
+    * Grab the list of default permissions by role type
+    *
+    * @return array List of permissions, grouped by role type
+    */
+   public function GetDefaults() {
+      if (empty($this->DefaultPermissions)) {
+         $this->AssignDefaults();
+      }
+
+      return $this->DefaultPermissions;
    }
 
    /**
@@ -993,11 +1006,10 @@ class PermissionModel extends Gdn_Model {
          $RoleType = self::TYPE_MEMBER;
       }
 
-      $this->AssignDefaults();
-      print_r($this->_DefaultPermissions);
+      $DefaultPermissions = $this->GetDefaults();
 
-      if (array_key_exists($RoleType, $this->_DefaultPermissions)) {
-         foreach ($this->_DefaultPermissions[$RoleType] as $Defaults) {
+      if (array_key_exists($RoleType, $DefaultPermissions)) {
+         foreach ($DefaultPermissions[$RoleType] as $Defaults) {
             list($Permissions, $SaveGlobal) = $Defaults;
             $Permissions['Role'] = $Role;
             $this->Save($Permissions, $SaveGlobal);

@@ -208,6 +208,7 @@ class ImportModel extends Gdn_Model {
 
    public function CustomFinalization() {
       $this->SetRoleDefaults();
+      PermissionModel::ResetAllRoles();
 
       $Imp = $this->GetCustomImportModel();
       if ($Imp !== NULL)
@@ -1504,7 +1505,6 @@ class ImportModel extends Gdn_Model {
             case 'guest':
             case 'guests':
             case 'unauthenticated':
-            case 'unregistered':
             case 'unregistered':
             case 'unregistered / not logged in':
                $GuestRoleID = $RoleID;

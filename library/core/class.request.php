@@ -859,6 +859,8 @@ class Gdn_Request {
             $Path = str_replace('https:', 'http:', $Path);
             $Scheme = 'http';
          }
+      } elseif (!$AllowSSL) {
+         $Scheme = 'http';
       } else {
          $Scheme = $this->Scheme();
       }
@@ -872,7 +874,7 @@ class Gdn_Request {
       if (!in_array($Port, array(80, 443)) && (strpos($Host, ':'.$Port) === FALSE))
          $Host .= ':'.$Port;
 
-      if ($WithDomain === '//') {
+      if ($WithDomain === '//' && $AllowSSL) {
          $Parts[] = '//'.$Host;
       } elseif ($WithDomain && $WithDomain !== '/') {
          $Parts[] = $Scheme.'://'.$Host;

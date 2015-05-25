@@ -153,54 +153,105 @@ class VanillaHooks implements Gdn_IPlugin {
     * @param PermissionModel $Sender Instance of permission model that fired the event
     */
    public function PermissionModel_DefaultPermissions_Handler($Sender) {
+      // Guest defaults
       $Sender->AddDefault(
          PermissionModel::TYPE_GUEST,
+         array(
+            'Vanilla.Discussions.View' => 1
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_GUEST,
+         array(
+            'Vanilla.Discussions.View' => 1
+         ),
          array(
             'JunctionTable' => 'Category',
             'JunctionColumn' => 'PermissionCategoryID',
             'JunctionID' => -1,
+         )
+      );
+
+      // Unconfirmed defaults
+      $Sender->AddDefault(
+         PermissionModel::TYPE_UNCONFIRMED,
+         array(
             'Vanilla.Discussions.View' => 1
-         ),
-         TRUE
+         )
       );
       $Sender->AddDefault(
          PermissionModel::TYPE_UNCONFIRMED,
          array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
             'Vanilla.Discussions.View' => 1
          ),
-         TRUE
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1
+         )
+      );
+
+      // Applicant defaults
+      $Sender->AddDefault(
+         PermissionModel::TYPE_APPLICANT,
+         array(
+            'Vanilla.Discussions.View' => 1
+         )
       );
       $Sender->AddDefault(
          PermissionModel::TYPE_APPLICANT,
          array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
             'Vanilla.Discussions.View' => 1
          ),
-         TRUE
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1
+         )
+      );
+
+      // Member defaults
+      $Sender->AddDefault(
+         PermissionModel::TYPE_MEMBER,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1
+         )
       );
       $Sender->AddDefault(
          PermissionModel::TYPE_MEMBER,
          array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.View' => 1,
             'Vanilla.Comments.Add' => 1
          ),
-         TRUE
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1
+         )
+      );
+
+      // Moderator defaults
+      $Sender->AddDefault(
+         PermissionModel::TYPE_MODERATOR,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         )
       );
       $Sender->AddDefault(
          PermissionModel::TYPE_MODERATOR,
          array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.Edit' => 1,
             'Vanilla.Discussions.Announce' => 1,
@@ -212,8 +263,14 @@ class VanillaHooks implements Gdn_IPlugin {
             'Vanilla.Comments.Edit' => 1,
             'Vanilla.Comments.Delete' => 1
          ),
-         TRUE
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1
+         )
       );
+
+      // Administrator defaults
       $Sender->AddDefault(
          PermissionModel::TYPE_ADMINISTRATOR,
          array(
@@ -230,8 +287,27 @@ class VanillaHooks implements Gdn_IPlugin {
             'Vanilla.Comments.Add' => 1,
             'Vanilla.Comments.Edit' => 1,
             'Vanilla.Comments.Delete' => 1
+         )
+      );
+      $Sender->AddDefault(
+         PermissionModel::TYPE_ADMINISTRATOR,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
          ),
-         TRUE
+         array(
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1
+         )
       );
    }
 

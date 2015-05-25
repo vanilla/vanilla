@@ -66,14 +66,14 @@ class PermissionModel extends Gdn_Model {
     *
     * @param string $Type Type of role the permissions should be added for.
     * @param array $Permissions List of permissions to include.
-    * @param bool $SaveGlobal Save a junction permission to the global permissions.
+    * @param array|bool $Junction Junction table information.
     */
-   public function AddDefault($Type, $Permissions, $SaveGlobal = FALSE) {
+   public function AddDefault($Type, $Permissions, $Junction = FALSE) {
       if (!array_key_exists($Type, $this->DefaultPermissions)) {
          $this->DefaultPermissions[$Type] = array();
       }
 
-      $this->DefaultPermissions[$Type][] = array($Permissions, $SaveGlobal);
+      $this->DefaultPermissions[$Type][] = array($Permissions, $Junction);
    }
 
    /**
@@ -1010,9 +1010,14 @@ class PermissionModel extends Gdn_Model {
 
       if (array_key_exists($RoleType, $DefaultPermissions)) {
          foreach ($DefaultPermissions[$RoleType] as $Defaults) {
-            list($Permissions, $SaveGlobal) = $Defaults;
+            list($Permissions, $Junction) = $Defaults;
+
+            if (is_array($Junction)) {
+               $Permissions = array_merge($Permissions, $Junction);
+            }
+
             $Permissions['Role'] = $Role;
-            $this->Save($Permissions, $SaveGlobal);
+            $this->Save($Permissions);
          }
       }
    }

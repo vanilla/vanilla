@@ -15,6 +15,7 @@
  *  1.8.4   Add tags before render so that other plugins can look at them.
  *  1.8.8   Added tabs.
  *  1.8.9   Ability to add tags based on tab.
+ *  1.8.12  Fix issues with CSS and js loading.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -25,7 +26,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.11',
+   'Version' => '1.8.12',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -55,6 +56,15 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function CategoriesController_Render_Before($Sender) {
       $this->AddTagModule($Sender);
+   }
+
+   /**
+    * Add the tag admin page CSS.
+    *
+    * @param AssetModel $sender
+    */
+   public function assetModel_adminCss_handler($sender) {
+      $sender->AddCssFile('tagadmin.css', 'plugins/Tagging');
    }
 
    /**
@@ -593,8 +603,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->Title('Tagging');
       $Sender->AddSideMenu('settings/tagging');
-      $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
-      $Sender->AddJSFile('plugins/Tagging/js/admin.js');
+      $Sender->AddJSFile('tagadmin.js', 'plugins/Tagging');
       $SQL = Gdn::SQL();
 
       // Get all tag types

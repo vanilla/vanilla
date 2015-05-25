@@ -334,7 +334,7 @@ class Gdn_Locale extends Gdn_Pluggable {
          Gdn_LibraryMap::PrepareCache('locale', $allLocaleSources);
       }
 
-      $localeSources = val($safeLocale, $allLocaleSources, []);
+      $localeSources = val($safeLocale, $allLocaleSources, array());
       return $localeSources;
    }
 

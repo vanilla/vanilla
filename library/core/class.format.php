@@ -1403,6 +1403,12 @@ EOT;
             return $Formatter->FormatMentions($Mixed);
          }
 
+         $protectCodeBlocks = C('Garden.Format.Mentions') || C('Garden.Format.Hashtags');
+         if($protectCodeBlocks)
+            $Mixed = preg_replace_callback('/<code>.*?[@#].*?<\/code>/si',
+               function ($match) { return preg_replace('/[@#]/', '\0\0', $match[0]);
+            }, $Mixed);
+
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
             $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
@@ -1424,6 +1430,11 @@ EOT;
 					$Mixed
 				);
 			}
+
+         if($protectCodeBlocks)
+            $Mixed = preg_replace_callback('/<code>.*?[@#]{2}.*?<\/code>/si',
+               function ($match) { return preg_replace('/([@#]){2}/', '\1', $match[0]);
+            }, $Mixed);
 
 			// Handle "/me does x" action statements
          if(C('Garden.Format.MeActions')) {

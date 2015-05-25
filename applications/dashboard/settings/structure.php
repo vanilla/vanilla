@@ -213,6 +213,15 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
 
+// Fix the sync roles config spelling mistake.
+if (C('Garden.SSO.SynchRoles')) {
+   SaveToConfig(
+      array('Garden.SSO.SynchRoles' => '', 'Garden.SSO.SyncRoles' => C('Garden.SSO.SynchRoles')),
+      '',
+      array('RemoveEmpty' => true)
+   );
+}
+
 $Construct->Table('Session')
 	->Column('SessionID', 'char(32)', FALSE, 'primary')
 	->Column('UserID', 'int', 0)

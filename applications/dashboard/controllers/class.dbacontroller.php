@@ -129,6 +129,58 @@ class DbaController extends DashboardController {
       $this->Render('Job');
    }
 
+   /**
+    * Scan a table for invalid InsertUserID values and update with SystemUserID
+    *
+    * @param bool|string $Table The name of the table to fix InsertUserID in.
+    */
+   public function FixInsertUserID($Table = false) {
+      $this->Permission('Garden.Settings.Manage');
+
+      if ($this->Request->IsAuthenticatedPostBack() && $Table) {
+         $this->Model->FixInsertUserID($Table);
+
+         $this->SetData(
+            'Result',
+            array('Complete' => true)
+         );
+      } else {
+         $Tables = array(
+            'Fix comments'    => 'Comment',
+            'Fix discussions' => 'Discussion'
+         );
+         $Jobs = array();
+
+         foreach ($Tables as $CurrentLabel => $CurrentTable) {
+            $Jobs[$CurrentLabel] = "/dba/fixinsertuserid.json?".http_build_query(array('table' => $CurrentTable));
+         }
+         unset($CurrentLabel, $CurrentTable);
+
+         $this->SetData('Jobs', $Jobs);
+      }
+
+      $this->SetData('Title', T('Fix Invalid InsertUserID'));
+      $this->AddSideMenu();
+      $this->Render('Job');
+   }
+
+   /**
+    * Look for users with an invalid role and apply the role specified to those users.
+    */
+   public function FixUserRole() {
+      $this->Permission('Garden.Settings.Manage');
+
+      if ($this->Request->IsAuthenticatedPostBack()) {
+         if (ValidateRequired($this->Form->GetFormValue('DefaultUserRole'))) {
+            $this->Model->FixUserRole($this->Form->GetFormValue('DefaultUserRole'));
+            $this->SetData('CompletedFix', true);
+         }
+      }
+
+      $this->AddSideMenu();
+      $this->Render();
+   }
+
    protected function _SetJob($Name) {
       $Args = array_change_key_case($this->ReflectArgs);
       $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);

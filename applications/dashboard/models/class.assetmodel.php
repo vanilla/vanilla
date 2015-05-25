@@ -270,7 +270,7 @@ class AssetModel extends Gdn_Model {
          } else if (stringBeginsWith($Folder, 'plugins/')) {
             $Folder = substr($Folder, strlen('plugins/'));
             $Path = "/{$Folder}/design/{$Filename}";
-            $Paths[] = array(PATH_PLUGINS.$Path, "/plugins/$Path");
+            $Paths[] = array(PATH_PLUGINS.$Path, "/plugins$Path");
 
             // Allow direct-to-file links for plugins
             $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}", true); // deprecated
@@ -298,7 +298,9 @@ class AssetModel extends Gdn_Model {
             return $Info;
          }
       }
-      Trace("Could not find file '$Filename' in folder '$Folder'.");
+      if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
+         Trace("Could not find file '$Filename' in folder '$Folder'.");
+      }
 
       return false;
    }

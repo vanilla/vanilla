@@ -570,7 +570,7 @@ class UserModel extends Gdn_Model {
          Trace('Not setting photo.');
       }
 
-      if (C('Garden.SSO.SynchRoles')) {
+      if (C('Garden.SSO.SyncRoles')) {
          // Translate the role names to IDs.
          $Roles = GetValue('Roles', $NewUser, '');
          if (is_string($Roles)) {
@@ -657,7 +657,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
-            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SyncRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);

@@ -155,6 +155,45 @@ if (!$UserRoleExists) {
    $SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
 }
 
+// Fix old default roles that were stored in the config and user-role table.
+if ($RoleTableExists && $UserRoleExists) {
+   $RoleModel = new RoleModel();
+   $types = $RoleModel->getAllDefaultRoles();
+   if ($v = C('Garden.Registration.ApplicantRoleID')) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_APPLICANT)
+         ->Where('RoleID', $types[RoleModel::TYPE_APPLICANT])
+         ->Put();
+      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
+   }
+
+   if ($v = C('Garden.Registration.DefaultRoles')) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_MEMBER)
+         ->Where('RoleID', $types[RoleModel::TYPE_MEMBER])
+         ->Put();
+      RemoveFromConfig('Garden.Registration.DefaultRoles');
+   }
+
+   if ($v = C('Garden.Registration.ConfirmEmailRole')) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_UNCONFIRMED)
+         ->Where('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
+         ->Put();
+      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
+   }
+
+   $guestRoleIDs = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();
+   if (!empty($guestRoleIDs)) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_GUEST)
+         ->Where('RoleID', $types[RoleModel::TYPE_GUEST])
+         ->Put();
+
+      $SQL->Delete('UserRole', array('UserID' => 0));
+   }
+}
+
 // User Meta Table
 $Construct->Table('UserMeta')
    ->Column('UserID', 'int', FALSE, 'primary')

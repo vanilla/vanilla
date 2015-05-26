@@ -9,6 +9,31 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class RoleModel extends Gdn_Model {
+   /**
+    * Slug for Guest role type
+    */
+   const TYPE_GUEST = 'guest';
+   /**
+    * Slug for Unconfirmed role type
+    */
+   const TYPE_UNCONFIRMED = 'unconfirmed';
+   /**
+    * Slug for Applicant role type
+    */
+   const TYPE_APPLICANT = 'applicant';
+   /**
+    * Slug for Member role type
+    */
+   const TYPE_MEMBER = 'member';
+   /**
+    * Slug for Moderator role type
+    */
+   const TYPE_MODERATOR = 'moderator';
+   /**
+    * Slug for Administrator role type
+    */
+   const TYPE_ADMINISTRATOR = 'administrator';
+
    public static $Roles = NULL;
 
    /**

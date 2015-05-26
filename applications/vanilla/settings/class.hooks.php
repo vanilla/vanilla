@@ -155,13 +155,13 @@ class VanillaHooks implements Gdn_IPlugin {
    public function PermissionModel_DefaultPermissions_Handler($Sender) {
       // Guest defaults
       $Sender->AddDefault(
-         PermissionModel::TYPE_GUEST,
+         RoleModel::TYPE_GUEST,
          array(
             'Vanilla.Discussions.View' => 1
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_GUEST,
+         RoleModel::TYPE_GUEST,
          array(
             'Vanilla.Discussions.View' => 1
          ),
@@ -174,13 +174,13 @@ class VanillaHooks implements Gdn_IPlugin {
 
       // Unconfirmed defaults
       $Sender->AddDefault(
-         PermissionModel::TYPE_UNCONFIRMED,
+         RoleModel::TYPE_UNCONFIRMED,
          array(
             'Vanilla.Discussions.View' => 1
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_UNCONFIRMED,
+         RoleModel::TYPE_UNCONFIRMED,
          array(
             'Vanilla.Discussions.View' => 1
          ),
@@ -193,13 +193,13 @@ class VanillaHooks implements Gdn_IPlugin {
 
       // Applicant defaults
       $Sender->AddDefault(
-         PermissionModel::TYPE_APPLICANT,
+         RoleModel::TYPE_APPLICANT,
          array(
             'Vanilla.Discussions.View' => 1
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_APPLICANT,
+         RoleModel::TYPE_APPLICANT,
          array(
             'Vanilla.Discussions.View' => 1
          ),
@@ -212,7 +212,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       // Member defaults
       $Sender->AddDefault(
-         PermissionModel::TYPE_MEMBER,
+         RoleModel::TYPE_MEMBER,
          array(
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.View' => 1,
@@ -220,7 +220,7 @@ class VanillaHooks implements Gdn_IPlugin {
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_MEMBER,
+         RoleModel::TYPE_MEMBER,
          array(
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.View' => 1,
@@ -235,7 +235,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       // Moderator defaults
       $Sender->AddDefault(
-         PermissionModel::TYPE_MODERATOR,
+         RoleModel::TYPE_MODERATOR,
          array(
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.Edit' => 1,
@@ -250,7 +250,7 @@ class VanillaHooks implements Gdn_IPlugin {
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_MODERATOR,
+         RoleModel::TYPE_MODERATOR,
          array(
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.Edit' => 1,
@@ -272,7 +272,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       // Administrator defaults
       $Sender->AddDefault(
-         PermissionModel::TYPE_ADMINISTRATOR,
+         RoleModel::TYPE_ADMINISTRATOR,
          array(
             'JunctionTable' => 'Category',
             'JunctionColumn' => 'PermissionCategoryID',
@@ -290,7 +290,7 @@ class VanillaHooks implements Gdn_IPlugin {
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_ADMINISTRATOR,
+         RoleModel::TYPE_ADMINISTRATOR,
          array(
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.Edit' => 1,

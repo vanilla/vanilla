@@ -166,42 +166,42 @@ class ConversationsHooks implements Gdn_IPlugin {
     */
    public function PermissionModel_DefaultPermissions_Handler($Sender) {
       $Sender->AddDefault(
-         PermissionModel::TYPE_GUEST,
+         RoleModel::TYPE_GUEST,
          array(
             'Conversations.Moderation.Manage' => 0,
             'Conversations.Conversations.Add' => 0
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_UNCONFIRMED,
+         RoleModel::TYPE_UNCONFIRMED,
          array(
             'Conversations.Moderation.Manage' => 0,
             'Conversations.Conversations.Add' => 0
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_APPLICANT,
+         RoleModel::TYPE_APPLICANT,
          array(
             'Conversations.Moderation.Manage' => 0,
             'Conversations.Conversations.Add' => 0
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_MEMBER,
+         RoleModel::TYPE_MEMBER,
          array(
             'Conversations.Moderation.Manage' => 0,
             'Conversations.Conversations.Add' => 1
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_MODERATOR,
+         RoleModel::TYPE_MODERATOR,
          array(
             'Conversations.Moderation.Manage' => 0,
             'Conversations.Conversations.Add' => 1
          )
       );
       $Sender->AddDefault(
-         PermissionModel::TYPE_ADMINISTRATOR,
+         RoleModel::TYPE_ADMINISTRATOR,
          array(
             'Conversations.Moderation.Manage' => 0,
             'Conversations.Conversations.Add' => 1

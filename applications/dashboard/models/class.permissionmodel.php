@@ -10,35 +10,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class PermissionModel extends Gdn_Model {
 
-   /**
-    * Slug for Guest role type
-    */
-   const TYPE_GUEST = 'guest';
-
-   /**
-    * Slug for Unconfirmed role type
-    */
-   const TYPE_UNCONFIRMED = 'unconfirmed';
-
-   /**
-    * Slug for Applicant role type
-    */
-   const TYPE_APPLICANT = 'applicant';
-
-   /**
-    * Slug for Member role type
-    */
-   const TYPE_MEMBER = 'member';
-
-   /**
-    * Slug for Moderator role type
-    */
-   const TYPE_MODERATOR = 'moderator';
-
-   /**
-    * Slug for Administrator role type
-    */
-   const TYPE_ADMINISTRATOR = 'administrator';
 
    /**
     * Default role permissions
@@ -91,7 +62,7 @@ class PermissionModel extends Gdn_Model {
       }
 
       $this->AddDefault(
-         self::TYPE_GUEST,
+         RoleModel::TYPE_GUEST,
          array(
             'Garden.Activity.View' => 1,
             'Garden.Profiles.View' => 1,
@@ -99,7 +70,7 @@ class PermissionModel extends Gdn_Model {
          )
       );
       $this->AddDefault(
-         self::TYPE_UNCONFIRMED,
+         RoleModel::TYPE_UNCONFIRMED,
          $Permissions = array(
             'Garden.SignIn.Allow' => 1,
             'Garden.Activity.View' => 1,
@@ -109,7 +80,7 @@ class PermissionModel extends Gdn_Model {
          )
       );
       $this->AddDefault(
-         self::TYPE_APPLICANT,
+         RoleModel::TYPE_APPLICANT,
          $Permissions = array(
             'Garden.SignIn.Allow' => 1,
             'Garden.Activity.View' => 1,
@@ -119,7 +90,7 @@ class PermissionModel extends Gdn_Model {
          )
       );
       $this->AddDefault(
-         self::TYPE_MODERATOR,
+         RoleModel::TYPE_MODERATOR,
          $Permissions = array(
             'Garden.SignIn.Allow' => 1,
             'Garden.Activity.View' => 1,
@@ -132,7 +103,7 @@ class PermissionModel extends Gdn_Model {
          )
       );
       $this->AddDefault(
-         self::TYPE_ADMINISTRATOR,
+         RoleModel::TYPE_ADMINISTRATOR,
          array(
             'Garden.SignIn.Allow' => 1,
             'Garden.Settings.View' => 1,
@@ -155,7 +126,7 @@ class PermissionModel extends Gdn_Model {
          )
       );
       $this->AddDefault(
-         self::TYPE_MEMBER,
+         RoleModel::TYPE_MEMBER,
          array(
             'Garden.SignIn.Allow' => 1,
             'Garden.Activity.View' => 1,
@@ -1003,7 +974,7 @@ class PermissionModel extends Gdn_Model {
       $RoleType = $this->SQL->GetWhere('Role', array('Name' => $Role))->Value('Type');
 
       if ($RoleType == '') {
-         $RoleType = self::TYPE_MEMBER;
+         $RoleType = RoleModel::TYPE_MEMBER;
       }
 
       $DefaultPermissions = $this->GetDefaults();

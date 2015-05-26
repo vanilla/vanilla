@@ -459,7 +459,7 @@ class UserModel extends Gdn_Model {
       // Sanitize result roles
       $Roles = array_diff($UserRoleIDs, array($ConfirmRoleID));
       if (!sizeof($Roles)) {
-         $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+         $DefaultRoles = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
          $Roles = $DefaultRoles;
       }
 
@@ -1805,8 +1805,9 @@ class UserModel extends Gdn_Model {
             // Now update the role settings if necessary.
             if ($SaveRoles) {
                // If no RoleIDs were provided, use the system defaults
-               if (!is_array($RoleIDs))
-                  $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+               if (!is_array($RoleIDs)) {
+                  $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+               }
 
                $this->SaveRoles($UserID, $RoleIDs, $RecordRoleChange);
             }
@@ -2188,7 +2189,7 @@ class UserModel extends Gdn_Model {
     * To be used for invitation registration
     */
    public function InsertForInvite($FormPostValues, $Options = array()) {
-      $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+      $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
       if (!is_array($RoleIDs) || count($RoleIDs) == 0)
          throw new Exception(T('The default role has not been configured.'), 400);
 
@@ -2372,7 +2373,7 @@ class UserModel extends Gdn_Model {
     * To be used for basic registration, and captcha registration
     */
    public function InsertForBasic($FormPostValues, $CheckCaptcha = TRUE, $Options = array()) {
-      $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
+      $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
       if (!is_array($RoleIDs) || count($RoleIDs) == 0)
          throw new Exception(T('The default role has not been configured.'), 400);
 
@@ -2733,7 +2734,7 @@ class UserModel extends Gdn_Model {
 
       if ($ApplicantFound) {
          // Retrieve the default role(s) for new users
-         $RoleIDs = C('Garden.Registration.DefaultRoles', array(8));
+         $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
 
          // Wipe out old & insert new roles for this user
          $this->SaveRoles($UserID, $RoleIDs, FALSE);
@@ -3462,11 +3463,11 @@ class UserModel extends Gdn_Model {
    public function NewUserRoleIDs() {
       // Registration method
       $RegistrationMethod = C('Garden.Registration.Method', 'Captcha');
-      $DefaultRoleID = C('Garden.Registration.DefaultRoles');
+      $DefaultRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
       switch ($RegistrationMethod) {
 
          case 'Approval':
-            $RoleID = C('Garden.Registration.ApplicantRoleID', $DefaultRoleID);
+            $RoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
          break;
 
          case 'Invitation':

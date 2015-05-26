@@ -190,7 +190,7 @@ class UserController extends DashboardController {
             $this->UserRoleData = $UserNewRoles;
          } else {
             // Set the default roles.
-            $this->UserRoleData = C('Garden.Registration.DefaultRoles', array());
+            $this->UserRoleData = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
          }
 
       } catch (Exception $Ex) {
@@ -910,7 +910,7 @@ class UserController extends DashboardController {
       if (!isset($User['UserID'])) {
          // Add some default values to make saving easier.
          if (!isset($User['RoleID'])) {
-            $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+            $DefaultRoles = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
             $User['RoleID'] = $DefaultRoles;
          }
          elseif (is_numeric($User['RoleID'])) {

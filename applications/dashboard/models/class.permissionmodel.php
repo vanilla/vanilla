@@ -364,6 +364,10 @@ class PermissionModel extends Gdn_Model {
    }
 
    public function CachePermissions($UserID = NULL, $RoleID = NULL) {
+      if (!$UserID) {
+         $RoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
+      }
+
       // Select all of the permission columns.
       $PermissionColumns = $this->PermissionColumns();
       foreach($PermissionColumns as $ColumnName => $Value) {

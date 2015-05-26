@@ -33,8 +33,7 @@ if (!function_exists('ValidateCaptcha')) {
 
 if (!function_exists('ValidateRegex')) {
    function ValidateRegex($Value, $Regex) {
-      preg_match($Regex, $Value, $Matches);
-      return is_array($Matches) && count($Matches) > 0 ? TRUE : FALSE;
+      return (filter_var($Value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $Regex))) !== false);
    }
 }
 
@@ -135,12 +134,11 @@ if (!function_exists('ValidateOldPassword')) {
 
 if (!function_exists('ValidateEmail')) {
    function ValidateEmail($Value, $Field = '') {
-      if (!ValidateRequired($Value))
-         return TRUE;
+      if (!ValidateRequired($Value, $Field)) {
+         return true;
+      }
 
-      $Result = PHPMailer::ValidateAddress($Value);
-      $Result = (bool)$Result;
-      return $Result;
+      return (filter_var($Value, FILTER_VALIDATE_EMAIL) !== false);
    }
 }
 
@@ -244,14 +242,14 @@ if (!function_exists('ValidateMinimumAge')) {
 }
 
 if (!function_exists('ValidateInteger')) {
-   function ValidateInteger($Value, $Field = NULL) {
-      if (!$Value || (is_string($Value) && !trim($Value)))
-         return TRUE;
-
-      $Integer = intval($Value);
-      $String = strval($Integer);
-      return $String == $Value ? TRUE : FALSE;
-   }
+    function ValidateInteger($Value, $Field = null) {
+        if (!$Value || (is_string($Value) && !trim($Value))) {
+            return true;
+        }
+        $Integer = intval($Value);
+        $String = strval($Integer);
+        return $String == $Value;
+    }
 }
 
 if (!function_exists('ValidateBoolean')) {

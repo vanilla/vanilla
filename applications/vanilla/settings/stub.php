@@ -6,19 +6,12 @@
  * @package Vanilla
  */
 
-$SQL = Gdn::Database()->SQL();
-
 // Only do this once, ever.
-$Row = $SQL->Get('Discussion', '', 'asc', 1)->FirstRow(DATASET_TYPE_ARRAY);
-if ($Row) {
-   return;
-}
+if (!Gdn::SQL()->Get('Discussion', '', 'asc', 1)->FirstRow(DATASET_TYPE_ARRAY)) {
 
-$DiscussionModel = new DiscussionModel();
-
-// Prep default content
-$DiscussionTitle = "BAM! You&rsquo;ve got a sweet forum";
-$DiscussionBody = "There&rsquo;s nothing sweeter than a fresh new forum, ready to welcome your community. A Vanilla Forum has all the bits and pieces you need to build an awesome discussion platform customized to your needs. Here&rsquo;s a few tips:
+   // Prep default content
+   $Now = Gdn_Format::ToDateTime();
+   $DiscussionBody = "There&rsquo;s nothing sweeter than a fresh new forum, ready to welcome your community. A Vanilla Forum has all the bits and pieces you need to build an awesome discussion platform customized to your needs. Here&rsquo;s a few tips:
 <ul>
    <li>Use the <a href=\"/dashboard/settings/gettingstarted\">Getting Started</a> list in the Dashboard to configure your site.</li>
    <li>Don&rsquo;t use too many categories. We recommend 3-8. Keep it simple!</li>
@@ -27,58 +20,81 @@ $DiscussionBody = "There&rsquo;s nothing sweeter than a fresh new forum, ready t
    <li>Bookmark a discussion (click the star) to get notifications for new comments. You can edit notification settings from your profile.</li>
 </ul>
 Go ahead and edit or delete this discussion, then spread the word to get this place cooking. Cheers!";
-$CommentBody = "This is the first comment on your site and it&rsquo;s an important one.
+   $Discussion = array(
+      'Name' => T('StubDiscussionTitle', "BAM! You&rsquo;ve got a sweet forum"),
+      'Body' => T('StubDiscussionBody', $DiscussionBody),
+      'Format' => 'Html',
+      'CategoryID' => val('CategoryID', CategoryModel::DefaultCategory()),
+      'ForeignID' => 'stub',
+      'InsertUserID' => Gdn::UserModel()->GetSystemUserID(),
+      'DateInserted' => $Now,
+      'DateLastComment' => $Now,
+      'LastCommentUserID' => Gdn::UserModel()->GetSystemUserID(),
+      'CountComments' => 1
+   );
 
-Don&rsquo;t see your must-have feature? We keep Vanilla nice and simple by default. Use <b>addons</b> to get the special sauce your community needs.
+   $CommentBody = "This is the first comment on your site and it&rsquo;s an important one.
+\nDon&rsquo;t see your must-have feature? We keep Vanilla nice and simple by default. Use <b>addons</b> to get the special sauce your community needs.
+\nNot sure which addons to enable? Our favorites are Button Bar and Tagging. They&rsquo;re almost always a great start.";
 
-Not sure which addons to enable? Our favorites are Button Bar and Tagging. They&rsquo;re almost always a great start.";
-$WallBody = "Ping! An activity post is a public way to talk at someone. When you update your status here, it posts it on your activity feed.";
+   $Comment = array(
+      'Body' => T('StubCommentBody', $CommentBody),
+      'Format' => 'Html',
+      'InsertUserID' => Gdn::UserModel()->GetSystemUserID(),
+      'DateInserted' => $Now
+   );
+   $Discussion['Comments'] = array($Comment);
+   $Discussions = array($Discussion);
 
-// Prep content meta data
-$SystemUserID = Gdn::UserModel()->GetSystemUserID();
-$TargetUserID = Gdn::Session()->UserID;
-$Now = Gdn_Format::ToDateTime();
-$CategoryID = GetValue('CategoryID', CategoryModel::DefaultCategory());
+   // Get wall post type ID
+   $FirstUser = Gdn::UserModel()->GetWhere('Admin', 1)->FirstRow(DATASET_TYPE_ARRAY);
+   $WallCommentTypeID = Gdn::SQL()->GetWhere('ActivityType', array('Name' => 'WallPost'))->Value('ActivityTypeID');
+   $WallBody = "Ping! An activity post is a public way to talk at someone. When you update your status here, it posts it on your activity feed.";
+   $Activity = array(
+      'Story' => T('StubWallBody', $WallBody),
+      'Format' => 'Html',
+      'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
+      'NotifyUserID' => -1,
+      'ActivityUserID' => $FirstUser['UserID'],
+      'RegardingUserID' => Gdn::UserModel()->GetSystemUserID(),
+      'ActivityTypeID' => $WallCommentTypeID,
+      'InsertUserID' => Gdn::UserModel()->GetSystemUserID(),
+      'DateInserted' => $Now,
+      'DateUpdated' => $Now
+   );
+   $Activities = array($Activity);
 
-// Get wall post type ID
-$WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))->Value('ActivityTypeID');
+   // Fire stub event for plugins.
+   $this->EventArguments['Discussions'] = &$Discussions;
+   $this->EventArguments['Activities'] = &$Activities;
+   $this->FireEvent('StubContent');
 
-// Insert first discussion & comment
-$DiscussionID = $SQL->Options('Ignore', true)->Insert('Discussion', array(
-   'Name' => T('StubDiscussionTitle', $DiscussionTitle),
-   'Body' => T('StubDiscussionBody', $DiscussionBody),
-   'Format' => 'Html',
-   'CategoryID' => $CategoryID,
-   'ForeignID' => 'stub',
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now,
-   'DateLastComment' => $Now,
-   'LastCommentUserID' => $SystemUserID,
-   'CountComments' => 1
-));
-$CommentID = $SQL->Insert('Comment', array(
-   'DiscussionID' => $DiscussionID,
-   'Body' => T('StubCommentBody', $CommentBody),
-   'Format' => 'Html',
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now
-));
-$SQL->Update('Discussion')
-   ->Set('LastCommentID', $CommentID)
-   ->Where('DiscussionID', $DiscussionID)
-   ->Put();
-$DiscussionModel->UpdateDiscussionCount($CategoryID);
+   // Discussions.
+   $DiscussionModel = new DiscussionModel();
+   foreach ($Discussions as $Discussion) {
+      // Insert discussion.
+      $DiscussionID = Gdn::SQL()->Options('Ignore', true)->Insert('Discussion', $Discussion);
+      $DiscussionModel->UpdateDiscussionCount($Discussion['CategoryID']);
 
-// Insert first wall post
-$SQL->Insert('Activity', array(
-   'Story' => T('StubWallBody', $WallBody),
-   'Format' => 'Html',
-   'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
-   'NotifyUserID' => -1,
-   'ActivityUserID' => $TargetUserID,
-   'RegardingUserID' => $SystemUserID,
-   'ActivityTypeID' => $WallCommentTypeID,
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now,
-   'DateUpdated' => $Now
-));
+      // Insert comments.
+      $Comments = val('Comments', $Discussion);
+      $CommentCount = 0;
+      if (is_array($Comments) && count($Comments)) {
+         foreach ($Comments as $Comment) {
+            $Comment['DiscussionID'] = $DiscussionID;
+            $CommentID = Gdn::SQL()->Insert('Comment', $Comment);
+            Gdn::SQL()->Update('Discussion')
+               ->Set('LastCommentID', $CommentID)
+               ->Set('CountComments', 'CountComments + 1', FALSE)
+               ->Where('DiscussionID', $DiscussionID)
+               ->Put();
+            $CommentCount++;
+         }
+      }
+   }
+
+   // Acitivities.
+   foreach ($Activities as $Activity) {
+      Gdn::SQL()->Insert('Activity', $Activity);
+   }
+}

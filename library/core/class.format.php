@@ -255,17 +255,7 @@ class Gdn_Format {
    public static function BBCode($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'BBCode');
-      } else {
-         // See if there is a custom BBCode formatter.
-         $BBCodeFormatter = Gdn::Factory('BBCodeFormatter');
-         if (is_object($BBCodeFormatter)) {
-            $Result = $BBCodeFormatter->Format($Mixed);
-            $Result = Gdn_Format::Links($Result);
-            $Result = Gdn_Format::Mentions($Result);
-	    $Result = Emoji::instance()->translateToHtml($Result);
-
-            return $Result;
-         }
+      }
 
          $Formatter = Gdn::Factory('HtmlFormatter');
          if (is_null($Formatter)) {
@@ -1564,13 +1554,13 @@ EOT;
    public static function To($Mixed, $FormatMethod) {
       // Process $Mixed based on its type.
       if (is_string($Mixed)) {
-         if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
-            $Mixed = self::$FormatMethod($Mixed);
+         if ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {
+            $Mixed = $Formatter->Format($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;
             $Mixed = $FormatMethod($Mixed);
-         } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {
-            $Mixed = $Formatter->Format($Mixed);
+         } elseif (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
+            $Mixed = self::$FormatMethod($Mixed);
          } else {
             $Mixed = Gdn_Format::Text($Mixed);
          }

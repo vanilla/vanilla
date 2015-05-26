@@ -218,10 +218,13 @@ class RoleModel extends Gdn_Model {
     * @return array Returns an array of arrays indexed by role type.
     */
    public static function getAllDefaultRoles() {
-      $result = array();
+      $result = array_fill_keys(
+         array_keys(self::getDefaultTypes(false)),
+         array()
+      );
 
       // Add the roles per type from the role table.
-      $roleData = Gdn::SQL()->GetWhere('Role', array('Type !=' => null))->ResultArray();
+      $roleData = Gdn::SQL()->GetWhere('Role', array('Type is not null' => ''))->ResultArray();
       foreach ($roleData as $row) {
          $result[$row['Type']][] = $row['RoleID'];
       }
@@ -260,7 +263,7 @@ class RoleModel extends Gdn_Model {
     * @param bool $translate Whether or not to translate the type names.
     * @return array Returns an array in the form `[type => name]`.
     */
-   public function getDefaultTypes($translate = true) {
+   public static function getDefaultTypes($translate = true) {
       $result = array(
          self::TYPE_MEMBER => self::TYPE_MEMBER,
          self::TYPE_GUEST => self::TYPE_GUEST,

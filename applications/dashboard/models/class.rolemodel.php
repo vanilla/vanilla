@@ -315,6 +315,19 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Return all roles matching a specific type.
+    *
+    * @param string $type Type slug to match role records against.
+    * @return Gdn_DataSet
+    */
+   public function getByType($type) {
+      return $this->SQL->Select()
+         ->From('Role')
+         ->Where('Type', $type)
+         ->Get();
+   }
+
+   /**
     * Returns a resultset of role data NOT related to the specified RoleID.
     *
     * @param int The RoleID to filter out.

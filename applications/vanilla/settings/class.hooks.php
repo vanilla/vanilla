@@ -165,11 +165,8 @@ class VanillaHooks implements Gdn_IPlugin {
          array(
             'Vanilla.Discussions.View' => 1
          ),
-         array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
-         )
+         'Category',
+         -1
       );
 
       // Unconfirmed defaults
@@ -184,11 +181,8 @@ class VanillaHooks implements Gdn_IPlugin {
          array(
             'Vanilla.Discussions.View' => 1
          ),
-         array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1
-         )
+         'Category',
+         -1
       );
 
       // Applicant defaults
@@ -203,11 +197,8 @@ class VanillaHooks implements Gdn_IPlugin {
          array(
             'Vanilla.Discussions.View' => 1
          ),
-         array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1
-         )
+         'Category',
+          -1
       );
 
       // Member defaults
@@ -226,11 +217,8 @@ class VanillaHooks implements Gdn_IPlugin {
             'Vanilla.Discussions.View' => 1,
             'Vanilla.Comments.Add' => 1
          ),
-         array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1
-         )
+         'Category',
+         -1
       );
 
       // Moderator defaults
@@ -263,20 +251,14 @@ class VanillaHooks implements Gdn_IPlugin {
             'Vanilla.Comments.Edit' => 1,
             'Vanilla.Comments.Delete' => 1
          ),
-         array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1
-         )
+         'Category',
+         -1
       );
 
       // Administrator defaults
       $Sender->AddDefault(
          RoleModel::TYPE_ADMINISTRATOR,
          array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
             'Vanilla.Discussions.Add' => 1,
             'Vanilla.Discussions.Edit' => 1,
             'Vanilla.Discussions.Announce' => 1,
@@ -303,11 +285,8 @@ class VanillaHooks implements Gdn_IPlugin {
             'Vanilla.Comments.Edit' => 1,
             'Vanilla.Comments.Delete' => 1
          ),
-         array(
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1
-         )
+         'Category',
+         -1
       );
    }
 

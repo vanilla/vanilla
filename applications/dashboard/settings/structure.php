@@ -794,6 +794,13 @@ $Construct
 // This will allow us to change the default later and grandfather existing forums in.
 SaveToConfig('Garden.InputFormatter', C('Garden.InputFormatter'));
 
+// Make sure the default locale is in its canonical form.
+$currentLocale = C('Garden.Locale');
+$canonicalLocale = Gdn_Locale::Canonicalize($currentLocale);
+if ($currentLocale !== $canonicalLocale) {
+   SaveToConfig('Garden.Locale', $canonicalLocale);
+}
+
 // We need to undo cleditor's bad behavior for our reformed users.
 // If you still need to manipulate this, do it in memory instead (SAVE = false).
 if (!C('Garden.Html.SafeStyles')) {

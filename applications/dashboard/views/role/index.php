@@ -47,7 +47,18 @@ foreach ($this->Data('Roles') as $Role) {
          </div>
          <?php } ?>
       </td>
-      <td class="Alt"><?php echo $Role['Description']; ?></td>
+      <td class="Alt">
+         <?php
+         echo $Role['Description'];
+
+         if (val('Type', $Role)) {
+            echo '<div class="Meta-Container"><span class="Meta-Label">'.
+               T('default for').': '.
+               T(val('Type', $Role)).
+               '</span></div>';
+         }
+         ?>
+      </td>
    </tr>
 <?php } ?>
    </tbody>

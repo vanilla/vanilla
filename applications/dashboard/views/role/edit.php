@@ -24,16 +24,23 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         echo $this->Form->Label('Default Type', 'Type');
+         echo '<div class="Info2">'.T('Select the type for this role, if any.').'</div>';
+         echo $this->Form->DropDown('Type', $this->Data('_Types'), array('IncludeNull' => TRUE));
+      ?>
+   </li>
+   <li>
+      <?php
       echo $this->Form->CheckBox('PersonalInfo', T('RolePersonalInfo', "This role is personal info. Only users with permission to view personal info will see it."), array('value' => '1'));
       ?>
    </li>
    <?php
    $this->FireEvent('BeforeRolePermissions');
-   
+
    echo $this->Form->Simple(
       $this->Data('_ExtendedFields', array()),
-      array('Wrap' => array('', '')));   
-   
+      array('Wrap' => array('', '')));
+
    if (count($this->PermissionData) > 0) {
       if ($this->Role && $this->Role->CanSession != '1') {
          ?>

@@ -255,6 +255,27 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Get an array of default role types.
+    *
+    * @param bool $translate Whether or not to translate the type names.
+    * @return array Returns an array in the form `[type => name]`.
+    */
+   public function getDefaultTypes($translate = true) {
+      $result = array(
+         self::TYPE_MEMBER => self::TYPE_MEMBER,
+         self::TYPE_GUEST => self::TYPE_GUEST,
+         self::TYPE_UNCONFIRMED => self::TYPE_UNCONFIRMED,
+         self::TYPE_APPLICANT => self::TYPE_APPLICANT,
+         self::TYPE_MODERATOR => self::TYPE_MODERATOR,
+         self::TYPE_ADMINISTRATOR => self::TYPE_ADMINISTRATOR
+      );
+      if ($translate) {
+         $result = array_map('t', $result);
+      }
+      return $result;
+   }
+
+   /**
     * Returns a resultset of all roles that have editable permissions.
     *
    public function GetEditablePermissions() {

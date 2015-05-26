@@ -1024,31 +1024,33 @@ class UserModel extends Gdn_Model {
       return $Data;
    }
 
+   /**
+    * Get the current number of applicants waiting to be approved.
+    *
+    * @return int Returns the number of applicants or 0 if the registration method isn't set to approval.
+    */
    public function GetApplicantCount() {
-      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      if ($ApplicantRoleID == 0)
-         return 0;
-
-      $Result = $this->SQL->Select('u.UserID', 'count', 'ApplicantCount')
-         ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID', $ApplicantRoleID, TRUE, FALSE)
-         ->Get()->Value('ApplicantCount', 0);
-      return $Result;
+      $roleModel = new RoleModel();
+      $result = $roleModel->GetApplicantCount();
+      return $result;
    }
 
    /**
-    * Returns all users in the applicant role
+    * Returns all users in the applicant role.
+    *
+    * @return Gdn_DataSet Returns a data set of the users who are applicants.
     */
    public function GetApplicants() {
-      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      if ($ApplicantRoleID == 0)
+      $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
+
+      if (empty($applicantRoleIDs)) {
          return new Gdn_DataSet();
+      }
 
       return $this->SQL->Select('u.*')
          ->From('User u')
          ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID', $ApplicantRoleID, TRUE, FALSE)
+         ->Where('ur.RoleID', $applicantRoleIDs)
 //         ->GroupBy('UserID')
          ->OrderBy('DateInserted', 'desc')
          ->Get();
@@ -1067,12 +1069,10 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetCountLike($Like = FALSE) {
-      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
-         ->From('User u')
-         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+         ->From('User u');
+
       if (is_array($Like)){
          $this->SQL
 				->BeginWhereGroup()
@@ -1080,8 +1080,7 @@ class UserModel extends Gdn_Model {
 				->EndWhereGroup();
 		}
 		$this->SQL
-         ->Where('u.Deleted', 0)
-         ->Where('ur.RoleID is null');
+         ->Where('u.Deleted', 0);
 
 		$Data =  $this->SQL->Get()->FirstRow();
 
@@ -1091,15 +1090,13 @@ class UserModel extends Gdn_Model {
    public function GetCountWhere($Where = FALSE) {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
-         ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID and ur.RoleID = '.(int)C('Garden.Registration.ApplicantRoleID', 0), 'left');
+         ->From('User u');
 
 		if (is_array($Where))
          $this->SQL->Where($Where);
 
 		$Data = $this->SQL
          ->Where('u.Deleted', 0)
-         ->Where('ur.RoleID is null')
          ->Get()
          ->FirstRow();
 
@@ -1216,11 +1213,9 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetLike($Like = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-
       $this->UserQuery();
       $this->SQL
-         ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
+         ->Join('UserRole ur', "u.UserID = ur.UserID", 'left');
 
       if (is_array($Like)) {
          $this->SQL
@@ -1231,7 +1226,6 @@ class UserModel extends Gdn_Model {
 
       return $this->SQL
          ->Where('u.Deleted', 0)
-         ->Where('ur.RoleID is null')
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
@@ -1994,11 +1988,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function Search($Filter, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      if (C('Garden.Registration.Method') === 'Approval') {
-         $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      } else {
-         $ApplicantRoleID = 0;
-      }
       $Optimize = FALSE;
 
       if (is_array($Filter)) {
@@ -2026,10 +2015,6 @@ class UserModel extends Gdn_Model {
       }
 
       $this->UserQuery();
-      if ($ApplicantRoleID != 0) {
-         $this->SQL
-            ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
-      }
 
       if (isset($Where))
          $this->SQL->Where($Where);
@@ -2076,10 +2061,6 @@ class UserModel extends Gdn_Model {
          return new Gdn_DataSet(array());
       }
 
-      if ($ApplicantRoleID != 0) {
-         $this->SQL->Where('ur.RoleID is null');
-      }
-
       $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
@@ -2101,11 +2082,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function SearchCount($Filter = FALSE) {
-      if (C('Garden.Registration.Method') == 'Approval')
-         $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      else
-         $ApplicantRoleID = 0;
-
       if (is_array($Filter)) {
          $Where = $Filter;
          $Keywords = $Where['Keywords'];
@@ -2131,8 +2107,6 @@ class UserModel extends Gdn_Model {
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u');
-      if ($ApplicantRoleID != 0)
-         $this->SQL->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
@@ -2153,9 +2127,6 @@ class UserModel extends Gdn_Model {
 
 		$this->SQL
          ->Where('u.Deleted', 0);
-
-      if ($ApplicantRoleID != 0)
-         $this->SQL->Where('ur.RoleID is null');
 
 		$Data =  $this->SQL->Get()->FirstRow();
 
@@ -2311,8 +2282,8 @@ class UserModel extends Gdn_Model {
     * To be used for approval registration
     */
    public function InsertForApproval($FormPostValues, $Options = array()) {
-      $RoleIDs = C('Garden.Registration.ApplicantRoleID');
-      if (!$RoleIDs) {
+      $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
+      if (empty($RoleIDs)) {
          throw new Exception(T('The default role has not been configured.'), 400);
       }
 
@@ -2719,7 +2690,7 @@ class UserModel extends Gdn_Model {
     * Approve a membership applicant.
     */
    public function Approve($UserID, $Email) {
-      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+      $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
       // Make sure the $UserID is an applicant
       $RoleData = $this->GetRoles($UserID);
@@ -2728,8 +2699,11 @@ class UserModel extends Gdn_Model {
       } else {
          $AppRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
          $ApplicantFound = FALSE;
-         foreach ($AppRoles as $AppRole)
-            if (GetValue('RoleID', $AppRole) == $ApplicantRoleID) $ApplicantFound = TRUE;
+         foreach ($AppRoles as $AppRole) {
+            if (in_array(val('RoleID', $AppRole), $applicantRoleIDs)) {
+               $ApplicantFound = TRUE;
+            }
+         }
       }
 
       if ($ApplicantFound) {
@@ -2892,7 +2866,7 @@ class UserModel extends Gdn_Model {
    }
 
    public function Decline($UserID) {
-      $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', 0);
+      $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
       // Make sure the user is an applicant
       $RoleData = $this->GetRoles($UserID);
@@ -2901,8 +2875,11 @@ class UserModel extends Gdn_Model {
       } else {
          $AppRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
          $ApplicantFound = FALSE;
-         foreach ($AppRoles as $AppRole)
-            if (GetValue('RoleID', $AppRole) == $ApplicantRoleID) $ApplicantFound = TRUE;
+         foreach ($AppRoles as $AppRole) {
+            if (in_array(GetValue('RoleID', $AppRole), $applicantRoleIDs)) {
+               $ApplicantFound = TRUE;
+            }
+         }
       }
 
       if ($ApplicantFound) {

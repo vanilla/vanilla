@@ -334,6 +334,12 @@ class RoleModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Get the current number of applicants waiting to be approved.
+    *
+    * @param bool $Force Whether or not to force a cache refresh.
+    * @return int Returns the number of applicants or 0 if the registration method isn't set to approval.
+    */
    public function GetApplicantCount($Force = FALSE) {
       if (C('Garden.Registration.Method') != 'Approval') {
          return 0;
@@ -344,13 +350,15 @@ class RoleModel extends Gdn_Model {
       if ($Force)
          Gdn::Cache()->Remove($CacheKey);
 
+      $applicantRoleIDs = static::getDefaultRoles(self::TYPE_APPLICANT);
+
       $Count = Gdn::Cache()->Get($CacheKey);
       if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
          $Count = Gdn::SQL()
             ->Select('u.UserID', 'count', 'UserCount')
             ->From('User u')
             ->Join('UserRole ur', 'u.UserID = ur.UserID')
-            ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
+            ->Where('ur.RoleID',  $applicantRoleIDs)
             ->Where('u.Deleted', '0')
             ->Get()->Value('UserCount', 0);
 

@@ -248,11 +248,7 @@ if (!function_exists('ValidateInteger')) {
         }
         $Integer = intval($Value);
         $String = strval($Integer);
-        if ($String == $Value) {
-            return true;
-        } else {
-            return false;
-        }
+        return $String == $Value;
     }
 }
 

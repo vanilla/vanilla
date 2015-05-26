@@ -36,15 +36,26 @@ class PermissionModel extends Gdn_Model {
     * Add an entry into the list of default permissions.
     *
     * @param string $Type Type of role the permissions should be added for.
-    * @param array $Permissions List of permissions to include.
-    * @param array|bool $Junction Junction table information.
+    * @param array $Permissions The list of permissions to include.
+    * @param null|string $Junction Type of junction to base the permission on.
+    * @param null|int $JunctionId Identifier for the specific junction record to base the permission on.
     */
-   public function AddDefault($Type, $Permissions, $Junction = FALSE) {
+   public function AddDefault($Type, $Permissions, $Junction = null, $JunctionId = null) {
       if (!array_key_exists($Type, $this->DefaultPermissions)) {
-         $this->DefaultPermissions[$Type] = array();
+         $this->DefaultPermissions[$Type] = array('global' => array());
       }
 
-      $this->DefaultPermissions[$Type][] = array($Permissions, $Junction);
+      if ($Junction && $JunctionId) {
+         $JunctionKey = "$Junction:$JunctionId";
+         if (!array_key_exists($JunctionKey, $this->DefaultPermissions[$Type])) {
+            $this->DefaultPermissions[$Type][$JunctionKey] = array();
+         }
+         $Defaults =& $this->DefaultPermissions[$Type][$JunctionKey];
+      } else {
+         $Defaults =& $this->DefaultPermissions[$Type]['global'];
+      }
+
+      $Defaults = array_merge($Defaults, $Permissions);
    }
 
    /**
@@ -954,44 +965,59 @@ class PermissionModel extends Gdn_Model {
 
    /**
     * Reset permissions for all roles, based on the value in their Type column.
+    *
+    * @param string $Type Role type to limit the updates to.
     */
-   public static function ResetAllRoles() {
+   public static function ResetAllRoles($Type = null) {
       // Retrieve an array containing all available roles.
       $RoleModel = new RoleModel();
-      $AllRoles = $RoleModel->GetArray();
+      if ($Type) {
+         $Result = $RoleModel->getByType($Type)->ResultArray();
+         $Roles = array_column($Result, 'Name', 'RoleID');
+      } else {
+         $Roles = $RoleModel->GetArray();
+      }
 
       // Iterate through our roles and reset their permissions.
       $Permissions = Gdn::PermissionModel();
-      foreach ($AllRoles as $RoleID => $Role) {
-         $Permissions->ResetRole($Role);
+      foreach ($Roles as $RoleID => $Role) {
+         $Permissions->ResetRole($RoleID);
       }
    }
 
    /**
     * Reset permissions for a role, based on the value in its Type column.
     *
-    * @param string $Role Name of the role to reset permissions for.
+    * @param int $RoleId ID of the role to reset permissions for.
     * @throws Exception
     */
-   public function ResetRole($Role) {
+   public function ResetRole($RoleId) {
       // Grab the value of Type for this role.
-      $RoleType = $this->SQL->GetWhere('Role', array('Name' => $Role))->Value('Type');
+      $RoleType = $this->SQL->GetWhere('Role', array('RoleID' => $RoleId))->Value('Type');
 
       if ($RoleType == '') {
          $RoleType = RoleModel::TYPE_MEMBER;
       }
 
-      $DefaultPermissions = $this->GetDefaults();
+      $Defaults = $this->GetDefaults();
 
-      if (array_key_exists($RoleType, $DefaultPermissions)) {
-         foreach ($DefaultPermissions[$RoleType] as $Defaults) {
-            list($Permissions, $Junction) = $Defaults;
+      if (array_key_exists($RoleType, $Defaults)) {
+         foreach ($Defaults[$RoleType] as $Specificity => $Permissions) {
+            $Permissions['RoleID'] = $RoleId;
 
-            if (is_array($Junction)) {
-               $Permissions = array_merge($Permissions, $Junction);
+            if (strpos($Specificity, ':')) {
+               list($Junction, $JunctionId) = explode(':', $Specificity);
+               if ($Junction && $JunctionId) {
+                  switch ($Junction) {
+                     case 'Category':
+                     default:
+                        $Permissions['JunctionTable'] = $Junction;
+                        $Permissions['JunctionColumn'] = 'PermissionCategoryID';
+                        $Permissions['JunctionID'] = $JunctionId;
+                  }
+               }
             }
 
-            $Permissions['Role'] = $Role;
             $this->Save($Permissions);
          }
       }

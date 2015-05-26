@@ -714,9 +714,6 @@ EOT;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
             if ($UserID) {
-//               // Add the user to the default roles.
-//               $UserModel->SaveRoles($UserID, C('Garden.Registration.DefaultRoles'));
-
                // Send the welcome email.
                $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
             }

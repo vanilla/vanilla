@@ -727,11 +727,6 @@ class SettingsController extends DashboardController {
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
       $this->SetData('_Roles', ConsolidateArrayValuesByKey($this->RoleData->ResultArray(), 'RoleID', 'Name'));
 
-      // Get the currently selected default roles
-      // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
-      // if (is_array($this->ExistingRoleData) === FALSE)
-      //    $this->ExistingRoleData = array();
-
       // Get currently selected InvitationOptions
       $this->ExistingRoleInvitations = Gdn::Config('Garden.Registration.InviteRoles');
       if (is_array($this->ExistingRoleInvitations) === FALSE)
@@ -772,8 +767,6 @@ class SettingsController extends DashboardController {
       } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');
-         // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
-         //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
 
          if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
             $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');

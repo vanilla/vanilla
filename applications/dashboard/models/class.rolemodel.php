@@ -200,7 +200,7 @@ class RoleModel extends Gdn_Model {
             $backRoleIDs = array_column($guestRoleData, 'RoleID');
             break;
          case self::TYPE_MEMBER:
-            $backRoleIDs = C('Garden.Registration.DefaultRoles', array());
+            $backRoleIDs = (array)C('Garden.Registration.DefaultRoles', null);
             break;
          case self::TYPE_UNCONFIRMED:
             $backRoleIDs = (array)C('Garden.Registration.ConfirmEmailRole', null);
@@ -210,6 +210,48 @@ class RoleModel extends Gdn_Model {
       $roleIDs = array_unique($roleIDs);
 
       return $roleIDs;
+   }
+
+   /**
+    * Get the default role IDs for all types of roles.
+    *
+    * @return array Returns an array of arrays indexed by role type.
+    */
+   public static function getAllDefaultRoles() {
+      $result = array();
+
+      // Add the roles per type from the role table.
+      $roleData = Gdn::SQL()->GetWhere('Role', array('Type !=' => null))->ResultArray();
+      foreach ($roleData as $row) {
+         $result[$row['Type']][] = $row['RoleID'];
+      }
+
+      // Add the backwards compatible roles.
+      $result[self::TYPE_APPLICANT] = array_merge(
+         $result[self::TYPE_APPLICANT],
+         (array)C('Garden.Registration.ApplicantRoleID', null)
+      );
+
+      $guestRoleIDs = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();
+      $guestRoleIDs = array_column($guestRoleIDs, 'RoleID');
+      $result[self::TYPE_GUEST] = array_merge(
+         $result[self::TYPE_GUEST],
+         $guestRoleIDs
+      );
+
+      $result[self::TYPE_MEMBER] = array_merge(
+         $result[self::TYPE_MEMBER],
+         (array)C('Garden.Registration.DefaultRoles', array())
+      );
+
+      $result[self::TYPE_UNCONFIRMED] = array_merge(
+         $result[self::TYPE_UNCONFIRMED],
+         (array)C('Garden.Registration.ConfirmEmailRole', null)
+      );
+
+      $result = array_map('array_unique', $result);
+
+      return $result;
    }
 
    /**

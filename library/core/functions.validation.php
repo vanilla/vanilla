@@ -242,9 +242,18 @@ if (!function_exists('ValidateMinimumAge')) {
 }
 
 if (!function_exists('ValidateInteger')) {
-   function ValidateInteger($Value, $Field = NULL) {
-      return (!$Value || filter_var($Value, FILTER_VALIDATE_INT) !== false);
-   }
+    function ValidateInteger($Value, $Field = null) {
+        if (!$Value || (is_string($Value) && !trim($Value))) {
+            return true;
+        }
+        $Integer = intval($Value);
+        $String = strval($Integer);
+        if ($String == $Value) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 if (!function_exists('ValidateBoolean')) {

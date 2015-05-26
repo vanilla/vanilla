@@ -768,9 +768,6 @@ class SettingsController extends DashboardController {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');
 
-         if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
-            $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');
-
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');
          $InvitationCounts = $this->Form->GetValue('InvitationCount');

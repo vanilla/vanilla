@@ -140,11 +140,6 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
       }
 
       echo $this->Form->CheckBox('Garden.Registration.ConfirmEmail', '@'.T('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
-
-      echo $this->Form->Label('Email Confirmation Role', 'Garden.Registration.ConfirmEmailRole'),
-         $this->Form->DropDown('Garden.Registration.ConfirmEmailRole', $this->Data('_Roles'), array('IncludeNull' => TRUE));
-
-      echo ' ', T('Users will be assigned to this role until they\'ve confirmed their email addresses.');
       ?>
       </div>
    </li>

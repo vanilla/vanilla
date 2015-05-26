@@ -272,11 +272,12 @@ class Gdn_Locale extends Gdn_Pluggable {
    /**
     * Return the first 2 letters of the current locale (the language code).
     */
-   public function Langauge() {
-      if ($this->Locale == '')
-         return FALSE;
-      else
+   public function Language() {
+      if ($this->Locale == '') {
+         return false;
+      } else {
          return substr($this->Locale, 0, 2);
+      }
    }
 
    /**

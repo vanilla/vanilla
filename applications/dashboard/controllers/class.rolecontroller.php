@@ -165,6 +165,8 @@ class RoleController extends DashboardController {
          }
       }
 
+      $this->SetData('_Types', $this->RoleModel->getDefaultTypes(true));
+
       $this->Render();
    }
 

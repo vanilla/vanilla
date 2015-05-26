@@ -180,6 +180,39 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Get the default role IDs for a type of role.
+    *
+    * @param string $type One of the {@link RoleModel::TYPE_*} constants.
+    * @return array Returns an array of role IDs.
+    */
+   public static function getDefaultRoles($type) {
+      // Get the roles that match the type.
+      $roleData = Gdn::SQL()->Select('RoleID')->GetWhere('Role', array('Type' => $type))->ResultArray();
+      $roleIDs = array_column($roleData, 'RoleID');
+
+      // This method has to be backwards compatible with the old config roles.
+      switch ($type) {
+         case self::TYPE_APPLICANT:
+            $backRoleIDs = (array)C('Garden.Registration.ApplicantRoleID', null);
+            break;
+         case self::TYPE_GUEST:
+            $guestRoleData = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();
+            $backRoleIDs = array_column($guestRoleData, 'RoleID');
+            break;
+         case self::TYPE_MEMBER:
+            $backRoleIDs = C('Garden.Registration.DefaultRoles', array());
+            break;
+         case self::TYPE_UNCONFIRMED:
+            $backRoleIDs = (array)C('Garden.Registration.ConfirmEmailRole', null);
+            break;
+      }
+      $roleIDs = array_merge($roleIDs, $backRoleIDs);
+      $roleIDs = array_unique($roleIDs);
+
+      return $roleIDs;
+   }
+
+   /**
     * Returns a resultset of all roles that have editable permissions.
     *
    public function GetEditablePermissions() {

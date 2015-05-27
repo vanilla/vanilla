@@ -147,13 +147,6 @@ $Construct
    ->Column('RoleID', 'int', FALSE, array('primary', 'index'))
    ->Set($Explicit, $Drop);
 
-if (!$UserRoleExists) {
-   // Assign the guest user to the guest role
-   $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
-   // Assign the admin user to admin role
-   $SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
-}
-
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists) {
    $types = $RoleModel->getAllDefaultRoles();
@@ -189,6 +182,15 @@ if ($RoleTableExists && $UserRoleExists) {
          ->Put();
 
       $SQL->Delete('UserRole', array('UserID' => 0));
+   }
+}
+
+if (!$UserRoleExists) {
+   // Assign the admin user to admin role.
+   $adminRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_ADMINISTRATOR);
+
+   foreach ($adminRoleIDs as $id) {
+      $SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => $id));
    }
 }
 

@@ -519,12 +519,20 @@ class PermissionModel extends Gdn_Model {
             $SQL->Select("p.`$PermissionName`, $DefaultValue", 'coalesce', $PermissionName);
          }
 
-         if(!is_null($RoleID)) {
+         if(!empty($RoleID)) {
+            $roleIDs = (array)$RoleID;
+            if (count($roleIDs) === 1) {
+               $roleOn = 'p.RoleID = '.$this->SQL->Database->Connection()->quote(reset($roleIDs));
+            } else {
+               $roleIDs = array_map(array($this->SQL->Database->Connection(), 'quote'), $roleIDs);
+               $roleOn = 'p.RoleID in ('.implode(',', $roleIDs).')';
+            }
+
             // Get the permissions for the junction table.
             $SQL->Select('junc.Name')
                ->Select('junc.'.$JunctionColumn, '', 'JunctionID')
                ->From($JunctionTable.' junc')
-               ->Join('Permission p', "p.JunctionID = junc.$JunctionColumn and p.RoleID = $RoleID", 'left')
+               ->Join('Permission p', "p.JunctionID = junc.$JunctionColumn and $roleOn", 'left')
                ->OrderBy('junc.Sort')
                ->OrderBy('junc.Name');
 

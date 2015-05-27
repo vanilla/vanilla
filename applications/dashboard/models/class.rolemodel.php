@@ -187,8 +187,13 @@ class RoleModel extends Gdn_Model {
     */
    public static function getDefaultRoles($type) {
       // Get the roles that match the type.
-      $roleData = Gdn::SQL()->Select('RoleID')->GetWhere('Role', array('Type' => $type))->ResultArray();
-      $roleIDs = array_column($roleData, 'RoleID');
+      try {
+         $roleData = Gdn::SQL()->Select('RoleID')->GetWhere('Role', array('Type' => $type))->ResultArray();
+         $roleIDs = array_column($roleData, 'RoleID');
+      } catch (Exception $ex) {
+         // This exception happens when the type column hasn't been added to GDN_Role yet.
+         $roleIDs = array();
+      }
 
       // This method has to be backwards compatible with the old config roles.
       switch ($type) {

@@ -539,13 +539,12 @@ class PermissionModel extends Gdn_Model {
     * Returns all defined permissions not related to junction tables. Excludes
     * permissions related to applications & plugins that are disabled.
     *
+    * @param int|array $RoleID The role(s) to get the permissions for.
     * @param string $LimitToSuffix An optional suffix to limit the permission names to.
-    * @return DataSet
+    * @return array
     */
    public function GetPermissions($RoleID, $LimitToSuffix = '') {
-      //$Namespaces = $this->GetAllowedPermissionNamespaces();
-      //$NamespaceCount = count($Namespaces);
-
+      $RoleID = (array)$RoleID;
       $Result = array();
 
       $GlobalPermissions = $this->GetGlobalPermissions($RoleID, $LimitToSuffix);

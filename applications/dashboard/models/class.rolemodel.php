@@ -336,13 +336,22 @@ class RoleModel extends Gdn_Model {
       return $this->GetWhere(array('RoleID <>' => $RoleID));
    }
 
+   /**
+    * Get the permissions for one or more roles.
+    *
+    * @param int|array $RoleID One or more role IDs to get the permissions for.
+    * @return array Returns an array of permissions.
+    */
    public function GetPermissions($RoleID) {
       $PermissionModel = Gdn::PermissionModel();
-      $Role = self::Roles($RoleID);
+      $roleIDs = (array)$RoleID;
 
-      $LimitToSuffix = GetValue('CanSession', $Role, TRUE) ? '' : 'View';
+      foreach ($roleIDs as $ID) {
+         $Role = self::Roles($ID);
+         $LimitToSuffix = GetValue('CanSession', $Role, TRUE) ? '' : 'View';
+      }
 
-      $Result = $PermissionModel->GetPermissions($RoleID, $LimitToSuffix);
+      $Result = $PermissionModel->GetPermissions($roleIDs, $LimitToSuffix);
       return $Result;
    }
 

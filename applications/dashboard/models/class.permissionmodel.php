@@ -18,6 +18,12 @@ class PermissionModel extends Gdn_Model {
    protected $DefaultPermissions = array();
 
    /**
+    * Default row permission values
+    * @var array
+    */
+   protected $RowDefaults =  array();
+
+   /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
@@ -251,6 +257,43 @@ class PermissionModel extends Gdn_Model {
       }
 
       return $this->DefaultPermissions;
+   }
+
+   /**
+    * Grab default permission column values.
+    *
+    * @throws Exception Throws when no default permission row can be found in the database.
+    * @return array A list of default permission values.
+    */
+   public function GetRowDefaults() {
+      if (empty($this->RowDefaults)) {
+         $DefaultRow = $this->SQL
+            ->Select('*')
+            ->From('Permission')
+            ->Where('RoleID', 0)
+            ->Where('JunctionTable is null')
+            ->OrderBy('RoleID')
+            ->Limit(1)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+
+         if (!$DefaultRow) {
+            throw new Exception(T('No default permission row.'));
+         }
+
+         $this->_MergeDisabledPermissions($DefaultRow);
+
+         unset(
+            $DefaultRow['PermissionID'],
+            $DefaultRow['RoleID'],
+            $DefaultRow['JunctionTable'],
+            $DefaultRow['JunctionColumn'],
+            $DefaultRow['JunctionID']
+         );
+
+         $this->RowDefaults = $this->StripPermissions($DefaultRow, $DefaultRow);
+      }
+
+      return $this->RowDefaults;
    }
 
    /**
@@ -625,7 +668,7 @@ class PermissionModel extends Gdn_Model {
             continue;
          }
 
-         switch ($Row[$PermissionName]) {
+         switch ($DefaultRow[$PermissionName]) {
             case 3:
                $Row[$PermissionName] = 1;
                break;
@@ -1000,10 +1043,12 @@ class PermissionModel extends Gdn_Model {
       }
 
       $Defaults = $this->GetDefaults();
+      $RowDefaults = $this->GetRowDefaults();
 
       if (array_key_exists($RoleType, $Defaults)) {
          foreach ($Defaults[$RoleType] as $Specificity => $Permissions) {
             $Permissions['RoleID'] = $RoleId;
+            $Permissions = array_merge($RowDefaults, $Permissions);
 
             if (strpos($Specificity, ':')) {
                list($Junction, $JunctionId) = explode(':', $Specificity);

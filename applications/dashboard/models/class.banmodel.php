@@ -309,7 +309,6 @@ class BanModel extends Gdn_Model {
       return $banned;
    }
 
->>>>>>> 65abe0be2a90e8f16e46b5730fc3f8201d1923eb
    /**
     * Save data about ban from form.
     *

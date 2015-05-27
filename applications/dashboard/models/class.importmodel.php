@@ -1247,11 +1247,14 @@ class ImportModel extends Gdn_Model {
       set_time_limit(60 * 5);
 
       $Path = $this->ImportPath;
-      $BasePath = dirname($Path);
+      $BasePath = dirname($Path).DS.'import';
       $Tables = array();
 
       if (!is_readable($Path)) {
          throw new Gdn_UserException(T('The input file is not readable.', 'The input file is not readable.  Please check permissions and try again.'));
+      }
+      if (!is_writeable($BasePath)) {
+         throw new Gdn_UserException(sprintf(T('Data file directory (%s) is not writable.'), $BasePath));
       }
 
       // Open the import file.
@@ -1286,11 +1289,13 @@ class ImportModel extends Gdn_Model {
          } else {
             // This is the start of a table.
             $TableInfo = $this->ParseInfoLine($Line);
+
             if (!array_key_exists('Table', $TableInfo)) {
                throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
             }
+
             $Table = $TableInfo['Table'];
-            $Path = $BasePath.DS.'import'.DS.$Table.'.txt';
+            $Path = $BasePath.DS.$Table.'.txt';
             $fpout = fopen($Path, 'wb');
 
             $TableInfo['Path'] = $Path;

@@ -53,7 +53,7 @@ foreach ($this->Data('Roles') as $Role) {
 
          if (val('Type', $Role)) {
             echo '<div class="Meta-Container"><span class="Meta-Label">'.
-               T('default for').': '.
+               T('default type', 'default').': '.
                T(val('Type', $Role)).
                '</span></div>';
          }

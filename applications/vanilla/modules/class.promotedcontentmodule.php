@@ -596,65 +596,64 @@ class PromotedContentModule extends Gdn_Module {
    /**
     * Pre-process content into a uniform format for output
     *
-    * @param Array $Content By reference
+    * @param Array $content By reference
     */
-   protected function Prepare(&$Content) {
+   protected function Prepare(&$content) {
 
-      foreach ($Content as &$ContentItem) {
-         $ContentType = val('RecordType', $ContentItem);
-         $UserID = GetValue('InsertUserID', $ContentItem);
-         $Replacement = array();
-         $Fields = array('DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl', );
+      foreach ($content as &$item) {
+         $contentType = val('RecordType', $item);
+         $userID = GetValue('InsertUserID', $item);
+         $itemProperties = array();
+         $itemFields = array('DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl', );
 
-         switch (strtolower($ContentType)) {
+         switch (strtolower($contentType)) {
             case 'comment':
-               $Fields = array_merge($Fields, array('CommentID'));
+               $itemFields = array_merge($itemFields, array('CommentID'));
 
                // Comment specific
-               $Replacement['Name'] = sprintf(T('Re: %s'), GetValueR('Discussion.Name', $ContentItem, val('Name', $ContentItem)));
-               $url = CommentUrl($ContentItem);
+               $itemProperties['Name'] = sprintf(T('Re: %s'), GetValueR('Discussion.Name', $item, val('Name', $item)));
+               $url = CommentUrl($item);
                break;
 
             case 'discussion':
-               $Fields = array_merge($Fields, array('Name', 'Type'));
-               $url = DiscussionUrl($ContentItem);
+               $itemFields = array_merge($itemFields, array('Name', 'Type'));
+               $url = DiscussionUrl($item);
                break;
          }
 
-         $ContentItem['Url'] = $url;
-         if ($categoryId = val('CategoryID', $ContentItem)) {
-            $Category = CategoryModel::Categories($categoryId);
-            $ContentItem['CategoryName'] = val('Name', $Category);
-            $ContentItem['CategoryUrl'] = CategoryUrl($Category);
+         $item['Url'] = $url;
+         if ($categoryId = val('CategoryID', $item)) {
+            $category = CategoryModel::Categories($categoryId);
+            $item['CategoryName'] = val('Name', $category);
+            $item['CategoryUrl'] = CategoryUrl($category);
          }
-         $Fields = array_fill_keys($Fields, TRUE);
-         $Common = array_intersect_key($ContentItem, $Fields);
-         $Replacement = array_merge($Replacement, $Common);
-         $ContentItem = $Replacement;
-
-
-
-         $UserFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', '_CssClass', 'Url', 'Roles', 'RoleNames');
+         $itemFields = array_fill_keys($itemFields, TRUE);
+         $filteredItem = array_intersect_key($item, $itemFields);
+         $itemProperties = array_merge($itemProperties, $filteredItem);
+         $item = $itemProperties;
 
          // Attach User
-         $User = Gdn::UserModel()->GetID($UserID);
-         $RoleModel = new RoleModel();
-         $Roles = $RoleModel->GetByUserID($UserID)->ResultArray();
-         $RoleNames = '';
-         foreach($Roles as $Role) {
-            $RoleNames[] = val('Name', $Role);
+         $userFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
+
+         $user = Gdn::UserModel()->GetID($userID);
+         $roleModel = new RoleModel();
+         $roles = $roleModel->GetByUserID($userID)->ResultArray();
+         $roleNames = '';
+         foreach($roles as $role) {
+            $roleNames[] = val('Name', $role);
          }
-         $Replacement = array(
-            'Url' => Url(UserUrl($User), true),
-            'PhotoUrl' => UserPhotoUrl($User),
-            'RankName' => val('Name', RankModel::Ranks(val('RankID', $User)), null),
-            'RoleNames' => $RoleNames
+         $userProperties = array(
+            'Url' => Url(UserUrl($user), true),
+            'PhotoUrl' => UserPhotoUrl($user),
+            'RankName' => val('Name', RankModel::Ranks(val('RankID', $user)), null),
+            'RoleNames' => $roleNames,
+            'CssClass' => val('_CssClass', $user)
          );
-         $User = (array) $User;
-         $UserFields = array_fill_keys($UserFields, TRUE);
-         $Common = array_intersect_key($User, $UserFields);
-         $Replacement = array_merge($Common, $Replacement);
-         $ContentItem['Author'] = $Replacement;
+         $user = (array) $user;
+         $userFields = array_fill_keys($userFields, TRUE);
+         $filteredUser = array_intersect_key($user, $userFields);
+         $userProperties = array_merge($filteredUser, $userProperties);
+         $item['Author'] = $userProperties;
       }
    }
 

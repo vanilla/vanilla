@@ -898,6 +898,30 @@ class Gdn_Autoloader_Map {
    public function MapType() {
       return $this->MapInfo['maptype'];
    }
+   
+   /**
+    * Fix path with backslash for Windows OS.
+    *
+    * @param string $path
+    * @return string
+    *
+    * Check to see if the path is not empty and if it is not in a form of drive: then replace any "\" with "/" to avoid 
+    * the parse_fn_file bug and it also further check to see if it has only one "/" and the OS is "WIN" then it will prepend "/" 
+    * in front of the path so it has the correct file path.
+    */
+   function fixBackSlash($path) {
+      if (!empty($path) && !preg_match('`^[a-z]:`i', $path)) {	  
+         // Convert to slash to avoid parse_in_file create array with missing backslash.
+         $path = str_replace("\\", "/", $path);
+
+         // If there is only 1 slash, add another to have a valid network path.
+         if (preg_match('`^/[^/]`', $path) && stripos(PHP_OS, 'win') === 0) {
+            $path = "/".$path;
+         }
+      }
+
+      return $path;
+   }
 
    public function Shutdown() {
 
@@ -914,6 +938,7 @@ class Gdn_Autoloader_Map {
       foreach ($this->Map as $SplitTopic => $TopicFiles) {
          $MapContents .= "[{$SplitTopic}]\n";
          foreach ($TopicFiles as $ClassName => $Location)
+            $Location = $this->fixBackSlash($Location);
             $MapContents .= "{$ClassName} = \"{$Location}\"\n";
       }
 

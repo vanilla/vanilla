@@ -42,7 +42,8 @@ class ImportModel extends Gdn_Model {
       8 => 'InsertTables',
       9 => 'UpdateCounts',
       10 => 'CustomFinalization',
-      11 => 'AddActivity'
+      11 => 'AddActivity',
+      12 => 'VerifyImport'
    );
 
    protected $_OverwriteSteps = array(
@@ -57,7 +58,8 @@ class ImportModel extends Gdn_Model {
       8 => 'InsertTables',
       9 => 'UpdateCounts',
       10 => 'CustomFinalization',
-      11 => 'AddActivity'
+      11 => 'AddActivity',
+      12 => 'VerifyImport'
    );
 
    protected $_OverwriteStepsDb = array(
@@ -69,7 +71,8 @@ class ImportModel extends Gdn_Model {
       5 => 'InsertTables',
       6 => 'UpdateCounts',
       7 => 'CustomFinalization',
-      8 => 'AddActivity'
+      8 => 'AddActivity',
+      9 => 'VerifyImport'
    );
 
    /**
@@ -1244,10 +1247,14 @@ class ImportModel extends Gdn_Model {
       set_time_limit(60 * 5);
 
       $Path = $this->ImportPath;
+      $BasePath = dirname($Path).DS.'import';
       $Tables = array();
 
       if (!is_readable($Path)) {
          throw new Gdn_UserException(T('The input file is not readable.', 'The input file is not readable.  Please check permissions and try again.'));
+      }
+      if (!is_writeable($BasePath)) {
+         throw new Gdn_UserException(sprintf(T('Data file directory (%s) is not writable.'), $BasePath));
       }
 
       // Open the import file.
@@ -1282,11 +1289,13 @@ class ImportModel extends Gdn_Model {
          } else {
             // This is the start of a table.
             $TableInfo = $this->ParseInfoLine($Line);
+
             if (!array_key_exists('Table', $TableInfo)) {
                throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
             }
+
             $Table = $TableInfo['Table'];
-            $Path = dirname($Path).DS.$Table.'.txt';
+            $Path = $BasePath.DS.$Table.'.txt';
             $fpout = fopen($Path, 'wb');
 
             $TableInfo['Path'] = $Path;
@@ -1790,6 +1799,66 @@ class ImportModel extends Gdn_Model {
       $CategoryModel = new CategoryModel();
       $CategoryModel->RebuildTree();
       $this->SetCategoryPermissionIDs();
+
+      return TRUE;
+   }
+
+   /**
+    * Verify imported data
+    */
+   public function VerifyImport() {
+      // When was the latest discussion posted?
+      $LatestDiscussion = $this->SQL->Select('DateInserted', 'max', 'LatestDiscussion')->From('Discussion')->Get();
+      if ($LatestDiscussion->count()) {
+         $this->Stat(
+            'Last Discussion',
+            $LatestDiscussion->Value('LatestDiscussion')
+         );
+      } else {
+         $this->Stat(
+            'Last Discussion',
+            '-'
+         );
+      }
+
+      // Any discussions without a user associated with them?
+      $this->Stat(
+         'Orphaned Discussions',
+         $this->SQL->GetCount('Discussion', array('InsertUserID' => '0'))
+      );
+
+      // When was the latest comment posted?
+      $LatestComment = $this->SQL->Select('DateInserted', 'max', 'LatestComment')->From('Comment')->Get();
+      if ($LatestComment->count()) {
+         $this->Stat(
+            'Last Comment',
+            $LatestComment->Value('LatestComment')
+         );
+      } else {
+         $this->Stat(
+            'Last Comment',
+            '-'
+         );
+      }
+
+      // Any comments without a user associated with them?
+      $this->Stat(
+         'Orphaned Comments',
+         $this->SQL->GetCount('Comment', array('InsertUserID' => '0'))
+      );
+
+      // Any users without roles?
+      $UsersWithoutRoles = $this->SQL
+         ->From('User u')
+         ->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')
+         ->LeftJoin('Role r', 'ur.RoleID = r.RoleID')
+         ->Where('r.Name', NULL)
+         ->Get()
+         ->Count();
+      $this->Stat(
+         'Users Without a Valid Role',
+         $UsersWithoutRoles
+      );
 
       return TRUE;
    }

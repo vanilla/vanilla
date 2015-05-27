@@ -85,7 +85,7 @@ class NotificationsController extends Gdn_Controller {
                'Icon');
          else
             $UserPhoto = '';
-         $Excerpt = Gdn_Format::Display($Activity['Story']);
+         $Excerpt = Gdn_Format::PlainText($Activity['Story']);
          $ActivityClass = ' Activity-'.$Activity['ActivityType'];
 
 

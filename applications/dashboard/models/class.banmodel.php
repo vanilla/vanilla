@@ -12,14 +12,49 @@
  * @package Dashboard
  */
 class BanModel extends Gdn_Model {
+   /**
+    * Manually banned by a moderator.
+    */
+   const BAN_MANUAL = 0x1;
+   /**
+    * Automatically banned by an IP ban, name, or email ban.
+    */
+   const BAN_AUTOMATIC = 0x2;
+   /**
+    * Reserved for future functionality.
+    */
+   const BAN_TEMPORARY = 0x4;
+   /**
+    * Banned by the warnings plugin.
+    */
+   const BAN_WARNING = 0x8;
+
    /* @var array */
    protected static $_AllBans;
+
+   /**
+    * @var BanModel The singleton instance of this class.
+    */
+   protected static $instance;
 
    /**
     * Defines the related database table name.
     */
    public function  __construct() {
       parent::__construct('Ban');
+      $this->FireEvent('Init');
+   }
+
+   /**
+    * Get the singleton instance of the {@link BanModel} class.
+    *
+    * @return BanModel Returns the singleton instance of this class.
+    */
+   public static function instance() {
+      if (!isset(self::$instance)) {
+         self::$instance = new BanModel();
+      }
+      return self::$instance;
    }
 
    /*
@@ -93,8 +128,9 @@ class BanModel extends Gdn_Model {
 
       // Check users that need to be banned.
       foreach ($NewUsers as $User) {
-         if ($User['Banned'])
+         if (self::isBanned($User['Banned'], BanModel::BAN_AUTOMATIC)) {
             continue;
+         }
          $this->SaveUser($User, TRUE, $NewBan);
       }
    }
@@ -222,6 +258,59 @@ class BanModel extends Gdn_Model {
 //   }
 
    /**
+    * Explode a banned bit mask into an array of ban constants.
+    * @param int $banned The banned bit mask to explode.
+    * @return array Returns an array of the set bits.
+    */
+   public static function explodeBans($banned) {
+      $result = array();
+
+      for ($i = 1; $i <= 8; $i++) {
+         $bit = pow(2, $i - 1);
+         if (($banned &  $bit) === $bit) {
+            $result[] = $bit;
+         }
+      }
+
+      return $result;
+   }
+
+
+   /**
+    * Check whether or not a banned value is banned for a given reason.
+    *
+    * @param int $banned The banned value.
+    * @param int $reason The reason for the banning or an empty string to check if banned for any reason.
+    * This should be one of the `BanModel::BAN_*` constants.
+    * @return bool Returns true if the value is banned or false otherwise.
+    */
+   public static function isBanned($banned, $reason = 0) {
+      if (!$reason) {
+         return (bool)$banned;
+      } else {
+         return ($banned & $reason) > 0;
+      }
+   }
+
+   /**
+    * Set the banned mask value for a reason and return the new value.
+    *
+    * @param int $banned The current banned value.
+    * @param bool $value The new ban value for the given reason.
+    * @param int $reason The reason for the banning. This should be one of the `BanModel::BAN_*` constants.
+    * @return int Returns the new banned value.
+    */
+   public static function setBanned($banned, $value, $reason) {
+      if ($value) {
+         $banned = $banned | $reason;
+      } else {
+         $banned = $banned & ~$reason;
+      }
+      return $banned;
+   }
+
+>>>>>>> 65abe0be2a90e8f16e46b5730fc3f8201d1923eb
+   /**
     * Save data about ban from form.
     *
     * @since 2.0.18
@@ -258,21 +347,30 @@ class BanModel extends Gdn_Model {
     *
     * @param array $User
     * @param bool $BannedValue Whether user is banned.
+    * @param array|false $Ban An array representing the specific auto-ban.
     */
    public function SaveUser($User, $BannedValue, $Ban = FALSE) {
+      $BannedValue = (bool)$BannedValue;
       $Banned = $User['Banned'];
 
-      if ($Banned == $BannedValue)
+      if (static::isBanned($Banned, self::BAN_AUTOMATIC) === $BannedValue) {
          return;
+      }
 
-      Gdn::UserModel()->SetField($User['UserID'], 'Banned', $BannedValue);
+      $NewBanned = static::setBanned($Banned, $BannedValue, self::BAN_AUTOMATIC);
+      Gdn::UserModel()->SetField($User['UserID'], 'Banned', $NewBanned);
+      $BanningUserID = Gdn::Session()->UserID;
+      // This is true when a session is started and the session user has a new ip address and it matches a banning rule ip address
+      if ($User['UserID'] == $BanningUserID) {
+         $BanningUserID = val('InsertUserID', $Ban, Gdn::UserModel()->GetSystemUserID());
+      }
 
       // Add the activity.
       $ActivityModel = new ActivityModel();
       $Activity = array(
           'ActivityType' => 'Ban',
           'ActivityUserID' => $User['UserID'],
-          'RegardingUserID' => Gdn::Session()->UserID,
+          'RegardingUserID' => $BanningUserID,
           'NotifyUserID' => ActivityModel::NOTIFY_MODS
           );
 

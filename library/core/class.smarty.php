@@ -92,10 +92,6 @@ class Gdn_Smarty {
 
       // Set the current locale for themes to take advantage of.
       $Locale = Gdn::Locale()->Locale;
-      // Kludge en-CA into just en until we can make our default local en.
-      if ($Locale === 'en-CA') {
-         $Locale = 'en';
-      }
       $CurrentLocale = array(
          'Key' => $Locale,
          'Lang' => str_replace('_', '-', $Locale) // mirrors html5 lang attribute

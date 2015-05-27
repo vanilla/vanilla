@@ -443,13 +443,17 @@ class PermissionModel extends Gdn_Model {
       $DefaultRow = $Data[0];
       unset($Data[0], $DefaultRow['RoleID'], $DefaultRow['JunctionTable'], $DefaultRow['JunctionColumn'], $DefaultRow['JunctionID']);
       $DefaultRow = $this->StripPermissions($DefaultRow, $DefaultRow, $LimitToSuffix);
+      if ($RoleID) {
+         // When editing a role make sure the default permissions are false so as not to be misleading.
+         $DefaultRow = array_fill_keys(array_keys($DefaultRow), 0);
+      }
 
-      foreach ($RoleIDs as $RoleID) {
-         if (isset($Data[$RoleID])) {
-            $Data[$RoleID] = array_intersect_key($Data[$RoleID], $DefaultRow);
+      foreach ($RoleIDs as $ID) {
+         if (isset($Data[$ID])) {
+            $Data[$ID] = array_intersect_key($Data[$ID], $DefaultRow);
          } else {
-            $Data[$RoleID] = $DefaultRow;
-            $Data[$RoleID]['PermissionID'] = NULL;
+            $Data[$ID] = $DefaultRow;
+            $Data[$ID]['PermissionID'] = NULL;
          }
       }
 

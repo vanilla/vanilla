@@ -1158,6 +1158,7 @@ class Gdn_Format {
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w=?&;+-_]*)/([\d]*)/([\d]*)';
       $TwitchUrlMatch = 'http://www.twitch.tv/([\w]+)';
       $HitboxUrlMatch = 'http://www.hitbox.tv/([\w]+)';
+      $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)';
 
       // YouTube
       if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
@@ -1278,6 +1279,13 @@ EOT;
          $Result = <<<EOT
 	 <iframe width="640" height="360" src="http://hitbox.tv/#!/embed/{$Matches[2]}" frameborder="0" allowfullscreen></iframe>
 <a href="http://www.hitbox.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.hitbox.tv</a>
+EOT;
+
+      // Soundcloud
+      } elseif (preg_match("`({$SoundcloudUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Soundcloud', true)
+        && !C('Garden.Format.DisableUrlEmbeds')) {
+         $Result = <<<EOT
+<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/{$Matches[2]}/{$Matches[3]}&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>
 EOT;
 
       // Unformatted links

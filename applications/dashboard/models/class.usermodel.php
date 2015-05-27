@@ -78,8 +78,18 @@ class UserModel extends Gdn_Model {
       return $attributes;
    }
 
+   /**
+    * Manually ban a user.
+    *
+    * @param int $UserID The ID of the user to ban.
+    * @param array $Options Additional options for the ban.
+    * @throws Exception Throws an exception if something goes wrong during the banning.
+    */
    public function Ban($UserID, $Options) {
-      $this->SetField($UserID, 'Banned', TRUE);
+      $User = $this->GetID($UserID);
+      $Banned = val('Banned', $User, 0);
+
+      $this->SetField($UserID, 'Banned', BanModel::setBanned($Banned, TRUE, BanModel::BAN_MANUAL));
 
       $LogID = FALSE;
       if (GetValue('DeleteContent', $Options)) {
@@ -359,14 +369,18 @@ class UserModel extends Gdn_Model {
     */
    public function UnBan($UserID, $Options = array()) {
       $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
-      if (!$User)
+      if (!$User) {
          throw NotFoundException();
+      }
 
-      if (!$User['Banned'])
-         throw new Gdn_UserException(T("The user isn't banned."));
+      $Banned = $User['Banned'];
+      if (!BanModel::isBanned($Banned, BanModel::BAN_MANUAL)) {
+         throw new Gdn_UserException(T("The user isn't banned.", "The user isn't banned or is banned by some other function."));
+      }
 
       // Unban the user.
-      $this->SetField($UserID, 'Banned', FALSE);
+      $NewBanned = BanModel::setBanned($Banned, false, BanModel::BAN_MANUAL);
+      $this->SetField($UserID, 'Banned', $NewBanned);
 
       // Restore the user's content.
       if (GetValue('RestoreContent', $Options)) {
@@ -556,7 +570,7 @@ class UserModel extends Gdn_Model {
          Trace('Not setting photo.');
       }
 
-      if (C('Garden.SSO.SynchRoles')) {
+      if (C('Garden.SSO.SyncRoles')) {
          // Translate the role names to IDs.
          $Roles = GetValue('Roles', $NewUser, '');
          if (is_string($Roles)) {
@@ -643,7 +657,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
-            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SyncRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);

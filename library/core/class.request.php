@@ -859,11 +859,14 @@ class Gdn_Request {
             $Path = str_replace('https:', 'http:', $Path);
             $Scheme = 'http';
          }
+      } elseif (!$AllowSSL) {
+         $Scheme = 'http';
       } else {
          $Scheme = $this->Scheme();
       }
-      if (substr($Path, 0, 2) == '//' || in_array(strpos($Path, '://'), array(4, 5))) // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
+      if (substr($Path, 0, 2) == '//' || in_array(strpos($Path, '://'), array(4, 5))) {// Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
          return $Path;
+      }
 
       $Parts = array();
 
@@ -872,27 +875,31 @@ class Gdn_Request {
       if (!in_array($Port, array(80, 443)) && (strpos($Host, ':'.$Port) === FALSE))
          $Host .= ':'.$Port;
 
-      if ($WithDomain === '//') {
+      if ($WithDomain === '//' && $AllowSSL) {
          $Parts[] = '//'.$Host;
       } elseif ($WithDomain && $WithDomain !== '/') {
          $Parts[] = $Scheme.'://'.$Host;
-      } else
+      } else {
          $Parts[] = '';
+      }
 
-      if ($WithDomain !== '/' && $this->WebRoot() != '')
+      if ($WithDomain !== '/' && $this->WebRoot() != '') {
          $Parts[] = $this->WebRoot();
+      }
 
       // Strip out the hash.
       $Hash = strchr($Path, '#');
-      if (strlen($Hash) > 0)
+      if (strlen($Hash) > 0) {
          $Path = substr($Path, 0, -strlen($Hash));
+      }
 
       // Strip out the querystring.
       $Query = strrchr($Path, '?');
-      if (strlen($Query) > 0)
+      if (strlen($Query) > 0) {
          $Path = substr($Path, 0, -strlen($Query));
+      }
 
-      if (!$RewriteUrls) {
+      if (!$RewriteUrls && $WithDomain !== '/') {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
          $Query = str_replace('?', '&', $Query);
       }
@@ -924,11 +931,13 @@ class Gdn_Request {
          }
       }
 
-      if (isset($Query))
+      if (isset($Query)) {
          $Result .= $Query;
+      }
 
-      if (isset($Hash))
+      if (isset($Hash)) {
          $Result .= $Hash;
+      }
 
       return $Result;
    }

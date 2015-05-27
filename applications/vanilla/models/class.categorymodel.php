@@ -203,7 +203,7 @@ class CategoryModel extends Gdn_Model {
       }
       if (is_null($isMaster)) {
          // Vote for master
-         $instanceKey = posix_getpid();
+         $instanceKey = getmypid();
          $masterKey = Gdn::cache()->add(self::MASTER_VOTE_KEY, $instanceKey, array(
             Gdn_Cache::FEATURE_EXPIRY => self::CACHE_GRACE
          ));
@@ -1317,7 +1317,7 @@ class CategoryModel extends Gdn_Model {
          foreach ($Categories as $Category) {
             if (isset($Category['Depth']) && $Category['Depth'] == 1) {
                $Row = $Category;
-               $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
+               $Row['Children'] = self::_MakeTreeChildren($Row, $Categories, 0);
                $Result[] = $Row;
             }
          }

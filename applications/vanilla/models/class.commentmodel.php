@@ -933,14 +933,12 @@ class CommentModel extends VanillaModel {
             ));
 
             // Update the cache.
-            if ($DiscussionID && $this->pageCache) {
-               $CategoryCache = array(
-                   'LastTitle'         => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
-                   'LastUserID'        => $Fields['InsertUserID'],
-                   'LastUrl'           => DiscussionUrl($Discussion).'#latest'
-               );
-               CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
-            }
+            $CategoryCache = array(
+                'LastTitle'         => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
+                'LastUserID'        => $Fields['InsertUserID'],
+                'LastUrl'           => DiscussionUrl($Discussion).'#latest'
+            );
+            CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
 			}
 
 			// Prepare the notification queue.

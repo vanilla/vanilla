@@ -22,6 +22,7 @@ class LocaleModel {
          $AvailableLocales = array();
          foreach ($LocaleInfoPaths as $InfoPath) {
             $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
+            $this->CalculateLocaleInfo($LocaleInfo);
             $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
          }
          $this->_AvailableLocalePacks = $AvailableLocales;
@@ -31,11 +32,19 @@ class LocaleModel {
 
    public function AvailableLocales() {
       // Get the list of locales that are supported.
-      $Locales = array_unique(array_column($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
-      asort($Locales);
-      $Locales = array_combine($Locales, $Locales);
+      $Locales = array_column($this->AvailableLocalePacks(), 'Locale', 'Locale');
+      $Locales['en'] = 'en'; // the default locale is always available.
+      ksort($Locales);
 
       return $Locales;
+   }
+
+   protected function CalculateLocaleInfo(&$info) {
+      $canonicalLocale = Gdn_Locale::Canonicalize($info['Locale']);
+      if ($canonicalLocale !== $info['Locale']) {
+         $info['LocaleRaw'] = $info['Locale'];
+         $info['Locale'] = $canonicalLocale;
+      }
    }
 
    public function CopyDefinitions($SourcePath, $DestPath) {
@@ -70,7 +79,8 @@ class LocaleModel {
             $InfoPath = PATH_ROOT."/locales/$Key/definitions.php";
             if (file_exists($InfoPath)) {
                $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
-               $Result[$Key] = current($LocaleInfo);
+               $this->CalculateLocaleInfo($LocaleInfo);
+               $Result[$Key] = $LocaleInfo;
             } else {
                unset($Result[$Key]);
             }

@@ -276,9 +276,12 @@ class DashboardHooks implements Gdn_IPlugin {
     * @param SiteNavModule $sender
     */
    public function SiteNavModule_default_handler($sender) {
-      if (Gdn::Session()->IsValid())
+      if (Gdn::Session()->IsValid()) {
          $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
-      $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
+      }
+      if (Gdn::Session()->CheckPermission('Garden.Activity.View')) {
+         $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
+      }
 
       // Add the moderation items.
       $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));

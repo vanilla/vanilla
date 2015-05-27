@@ -374,8 +374,14 @@ if (!function_exists('ArrayValuesToKeys')) {
 if (!function_exists('Asset')) {
    /**
     * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
+    *
+    * @param string $Destination
+    * @param boolean $WithDomain
+    * @param boolean $AddVersion
+    * @param string $Version optional. forced version, skips auto-lookup.
+    * @return string
     */
-   function Asset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
+   function Asset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE, $Version = NULL) {
       $Destination = str_replace('\\', '/', $Destination);
       if (IsUrl($Destination)) {
          $Result = $Destination;
@@ -391,28 +397,34 @@ if (!function_exists('Asset')) {
          }
 
          // Figure out which version to put after the asset.
-         $Version = APPLICATION_VERSION;
-         if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-            $Type = $Matches[1];
-            $Key = $Matches[2];
-            static $ThemeVersion = NULL;
+         if (is_null($Version)) {
+            $Version = APPLICATION_VERSION;
+            if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
+               $Type = $Matches[1];
+               $Key = $Matches[2];
+               static $ThemeVersion = NULL;
 
-            switch ($Type) {
-               case 'plugins':
-                  $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
-                  $Version = GetValue('Version', $PluginInfo, $Version);
-                  break;
-               case 'themes':
-                  if ($ThemeVersion === NULL) {
-                     $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
-                     if ($ThemeInfo !== FALSE) {
-                        $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
-                     } else {
-                        $ThemeVersion = $Version;
+               switch ($Type) {
+                  case 'plugins':
+                     $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
+                     $Version = GetValue('Version', $PluginInfo, $Version);
+                     break;
+                  case 'applications':
+                     $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo($Key);
+                     $Version = GetValue('Version', $AppInfo, $Version);
+                     break;
+                  case 'themes':
+                     if ($ThemeVersion === NULL) {
+                        $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
+                        if ($ThemeInfo !== FALSE) {
+                           $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
+                        } else {
+                           $ThemeVersion = $Version;
+                        }
                      }
-                  }
-                  $Version = $ThemeVersion;
-                  break;
+                     $Version = $ThemeVersion;
+                     break;
+               }
             }
          }
 
@@ -3368,7 +3380,10 @@ if (!function_exists('TrustedDomains')) {
     * @return array
     */
    function TrustedDomains() {
-      $Result = (array)C('Garden.TrustedDomains', array());
+      $Result = C('Garden.TrustedDomains', array());
+      if (!is_array($Result)) {
+         $Result = explode("\n", $Result);
+      }
 
       // This domain is safe.
       $Result[] = Gdn::Request()->Host();

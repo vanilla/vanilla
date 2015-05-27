@@ -171,7 +171,7 @@ function writePromotedContentRow($row, $view) {
    $username     = val('Name', $author);
    $userUrl      = val('Url', $author);
    $userPhoto    = val('PhotoUrl', $author);
-   $cssClass     = val('_CssClass', $author);
+   $cssClass     = val('CssClass', $author);
 
    if ($view == 'table') {
       ?>

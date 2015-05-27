@@ -71,7 +71,7 @@ class NotificationsController extends Gdn_Controller {
 
       $Activities = $ActivityModel->GetWhere($Where, 0, 5)->ResultArray();
 
-      $ActivityIDs = ConsolidateArrayValuesByKey($Activities, 'ActivityID');
+      $ActivityIDs = array_column($Activities, 'ActivityID');
       $ActivityModel->SetNotified($ActivityIDs);
 
       $Sender->EventArguments['Activities'] = &$Activities;

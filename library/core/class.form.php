@@ -457,7 +457,7 @@ class Gdn_Form extends Gdn_Pluggable {
          } else {
             $CheckedValues = $ValueDataSet;
             if (is_object($ValueDataSet))
-               $CheckedValues = ConsolidateArrayValuesByKey($ValueDataSet->ResultArray(), $FieldName);
+               $CheckedValues = array_column($ValueDataSet->ResultArray(), $FieldName);
          }
       } else {
          $CheckedValues = $this->GetFormValue($FieldName, array());
@@ -548,8 +548,9 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $Return = '';
       $CheckedValues = $ValueDataSet;
-      if (is_object($ValueDataSet)) $CheckedValues = ConsolidateArrayValuesByKey(
-         $ValueDataSet->ResultArray(), $FieldName);
+      if (is_object($ValueDataSet)) {
+         $CheckedValues = array_column($ValueDataSet->ResultArray(), $FieldName);
+      }
 
       $i = 1;
       if (is_object($DataSet)) {

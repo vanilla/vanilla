@@ -103,7 +103,7 @@ class BanModel extends Gdn_Model {
             ->From('User u')
             ->Where($this->BanWhere($NewBan))
             ->Get()->ResultArray();
-         $NewUserIDs = ConsolidateArrayValuesByKey($NewUsers, 'UserID');
+         $NewUserIDs = array_column($NewUsers, 'UserID');
       } elseif (isset($OldBan['BanID'])) {
          unset($AllBans[$OldBan['BanID']]);
       }
@@ -115,7 +115,7 @@ class BanModel extends Gdn_Model {
             ->From('User u')
             ->Where($this->BanWhere($OldBan))
             ->Get()->ResultArray();
-         $OldUserIDs = ConsolidateArrayValuesByKey($OldUsers, 'UserID');
+         $OldUserIDs = array_column($OldUsers, 'UserID');
       }
 
       // Check users that need to be unbanned.
@@ -256,7 +256,6 @@ class BanModel extends Gdn_Model {
 //
 //      return $Result;
 //   }
-
 
    /**
     * Explode a banned bit mask into an array of ban constants.

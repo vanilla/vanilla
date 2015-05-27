@@ -6,6 +6,7 @@ $Advanced = TRUE;
    echo Wrap(T('Need More Help?'), 'h2');
    echo '<ul>';
    echo Wrap(Anchor(T("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
+   echo Wrap(Anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
    echo '</ul>';
    ?>
 </div>

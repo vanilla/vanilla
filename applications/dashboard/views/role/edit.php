@@ -25,7 +25,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Default Type', 'Type');
-         echo '<div class="Info2">'.T('Select the type for this role, if any.').'</div>';
+         echo '<div class="Info2">'.T('Select the default type for this role, if any.').'</div>';
          echo $this->Form->DropDown('Type', $this->Data('_Types'), array('IncludeNull' => TRUE));
       ?>
    </li>

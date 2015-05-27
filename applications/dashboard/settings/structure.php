@@ -35,10 +35,10 @@ $Construct
    ->Column('PersonalInfo', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
+$RoleModel = new RoleModel();
+
 if (!$RoleTableExists || $Drop) {
-   // Define default roles
-   // RoleIDs 3, 4, & 8 are referenced in config-defaults.php
-   $RoleModel = Gdn::Factory('RoleModel');
+   // Define default roles.
    $RoleModel->Database = $Database;
    $RoleModel->SQL = $SQL;
    $Sort = 1;
@@ -48,7 +48,6 @@ if (!$RoleTableExists || $Drop) {
    $RoleModel->Define(array('Name' => 'Member', 'Type' => RoleModel::TYPE_MEMBER, 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Member Role Description', 'Members can participate in discussions.')));
    $RoleModel->Define(array('Name' => 'Moderator', 'Type' => RoleModel::TYPE_MODERATOR, 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Moderator Role Description', 'Moderators have permission to edit most content.')));
    $RoleModel->Define(array('Name' => 'Administrator', 'Type' => RoleModel::TYPE_ADMINISTRATOR, 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Administrator Role Description', 'Administrators have permission to do anything.')));
-   unset($RoleModel);
 }
 
 // User Table
@@ -102,8 +101,8 @@ $Construct
 // Modify all users with ConfirmEmail role to be unconfirmed
 if ($UserExists && !$ConfirmedExists) {
    $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
-   $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole', false);
-   if ($ConfirmEmail && $ConfirmEmailRoleID !== false) {
+   $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+   if ($ConfirmEmail && !empty($ConfirmEmailRoleID)) {
       // Select unconfirmed users
       $Users = Gdn::SQL()->Select('UserID')->From('UserRole')->Where('RoleID', $ConfirmEmailRoleID)->Get();
       $UserIDs = array();
@@ -157,7 +156,6 @@ if (!$UserRoleExists) {
 
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists) {
-   $RoleModel = new RoleModel();
    $types = $RoleModel->getAllDefaultRoles();
    if ($v = C('Garden.Registration.ApplicantRoleID')) {
       $SQL->Update('Role')

@@ -8,8 +8,8 @@
 *.yml   text eol=lf
 
 # Skip files on archive
-.editorconfig export-ignore 
+.editorconfig export-ignore
 .gitattributes export-ignore
- .gitignore export-ignore
+.gitignore export-ignore
 .travis.yml export-ignore
- tests export-ignore
+tests export-ignore

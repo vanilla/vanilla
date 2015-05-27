@@ -1247,6 +1247,7 @@ class ImportModel extends Gdn_Model {
       set_time_limit(60 * 5);
 
       $Path = $this->ImportPath;
+      $BasePath = dirname($Path);
       $Tables = array();
 
       if (!is_readable($Path)) {
@@ -1289,7 +1290,7 @@ class ImportModel extends Gdn_Model {
                throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
             }
             $Table = $TableInfo['Table'];
-            $Path = dirname($Path).DS.$Table.'.txt';
+            $Path = $BasePath.DS.'import'.DS.$Table.'.txt';
             $fpout = fopen($Path, 'wb');
 
             $TableInfo['Path'] = $Path;

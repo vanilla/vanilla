@@ -230,7 +230,42 @@ class Gdn_Form extends Gdn_Pluggable {
       return $this->Input($FieldName, 'text', $Attributes);
    }
 
+   /**
+    * Returns Captcha HTML & adds translations to document head.
+    *
+    * @return string
+    */
    public function Captcha() {
+      // Google whitelist
+      $Whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
+
+      // reCAPTCHA Options
+      $Options = array(
+         'custom_translations' => array(
+            'instructions_visual' => T("Type the text:"),
+            'instructions_audio'  => T("Type what you hear:"),
+            'play_again'          => T("Play the sound again"),
+            'cant_hear_this'      => T("Download the sounds as MP3"),
+            'visual_challenge'    => T("Get a visual challenge"),
+            'audio_challenge'     => T("Get an audio challenge"),
+            'refresh_btn'         => T("Get a new challenge"),
+            'help_btn'            => T("Help"),
+            'incorrect_try_again' => T("Incorrect. Try again.")
+         )
+      );
+
+      // Use our current locale against the whitelist.
+      $Language = Gdn::Locale()->Language();
+      if (!in_array($Language, $Whitelist)) {
+         $Language = (in_array(Gdn::Locale()->Locale, $Whitelist)) ? Gdn::Locale()->Locale : false;
+      }
+      if ($Language) {
+         $Options['lang'] = $Language;
+      }
+
+      // Add custom translation strings as JSON.
+      Gdn::Controller()->Head->AddString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($Options).';</script>');
+
       require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 
       return recaptcha_get_html(C('Garden.Registration.CaptchaPublicKey'), NULL, Gdn::Request()->Scheme() == 'https');

@@ -441,26 +441,20 @@ class UserModel extends Gdn_Model {
          return FALSE;
       }
 
-      $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
+      $confirmRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+      $defaultRoles = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
 
       // Update the user's roles.
       $UserRoles = $this->GetRoles($UserID);
       $UserRoleIDs = array();
-      while ($UserRole = $UserRoles->NextRow(DATASET_TYPE_ARRAY))
+      while ($UserRole = $UserRoles->NextRow(DATASET_TYPE_ARRAY)) {
          $UserRoleIDs[] = $UserRole['RoleID'];
-
-      // Need to give replacement roles
-      if (in_array($ConfirmRoleID, $UserRoleIDs) && sizeof($UserRoleIDs) < 2) {
-         $Roles = GetValue('ConfirmedEmailRoles', $Attributes, $DefaultRoles);
-      } else {
-         $Roles = $UserRoleIDs;
       }
 
       // Sanitize result roles
-      $Roles = array_diff($UserRoleIDs, array($ConfirmRoleID));
+      $Roles = array_diff($UserRoleIDs, $confirmRoleIDs);
       if (!sizeof($Roles)) {
-         $DefaultRoles = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
-         $Roles = $DefaultRoles;
+         $Roles = $defaultRoles;
       }
 
       $this->EventArguments['ConfirmUserID'] = $UserID;
@@ -737,8 +731,9 @@ class UserModel extends Gdn_Model {
 
       // Massage the roles for email confirmation.
       if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Options)) {
-         $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
-         if ($ConfirmRoleID) {
+         $ConfirmRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+
+         if (!empty($ConfirmRoleID)) {
             TouchValue('Attributes', $Fields, array());
             $ConfirmationCode = RandomString(8);
             $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
@@ -1318,7 +1313,7 @@ class UserModel extends Gdn_Model {
       if ($ConfirmEmail && !$Confirmed) {
 
          // Replace permissions with those of the ConfirmEmailRole
-         $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
+         $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
          $RoleModel = new RoleModel();
          $RolePermissions = $RoleModel->GetPermissions($ConfirmEmailRoleID);
          $Permissions = UserModel::CompilePermissions($RolePermissions);
@@ -1693,8 +1688,8 @@ class UserModel extends Gdn_Model {
                $Attributes = GetValue('Attributes', Gdn::Session()->User);
                if (is_string($Attributes)) $Attributes = @unserialize($Attributes);
 
-               $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
-               if (RoleModel::Roles($ConfirmEmailRoleID)) {
+               $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+               if (!empty($ConfirmEmailRoleID)) {
                   // The confirm email role is set and it exists so go ahead with the email confirmation.
                   $NewKey = RandomString(8);
                   $EmailKey = TouchValue('EmailKey', $Attributes, $NewKey);

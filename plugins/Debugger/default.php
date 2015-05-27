@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Debugger'] = array(
    'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE, // This is an array of plugin names/versions that this plugin requires
@@ -99,7 +99,7 @@ class DebuggerPlugin extends Gdn_Plugin {
    public function Setup() {
       SaveToConfig('Debug', TRUE);
    }
-   
+
    public function OnDisable() {
        SaveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
    }

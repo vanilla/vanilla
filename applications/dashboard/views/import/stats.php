@@ -15,12 +15,22 @@
    $Stats = (array)GetValue('Stats', $this->Data, array());
    $Info = array_merge($Header, $Stats);
 	foreach($Info as $Name => $Value) {
-      if(substr_compare('Time', $Name, 0, 4, TRUE) == 0)
-         $Value = Gdn_Timer::FormatElapsed($Value);
+      switch ($Name) {
+         case 'Orphaned Comments':
+         case 'Orphaned Discussions':
+            $Value .= ' ' . Anchor(
+               T('Click here to fix.'),
+               Gdn::Request()->Url('dba/fixinsertuserid')
+            );
+            break;
+         default:
+            $Name = htmlspecialchars($Name);
+            $Value = htmlspecialchars($Value);
 
-
-		$Name = htmlspecialchars($Name);
-		$Value = htmlspecialchars($Value);
+            if (substr_compare('Time', $Name, 0, 4, TRUE) == 0) {
+               $Value = Gdn_Timer::FormatElapsed($Value);
+            }
+      }
 
 		echo "<tr><th>$Name</th><td class=\"Alt\">$Value</td></tr>\n";
 	}

@@ -33,8 +33,7 @@ if (!function_exists('ValidateCaptcha')) {
 
 if (!function_exists('ValidateRegex')) {
    function ValidateRegex($Value, $Regex) {
-      preg_match($Regex, $Value, $Matches);
-      return is_array($Matches) && count($Matches) > 0 ? TRUE : FALSE;
+      return (filter_var($Value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $Regex))) !== false);
    }
 }
 
@@ -135,12 +134,11 @@ if (!function_exists('ValidateOldPassword')) {
 
 if (!function_exists('ValidateEmail')) {
    function ValidateEmail($Value, $Field = '') {
-      if (!ValidateRequired($Value))
-         return TRUE;
+      if (!ValidateRequired($Value, $Field)) {
+         return true;
+      }
 
-      $Result = PHPMailer::ValidateAddress($Value);
-      $Result = (bool)$Result;
-      return $Result;
+      return (filter_var($Value, FILTER_VALIDATE_EMAIL) !== false);
    }
 }
 
@@ -244,14 +242,14 @@ if (!function_exists('ValidateMinimumAge')) {
 }
 
 if (!function_exists('ValidateInteger')) {
-   function ValidateInteger($Value, $Field = NULL) {
-      if (!$Value || (is_string($Value) && !trim($Value)))
-         return TRUE;
-
-      $Integer = intval($Value);
-      $String = strval($Integer);
-      return $String == $Value ? TRUE : FALSE;
-   }
+    function ValidateInteger($Value, $Field = null) {
+        if (!$Value || (is_string($Value) && !trim($Value))) {
+            return true;
+        }
+        $Integer = intval($Value);
+        $String = strval($Integer);
+        return $String == $Value;
+    }
 }
 
 if (!function_exists('ValidateBoolean')) {
@@ -437,6 +435,22 @@ if (!function_exists('ValidatePhoneInt')) {
          return true; // Do not require by default.
       $Valid = ValidateRegex($Value, '/^\+(?:[0-9] ?){6,14}[0-9]$/');
       return ($Valid) ? $Valid : T('ValidatePhone', 'Phone number is invalid.');
+   }
+}
+
+if (!function_exists('ValidateUrl')) {
+   /**
+    * Check to see if a value represents a valid url.
+    *
+    * @param string $Value The value to validate.
+    * @return bool Returns true if the value is a value url or false otherwise.
+    */
+   function ValidateUrl($Value) {
+      if (empty($Value)) {
+         return true;
+      }
+      $Valid = (bool)filter_var($Value, FILTER_VALIDATE_URL);
+      return $Valid;
    }
 }
 

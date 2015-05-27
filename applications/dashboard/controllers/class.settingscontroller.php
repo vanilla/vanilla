@@ -715,8 +715,7 @@ class SettingsController extends DashboardController {
          'Garden.Registration.CaptchaPrivateKey',
          'Garden.Registration.CaptchaPublicKey',
          'Garden.Registration.InviteExpiration',
-         'Garden.Registration.ConfirmEmail',
-         'Garden.Registration.ConfirmEmailRole'
+         'Garden.Registration.ConfirmEmail'
       ));
 
       // Set the model on the forms.

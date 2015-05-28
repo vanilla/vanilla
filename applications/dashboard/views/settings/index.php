@@ -34,7 +34,11 @@ $this->RenderAsset('Messages');
       </tbody>
    </table>
 </div>
-<div class="Column Column1 NewsColumn">
+<div class="Column Column1 ReleasesColumn">
+   <h1><?php echo T('Updates'); ?></h1>
+   <div class="List"></div>
+</div>
+<div class="Column Column2 NewsColumn">
    <h1><?php echo T('Recent News'); ?></h1>
    <div class="List"></div>
 </div>

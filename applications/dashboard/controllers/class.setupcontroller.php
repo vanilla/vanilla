@@ -37,8 +37,6 @@ class SetupController extends DashboardController {
     * @access public
     */
    public function Index() {
-      $this->AddJsFile('setup.js');
-
       $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
@@ -108,7 +106,7 @@ class SetupController extends DashboardController {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.RewriteUrls', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
+      $ConfigurationModel->SetField(array('Garden.Locale', 'Garden.Title', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
 
       // Set the models on the forms.
       $this->Form->SetModel($ConfigurationModel);
@@ -227,15 +225,11 @@ class SetupController extends DashboardController {
             $ApplicationInfo = array();
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
 
-            // Detect rewrite abilities
-            $CanRewrite = (bool)$this->Form->GetFormValue('RewriteUrls');
-
             // Detect Internet connection for CDNs
             $Disconnected = !(bool)@fsockopen('ajax.googleapis.com',80);
 
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-               'Garden.RewriteUrls' => $CanRewrite,
                'Garden.Cdns.Disable' => $Disconnected,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled

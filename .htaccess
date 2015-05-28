@@ -1,12 +1,32 @@
 # Original
 # If you modify this file then change the above line to: # Modified
 <IfModule mod_rewrite.c>
-   RewriteEngine On
-   # Certain hosts may require the following line.
-   # If vanilla is in a subfolder then you need to specify it after the /. 
-   # (ex. You put Vanilla in /forum so change the next line to: RewriteBase /forum)
-   # RewriteBase /
-   RewriteCond %{REQUEST_FILENAME} !-d
-   RewriteCond %{REQUEST_FILENAME} !-f
-   RewriteRule ^(.*)$ index.php\?p=$1 [QSA,L]
+    RewriteEngine On
+    # Certain hosts may require the following line.
+    # If vanilla is in a subfolder then you need to specify it after the /.
+    # (ex. You put Vanilla in /forum so change the next line to: RewriteBase /forum)
+    # RewriteBase /
+
+    RewriteCond %{QUERY_STRING} ^p=/?([^&]+)(&(.+))?$
+    RewriteRule ^index\.php index.php/%1?%3 [E=X_REWRITE:1,L]
+
+    # The basic rewrite rule.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php/$1 [QSA,E=X_REWRITE:1,L]
+
+    # Add the proper X_REWRITE server variable for rewritten requests.
+    RewriteCond %{ENV:REDIRECT_X_REWRITE} .+
+    RewriteRule ^index\.php - [QSA,E=X_REWRITE:1,E=!REDIRECT_X_REWRITE,L]
+
+    # 301 redirect urls that start with index.php
+    #RewriteCond %{REQUEST_METHOD} GET [NC]
+    #RewriteCond %{REQUEST_URI} ^(.*?)/index\.php(.*)$
+    #RewriteRule ^index\.php /%1%2 [QSA,R,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+   <FilesMatch "(?<!embed)\.(css|js|woff|ttf|eot|svg|png|gif|jpeg|jpg|ico|swf)$">
+      Header set Cache-Control "max-age=315360000"
+      Header set Expires "31 December 2037 23:59:59 GMT"
+   </FilesMatch>
 </IfModule>

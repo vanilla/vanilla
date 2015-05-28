@@ -1,7 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
 echo $this->Form->Open();
-echo $this->Form->Hidden('RewriteUrls');
 ?>
 <div class="Title">
    <h1>

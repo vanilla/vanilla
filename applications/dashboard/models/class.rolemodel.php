@@ -9,6 +9,31 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class RoleModel extends Gdn_Model {
+   /**
+    * Slug for Guest role type
+    */
+   const TYPE_GUEST = 'guest';
+   /**
+    * Slug for Unconfirmed role type
+    */
+   const TYPE_UNCONFIRMED = 'unconfirmed';
+   /**
+    * Slug for Applicant role type
+    */
+   const TYPE_APPLICANT = 'applicant';
+   /**
+    * Slug for Member role type
+    */
+   const TYPE_MEMBER = 'member';
+   /**
+    * Slug for Moderator role type
+    */
+   const TYPE_MODERATOR = 'moderator';
+   /**
+    * Slug for Administrator role type
+    */
+   const TYPE_ADMINISTRATOR = 'administrator';
+
    public static $Roles = NULL;
 
    /**
@@ -155,6 +180,110 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Get the default role IDs for a type of role.
+    *
+    * @param string $type One of the {@link RoleModel::TYPE_*} constants.
+    * @return array Returns an array of role IDs.
+    */
+   public static function getDefaultRoles($type) {
+      // Get the roles that match the type.
+      try {
+         $roleData = Gdn::SQL()->Select('RoleID')->GetWhere('Role', array('Type' => $type))->ResultArray();
+         $roleIDs = array_column($roleData, 'RoleID');
+      } catch (Exception $ex) {
+         // This exception happens when the type column hasn't been added to GDN_Role yet.
+         $roleIDs = array();
+      }
+
+      // This method has to be backwards compatible with the old config roles.
+      switch ($type) {
+         case self::TYPE_APPLICANT:
+            $backRoleIDs = (array)C('Garden.Registration.ApplicantRoleID', null);
+            break;
+         case self::TYPE_GUEST:
+            $guestRoleData = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();
+            $backRoleIDs = array_column($guestRoleData, 'RoleID');
+            break;
+         case self::TYPE_MEMBER:
+            $backRoleIDs = (array)C('Garden.Registration.DefaultRoles', null);
+            break;
+         case self::TYPE_UNCONFIRMED:
+            $backRoleIDs = (array)C('Garden.Registration.ConfirmEmailRole', null);
+            break;
+      }
+      $roleIDs = array_merge($roleIDs, $backRoleIDs);
+      $roleIDs = array_unique($roleIDs);
+
+      return $roleIDs;
+   }
+
+   /**
+    * Get the default role IDs for all types of roles.
+    *
+    * @return array Returns an array of arrays indexed by role type.
+    */
+   public static function getAllDefaultRoles() {
+      $result = array_fill_keys(
+         array_keys(self::getDefaultTypes(false)),
+         array()
+      );
+
+      // Add the roles per type from the role table.
+      $roleData = Gdn::SQL()->GetWhere('Role', array('Type is not null' => ''))->ResultArray();
+      foreach ($roleData as $row) {
+         $result[$row['Type']][] = $row['RoleID'];
+      }
+
+      // Add the backwards compatible roles.
+      $result[self::TYPE_APPLICANT] = array_merge(
+         $result[self::TYPE_APPLICANT],
+         (array)C('Garden.Registration.ApplicantRoleID', null)
+      );
+
+      $guestRoleIDs = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();
+      $guestRoleIDs = array_column($guestRoleIDs, 'RoleID');
+      $result[self::TYPE_GUEST] = array_merge(
+         $result[self::TYPE_GUEST],
+         $guestRoleIDs
+      );
+
+      $result[self::TYPE_MEMBER] = array_merge(
+         $result[self::TYPE_MEMBER],
+         (array)C('Garden.Registration.DefaultRoles', array())
+      );
+
+      $result[self::TYPE_UNCONFIRMED] = array_merge(
+         $result[self::TYPE_UNCONFIRMED],
+         (array)C('Garden.Registration.ConfirmEmailRole', null)
+      );
+
+      $result = array_map('array_unique', $result);
+
+      return $result;
+   }
+
+   /**
+    * Get an array of default role types.
+    *
+    * @param bool $translate Whether or not to translate the type names.
+    * @return array Returns an array in the form `[type => name]`.
+    */
+   public static function getDefaultTypes($translate = true) {
+      $result = array(
+         self::TYPE_MEMBER => self::TYPE_MEMBER,
+         self::TYPE_GUEST => self::TYPE_GUEST,
+         self::TYPE_UNCONFIRMED => self::TYPE_UNCONFIRMED,
+         self::TYPE_APPLICANT => self::TYPE_APPLICANT,
+         self::TYPE_MODERATOR => self::TYPE_MODERATOR,
+         self::TYPE_ADMINISTRATOR => self::TYPE_ADMINISTRATOR
+      );
+      if ($translate) {
+         $result = array_map('t', $result);
+      }
+      return $result;
+   }
+
+   /**
     * Returns a resultset of all roles that have editable permissions.
     *
    public function GetEditablePermissions() {
@@ -191,6 +320,19 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Return all roles matching a specific type.
+    *
+    * @param string $type Type slug to match role records against.
+    * @return Gdn_DataSet
+    */
+   public function getByType($type) {
+      return $this->SQL->Select()
+         ->From('Role')
+         ->Where('Type', $type)
+         ->Get();
+   }
+
+   /**
     * Returns a resultset of role data NOT related to the specified RoleID.
     *
     * @param int The RoleID to filter out.
@@ -199,13 +341,22 @@ class RoleModel extends Gdn_Model {
       return $this->GetWhere(array('RoleID <>' => $RoleID));
    }
 
+   /**
+    * Get the permissions for one or more roles.
+    *
+    * @param int|array $RoleID One or more role IDs to get the permissions for.
+    * @return array Returns an array of permissions.
+    */
    public function GetPermissions($RoleID) {
       $PermissionModel = Gdn::PermissionModel();
-      $Role = self::Roles($RoleID);
+      $roleIDs = (array)$RoleID;
 
-      $LimitToSuffix = GetValue('CanSession', $Role, TRUE) ? '' : 'View';
+      foreach ($roleIDs as $ID) {
+         $Role = self::Roles($ID);
+         $LimitToSuffix = GetValue('CanSession', $Role, TRUE) ? '' : 'View';
+      }
 
-      $Result = $PermissionModel->GetPermissions($RoleID, $LimitToSuffix);
+      $Result = $PermissionModel->GetPermissions($roleIDs, $LimitToSuffix);
       return $Result;
    }
 
@@ -234,6 +385,12 @@ class RoleModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Get the current number of applicants waiting to be approved.
+    *
+    * @param bool $Force Whether or not to force a cache refresh.
+    * @return int Returns the number of applicants or 0 if the registration method isn't set to approval.
+    */
    public function GetApplicantCount($Force = FALSE) {
       if (C('Garden.Registration.Method') != 'Approval') {
          return 0;
@@ -244,13 +401,15 @@ class RoleModel extends Gdn_Model {
       if ($Force)
          Gdn::Cache()->Remove($CacheKey);
 
+      $applicantRoleIDs = static::getDefaultRoles(self::TYPE_APPLICANT);
+
       $Count = Gdn::Cache()->Get($CacheKey);
       if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
          $Count = Gdn::SQL()
             ->Select('u.UserID', 'count', 'UserCount')
             ->From('User u')
             ->Join('UserRole ur', 'u.UserID = ur.UserID')
-            ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
+            ->Where('ur.RoleID',  $applicantRoleIDs)
             ->Where('u.Deleted', '0')
             ->Get()->Value('UserCount', 0);
 

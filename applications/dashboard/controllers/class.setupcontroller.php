@@ -74,6 +74,8 @@ class SetupController extends DashboardController {
                   $ApplicationManager->RegisterPermissions($AppName, $Validation);
                   $ApplicationManager->EnableApplication($AppName, $Validation);
                }
+
+               Gdn::PluginManager()->Start(TRUE);
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
             }
@@ -83,6 +85,8 @@ class SetupController extends DashboardController {
                $Config = array('Garden.Installed' => TRUE);
                SaveToConfig($Config);
                $this->FireEvent('Installed');
+
+               PermissionModel::ResetAllRoles();
 
                // Go to the dashboard
                Redirect('/settings/gettingstarted');

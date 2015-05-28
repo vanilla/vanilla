@@ -211,6 +211,7 @@ class ImportModel extends Gdn_Model {
 
    public function CustomFinalization() {
       $this->SetRoleDefaults();
+      PermissionModel::ResetAllRoles();
 
       $Imp = $this->GetCustomImportModel();
       if ($Imp !== NULL)
@@ -363,12 +364,6 @@ class ImportModel extends Gdn_Model {
       $Tables = array('Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
          'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Rank', 'Poll', 'PollOption', 'PollVote', 'Role', 'UserAuthentication',
          'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
-
-      // Delete the default role settings.
-      SaveToConfig(array(
-         'Garden.Registration.DefaultRoles' => array(),
-         'Garden.Registration.ApplicantRoleID' => 0
-      ));
 
       // Execute the SQL.
       $CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
@@ -1477,11 +1472,9 @@ class ImportModel extends Gdn_Model {
       $Data = $this->SQL->Get('zRole')->ResultArray();
 
       $RoleDefaults = array(
-          'Garden.Registration.DefaultRoles' => array(),
-          'Garden.Registration.ApplicantRoleID' => 0,
-          'Garden.Registration.ConfirmEmail' => FALSE,
-          'Garden.Registration.ConfirmEmailRole' => '');
-      $GuestRoleID = FALSE;
+          'Garden.Registration.ConfirmEmail' => FALSE
+      );
+      $RoleTypes = array();
 
       foreach ($Data as $Row) {
          if ($this->ImportExists('Role', '_Default'))
@@ -1501,32 +1494,32 @@ class ImportModel extends Gdn_Model {
             case 'confirm email':
             case 'users awaiting email confirmation':
             case 'pending':
+               $RoleTypes[$RoleID] = RoleModel::TYPE_UNCONFIRMED;
                $RoleDefaults['Garden.Registration.ConfirmEmail'] = TRUE;
-               $RoleDefaults['Garden.Registration.ConfirmEmailRole'] = $RoleID;
                break;
             case 'member':
             case 'members':
             case 'registered':
             case 'registered users':
-               $RoleDefaults['Garden.Registration.DefaultRoles'][] = $RoleID;
+               $RoleTypes[$RoleID] = RoleModel::TYPE_MEMBER;
                break;
             case 'guest':
             case 'guests':
             case 'unauthenticated':
             case 'unregistered':
-            case 'unregistered':
             case 'unregistered / not logged in':
-               $GuestRoleID = $RoleID;
+               $RoleTypes[$RoleID] = RoleModel::TYPE_GUEST;
                break;
             case 'applicant':
             case 'applicants':
-               $RoleDefaults['Garden.Registration.ApplicantRoleID'] = $RoleID;
+               $RoleTypes[$RoleID] = RoleModel::TYPE_APPLICANT;
                break;
          }
       }
       SaveToConfig($RoleDefaults);
-      if ($GuestRoleID) {
-         $this->SQL->Replace('UserRole', array('UserID' => 0, 'RoleID' => $GuestRoleID), array('UserID' => 0, 'RoleID' => $GuestRoleID));
+      $roleModel = new RoleModel();
+      foreach ($RoleTypes as $RoleID => $Type) {
+         $roleModel->SetField($RoleID, 'Type', $Type);
       }
    }
 

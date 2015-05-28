@@ -191,8 +191,8 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
    /**
     * Returns the first row or FALSE if there are no rows to return.
     *
-    * @param string|bool $DatasetType The format in which the result should be returned: object or array.
-    * @return array|object|bool Returns the first row or `false` if the data set is empty.
+    * @param string $DatasetType The format in which the result should be returned: object or array.
+    * @return bool|array|stdClass False when empty result set, object or array depending on $DatasetType.
     */
    public function &FirstRow($DatasetType = false) {
 		$Result = &$this->Result($DatasetType);

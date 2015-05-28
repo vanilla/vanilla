@@ -10,9 +10,9 @@ jQuery(document).ready(function($) {
       $('#InvitationSettings').hide();
       $('#InvitationExpiration').hide();
    }
-      
+
    // Show/Hide the CaptchaSettings depending on the selected registration method
-   if (selected == 'Captcha')
+   if (selected == 'Captcha' || selected == 'Approval')
       $('#CaptchaSettings').show();
    else
       $('#CaptchaSettings').hide();
@@ -33,18 +33,18 @@ jQuery(document).ready(function($) {
          $('#InvitationSettings').slideUp('fast');
          $('#InvitationExpiration').slideUp('fast');
       }
-         
+
       // Show/Hide the CaptchaSettings depending on the selected registration method
-      if ($(this).val() == 'Captcha')
+      if ($(this).val() == 'Captcha' || $(this).val() == 'Approval')
          $('#CaptchaSettings').slideDown('fast');
       else
          $('#CaptchaSettings').slideUp('fast');
-         
+
       // Show/Hide the InvitationSettings depending on the selected registration method
       if ($(this).val() == 'Closed')
          $('#NewUserRoles').slideUp('fast');
       else
          $('#NewUserRoles').slideDown('fast');
-         
+
    });
 });

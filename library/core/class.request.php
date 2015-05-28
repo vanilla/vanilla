@@ -866,6 +866,7 @@ class Gdn_Request {
       }
       if (substr($Path, 0, 2) == '//' || in_array(strpos($Path, '://'), array(4, 5))) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
          return $Path;
+      }
 
       $Parts = array();
 

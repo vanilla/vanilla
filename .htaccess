@@ -25,7 +25,7 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-   <FilesMatch "\.(css|js|woff|ttf|eot|svg|png|gif|jpeg|jpg|ico|swf)$">
+   <FilesMatch "(?<!embed)\.(css|js|woff|ttf|eot|svg|png|gif|jpeg|jpg|ico|swf)$">
       Header set Cache-Control "max-age=315360000"
       Header set Expires "31 December 2037 23:59:59 GMT"
    </FilesMatch>

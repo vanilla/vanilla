@@ -41,15 +41,7 @@ function WritePromotedContent($Content, $Sender) {
    $ContentType = val('RecordType', $Content);
    $ContentID = val("{$ContentType}ID", $Content);
    $Author = val('Author', $Content);
-
-   switch (strtolower($ContentType)) {
-      case 'comment':
-         $ContentURL = CommentUrl($Content);
-         break;
-      case 'discussion':
-         $ContentURL = DiscussionUrl($Content);
-         break;
-   }
+   $ContentURL = val('Url', $Content);
    $Sender->EventArguments['Content'] = &$Content;
    $Sender->EventArguments['ContentUrl'] = &$ContentURL;
 ?>

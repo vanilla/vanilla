@@ -1405,7 +1405,6 @@ EOT;
    private function RegisterCaptcha() {
       Gdn::UserModel()->AddPasswordStrength($this);
 
-      include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();

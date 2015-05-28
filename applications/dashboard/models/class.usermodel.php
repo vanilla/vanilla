@@ -78,8 +78,18 @@ class UserModel extends Gdn_Model {
       return $attributes;
    }
 
+   /**
+    * Manually ban a user.
+    *
+    * @param int $UserID The ID of the user to ban.
+    * @param array $Options Additional options for the ban.
+    * @throws Exception Throws an exception if something goes wrong during the banning.
+    */
    public function Ban($UserID, $Options) {
-      $this->SetField($UserID, 'Banned', TRUE);
+      $User = $this->GetID($UserID);
+      $Banned = val('Banned', $User, 0);
+
+      $this->SetField($UserID, 'Banned', BanModel::setBanned($Banned, TRUE, BanModel::BAN_MANUAL));
 
       $LogID = FALSE;
       if (GetValue('DeleteContent', $Options)) {
@@ -359,14 +369,18 @@ class UserModel extends Gdn_Model {
     */
    public function UnBan($UserID, $Options = array()) {
       $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
-      if (!$User)
+      if (!$User) {
          throw NotFoundException();
+      }
 
-      if (!$User['Banned'])
-         throw new Gdn_UserException(T("The user isn't banned."));
+      $Banned = $User['Banned'];
+      if (!BanModel::isBanned($Banned, BanModel::BAN_MANUAL)) {
+         throw new Gdn_UserException(T("The user isn't banned.", "The user isn't banned or is banned by some other function."));
+      }
 
       // Unban the user.
-      $this->SetField($UserID, 'Banned', FALSE);
+      $NewBanned = BanModel::setBanned($Banned, false, BanModel::BAN_MANUAL);
+      $this->SetField($UserID, 'Banned', $NewBanned);
 
       // Restore the user's content.
       if (GetValue('RestoreContent', $Options)) {
@@ -556,7 +570,7 @@ class UserModel extends Gdn_Model {
          Trace('Not setting photo.');
       }
 
-      if (C('Garden.SSO.SynchRoles')) {
+      if (C('Garden.SSO.SyncRoles')) {
          // Translate the role names to IDs.
          $Roles = GetValue('Roles', $NewUser, '');
          if (is_string($Roles)) {
@@ -643,7 +657,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
-            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SyncRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);
@@ -1978,25 +1992,33 @@ class UserModel extends Gdn_Model {
       }
    }
 
-   public function Search($Keywords, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      if (C('Garden.Registration.Method') == 'Approval')
+   public function Search($Filter, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      if (C('Garden.Registration.Method') === 'Approval') {
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      else
+      } else {
          $ApplicantRoleID = 0;
-
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
-         $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
       }
+      $Optimize = FALSE;
+
+      if (is_array($Filter)) {
+         $Where = $Filter;
+         $Keywords = $Where['Keywords'];
+         $Optimize = val('Optimize', $Filter);
+         unset($Where['Keywords'], $Where['Optimize']);
+      } else {
+         $Keywords = $Filter;
+      }
+      $Keywords = trim($Keywords);
 
       // Check for an IP address.
       if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
          $IPAddress = $Keywords;
       } elseif (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+         $Keywords = '';
       } elseif (preg_match('/^\d+$/', $Keywords)) {
          $UserID = $Keywords;
+         $Keywords = '';
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
@@ -2011,22 +2033,34 @@ class UserModel extends Gdn_Model {
       if (isset($Where))
          $this->SQL->Where($Where);
 
-      if (isset($RoleID) && $RoleID) {
+      if (!empty($RoleID)) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
       } elseif (isset($IPAddress)) {
          $this->SQL
             ->OrOp()
             ->BeginWhereGroup()
-            ->OrWhere('u.InsertIPAddress', $IPAddress)
-            ->OrWhere('u.LastIPAddress', $IPAddress)
-            ->EndWhereGroup();
+            ->OrWhere('u.LastIPAddress', $IPAddress);
+
+         // An or is expensive so only do it if the query isn't optimized.
+         if (!$Optimize) {
+            $this->SQL->OrWhere('u.InsertIPAddress', $IPAddress);
+         }
+
+         $this->SQL->EndWhereGroup();
       } elseif (isset($UserID)) {
          $this->SQL->Where('u.UserID', $UserID);
-      } else {
-         // Search on the user table.
-         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+      } elseif ($Keywords) {
+         if ($Optimize) {
+            // An optimized search should only be done against name OR email.
+            if (strpos($Keywords, '@') !== FALSE) {
+               $this->SQL->Like('u.Email', $Keywords, 'right');
+            } else {
+               $this->SQL->Like('u.Name', $Keywords, 'right');
+            }
+         } else {
+            // Search on the user table.
+            $Like = array('u.Name' => $Keywords, 'u.Email' => $Keywords);
 
-         if (is_array($Like)) {
             $this->SQL
                ->OrOp()
                ->BeginWhereGroup()
@@ -2035,8 +2069,15 @@ class UserModel extends Gdn_Model {
          }
       }
 
-      if ($ApplicantRoleID != 0)
+      // Optimized searches need at least some criteria before performing a query.
+      if ($Optimize && $this->SQL->WhereCount() == 0 && !$RoleID) {
+         $this->SQL->Reset();
+         return new Gdn_DataSet(array());
+      }
+
+      if ($ApplicantRoleID != 0) {
          $this->SQL->Where('ur.RoleID is null');
+      }
 
       $Data = $this->SQL
          ->Where('u.Deleted', 0)
@@ -2058,17 +2099,20 @@ class UserModel extends Gdn_Model {
       return $Data;
    }
 
-   public function SearchCount($Keywords = FALSE) {
+   public function SearchCount($Filter = FALSE) {
       if (C('Garden.Registration.Method') == 'Approval')
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
       else
          $ApplicantRoleID = 0;
 
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
+      if (is_array($Filter)) {
+         $Where = $Filter;
          $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
+         unset($Where['Keywords'], $Where['Optimize']);
+      } else {
+         $Keywords = $Filter;
       }
+      $Keywords = trim($Keywords);
 
       // Check to see if the search exactly matches a role name.
       $RoleID = FALSE;
@@ -3174,10 +3218,11 @@ class UserModel extends Gdn_Model {
 
       foreach ($Meta as $Name => $Value) {
          $Name = $Prefix.$Name;
-         if ($Value === NULL)
+         if ($Value === NULL || $Value == '') {
             $Deletes[] = $Name;
-         else
+         } else {
             Gdn::Database()->Query($Sql, array(':UserID' => $UserID, ':Name' => $Name, ':Value' => $Value, ':Value1' => $Value));
+         }
       }
       if (count($Deletes))
          Gdn::SQL()->WhereIn('Name', $Deletes)->Where('UserID',$UserID)->Delete('UserMeta');

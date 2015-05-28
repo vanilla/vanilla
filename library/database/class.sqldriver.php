@@ -1355,7 +1355,7 @@ abstract class Gdn_SQLDriver {
     */
    public function NamedParameter($Name, $CreateNew = FALSE, $Value = NULL) {
       // Format the parameter name so it is safe for sql
-      $NiceName = ':'.preg_replace('/([^\w\d_-])/', '', $Name); // Removes everything from the string except letters, numbers, dashes, and underscores
+      $NiceName = ':'.preg_replace('/([^\w])/', '', $Name); // Removes everything from the string except letters, numbers and underscores
 
       if($CreateNew) {
          // Make sure that the new name doesn't already exist.
@@ -2012,6 +2012,15 @@ abstract class Gdn_SQLDriver {
         }
       }
       return $this;
+   }
+
+   /**
+    * Get the number of items in the where array.
+    *
+    * @return int Returns the number of items in the where array.
+    */
+   public function WhereCount() {
+      return count($this->_Wheres);
    }
 
    /**

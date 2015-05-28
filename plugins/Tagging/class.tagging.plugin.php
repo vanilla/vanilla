@@ -15,6 +15,7 @@
  *  1.8.4   Add tags before render so that other plugins can look at them.
  *  1.8.8   Added tabs.
  *  1.8.9   Ability to add tags based on tab.
+ *  1.8.12  Fix issues with CSS and js loading.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -25,7 +26,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.11',
+   'Version' => '1.8.12',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -55,6 +56,15 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function CategoriesController_Render_Before($Sender) {
       $this->AddTagModule($Sender);
+   }
+
+   /**
+    * Add the tag admin page CSS.
+    *
+    * @param AssetModel $sender
+    */
+   public function assetModel_adminCss_handler($sender) {
+      $sender->AddCssFile('tagadmin.css', 'plugins/Tagging');
    }
 
    /**
@@ -302,8 +312,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $CategoryID = GetValueR('Fields.CategoryID', $Sender->EventArguments, 0);
 //      $IsInsert = GetValue('Insert', $Sender->EventArguments);
       $RawFormTags = GetValue('Tags', $FormPostValues, '');
-      $FormTags = trim(strtolower($RawFormTags));
-      $FormTags = TagModel::SplitTags($FormTags);
+      $FormTags = TagModel::SplitTags($RawFormTags);
 
       // If we're associating with categories
       $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
@@ -365,7 +374,7 @@ class TaggingPlugin extends Gdn_Plugin {
          ->Where('DiscussionID',$DiscussionID)
          ->Get()->ResultArray();
 
-      $RemovedTagIDs = ConsolidateArrayValuesByKey($TagDataSet, 'TagID');
+      $RemovedTagIDs = array_column($TagDataSet, 'TagID');
 
       // Check if there are even any tags to delete
       if (count($RemovedTagIDs) > 0) {
@@ -456,7 +465,7 @@ class TaggingPlugin extends Gdn_Plugin {
          ->WhereIn('Name', $Tags)
          ->Get()->ResultArray();
 
-      $TagIDs = ConsolidateArrayValuesByKey($TagIDs, 'TagID');
+      $TagIDs = array_column($TagIDs, 'TagID');
 
       if ($Op == 'and' && count($Tags) > 1) {
          $DiscussionIDs = $TagSql
@@ -472,7 +481,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Limit = '';
          $Offset = 0;
 
-         $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+         $DiscussionIDs = array_column($DiscussionIDs, 'DiscussionID');
 
          $Sql->WhereIn('d.DiscussionID', $DiscussionIDs);
          $SortField = 'd.DiscussionID';
@@ -511,14 +520,14 @@ class TaggingPlugin extends Gdn_Plugin {
          if ($Sender->Request->IsPostBack()) {
             $tag_ids = TagModel::SplitTags($Sender->Form->GetFormValue('Tags'));
             $tags = TagModel::instance()->GetWhere(array('TagID' => $tag_ids))->ResultArray();
-            $tags = ConsolidateArrayValuesByKey($tags, 'FullName', 'TagID');
+            $tags = array_column($tags, 'TagID', 'FullName');
          } else {
             // The tags should be set on the data.
-            $tags = ConsolidateArrayValuesByKey($Sender->Data('Tags', array()), 'TagID', 'FullName');
+            $tags = array_column($Sender->Data('Tags', array()), 'FullName', 'TagID');
             $xtags = $Sender->Data('XTags', array());
             foreach (TagModel::instance()->defaultTypes() as $key => $row) {
                if (isset($xtags[$key])) {
-                  $xtags2 = ConsolidateArrayValuesByKey($xtags[$key], 'TagID', 'FullName');
+                  $xtags2 = array_column($xtags[$key], 'FullName', 'TagID');
                   foreach ($xtags2 as $id => $name) {
                      $tags[$id] = $name;
                   }
@@ -545,6 +554,8 @@ class TaggingPlugin extends Gdn_Plugin {
 
    /**
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
+    *
+    * @param PostController $Sender
     */
    public function PostController_Render_Before($Sender) {
       $Sender->AddJsFile('jquery.tokeninput.js');
@@ -553,10 +564,34 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));
 
       // Make sure that detailed tag data is available to the form.
-      $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
       $TagModel = TagModel::instance();
-      $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
-      $Sender->SetData($Tags);
+
+      $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
+
+      if ($DiscussionID) {
+         $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
+         $Sender->SetData($Tags);
+      } elseif (!$Sender->Request->IsPostBack() && $tagString = $Sender->Request->Get('tags')) {
+         $tags = explodeTrim(',', $tagString);
+         $types = array_column(TagModel::instance()->defaultTypes(), 'key');
+
+         // Look up the tags by name.
+         $tagData = Gdn::SQL()->GetWhere(
+            'Tag',
+            array('Name' => $tags, 'Type' => $types)
+         )->ResultArray();
+
+         // Add any missing tags.
+         $tagNames = array_change_key_case(array_column($tagData, 'Name', 'Name'));
+         foreach ($tags as $tag) {
+            $tagKey = strtolower($tag);
+            if (!isset($tagNames[$tagKey])) {
+               $tagData[] = array('TagID' => $tag, 'Name' => $tagKey, 'FullName' => $tag, 'Type' => '');
+            }
+         }
+
+         $Sender->SetData('Tags', $tagData);
+      }
    }
 
    /**
@@ -568,8 +603,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->Title('Tagging');
       $Sender->AddSideMenu('settings/tagging');
-      $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
-      $Sender->AddJSFile('plugins/Tagging/js/admin.js');
+      $Sender->AddJSFile('tagadmin.js', 'plugins/Tagging');
       $SQL = Gdn::SQL();
 
       // Get all tag types

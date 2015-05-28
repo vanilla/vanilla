@@ -14,6 +14,13 @@ class UserController extends DashboardController {
    public $Uses = array('Database', 'Form');
 
    /**
+    * The number of users when certain optimizations kick in.
+    *
+    * @var int Returns the number of users we need before optimizing.
+    */
+   public $UserThreshold = 10000;
+
+   /**
     * @var Gdn_Form
     */
    public $Form;
@@ -27,8 +34,10 @@ class UserController extends DashboardController {
    public function Initialize() {
       parent::Initialize();
       Gdn_Theme::Section('Dashboard');
-      if ($this->Menu)
+      if ($this->Menu) {
          $this->Menu->HighlightRoute('/dashboard/settings');
+      }
+      $this->FireEvent('Init');
    }
 
    /**
@@ -86,10 +95,9 @@ class UserController extends DashboardController {
       if ($Filter) {
          $Filter['Keywords'] = $Keywords;
       } else {
-         $Filter = $Keywords;
+         $Filter = array('Keywords' => (string)$Keywords);
       }
-
-      $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
+      $Filter['Optimize'] = $this->PastUserThreshold();
 
       // Sorting
       if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
@@ -103,6 +111,12 @@ class UserController extends DashboardController {
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       $this->SetData('Users', $this->UserData);
+      if ($this->PastUserThreshold()) {
+         $this->SetData('_CurrentRecords', $this->UserData->count());
+      } else {
+         $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
+      }
+
       RoleModel::SetUserRoles($this->UserData->Result());
 
       // Deliver json data if necessary
@@ -333,16 +347,18 @@ class UserController extends DashboardController {
       if (!$User)
          throw NotFoundException($User);
 
-//      $this->Form = new Gdn_Form();
-
       $UserModel = Gdn::UserModel();
 
-      // Block banning the superadmin or System accounts
+      // Block banning the super admin or system accounts.
       $User = $UserModel->GetID($UserID);
-      if (GetValue('Admin', $User) == 2)
-         throw ForbiddenException("@You may not ban a System user.");
-      elseif (GetValue('Admin', $User))
-         throw ForbiddenException("@You may not ban a user with the Admin flag set.");
+      if (GetValue('Admin', $User) == 2) {
+         throw ForbiddenException("@You may not ban a system user.");
+      } elseif (GetValue('Admin', $User)) {
+         throw ForbiddenException("@You may not ban a super admin.");
+      }
+
+      // Is the user banned for other reasons?
+      $this->SetData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_AUTOMATIC));
 
 
       if ($this->Form->AuthenticatedPostBack()) {
@@ -826,6 +842,15 @@ class UserController extends DashboardController {
       $Get = Gdn::Request()->Get();
       $Get['order'] = $Field;
       return '/dashboard/user?'.http_build_query($Get);
+   }
+
+   /**
+    * Whether or not we are past the user threshold.
+    */
+   protected function PastUserThreshold() {
+      $px = Gdn::Database()->DatabasePrefix;
+      $countEstimate = Gdn::Database()->Query("show table status like '{$px}User'")->Value('Rows', 0);
+      return $countEstimate > $this->UserThreshold;
    }
 
    /**

@@ -15,18 +15,18 @@ class GettingStartedPlugin extends Gdn_Plugin {
 
 /*
    This plugin should:
-   
+
    1. Display 5 tips for getting started on the dashboard
    2. Check off each item as it is completed
    3. Disable itself when "dismiss" is clicked
-*/    
-    
+*/
+
    // Adds a "My Forums" menu option to the dashboard area
    public function SettingsController_Render_Before($Sender) {
       // Have they visited their dashboard?
       if (strtolower($Sender->RequestMethod) != 'index')
          $this->SaveStep('Plugins.GettingStarted.Dashboard');
-         
+
       // Save the action if editing registration settings
       if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStarted.Registration');
@@ -41,8 +41,8 @@ class GettingStartedPlugin extends Gdn_Plugin {
 
       // Add messages & their css on dashboard
       if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
-         $Sender->AddCssFile('plugins/GettingStarted/style.css');
-         
+         $Sender->AddCssFile('getting-started.css', 'plugins/GettingStarted');
+
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStarted">'
             .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
@@ -77,13 +77,13 @@ class GettingStartedPlugin extends Gdn_Plugin {
          $Sender->AddAsset('Messages', $WelcomeMessage, 'WelcomeMessage');
       }
    }
-   
+
    // Record when the various actions are taken
    // 1. If the user edits the registration settings
    public function SaveStep($Step) {
       if (Gdn::Config($Step, '') != '1')
          SaveToConfig($Step, '1');
-         
+
       // If all of the steps are now completed, disable this plugin
       if (
          Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
@@ -95,7 +95,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
          Gdn::PluginManager()->DisablePlugin('GettingStarted');
       }
    }
-   
+
    // If the user posts back any forms to their profile, they've completed step 4: profile customization
    public function ProfileController_Render_Before($Sender) {
       if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === TRUE)
@@ -107,12 +107,12 @@ class GettingStartedPlugin extends Gdn_Plugin {
       if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStarted.Discussion');
    }
-   
+
    public function PluginController_DismissGettingStarted_Create($Sender) {
       Gdn::PluginManager()->DisablePlugin('GettingStarted');
       echo 'TRUE';
    }
-   
+
    public function Setup() {
       // No setup required.
    }

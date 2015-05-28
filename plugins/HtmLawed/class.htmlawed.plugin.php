@@ -24,18 +24,107 @@ $PluginInfo['HtmLawed'] = array(
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLawedPlugin', __FILE__, Gdn::FactorySingleton);
 
 class HTMLawedPlugin extends Gdn_Plugin {
-	/// CONSTRUCTOR ///
-	public function __construct() {
+   /// CONSTRUCTOR ///
+   public function __construct() {
       require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
-      $this->SafeStyles = C('Garden.Html.SafeStyles');
-	}
 
-	/// PROPERTIES ///
+      /** @var bool Whether SafeStyles is enabled. Turning this off is bad mojo. */
+      $this->SafeStyles = C('Garden.Html.SafeStyles');
+
+      /** @var array HTML elements allowed to have classes in user generated content. */
+      $this->ClassedElements = array('a','span','div','p','li','ul','ol','dl','dd','dt','i','b','strong','em','code','blockquote','img','pre','h1','h2','h3','h4','h5','h6');
+
+      /** @var array Classes users may have in their content. */
+      $this->AllowedClasses = array(
+         "post-clear-both",
+         "post-clear-left",
+         "post-clear-right",
+         "post-color-aqua",
+         "post-highlightcolor-aqua",
+         "post-color-black",
+         "post-highlightcolor-black",
+         "post-color-blue",
+         "post-highlightcolor-blue",
+         "post-color-fuchsia",
+         "post-highlightcolor-fuchsia",
+         "post-color-gray",
+         "post-highlightcolor-gray",
+         "post-color-green",
+         "post-highlightcolor-green",
+         "post-color-lime",
+         "post-highlightcolor-lime",
+         "post-color-maroon",
+         "post-highlightcolor-maroon",
+         "post-color-navy",
+         "post-highlightcolor-navy",
+         "post-color-olive",
+         "post-highlightcolor-olive",
+         "post-color-purple",
+         "post-highlightcolor-purple",
+         "post-color-red",
+         "post-highlightcolor-red",
+         "post-color-silver",
+         "post-highlightcolor-silver",
+         "post-color-teal",
+         "post-highlightcolor-teal",
+         "post-color-white",
+         "post-highlightcolor-white",
+         "post-color-yellow",
+         "post-highlightcolor-yellow",
+         "post-color-orange",
+         "post-highlightcolor-orange",
+         "post-float-left",
+         "post-float-right",
+         "post-font-size-large",
+         "post-font-size-larger",
+         "post-font-size-medium",
+         "post-font-size-small",
+         "post-font-size-smaller",
+         "post-font-size-x-large",
+         "post-font-size-x-small",
+         "post-font-size-xx-large",
+         "post-font-size-xx-small",
+         "post-text-align-center",
+         "post-text-align-justify",
+         "post-text-align-left",
+         "post-text-align-right",
+         "post-fontfamily-default",
+         "post-fontfamily-arial",
+         "post-fontfamily-comicsansms",
+         "post-fontfamily-couriernew",
+         "post-fontfamily-georgia",
+         "post-fontfamily-impact",
+         "post-fontfamily-timesnewroman",
+         "post-fontfamily-trebuchetms",
+         "post-fontfamily-verdana",
+         "post-text-decoration-line-through",
+         "post-font-size-h1",
+         "post-font-size-h2",
+         "P",
+         "Spoiler",
+         "Spoiled",
+         "UserSpoiler",
+         "SpoilerTitle",
+         "SpoilerText",
+         "Quote",
+         "QuoteAuthor",
+         "QuoteText",
+         "QuoteLink",
+         "UserQuote",
+         "CodeBlock",
+         "CodeInline",
+         "AlignRight",
+         "AlignLeft",
+         "AlignCenter",
+      );
+   }
+
+   /// PROPERTIES ///
 
    public $SafeStyles = TRUE;
 
-	/// METHODS ///
-	public function Format($Html) {
+   /// METHODS ///
+   public function Format($Html) {
       $Attributes = C('Garden.Html.BlockedAttributes', 'on*');
       $Config = array(
        'anti_link_spam' => array('`.`', ''),
@@ -51,10 +140,10 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'direct_list_nest' => 1,
        'balance' => 1
       );
-      
+
       // Turn embedded videos into simple links (legacy workaround)
       $Html = Gdn_Format::UnembedContent($Html);
-      
+
       // We check the flag within Gdn_Format to see
       // if htmLawed should place rel="nofollow" links
       // within output or not.
@@ -72,7 +161,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
       if ($this->SafeStyles) {
          // Deny all class and style attributes.
          // A lot of damage can be done by hackers with these attributes.
-         $Config['deny_attribute'] .= ',style';
+         $Config['deny_attribute'] .= ',style,class';
 //      } else {
 //         $Config['hook_tag'] = 'HTMLawedHookTag';
       }
@@ -97,22 +186,28 @@ class HTMLawedPlugin extends Gdn_Plugin {
          'Status' => 1,
       );
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Dismiss|MorePager/nomatch=%pop[in|up|down]|flyout|ajax%i)';
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); ';
+      //$Spec .= 'a=class(noneof=Hijack|Dismiss|MorePager/nomatch=%pop[in|up|down]|flyout|ajax%i); ';
+
+      // Define elements allowed to have a `class`.
+      $Spec .= implode(',', $this->ClassedElements);
+      // Whitelist classes we allow.
+      $Spec .= '=class(oneof='.implode('|',$this->AllowedClasses).'); ';
 
       $Result = htmLawed($Html, $Config, $Spec);
 
       return $Result;
-	}
+   }
 
-	public function Setup() {
-	}
+   public function Setup() {
+   }
 }
 
 if (!function_exists('FormatRssCustom')):
-   
+
 function FormatRssHtmlCustom($Html) {
    require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
-   
+
    $Config = array(
        'anti_link_spam' => array('`.`', ''),
        'comment' => 1,
@@ -129,17 +224,17 @@ function FormatRssHtmlCustom($Html) {
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
 
       $Result = htmLawed($Html, $Config, $Spec);
-      
+
       return $Result;
 }
 endif;
 
 function HTMLawedHookTag($Element, $Attributes = 0) {
-   // If second argument is not received, it means a closing tag is being handled 
-   if($Attributes === 0){ 
-      return "</$Element>"; 
+   // If second argument is not received, it means a closing tag is being handled
+   if($Attributes === 0){
+      return "</$Element>";
    }
-   
+
    $Attribs = '';
    foreach ($Attributes as $Key => $Value) {
       if (strcasecmp($Key, 'style') == 0) {
@@ -149,8 +244,8 @@ function HTMLawedHookTag($Element, $Attributes = 0) {
 
       $Attribs .= " {$Key}=\"{$Value}\"";
    }
-   
-   static $empty_elements = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1); 
-   
+
+   static $empty_elements = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1);
+
    return "<{$Element}{$Attribs}". (isset($empty_elements[$Element]) ? ' /' : ''). '>';
 }

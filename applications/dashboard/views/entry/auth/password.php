@@ -31,10 +31,13 @@
       <li class="CreateAccount">
          <?php
             $Target = GetIncomingValue('Target', '');
-            if ($Target != '')
-               $Target = '?Target='.$Target;
-               
-            printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register'.$Target));
+            if ($Target != '') {
+               $Target = '?Target=' . $Target;
+            }
+
+            if (C('Garden.Registration.Method') != 'Invitation') {
+               printf(T("Don't have an account? %s"), Anchor(T('Create One.'), '/entry/register' . $Target));
+            }
          ?>
       </li>
       <?php endif; ?>

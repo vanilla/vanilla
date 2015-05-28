@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
    'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
-   'Version' => '1.0.2',
+   'Version' => '1.2.0',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -63,9 +63,20 @@ class OpenIDPlugin extends Gdn_Plugin {
       $OpenID = new LightOpenID();
 
       if ($url = Gdn::Request()->Get('url')) {
+         if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new Gdn_UserException(sprintf(T('ValidateUrl'), 'OpenID'), 400);
+         }
+
+         // Don't allow open ID on a non-standard scheme.
          $scheme = parse_url($url, PHP_URL_SCHEME);
          if (!in_array($scheme, array('http', 'https'))) {
-            throw new Gdn_UserException(sprintf(T('Invalid url scheme: %s.'), $scheme), 400);
+            throw new Gdn_UserException(sprintf(T('ValidateUrl'), 'OpenID'), 400);
+         }
+
+         // Don't allow open ID on a non-standard port.
+         $port = parse_url($url, PHP_URL_PORT);
+         if ($port && !in_array($port, array(80, 8080, 443))) {
+            throw new Gdn_UserException(T('OpenID is not allowed on non-standard ports.'));
          }
 
          $OpenID->identity = $url;
@@ -165,7 +176,14 @@ class OpenIDPlugin extends Gdn_Plugin {
    public function EntryController_OpenID_Create($Sender, $Args) {
       $this->EventArguments = $Args;
       $Sender->Form->InputPrefix = '';
-      $OpenID = $this->GetOpenID();
+
+
+      try {
+         $OpenID = $this->GetOpenID();
+      } catch (Gdn_UserException $ex) {
+         $Sender->Form->AddError('@'.$ex->getMessage());
+         $Sender->Render('Url', '', 'plugins/OpenID');
+      }
 
       $Mode = $Sender->Request->Get('openid_mode');
       switch($Mode) {
@@ -236,7 +254,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       if ($this->SignInAllowed()) {
          $Url = $this->_AuthorizeHref();
-         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
+         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern', 'rel' => 'nofollow'));
       }
 	}
 

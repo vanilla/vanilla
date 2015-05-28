@@ -455,8 +455,8 @@ EOT;
       $UserID = GetValue('UserID', $Auth);
 
       // Check to synchronise roles upon connecting.
-      if (($this->Data('Trusted') || C('Garden.SSO.SynchRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
-         $SaveRoles = TRUE;
+      if (($this->Data('Trusted') || C('Garden.SSO.SyncRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
+         $SaveRoles = $SaveRolesRegister = TRUE;
 
          // Translate the role names to IDs.
          $Roles = $this->Form->GetFormValue('Roles', NULL);
@@ -468,9 +468,14 @@ EOT;
             $RoleIDs = $this->UserModel->NewUserRoleIDs();
          }
 
+         if (C('Garden.SSO.SyncRolesBehavior') === 'register') {
+            $SaveRoles = FALSE;
+         }
+
          $this->Form->SetFormValue('RoleID', $RoleIDs);
       } else {
          $SaveRoles = FALSE;
+         $SaveRolesRegister = FALSE;
       }
 
       if ($UserID) {
@@ -615,8 +620,7 @@ EOT;
             $User['Attributes'] = $this->Form->GetFormValue('Attributes', NULL);
             $User['Email'] = $this->Form->GetFormValue('ConnectEmail', $this->Form->GetFormValue('Email', NULL));
 
-//            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRolesRegister));
 
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
@@ -709,7 +713,7 @@ EOT;
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRolesRegister));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -1883,6 +1887,10 @@ EOT;
 
          // Only allow external redirects to trusted domains.
          $TrustedDomains = C('Garden.TrustedDomains', TRUE);
+         // Trusted domains were previously saved in config as an array.
+         if ($TrustedDomains && $TrustedDomains !== TRUE && !is_array($TrustedDomains)) {
+            $TrustedDomains = explode("\n", $TrustedDomains);
+         }
 
          if (is_array($TrustedDomains)) {
             // Add this domain to the trusted hosts.

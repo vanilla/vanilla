@@ -37,6 +37,8 @@ class SetupController extends DashboardController {
     * @access public
     */
    public function Index() {
+      $this->AddJsFile('setup.js');
+
       $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.

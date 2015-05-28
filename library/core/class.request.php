@@ -861,8 +861,6 @@ class Gdn_Request {
             $Path = str_replace('https:', 'http:', $Path);
             $Scheme = 'http';
          }
-      } elseif (!$AllowSSL) {
-         $Scheme = 'http';
       } else {
          $Scheme = $this->Scheme();
       }
@@ -881,25 +879,21 @@ class Gdn_Request {
          $Parts[] = '//'.$Host;
       } elseif ($WithDomain && $WithDomain !== '/') {
          $Parts[] = $Scheme.'://'.$Host;
-      } else {
+      } else
          $Parts[] = '';
-      }
 
-      if ($WithDomain !== '/' && $this->WebRoot() != '') {
+      if ($WithDomain !== '/' && $this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
-      }
 
       // Strip out the hash.
       $Hash = strchr($Path, '#');
-      if (strlen($Hash) > 0) {
+      if (strlen($Hash) > 0)
          $Path = substr($Path, 0, -strlen($Hash));
-      }
 
       // Strip out the querystring.
       $Query = strrchr($Path, '?');
-      if (strlen($Query) > 0) {
+      if (strlen($Query) > 0)
          $Path = substr($Path, 0, -strlen($Query));
-      }
 
       if (!$Rewrite && $WithDomain !== '/') {
          $Parts[] = $this->_EnvironmentElement('Script').'?p=';
@@ -933,13 +927,11 @@ class Gdn_Request {
          }
       }
 
-      if (isset($Query)) {
+      if (isset($Query))
          $Result .= $Query;
-      }
 
-      if (isset($Hash)) {
+      if (isset($Hash))
          $Result .= $Hash;
-      }
 
       return $Result;
    }

@@ -715,8 +715,7 @@ class SettingsController extends DashboardController {
          'Garden.Registration.CaptchaPrivateKey',
          'Garden.Registration.CaptchaPublicKey',
          'Garden.Registration.InviteExpiration',
-         'Garden.Registration.ConfirmEmail',
-         'Garden.Registration.ConfirmEmailRole'
+         'Garden.Registration.ConfirmEmail'
       ));
 
       // Set the model on the forms.
@@ -726,11 +725,6 @@ class SettingsController extends DashboardController {
       $RoleModel = new RoleModel();
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
       $this->SetData('_Roles', array_column($this->RoleData->ResultArray(), 'Name', 'RoleID'));
-
-      // Get the currently selected default roles
-      // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
-      // if (is_array($this->ExistingRoleData) === FALSE)
-      //    $this->ExistingRoleData = array();
 
       // Get currently selected InvitationOptions
       $this->ExistingRoleInvitations = Gdn::Config('Garden.Registration.InviteRoles');
@@ -772,11 +766,6 @@ class SettingsController extends DashboardController {
       } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');
-         // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
-         //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
-
-         if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
-            $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');
 
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');

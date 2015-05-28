@@ -147,6 +147,149 @@ class VanillaHooks implements Gdn_IPlugin {
          ->Put();
    }
 
+   /**
+    * Provide default permissions for roles, based on the value in their Type column.
+    *
+    * @param PermissionModel $Sender Instance of permission model that fired the event
+    */
+   public function PermissionModel_DefaultPermissions_Handler($Sender) {
+      // Guest defaults
+      $Sender->AddDefault(
+         RoleModel::TYPE_GUEST,
+         array(
+            'Vanilla.Discussions.View' => 1
+         )
+      );
+      $Sender->AddDefault(
+         RoleModel::TYPE_GUEST,
+         array(
+            'Vanilla.Discussions.View' => 1
+         ),
+         'Category',
+         -1
+      );
+
+      // Unconfirmed defaults
+      $Sender->AddDefault(
+         RoleModel::TYPE_UNCONFIRMED,
+         array(
+            'Vanilla.Discussions.View' => 1
+         )
+      );
+      $Sender->AddDefault(
+         RoleModel::TYPE_UNCONFIRMED,
+         array(
+            'Vanilla.Discussions.View' => 1
+         ),
+         'Category',
+         -1
+      );
+
+      // Applicant defaults
+      $Sender->AddDefault(
+         RoleModel::TYPE_APPLICANT,
+         array(
+            'Vanilla.Discussions.View' => 1
+         )
+      );
+      $Sender->AddDefault(
+         RoleModel::TYPE_APPLICANT,
+         array(
+            'Vanilla.Discussions.View' => 1
+         ),
+         'Category',
+          -1
+      );
+
+      // Member defaults
+      $Sender->AddDefault(
+         RoleModel::TYPE_MEMBER,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1
+         )
+      );
+      $Sender->AddDefault(
+         RoleModel::TYPE_MEMBER,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1
+         ),
+         'Category',
+         -1
+      );
+
+      // Moderator defaults
+      $Sender->AddDefault(
+         RoleModel::TYPE_MODERATOR,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         )
+      );
+      $Sender->AddDefault(
+         RoleModel::TYPE_MODERATOR,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         ),
+         'Category',
+         -1
+      );
+
+      // Administrator defaults
+      $Sender->AddDefault(
+         RoleModel::TYPE_ADMINISTRATOR,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         )
+      );
+      $Sender->AddDefault(
+         RoleModel::TYPE_ADMINISTRATOR,
+         array(
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 1,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Comments.Add' => 1,
+            'Vanilla.Comments.Edit' => 1,
+            'Vanilla.Comments.Delete' => 1
+         ),
+         'Category',
+         -1
+      );
+   }
+
 	/**
 	 * Remove Vanilla data when deleting a user.
     *

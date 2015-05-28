@@ -36,7 +36,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                ++$i;
                if ($Count == $i)
                   $CssClass .= ' Last';
-               
+
                $CssClass = trim($CssClass);
                ?>
                <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
@@ -44,7 +44,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                      $MethodName = $Method;
                      if ($MethodName == 'Captcha')
                         $MethodName = 'Basic';
-                        
+
                      echo $this->Form->Radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
                   ?></th>
                   <td class="Alt"><?php echo T($Description); ?></td>
@@ -55,14 +55,6 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
          </tbody>
       </table>
    </li>
-   <?php
-   /*
-   <li id="NewUserRoles">
-      <div class="Info"><?php echo T('Check all roles that should be applied to new/approved users:'); ?></div>
-      <?php echo $this->Form->CheckBoxList('Garden.Registration.DefaultRoles', $this->RoleData, $this->ExistingRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
-   </li>
-   */
-   ?>
    <li id="CaptchaSettings">
       <div class="Info"><?php echo T('Captcha Explanation', 'The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.', '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
       <table class="Label AltColumns">
@@ -97,7 +89,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
             'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.'),
             Url('/dashboard/profile/invitations')),
             '<br /><br />';
-         
+
          echo T('Choose who can send out invitations to new members:');
       ?>
       </div>
@@ -119,11 +111,11 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                ++$i;
                if ($Count == $i)
                   $CssClass .= ' Last';
-               
+
                $CssClass = trim($CssClass);
                $CurrentValue = ArrayValue($Role['RoleID'], $this->ExistingRoleInvitations, FALSE);
                ?>
-               <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>               
+               <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                   <th><?php echo $Role['Name']; ?></th>
                   <td class="Alt">
                      <?php
@@ -146,13 +138,8 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
             T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
             '</div>';
       }
-      
+
       echo $this->Form->CheckBox('Garden.Registration.ConfirmEmail', '@'.T('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
-
-      echo $this->Form->Label('Email Confirmation Role', 'Garden.Registration.ConfirmEmailRole'),
-         $this->Form->DropDown('Garden.Registration.ConfirmEmailRole', $this->Data('_Roles'), array('IncludeNull' => TRUE));
-
-      echo ' ', T('Users will be assigned to this role until they\'ve confirmed their email addresses.');
       ?>
       </div>
    </li>

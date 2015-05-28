@@ -28,26 +28,26 @@ $Construct
    ->PrimaryKey('RoleID')
    ->Column('Name', 'varchar(100)')
    ->Column('Description', 'varchar(500)', TRUE)
+   ->Column('Type', array(RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR), TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Column('Deletable', 'tinyint(1)', '1')
    ->Column('CanSession', 'tinyint(1)', '1')
    ->Column('PersonalInfo', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
+$RoleModel = new RoleModel();
+
 if (!$RoleTableExists || $Drop) {
-   // Define default roles
-   // RoleIDs 3, 4, & 8 are referenced in config-defaults.php
-   $RoleModel = Gdn::Factory('RoleModel');
+   // Define default roles.
    $RoleModel->Database = $Database;
    $RoleModel->SQL = $SQL;
    $Sort = 1;
-   $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '0', 'Description' => T('Guest Role Description', 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".')));
-   $RoleModel->Define(array('Name' => 'Unconfirmed', 'RoleID' => 3, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => T('Unconfirmed Role Description', 'Users must confirm their emails before becoming full members. They get assigned to this role.')));
-   $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => T('Applicant Role Description', 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.')));
-   $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Member Role Description', 'Members can participate in discussions.')));
-   $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Moderator Role Description', 'Moderators have permission to edit most content.')));
-   $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Administrator Role Description', 'Administrators have permission to do anything.')));
-   unset($RoleModel);
+   $RoleModel->Define(array('Name' => 'Guest', 'Type' => RoleModel::TYPE_GUEST, 'RoleID' => 2, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '0', 'Description' => T('Guest Role Description', 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".')));
+   $RoleModel->Define(array('Name' => 'Unconfirmed', 'Type' => RoleModel::TYPE_UNCONFIRMED, 'RoleID' => 3, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => T('Unconfirmed Role Description', 'Users must confirm their emails before becoming full members. They get assigned to this role.')));
+   $RoleModel->Define(array('Name' => 'Applicant', 'Type' => RoleModel::TYPE_APPLICANT, 'RoleID' => 4, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => T('Applicant Role Description', 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.')));
+   $RoleModel->Define(array('Name' => 'Member', 'Type' => RoleModel::TYPE_MEMBER, 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Member Role Description', 'Members can participate in discussions.')));
+   $RoleModel->Define(array('Name' => 'Moderator', 'Type' => RoleModel::TYPE_MODERATOR, 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Moderator Role Description', 'Moderators have permission to edit most content.')));
+   $RoleModel->Define(array('Name' => 'Administrator', 'Type' => RoleModel::TYPE_ADMINISTRATOR, 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => T('Administrator Role Description', 'Administrators have permission to do anything.')));
 }
 
 // User Table
@@ -101,8 +101,8 @@ $Construct
 // Modify all users with ConfirmEmail role to be unconfirmed
 if ($UserExists && !$ConfirmedExists) {
    $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
-   $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole', false);
-   if ($ConfirmEmail && $ConfirmEmailRoleID !== false) {
+   $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+   if ($ConfirmEmail && !empty($ConfirmEmailRoleID)) {
       // Select unconfirmed users
       $Users = Gdn::SQL()->Select('UserID')->From('UserRole')->Where('RoleID', $ConfirmEmailRoleID)->Get();
       $UserIDs = array();
@@ -147,11 +147,51 @@ $Construct
    ->Column('RoleID', 'int', FALSE, array('primary', 'index'))
    ->Set($Explicit, $Drop);
 
+// Fix old default roles that were stored in the config and user-role table.
+if ($RoleTableExists && $UserRoleExists) {
+   $types = $RoleModel->getAllDefaultRoles();
+   if ($v = C('Garden.Registration.ApplicantRoleID')) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_APPLICANT)
+         ->Where('RoleID', $types[RoleModel::TYPE_APPLICANT])
+         ->Put();
+//      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
+   }
+
+   if ($v = C('Garden.Registration.DefaultRoles')) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_MEMBER)
+         ->Where('RoleID', $types[RoleModel::TYPE_MEMBER])
+         ->Put();
+//      RemoveFromConfig('Garden.Registration.DefaultRoles');
+   }
+
+   if ($v = C('Garden.Registration.ConfirmEmailRole')) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_UNCONFIRMED)
+         ->Where('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
+         ->Put();
+//      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
+   }
+
+   $guestRoleIDs = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();
+   if (!empty($guestRoleIDs)) {
+      $SQL->Update('Role')
+         ->Set('Type', RoleModel::TYPE_GUEST)
+         ->Where('RoleID', $types[RoleModel::TYPE_GUEST])
+         ->Put();
+
+      $SQL->Delete('UserRole', array('UserID' => 0));
+   }
+}
+
 if (!$UserRoleExists) {
-   // Assign the guest user to the guest role
-   $SQL->Replace('UserRole', array(), array('UserID' => 0, 'RoleID' => 2));
-   // Assign the admin user to admin role
-   $SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => 16));
+   // Assign the admin user to admin role.
+   $adminRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_ADMINISTRATOR);
+
+   foreach ($adminRoleIDs as $id) {
+      $SQL->Replace('UserRole', array(), array('UserID' => 1, 'RoleID' => $id));
+   }
 }
 
 // User Meta Table
@@ -287,84 +327,6 @@ $PermissionModel->Undefine(array(
    'Garden.Themes.Manage',
    'Garden.Messages.Manage'
    ));
-
-if (!$PermissionTableExists) {
-
-   // Set initial guest permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Guest',
-      'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 0
-      ));
-
-   // Set initial confirm email permissions.
-   $PermissionModel->Save(array(
-       'Role' => 'Unconfirmed',
-       'Garden.SignIn.Allow' => 1,
-       'Garden.Activity.View' => 1,
-       'Garden.Profiles.View' => 1,
-       'Garden.Profiles.Edit' => 0,
-       'Garden.Email.View' => 1
-       ));
-
-   // Set initial applicant permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Applicant',
-      'Garden.SignIn.Allow' => 1,
-      'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 0,
-      'Garden.Email.View' => 1
-      ));
-
-   // Set initial member permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Member',
-      'Garden.SignIn.Allow' => 1,
-      'Garden.Activity.View' => 1,
-      'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1,
-      'Garden.Email.View' => 1
-      ));
-
-   // Set initial moderator permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Moderator',
-      'Garden.SignIn.Allow' => 1,
-      'Garden.Activity.View' => 1,
-      'Garden.Curation.Manage' => 1,
-      'Garden.Moderation.Manage' => 1,
-      'Garden.PersonalInfo.View' => 1,
-      'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1,
-      'Garden.Email.View' => 1
-      ));
-
-   // Set initial admininstrator permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Administrator',
-      'Garden.SignIn.Allow' => 1,
-      'Garden.Settings.View' => 1,
-      'Garden.Settings.Manage' => 1,
-      'Garden.Community.Manage' => 1,
-      'Garden.Users.Add' => 1,
-      'Garden.Users.Edit' => 1,
-      'Garden.Users.Delete' => 1,
-      'Garden.Users.Approve' => 1,
-      'Garden.Activity.Delete' => 1,
-      'Garden.Activity.View' => 1,
-      'Garden.Messages.Manage' => 1,
-      'Garden.PersonalInfo.View' => 1,
-      'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1,
-      'Garden.AdvancedNotifications.Allow' => 1,
-      'Garden.Email.View' => 1,
-      'Garden.Curation.Manage' => 1,
-      'Garden.Moderation.Manage' => 1
-      ));
-}
-$PermissionModel->ClearPermissions();
 
 //// Photo Table
 //$Construct->Table('Photo');

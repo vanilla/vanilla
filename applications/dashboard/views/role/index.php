@@ -6,6 +6,7 @@ $Advanced = TRUE;
    echo Wrap(T('Need More Help?'), 'h2');
    echo '<ul>';
    echo Wrap(Anchor(T("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
+   echo Wrap(Anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
    echo '</ul>';
    ?>
 </div>
@@ -47,7 +48,18 @@ foreach ($this->Data('Roles') as $Role) {
          </div>
          <?php } ?>
       </td>
-      <td class="Alt"><?php echo $Role['Description']; ?></td>
+      <td class="Alt">
+         <?php
+         echo $Role['Description'];
+
+         if (val('Type', $Role)) {
+            echo '<div class="Meta-Container"><span class="Meta-Label">'.
+               T('default type', 'default').': '.
+               T(val('Type', $Role)).
+               '</span></div>';
+         }
+         ?>
+      </td>
    </tr>
 <?php } ?>
    </tbody>

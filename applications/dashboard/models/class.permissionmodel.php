@@ -9,6 +9,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class PermissionModel extends Gdn_Model {
+
+
+   /**
+    * Default role permissions
+    * @var array
+    */
+   protected $DefaultPermissions = array();
+
+   /**
+    * Default row permission values
+    * @var array
+    */
+   protected $RowDefaults =  array();
+
    /**
     * Class constructor. Defines the related database table name.
     */
@@ -22,6 +36,122 @@ class PermissionModel extends Gdn_Model {
          $NewValues['`'.$Key.'`'] = $Value;
       }
       return $NewValues;
+   }
+
+   /**
+    * Add an entry into the list of default permissions.
+    *
+    * @param string $Type Type of role the permissions should be added for.
+    * @param array $Permissions The list of permissions to include.
+    * @param null|string $Junction Type of junction to base the permission on.
+    * @param null|int $JunctionId Identifier for the specific junction record to base the permission on.
+    */
+   public function AddDefault($Type, $Permissions, $Junction = null, $JunctionId = null) {
+      if (!array_key_exists($Type, $this->DefaultPermissions)) {
+         $this->DefaultPermissions[$Type] = array('global' => array());
+      }
+
+      if ($Junction && $JunctionId) {
+         $JunctionKey = "$Junction:$JunctionId";
+         if (!array_key_exists($JunctionKey, $this->DefaultPermissions[$Type])) {
+            $this->DefaultPermissions[$Type][$JunctionKey] = array();
+         }
+         $Defaults =& $this->DefaultPermissions[$Type][$JunctionKey];
+      } else {
+         $Defaults =& $this->DefaultPermissions[$Type]['global'];
+      }
+
+      $Defaults = array_merge($Defaults, $Permissions);
+   }
+
+   /**
+    * Populate a list of default permissions, per type.
+    *
+    * @param bool $ResetDefaults If we already have defaults, should they be discarded?
+    */
+   public function AssignDefaults($ResetDefaults = FALSE) {
+      if (count($this->DefaultPermissions)) {
+         if ($ResetDefaults) {
+            $this->DefaultPermissions = array();
+         } else {
+            return;
+         }
+      }
+
+      $this->AddDefault(
+         RoleModel::TYPE_GUEST,
+         array(
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+         )
+      );
+      $this->AddDefault(
+         RoleModel::TYPE_UNCONFIRMED,
+         $Permissions = array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Email.View' => 1
+         )
+      );
+      $this->AddDefault(
+         RoleModel::TYPE_APPLICANT,
+         $Permissions = array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Email.View' => 1
+         )
+      );
+      $this->AddDefault(
+         RoleModel::TYPE_MODERATOR,
+         $Permissions = array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Curation.Manage' => 1,
+            'Garden.Moderation.Manage' => 1,
+            'Garden.PersonalInfo.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 1,
+            'Garden.Email.View' => 1
+         )
+      );
+      $this->AddDefault(
+         RoleModel::TYPE_ADMINISTRATOR,
+         array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Settings.View' => 1,
+            'Garden.Settings.Manage' => 1,
+            'Garden.Community.Manage' => 1,
+            'Garden.Users.Add' => 1,
+            'Garden.Users.Edit' => 1,
+            'Garden.Users.Delete' => 1,
+            'Garden.Users.Approve' => 1,
+            'Garden.Activity.Delete' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Messages.Manage' => 1,
+            'Garden.PersonalInfo.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 1,
+            'Garden.AdvancedNotifications.Allow' => 1,
+            'Garden.Email.View' => 1,
+            'Garden.Curation.Manage' => 1,
+            'Garden.Moderation.Manage' => 1
+         )
+      );
+      $this->AddDefault(
+         RoleModel::TYPE_MEMBER,
+         array(
+            'Garden.SignIn.Allow' => 1,
+            'Garden.Activity.View' => 1,
+            'Garden.Profiles.View' => 1,
+            'Garden.Profiles.Edit' => 1,
+            'Garden.Email.View' => 1
+         )
+      );
+
+      // Allow the ability for other applications and plug-ins to speakup with their own default permissions.
+      $this->FireEvent('DefaultPermissions');
    }
 
    public function ClearPermissions() {
@@ -111,6 +241,56 @@ class PermissionModel extends Gdn_Model {
       if(!is_null($RoleID)) {
          // Rebuild the permission cache.
       }
+   }
+
+   /**
+    * Grab the list of default permissions by role type
+    *
+    * @return array List of permissions, grouped by role type
+    */
+   public function GetDefaults() {
+      if (empty($this->DefaultPermissions)) {
+         $this->AssignDefaults();
+      }
+
+      return $this->DefaultPermissions;
+   }
+
+   /**
+    * Grab default permission column values.
+    *
+    * @throws Exception Throws when no default permission row can be found in the database.
+    * @return array A list of default permission values.
+    */
+   public function GetRowDefaults() {
+      if (empty($this->RowDefaults)) {
+         $DefaultRow = $this->SQL
+            ->Select('*')
+            ->From('Permission')
+            ->Where('RoleID', 0)
+            ->Where('JunctionTable is null')
+            ->OrderBy('RoleID')
+            ->Limit(1)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+
+         if (!$DefaultRow) {
+            throw new Exception(T('No default permission row.'));
+         }
+
+         $this->_MergeDisabledPermissions($DefaultRow);
+
+         unset(
+            $DefaultRow['PermissionID'],
+            $DefaultRow['RoleID'],
+            $DefaultRow['JunctionTable'],
+            $DefaultRow['JunctionColumn'],
+            $DefaultRow['JunctionID']
+         );
+
+         $this->RowDefaults = $this->StripPermissions($DefaultRow, $DefaultRow);
+      }
+
+      return $this->RowDefaults;
    }
 
    /**
@@ -235,6 +415,10 @@ class PermissionModel extends Gdn_Model {
    }
 
    public function CachePermissions($UserID = NULL, $RoleID = NULL) {
+      if (!$UserID) {
+         $RoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
+      }
+
       // Select all of the permission columns.
       $PermissionColumns = $this->PermissionColumns();
       foreach($PermissionColumns as $ColumnName => $Value) {
@@ -332,12 +516,20 @@ class PermissionModel extends Gdn_Model {
             $SQL->Select("p.`$PermissionName`, $DefaultValue", 'coalesce', $PermissionName);
          }
 
-         if(!is_null($RoleID)) {
+         if(!empty($RoleID)) {
+            $roleIDs = (array)$RoleID;
+            if (count($roleIDs) === 1) {
+               $roleOn = 'p.RoleID = '.$this->SQL->Database->Connection()->quote(reset($roleIDs));
+            } else {
+               $roleIDs = array_map(array($this->SQL->Database->Connection(), 'quote'), $roleIDs);
+               $roleOn = 'p.RoleID in ('.implode(',', $roleIDs).')';
+            }
+
             // Get the permissions for the junction table.
             $SQL->Select('junc.Name')
                ->Select('junc.'.$JunctionColumn, '', 'JunctionID')
                ->From($JunctionTable.' junc')
-               ->Join('Permission p', "p.JunctionID = junc.$JunctionColumn and p.RoleID = $RoleID", 'left')
+               ->Join('Permission p', "p.JunctionID = junc.$JunctionColumn and $roleOn", 'left')
                ->OrderBy('junc.Sort')
                ->OrderBy('junc.Name');
 
@@ -395,13 +587,12 @@ class PermissionModel extends Gdn_Model {
     * Returns all defined permissions not related to junction tables. Excludes
     * permissions related to applications & plugins that are disabled.
     *
+    * @param int|array $RoleID The role(s) to get the permissions for.
     * @param string $LimitToSuffix An optional suffix to limit the permission names to.
-    * @return DataSet
+    * @return array
     */
    public function GetPermissions($RoleID, $LimitToSuffix = '') {
-      //$Namespaces = $this->GetAllowedPermissionNamespaces();
-      //$NamespaceCount = count($Namespaces);
-
+      $RoleID = (array)$RoleID;
       $Result = array();
 
       $GlobalPermissions = $this->GetGlobalPermissions($RoleID, $LimitToSuffix);
@@ -481,7 +672,7 @@ class PermissionModel extends Gdn_Model {
             continue;
          }
 
-         switch ($Row[$PermissionName]) {
+         switch ($DefaultRow[$PermissionName]) {
             case 3:
                $Row[$PermissionName] = 1;
                break;
@@ -817,6 +1008,70 @@ class PermissionModel extends Gdn_Model {
       }
 
       // TODO: Clear the permissions for rows that aren't here.
+   }
+
+   /**
+    * Reset permissions for all roles, based on the value in their Type column.
+    *
+    * @param string $Type Role type to limit the updates to.
+    */
+   public static function ResetAllRoles($Type = null) {
+      // Retrieve an array containing all available roles.
+      $RoleModel = new RoleModel();
+      if ($Type) {
+         $Result = $RoleModel->getByType($Type)->ResultArray();
+         $Roles = array_column($Result, 'Name', 'RoleID');
+      } else {
+         $Roles = $RoleModel->GetArray();
+      }
+
+      // Iterate through our roles and reset their permissions.
+      $Permissions = Gdn::PermissionModel();
+      foreach ($Roles as $RoleID => $Role) {
+         $Permissions->ResetRole($RoleID);
+      }
+   }
+
+   /**
+    * Reset permissions for a role, based on the value in its Type column.
+    *
+    * @param int $RoleId ID of the role to reset permissions for.
+    * @throws Exception
+    */
+   public function ResetRole($RoleId) {
+      // Grab the value of Type for this role.
+      $RoleType = $this->SQL->GetWhere('Role', array('RoleID' => $RoleId))->Value('Type');
+
+      if ($RoleType == '') {
+         $RoleType = RoleModel::TYPE_MEMBER;
+      }
+
+      $Defaults = $this->GetDefaults();
+      $RowDefaults = $this->GetRowDefaults();
+
+      $ResetValues = array_fill_keys(array_keys($RowDefaults), 0);
+
+      if (array_key_exists($RoleType, $Defaults)) {
+         foreach ($Defaults[$RoleType] as $Specificity => $Permissions) {
+            $Permissions['RoleID'] = $RoleId;
+            $Permissions = array_merge($ResetValues, $Permissions);
+
+            if (strpos($Specificity, ':')) {
+               list($Junction, $JunctionId) = explode(':', $Specificity);
+               if ($Junction && $JunctionId) {
+                  switch ($Junction) {
+                     case 'Category':
+                     default:
+                        $Permissions['JunctionTable'] = $Junction;
+                        $Permissions['JunctionColumn'] = 'PermissionCategoryID';
+                        $Permissions['JunctionID'] = $JunctionId;
+                  }
+               }
+            }
+
+            $this->Save($Permissions);
+         }
+      }
    }
 
    /**

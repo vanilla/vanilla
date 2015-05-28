@@ -96,79 +96,14 @@ class RoleController extends DashboardController {
    }
 
    /**
-    * Manage default role assignments.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function DefaultRoles() {
-      $this->Permission('Garden.Settings.Manage');
-      $this->AddSideMenu('');
-
-      $this->Title(T('Default Roles'));
-
-      // Load roles for dropdowns.
-      $RoleModel = new RoleModel();
-      $this->SetData('RoleData', $RoleModel->Get());
-
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Get a list of default member roles from the config.
-         $DefaultRoles = C('Garden.Registration.DefaultRoles');
-         $this->Form->SetValue('DefaultRoles', $DefaultRoles);
-
-         // Get the guest roles.
-         $GuestRolesData = $RoleModel->GetByUserID(0);
-         $GuestRoles = array_column($GuestRolesData, 'RoleID');
-         $this->Form->SetValue('GuestRoles', $GuestRoles);
-
-         // The applicant role.
-         $ApplicantRoleID = C('Garden.Registration.ApplicantRoleID', '');
-         $this->Form->SetValue('ApplicantRoleID', $ApplicantRoleID);
-      } else {
-         $DefaultRoles = $this->Form->GetFormValue('DefaultRoles');
-         $ApplicantRoleID = $this->Form->GetFormValue('ApplicantRoleID');
-         SaveToConfig(array(
-            'Garden.Registration.DefaultRoles' => $DefaultRoles,
-            'Garden.Registration.ApplicantRoleID' => $ApplicantRoleID));
-
-         $GuestRoles = $this->Form->GetFormValue('GuestRoles');
-         $UserModel = new UserModel();
-         $UserModel->SaveRoles(0, $GuestRoles, FALSE);
-
-         $this->InformMessage(T("Saved"));
-      }
-
-      $this->Render();
-   }
-
-   /**
     * Show a warning if default roles are not setup yet.
     *
     * @since 2.0.?
     * @access public
     */
    public function DefaultRolesWarning() {
-      // Check to see if there are no default roles for guests or members.
-      $DefaultRolesWarning = FALSE;
-      $DefaultRoles = C('Garden.Registration.DefaultRoles');
-      if (!is_array($DefaultRoles) || count($DefaultRoles) == 0) {
-         $DefaultRolesWarning = TRUE;
-      } elseif (!C('Garden.Registration.ApplicantRoleID') && C('Garden.Registration.Method') == 'Approval') {
-         $DefaultRolesWarning = TRUE;
-      } else {
-         $RoleModel = new RoleModel();
-         $GuestRoles = $RoleModel->GetByUserID(0);
-         if($GuestRoles->NumRows() == 0)
-            $DefaultRolesWarning = TRUE;
+      // Do nothing (for now).
       }
-
-      if ($DefaultRolesWarning) {
-         echo '<div class="Messages Errors"><ul><li>',
-            sprintf(T('No default roles.', 'You don\'t have your default roles set up. To correct this problem click %s.'),
-            Anchor(T('here'), 'dashboard/role/defaultroles')),
-            '</div>';
-      }
-   }
 
    /**
     * Edit a role.
@@ -229,6 +164,8 @@ class RoleController extends DashboardController {
             $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
          }
       }
+
+      $this->SetData('_Types', $this->RoleModel->getDefaultTypes(true));
 
       $this->Render();
    }

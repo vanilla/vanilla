@@ -83,7 +83,6 @@ class PermissionModel extends Gdn_Model {
          array(
             'Garden.Activity.View' => 1,
             'Garden.Profiles.View' => 1,
-            'Garden.Profiles.Edit' => 0
          )
       );
       $this->AddDefault(
@@ -92,7 +91,6 @@ class PermissionModel extends Gdn_Model {
             'Garden.SignIn.Allow' => 1,
             'Garden.Activity.View' => 1,
             'Garden.Profiles.View' => 1,
-            'Garden.Profiles.Edit' => 0,
             'Garden.Email.View' => 1
          )
       );
@@ -102,7 +100,6 @@ class PermissionModel extends Gdn_Model {
             'Garden.SignIn.Allow' => 1,
             'Garden.Activity.View' => 1,
             'Garden.Profiles.View' => 1,
-            'Garden.Profiles.Edit' => 0,
             'Garden.Email.View' => 1
          )
       );
@@ -1052,10 +1049,12 @@ class PermissionModel extends Gdn_Model {
       $Defaults = $this->GetDefaults();
       $RowDefaults = $this->GetRowDefaults();
 
+      $ResetValues = array_fill_keys(array_keys($RowDefaults), 0);
+
       if (array_key_exists($RoleType, $Defaults)) {
          foreach ($Defaults[$RoleType] as $Specificity => $Permissions) {
             $Permissions['RoleID'] = $RoleId;
-            $Permissions = array_merge($RowDefaults, $Permissions);
+            $Permissions = array_merge($ResetValues, $Permissions);
 
             if (strpos($Specificity, ':')) {
                list($Junction, $JunctionId) = explode(':', $Specificity);

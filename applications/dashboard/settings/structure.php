@@ -155,7 +155,7 @@ if ($RoleTableExists && $UserRoleExists) {
          ->Set('Type', RoleModel::TYPE_APPLICANT)
          ->Where('RoleID', $types[RoleModel::TYPE_APPLICANT])
          ->Put();
-      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
+//      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
    }
 
    if ($v = C('Garden.Registration.DefaultRoles')) {
@@ -163,7 +163,7 @@ if ($RoleTableExists && $UserRoleExists) {
          ->Set('Type', RoleModel::TYPE_MEMBER)
          ->Where('RoleID', $types[RoleModel::TYPE_MEMBER])
          ->Put();
-      RemoveFromConfig('Garden.Registration.DefaultRoles');
+//      RemoveFromConfig('Garden.Registration.DefaultRoles');
    }
 
    if ($v = C('Garden.Registration.ConfirmEmailRole')) {
@@ -171,7 +171,7 @@ if ($RoleTableExists && $UserRoleExists) {
          ->Set('Type', RoleModel::TYPE_UNCONFIRMED)
          ->Where('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
          ->Put();
-      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
+//      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
    }
 
    $guestRoleIDs = Gdn::SQL()->GetWhere('UserRole', array('UserID' => 0))->ResultArray();

@@ -329,6 +329,7 @@ class ModerationController extends VanillaController {
       $Session = Gdn::Session();
       $this->Form = new Gdn_Form();
       $DiscussionModel = new DiscussionModel();
+      $CategoryModel = new CategoryModel();
 
       $this->Title(T('Confirm'));
 
@@ -349,7 +350,7 @@ class ModerationController extends VanillaController {
 
       // Check for edit permissions on each discussion
       $AllowedDiscussions = array();
-      $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, Name, DateLastComment, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
+      $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, Name, DateLastComment, CategoryID, CountComments')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
       $DiscussionData = Gdn_DataSet::Index($DiscussionData->ResultArray(), array('DiscussionID'));
       foreach ($DiscussionData as $DiscussionID => $Discussion) {
          $Category = CategoryModel::Categories($Discussion['CategoryID']);
@@ -371,12 +372,14 @@ class ModerationController extends VanillaController {
             throw ForbiddenException('@'.T('You do not have permission to add discussions to this category.'));
          }
 
+         $AffectedCategories = array();
+
          // Iterate and move.
          foreach ($AllowedDiscussions as $DiscussionID) {
+            $Discussion = val($DiscussionID, $DiscussionData);
+
             // Create the shadow redirect.
             if ($RedirectLink) {
-               $Discussion = GetValue($DiscussionID, $DiscussionData);
-
                $DiscussionModel->DefineSchema();
                $MaxNameLength = GetValue('Length', $DiscussionModel->Schema->GetField('Name'));
 
@@ -410,6 +413,30 @@ class ModerationController extends VanillaController {
             }
 
             $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
+
+            if (!isset($AffectedCategories[$Discussion['CategoryID']])) {
+               $AffectedCategories[$Discussion['CategoryID']] = array(-1, -$Discussion['CountComments']);
+            } else {
+               $AffectedCategories[$Discussion['CategoryID']][0] -= 1;
+               $AffectedCategories[$Discussion['CategoryID']][1] -= $Discussion['CountComments'];
+            }
+            if (!isset($AffectedCategories[$CategoryID])) {
+               $AffectedCategories[$CategoryID] = array(1, $Discussion['CountComments']);
+            } else {
+               $AffectedCategories[$CategoryID][0] += 1;
+               $AffectedCategories[$CategoryID][1] += $Discussion['CountComments'];
+            }
+         }
+
+         // Update recent posts and counts on all affected categories.
+         foreach ($AffectedCategories as $CategoryID => $Counts) {
+            $CategoryModel->SetRecentPost($CategoryID);
+            $CategoryModel->SQL
+               ->Update('Category')
+               ->Set('CountDiscussions', 'CountDiscussions'.($Counts[0] < 0 ? ' - ' : ' + ').abs($Counts[0]), false)
+               ->Set('CountComments', 'CountComments'.($Counts[1] < 0 ? ' - ' : ' + ').abs($Counts[1]), false)
+               ->Where('CategoryID', $CategoryID)
+               ->Put();
          }
 
          // Clear selections.

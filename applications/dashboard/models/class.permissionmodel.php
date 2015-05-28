@@ -342,7 +342,7 @@ class PermissionModel extends Gdn_Model {
                ->OrderBy('junc.Name');
 
             if (isset($JuncIDs)) {
-               $SQL->WhereIn("junc.{$JunctionTable}ID", ConsolidateArrayValuesByKey($JuncIDs, "{$JunctionTable}ID"));
+               $SQL->WhereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
             }
          } else {
             // Here we are getting permissions for all roles.

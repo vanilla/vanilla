@@ -481,8 +481,8 @@ class UserController extends DashboardController {
          $this->EventArguments['RoleData'] = &$this->RoleData;
 
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
-         $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
-         $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
+         $RoleIDs = array_column($UserRoleData, 'RoleID');
+         $RoleNames = array_column($UserRoleData, 'Name');
          $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
          $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
 
@@ -632,8 +632,8 @@ class UserController extends DashboardController {
          $this->EventArguments['RoleData'] = &$RoleData;
 
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
-         $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
-         $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
+         $RoleIDs = array_column($UserRoleData, 'RoleID');
+         $RoleNames = array_column($UserRoleData, 'Name');
          $UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
          $this->EventArguments['UserRoleData'] = &$UserRoleData;
 

@@ -2,7 +2,7 @@
 
 /**
  * Non-activity action logging.
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -127,7 +127,7 @@ class LogController extends DashboardController {
       if (!empty($UserIDs)) {
          // Grab the rest of the log entries.
          $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
-         $OtherLogIDs = ConsolidateArrayValuesByKey($OtherLogIDs, 'LogID');
+         $OtherLogIDs = array_column($OtherLogIDs, 'LogID');
          $LogIDs = array_merge($LogIDs, $OtherLogIDs);
 
          foreach ($UserIDs as $UserID) {

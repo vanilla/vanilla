@@ -16,6 +16,12 @@
 class PromotedContentModule extends Gdn_Module {
 
    /**
+    * Max number of records to be fetched
+    * @var integer
+    */
+   const MAX_LIMIT = 50;
+
+   /**
     * How should we choose the content?
     *  - role        Author's Role
     *  - rank        Author's Rank
@@ -107,6 +113,9 @@ class PromotedContentModule extends Gdn_Module {
             if (isset($Parameters[$key])) {
                $this->$Property = $Parameters[$key];
             }
+         }
+         if (isset($Parameters['limit'])) {
+            $this->Limit = min($this->Limit, self::MAX_LIMIT);
          }
          return true;
       } else {
@@ -587,38 +596,64 @@ class PromotedContentModule extends Gdn_Module {
    /**
     * Pre-process content into a uniform format for output
     *
-    * @param Array $Content By reference
+    * @param Array $content By reference
     */
-   protected function Prepare(&$Content) {
+   protected function Prepare(&$content) {
 
-      foreach ($Content as &$ContentItem) {
-         $ContentType = val('RecordType', $ContentItem);
+      foreach ($content as &$item) {
+         $contentType = val('RecordType', $item);
+         $userID = GetValue('InsertUserID', $item);
+         $itemProperties = array();
+         $itemFields = array('DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl', );
 
-         $Replacement = array();
-         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'RecordType');
-
-         switch (strtolower($ContentType)) {
+         switch (strtolower($contentType)) {
             case 'comment':
-               $Fields = array_merge($Fields, array('CommentID'));
+               $itemFields = array_merge($itemFields, array('CommentID'));
 
                // Comment specific
-               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem, val('Name', $ContentItem));
+               $itemProperties['Name'] = sprintf(T('Re: %s'), GetValueR('Discussion.Name', $item, val('Name', $item)));
+               $url = CommentUrl($item);
                break;
 
             case 'discussion':
-               $Fields = array_merge($Fields, array('Name', 'Type'));
+               $itemFields = array_merge($itemFields, array('Name', 'Type'));
+               $url = DiscussionUrl($item);
                break;
          }
 
-         $Fields = array_fill_keys($Fields, TRUE);
-         $Common = array_intersect_key($ContentItem, $Fields);
-         $Replacement = array_merge($Replacement, $Common);
-         $ContentItem = $Replacement;
+         $item['Url'] = $url;
+         if ($categoryId = val('CategoryID', $item)) {
+            $category = CategoryModel::Categories($categoryId);
+            $item['CategoryName'] = val('Name', $category);
+            $item['CategoryUrl'] = CategoryUrl($category);
+         }
+         $itemFields = array_fill_keys($itemFields, TRUE);
+         $filteredItem = array_intersect_key($item, $itemFields);
+         $itemProperties = array_merge($itemProperties, $filteredItem);
+         $item = $itemProperties;
 
          // Attach User
-         $UserID = GetValue('InsertUserID', $ContentItem);
-         $User = Gdn::UserModel()->GetID($UserID);
-         $ContentItem['Author'] = $User;
+         $userFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
+
+         $user = Gdn::UserModel()->GetID($userID);
+         $roleModel = new RoleModel();
+         $roles = $roleModel->GetByUserID($userID)->ResultArray();
+         $roleNames = '';
+         foreach($roles as $role) {
+            $roleNames[] = val('Name', $role);
+         }
+         $userProperties = array(
+            'Url' => Url(UserUrl($user), true),
+            'PhotoUrl' => UserPhotoUrl($user),
+            'RankName' => val('Name', RankModel::Ranks(val('RankID', $user)), null),
+            'RoleNames' => $roleNames,
+            'CssClass' => val('_CssClass', $user)
+         );
+         $user = (array) $user;
+         $userFields = array_fill_keys($userFields, TRUE);
+         $filteredUser = array_intersect_key($user, $userFields);
+         $userProperties = array_merge($filteredUser, $userProperties);
+         $item['Author'] = $userProperties;
       }
    }
 

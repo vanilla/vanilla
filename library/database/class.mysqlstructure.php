@@ -259,6 +259,45 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       return $Result;
    }
 
+   /**
+    * Get the character set for a  collation.
+    * @param string $collation The name of the collation.
+    * @return string Returns the name of the character set or an empty string if the collation was not found.
+    */
+   protected function getCharsetFromCollation($collation) {
+      static $cache = array();
+
+      $collation = strtolower($collation);
+
+      if (!isset($cache[$collation])) {
+         $collationRow = $this->Database->Query('show collation where Collation = :c', array(':c' => $collation))->FirstRow(DATASET_TYPE_ARRAY);
+         $cache[$collation] = val('Charset', $collationRow, '');
+      }
+
+      return $cache[$collation];
+   }
+
+   /**
+    * Get the high-level table information for a given table.
+    *
+    * @param string $tableName The name of the table to get the information for.
+    * @return array? Returns an array of table information.
+    */
+   protected function getTableInfo($tableName) {
+      $pxName = $this->_DatabasePrefix.$tableName;
+      $status = $this->Database->Query("show table status where name = '$pxName'")->FirstRow(DATASET_TYPE_ARRAY);
+
+      if (!$status) {
+         return null;
+      }
+
+      $result = ArrayTranslate($status, array('Engine' => 'engine', 'Rows' => 'rows', 'Collation' => 'collation'));
+
+      // Look up the encoding for the collation.
+      $result['charset'] = $this->getCharsetFromCollation($result['collation']);
+      return $result;
+   }
+
    protected function _IndexSql($Columns, $KeyType = FALSE) {
 //      if ($this->TableName() != 'Comment')
 //         return array();
@@ -377,6 +416,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    protected function _Modify($Explicit = FALSE) {
       $Px = $this->_DatabasePrefix;
       $AdditionalSql = array(); // statements executed at the end
+      $tableInfo = $this->getTableInfo($this->_TableName);
 
       // Returns an array of schema data objects for each field in the specified
       // table. The returned array of objects contains the following properties:
@@ -407,7 +447,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $IndexesDb = $this->_IndexSqlDb();
 
       if($this->_TableStorageEngine) {
-			$CurrentEngine = $this->Database->Query("show table status where name = '".$this->_DatabasePrefix.$this->_TableName."'")->Value('Engine');
+			$CurrentEngine = val('engine', $tableInfo);
 
 			if(strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {
             // Check to drop a fulltext index if we don't support it.
@@ -483,13 +523,25 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $PrevColumnName = $ColumnName;
       }
 
+      // 4. Alter the character set and collation.
+      if ($this->_CharacterEncoding && (strcasecmp($tableInfo['charset'], $this->_CharacterEncoding)
+         || strcasecmp($tableInfo['collation'], val('Collate', $this->Database->ExtendedProperties)))) {
+
+         $charset = $this->_CharacterEncoding;
+         $collation = val('Collate', $this->Database->ExtendedProperties);
+
+         $charsetSql = "character set $charset".($collation ? " collate $collation" : '');
+         $AlterSql[] = $charsetSql;
+         $AlterSql[] = "convert to $charsetSql";
+      }
+
       if (count($AlterSql) > 0) {
          if (!$this->Query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
             throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
          }
       }
 
-      // 4. Update Indexes.
+      // 5. Update Indexes.
       $IndexSql = array();
       // Go through the indexes to add or modify.
       foreach($Indexes as $Name => $Sql) {

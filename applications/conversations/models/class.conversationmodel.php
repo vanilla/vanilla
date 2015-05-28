@@ -456,8 +456,8 @@ class ConversationModel extends ConversationsModel {
             ->Select('UserID')
             ->From('User')
             ->WhereIn('Name', $To)
-            ->Get();
-         $RecipientUserIDs = ConsolidateArrayValuesByKey($RecipientUserIDs, 'UserID');
+            ->Get()->ResultArray();
+         $RecipientUserIDs = array_column($RecipientUserIDs, 'UserID');
          $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
       }
 

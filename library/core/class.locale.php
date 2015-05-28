@@ -106,7 +106,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       // This is a bit of a kludge, but we are deprecating en_CA in favour of just en.
       if ($result === 'en_CA') {
          $result = 'en';
-   }
+      }
 
       return $result;
    }

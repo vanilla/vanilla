@@ -21,8 +21,7 @@
             }
             $PhotoUser = UserBuilder($Row, 'LastInsert');
             ?>
-            <li class="Item"
-                rel="<?php echo Url("/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?>">
+            <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?>">
                 <div class="Author Photo"><?php echo UserPhoto($PhotoUser); ?></div>
                 <div class="ItemContent">
                     <b class="Subject"><?php echo Anchor($Subject, "/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?></b>

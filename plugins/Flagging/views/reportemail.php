@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php 
+<?php
 $Flag = $this->Data['Plugin.Flagging.Data'];
 $Report = $this->Data['Plugin.Flagging.Report'];
 $DiscussionID = $this->Data['Plugin.Flagging.DiscussionID'];
@@ -10,9 +10,9 @@ echo T('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Repo
 <?php echo ExternalUrl($Flag['URL']); ?>
 
 
-<?php echo T('Reason') . ': ' . $Reason; ?>
+<?php echo T('Reason').': '.$Reason; ?>
 
 
-<?php echo T('FlaggedBy', 'Reported by:') .' '. $Flag['UserName']; ?>
+<?php echo T('FlaggedBy', 'Reported by:').' '.$Flag['UserName']; ?>
 
-<?php if ($DiscussionID) echo T('FlagDiscuss', 'Discuss it') . ': ' . ExternalUrl('discussion/'.$DiscussionID); ?>
+<?php if ($DiscussionID) echo T('FlagDiscuss', 'Discuss it').': '.ExternalUrl('discussion/'.$DiscussionID); ?>

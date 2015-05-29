@@ -45,15 +45,15 @@
  * the dropdown.
  */
 .post-font-size-h1 {
-   font-size: 21px;
-   font-weight: bold;
-   line-height: 31px !important;
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 31px !important;
 }
 
 .post-font-size-h2 {
-   font-size: 18px;
-   font-weight: bold;
-   line-height: 26px !important;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 26px !important;
 }
 
 /* Colours based on http://clrs.cc/
@@ -62,6 +62,7 @@ cell-* are used for the dropdown */
 .post-color-black {
   color: #111111;
 }
+
 .cell-color-black,
 .post-highlightcolor-black {
   background-color: #111111;
@@ -70,6 +71,7 @@ cell-* are used for the dropdown */
 .post-color-silver {
   color: #dddddd;
 }
+
 .cell-color-silver,
 .post-highlightcolor-silver {
   background-color: #dddddd;
@@ -78,6 +80,7 @@ cell-* are used for the dropdown */
 .post-color-gray {
   color: #aaaaaa;
 }
+
 .cell-color-gray,
 .post-highlightcolor-gray {
   background-color: #aaaaaa;
@@ -86,6 +89,7 @@ cell-* are used for the dropdown */
 .post-color-white {
   color: #ffffff;
 }
+
 .cell-color-white,
 .post-highlightcolor-white {
   background-color: #ffffff;
@@ -94,6 +98,7 @@ cell-* are used for the dropdown */
 .post-color-maroon {
   color: #85144b;
 }
+
 .cell-color-maroon,
 .post-highlightcolor-maroon {
   background-color: #85144b;
@@ -102,6 +107,7 @@ cell-* are used for the dropdown */
 .post-color-red {
   color: #ff4136;
 }
+
 .cell-color-red,
 .post-highlightcolor-red {
   background-color: #ff4136;
@@ -110,6 +116,7 @@ cell-* are used for the dropdown */
 .post-color-purple {
   color: #7b11d0;
 }
+
 .cell-color-purple,
 .post-highlightcolor-purple {
   background-color: #7b11d0;
@@ -118,6 +125,7 @@ cell-* are used for the dropdown */
 .post-color-fuchsia {
   color: #f012be;
 }
+
 .cell-color-fuchsia,
 .post-highlightcolor-fuchsia {
   background-color: #f012be;
@@ -126,6 +134,7 @@ cell-* are used for the dropdown */
 .post-color-green {
   color: #2ecc40;
 }
+
 .cell-color-green,
 .post-highlightcolor-green {
   background-color: #2ecc40;
@@ -134,6 +143,7 @@ cell-* are used for the dropdown */
 .post-color-lime {
   color: #01ff70;
 }
+
 .cell-color-lime,
 .post-highlightcolor-lime {
   background-color: #01ff70;
@@ -142,6 +152,7 @@ cell-* are used for the dropdown */
 .post-color-olive {
   color: #3d9970;
 }
+
 .cell-color-olive,
 .post-highlightcolor-olive {
   background-color: #3d9970;
@@ -150,6 +161,7 @@ cell-* are used for the dropdown */
 .post-color-yellow {
   color: #ffdc00;
 }
+
 .cell-color-yellow,
 .post-highlightcolor-yellow {
   background-color: #ffdc00;
@@ -158,6 +170,7 @@ cell-* are used for the dropdown */
 .post-color-navy {
   color: #001f3f;
 }
+
 .cell-color-navy,
 .post-highlightcolor-navy {
   background-color: #001f3f;
@@ -166,6 +179,7 @@ cell-* are used for the dropdown */
 .post-color-blue {
   color: #0074d9;
 }
+
 .cell-color-blue,
 .post-highlightcolor-blue {
   background-color: #0074d9;
@@ -174,6 +188,7 @@ cell-* are used for the dropdown */
 .post-color-teal {
   color: #39cccc;
 }
+
 .cell-color-teal,
 .post-highlightcolor-teal {
   background-color: #39cccc;
@@ -182,6 +197,7 @@ cell-* are used for the dropdown */
 .post-color-aqua {
   color: #7fdbff;
 }
+
 .cell-color-aqua,
 .post-highlightcolor-aqua {
   background-color: #7fdbff;
@@ -190,6 +206,7 @@ cell-* are used for the dropdown */
 .post-color-orange {
   color: #ffa500;
 }
+
 .cell-color-orange,
 .post-highlightcolor-orange {
   background-color: #ffa500;
@@ -233,119 +250,112 @@ cell-* are used for the dropdown */
  * Font families
  */
 .post-fontfamily-default {
-   font-family: inherit;
+  font-family: inherit;
 }
 
 .post-fontfamily-arial {
-   font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 }
 
 .post-fontfamily-comicsansms {
-   font-family: 'Comic Sans MS', cursive !important;
+  font-family: 'Comic Sans MS', cursive !important;
 }
 
 .post-fontfamily-couriernew {
-   font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
 }
 
 .post-fontfamily-georgia {
-   font-family: Georgia, Times, 'Times New Roman', serif;
+  font-family: Georgia, Times, 'Times New Roman', serif;
 }
 
 .post-fontfamily-impact {
-   font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif;
+  font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif;
 }
 
 .post-fontfamily-timesnewroman {
-   font-family: 'Times New Roman', Times, Baskerville, Georgia, serif;
+  font-family: 'Times New Roman', Times, Baskerville, Georgia, serif;
 }
 
 .post-fontfamily-trebuchetms {
-   font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+  font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
 }
 
 .post-fontfamily-verdana {
-   font-family: Verdana, Geneva, sans-serif;
+  font-family: Verdana, Geneva, sans-serif;
 }
-
-
-
-
-
-
-
-
 
 /* Custom classes */
 
-
-del {}
+del {
+}
 
 blockquote.Quote {
-   background: rgba(0, 0, 0, 0.05);
-   border-left: 4px solid rgba(0, 0, 0, 0.1);
-   margin: 1em;
-   padding: 1ex 10px;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 4px solid rgba(0, 0, 0, 0.1);
+  margin: 1em;
+  padding: 1ex 10px;
 }
 
 pre.CodeBlock {
-   background-color: rgba(0, 0, 0, 0.05);
-   border: 1px solid rgba(0,0,0,0.07);
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07);
 }
 
-.CodeInline {}
+.CodeInline {
+}
 
 .Spoiler {
-   background-color: rgba(0, 0, 0, 0.05) !important;
-   margin: 1em 0;
-   padding: 1ex 16px;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  margin: 1em 0;
+  padding: 1ex 16px;
 }
 
 .Message .Spoiler {
-   overflow: hidden;
-   border: 1px solid rgba(0,0,0,0.07);
-   height: 0;
-   width: 0;
-   margin: 5px 0;
-   padding: 8px 16px;
-   position: relative;
-   cursor: pointer;
-   font-size: 0;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  height: 0;
+  width: 0;
+  margin: 5px 0;
+  padding: 8px 16px;
+  position: relative;
+  cursor: pointer;
+  font-size: 0;
 }
 
 .Message .Spoiler:hover {
-   border: 1px solid rgba(0,0,0,0.15);
-   background-color: rgba(0, 0, 0, 0.10) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.10) !important;
 }
 
 .Message .Spoiler:before {
-   content: '...';
-   position: absolute;
-   top: -7px;
-   left: 9px;
-   font-size: 14px;
+  content: '...';
+  position: absolute;
+  top: -7px;
+  left: 9px;
+  font-size: 14px;
 }
 
 .Spoiled {
-   background-color: rgba(0, 0, 0, 0.05);
-   border: 1px solid rgba(0,0,0,0.07);
-   padding: 20px;
-   font-size: inherit;
-   margin: 5px 0;
-   transition: padding 0.1s ease;
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 20px;
+  font-size: inherit;
+  margin: 5px 0;
+  transition: padding 0.1s ease;
 }
 
-
-.AlignLeft{
-   text-align: left;
-}
-.AlignCenter{
-   text-align: center;
-}
-.AlignRight{
-   text-align: right;
+.AlignLeft {
+  text-align: left;
 }
 
+.AlignCenter {
+  text-align: center;
+}
+
+.AlignRight {
+  text-align: right;
+}
 
 /**
  * Target iframe and actual body within editor iframe. Do not use body to set
@@ -357,15 +367,16 @@ pre.CodeBlock {
  */
 
 /* iframe */
-.wysihtml5-sandbox{}
+.wysihtml5-sandbox {
+}
 
 /* body within iframe */
 .editor-composer {
-   margin: 0;
-	border: 0;
-   padding: inherit;
-	font: inherit;
-   outline: none;
+  margin: 0;
+  border: 0;
+  padding: inherit;
+  font: inherit;
+  outline: none;
 }
 
 /**
@@ -373,11 +384,11 @@ pre.CodeBlock {
  * styles in styles.css. These rules match the font sizes for post-font-size-h*
  */
 .editor-composer {
-   h1 {
-      font-size: 21px;
-   }
+  h1 {
+    font-size: 21px;
+  }
 
-   h2 {
-      font-size: 18px;
-   }
+  h2 {
+    font-size: 18px;
+  }
 }

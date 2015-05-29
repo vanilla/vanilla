@@ -5,6 +5,7 @@
  * @package Garden
  * @since 2.2
  */
+
 /**
  * Describes log levels. These are ordered from most severe to least severe.
  *

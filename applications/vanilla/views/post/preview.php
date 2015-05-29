@@ -4,5 +4,5 @@ $this->Comment->Body = Gdn_Format::To($this->Comment->Body, GetValue('Format', $
 $this->FireEvent('AfterCommentPreviewFormat');
 ?>
 <div class="Preview">
-   <div class="Message"><?php echo $this->Comment->Body; ?></div>
+    <div class="Message"><?php echo $this->Comment->Body; ?></div>
 </div>

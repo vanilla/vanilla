@@ -12,16 +12,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the discussion filter menu
  */
 class DiscussionFilterModule extends Gdn_Module {
-   
-   public function __construct($Sender) {
-      parent::__construct($Sender, 'Vanilla');
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
 
-   public function ToString() {
-      return parent::ToString();
-   }
+    public function __construct($Sender) {
+        parent::__construct($Sender, 'Vanilla');
+    }
+
+    public function AssetTarget() {
+        return 'Panel';
+    }
+
+    public function ToString() {
+        return parent::ToString();
+    }
 }

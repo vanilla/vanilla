@@ -12,34 +12,34 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Allows the user to show all unfollowed categories so they can re-follow them.
  */
 class CategoryFollowToggleModule extends Gdn_Module {
-   
-   /**
-    * Set the preference in the user's session.
-    */
-   public function SetToggle() {
-      $Session = Gdn::Session();
-      if (!$Session->IsValid())
-         return;
-      
-      $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
-      if ($ShowAllCategories != '') {
-         $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
-         $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
-         if ($ShowAllCategories != $ShowAllCategoriesPref)
-            $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
-            
-         Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
-      }
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
 
-   public function ToString() {
-      if (Gdn::Session()->IsValid())
-         return parent::ToString();
+    /**
+     * Set the preference in the user's session.
+     */
+    public function SetToggle() {
+        $Session = Gdn::Session();
+        if (!$Session->IsValid())
+            return;
 
-      return '';
-   }
+        $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
+        if ($ShowAllCategories != '') {
+            $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
+            $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
+            if ($ShowAllCategories != $ShowAllCategoriesPref)
+                $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+
+            Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
+        }
+    }
+
+    public function AssetTarget() {
+        return 'Panel';
+    }
+
+    public function ToString() {
+        if (Gdn::Session()->IsValid())
+            return parent::ToString();
+
+        return '';
+    }
 }

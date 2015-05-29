@@ -11,7 +11,7 @@ $SQL = Gdn::Database()->SQL();
 // Only do this once, ever.
 $Row = $SQL->Get('Discussion', '', 'asc', 1)->FirstRow(DATASET_TYPE_ARRAY);
 if ($Row) {
-   return;
+    return;
 }
 
 $DiscussionModel = new DiscussionModel();
@@ -45,40 +45,40 @@ $WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))
 
 // Insert first discussion & comment
 $DiscussionID = $SQL->Options('Ignore', true)->Insert('Discussion', array(
-   'Name' => T('StubDiscussionTitle', $DiscussionTitle),
-   'Body' => T('StubDiscussionBody', $DiscussionBody),
-   'Format' => 'Html',
-   'CategoryID' => $CategoryID,
-   'ForeignID' => 'stub',
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now,
-   'DateLastComment' => $Now,
-   'LastCommentUserID' => $SystemUserID,
-   'CountComments' => 1
+    'Name' => T('StubDiscussionTitle', $DiscussionTitle),
+    'Body' => T('StubDiscussionBody', $DiscussionBody),
+    'Format' => 'Html',
+    'CategoryID' => $CategoryID,
+    'ForeignID' => 'stub',
+    'InsertUserID' => $SystemUserID,
+    'DateInserted' => $Now,
+    'DateLastComment' => $Now,
+    'LastCommentUserID' => $SystemUserID,
+    'CountComments' => 1
 ));
 $CommentID = $SQL->Insert('Comment', array(
-   'DiscussionID' => $DiscussionID,
-   'Body' => T('StubCommentBody', $CommentBody),
-   'Format' => 'Html',
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now
+    'DiscussionID' => $DiscussionID,
+    'Body' => T('StubCommentBody', $CommentBody),
+    'Format' => 'Html',
+    'InsertUserID' => $SystemUserID,
+    'DateInserted' => $Now
 ));
 $SQL->Update('Discussion')
-   ->Set('LastCommentID', $CommentID)
-   ->Where('DiscussionID', $DiscussionID)
-   ->Put();
+    ->Set('LastCommentID', $CommentID)
+    ->Where('DiscussionID', $DiscussionID)
+    ->Put();
 $DiscussionModel->UpdateDiscussionCount($CategoryID);
 
 // Insert first wall post
 $SQL->Insert('Activity', array(
-   'Story' => T('StubWallBody', $WallBody),
-   'Format' => 'Html',
-   'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
-   'NotifyUserID' => -1,
-   'ActivityUserID' => $TargetUserID,
-   'RegardingUserID' => $SystemUserID,
-   'ActivityTypeID' => $WallCommentTypeID,
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now,
-   'DateUpdated' => $Now
+    'Story' => T('StubWallBody', $WallBody),
+    'Format' => 'Html',
+    'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
+    'NotifyUserID' => -1,
+    'ActivityUserID' => $TargetUserID,
+    'RegardingUserID' => $SystemUserID,
+    'ActivityTypeID' => $WallCommentTypeID,
+    'InsertUserID' => $SystemUserID,
+    'DateInserted' => $Now,
+    'DateUpdated' => $Now
 ));

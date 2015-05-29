@@ -12,12 +12,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the profile filter menu
  */
 class ProfileFilterModule extends Gdn_Module {
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
 
-   public function ToString() {
-      return parent::ToString();
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
+
+    public function ToString() {
+        return parent::ToString();
+    }
 }

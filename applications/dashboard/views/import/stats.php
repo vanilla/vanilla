@@ -1,42 +1,42 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <table class="AltColumns">
-	<?php
-   $Header = array();
-   $ImportPaths = $this->Data('ImportPaths');
-   if (is_array($ImportPaths))
-      $Filename = GetValue($this->Data('ImportPath'), $ImportPaths);
-   else
-      $Filename = '';
-   //$Filename = GetValue('OriginalFilename', $this->Data);
-   if($Filename)
-      $Header[T('Source')] = $Filename;
+    <?php
+    $Header = array();
+    $ImportPaths = $this->Data('ImportPaths');
+    if (is_array($ImportPaths))
+        $Filename = GetValue($this->Data('ImportPath'), $ImportPaths);
+    else
+        $Filename = '';
+    //$Filename = GetValue('OriginalFilename', $this->Data);
+    if ($Filename)
+        $Header[T('Source')] = $Filename;
 
-   $Header = array_merge($Header, (array)GetValue('Header', $this->Data, array()));
-   $Stats = (array)GetValue('Stats', $this->Data, array());
-   $Info = array_merge($Header, $Stats);
-	foreach($Info as $Name => $Value) {
-      switch ($Name) {
-         case 'Orphaned Comments':
-         case 'Orphaned Discussions':
-            $Value .= ' ' . Anchor(
-               T('Click here to fix.'),
-               Gdn::Request()->Url('dba/fixinsertuserid')
-            );
-            break;
-         default:
-            $Name = htmlspecialchars($Name);
-            $Value = htmlspecialchars($Value);
+    $Header = array_merge($Header, (array)GetValue('Header', $this->Data, array()));
+    $Stats = (array)GetValue('Stats', $this->Data, array());
+    $Info = array_merge($Header, $Stats);
+    foreach ($Info as $Name => $Value) {
+        switch ($Name) {
+            case 'Orphaned Comments':
+            case 'Orphaned Discussions':
+                $Value .= ' '.Anchor(
+                        T('Click here to fix.'),
+                        Gdn::Request()->Url('dba/fixinsertuserid')
+                    );
+                break;
+            default:
+                $Name = htmlspecialchars($Name);
+                $Value = htmlspecialchars($Value);
 
-            if (substr_compare('Time', $Name, 0, 4, TRUE) == 0) {
-               $Value = Gdn_Timer::FormatElapsed($Value);
-            }
-      }
+                if (substr_compare('Time', $Name, 0, 4, TRUE) == 0) {
+                    $Value = Gdn_Timer::FormatElapsed($Value);
+                }
+        }
 
-		echo "<tr><th>$Name</th><td class=\"Alt\">$Value</td></tr>\n";
-	}
+        echo "<tr><th>$Name</th><td class=\"Alt\">$Value</td></tr>\n";
+    }
 
-   if ($this->Data('GenerateSQL')) {
-      echo "<tr><th>".T('Special')."</th><td class=\"Alt\">".T('Generate import SQL only')."</td></tr>\n";
-   }
-	?>
+    if ($this->Data('GenerateSQL')) {
+        echo "<tr><th>".T('Special')."</th><td class=\"Alt\">".T('Generate import SQL only')."</td></tr>\n";
+    }
+    ?>
 </table>

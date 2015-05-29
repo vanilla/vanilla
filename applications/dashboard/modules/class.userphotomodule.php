@@ -12,17 +12,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders a user's photo (if they've uploaded one).
  */
 class UserPhotoModule extends Gdn_Module {
-   public function __construct() {
-      parent::__construct();
-      $this->_ApplicationFolder = 'dashboard';
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function __construct() {
+        parent::__construct();
+        $this->_ApplicationFolder = 'dashboard';
+    }
 
-   public function ToString() {
-      $this->CanEditPhotos = C('Garden.Profile.EditPhotos');
-		return parent::ToString();
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
+
+    public function ToString() {
+        $this->CanEditPhotos = C('Garden.Profile.EditPhotos');
+        return parent::ToString();
+    }
 }

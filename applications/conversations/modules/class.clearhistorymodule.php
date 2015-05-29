@@ -12,15 +12,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the "Clear Conversation History" button.
  */
 class ClearHistoryModule extends Gdn_Module {
-   
-   protected $ConversationID;
-   
-   public function ConversationID($ConversationID) {
-      $this->ConversationID = $ConversationID;
-   }
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    protected $ConversationID;
+
+    public function ConversationID($ConversationID) {
+        $this->ConversationID = $ConversationID;
+    }
+
+    public function AssetTarget() {
+        return 'Panel';
+    }
 
 }

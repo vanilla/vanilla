@@ -2173,7 +2173,7 @@ PASSWORDMETER;
     /**
      * Assign a set of data to be displayed in the form elements.
      *
-     * @param Ressource $Data A result resource or associative array containing data to be filled in
+     * @param array $Data A result resource or associative array containing data to be filled in
      */
     public function SetData($Data) {
         if (is_object($Data) === TRUE) {

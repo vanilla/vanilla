@@ -2219,7 +2219,9 @@ if (!function_exists('write_ini_string')) {
                 $Flat[] = "[{$Topic}]";
                 foreach ($Settings as $SettingsKey => $SettingsVal) $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
                 $Flat[] = "";
-            } else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
+            } else {
+                $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
+            }
         }
         return implode("\n", $Flat);
     }

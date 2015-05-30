@@ -844,9 +844,13 @@ class Gdn_Request {
      */
     public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
         static $AllowSSL = NULL;
-        if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
+        if ($AllowSSL === NULL) {
+            $AllowSSL = C('Garden.AllowSSL', FALSE);
+        }
         static $Rewrite = NULL;
-        if ($Rewrite === NULL) $Rewrite = val('X_REWRITE', $_SERVER, C('Garden.RewriteUrls', FALSE));
+        if ($Rewrite === NULL) {
+            $Rewrite = val('X_REWRITE', $_SERVER, C('Garden.RewriteUrls', FALSE));
+        }
 
         if (!$AllowSSL) {
             $SSL = NULL;

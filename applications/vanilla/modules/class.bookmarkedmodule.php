@@ -12,58 +12,58 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders recently active bookmarked discussions
  */
 class BookmarkedModule extends Gdn_Module {
-   public $Limit = 10;
-   public $Help = FALSE;
-   public $ListID = 'Bookmark_List';
-   
-   public function __construct() {
-      parent::__construct();
-      $this->_ApplicationFolder = 'vanilla';
-      $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
-   }
-   
-   public function GetData() {
-      if (Gdn::Session()->IsValid()) {
-         $BookmarkIDs = Gdn::SQL()
-            ->Select('DiscussionID')
-            ->From('UserDiscussion')
-            ->Where('UserID', Gdn::Session()->UserID)
-            ->Where('Bookmarked', 1)
-            ->Get()->ResultArray();
-         $BookmarkIDs = ConsolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
+    public $Limit = 10;
+    public $Help = FALSE;
+    public $ListID = 'Bookmark_List';
 
-         if (count($BookmarkIDs)) {
-            $DiscussionModel = new DiscussionModel();
-            DiscussionModel::CategoryPermissions();
+    public function __construct() {
+        parent::__construct();
+        $this->_ApplicationFolder = 'vanilla';
+        $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
+    }
 
-            $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
-            
-            $Bookmarks = $DiscussionModel->Get(
-               0,
-               $this->Limit,
-               array( 'w.Bookmarked' => '1' )
-            );
-            $this->SetData('Bookmarks', $Bookmarks);
-         } else {
-            
-            $this->SetData('Bookmarks', new Gdn_DataSet());
-         }
-      }
-   }
+    public function GetData() {
+        if (Gdn::Session()->IsValid()) {
+            $BookmarkIDs = Gdn::SQL()
+                ->Select('DiscussionID')
+                ->From('UserDiscussion')
+                ->Where('UserID', Gdn::Session()->UserID)
+                ->Where('Bookmarked', 1)
+                ->Get()->ResultArray();
+            $BookmarkIDs = ConsolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+            if (count($BookmarkIDs)) {
+                $DiscussionModel = new DiscussionModel();
+                DiscussionModel::CategoryPermissions();
 
-   public function ToString() {
-      if (!$this->Data('Bookmarks'))
-         $this->GetData();
-      
-      $Bookmarks = $this->Data('Bookmarks');
-      
-      if (is_object($Bookmarks) && ($Bookmarks->NumRows() > 0 || $this->Help))
-         return parent::ToString();
-      
-      return '';
-   }
+                $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
+
+                $Bookmarks = $DiscussionModel->Get(
+                    0,
+                    $this->Limit,
+                    array('w.Bookmarked' => '1')
+                );
+                $this->SetData('Bookmarks', $Bookmarks);
+            } else {
+
+                $this->SetData('Bookmarks', new Gdn_DataSet());
+            }
+        }
+    }
+
+    public function AssetTarget() {
+        return 'Panel';
+    }
+
+    public function ToString() {
+        if (!$this->Data('Bookmarks'))
+            $this->GetData();
+
+        $Bookmarks = $this->Data('Bookmarks');
+
+        if (is_object($Bookmarks) && ($Bookmarks->NumRows() > 0 || $this->Help))
+            return parent::ToString();
+
+        return '';
+    }
 }

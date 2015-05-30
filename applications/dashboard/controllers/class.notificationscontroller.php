@@ -8,93 +8,92 @@
  * @package Garden
  * @since 2.0
  */
-
 class NotificationsController extends Gdn_Controller {
-   /**
-    * CSS, JS and module includes.
-    */
-   public function Initialize() {
-      $this->Head = new HeadModule($this);
-      $this->AddJsFile('jquery.js');
-      $this->AddJsFile('jquery.livequery.js');
-      $this->AddJsFile('jquery.form.js');
-      $this->AddJsFile('jquery.popup.js');
-      $this->AddJsFile('jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('global.js');
-      $this->AddCssFile('style.css');
-      $this->AddCssFile('vanillicon.css', 'static');
-      $this->AddModule('GuestModule');
-      parent::Initialize();
-   }
+    /**
+     * CSS, JS and module includes.
+     */
+    public function Initialize() {
+        $this->Head = new HeadModule($this);
+        $this->AddJsFile('jquery.js');
+        $this->AddJsFile('jquery.livequery.js');
+        $this->AddJsFile('jquery.form.js');
+        $this->AddJsFile('jquery.popup.js');
+        $this->AddJsFile('jquery.gardenhandleajaxform.js');
+        $this->AddJsFile('global.js');
+        $this->AddCssFile('style.css');
+        $this->AddCssFile('vanillicon.css', 'static');
+        $this->AddModule('GuestModule');
+        parent::Initialize();
+    }
 
-   /**
-    * Adds inform messages to response for inclusion in pages dynamically.
-    *
-    * @since 2.0.18
-    * @access public
-    */
-   public function Inform() {
-      $this->DeliveryType(DELIVERY_TYPE_BOOL);
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+    /**
+     * Adds inform messages to response for inclusion in pages dynamically.
+     *
+     * @since 2.0.18
+     * @access public
+     */
+    public function Inform() {
+        $this->DeliveryType(DELIVERY_TYPE_BOOL);
+        $this->DeliveryMethod(DELIVERY_METHOD_JSON);
 
-      // Retrieve all notifications and inform them.
-      NotificationsController::InformNotifications($this);
-      $this->FireEvent('BeforeInformNotifications');
+        // Retrieve all notifications and inform them.
+        NotificationsController::InformNotifications($this);
+        $this->FireEvent('BeforeInformNotifications');
 
-      $this->Render();
-   }
+        $this->Render();
+    }
 
-   /**
-    * Grabs all new notifications and adds them to the sender's inform queue.
-    *
-    * This method gets called by dashboard's hooks file to display new
-    * notifications on every pageload.
-    *
-    * @since 2.0.18
-    * @access public
-    *
-    * @param Gdn_Controller $Sender The object calling this method.
-    */
-   public static function InformNotifications($Sender) {
-      $Session = Gdn::Session();
-      if (!$Session->IsValid())
-         return;
+    /**
+     * Grabs all new notifications and adds them to the sender's inform queue.
+     *
+     * This method gets called by dashboard's hooks file to display new
+     * notifications on every pageload.
+     *
+     * @since 2.0.18
+     * @access public
+     *
+     * @param Gdn_Controller $Sender The object calling this method.
+     */
+    public static function InformNotifications($Sender) {
+        $Session = Gdn::Session();
+        if (!$Session->IsValid())
+            return;
 
-      $ActivityModel = new ActivityModel();
-      // Get five pending notifications.
-      $Where = array(
-          'NotifyUserID' => Gdn::Session()->UserID,
-          'Notified' => ActivityModel::SENT_PENDING);
+        $ActivityModel = new ActivityModel();
+        // Get five pending notifications.
+        $Where = array(
+            'NotifyUserID' => Gdn::Session()->UserID,
+            'Notified' => ActivityModel::SENT_PENDING);
 
-      // If we're in the middle of a visit only get very recent notifications.
-      $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-5 minutes'));
+        // If we're in the middle of a visit only get very recent notifications.
+        $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-5 minutes'));
 
-      $Activities = $ActivityModel->GetWhere($Where, 0, 5)->ResultArray();
+        $Activities = $ActivityModel->GetWhere($Where, 0, 5)->ResultArray();
 
-      $ActivityIDs = array_column($Activities, 'ActivityID');
-      $ActivityModel->SetNotified($ActivityIDs);
+        $ActivityIDs = array_column($Activities, 'ActivityID');
+        $ActivityModel->SetNotified($ActivityIDs);
 
-      $Sender->EventArguments['Activities'] = &$Activities;
-      $Sender->FireEvent('InformNotifications');
+        $Sender->EventArguments['Activities'] = &$Activities;
+        $Sender->FireEvent('InformNotifications');
 
-      foreach ($Activities as $Activity) {
-         if ($Activity['Photo'])
-            $UserPhoto = Anchor(
-               Img($Activity['Photo'], array('class' => 'ProfilePhotoMedium')),
-               $Activity['Url'],
-               'Icon');
-         else
-            $UserPhoto = '';
-         $Excerpt = Gdn_Format::PlainText($Activity['Story']);
-         $ActivityClass = ' Activity-'.$Activity['ActivityType'];
+        foreach ($Activities as $Activity) {
+            if ($Activity['Photo'])
+                $UserPhoto = Anchor(
+                    Img($Activity['Photo'], array('class' => 'ProfilePhotoMedium')),
+                    $Activity['Url'],
+                    'Icon');
+            else
+                $UserPhoto = '';
+            $Excerpt = Gdn_Format::PlainText($Activity['Story']);
+            $ActivityClass = ' Activity-'.$Activity['ActivityType'];
 
 
-         $Sender->InformMessage(
-            $UserPhoto
-            .Wrap($Activity['Headline'], 'div', array('class' => 'Title'))
-            .Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
-            'Dismissable AutoDismiss'.$ActivityClass.($UserPhoto == '' ? '' : ' HasIcon')
-         );
-      }
-   }
+            $Sender->InformMessage(
+                $UserPhoto
+                .Wrap($Activity['Headline'], 'div', array('class' => 'Title'))
+                .Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
+                'Dismissable AutoDismiss'.$ActivityClass.($UserPhoto == '' ? '' : ' HasIcon')
+            );
+        }
+    }
 }

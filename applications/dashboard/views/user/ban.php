@@ -1,46 +1,46 @@
 <?php if (!defined('APPLICATION')) return; ?>
 <script language="javascript">
-   jQuery(document).ready(function($) {
-      $('#Form_ReasonText').focus(function() {
-         $('#Form_Reason2').prop('checked', true);
-      });
-   });
+    jQuery(document).ready(function($) {
+        $('#Form_ReasonText').focus(function() {
+            $('#Form_Reason2').prop('checked', true);
+        });
+    });
 </script>
 
 <h1><?php echo $this->Data('Title'); ?></h1>
 <div class="Wrap">
-<?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
-?>
+    <?php
+    echo $this->Form->Open();
+    echo $this->Form->Errors();
+    ?>
 
-<div class="DismissMessage WarningMessage">
-   <?php
-   echo FormatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
-   ?>
-</div>
+    <div class="DismissMessage WarningMessage">
+        <?php
+        echo FormatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
+        ?>
+    </div>
 
-<div class="P"><b><?php echo T('Why are you Banning this user?') ?></b></div>
+    <div class="P"><b><?php echo T('Why are you Banning this user?') ?></b></div>
 
-<?php
+    <?php
 
-echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
-echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
-echo '<div class="P">',
-   $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
-   '<div class="TextBoxWrapper">',
-   $this->Form->TextBox('ReasonText', array('MultiLine' => TRUE)),
-   '</div>',
-   '</div>';
+    echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
+    echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
+    echo '<div class="P">',
+    $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
+    '<div class="TextBoxWrapper">',
+    $this->Form->TextBox('ReasonText', array('MultiLine' => TRUE)),
+    '</div>',
+    '</div>';
 
-if ($this->Data('_MayDeleteContent'))
-   echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
+    if ($this->Data('_MayDeleteContent'))
+        echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
 
-?>
+    ?>
 
 
-<?php
-echo '<div class="Buttons P">', $this->Form->Button(T('Ban.Action', 'Ban')), '</div>';
-echo $this->Form->Close();
-?>
+    <?php
+    echo '<div class="Buttons P">', $this->Form->Button(T('Ban.Action', 'Ban')), '</div>';
+    echo $this->Form->Close();
+    ?>
 </div>

@@ -16,7 +16,6 @@ define('APPLICATION', 'Vanilla');
 define('APPLICATION_VERSION', '2.2.100.2');
 
 // Report and track all errors.
-
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 0);
 ini_set('track_errors', 1);
@@ -41,6 +40,5 @@ $Dispatcher->EnabledApplicationFolders($EnabledApplications);
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
 // Process the request.
-
 $Dispatcher->Start();
 $Dispatcher->Dispatch();

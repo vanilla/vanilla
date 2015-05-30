@@ -12,11 +12,10 @@
  * @package Garden
  * @since 2.1
  */
-
 class RootController extends Gdn_Controller {
-   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $ThrowError = TRUE) {
-      if (!$ControllerName)
-         $ControllerName = '';
-      return parent::FetchViewLocation($View, $ControllerName, $ApplicationFolder, $ThrowError);
-   }
+    public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $ThrowError = TRUE) {
+        if (!$ControllerName)
+            $ControllerName = '';
+        return parent::FetchViewLocation($View, $ControllerName, $ApplicationFolder, $ThrowError);
+    }
 }

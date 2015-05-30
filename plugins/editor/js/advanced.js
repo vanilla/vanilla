@@ -1,42 +1,42 @@
- /**
-* Full HTML5 compatibility rule set
-* These rules define which tags and CSS classes are supported and which tags should be specially treated.
-*
-* Examples based on this rule set:
-*
-* <a href="http://foobar.com">foo</a>
-* ... becomes ...
-* <a href="http://foobar.com" target="_blank" rel="nofollow">foo</a>
-*
-* <img align="left" src="http://foobar.com/image.png">
-* ... becomes ...
-* <img class="post-float-left" src="http://foobar.com/image.png" alt="">
-*
-* <div>foo<script>alert(document.cookie)</script></div>
-* ... becomes ...
-* <div>foo</div>
-*
-* <marquee>foo</marquee>
-* ... becomes ...
-* <span>foo</span>
-*
-* foo <br clear="both"> bar
-* ... becomes ...
-* foo <br class="post-clear-both"> bar
-*
-* <div>hello <iframe src="http://google.com"></iframe></div>
-* ... becomes ...
-* <div>hello </div>
-*
-* <center>hello</center>
-* ... becomes ...
-* <div class="post-text-align-center">hello</div>
-*/
+/**
+ * Full HTML5 compatibility rule set
+ * These rules define which tags and CSS classes are supported and which tags should be specially treated.
+ *
+ * Examples based on this rule set:
+ *
+ * <a href="http://foobar.com">foo</a>
+ * ... becomes ...
+ * <a href="http://foobar.com" target="_blank" rel="nofollow">foo</a>
+ *
+ * <img align="left" src="http://foobar.com/image.png">
+ * ... becomes ...
+ * <img class="post-float-left" src="http://foobar.com/image.png" alt="">
+ *
+ * <div>foo<script>alert(document.cookie)</script></div>
+ * ... becomes ...
+ * <div>foo</div>
+ *
+ * <marquee>foo</marquee>
+ * ... becomes ...
+ * <span>foo</span>
+ *
+ * foo <br clear="both"> bar
+ * ... becomes ...
+ * foo <br class="post-clear-both"> bar
+ *
+ * <div>hello <iframe src="http://google.com"></iframe></div>
+ * ... becomes ...
+ * <div>hello </div>
+ *
+ * <center>hello</center>
+ * ... becomes ...
+ * <div class="post-text-align-center">hello</div>
+ */
 var wysihtml5ParserRules = {
     /**
-* CSS Class white-list
-* Following CSS classes won't be removed when parsed by the wysihtml5 HTML parser
-*/
+     * CSS Class white-list
+     * Following CSS classes won't be removed when parsed by the wysihtml5 HTML parser
+     */
     "classes": {
         "post-clear-both": 1,
         "post-clear-left": 1,
@@ -109,41 +109,40 @@ var wysihtml5ParserRules = {
         "post-font-size-h2": 1
     },
     /**
-* Tag list
-*
-* The following options are available:
-*
-* - add_class: converts and deletes the given HTML4 attribute (align, clear, ...) via the given method to a css class
-* The following methods are implemented in wysihtml5.dom.parse:
-* - align_text: converts align attribute values (right/left/center/justify) to their corresponding css class "post-text-align-*")
-* <p align="center">foo</p> ... becomes ... <p> class="post-text-align-center">foo</p>
-* - clear_br: converts clear attribute values left/right/all/both to their corresponding css class "post-clear-*"
-* <br clear="all"> ... becomes ... <br class="post-clear-both">
-* - align_img: converts align attribute values (right/left) on <img> to their corresponding css class "post-float-*"
-*
-* - remove: removes the element and its content
-*
-* - rename_tag: renames the element to the given tag
-*
-* - set_class: adds the given class to the element (note: make sure that the class is in the "classes" white list above)
-*
-* - set_attributes: sets/overrides the given attributes
-*
-* - check_attributes: checks the given HTML attribute via the given method
-* - url: allows only valid urls (starting with http:// or https://)
-* - src: allows something like "/foobar.jpg", "http://google.com", ...
-* - href: allows something like "mailto:bert@foo.com", "http://google.com", "/foobar.jpg"
-* - alt: strips unwanted characters. if the attribute is not set, then it gets set (to ensure valid and compatible HTML)
-* - numbers: ensures that the attribute only contains numeric characters
-*/
+     * Tag list
+     *
+     * The following options are available:
+     *
+     * - add_class: converts and deletes the given HTML4 attribute (align, clear, ...) via the given method to a css class
+     * The following methods are implemented in wysihtml5.dom.parse:
+     * - align_text: converts align attribute values (right/left/center/justify) to their corresponding css class "post-text-align-*")
+     * <p align="center">foo</p> ... becomes ... <p> class="post-text-align-center">foo</p>
+     * - clear_br: converts clear attribute values left/right/all/both to their corresponding css class "post-clear-*"
+     * <br clear="all"> ... becomes ... <br class="post-clear-both">
+     * - align_img: converts align attribute values (right/left) on <img> to their corresponding css class "post-float-*"
+     *
+     * - remove: removes the element and its content
+     *
+     * - rename_tag: renames the element to the given tag
+     *
+     * - set_class: adds the given class to the element (note: make sure that the class is in the "classes" white list above)
+     *
+     * - set_attributes: sets/overrides the given attributes
+     *
+     * - check_attributes: checks the given HTML attribute via the given method
+     * - url: allows only valid urls (starting with http:// or https://)
+     * - src: allows something like "/foobar.jpg", "http://google.com", ...
+     * - href: allows something like "mailto:bert@foo.com", "http://google.com", "/foobar.jpg"
+     * - alt: strips unwanted characters. if the attribute is not set, then it gets set (to ensure valid and compatible HTML)
+     * - numbers: ensures that the attribute only contains numeric characters
+     */
     "tags": {
         "tr": {
             "add_class": {
                 "align": "align_text"
             }
         },
-        "strike": {
-        },
+        "strike": {},
         "form": {
             "rename_tag": "div"
         },
@@ -422,8 +421,7 @@ var wysihtml5ParserRules = {
         "var": {
             "rename_tag": "span"
         },
-        "del": {
-        },
+        "del": {},
         "blockquote": {
             "check_attributes": {
                 "cite": "url"
@@ -557,8 +555,8 @@ var wysihtml5ParserRules = {
             "rename_tag": "span"
         },
         "h2": {
-           //"set_class": "post-font-size-h2",
-           "add_class": {
+            //"set_class": "post-font-size-h2",
+            "add_class": {
                 "align": "align_text"
             }
         },

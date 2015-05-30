@@ -10,12 +10,11 @@
  *  public function PluginController_MyNewMethod_Create($Sender) {
  *     $Sender->Render('/path/to/some/view.php');
  *  }
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @since 2.0
  */
-
 class PluginController extends DashboardController {
 }

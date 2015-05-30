@@ -13,63 +13,63 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoriesModule extends Gdn_Module {
 
-   public $startDepth = 1; //inclusive
-   public $endDepth; //inclusive
+    public $startDepth = 1; //inclusive
+    public $endDepth; //inclusive
 
-   public function __construct($Sender = '') {
-      parent::__construct($Sender);
-      $this->_ApplicationFolder = 'vanilla';
+    public function __construct($Sender = '') {
+        parent::__construct($Sender);
+        $this->_ApplicationFolder = 'vanilla';
 
-      $this->Visible = C('Vanilla.Categories.Use') && !C('Vanilla.Categories.HideModule');
-   }
+        $this->Visible = C('Vanilla.Categories.Use') && !C('Vanilla.Categories.HideModule');
+    }
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
 
-   /**
-    * Get the data for this module.
-    */
-   protected function GetData() {
-      // Allow plugins to set different data.
-      $this->FireEvent('GetData');
-      if ($this->Data) {
-         return;
-      }
+    /**
+     * Get the data for this module.
+     */
+    protected function GetData() {
+        // Allow plugins to set different data.
+        $this->FireEvent('GetData');
+        if ($this->Data) {
+            return;
+        }
 
-      $Categories = CategoryModel::Categories();
-      $Categories2 = $Categories;
+        $Categories = CategoryModel::Categories();
+        $Categories2 = $Categories;
 
-      // Filter out the categories we aren't watching.
-      foreach ($Categories2 as $i => $Category) {
-         if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
-            unset($Categories[$i]);
-         }
-      }
-
-      $Data = new Gdn_DataSet($Categories);
-      $Data->DatasetType(DATASET_TYPE_ARRAY);
-      $Data->DatasetType(DATASET_TYPE_OBJECT);
-      $this->Data = $Data;
-   }
-
-   public function filterDepth(&$Categories, $startDepth, $endDepth) {
-      if ($startDepth != 1 || $endDepth) {
-         foreach ($Categories as $i => $Category) {
-            if (val('Depth', $Category) < $startDepth || ($endDepth && val('Depth', $Category) > $endDepth)) {
-               unset($Categories[$i]);
+        // Filter out the categories we aren't watching.
+        foreach ($Categories2 as $i => $Category) {
+            if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
+                unset($Categories[$i]);
             }
-         }
-      }
-   }
+        }
 
-   public function ToString() {
-      if (!$this->Data) {
-         $this->GetData();
-      }
+        $Data = new Gdn_DataSet($Categories);
+        $Data->DatasetType(DATASET_TYPE_ARRAY);
+        $Data->DatasetType(DATASET_TYPE_OBJECT);
+        $this->Data = $Data;
+    }
 
-      $this->filterDepth($this->Data->Result(), $this->startDepth, $this->endDepth);
+    public function filterDepth(&$Categories, $startDepth, $endDepth) {
+        if ($startDepth != 1 || $endDepth) {
+            foreach ($Categories as $i => $Category) {
+                if (val('Depth', $Category) < $startDepth || ($endDepth && val('Depth', $Category) > $endDepth)) {
+                    unset($Categories[$i]);
+                }
+            }
+        }
+    }
 
-      return parent::ToString();
-   }
+    public function ToString() {
+        if (!$this->Data) {
+            $this->GetData();
+        }
+
+        $this->filterDepth($this->Data->Result(), $this->startDepth, $this->endDepth);
+
+        return parent::ToString();
+    }
 }

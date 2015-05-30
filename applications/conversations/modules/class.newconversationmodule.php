@@ -13,8 +13,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class NewConversationModule extends Gdn_Module {
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
 
 }

@@ -7,8 +7,9 @@
  * real work has been done. Nothing has been included yet, aside from this file.
  * No Garden features are available yet.
  */
-if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php'))
-   require_once(PATH_ROOT.'/conf/bootstrap.before.php');
+if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
+    require_once(PATH_ROOT.'/conf/bootstrap.before.php');
+}
 
 /**
  * Define Core Constants
@@ -19,18 +20,21 @@ if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php'))
  */
 
 // Path to the primary configuration file
-if (!defined('PATH_CONF')) define('PATH_CONF', PATH_ROOT.'/conf');
+if (!defined('PATH_CONF')) {
+    define('PATH_CONF', PATH_ROOT.'/conf');
+}
 
 // Include default constants if none were defined elsewhere
-if (!defined('VANILLA_CONSTANTS'))
-   include(PATH_CONF.'/constants.php');
+if (!defined('VANILLA_CONSTANTS')) {
+    include(PATH_CONF.'/constants.php');
+}
 
 // Make sure a default time zone is set
 date_default_timezone_set('UTC');
 
 // Make sure the mb_* functions are utf8.
 if (function_exists('mb_internal_encoding')) {
-   mb_internal_encoding('UTF-8');
+    mb_internal_encoding('UTF-8');
 }
 
 // Include the core function definitions
@@ -44,9 +48,9 @@ Gdn_Autoloader::Start();
 
 // Guard against broken cache files
 if (!class_exists('Gdn')) {
-   // Throwing an exception here would result in a white screen for the user.
-   // This error usually indicates the .ini files in /cache are out of date and should be deleted.
-   exit("Class Gdn not found.");
+    // Throwing an exception here would result in a white screen for the user.
+    // This error usually indicates the .ini files in /cache are out of date and should be deleted.
+    exit("Class Gdn not found.");
 }
 
 // Cache Layer
@@ -68,8 +72,9 @@ Gdn::Config()->Load(Gdn::Config()->DefaultPath(), 'Configuration', TRUE);
  * default config and the general and error functions. More control is possible
  * here, but some things have already been loaded and are immutable.
  */
-if (file_exists(PATH_CONF.'/bootstrap.early.php'))
-   require_once(PATH_CONF.'/bootstrap.early.php');
+if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
+    require_once(PATH_CONF.'/bootstrap.early.php');
+}
 
 Gdn::Config()->Caching(TRUE);
 
@@ -97,8 +102,9 @@ Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
 // Load the configurations for enabled Applications
-foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder)
-   Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
+foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
+    Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
+}
 
 /**
  * Installer Redirect
@@ -107,8 +113,8 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
  * begin installation.
  */
 if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
-   safeHeader('Location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
-   exit();
+    safeHeader('Location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
+    exit();
 }
 
 // Re-apply loaded user settings
@@ -120,11 +126,13 @@ Gdn::Config()->OverlayDynamic();
  * All configurations are loaded, as well as the Application, Plugin and Theme
  * managers.
  */
-if (file_exists(PATH_CONF.'/bootstrap.late.php'))
-   require_once(PATH_CONF.'/bootstrap.late.php');
+if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
+    require_once(PATH_CONF.'/bootstrap.late.php');
+}
 
-if (C('Debug'))
-   Debug(TRUE);
+if (C('Debug')) {
+    Debug(TRUE);
+}
 
 Gdn_Cache::Trace(Debug());
 
@@ -179,15 +187,17 @@ Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
 
 // Applications startup
 foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
-   // Include the application's bootstrap.
-   $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
-   if (file_exists($Gdn_Path))
-      include_once($Gdn_Path);
+    // Include the application's bootstrap.
+    $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
+    if (file_exists($Gdn_Path)) {
+        include_once($Gdn_Path);
+    }
 
-   // Include the application's hooks.
-   $Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
-   if (file_exists($Hooks_Path))
-      include_once($Hooks_Path);
+    // Include the application's hooks.
+    $Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
+    if (file_exists($Hooks_Path)) {
+        include_once($Hooks_Path);
+    }
 }
 
 unset($Gdn_Path);
@@ -225,11 +235,13 @@ Gdn::Authenticator()->StartAuthenticator();
  * chance to customize Garden's runtime environment before the actual request
  * is handled.
  */
-if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
-   require_once(PATH_ROOT.'/conf/bootstrap.after.php');
+if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php')) {
+    require_once(PATH_ROOT.'/conf/bootstrap.after.php');
+}
 
 // Include "Render" functions now - this way pluggables and custom confs can override them.
 require_once(PATH_LIBRARY_CORE.'/functions.render.php');
 
-if (!defined('CLIENT_NAME'))
-   define('CLIENT_NAME', 'vanilla');
+if (!defined('CLIENT_NAME')) {
+    define('CLIENT_NAME', 'vanilla');
+}

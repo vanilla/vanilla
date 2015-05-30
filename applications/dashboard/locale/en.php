@@ -14,9 +14,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @param string The word to format.
  */
 if (!function_exists('FormatPossessive')) {
-   function FormatPossessive($Word) {
-      return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
-   }
+    function FormatPossessive($Word) {
+        return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+    }
 }
 
 $Definition['Apply for Membership'] = 'Register';
@@ -148,7 +148,7 @@ $Definition['Saved'] = 'Your changes have been saved.';
 $Definition['%s new plural'] = '%s new';
 $Definition['TermsOfService'] = 'Terms of Service';
 $Definition['TermsOfServiceText'] =
-"You agree, through your use of this service, that you will not use this
+    "You agree, through your use of this service, that you will not use this
 community to post any material which is knowingly false and/or defamatory,
 inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually
 oriented, threatening, invasive of a person's privacy, or otherwise violative

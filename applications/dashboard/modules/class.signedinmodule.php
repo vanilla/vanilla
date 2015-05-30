@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -9,9 +10,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class SignedInModule extends Gdn_Module {
-   
-   public function AssetTarget() {
-      $this->_ApplicationFolder = 'dashboard';
-      return 'Panel';
-   }
+
+    public function AssetTarget() {
+        $this->_ApplicationFolder = 'dashboard';
+        return 'Panel';
+    }
 }

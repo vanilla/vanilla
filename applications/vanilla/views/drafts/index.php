@@ -8,17 +8,17 @@ $ViewLocation = $this->FetchViewLocation('drafts', 'drafts');
 // WriteFilterTabs($this);
 echo Gdn_Theme::Module('DiscussionFilterModule');
 if ($this->DraftData->NumRows() > 0) {
-   echo $this->Pager->ToString('less');
-?>
-<ul class="DataList Drafts">
-   <?php
-   include($ViewLocation);
-   ?>
-</ul>
-   <?php
-   echo $this->Pager->ToString('more');
+    echo $this->Pager->ToString('less');
+    ?>
+    <ul class="DataList Drafts">
+        <?php
+        include($ViewLocation);
+        ?>
+    </ul>
+    <?php
+    echo $this->Pager->ToString('more');
 } else {
-   ?>
-   <div class="Empty"><?php echo T('You do not have any drafts.'); ?></div>
-   <?php
+    ?>
+    <div class="Empty"><?php echo T('You do not have any drafts.'); ?></div>
+<?php
 }

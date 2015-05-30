@@ -1,13 +1,13 @@
 <?php if (!defined('APPLICATION')) exit;
 
 $PluginInfo['EmojiExtender'] = array(
-    'Name'        => "Emoji Sets",
+    'Name' => "Emoji Sets",
     'Description' => "Change your emoji set!",
-    'Version'     => '1.1',
-    'Author'      => "Becky Van Bussel",
+    'Version' => '1.1',
+    'Author' => "Becky Van Bussel",
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'GNU GPL2',
+    'AuthorUrl' => 'http://vanillaforums.com',
+    'License' => 'GNU GPL2',
     'SettingsUrl' => '/settings/EmojiExtender',
     'MobileFriendly' => true
 );
@@ -170,11 +170,11 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 
             $icon = (isset($manifest['icon'])) ? Img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
             $items[$key] = '@'.$icon.
-            '<div emojiset-body>'.
+                '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
                 (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
                 (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::Wysiwyg($manifest['description']).'</p>').
-            '</div>';
+                '</div>';
         }
         $cf->Initialize(array(
             'Garden.EmojiSet' => array(
@@ -192,6 +192,6 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $sender->AddSideMenu();
         $sender->SetData('Title', sprintf(T('%s Settings'), 'Emoji'));
         $cf->RenderAll();
-   }
+    }
 
 }

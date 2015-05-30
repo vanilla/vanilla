@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -9,49 +10,51 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class ToggleMenuModule extends Gdn_Module {
-   
-   private $_Labels = array();
-   public function AddLabel($Name, $Code = '', $Url = '') {
-      if ($Code == '')
-         $Code = Gdn_Format::Url(ucwords(trim(Gdn_Format::PlainText($Name))));
 
-      $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
-   }
-   
-   private $_CurrentLabelCode = FALSE;
-   public function CurrentLabelCode($Label = '') {
-      if ($Label != '')
-         $this->_CurrentLabelCode = $Label;
-      
-      // If the current code hasn't been assigned, use the first available label
-      if (!$this->_CurrentLabelCode && count($this->_Labels) > 0)
-         return $this->_Labels[0]['Code'];
+    private $_Labels = array();
 
-      return $this->_CurrentLabelCode;
-   }
-   
-   public function ToString() {
-      $Return = '<ul class="FilterMenu ToggleMenu">';
-      foreach ($this->_Labels as $Label) {
-         $Url = GetValue('Url', $Label, '');
-         if ($Url == '')
-            $Url = '#';
-         
-         $Name = GetValue('Name', $Label, '');
-         $Code = GetValue('Code', $Label, '');
-         $Active = strcasecmp($Code, $this->CurrentLabelCode()) == 0;
-         $CssClass = 'Handle-'.$Code;
-         $AnchorClass = '';
-         if ($Active) {
-            $CssClass .= ' Active';
-            $AnchorClass = 'TextColor';
-         }
+    public function AddLabel($Name, $Code = '', $Url = '') {
+        if ($Code == '')
+            $Code = Gdn_Format::Url(ucwords(trim(Gdn_Format::PlainText($Name))));
 
-         $Return .= '<li class="'.$CssClass.'">';
+        $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
+    }
+
+    private $_CurrentLabelCode = FALSE;
+
+    public function CurrentLabelCode($Label = '') {
+        if ($Label != '')
+            $this->_CurrentLabelCode = $Label;
+
+        // If the current code hasn't been assigned, use the first available label
+        if (!$this->_CurrentLabelCode && count($this->_Labels) > 0)
+            return $this->_Labels[0]['Code'];
+
+        return $this->_CurrentLabelCode;
+    }
+
+    public function ToString() {
+        $Return = '<ul class="FilterMenu ToggleMenu">';
+        foreach ($this->_Labels as $Label) {
+            $Url = GetValue('Url', $Label, '');
+            if ($Url == '')
+                $Url = '#';
+
+            $Name = GetValue('Name', $Label, '');
+            $Code = GetValue('Code', $Label, '');
+            $Active = strcasecmp($Code, $this->CurrentLabelCode()) == 0;
+            $CssClass = 'Handle-'.$Code;
+            $AnchorClass = '';
+            if ($Active) {
+                $CssClass .= ' Active';
+                $AnchorClass = 'TextColor';
+            }
+
+            $Return .= '<li class="'.$CssClass.'">';
             $Return .= Anchor($Name, $Url, $AnchorClass);
-         $Return .= '</li>';
-      }
-      $Return .= '</ul>';   
-      return $Return;
-   }
+            $Return .= '</li>';
+        }
+        $Return .= '</ul>';
+        return $Return;
+    }
 }

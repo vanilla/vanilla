@@ -14,188 +14,188 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class LocaleModel {
 
-   protected $_AvailableLocalePacks = NULL;
+    protected $_AvailableLocalePacks = NULL;
 
-   public function AvailableLocalePacks() {
-      if ($this->_AvailableLocalePacks === NULL) {
-         $LocaleInfoPaths = SafeGlob(PATH_ROOT."/locales/*/definitions.php");
-         $AvailableLocales = array();
-         foreach ($LocaleInfoPaths as $InfoPath) {
-            $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
-            $this->CalculateLocaleInfo($LocaleInfo);
-            $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
-         }
-         $this->_AvailableLocalePacks = $AvailableLocales;
-      }
-      return $this->_AvailableLocalePacks;
-   }
-
-   public function AvailableLocales() {
-      // Get the list of locales that are supported.
-      $Locales = array_column($this->AvailableLocalePacks(), 'Locale', 'Locale');
-      $Locales['en'] = 'en'; // the default locale is always available.
-      ksort($Locales);
-
-      return $Locales;
-   }
-
-   protected function CalculateLocaleInfo(&$info) {
-      $canonicalLocale = Gdn_Locale::Canonicalize($info['Locale']);
-      if ($canonicalLocale !== $info['Locale']) {
-         $info['LocaleRaw'] = $info['Locale'];
-         $info['Locale'] = $canonicalLocale;
-      }
-   }
-
-   public function CopyDefinitions($SourcePath, $DestPath) {
-      // Load the definitions from the source path.
-      $Definitions = $this->LoadDefinitions($SourcePath);
-
-      $TmpPath = dirname($DestPath).'/tmp_'.RandomString(10);
-      $Key = trim(strchr($SourcePath, '/'), '/');
-
-      $fp = fopen($TmpPath, 'wb');
-      if (!$fp) {
-         throw new Exception(sprintf(T('Could not open %s.'), $TmpPath));
-      }
-
-      fwrite($fp, $this->GetFileHeader());
-      fwrite($fp, "/** Definitions copied from $Key. **/\n\n");
-      $this->WriteDefinitions($fp, $Definitions);
-      fclose($fp);
-
-      $Result = rename($TmpPath, $DestPath);
-      if (!$Result) {
-         throw new Exception(sprintf(T('Could not open %s.'), $DestPath));
-      }
-      return $DestPath;
-   }
-
-   public function EnabledLocalePacks($GetInfo = FALSE) {
-      $Result = (array)C('EnabledLocales', array());
-
-      if ($GetInfo) {
-         foreach ($Result as $Key => $Locale) {
-            $InfoPath = PATH_ROOT."/locales/$Key/definitions.php";
-            if (file_exists($InfoPath)) {
-               $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
-               $this->CalculateLocaleInfo($LocaleInfo);
-               $Result[$Key] = $LocaleInfo;
-            } else {
-               unset($Result[$Key]);
+    public function AvailableLocalePacks() {
+        if ($this->_AvailableLocalePacks === NULL) {
+            $LocaleInfoPaths = SafeGlob(PATH_ROOT."/locales/*/definitions.php");
+            $AvailableLocales = array();
+            foreach ($LocaleInfoPaths as $InfoPath) {
+                $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
+                $this->CalculateLocaleInfo($LocaleInfo);
+                $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
             }
-         }
-      }
+            $this->_AvailableLocalePacks = $AvailableLocales;
+        }
+        return $this->_AvailableLocalePacks;
+    }
 
-      return $Result;
-   }
+    public function AvailableLocales() {
+        // Get the list of locales that are supported.
+        $Locales = array_column($this->AvailableLocalePacks(), 'Locale', 'Locale');
+        $Locales['en'] = 'en'; // the default locale is always available.
+        ksort($Locales);
 
-   public function LoadDefinitions($Path, $Skip = NULL) {
-      $Skip = (array)$Skip;
+        return $Locales;
+    }
 
-      $Paths = SafeGlob($Path.'/*.php');
-      $Definition = array();
-      foreach ($Paths as $Path) {
-         if (in_array($Path, $Skip))
-            continue;
-         include $Path;
-      }
-      return $Definition;
-   }
+    protected function CalculateLocaleInfo(&$info) {
+        $canonicalLocale = Gdn_Locale::Canonicalize($info['Locale']);
+        if ($canonicalLocale !== $info['Locale']) {
+            $info['LocaleRaw'] = $info['Locale'];
+            $info['Locale'] = $canonicalLocale;
+        }
+    }
 
-   public function GenerateChanges($Path, $BasePath, $DestPath = NULL) {
-      if ($DestPath == NULL) {
-         $DestPath = $BasePath.'/changes.php';
-      }
+    public function CopyDefinitions($SourcePath, $DestPath) {
+        // Load the definitions from the source path.
+        $Definitions = $this->LoadDefinitions($SourcePath);
 
-      // Load the given locale pack.
-      $Definitions = $this->LoadDefinitions($Path, $DestPath);
-      $BaseDefinitions = $this->LoadDefinitions($BasePath, $DestPath);
+        $TmpPath = dirname($DestPath).'/tmp_'.RandomString(10);
+        $Key = trim(strchr($SourcePath, '/'), '/');
 
-      // Figure out the missing definitions.
-      $MissingDefinitions = array_diff_key($BaseDefinitions, $Definitions);
+        $fp = fopen($TmpPath, 'wb');
+        if (!$fp) {
+            throw new Exception(sprintf(T('Could not open %s.'), $TmpPath));
+        }
 
-      // Figure out the extraneous definitions.
-      $ExtraDefinitions = array_diff($Definitions, $BaseDefinitions);
+        fwrite($fp, $this->GetFileHeader());
+        fwrite($fp, "/** Definitions copied from $Key. **/\n\n");
+        $this->WriteDefinitions($fp, $Definitions);
+        fclose($fp);
 
-      // Generate the changes file.
-      $TmpPath = dirname($BasePath).'/tmp_'.RandomString(10);
-      $fp = fopen($TmpPath, 'wb');
-      if (!$fp) {
-         throw new Exception(sprintf(T('Could not open %s.'), $TmpPath));
-      }
+        $Result = rename($TmpPath, $DestPath);
+        if (!$Result) {
+            throw new Exception(sprintf(T('Could not open %s.'), $DestPath));
+        }
+        return $DestPath;
+    }
 
-      $Key = trim(strchr($Path, '/'), '/');
-      $BaseKey = trim(strchr($BasePath, '/'), '/');
+    public function EnabledLocalePacks($GetInfo = FALSE) {
+        $Result = (array)C('EnabledLocales', array());
 
-      fwrite($fp, $this->GetFileHeader());
-      fwrite($fp, "/** Changes file comparing $Key to $BaseKey. **/\n\n\n");
+        if ($GetInfo) {
+            foreach ($Result as $Key => $Locale) {
+                $InfoPath = PATH_ROOT."/locales/$Key/definitions.php";
+                if (file_exists($InfoPath)) {
+                    $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
+                    $this->CalculateLocaleInfo($LocaleInfo);
+                    $Result[$Key] = $LocaleInfo;
+                } else {
+                    unset($Result[$Key]);
+                }
+            }
+        }
 
-      fwrite($fp, "/** Missing definitions that are in the $BaseKey, but not $Key. **/\n");
-      $this->WriteDefinitions($fp, $MissingDefinitions);
+        return $Result;
+    }
 
-      fwrite($fp, "\n\n/** Extra definitions that are in the $Key, but not the $BaseKey. **/\n");
-      $this->WriteDefinitions($fp, $ExtraDefinitions);
+    public function LoadDefinitions($Path, $Skip = NULL) {
+        $Skip = (array)$Skip;
 
-      fclose($fp);
+        $Paths = SafeGlob($Path.'/*.php');
+        $Definition = array();
+        foreach ($Paths as $Path) {
+            if (in_array($Path, $Skip))
+                continue;
+            include $Path;
+        }
+        return $Definition;
+    }
 
-      $Result = rename($TmpPath, $DestPath);
-      if (!$Result) {
-         throw new Exception(sprintf(T('Could not open %s.'), $DestPath));
-      }
-      return $DestPath;
-   }
+    public function GenerateChanges($Path, $BasePath, $DestPath = NULL) {
+        if ($DestPath == NULL) {
+            $DestPath = $BasePath.'/changes.php';
+        }
 
-   protected function GetFileHeader() {
-      $Now = Gdn_Format::ToDateTime();
+        // Load the given locale pack.
+        $Definitions = $this->LoadDefinitions($Path, $DestPath);
+        $BaseDefinitions = $this->LoadDefinitions($BasePath, $DestPath);
 
-      $Result = "<?php if (!defined('APPLICATION')) exit();
+        // Figure out the missing definitions.
+        $MissingDefinitions = array_diff_key($BaseDefinitions, $Definitions);
+
+        // Figure out the extraneous definitions.
+        $ExtraDefinitions = array_diff($Definitions, $BaseDefinitions);
+
+        // Generate the changes file.
+        $TmpPath = dirname($BasePath).'/tmp_'.RandomString(10);
+        $fp = fopen($TmpPath, 'wb');
+        if (!$fp) {
+            throw new Exception(sprintf(T('Could not open %s.'), $TmpPath));
+        }
+
+        $Key = trim(strchr($Path, '/'), '/');
+        $BaseKey = trim(strchr($BasePath, '/'), '/');
+
+        fwrite($fp, $this->GetFileHeader());
+        fwrite($fp, "/** Changes file comparing $Key to $BaseKey. **/\n\n\n");
+
+        fwrite($fp, "/** Missing definitions that are in the $BaseKey, but not $Key. **/\n");
+        $this->WriteDefinitions($fp, $MissingDefinitions);
+
+        fwrite($fp, "\n\n/** Extra definitions that are in the $Key, but not the $BaseKey. **/\n");
+        $this->WriteDefinitions($fp, $ExtraDefinitions);
+
+        fclose($fp);
+
+        $Result = rename($TmpPath, $DestPath);
+        if (!$Result) {
+            throw new Exception(sprintf(T('Could not open %s.'), $DestPath));
+        }
+        return $DestPath;
+    }
+
+    protected function GetFileHeader() {
+        $Now = Gdn_Format::ToDateTime();
+
+        $Result = "<?php if (!defined('APPLICATION')) exit();
 /** This file was generated by the LocaleModel on $Now **/\n\n";
 
-      return $Result;
-   }
+        return $Result;
+    }
 
-   /**
-    * Temporarily enable a locale pack without installing it
-    *
-    * @param string $LocaleKey The key of the folder.
-    */
-   public function TestLocale($LocaleKey) {
-      $Available = $this->AvailableLocalePacks();
-      if (!isset($Available[$LocaleKey]))
-         throw NotFoundException('Locale');
+    /**
+     * Temporarily enable a locale pack without installing it
+     *
+     * @param string $LocaleKey The key of the folder.
+     */
+    public function TestLocale($LocaleKey) {
+        $Available = $this->AvailableLocalePacks();
+        if (!isset($Available[$LocaleKey]))
+            throw NotFoundException('Locale');
 
-      // Grab all of the definition files from the locale.
-      $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
+        // Grab all of the definition files from the locale.
+        $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
 
-      // Unload the dynamic config
-      Gdn::Locale()->Unload();
+        // Unload the dynamic config
+        Gdn::Locale()->Unload();
 
-      // Load each locale file, checking for errors
-      foreach ($Paths as $Path) {
-         Gdn::Locale()->Load($Path, FALSE);
-      }
-   }
+        // Load each locale file, checking for errors
+        foreach ($Paths as $Path) {
+            Gdn::Locale()->Load($Path, FALSE);
+        }
+    }
 
-   /**
-    * Write a locale's definitions to a file.
-    *
-    * @param resource $fp The file to write to.
-    * @param array $Definitions The definitions to write.
-    */
-   public static function WriteDefinitions($fp, $Definitions) {
-      // Write the definitions.
-      uksort($Definitions, 'strcasecmp');
-      $LastC = '';
-      foreach ($Definitions as $Key => $Value) {
-         // Add a blank line between letters of the alphabet.
-         if (isset($Key[0]) && strcasecmp($LastC, $Key[0]) != 0) {
-            fwrite($fp, "\n");
-            $LastC = $Key[0];
-         }
+    /**
+     * Write a locale's definitions to a file.
+     *
+     * @param resource $fp The file to write to.
+     * @param array $Definitions The definitions to write.
+     */
+    public static function WriteDefinitions($fp, $Definitions) {
+        // Write the definitions.
+        uksort($Definitions, 'strcasecmp');
+        $LastC = '';
+        foreach ($Definitions as $Key => $Value) {
+            // Add a blank line between letters of the alphabet.
+            if (isset($Key[0]) && strcasecmp($LastC, $Key[0]) != 0) {
+                fwrite($fp, "\n");
+                $LastC = $Key[0];
+            }
 
-         $Str = '$Definition['.var_export($Key, TRUE).'] = '.var_export($Value, TRUE).";\n";
-         fwrite($fp, $Str);
-      }
-   }
+            $Str = '$Definition['.var_export($Key, TRUE).'] = '.var_export($Value, TRUE).";\n";
+            fwrite($fp, $Str);
+        }
+    }
 }

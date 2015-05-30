@@ -1,19 +1,19 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo T("Confirm Email") ?></h1>
 <div>
-   <?php
-   echo $this->Form->Open();
-   echo $this->Form->Errors();
+    <?php
+    echo $this->Form->Open();
+    echo $this->Form->Errors();
 
-   echo '<div class="P NoPanel">';
+    echo '<div class="P NoPanel">';
 
-   if ($this->Data('EmailConfirmed')) {
-      echo T('Your email has been successfully confirmed.');
-   } else {
-      echo sprintf(T('To send another confirmation email click <a href="%s">here</a>.'), Url('/entry/emailconfirmrequest'));
-   }
+    if ($this->Data('EmailConfirmed')) {
+        echo T('Your email has been successfully confirmed.');
+    } else {
+        echo sprintf(T('To send another confirmation email click <a href="%s">here</a>.'), Url('/entry/emailconfirmrequest'));
+    }
 
-   echo '</div>';
+    echo '</div>';
 
-   echo $this->Form->Close(); ?>
+    echo $this->Form->Close(); ?>
 </div>

@@ -12,30 +12,30 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the moderators in the specified category. Built for use in a side panel.
  */
 class CategoryModeratorsModule extends Gdn_Module {
-   
-   public function __construct($Sender = '') {
-      parent::__construct($Sender);
-      $this->ModeratorData = FALSE;
-   }
-   
-   public function GetData($Category) {
-      $this->ModeratorData = array($Category);
-      CategoryModel::JoinModerators($this->ModeratorData);
-   }
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function __construct($Sender = '') {
+        parent::__construct($Sender);
+        $this->ModeratorData = FALSE;
+    }
 
-   public function ToString() {
-      if (
-         is_array($this->ModeratorData)
-         && count($this->ModeratorData) > 0
-         && is_array($this->ModeratorData[0]->Moderators)
-         && count($this->ModeratorData[0]->Moderators) > 0
-      )
-         return parent::ToString();
+    public function GetData($Category) {
+        $this->ModeratorData = array($Category);
+        CategoryModel::JoinModerators($this->ModeratorData);
+    }
 
-      return '';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
+
+    public function ToString() {
+        if (
+            is_array($this->ModeratorData)
+            && count($this->ModeratorData) > 0
+            && is_array($this->ModeratorData[0]->Moderators)
+            && count($this->ModeratorData[0]->Moderators) > 0
+        )
+            return parent::ToString();
+
+        return '';
+    }
 }

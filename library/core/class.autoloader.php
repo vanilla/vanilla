@@ -936,9 +936,10 @@ class Gdn_Autoloader_Map {
         $MapContents = '';
         foreach ($this->Map as $SplitTopic => $TopicFiles) {
             $MapContents .= "[{$SplitTopic}]\n";
-            foreach ($TopicFiles as $ClassName => $Location)
+            foreach ($TopicFiles as $ClassName => $Location) {
                 $Location = $this->fixBackSlash($Location);
-            $MapContents .= "{$ClassName} = \"{$Location}\"\n";
+                $MapContents .= "{$ClassName} = \"{$Location}\"\n";
+            }
         }
 
         try {

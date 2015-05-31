@@ -1,7 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Generic SQL database driver
+ * Generic SQL database driver.
  *
  * The Gdn_DatabaseDriver class (equivalent to SqlBuilder from Vanilla 1.x) is used
  * by any given database driver to build and execute database queries.
@@ -10,212 +9,122 @@
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Class Gdn_SQLDriver
  */
 abstract class Gdn_SQLDriver {
 
     /** @const 2^31 is the max signed int range. */
     const MAX_SIGNED_INT = 2147483648;
 
-    public function __construct() {
-        $this->ClassName = get_class($this);
-        $this->Reset();
-    }
-
-    /**
-     * An associative array of table alias => table name pairs.
-     *
-     * @var array
-     */
+    /** @var array An associative array of table alias => table name pairs. */
     protected $_AliasMap;
 
-    /**
-     *
-     * @var bool Whether or not to capture (not execute) DML statements.
-     */
+    /** @var bool Whether or not to capture (not execute) DML statements. */
     public $CaptureModifications = FALSE;
 
-    /**
-     * The name of the class that has been instantiated.
-     *
-     * @var string
-     */
+    /** @var string The name of the class that has been instantiated. */
     public $ClassName;
 
-    /**
-     * The database connection.
-     *
-     * @var Gdn_Database The connection and engine information for the database.
-     */
+    /** @var Gdn_Database The connection and engine information for the database. */
     public $Database;
 
-    /**
-     * The name of the cache key associated with this query.
-     *
-     * @var string
-     */
+    /** @var string The name of the cache key associated with this query. */
     protected $_CacheKey = NULL;
+
+    /** @var string|null Cache op. */
     protected $_CacheOperation = NULL;
+
+    /** @var array|null Cache options. */
     protected $_CacheOptions = NULL;
 
     /**
-     * An associative array of information about the database to which the
+     * @var string An associative array of information about the database to which the
      * application is connected. Values include: Engine, Version, DatabaseName.
-     *
-     * @var string
      */
     protected $_DatabaseInfo = array();
 
-    /**
-     * A boolean value indicating if this is a distinct query.
-     *
-     * @var boolean
-     */
+    /** @var boolean A boolean value indicating if this is a distinct query. */
     protected $_Distinct;
 
-    /**
-     * A collection of tables from which data is being selected.
-     *
-     * @var array
-     */
+    /** @var array A collection of tables from which data is being selected. */
     protected $_Froms;
 
-    /**
-     * A collection of group by clauses.
-     *
-     * @var array
-     */
+    /** @var array A collection of group by clauses. */
     protected $_GroupBys;
 
-    /**
-     * A collection of having clauses.
-     *
-     * @var array
-     */
+    /** @var array A collection of having clauses. */
     protected $_Havings;
 
-    /**
-     * A collection of tables which have been joined to.
-     *
-     * @var array
-     */
+    /** @var array A collection of tables which have been joined to. */
     protected $_Joins;
 
-    /**
-     * The number of records to limit the query to. FALSE by default.
-     *
-     * @var int
-     */
+    /** @var int The number of records to limit the query to. FALSE by default. */
     protected $_Limit;
 
     /**
-     * An associative array of parameter_name => parameter_value pairs to be
+     * @var array An associative array of parameter_name => parameter_value pairs to be
      * inserted into the prepared $this->_PDOStatement.
-     *
-     * @var array
      */
     protected $_NamedParameters = array();
 
     /**
-     * Whether or not to reset the properties when a query is executed.
-     *
-     * @var int
+     * @var int Whether or not to reset the properties when a query is executed.
      *   0 = The object will reset after query execution.
      *   1 = The object will not reset after the <b>NEXT</b> query execution.
      *   2 = The object will not reset after <b>ALL</b> query executions.
      */
     protected $_NoReset = FALSE;
 
-    /**
-     * The offset from which data should be returned. FALSE by default.
-     *
-     * @var int
-     */
+    /** @var int The offset from which data should be returned. FALSE by default. */
     protected $_Offset;
 
-    /**
-     * The number of where groups currently open.
-     *
-     * @var int
-     */
+    /** @var int The number of where groups currently open. */
     protected $_OpenWhereGroupCount;
 
-    /**
-     * Extended options for a statement, usable by the driver.
-     *
-     * @var array
-     */
+    /**@var array Extended options for a statement, usable by the driver. */
     protected $_Options = array();
 
-    /**
-     * A collection of order by statements.
-     *
-     * @var array
-     */
+    /** @var array A collection of order by statements. */
     protected $_OrderBys;
 
-    /**
-     * A collection of fields that are being selected.
-     *
-     * @var array
-     */
+    /** @var array A collection of fields that are being selected. */
     protected $_Selects;
 
-    /**
-     * An associative array of Field Name => Value pairs to be saved
-     * to the database.
-     *
-     * @var array
-     */
+    /** @var array An associative array of Field Name => Value pairs to be saved to the database. */
     protected $_Sets;
 
-    /**
-     * The logical operator used to concatenate where clauses.
-     *
-     * @var string
-     */
+    /** @var string The logical operator used to concatenate where clauses.*/
     protected $_WhereConcat;
 
-    /**
-     * The default $_WhereConcat that will be reverted back to after every where clause is appended.
-     *
-     * @var string
-     */
+    /** @var string The default $_WhereConcat that will be reverted back to after every where clause is appended. */
     protected $_WhereConcatDefault;
 
-    /**
-     * The logical operator used to concatenate where group clauses.
-     *
-     * @var string
-     */
+    /** @var string The logical operator used to concatenate where group clauses. */
     protected $_WhereGroupConcat;
 
-    /**
-     * The default $_WhereGroupConcat that will be reverted back to after every where or where group clause is appended.
-     *
-     * @var string
-     */
+    /** @var string The default $_WhereGroupConcat that will be reverted back to after every where or where group clause is appended. */
     protected $_WhereGroupConcatDefault;
 
-    /**
-     * The number of where groups to open.
-     *
-     * @var int
-     */
+    /** @var int The number of where groups to open. */
     protected $_WhereGroupCount;
 
-    /**
-     * A collection of where clauses.
-     *
-     * @var array
-     */
+    /** @var array A collection of where clauses. */
     protected $_Wheres;
 
-
-    /// METHODS ///
+    /**
+     *
+     */
+    public function __construct() {
+        $this->ClassName = get_class($this);
+        $this->Reset();
+    }
 
     /**
      * Removes table aliases from an array of JOIN ($this->_Joins) and GROUP BY
@@ -256,6 +165,13 @@ abstract class Gdn_SQLDriver {
         return $this;
     }
 
+    /**
+     *
+     *
+     * @param $Sql
+     * @param null $Parameters
+     * @return mixed
+     */
     public function ApplyParameters($Sql, $Parameters = NULL) {
         if (!is_array($Parameters))
             $Parameters = $this->_NamedParameters;

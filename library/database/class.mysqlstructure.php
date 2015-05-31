@@ -1,20 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * MySQL structure driver
+ * MySQL structure driver.
  *
  * MySQL-specific structure tools for performing structural changes on MySQL
  * database servers.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
-class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
-    /// Constructor ///
 
+/**
+ * Class Gdn_MySQLStructure
+ */
+class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
+
+    /**
+     *
+     *
+     * @param null $Database
+     */
     public function __construct($Database = NULL) {
         parent::__construct($Database);
     }
@@ -40,6 +47,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $Engine
+     * @return bool
+     */
     public function HasEngine($Engine) {
         static $ViableEngines = NULL;
 
@@ -58,6 +71,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $Engine
+     * @param bool $CheckAvailability
+     * @return $this
+     */
     public function Engine($Engine, $CheckAvailability = TRUE) {
         $Engine = strtolower($Engine);
 
@@ -297,6 +317,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         return $result;
     }
 
+    /**
+     *
+     *
+     * @param $Columns
+     * @param bool $KeyType
+     * @return array
+     */
     protected function _IndexSql($Columns, $KeyType = FALSE) {
 //      if ($this->TableName() != 'Comment')
 //         return array();
@@ -354,10 +381,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function IndexSqlDb() {
         return $this->_IndexSqlDb();
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     protected function _IndexSqlDb() {
         // We don't want this to be captured so send it directly.
         $Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
@@ -588,10 +625,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     * Undocumented method.
+     *
      *
      * @param string $Column
-     * @todo This method and $Column need descriptions.
      */
     protected function _DefineColumn($Column) {
         $ValidColumnTypes = array(
@@ -656,6 +692,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         return $Return;
     }
 
+    /**
+     *
+     *
+     * @param $Value
+     * @return string
+     */
     protected static function _QuoteValue($Value) {
         if (is_numeric($Value)) {
             return $Value;
@@ -666,6 +708,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     protected function _SupportsFulltext() {
         return strcasecmp($this->_TableStorageEngine, 'myisam') == 0;
     }

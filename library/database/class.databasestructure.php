@@ -1,67 +1,47 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Database Structure tools
  *
- * Used by any given database driver to build, modify, and create tables and views.
- *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Used by any given database driver to build, modify, and create tables and views.
  */
 abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
+    /** @var string  */
     protected $_DatabasePrefix = '';
 
     /**
-     * Whether or not to only capture the sql, rather than execute it.
-     * When this property is true then a property called CapturedSql will be added to this class which is an array of all the Sql statements.
-     * @var bool
+     * @var bool Whether or not to only capture the sql, rather than execute it. When this property is true
+     * then a property called CapturedSql will be added to this class which is an array of all the Sql statements.
      */
     public $CaptureOnly = FALSE;
 
-    /**
-     * The character encoding to set as default for the table being created.
-     *
-     * @var string
-     */
+    /** @var string The character encoding to set as default for the table being created. */
     protected $_CharacterEncoding;
 
-    /**
-     * An associative array of $ColumnName => $ColumnPropertiesObject columns to
-     * be added to $this->_TableName;
-     *
-     * @var array
-     */
+    /** @var array $ColumnName => $ColumnPropertiesObject columns to be added to $this->_TableName. */
     protected $_Columns;
 
-    /**
-     * The instance of the database singleton.
-     *
-     * @var Gdn_Database
-     */
+    /** @var Gdn_Database The instance of the database singleton. */
     public $Database;
 
-    /** The existing columns in the database.
-     * @var array
-     */
+    /** @var array The existing columns in the database. */
     protected $_ExistingColumns = NULL;
 
-    /**
-     * The name of the table to create or modify.
-     *
-     * @var string
-     */
+    /** @var string The name of the table to create or modify. */
     protected $_TableName;
 
-    /** @var bool Whether or not this table exists in the database.
-     */
+    /** @var bool Whether or not this table exists in the database. */
     protected $_TableExists;
 
-    /** @var string The name of the storage engine for this table.
-     */
+    /** @var string The name of the storage engine for this table. */
     protected $_TableStorageEngine;
 
     /**
@@ -83,6 +63,16 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $this->Reset();
     }
 
+    /**
+     *
+     *
+     * @param $Name
+     * @param $Type
+     * @param $Null
+     * @param $Default
+     * @param $KeyType
+     * @return stdClass
+     */
     protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
         $Length = '';
         $Precision = '';
@@ -184,7 +174,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this;
     }
 
-    /** Returns whether or not a column exists in the database.
+    /**
+     * Returns whether or not a column exists in the database.
      *
      * @param string $ColumnName The name of the column to check.
      * @return bool
@@ -202,7 +193,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * And associative array of $ColumnName => $ColumnProperties columns for the table.
+     * An associative array of $ColumnName => $ColumnProperties columns for the table.
+     *
      * @return array
      */
     public function Columns($Name = '') {
@@ -220,11 +212,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this->_Columns;
     }
 
-    /** Return the definition string for a column.
+    /**
+     * Return the definition string for a column.
+     *
      * @param mixed $Column The column to get the type string from.
      *  - <b>object</b>: The column as returned by the database schema. The properties looked at are Type, Length, and Precision.
      *  - <b>string</b<: The name of the column currently in this structure.
-     * * @return string The type definition string.
+     * @return string The type definition string.
      */
     public function ColumnTypeString($Column) {
         if (is_string($Column))
@@ -280,12 +274,20 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'DropColumn'), E_USER_ERROR);
     }
 
+    /**
+     *
+     *
+     * @param $Engine
+     * @param bool $CheckAvailability
+     */
     public function Engine($Engine, $CheckAvailability = TRUE) {
         trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
     }
 
 
-    /** Load the schema for this table from the database.
+    /**
+     * Load the schema for this table from the database.
+     *
      * @param string $TableName The name of the table to get or blank to get the schema for the current table.
      * @return Gdn_DatabaseStructure $this
      */
@@ -316,6 +318,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
     /**
      * Send a query to the database and return the result.
+     *
      * @param string $Sql The sql to execute.
      * @return bool Whethor or not the query succeeded.
      */
@@ -417,7 +420,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this;
     }
 
-    /** Whether or not the table exists in the database.
+    /**
+     * Whether or not the table exists in the database.
+     *
      * @return bool
      */
     public function TableExists($TableName = NULL) {
@@ -438,7 +443,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this->_TableExists;
     }
 
-    /** Returns the name of the table being defined in this object.
+    /**
+     * Returns the name of the table being defined in this object.
      *
      * @return string
      */
@@ -446,7 +452,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this->_TableName;
     }
 
-    /** Gets an arrya of type names allowed in the structure.
+    /**
+     * Gets an arrya of type names allowed in the structure.
+     *
      * @param string $Class The class of types to get. Valid values are:
      *  - <b>int</b>: Integer types.
      *  - <b>float</b>: Floating point types.
@@ -498,8 +506,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Specifies the name of the view to create or modify.
      *
      * @param string $Name The name of the view.
-     * @param string $Query The actual query to create as the view. Typically this
-     * can be generated with the $Database object.
+     * @param string $Query Query to create as the view. Typically this can be generated with the $Database object.
      */
     public function View($Name, $Query) {
         trigger_error(ErrorMessage('The selected database engine can not create or modify views.', $this->ClassName, 'View'), E_USER_ERROR);
@@ -512,7 +519,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Create'), E_USER_ERROR);
     }
 
-    /** Gets the column definitions for the columns in the database.
+    /**
+     * Gets the column definitions for the columns in the database.
+     *
      * @return array
      */
     public function ExistingColumns() {
@@ -535,7 +544,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Modify'), E_USER_ERROR);
     }
 
-    /** Reset the internal state of this object so that it can be reused.
+    /**
+     * Reset the internal state of this object so that it can be reused.
+     *
      * @return Gdn_DatabaseStructure $this
      */
     public function Reset() {

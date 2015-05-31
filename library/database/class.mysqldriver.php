@@ -1,7 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * MySQL database driver
+ * MySQL database driver.
  *
  * The MySQLDriver class can be treated as an interface for all database
  * engines. Any new database engine should have the same public and protected
@@ -12,17 +11,21 @@
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Class Gdn_MySQLDriver
  */
 class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
-// =============================================================================
-// SECTION 1. STRING SAFETY, PARSING, AND MANIPULATION.
-// =============================================================================
-
+    /**
+     * @param $String
+     * @return string
+     */
     public function Backtick($String) {
         return '`'.trim($String, '`').'`';
     }
@@ -79,14 +82,16 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
         return $String;
     }
 
+    /**
+     *
+     *
+     * @param string $RefExpr
+     * @return string
+     */
     public function EscapeIdentifier($RefExpr) {
         // The MySql back tick syntax is the default escape sequence so nothing needs to be done.
         return $RefExpr;
     }
-
-// =============================================================================
-// SECTION 2. DATABASE ENGINE SPECIFIC QUERYING.
-// =============================================================================
 
     /**
      * Returns a platform-specific query to fetch column data from $Table.

@@ -1,34 +1,29 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Form.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Form validation layer
  *
  * Helps with the rendering of form controls that link directly to a data model.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Form extends Gdn_Pluggable {
-    /**
-     * @var string Action with which the form should be sent.
-     * @access public
-     */
+
+    /** @var string Action with which the form should be sent. */
     public $Action = '';
 
-    /**
-     * @var string Class name to assign to form elements with errors when InlineErrors is enabled.
-     * @since 2.0.18
-     * @access public
-     */
+    /** @var string Class name to assign to form elements with errors when InlineErrors is enabled. */
     public $ErrorClass = 'Error';
 
-    /**
-     * @var array Associative array of hidden inputs with their "Name" attribute as the key.
-     * @access public
-     */
+    /** @var array Associative array of hidden inputs with their "Name" attribute as the key. */
     public $HiddenInputs;
 
     /**
@@ -36,7 +31,6 @@ class Gdn_Form extends Gdn_Pluggable {
      *    this value prefixed on their ID attribute. Default is "Form_". If the
      *    id value is overridden with the Attribute collection for an element, this
      *    value will not be used.
-     * @access public
      */
     public $IDPrefix = 'Form_';
 
@@ -44,41 +38,27 @@ class Gdn_Form extends Gdn_Pluggable {
      * @var string All form-related elements (form, input, select, etc) will have
      *    this value prefixed on their name attribute. Default is "Form".
      *    If a model is assigned, the model name is used instead.
-     * @access public
      */
     public $InputPrefix = '';
 
-    /**
-     * @var string Form submit method. Options are 'post' or 'get'.
-     * @access public
-     */
+    /** @var string Form submit method. Options are 'post' or 'get'. */
     public $Method = 'post';
 
     /**
      * @var array Associative array containing the key => value pairs being placed in the
      *    controls returned by this object. Assigned by $this->Open() or $this->SetData().
-     * @access protected
      */
     protected $_DataArray;
 
-    /**
-     * @var bool Whether to display inline errors with form elements.
-     *    Set with $this->ShowErrors() and $this->HideErrors().
-     * @since 2.0.18
-     * @access protected
-     */
+    /** @var bool Whether to display inline errors with form elements. Set with ShowErrors() and HideErrors(). */
     protected $_InlineErrors = FALSE;
 
-    /**
-     * @var object Model that enforces data rules on $this->_DataArray.
-     * @access protected
-     */
+    /** @var object Model that enforces data rules on $this->_DataArray. */
     protected $_Model;
 
     /**
      * @var array Associative array of $FieldName => $ValidationFunctionName arrays that
      *    describe how each field specified failed validation.
-     * @access protected
      */
     protected $_ValidationResults = array();
 
@@ -87,7 +67,6 @@ class Gdn_Form extends Gdn_Pluggable {
      *    (depending on which method was specified for sending form data in $this->Method).
      *    Populated & accessed by $this->FormValues().
      *    Values can be retrieved with $this->GetFormValue($FieldName).
-     * @access private
      */
     public $_FormValues;
 
@@ -95,7 +74,6 @@ class Gdn_Form extends Gdn_Pluggable {
      * @var array Collection of IDs that have been created for form elements. This
      *    private property is used to record all IDs so that duplicate IDs are not
      *    added to the screen.
-     * @access private
      */
     private $_IDCollection = array();
 

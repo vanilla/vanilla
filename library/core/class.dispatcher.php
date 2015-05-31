@@ -1,112 +1,80 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Framework dispatcher
- *
- * Handles all requests and routing.
+ * Framework dispatcher.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Handles all requests and routing.
  */
 class Gdn_Dispatcher extends Gdn_Pluggable {
 
+    /** Block condition. */
+    const BLOCK_NEVER = 0;
+
+    /** Block condition. */
+    const BLOCK_PERMISSION = 1;
+
+    /** Block condition. */
+    const BLOCK_ANY = 2;
+
     /**
-     * An array of folders within the application that are OK to search through
+     * @var array An array of folders within the application that are OK to search through
      * for controllers. This property is filled by the applications array
      * located in /conf/applications.php and included in /bootstrap.php
-     *
-     * @var array
      */
     private $_EnabledApplicationFolders;
 
     /**
-     * An associative array of ApplicationName => ApplicationFolder. This
+     * @var array An associative array of ApplicationName => ApplicationFolder. This
      * property is filled by the applications array located in
      * /conf/applications.php and included in /bootstrap.php
-     *
-     * @var array
      */
     private $_EnabledApplications;
 
-    /**
-     * The currently requested url (defined in _AnalyzeRequest)
-     *
-     * @var string
-     */
+    /** @var string The currently requested url (defined in _AnalyzeRequest). */
     public $Request;
 
-    /**
-     * The name of the application folder that contains the controller that has
-     * been requested.
-     *
-     * @var string
-     */
+    /** @var string The name of the application folder that contains the controller that has been requested. */
     private $_ApplicationFolder;
 
     /**
-     * An associative collection of AssetName => Strings that will get passed
+     * @var array An associative collection of AssetName => Strings that will get passed
      * into the controller once it has been instantiated.
-     *
-     * @var array
      */
     private $_AssetCollection;
 
-    /**
-     * The name of the controller to be dispatched.
-     *
-     * @var string
-     */
+    /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
 
-    /**
-     * The method of the controller to be called.
-     *
-     * @var string
-     */
+    /** @var stringThe method of the controller to be called. */
     public $ControllerMethod;
 
-    /**
-     * Any query string arguments supplied to the controller method.
-     *
-     * @var string
-     */
+    /** @var stringAny query string arguments supplied to the controller method. */
     private $_ControllerMethodArgs = array();
 
-    /**
-     * @var string|FALSE The delivery method to set on the controller.
-     */
+    /** @var string|FALSE The delivery method to set on the controller. */
     private $_DeliveryMethod = FALSE;
 
 
-    /**
-     * @var string|FALSE The delivery type to set on the controller.
-     */
+    /** @var string|FALSE The delivery type to set on the controller. */
     private $_DeliveryType = FALSE;
 
     /**
-     * An associative collection of variables that will get passed into the
+     * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
-     *
-     * @var array
      */
     private $_PropertyCollection;
 
-    /**
-     * Defined by the url of the request: SYNDICATION_RSS, SYNDICATION_ATOM, or
-     * SYNDICATION_NONE (default).
-     *
-     * @var string
-     */
+    /** @var string Defined by the url of the request: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
     private $_SyndicationMethod;
-
-    const BLOCK_NEVER = 0;
-    const BLOCK_PERMISSION = 1;
-    const BLOCK_ANY = 2;
 
     /**
      * Class constructor.
@@ -124,6 +92,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->_Data = array();
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function Cleanup() {
         $this->FireEvent('Cleanup');
     }

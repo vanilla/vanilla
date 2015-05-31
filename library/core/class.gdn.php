@@ -1,50 +1,69 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Framework superobject
- *
- * Static object that provides an anchor and namespace for many framework
- * components, such as Controller, Dispatcher, Config, Database, etc.
+ * The heart of the beast.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
- * @static
+ */
+
+/**
+ * Framework superobject.
+ *
+ * Static object that provides an anchor and namespace for many framework
+ * components, such as Controller, Dispatcher, Config, Database, etc.
  */
 class Gdn {
 
-    /// CONSTANTS ///
     const AliasAuthenticator = 'Authenticator';
+
     const AliasCache = 'Cache';
+
     const AliasConfig = 'Config';
+
     const AliasDatabase = 'Database';
+
     const AliasDatabaseStructure = 'DatabaseStructure';
+
     const AliasDispatcher = 'Dispatcher';
+
     const AliasLocale = 'Locale';
+
     const AliasPermissionModel = 'PermissionModel';
+
     const AliasRequest = 'Request';
+
     const AliasRouter = 'Router';
+
     const AliasSession = 'Session';
+
     const AliasSlice = 'Slice';
+
     const AliasSqlDriver = 'SqlDriver';
+
     const AliasUserMetaModel = 'UserMetaModel';
+
     const AliasUserModel = 'UserModel';
 
     const AliasApplicationManager = 'ApplicationManager';
+
     const AliasPluginManager = 'PluginManager';
+
     const AliasThemeManager = 'ThemeManager';
 
     const FactoryInstance = 'Instance';
+
     const FactoryPrototype = 'Prototype';
+
     const FactorySingleton = 'Singleton';
+
     const FactoryRealSingleton = 'RealSingleton';
 
-    /// PROPERTIES ///
-
+    /** @var object  */
     protected static $_Config = NULL;
 
     /** @var Gdn_Factory The factory used to create core objects in the application. */
@@ -53,15 +72,17 @@ class Gdn {
     /** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
     protected static $_FactoryOverwrite = TRUE;
 
+    /** @var object  */
     protected static $_Locale = NULL;
 
+    /** @var object  */
     protected static $_Request = NULL;
 
+    /** @var object  */
     protected static $_PluginManager = NULL;
 
+    /** @var object  */
     protected static $_Session = NULL;
-
-    /// METHODS ///
 
     /**
      * Get the application manager
@@ -72,7 +93,11 @@ class Gdn {
         return self::Factory(self::AliasApplicationManager);
     }
 
-    /** @return Gdn_Auth */
+    /**
+     *
+     *
+     * @return Gdn_Auth
+     */
     public static function Authenticator() {
         return self::Factory(self::AliasAuthenticator);
     }
@@ -88,6 +113,7 @@ class Gdn {
 
     /**
      * Get a configuration setting for the application.
+     *
      * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
      * @param mixed $Default The result to return if the configuration setting is not found.
      * @return Gdn_Config|mixed The configuration setting.
@@ -117,7 +143,8 @@ class Gdn {
         return $Controller;
     }
 
-    /** Gets the global dispatcher object.
+    /**
+     * Gets the global dispatcher object.
      *
      * @return Gdn_Dispatcher
      */
@@ -127,6 +154,7 @@ class Gdn {
 
     /**
      * Get a reference to the default database object.
+     *
      * @return Gdn_Database
      */
     public static function Database() {
@@ -135,6 +163,7 @@ class Gdn {
 
     /**
      * Get an object from the factory.
+     *
      * @param string $Alias The alias of the class.
      * @param mixed $Args A variable number of arguments to pass to the constructor.
      * @see Gdn_Factory::Factory()
@@ -278,6 +307,12 @@ class Gdn {
         }
     }
 
+    /**
+     *
+     *
+     * @param null $Value
+     * @return int
+     */
     public static function FactoryOverwrite($Value = NULL) {
         $Result = (self::$_FactoryOverwrite & 1 > 0);
 
@@ -356,6 +391,8 @@ class Gdn {
     }
 
     /**
+     *
+     *
      * @return Gdn_Locale
      */
     public static function Locale() {
@@ -389,6 +426,7 @@ class Gdn {
 
     /**
      * Get or set the current request object.
+     *
      * @param Gdn_Request $NewRequest The new request or null to just get the request.
      * @return Gdn_Request
      */
@@ -460,6 +498,7 @@ class Gdn {
 
     /**
      * Get a reference to the Statistics object.
+     *
      * @return Gdn_Statistics
      */
     public static function Statistics() {
@@ -468,6 +507,7 @@ class Gdn {
 
     /**
      * Get a reference to the default database structure object.
+     * 
      * @return Gdn_DatabaseStructure
      */
     public static function Structure() {

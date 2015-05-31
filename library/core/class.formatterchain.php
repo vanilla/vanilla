@@ -1,4 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_FormatterChain.
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Output formatter chain
@@ -11,25 +20,17 @@
  *  - Create the object with a Format($String) method.
  *  - Call the static method Gdn_FormatterChain::Chain() to install it on top of the other formatter.
  *  - Depending on the priority you specified your formatter will be called before or after the existing formatter.
- *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_FormatterChain {
-    /// Constants ///
+
     const PRIORITY_DEFAULT = 0;
+
     const PRIORITY_FIRST = 1000;
+
     const PRIORITY_LAST = -1000;
 
-    /// Properties ///
-
+    /** @var array  */
     protected $_Formatters = array();
-
-
-    /// Methods ///
 
     /** Add a formatter to the chain. This method isn't usuall called directly. Use Gdn_FormatterChain::Chain() instead.
      *
@@ -50,8 +51,10 @@ class Gdn_FormatterChain {
         usort($this->_Formatters, array('Gdn_FormatterChain', 'Compare'));
     }
 
-    /** Add a formatter and create a chain in the Gdn factory.
-     *  This is a conveinience method for chaining formatters without having to deal with the object creation logic.
+    /**
+     * Add a formatter and create a chain in the Gdn factory.
+     *
+     * This is a conveinience method for chaining formatters without having to deal with the object creation logic.
      *
      * @param string $Type The type of formatter.
      * @param object $Formatter The formatter to install.

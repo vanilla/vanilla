@@ -1,26 +1,32 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_FileSystem.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
+
+if (!defined('VANILLA_FILE_PUT_FLAGS')) {
+    define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
+}
 
 /**
  * Framework filesystem layer
  *
  * Abstract many common filesystem tasks such as deleting and creating folders,
  * reading files, and creating blank files.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
-
-if (!defined('VANILLA_FILE_PUT_FLAGS')) define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
-
 class Gdn_FileSystem {
 
     const O_CREATE = 1;
+
     const O_WRITE = 2;
+
     const O_READ = 4;
 
     /**

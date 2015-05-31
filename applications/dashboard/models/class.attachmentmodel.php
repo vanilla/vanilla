@@ -1,11 +1,15 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Attachment Model.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.2
  */
 
 /**
- * Attachment Model.
+ * Handles attachments. Least-Buddhist model of them all.
  *
  * Attachments can be made to the following content Types
  *    - Discussion
@@ -55,15 +59,13 @@
  * To set an error just use the key 'Error'.  WriteErrorAttachment() will then display the error.
  */
 class AttachmentModel extends Gdn_Model {
-    /// Properties ///
 
-    /**
-     * @var AttachmentModel
-     */
+    /** @var AttachmentModel */
     static $Instance = NULL;
 
-    /// Methods ///
-
+    /**
+     * Set up the attachment.
+     */
     public function __construct() {
         parent::__construct('Attachment');
         $this->PrimaryKey = 'AttachmentID';
@@ -71,6 +73,7 @@ class AttachmentModel extends Gdn_Model {
 
     /**
      * Calculate any necessary values on an attachment row after it comes from the database.
+     *
      * @param array $Row The attachment row.
      */
     protected function CalculateRow(&$Row) {
@@ -93,6 +96,11 @@ class AttachmentModel extends Gdn_Model {
         );
     }
 
+    /**
+     * Whether attachments are enabled.
+     *
+     * @return bool
+     */
     public static function Enabled() {
         return C('Garden.AttachmentsEnabled', FALSE);
     }

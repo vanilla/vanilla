@@ -1,29 +1,39 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Social Controller
- *
  * Manages the social plugins.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.1
+ */
+
+/**
+ * Handles /social endpoint, so it must be an extrovert.
  */
 class SocialController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form', 'Database');
 
+    /**
+     * Runs before every call to this controller.
+     */
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');
     }
 
+    /**
+     * Default method.
+     */
     public function Index() {
         Redirect('social/manage');
     }
 
+    /**
+     * Settings page.
+     */
     public function Manage() {
         $this->Permission('Garden.Settings.Manage');
         $this->Title("Social Integration");
@@ -35,8 +45,13 @@ class SocialController extends DashboardController {
         $this->Render();
     }
 
+    /**
+     * Find available social plugins.
+     *
+     * @return array|mixed
+     * @throws Exception
+     */
     protected function GetConnections() {
-
         $this->FireEvent('GetConnections');
         $Connections = $this->Data('Connections', array());
         if (!is_array($Connections)) $Connections = array();
@@ -66,6 +81,12 @@ class SocialController extends DashboardController {
         return $Connections;
     }
 
+    /**
+     * Turn off a social plugin.
+     *
+     * @param $Plugin
+     * @throws Exception
+     */
     public function Disable($Plugin) {
         $this->Permission('Garden.Settings.Manage');
         $Connections = $this->GetConnections();
@@ -92,6 +113,13 @@ class SocialController extends DashboardController {
         $this->Render('blank', 'utility');
     }
 
+    /**
+     * Turn on a social plugin.
+     *
+     * @param $Plugin
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function Enable($Plugin) {
         $this->Permission('Garden.Settings.Manage');
         $Connections = $this->GetConnections();

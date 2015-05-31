@@ -1,20 +1,22 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * RBAC (Role Based Access Control) system.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /role endpoint.
+ */
 class RoleController extends DashboardController {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form', 'RoleModel');
 
-    /**
-     * @var RoleModel
-     */
+    /** @var RoleModel */
     public $RoleModel;
 
     /**

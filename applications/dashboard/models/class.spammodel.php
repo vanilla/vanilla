@@ -1,18 +1,29 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Spam model.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Handles spam data.
  */
 class SpamModel extends Gdn_Pluggable {
-    /// PROPERTIES ///
+
+    /** @var SpamModel */
     protected static $_Instance;
 
+    /** @var bool */
     public static $Disabled = FALSE;
 
-
-    /// METHODS ///
-
+    /**
+     *
+     *
+     * @return SpamModel
+     */
     protected static function _Instance() {
         if (!self::$_Instance)
             self::$_Instance = new SpamModel();

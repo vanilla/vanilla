@@ -1,25 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
-
-set_time_limit(0);
-
+<?php
 /**
  * Perform miscellaneous operations for Dashboard.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /utility endpoint.
+ */
 class UtilityController extends DashboardController {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form');
 
     /**
-     * Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
+     * @var array Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
      * Typically, HTTP headers in the $_SERVER array will be prefixed with
      * `HTTP_` or `X_`. These are not so we list them here for later reference.
-     *
-     * @var array
      */
     protected static $specialHeaders = array(
         'CONTENT_TYPE',
@@ -41,9 +41,13 @@ class UtilityController extends DashboardController {
         $AssetModel->ServeCss($ThemeType, $Filename);
     }
 
+    /**
+     * Runs before every call to this controller.
+     */
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');
+        set_time_limit(0); // Is this even doing anything?
     }
 
 //   /**

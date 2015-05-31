@@ -1,18 +1,22 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Message model.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+/**
+ * Handles message data.
+ */
 class MessageModel extends Gdn_Model {
 
+    /** @var array Non-standard message location allowed. */
     private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
 
+    /** @var array Current message data. */
     protected static $Messages;
 
     /**
@@ -20,10 +24,15 @@ class MessageModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Message');
-
-
     }
 
+    /**
+     *
+     *
+     * @param string $Where
+     * @param bool $Limit
+     * @param bool $ResetData
+     */
     public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
         parent::Delete($Where, $Limit, $ResetData);
         self::Messages(NULL);
@@ -65,6 +74,14 @@ class MessageModel extends Gdn_Model {
         return $Message;
     }
 
+    /**
+     *
+     *
+     * @param $NeedleCategoryID
+     * @param $HaystackCategoryID
+     * @param bool $IncludeSubcategories
+     * @return bool
+     */
     protected function InCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = FALSE) {
         if (!$HaystackCategoryID)
             return TRUE;
@@ -88,6 +105,14 @@ class MessageModel extends Gdn_Model {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $Location
+     * @param array $Exceptions
+     * @param null $CategoryID
+     * @return array|null
+     */
     public function GetMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = NULL) {
         $Session = Gdn::Session();
         $Prefs = $Session->GetPreference('DismissedMessages', array());
@@ -175,6 +200,12 @@ class MessageModel extends Gdn_Model {
         return $Locations;
     }
 
+    /**
+     *
+     *
+     * @param bool $ID
+     * @return array|mixed|null|type|void
+     */
     public static function Messages($ID = FALSE) {
         if ($ID === NULL) {
             Gdn::Cache()->Remove('Messages');
@@ -193,6 +224,13 @@ class MessageModel extends Gdn_Model {
             return GetValue($ID, $Messages);
     }
 
+    /**
+     *
+     *
+     * @param array $FormPostValues
+     * @param bool $Settings
+     * @return unknown
+     */
     public function Save($FormPostValues, $Settings = FALSE) {
         // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
         $Location = ArrayValue('Location', $FormPostValues, '');
@@ -214,6 +252,9 @@ class MessageModel extends Gdn_Model {
         return parent::Save($FormPostValues, $Settings);
     }
 
+    /**
+     *
+     */
     public function SetMessageCache() {
         // Retrieve an array of all controllers that have enabled messages associated
         SaveToConfig('Garden.Messages.Cache', $this->GetEnabledLocations());

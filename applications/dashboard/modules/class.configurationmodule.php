@@ -1,10 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Configuration module.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.2
+ */
 
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- *
  * This class gives a simple way to load/save configuration settings.
+ *
  * To use this module you must:
  *  1. Call Schema() to set the config fields you are using.
  *  2. Call Initialize() within the controller to load/save the data.
@@ -13,28 +19,19 @@
  *   b) Call this object's RenderAll() method within the view if you don't want to customize the view any further.
  */
 class ConfigurationModule extends Gdn_Module {
-    /// PROPERTIES ///
 
-    /**
-     * Whether or not the view is rendering the entire page.
-     * @var bool
-     */
+    /** @var bool Whether or not the view is rendering the entire page. */
     public $RenderAll = FALSE;
+
+    /** @var array A definition of the data that this will manage. */
+    protected $_Schema;
+
+    /** @var ConfigurationModule */
+    public $ConfigurationModule = NULL;
 
     /**
      *
-     * @var array A definition of the data that this will manage.
-     */
-    protected $_Schema;
-
-    /**
-     * @var ConfigurationModule
-     */
-    public $ConfigurationModule = NULL;
-
-    /// METHODS ///
-
-    /**
+     *
      * @param Gdn_Controller $Controller The controller using this model.
      */
     public function __construct($Sender = NULL) {
@@ -47,6 +44,8 @@ class ConfigurationModule extends Gdn_Module {
     }
 
     /**
+     *
+     *
      * @return Gdn_Controller
      */
     public function Controller() {
@@ -54,6 +53,7 @@ class ConfigurationModule extends Gdn_Module {
     }
 
     /**
+     *
      *
      * @param Gdn_Form $NewValue
      * @return Gdn_Form
@@ -69,6 +69,11 @@ class ConfigurationModule extends Gdn_Module {
         return $Form;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function HasFiles() {
         static $HasFiles = NULL;
 
@@ -84,6 +89,12 @@ class ConfigurationModule extends Gdn_Module {
         return $HasFiles;
     }
 
+    /**
+     *
+     *
+     * @param null $Schema
+     * @throws Exception
+     */
     public function Initialize($Schema = NULL) {
         if ($Schema !== NULL)
             $this->Schema($Schema);
@@ -132,6 +143,12 @@ class ConfigurationModule extends Gdn_Module {
         }
     }
 
+    /**
+     *
+     *
+     * @param $SchemaRow
+     * @return bool|mixed|string
+     */
     public function LabelCode($SchemaRow) {
         if (isset($SchemaRow['LabelCode']))
             return $SchemaRow['LabelCode'];
@@ -152,6 +169,11 @@ class ConfigurationModule extends Gdn_Module {
         return $LabelCode;
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function RenderAll() {
         $this->RenderAll = TRUE;
         $Controller = $this->Controller();
@@ -163,6 +185,7 @@ class ConfigurationModule extends Gdn_Module {
 
     /**
      * Set the data definition to load/save from the config.
+     *
      * @param array $Def A list of fields from the config that this form will use.
      */
     public function Schema($Def = NULL) {

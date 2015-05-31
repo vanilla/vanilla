@@ -1,16 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Provides a way to widgetize modules.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /module endpoint.
+ */
 class ModuleController extends Gdn_Controller {
+
     /**
      * Creates and renders an instance of a module.
+     *
+     * @param string $Module
+     * @param string $AppFolder
+     * @param string $DeliveryType
+     * @throws NotFoundException
      */
     public function Index($Module, $AppFolder = '', $DeliveryType = '') {
         if (!$DeliveryType)

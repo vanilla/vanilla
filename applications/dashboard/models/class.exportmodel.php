@@ -1,27 +1,66 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * For exporting other database structures into a format that can be imported.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.1
+ */
 
 /**
- * Object for exporting other database structures into a format that can be imported.
+ * Export handler.
+ *
  * @see Gdn_ImportModel
  */
 class ExportModel {
+
+    /** Comment character to use in export. */
     const COMMENT = '//';
+
+    /** Delimiter character to use in export. */
     const DELIM = ',';
+
+    /** Escape character to use in export. */
     const ESCAPE = '\\';
+
+    /** Newline character to use in export. */
     const NEWLINE = "\n";
+
+    /** Null character to use in export. */
     const NULL = '\N';
+
+    /** Quote character to use in export. */
     const QUOTE = '"';
+
+    /** @var object|null File pointer. */
+    protected $_File = NULL;
+
+    /** @var object|null PDO connection. */
+    protected $_PDO = NULL;
+
+    /** @var bool Whether or not to use compression when creating the file.  */
+    public $UseCompression = TRUE;
+
+    /** @var string The database prefix that ExportTable() it will replace :_ with in a query string. */
+    public $Prefix = '';
+
+    /** @var array Data format we support exporting. */
+    protected $_Structures = array(
+        'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+        'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
+        'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+        'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
+        'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
+        'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
+        'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
+        'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('u', 'm', 'f'), 'Score' => 'float'),
+        'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
+    );
 
     /**
      * Create the export file and begin the export.
+     *
      * @param string $Path The path to the export file.
      * @param string $Source The source program that created the export. This may be used by the import routine to do additional processing.
      */
@@ -44,6 +83,7 @@ class ExportModel {
 
     /**
      * Write a comment to the export file.
+     *
      * @param string $Message The message to write.
      * @param bool $Echo Whether or not to echo the message in addition to writing it to the file.
      */
@@ -54,7 +94,9 @@ class ExportModel {
     }
 
     /**
-     * End the export and close the export file. This method must be called if BeginExport() has been called or else the export file will not be closed.
+     * End the export and close the export file.
+     *
+     * This method must be called if BeginExport() has been called or else the export file will not be closed.
      */
     public function EndExport() {
         $this->EndTime = microtime(TRUE);
@@ -70,12 +112,9 @@ class ExportModel {
             fclose($this->_File);
     }
 
-    protected $_File = NULL;
-
-    protected $_PDO = NULL;
-
     /**
      * Gets or sets the PDO connection to the database.
+     *
      * @param mixed $DsnOrPDO One of the following:
      *  - <b>String</b>: The dsn to the database.
      *  - <b>PDO</b>: An existing connection to the database.
@@ -99,6 +138,7 @@ class ExportModel {
 
     /**
      * Export a table to the export file.
+     *
      * @param string $TableName the name of the table to export. This must correspond to one of the accepted vanilla tables.
      * @param mixed $Query The query that will fetch the data for the export this can be one of the following:
      *  - <b>String</b>: Represents a string of sql to execute.
@@ -189,23 +229,7 @@ class ExportModel {
             $Data->closeCursor();
     }
 
-    /**
-     * @var string The database prefix. When you pass a sql string to ExportTable() it will replace occurances of :_ with this property.
-     * @see vnExport::ExportTable()
-     */
-    public $Prefix = '';
 
-    protected $_Structures = array(
-        'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-        'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
-        'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-        'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
-        'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
-        'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
-        'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
-        'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('u', 'm', 'f'), 'Score' => 'float'),
-        'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
-    );
 
     /**
      * Returns an array of all the expected export tables and expected columns in the exports.
@@ -216,11 +240,6 @@ class ExportModel {
     public function Structures() {
         return $this->_Structures;
     }
-
-    /**
-     * @var bool Whether or not to use compression when creating the file.
-     */
-    public $UseCompression = TRUE;
 
     /**
      * Returns the version of export file that will be created with this export.

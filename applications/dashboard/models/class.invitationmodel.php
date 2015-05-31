@@ -1,15 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Invitation model.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+/**
+ * Handles invitation data.
+ */
 class InvitationModel extends Gdn_Model {
+
     /**
      * Class constructor. Defines the related database table name.
      */
@@ -17,6 +20,12 @@ class InvitationModel extends Gdn_Model {
         parent::__construct('Invitation');
     }
 
+    /**
+     *
+     *
+     * @param $InvitationID
+     * @return array|bool|stdClass
+     */
     public function GetByInvitationID($InvitationID) {
         $DataSet = $this->SQL->From('Invitation i')
             ->Join('User su', 'i.InsertUserID = su.UserID')
@@ -33,6 +42,16 @@ class InvitationModel extends Gdn_Model {
         return $DataSet->FirstRow();
     }
 
+    /**
+     *
+     *
+     * @param $UserID
+     * @param string $InvitationID
+     * @param int $Limit
+     * @param int $Offset
+     * @return Gdn_DataSet
+     * @throws Exception
+     */
     public function GetByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
         $this->SQL->Select('i.*')
             ->Select('u.Name', '', 'AcceptedName')
@@ -49,6 +68,15 @@ class InvitationModel extends Gdn_Model {
         return $this->SQL->Get();
     }
 
+    /**
+     *
+     *
+     * @param array $FormPostValues
+     * @param array|bool $UserModel
+     * @param array $Options
+     * @return bool
+     * @throws Exception
+     */
     public function Save($FormPostValues, $UserModel, $Options = array()) {
         $Session = Gdn::Session();
         $UserID = $Session->UserID;
@@ -134,6 +162,12 @@ class InvitationModel extends Gdn_Model {
         return false;
     }
 
+    /**
+     *
+     *
+     * @param $InvitationID
+     * @throws Exception
+     */
     public function Send($InvitationID) {
         $Invitation = $this->GetByInvitationID($InvitationID);
         $Session = Gdn::Session();
@@ -161,6 +195,13 @@ class InvitationModel extends Gdn_Model {
         }
     }
 
+    /**
+     *
+     *
+     * @param string|unknown_type $InvitationID
+     * @return bool
+     * @throws Exception
+     */
     public function Delete($InvitationID) {
         $Session = Gdn::Session();
         $UserID = $Session->UserID;
@@ -188,7 +229,7 @@ class InvitationModel extends Gdn_Model {
     }
 
     /**
-     * Returns a unique 8 character invitation code
+     * Returns a unique 8 character invitation code.
      */
     protected function GetInvitationCode() {
         // Generate a new invitation code.

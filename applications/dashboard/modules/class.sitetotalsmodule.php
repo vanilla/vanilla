@@ -1,5 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Site totals module.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
+/**
+ * Site-wide stats.
+ */
 class SiteTotalsModule extends Gdn_Module {
 
     public function __construct() {

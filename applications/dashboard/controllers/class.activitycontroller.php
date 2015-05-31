@@ -1,28 +1,30 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages the activity stream.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /activity endpoint.
+ */
 class ActivityController extends Gdn_Controller {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /**  @var array Models to include. */
     public $Uses = array('Database', 'Form', 'ActivityModel');
 
-    /**
-     * @var ActivityModel
-     */
+    /** @var ActivityModel */
     public $ActivityModel;
 
+    /**
+     * Create some virtual properties.
+     *
+     * @param $Name
+     * @return Gdn_DataSet
+     */
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':

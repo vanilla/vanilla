@@ -1,14 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages individual user profiles.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /profile endpoint.
+ */
 class ProfileController extends Gdn_Controller {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form', 'UserModel');
 
@@ -21,9 +25,7 @@ class ProfileController extends Gdn_Controller {
     /** @var bool Is the page in "edit" mode or not. */
     public $EditMode;
 
-    /**
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     public $Form;
 
     /** @var array List of available tabs. */

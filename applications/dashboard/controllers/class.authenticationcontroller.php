@@ -1,12 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages user authentication in Dashboard.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0.3
+ */
+
+/**
+ * Authentication manager.
  */
 class AuthenticationController extends DashboardController {
     /**

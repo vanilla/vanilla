@@ -1,14 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages default info, error, and site status pages.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /home endpoint.
+ */
 class HomeController extends Gdn_Controller {
+
     /**
      * JS & CSS includes for all methods in this controller.
      *
@@ -39,6 +43,9 @@ class HomeController extends Gdn_Controller {
         $this->FileNotFound();
     }
 
+    /**
+     * Display error page.
+     */
     public function Error() {
         $this->RemoveCssFile('admin.css');
         $this->AddCssFile('style.css');

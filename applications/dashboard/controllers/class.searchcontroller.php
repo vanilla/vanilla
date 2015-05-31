@@ -1,19 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages basic searching.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /search endpoint.
+ */
 class SearchController extends Gdn_Controller {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database');
 
-    // Object initialization
+    /**  @var Gdn_Form */
     public $Form;
+
+    /**  @var SearchModel */
     public $SearchModel;
 
     /**

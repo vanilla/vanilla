@@ -1,27 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Non-activity action logging.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /log endpoint.
+ */
 class LogController extends DashboardController {
+
     /** @var array Objects to prep. */
     public $Uses = array('Form', 'LogModel');
 
-    /**
-     *
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     public $Form;
 
-    /**
-     *
-     * @var LogModel
-     */
+    /** @var LogModel */
     public $LogModel;
 
     /**

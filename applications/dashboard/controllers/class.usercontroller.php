@@ -1,27 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manage users.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /user endpoint.
+ */
 class UserController extends DashboardController {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form');
 
-    /**
-     * The number of users when certain optimizations kick in.
-     *
-     * @var int Returns the number of users we need before optimizing.
-     */
+    /** @var int The number of users when certain optimizations kick in. */
     public $UserThreshold = 10000;
 
-    /**
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     public $Form;
 
     /**

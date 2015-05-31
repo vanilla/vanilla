@@ -1,22 +1,33 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Update model.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
-define('ADDON_TYPE_PLUGIN', 1);
-define('ADDON_TYPE_THEME', 2);
-define('ADDON_TYPE_LOCALE', 4);
-define('ADDON_TYPE_APPLICATION', 5);
-define('ADDON_TYPE_CORE', 10);
-
+/**
+ * Handles updating.
+ */
 class UpdateModel extends Gdn_Model {
+
+    const ADDON_TYPE_PLUGIN = 1;
+    const ADDON_TYPE_THEME = 2;
+    const ADDON_TYPE_LOCALE = 4;
+    const ADDON_TYPE_APPLICATION = 5;
+    const ADDON_TYPE_CORE = 10;
+
+    /** @var string URL to the addons site. */
     public $AddonSiteUrl = 'http://vanilla.local';
 
+    /**
+     *
+     *
+     * @param $Addon
+     * @param $Addons
+     */
     protected static function _AddAddon($Addon, &$Addons) {
         $Slug = strtolower($Addon['AddonKey']).'-'.strtolower($Addon['AddonType']);
         $Addons[$Slug] = $Addon;
@@ -67,7 +78,7 @@ class UpdateModel extends Gdn_Model {
                 // The application was confirmed.
                 $Addon = array(
                     'AddonKey' => 'vanilla',
-                    'AddonTypeID' => ADDON_TYPE_CORE,
+                    'AddonTypeID' => self::ADDON_TYPE_CORE,
                     'Name' => 'Vanilla',
                     'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
                     'Version' => $Version,
@@ -82,7 +93,7 @@ class UpdateModel extends Gdn_Model {
 
                 $Addon = array(
                     'AddonKey' => 'porter',
-                    'AddonTypeID' => ADDON_TYPE_CORE,
+                    'AddonTypeID' => self::ADDON_TYPE_CORE,
                     'Name' => 'Vanilla Porter',
                     'Description' => 'Drop this script in your existing site and navigate to it in your web browser to export your existing forum data to the Vanilla 2 import format.',
                     'Version' => $Version,
@@ -127,16 +138,16 @@ class UpdateModel extends Gdn_Model {
                 $Addon = array_merge(array('AddonKey' => $Key, 'AddonTypeID' => ''), $Info);
                 switch ($Variable) {
                     case 'ApplicationInfo':
-                        $Addon['AddonTypeID'] = ADDON_TYPE_APPLICATION;
+                        $Addon['AddonTypeID'] = self::ADDON_TYPE_APPLICATION;
                         break;
                     case 'LocaleInfo':
-                        $Addon['AddonTypeID'] = ADDON_TYPE_LOCALE;
+                        $Addon['AddonTypeID'] = self::ADDON_TYPE_LOCALE;
                         break;
                     case 'PluginInfo':
-                        $Addon['AddonTypeID'] = ADDON_TYPE_PLUGIN;
+                        $Addon['AddonTypeID'] = self::ADDON_TYPE_PLUGIN;
                         break;
                     case 'ThemeInfo':
-                        $Addon['AddonTypeID'] = ADDON_TYPE_THEME;
+                        $Addon['AddonTypeID'] = self::ADDON_TYPE_THEME;
                         break;
                 }
             }
@@ -231,7 +242,7 @@ class UpdateModel extends Gdn_Model {
                     // The plugin was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_PLUGIN,
+                        'AddonTypeID' => self::ADDON_TYPE_PLUGIN,
                         'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -287,7 +298,7 @@ class UpdateModel extends Gdn_Model {
                     // The application was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_APPLICATION,
+                        'AddonTypeID' => self::ADDON_TYPE_APPLICATION,
                         'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -338,7 +349,7 @@ class UpdateModel extends Gdn_Model {
                     // The application was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_THEME,
+                        'AddonTypeID' => self::ADDON_TYPE_THEME,
                         'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -395,7 +406,7 @@ class UpdateModel extends Gdn_Model {
                     // The locale pack was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_LOCALE,
+                        'AddonTypeID' => self::ADDON_TYPE_LOCALE,
                         'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -424,7 +435,7 @@ class UpdateModel extends Gdn_Model {
                 // The application was confirmed.
                 $Addon = array(
                     'AddonKey' => 'vanilla',
-                    'AddonTypeID' => ADDON_TYPE_CORE,
+                    'AddonTypeID' => self::ADDON_TYPE_CORE,
                     'Name' => 'Vanilla',
                     'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
                     'Version' => $Version,
@@ -479,6 +490,13 @@ class UpdateModel extends Gdn_Model {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Path
+     * @param $InfoPaths
+     * @return array
+     */
     protected static function _GetInfoFiles($Path, $InfoPaths) {
         $Path = str_replace('\\', '/', rtrim($Path));
 
@@ -496,6 +514,16 @@ class UpdateModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Path
+     * @param $InfoPaths
+     * @param bool $TmpPath
+     * @param bool $ThrowError
+     * @return array|bool
+     * @throws Exception
+     */
     protected static function _GetInfoZip($Path, $InfoPaths, $TmpPath = FALSE, $ThrowError = TRUE) {
         // Extract the zip file so we can make sure it has appropriate information.
         $Zip = NULL;
@@ -586,6 +614,7 @@ class UpdateModel extends Gdn_Model {
 
     /**
      * Offers a quick and dirty way of parsing an addon's info array without using eval().
+     *
      * @param string $Path The path to the info array.
      * @param string $Variable The name of variable containing the information.
      * @return array|false The info array or false if the file could not be parsed.
@@ -695,6 +724,12 @@ class UpdateModel extends Gdn_Model {
         return $UpdateAddons;
     }
 
+    /**
+     *
+     *
+     * @param bool $Enabled
+     * @return array
+     */
     public function GetAddons($Enabled = FALSE) {
         $Addons = array();
 
@@ -769,6 +804,14 @@ class UpdateModel extends Gdn_Model {
         return $Addons;
     }
 
+    /**
+     *
+     *
+     * @param bool $Enabled
+     * @param bool $OnlyUpdates
+     * @return array|bool
+     * @throws Exception
+     */
     public function GetAddonUpdates($Enabled = FALSE, $OnlyUpdates = TRUE) {
         // Get the addons on this site.
         $MyAddons = $this->GetAddons($Enabled);
@@ -789,6 +832,14 @@ class UpdateModel extends Gdn_Model {
         return $UpdateAddons;
     }
 
+    /**
+     *
+     *
+     * @param null $AddonCode
+     * @param bool $Explicit
+     * @param bool $Drop
+     * @throws Exception
+     */
     public function RunStructure($AddonCode = NULL, $Explicit = FALSE, $Drop = FALSE) {
         // Get the structure files for all of the enabled applications.
         $ApplicationManager = new Gdn_ApplicationManager();

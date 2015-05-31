@@ -1,12 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Menu module.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 if (!class_exists('MenuModule', FALSE)) {
     /**
@@ -15,42 +15,45 @@ if (!class_exists('MenuModule', FALSE)) {
      */
     class MenuModule extends Gdn_Module {
 
-        /**
-         * An array of menu items.
-         */
+        /**  @var array Menu items. */
         public $Items;
 
-        /**
-         * The html id attribute to be applied to the root element of the menu.
-         * Default is "Menu".
-         */
+        /** @var string The html id attribute to be applied to the root element of the menu.vDefault is "Menu". */
         public $HtmlId;
 
-        /**
-         * The class attribute to be applied to the root element of the
-         * breadcrumb. Default is none.
-         */
+        /** @var string The class attribute to be applied to the root element of the breadcrumb. Default is none. */
         public $CssClass;
 
-        /**
-         * An array of menu group names arranged in the order that the menu
-         * should be rendered.
-         */
+        /** @var array Menu group names arranged in the order that the menu should be rendered. */
         public $Sort;
 
         /**
-         * A route that, if found in the menu links, should cause that link to
-         * have the Highlight class applied. This property is assigned with
-         * $this->Highlight();
+         * @var string A route that, if found in the menu links, should cause that link to
+         * have the Highlight class applied. This property is assigned with $this->Highlight();
          */
         private $_HighlightRoute;
 
+        /**
+         *
+         *
+         * @param string $Sender
+         */
         public function __construct($Sender = '') {
             $this->HtmlId = 'Menu';
             $this->ClearGroups();
             parent::__construct($Sender);
         }
 
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         * @param $Url
+         * @param bool $Permission
+         * @param string $Attributes
+         * @param string $AnchorAttributes
+         */
         public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '', $AnchorAttributes = '') {
             if (!array_key_exists($Group, $this->Items))
                 $this->Items[$Group] = array();
@@ -58,6 +61,14 @@ if (!class_exists('MenuModule', FALSE)) {
             $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes);
         }
 
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         * @param bool $Permission
+         * @param string $Attributes
+         */
         public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
             if (!array_key_exists($Group, $this->Items))
                 $this->Items[$Group] = array();
@@ -65,18 +76,37 @@ if (!class_exists('MenuModule', FALSE)) {
             $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
         }
 
+        /**
+         *
+         *
+         * @return string
+         */
         public function AssetTarget() {
             return 'Menu';
         }
 
+        /**
+         *
+         */
         public function ClearGroups() {
             $this->Items = array();
         }
 
+        /**
+         *
+         *
+         * @param $Route
+         */
         public function HighlightRoute($Route) {
             $this->_HighlightRoute = $Route;
         }
 
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         */
         public function RemoveLink($Group, $Text) {
             if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
                 foreach ($this->Items[$Group] as $Index => $GroupArray) {
@@ -104,6 +134,13 @@ if (!class_exists('MenuModule', FALSE)) {
                 unset($this->Items[$Group]);
         }
 
+        /**
+         *
+         *
+         * @param string $HighlightRoute
+         * @return string
+         * @throws Exception
+         */
         public function ToString($HighlightRoute = '') {
             if ($HighlightRoute == '')
                 $HighlightRoute = $this->_HighlightRoute;

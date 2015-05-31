@@ -1,22 +1,33 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Contains functions for combining javascript and css files.
+ * Contains functions for combining Javascript and CSS files.
  *
- * Events:
- * - AssetModel_StyleCss_Handler(...)
+ * Use the AssetModel_StyleCss_Handler event to include CSS files in your plugin.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.1
  */
+
+/**
+ * Manages Assets.
+ */
 class AssetModel extends Gdn_Model {
+
+    /** @var array List of CSS files to serve. */
     protected $_CssFiles = array();
 
+     /** @var string */
     public $UrlPrefix = '';
 
+    /**
+     * Add to the list of CSS files to serve.
+     *
+     * @param $Filename
+     * @param bool $Folder
+     * @param bool $Options
+     */
     public function AddCssFile($Filename, $Folder = false, $Options = false) {
         if (is_string($Options)) {
             $Options = array('Css' => $Options);
@@ -24,6 +35,13 @@ class AssetModel extends Gdn_Model {
         $this->_CssFiles[] = array($Filename, $Folder, $Options);
     }
 
+    /**
+     * Serve all CSS files.
+     *
+     * @param $ThemeType
+     * @param $Filename
+     * @throws Exception
+     */
     public function ServeCss($ThemeType, $Filename) {
         // Split the filename into filename and etag.
         if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
@@ -131,6 +149,16 @@ class AssetModel extends Gdn_Model {
         file_put_contents($CachePath, $Css);
     }
 
+    /**
+     *
+     *
+     * @param $ThemeType
+     * @param $Basename
+     * @param $ETag
+     * @param null $NotFound
+     * @return array
+     * @throws Exception
+     */
     public function GetCssFiles($ThemeType, $Basename, $ETag, &$NotFound = NULL) {
         $NotFound = array();
 
@@ -205,6 +233,13 @@ class AssetModel extends Gdn_Model {
         return $Paths;
     }
 
+    /**
+     *
+     *
+     * @param $A
+     * @param $B
+     * @return int
+     */
     protected function _ComparePath($A, $B) {
         $SortA = val('Sort', $A[2], 0);
         $SortB = val('Sort', $B[2], 0);
@@ -304,7 +339,9 @@ class AssetModel extends Gdn_Model {
         return false;
     }
 
-    /** Generate an e-tag for the application from the versions of all of its enabled applications/plugins. **/
+    /**
+     * Generate an e-tag for the application from the versions of all of its enabled applications/plugins.
+     **/
     public static function ETag() {
         $Data = array();
         $Data['vanilla-core-'.APPLICATION_VERSION] = TRUE;

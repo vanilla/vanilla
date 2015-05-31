@@ -1,22 +1,34 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Contains useful functions for cleaning up the database.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.1
+ */
 
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Handles additional logging.
  */
 class LogModel extends Gdn_Pluggable {
-    /// PROPERTIES ///
 
     protected static $_Instance = NULL;
     protected $_RecalcIDs = array('Discussion' => array());
     protected static $_TransactionID = NULL;
 
-    /// METHODS ///
-
+    /**
+     *
+     */
     public static function BeginTransaction() {
         self::$_TransactionID = TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $LogIDs
+     */
     public function Delete($LogIDs) {
         if (!is_array($LogIDs))
             $LogIDs = explode(',', $LogIDs);
@@ -38,11 +50,19 @@ class LogModel extends Gdn_Pluggable {
         Gdn::SQL()->WhereIn('LogID', $LogIDs)->Delete('Log');
     }
 
+    /**
+     *
+     */
     public static function EndTransaction() {
         self::$_TransactionID = NULL;
     }
 
-    // Format the content of a log file.
+    /**
+     * Format the content of a log file.
+     *
+     * @param $Log
+     * @return array|string
+     */
     public function FormatContent($Log) {
         $Data = $Log['Data'];
 
@@ -80,6 +100,12 @@ class LogModel extends Gdn_Pluggable {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     * @return array|string
+     */
     public function FormatConfiguration($Data) {
         $Old = $Data;
         $New = $Data['_New'];
@@ -108,6 +134,13 @@ class LogModel extends Gdn_Pluggable {
             return T('No Change');
     }
 
+    /**
+     *
+     *
+     * @param $Key
+     * @param $Data
+     * @return string
+     */
     public function FormatKey($Key, $Data) {
         if (!is_array($Data)) $Data = (array)$Data;
         if (isset($Data['_New']) && isset($Data['_New'][$Key])) {
@@ -120,6 +153,13 @@ class LogModel extends Gdn_Pluggable {
         return nl2br(trim(($Result)));
     }
 
+    /**
+     *
+     *
+     * @param $Keys
+     * @param $Data
+     * @return array|string
+     */
     public function FormatRecord($Keys, $Data) {
         $Result = array();
         foreach ($Keys as $Index => $Key) {
@@ -135,6 +175,14 @@ class LogModel extends Gdn_Pluggable {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Old
+     * @param $New
+     * @param string $Method
+     * @return string
+     */
     public function FormatDiff($Old, $New, $Method = 'html') {
         static $TinyDiff = NULL;
 
@@ -147,6 +195,12 @@ class LogModel extends Gdn_Pluggable {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $IDs
+     * @return array|null
+     */
     public function GetIDs($IDs) {
         if (is_string($IDs))
             $IDs = explode(',', $IDs);
@@ -165,6 +219,17 @@ class LogModel extends Gdn_Pluggable {
         return $Logs;
     }
 
+    /**
+     *
+     *
+     * @param bool $Where
+     * @param string $OrderFields
+     * @param string $OrderDirection
+     * @param bool $Offset
+     * @param bool $Limit
+     * @return array|null
+     * @throws Exception
+     */
     public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Offset = FALSE, $Limit = FALSE) {
         if ($Offset < 0)
             $Offset = 0;
@@ -195,6 +260,12 @@ class LogModel extends Gdn_Pluggable {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Where
+     * @return mixed
+     */
     public function GetCountWhere($Where) {
         if (isset($Where['Operation'])) {
             Gdn::SQL()->WhereIn('Operation', (array)$Where['Operation']);
@@ -212,7 +283,9 @@ class LogModel extends Gdn_Pluggable {
 
     /**
      * Wrapper for GetCountWhere that takes care of caching specific operation counts.
+     *
      * @param string $Operation Comma-delimited list of operation types to get (sum of) counts for.
+     * @return int
      */
     public function GetOperationCount($Operation) {
         if ($Operation == 'edits')
@@ -399,6 +472,7 @@ class LogModel extends Gdn_Pluggable {
 
     /**
      *
+     *
      * @return LogModel
      */
     protected static function _Instance() {
@@ -408,6 +482,14 @@ class LogModel extends Gdn_Pluggable {
         return self::$_Instance;
     }
 
+    /**
+     *
+     *
+     * @param $Operation
+     * @param $RecordType
+     * @param $NewData
+     * @param null $OldData
+     */
     public static function LogChange($Operation, $RecordType, $NewData, $OldData = NULL) {
         $RecordID = isset($NewData['RecordID']) ? $NewData['RecordID'] : GetValue($RecordType.'ID', $NewData);
 
@@ -428,6 +510,15 @@ class LogModel extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     * @param $LogKey
+     * @param string $BakKey1
+     * @param string $BakKey2
+     * @return null
+     */
     protected static function _LogValue($Data, $LogKey, $BakKey1 = '', $BakKey2 = '') {
         $Data = (array)$Data;
         if (isset($Data[$LogKey]) && $LogKey != $BakKey1) {
@@ -446,8 +537,12 @@ class LogModel extends Gdn_Pluggable {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function Recalculate() {
-
         if ($DiscussionIDs = val('Discussion', $this->_RecalcIDs)) {
             $In = implode(',', array_keys($DiscussionIDs));
 
@@ -487,13 +582,12 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Takes an array and returns a flip, making values the keys
-     * and making the keys values. In case of multiple values with
-     * the several occurrences, this reserves all original keys by
+     * Takes an array and returns a flip, making values the keys and making the keys values.
+     *
+     * In case of multiple values with the several occurrences, this reserves all original keys by
      * pushing them onto an array.
      *
-     * @param array $array An array in the format {[id1] => count,
-     *                                             [id2] => count }
+     * @param array $array An array in the format {[id1] => count, [id2] => count }
      * @return array A 2D array the format {[count] => [id1, id2]}
      */
     public function arrayFlipAndCombine($array) {
@@ -513,6 +607,14 @@ class LogModel extends Gdn_Pluggable {
         return $newArray;
     }
 
+    /**
+     *
+     *
+     * @param $Log
+     * @param bool $DeleteLog
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function Restore($Log, $DeleteLog = TRUE) {
         static $Columns = array();
 
@@ -559,6 +661,14 @@ class LogModel extends Gdn_Pluggable {
 //      die();
     }
 
+    /**
+     *
+     *
+     * @param $Log
+     * @param bool $DeleteLog
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     protected function _RestoreOne($Log, $DeleteLog = TRUE) {
         // Throw an event to see if the restore is being overridden.
         $Handled = FALSE;

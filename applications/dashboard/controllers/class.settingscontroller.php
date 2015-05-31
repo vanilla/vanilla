@@ -1,14 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Managing core Dashboard settings.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /settings endpoint.
+ */
 class SettingsController extends DashboardController {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form', 'Database');
 

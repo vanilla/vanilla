@@ -1,15 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Handshake interface
  *
- * A template for handshake-aware authenticator classes.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.10
+ */
+
+/**
+ * A template for handshake-aware authenticator classes.
  */
 interface Gdn_IHandshake {
 
@@ -40,5 +40,4 @@ interface Gdn_IHandshake {
     public function Finalize($UserKey, $UserID, $ConsumerKey, $TokenKey, $Payload);
 
     public function GetHandshakeMode();
-
 }

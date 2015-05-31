@@ -1,30 +1,56 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * Catch and render errors.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
- * Catch and render errors
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
+ * Class Gdn_ErrorException
  */
 class Gdn_ErrorException extends ErrorException {
 
+    /** @var string */
     protected $_Context;
 
+    /**
+     *
+     *
+     * @param string $Message
+     * @param int $ErrorNumber
+     * @param int $File
+     * @param string $Line
+     * @param int $Context
+     */
     public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
         parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
         $this->_Context = $Context;
     }
 
+    /**
+     *
+     *
+     * @return int|string
+     */
     public function getContext() {
         return $this->_Context;
     }
 }
 
+/**
+ *
+ *
+ * @param $ErrorNumber
+ * @param $Message
+ * @param $File
+ * @param $Line
+ * @param $Arguments
+ * @return bool|void
+ * @throws Gdn_ErrorException
+ */
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
     $ErrorReporting = error_reporting();
 
@@ -48,6 +74,7 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
 /**
  * A custom error handler that displays much more, very useful information when
  * errors are encountered in Garden.
+ *
  * @param Exception $Exception The exception that was thrown.
  */
 function Gdn_ExceptionHandler($Exception) {
@@ -425,6 +452,12 @@ if (!function_exists('Boop')) {
 }
 
 if (!function_exists('CleanErrorArguments')) {
+    /**
+     *
+     *
+     * @param $Var
+     * @param array $BlackList
+     */
     function CleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
         if (is_array($Var)) {
             foreach ($Var as $Key => $Value) {

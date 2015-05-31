@@ -1,16 +1,13 @@
-<?php
-
+<?php if (!defined('APPLICATION')) exit();
 /**
  * General functions Interim Compatibility Map
  *
  * These functions are copies of existing functions but with new and improved
  * names. Parent functions will be deprecated in a future release.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.2
  */
 

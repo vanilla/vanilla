@@ -1,5 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Authentication Module: Local User/Password auth tokens.
  *
@@ -9,13 +8,20 @@
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Class Gdn_PasswordAuthenticator
  */
 class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
 
+    /**
+     *
+     */
     public function __construct() {
         $this->_DataSourceType = Gdn_Authenticator::DATA_FORM;
 
@@ -90,6 +96,11 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
         return $UserID;
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public function CurrentStep() {
         // Was data submitted through the form already?
         if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === TRUE)) {

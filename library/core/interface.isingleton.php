@@ -1,27 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Singleton interface
  *
- * A simple interface that all singletons must follow.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
-if (!defined('APPLICATION'))
-    exit();
-
-
 /**
  * A simple interface that all singletons must follow.
- *
- * @package Garden
  */
 interface ISingleton {
     /**

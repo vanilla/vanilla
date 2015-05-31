@@ -1,12 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Vanilla controller
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
+ */
 
 /**
  * Master application controller for Vanilla, extended by all others except Settings.
- *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
- * @package Vanilla
  */
 class VanillaController extends Gdn_Controller {
 
@@ -31,7 +34,6 @@ class VanillaController extends Gdn_Controller {
         $this->AddJsFile('global.js');
         $this->AddCssFile('style.css');
         $this->AddCssFile('vanillicon.css', 'static');
-
 
         // Add modules
 //      $this->AddModule('MeModule');

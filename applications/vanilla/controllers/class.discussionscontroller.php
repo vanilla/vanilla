@@ -1,57 +1,33 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Discussions controller
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
+ */
 
 /**
- * Handles displaying discussions in most contexts.
+ * Handles displaying discussions in most contexts via /discussions endpoint.
  *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
- * @package Vanilla
  * @todo Resolve inconsistency between use of $Page and $Offset as parameters.
  */
 class DiscussionsController extends VanillaController {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /** @var arrayModels to include. */
     public $Uses = array('Database', 'DiscussionModel', 'Form');
 
-    /**
-     * A boolean value indicating if discussion options should be displayed when
-     * rendering the discussion view.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var boolean
-     */
+    /** @var boolean Value indicating if discussion options should be displayed when rendering the discussion view.*/
     public $ShowOptions;
 
-    /**
-     * Category object.
-     *
-     * Used to limit which discussions are returned to a particular category.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var object
-     */
+    /** @var object Category object. Used to limit which discussions are returned to a particular category. */
     public $Category;
 
-    /**
-     * Unique identifier for category.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var int
-     */
+    /** @var int Unique identifier for category. */
     public $CategoryID;
 
-    /**
-     * @var array Limit the discussions to just this list of categories, checked for view permission.
-     */
+    /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
 
     /**

@@ -1,17 +1,17 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Garden.Modules
+ * New Discussion module
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
  */
 
 /**
  * Renders the "Start a New Discussion" button.
  */
 class NewDiscussionModule extends Gdn_Module {
-
-    public function AssetTarget() {
-        return 'Panel';
-    }
 
     /** @var int Which category we are viewing (if any). */
     public $CategoryID = NULL;
@@ -44,6 +44,15 @@ class NewDiscussionModule extends Gdn_Module {
         parent::__construct($Sender, 'Vanilla');
         // Customize main button by setting Vanilla.DefaultNewButton to URL code. Example: "post/question"
         $this->DefaultButton = C('Vanilla.DefaultNewButton', FALSE);
+    }
+
+    /**
+     *
+     *
+     * @return string
+     */
+    public function AssetTarget() {
+        return 'Panel';
     }
 
     /**

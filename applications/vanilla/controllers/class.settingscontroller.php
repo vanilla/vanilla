@@ -1,33 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Settings controller
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
+ */
 
 /**
- * Handles displaying the dashboard "settings" pages for Vanilla via Dashboard.
+ * Handles displaying the dashboard "settings" pages for Vanilla via /settings endpoint.
  *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
- * @package Vanilla
- * @todo Resolve inconsistency between use of $Page and $Offset as parameters.
+ * @todo Remove this controller in favor of Dashboard's settings controller.
  */
 class SettingsController extends Gdn_Controller {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /** @var array Models to include. */
     public $Uses = array('Database', 'Form', 'CategoryModel');
 
-    /**
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     public $Form;
 
-    /**
-     *
-     * @var bool
-     */
+    /** @var bool */
     public $ShowCustomPoints = FALSE;
 
     /**

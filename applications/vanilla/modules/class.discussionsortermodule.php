@@ -1,12 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
+ * Discussion Sort module
  *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
  */
 
 /**
  * Renders the discussion sorter.
  */
 class DiscussionSorterModule extends Gdn_Module {
+
     /** @array Available sort options. data-field => Text for user. */
     var $SortOptions;
 

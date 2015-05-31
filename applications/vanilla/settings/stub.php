@@ -3,6 +3,10 @@
  * Vanilla stub content for a new forum.
  *
  * Called by VanillaHooks::Setup() to insert stub content upon enabling app.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @since 2.0
  * @package Vanilla
  */
 

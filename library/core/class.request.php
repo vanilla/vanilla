@@ -1,8 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Incoming request parser.
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
- * Incoming request parser
- *
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
  * that can be accessed directly by the Dispatcher.
  *
@@ -11,30 +19,48 @@
  * @method string RequestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
  * @method string RequestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
  * @method string RequestFolder($URI = NULL) Get/Set the Request script's Folder.
- *
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Request {
 
+    /** Superglobal source. */
     const INPUT_CUSTOM = "custom";
+
+    /** Superglobal source. */
     const INPUT_ENV = "env";
+
+    /** Superglobal source. */
     const INPUT_FILES = "files";
+
+    /** Superglobal source. */
     const INPUT_GET = "get";
+
+    /** Superglobal source. */
     const INPUT_POST = "post";
+
+    /** Superglobal source. */
     const INPUT_SERVER = "server";
+
+    /** Superglobal source. */
     const INPUT_COOKIES = "cookies";
 
-    protected $_HaveParsedRequest = FALSE; // Bool, signifies whether or not _ParseRequest has been called yet.
-    protected $_Environment;               // Raw environment variables, unparsed
-    protected $_ParsedRequest;             // Resolved/parsed request information
-    protected $_Parsing = FALSE;
-    protected $_RequestArguments;          // Request data/parameters, either from superglobals or from a custom array of key/value pairs
+    /** @var bool Whether or not _ParseRequest has been called yet. */
+    protected $_HaveParsedRequest = FALSE;
 
+    /** @var array Raw environment variables, unparsed. */
+    protected $_Environment;
+
+    /** @var array Resolved/parsed request information. */
+    protected $_ParsedRequest;
+
+    /** @var bool  */
+    protected $_Parsing = FALSE;
+
+    /** @var array Request data/parameters, either from superglobals or from a custom array of key/value pairs. */
+    protected $_RequestArguments;
+
+    /**
+     *
+     */
     private function __construct() {
         $this->Reset();
     }
@@ -309,8 +335,9 @@ class Gdn_Request {
         return $this->RequestAddress();
     }
 
-    /*
+    /**
      * Returns a boolean value indicating if the current page has an authenticated postback.
+     *
      * @return type
      * @since 2.1
      */
@@ -328,6 +355,7 @@ class Gdn_Request {
 
     /**
      * Gets/sets the port of the request.
+     *
      * @param int $Port
      * @return int
      * @since 2.1

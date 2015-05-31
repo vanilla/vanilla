@@ -1,29 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Schema representation
- *
- * Manages defining and examining the schema of a database table.
+ * Schema representation.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Manages defining and examining the schema of a database table.
  */
 class Gdn_Schema {
 
     /**
-     * An associative array of TableName => Fields associative arrays that
+     * @var array An associative array of TableName => Fields associative arrays that
      * describe the table's field properties. Each field is represented by an
-     * object with the following properties:
-     *  Name, PrimaryKey, Type, AllowNull, Default, Length, Enum
+     * object with the following properties: Name, PrimaryKey, Type, AllowNull, Default, Length, Enum
      */
     protected $_Schema;
 
-    /**
-     * The name of the table currently being examined.
-     */
+    /** @var string The name of the table currently being examined. */
     public $CurrentTable;
 
     /**

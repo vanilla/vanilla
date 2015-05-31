@@ -1,25 +1,33 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Analytics system
- *
- * Handles install-side analytics gathering and sending.
+ * Analytics system.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.17
+ */
+
+/**
+ * Handles install-side analytics gathering and sending.
  */
 class Gdn_Statistics extends Gdn_Plugin {
 
+    /** @var mixed  */
     protected $AnalyticsServer;
+
+    /** @var array  */
     public static $Increments = array('h' => 'hours', 'd' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
 
+    /** @var array  */
     protected $TickExtra;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
 
@@ -30,6 +38,16 @@ class Gdn_Statistics extends Gdn_Plugin {
         $this->TickExtra = array();
     }
 
+    /**
+     *
+     *
+     * @param $Method
+     * @param $RequestParameters
+     * @param bool $Callback
+     * @param bool $ParseResponse
+     * @return array|bool|mixed|type
+     * @throws Exception
+     */
     public function Analytics($Method, $RequestParameters, $Callback = FALSE, $ParseResponse = TRUE) {
         $FullMethod = explode('/', $Method);
         if (sizeof($FullMethod) < 2)
@@ -95,11 +113,23 @@ class Gdn_Statistics extends Gdn_Plugin {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $Method
+     * @param $Parameters
+     * @return array|bool|mixed|type
+     */
     public function Api($Method, $Parameters) {
         $ApiResponse = $this->Analytics($Method, $Parameters, FALSE, FALSE);
         return $ApiResponse;
     }
 
+    /**
+     *
+     *
+     * @param $JsonResponse
+     */
     protected function AnalyticsFailed($JsonResponse) {
         self::Throttled(TRUE);
 
@@ -108,6 +138,11 @@ class Gdn_Statistics extends Gdn_Plugin {
             Gdn::Controller()->InformMessage("Analytics: {$Reason}");
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function Base_Render_Before($Sender) {
         // If this is a full page request, trigger stats environment check
         if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
@@ -154,10 +189,21 @@ class Gdn_Statistics extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Name
+     * @param $Value
+     */
     public function AddExtra($Name, $Value) {
         $this->TickExtra[$Name] = $Value;
     }
 
+    /**
+     *
+     *
+     * @return null|string
+     */
     public function GetEncodedTickExtra() {
         if (!sizeof($this->TickExtra))
             return NULL;
@@ -165,6 +211,11 @@ class Gdn_Statistics extends Gdn_Plugin {
         return @json_encode($this->TickExtra);
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public static function CheckIsAllowed() {
         // These applications are not included in statistics
         $ExceptionApplications = array('dashboard');
@@ -189,6 +240,11 @@ class Gdn_Statistics extends Gdn_Plugin {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public static function CheckIsLocalhost() {
         $ServerAddress = Gdn::Request()->IpAddress();
         $ServerHostname = Gdn::Request()->GetValue('SERVER_NAME');
@@ -215,6 +271,11 @@ class Gdn_Statistics extends Gdn_Plugin {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @return bool|int
+     */
     public static function CheckIsEnabled() {
         // Forums that are busy installing should not yet be tracked
         if (!C('Garden.Installed', FALSE))
@@ -231,7 +292,15 @@ class Gdn_Statistics extends Gdn_Plugin {
         return TRUE;
     }
 
-    // credit: claudiu(at)cnixs.com via php.net/manual/en/ref.network.php
+    /**
+     *
+     *
+     * credit: claudiu(at)cnixs.com via php.net/manual/en/ref.network.php
+     *
+     * @param $IP
+     * @param $CIDR
+     * @return bool
+     */
     public static function CIDRCheck($IP, $CIDR) {
         list ($net, $mask) = explode("/", $CIDR);
 
@@ -253,6 +322,12 @@ class Gdn_Statistics extends Gdn_Plugin {
         return ($ip_ip_net == $ip_net);
     }
 
+    /**
+     *
+     *
+     * @param $Response
+     * @param $Raw
+     */
     protected function DoneRegister($Response, $Raw) {
         $VanillaID = GetValue('VanillaID', $Response, FALSE);
         $Secret = GetValue('Secret', $Response, FALSE);
@@ -264,12 +339,23 @@ class Gdn_Statistics extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Response
+     * @param $Raw
+     */
     protected function DoneStats($Response, $Raw) {
         $SuccessTimeSlot = GetValue('TimeSlot', $Response, FALSE);
         if ($SuccessTimeSlot !== FALSE)
             self::LastSentDate($SuccessTimeSlot);
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public static function FirstDate() {
         $FirstDate = Gdn::SQL()
             ->Select('DateInserted', 'min')
@@ -279,6 +365,12 @@ class Gdn_Statistics extends Gdn_Plugin {
         return $FirstDate;
     }
 
+    /**
+     *
+     *
+     * @param null $SetLastSentDate
+     * @return mixed|null
+     */
     public static function LastSentDate($SetLastSentDate = NULL) {
         static $LastSentDate = NULL;
 
@@ -295,8 +387,14 @@ class Gdn_Statistics extends Gdn_Plugin {
         return $LastSentDate;
     }
 
+    /**
+     *
+     *
+     * @param $JsonResponse
+     * @param $RawResponse
+     * @param $Callbacks
+     */
     protected function ParseAnalyticsResponse($JsonResponse, $RawResponse, $Callbacks) {
-
         // Verify signature of reply
         $Verified = $this->VerifySignature($JsonResponse);
         if ($Verified === FALSE)
@@ -370,8 +468,10 @@ class Gdn_Statistics extends Gdn_Plugin {
             call_user_func($CallbackExecute, $JsonResponse, $RawResponse);
     }
 
+    /**
+     *
+     */
     public function Register() {
-
         // Set the time we last attempted to perform registration
         Gdn::Set('Garden.Analytics.Registering', time());
 
@@ -398,17 +498,15 @@ class Gdn_Statistics extends Gdn_Plugin {
     }
 
     /**
-     * Sign a request or response
+     * Sign a request or response.
      *
      * Uses the known site secret to sign the given request or response. The
-     * request/response is passed in by reference so that it can be augmented
-     * with the signature.
+     * request/response is passed in by reference so that it can be augmented with the signature.
      *
      * @param array $Request The request array to be signed
      * @param boolean $Modify Optional whether or not to modify the request in place (default false)
      */
     public function Sign(&$Request, $Modify = FALSE) {
-
         // Fail if no ID is present
         $VanillaID = GetValue('VanillaID', $Request, FALSE);
         if (empty($VanillaID))
@@ -454,6 +552,11 @@ class Gdn_Statistics extends Gdn_Plugin {
         return $RealHash;
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     protected function Stats() {
         $StartTime = time();
         $Request = array();
@@ -584,6 +687,12 @@ class Gdn_Statistics extends Gdn_Plugin {
         ));
     }
 
+    /**
+     *
+     *
+     * @param null $SetThrottled
+     * @return bool
+     */
     public static function Throttled($SetThrottled = NULL) {
         static $Throttled = NULL;
 
@@ -607,14 +716,13 @@ class Gdn_Statistics extends Gdn_Plugin {
     }
 
     /**
-     * This is the asynchronous callback
+     * This is the asynchronous callback.
      *
      * This method is triggerd on every page request via a callback AJAX request
      * so that it may execute asychronously and reduce lag for users. It tracks
-     * views, handles registration for new installations, and sends stats every
-     * day as needed.
+     * views, handles registration for new installations, and sends stats every day as needed.
      *
-     * @return void;
+     * @return void
      */
     public function Tick() {
         // Fire an event for plugins to track their own stats.
@@ -676,7 +784,7 @@ class Gdn_Statistics extends Gdn_Plugin {
     }
 
     /**
-     * Increments overall pageview view count
+     * Increments overall pageview view count.
      *
      * @since 2.1a
      * @access public
@@ -757,10 +865,22 @@ class Gdn_Statistics extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @return int
+     */
     public static function Time() {
         return time();
     }
 
+    /**
+     *
+     *
+     * @param string $SlotType
+     * @param bool $Timestamp
+     * @return string
+     */
     public static function TimeSlot($SlotType = 'd', $Timestamp = FALSE) {
         if (!$Timestamp)
             $Timestamp = self::Time();
@@ -781,23 +901,53 @@ class Gdn_Statistics extends Gdn_Plugin {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $SlotType
+     * @param $Number
+     * @param bool $Timestamp
+     * @return int
+     */
     public static function TimeSlotAdd($SlotType, $Number, $Timestamp = FALSE) {
         $Timestamp = self::TimeSlotStamp($SlotType, $Timestamp);
         $Result = strtotime(sprintf('%+d %s', $Number, self::$Increments[$SlotType]), $Timestamp);
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param string $SlotType
+     * @param bool $Timestamp
+     * @return array
+     */
     public static function TimeSlotBounds($SlotType = 'd', $Timestamp = FALSE) {
         $From = self::TimeSlotStamp($SlotType, $Timestamp);
         $To = strtotime('+1 '.self::$Increments[$SlotType], $From);
         return array($From, $To);
     }
 
+    /**
+     *
+     *
+     * @param string $SlotType
+     * @param bool $Timestamp
+     * @return int
+     * @throws Exception
+     */
     public static function TimeSlotStamp($SlotType = 'd', $Timestamp = FALSE) {
         $Result = self::TimeFromTimeSlot(self::TimeSlot($SlotType, $Timestamp));
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $TimeSlot
+     * @return int
+     * @throws Exception
+     */
     public static function TimeFromTimeSlot($TimeSlot) {
         if ($TimeSlot == '00000000')
             return 0;
@@ -815,6 +965,14 @@ class Gdn_Statistics extends Gdn_Plugin {
         return $DateRaw;
     }
 
+    /**
+     *
+     *
+     * @param $TimeSlot
+     * @param string $Resolution
+     * @return int
+     * @throws Exception
+     */
     public static function TimeFromExtendedTimeSlot($TimeSlot, $Resolution = 'auto') {
         if ($TimeSlot == '00000000')
             return 0;
@@ -849,6 +1007,11 @@ class Gdn_Statistics extends Gdn_Plugin {
         return $DateRaw;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function ValidateCredentials() {
         $Request = array();
         $this->BasicParameters($Request);
@@ -872,7 +1035,7 @@ class Gdn_Statistics extends Gdn_Plugin {
     }
 
     /**
-     * Signature check
+     * Signature check.
      *
      * This method checks the supplied signature of a request against a hash of
      * the request arguments augmented with the local secret from the config file.

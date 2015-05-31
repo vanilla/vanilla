@@ -1,41 +1,63 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Regarding entity
- *
- * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc
+ * Regarding entity.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
  */
 class Gdn_RegardingEntity extends Gdn_Pluggable {
 
     private $Type = NULL;
+
     private $ForeignType = NULL;
+
     private $ForeignID = NULL;
+
     private $SourceElement = NULL;
 
     private $ParentType = NULL;
+
     private $ParentID = NULL;
+
     private $ParentElement = NULL;
 
     private $UserID = NULL;
+
     private $ForeignURL = NULL;
+
     private $Comment = NULL;
+
     private $OriginalContent = NULL;
 
     private $CollaborativeActions = array();
+
     private $CollaborativeTitle = NULL;
 
+    /**
+     *
+     *
+     * @param $ForeignType
+     * @param $ForeignID
+     */
     public function __construct($ForeignType, $ForeignID) {
         $this->ForeignType = strtolower($ForeignType);
         $this->ForeignID = $ForeignID;
         parent::__construct();
     }
 
+    /**
+     *
+     *
+     * @param null $SourceElement
+     * @return $this|null
+     */
     public function VerifiedAs($SourceElement = NULL) {
         if (is_null($SourceElement))
             return $this->SourceElement;
@@ -70,6 +92,14 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         return $this;
     }
 
+    /**
+     *
+     *
+     * @param $ParentType
+     * @param null $ParentIDKey
+     * @return $this
+     * @throws Exception
+     */
     public function AutoParent($ParentType, $ParentIDKey = NULL) {
         if (!is_null($this->SourceElement)) {
             if (is_null($ParentIDKey))
@@ -82,6 +112,14 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         return $this;
     }
 
+    /**
+     *
+     *
+     * @param $ParentType
+     * @param $ParentID
+     * @return $this
+     * @throws Exception
+     */
     public function WithParent($ParentType, $ParentID) {
         $ModelName = ucfirst($ParentType).'Model';
 
@@ -103,6 +141,12 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
     /* I'd like to... */
 
+    /**
+     *
+     *
+     * @param $ActionType
+     * @return $this
+     */
     public function ActionIt($ActionType) {
         $this->Type = strtolower($ActionType);
         return $this;
@@ -110,14 +154,33 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
     /* ... */
 
+    /**
+     *
+     *
+     * @param $InCategory
+     * @return Gdn_RegardingEntity
+     */
     public function ForDiscussion($InCategory) {
         return $this->ForCollaboration('discussion', $InCategory);
     }
 
+    /**
+     *
+     *
+     * @param $WithUsers
+     * @return Gdn_RegardingEntity
+     */
     public function ForConversation($WithUsers) {
         return $this->ForCollaboration('conversation', $WithUsers);
     }
 
+    /**
+     *
+     *
+     * @param $CollaborationType
+     * @param null $CollaborationParameters
+     * @return $this
+     */
     public function ForCollaboration($CollaborationType, $CollaborationParameters = NULL) {
         if ($CollaborationType !== FALSE) {
             $this->CollaborativeActions[] = array(
@@ -128,6 +191,12 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         return $this;
     }
 
+    /**
+     *
+     *
+     * @param $CollaborativeTitle
+     * @return $this
+     */
     public function Entitled($CollaborativeTitle) {
         $this->CollaborativeTitle = $CollaborativeTitle;
 
@@ -169,6 +238,12 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
     /* Meta data */
 
+    /**
+     *
+     *
+     * @param $URL
+     * @return $this
+     */
     public function Located($URL) {
         // Try to auto generate URL from known information
         if ($URL === TRUE) {
@@ -200,11 +275,23 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         return $this;
     }
 
+    /**
+     *
+     *
+     * @param $UserID
+     * @return $this
+     */
     public function From($UserID) {
         $this->UserID = $UserID;
         return $this;
     }
 
+    /**
+     *
+     *
+     * @param $Reason
+     * @return $this
+     */
     public function Because($Reason) {
         $this->Comment = $Reason;
         return $this;
@@ -212,6 +299,13 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
     /* Finally... */
 
+    /**
+     *
+     *
+     * @return bool
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function Commit() {
         if (is_null($this->Type))
             throw new Exception(T("Adding a Regarding event requires a type."));
@@ -340,6 +434,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         return TRUE;
     }
 
+    /**
+     * No setup.
+     */
     public function Setup() {
     }
 

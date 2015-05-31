@@ -1,18 +1,22 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Regarding system
- *
- * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc
+ * Regarding system.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
  */
 class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
     }
@@ -73,6 +77,15 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         return $this->Regarding('Conversation', $ConversationID, $Verify);
     }
 
+    /**
+     *
+     *
+     * @param $ThingType
+     * @param $ThingID
+     * @param bool $Verify
+     * @return Gdn_RegardingEntity
+     * @throws Exception
+     */
     protected function Regarding($ThingType, $ThingID, $Verify = TRUE) {
         $Verified = FALSE;
         if ($Verify) {
@@ -102,7 +115,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         throw new Exception(sprintf(T("Could not verify entity relationship '%s(%d)' for Regarding call"), $ModelName, $ThingID));
     }
 
-    // Transparent forwarder to built-in starter methods
+    /**
+     * Transparent forwarder to built-in starter methods.
+     *
+     * @return mixed
+     */
     public function That() {
         $Args = func_get_args();
         $ThingType = array_shift($Args);
@@ -110,10 +127,14 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         return call_user_func_array(array($this, $ThingType), $Args);
     }
 
-    /*
-     * Event system: Provide information for external hooks
+    /**
+     *  Event system: Provide information for external hooks.
+     *
+     * @param $RegardingType
+     * @param $ForeignType
+     * @param null $ForeignID
+     * @return array|bool
      */
-
     public function MatchEvent($RegardingType, $ForeignType, $ForeignID = NULL) {
         $RegardingData = GetValue('RegardingData', $this->EventArguments);
 
@@ -165,10 +186,17 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 //      $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
 //   }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $ParentType
+     * @param $ParentID
+     * @param $ForeignType
+     * @param $ForeignIDs
+     */
     protected function CacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
-
         $Sender->RegardingCache = array();
-
         $ChildRegardingData = $this->RegardingModel()->GetAll($ForeignType, $ForeignIDs);
         $ParentRegardingData = $this->RegardingModel()->Get($ParentType, $ParentID);
 
@@ -186,6 +214,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         $this->RegardingCache = array();
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function DiscussionController_BeforeCommentBody_Handler($Sender) {
         $Context = strtolower($Sender->EventArguments['Type']);
 
@@ -210,6 +243,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         }
     }
 
+    /**
+     *
+     *
+     * @return RegardingModel
+     */
     public function RegardingModel() {
         static $RegardingModel = NULL;
         if (is_null($RegardingModel))
@@ -217,6 +255,9 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         return $RegardingModel;
     }
 
+    /**
+     * Do nothing.
+     */
     public function Setup() {
     }
 

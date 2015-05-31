@@ -1,22 +1,28 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Slice manager: plugins and controllers
  *
- * Allows plugns and controllers to implement small asynchronously refreshable
- * portions of the page - slices.
- *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Allows plugns and controllers to implement small asynchronously refreshable portions of the page - slices.
  */
 class Gdn_SliceProvider {
 
     protected $SliceHandler;
+
     protected $SliceConfig;
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function EnableSlicing($Sender) {
         $this->SliceHandler = $Sender;
         $this->SliceConfig = array(
@@ -28,6 +34,13 @@ class Gdn_SliceProvider {
         $Sender->AddCssFile('/applications/dashboard/design/slice.css');
     }
 
+    /**
+     *
+     *
+     * @param $SliceName
+     * @param array $Arguments
+     * @return Gdn_Slice
+     */
     public function Slice($SliceName, $Arguments = array()) {
         $CurrentPath = Gdn::Request()->Path();
         $ExplodedPath = explode('/', $CurrentPath);
@@ -49,6 +62,11 @@ class Gdn_SliceProvider {
         return Gdn::Slice($SlicePath);
     }
 
+    /**
+     *
+     *
+     * @param $Asset
+     */
     public function AddSliceAsset($Asset) {
         $Extension = strtolower(array_pop($Trash = explode('.', basename($Asset))));
         switch ($Extension) {
@@ -64,6 +82,11 @@ class Gdn_SliceProvider {
         }
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public function RenderSliceConfig() {
         return json_encode($this->SliceConfig);
     }

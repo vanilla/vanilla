@@ -1,4 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Class Gdn_ConfigurationModel
+ *
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Represents and manages configuration data
@@ -7,45 +16,26 @@
  * name it is intended to represent) and used directly, or it can be extended
  * and overridden for more complicated procedures related to different
  * configuration arrays.
- *
- * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_ConfigurationModel {
 
     /**
-     * The name of the configuration array that this model is intended to
+     * @var string The name of the configuration array that this model is intended to
      * represent. The default value assigned to $this->Name will be the name
      * that the model was instantiated with (defined in $this->__construct()).
-     *
-     * @var string
      */
     public $Name;
 
-    /**
-     * An object that is used to manage and execute data integrity rules on this
-     * object.
-     *
-     * @var object
-     */
+    /** @var object An object that is used to manage and execute data integrity rules on this object. */
     public $Validation;
 
-    /**
-     * The actual array of data being worked on.
-     *
-     * @var object
-     */
+    /** @var object The actual array of data being worked on. */
     public $Data;
 
     /**
-     * A collection of Field => Values that will NOT be validated and WILL be
+     * @var string A collection of Field => Values that will NOT be validated and WILL be
      * saved as long as validation succeeds. You can add to this collection with
      * $this->ForceSetting();
-     *
-     * @var string
      */
     private $_ForceSettings = array();
 

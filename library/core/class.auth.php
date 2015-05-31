@@ -1,32 +1,49 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Authentication Manager
  *
- * Manages the authentication system for vanilla, including all authentication
- * modules.
- *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.10
+ */
+
+/**
+ * Manages the authentication system for vanilla, including all authentication modules.
  */
 class Gdn_Auth extends Gdn_Pluggable {
 
+    /** @var array  */
     protected $_AuthenticationSchemes = array();
+
+    /** @var object  */
     protected $_Authenticator = NULL;
+
+    /** @var array  */
     protected $_Authenticators = array();
 
+    /** @var string  */
     protected $_Protocol = 'http';
+
+    /** @var array  */
     protected $_Identity = NULL;
+
+    /** @var object  */
     protected $_UserModel = NULL;
+
+    /** @var PermissionModel  */
     protected $_PermissionModel = NULL;
 
+    /** @var bool  */
     protected $_AllowHandshake;
 
+    /** @var bool  */
     protected $_Started = FALSE;
 
+    /**
+     *
+     */
     public function __construct() {
         // Prepare Identity storage container
         $this->Identity();
@@ -34,6 +51,11 @@ class Gdn_Auth extends Gdn_Pluggable {
         parent::__construct();
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function StartAuthenticator() {
         if (!C('Garden.Installed', FALSE)) return;
         // Start the 'session'
@@ -54,6 +76,12 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @throws Exception
+     */
     public function RegisterAuthenticator($AuthenticationSchemeAlias) {
         $AuthenticatorClassPath = PATH_LIBRARY.'/core/authenticators/class.%sauthenticator.php';
         $Alias = strtolower($AuthenticationSchemeAlias);
@@ -78,6 +106,11 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function WakeUpAuthenticators() {
         foreach ($this->_AuthenticationSchemes as $Alias => $Properties) {
             $Authenticator = $this->AuthenticateWith($Alias, FALSE);
@@ -85,6 +118,14 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param string $AuthenticationSchemeAlias
+     * @param bool $InheritAuthenticator
+     * @return mixed
+     * @throws Exception
+     */
     public function AuthenticateWith($AuthenticationSchemeAlias = 'default', $InheritAuthenticator = TRUE) {
         if ($AuthenticationSchemeAlias == 'user') {
             if (Gdn::Session()->IsValid()) {
@@ -120,6 +161,12 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @param bool $SetAsDefault
+     */
     public function EnableAuthenticationScheme($AuthenticationSchemeAlias, $SetAsDefault = FALSE) {
         // Get list of currently enabled schemes.
         $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
@@ -152,6 +199,11 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     */
     public function DisableAuthenticationScheme($AuthenticationSchemeAlias) {
         $this->UnsetDefaultAuthenticator($AuthenticationSchemeAlias);
 
@@ -179,6 +231,12 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @return bool
+     */
     public function UnsetDefaultAuthenticator($AuthenticationSchemeAlias) {
         $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
         if (C('Garden.Authenticator.DefaultScheme') == $AuthenticationSchemeAlias) {
@@ -189,6 +247,12 @@ class Gdn_Auth extends Gdn_Pluggable {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @return bool
+     */
     public function SetDefaultAuthenticator($AuthenticationSchemeAlias) {
         $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
         $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
@@ -198,6 +262,13 @@ class Gdn_Auth extends Gdn_Pluggable {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param string $Default
+     * @return object
+     * @throws Exception
+     */
     public function GetAuthenticator($Default = 'default') {
         if (!$this->_Authenticator)
             $this->AuthenticateWith($Default);
@@ -212,10 +283,23 @@ class Gdn_Auth extends Gdn_Pluggable {
         return $this->_AuthenticationSchemes;
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @return bool
+     */
     public function GetAuthenticatorInfo($AuthenticationSchemeAlias) {
         return (array_key_exists($AuthenticationSchemeAlias, $this->_AuthenticationSchemes)) ? $this->_AuthenticationSchemes[$AuthenticationSchemeAlias] : FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $PlaceholderString
+     * @param array $ExtraReplacements
+     * @return mixed
+     */
     public function ReplaceAuthPlaceholders($PlaceholderString, $ExtraReplacements = array()) {
         $Replacements = array_merge(array(
             'Session_TransientKey' => '',
@@ -229,6 +313,14 @@ class Gdn_Auth extends Gdn_Pluggable {
         return Gdn_Format::VanillaSprintf($PlaceholderString, $Replacements);
     }
 
+    /**
+     *
+     *
+     * @param $ProviderKey
+     * @param $UserKey
+     * @param int $UserID
+     * @return array|bool
+     */
     public function AssociateUser($ProviderKey, $UserKey, $UserID = 0) {
         if ($UserID == 0) {
             try {
@@ -259,6 +351,14 @@ class Gdn_Auth extends Gdn_Pluggable {
         );
     }
 
+    /**
+     *
+     *
+     * @param $UserKey
+     * @param bool $ProviderKey
+     * @param string $KeyType
+     * @return array|bool|stdClass
+     */
     public function GetAssociation($UserKey, $ProviderKey = FALSE, $KeyType = Gdn_Authenticator::KEY_TYPE_TOKEN) {
         $Query = Gdn::SQL()->Select('ua.UserID, ua.ForeignUserKey, uat.Token')
             ->From('UserAuthentication ua')
@@ -278,14 +378,28 @@ class Gdn_Auth extends Gdn_Pluggable {
         return $UserAssociation ? $UserAssociation : FALSE;
     }
 
+    /**
+     *
+     */
     public function AllowHandshake() {
         $this->_AllowHandshake = TRUE;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function CanHandshake() {
         return $this->_AllowHandshake;
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @return bool
+     */
     public function IsPrimary($AuthenticationSchemeAlias) {
         return ($AuthenticationSchemeAlias == strtolower(Gdn::Config('Garden.Authenticator.DefaultScheme', 'password')));
     }
@@ -306,6 +420,11 @@ class Gdn_Auth extends Gdn_Pluggable {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function GetRealIdentity() {
         $Result = $this->_Identity->GetIdentity();
         return $Result;
@@ -322,6 +441,8 @@ class Gdn_Auth extends Gdn_Pluggable {
     }
 
     /**
+     *
+     *
      * @return UserModel
      */
     public function GetUserModel() {
@@ -337,7 +458,8 @@ class Gdn_Auth extends Gdn_Pluggable {
 
     /**
      *
-     * @return type Gdn_CookieIdentity
+     *
+     * @return Gdn_CookieIdentity
      */
     public function Identity() {
         if (is_null($this->_Identity)) {
@@ -349,6 +471,8 @@ class Gdn_Auth extends Gdn_Pluggable {
     }
 
     /**
+     *
+     *
      * @param PermissionModel $PermissionModel
      */
     public function SetPermissionModel($PermissionModel) {
@@ -356,6 +480,8 @@ class Gdn_Auth extends Gdn_Pluggable {
     }
 
     /**
+     *
+     *
      * @param UserModel $UserModel
      */
     public function SetUserModel($UserModel) {
@@ -374,6 +500,12 @@ class Gdn_Auth extends Gdn_Pluggable {
         return $this->_Protocol;
     }
 
+    /**
+     *
+     *
+     * @param $User
+     * @return bool
+     */
     public function ReturningUser($User) {
         if ($this->_Identity->HasVolatileMarker($User->UserID))
             return FALSE;
@@ -408,22 +540,54 @@ class Gdn_Auth extends Gdn_Pluggable {
         return $this->_GetURL(Gdn_Authenticator::URL_SIGNOUT, $Redirect);
     }
 
+    /**
+     *
+     *
+     * @param string $Redirect
+     * @return bool|mixed|string
+     */
     public function RemoteRegisterUrl($Redirect = '/') {
         return $this->_GetURL(Gdn_Authenticator::URL_REMOTE_REGISTER, $Redirect);
     }
 
+    /**
+     *
+     *
+     * @param string $Redirect
+     * @return bool|mixed|string
+     */
     public function RemoteSignInUrl($Redirect = '/') {
         return $this->_GetURL(Gdn_Authenticator::URL_REMOTE_SIGNIN, $Redirect);
     }
 
+    /**
+     *
+     *
+     * @param string $Redirect
+     * @return bool|mixed|string
+     */
     public function RemoteSignOutUrl($Redirect = '/') {
         return $this->_GetURL(Gdn_Authenticator::URL_REMOTE_SIGNOUT, $Redirect);
     }
 
+    /**
+     *
+     *
+     * @param $URLType
+     * @param $Redirect
+     * @return bool|mixed|string
+     */
     public function GetURL($URLType, $Redirect) {
         return $this->_GetURL($URLType, $Redirect);
     }
 
+    /**
+     *
+     *
+     * @param $URLType
+     * @param $Redirect
+     * @return bool|mixed|string
+     */
     protected function _GetURL($URLType, $Redirect) {
         $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
         $AuthenticationScheme = ($SessionAuthenticator) ? $SessionAuthenticator : 'default';
@@ -476,6 +640,13 @@ class Gdn_Auth extends Gdn_Pluggable {
         return $Return;
     }
 
+    /**
+     *
+     *
+     * @param $AuthResponse
+     * @param null $UserData
+     * @throws Exception
+     */
     public function Trigger($AuthResponse, $UserData = NULL) {
         if (!is_null($UserData))
             $this->EventArguments['UserData'] = $UserData;

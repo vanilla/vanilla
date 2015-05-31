@@ -1,332 +1,208 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Controller
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ * @abstract
+ */
 
 /**
- * Controller base class
+ * Controller base class.
  *
  * A base class that all controllers can inherit for common controller
  * properties and methods.
  *
  * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
- * @param string $View
- * @param string $ControllerName
- * @param string $ApplicationFolder
- * @param string $AssetName The name of the asset container that the content should be rendered in.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
- * @abstract
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
-    /**
-     * The name of the application that this controller can be found in
-     * (ie. Vanilla, Garden, etc).
-     *
-     * @var string
-     */
+    /** @var string The name of the application that this controller can be found in. */
     public $Application;
 
-    /**
-     * The name of the application folder that this controller can be found in
-     * (ie. vanilla, dashboard, etc).
-     *
-     * @var string
-     */
+    /** @var string The name of the application folder that this controller can be found in. */
     public $ApplicationFolder;
 
     /**
-     * An associative array that contains content to be inserted into the
+     * @var array An associative array that contains content to be inserted into the
      * master view. All assets are placed in this array before being passed to
      * the master view. If an asset's key is not called by the master view,
      * that asset will not be rendered.
-     *
-     * @var array
      */
     public $Assets;
 
-
+    /** @var string */
     protected $_CanonicalUrl;
 
     /**
-     * The name of the controller that holds the view (used by $this->FetchView
+     * @var string The name of the controller that holds the view (used by $this->FetchView
      * when retrieving the view). Default value is $this->ClassName.
-     *
-     * @var string
      */
     public $ControllerName;
 
     /**
-     * A CSS class to apply to the body tag of the page. Note: you can only
+     * @var string A CSS class to apply to the body tag of the page. Note: you can only
      * assume that the master view will use this property (ie. a custom theme
      * may not decide to implement this property).
-     *
-     * @var string
      */
     public $CssClass;
 
-    /**
-     * The data that a controller method has built up from models and other calcualtions.
-     *
-     * @var array The data from method calls.
-     */
+    /** @var array The data that a controller method has built up from models and other calculations. */
     public $Data = array();
 
-    /**
-     * The Head module that this controller should use to add CSS files.
-     *
-     * @var HeadModule
-     */
+    /** @var HeadModule The Head module that this controller should use to add CSS files. */
     public $Head;
 
     /**
-     * The name of the master view that has been requested. Typically this is
+     * @var string The name of the master view that has been requested. Typically this is
      * part of the master view's file name. ie. $this->MasterView.'.master.tpl'
-     *
-     * @var string
      */
     public $MasterView;
 
-    /**
-     * A Menu module for rendering the main menu on each page.
-     *
-     * @var object
-     */
+    /** @var object A Menu module for rendering the main menu on each page. */
     public $Menu;
 
     /**
-     * An associative array of assets and what order their modules should be rendered in.
+     * @var string An associative array of assets and what order their modules should be rendered in.
      * You can set module sort orders in the config using Modules.ModuleSortContainer.AssetName.
-     *
      * @example $Configuration['Modules']['Vanilla']['Panel'] = array('CategoryModule', 'NewDiscussionModule');
-     * @var string
      */
     public $ModuleSortContainer;
 
-    /**
-     * The method that was requested before the dispatcher did any re-routing.
-     *
-     * @var string
-     */
+    /** @var string The method that was requested before the dispatcher did any re-routing. */
     public $OriginalRequestMethod;
 
-    /**
-     * The url to redirect the user to by ajax'd forms after the form is
-     * successfully saved.
-     *
-     * @var string
-     */
+    /** @var string The url to redirect the user to by ajax'd forms after the form is successfully saved. */
     public $RedirectUrl;
 
-    /**
-     * @var string Fully resolved path to the application/controller/method
-     * @since 2.1
-     */
+    /** @var string Fully resolved path to the application/controller/method. */
     public $ResolvedPath;
 
-    /**
-     * @var array The arguments passed into the controller mapped to their proper argument names.
-     * @since 2.1
-     */
+    /** @var array The arguments passed into the controller mapped to their proper argument names. */
     public $ReflectArgs;
 
     /**
-     * This is typically an array of arguments passed after the controller
+     * @var mixed This is typically an array of arguments passed after the controller
      * name and controller method in the query string. Additional arguments are
      * parsed out by the @@Dispatcher and sent to $this->RequestArgs as an
      * array. If there are no additional arguments specified, this value will
      * remain FALSE.
      * ie. http://localhost/index.php?/controller_name/controller_method/arg1/arg2/arg3
      * translates to: array('arg1', 'arg2', 'arg3');
-     *
-     * @var mixed
      */
     public $RequestArgs;
 
     /**
-     * The method that has been requested. The request method is defined by the
+     * @var string The method that has been requested. The request method is defined by the
      * @@Dispatcher as the second parameter passed in the query string. In the
      * following example it would be "controller_method" and it relates
      * directly to the method that will be called in the controller. This value
      * is also used as $this->View unless $this->View has already been
      * hard-coded to be something else.
      * ie. http://localhost/index.php?/controller_name/controller_method/
-     *
-     * @var string
      */
     public $RequestMethod;
 
-    /**
-     * Reference to the Request object that spawned this controller
-     *
-     * @var Gdn_Request
-     */
+    /** @var Gdn_Request Reference to the Request object that spawned this controller. */
     public $Request;
 
-    /**
-     * The requested url to this controller.
-     *
-     * @var string
-     */
+    /** @var string The requested url to this controller. */
     public $SelfUrl;
 
     /**
-     * The message to be displayed on the screen by ajax'd forms after the form
+     * @var string The message to be displayed on the screen by ajax'd forms after the form
      * is successfully saved.
      *
      * @deprecated since 2.0.18; $this->ErrorMessage() and $this->InformMessage()
      * are to be used going forward.
-     *
-     * @var string
      */
     public $StatusMessage;
 
-    /**
-     * Defined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or
-     * SYNDICATION_NONE (default).
-     *
-     * @var string
-     */
+    /** @var stringDefined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
     public $SyndicationMethod;
 
     /**
-     * The name of the folder containing the views to be used by this
+     * @var string The name of the folder containing the views to be used by this
      * controller. This value is retrieved from the $Configuration array when
      * this class is instantiated. Any controller can then override the property
      * before render if there is a need.
-     *
-     * @var string
      */
     public $Theme;
 
-    /**
-     * Specific options on the currently selected theme.
-     * @var array
-     */
+    /** @var array Specific options on the currently selected theme. */
     public $ThemeOptions;
 
-    /**
-     * The name of the view that has been requested. Typically this is part of
-     * the view's file name. ie. $this->View.'.php'
-     *
-     * @var string
-     */
+    /** @var string Name of the view that has been requested. Typically part of the view's file name. ie. $this->View.'.php' */
     public $View;
 
-    /**
-     * An array of CSS file names to search for in theme folders & include in
-     * the page.
-     *
-     * @var array
-     */
+    /** @var array An array of CSS file names to search for in theme folders & include in the page. */
     protected $_CssFiles;
 
     /**
-     * A collection of definitions that will be written to the screen in a
-     * hidden unordered list so that JavaScript has access to them (ie. for
-     * language translations, web root, etc).
-     *
-     * @var array
+     * @var array A collection of definitions that will be written to the screen in a hidden unordered list
+     * so that JavaScript has access to them (ie. for language translations, web root, etc).
      */
     protected $_Definitions;
 
     /**
-     * An enumerator indicating how the response should be delivered to the
+     * @var string An enumerator indicating how the response should be delivered to the
      * output buffer. Options are:
      *    DELIVERY_METHOD_XHTML: page contents are delivered as normal.
      *    DELIVERY_METHOD_JSON: page contents and extra information delivered as JSON.
      * The default value is DELIVERY_METHOD_XHTML.
-     *
-     * @var string
      */
     protected $_DeliveryMethod;
 
     /**
-     * An enumerator indicating what should be delivered to the screen. Options
-     * are:
-     *    DELIVERY_TYPE_ALL: The master view and everything in the requested asset.
+     * @var string An enumerator indicating what should be delivered to the screen. Options are:
+     *    DELIVERY_TYPE_ALL: The master view and everything in the requested asset (DEFAULT).
      *    DELIVERY_TYPE_ASSET: Everything in the requested asset.
      *    DELIVERY_TYPE_VIEW: Only the requested view.
      *    DELIVERY_TYPE_BOOL: Deliver only the success status (or error) of the request
      *    DELIVERY_TYPE_NONE: Deliver nothing
-     * The default value is DELIVERY_TYPE_ALL.
-     *
-     * @var string
      */
     protected $_DeliveryType;
 
-    /**
-     * A string of html containing error messages to be displayed to the user.
-     *
-     * @since 2.0.18
-     * @var string
-     */
+    /** @var string A string of html containing error messages to be displayed to the user. */
     protected $_ErrorMessages;
 
-    /**
-     * @var bool Allows overriding 'FormSaved' property to send with DELIVERY_METHOD_JSON.
-     */
+    /** @var bool Allows overriding 'FormSaved' property to send with DELIVERY_METHOD_JSON. */
     protected $_FormSaved;
 
-    /**
-     * An associative array of header values to be sent to the browser before
-     * the page is rendered.
-     *
-     * @var array
-     */
+    /** @var array An associative array of header values to be sent to the browser before the page is rendered. */
     protected $_Headers;
 
-    /**
-     * @var array An array of internal methods that cannot be dispatched.
-     */
+    /** @var array An array of internal methods that cannot be dispatched. */
     protected $internalMethods;
 
-    /**
-     * A collection of "inform" messages to be displayed to the user.
-     *
-     * @since 2.0.18
-     * @var array
-     */
+    /** @var array A collection of "inform" messages to be displayed to the user. */
     protected $_InformMessages;
 
-    /**
-     * An array of JS file names to search for in app folders & include in
-     * the page.
-     *
-     * @var array
-     */
+    /** @var array An array of JS file names to search for in app folders & include in the page. */
     protected $_JsFiles;
 
-    /**
-     *
-     * @var array
-     */
+    /**  @var array */
     protected $_Staches;
 
     /**
-     * If JSON is going to be delivered to the client (see the render method),
+     * @var array If JSON is going to be delivered to the client (see the render method),
      * this property will hold the values being sent.
-     *
-     * @var array
      */
     protected $_Json;
 
-    /**
-     * A collection of view locations that have already been found. Used to
-     * prevent re-finding views.
-     *
-     * @var array
-     */
+    /** @var array A collection of view locations that have already been found. Used to prevent re-finding views. */
     protected $_ViewLocations;
 
+    /** @var string|null  */
+    protected $_PageName = NULL;
+
     /**
-     * Undocumented method.
      *
-     * @todo Method __construct() needs a description.
      */
     public function __construct() {
         $this->Application = '';
@@ -386,7 +262,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Add a breadcrumb to the list
+     * Add a breadcrumb to the list.
      *
      * @param string $Name Translation code
      * @param string $Link Optional. Hyperlink this breadcrumb somewhere.
@@ -411,8 +287,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Adds as asset (string) to the $this->Assets collection. The assets will
-     * later be added to the view if their $AssetName is called by
+     * Adds as asset (string) to the $this->Assets collection.
+     *
+     * The assets will later be added to the view if their $AssetName is called by
      * $this->RenderAsset($AssetName) within the view.
      *
      * @param string $AssetContainer The name of the asset container to add $Asset to.
@@ -503,7 +380,6 @@ class Gdn_Controller extends Gdn_Pluggable {
      *
      * @param mixed $Module A module or the name of a module to add to the page.
      * @param string $AssetTarget
-     * @todo $AssetTarget need the correct variable type and description.
      */
     public function AddModule($Module, $AssetTarget = '') {
         $this->FireEvent('BeforeAddModule');
@@ -564,6 +440,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             return C('Garden.AllowJSONP');
     }
 
+    /**
+     *
+     *
+     * @param null $Value
+     * @return null|string
+     */
     public function CanonicalUrl($Value = NULL) {
         if ($Value === NULL) {
             if ($this->_CanonicalUrl) {
@@ -597,6 +479,9 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     */
     public function ClearCssFiles() {
         $this->_CssFiles = array();
     }
@@ -608,15 +493,26 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_JsFiles = array();
     }
 
+    /**
+     *
+     *
+     * @param $ContentType
+     */
     public function ContentType($ContentType) {
         $this->SetHeader("Content-Type", $ContentType);
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function CssFiles() {
         return $this->_CssFiles;
     }
 
-    /** Get a value out of the controller's data array.
+    /**
+     * Get a value out of the controller's data array.
      *
      * @param string $Path The path to the data.
      * @param mixed $Default The default value if the data array doesn't contain the path.
@@ -741,6 +637,13 @@ class Gdn_Controller extends Gdn_Pluggable {
         return $this->_DeliveryMethod;
     }
 
+    /**
+     *
+     *
+     * @param bool $Value
+     * @param bool $PlainText
+     * @return mixed
+     */
     public function Description($Value = FALSE, $PlainText = FALSE) {
         if ($Value != FALSE) {
             if ($PlainText)
@@ -929,10 +832,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Undocumented method.
+     *
      *
      * @param string $AssetName
-     * @todo Method GetAsset() and $AssetName needs descriptions.
      */
     public function GetAsset($AssetName) {
         if (!array_key_exists($AssetName, $this->Assets))
@@ -979,9 +881,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Undocumented method.
      *
-     * @todo Method GetImports() needs a description.
      */
     public function GetImports() {
         if (!isset($this->Uses) || !is_array($this->Uses))
@@ -1017,6 +917,11 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function GetJson() {
         return $this->_Json;
     }
@@ -1024,6 +929,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Allows images to be specified for the page, to be used by the head module
      * to add facebook open graph information.
+     *
      * @param mixed $Img An image or array of image urls.
      * @return array The array of image urls.
      */
@@ -1084,6 +990,11 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->FireEvent('Initialize');
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function JsFiles() {
         return $this->_JsFiles;
     }
@@ -1114,6 +1025,13 @@ class Gdn_Controller extends Gdn_Pluggable {
         return ArrayValue($Key, $this->_Json, NULL);
     }
 
+    /**
+     *
+     *
+     * @param $Target
+     * @param $Data
+     * @param string $Type
+     */
     public function JsonTarget($Target, $Data, $Type = 'Html') {
         $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
 
@@ -1139,8 +1057,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
         return $this->MasterView;
     }
-
-    protected $_PageName = NULL;
 
     /**
      * Gets or sets the name of the page for the controller.
@@ -1172,10 +1088,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
     /**
      * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
+     *
      * @param mixed $Permission A permission or array of permission names required to access this resource.
      * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
      * @param string $JunctionTable The name of the junction table for a junction permission.
-     * @param in $JunctionID The ID of the junction permission.
+     * @param int $JunctionID The ID of the junction permission.
      */
     public function Permission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
         $Session = Gdn::Session();
@@ -1240,7 +1157,6 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @param string $ControllerName
      * @param string $ApplicationFolder
      * @param string $AssetName The name of the asset container that the content should be rendered in.
-     * @todo $View, $ControllerName, and $ApplicationFolder need correct variable types and descriptions.
      */
     public function xRender($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $AssetName = 'Content') {
         // Remove the deliver type and method from the query string so they don't corrupt calls to Url.
@@ -1388,7 +1304,13 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->FireEvent('AfterRenderAsset');
     }
 
-    // Render the data array.
+    /**
+     * Render the data array.
+     *
+     * @param null $Data
+     * @return bool
+     * @throws Exception
+     */
     public function RenderData($Data = NULL) {
         if ($Data === NULL) {
             $Data = array();
@@ -1514,6 +1436,13 @@ class Gdn_Controller extends Gdn_Pluggable {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $Value
+     * @param $Key
+     * @param $Scheme
+     */
     protected static function _FixUrlScheme(&$Value, $Key, $Scheme) {
         if (!is_string($Value))
             return;
@@ -1659,9 +1588,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Undocumented method.
      *
-     * @todo Method RenderMaster() needs a description.
      */
     public function RenderMaster() {
         // Build the master view if necessary
@@ -1900,8 +1827,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Sends all headers in $this->_Headers (defined with $this->SetHeader()) to
-     * the browser.
+     * Sends all headers in $this->_Headers (defined with $this->SetHeader()) to the browser.
      */
     public function SendHeaders() {
         // TODO: ALWAYS RENDER OR REDIRECT FROM THE CONTROLLER OR HEADERS WILL NOT BE SENT!! PUT THIS IN DOCS!!!
@@ -2012,6 +1938,14 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_Json[$Key] = $Value;
     }
 
+    /**
+     *
+     *
+     * @param $StatusCode
+     * @param null $Message
+     * @param bool $SetHeader
+     * @return null|string
+     */
     public function StatusCode($StatusCode, $Message = NULL, $SetHeader = TRUE) {
         if (is_null($Message))
             $Message = self::GetStatusMessage($StatusCode);
@@ -2021,6 +1955,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         return $Message;
     }
 
+    /**
+     *
+     *
+     * @param $StatusCode
+     * @return string
+     */
     public static function GetStatusMessage($StatusCode) {
         switch ($StatusCode) {
             case 100:

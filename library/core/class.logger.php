@@ -1,38 +1,55 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Logger.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.2
  */
 
 /**
  * Global event logging object.
  *
- * If nothing sets logger then Logger will be set to BaseLogger which is a dry loop
+ * If nothing sets logger then Logger will be set to BaseLogger which is a dry loop.
  *
  * @see BaseLogger
- * @since 2.2
  */
 class Logger {
+
+    /** Log type. */
     const EMERGENCY = 'emergency';
+
+    /** Log type. */
     const ALERT = 'alert';
+
+    /** Log type. */
     const CRITICAL = 'critical';
+
+    /** Log type. */
     const ERROR = 'error';
+
+    /** Log type. */
     const WARNING = 'warning';
+
+    /** Log type. */
     const NOTICE = 'notice';
+
+    /** Log type. */
     const INFO = 'info';
+
+    /** Log type. */
     const DEBUG = 'debug';
 
-    /**
-     * @var LoggerInterface The interface responsible for doing the actual logging.
-     */
+    /** @var LoggerInterface The interface responsible for doing the actual logging. */
     protected static $instance;
 
-    /**
-     * @var string The global level at which events are committed to the log.
-     */
+    /** @var string The global level at which events are committed to the log. */
     protected static $logLevel;
 
     /**
+     *
+     *
      * @param LoggerInterface $value Specify a new value to set the logger to.
      */
     public static function setLogger(LoggerInterface $value = null) {
@@ -44,6 +61,8 @@ class Logger {
     }
 
     /**
+     *
+     *
      * @return LoggerInterface
      */
     public static function getLogger() {

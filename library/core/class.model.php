@@ -1,118 +1,81 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Model.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
- * Model base class
+ * Model base class.
  *
  * This generic model can be instantiated (with the table name it is intended to
  * represent) and used directly, or it can be extended and overridden for more
  * complicated procedures related to different tables.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Model extends Gdn_Pluggable {
 
-
-    /**
-     * An object representation of the current working dataset.
-     *
-     * @var Gdn_DataSet
-     */
+    /**  @var Gdn_DataSet An object representation of the current working dataset. */
     public $Data;
 
-
-    /**
-     * Database object
-     *
-     * @var Gdn_Database The database object.
-     */
+    /**  @var Gdn_Database Database object. */
     public $Database;
 
-
     /**
-     * The name of the field that stores the insert date for a record. This
+     * @var string The name of the field that stores the insert date for a record. This
      * field will be automatically filled by the model if it exists.
-     *
-     * @var string
      */
     public $DateInserted = 'DateInserted';
 
-
     /**
-     * The name of the field that stores the update date for a record. This
+     * @var string The name of the field that stores the update date for a record. This
      * field will be automatically filled by the model if it exists.
-     *
-     * @var string
      */
     public $DateUpdated = 'DateUpdated';
 
-
     /**
-     * The name of the field that stores the id of the user that inserted it.
+     * @var string The name of the field that stores the id of the user that inserted it.
      * This field will be automatically filled by the model if it exists and
      * @@Session::UserID is a valid integer.
-     *
-     * @var string
      */
     public $InsertUserID = 'InsertUserID';
 
-
     /**
-     * The name of the table that this model is intended to represent. The
+     * @var string The name of the table that this model is intended to represent. The
      * default value assigned to $this->Name will be the name that the
      * model was instantiated with (defined in $this->__construct()).
-     *
-     * @var string
      */
     public $Name;
 
-
     /**
-     * The name of the primary key field of this model. The default is 'id'. If
+     * @var stringThe name of the primary key field of this model. The default is 'id'. If
      * $this->DefineSchema() is called, this value will be automatically changed
      * to any primary key discovered when examining the table schema.
-     *
-     * @var string
      */
     public $PrimaryKey = 'id';
 
-
     /**
-     * An object that is used to store and examine database schema information
-     * related to this model. This object is defined and populated with
-     * $this->DefineSchema().
-     *
-     * @var Gdn_Schema
+     * @var Gdn_Schema An object that is used to store and examine database schema information
+     * related to this model. This object is defined and populated with $this->DefineSchema().
      */
     public $Schema;
 
-    /**
-     * Contains the sql driver for the object.
-     *
-     * @var Gdn_SQLDriver
-     */
+    /** @var Gdn_SQLDriver Contains the sql driver for the object. */
     public $SQL;
 
-
     /**
-     * The name of the field that stores the id of the user that updated it.
-     * This field will be automatically filled by the model if it exists and
-     * @@Session::UserID is a valid integer.
-     *
-     * @var string
+     * @var string The name of the field that stores the id of the user that updated it.
+     * This field will be automatically filled by the model if it exists and @@Session::UserID is a valid integer.
      */
     public $UpdateUserID = 'UpdateUserID';
 
-
     /**
-     * An object that is used to manage and execute data integrity rules on this
+     * @var Gdn_Validation An object that is used to manage and execute data integrity rules on this
      * object. By default, this object only enforces maxlength, data types, and
      * required fields (defined when $this->DefineSchema() is called).
-     *
-     * @var Gdn_Validation
      */
     public $Validation;
 
@@ -121,8 +84,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * Class constructor. Defines the related database table name.
      *
      * @param string $Name An optional parameter that allows you to explicitly define the name of
-     * the table that this model represents. You can also explicitly set this
-     * value with $this->Name.
+     * the table that this model represents. You can also explicitly set this value with $this->Name.
      */
     public function __construct($Name = '') {
         if ($Name == '')

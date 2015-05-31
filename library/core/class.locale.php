@@ -1,41 +1,33 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Locale.
+ *
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
- *
- * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Locale extends Gdn_Pluggable {
 
-    /**
-     * The name of the currently loaded Locale
-     * @var string
-     */
+    /**  @var string The name of the currently loaded Locale. */
     public $Locale = '';
 
-    /**
-     * Holds all locale sources
-     * @var Gdn_Configuration
-     */
+    /** @var Gdn_Configuration Holds all locale sources. */
     public $LocaleContainer = NULL;
 
-    /**
-     * Whether or not to record core translations
-     * @var boolean
-     */
+    /** @var boolean Whether or not to record core translations. */
     public $DeveloperMode = FALSE;
 
-    /**
-     * Core translations, and untranslated codes
-     * @var Gdn_Configuration
-     */
+    /** @var Gdn_Configuration Core translations, and untranslated codes. */
     public $DeveloperContainer = NULL;
 
+    /** @var array  */
     public static $SetLocales = array(
         'bg' => 'bg_BG',
         'bs' => 'bs_BA',
@@ -72,8 +64,17 @@ class Gdn_Locale extends Gdn_Pluggable {
         'zh' => 'zh_CN'
     );
 
+    /** @var int  */
     public $SavedDeveloperCalls = 0;
 
+    /**
+     *
+     *
+     * @param $LocaleName
+     * @param $ApplicationWhiteList
+     * @param $PluginWhiteList
+     * @param bool $ForceRemapping
+     */
     public function __construct($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
         parent::__construct();
         $this->ClassName = 'Gdn_Locale';
@@ -111,7 +112,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     }
 
     /**
-     * Reload the locale system
+     * Reload the locale system.
      */
     public function Refresh() {
         $LocalName = $this->Current();
@@ -124,6 +125,13 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->Set($LocalName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
     }
 
+    /**
+     *
+     *
+     * @param $Translations
+     * @param bool $LocaleName
+     * @throws Exception
+     */
     public function SaveTranslations($Translations, $LocaleName = FALSE) {
         $this->LocaleContainer->Save();
     }

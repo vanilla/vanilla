@@ -1,28 +1,34 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Memcache.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Cache Layer: Memcache
  *
- * A cache layer that stores its items in memcached and uses libmemcache to
- * interact with the daemons.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
+ * A cache layer that stores its items in memcached and uses libmemcache to interact with the daemons.
  */
 class Gdn_Memcache extends Gdn_Cache {
 
     const OPT_MOD_SPLIT = 65000;
+
     const OPT_PASSTHRU_CONTAINER = 'passthru';
+
     const O_CREATE = 1;
 
     private $Memcache;
 
-    // Placeholder
     protected $WeightedContainers;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
         $this->CacheType = Gdn_Cache::CACHE_TYPE_MEMORY;

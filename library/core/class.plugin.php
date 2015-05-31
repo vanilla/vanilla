@@ -1,4 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Plugin
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Plugin base class
@@ -6,17 +15,15 @@
  * A simple framework that all plugins should extend. Aside from the implementation of
  * Gdn_IPlugin, this class provides some convenience methods to make plugin development
  * easier and faster.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
+    /** @var object */
     protected $Sender;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
     }
@@ -33,14 +40,30 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return Gdn::PluginManager()->GetPluginInstance(get_called_class(), Gdn_PluginManager::ACCESS_CLASSNAME);
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function GetPluginName() {
         return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function GetPluginIndex() {
         return GetValue('Index', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
     }
 
+    /**
+     *
+     *
+     * @param bool $Absolute
+     * @return mixed
+     */
     public function GetPluginFolder($Absolute = TRUE) {
         $Folder = GetValue('PluginRoot', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
         if (!$Absolute)
@@ -90,6 +113,13 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return $PluginDirectory.DS.$ViewName;
     }
 
+    /**
+     *
+     *
+     * @param $Filepath
+     * @param bool $WithDomain
+     * @return string
+     */
     public function GetWebResource($Filepath, $WithDomain = FALSE) {
         $WebResource = $this->GetResource($Filepath, FALSE, FALSE);
 
@@ -107,7 +137,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return $WebResource;
     }
 
-    /** Implementaion of Gdn_IPlugin::Setup().
+    /**
+     * Implementaion of Gdn_IPlugin::Setup().
      */
     public function Setup() {
         // Do nothing...
@@ -193,6 +224,11 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return implode('.', array('Plugin', $this->GetPluginIndex(), $this->TrimMetaKey($RelativeUserKey)));
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function Controller_Index($Sender) {
         $Sender->Title($this->GetPluginKey('Name'));
         $Sender->AddSideMenu('plugin/'.$this->GetPluginIndex());
@@ -235,6 +271,12 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return $CurrentConfig;
     }
 
+    /**
+     *
+     *
+     * @param null $Path
+     * @return null|string
+     */
     public function AutoTogglePath($Path = NULL) {
         if (is_null($Path)) {
             $PluginName = $this->GetPluginIndex();
@@ -257,6 +299,14 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return C($EnabledKey, FALSE);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param array $RequestArgs
+     * @return mixed
+     * @throws Exception
+     */
     public function Dispatch($Sender, $RequestArgs = array()) {
         $this->Sender = $Sender;
         $Sender->Form = new Gdn_Form();
@@ -293,6 +343,11 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         $this->Sender->Render($ViewName, '', $PluginFolder);
     }
 
+    /**
+     *
+     *
+     * @return UserMetaModel
+     */
     public function UserMetaModel() {
         return Gdn::UserMetaModel();
     }

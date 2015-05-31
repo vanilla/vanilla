@@ -507,7 +507,7 @@ class Gdn {
 
     /**
      * Get a reference to the default database structure object.
-     * 
+     *
      * @return Gdn_DatabaseStructure
      */
     public static function Structure() {

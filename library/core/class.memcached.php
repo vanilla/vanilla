@@ -1,28 +1,39 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Memcached & MemcachedShard.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Cache Layer: Memcached
  *
- * A cache layer that stores its items in memcached and uses libmemcached to
- * interact with the daemons.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
+ * A cache layer that stores its items in memcached and uses libmemcached to interact with the daemons.
  */
 class Gdn_Memcached extends Gdn_Cache {
 
+    /**  */
     const OPT_MOD_SPLIT = 65000;
+
+    /**  */
     const OPT_PASSTHRU_CONTAINER = 'passthru';
+
+    /**  */
     const O_CREATE = 1;
 
+    /** @var Memcached  */
     private $Memcache;
 
-    // Placeholder
+    /** @var   */
     protected $WeightedContainers;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
         $this->CacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
@@ -184,8 +195,7 @@ class Gdn_Memcached extends Gdn_Cache {
     }
 
     /**
-     * Get server list with mapping keys
-     *
+     * Get server list with mapping keys.
      */
     public function ShardMap() {
         static $servers = null;
@@ -312,6 +322,14 @@ class Gdn_Memcached extends Gdn_Cache {
         return $manifest;
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param array $options
+     * @return bool
+     */
     public function Add($key, $value, $options = array()) {
         if (!$this->online()) return Gdn_Cache::CACHEOP_FAILURE;
 
@@ -361,6 +379,14 @@ class Gdn_Memcached extends Gdn_Cache {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param array $options
+     * @return bool
+     */
     public function Store($key, $value, $options = array()) {
         if (!$this->online()) return Gdn_Cache::CACHEOP_FAILURE;
 
@@ -410,6 +436,13 @@ class Gdn_Memcached extends Gdn_Cache {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param array $options
+     * @return array|bool|mixed
+     */
     public function Get($key, $options = array()) {
         if (!$this->online()) return Gdn_Cache::CACHEOP_FAILURE;
 
@@ -559,12 +592,26 @@ class Gdn_Memcached extends Gdn_Cache {
         return $data;
     }
 
+    /**
+     *
+     *
+     * @param string $Key
+     * @param array $Options
+     * @return bool
+     */
     public function Exists($Key, $Options = array()) {
         if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
 
         return ($this->Get($Key, $Options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param array $options
+     * @return bool
+     */
     public function Remove($key, $options = array()) {
         if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
 
@@ -581,12 +628,28 @@ class Gdn_Memcached extends Gdn_Cache {
         return ($deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param array $options
+     * @return bool
+     */
     public function Replace($key, $value, $options = array()) {
         if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
 
         return $this->Store($key, $value, $options);
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param int $amount
+     * @param array $options
+     * @return bool|int|mixed
+     */
     public function Increment($key, $amount = 1, $options = array()) {
         if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
 
@@ -624,6 +687,14 @@ class Gdn_Memcached extends Gdn_Cache {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
+    /**
+     *
+     *
+     * @param string $key
+     * @param int $amount
+     * @param array $options
+     * @return bool|int|mixed
+     */
     public function Decrement($key, $amount = 1, $options = array()) {
         if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
 
@@ -661,6 +732,11 @@ class Gdn_Memcached extends Gdn_Cache {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function Flush() {
         return $this->Memcache->flush();
     }
@@ -686,29 +762,57 @@ class Gdn_Memcached extends Gdn_Cache {
         return true;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function online() {
         return (bool)sizeof($this->Containers);
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function servers() {
         return $this->Memcache->getServerList();
     }
 
+    /**
+     *
+     *
+     * @return int
+     */
     public function ResultCode() {
         return $this->Memcache->getResultCode();
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public function ResultMessage() {
         return $this->Memcache->getResultMessage();
     }
 }
 
+/**
+ * Class MemcachedShard
+ */
 class MemcachedShard {
 
+    /** @var   */
     public $hash;
+
+    /** @var   */
     public $size;
 
+    /** @var array  */
     public $shards = array();
-    public $keys = array();
 
+    /** @var array  */
+    public $keys = array();
 }

@@ -1,56 +1,28 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
 /**
- * Messages Controller
+ * Messages controller.
  *
- * @package Conversations
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Coversations
+ * @since 2.0
  */
 
 /**
  * MessagesController handles displaying lists of conversations and conversation messages.
- *
- * @since 2.0.0
- * @package Conversations
  */
 class MessagesController extends ConversationsController {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /** @var array Models to include. */
     public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
 
-
-    /**
-     * @var ConversationModel
-     */
+    /**  @var ConversationModel */
     public $ConversationModel;
 
-    /**
-     * A dataset of users taking part in this discussion. Used by $this->Index.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var object
-     */
+    /** @var object A dataset of users taking part in this discussion. Used by $this->Index. */
     public $RecipientData;
 
-    /**
-     * The current offset of the paged data set. Defined and used by $this->Index and $this->All.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var int
-     */
+    /** @var int The current offset of the paged data set. Defined and used by $this->Index and $this->All. */
     public $Offset;
 
     /**

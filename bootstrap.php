@@ -1,4 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * Bootstrap.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Bootstrap Before

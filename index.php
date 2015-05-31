@@ -1,14 +1,10 @@
 <?php
-
 /**
- * Application Gateway
+ * Application Gateway.
  *
- * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 

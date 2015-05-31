@@ -1,7 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Handles file uploads
+ * Gdn_Upload
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
@@ -10,17 +9,23 @@
  * @package Garden
  * @since 2.0
  */
-class Gdn_Upload extends Gdn_Pluggable {
-    /// PROPERTIES ///
 
+/**
+ * Handles file uploads.
+ */
+class Gdn_Upload extends Gdn_Pluggable {
+
+    /** @var array */
     protected $_AllowedFileExtensions;
+
+    /** @var int */
     protected $_MaxFileSize;
+
+    /** @var string */
     protected $_UploadedFile;
 
-    /// METHODS ///
-
     /**
-     * Class constructor
+     * Class constructor.
      */
     public function __construct() {
         $this->Clear();
@@ -28,10 +33,8 @@ class Gdn_Upload extends Gdn_Pluggable {
         $this->ClassName = 'Gdn_Upload';
     }
 
-
     /**
-     * Adds an extension (or array of extensions) to the array of allowed file
-     * extensions.
+     * Adds an extension (or array of extensions) to the array of allowed file extensions.
      *
      * @param mixed The name (or array of names) of the extension to allow.
      */
@@ -44,6 +47,12 @@ class Gdn_Upload extends Gdn_Pluggable {
             $this->_AllowedFileExtensions[] = $Extension;
     }
 
+    /**
+     *
+     *
+     * @param null $UploadPath
+     * @return bool
+     */
     public static function CanUpload($UploadPath = NULL) {
         if (is_null($UploadPath))
             $UploadPath = PATH_UPLOADS;
@@ -62,6 +71,9 @@ class Gdn_Upload extends Gdn_Pluggable {
         return TRUE;
     }
 
+    /**
+     *
+     */
     public function Clear() {
         $this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', ''));
         $this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
@@ -106,7 +118,9 @@ class Gdn_Upload extends Gdn_Pluggable {
         }
     }
 
-    /** Format a number of bytes with the largest unit.
+    /**
+     * Format a number of bytes with the largest unit.
+     *
      * @param int $Bytes The number of bytes.
      * @param int $Precision The number of decimal places in the formatted number.
      * @return string the formatted filesize.
@@ -192,6 +206,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
     /**
      * Take a string formatted filesize and return the number of bytes.
+     *
      * @param string $Formatted The formatted filesize.
      * @return int The number of bytes in the string.
      */
@@ -210,16 +225,34 @@ class Gdn_Upload extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function GetUploadedFileName() {
         return GetValue('name', $this->_UploadedFile);
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function GetUploadedFileExtension() {
         $Name = $this->_UploadedFile['name'];
         $Info = pathinfo($Name);
         return GetValue('extension', $Info, '');
     }
 
+    /**
+     *
+     *
+     * @param $TargetFolder
+     * @param string $Extension
+     * @param bool $Chunk
+     * @return string
+     */
     public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
         if (!$Extension) {
             $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
@@ -238,6 +271,15 @@ class Gdn_Upload extends Gdn_Pluggable {
         return $Path;
     }
 
+    /**
+     *
+     *
+     * @param $Source
+     * @param $Target
+     * @param array $Options
+     * @return array|bool
+     * @throws Exception
+     */
     public function SaveAs($Source, $Target, $Options = array()) {
         $this->EventArguments['Path'] = $Source;
         $Parsed = self::Parse($Target);
@@ -261,6 +303,12 @@ class Gdn_Upload extends Gdn_Pluggable {
         return $Parsed;
     }
 
+    /**
+     *
+     *
+     * @param $Name
+     * @return mixed
+     */
     public static function Url($Name) {
         $Parsed = self::Parse($Name);
         return $Parsed['Url'];

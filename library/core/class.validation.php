@@ -1,90 +1,63 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Data validation
- *
- * Manages data integrity validation rules. Can automatically define a set of
- * validation rules based on a @@Schema with $this->GenerateBySchema($Schema);
+ * Data validation.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Manages data integrity validation rules. Can automatically define a set of
+ * validation rules based on a @@Schema with $this->GenerateBySchema($Schema);
  */
 class Gdn_Validation {
 
-
     /**
-     * The collection of validation rules in the format of $RuleName =>
-     * $Rule. This list can be added to with $this->AddRule($RuleName, $Rule).
-     *
-     * @var array
+     * @var array The collection of validation rules in the format of $RuleName => $Rule.
+     * This list can be added to with $this->AddRule($RuleName, $Rule).
      */
     protected $_Rules;
 
-
     /**
-     * An associative array of fieldname => value pairs that are being
-     * validated. In order for a field to become a part of this collection, it
-     * must either be present in the defined schema, or have a rule defined in
-     * $this->_FieldRules.
-     *
-     * @var array
+     * @var array An associative array of fieldname => value pairs that are being validated.
+     * In order for a field to become a part of this collection, it must either be present in the defined schema,
+     * or have a rule defined in $this->_FieldRules.
      */
     protected $_ValidationFields;
 
     /**
-     * An array of FieldName => Reason arrays that describe which fields failed
+     * @var array An array of FieldName => Reason arrays that describe which fields failed
      * validation and which functions/regex caused them to fail.
-     *
-     * @var array
      */
     protected $_ValidationResults;
 
-
     /**
-     * An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
+     * @var array An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
      * These are rules that have been explicitly called with {@link Gdn_Validation::ApplyRule()}.
-     *
-     * @var array
      */
     protected $_FieldRules = array();
 
-
     /**
-     * An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
+     * @var array An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
      * These are rules that come from the current schema that have been applied by {@link Gdn_Validation::ApplyRulesBySchema()}.
-     * @var array
      */
     protected $_SchemaRules = array();
 
-
-    /**
-     * The schema being used to generate validation rules.
-     *
-     * @var array
-     */
+    /** @var array The schema being used to generate validation rules. */
     protected $_Schema = array();
 
-
-    /**
-     * @var bool Whether or not to reset the validation results on validate.
-     */
+    /** @var bool Whether or not to reset the validation results on validate. */
     protected $_ResetOnValidate = FALSE;
 
-
-    /**
-     * An array of FieldName.RuleName => "Custom Error Message"s. See $this->ApplyRule.
-     *
-     * @var array
-     */
+    /** @var array An array of FieldName.RuleName => "Custom Error Message"s. See $this->ApplyRule. */
     private $_CustomErrors = array();
 
-
     /**
-     * Class constructor. Optionally takes a schema definition to generate
-     * validation rules for.
+     * Class constructor. Optionally takes a schema definition to generate validation rules for.
      *
      * @param Gdn_Schema|array $Schema A schema object to generate validation rules for.
      * @param bool Whether or not to reset the validation results on {@link Validate()}.
@@ -126,11 +99,9 @@ class Gdn_Validation {
         $this->AddRule('Url', 'function:ValidateUrl');
     }
 
-
     /**
      * Examines the current schema and fills {@link Gdn_Validation::$_SchemaRules} with rules based
      * on the properties of each field in the table schema.
-     *
      */
     protected function ApplyRulesBySchema() {
         $this->_SchemaRules = array();
@@ -232,10 +203,8 @@ class Gdn_Validation {
         }
     }
 
-
     /**
-     * Applies a $RuleName to a $FieldName. You can apply as many rules to a
-     * field as you like.
+     * Applies a $RuleName to a $FieldName. You can apply as many rules to a field as you like.
      *
      * @param string $FieldName The name of the field to apply rules to.
      * @param mixed $RuleName The rule name (or array of rule names) to apply to the field.
@@ -278,9 +247,8 @@ class Gdn_Validation {
         $Array[$FieldName] = array_unique(array_merge($ExistingRules, $RuleName));
     }
 
-
     /**
-     * Allows the explicit definition of a schema to use
+     * Allows the explicit definition of a schema to use.
      *
      * @param array $Schema
      * @deprecated This method has been deprecated in favor of {@link Gdn_Validation::SetSchema()}.
@@ -290,10 +258,8 @@ class Gdn_Validation {
         $this->SetSchema($Schema);
     }
 
-
     /**
-     * Fills $this->_ValidationFields with field names that exist in the
-     * $PostedFields collection.
+     * Fills $this->_ValidationFields with field names that exist in the $PostedFields collection.
      *
      * @param array $PostedFields The associative array collection of field names to add.
      * @param boolean $Insert A boolean value indicating if the posted fields are to be inserted or
@@ -411,7 +377,6 @@ class Gdn_Validation {
         return $this->_ValidationFields;
     }
 
-
     /**
      * Adds to the rules collection ($this->_Rules).
      *
@@ -472,7 +437,6 @@ class Gdn_Validation {
         return $this;
     }
 
-
     /**
      * Adds a fieldname to the $this->_ValidationFields collection.
      *
@@ -489,7 +453,6 @@ class Gdn_Validation {
         $this->_ValidationFields[$FieldName] = $Value;
     }
 
-
     /**
      * Returns an array of field names that are in both $this->_ValidationFields AND $this->_Schema.
      *
@@ -499,7 +462,6 @@ class Gdn_Validation {
         $Result = array_intersect_key($this->_ValidationFields, $this->_Schema);
         return $Result;
     }
-
 
     /**
      * Allows you to explicitly set a field property on $this->_Schema. Can be
@@ -604,13 +566,11 @@ class Gdn_Validation {
     }
 
     /**
-     * Examines the posted fields, defines $this->_ValidationFields, and
-     * enforces the $this->Rules collection on them.
+     * Examines the posted fields, defines $this->_ValidationFields, and enforces the $this->Rules collection on them.
      *
      * @param array $PostedFields An associative array of posted fields to be validated.
      * @param boolean $Insert A boolean value indicating if the posted fields are to be inserted or
-     *  updated. If being inserted, the schema's required field rules will be
-     *  enforced.
+     *  updated. If being inserted, the schema's required field rules will be enforced.
      * @return boolean Whether or not the validation was successful.
      */
     public function Validate($PostedFields, $Insert = FALSE) {

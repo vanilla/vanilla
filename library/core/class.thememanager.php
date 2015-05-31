@@ -1,38 +1,36 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Theme manager
- *
- * Manages available themes, enabling and disabling them.
+ * Theme manager.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Manages available themes, enabling and disabling them.
  */
 class Gdn_ThemeManager extends Gdn_Pluggable {
 
-    /**
-     * An array of search paths for themes and their files
-     */
+    /** @var array An array of search paths for themes and their files. */
     protected $ThemeSearchPaths = NULL;
+
+    /** @var array */
     protected $AlternateThemeSearchPaths = NULL;
 
-    /**
-     * An array of available plugins. Never access this directly, instead use
-     * $this->AvailablePlugins();
-     */
+    /** @var array An array of available plugins. Never access this directly, instead use $this->AvailablePlugins(); */
     protected $ThemeCache = NULL;
 
-    /**
-     * Whether to use APC for theme cache storage
-     * @var type
-     */
+    /** @var bool Whether to use APC for theme cache storage. */
     protected $Apc = FALSE;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
     }
@@ -124,6 +122,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return $this->ThemeCache;
     }
 
+    /**
+     *
+     *
+     * @param $SearchPath
+     * @param $ThemeInfo
+     * @param null $PathListing
+     * @return bool|string
+     */
     public function IndexSearchPath($SearchPath, &$ThemeInfo, $PathListing = NULL) {
         if (is_null($PathListing) || !is_array($PathListing)) {
             $PathListing = scandir($SearchPath, 0);
@@ -176,6 +182,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return md5(serialize($PathListing));
     }
 
+    /**
+     *
+     *
+     * @param null $SearchPaths
+     */
     public function ClearThemeCache($SearchPaths = NULL) {
         if (!is_null($SearchPaths)) {
             if (!is_array($SearchPaths))
@@ -240,6 +251,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return $this->AlternateThemeSearchPaths;
     }
 
+    /**
+     *
+     *
+     * @param $ThemePath
+     * @return array|bool
+     */
     public function FindThemeFiles($ThemePath) {
         if (!is_dir($ThemePath))
             return FALSE;
@@ -264,6 +281,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return array_key_exists('about', $MatchedThemeFiles) ? $MatchedThemeFiles : FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $ThemeFile
+     * @param null $VariableName
+     * @return null|void
+     */
     public function ScanThemeFile($ThemeFile, $VariableName = NULL) {
         // Find the $PluginInfo array
         if (!file_exists($ThemeFile)) return;
@@ -330,18 +354,39 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return NULL;
     }
 
+    /**
+     *
+     *
+     * @param $ThemeName
+     * @return mixed
+     */
     public function GetThemeInfo($ThemeName) {
         return val($ThemeName, $this->AvailableThemes(), FALSE);
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function CurrentTheme() {
         return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function DesktopTheme() {
         return C('Garden.Theme', 'default');
     }
 
+    /**
+     *
+     *
+     * @throws Gdn_UserException
+     */
     public function DisableTheme() {
         if ($this->CurrentTheme() == 'default') {
             throw new Gdn_UserException(T('You cannot disable the default theme.'));
@@ -363,11 +408,22 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @return Gdn_Config|mixed
+     */
     public function EnabledTheme() {
         $ThemeName = Gdn::Config('Garden.Theme', 'default');
         return $ThemeName;
     }
 
+    /**
+     *
+     *
+     * @param bool $ReturnInSourceFormat
+     * @return array|mixed
+     */
     public function EnabledThemeInfo($ReturnInSourceFormat = FALSE) {
         $EnabledThemeName = $this->EnabledTheme();
         $ThemeInfo = $this->GetThemeInfo($EnabledThemeName);
@@ -407,6 +463,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return $ThemeInfo;
     }
 
+    /**
+     *
+     *
+     * @param $ThemeName
+     * @param bool $IsMobile
+     * @return bool
+     * @throws Exception
+     */
     public function EnableTheme($ThemeName, $IsMobile = FALSE) {
         // Make sure to run the setup
         $this->TestTheme($ThemeName);
@@ -462,6 +526,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $ThemeName
+     * @return bool
+     * @throws Gdn_UserException
+     */
     public function TestTheme($ThemeName) {
         // Get some info about the currently enabled theme.
         $EnabledTheme = $this->EnabledThemeInfo();
@@ -500,10 +571,21 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function MobileTheme() {
         return C('Garden.MobileTheme', 'default');
     }
 
+    /**
+     *
+     *
+     * @param $Type
+     * @return mixed
+     */
     public function ThemeFromType($Type) {
         if ($Type === 'mobile')
             return $this->MobileTheme();

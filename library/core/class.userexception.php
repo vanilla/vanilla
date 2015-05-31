@@ -1,19 +1,21 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_UserException
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * A wrapper for the Exception class so that methods can throw a specific
  * application as a means of validation or user error, rather than a critical exception.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_UserException extends Exception {
-    /** Constructs the Gdn_ApplicationException.
+
+    /**
+     * Constructs the Gdn_ApplicationException.
      *
      * @param string $Message A user readable message for the exception.
      * @param Exception $Previous The previous exception used for exception chaining.

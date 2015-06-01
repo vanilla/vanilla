@@ -469,7 +469,7 @@ class Gdn_Model extends Gdn_Pluggable {
                         $Result[$Field] = $Val;
                     }
                 }
-            } else if (is_object($Result)) {
+            } elseif (is_object($Result)) {
                 if (isset($Result->$Field) && is_string($Result->$Field)) {
                     $Val = unserialize($Result->$Field);
                     if ($Val) {

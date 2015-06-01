@@ -3,7 +3,7 @@
  * Vanilla framework autoloader: Gdn_Autoloader & Gdn_Autoloader_Map
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2008-2015 Vanilla Forums, Inc
+ * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.16

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright 2008-2015 Vanilla Forums, Inc
+ * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Facebook
  */
@@ -262,6 +262,8 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     public function Base_GetConnections_Handler($Sender, $Args) {
+
+
         $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
 
         $Sender->Data["Connections"][self::ProviderKey] = array(

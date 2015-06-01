@@ -1,27 +1,31 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages the embedding of a forum on a foreign page.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0.18
  */
+
+/**
+ * Handles /embed endpoint.
+ */
 class EmbedController extends DashboardController {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.18
-     * @access public
-     * @var array
-     */
+
+    /** @var array Models to include. */
     public $Uses = array('Database', 'Form');
 
+    /**
+     * Default method.
+     */
     public function Index() {
         Redirect('embed/comments');
     }
 
+    /**
+     * Run before
+     */
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');
@@ -62,6 +66,12 @@ class EmbedController extends DashboardController {
         $this->Render();
     }
 
+    /**
+     * Embed the entire forum.
+     *
+     * @param string $Toggle
+     * @param string $TransientKey
+     */
     public function Forum($Toggle = '', $TransientKey = '') {
         $this->Permission('Garden.Settings.Manage');
 
@@ -77,6 +87,12 @@ class EmbedController extends DashboardController {
         $this->Render();
     }
 
+    /**
+     * Options page.
+     *
+     * @param string $Toggle
+     * @param string $TransientKey
+     */
     public function Advanced($Toggle = '', $TransientKey = '') {
         $this->Permission('Garden.Settings.Manage');
 
@@ -129,9 +145,11 @@ class EmbedController extends DashboardController {
 
     /**
      * Handle toggling this version of embedding on and off. Take care of disabling the other version of embed (the old plugin).
-     * @param type $Toggle
-     * @param type $TransientKey
+     *
+     * @param string $Toggle
+     * @param string $TransientKey
      * @return boolean
+     * @throws Gdn_UserException
      */
     private function Toggle($Toggle = '', $TransientKey = '') {
         if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
@@ -144,7 +162,6 @@ class EmbedController extends DashboardController {
         }
         return FALSE;
     }
-
 
     /**
      * Allow for a custom embed theme.

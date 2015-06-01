@@ -1,59 +1,51 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Side menu module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 if (!class_exists('SideMenuModule', FALSE)) {
     /**
-     * Manages the items in the page menu and eventually returns the menu as a
-     * string with ToString();
+     * Manages the items in the page menu and eventually returns the menu as a string with ToString();
      */
     class SideMenuModule extends Gdn_Module {
 
-        /**
-         * Should the group titles be autolinked to the first anchor in the group? Default TRUE;
-         */
+        /** @var bool Should the group titles be autolinked to the first anchor in the group? Default TRUE. */
         public $AutoLinkGroups;
 
+        /** @var string|bool */
         public $EventName = FALSE;
 
-        /**
-         * An array of menu items.
-         */
+        /** @var array An array of menu items. */
         public $Items;
 
+        /** @var array */
         protected $_Items;
 
-        /**
-         * The html id attribute to be applied to the root element of the menu.
-         * Default is "Menu".
-         */
+        /** @var string The html id attribute to be applied to the root element of the menu. Default is "Menu". */
         public $HtmlId;
 
-        /**
-         * The class attribute to be applied to the root element of the
-         * breadcrumb. Default is none.
-         */
+        /** @var string The class attribute to be applied to the root element of the breadcrumb. Default is none. */
         public $CssClass;
 
-        /**
-         * An array of menu group names arranged in the order that the menu
-         * should be rendered.
-         */
+        /** @var array An array of menu group names arranged in the order that the menu should be rendered. */
         public $Sort;
 
         /**
-         * A route that, if found in the menu links, should cause that link to
-         * have the Highlight class applied. This property is assigned with
-         * $this->Highlight();
+         * @var string A route that, if found in the menu links, should cause that link to
+         * have the Highlight class applied. This property is assigned with $this->Highlight();
          */
         private $_HighlightRoute;
 
+        /**
+         *
+         *
+         * @param string $Sender
+         */
         public function __construct($Sender = '') {
             parent::__construct($Sender);
 
@@ -63,6 +55,15 @@ if (!class_exists('SideMenuModule', FALSE)) {
             $this->ClearGroups();
         }
 
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         * @param $Url
+         * @param bool $Permission
+         * @param array $Attributes
+         */
         public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = array()) {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->AddItem($Group, T($Group));
@@ -82,6 +83,14 @@ if (!class_exists('SideMenuModule', FALSE)) {
             }
         }
 
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         * @param bool $Permission
+         * @param array $Attributes
+         */
         public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = array()) {
             if (!array_key_exists($Group, $this->Items))
                 $Item = array('Group' => $Group, 'Links' => array(), 'Attributes' => array(), '_Sort' => count($this->Items));
@@ -102,10 +111,18 @@ if (!class_exists('SideMenuModule', FALSE)) {
             $this->Items[$Group] = $Item;
         }
 
+        /**
+         *
+         *
+         * @return string
+         */
         public function AssetTarget() {
             return 'Menu';
         }
 
+        /**
+         *
+         */
         public function CheckPermissions() {
             $Session = Gdn::Session();
 
@@ -125,10 +142,20 @@ if (!class_exists('SideMenuModule', FALSE)) {
             }
         }
 
+        /**
+         *
+         */
         public function ClearGroups() {
             $this->Items = array();
         }
 
+        /**
+         *
+         *
+         * @param $A
+         * @param null $B
+         * @return int|void
+         */
         protected function _Compare($A, $B = NULL) {
             static $Groups;
             if ($B === NULL) {
@@ -173,10 +200,21 @@ if (!class_exists('SideMenuModule', FALSE)) {
             return $A['_Sort'];
         }
 
+        /**
+         *
+         *
+         * @param $Route
+         */
         public function HighlightRoute($Route) {
             $this->_HighlightRoute = $Route;
         }
 
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         */
         public function RemoveLink($Group, $Text) {
             if (array_key_exists($Group, $this->Items) && isset($this->Items[$Group]['Links'])) {
                 $Links =& $this->Items[$Group]['Links'];
@@ -211,6 +249,13 @@ if (!class_exists('SideMenuModule', FALSE)) {
                 unset($this->Items[$Group]);
         }
 
+        /**
+         *
+         *
+         * @param string $HighlightRoute
+         * @return string
+         * @throws Exception
+         */
         public function ToString($HighlightRoute = '') {
             Gdn::Controller()->EventArguments['SideMenu'] = $this;
             if ($this->EventName)

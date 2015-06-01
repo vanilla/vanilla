@@ -1,17 +1,31 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.1
  */
+
+/**
+ * Database Administration task handler.
+ */
 class DBAModel extends Gdn_Model {
+
+    /** @var int Operations to perform at once. */
     public static $ChunkSize = 10000;
 
+    /**
+     * Update the counters.
+     *
+     * @param $Table
+     * @param $Column
+     * @param bool $From
+     * @param bool $To
+     * @return mixed
+     * @throws Gdn_UserException
+     */
     public function Counts($Table, $Column, $From = FALSE, $To = FALSE) {
         $Model = $this->CreateModel($Table);
 
@@ -38,12 +52,13 @@ class DBAModel extends Gdn_Model {
         }
     }
 
-    /*
+    /**
      * Return SQL for updating a count.
+     *
      * @param string $Aggregate count, max, min, etc.
      * @param string $ParentTable The name of the parent table.
      * @param string $ChildTable The name of the child table
-     * @param type $ParentColumnName
+     * @param string $ParentColumnName
      * @param string $ChildColumnName
      * @param string $ParentJoinColumn
      * @param string $ChildJoinColumn
@@ -256,11 +271,26 @@ class DBAModel extends Gdn_Model {
         return $this->SQL->Query($InsertQuery);
     }
 
+    /**
+     *
+     *
+     * @param $Table
+     * @param $Key
+     */
     public function ResetBatch($Table, $Key) {
         $Key = "DBA.Range.$Key";
         Gdn::Set($Key, NULL);
     }
 
+    /**
+     *
+     *
+     * @param $Table
+     * @param $Key
+     * @param int $Limit
+     * @param bool $Max
+     * @return array|mixed
+     */
     public function GetBatch($Table, $Key, $Limit = 10000, $Max = FALSE) {
         $Key = "DBA.Range.$Key";
 

@@ -1,14 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Messages are used to display (optionally dismissable) information in various parts of the applications.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /message endpoint.
+ */
 class MessageController extends DashboardController {
+
     /** @var array Objects to prep. */
     public $Uses = array('Form', 'MessageModel');
 

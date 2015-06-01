@@ -1,20 +1,21 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Url
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Handles analyzing and returning various parts of the current url.
- *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Url {
 
-
     /**
-     * Returns the path to the application's dispatcher. Optionally with the
-     * domain prepended.
+     * Returns the path to the application's dispatcher. Optionally with the domain prepended.
      *  ie. http://domain.com/[web_root]/index.php?/request
      *
      * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
@@ -31,7 +32,6 @@ class Gdn_Url {
         return $Result;
     }
 
-
     /**
      * Returns the domain from the current url. ie. "http://localhost/" in
      * "http://localhost/this/that/garden/index.php?/controller/action/"
@@ -43,7 +43,6 @@ class Gdn_Url {
         return Gdn::Request()->Domain();
     }
 
-
     /**
      * Returns the host from the current url. ie. "localhost" in
      * "http://localhost/this/that/garden/index.php?/controller/action/"
@@ -54,7 +53,6 @@ class Gdn_Url {
         return Gdn::Request()->RequestHost();
     }
 
-
     /**
      * Returns any GET parameters from the querystring. ie. "this=that&y=n" in
      * http://localhost/index.php?/controller/action/&this=that&y=n"
@@ -64,7 +62,6 @@ class Gdn_Url {
     public static function QueryString() {
         return http_build_query(Gdn::Request()->GetRequestArguments(Gdn_Request::INPUT_GET));
     }
-
 
     /**
      * Returns the Request part of the current url. ie. "/controller/action/" in

@@ -1,23 +1,32 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Routing system
- *
- * Allows paths within the application to redirect, either internally or via
- * http, to other locations.
+ * Routing system.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Allows paths within the application to redirect, either internally or via
+ * http, to other locations.
  */
 class Gdn_Router extends Gdn_Pluggable {
 
+    /** @var array */
     public $Routes;
+
+    /** @var array */
     public $ReservedRoutes;
+
+    /** @var array */
     public $RouteTypes;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
         $this->RouteTypes = array(
@@ -61,6 +70,12 @@ class Gdn_Router extends Gdn_Pluggable {
 
     }
 
+    /**
+     *
+     *
+     * @param $Request
+     * @return bool
+     */
     public function GetDestination($Request) {
         $Route = $this->MatchRoute($Request);
 
@@ -84,6 +99,11 @@ class Gdn_Router extends Gdn_Pluggable {
         $this->_LoadRoutes();
     }
 
+    /**
+     *
+     *
+     * @param $Route
+     */
     public function DeleteRoute($Route) {
         $Route = $this->GetRoute($Route);
 
@@ -96,8 +116,13 @@ class Gdn_Router extends Gdn_Pluggable {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Request
+     * @return array|bool
+     */
     public function MatchRoute($Request) {
-
         // Check for a literal match
         if ($this->GetRoute($Request, FALSE))
             return $this->GetRoute($Request);
@@ -128,6 +153,12 @@ class Gdn_Router extends Gdn_Pluggable {
         return FALSE; // No route matched
     }
 
+    /**
+     *
+     *
+     * @param $Url
+     * @return bool|int|string
+     */
     public function ReverseRoute($Url) {
         $Root = rtrim(Gdn::Request()->Domain().'/'.Gdn::Request()->WebRoot(), '/');
 
@@ -163,6 +194,11 @@ class Gdn_Router extends Gdn_Pluggable {
             return $Url;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function GetRouteTypes() {
         $RT = array();
         foreach ($this->RouteTypes as $RouteType => $RouteTypeText) {
@@ -171,6 +207,11 @@ class Gdn_Router extends Gdn_Pluggable {
         return $RT;
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     private function _LoadRoutes() {
         $Routes = Gdn::Config('Routes', array());
         $this->EventArguments['Routes'] = &$Routes;
@@ -188,8 +229,13 @@ class Gdn_Router extends Gdn_Pluggable {
         $this->FireEvent("AfterLoadRoutes");
     }
 
+    /**
+     *
+     *
+     * @param $Destination
+     * @return array|mixed
+     */
     private function _ParseRoute($Destination) {
-
         // If Destination is a serialized array
         if (is_string($Destination) && ($Decoded = @unserialize($Destination)) !== FALSE)
             $Destination = $Decoded;
@@ -209,6 +255,13 @@ class Gdn_Router extends Gdn_Pluggable {
         return $Destination;
     }
 
+    /**
+     *
+     *
+     * @param $Destination
+     * @param $RouteType
+     * @return array
+     */
     private function _FormatRoute($Destination, $RouteType) {
         return array(
             'Destination' => $Destination,
@@ -216,14 +269,23 @@ class Gdn_Router extends Gdn_Pluggable {
         );
     }
 
+    /**
+     *
+     *
+     * @param $Key
+     * @return mixed
+     */
     protected function _EncodeRouteKey($Key) {
         return str_replace('/', '_', in_array($Key, $this->ReservedRoutes) ? $Key : base64_encode($Key));
     }
 
+    /**
+     *
+     *
+     * @param $Key
+     * @return string
+     */
     protected function _DecodeRouteKey($Key) {
         return in_array($Key, $this->ReservedRoutes) ? $Key : base64_decode(str_replace('_', '/', $Key));
     }
-
 }
-
-?>

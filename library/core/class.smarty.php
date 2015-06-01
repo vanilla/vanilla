@@ -1,29 +1,28 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Smart abstraction layer
- *
- * Vanilla implementation of Smarty templating engine.
+ * Smart abstraction layer.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
+
+/**
+ * Vanilla implementation of Smarty templating engine.
+ */
 class Gdn_Smarty {
-    /// Constructor ///
 
-    /// Properties ///
-
-    /**
-     * @var Smarty The smarty object used for the template.
-     */
+    /** @var Smarty The smarty object used for the template. */
     protected $_Smarty = NULL;
 
-    /// Methods ///
-
-
+    /**
+     *
+     *
+     * @param $Path
+     * @param $Controller
+     */
     public function Init($Path, $Controller) {
         $Smarty = $this->Smarty();
 
@@ -140,6 +139,8 @@ class Gdn_Smarty {
     }
 
     /**
+     *
+     *
      * @return Smarty The smarty object used for rendering.
      */
     public function Smarty() {
@@ -160,6 +161,7 @@ class Gdn_Smarty {
 
     /**
      * See if the provided template causes any errors.
+     *
      * @param type $Path Path of template file to test.
      * @return boolean TRUE if template loads successfully.
      */

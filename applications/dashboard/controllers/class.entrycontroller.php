@@ -1,51 +1,31 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages users manually authenticating (signing in).
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /entry endpoint.
+ */
 class EntryController extends Gdn_Controller {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /** @var array Models to include. */
     public $Uses = array('Database', 'Form', 'UserModel');
 
-
-    /**
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     public $Form;
 
-    /**
-     *
-     * @var UserModel
-     */
+    /** @var UserModel */
     public $UserModel;
 
-    /**
-     * Resuable username requirement error message.
-     *
-     * @since 2.0.17
-     * @access public
-     * @var string
-     */
+    /** @var string Reusable username requirement error message. */
     public $UsernameError = '';
 
-    /**
-     * Place to store DeliveryType.
-     *
-     * @since 2.0.0
-     * @access protected
-     * @var string
-     */
+    /** @var string Place to store DeliveryType. */
     protected $_RealDeliveryType;
 
     /**
@@ -288,10 +268,13 @@ class EntryController extends Gdn_Controller {
 
     /**
      * Check the default provider to see if it overrides one of the entry methods and then redirect.
+     *
      * @param string $Type One of the following.
      *  - SignIn
      *  - Register
      *  - SignOut (not complete)
+     * @param string $Target
+     * @param string $TransientKey
      */
     protected function CheckOverride($Type, $Target, $TransientKey = NULL) {
         if (!$this->Request->Get('override', TRUE))

@@ -1,18 +1,20 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * VanillaHooks Plugin
  *
- * The class.hooks.php file is essentially a giant plugin container for an app
- * that is automatically enabled when the app is.
- *
- * @link http://docs.vanillaforums.com/developers/plugins/quickstart/
- * @since 2.0.0
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @since 2.0
  * @package Vanilla
+ */
+
+/**
+ * Vanilla's event handlers.
  */
 class VanillaHooks implements Gdn_IPlugin {
 
     /**
+     * Counter rebuilding.
      *
      * @param DbaController $Sender
      */
@@ -34,10 +36,12 @@ class VanillaHooks implements Gdn_IPlugin {
 
     /**
      * Delete all of the Vanilla related information for a specific user.
+     *
+     * @since 2.1
+     *
      * @param int $UserID The ID of the user to delete.
      * @param array $Options An array of options:
      *  - DeleteMethod: One of delete, wipe, or NULL
-     * @since 2.1
      */
     public function DeleteUserData($UserID, $Options = array(), &$Data = NULL) {
         $SQL = Gdn::SQL();

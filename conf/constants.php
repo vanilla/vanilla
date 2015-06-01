@@ -1,6 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * Garden Constants.
+ * Framework constants.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
  */
 
 // If you want to change where the garden libraries are located on your server, edit these paths:

@@ -1,38 +1,52 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
 /**
- * Activity Model
+ * Activity Model.
  *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
+ * @since 2.0
  */
 
 /**
  * Activity data management.
- *
- * @since 2.0.0
- * @package Dashboard
  */
 class ActivityModel extends Gdn_Model {
+
+    /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
+
+    /** Activity notification level: Moderators & admins. */
     const NOTIFY_MODS = -2;
+
+    /** Activity notification level: Admins-only. */
     const NOTIFY_ADMINS = -3;
 
-    const SENT_ARCHIVE = 1; // The activity was added before this system was put in place.
-    const SENT_OK = 2; // The activity sent just fine.
-    const SENT_PENDING = 3; // The activity is waiting to be sent.
-    const SENT_FAIL = 4; // The activity could not be sent.
-    const SENT_ERROR = 5; // There was an error sending the activity, but it can be retried.
-    const SENT_INPROGRESS = 31; // Sending is in progress.
+    /** Activity status: The activity was added before this system was put in place. */
+    const SENT_ARCHIVE = 1;
 
+    /** Activity status: The activity sent just fine. */
+    const SENT_OK = 2;
+
+    /** Activity status: The activity is waiting to be sent. */
+    const SENT_PENDING = 3;
+
+    /** Activity status: The activity could not be sent. */
+    const SENT_FAIL = 4;
+
+    /** Activity status: There was an error sending the activity, but it can be retried. */
+    const SENT_ERROR = 5;
+
+    /** Activity status: Sending is in progress. */
+    const SENT_INPROGRESS = 31;
+
+    /** @var array|null Allowed activity types. */
     public static $ActivityTypes = NULL;
+
+    /** @var array Activity to be saved. */
     public static $Queue = array();
+
+    /** @var int Limit on number of activity to combine. */
     public static $MaxMergeCount = 10;
 
     /**
@@ -73,12 +87,22 @@ class ActivityModel extends Gdn_Model {
         $this->FireEvent('AfterActivityQuery');
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     */
     public function CalculateData(&$Data) {
         foreach ($Data as &$Row) {
             $this->CalculateRow($Row);
         }
     }
 
+    /**
+     *
+     *
+     * @param $Row
+     */
     public function CalculateRow(&$Row) {
         $ActivityType = self::GetActivityType($Row['ActivityTypeID']);
         $Row['ActivityType'] = GetValue('Name', $ActivityType);
@@ -160,9 +184,12 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Delete an activity comment.
+     *
+     * @since 2.1
      *
      * @param int $ID
-     * @since 2.1
+     * @return Gdn_DataSet
      */
     public function DeleteComment($ID) {
         return $this->SQL->Delete('ActivityComment', array('ActivityCommentID' => $ID));
@@ -293,6 +320,11 @@ class ActivityModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     */
     public static function GetUsers(&$Data) {
         $UserIDs = array();
 
@@ -319,6 +351,12 @@ class ActivityModel extends Gdn_Model {
         Gdn::UserModel()->GetIDs(array_keys($UserIDs));
     }
 
+    /**
+     *
+     *
+     * @param $ActivityType
+     * @return bool
+     */
     public static function GetActivityType($ActivityType) {
         if (self::$ActivityTypes === NULL) {
             $Data = Gdn::SQL()->Get('ActivityType')->ResultArray();
@@ -805,6 +843,14 @@ class ActivityModel extends Gdn_Model {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Activity
+     * @param bool $NoDelete
+     * @return bool
+     * @throws Exception
+     */
     public function Email(&$Activity, $NoDelete = FALSE) {
         if (is_numeric($Activity)) {
             $ActivityID = $Activity;
@@ -1032,6 +1078,12 @@ class ActivityModel extends Gdn_Model {
         $this->_NotificationQueue = array();
     }
 
+    /**
+     *
+     *
+     * @param $ActivityIDs
+     * @throws Exception
+     */
     public function SetNotified($ActivityIDs) {
         if (!is_array($ActivityIDs) || count($ActivityIDs) == 0)
             return;
@@ -1042,6 +1094,12 @@ class ActivityModel extends Gdn_Model {
             ->Put();
     }
 
+    /**
+     *
+     *
+     * @param $Activity
+     * @throws Exception
+     */
     public function Share(&$Activity) {
         // Massage the event for the user.
         $this->EventArguments['RecordType'] = 'Activity';
@@ -1163,6 +1221,15 @@ class ActivityModel extends Gdn_Model {
         self::$Queue[$Data['NotifyUserID']][$Data['ActivityType']] = array($Data, $Options);
     }
 
+    /**
+     *
+     *
+     * @param array $Data
+     * @param bool $Preference
+     * @param array $Options
+     * @return array
+     * @throws Exception
+     */
     public function Save($Data, $Preference = FALSE, $Options = array()) {
         Trace('ActivityModel->Save()');
         $Activity = $Data;
@@ -1351,6 +1418,14 @@ class ActivityModel extends Gdn_Model {
             Gdn::UserModel()->SetField($UserID, 'CountNotifications', 0);
     }
 
+    /**
+     *
+     *
+     * @param $OldActivity
+     * @param $NewActivity
+     * @param array $Options
+     * @return array
+     */
     public function MergeActivities($OldActivity, $NewActivity, $Options = array()) {
         $GroupHeadlineFormat = GetValue('GroupHeadlineFormat', $Options, $NewActivity['HeadlineFormat']);
         $GroupStory = GetValue('GroupStory', $Options, $NewActivity['Story']);
@@ -1436,6 +1511,11 @@ class ActivityModel extends Gdn_Model {
         $this->Save($Activity, 'WallComment');
     }
 
+    /**
+     *
+     *
+     * @param $WallPost
+     */
     protected function NotifyWallPost($WallPost) {
         $NotifyUser = Gdn::UserModel()->GetID($WallPost['ActivityUserID']);
 
@@ -1455,6 +1535,11 @@ class ActivityModel extends Gdn_Model {
         $this->Save($Activity, 'WallComment');
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function SaveQueue() {
         $Result = array();
         foreach (self::$Queue as $UserID => $Activities) {
@@ -1466,6 +1551,11 @@ class ActivityModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     */
     protected function _Touch(&$Data) {
         TouchValue('ActivityType', $Data, 'Default');
         TouchValue('ActivityUserID', $Data, Gdn::Session()->UserID);

@@ -1,19 +1,28 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Module collection
+ * Gdn_ModuleCollection
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
+
+/**
+ * Module collection.
+ */
 class Gdn_ModuleCollection extends Gdn_Module {
-    /// PROPERTIES ///
+
+    /** @var array  */
     public $Items = array();
 
-    /// METHODS ///
+
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function Render() {
         $RenderedCount = 0;
         foreach ($this->Items as $Item) {
@@ -47,6 +56,12 @@ class Gdn_ModuleCollection extends Gdn_Module {
         unset($this->EventArguments['AssetName']);
     }
 
+    /**
+     *
+     *
+     * @return string
+     * @throws Exception
+     */
     public function ToString() {
         ob_start();
         $this->Render();

@@ -1,14 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Creates and sends notifications to user.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handle /notifications endpoint.
+ */
 class NotificationsController extends Gdn_Controller {
+
     /**
      * CSS, JS and module includes.
      */

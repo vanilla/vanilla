@@ -1,14 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * General functions
  *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003-2014 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
@@ -17,6 +13,7 @@ if (!function_exists('AbsoluteSource')) {
      * Takes a source path (ie. an image src from an html page), and an
      * associated URL (ie. the page that the image appears on), and returns the
      * absolute source (including url & protocol) path.
+     *
      * @param string $SrcPath The source path to make absolute (if not absolute already).
      * @param string $Url The full url to the page containing the src reference.
      * @return string Absolute source path.
@@ -76,7 +73,6 @@ if (!function_exists('AddActivity')) {
  */
 
 if (!function_exists('array_column')):
-
     /**
      * Returns the values from a single column of the input array, identified by
      * the $columnKey.

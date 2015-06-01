@@ -1,15 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * ProxyRequest handler class
- *
- * This class abstracts the work of doing external requests.
+ * ProxyRequest handler class.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.18
+ */
+
+/**
+ * This class abstracts the work of doing external requests.
  */
 class ProxyRequest {
 
@@ -18,21 +19,31 @@ class ProxyRequest {
     public $MaxReadSize = 4096;
 
     public $RequestDefaults;
+
     public $RequestHeaders;
+
     public $RequestBody;
+
     public $ParsedBody;
 
     public $ResponseHeaders;
+
     public $ResponseStatus;
+
     public $ResponseBody;
+
     public $ResponseTime;
 
     public $ContentType;
+
     public $ContentLength;
+
     public $ConnectionMode;
 
     protected $FileTransfer;
+
     protected $UseSSL;
+
     protected $SaveFile;
 
     public $ActionLog;
@@ -40,7 +51,7 @@ class ProxyRequest {
     protected $Options;
 
     /**
-     * Set up ProxyRequest
+     * Set up ProxyRequest.
      *
      * Options:
      *   URL
@@ -94,6 +105,13 @@ class ProxyRequest {
         $this->RequestDefaults = array_merge($Defaults, $RequestDefaults);
     }
 
+    /**
+     *
+     *
+     * @param $Handler
+     * @param $HeaderString
+     * @return int
+     */
     public function CurlHeader(&$Handler, $HeaderString) {
         $Line = explode(':', trim($HeaderString));
         $Key = trim(array_shift($Line));
@@ -103,6 +121,10 @@ class ProxyRequest {
         return strlen($HeaderString);
     }
 
+    /**
+     * @param $Handler
+     * @return mixed|string
+     */
     protected function CurlReceive(&$Handler) {
         $this->ResponseHeaders = array();
         $startTime = microtime(true);
@@ -156,7 +178,7 @@ class ProxyRequest {
     }
 
     /**
-     * Send a request and receive the response
+     * Send a request and receive the response.
      *
      * Options:
      *     'URL'                  => NULL,
@@ -511,6 +533,12 @@ class ProxyRequest {
         return $this->ResponseBody;
     }
 
+    /**
+     *
+     *
+     * @param $Message
+     * @param null $Loud
+     */
     protected function Action($Message, $Loud = NULL) {
         if ($this->Loud || $Loud) {
             echo "{$Message}\n";
@@ -521,11 +549,19 @@ class ProxyRequest {
         $this->ActionLog[] = $Message;
     }
 
+    /**
+     *
+     */
     public function __destruct() {
         if (file_exists($this->CookieJar))
             @unlink($this->CookieJar);
     }
 
+    /**
+     *
+     *
+     * @return $this
+     */
     public function Clean() {
         return $this;
     }
@@ -553,14 +589,29 @@ class ProxyRequest {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function Headers() {
         return $this->ResponseHeaders;
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function Status() {
         return $this->ResponseStatus;
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function Body() {
         return $this->ResponseBody;
     }

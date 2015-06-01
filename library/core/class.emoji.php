@@ -1,18 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Interpreting Emoji emoticons
- *
+ * Emoji.
  *
  * @author Dane MacMillan <dane@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.2.3.11
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.2
+ */
+
+/**
+ * Interpreting Emoji emoticons.
  */
 class Emoji {
-    /// Properties ///
 
     /**
      * The emoji aliases are an array where each key is an alias and each value is the name of an emoji.
@@ -25,7 +26,6 @@ class Emoji {
      * The archive is an array of deprecated emoji to new emoji that allows us to rename emoji with compatibility.
      *
      * The archive can be used for a couple of purposes.
-     *
      * 1. If you want to remove an emoji from the lookup list then you can just move the entry from the `$emoji` array to
      * the `$archive` array.
      * 2. If you want to rename an emoji then copy it to the `$archive` array and then rename it in the `$emoji` array.
@@ -34,15 +34,10 @@ class Emoji {
      */
     protected $archive;
 
-    /**
-     * @var string The base path where the emoji are located.
-     */
+    /** @var string The base path where the emoji are located. */
     protected $assetPath = '/resources/emoji';
 
-    /**
-     *
-     * @var string If assetPath is modified, this will hold the original path.
-     */
+    /** @var string If assetPath is modified, this will hold the original path. */
     protected $assetPathOriginal;
 
     /**
@@ -65,7 +60,6 @@ class Emoji {
     protected $emoji;
 
     /**
-     *
      * @var array The original emoji that are not accounted for in the custom
      * set of emoji supplied by plugin, if any. This is useful when merging the
      * custom ones with the original ones, which have different assetPaths.
@@ -79,11 +73,7 @@ class Emoji {
      */
     protected $errorEmoji = 'error';
 
-    /**
-     *
-     * @var bool Setting to true will allow editor to interpret emoji aliases as
-     *           Html equivalent markup.
-     */
+    /** @var bool Setting to true will allow editor to interpret emoji aliases as Html equivalent markup. */
     public $enabled = true;
 
     /**
@@ -93,26 +83,18 @@ class Emoji {
      */
     protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
-    /**
-     *
-     * @var Emoji The singleton instance of this class.
-     */
+    /** @var Emoji The singleton instance of this class. */
     public static $instance;
 
-    /**
-     *
-     * @var string left-side delimiter surrounding emoji, typically a full-colon
-     */
+    /** @var string left-side delimiter surrounding emoji, typically a full-colon. */
     public $ldelim = ':';
 
-    /**
-     *
-     * @var string right-side delimiter surrounding emoji, typically a full-colon
-     */
+    /** @var string right-side delimiter surrounding emoji, typically a full-colon */
     public $rdelim = ':';
 
-    /// Methods ///
-
+    /**
+     *
+     */
     protected function __construct() {
         // Initialize the canonical list. (emoji)
         $this->emoji = array(
@@ -390,6 +372,7 @@ class Emoji {
 
     /**
      *
+     *
      * @return array List of Emojis that will appear in the editor.
      */
     public function getEmojiEditorList() {
@@ -538,6 +521,7 @@ class Emoji {
 
     /**
      * Set the emoji from a manifest.
+     *
      * @param array $manifest An emoji manifest with the following keys:
      * - emoji: An array in the form: name => filename (ex. ['smile' => 'smile.png'])
      * - aliases (optional): An array of emoji short forms: alias => emojiName  (ex. [':)' => 'smile'])

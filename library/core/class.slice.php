@@ -1,21 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Slice manager: views
- *
- * Allows views to implement small asynchronously refreshable portions of the
- * page - slices.
+ * Slice manager: views.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Allows views to implement small asynchronously refreshable portions of the page - slices.
  */
 class Gdn_Slice {
 
+    /** @var Gdn_Dispatcher */
     protected $Dispatcher;
 
+    /**
+     *
+     */
     public function __construct() {
         $this->Dispatcher = new Gdn_Dispatcher();
         $EnabledApplications = Gdn::Config('EnabledApplications');
@@ -23,6 +27,11 @@ class Gdn_Slice {
         $this->Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public function Execute() {
         $SliceArgs = func_get_args();
         switch (count($SliceArgs)) {

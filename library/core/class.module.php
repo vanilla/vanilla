@@ -1,59 +1,39 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Module.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Module base class
  *
  * Provides basic functionality when extended by real modules.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
 
-    /** The name of the current asset that is being rendered.
-     *
-     * @var string
-     */
+    /** @var string The name of the current asset that is being rendered. */
     public $AssetName = '';
 
-
-    /**
-     * The name of the application folder that this module resides within.
-     *
-     * @var string
-     */
+    /** @var string The name of the application folder that this module resides within. */
     protected $_ApplicationFolder;
 
-    /**
-     * Data that is passed into the view.
-     *
-     * @var array
-     */
+    /** @var array Data that is passed into the view. */
     public $Data = array();
 
-
-    /**
-     * The object that constructed this object. Typically this should be a
-     * Controller object.
-     *
-     * @var Gdn_Controller
-     */
+    /** @var Gdn_Controller The object that constructed this object. Typically this should be a Controller object. */
     protected $_Sender;
 
-
-    /**
-     * The name of the theme folder that the application is currently using.
-     *
-     * @var string
-     */
+    /** @var string The name of the theme folder that the application is currently using. */
     protected $_ThemeFolder;
 
+    /** @var bool  */
     public $Visible = TRUE;
-
 
     /**
      * Class constructor
@@ -80,7 +60,6 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         parent::__construct();
     }
 
-
     /**
      * Returns the name of the asset where this component should be rendered.
      */
@@ -88,6 +67,13 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         trigger_error(ErrorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
     }
 
+    /**
+     *
+     *
+     * @param null $Name
+     * @param string $Default
+     * @return array|mixed
+     */
     public function Data($Name = NULL, $Default = '') {
         if ($Name == NULL)
             $Result = $this->Data;
@@ -115,7 +101,6 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         @ob_end_clean();
         return $String;
     }
-
 
     /**
      * Returns the location of the view for this module in the filesystem.
@@ -150,7 +135,6 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         }
 
         if (!$ViewPath) {
-
             $ViewPaths = array();
             // 1. An explicitly defined path to a view
             if (strpos($View, '/') !== FALSE)
@@ -194,6 +178,12 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         return get_class($this);
     }
 
+    /**
+     *
+     *
+     * @param bool $NewValue
+     * @return bool|string
+     */
     public function Path($NewValue = FALSE) {
         static $Path = FALSE;
         if ($NewValue !== FALSE)
@@ -205,10 +195,19 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         return $Path;
     }
 
+    /**
+     *
+     */
     public function Render() {
         echo $this->ToString();
     }
 
+    /**
+     *
+     *
+     * @param $Name
+     * @param $Value
+     */
     public function SetData($Name, $Value) {
         $this->Data[$Name] = $Value;
     }
@@ -229,7 +228,6 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     /**
      * Magic method for type casting to string.
      *
-     * @todo check if you want to keep this.
      * @return string
      */
     public function __toString() {

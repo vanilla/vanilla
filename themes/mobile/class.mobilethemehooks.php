@@ -1,22 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Mobile Theme hooks.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Mobile Theme
+ * @since 2.0
+ */
 
 /**
  * Customizations for the mobile theme.
  */
 class MobileThemeHooks implements Gdn_IPlugin {
-    /** No setup required. */
+
+    /**
+     * No setup required.
+     */
     public function Setup() {
     }
 
-    /** Remove plugins that are not mobile friendly! */
+    /**
+     * Remove plugins that are not mobile friendly!
+     */
     public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
         // Remove plugins so they don't mess up layout or functionality.
         if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
@@ -25,7 +30,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
         SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
     }
 
-    /** Add mobile meta info. Add script to hide iPhone browser bar on pageload. */
+    /**
+     * Add mobile meta info. Add script to hide iPhone browser bar on pageload.
+     */
     public function Base_Render_Before($Sender) {
         if (IsMobile() && is_object($Sender->Head)) {
             $Sender->Head->AddTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
@@ -42,7 +49,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
         }
     }
 
-    /** Add button, remove options, increase click area on discussions list. */
+    /**
+     * Add button, remove options, increase click area on discussions list.
+     */
     public function CategoriesController_Render_Before($Sender) {
         $Sender->ShowOptions = FALSE;
         SaveToConfig('Vanilla.AdminCheckboxes.Use', FALSE, FALSE);
@@ -50,7 +59,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
         $this->DiscussionsClickable($Sender);
     }
 
-    /** Add button, remove options, increase click area on discussions list. */
+    /**
+     * Add button, remove options, increase click area on discussions list.
+     */
     public function DiscussionsController_Render_Before($Sender) {
         $Sender->ShowOptions = FALSE;
         SaveToConfig('Vanilla.AdminCheckboxes.Use', FALSE, FALSE);
@@ -58,27 +69,37 @@ class MobileThemeHooks implements Gdn_IPlugin {
         $this->DiscussionsClickable($Sender);
     }
 
-    /** Add New Discussion button. */
+    /**
+     * Add New Discussion button.
+     */
     public function DiscussionController_Render_Before($Sender) {
         $this->AddButton($Sender, 'Discussion');
     }
 
-    /** Add New Discussion button. */
+    /**
+     * Add New Discussion button.
+     */
     public function DraftsController_Render_Before($Sender) {
         $this->AddButton($Sender, 'Discussion');
     }
 
-    /** Add New Conversation button. */
+    /**
+     * Add New Conversation button.
+     */
     public function MessagesController_Render_Before($Sender) {
         $this->AddButton($Sender, 'Conversation');
     }
 
-    /** Add New Discussion button. */
+    /**
+     * Add New Discussion button.
+     */
     public function PostController_Render_Before($Sender) {
         $this->AddButton($Sender, 'Discussion');
     }
 
-    /** Add a button to the navbar. */
+    /**
+     * Add a button to the navbar.
+     */
     private function AddButton($Sender, $ButtonType) {
         if (is_object($Sender->Menu)) {
             if ($ButtonType == 'Discussion')
@@ -88,7 +109,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
         }
     }
 
-    /** Increases clickable area on a discussions list. */
+    /**
+     * Increases clickable area on a discussions list.
+     */
     private function DiscussionsClickable($Sender) {
         // Make sure that discussion clicks (anywhere in a discussion row) take the user to the discussion.
         if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
@@ -105,7 +128,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
         }
     }
 
-    /** Add the user photo before the user Info on the profile page. */
+    /**
+     * Add the user photo before the user Info on the profile page.
+     */
     public function ProfileController_BeforeUserInfo_Handler($Sender) {
         $UserPhoto = new UserPhotoModule();
         echo $UserPhoto->ToString();

@@ -1,17 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Discussion controller
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0.17.9
+ */
 
 /**
- * Category controller
- *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.17.9
- * @package Vanilla
+ * Handles the /category endpoint.
  */
 class CategoryController extends VanillaController {
-    /**
-     * @var Gdn_CategoryModel
-     */
+
+    /** @var Gdn_CategoryModel */
     public $CategoryModel;
 
     public function  __construct() {

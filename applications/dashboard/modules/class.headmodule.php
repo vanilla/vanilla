@@ -1,12 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Head module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 if (!class_exists('HeadModule', FALSE)) {
     /**
@@ -14,41 +14,39 @@ if (!class_exists('HeadModule', FALSE)) {
      * page.
      */
     class HeadModule extends Gdn_Module {
-        /**
-         * The name of the key in a tag that refers to the tag's name.
-         */
+
+        /** The name of the key in a tag that refers to the tag's name. */
         const TAG_KEY = '_tag';
 
+        /**  */
         const CONTENT_KEY = '_content';
 
+        /**  */
         const SORT_KEY = '_sort';
 
-        /**
-         * A collection of tags to be placed in the head.
-         */
+        /** @var array A collection of tags to be placed in the head. */
         private $_Tags;
 
-        /**
-         * A collection of strings to be placed in the head.
-         */
+        /** @var array  A collection of strings to be placed in the head. */
         private $_Strings;
 
-        /**
-         * The main text for the "title" tag in the head.
-         */
+        /** @var string The main text for the "title" tag in the head. */
         protected $_Title;
 
-        /**
-         * A string to be concatenated with $this->_Title.
-         */
+        /** @var string A string to be concatenated with $this->_Title. */
         protected $_SubTitle;
 
-        /**
-         * A string to be concatenated with $this->_Title if there is also a
-         * $this->_SubTitle string being concatenated.
-         */
+        /** @var A string to be concatenated with $this->_Title if there is also a $this->_SubTitle string being concatenated. */
         protected $_TitleDivider;
 
+        /** @var bool  */
+        private $_FavIconSet = FALSE;
+
+        /**
+         *
+         *
+         * @param string $Sender
+         */
         public function __construct($Sender = '') {
             $this->_Tags = array();
             $this->_Strings = array();
@@ -83,6 +81,12 @@ if (!class_exists('HeadModule', FALSE)) {
             $this->AddTag('link', $Properties);
         }
 
+        /**
+         *
+         *
+         * @param $HRef
+         * @param $Title
+         */
         public function AddRss($HRef, $Title) {
             $this->AddTag('link', array(
                 'rel' => 'alternate',
@@ -159,6 +163,11 @@ if (!class_exists('HeadModule', FALSE)) {
             $this->_Strings[] = $String;
         }
 
+        /**
+         *
+         *
+         * @return string
+         */
         public function AssetTarget() {
             return 'Head';
         }
@@ -251,8 +260,6 @@ if (!class_exists('HeadModule', FALSE)) {
             }
         }
 
-        private $_FavIconSet = FALSE;
-
         /**
          * Gets or sets the tags collection.
          *
@@ -264,6 +271,13 @@ if (!class_exists('HeadModule', FALSE)) {
             return $this->_Tags;
         }
 
+        /**
+         *
+         *
+         * @param string $Title
+         * @param bool $NoSubTitle
+         * @return mixed|string
+         */
         public function Title($Title = '', $NoSubTitle = FALSE) {
             if ($Title != '') {
                 // Apply $Title to $this->_Title and return it;
@@ -283,6 +297,13 @@ if (!class_exists('HeadModule', FALSE)) {
             }
         }
 
+        /**
+         *
+         *
+         * @param $A
+         * @param $B
+         * @return int
+         */
         public static function TagCmp($A, $B) {
             if ($A[self::TAG_KEY] == 'title')
                 return -1;

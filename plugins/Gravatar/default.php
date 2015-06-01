@@ -1,4 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * Gravatar Plugin.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Gravatar
+ */
 
 // Define the plugin:
 $PluginInfo['Gravatar'] = array(
@@ -16,7 +23,17 @@ $PluginInfo['Gravatar'] = array(
 // 1.3 Fixes - Changed UserBuilder override to also accept an array of user info
 // 1.4 Change - Lets you chain Vanillicon as the default by setting Plugins.Gravatar.UseVanillicon in config.
 
+/**
+ * Class GravatarPlugin
+ */
 class GravatarPlugin extends Gdn_Plugin {
+
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function ProfileController_AfterAddSideMenu_Handler($Sender, $Args) {
         if (!$Sender->User->Photo) {
             $Email = GetValue('Email', $Sender->User);
@@ -38,6 +55,12 @@ class GravatarPlugin extends Gdn_Plugin {
 }
 
 if (!function_exists('UserPhotoDefaultUrl')) {
+    /**
+     *
+     *
+     * @param $User
+     * @return string
+     */
     function UserPhotoDefaultUrl($User) {
         $Email = GetValue('Email', $User);
         $Https = Gdn::Request()->Scheme() == 'https';

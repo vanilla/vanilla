@@ -1,19 +1,26 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Dashboard Application Hooks
+ * DashboardHooks class.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Event handlers for the Dashboard application.
+ */
 class DashboardHooks implements Gdn_IPlugin {
+
+    /**
+     * Do nothing.
+     */
     public function Setup() {
-        return TRUE;
     }
 
     /**
+     * Fire before every page render.
      *
      * @param Gdn_Controller $Sender
      */
@@ -121,8 +128,11 @@ class DashboardHooks implements Gdn_IPlugin {
         $Sender->AddDefinition("TagHint", T("TagHint", "Start to type..."));
     }
 
+    /**
+     * @param $Sender
+     */
     public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-        /* @var SideMenuModule $Menu */
+        // SideMenuModule menu
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
         $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.View', array('class' => 'nav-dashboard'));
@@ -193,6 +203,8 @@ class DashboardHooks implements Gdn_IPlugin {
      * This must be done in the Dispatcher because of PrivateCommunity.
      * That precludes using Controller->SetHeader.
      * This is done so comment & forum embedding can work in old IE.
+     *
+     * @param Gdn_Dispatcher $Sender
      */
     public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
         safeHeader('P3P: CP="CAO PSA OUR"', true);
@@ -255,6 +267,11 @@ class DashboardHooks implements Gdn_IPlugin {
             Redirect($Target, 302);
     }
 
+    /**
+     *
+     *
+     * @param SiteNavModule $sender
+     */
     public function SiteNavModule_all_handler($sender) {
         // Add a link to the community home.
         $sender->addLink('main.home', array('text' => t('Community Home'), 'url' => '/', 'icon' => icon('home'), 'sort' => -100));
@@ -273,6 +290,8 @@ class DashboardHooks implements Gdn_IPlugin {
     }
 
     /**
+     *
+     *
      * @param SiteNavModule $sender
      */
     public function SiteNavModule_default_handler($sender) {
@@ -304,6 +323,8 @@ class DashboardHooks implements Gdn_IPlugin {
     }
 
     /**
+     *
+     *
      * @param SiteNavModule $sender
      */
     public function SiteNavModule_editprofile_handler($sender) {
@@ -326,6 +347,8 @@ class DashboardHooks implements Gdn_IPlugin {
     }
 
     /**
+     *
+     *
      * @param SiteNavModule $sender
      */
     public function SiteNavModule_profile_handler($sender) {

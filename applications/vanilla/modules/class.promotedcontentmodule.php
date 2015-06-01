@@ -1,4 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Promoted Content module
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0.17.9
+ */
 
 /**
  * Renders "Promoted" discussions and comments according to criteria.
@@ -6,83 +14,44 @@
  *  - Posted by a certain role
  *  - Reached bestof status
  *  - Latest from a certain category
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.17.9
- * @package Vanilla
  */
 class PromotedContentModule extends Gdn_Module {
 
-    /**
-     * Max number of records to be fetched
-     * @var integer
-     */
+    /** @var integer Max number of records to be fetched. */
     const MAX_LIMIT = 50;
 
     /**
-     * How should we choose the content?
+     * @var string How should we choose the content?
      *  - role        Author's Role
      *  - rank        Author's Rank
      *  - category    Content's Category
      *  - score       Content's Score
      *  - promoted
-     * @var string
      */
     public $Selector;
 
-    /**
-     * Parameters for the selector method
-     * @var string|int
-     */
+    /** @var string|int Parameters for the selector method. */
     public $Selection;
 
-    /**
-     * What type of content to fetch.
-     * - all
-     * - discussions
-     * - comments
-     * @var string
-     */
+    /** @var string What type of content to fetch. One of: all, discussions, comments. */
     public $ContentType = 'all';
 
-    /**
-     * How much content should be fetched
-     * @var integer
-     */
+    /** @var integer How much content should be fetched. */
     public $Limit = 9;
 
-    /**
-     * How often should we encapsulate content in groups
-     * Groups of: n
-     * @var integer
-     */
+    /** @var integer How often should we encapsulate content in groups. Groups of: n. */
     public $Group = 3;
 
-    /**
-     * How many chars of Title to return
-     * @var integer
-     */
+    /** @var integer How many chars of Title to return. */
     public $TitleLimit = 0;
 
-    /**
-     * How many chars of Body to return
-     * @var integer
-     */
+    /** @var integer How many chars of Body to return. */
     public $BodyLimit = 0;
 
-    /**
-     * How long do we cache?
-     * Units: seconds
-     * Default: 10 minutes
-     * @var integer
-     */
+    /** @var integer How long do we cache in seconds. */
     public $Expiry = 60;
 
-    /**
-     * @var array Whitelist of accepted parameters.
-     */
+    /** @var array Whitelist of accepted parameters. */
     public $Properties = array(
         'Selector',
         'Selection',
@@ -128,7 +97,6 @@ class PromotedContentModule extends Gdn_Module {
      * Validate data to be used as class properties.
      *
      * @param array $Parameters .
-     *
      * @return string|true True on success or string (message) on error.
      */
     public function Validate($Parameters = array()) {
@@ -178,7 +146,6 @@ class PromotedContentModule extends Gdn_Module {
      * Select content based on author RoleID.
      *
      * @param array|int $Parameters
-     *
      * @return array|false
      */
     protected function SelectByRole($Parameters) {
@@ -271,7 +238,6 @@ class PromotedContentModule extends Gdn_Module {
      * Select content based on author RankID.
      *
      * @param array|int $Parameters
-     *
      * @return array|false
      */
     protected function SelectByRank($Parameters) {
@@ -358,7 +324,6 @@ class PromotedContentModule extends Gdn_Module {
      * Select content based on its CategoryID.
      *
      * @param array|int $Parameters
-     *
      * @return array|false
      */
     protected function SelectByCategory($Parameters) {
@@ -437,7 +402,6 @@ class PromotedContentModule extends Gdn_Module {
      * Select content based on its Score.
      *
      * @param array|int $Parameters
-     *
      * @return array|false
      */
     protected function SelectByScore($Parameters) {

@@ -1,12 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+/**
+ * OpenID Plugin.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package OpenID
+ */
 
 // Define the plugin:
 $PluginInfo['OpenID'] = array(
@@ -14,13 +13,9 @@ $PluginInfo['OpenID'] = array(
     'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
     'Version' => '1.2.0',
     'RequiredApplications' => array('Vanilla' => '2.0.14'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
     'MobileFriendly' => TRUE,
     'SettingsUrl' => '/settings/openid',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'HasLocale' => TRUE,
-    'RegisterPermissions' => FALSE,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
@@ -28,11 +23,20 @@ $PluginInfo['OpenID'] = array(
 
 // 0.2 - Remove redundant enable toggle (2012-03-08 Lincoln)
 
+/**
+ * Class OpenIDPlugin
+ */
 class OpenIDPlugin extends Gdn_Plugin {
+
+    /** @var string  */
     public static $ProviderKey = 'OpenID';
 
-    /// Methods ///
-
+    /**
+     *
+     *
+     * @param bool $Popup
+     * @return string
+     */
     protected function _AuthorizeHref($Popup = FALSE) {
         $Url = Url('/entry/openid', TRUE);
         $UrlParts = explode('?', $Url);
@@ -51,6 +55,8 @@ class OpenIDPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
+     *
      * @return LightOpenID
      */
     public function GetOpenID() {
@@ -119,14 +125,23 @@ class OpenIDPlugin extends Gdn_Plugin {
 //      }
 //   }
 
+    /**
+     * @throws Gdn_UserException
+     */
     public function Setup() {
         if (!ini_get('allow_url_fopen')) {
             throw new Gdn_UserException('This plugin requires the allow_url_fopen php.ini setting.');
         }
     }
 
-    /// Plugin Event Handlers ///
-
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function Base_ConnectData_Handler($Sender, $Args) {
         if (GetValue(0, $Args) != 'openid')
             return;
@@ -170,13 +185,13 @@ class OpenIDPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param EntryController $Sender
      * @param array $Args
      */
     public function EntryController_OpenID_Create($Sender, $Args) {
         $this->EventArguments = $Args;
         $Sender->Form->InputPrefix = '';
-
 
         try {
             $OpenID = $this->GetOpenID();
@@ -217,6 +232,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param Gdn_Controller $Sender
      */
     public function EntryController_SignIn_Handler($Sender, $Args) {
@@ -235,22 +251,44 @@ class OpenIDPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function SignInAllowed() {
         return !C('Plugins.OpenID.DisableSignIn', FALSE);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function Base_SignInIcons_Handler($Sender, $Args) {
         if ($this->SignInAllowed()) {
             echo "\n".$this->_GetButton();
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function Base_BeforeSignInButton_Handler($Sender, $Args) {
         if ($this->SignInAllowed()) {
             echo "\n".$this->_GetButton();
         }
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     private function _GetButton() {
         if ($this->SignInAllowed()) {
             $Url = $this->_AuthorizeHref();
@@ -258,6 +296,11 @@ class OpenIDPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function Base_BeforeSignInLink_Handler($Sender) {
 //      if (!$this->IsEnabled())
 //			return;
@@ -269,8 +312,9 @@ class OpenIDPlugin extends Gdn_Plugin {
             echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect OpenIDConnect'));
     }
 
-    /*
+    /**
      * This OpenID plugin is requisite for some other sso plugins, but we may not always want the OpenID sso option.
+     *
      * Let's allow users to remove the ability to sign in with OpenID.
      */
     public function SettingsController_OpenID_Create($Sender) {

@@ -1,20 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Cache Layer: Dirty
- *
- * This is a cache implementation that caches nothing and always reports
- * cache misses.
+ * Gdn_Dirtycache
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
+
+/**
+ * Cache Layer: Dirty.
+ *
+ * This is a cache implementation that caches nothing and always reports cache misses.
+ */
 class Gdn_Dirtycache extends Gdn_Cache {
+
+    /** @var array  */
     protected $Cache = array();
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
         $this->CacheType = Gdn_Cache::CACHE_TYPE_NULL;

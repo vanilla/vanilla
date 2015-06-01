@@ -1,13 +1,11 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * A module for a list of links.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.3
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.2
  */
 
 /**
@@ -17,27 +15,21 @@
  * When adding an item you provide an array of with the following keys.
  */
 class NavModule extends Gdn_Module {
-    /// Properties ///
 
-    /**
-     *
-     * @var string The css class of the menu, if any.
-     */
+    /** @var string The css class of the menu, if any. */
     public $cssClass = null;
 
-    /**
-     *
-     * @var string The id of the menu, if any.
-     */
+    /** @var string The id of the menu, if any. */
     public $id = null;
 
-    /**
-     * @var array An array of items in the menu.
-     */
+    /** @var array An array of items in the menu. */
     protected $items = array();
 
-    /// Methods ///
-
+    /**
+     *
+     *
+     * @param string $Sender
+     */
     public function __construct($Sender = '') {
         $this->_ApplicationFolder = 'dashboard';
 
@@ -165,6 +157,12 @@ class NavModule extends Gdn_Module {
         echo "</nav>\n";
     }
 
+    /**
+     *
+     *
+     * @param $items
+     * @param int $level
+     */
     protected function renderItems($items, $level = 0) {
         NavModule::sortItems($items);
 
@@ -189,6 +187,12 @@ class NavModule extends Gdn_Module {
         }
     }
 
+    /**
+     *
+     *
+     * @param $key
+     * @param $link
+     */
     protected function renderLink($key, $link) {
         $href = $link['url'];
         $text = $link['text'];
@@ -210,6 +214,13 @@ class NavModule extends Gdn_Module {
         echo Anchor($text, $href, $class, $link, true)."\n";
     }
 
+    /**
+     *
+     *
+     * @param $key
+     * @param $group
+     * @param int $level
+     */
     protected function renderGroup($key, $group, $level = 0) {
         $text = $group['text'];
         $group['class'] = 'nav-group '.($text ? '' : 'nav-group-noheading ').$this->getCssClass($key, $group);
@@ -234,6 +245,12 @@ class NavModule extends Gdn_Module {
         echo "</div>\n";
     }
 
+    /**
+     *
+     *
+     * @param $key
+     * @param $divider
+     */
     protected function renderDivider($key, $divider) {
         echo "<div class=\"nav-divider\"></div>\n";
     }
@@ -296,7 +313,11 @@ class NavModule extends Gdn_Module {
         return $default_sort * 10000 + $default_sort;
     }
 
-
+    /**
+     *
+     *
+     * @return string
+     */
     public function toString() {
         ob_start();
         $this->render();
@@ -307,7 +328,12 @@ class NavModule extends Gdn_Module {
 }
 
 if (!function_exists('icon')):
-
+    /**
+     * Return icon HTML.
+     *
+     * @param $name
+     * @return string
+     */
     function icon($name) {
         return <<<EOT
 <span class="icon icon-$name"></span>

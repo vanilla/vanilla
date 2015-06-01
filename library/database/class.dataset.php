@@ -1,5 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * A database-independent dataset management/manipulation class.
  *
@@ -7,59 +6,54 @@
  * My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
-define('JOIN_INNER', 'inner');
-define('JOIN_LEFT', 'left');
-
+/**
+ * Class Gdn_DataSet
+ */
 class Gdn_DataSet implements IteratorAggregate, Countable {
 
+    /** Inner join. */
+    const JOIN_INNER = 'inner';
+
+    /** Left join. */
+    const JOIN_LEFT = 'left';
+
     /**
-     * Contains a reference to the open database connection. FALSE by default.
+     * @var PDO Contains a reference to the open database connection. FALSE by default.
      * This property is passed by reference from the Database object. Do not
      * manipulate or assign anything to this property!
-     *
-     * @var PDO
      */
     public $Connection;
 
-    /**
-     * The index of the $this->_ResultSet currently being accessed.
-     *
-     * @var int
-     */
+    /** @var int The index of the $this->_ResultSet currently being accessed. */
     private $_Cursor = -1;
 
     /**
-     * Determines what type of result is returned from the various methods by default.
-     *
-     * @var int Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
+     * @var intDetermines what type of result is returned from the various methods by default.
+     * Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
      */
     protected $_DatasetType = DATASET_TYPE_OBJECT;
 
+    /** @var bool  */
     protected $_EOF = FALSE;
 
     /**
-     * Contains a PDOStatement object returned by a PDO query. FALSE by default.
+     * @var object Contains a PDOStatement object returned by a PDO query. FALSE by default.
      * This property is assigned by the database driver object when a query is
      * executed in $Database->Query().
-     *
-     * @var object
      */
     private $_PDOStatement;
 
-    /**
-     * An array of either objects or associative arrays with the data in this dataset.
-     * @var array
-     */
+    /** @var array An array of either objects or associative arrays with the data in this dataset. */
     protected $_Result;
 
     /**
-     * @todo Undocumented method.
+     *
      */
     public function __construct($Result = NULL, $DataSetType = NULL) {
         // Set defaults
@@ -76,11 +70,16 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         }
     }
 
+    /**
+     *
+     */
     public function  __destruct() {
         $this->FreePDOStatement(TRUE);
     }
 
-    /** Clean sensitive data out of the object. */
+    /**
+     * Clean sensitive data out of the object.
+     */
     public function Clean() {
         $this->Connection = NULL;
         $this->FreePDOStatement(TRUE);
@@ -104,6 +103,12 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         $this->_Cursor = $RowIndex;
     }
 
+    /**
+     *
+     *
+     * @param bool $DatasetType
+     * @return $this|intDetermines|string
+     */
     public function DatasetType($DatasetType = FALSE) {
         if ($DatasetType !== FALSE) {
             // Make sure the type isn't changed if the result is already fetched.
@@ -131,6 +136,11 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         }
     }
 
+    /**
+     *
+     *
+     * @param string $Name
+     */
     public function ExpandAttributes($Name = 'Attributes') {
         $Result =& $this->Result();
 
@@ -240,6 +250,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
 
     /**
      * Index a result array.
+     *
      * @param array $Data The array to index. It is formatted similar to the array returned by Gdn_DataSet::Result().
      * @param string|array $Columns The name of the column to index on or an array of columns to index on.
      * @param array $Options An array of options for the method.
@@ -276,6 +287,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
     }
 
     /**
+     *
      *
      * @param array $Data
      * @param array $Columns The columns/table information for the join. Depending on the argument's index it will be interpreted differently.
@@ -378,7 +390,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
             $ColumnPrefix = StringEndsWith($ParentColumn, 'ID', TRUE, TRUE);
         }
 
-        $JoinType = strtolower(GetValue('Type', $Options, JOIN_LEFT));
+        $JoinType = strtolower(GetValue('Type', $Options, self::JOIN_LEFT));
 
         // Start augmenting the sql for the join.
         if (isset($Table))
@@ -417,7 +429,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
                     SetValue($JoinColumn, $Row, $ChildRow);
                 }
             } else {
-                if ($JoinType == JOIN_LEFT) {
+                if ($JoinType == self::JOIN_LEFT) {
                     if (isset($ColumnPrefix)) {
                         foreach ($ResultColumns as $Name) {
                             SetValue($ColumnPrefix.$Name, $Row, NULL);
@@ -432,7 +444,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         }
 
         // Remove inner join rows.
-        if ($JoinType == JOIN_INNER) {
+        if ($JoinType == self::JOIN_INNER) {
             foreach ($NotFound as $Index) {
                 unset($Data[$Index]);
             }
@@ -578,6 +590,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
 
     /**
      * Unserialize the fields in the dataset.
+     *
      * @param array $Fields
      * @since 2.1
      */

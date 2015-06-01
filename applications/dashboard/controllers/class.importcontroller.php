@@ -1,16 +1,23 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages imports and exports of data.
  *
  * This controller could use a code audit. Don't use it as sample code.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /import endpoint.
+ */
 class ImportController extends DashboardController {
+
+    /**
+     * Runs before every call to this controller.
+     */
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');

@@ -1,70 +1,40 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Session manager
- *
- * Handles user information throughout a session. This class is a singleton.
+ * Session manager.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Handles user information throughout a session. This class is a singleton.
  */
 class Gdn_Session {
 
-
-    /**
-     * Unique user identifier.
-     *
-     * @var int
-     */
+    /** @var int Unique user identifier. */
     public $UserID;
 
-
-    /**
-     * A User object containing properties relevant to session
-     *
-     * @var object
-     */
+    /** @var object A User object containing properties relevant to session */
     public $User;
 
-
-    /**
-     * Attributes of the current user.
-     *
-     * @var object
-     */
+    /** @var object Attributes of the current user. */
     protected $_Attributes;
 
-    /**
-     * Permissions of the current user.
-     *
-     * @var object
-     */
+    /** @var object Permissions of the current user. */
     protected $_Permissions;
 
-
-    /**
-     * Preferences of the current user.
-     *
-     * @var object
-     */
+    /** @var object Preferences of the current user. */
     protected $_Preferences;
 
-
-    /**
-     * The current user's transient key.
-     *
-     * @var object
-     */
+    /** @var object The current user's transient key. */
     protected $_TransientKey;
-
 
     /**
      * Private constructor prevents direct instantiation of object
-     *
      */
     public function __construct() {
         $this->UserID = 0;
@@ -178,6 +148,13 @@ class Gdn_Session {
         return is_array($this->_Permissions) ? $this->_Permissions : array();
     }
 
+    /**
+     *
+     *
+     * @param $Suffix
+     * @param null $Default
+     * @return mixed
+     */
     public function GetCookie($Suffix, $Default = NULL) {
         return GetValue(C('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
     }
@@ -210,6 +187,13 @@ class Gdn_Session {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Suffix
+     * @param $Value
+     * @param $Expires
+     */
     public function SetCookie($Suffix, $Value, $Expires) {
         $Name = C('Garden.Cookie.Name').$Suffix;
         $Path = C('Garden.Cookie.Path');
@@ -228,6 +212,11 @@ class Gdn_Session {
         $_COOKIE[$Name] = $Value;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     public function NewVisit() {
         static $NewVisit = NULL;
 
@@ -319,8 +308,9 @@ class Gdn_Session {
     }
 
     /**
+     *
+     *
      * @return array
-     * @todo add doc
      */
     public function GetAttributes() {
         return is_array($this->_Attributes) ? $this->_Attributes : array();
@@ -417,7 +407,6 @@ class Gdn_Session {
      *
      * @param string|array $Name
      * @param mixed $Value
-     * @todo check argument type
      */
     public function SetAttribute($Name, $Value = '') {
         if (!is_array($Name))
@@ -436,7 +425,6 @@ class Gdn_Session {
      *
      * @param string|array $Name
      * @param mixed $Value
-     * @todo check argument type
      */
     public function SetPreference($Name, $Value = '', $SaveToDatabase = TRUE) {
         if (!is_array($Name))
@@ -452,6 +440,11 @@ class Gdn_Session {
         }
     }
 
+    /**
+     *
+     *
+     * @return bool|object|string
+     */
     public function EnsureTransientKey() {
         if (!$this->_TransientKey) {
             // Generate a transient key in the browser.
@@ -466,7 +459,6 @@ class Gdn_Session {
      * Returns the transient key for the authenticated user.
      *
      * @return string
-     * @todo check return type
      */
     public function TransientKey($NewKey = NULL) {
         if (!is_null($NewKey)) {
@@ -554,6 +546,7 @@ class Gdn_Session {
 
     /**
      * Used by $this->Stash() to create & manage sessions for users & guests.
+     *
      * This is a stop-gap solution until full session management for users &
      * guests can be imlemented.
      */
@@ -617,6 +610,4 @@ class Gdn_Session {
 
         return $Session;
     }
-
-
 }

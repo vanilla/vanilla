@@ -3,7 +3,11 @@
  * Conversations stub content for a new site.
  *
  * Called by ConversationsHooks::Setup() to insert stub content upon enabling app.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
+ * @since 2.2
  */
 
 // Only do this once, ever.

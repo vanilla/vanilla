@@ -1,11 +1,18 @@
 <?php if (!defined('APPLICATION')) die();
+/**
+ * Editor Plugin
+ *
+ * @author Dane MacMillan
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package editor
+ */
 
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
    'Version' => '1.7.2',
    'Author' => "Dane MacMillan",
-   'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
    'RequiredTheme' => false,
@@ -19,89 +26,48 @@ $PluginInfo['editor'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
+/**
+ * Class EditorPlugin
+ */
 class EditorPlugin extends Gdn_Plugin {
 
-   /**
-    * Base string to be used for generating a memcached key.
-    */
+   /** Base string to be used for generating a memcached key. */
    const DISCUSSION_MEDIA_CACHE_KEY = 'media.discussion.%d';
 
-   /**
-    *
-    * Properties
-    *
-    */
-
+   /** @var bool  */
    protected $canUpload = false;
 
-
-   /**
-    *
-    * @var array Give class access to PluginInfo
-    */
+   /** @var array Give class access to PluginInfo */
    protected $pluginInfo = array();
 
-   /**
-    *
-    * @var array List of possible formats the editor supports.
-    */
+   /** @var array List of possible formats the editor supports. */
    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
 
-   /**
-    *
-    * @var string Default format being used for current rendering. Can be one of
-    *             the formats listed in $Formats array above.
-    */
+   /** @var string Default format being used for current rendering. Can be one of the formats listed in $Formats. */
    protected $Format;
 
-   /**
-    *
-    * @var string Asset path for this plugin, set in Gdn_Form_BeforeBodyBox_Handler.
-    *             TODO check how to set it at runtime in constructor.
-    */
+   /** @var string Asset path for this plugin, set in Gdn_Form_BeforeBodyBox_Handler. */
    protected $AssetPath;
 
    /**
-    *
     * @var string This is used as the input name for file uploads. It will be
-    *             passed to JS as well. Note that it can be defined as an
-    *             array, by adding square brackets, e.g., `editorupload[]`,
-    *             but that will make all the Vanilla upload classes
-    *             incompatible because they are hardcoded to handle only
-    *             single files at a time, not an array of files. Perhaps in
-    *             future make core upload classes more flexible.
+    * passed to JS as well. Note that it can be defined as an array, by adding square brackets, e.g., `editorupload[]`,
+    * but that will make all the Vanilla upload classes incompatible because they are hardcoded to handle only
+    * single files at a time, not an array of files. Perhaps in future make core upload classes more flexible.
     */
    protected $editorFileInputName = 'editorupload';
 
-   /**
-    *
-    * @var string
-    */
+   /** @var string */
    protected $editorBaseUploadDestinationDir = '';
 
-   /**
-    *
-    */
+   /** @var int|mixed  */
    public $ForceWysiwyg = 0;
 
-   /**
-    * This will cache the discussion media results for the page request. It
-    * gets populated from either the db or memcached.
-    *
-    * @var array
-    */
+   /** @var array This will cache the discussion media results for the page request. Populated from either the db or memcached. */
    protected $mediaCache;
 
-   /**
-    * How long memcached holds data until it expires.
-    */
+   /** @var int How long memcached holds data until it expires. */
    protected $mediaCacheExpire;
-
-   /**
-    *
-    * Methods
-    *
-    */
 
    /**
     * Setup some variables for instance.

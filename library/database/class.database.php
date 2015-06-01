@@ -1,39 +1,31 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Database manager
  *
- * The Database object contains connection and engine information for a single database.
- * It also allows a database to execute string sql statements against that database.
- *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
+
+/**
+ * The Database object contains connection and engine information for a single database.
+ *
+ * It also allows a database to execute string sql statements against that database.
+ */
 class Gdn_Database {
-    /// CONSTRUCTOR ///
-
-    /** @param mixed $Config The configuration settings for this object.
-     * @see Database::Init()
-     */
-    public function __construct($Config = NULL) {
-        $this->ClassName = get_class($this);
-        $this->Init($Config);
-        $this->ConnectRetries = 1;
-    }
-
-    /// PROPERTIES ///
 
     /** @var string The instance name of this class or the class that inherits from this class. */
     public $ClassName;
 
+    /** @var object */
     private $_CurrentResultSet;
 
-    /** @var PDO The connectio to the database. */
+    /** @var PDO The connection to the database. */
     protected $_Connection = NULL;
 
+    /** @var bool */
     protected $_IsPersistent = FALSE;
 
     /** @var PDO The connection to the slave database. */
@@ -42,11 +34,13 @@ class Gdn_Database {
     /** @var array The slave connection settings. */
     protected $_SlaveConfig = NULL;
 
+    /** @var string|null */
     protected $_SQL = NULL;
 
+    /** @var array|null */
     protected $_Structure = NULL;
 
-    /** @var array The connection options passed to the PDO constructor */
+    /** @var array The connection options passed to the PDO constructor. */
     public $ConnectionOptions;
 
     /** @var string The prefix to all database tables. */
@@ -58,17 +52,13 @@ class Gdn_Database {
     /** $var bool Whether or not the connection is in a transaction. **/
     protected $_InTransaction = FALSE;
 
-    /** @var string The PDO dsn for the database connection.
-     *  Note: This does NOT include the engine before the dsn.
-     */
+    /** @var string The PDO dsn for the database connection. Note: This does NOT include the engine before the DSN. */
     public $Dsn;
 
     /** @var string The name of the database engine for this class. */
     public $Engine;
 
-    /**
-     * @var array Information about the last query.
-     */
+    /** @var array Information about the last query. */
     public $LastInfo = array();
 
     /** @var string The password to the database. */
@@ -80,7 +70,17 @@ class Gdn_Database {
     /** @var int Number of retries when the db has gone away. */
     public $ConnectRetries;
 
-    /// METHODS ///
+    /**
+     *
+     *
+     * @param mixed $Config The configuration settings for this object.
+     * @see Database::Init()
+     */
+    public function __construct($Config = NULL) {
+        $this->ClassName = get_class($this);
+        $this->Init($Config);
+        $this->ConnectRetries = 1;
+    }
 
     /**
      * Begin a transaction on the database.
@@ -90,7 +90,9 @@ class Gdn_Database {
             $this->_InTransaction = $this->Connection()->beginTransaction();
     }
 
-    /** Get the PDO connection to the database.
+    /**
+     * Get the PDO connection to the database.
+     *
      * @return PDO The connection to the database.
      */
     public function Connection() {
@@ -102,6 +104,9 @@ class Gdn_Database {
         return $this->_Connection;
     }
 
+    /**
+     *
+     */
     public function CloseConnection() {
         if (!$this->_IsPersistent) {
             $this->CommitTransaction();
@@ -111,16 +116,14 @@ class Gdn_Database {
     }
 
     /**
-     * Close connection regardless of persistence
-     *
+     * Close connection regardless of persistence.
      */
     public function ForceCloseConnection() {
         $this->_Connection = NULL;
     }
 
     /**
-     * Hook for cleanup via Gdn_Factory
-     *
+     * Hook for cleanup via Gdn_Factory.
      */
     public function Cleanup() {
         $this->CloseConnection();
@@ -134,6 +137,15 @@ class Gdn_Database {
             $this->_InTransaction = !$this->Connection()->commit();
     }
 
+    /**
+     *
+     *
+     * @param $Dsn
+     * @param $User
+     * @param $Password
+     * @return PDO
+     * @throws Exception
+     */
     protected function NewPDO($Dsn, $User, $Password) {
         try {
             $PDO = new PDO(strtolower($this->Engine).':'.$Dsn, $User, $Password, $this->ConnectionOptions);
@@ -161,7 +173,8 @@ class Gdn_Database {
     }
 
     /**
-     * Properly quotes and escapes a expression for an sql string.
+     * Properly quotes and escapes a expression for a SQL string.
+     *
      * @param mixed $Expr The expression to quote.
      * @return string The quoted expression.
      */
@@ -179,6 +192,7 @@ class Gdn_Database {
 
     /**
      * Initialize the properties of this object.
+     *
      * @param mixed $Config The database is instantiated differently depending on the type of $Config:
      * - <b>null</b>: The database stored in the factory location Gdn:AliasDatabase will be used.
      * - <b>string</b>: The name of the configuration section to get the connection information from.
@@ -430,12 +444,21 @@ class Gdn_Database {
         return $this->_CurrentResultSet;
     }
 
+    /**
+     *
+     */
     public function RollbackTransaction() {
         if ($this->_InTransaction) {
             $this->_InTransaction = !$this->Connection()->rollBack();
         }
     }
 
+    /**
+     *
+     *
+     * @param $ErrorInfo
+     * @return string
+     */
     public function GetPDOErrorMessage($ErrorInfo) {
         $ErrorMessage = '';
         if (is_array($ErrorInfo)) {
@@ -452,6 +475,7 @@ class Gdn_Database {
 
     /**
      * The slave connection to the database.
+     *
      * @return PDO
      */
     public function Slave() {
@@ -468,6 +492,7 @@ class Gdn_Database {
 
     /**
      * Get the database driver class for the database.
+     *
      * @return Gdn_SQLDriver The database driver class associated with this database.
      */
     public function SQL() {

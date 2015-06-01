@@ -1,19 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /**
  * VanillaStats Plugin
  *
- * This plugin tracks pageviews on the forum and reports them to the central Vanilla
- * Analytics System.
- *
- * Changes:
- *  1.0     Official release
- *  2.0.3   Fix http/https issue
- *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package VanillaStats
  */
 
 $PluginInfo['VanillaStats'] = array(
@@ -23,18 +15,28 @@ $PluginInfo['VanillaStats'] = array(
     'MobileFriendly' => FALSE,
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'HasLocale' => TRUE,
-    'Author' => "Mark O'Sullivan",
+    'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+/**
+ * This plugin tracks pageviews on the forum and reports them to the central Vanilla
+ * Analytics System.
+ *
+ * Changes:
+ *  1.0     Official release
+ *  2.0.3   Fix http/https issue
+ */
 class VanillaStatsPlugin extends Gdn_Plugin {
 
-    public $AnalyticsServer;
-    public $VanillaID;
-
     const RESOLUTION_DAY = 'day';
+
     const RESOLUTION_MONTH = 'month';
+
+    public $AnalyticsServer;
+
+    public $VanillaID;
 
     /**
      * Plugin setup.

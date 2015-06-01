@@ -1,7 +1,11 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * BaseLogger
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.2
  */
 
 /**
@@ -19,7 +23,6 @@ class BaseLogger implements LoggerInterface {
     public function emergency($message, array $context = array()) {
         $this->log(Logger::EMERGENCY, $message, $context);
     }
-
 
     /**
      * Action must be taken immediately.

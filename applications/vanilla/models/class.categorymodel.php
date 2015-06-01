@@ -1,50 +1,42 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
 /**
- * Category Model
+ * Category model
  *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
+ * @since 2.0
  */
 
 /**
- * Manages discussion categories.
- *
- * @since 2.0.0
- * @package Vanilla
+ * Manages discussion categories' data.
  */
 class CategoryModel extends Gdn_Model {
 
+    /** Cache key. */
     const CACHE_KEY = 'Categories';
+
+    /** Cache time to live. */
     const CACHE_TTL = 600;
+
+    /** Cache grace. */
     const CACHE_GRACE = 60;
+
+    /** Cache key. */
     const MASTER_VOTE_KEY = 'Categories.Rebuild.Vote';
 
+    /** @var bool */
     public $Watching = FALSE;
 
-    /**
-     * Merged Category data, including Pure + UserCategory
-     *
-     * @var array
-     */
+    /** @var array Merged Category data, including Pure + UserCategory. */
     public static $Categories = NULL;
 
-    /**
-     * Whether or not to explicitly shard the categories cache.
-     * @var bool
-     */
+    /** @var bool Whether or not to explicitly shard the categories cache. */
     public static $ShardCache = FALSE;
 
     /**
-     * Whether or not to join the users in some calls.
-     * Forums with a lot of categories may need to optimize using this setting and simpler views.
      * @var bool Whether or not to join users to recent posts.
+     * Forums with a lot of categories may need to optimize using this setting and simpler views.
      */
     public $JoinRecentUsers = TRUE;
 
@@ -58,6 +50,12 @@ class CategoryModel extends Gdn_Model {
         parent::__construct('Category');
     }
 
+    /**
+     *
+     *
+     * @param $Category
+     * @return array
+     */
     public static function AllowedDiscussionTypes($Category) {
         $Category = self::PermissionCategory($Category);
         $Allowed = GetValue('AllowedDiscussionTypes', $Category);

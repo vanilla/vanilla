@@ -1,25 +1,25 @@
 <?php
+/**
+ * SignedIn module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 /**
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license GPLv2
+ * Info about a user ban.
  */
 class UserBanModule extends GDN_Module {
 
-    /**
-     * @var int The ban(s) to exclude from the reasons.
-     */
+    /** @var int The ban(s) to exclude from the reasons. */
     public $ExcludeBans = 0;
 
-    /**
-     * @var string The translation code for the the summary.
-     */
+    /** @var string The translation code for the the summary. */
     public $Summary;
 
-    /**
-     * @var int UserID The user ID we are looking at. Default to the current user.
-     */
+    /** @var int UserID The user ID we are looking at. Default to the current user. */
     public $UserID;
 
     /**
@@ -30,6 +30,11 @@ class UserBanModule extends GDN_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     protected function getData() {
         $userID = $this->UserID ?: Gdn::Session()->UserID;
         $user = Gdn::UserModel()->GetID($userID);
@@ -58,6 +63,11 @@ class UserBanModule extends GDN_Module {
         $this->FireEvent('GetData');
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public function ToString() {
         if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             // Only moderators can view the reasons for being banned.

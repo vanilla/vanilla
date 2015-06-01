@@ -1,17 +1,24 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Managing site statistic reporting.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
+
+/**
+ * Handles /statistics endpoint.
+ */
 class StatisticsController extends DashboardController {
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form');
 
+    /**
+     * Output available info.
+     */
     public function Info() {
         $this->SetData('FirstDate', Gdn::Statistics()->FirstDate());
         $this->Render();

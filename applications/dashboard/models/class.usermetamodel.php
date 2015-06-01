@@ -1,29 +1,25 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * UserMeta model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0.18 (?)
+ */
 
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+/**
+ * Handles usermeta data.
+ */
 class UserMetaModel extends Gdn_Model {
 
-    /**
-     * Store in-memory copies of everything retrieved from and set to the DB.
-     * Reference this if available, instead of querying
-     * @TODO
-     * @var array
-     */
+    /** @var array Store in-memory copies of everything retrieved from and set to the DB. */
     protected static $MemoryCache;
 
     /**
      * Class constructor. Defines the related database table name.
      */
     public function __construct() {
-
         self::$MemoryCache = array();
         parent::__construct('UserMeta');
         $this->SQL = clone Gdn::SQL();
@@ -31,7 +27,7 @@ class UserMetaModel extends Gdn_Model {
     }
 
     /**
-     * Retrieves UserMeta information for a UserID / Key pair
+     * Retrieves UserMeta information for a UserID / Key pair.
      *
      * This method takes a $UserID or array of $UserIDs, and a $Key. It converts the
      * $Key to fully qualified format and then queries for the associated value(s). $Key
@@ -125,7 +121,7 @@ class UserMetaModel extends Gdn_Model {
     }
 
     /**
-     * Sets UserMeta data to the UserMeta table
+     * Sets UserMeta data to the UserMeta table.
      *
      * This method takes a UserID, Key, and Value, and attempts to set $Key = $Value for $UserID.
      * $Key can be an SQL wildcard, thereby allowing multiple variations of a $Key to be set. $UserID

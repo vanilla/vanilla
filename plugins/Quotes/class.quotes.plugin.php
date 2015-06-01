@@ -1,23 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /**
- * Quotes Plugin
+ * Quotes Plugin.
  *
- * This plugin allows users to quote comments for reference in their own comments
- * within a discussion.
- *
- * Changes:
- *  1.0     Initial release
- *  1.6.1   Overhaul
- *  1.6.4   Moved button to reactions area & changed js accordingly.
- *  1.6.8   Textarea target will now automatically resize to fit text body.
- *  1.6.9   Security fix.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Addons
+ *  @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Quotes
  */
+
 // Define the plugin:
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
@@ -34,9 +24,26 @@ $PluginInfo['Quotes'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+/**
+ * This plugin allows users to quote comments for reference in their own comments
+ * within a discussion.
+ *
+ * Changes:
+ *  1.0     Initial release
+ *  1.6.1   Overhaul
+ *  1.6.4   Moved button to reactions area & changed js accordingly.
+ *  1.6.8   Textarea target will now automatically resize to fit text body.
+ *  1.6.9   Security fix.
+ *
+ */
 class QuotesPlugin extends Gdn_Plugin {
+
+    /** @var bool */
     public $HandleRenderQuotes = TRUE;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
 
@@ -50,6 +57,11 @@ class QuotesPlugin extends Gdn_Plugin {
         $this->HandleRenderQuotes = C('Plugins.Quotes.RenderQuotes', TRUE);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function ProfileController_AfterAddSideMenu_Handler($Sender) {
         if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
             return;
@@ -65,6 +77,11 @@ class QuotesPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function ProfileController_Quotes_Create($Sender) {
         $Sender->Permission('Garden.SignIn.Allow');
         $Sender->Title(T("Quotes Settings"));
@@ -119,6 +136,11 @@ class QuotesPlugin extends Gdn_Plugin {
         $Sender->Render('quotes', '', 'plugins/Quotes');
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
         if (!Gdn::Session()->IsValid()) {
             return;
@@ -133,14 +155,32 @@ class QuotesPlugin extends Gdn_Plugin {
         $Sender->AddDefinition('QuotesFolding', $QuoteFolding);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @throws Exception
+     */
     public function PluginController_Quotes_Create($Sender) {
         $this->Dispatch($Sender, $Sender->RequestArgs);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function Controller_Getquote($Sender) {
         $this->DiscussionController_GetQuote_Create($Sender);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Selector
+     * @param bool $Format
+     */
     public function DiscussionController_GetQuote_Create($Sender, $Selector, $Format = FALSE) {
         $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
         $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
@@ -160,14 +200,29 @@ class QuotesPlugin extends Gdn_Plugin {
         $Sender->Render('GetQuote', '', 'plugins/Quotes');
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function DiscussionController_Render_Before($Sender) {
         $this->PrepareController($Sender);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function PostController_Render_Before($Sender) {
         $this->PrepareController($Sender);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     protected function PrepareController($Sender) {
         //if (!$this->HandleRenderQuotes) return;
         $Sender->AddJsFile('quotes.js', 'plugins/Quotes');
@@ -218,6 +273,11 @@ class QuotesPlugin extends Gdn_Plugin {
         $this->RenderQuotes($Sender);
     }
 
+    /**
+     * Render quotes.
+     *
+     * @param $Sender
+     */
     protected function RenderQuotes($Sender) {
         if (!$this->HandleRenderQuotes) {
             return;
@@ -264,6 +324,12 @@ class QuotesPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Matches
+     * @return string
+     */
     protected function QuoteAuthorCallback($Matches) {
         $Attribution = T('%s said:');
         $Link = Anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
@@ -273,6 +339,11 @@ class QuotesPlugin extends Gdn_Plugin {
 BLOCKQUOTE;
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function PostController_Quote_Create($Sender) {
         if (sizeof($Sender->RequestArgs) < 2) {
             return;
@@ -283,6 +354,11 @@ BLOCKQUOTE;
         return $Sender->Comment();
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function PostController_BeforeCommentRender_Handler($Sender) {
         if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
             if (sizeof($Sender->RequestArgs) < 2) {
@@ -300,6 +376,14 @@ BLOCKQUOTE;
         }
     }
 
+    /**
+     *
+     *
+     * @param $Type
+     * @param $ID
+     * @param $QuoteData
+     * @param bool $Format
+     */
     protected function FormatQuote($Type, $ID, &$QuoteData, $Format = FALSE) {
         // Temporarily disable Emoji parsing (prevent double-parsing to HTML)
         $emojiEnabled = Emoji::instance()->enabled;
@@ -427,10 +511,18 @@ BLOCKQUOTE;
         Emoji::instance()->enabled = $emojiEnabled;
     }
 
+    /**
+     * No setup.
+     */
     public function Setup() {
-        // Nothing to do here!
     }
 
+    /**
+     *
+     *
+     * @param $Text
+     * @return mixed
+     */
     protected static function _StripMarkdownQuotes($Text) {
         $Text = preg_replace('/
               (                                # Wrap whole match in $1
@@ -446,19 +538,17 @@ BLOCKQUOTE;
         return $Text;
     }
 
+    /**
+     *
+     *
+     * @param $Text
+     * @return mixed
+     */
     protected static function _StripMentions($Text) {
         $Text = preg_replace(
             '/(^|[\s,\.>])@(\w{1,50})\b/i', '$1$2', $Text
         );
 
         return $Text;
-    }
-
-    public function OnDisable() {
-        // Nothing to do here!
-    }
-
-    public function Structure() {
-        // Nothing to do here!
     }
 }

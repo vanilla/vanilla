@@ -1,39 +1,38 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Format.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Output formatter
  *
  * Utility class that helps to format strings, objects, and arrays.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Format {
 
     /**
-     * Flag which allows plugins to decide if the output
-     * should include rel="nofollow" on any <a> links.
-     * Example: a plugin can run on "BeforeCommentBody" to
-     * check the current users role and decide if his/her post
-     * should contain rel="nofollow" links.
-     * The default setting is true, meaning all links will contain
+     * Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
+     * Example: a plugin can run on "BeforeCommentBody" to check the current users role and decide if his/her post
+     * should contain rel="nofollow" links. The default setting is true, meaning all links will contain
      * the rel="nofollow" attribute.
      */
     public static $DisplayNoFollow = TRUE;
 
-    /**
-     *
-     * @var bool Whether or not to replace plain text links with anchors.
-     * @since 2.1
-     */
+    /** @var bool Whether or not to replace plain text links with anchors. */
     public static $FormatLinks = TRUE;
 
+    /** @var string  */
     public static $MentionsUrlFormat = '/profile/{name}';
 
+    /** @var array  */
     protected static $SanitizedFormats = array(
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
     );

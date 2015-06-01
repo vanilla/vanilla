@@ -1,20 +1,26 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Handles image uploads
+ * Gdn_UploadImage
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Handles image uploads
  */
 class Gdn_UploadImage extends Gdn_Upload {
 
+    /**
+     * Check that we have the necessary tools to allow image uploading.
+     *
+     * @return bool
+     */
     public static function CanUploadImages() {
-        // Check that we have the necessary tools to allow image uploading
-
         // Is the Uploads directory available and correctly permissioned?
         if (!Gdn_Upload::CanUpload())
             return FALSE;
@@ -32,6 +38,9 @@ class Gdn_UploadImage extends Gdn_Upload {
         return TRUE;
     }
 
+    /**
+     *
+     */
     public function Clear() {
         parent::Clear();
         $this->_AllowedFileExtensions = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico');
@@ -39,6 +48,7 @@ class Gdn_UploadImage extends Gdn_Upload {
 
     /**
      * Gets the image size of a file.
+     *
      * @param string $Path The path to the file.
      * @param string $Filename The name of the file.
      * @return array An array of [width, height, image type].
@@ -61,7 +71,6 @@ class Gdn_UploadImage extends Gdn_Upload {
      * Validates the uploaded image. Returns the temporary name of the uploaded file.
      */
     public function ValidateUpload($InputName, $ThrowError = TRUE) {
-
         if (!function_exists('gd_info'))
             throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
 
@@ -80,8 +89,7 @@ class Gdn_UploadImage extends Gdn_Upload {
 
     /**
      * Saves the specified image at $Target in the specified format with the
-     * specified dimensions (or the existing dimensions if height/width are not
-     * provided.
+     * specified dimensions (or the existing dimensions if height/width are not provided.
      *
      * @param string The path to the source image. Typically this is the tmp file name returned by $this->ValidateUpload();
      * @param string The full path to where the image should be saved, including image name.
@@ -286,6 +294,12 @@ class Gdn_UploadImage extends Gdn_Upload {
         return $Sender->EventArguments['Parsed'];
     }
 
+    /**
+     *
+     *
+     * @param $GD
+     * @param $TargetPath
+     */
     public static function ImageIco($GD, $TargetPath) {
         require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
         require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';

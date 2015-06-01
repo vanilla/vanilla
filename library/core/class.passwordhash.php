@@ -1,37 +1,41 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Wrapper for the Portable PHP password hashing framework.
+ * Gdn_PasswordHash
  *
  * @author Damien Lebrun
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
-include PATH_LIBRARY.'/vendors/phpass/PasswordHash.php';
-
+include_once PATH_LIBRARY.'/vendors/phpass/PasswordHash.php';
 
 /**
  * Wrapper for the Portable PHP password hashing framework.
- *
- * @namespace Garden.Core
  */
 class Gdn_PasswordHash extends PasswordHash {
 
+    /** @var bool  */
     public $Weak = FALSE;
 
     /**
-     * Constructor
-     *
-     * @todo use configuration settings here.
+     * Constructor.
      */
     function __construct() {
         // 8 iteration to create a Portable hash
         parent::PasswordHash(8, FALSE);
     }
 
+    /**
+     * Check a Django hash.
+     *
+     * @param $Password
+     * @param $StoredHash
+     * @return bool
+     */
     function CheckDjango($Password, $StoredHash) {
         if (strpos($StoredHash, '$') === FALSE) {
             return md5($Password) == $StoredHash;
@@ -51,6 +55,13 @@ class Gdn_PasswordHash extends PasswordHash {
         }
     }
 
+    /**
+     * Check an IPB hash.
+     *
+     * @param $Password
+     * @param $StoredHash
+     * @return bool
+     */
     function CheckIPB($Password, $StoredHash) {
         $Parts = explode('$', $StoredHash, 2);
         if (count($Parts) == 2) {
@@ -177,6 +188,13 @@ class Gdn_PasswordHash extends PasswordHash {
         return $Result;
     }
 
+    /**
+     * Check a Vanilla hash.
+     *
+     * @param $Password
+     * @param $StoredHash
+     * @return bool
+     */
     function CheckVanilla($Password, $StoredHash) {
         $this->Weak = FALSE;
         if (!isset($StoredHash[0]))
@@ -199,6 +217,13 @@ class Gdn_PasswordHash extends PasswordHash {
         return FALSE;
     }
 
+    /**
+     * Check a YAF hash.
+     *
+     * @param $Password
+     * @param $StoredHash
+     * @return bool
+     */
     function CheckYaf($Password, $StoredHash) {
         if (strpos($StoredHash, '$') === FALSE) {
             return md5($Password) == $StoredHash;

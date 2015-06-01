@@ -1,4 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Pluggable
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Event Framework: Pluggable
@@ -8,40 +17,28 @@
  * has the ability to throw custom events at any time, which can then be
  * handled by plugins.
  *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  * @abstract
  */
 abstract class Gdn_Pluggable extends Gdn_SliceProvider {
 
-
     /**
-     * The name of the class that has been instantiated. Typically this will be
+     * @var string The name of the class that has been instantiated. Typically this will be
      * a class that has extended this class.
-     *
-     * @var string
      */
     protected $ClassName;
 
-
     /**
-     * Any arguments that should be passed into a plugin's event handler.
+     * @var array Any arguments that should be passed into a plugin's event handler.
      * Typically these are variables that were defined before the event fired
      * and were local to the method being executed. It is an associative array
      * of Argument_Name => Argument_Value pairs. The EventArguments can be
      * accessed (and changed) in the plugin since the plugin has full
      * access to the object throwing the event (see FireEvent() below).
-     *
-     * @var array
      */
     public $EventArguments;
 
-
     /**
-     * When any events are handled by plugins, the return values from those
+     * @var array When any events are handled by plugins, the return values from those
      * method are saved in $this->Returns array as $EventHandlerName =>
      * array($PluginName => $ReturnValue) pairs.
      * Note: Method overrides and direct method call return values are NOT saved
@@ -50,30 +47,23 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
      *  attaches to an "ExampleController->Render()" method using the magic
      *  "Before" event, you would reference it like so:
      *  $ReturnVal = $Sender->Returns['ExampleController_BeforeRender_Handler']['TestPlugin'];
-     *
-     * @var array
      */
     public $Returns = array();
 
 
     /**
-     * An enumerator indicating what type of handler the method being called is.
+     * @var enumerator An enumerator indicating what type of handler the method being called is.
      * Options are:
-     *  HANDLER_TYPE_NORMAL: Standard call to a method on the object.
+     *  HANDLER_TYPE_NORMAL: Standard call to a method on the object (DEFAULT).
      *  HANDLER_TYPE_OVERRIDE: Call to a method override.
      *  HANDLER_TYPE_NEW: Call to a new object method.
-     * The default value is HANDLER_TYPE_NORMAL;
-     *
-     * @var enumerator
      */
     public $HandlerType;
 
-
     /**
-     * In some cases it may be desirable to fire an event from a different class
+     * @var string In some cases it may be desirable to fire an event from a different class
      * than is currently available via $this. If this variable is set, it should
      * contain the name of the class that the next event will fire off.
-     * @var string
      */
     public $FireAs;
 
@@ -81,7 +71,6 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
      * The public constructor of the class. If any extender of this class
      * overrides this one, parent::__construct(); should be called to ensure
      * interoperability.
-     *
      */
     public function __construct() {
         $this->ClassName = get_class($this);
@@ -90,17 +79,16 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
         $this->HandlerType = HANDLER_TYPE_NORMAL;
     }
 
-
     /**
-     * @param unknown_type $PluginName
-     * @param unknown_type $HandlerName
+     *
+     *
+     * @param string $PluginName
+     * @param string $HandlerName
      * @return
-     * @todo add doc
      */
     public function GetReturn($PluginName, $HandlerName) {
         return $this->Returns[strtolower($HandlerName)][strtolower($PluginName)];
     }
-
 
     /**
      * Fire the next event off a custom parent class
@@ -116,7 +104,6 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
 
         return $this;
     }
-
 
     /**
      * Fires an event to be dealt with by plugins. Plugins can create
@@ -143,9 +130,8 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
         return Gdn::PluginManager()->CallEventHandlers($this, $FireClass, $EventName);
     }
 
-
     /**
-     * Used to extend any method
+     * Used to extend any method.
      *
      * There are two types of extended method calls:
      *  1. Declared: The method was declared with the lowercase "x" prefix and called without it.

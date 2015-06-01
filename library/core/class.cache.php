@@ -1,5 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Cache layer base class
  *
@@ -7,127 +6,125 @@
  * caching.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.10
  * @abstract
  */
 abstract class Gdn_Cache {
 
-    /**
-     * List of cache containers
-     * @var array
-     */
+    /** @var array List of cache containers. */
     protected $Containers;
 
-    /**
-     * List of features this cache system supports
-     * @var array
-     */
+    /** @var array List of features this cache system supports. */
     protected $Features;
 
-    /**
-     * Type of cache this this: one of CACHE_TYPE_MEMORY, CACHE_TYPE_FILE, CACHE_TYPE_NULL
-     * @var string
-     */
+    /** @var string Type of cache this this: one of CACHE_TYPE_MEMORY, CACHE_TYPE_FILE, CACHE_TYPE_NULL. */
     protected $CacheType;
 
-    /**
-     * Memory copy of store containers
-     * @var array
-     */
+    /** @var array Memory copy of store containers. */
     protected static $Stores = array();
 
-    // Allows items to be internally compressed/decompressed
+    /** Allows items to be internally compressed/decompressed. */
     const FEATURE_COMPRESS = 'f_compress';
-    // Allows items to autoexpire (seconds)
+
+    /** Allows items to autoexpire (seconds). */
     const FEATURE_EXPIRY = 'f_expiry';
-    // Allows set/get timeouts (seconds)
+
+    /** Allows set/get timeouts (seconds). */
     const FEATURE_TIMEOUT = 'f_timeout';
-    // Allows disabling usage of key prefix
+
+    /** Allows disabling usage of key prefix. */
     const FEATURE_NOPREFIX = 'f_noprefix';
-    // Allows forcing alternate key prefix
+
+    /** Allows forcing alternate key prefix. */
     const FEATURE_FORCEPREFIX = 'f_forceprefix';
-    // Allows querying DB for missing keys, or firing a callback
+
+    /** Allows querying DB for missing keys, or firing a callback. */
     const FEATURE_FALLBACK = 'f_fallback';
-    // In incr/decr ops, what should the initial value be
+
+    /** In incr/decr ops, what should the initial value be. */
     const FEATURE_INITIAL = 'f_initial';
-    // Allows sharding large keys across all servers [Add,Store,Get,Replace,Remove]
+
+    /** Allows sharding large keys across all servers [Add,Store,Get,Replace,Remove]. */
     const FEATURE_SHARD = 'f_shard';
-    // Allows control over localcache usage
+
+    /** Allows control over localcache usage. */
     const FEATURE_LOCAL = 'f_local';
 
-    /**
-     * Location - SERVER:IP, Filepath, etc
-     */
+    /** Location - SERVER:IP, Filepath, etc. */
     const CONTAINER_LOCATION = 'c_location';
 
-    /**
-     * Persistent - Whether to use connect() or pconnect() where applicable
-     */
+    /** Persistent - Whether to use connect() or pconnect() where applicable. */
     const CONTAINER_PERSISTENT = 'c_persistent';
 
-    /**
-     * Pool Size - When using pconnect(), how many connections should we use in the pool?
-     */
+    /** Pool Size - When using pconnect(), how many connections should we use in the pool? */
     const CONTAINER_POOLSIZE = 'c_poolsize';
 
-    /**
-     * Pool Key - When using pconnect(), what should the pool key look like?
-     */
+    /** Pool Key - When using pconnect(), what should the pool key look like? */
     const CONTAINER_POOLKEY = 'c_poolkey';
 
-    /**
-     * Weight - Allows for differently weighted storage locations
-     */
+    /** Weight - Allows for differently weighted storage locations. */
     const CONTAINER_WEIGHT = 'c_weight';
 
-    /**
-     * Persistent - Retry delay inverval in seconds
-     */
+    /** Persistent - Retry delay inverval in seconds. */
     const CONTAINER_RETRYINT = 'c_retryint';
 
-    /**
-     * Timeout - How long to wait before timing out while connecting
-     */
+    /** Timeout - How long to wait before timing out while connecting. */
     const CONTAINER_TIMEOUT = 'c_timeout';
 
-    /**
-     * Online - If this container is available for requests
-     */
+    /** Online - If this container is available for requests. */
     const CONTAINER_ONLINE = 'c_online';
 
-    /**
-     * Callback - Method to call if the location fails to be added
-     */
+    /** Callback - Method to call if the location fails to be added. */
     const CONTAINER_CALLBACK = 'c_callback';
 
+    /** Cache status. */
     const CACHEOP_FAILURE = FALSE;
+
+    /** Cache status. */
     const CACHEOP_SUCCESS = TRUE;
 
+    /** Cache type. */
     const CACHE_TYPE_MEMORY = 'ct_memory';
+
+    /** Cache type. */
     const CACHE_TYPE_FILE = 'ct_file';
+
+    /** Cache type. */
     const CACHE_TYPE_NULL = 'ct_null';
 
+    /** Seconds. */
     const CACHE_EJECT_DURATION = 60;
 
+    /** Seconds. */
     const APC_CACHE_DURATION = 300;
 
-    /**
-     * Local in-memory cache of fetched data
-     * This prevents duplicate gets to memcache
-     * @var array
-     */
+    /**  @var arrayLocal in-memory cache of fetched data. This prevents duplicate gets to memcache. */
     protected static $localCache = array();
 
+    /** @var bool  */
     public static $trace = true;
+
+    /** @var array  */
     public static $trackGet = array();
+
+    /** @var int  */
     public static $trackGets = 0;
+
+    /** @var array  */
     public static $trackSet = array();
+
+    /** @var int  */
     public static $trackSets = 0;
+
+    /** @var int  */
     public static $trackTime = 0;
 
+    /**
+     *
+     */
     public function __construct() {
         $this->Containers = array();
         $this->Features = array();

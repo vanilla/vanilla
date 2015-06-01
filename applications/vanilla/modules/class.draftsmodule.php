@@ -1,15 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Garden.Modules
+ * Drafts module
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
  */
 
 /**
- * Renders user drafts. If rendered within a discussion, it only shows drafts
- * related to that discussion.
+ * Renders user drafts. If rendered within a discussion, it only shows drafts related to that discussion.
  */
 class DraftsModule extends Gdn_Module {
 
+    /** @var  Gdn_Form */
     public $Form;
 
     public function GetData($Limit = 20, $DiscussionID = '') {

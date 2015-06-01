@@ -1,4 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * GettingStarted Plugin.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package GettingStarted
+ */
 
 // Define the plugin:
 $PluginInfo['GettingStarted'] = array(
@@ -11,17 +18,19 @@ $PluginInfo['GettingStarted'] = array(
     'Hidden' => TRUE
 );
 
+/**
+ * Class GettingStartedPlugin
+ *
+ * This plugin should:
+ * 1. Display 5 tips for getting started on the dashboard
+ * 2. Check off each item as it is completed
+ * 3. Disable itself when "dismiss" is clicked
+ */
 class GettingStartedPlugin extends Gdn_Plugin {
 
-    /*
-       This plugin should:
-
-       1. Display 5 tips for getting started on the dashboard
-       2. Check off each item as it is completed
-       3. Disable itself when "dismiss" is clicked
-    */
-
-    // Adds a "My Forums" menu option to the dashboard area
+    /**
+     * Adds a "My Forums" menu option to the dashboard area.
+     */
     public function SettingsController_Render_Before($Sender) {
         // Have they visited their dashboard?
         if (strtolower($Sender->RequestMethod) != 'index')

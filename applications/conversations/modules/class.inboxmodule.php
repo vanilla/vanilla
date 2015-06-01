@@ -1,7 +1,22 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Inbox module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Conversations
+ * @since 2.0
+ */
 
+/**
+ * Handles displaying the inbox.
+ */
 class InboxModule extends Gdn_Module {
+
+    /** @var int */
     public $Limit = 10;
+
+    /** @var int */
     public $UserID = NULL;
 
     public function __construct() {

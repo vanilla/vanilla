@@ -1,8 +1,11 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * Ban Model
+ * Ban Model.
  *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
+ * @since 2.0
  */
 
 /**
@@ -12,29 +15,23 @@
  * @package Dashboard
  */
 class BanModel extends Gdn_Model {
-    /**
-     * Manually banned by a moderator.
-     */
+
+    /** Manually banned by a moderator. */
     const BAN_MANUAL = 0x1;
-    /**
-     * Automatically banned by an IP ban, name, or email ban.
-     */
+
+    /** Automatically banned by an IP ban, name, or email ban. */
     const BAN_AUTOMATIC = 0x2;
-    /**
-     * Reserved for future functionality.
-     */
+
+    /** Reserved for future functionality. */
     const BAN_TEMPORARY = 0x4;
-    /**
-     * Banned by the warnings plugin.
-     */
+
+    /** Banned by the warnings plugin. */
     const BAN_WARNING = 0x8;
 
     /* @var array */
     protected static $_AllBans;
 
-    /**
-     * @var BanModel The singleton instance of this class.
-     */
+    /** @var BanModel The singleton instance of this class. */
     protected static $instance;
 
     /**
@@ -57,7 +54,7 @@ class BanModel extends Gdn_Model {
         return self::$instance;
     }
 
-    /*
+    /**
      * Get and store list of current bans.
      *
      * @since 2.0.18
@@ -143,6 +140,7 @@ class BanModel extends Gdn_Model {
      * @param array $Ban Data about the ban.
      *    Valid keys are BanType and BanValue. BanValue is what is to be banned.
      *    Valid values for BanType are email, ipaddress or name.
+     * @return array
      */
     public function BanWhere($Ban) {
         $Result = array('u.Admin' => 0, 'u.Deleted' => 0);

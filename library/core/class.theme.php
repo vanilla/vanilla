@@ -1,26 +1,43 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Theme system
- *
- * Allows access to theme controls from within views, to give themers a unified
- * toolset for interacting with Vanilla from within views.
+ * Theme system.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Allows access to theme controls from within views, to give themers a unified
+ * toolset for interacting with Vanilla from within views.
  */
 class Gdn_Theme {
 
+    /** @var array  */
     protected static $_AssetInfo = array();
 
+    protected static $_BulletSep = FALSE;
+
+    protected static $_BulletSection = FALSE;
+
+    /** @var array */
+    protected static $_Section = array();
+
+    /**
+     *
+     *
+     * @param string $AssetContainer
+     */
     public static function AssetBegin($AssetContainer = 'Panel') {
         self::$_AssetInfo[] = array('AssetContainer' => $AssetContainer);
         ob_start();
     }
 
+    /**
+     *
+     */
     public static function AssetEnd() {
         if (count(self::$_AssetInfo) == 0)
             return;
@@ -31,6 +48,14 @@ class Gdn_Theme {
         Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     * @param bool $HomeLink
+     * @param array $Options
+     * @return string
+     */
     public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
         $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
 
@@ -98,9 +123,6 @@ class Gdn_Theme {
         return $Result;
     }
 
-    protected static $_BulletSep = FALSE;
-    protected static $_BulletSection = FALSE;
-
     /**
      * Call before writing an item and it will optionally write a bullet seperator.
      *
@@ -144,6 +166,7 @@ class Gdn_Theme {
 
     /**
      * Returns whether or not the page is in the current section.
+     *
      * @param string|array $Section
      */
     public static function InSection($Section) {
@@ -155,6 +178,15 @@ class Gdn_Theme {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $Path
+     * @param bool $Text
+     * @param null $Format
+     * @param array $Options
+     * @return mixed|null|string
+     */
     public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
         $Session = Gdn::Session();
         $Class = GetValue('class', $Options, '');
@@ -363,6 +395,13 @@ class Gdn_Theme {
             return $Title;
     }
 
+    /**
+     *
+     *
+     * @param $Name
+     * @param array $Properties
+     * @return mixed|string
+     */
     public static function Module($Name, $Properties = array()) {
         if (isset($Properties['cache'])) {
             $Key = isset($Properties['cachekey']) ? $Properties['cachekey'] : 'module.'.$Name;
@@ -409,6 +448,11 @@ class Gdn_Theme {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public static function Pagename() {
         $Application = Gdn::Dispatcher()->Application();
         $Controller = Gdn::Dispatcher()->Controller();
@@ -435,19 +479,12 @@ class Gdn_Theme {
     }
 
     /**
-     * @var array
-     */
-    protected static $_Section = array();
-
-    /**
      * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
+     *
      * @since 2.1
-     * @param string $Section The name of the section
-     * @param string $Method One of:
-     *  - add
-     *  - remove
-     *  - set
-     *  - get
+     *
+     * @param string $Section The name of the section.
+     * @param string $Method One of: add, remove, set, get.
      */
     public static function Section($Section, $Method = 'add') {
         $Section = array_fill_keys((array)$Section, TRUE);
@@ -469,6 +506,13 @@ class Gdn_Theme {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Code
+     * @param $Default
+     * @return mixed
+     */
     public static function Text($Code, $Default) {
         return C("ThemeOption.{$Code}", T('Theme_'.$Code, $Default));
     }

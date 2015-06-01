@@ -1,4 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Factory.
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Object factory
@@ -6,20 +16,18 @@
  * A factory used to create most objects in the core library.
  * If you have your own object that implements some base portion of the library you can install it in the factory
  * make sure your own object has the same properties/methods as the core object and then install it into this factory.
- *
- * @author Todd Burry <todd@vanillaforums.com>
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Factory {
+
     /** @var array The object definitions for the factory. */
     protected $_Objects = array();
+
     /** @var array The property dependancies for the factory. */
     protected $_Dependencies = array();
 
+    /**
+     *
+     */
     public function __construct() {
         register_shutdown_function(array($this, 'Cleanup'));
     }

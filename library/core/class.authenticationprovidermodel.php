@@ -1,26 +1,41 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Authentication Helper: Authentication Provider Model
  *
- * Used to access and manipulate the UserAuthenticationProvider table.
- *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.10
  */
+
+/**
+ * Used to access and manipulate the UserAuthenticationProvider table.
+ */
 class Gdn_AuthenticationProviderModel extends Gdn_Model {
+
+    /** Database mapping. */
     const COLUMN_KEY = 'AuthenticationKey';
+
+    /** Database mapping. */
     const COLUMN_ALIAS = 'AuthenticationSchemeAlias';
+
+    /** Database mapping. */
     const COLUMN_NAME = 'Name';
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct('UserAuthenticationProvider');
         $this->PrimaryKey = self::COLUMN_KEY;
     }
 
+    /**
+     *
+     *
+     * @param $Row
+     */
     protected static function _Calculate(&$Row) {
         if (!$Row)
             return;
@@ -43,6 +58,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return array_pop($Rows);
     }
 
+    /**
+     *
+     *
+     * @return array|null|type
+     */
     public function GetProviders() {
         $this->SQL
             ->Select('uap.*')
@@ -64,6 +84,12 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return $Data;
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationProviderKey
+     * @return array|bool|stdClass
+     */
     public static function GetProviderByKey($AuthenticationProviderKey) {
         $ProviderData = Gdn::SQL()
             ->Select('uap.*')
@@ -77,6 +103,12 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return $ProviderData;
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationProviderURL
+     * @return array|bool|stdClass
+     */
     public static function GetProviderByURL($AuthenticationProviderURL) {
         $ProviderData = Gdn::SQL()
             ->Select('uap.*')
@@ -90,6 +122,13 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return $ProviderData;
     }
 
+    /**
+     *
+     *
+     * @param $AuthenticationSchemeAlias
+     * @param null $UserID
+     * @return array|bool|stdClass
+     */
     public static function GetProviderByScheme($AuthenticationSchemeAlias, $UserID = NULL) {
         $ProviderQuery = Gdn::SQL()
             ->Select('uap.*')
@@ -109,6 +148,16 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param bool $Where
+     * @param string $OrderFields
+     * @param string $OrderDirection
+     * @param bool $Limit
+     * @param bool $Offset
+     * @return array|null
+     */
     public static function GetWhereStatic($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
         $Data = Gdn::SQL()->GetWhere('UserAuthenticationProvider', $Where, $OrderFields, $OrderDirection, $Limit, $Offset)->ResultArray();
         foreach ($Data as &$Row) {
@@ -117,6 +166,13 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return $Data;
     }
 
+    /**
+     *
+     *
+     * @param array $Data
+     * @param bool $Settings
+     * @return bool
+     */
     public function Save($Data, $Settings = FALSE) {
         // Grab the current record.
         $Row = FALSE;

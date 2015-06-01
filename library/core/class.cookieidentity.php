@@ -1,34 +1,62 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Validating, Setting, and Retrieving session data in cookies.
+ * Gdn_CookieIdentity
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Validating, Setting, and Retrieving session data in cookies.
  */
 class Gdn_CookieIdentity {
 
+    /** @var int|null */
     public $UserID = NULL;
 
+    /** @var string */
     public $CookieName;
+
+    /** @var string */
     public $CookiePath;
+
+    /** @var string */
     public $CookieDomain;
+
+    /** @var string */
     public $VolatileMarker;
+
+    /** @var bool */
     public $CookieHashMethod;
+
+    /** @var string */
     public $CookieSalt;
 
+    /** @var string */
     public $PersistExpiry = '30 days';
+
+    /** @var string */
     public $SessionExpiry = '2 days';
 
+    /**
+     *
+     *
+     * @param null $Config
+     */
     public function __construct($Config = NULL) {
         $this->Init($Config);
     }
 
+    /**
+     *
+     *
+     * @param null $Config
+     */
     public function Init($Config = NULL) {
         if (is_null($Config))
             $Config = Gdn::Config('Garden.Cookie');
@@ -82,6 +110,12 @@ class Gdn_CookieIdentity {
         return $this->UserID = $UserID;
     }
 
+    /**
+     *
+     *
+     * @param $CheckUserID
+     * @return bool
+     */
     public function HasVolatileMarker($CheckUserID) {
         $HasMarker = $this->CheckVolatileMarker($CheckUserID);
         if (!$HasMarker)
@@ -90,6 +124,12 @@ class Gdn_CookieIdentity {
         return $HasMarker;
     }
 
+    /**
+     *
+     *
+     * @param $CheckUserID
+     * @return bool
+     */
     public function CheckVolatileMarker($CheckUserID) {
         if (!$this->_CheckCookie($this->VolatileMarker)) return FALSE;
 
@@ -252,6 +292,12 @@ class Gdn_CookieIdentity {
         $_COOKIE[$CookieName] = $CookieContents;
     }
 
+    /**
+     *
+     *
+     * @param $CookieName
+     * @return bool
+     */
     protected function _CheckCookie($CookieName) {
         $CookieStatus = self::CheckCookie($CookieName, $this->CookieHashMethod, $this->CookieSalt);
         if ($CookieStatus === FALSE)
@@ -259,6 +305,14 @@ class Gdn_CookieIdentity {
         return $CookieStatus;
     }
 
+    /**
+     *
+     *
+     * @param $CookieName
+     * @param null $CookieHashMethod
+     * @param null $CookieSalt
+     * @return bool
+     */
     public static function CheckCookie($CookieName, $CookieHashMethod = NULL, $CookieSalt = NULL) {
         if (empty($_COOKIE[$CookieName])) {
             return FALSE;
@@ -292,6 +346,14 @@ class Gdn_CookieIdentity {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $CookieName
+     * @param null $CookieHashMethod
+     * @param null $CookieSalt
+     * @return array|bool
+     */
     public static function GetCookiePayload($CookieName, $CookieHashMethod = NULL, $CookieSalt = NULL) {
         if (!self::CheckCookie($CookieName)) return FALSE;
 
@@ -307,13 +369,24 @@ class Gdn_CookieIdentity {
         return $Payload;
     }
 
+    /**
+     *
+     *
+     * @param $CookieName
+     */
     protected function _DeleteCookie($CookieName) {
         unset($_COOKIE[$CookieName]);
         self::DeleteCookie($CookieName, $this->CookiePath, $this->CookieDomain);
     }
 
+    /**
+     *
+     *
+     * @param $CookieName
+     * @param null $Path
+     * @param null $Domain
+     */
     public static function DeleteCookie($CookieName, $Path = NULL, $Domain = NULL) {
-
         if (is_null($Path))
             $Path = Gdn::Config('Garden.Cookie.Path');
 

@@ -1,16 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license GNU GPLv2
+ * Conversations model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Conversations
+ * @since 2.0
  */
 
 /**
  * Introduces common methods that child classes can use.
- *
- * @since 2.2
- * @package Conversations
  */
 abstract class ConversationsModel extends Gdn_Model {
+
     /**
      * Class constructor. Defines the related database table name.
      *

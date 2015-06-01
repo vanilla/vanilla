@@ -1,21 +1,26 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+<?php
+/**
+ * Locale model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 /**
  * Used to manage adding/removing different locale files.
  */
 class LocaleModel {
 
+    /** @var array|null Locales in the system.  */
     protected $_AvailableLocalePacks = NULL;
 
+    /**
+     *
+     *
+     * @return array|null
+     */
     public function AvailableLocalePacks() {
         if ($this->_AvailableLocalePacks === NULL) {
             $LocaleInfoPaths = SafeGlob(PATH_ROOT."/locales/*/definitions.php");
@@ -30,6 +35,11 @@ class LocaleModel {
         return $this->_AvailableLocalePacks;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function AvailableLocales() {
         // Get the list of locales that are supported.
         $Locales = array_column($this->AvailableLocalePacks(), 'Locale', 'Locale');
@@ -39,6 +49,11 @@ class LocaleModel {
         return $Locales;
     }
 
+    /**
+     *
+     *
+     * @param $info
+     */
     protected function CalculateLocaleInfo(&$info) {
         $canonicalLocale = Gdn_Locale::Canonicalize($info['Locale']);
         if ($canonicalLocale !== $info['Locale']) {
@@ -47,6 +62,14 @@ class LocaleModel {
         }
     }
 
+    /**
+     *
+     *
+     * @param $SourcePath
+     * @param $DestPath
+     * @return mixed
+     * @throws Exception
+     */
     public function CopyDefinitions($SourcePath, $DestPath) {
         // Load the definitions from the source path.
         $Definitions = $this->LoadDefinitions($SourcePath);
@@ -71,6 +94,12 @@ class LocaleModel {
         return $DestPath;
     }
 
+    /**
+     *
+     *
+     * @param bool $GetInfo
+     * @return array
+     */
     public function EnabledLocalePacks($GetInfo = FALSE) {
         $Result = (array)C('EnabledLocales', array());
 
@@ -90,6 +119,13 @@ class LocaleModel {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Path
+     * @param null $Skip
+     * @return array
+     */
     public function LoadDefinitions($Path, $Skip = NULL) {
         $Skip = (array)$Skip;
 
@@ -103,6 +139,15 @@ class LocaleModel {
         return $Definition;
     }
 
+    /**
+     *
+     *
+     * @param $Path
+     * @param $BasePath
+     * @param null $DestPath
+     * @return null|string
+     * @throws Exception
+     */
     public function GenerateChanges($Path, $BasePath, $DestPath = NULL) {
         if ($DestPath == NULL) {
             $DestPath = $BasePath.'/changes.php';
@@ -156,9 +201,10 @@ class LocaleModel {
     }
 
     /**
-     * Temporarily enable a locale pack without installing it
+     * Temporarily enable a locale pack without installing it/
      *
      * @param string $LocaleKey The key of the folder.
+     * @throws NotFoundException
      */
     public function TestLocale($LocaleKey) {
         $Available = $this->AvailableLocalePacks();

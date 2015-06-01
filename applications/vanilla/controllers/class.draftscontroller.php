@@ -1,21 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Drafts controller
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
+ */
 
 /**
- * Handles displaying saved drafts of unposted comments.
- *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
- * @package Vanilla
+ * Handles displaying saved drafts of unposted comments via /drafts endpoint.
  */
 class DraftsController extends VanillaController {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /** @var array Models to include. */
     public $Uses = array('Database', 'DraftModel');
 
     /**

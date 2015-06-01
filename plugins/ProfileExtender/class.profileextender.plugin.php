@@ -1,7 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright 2013 Vanilla Forums Inc.
- * @license GNU GPL2
+ * ProfileExtender Plugin.
+ *
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package ProfileExtender
  */
 
 $PluginInfo['ProfileExtender'] = array(
@@ -33,6 +37,7 @@ $PluginInfo['ProfileExtender'] = array(
  * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
+
     /** @var array */
     public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'Website', 'Real Name');
 

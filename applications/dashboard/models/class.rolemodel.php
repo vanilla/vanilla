@@ -1,45 +1,40 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * A role model you can look up to.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+/**
+ * Handles role data.
+ */
 class RoleModel extends Gdn_Model {
-    /**
-     * Slug for Guest role type
-     */
+
+    /** Slug for Guest role type. */
     const TYPE_GUEST = 'guest';
-    /**
-     * Slug for Unconfirmed role type
-     */
+
+    /** Slug for Unconfirmed role type. */
     const TYPE_UNCONFIRMED = 'unconfirmed';
-    /**
-     * Slug for Applicant role type
-     */
+
+    /** Slug for Applicant role type. */
     const TYPE_APPLICANT = 'applicant';
-    /**
-     * Slug for Member role type
-     */
+
+    /** Slug for Member role type. */
     const TYPE_MEMBER = 'member';
-    /**
-     * Slug for Moderator role type
-     */
+
+    /** Slug for Moderator role type. */
     const TYPE_MODERATOR = 'moderator';
-    /**
-     * Slug for Administrator role type
-     */
+
+    /** Slug for Administrator role type. */
     const TYPE_ADMINISTRATOR = 'administrator';
 
+    /** @var array|null All roles. */
     public static $Roles = NULL;
 
-    /**
-     * @var array A list of permissions that define an increasing ranking of permissions.
-     */
+    /** @var array A list of permissions that define an increasing ranking of permissions. */
     public $RankPermissions = array(
         'Garden.Moderation.Manage',
         'Garden.Community.Manage',
@@ -56,11 +51,19 @@ class RoleModel extends Gdn_Model {
         $this->FireEvent('Init');
     }
 
+    /**
+     * Clear the roles cache.
+     */
     public function ClearCache() {
         $Key = 'Roles';
         Gdn::Cache()->Remove($Key);
     }
 
+    /**
+     * Define a role.
+     *
+     * @param $Values
+     */
     public function Define($Values) {
         if (array_key_exists('RoleID', $Values)) {
             $RoleID = $Values['RoleID'];
@@ -445,6 +448,7 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
+     * Get a role by name.
      *
      * @param array|string $Names
      */
@@ -475,6 +479,13 @@ class RoleModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param null $RoleID
+     * @param bool $Force
+     * @return array|mixed|null|type
+     */
     public static function Roles($RoleID = NULL, $Force = FALSE) {
         if (self::$Roles == NULL) {
             $Key = 'Roles';
@@ -498,6 +509,13 @@ class RoleModel extends Gdn_Model {
             return NULL;
     }
 
+    /**
+     * Save role data.
+     *
+     * @param array $FormPostValues
+     * @return bool|mixed
+     * @throws Exception
+     */
     public function Save($FormPostValues) {
         // Define the primary key in this model's table.
         $this->DefineSchema();
@@ -550,6 +568,13 @@ class RoleModel extends Gdn_Model {
         return $RoleID;
     }
 
+    /**
+     *
+     *
+     * @param $Users
+     * @param string $UserIDColumn
+     * @param string $RolesColumn
+     */
     public static function SetUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
         $UserIDs = array_unique(ConsolidateArrayValuesByKey($Users, $UserIDColumn));
 
@@ -610,6 +635,12 @@ class RoleModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Delete a role.
+     *
+     * @param string|unknown_type $RoleID
+     * @param bool|unknown_type $ReplacementRoleID
+     */
     public function Delete($RoleID, $ReplacementRoleID) {
         // First update users that will be orphaned
         if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {

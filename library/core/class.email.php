@@ -1,4 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_Email.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Object Representation of an email.
@@ -6,34 +16,20 @@
  * All public methods return $this for
  * chaining purposes. ie. $Email->Subject('Hi')->Message('Just saying hi!')-
  * To('joe@vanillaforums.com')->Send();
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_Email extends Gdn_Pluggable {
 
-    /**
-     * @var PHPMailer
-     */
+    /** @var PHPMailer */
     public $PhpMailer;
 
-    /**
-     * @var boolean
-     */
+    /** @var boolean */
     private $_IsToSet;
 
-    /**
-     *
-     * @var array Recipients that were skipped because they lack permission.
-     */
+    /** @var array Recipients that were skipped because they lack permission. */
     public $Skipped = array();
 
     /**
-     * Constructor
+     * Constructor.
      */
     function __construct() {
         $this->PhpMailer = new PHPMailer();
@@ -50,6 +46,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
     /**
      * Add a custom header to the outgoing email.
+     *
      * @param string $Name
      * @param string $Value
      * @since 2.1

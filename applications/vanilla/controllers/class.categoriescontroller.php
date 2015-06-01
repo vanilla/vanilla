@@ -1,55 +1,42 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Categories controller
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
+ */
 
 /**
- * Handles displaying categories.
- *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
- * @package Vanilla
+ * Handles displaying categories via /categoris endpoint.
  */
 class CategoriesController extends VanillaController {
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+
+    /** @var array Models to include.*/
     public $Uses = array('Database', 'Form', 'CategoryModel');
 
-    /**
-     * @var CategoryModel
-     */
+    /** @var CategoryModel */
     public $CategoryModel;
 
-    /**
-     * Should the discussions have their options available.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var bool
-     */
+    /**  @var bool Should the discussions have their options available. */
     public $ShowOptions = TRUE;
 
-    /**
-     * Unique identifier.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var int
-     */
+    /** @var int Unique identifier. */
     public $CategoryID;
 
-    /**
-     * Category object.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var object
-     */
+    /** @var object Category object. */
     public $Category;
 
+    /**
+     *
+     *
+     * @param $Category
+     * @param $Month
+     * @param bool $Page
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function Archives($Category, $Month, $Page = FALSE) {
         $Category = CategoryModel::Categories($Category);
         if (!$Category)

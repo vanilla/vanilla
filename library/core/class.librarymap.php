@@ -1,30 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Gdn_LibraryMap.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Handle the creation, usage, and deletion of file cache entries which map paths
  * to locale files.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
 class Gdn_LibraryMap {
 
-    /**
-     * Sprintf format string that describes the on-disk name of the mapping caches
-     *
-     * @const string
-     */
+    /** Sprintf format string that describes the on-disk name of the mapping caches. */
     const DISK_CACHE_NAME_FORMAT = '%s_map.ini';
+
+    /** Sprintf format string that describes the on-disk name of the mapping caches. */
     const CACHE_CACHE_NAME_FORMAT = 'garden.librarymap.%s';
 
-    /**
-     * Holds the in-memory array of cache entries
-     *
-     * @var array
-     */
+    /** @var array Holds the in-memory array of cache entries. */
     public static $Caches;
 
     /**

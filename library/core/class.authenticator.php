@@ -1,14 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Authenticator Module: Base Class
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0.10
- * @abstract
+ */
+
+/**
+ * Class Gdn_Authenticator
  */
 abstract class Gdn_Authenticator extends Gdn_Pluggable {
 

@@ -1,28 +1,26 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Permission model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+/**
+ * Handles permission data.
+ */
 class PermissionModel extends Gdn_Model {
 
-
-    /**
-     * Default role permissions
-     * @var array
-     */
+    /** @var array Default role permissions. */
     protected $DefaultPermissions = array();
 
-    /**
-     * Default row permission values
-     * @var array
-     */
+    /** @var array Default row permission values. */
     protected $RowDefaults = array();
+
+    /** @var array Permission columns. */
+    protected $_PermissionColumns = array();
 
     /**
      * Class constructor. Defines the related database table name.
@@ -31,6 +29,12 @@ class PermissionModel extends Gdn_Model {
         parent::__construct('Permission');
     }
 
+    /**
+     *
+     *
+     * @param $Values
+     * @return array
+     */
     protected function _Backtick($Values) {
         $NewValues = array();
         foreach ($Values as $Key => $Value) {
@@ -155,6 +159,9 @@ class PermissionModel extends Gdn_Model {
         $this->FireEvent('DefaultPermissions');
     }
 
+    /**
+     *
+     */
     public function ClearPermissions() {
         static $PermissionsCleared = FALSE;
 
@@ -165,6 +172,15 @@ class PermissionModel extends Gdn_Model {
         }
     }
 
+    /**
+     *
+     *
+     * @param $PermissionNames
+     * @param string $Type
+     * @param null $JunctionTable
+     * @param null $JunctionColumn
+     * @throws Exception
+     */
     public function Define($PermissionNames, $Type = 'tinyint', $JunctionTable = NULL, $JunctionColumn = NULL) {
         $PermissionNames = (array)$PermissionNames;
 
@@ -225,6 +241,14 @@ class PermissionModel extends Gdn_Model {
         }
     }
 
+    /**
+     *
+     *
+     * @param null $RoleID
+     * @param null $JunctionTable
+     * @param null $JunctionColumn
+     * @param null $JunctionID
+     */
     public function Delete($RoleID = NULL, $JunctionTable = NULL, $JunctionColumn = NULL, $JunctionID = NULL) {
         // Build the where clause.
         $Where = array();
@@ -390,6 +414,7 @@ class PermissionModel extends Gdn_Model {
     /**
      * Returns a complete list of all enabled applications & plugins. This list
      * can act as a namespace list for permissions.
+     *
      * @return array
      */
     public function GetAllowedPermissionNamespaces() {
@@ -415,6 +440,13 @@ class PermissionModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param null $UserID
+     * @param null $RoleID
+     * @return array|null
+     */
     public function CachePermissions($UserID = NULL, $RoleID = NULL) {
         if (!$UserID) {
             $RoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
@@ -442,6 +474,13 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     *
+     *
+     * @param $Where
+     * @param null $JunctionTable
+     * @param string $LimitToSuffix
+     * @param array $Options
+     * @return array
      */
     public function GetJunctionPermissions($Where, $JunctionTable = NULL, $LimitToSuffix = '', $Options = array()) {
         $Namespaces = $this->GetAllowedPermissionNamespaces();
@@ -606,6 +645,13 @@ class PermissionModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $RoleID
+     * @param string $LimitToSuffix
+     * @return array
+     */
     public function GetPermissionsEdit($RoleID, $LimitToSuffix = '') {
         $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix);
         return $this->UnpivotPermissions($Permissions);
@@ -657,7 +703,14 @@ class PermissionModel extends Gdn_Model {
         }
     }
 
-    // Take a permission row and strip the global/local permissions from it.
+    /**
+     * Take a permission row and strip the global/local permissions from it.
+     *
+     * @param $Row
+     * @param $DefaultRow
+     * @param string $LimitToSuffix
+     * @return mixed
+     */
     public function StripPermissions($Row, $DefaultRow, $LimitToSuffix = '') {
         static $Namespaces;
         if (!isset($Namespaces)) {
@@ -711,6 +764,7 @@ class PermissionModel extends Gdn_Model {
     }
 
     /** Merge junction permissions with global permissions if they are disabled.
+     *
      * @param array $GlobalPermissions
      * @return void
      */
@@ -752,10 +806,13 @@ class PermissionModel extends Gdn_Model {
         }
     }
 
-    protected $_PermissionColumns = array();
-
     /**
      * Get all of the permission columns in the system.
+     *
+     * @param bool $JunctionTable
+     * @param bool $JunctionColumn
+     * @return mixed
+     * @throws Exception
      */
     public function PermissionColumns($JunctionTable = FALSE, $JunctionColumn = FALSE) {
         $Key = "{$JunctionTable}__{$JunctionColumn}";
@@ -785,12 +842,25 @@ class PermissionModel extends Gdn_Model {
         return $this->_PermissionColumns[$Key];
     }
 
+    /**
+     *
+     *
+     * @param $PermissionName
+     * @return string
+     */
     public static function PermissionNamespace($PermissionName) {
         if ($Index = strpos($PermissionName))
             return substr($PermissionName, 0, $Index);
         return '';
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     * @param null $Overrides
+     * @return array
+     */
     public function PivotPermissions($Data, $Overrides = NULL) {
         // Get all of the columns in the permissions table.
         $Schema = $this->SQL->Get('Permission', '', '', 1)->FirstRow(DATASET_TYPE_ARRAY);
@@ -913,10 +983,11 @@ class PermissionModel extends Gdn_Model {
         }
      }*/
 
-    /** Save a permission row.
+    /**
+     * Save a permission row.
      *
      * @param array $Values The values you want to save. See the Permission table for possible columns.
-     * @param bit $SaveGlobal Also save a junction permission to the global permissions.
+     * @param bool $SaveGlobal Also save a junction permission to the global permissions.
      */
     public function Save($Values, $SaveGlobal = FALSE) {
         // Get the list of columns that are available for permissions.
@@ -979,6 +1050,12 @@ class PermissionModel extends Gdn_Model {
         $this->ClearPermissions();
     }
 
+    /**
+     *
+     *
+     * @param $Permissions
+     * @param null $AllWhere
+     */
     public function SaveAll($Permissions, $AllWhere = NULL) {
         // Load the permission data corresponding to the where so unset permissions get ovewritten.
         if (is_array($AllWhere)) {
@@ -1140,6 +1217,13 @@ class PermissionModel extends Gdn_Model {
         return $SQL;
     }
 
+    /**
+     *
+     *
+     * @param $Permissions
+     * @param bool $IncludeRole
+     * @return array
+     */
     public function UnpivotPermissions($Permissions, $IncludeRole = FALSE) {
         $Result = array();
         foreach ($Permissions as $Row) {
@@ -1148,6 +1232,11 @@ class PermissionModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Names
+     */
     public function Undefine($Names) {
         $Names = (array)$Names;
         $St = $this->Database->Structure();
@@ -1160,6 +1249,13 @@ class PermissionModel extends Gdn_Model {
         $St->Reset();
     }
 
+    /**
+     *
+     *
+     * @param $Row
+     * @param $Result
+     * @param bool $IncludeRole
+     */
     protected function _UnpivotPermissionsRow($Row, &$Result, $IncludeRole = FALSE) {
         $GlobalName = ArrayValue('Name', $Row);
 

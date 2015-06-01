@@ -1,34 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.1
  */
-class DbaController extends DashboardController {
-    /// Properties ///
 
-    /**
-     * @var Gdn_Form
-     */
+/**
+ * Handles the admin utility /dba endpoint.
+ */
+class DbaController extends DashboardController {
+
+    /** @var Gdn_Form */
     public $Form = NULL;
 
-    /**
-     * @var DBAModel
-     */
+    /** @var DBAModel */
     public $Model = NULL;
 
-
-    /// Methods ///
-
-    public function __construct() {
-        parent::__construct();
-    }
-
+    /**
+     * Runs before every call to this controller.
+     */
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');
@@ -39,6 +32,17 @@ class DbaController extends DashboardController {
         $this->AddJsFile('dba.js');
     }
 
+    /**
+     * Recalculate counters.
+     *
+     * @param bool $Table
+     * @param bool $Column
+     * @param bool $From
+     * @param bool $To
+     * @param bool $Max
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function Counts($Table = FALSE, $Column = FALSE, $From = FALSE, $To = FALSE, $Max = FALSE) {
         set_time_limit(300);
         $this->Permission('Garden.Settings.Manage');

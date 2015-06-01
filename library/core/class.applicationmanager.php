@@ -1,40 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Application Manager
  *
- * Manages available applications, enabling and disabling them.
- *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
+ */
+
+/**
+ * Manages available applications, enabling and disabling them.
  */
 class Gdn_ApplicationManager {
 
-    /**
-     * An array of available applications. Never access this directly, instead
-     * use $this->AvailableApplications();
-     *
-     * @var array
-     */
+    /** @var array Available applications. Never access this directly, instead use $this->AvailableApplications(); */
     private $_AvailableApplications = NULL;
 
-    /**
-     * An array of enabled applications. Never access this directly, instead
-     * use $this->EnabledApplications();
-     *
-     * @var array
-     */
+    /** @var array Enabled applications. Never access this directly, instead use $this->EnabledApplications(); */
     private $_EnabledApplications = NULL;
 
-    /**
-     * The valid paths to search for applications.
-     *
-     * @var array
-     */
+    /** @var array The valid paths to search for applications. */
     public $Paths = array(PATH_APPLICATIONS);
 
     /**
@@ -79,6 +66,7 @@ class Gdn_ApplicationManager {
 
     /**
      * Gets an array of all of the enabled applications.
+     *
      * @return array
      */
     public function EnabledApplications() {
@@ -104,6 +92,12 @@ class Gdn_ApplicationManager {
         return $this->_EnabledApplications;
     }
 
+    /**
+     *
+     *
+     * @param $ApplicationName
+     * @return bool
+     */
     public function CheckApplication($ApplicationName) {
         if (array_key_exists($ApplicationName, $this->EnabledApplications()))
             return TRUE;
@@ -111,6 +105,13 @@ class Gdn_ApplicationManager {
         return FALSE;
     }
 
+    /**
+     *
+     *
+     * @param $ApplicationName
+     * @param null $Target
+     * @return bool|mixed
+     */
     public function GetApplicationInfo($ApplicationName, $Target = NULL) {
         $ApplicationInfo = GetValue($ApplicationName, $this->AvailableApplications(), NULL);
         if (is_null($ApplicationInfo)) return FALSE;
@@ -120,6 +121,11 @@ class Gdn_ApplicationManager {
         return $ApplicationInfo;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function AvailableVisibleApplications() {
         $AvailableApplications = $this->AvailableApplications();
         foreach ($AvailableApplications as $ApplicationName => $Info) {
@@ -129,6 +135,11 @@ class Gdn_ApplicationManager {
         return $AvailableApplications;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function EnabledVisibleApplications() {
         $AvailableApplications = $this->AvailableApplications();
         $EnabledApplications = $this->EnabledApplications();
@@ -145,7 +156,8 @@ class Gdn_ApplicationManager {
     }
 
     /**
-     * @todo Undocumented method.
+     *
+     * @return array
      */
     public function EnabledApplicationFolders() {
         $EnabledApplications = C('EnabledApplications', array());
@@ -154,10 +166,9 @@ class Gdn_ApplicationManager {
     }
 
     /**
-     * Undocumented method.
+     *
      *
      * @param string $ApplicationName Undocumented variable.
-     * @todo Document CheckRequirements() method.
      */
     public function CheckRequirements($ApplicationName) {
         $AvailableApplications = $this->AvailableApplications();
@@ -167,11 +178,11 @@ class Gdn_ApplicationManager {
     }
 
     /**
-     * Undocumented method.
      *
-     * @param string $ApplicationName Undocumented variable.
-     * @param string $Validation Undocumented variable.
-     * @todo Document EnableApplication() method.
+     *
+     * @param string $ApplicationName
+     * @param string $Validation
+     * @return true
      */
     public function EnableApplication($ApplicationName, $Validation) {
         $this->TestApplication($ApplicationName, $Validation);
@@ -197,6 +208,14 @@ class Gdn_ApplicationManager {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $ApplicationName
+     * @param $Validation
+     * @return bool
+     * @throws Exception
+     */
     public function TestApplication($ApplicationName, &$Validation) {
         // Add the application to the $EnabledApplications array in conf/applications.php
         $ApplicationInfo = ArrayValueI($ApplicationName, $this->AvailableApplications(), array());
@@ -224,10 +243,9 @@ class Gdn_ApplicationManager {
     }
 
     /**
-     * Undocumented method.
      *
-     * @param string $ApplicationName Undocumented variable.
-     * @todo Document DisableApplication() method.
+     *
+     * @param string $ApplicationName
      */
     public function DisableApplication($ApplicationName) {
         // 1. Check to make sure that this application is allowed to be disabled
@@ -278,11 +296,10 @@ class Gdn_ApplicationManager {
     }
 
     /**
-     * Undocumented method.
      *
-     * @param string $ApplicationName Undocumented variable.
-     * @param string $Validation Undocumented variable.
-     * @todo Document RegisterPermissions() method.
+     *
+     * @param string $ApplicationName
+     * @param string $Validation
      */
     public function RegisterPermissions($ApplicationName, &$Validation) {
         $ApplicationInfo = ArrayValue($ApplicationName, $this->AvailableApplications(), array());

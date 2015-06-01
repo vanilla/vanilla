@@ -1,5 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Trace module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
+/**
+ * Assist with debugging.
+ *
+ * @see Trace()
+ */
 class TraceModule extends Gdn_Module {
 
     public function __construct() {

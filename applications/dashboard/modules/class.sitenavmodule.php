@@ -1,25 +1,26 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * A module for a list of links.
+ * Site nav module.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.3
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
  */
 
 /**
- *
+ * Module for a list of links.
  */
 class SiteNavModule extends NavModule {
-    /// Properties ///
 
+    /** @var array  */
     protected $customSections = array('EditProfile', 'Profile');
 
-    /// Methods ///
-
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function render() {
         $section_found = false;
 

@@ -1,41 +1,31 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Post controller
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
+ */
 
 /**
- * Handles posting and editing comments, discussions, and drafts.
- *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
- * @package Vanilla
+ * Handles posting and editing comments, discussions, and drafts via /post endpoint.
  */
 class PostController extends VanillaController {
-    /**
-     * @var DiscussionModel
-     */
+
+    /** @var DiscussionModel */
     public $DiscussionModel;
 
-    /**
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     public $Form;
 
-    /**
-     * @var array An associative array of form types and their locations.
-     */
+    /** @var array An associative array of form types and their locations. */
     public $FormCollection;
 
-    /**
-     * Models to include.
-     *
-     * @since 2.0.0
-     * @access public
-     * @var array
-     */
+    /** @var array Models to include. */
     public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
 
-    /**
-     * @var bool Whether or not to show the category dropdown.
-     */
+    /** @var bool Whether or not to show the category dropdown. */
     public $ShowCategorySelector = TRUE;
 
     /**

@@ -1,4 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * IndexPhotos Plugin.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package IndexPhotos
+ */
 
 $PluginInfo['IndexPhotos'] = array(
     'Name' => 'Discussion Photos',
@@ -7,13 +14,21 @@ $PluginInfo['IndexPhotos'] = array(
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'RegisterPermissions' => FALSE,
     'MobileFriendly' => TRUE,
-    'Author' => "Matt Lincoln Russell",
+    'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'
 );
 
+/**
+ * Class IndexPhotosPlugin
+ */
 class IndexPhotosPlugin extends Gdn_Plugin {
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function AssetModel_StyleCss_Handler($Sender) {
         if (!$this->hasLayoutTables() || IsMobile()) {
             $Sender->AddCssFile('indexphotos.css', 'plugins/IndexPhotos');
@@ -30,6 +45,12 @@ class IndexPhotosPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
             if (GetValue('FirstUser', $Args))

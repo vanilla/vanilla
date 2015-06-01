@@ -1,4 +1,24 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * Tagging plugin.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Tagging
+ */
+
+$PluginInfo['Tagging'] = array(
+    'Name' => 'Tagging',
+    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
+    'Version' => '1.8.12',
+    'SettingsUrl' => '/dashboard/settings/tagging',
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'Author' => "Vanilla Staff",
+    'AuthorEmail' => 'support@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.org',
+    'MobileFriendly' => true,
+    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
+);
 
 /**
  * Tagging Plugin
@@ -16,26 +36,7 @@
  *  1.8.8   Added tabs.
  *  1.8.9   Ability to add tags based on tab.
  *  1.8.12  Fix issues with CSS and js loading.
- *
- * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Misc
  */
-
-$PluginInfo['Tagging'] = array(
-    'Name' => 'Tagging',
-    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-    'Version' => '1.8.12',
-    'SettingsUrl' => '/dashboard/settings/tagging',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://markosullivan.ca',
-    'MobileFriendly' => true,
-    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
-);
-
 class TaggingPlugin extends Gdn_Plugin {
 
     public function __construct() {

@@ -1,12 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+/**
+ * PrivateCommunity Plugin.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package PrivateCommunity
+ */
 
 // Define the plugin:
 $PluginInfo['PrivateCommunity'] = array(
@@ -19,8 +18,16 @@ $PluginInfo['PrivateCommunity'] = array(
     'SettingsUrl' => '/dashboard/role',
 );
 
+/**
+ * Class PrivateCommunityPlugin
+ */
 class PrivateCommunityPlugin extends Gdn_Plugin {
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function RoleController_AfterRolesInfo_Handler($Sender) {
         if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
             return;
@@ -38,6 +45,11 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         echo '</div>';
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function SettingsController_PrivateCommunity_Create($Sender) {
         $Session = Gdn::Session();
         $Switch = GetValue(0, $Sender->RequestArgs);
@@ -52,7 +64,9 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         Redirect('dashboard/role');
     }
 
+    /**
+     * No setup.
+     */
     public function Setup() {
-        // No setup required
     }
 }

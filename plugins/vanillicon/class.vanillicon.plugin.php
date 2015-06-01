@@ -1,8 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Vanillicon plugin.
+ *
  * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillicon
  */
 
 // Define the plugin:
@@ -19,8 +22,10 @@ $PluginInfo['vanillicon'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
+/**
+ * Class VanilliconPlugin
+ */
 class VanilliconPlugin extends Gdn_Plugin {
-   /// Methods ///
 
    /**
     * Set up the plugin.
@@ -35,8 +40,6 @@ class VanilliconPlugin extends Gdn_Plugin {
    public function structure() {
       TouchConfig('Plugins.Vanillicon.Type', 'v1');
    }
-
-   /// Properties ///
 
    /**
     * Set the vanillicon on the user' profile.

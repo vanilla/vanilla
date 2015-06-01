@@ -1,26 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /**
  * 'All Viewed' plugin for Vanilla Forums.
  *
- * v1.2
- * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
- * - Removed spurious config checks and &s
- * v1.3
- * - Made it possible to forgo the 'Mark All Viewed' option being added to menu automatically
- * - Cleanup spurious local variable assignments
- * - Documentation cleanup
- * v2.0
- * - Reimplemented using UserCategory's DateMarkedRead column
- * - Added Mark Category Read
- * - Redirects to previous page instead of /discussions
- * v2.1
- * - Added SpMarkAllViewed and SpMarkCategoryViewed sprites to links
- * - Cleaned up formatting to match majority
- *
- * @copyright 2009 Vanilla Forums Inc.
- * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @author Oliver Chung <shoat@cs.washington.edu>
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package AllViewed
  */
 
@@ -38,9 +23,23 @@ $PluginInfo['AllViewed'] = array(
 /**
  * Allows users to mark all discussions as viewed and mark category viewed.
  *
- * @package AllViewed
+ * v1.2
+ * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
+ * - Removed spurious config checks and &s
+ * v1.3
+ * - Made it possible to forgo the 'Mark All Viewed' option being added to menu automatically
+ * - Cleanup spurious local variable assignments
+ * - Documentation cleanup
+ * v2.0
+ * - Reimplemented using UserCategory's DateMarkedRead column
+ * - Added Mark Category Read
+ * - Redirects to previous page instead of /discussions
+ * v2.1
+ * - Added SpMarkAllViewed and SpMarkCategoryViewed sprites to links
+ * - Cleaned up formatting to match majority
  */
 class AllViewedPlugin extends Gdn_Plugin {
+
     /**
      * Adds "Mark All Viewed" to main menu.
      *

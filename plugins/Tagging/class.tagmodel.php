@@ -1,26 +1,27 @@
-<?php if (!defined('APPLICATION')) exit();
-
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Tagging plugin.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Tagging
+ */
 
 class TagModel extends Gdn_Model {
+
     const IX_EXTENDED = 'x';
+
     const IX_TAGID = 'id';
 
-    /// Properties ///
-
     protected $Types;
+
     protected static $instance;
+
     public $StringTags;
 
-    /// Methods ///
-
+    /**
+     * @param string $Name
+     */
     public function  __construct($Name = '') {
         parent::__construct('Tag');
         $this->StringTags = C('Plugins.Tagging.StringTags');
@@ -37,6 +38,11 @@ class TagModel extends Gdn_Model {
         return self::$instance;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function defaultTypes() {
         $types = array_filter($this->Types(), function ($val) {
             if (val('default', $val))
@@ -46,6 +52,14 @@ class TagModel extends Gdn_Model {
         return $types;
     }
 
+    /**
+     *
+     *
+     * @param array $FormPostValues
+     * @param bool $Settings
+     * @return bool|unknown
+     * @throws Exception
+     */
     public function  Save($FormPostValues, $Settings = FALSE) {
         // Get the ID of an existing tag with the same name.
         $ExistingTag = $this->GetWhere(array('Name' => $FormPostValues['Name'], 'TagID <>' => GetValue('TagID', $FormPostValues)))->FirstRow(DATASET_TYPE_ARRAY);
@@ -100,6 +114,7 @@ class TagModel extends Gdn_Model {
 
     /**
      * Add a tag type.
+     *
      * @param string $key
      * @param array $row
      */
@@ -110,7 +125,6 @@ class TagModel extends Gdn_Model {
 
     /**
      * Get the available tag types.
-     *
      */
     public function Types() {
         if (!isset($this->Types)) {
@@ -130,6 +144,11 @@ class TagModel extends Gdn_Model {
         return $this->Types;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function getTagTypes() {
         $TagTypes = $this->Types();
 
@@ -165,6 +184,7 @@ class TagModel extends Gdn_Model {
 
     /**
      * Get all of the tags related to the current tag.
+     *
      * @param mixed $tag
      */
     public function getRelatedTags($tag) {
@@ -246,6 +266,7 @@ class TagModel extends Gdn_Model {
 
     /**
      * Join the tags to a set of discussions.
+     *
      * @param $data
      */
     public function joinTags(&$data) {
@@ -290,6 +311,16 @@ class TagModel extends Gdn_Model {
 
     }
 
+    /**
+     *
+     *
+     * @param $discussion_id
+     * @param $tags
+     * @param array $types
+     * @param int $category_id
+     * @param string $new_type
+     * @throws Exception
+     */
     public function saveDiscussion($discussion_id, $tags, $types = array(''), $category_id = 0, $new_type = '') {
         // First grab all of the current tags.
         $all_tags = $current_tags = $this->getDiscussionTags($discussion_id, TagModel::IX_TAGID);
@@ -406,6 +437,7 @@ class TagModel extends Gdn_Model {
 
     /**
      *
+     *
      * @param Gdn_SQLDriver $Sql
      */
     public function SetTagSql($Sql, $Tag, &$Limit, &$Offset = 0, $Op = 'or') {
@@ -481,6 +513,14 @@ class TagModel extends Gdn_Model {
         return $result;
     }
 
+    /**
+     *
+     *
+     * @param $Column
+     * @param null $UserID
+     * @return array
+     * @throws Gdn_UserException
+     */
     public function Counts($Column, $UserID = NULL) {
         // Delete all the orphaned tagdiscussion records
         $Px = $this->Database->DatabasePrefix;
@@ -498,6 +538,12 @@ class TagModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Tag
+     * @return bool
+     */
     public static function ValidateTag($Tag) {
         // Tags can't contain commas.
         if (preg_match('`,`', $Tag))
@@ -505,6 +551,12 @@ class TagModel extends Gdn_Model {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $Tags
+     * @return bool
+     */
     public static function ValidateTags($Tags) {
         if (is_string($Tags))
             $Tags = self::SplitTags($Tags);
@@ -516,6 +568,12 @@ class TagModel extends Gdn_Model {
         return TRUE;
     }
 
+    /**
+     *
+     *
+     * @param $Type
+     * @return bool
+     */
     public function ValidateType($Type) {
         $ValidType = false;
         $TagTypes = $this->Types();
@@ -537,6 +595,12 @@ class TagModel extends Gdn_Model {
         return $ValidType;
     }
 
+    /**
+     *
+     *
+     * @param $Type
+     * @return bool
+     */
     public function CanAddTagForType($Type) {
         $CanAddTagForType = false;
         $TagTypes = $this->Types();
@@ -560,6 +624,12 @@ class TagModel extends Gdn_Model {
         return $CanAddTagForType;
     }
 
+    /**
+     *
+     *
+     * @param $TagsString
+     * @return array
+     */
     public static function SplitTags($TagsString) {
         $Tags = preg_split('`[,]`', $TagsString);
         // Trim each tag.
@@ -574,6 +644,12 @@ class TagModel extends Gdn_Model {
         return $Tags;
     }
 
+    /**
+     *
+     *
+     * @param $Str
+     * @return string
+     */
     public static function TagSlug($Str) {
         return rawurldecode(Gdn_Format::Url($Str));
     }

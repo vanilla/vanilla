@@ -1,7 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * GooglePrettify Plugin.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package GooglePrettify
  */
 
 // Define the plugin:
@@ -21,7 +24,11 @@ $PluginInfo['GooglePrettify'] = array(
 // Changelog
 // v1.1 Add Tabby, docs/cleanup  -Lincoln, Aug 2012
 
+/**
+ * Class GooglePrettifyPlugin
+ */
 class GooglePrettifyPlugin extends Gdn_Plugin {
+
     /**
      * Add Prettify to page text.
      */

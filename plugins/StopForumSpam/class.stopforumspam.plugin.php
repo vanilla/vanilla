@@ -1,11 +1,12 @@
-<?php
-
-if (!defined('APPLICATION'))
-    exit();
+<?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * StopForumSpam plugin.
+ *
+ * @copyright 2008-2015 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package StopForumSpam
  */
+
 // Define the plugin:
 $PluginInfo['StopForumSpam'] = array(
     'Name' => 'Stop Forum Spam',
@@ -18,11 +19,18 @@ $PluginInfo['StopForumSpam'] = array(
     'SettingsUrl' => '/settings/stopforumspam'
 );
 
+/**
+ * Class StopForumSpamPlugin
+ */
 class StopForumSpamPlugin extends Gdn_Plugin {
 
-    /// Properties ///
-    /// Methods ///
-
+    /**
+     *
+     *
+     * @param $Data
+     * @param $Options
+     * @return bool
+     */
     public static function Check(&$Data, &$Options) {
         // Make the request.
         $Get = array();
@@ -95,10 +103,16 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         return FALSE;
     }
 
+    /**
+     *
+     */
     public function Setup() {
         $this->Structure();
     }
 
+    /**
+     *
+     */
     public function Structure() {
         // Get a user for operations.
         $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->Value('UserID');
@@ -116,12 +130,19 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => TRUE));
     }
 
+    /**
+     * @return mixed
+     */
     public function UserID() {
         return C('Plugins.StopForumSpam.UserID', NULL);
     }
 
-    /// Event Handlers ///
-
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function Base_CheckSpam_Handler($Sender, $Args) {
         // Don't check for spam if another plugin has already determined it is.
         if ($Sender->EventArguments['IsSpam'])
@@ -159,6 +180,12 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         $Sender->EventArguments['IsSpam'] = $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param array $Args
+     */
     public function SettingsController_StopForumSpam_Create($Sender, $Args = array()) {
         $Sender->Permission('Garden.Settings.Manage');
         $Conf = new ConfigurationModule($Sender);

@@ -86,7 +86,7 @@ if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
 
 Gdn::Config()->Caching(TRUE);
 
-Debug(C('Debug', FALSE));
+debug(C('Debug', FALSE));
 
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', NULL, Gdn::FactoryRealSingleton, 'Create');
@@ -139,10 +139,10 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
 }
 
 if (C('Debug')) {
-    Debug(TRUE);
+    debug(TRUE);
 }
 
-Gdn_Cache::Trace(Debug());
+Gdn_Cache::Trace(debug());
 
 /**
  * Factory Services

@@ -393,7 +393,7 @@ class UtilityController extends DashboardController {
             $this->SetData('Success', TRUE);
         } catch (Exception $Ex) {
             $this->SetData('Success', FALSE);
-            if (Debug())
+            if (debug())
                 throw $Ex;
         }
 

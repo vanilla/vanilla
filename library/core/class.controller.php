@@ -1257,7 +1257,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
                 $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
 
-            if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && Debug()) {
+            if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && debug()) {
                 $this->AddModule('TraceModule');
             }
 
@@ -1369,7 +1369,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data = RemoveKeysFromNestedArray($Data, $Remove);
         }
 
-        if (Debug() && $Trace = Trace()) {
+        if (debug() && $Trace = Trace()) {
             // Clear passwords from the trace.
             array_walk_recursive($Trace, function (&$Value, $Key) {
                 if (in_array(strtolower($Key), array('password'))) {
@@ -1533,7 +1533,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $Code = $Ex->getCode();
         $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
 
-        if (Debug()) {
+        if (debug()) {
             if ($Trace = Trace()) {
                 // Clear passwords from the trace.
                 array_walk_recursive($Trace, function (&$Value, $Key) {

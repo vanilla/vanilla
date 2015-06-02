@@ -395,7 +395,7 @@ EOT;
             $this->Form->AddError($Ex);
             return $this->Render('ConnectError');
         } catch (Exception $Ex) {
-            if (Debug())
+            if (debug())
                 $this->Form->AddError($Ex);
             else
                 $this->Form->AddError('There was an error fetching the connection data.');

@@ -88,7 +88,7 @@ class AssetModel extends Gdn_Model {
 
         $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$ThemeType.'-'.strtolower($Basename)."-$CurrentETag.css";
 
-        if (!Debug() && file_exists($CachePath)) {
+        if (!debug() && file_exists($CachePath)) {
             readfile($CachePath);
             die();
         }

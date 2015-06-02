@@ -1636,7 +1636,7 @@ PASSWORDMETER;
             else
                 $FileSuffix = "";
 
-            if (Debug()) {
+            if (debug()) {
                 $ErrorCode = '@<pre>'.
                     $Message."\n".
                     '## '.$Error->getFile().'('.$Error->getLine().")".$FileSuffix."\n".

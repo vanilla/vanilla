@@ -753,10 +753,10 @@ if (!function_exists('DateCompare')) {
     }
 }
 
-if (!function_exists('Debug')) {
-    function Debug($Value = NULL) {
-        static $Debug = FALSE;
-        if ($Value === NULL)
+if (!function_exists('debug')) {
+    function debug($Value = null) {
+        static $Debug = false;
+        if ($Value === null)
             return $Debug;
 
         $Changed = $Debug != $Value;

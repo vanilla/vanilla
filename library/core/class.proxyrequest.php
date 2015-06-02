@@ -510,7 +510,7 @@ class ProxyRequest {
 
         $logContext['responseCode'] = $this->ResponseStatus;
         $logContext['responseTime'] = $this->ResponseTime;
-        if (Debug()) {
+        if (debug()) {
             if ($this->ContentType == 'application/json') {
                 $body = @json_decode($this->ResponseBody, true);
                 if (!$body) {

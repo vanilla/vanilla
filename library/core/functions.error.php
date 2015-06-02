@@ -138,7 +138,7 @@ function Gdn_ExceptionHandler($Exception) {
             $DeliveryType = $_GET['DeliveryType'];
         }
 
-        if (function_exists('Debug') && Debug())
+        if (function_exists('debug') && debug())
             $Debug = TRUE;
         else
             $Debug = FALSE;

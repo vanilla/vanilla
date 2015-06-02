@@ -415,7 +415,7 @@ class Gdn_Theme {
 
         try {
             if (!class_exists($Name)) {
-                if (Debug())
+                if (debug())
                     $Result = "Error: $Name doesn't exist";
                 else
                     $Result = "<!-- Error: $Name doesn't exist -->";
@@ -434,7 +434,7 @@ class Gdn_Theme {
                 $Result = $Module->ToString();
             }
         } catch (Exception $Ex) {
-            if (Debug())
+            if (debug())
                 $Result = '<pre class="Exception">'.htmlspecialchars($Ex->getMessage()."\n".$Ex->getTraceAsString()).'</pre>';
             else
                 $Result = $Ex->getMessage();

@@ -771,7 +771,7 @@ abstract class Gdn_Cache {
     }
 
     protected function Failure($Message) {
-        if (Debug())
+        if (debug())
             throw new Exception($Message);
         else
             return Gdn_Cache::CACHEOP_FAILURE;

@@ -184,6 +184,23 @@ class DbaController extends DashboardController {
         $this->Render();
     }
 
+    /**
+     * Reset all role permissions based on role type.
+     */
+    public function resetPermissions() {
+        $this->Permission('Garden.Settings.Manage');
+
+        if ($this->Request->IsAuthenticatedPostBack()) {
+            PermissionModel::ResetAllRoles();
+            $this->SetData('Result', array('Complete' => true));
+        }
+
+        $this->SetData('Title', 'Reset all role permissions');
+        $this->_SetJob($this->Data('Title'));
+        $this->AddSideMenu();
+        $this->Render('Job');
+    }
+
     protected function _SetJob($Name) {
         $Args = array_change_key_case($this->ReflectArgs);
         $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);

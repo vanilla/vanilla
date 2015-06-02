@@ -324,7 +324,7 @@ class UserModel extends Gdn_Model {
 
         $UserSet = array();
         $OldUserSet = array();
-        if (DateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0)
+        if (dateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0)
             $UserSet['DateFirstVisit'] = $OldUser['DateFirstVisit'];
 
         if (!isset($Row['Attributes']['User']['CountVisits'])) {

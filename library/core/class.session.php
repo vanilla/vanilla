@@ -104,7 +104,7 @@ class Gdn_Session {
         } else {
             // Non-junction permission ($Permissions = array(PermissionNames))
             if (is_array($Permission)) {
-                return ArrayInArray($Permission, $Permissions, $FullMatch);
+                return arrayInArray($Permission, $Permissions, $FullMatch);
             } else {
                 return in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
             }

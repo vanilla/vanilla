@@ -250,21 +250,25 @@ if (!function_exists('arrayKeyExistsI')) {
 
 if (!function_exists('arrayInArray')) {
     /**
-     * Searches Haystack array for items in Needle array. If FullMatch is true,
+     * Check to see if an array contains another array.
+     *
+     * Searches {@link $Haystack} array for items in {@link $Needle} array. If FullMatch is true,
      * all items in Needle must also be in Haystack. If FullMatch is false, only
      * one-or-more items in Needle must be in Haystack.
      *
      * @param array $Needle The array containing items to match to Haystack.
      * @param array $Haystack The array to search in for Needle items.
      * @param bool $FullMatch Should all items in Needle be found in Haystack to return true?
+     * @deprecated
      */
     function arrayInArray($Needle, $Haystack, $FullMatch = true) {
         $Count = count($Needle);
         $Return = $FullMatch ? true : false;
         for ($i = 0; $i < $Count; ++$i) {
             if ($FullMatch === true) {
-                if (in_array($Needle[$i], $Haystack) === false)
+                if (in_array($Needle[$i], $Haystack) === false) {
                     $Return = false;
+                }
             } else {
                 if (in_array($Needle[$i], $Haystack) === true) {
                     $Return = true;

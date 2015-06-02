@@ -729,28 +729,6 @@ if (!function_exists('decho')) {
     }
 }
 
-if (!function_exists('filter_input')) {
-    if (!defined('INPUT_GET')) define('INPUT_GET', 'INPUT_GET');
-    if (!defined('INPUT_POST')) define('INPUT_POST', 'INPUT_POST');
-    if (!defined('FILTER_SANITIZE_STRING')) define('FILTER_SANITIZE_STRING', 'FILTER_SANITIZE_STRING');
-    if (!defined('FILTER_REQUIRE_ARRAY')) define('FILTER_REQUIRE_ARRAY', 'FILTER_REQUIRE_ARRAY');
-    function filter_input($InputType, $FieldName, $Filter = '', $Options = '') {
-        $Collection = $InputType == INPUT_GET ? $_GET : $_POST;
-        $Value = ArrayValue($FieldName, $Collection, '');
-        if (get_magic_quotes_gpc()) {
-            if (is_array($Value)) {
-                $Count = count($Value);
-                for ($i = 0; $i < $Count; ++$i) {
-                    $Value[$i] = stripslashes($Value[$i]);
-                }
-            } else {
-                $Value = stripslashes($Value);
-            }
-        }
-        return $Value;
-    }
-}
-
 if (!function_exists('DateCompare')) {
     /**
      * Compare two dates.

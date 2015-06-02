@@ -432,8 +432,6 @@ class ConversationModel extends ConversationsModel {
      * @return int Unique ID of conversation created or updated.
      */
     public function Save($FormPostValues, $MessageModel) {
-        $Session = Gdn::Session();
-
         // Define the primary key in this model's table.
         $this->DefineSchema();
         $MessageModel->DefineSchema();
@@ -482,8 +480,8 @@ class ConversationModel extends ConversationsModel {
             // Define the recipients, and make sure that the sender is in the list
             $RecipientUserIDs = GetValue('RecipientUserID', $Fields, 0);
 
-            if (!in_array($Session->UserID, $RecipientUserIDs))
-                $RecipientUserIDs[] = $Session->UserID;
+            if (!in_array($FormPostValues['InsertUserID'], $RecipientUserIDs))
+                $RecipientUserIDs[] = $FormPostValues['InsertUserID'];
 
             // Also make sure there are no duplicates in the recipient list
             $RecipientUserIDs = array_unique($RecipientUserIDs);
@@ -510,7 +508,7 @@ class ConversationModel extends ConversationsModel {
 
             // Now that the message & conversation have been inserted, insert all of the recipients
             foreach ($RecipientUserIDs as $UserID) {
-                $CountReadMessages = $UserID == $Session->UserID ? 1 : 0;
+                $CountReadMessages = $UserID == $FormPostValues['InsertUserID'] ? 1 : 0;
                 $this->SQL->Options('Ignore', TRUE)->Insert('UserConversation', array(
                     'UserID' => $UserID,
                     'ConversationID' => $ConversationID,
@@ -521,7 +519,7 @@ class ConversationModel extends ConversationsModel {
             }
 
             // And update the CountUnreadConversations count on each user related to the discussion.
-            $this->UpdateUserUnreadCount($RecipientUserIDs, TRUE);
+            $this->UpdateUserUnreadCount(array_diff($RecipientUserIDs, array($FormPostValues['InsertUserID'])));
             $this->UpdateParticipantCount($ConversationID);
 
             $this->EventArguments['Recipients'] = $RecipientUserIDs;
@@ -538,12 +536,12 @@ class ConversationModel extends ConversationsModel {
                 ->Select('uc.UserID')
                 ->From('UserConversation uc')
                 ->Where('uc.ConversationID', $ConversationID)// hopefully coax this index.
-                ->Where('uc.UserID <>', $Session->UserID)
+                ->Where('uc.UserID <>', $FormPostValues['InsertUserID'])
                 ->Get();
 
             $Activity = array(
                 'ActivityType' => 'ConversationMessage',
-                'ActivityUserID' => $Session->UserID,
+                'ActivityUserID' => $FormPostValues['InsertUserID'],
                 'HeadlineFormat' => T('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
                 'RecordType' => 'Conversation',
                 'RecordID' => $ConversationID,

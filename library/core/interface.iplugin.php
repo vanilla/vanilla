@@ -16,8 +16,7 @@
 interface Gdn_IPlugin {
 
     /**
-     * This method can be used to ensure that any setup components of a plugin have been set up before the
-     * plugin is "enabled".
+     * Run any setup code that a plugin requires before it is ready for general use.
      *
      * This method will be called every time a plugin is enabled,
      * so it should check before performing redundant operations like
@@ -28,7 +27,7 @@ interface Gdn_IPlugin {
      *
      * @return boolean
      */
-    public function Setup();
+    public function setup();
 
     /**
      * These methods are invoked if present, but are not required and will be silently ignored

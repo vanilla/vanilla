@@ -884,16 +884,26 @@ if (!function_exists('deprecated')) {
     /**
      * Mark a function deprecated.
      *
-     * @param string $Name The name of the deprecated function.
-     * @param string $NewName The name of the new function that should be used instead.
+     * You can pass an optional date to the deprecated function to make errors more noisy in debug mode after 3 months.
+     *
+     * @param string $oldName The name of the deprecated function.
+     * @param string $newName The name of the new function that should be used instead.
+     * @param string $date A string in the form "yyyy-mm-dd" representing the date that the code was deprecated.
      */
-    function deprecated($Name, $NewName = '') {
-        $Msg = $Name.' is deprecated.';
-        if ($NewName) {
-            $Msg .= " Use $NewName instead.";
+    function deprecated($oldName, $newName = '', $date = '') {
+        $message = "$oldName is deprecated.";
+        if ($newName) {
+            $message .= " Use $newName instead.";
         }
 
-        trigger_error($Msg, E_USER_DEPRECATED);
+        if ($date && debug()) {
+            $expires = strtotime('+3 months', strtotime($date));
+            if ($expires <= time()) {
+                trigger_error($message, E_USER_ERROR);
+                return;
+            }
+        }
+        trigger_error($message, E_USER_DEPRECATED);
     }
 }
 

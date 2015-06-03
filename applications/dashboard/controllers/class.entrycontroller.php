@@ -1279,7 +1279,7 @@ EOT;
 
                     // Notification text
                     $Label = T('NewApplicantEmail', 'New applicant:');
-                    $Story = Anchor(Gdn_Format::Text($Label.' '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
+                    $Story = Anchor(Gdn_Format::Text($Label.' '.$Values['Name']), externalUrl('dashboard/user/applicants'));
 
                     $this->EventArguments['AuthUserID'] = $AuthUserID;
                     $this->EventArguments['Story'] = &$Story;

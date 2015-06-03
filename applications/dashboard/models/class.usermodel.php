@@ -2974,7 +2974,7 @@ class UserModel extends Gdn_Model {
             $User = $this->GetID($UserID);
             if ($User) {
                 $Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
-                $Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
+                $Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, externalUrl(SignInUrl())));
                 $Email->To($User->Email);
                 //$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
                 $Email->Send();
@@ -3647,7 +3647,7 @@ class UserModel extends Gdn_Model {
                 $User->Name,
                 $Sender->Name,
                 $AppTitle,
-                ExternalUrl('/'),
+                externalUrl('/'),
                 $Password,
                 $User->Email
             );
@@ -3694,7 +3694,7 @@ class UserModel extends Gdn_Model {
                 $User->Name,
                 $Sender->Name,
                 $AppTitle,
-                ExternalUrl('/'),
+                externalUrl('/'),
                 $Password,
                 $User->Email
             );
@@ -3850,7 +3850,7 @@ class UserModel extends Gdn_Model {
                     T('PasswordRequest'),
                     $User->Name,
                     $AppTitle,
-                    ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
+                    externalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
                 )
             );
             $Email->Send();

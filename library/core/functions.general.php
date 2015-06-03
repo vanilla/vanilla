@@ -918,14 +918,22 @@ if (!function_exists('explodeTrim')) {
     }
 }
 
-if (!function_exists('ExternalUrl')) {
-    function ExternalUrl($Path) {
+if (!function_exists('externalUrl')) {
+    /**
+     * Build a URL to an external site linked to this one.
+     *
+     * This function is used when an external site is configured with Vanilla in an embedding scenario.
+     *
+     * @param string $path The path within Vanilla.
+     * @return string Returns the external URL.
+     */
+    function externalUrl($path) {
         $Format = C('Garden.ExternalUrlFormat');
 
-        if ($Format && !StringBeginsWith($Path, 'http')) {
-            $Result = sprintf($Format, ltrim($Path, '/'));
+        if ($Format && !StringBeginsWith($path, 'http')) {
+            $Result = sprintf($Format, ltrim($path, '/'));
         } else {
-            $Result = Url($Path, true);
+            $Result = Url($path, true);
         }
 
         return $Result;
@@ -1303,7 +1311,7 @@ if (!function_exists('_FormatStringCallback')) {
                     if (strpos($Field, '/') !== false) {
                         $Value = $Field;
                     }
-                    $Result = ExternalUrl($Value);
+                    $Result = externalUrl($Value);
                     break;
                 case 'urlencode':
                     $Result = urlencode($Value);

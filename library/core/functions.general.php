@@ -1554,7 +1554,8 @@ if (!function_exists('getallheaders')) {
     /**
      * If PHP isn't running as an apache module, getallheaders doesn't exist in some systems.
      *
-     * Ref: http://github.com/lussumo/Garden/issues/closed#issue/3/comment/19938
+     * @return array Returns an array of the current HTTP headers.
+     * @see https://github.com/vanilla/vanilla/issues/3
      */
     function getallheaders() {
         foreach ($_SERVER as $name => $value) {

@@ -22,7 +22,7 @@ if (!function_exists('Alternate')) {
  * English "plural" formatting for numbers that can get really big.
  */
 if (!function_exists('BigPlural')) {
-    function BigPlural($Number, $Singular, $Plural = FALSE) {
+    function BigPlural($Number, $Singular, $Plural = false) {
         if (!$Plural) {
             $Plural = $Singular.'s';
         }
@@ -57,9 +57,10 @@ if (!function_exists('ButtonDropDown')):
      * @param string $Label The text of the button.
      * @since 2.1
      */
-    function ButtonDropDown($Links, $CssClass = 'Button', $Label = FALSE) {
-        if (!is_array($Links) || count($Links) < 1)
+    function ButtonDropDown($Links, $CssClass = 'Button', $Label = false) {
+        if (!is_array($Links) || count($Links) < 1) {
             return;
+        }
 
         $ButtonClass = '';
         if (is_array($CssClass))
@@ -69,15 +70,17 @@ if (!function_exists('ButtonDropDown')):
             $Link = array_pop($Links);
 
 
-            if (strpos(GetValue('CssClass', $Link, ''), 'Popup') !== FALSE)
+            if (strpos(GetValue('CssClass', $Link, ''), 'Popup') !== false) {
                 $CssClass .= ' Popup';
+            }
 
             echo Anchor($Link['Text'], $Link['Url'], GetValue('ButtonCssClass', $Link, $CssClass));
         } else {
             // NavButton or Button?
-            $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button');
-            if (strpos($CssClass, 'Primary') !== FALSE)
+            $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
+            if (strpos($CssClass, 'Primary') !== false) {
                 $ButtonClass .= ' Primary';
+            }
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup'.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
 //            echo Anchor($Text, $Url, $ButtonClass);
@@ -104,9 +107,10 @@ if (!function_exists('ButtonGroup')):
      * @param string|false $Default The url of the default link.
      * @since 2.1
      */
-    function ButtonGroup($Links, $CssClass = 'Button', $Default = FALSE) {
-        if (!is_array($Links) || count($Links) < 1)
+    function ButtonGroup($Links, $CssClass = 'Button', $Default = false) {
+        if (!is_array($Links) || count($Links) < 1) {
             return;
+        }
 
         $Text = $Links[0]['Text'];
         $Url = $Links[0]['Url'];
@@ -139,9 +143,10 @@ if (!function_exists('ButtonGroup')):
             echo Anchor($Text, $Url, $CssClass);
         } else {
             // NavButton or Button?
-            $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button');
-            if (strpos($CssClass, 'Primary') !== FALSE)
+            $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
+            if (strpos($CssClass, 'Primary') !== false) {
                 $ButtonClass .= ' Primary';
+            }
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup Multi '.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
             echo Anchor($Text, $Url, $ButtonClass);
@@ -165,7 +170,7 @@ if (!function_exists('Category')):
      * @param int $Depth The level you want to look at.
      * @param array $Category
      */
-    function Category($Depth = NULL, $Category = NULL) {
+    function Category($Depth = null, $Category = null) {
         if (!$Category) {
             $Category = Gdn::Controller()->Data('Category');
         } elseif (!is_array($Category)) {
@@ -176,18 +181,19 @@ if (!function_exists('Category')):
             $Category = Gdn::Controller()->Data('CategoryID');
             if ($Category)
                 $Category = CategoryModel::Categories($Category);
+        if (!$Category) {
+            return null;
         }
-        if (!$Category)
-            return NULL;
 
         $Category = (array)$Category;
 
-        if ($Depth !== NULL) {
+        if ($Depth !== null) {
             // Get the category at the correct level.
             while ($Category['Depth'] > $Depth) {
                 $Category = CategoryModel::Categories($Category['ParentCategoryID']);
-                if (!$Category)
-                    return NULL;
+                if (!$Category) {
+                    return null;
+                }
             }
         }
 
@@ -203,7 +209,7 @@ if (!function_exists('CategoryUrl')):
      * @param array $Category
      * @return string
      */
-    function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+    function CategoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category))
             $Category = CategoryModel::Categories($Category);
         $Category = (array)$Category;
@@ -261,8 +267,8 @@ if (!function_exists('CssClass')):
      * @param type $Row
      * @return string The CSS classes to be inserted into the row.
      */
-    function CssClass($Row, $InList = TRUE) {
-        static $Alt = FALSE;
+    function CssClass($Row, $InList = true) {
+        static $Alt = false;
         $Row = (array)$Row;
         $CssClass = 'Item';
         $Session = Gdn::Session();
@@ -299,14 +305,14 @@ if (!function_exists('CssClass')):
             $CssClass .= GetValue('Participated', $Row) == '1' ? ' Participated' : '';
             if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
                 $CountUnreadComments = $Row['CountUnreadComments'];
-                if ($CountUnreadComments === TRUE) {
+                if ($CountUnreadComments === true) {
                     $CssClass .= ' New';
                 } elseif ($CountUnreadComments == 0) {
                     $CssClass .= ' Read';
                 } else {
                     $CssClass .= ' Unread';
                 }
-            } elseif (($IsRead = GetValue('Read', $Row, NULL)) !== NULL) {
+            } elseif (($IsRead = GetValue('Read', $Row, null)) !== null) {
                 // Category list
                 $CssClass .= $IsRead ? ' Read' : ' Unread';
             }
@@ -338,7 +344,7 @@ endif;
 
 if (!function_exists('DateUpdated')):
 
-    function DateUpdated($Row, $Wrap = NULL) {
+    function DateUpdated($Row, $Wrap = null) {
         $Result = '';
         $DateUpdated = GetValue('DateUpdated', $Row);
         $UpdateUserID = GetValue('UpdateUserID', $Row);
@@ -372,30 +378,30 @@ if (!function_exists('Anchor')) {
     /**
      * Builds and returns an anchor tag.
      */
-    function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = FALSE) {
+    function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = false) {
         if (!is_array($CssClass) && $CssClass != '')
             $CssClass = array('class' => $CssClass);
 
-        if ($Destination == '' && $ForceAnchor === FALSE)
+        if ($Destination == '' && $ForceAnchor === false)
             return $Text;
 
         if (!is_array($Attributes))
             $Attributes = array();
 
-        $SSL = NULL;
+        $SSL = null;
         if (isset($Attributes['SSL'])) {
             $SSL = $Attributes['SSL'];
             unset($Attributes['SSL']);
         }
 
-        $WithDomain = FALSE;
+        $WithDomain = false;
         if (isset($Attributes['WithDomain'])) {
             $WithDomain = $Attributes['WithDomain'];
             unset($Attributes['WithDomain']);
         }
 
         $Prefix = substr($Destination, 0, 7);
-        if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
+        if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === false))
             $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
 
         return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
@@ -409,7 +415,7 @@ if (!function_exists('CommentUrl')):
      * @param object $Comment
      * @return string
      */
-    function CommentUrl($Comment, $WithDomain = TRUE) {
+    function CommentUrl($Comment, $WithDomain = true) {
         $Comment = (object)$Comment;
         $Result = "/discussion/comment/{$Comment->CommentID}#Comment_{$Comment->CommentID}";
         return Url($Result, $WithDomain);
@@ -424,7 +430,7 @@ if (!function_exists('DiscussionUrl')):
      * @param object $Discussion
      * @return string
      */
-    function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
+    function DiscussionUrl($Discussion, $Page = '', $WithDomain = true) {
         $Discussion = (object)$Discussion;
         $Name = Gdn_Format::Url($Discussion->Name);
         if (empty($Name)) {
@@ -470,8 +476,8 @@ if (!function_exists('FormatPossessive')) {
 }
 
 if (!function_exists('FormatUsername')) {
-    function FormatUsername($User, $Format, $ViewingUserID = FALSE) {
-        if ($ViewingUserID === FALSE)
+    function FormatUsername($User, $Format, $ViewingUserID = false) {
+        if ($ViewingUserID === false)
             $ViewingUserID = Gdn::Session()->UserID;
         $UserID = GetValue('UserID', $User);
         $Name = GetValue('Name', $User);
@@ -531,7 +537,7 @@ if (!function_exists('hasEditProfile')) {
 
         $result &= (
             C('Garden.Profile.Titles') ||
-            C('Garden.Profile.Locations', FALSE) ||
+            C('Garden.Profile.Locations', false) ||
             C('Garden.Registration.Method') != 'Connect'
         );
 
@@ -552,7 +558,7 @@ if (!function_exists('Img')) {
     /**
      * Returns an img tag.
      */
-    function Img($Image, $Attributes = '', $WithDomain = FALSE) {
+    function Img($Image, $Attributes = '', $WithDomain = false) {
         if ($Attributes != '') {
             $Attributes = Attribute($Attributes);
         }
@@ -578,11 +584,11 @@ if (!function_exists('InCategory')) {
 
         foreach ($Breadcrumbs as $Breadcrumb) {
             if (isset($Breadcrumb['CategoryID']) && strcasecmp($Breadcrumb['UrlCode'], $Category) == 0) {
-                return TRUE;
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 }
 
@@ -630,10 +636,10 @@ if (!function_exists('panelHeading')) {
  * /applications/garden/locale/en-US/definitions.php.
  */
 if (!function_exists('Plural')) {
-    function Plural($Number, $Singular, $Plural, $FormattedNumber = FALSE) {
+    function Plural($Number, $Singular, $Plural, $FormattedNumber = false) {
         // Make sure to fix comma-formatted numbers
         $WorkingNumber = str_replace(',', '', $Number);
-        if ($FormattedNumber === FALSE)
+        if ($FormattedNumber === false)
             $FormattedNumber = $Number;
 
         $Format = T(abs($WorkingNumber) == 1 ? $Singular : $Plural);
@@ -654,7 +660,7 @@ if (!function_exists('PluralTranslate')) {
      * @return string
      * @since 2.1
      */
-    function PluralTranslate($Number, $Singular, $Plural, $SingularDefault = FALSE, $PluralDefault = FALSE) {
+    function PluralTranslate($Number, $Singular, $Plural, $SingularDefault = false, $PluralDefault = false) {
         if ($Number == 1)
             return T($Singular, $SingularDefault);
         else
@@ -683,13 +689,13 @@ if (!function_exists('SearchExcerpt')):
                 if (!$Term)
                     continue;
 
-                if (($Pos = mb_stripos($Line, $Term)) !== FALSE) {
+                if (($Pos = mb_stripos($Line, $Term)) !== false) {
                     $Line = substrWord($Line, $Term, $Length);
 
 //            if ($Pos + mb_strlen($Term) > $Length) {
 //               $St = -(strlen($Line) - ($Pos - $Length / 4));
 //               $Pos2 = strrpos($Line, ' ', $St);
-//               if ($Pos2 !== FALSE)
+//               if ($Pos2 !== false)
 //                  $Line = '…'.substrWord($Line, $Pos2, $Length, "!!!");
 //               else
 //                  $Line = '…!'.mb_substr($Line, $St, $Length);
@@ -758,14 +764,14 @@ endif;
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-    function UserAnchor($User, $CssClass = NULL, $Options = NULL) {
-        static $NameUnique = NULL;
-        if ($NameUnique === NULL)
+    function UserAnchor($User, $CssClass = null, $Options = null) {
+        static $NameUnique = null;
+        if ($NameUnique === null)
             $NameUnique = C('Garden.Registration.NameUnique');
 
         if (is_array($CssClass)) {
             $Options = $CssClass;
-            $CssClass = NULL;
+            $CssClass = null;
         } elseif (is_string($Options))
             $Options = array('Px' => $Options);
 
@@ -802,8 +808,8 @@ if (!function_exists('UserBuilder')) {
         $User->UserID = $Object->$UserID;
         $User->Name = $Object->$Name;
         $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-        $User->Email = GetValue($UserPrefix.'Email', $Object, NULL);
-        $User->Gender = property_exists($Object, $Gender) ? $Object->$Gender : NULL;
+        $User->Email = GetValue($UserPrefix.'Email', $Object, null);
+        $User->Gender = property_exists($Object, $Gender) ? $Object->$Gender : null;
         return $User;
     }
 }
@@ -907,9 +913,9 @@ if (!function_exists('UserUrl')) {
      * @param string $Method Optional. ProfileController method to target.
      * @return string The url suitable to be passed into the Url() function.
      */
-    function UserUrl($User, $Px = '', $Method = '', $Get = FALSE) {
-        static $NameUnique = NULL;
-        if ($NameUnique === NULL)
+    function UserUrl($User, $Px = '', $Method = '', $Get = false) {
+        static $NameUnique = null;
+        if ($NameUnique === null)
             $NameUnique = C('Garden.Registration.NameUnique');
 
         $UserName = GetValue($Px.'Name', $User);
@@ -969,7 +975,7 @@ if (!function_exists('WrapIf')) {
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */
 if (!function_exists('DiscussionLink')) {
-    function DiscussionLink($Discussion, $Extended = TRUE) {
+    function DiscussionLink($Discussion, $Extended = true) {
         $DiscussionID = GetValue('DiscussionID', $Discussion);
         $DiscussionName = GetValue('Name', $Discussion);
         $Parts = array(
@@ -980,7 +986,7 @@ if (!function_exists('DiscussionLink')) {
         if ($Extended) {
             $Parts[] = ($Discussion->CountCommentWatch > 0) ? '#Item_'.$Discussion->CountCommentWatch : '';
         }
-        return Url(implode('/', $Parts), TRUE);
+        return Url(implode('/', $Parts), true);
     }
 }
 
@@ -1057,7 +1063,7 @@ if (!function_exists('SocialSignInButton')) {
 }
 
 if (!function_exists('Sprite')) {
-    function Sprite($Name, $Type = 'Sprite', $Text = FALSE) {
+    function Sprite($Name, $Type = 'Sprite', $Text = false) {
         $Sprite = '<span class="'.$Type.' '.$Name.'"></span>';
         if ($Text) {
             $Sprite .= '<span class="sr-only">'.$Text.'</span>';
@@ -1092,8 +1098,8 @@ if (!function_exists('WriteReactions')):
         Gdn_Theme::BulletRow();
 
         // Write the flags.
-        static $Flags = NULL, $FlagCodes = NULL;
-        if ($Flags === NULL) {
+        static $Flags = null, $FlagCodes = null;
+        if ($Flags === null) {
             Gdn::Controller()->EventArguments['Flags'] = &$Flags;
             Gdn::Controller()->FireEvent('Flags');
         }
@@ -1107,7 +1113,7 @@ if (!function_exists('WriteReactions')):
 
             echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo Anchor(Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T('Flag'), 'span', array('class' => 'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title' => 'Flag'), TRUE);
+            echo Anchor(Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T('Flag'), 'span', array('class' => 'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title' => 'Flag'), true);
             echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {

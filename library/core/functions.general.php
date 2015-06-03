@@ -1046,8 +1046,8 @@ if (!function_exists('fetchPageInfo')) {
                 $PageInfo['Images'] = array_values($Images);
             }
 
-            $PageInfo['Title'] = HtmlEntityDecode($PageInfo['Title']);
-            $PageInfo['Description'] = HtmlEntityDecode($PageInfo['Description']);
+            $PageInfo['Title'] = htmlEntityDecode($PageInfo['Title']);
+            $PageInfo['Description'] = htmlEntityDecode($PageInfo['Description']);
 
         } catch (Exception $ex) {
             $PageInfo['Exception'] = $ex->getMessage();
@@ -1807,18 +1807,18 @@ if (!function_exists('getValueR')) {
     }
 }
 
-if (!function_exists('HtmlEntityDecode')) {
+if (!function_exists('htmlEntityDecode')) {
 
     /**
-     * Decode ALL of the entities out of an html string.
+     * Decode all of the entities out of an HTML string.
      *
      * @param string $string The string to decode.
-     * @param constant $quote_style
-     * @param string $charset
-     * @return string
+     * @param int $quote_style One of the `ENT_*` constants.
+     * @param string $charset The character set of the string.
+     * @return string Returns {@link $string} with HTML entities decoded.
      * @since 2.1
      */
-    function HtmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
+    function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
         $string = preg_replace_callback('~&#x([0-9a-fA-F]+);~i', "chr_utf8_callback", $string);
@@ -1850,41 +1850,45 @@ if (!function_exists('HtmlEntityDecode')) {
             return chr(($num >> 12) + 224).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
         }
         if ($num < 2097152) {
-            return chr(($num >> 18) + 240).chr((($num >> 12) & 63) + 128).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
+            return
+                chr(($num >> 18) + 240).
+                chr((($num >> 12) & 63) + 128).
+                chr((($num >> 6) & 63) + 128).
+                chr(($num & 63) + 128);
         }
         return '';
     }
 
 }
 
-if (!function_exists('ImplodeAssoc')) {
+if (!function_exists('implodeAssoc')) {
     /**
      * A version of implode() that operates on array keys and values.
      *
-     * @param string $KeyGlue The glue between keys and values.
-     * @param string $ElementGlue The glue between array elements.
-     * @param array $Array The array to implode.
+     * @param string $keyGlue The glue between keys and values.
+     * @param string $elementGlue The glue between array elements.
+     * @param array $array The array to implode.
      * @return string The imploded array.
      */
-    function ImplodeAssoc($KeyGlue, $ElementGlue, $Array) {
+    function implodeAssoc($keyGlue, $elementGlue, $array) {
         $Result = '';
 
-        foreach ($Array as $Key => $Value) {
+        foreach ($array as $Key => $Value) {
             if (strlen($Result) > 0) {
-                $Result .= $ElementGlue;
+                $Result .= $elementGlue;
             }
 
-            $Result .= $Key.$KeyGlue.$Value;
+            $Result .= $Key.$keyGlue.$Value;
         }
         return $Result;
     }
 }
 
-if (!function_exists('InArrayI')) {
+if (!function_exists('inArrayI')) {
     /**
      * Case-insensitive version of php's native in_array function.
      */
-    function InArrayI($Needle, $Haystack) {
+    function inArrayI($Needle, $Haystack) {
         $Needle = strtolower($Needle);
         foreach ($Haystack as $Item) {
             if (strtolower($Item) == $Needle) {
@@ -1895,11 +1899,11 @@ if (!function_exists('InArrayI')) {
     }
 }
 
-if (!function_exists('InSubArray')) {
+if (!function_exists('inSubArray')) {
     /**
      * Loop through $Haystack looking for subarrays that contain $Needle.
      */
-    function InSubArray($Needle, $Haystack) {
+    function inSubArray($Needle, $Haystack) {
         foreach ($Haystack as $Key => $Val) {
             if (is_array($Val) && in_array($Needle, $Val)) {
                 return true;
@@ -1909,7 +1913,7 @@ if (!function_exists('InSubArray')) {
     }
 }
 
-if (!function_exists('IsMobile')) {
+if (!function_exists('isMobile')) {
     /**
      * Determine whether or not the site is in mobile mode.
      *
@@ -1920,7 +1924,7 @@ if (!function_exists('IsMobile')) {
      * - not specified: Use the current setting or use the system determined mobile setting.
      * @return bool
      */
-    function IsMobile($value = '') {
+    function isMobile($value = '') {
         if ($value === true || $value === false) {
             $type = $value ? 'mobile' : 'desktop';
             userAgentType($type);
@@ -1946,8 +1950,8 @@ if (!function_exists('IsMobile')) {
     }
 }
 
-if (!function_exists('IsSearchEngine')) {
-    function IsSearchEngine() {
+if (!function_exists('isSearchEngine')) {
+    function isSearchEngine() {
         $Engines = array(
             'googlebot',
             'slurp',
@@ -1974,8 +1978,8 @@ if (!function_exists('IsSearchEngine')) {
     }
 }
 
-if (!function_exists('IsTimestamp')) {
-    function IsTimestamp($Stamp) {
+if (!function_exists('isTimestamp')) {
+    function isTimestamp($Stamp) {
         return checkdate(
             @date("m", $Stamp),
             @date("d", $Stamp),
@@ -1984,7 +1988,7 @@ if (!function_exists('IsTimestamp')) {
     }
 }
 
-if (!function_exists('IsUrl')) {
+if (!function_exists('isUrl')) {
     /**
      * Determine whether or not a string is a url in the form http://, https://, or //.
      *
@@ -1992,7 +1996,7 @@ if (!function_exists('IsUrl')) {
      * @return bool
      * @since 2.1
      */
-    function IsUrl($Str) {
+    function isUrl($Str) {
         if (!$Str) {
             return false;
         }
@@ -2006,7 +2010,7 @@ if (!function_exists('IsUrl')) {
     }
 }
 
-if (!function_exists('IsWritable')) {
+if (!function_exists('isWritable')) {
     /**
      * Determine whether or not a path is writable.
      *
@@ -2016,7 +2020,7 @@ if (!function_exists('IsWritable')) {
      * checked. Our version truly verifies permissions by performing file-write
      * tests.
      */
-    function IsWritable($Path) {
+    function isWritable($Path) {
         if ($Path{strlen($Path) - 1} == DS) {
             // Recursively return a temporary file path
             return IsWritable($Path.uniqid(mt_rand()).'.tmp');
@@ -2040,7 +2044,7 @@ if (!function_exists('IsWritable')) {
     }
 }
 
-if (!function_exists('MarkString')) {
+if (!function_exists('markString')) {
     /**
      * Wrap occurrences of {@link $Needle} in {@link $Haystack} with `<mark>` tags.
      *
@@ -2050,7 +2054,7 @@ if (!function_exists('MarkString')) {
      * @param string $Haystack The string to search for replacements.
      * @return string Returns a marked version of {@link $Haystack}.
      */
-    function MarkString($Needle, $Haystack) {
+    function markString($Needle, $Haystack) {
         if (!$Needle) {
             return $Haystack;
         }
@@ -2075,7 +2079,7 @@ if (!function_exists('MarkString')) {
     }
 }
 
-if (!function_exists('JoinRecords')) {
+if (!function_exists('joinRecords')) {
 
     /**
      * Join external records to an array.
@@ -2087,7 +2091,7 @@ if (!function_exists('JoinRecords')) {
      * @param bool $Unset Whether or not to unset rows that don't have a record.
      * @since 2.3
      */
-    function JoinRecords(&$Data, $Column = '', $Unset = false) {
+    function joinRecords(&$Data, $Column = '', $Unset = false) {
         $IDs = array();
         $AllowedCats = DiscussionModel::CategoryPermissions();
 
@@ -2183,7 +2187,7 @@ if (!function_exists('JoinRecords')) {
 
 }
 
-if (!function_exists('MergeArrays')) {
+if (!function_exists('mergeArrays')) {
     /**
      * Merge two associative arrays into a single array.
      *
@@ -2191,7 +2195,7 @@ if (!function_exists('MergeArrays')) {
      * @param array $Subservient The "subservient" array, who's values will be disregarded over those of the dominant.
      * @deprecated Use {@link array_merge_recursive()}
      */
-    function MergeArrays(&$Dominant, $Subservient) {
+    function mergeArrays(&$Dominant, $Subservient) {
         foreach ($Subservient as $Key => $Value) {
             if (!array_key_exists($Key, $Dominant)) {
                 // Add the key from the subservient array if it doesn't exist in the
@@ -2210,8 +2214,8 @@ if (!function_exists('MergeArrays')) {
     }
 }
 
-if (!function_exists('Now')) {
-    function Now() {
+if (!function_exists('now')) {
+    function now() {
         return microtime(true);
     }
 }

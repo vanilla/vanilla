@@ -1426,8 +1426,8 @@ if (!function_exists('_formatStringCallback')) {
     }
 }
 
-if (!function_exists('ForceBool')) {
-    function ForceBool($Value, $DefaultValue = false, $True = true, $False = false) {
+if (!function_exists('forceBool')) {
+    function forceBool($Value, $DefaultValue = false, $True = true, $False = false) {
         if (is_bool($Value)) {
             return $Value ? $True : $False;
         } elseif (is_numeric($Value)) {

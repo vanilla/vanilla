@@ -2303,7 +2303,7 @@ if (!function_exists('pageNumber')) {
 
 if (!function_exists('parse_ini_string')) {
     /**
-     * parse_ini_string not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
+     * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
      */
     function parse_ini_string($Ini) {
         $Lines = explode("\n", $Ini);
@@ -2320,24 +2320,24 @@ if (!function_exists('parse_ini_string')) {
     }
 }
 
-if (!function_exists('RecordType')) {
+if (!function_exists('recordType')) {
     /**
      * Return the record type and id of a row.
      *
-     * @param array|object $Row The record we are looking at.
+     * @param array|object $row The record we are looking at.
      * @return array An array with the following items
      *  - 0: record type
      *  - 1: record ID
      * @since 2.1
      */
-    function RecordType($Row) {
-        if ($RecordType = GetValue('RecordType', $Row)) {
-            return array($RecordType, GetValue('RecordID', $Row));
-        } elseif ($CommentID = GetValue('CommentID', $Row)) {
+    function recordType($row) {
+        if ($RecordType = val('RecordType', $row)) {
+            return array($RecordType, val('RecordID', $row));
+        } elseif ($CommentID = val('CommentID', $row)) {
             return array('Comment', $CommentID);
-        } elseif ($DiscussionID = GetValue('DiscussionID', $Row)) {
+        } elseif ($DiscussionID = val('DiscussionID', $row)) {
             return array('Discussion', $DiscussionID);
-        } elseif ($ActivityID = GetValue('ActivityID', $Row)) {
+        } elseif ($ActivityID = val('ActivityID', $row)) {
             return array('Activity', $ActivityID);
         } else {
             return array(null, null);
@@ -2345,15 +2345,16 @@ if (!function_exists('RecordType')) {
     }
 }
 
-if (!function_exists('TouchConfig')) {
+if (!function_exists('touchConfig')) {
     /**
      * Make sure the config has a setting.
+     *
      * This function is useful to call in the setup/structure of plugins to make sure they have some default config set.
      *
      * @param string|array $Name The name of the config key or an array of config key value pairs.
      * @param mixed $Default The default value to set in the config.
      */
-    function TouchConfig($Name, $Default = null) {
+    function touchConfig($Name, $Default = null) {
         if (!is_array($Name)) {
             $Name = array($Name => $Default);
         }
@@ -2377,7 +2378,9 @@ if (!function_exists('write_ini_string')) {
         foreach ($Data as $Topic => $Settings) {
             if (is_array($Settings)) {
                 $Flat[] = "[{$Topic}]";
-                foreach ($Settings as $SettingsKey => $SettingsVal) $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
+                foreach ($Settings as $SettingsKey => $SettingsVal) {
+                    $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
+                }
                 $Flat[] = "";
             } else {
                 $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
@@ -2394,18 +2397,18 @@ if (!function_exists('write_ini_file')) {
     }
 }
 
-if (!function_exists('SignInPopup')) {
+if (!function_exists('signInPopup')) {
     /**
      * Returns a boolean value indicating if sign in windows should be "popped" into modal in-page popups.
      *
      * @return bool Returns true if signin popups are used.
      */
-    function SignInPopup() {
+    function signInPopup() {
         return C('Garden.SignIn.Popup');
     }
 }
 
-if (!function_exists('ParseUrl')) {
+if (!function_exists('parseUrl')) {
     /**
      * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
      *
@@ -2414,7 +2417,7 @@ if (!function_exists('ParseUrl')) {
      * PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
      * @deprecated
      */
-    function ParseUrl($Url, $Component = -1) {
+    function parseUrl($Url, $Component = -1) {
         // Retrieve all the parts
         $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
         $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
@@ -2460,17 +2463,18 @@ if (!function_exists('ParseUrl')) {
         }
     }
 }
-if (!function_exists('BuildUrl')) {
+if (!function_exists('buildUrl')) {
     /**
-     * Complementary to ParseUrl, this function puts the pieces back together and returns a valid url.
+     * Complementary to {@link ParseUrl()}, this function puts the pieces back together and returns a valid url.
      *
-     * @param array ParseUrl array to build.
+     * @param array $Parts The ParseUrl array to build.
      */
-    function BuildUrl($Parts) {
+    function buildUrl($Parts) {
         // Full format: http://user:pass@hostname:port/path?querystring#fragment
         $Return = $Parts['scheme'].'://';
-        if ($Parts['user'] != '' || $Parts['pass'] != '')
+        if ($Parts['user'] != '' || $Parts['pass'] != '') {
             $Return .= $Parts['user'].':'.$Parts['pass'].'@';
+        }
 
         $Return .= $Parts['host'];
         // Custom port?
@@ -2498,14 +2502,14 @@ if (!function_exists('BuildUrl')) {
     }
 }
 
-if (!function_exists('PrefixString')) {
+if (!function_exists('prefixString')) {
     /**
      * Takes a string, and prefixes it with $Prefix unless it is already prefixed that way.
      *
      * @param string $Prefix The prefix to use.
      * @param string $String The string to be prefixed.
      */
-    function PrefixString($Prefix, $String) {
+    function prefixString($Prefix, $String) {
         if (substr($String, 0, strlen($Prefix)) != $Prefix) {
             $String = $Prefix.$String;
         }
@@ -2513,7 +2517,7 @@ if (!function_exists('PrefixString')) {
     }
 }
 
-if (!function_exists('PrepareArray')) {
+if (!function_exists('prepareArray')) {
     /**
      * Makes sure that the key in question exists and is of the specified type,
      * by default also an array.
@@ -2523,7 +2527,7 @@ if (!function_exists('PrepareArray')) {
      * @param string $PrepareType Optional,
      * @deprecated
      */
-    function PrepareArray($Key, &$Array, $PrepareType = 'array') {
+    function prepareArray($Key, &$Array, $PrepareType = 'array') {
         if (!array_key_exists($Key, $Array)) {
             $Array[$Key] = null;
         }
@@ -2562,9 +2566,9 @@ if (!function_exists('PrepareArray')) {
     }
 }
 
-if (!function_exists('ProxyHead')) {
+if (!function_exists('proxyHead')) {
 
-    function ProxyHead($Url, $Headers = null, $Timeout = false, $FollowRedirects = false) {
+    function proxyHead($Url, $Headers = null, $Timeout = false, $FollowRedirects = false) {
         if (is_null($Headers)) {
             $Headers = array();
         }
@@ -2576,11 +2580,11 @@ if (!function_exists('ProxyHead')) {
         }
 
         $UrlParts = parse_url($Url);
-        $Scheme = GetValue('scheme', $UrlParts, 'http');
-        $Host = GetValue('host', $UrlParts, '');
-        $Port = GetValue('port', $UrlParts, '80');
-        $Path = GetValue('path', $UrlParts, '');
-        $Query = GetValue('query', $UrlParts, '');
+        $Scheme = val('scheme', $UrlParts, 'http');
+        $Host = val('host', $UrlParts, '');
+        $Port = val('port', $UrlParts, '80');
+        $Path = val('path', $UrlParts, '');
+        $Query = val('query', $UrlParts, '');
 
         // Get the cookie.
         $Cookie = '';
@@ -2613,16 +2617,14 @@ if (!function_exists('ProxyHead')) {
             curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($Handler, CURLOPT_HTTPHEADER, $Headers);
 
-            if (strlen($Cookie['Cookie']))
+            if (strlen($Cookie['Cookie'])) {
                 curl_setopt($Handler, CURLOPT_COOKIE, $Cookie['Cookie']);
+            }
 
-            //if ($Query != '') {
-            //   curl_setopt($Handler, CURLOPT_POST, 1);
-            //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
-            //}
             $Response = curl_exec($Handler);
-            if ($Response == false)
+            if ($Response == false) {
                 $Response = curl_error($Handler);
+            }
 
             curl_close($Handler);
         } elseif (function_exists('fsockopen')) {
@@ -2631,7 +2633,14 @@ if (!function_exists('ProxyHead')) {
             // Make the request
             $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
             if (!$Pointer) {
-                throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+                throw new Exception(
+                    sprintf(
+                        T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'),
+                        $Url,
+                        $ErrorNumber,
+                        $Error
+                    )
+                );
             }
 
             $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
@@ -2706,17 +2715,17 @@ if (!function_exists('ProxyHead')) {
 
 }
 
-if (!function_exists('ProxyRequest')) {
+if (!function_exists('proxyRequest')) {
     /**
-     * Uses curl or fsock to make a request to a remote server. Returns the
-     * response.
+     * Use curl or fsock to make a request to a remote server.
      *
-     * @param string $Url The full url to the page being requested (including http://)
-     * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout
+     * @param string $Url The full url to the page being requested (including http://).
+     * @param integer $Timeout How long to allow for this request.
+     * Default Garden.SocketTimeout or 1, 0 to never timeout.
      * @param boolean $FollowRedirects Whether or not to follow 301 and 302 redirects. Defaults false.
-     * @return string Response (no headers)
+     * @return string Returns the response body.
      */
-    function ProxyRequest($Url, $Timeout = false, $FollowRedirects = false) {
+    function proxyRequest($Url, $Timeout = false, $FollowRedirects = false) {
         $OriginalTimeout = $Timeout;
         if ($Timeout === false) {
             $Timeout = C('Garden.SocketTimeout', 1.0);
@@ -2763,7 +2772,8 @@ if (!function_exists('ProxyRequest')) {
                 curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
             }
 
-            // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
+            // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST.
+            //Same for the $Url above
             //
             //if ($Query != '') {
             //   curl_setopt($Handler, CURLOPT_POST, 1);
@@ -2778,13 +2788,20 @@ if (!function_exists('ProxyRequest')) {
             }
 
             curl_close($Handler);
-        } else if (function_exists('fsockopen')) {
+        } elseif (function_exists('fsockopen')) {
             $Referer = Gdn_Url::WebRoot(true);
 
             // Make the request
             $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
             if (!$Pointer) {
-                throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+                throw new Exception(
+                    sprintf(
+                        T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'),
+                        $Url,
+                        $ErrorNumber,
+                        $Error
+                    )
+                );
             }
 
             stream_set_timeout($Pointer, $Timeout);
@@ -2795,7 +2812,8 @@ if (!function_exists('ProxyRequest')) {
             $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
             $Header = "GET $Path?$Query HTTP/1.1\r\n"
                 ."Host: {$HostHeader}\r\n"
-                // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+                // If you've got basic authentication enabled for the app, you're going to need to explicitly define
+                // the user/pass for this fsock call.
                 // "Authorization: Basic ". base64_encode ("username:password")."\r\n" .
                 ."User-Agent: ".ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
                 ."Accept: */*\r\n"
@@ -2873,8 +2891,8 @@ if (!function_exists('ProxyRequest')) {
     }
 }
 
-if (!function_exists('RandomString')) {
-    function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+if (!function_exists('randomString')) {
+    function randomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
         $CharLen = strlen($Characters);
         $String = '';
         for ($i = 0; $i < $Length; ++$i) {
@@ -2885,7 +2903,7 @@ if (!function_exists('RandomString')) {
     }
 }
 
-if (!function_exists('BetterRandomString')) {
+if (!function_exists('betterRandomString')) {
 
     /**
      * Generate a random string of characters with additional character options that can be cryptographically strong.
@@ -2894,14 +2912,15 @@ if (!function_exists('BetterRandomString')) {
      * If that function does not exists then it just uses mt_rand().
      *
      * @param int $Length The length of the string.
-     * @param string $CharacterOptions Character sets that are allowed in the string. This is a string made up of the following characters.
+     * @param string $CharacterOptions Character sets that are allowed in the string.
+     * This is a string made up of the following characters.
      *  - A: uppercase characters
      *  - a: lowercase characters
      *  - 0: digits
      *  - !: basic punctuation (~!@#$^&*_+-)
      * @return string Returns the random string for the given arguments.
      */
-    function BetterRandomString($Length, $CharacterOptions = 'A0') {
+    function betterRandomString($Length, $CharacterOptions = 'A0') {
         $CharacterClasses = array(
             'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'a' => 'abcdefghijklmnopqrstuvwxyz',
@@ -2933,8 +2952,8 @@ if (!function_exists('BetterRandomString')) {
     }
 }
 
-if (!function_exists('Redirect')) {
-    function Redirect($Destination = false, $StatusCode = null) {
+if (!function_exists('redirect')) {
+    function redirect($Destination = false, $StatusCode = null) {
         if (!$Destination) {
             $Destination = '';
         }
@@ -2989,7 +3008,7 @@ if (!function_exists('redirectUrl')) {
     }
 }
 
-if (!function_exists('ReflectArgs')) {
+if (!function_exists('reflectArgs')) {
     /**
      * Reflect the arguments on a callback and returns them as an associative array.
      * @param callback $Callback A callback to the function.
@@ -2997,7 +3016,7 @@ if (!function_exists('ReflectArgs')) {
      * @param array $Args2 An optional other array of arguments.
      * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
      */
-    function ReflectArgs($Callback, $Args1, $Args2 = null) {
+    function reflectArgs($Callback, $Args1, $Args2 = null) {
         if (is_string($Callback) && !function_exists($Callback)) {
             throw new Exception("Function $Callback does not exist");
         }
@@ -3060,21 +3079,30 @@ if (!function_exists('ReflectArgs')) {
     }
 }
 
-if (!function_exists('RemoteIP')) {
-    function RemoteIP() {
+if (!function_exists('remoteIP')) {
+    function remoteIP() {
         return Gdn::Request()->IpAddress();
     }
 }
 
-if (!function_exists('RemoveFromConfig')) {
-    function RemoveFromConfig($Name, $Options = array()) {
+if (!function_exists('removeFromConfig')) {
+    function removeFromConfig($Name, $Options = array()) {
         Gdn::Config()->RemoveFromConfig($Name, $Options);
     }
 }
 
 // Functions relating to data/variable types and type casting
-if (!function_exists('RemoveKeyFromArray')) {
-    function RemoveKeyFromArray($Array, $Key) {
+if (!function_exists('removeKeyFromArray')) {
+    /**
+     * Remove a value from an array at a certain key.
+     *
+     * @param array $Array
+     * @param string|int $Key
+     * @return mixed
+     * @deprecated Use unset() instead.
+     * @todo Remove this function.
+     */
+    function removeKeyFromArray($Array, $Key) {
         if (!is_array($Key)) {
             $Key = array($Key);
         }
@@ -3090,8 +3118,8 @@ if (!function_exists('RemoveKeyFromArray')) {
     }
 }
 
-if (!function_exists('RemoveKeysFromNestedArray')) {
-    function RemoveKeysFromNestedArray($Array, $Matches) {
+if (!function_exists('removeKeysFromNestedArray')) {
+    function removeKeysFromNestedArray($Array, $Matches) {
         if (is_array($Array)) {
             foreach ($Array as $Key => $Value) {
                 $IsMatch = false;
@@ -3124,14 +3152,14 @@ if (!function_exists('RemoveKeysFromNestedArray')) {
     }
 }
 
-if (!function_exists('RemoveQuoteSlashes')) {
-    function RemoveQuoteSlashes($String) {
+if (!function_exists('removeQuoteSlashes')) {
+    function removeQuoteSlashes($String) {
         return str_replace("\\\"", '"', $String);
     }
 }
 
-if (!function_exists('RemoveValueFromArray')) {
-    function RemoveValueFromArray(&$Array, $Value) {
+if (!function_exists('removeValueFromArray')) {
+    function removeValueFromArray(&$Array, $Value) {
         foreach ($Array as $key => $val) {
             if ($val == $Value) {
                 unset($Array[$key]);
@@ -3141,8 +3169,8 @@ if (!function_exists('RemoveValueFromArray')) {
     }
 }
 
-if (!function_exists('SafeGlob')) {
-    function SafeGlob($Pattern, $Extensions = array()) {
+if (!function_exists('safeGlob')) {
+    function safeGlob($Pattern, $Extensions = array()) {
         $Result = glob($Pattern);
         if (!is_array($Result)) {
             $Result = array();
@@ -3164,15 +3192,16 @@ if (!function_exists('SafeGlob')) {
     }
 }
 
-if (!function_exists('SafeImage')) {
+if (!function_exists('safeImage')) {
     /**
      * Examines the provided url & checks to see if there is a valid image on the other side. Optionally you can specify minimum dimensions.
+     *
      * @param string $ImageUrl Full url (including http) of the image to examine.
      * @param int $MinHeight Minimum height (in pixels) of image. 0 means any height.
      * @param int $MinWidth Minimum width (in pixels) of image. 0 means any width.
      * @return mixed The url of the image if safe, false otherwise.
      */
-    function SafeImage($ImageUrl, $MinHeight = 0, $MinWidth = 0) {
+    function safeImage($ImageUrl, $MinHeight = 0, $MinWidth = 0) {
         try {
             list($Width, $Height, $Type, $Attributes) = getimagesize($ImageUrl);
             if ($MinHeight > 0 && $MinHeight < $Height) {
@@ -3189,8 +3218,8 @@ if (!function_exists('SafeImage')) {
     }
 }
 
-if (!function_exists('SafeParseStr')) {
-    function SafeParseStr($Str, &$Output, $Original = null) {
+if (!function_exists('safeParseStr')) {
+    function safeParseStr($Str, &$Output, $Original = null) {
         $Exploded = explode('&', $Str);
         $Output = array();
         if (is_array($Original)) {
@@ -3215,14 +3244,14 @@ if (!function_exists('SafeParseStr')) {
 }
 
 
-if (!function_exists('SafeRedirect')) {
+if (!function_exists('safeRedirect')) {
     /**
      * Redirect, but only to a safe domain.
      *
      * @param string $Destination Where to redirect.
      * @param int $StatusCode
      */
-    function SafeRedirect($Destination = false, $StatusCode = null) {
+    function safeRedirect($Destination = false, $StatusCode = null) {
         if (!$Destination) {
             $Destination = Url('', true);
         } else {
@@ -3238,7 +3267,7 @@ if (!function_exists('SafeRedirect')) {
     }
 }
 
-if (!function_exists('SaveToConfig')) {
+if (!function_exists('saveToConfig')) {
     /**
      * Save values to the application's configuration file.
      *
@@ -3251,13 +3280,13 @@ if (!function_exists('SaveToConfig')) {
      *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
      * @return bool: Whether or not the save was successful. null if no changes were necessary.
      */
-    function SaveToConfig($Name, $Value = '', $Options = array()) {
+    function saveToConfig($Name, $Value = '', $Options = array()) {
         Gdn::Config()->SaveToConfig($Name, $Value, $Options);
     }
 }
 
 
-if (!function_exists('SetAppCookie')) {
+if (!function_exists('setAppCookie')) {
 
     /**
      * Set a cookie withe the appropriate application cookie prefix and other cookie information.
@@ -3267,7 +3296,7 @@ if (!function_exists('SetAppCookie')) {
      * @param int $Expire
      * @param bool $Force Whether or not to set the cookie even if already exists.
      */
-    function SetAppCookie($Name, $Value, $Expire = 0, $Force = false) {
+    function setAppCookie($Name, $Value, $Expire = 0, $Force = false) {
         $Px = C('Garden.Cookie.Name');
         $Key = "$Px-$Name";
 
@@ -3290,9 +3319,10 @@ if (!function_exists('SetAppCookie')) {
     }
 }
 
-if (!function_exists('SliceParagraph')) {
+if (!function_exists('sliceParagraph')) {
     /**
      * Slices a string at a paragraph.
+     *
      * This function will attempt to slice a string at paragraph that is no longer than the specified maximum length.
      * If it can't slice the string at a paragraph it will attempt to slice on a sentence.
      *
@@ -3304,7 +3334,7 @@ if (!function_exists('SliceParagraph')) {
      * @param string $Suffix The suffix if the string must be sliced mid-sentence.
      * @return string
      */
-    function SliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
+    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
         if ($MaxLength >= strlen($String)) {
             return $String;
         }
@@ -3350,8 +3380,8 @@ if (!function_exists('SliceParagraph')) {
     }
 }
 
-if (!function_exists('SliceString')) {
-    function SliceString($String, $Length, $Suffix = '…') {
+if (!function_exists('sliceString')) {
+    function sliceString($String, $Length, $Suffix = '…') {
         if (!$Length) {
             return $String;
         }
@@ -3369,11 +3399,11 @@ if (!function_exists('SliceString')) {
     }
 }
 
-if (!function_exists('SmartAsset')) {
+if (!function_exists('smartAsset')) {
     /**
-     * Takes the path to an asset (image, js file, css file, etc) and prepends the webroot.
+     * Takes the path to an asset (image, js file, css file, etc) and prepends the web root.
      */
-    function SmartAsset($Destination = '', $WithDomain = false, $AddVersion = false) {
+    function smartAsset($Destination = '', $WithDomain = false, $AddVersion = false) {
         $Destination = str_replace('\\', '/', $Destination);
         if (IsUrl($Destination)) {
             $Result = $Destination;
@@ -3420,16 +3450,17 @@ if (!function_exists('SmartAsset')) {
     }
 }
 
-if (!function_exists('StringBeginsWith')) {
-    /** Checks whether or not string A begins with string B.
+if (!function_exists('stringBeginsWith')) {
+    /**
+     * Checks whether or not string A begins with string B.
      *
      * @param string $Haystack The main string to check.
      * @param string $Needle The substring to check against.
      * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
-     * @param bool Whether or not to trim $B off of $A if it is found.
+     * @param bool $Trim Whether or not to trim $B off of $A if it is found.
      * @return bool|string Returns true/false unless $Trim is true.
      */
-    function StringBeginsWith($Haystack, $Needle, $CaseInsensitive = false, $Trim = false) {
+    function stringBeginsWith($Haystack, $Needle, $CaseInsensitive = false, $Trim = false) {
         if (strlen($Haystack) < strlen($Needle)) {
             return $Trim ? $Haystack : false;
         } elseif (strlen($Needle) == 0) {
@@ -3447,16 +3478,17 @@ if (!function_exists('StringBeginsWith')) {
     }
 }
 
-if (!function_exists('StringEndsWith')) {
-    /** Checks whether or not string A ends with string B.
+if (!function_exists('stringEndsWith')) {
+    /**
+     * Checks whether or not string A ends with string B.
      *
      * @param string $Haystack The main string to check.
      * @param string $Needle The substring to check against.
      * @param bool $CaseInsensitive Whether or not the comparison should be case insensitive.
-     * @param bool Whether or not to trim $B off of $A if it is found.
+     * @param bool $Trim Whether or not to trim $B off of $A if it is found.
      * @return bool|string Returns true/false unless $Trim is true.
      */
-    function StringEndsWith($Haystack, $Needle, $CaseInsensitive = false, $Trim = false) {
+    function stringEndsWith($Haystack, $Needle, $CaseInsensitive = false, $Trim = false) {
         if (strlen($Haystack) < strlen($Needle)) {
             return $Trim ? $Haystack : false;
         } elseif (strlen($Needle) == 0) {
@@ -3474,55 +3506,56 @@ if (!function_exists('StringEndsWith')) {
     }
 }
 
-if (!function_exists('StringIsNullOrEmpty')) {
-    /** Checks whether or not a string is null or an empty string (after trimming).
+if (!function_exists('stringIsNullOrEmpty')) {
+    /**
+     * Checks whether or not a string is null or an empty string (after trimming).
      *
      * @param string $String The string to check.
      * @return bool
      */
-    function StringIsNullOrEmpty($String) {
+    function stringIsNullOrEmpty($String) {
         return is_null($String) === true || (is_string($String) && trim($String) == '');
     }
 }
 
 
-if (!function_exists('SetValue')) {
+if (!function_exists('setValue')) {
     /**
      * Set the value on an object/array.
      *
      * @param string $Needle The key or property name of the value.
-     * @param mixed $Haystack The array or object to set.
+     * @param mixed &$Haystack The array or object to set.
      * @param mixed $Value The value to set.
      */
-    function SetValue($Key, &$Collection, $Value) {
-        if (is_array($Collection)) {
-            $Collection[$Key] = $Value;
-        } elseif (is_object($Collection)) {
-            $Collection->$Key = $Value;
+    function setValue($Needle, &$Haystack, $Value) {
+        if (is_array($Haystack)) {
+            $Haystack[$Needle] = $Value;
+        } elseif (is_object($Haystack)) {
+            $Haystack->$Needle = $Value;
         }
     }
 }
 
 
-if (!function_exists('T')) {
+if (!function_exists('t')) {
     /**
      * Translates a code into the selected locale's definition.
      *
      * @param string $Code The code related to the language-specific definition.
-     *   Codes thst begin with an '@' symbol are treated as literals and not translated.
+     *   Codes that begin with an '@' symbol are treated as literals and not translated.
      * @param string $Default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $Code if there is no value in $Default.
      * @see Gdn::Translate()
      */
-    function T($Code, $Default = false) {
+    function t($Code, $Default = false) {
         return Gdn::Translate($Code, $Default);
     }
 }
 
-if (!function_exists('TranslateContent')) {
+if (!function_exists('translateContent')) {
     /**
      * Translates user-generated content into the selected locale's definition. Currently just an
-     * alias for T().
+     * alias for t().
      *
      * @param string $Code The code related to the language-specific definition.
      *   Codes thst begin with an '@' symbol are treated as literals and not translated.
@@ -3530,37 +3563,37 @@ if (!function_exists('TranslateContent')) {
      * @return string The translated string or $Code if there is no value in $Default.
      * @see Gdn::Translate()
      */
-    function TranslateContent($Code, $Default = false) {
-        return T($Code, $Default);
+    function translateContent($Code, $Default = false) {
+        return t($Code, $Default);
     }
 }
 
-if (!function_exists('Theme')) {
-    function Theme() {
+if (!function_exists('theme')) {
+    function theme() {
         return Gdn::ThemeManager()->CurrentTheme();
     }
 }
 
-if (!function_exists('TouchValue')) {
+if (!function_exists('touchValue')) {
     /**
      * Set the value on an object/array if it doesn't already exist.
      *
      * @param string $Key The key or property name of the value.
-     * @param mixed $Collection The array or object to set.
+     * @param mixed &$Collection The array or object to set.
      * @param mixed $Default The value to set.
      */
-    function TouchValue($Key, &$Collection, $Default) {
+    function touchValue($Key, &$Collection, $Default) {
         if (is_array($Collection) && !array_key_exists($Key, $Collection)) {
             $Collection[$Key] = $Default;
         } elseif (is_object($Collection) && !property_exists($Collection, $Key)) {
             $Collection->$Key = $Default;
         }
 
-        return GetValue($Key, $Collection);
+        return val($Key, $Collection);
     }
 }
 
-if (!function_exists('TouchFolder')) {
+if (!function_exists('touchFolder')) {
     /**
      * Ensure that a folder exists.
      *
@@ -3568,15 +3601,15 @@ if (!function_exists('TouchFolder')) {
      * @param int $Perms
      * @since 2.1
      */
-    function TouchFolder($Path, $Perms = 0777) {
+    function touchFolder($Path, $Perms = 0777) {
         if (!file_exists($Path)) {
             mkdir($Path, $Perms, true);
         }
     }
 }
 
-if (!function_exists('Trace')) {
-    function Trace($Value = null, $Type = TRACE_INFO) {
+if (!function_exists('trace')) {
+    function trace($Value = null, $Type = TRACE_INFO) {
         static $Traces = array();
 
         if ($Value === null) {
@@ -3589,24 +3622,25 @@ if (!function_exists('Trace')) {
     }
 }
 
-if (!function_exists('TrueStripSlashes')) {
+if (!function_exists('trueStripSlashes')) {
     if (get_magic_quotes_gpc()) {
-        function TrueStripSlashes($String) {
+        function trueStripSlashes($String) {
             return stripslashes($String);
         }
     } else {
-        function TrueStripSlashes($String) {
+        function trueStripSlashes($String) {
             return $String;
         }
     }
 }
 
-if (!function_exists('TrustedDomains')) {
+if (!function_exists('trustedDomains')) {
     /**
      * Get an array of all of the trusted domains in the application.
+     *
      * @return array
      */
-    function TrustedDomains() {
+    function trustedDomains() {
         $Result = C('Garden.TrustedDomains', array());
         if (!is_array($Result)) {
             $Result = explode("\n", $Result);
@@ -3709,7 +3743,7 @@ if (!function_exists('viewLocation')) {
 if (!function_exists('passwordStrength')) {
 
     /**
-     * Check a password's strength
+     * Check a password's strength.
      *
      * Returns an analysis of the supplied password, comprised of an array with
      * the following keys:
@@ -3719,7 +3753,6 @@ if (!function_exists('passwordStrength')) {
      *    Length
      *    Entropy
      *    Score
-     *
      *
      * @param string $Password
      * @param string $Username

@@ -1125,15 +1125,15 @@ if (!function_exists('domGetImages')) {
     }
 }
 
-if (!function_exists('ForceIPv4')) {
+if (!function_exists('forceIPv4')) {
     /**
      * Force a string into ipv4 notation.
      *
-     * @param string $IP
-     * @return string
+     * @param string $IP The IP address to force.
+     * @return string Returns the IPv4 address version of {@link IP}.
      * @since 2.1
      */
-    function ForceIPv4($IP) {
+    function forceIPv4($IP) {
         if ($IP === '::1') {
             return '127.0.0.1';
         } elseif (strpos($IP, ':') === true) {

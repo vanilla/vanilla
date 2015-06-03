@@ -2726,7 +2726,7 @@ class UserModel extends Gdn_Model {
         if (!is_array($AllIPs))
             $AllIPs = array();
         if ($IP = GetValue('InsertIPAddress', $User))
-            array_unshift($AllIPs, ForceIPv4($IP));
+            array_unshift($AllIPs, forceIPv4($IP));
         if ($IP = GetValue('LastIPAddress', $User))
             array_unshift($AllIPs, $IP);
         // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
@@ -3463,7 +3463,7 @@ class UserModel extends Gdn_Model {
             if (is_string($v)) {
                 $IPAddresses = explode(',', $v);
                 foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = ForceIPv4($IPAddress);
+                    $IPAddresses[$i] = forceIPv4($IPAddress);
                 }
                 SetValue('AllIPAddresses', $User, $IPAddresses);
             }
@@ -3975,7 +3975,7 @@ class UserModel extends Gdn_Model {
 
         if (isset($Property['AllIPAddresses'])) {
             if (is_array($Property['AllIPAddresses'])) {
-                $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
+                $IPs = array_map('forceIPv4', $Property['AllIPAddresses']);
                 $IPs = array_unique($IPs);
                 $Property['AllIPAddresses'] = implode(',', $IPs);
                 // Ensure this isn't too big for our column

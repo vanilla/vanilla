@@ -67,7 +67,7 @@ class UserController extends DashboardController {
         $this->Form->Method = 'get';
 
         // Input Validation.
-        list($Offset, $Limit) = OffsetLimit($Page, PagerModule::$DefaultPageSize);
+        list($Offset, $Limit) = offsetLimit($Page, PagerModule::$DefaultPageSize);
         if (!$Keywords) {
             $Keywords = $this->Form->GetFormValue('Keywords');
             if ($Keywords) {
@@ -86,7 +86,7 @@ class UserController extends DashboardController {
 
         $UserModel = new UserModel();
         //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
-        list($Offset, $Limit) = OffsetLimit($Page, 30);
+        list($Offset, $Limit) = offsetLimit($Page, 30);
 
         $Filter = $this->_GetFilter();
         if ($Filter) {

@@ -110,7 +110,7 @@ class ProfileController extends Gdn_Controller {
         $this->ActivityModel = new ActivityModel();
 
         // Calculate offset.
-        list($Offset, $Limit) = OffsetLimit($Page, 30);
+        list($Offset, $Limit) = offsetLimit($Page, 30);
 
         // Get user, tab, and comment
         $this->GetUserInfo($UserReference, $Username, $UserID);
@@ -537,7 +537,7 @@ class ProfileController extends Gdn_Controller {
         $this->Permission('Garden.SignIn.Allow');
         $this->EditMode(FALSE);
 
-        list($Offset, $Limit) = OffsetLimit($Page, 30);
+        list($Offset, $Limit) = offsetLimit($Page, 30);
 
         $this->GetUserInfo();
         $this->_SetBreadcrumbs(T('Notifications'), '/profile/notifications');

@@ -138,7 +138,7 @@ class CommentModel extends VanillaModel {
         $this->EventArguments['Offset'] =& $Offset;
         $this->FireEvent('BeforeGet');
 
-        $Page = PageNumber($Offset, $Limit);
+        $Page = pageNumber($Offset, $Limit);
         $PageWhere = $this->PageWhere($DiscussionID, $Page, $Limit);
 
         if ($PageWhere) {
@@ -1111,7 +1111,7 @@ class CommentModel extends VanillaModel {
 
         $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
         $Limit = C('Vanilla.Comments.PerPage', 30);
-        $PageCount = PageNumber($CountComments, $Limit) + 1;
+        $PageCount = pageNumber($CountComments, $Limit) + 1;
 
         for ($Page = $From; $Page <= $PageCount; $Page++) {
             $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";

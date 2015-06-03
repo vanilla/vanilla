@@ -566,7 +566,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
 
         $PageSize = Gdn::Config('Vanilla.Discussions.PerPage', 30);
-        list($Offset, $Limit) = OffsetLimit($Page, $PageSize);
+        list($Offset, $Limit) = offsetLimit($Page, $PageSize);
 
         $CommentModel = new CommentModel();
         $Comments = $CommentModel->GetByUser2($Sender->User->UserID, $Limit, $Offset, $Sender->Request->Get('lid'));
@@ -624,7 +624,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
         $Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
 
-        list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+        list($Offset, $Limit) = offsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
 
         $DiscussionModel = new DiscussionModel();
         $Discussions = $DiscussionModel->GetByUser($Sender->User->UserID, $Limit, $Offset, FALSE, Gdn::Session()->UserID);

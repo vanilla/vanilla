@@ -76,7 +76,7 @@ class SearchController extends Gdn_Controller {
         SaveToConfig('Garden.Format.EmbedSize', '160x90', FALSE);
         Gdn_Theme::Section('SearchResults');
 
-        list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
+        list($Offset, $Limit) = offsetLimit($Page, C('Garden.Search.PerPage', 20));
         $this->SetData('_Limit', $Limit);
 
         $Search = $this->Form->GetFormValue('Search');

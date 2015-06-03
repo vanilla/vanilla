@@ -160,7 +160,7 @@ class MorePagerModule extends PagerModule {
     public static function FormatUrl($Url, $Offset, $Limit = '') {
         // Check for new style page.
         if (strpos($Url, '{Page}') !== FALSE || strpos($Url, '{Offset}') !== FALSE) {
-            $Page = PageNumber($Offset, $Limit, TRUE);
+            $Page = pageNumber($Offset, $Limit, TRUE);
             return str_replace(array('{Offset}', '{Page}', '{Size}'), array($Offset, $Page, $Limit), $Url);
         } else
             return self::FormatUrl($Url, $Page, $Limit);

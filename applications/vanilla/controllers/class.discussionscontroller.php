@@ -69,8 +69,8 @@ class DiscussionsController extends VanillaController {
         }
 
         // Determine offset from $Page
-        list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30), TRUE);
-        $Page = PageNumber($Offset, $Limit);
+        list($Offset, $Limit) = offsetLimit($Page, C('Vanilla.Discussions.PerPage', 30), TRUE);
+        $Page = pageNumber($Offset, $Limit);
 
         // Allow page manipulation
         $this->EventArguments['Page'] = &$Page;
@@ -79,7 +79,7 @@ class DiscussionsController extends VanillaController {
         $this->FireEvent('AfterPageCalculation');
 
         // Set canonical URL
-        $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
+        $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', pageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
 
         // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
         $MaxPages = C('Vanilla.Discussions.MaxPages');
@@ -191,8 +191,8 @@ class DiscussionsController extends VanillaController {
         Gdn_Theme::Section('DiscussionList');
 
         // Determine offset from $Page
-        list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-        $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'unread', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
+        list($Page, $Limit) = offsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'unread', pageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
 
         // Validate $Page
         if (!is_numeric($Page) || $Page < 0)
@@ -314,8 +314,8 @@ class DiscussionsController extends VanillaController {
         }
 
         // Determine offset from $Page
-        list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-        $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'bookmarked', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
+        list($Page, $Limit) = offsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'bookmarked', pageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
 
         // Validate $Page
         if (!is_numeric($Page) || $Page < 0)
@@ -414,7 +414,7 @@ class DiscussionsController extends VanillaController {
         Gdn_Theme::Section('DiscussionList');
 
         // Set criteria & get discussions data
-        list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        list($Offset, $Limit) = offsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
         $Session = Gdn::Session();
         $Wheres = array('d.InsertUserID' => $Session->UserID);
         $DiscussionModel = new DiscussionModel();

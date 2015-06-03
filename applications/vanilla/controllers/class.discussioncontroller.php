@@ -70,7 +70,7 @@ class DiscussionController extends VanillaController {
         $Limit = C('Vanilla.Comments.PerPage', 30);
 
         $OffsetProvided = $Page != '';
-        list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+        list($Offset, $Limit) = offsetLimit($Page, $Limit);
 
         // Check permissions
         $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
@@ -131,14 +131,14 @@ class DiscussionController extends VanillaController {
         $this->SetData('_LatestItem', $LatestItem);
 
         // Set the canonical url to have the proper page title.
-        $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, 0, FALSE)));
+        $this->CanonicalUrl(DiscussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, FALSE)));
 
 //      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
 
         // Load the comments
         $this->SetData('Comments', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset));
 
-        $PageNumber = PageNumber($this->Offset, $Limit);
+        $PageNumber = pageNumber($this->Offset, $Limit);
         $this->SetData('Page', $PageNumber);
         $this->_SetOpenGraph();
 
@@ -149,7 +149,7 @@ class DiscussionController extends VanillaController {
             // Add images to head for open graph
             $Dom = str_get_html(Gdn_Format::To($this->Discussion->Body, $this->Discussion->Format));
         } else {
-            $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
+            $this->Data['Title'] .= sprintf(T(' - Page %s'), pageNumber($this->Offset, $Limit));
 
             $FirstComment = $this->Data('Comments')->FirstRow();
             $FirstBody = GetValue('Body', $FirstComment);
@@ -327,7 +327,7 @@ class DiscussionController extends VanillaController {
         $Offset = $this->CommentModel->GetOffset($Comment);
         $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
 
-        $PageNumber = PageNumber($Offset, $Limit, TRUE);
+        $PageNumber = pageNumber($Offset, $Limit, TRUE);
         $this->SetData('Page', $PageNumber);
 
         $this->View = 'index';
@@ -805,7 +805,7 @@ body { background: transparent !important; }
                 $Limit = C('Garden.Embed.CommentsPerPage', 30);
 
             $OffsetProvided = $Offset != '';
-            list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
+            list($Offset, $Limit) = offsetLimit($Offset, $Limit);
             $this->Offset = $Offset;
             if (C('Vanilla.Comments.AutoOffset')) {
                 if ($ActualResponses <= $Limit)
@@ -820,7 +820,7 @@ body { background: transparent !important; }
                 $this->Offset = 0;
 
             // Set the canonical url to have the proper page title.
-            $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
+            $this->CanonicalUrl(DiscussionUrl($Discussion, pageNumber($this->Offset, $Limit)));
 
             // Load the comments.
             $CurrentOrderBy = $this->CommentModel->OrderBy();

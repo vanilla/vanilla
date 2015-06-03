@@ -2220,48 +2220,48 @@ if (!function_exists('now')) {
     }
 }
 
-if (!function_exists('OffsetLimit')) {
+if (!function_exists('offsetLimit')) {
     /**
      * Convert various forms of querystring limit/offset, page, limit/range to database limit/offset.
      *
-     * @param string $OffsetOrPage The page query in one of the following formats:
+     * @param string $offsetOrPage The page query in one of the following formats:
      *  - p<x>: Get page x.
      *  - <x>-<y>: This is a range viewing records x through y.
      *  - <x>lim<n>: This is a limit/offset pair.
      *  - <x>: This is a limit where offset is given in the next parameter.
-     * @param int $LimitOrPageSize The page size or limit.
+     * @param int $limitOrPageSize The page size or limit.
      */
-    function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '', $Throw = false) {
-        $LimitOrPageSize = is_numeric($LimitOrPageSize) ? (int)$LimitOrPageSize : 50;
+    function offsetLimit($offsetOrPage = '', $limitOrPageSize = '', $throw = false) {
+        $limitOrPageSize = is_numeric($limitOrPageSize) ? (int)$limitOrPageSize : 50;
 
-        if (is_numeric($OffsetOrPage)) {
-            $Offset = (int)$OffsetOrPage;
-            $Limit = $LimitOrPageSize;
-        } elseif (preg_match('/p(\d+)/i', $OffsetOrPage, $Matches)) {
+        if (is_numeric($offsetOrPage)) {
+            $Offset = (int)$offsetOrPage;
+            $Limit = $limitOrPageSize;
+        } elseif (preg_match('/p(\d+)/i', $offsetOrPage, $Matches)) {
             $Page = $Matches[1];
-            $Offset = $LimitOrPageSize * ($Page - 1);
-            $Limit = $LimitOrPageSize;
-        } elseif (preg_match('/(\d+)-(\d+)/', $OffsetOrPage, $Matches)) {
+            $Offset = $limitOrPageSize * ($Page - 1);
+            $Limit = $limitOrPageSize;
+        } elseif (preg_match('/(\d+)-(\d+)/', $offsetOrPage, $Matches)) {
             $Offset = $Matches[1] - 1;
             $Limit = $Matches[2] - $Matches[1] + 1;
-        } elseif (preg_match('/(\d+)lim(\d*)/i', $OffsetOrPage, $Matches)) {
+        } elseif (preg_match('/(\d+)lim(\d*)/i', $offsetOrPage, $Matches)) {
             $Offset = (int)$Matches[1];
             $Limit = (int)$Matches[2];
             if (!is_numeric($Limit)) {
-                $Limit = $LimitOrPageSize;
+                $Limit = $limitOrPageSize;
             }
-        } elseif (preg_match('/(\d+)lin(\d*)/i', $OffsetOrPage, $Matches)) {
+        } elseif (preg_match('/(\d+)lin(\d*)/i', $offsetOrPage, $Matches)) {
             $Offset = $Matches[1] - 1;
             $Limit = (int)$Matches[2];
             if (!is_numeric($Limit)) {
-                $Limit = $LimitOrPageSize;
+                $Limit = $limitOrPageSize;
             }
-        } elseif ($OffsetOrPage && $Throw) {
+        } elseif ($offsetOrPage && $throw) {
             // Some unrecognized page string was passed.
             throw NotFoundException();
         } else {
             $Offset = 0;
-            $Limit = $LimitOrPageSize;
+            $Limit = $limitOrPageSize;
         }
 
         if ($Offset < 0) {
@@ -2275,26 +2275,26 @@ if (!function_exists('OffsetLimit')) {
     }
 }
 
-if (!function_exists('PageNumber')) {
+if (!function_exists('pageNumber')) {
     /**
      * Get the page number from a database offset and limit.
      *
-     * @param int $Offset The database offset, starting at zero.
-     * @param int $Limit The database limit, otherwise known as the page size.
-     * @param bool|string $UrlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
+     * @param int $offset The database offset, starting at zero.
+     * @param int $limit The database limit, otherwise known as the page size.
+     * @param bool|string $urlParam Whether or not the result should be formatted as a url parameter, suitable for OffsetLimit.
      *  - bool: true means yes, false means no.
      *  - string: The prefix for the page number.
-     * @param bool $First Whether or not to return the page number if it is the first page.
+     * @param bool $first Whether or not to return the page number if it is the first page.
      */
-    function PageNumber($Offset, $Limit, $UrlParam = false, $First = true) {
-        $Result = floor($Offset / $Limit) + 1;
+    function pageNumber($offset, $limit, $urlParam = false, $first = true) {
+        $Result = floor($offset / $limit) + 1;
 
-        if ($UrlParam !== false && !$First && $Result == 1) {
+        if ($urlParam !== false && !$first && $Result == 1) {
             $Result = '';
-        } elseif ($UrlParam === true) {
+        } elseif ($urlParam === true) {
             $Result = 'p'.$Result;
-        } elseif (is_string($UrlParam)) {
-            $Result = $UrlParam.$Result;
+        } elseif (is_string($urlParam)) {
+            $Result = $urlParam.$Result;
         }
 
         return $Result;

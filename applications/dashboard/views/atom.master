@@ -1,7 +1,7 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
    <title><?php echo $this->Head->Title(); ?></title>
-   <link href="<?php echo Url('', TRUE, TRUE); ?>"/>
+   <link rel="alternate" type="text/html" hreflang="<?php echo Gdn::Locale()->Locale; ?>" href="<?php echo Url('', true, true); ?>"/>
    <updated><?php echo date(DATE_ATOM); ?></updated>
    
    <?php

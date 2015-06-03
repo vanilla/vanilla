@@ -36,13 +36,15 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      *
      * @param $Row
      */
-    protected static function _Calculate(&$Row) {
-        if (!$Row)
+    protected static function calculate(&$Row) {
+        if (!$Row) {
             return;
+        }
 
         $Attributes = @unserialize($Row['Attributes']);
-        if (is_array($Attributes))
+        if (is_array($Attributes)) {
             $Row = array_merge($Attributes, $Row);
+        }
         unset($Row['Attributes']);
     }
 
@@ -51,10 +53,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      *
      * @return array
      */
-    public static function GetDefault() {
+    public static function getDefault() {
         $Rows = self::GetWhereStatic(array('IsDefault' => 1));
-        if (empty($Rows))
-            return FALSE;
+        if (empty($Rows)) {
+            return false;
+        }
         return array_pop($Rows);
     }
 
@@ -63,7 +66,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      *
      * @return array|null|type
      */
-    public function GetProviders() {
+    public function getProviders() {
         $this->SQL
             ->Select('uap.*')
             ->From('UserAuthenticationProvider uap');
@@ -79,7 +82,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         $Data = $this->SQL->Get()->ResultArray();
         $Data = Gdn_DataSet::Index($Data, array('AuthenticationKey'));
         foreach ($Data as &$Row) {
-            self::_Calculate($Row);
+            self::calculate($Row);
         }
         return $Data;
     }
@@ -90,7 +93,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @param $AuthenticationProviderKey
      * @return array|bool|stdClass
      */
-    public static function GetProviderByKey($AuthenticationProviderKey) {
+    public static function getProviderByKey($AuthenticationProviderKey) {
         $ProviderData = Gdn::SQL()
             ->Select('uap.*')
             ->From('UserAuthenticationProvider uap')
@@ -98,7 +101,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             ->Get()
             ->FirstRow(DATASET_TYPE_ARRAY);
 
-        self::_Calculate($ProviderData);
+        self::calculate($ProviderData);
 
         return $ProviderData;
     }
@@ -109,7 +112,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @param $AuthenticationProviderURL
      * @return array|bool|stdClass
      */
-    public static function GetProviderByURL($AuthenticationProviderURL) {
+    public static function getProviderByURL($AuthenticationProviderURL) {
         $ProviderData = Gdn::SQL()
             ->Select('uap.*')
             ->From('UserAuthenticationProvider uap')
@@ -117,7 +120,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             ->Get()
             ->FirstRow(DATASET_TYPE_ARRAY);
 
-        self::_Calculate($ProviderData);
+        self::calculate($ProviderData);
 
         return $ProviderData;
     }
@@ -129,23 +132,26 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @param null $UserID
      * @return array|bool|stdClass
      */
-    public static function GetProviderByScheme($AuthenticationSchemeAlias, $UserID = NULL) {
+    public static function getProviderByScheme($AuthenticationSchemeAlias, $UserID = null) {
         $ProviderQuery = Gdn::SQL()
             ->Select('uap.*')
             ->From('UserAuthenticationProvider uap')
             ->Where('uap.AuthenticationSchemeAlias', $AuthenticationSchemeAlias);
 
-        if (!is_null($UserID) && $UserID)
-            $ProviderQuery->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')->Where('ua.UserID', $UserID);
+        if (!is_null($UserID) && $UserID) {
+            $ProviderQuery
+                ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
+                ->Where('ua.UserID', $UserID);
+        }
 
         $ProviderData = $ProviderQuery->Get();
         if ($ProviderData->NumRows()) {
             $Result = $ProviderData->FirstRow(DATASET_TYPE_ARRAY);
-            self::_Calculate($Result);
+            self::calculate($Result);
             return $Result;
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -158,10 +164,10 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @param bool $Offset
      * @return array|null
      */
-    public static function GetWhereStatic($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+    public static function getWhereStatic($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         $Data = Gdn::SQL()->GetWhere('UserAuthenticationProvider', $Where, $OrderFields, $OrderDirection, $Limit, $Offset)->ResultArray();
         foreach ($Data as &$Row) {
-            self::_Calculate($Row);
+            self::calculate($Row);
         }
         return $Data;
     }
@@ -173,9 +179,9 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @param bool $Settings
      * @return bool
      */
-    public function Save($Data, $Settings = FALSE) {
+    public function save($Data, $Settings = false) {
         // Grab the current record.
-        $Row = FALSE;
+        $Row = false;
         if (isset($Data[$this->PrimaryKey]))
             $Row = $this->GetWhere(array($this->PrimaryKey => $Data[$this->PrimaryKey]))->FirstRow(DATASET_TYPE_ARRAY);
         elseif ($PK = GetValue('PK', $Settings)) {
@@ -202,18 +208,19 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         }
 
         // Validate the form posted values
-        if ($this->Validate($Data, $Insert) === TRUE) {
+        if ($this->Validate($Data, $Insert) === true) {
             // Clear the default from other authentication providers.
             $Default = GetValue('IsDefault', $Data);
             if ($Default) {
                 $this->SQL->Put(
                     $this->Name,
                     array('IsDefault' => 0),
-                    array('AuthenticationKey <>' => GetValue('AuthenticationKey', $Data)));
+                    array('AuthenticationKey <>' => GetValue('AuthenticationKey', $Data))
+                );
             }
 
             $Fields = $this->Validation->ValidationFields();
-            if ($Insert === FALSE) {
+            if ($Insert === false) {
                 $PrimaryKeyVal = $Row[$this->PrimaryKey];
                 $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
 
@@ -221,9 +228,8 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
                 $PrimaryKeyVal = $this->Insert($Fields);
             }
         } else {
-            $PrimaryKeyVal = FALSE;
+            $PrimaryKeyVal = false;
         }
         return $PrimaryKeyVal;
     }
-
 }

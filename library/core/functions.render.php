@@ -12,8 +12,9 @@ if (!function_exists('Alternate')) {
     function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class') {
         static $i = 0;
         $Value = $i++ % 2 ? $Odd : $Even;
-        if ($Value != '' && $Even == '' && $AttributeName)
+        if ($Value != '' && $Even == '' && $AttributeName) {
             $Value = ' '.$AttributeName.'="'.$Value.'"';
+        }
         return $Value;
     }
 }
@@ -63,8 +64,9 @@ if (!function_exists('ButtonDropDown')):
         }
 
         $ButtonClass = '';
-        if (is_array($CssClass))
+        if (is_array($CssClass)) {
             list($CssClass, $ButtonClass) = $CssClass;
+        }
 
         if (count($Links) < 2) {
             $Link = array_pop($Links);
@@ -116,8 +118,9 @@ if (!function_exists('ButtonGroup')):
         $Url = $Links[0]['Url'];
 
         $ButtonClass = '';
-        if (is_array($CssClass))
+        if (is_array($CssClass)) {
             list($CssClass, $ButtonClass) = $CssClass;
+        }
 
         if ($Default && count($Links) > 1) {
             if (is_array($Default)) {
@@ -135,8 +138,9 @@ if (!function_exists('ButtonGroup')):
                 }
             }
 
-            if (isset($DefaultText))
+            if (isset($DefaultText)) {
                 $Text = $DefaultText;
+            }
         }
 
         if (count($Links) < 2) {
@@ -179,8 +183,10 @@ if (!function_exists('Category')):
 
         if (!$Category) {
             $Category = Gdn::Controller()->Data('CategoryID');
-            if ($Category)
+            if ($Category) {
                 $Category = CategoryModel::Categories($Category);
+            }
+        }
         if (!$Category) {
             return null;
         }
@@ -210,8 +216,9 @@ if (!function_exists('CategoryUrl')):
      * @return string
      */
     function CategoryUrl($Category, $Page = '', $WithDomain = true) {
-        if (is_string($Category))
+        if (is_string($Category)) {
             $Category = CategoryModel::Categories($Category);
+        }
         $Category = (array)$Category;
 
         $Result = '/categories/'.rawurlencode($Category['UrlCode']);
@@ -274,31 +281,37 @@ if (!function_exists('CssClass')):
         $Session = Gdn::Session();
 
         // Alt rows
-        if ($Alt)
+        if ($Alt) {
             $CssClass .= ' Alt';
+        }
         $Alt = !$Alt;
 
         // Category list classes
-        if (array_key_exists('UrlCode', $Row))
+        if (array_key_exists('UrlCode', $Row)) {
             $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
-        if (GetValue('CssClass', $Row))
+        }
+        if (GetValue('CssClass', $Row)) {
             $CssClass .= ' Item-'.$Row['CssClass'];
+        }
 
-        if (array_key_exists('Depth', $Row))
+        if (array_key_exists('Depth', $Row)) {
             $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
+        }
 
-        if (array_key_exists('Archive', $Row))
+        if (array_key_exists('Archive', $Row)) {
             $CssClass .= ' Archived';
+        }
 
         // Discussion list classes.
         if ($InList) {
             $CssClass .= GetValue('Bookmarked', $Row) == '1' ? ' Bookmarked' : '';
 
             $Announce = GetValue('Announce', $Row);
-            if ($Announce == 2)
+            if ($Announce == 2) {
                 $CssClass .= ' Announcement Announcement-Category';
-            elseif ($Announce)
+            } elseif ($Announce) {
                 $CssClass .= ' Announcement Announcement-Everywhere';
+            }
 
             $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
             $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
@@ -319,16 +332,19 @@ if (!function_exists('CssClass')):
         }
 
         // Comment list classes
-        if (array_key_exists('CommentID', $Row))
+        if (array_key_exists('CommentID', $Row)) {
             $CssClass .= ' ItemComment';
-        else if (array_key_exists('DiscussionID', $Row))
+        } elseif (array_key_exists('DiscussionID', $Row)) {
             $CssClass .= ' ItemDiscussion';
+        }
 
-        if (function_exists('IsMeAction'))
+        if (function_exists('IsMeAction')) {
             $CssClass .= IsMeAction($Row) ? ' MeAction' : '';
+        }
 
-        if ($_CssClss = GetValue('_CssClass', $Row))
+        if ($_CssClss = GetValue('_CssClass', $Row)) {
             $CssClass .= ' '.$_CssClss;
+        }
 
         // Insert User classes.
         if ($UserID = GetValue('InsertUserID', $Row)) {
@@ -353,17 +369,19 @@ if (!function_exists('DateUpdated')):
             $Result = '';
 
             $UpdateUser = Gdn::UserModel()->GetID($UpdateUserID);
-            if ($UpdateUser)
+            if ($UpdateUser) {
                 $Title = sprintf(T('Edited %s by %s.'), Gdn_Format::DateFull($DateUpdated), GetValue('Name', $UpdateUser));
-            else
+            } else {
                 $Title = sprintf(T('Edited %s.'), Gdn_Format::DateFull($DateUpdated));
+            }
 
             $Result = ' <span title="'.htmlspecialchars($Title).'" class="DateUpdated">'.
                 sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).
                 '</span> ';
 
-            if ($Wrap)
+            if ($Wrap) {
                 $Result = $Wrap[0].$Result.$Wrap[1];
+            }
         }
 
         return $Result;
@@ -379,14 +397,17 @@ if (!function_exists('Anchor')) {
      * Builds and returns an anchor tag.
      */
     function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = false) {
-        if (!is_array($CssClass) && $CssClass != '')
+        if (!is_array($CssClass) && $CssClass != '') {
             $CssClass = array('class' => $CssClass);
+        }
 
-        if ($Destination == '' && $ForceAnchor === false)
+        if ($Destination == '' && $ForceAnchor === false) {
             return $Text;
+        }
 
-        if (!is_array($Attributes))
+        if (!is_array($Attributes)) {
             $Attributes = array();
+        }
 
         $SSL = null;
         if (isset($Attributes['SSL'])) {
@@ -401,8 +422,9 @@ if (!function_exists('Anchor')) {
         }
 
         $Prefix = substr($Destination, 0, 7);
-        if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === false))
+        if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === false)) {
             $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
+        }
 
         return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
     }
@@ -438,8 +460,9 @@ if (!function_exists('DiscussionUrl')):
         }
         $Result = '/discussion/'.$Discussion->DiscussionID.'/'.$Name;
         if ($Page) {
-            if ($Page > 1 || Gdn::Session()->UserID)
+            if ($Page > 1 || Gdn::Session()->UserID) {
                 $Result .= '/p'.$Page;
+            }
         }
         return Url($Result, $WithDomain);
     }
@@ -468,8 +491,9 @@ if (!function_exists('FixNl2Br')) {
  */
 if (!function_exists('FormatPossessive')) {
     function FormatPossessive($Word) {
-        if (function_exists('FormatPossessiveCustom'))
+        if (function_exists('FormatPossessiveCustom')) {
             return FormatPossesiveCustom($Word);
+        }
 
         return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
     }
@@ -477,8 +501,9 @@ if (!function_exists('FormatPossessive')) {
 
 if (!function_exists('FormatUsername')) {
     function FormatUsername($User, $Format, $ViewingUserID = false) {
-        if ($ViewingUserID === false)
+        if ($ViewingUserID === false) {
             $ViewingUserID = Gdn::Session()->UserID;
+        }
         $UserID = GetValue('UserID', $User);
         $Name = GetValue('Name', $User);
         $Gender = strtolower(GetValue('Gender', $User));
@@ -488,15 +513,16 @@ if (!function_exists('FormatUsername')) {
 
         switch (strtolower($Format)) {
             case 'you':
-                if ($ViewingUserID == $UserID)
+                if ($ViewingUserID == $UserID) {
                     return T("Format $Format", $Format);
+                }
                 return $Name;
             case 'his':
             case 'her':
             case 'your':
-                if ($ViewingUserID == $UserID)
+                if ($ViewingUserID == $UserID) {
                     return T("Format Your", 'Your');
-                else {
+                } else {
                     switch ($Gender) {
                         case 'm':
                             $Format = 'his';
@@ -508,10 +534,12 @@ if (!function_exists('FormatUsername')) {
                             $Format = 'their';
                             break;
                     }
-                    if ($UCFirst)
+                    if ($UCFirst) {
                         $Format = ucfirst($Format);
+                    }
                     return T("Format $Format", $Format);
                 }
+                break;
             default:
                 return $Name;
         }
@@ -609,10 +637,11 @@ if (!function_exists('IPAnchor')) {
      * Returns an IP address with a link to the user search.
      */
     function IPAnchor($IP, $CssClass = '') {
-        if ($IP)
+        if ($IP) {
             return Anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
-        else
+        } else {
             return $IP;
+        }
     }
 }
 
@@ -639,8 +668,9 @@ if (!function_exists('Plural')) {
     function Plural($Number, $Singular, $Plural, $FormattedNumber = false) {
         // Make sure to fix comma-formatted numbers
         $WorkingNumber = str_replace(',', '', $Number);
-        if ($FormattedNumber === false)
+        if ($FormattedNumber === false) {
             $FormattedNumber = $Number;
+        }
 
         $Format = T(abs($WorkingNumber) == 1 ? $Singular : $Plural);
 
@@ -661,33 +691,38 @@ if (!function_exists('PluralTranslate')) {
      * @since 2.1
      */
     function PluralTranslate($Number, $Singular, $Plural, $SingularDefault = false, $PluralDefault = false) {
-        if ($Number == 1)
+        if ($Number == 1) {
             return T($Singular, $SingularDefault);
-        else
+        } else {
             return T($Plural, $PluralDefault);
+        }
     }
 }
 
 if (!function_exists('SearchExcerpt')):
 
     function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
-        if (empty($SearchTerms))
+        if (empty($SearchTerms)) {
             return substrWord($PlainText, 0, $Length);
+        }
 
-        if (is_string($SearchTerms))
+        if (is_string($SearchTerms)) {
             $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
+        }
 
         // Split the string into lines.
         $Lines = explode("\n", $PlainText);
         // Find the first line that includes a search term.
         foreach ($Lines as $i => &$Line) {
             $Line = trim($Line);
-            if (!$Line)
+            if (!$Line) {
                 continue;
+            }
 
             foreach ($SearchTerms as $Term) {
-                if (!$Term)
+                if (!$Term) {
                     continue;
+                }
 
                 if (($Pos = mb_stripos($Line, $Term)) !== false) {
                     $Line = substrWord($Line, $Term, $Length);
@@ -710,8 +745,9 @@ if (!function_exists('SearchExcerpt')):
 
         // No line was found so return the first non-blank line.
         foreach ($Lines as $Line) {
-            if ($Line)
+            if ($Line) {
                 return SliceString($Line, $Length);
+            }
         }
     }
 
@@ -722,35 +758,39 @@ if (!function_exists('SearchExcerpt')):
 
             $p = $pos + strlen($start);
 
-            if ($pos !== false && (($pos + strlen($start)) <= $length))
+            if ($pos !== false && (($pos + strlen($start)) <= $length)) {
                 $start = 0;
-            else
+            } else {
                 $start = $pos - $length / 4;
+            }
         }
 
         // Find the word break from the offset.
         if ($start > 0) {
             $pos = mb_strpos($str, ' ', $start);
-            if ($pos !== false)
+            if ($pos !== false) {
                 $start = $pos;
+            }
         } elseif ($start < 0) {
             $pos = mb_strrpos($str, ' ', $start);
-            if ($pos !== false)
+            if ($pos !== false) {
                 $start = $pos;
-            else
+            } else {
                 $start = 0;
+            }
         }
 
         $len = strlen($str);
 
         if ($start + $length > $len) {
-            if ($length - $start <= 0)
+            if ($length - $start <= 0) {
                 $start = 0;
-            else {
+            } else {
                 // Zoom the offset back a bit.
                 $pos = mb_strpos($str, ' ', max(0, $len - $length));
-                if ($pos === false)
+                if ($pos === false) {
                     $pos = $len - $length;
+                }
             }
         }
 
@@ -766,14 +806,16 @@ endif;
 if (!function_exists('UserAnchor')) {
     function UserAnchor($User, $CssClass = null, $Options = null) {
         static $NameUnique = null;
-        if ($NameUnique === null)
+        if ($NameUnique === null) {
             $NameUnique = C('Garden.Registration.NameUnique');
+        }
 
         if (is_array($CssClass)) {
             $Options = $CssClass;
             $CssClass = null;
-        } elseif (is_string($Options))
+        } elseif (is_string($Options)) {
             $Options = array('Px' => $Options);
+        }
 
         $Px = GetValue('Px', $Options, '');
 
@@ -785,8 +827,9 @@ if (!function_exists('UserAnchor')) {
             'class' => $CssClass,
             'rel' => GetValue('Rel', $Options)
         );
-        if (isset($Options['title']))
+        if (isset($Options['title'])) {
             $Attributes['title'] = $Options['title'];
+        }
         $UserUrl = UserUrl($User, $Px);
         return '<a href="'.htmlspecialchars(Url($UserUrl)).'"'.Attribute($Attributes).'>'.$Text.'</a>';
     }
@@ -822,13 +865,15 @@ if (!function_exists('UserPhoto')) {
      * @param array $Options
      */
     function UserPhoto($User, $Options = array()) {
-        if (is_string($Options))
+        if (is_string($Options)) {
             $Options = array('LinkClass' => $Options);
+        }
 
-        if ($Px = GetValue('Px', $Options))
+        if ($Px = GetValue('Px', $Options)) {
             $User = UserBuilder($User, $Px);
-        else
+        } else {
             $User = (object)$User;
+        }
 
         $LinkClass = ConcatSep(' ', GetValue('LinkClass', $Options, ''), 'PhotoWrap');
         $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto');
@@ -843,8 +888,9 @@ if (!function_exists('UserPhoto')) {
 
         $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
         $UserCssClass = GetValue('_CssClass', $FullUser);
-        if ($UserCssClass)
+        if ($UserCssClass) {
             $LinkClass .= ' '.$UserCssClass;
+        }
 
         $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
@@ -857,8 +903,9 @@ if (!function_exists('UserPhoto')) {
             $Title .= ' ('.T('Banned').')';
         }
 
-        if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+        if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
             $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+        }
 
         if ($Photo) {
             if (!isUrl($Photo)) {
@@ -889,8 +936,9 @@ if (!function_exists('UserPhotoUrl')) {
             $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
         }
 
-        if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+        if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
             $Photo = UserPhotoDefaultUrl($User);
+        }
 
         if ($Photo) {
             if (!isUrl($Photo)) {
@@ -915,8 +963,9 @@ if (!function_exists('UserUrl')) {
      */
     function UserUrl($User, $Px = '', $Method = '', $Get = false) {
         static $NameUnique = null;
-        if ($NameUnique === null)
+        if ($NameUnique === null) {
             $NameUnique = C('Garden.Registration.NameUnique');
+        }
 
         $UserName = GetValue($Px.'Name', $User);
         $UserName = preg_replace('/([\?&]+)/', '', $UserName);
@@ -926,8 +975,9 @@ if (!function_exists('UserUrl')) {
             ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
             rawurlencode($UserName);
 
-        if ($Get)
+        if ($Get) {
             $Result .= '?'.http_build_query($Get);
+        }
 
         return $Result;
     }
@@ -939,11 +989,13 @@ if (!function_exists('UserUrl')) {
  */
 if (!function_exists('Wrap')) {
     function Wrap($String, $Tag = 'span', $Attributes = '') {
-        if ($Tag == '')
+        if ($Tag == '') {
             return $String;
+        }
 
-        if (is_array($Attributes))
+        if (is_array($Attributes)) {
             $Attributes = Attribute($Attributes);
+        }
 
         // Strip the first part of the tag as the closing tag - this allows us to
         // easily throw 'span class="something"' into the $Tag field.
@@ -964,10 +1016,11 @@ if (!function_exists('WrapIf')) {
      * @since 2.1
      */
     function WrapIf($String, $Tag = 'span', $Attributes = '') {
-        if (empty($String))
+        if (empty($String)) {
             return '';
-        else
+        } else {
             return Wrap($String, $Tag, $Attributes);
+        }
     }
 }
 
@@ -1117,10 +1170,11 @@ if (!function_exists('WriteReactions')):
             echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {
-                if (is_callable($Flag))
+                if (is_callable($Flag)) {
                     echo '<li>'.call_user_func($Flag, $Row, $RecordType, $ID).'</li>';
-                else
+                } else {
                     echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+                }
             }
             Gdn::Controller()->FireEvent('AfterFlagOptions');
             echo '</ul>';

@@ -483,7 +483,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @throws type
      */
     public function PostController_GooglePlus_Create($Sender, $RecordType, $ID) {
-        $Row = GetRecord($RecordType, $ID);
+        $Row = getRecord($RecordType, $ID);
         if ($Row) {
             $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
 

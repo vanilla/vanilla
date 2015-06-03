@@ -1665,7 +1665,7 @@ if (!function_exists('getMentions')) {
     }
 }
 
-if (!function_exists('GetObject')) {
+if (!function_exists('getObject')) {
     /**
      * Get a value off of an object.
      *
@@ -1673,34 +1673,35 @@ if (!function_exists('GetObject')) {
      * @param object $Object The object that contains the value.
      * @param mixed $Default The default to return if the object doesn't contain the property.
      * @return mixed
-     * @deprecated GetObject() is deprecated. Use val() instead.
+     * @deprecated getObject() is deprecated. Use val() instead.
      */
-    function GetObject($Property, $Object, $Default) {
+    function getObject($Property, $Object, $Default) {
         trigger_error('GetObject() is deprecated. Use GetValue() instead.', E_USER_DEPRECATED);
         $Result = val($Property, $Object, $Default);
         return $Result;
     }
 }
 
-if (!function_exists('GetPostValue')) {
+if (!function_exists('getPostValue')) {
     /**
      * Return the value for $FieldName from the $_POST collection.
+     *
      * @deprecated
      */
-    function GetPostValue($FieldName, $Default = false) {
+    function getPostValue($FieldName, $Default = false) {
         return array_key_exists($FieldName, $_POST) ? $_POST[$FieldName] : $Default;
     }
 }
 
-if (!function_exists('GetRecord')) {
+if (!function_exists('getRecord')) {
 
-    function GetRecord($RecordType, $ID, $ThrowError = false) {
+    function getRecord($recordType, $id, $throw = false) {
         $Row = false;
 
-        switch (strtolower($RecordType)) {
+        switch (strtolower($recordType)) {
             case 'discussion':
                 $Model = new DiscussionModel();
-                $Row = $Model->GetID($ID);
+                $Row = $Model->GetID($id);
                 $Row->Url = DiscussionUrl($Row);
                 $Row->ShareUrl = $Row->Url;
                 if ($Row) {
@@ -1709,9 +1710,9 @@ if (!function_exists('GetRecord')) {
                 break;
             case 'comment':
                 $Model = new CommentModel();
-                $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
-                    $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", true);
+                    $Row['Url'] = Url("/discussion/comment/$id#Comment_$id", true);
 
                     $Model = new DiscussionModel();
                     $Discussion = $Model->GetID($Row['DiscussionID']);
@@ -1726,7 +1727,7 @@ if (!function_exists('GetRecord')) {
                 break;
             case 'activity':
                 $Model = new ActivityModel();
-                $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Name'] = formatString($Row['HeadlineFormat'], $Row);
                     $Row['Body'] = $Row['Story'];
@@ -1734,11 +1735,11 @@ if (!function_exists('GetRecord')) {
                 }
                 break;
             default:
-                throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
+                throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($recordType)));
         }
 
-        if ($ThrowError) {
-            throw NotFoundException($RecordType);
+        if ($throw) {
+            throw NotFoundException($recordType);
         } else {
             return false;
         }
@@ -1746,28 +1747,28 @@ if (!function_exists('GetRecord')) {
 
 }
 
-if (!function_exists('GetValue')) {
+if (!function_exists('getValue')) {
     /**
      * Return the value from an associative array or an object.
      *
-     * @param string $Key The key or property name of the value.
-     * @param mixed &$Collection The array or object to search.
-     * @param mixed $Default The value to return if the key does not exist.
-     * @param bool $Remove Whether or not to remove the item from the collection.
+     * @param string $key The key or property name of the value.
+     * @param mixed &$collection The array or object to search.
+     * @param mixed $default The value to return if the key does not exist.
+     * @param bool $remove Whether or not to remove the item from the collection.
      * @return mixed The value from the array or object.
      * @deprecated Deprecated since 2.2. Use {@link val()} instead.
      */
-    function GetValue($Key, &$Collection, $Default = false, $Remove = false) {
-        $Result = $Default;
-        if (is_array($Collection) && array_key_exists($Key, $Collection)) {
-            $Result = $Collection[$Key];
-            if ($Remove) {
-                unset($Collection[$Key]);
+    function getValue($key, &$collection, $default = false, $remove = false) {
+        $Result = $default;
+        if (is_array($collection) && array_key_exists($key, $collection)) {
+            $Result = $collection[$key];
+            if ($remove) {
+                unset($collection[$key]);
             }
-        } elseif (is_object($Collection) && property_exists($Collection, $Key)) {
-            $Result = $Collection->$Key;
-            if ($Remove) {
-                unset($Collection->$Key);
+        } elseif (is_object($collection) && property_exists($collection, $key)) {
+            $Result = $collection->$key;
+            if ($remove) {
+                unset($collection->$key);
             }
         }
 
@@ -1775,22 +1776,22 @@ if (!function_exists('GetValue')) {
     }
 }
 
-if (!function_exists('GetValueR')) {
+if (!function_exists('getValueR')) {
     /**
      * Return the value from an associative array or an object.
      *
      * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used
      * to recursively traverse the collection.
      *
-     * @param string $Key The key or property name of the value.
-     * @param mixed $Collection The array or object to search.
-     * @param mixed $Default The value to return if the key does not exist.
+     * @param string $key The key or property name of the value.
+     * @param mixed $collection The array or object to search.
+     * @param mixed $default The value to return if the key does not exist.
      * @return mixed The value from the array or object.
      */
-    function GetValueR($Key, $Collection, $Default = false) {
-        $Path = explode('.', $Key);
+    function getValueR($key, $collection, $default = false) {
+        $Path = explode('.', $key);
 
-        $Value = $Collection;
+        $Value = $collection;
         for ($i = 0; $i < count($Path); ++$i) {
             $SubKey = $Path[$i];
 
@@ -1799,7 +1800,7 @@ if (!function_exists('GetValueR')) {
             } elseif (is_object($Value) && isset($Value->$SubKey)) {
                 $Value = $Value->$SubKey;
             } else {
-                return $Default;
+                return $default;
             }
         }
         return $Value;

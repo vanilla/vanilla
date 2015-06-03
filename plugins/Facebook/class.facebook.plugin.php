@@ -290,7 +290,7 @@ class FacebookPlugin extends Gdn_Plugin {
             throw PermissionException();
         }
 
-        $Row = GetRecord($RecordType, $ID, TRUE);
+        $Row = getRecord($RecordType, $ID, TRUE);
         if ($Row) {
             $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
 

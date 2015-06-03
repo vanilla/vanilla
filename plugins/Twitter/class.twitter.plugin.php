@@ -372,7 +372,7 @@ class TwitterPlugin extends Gdn_Plugin {
 //      if (!Gdn::Request()->IsPostBack())
 //         throw PermissionException('Javascript');
 
-        $Row = GetRecord($RecordType, $ID, TRUE);
+        $Row = getRecord($RecordType, $ID, TRUE);
         if ($Row) {
             // Grab the tweet message.
             switch (strtolower($RecordType)) {

@@ -1639,12 +1639,12 @@ if (!function_exists('getIncomingValue')) {
     }
 }
 
-if (!function_exists('GetMentions')) {
+if (!function_exists('getMentions')) {
     /**
      * @param $String
      * @return array
      */
-    function GetMentions($String) {
+    function getMentions($String) {
         // Check for a custom mentions formatter and use it.
         $Formatter = Gdn::Factory('MentionsFormatter');
         if (is_object($Formatter)) {

@@ -1011,7 +1011,7 @@ class CommentModel extends VanillaModel {
             }
 
             // Notify any users who were mentioned in the comment.
-            $Usernames = GetMentions($Fields['Body']);
+            $Usernames = getMentions($Fields['Body']);
             foreach ($Usernames as $i => $Username) {
                 $User = $UserModel->GetByUsername($Username);
                 if (!$User) {

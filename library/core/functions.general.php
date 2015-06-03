@@ -329,8 +329,9 @@ if (!function_exists('arrayTranslate')) {
 
         if ($AddRemaining) {
             foreach ($Array as $Key => $Value) {
-                if (!isset($Result[$Key]))
+                if (!isset($Result[$Key])) {
                     $Result[$Key] = $Value;
+                }
             }
         }
 
@@ -464,8 +465,9 @@ if (!function_exists('attribute')) {
             $Exclude = $ValueOrExclude;
         }
         foreach ($Name as $Attribute => $Val) {
-            if ($Exclude && StringBeginsWith($Attribute, $Exclude))
+            if ($Exclude && StringBeginsWith($Attribute, $Exclude)) {
                 continue;
+            }
 
             if ($Val != '' && $Attribute != 'Standard') {
                 $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"';
@@ -502,8 +504,9 @@ if (!function_exists('cTo')) {
         $Current =& $Data;
 
         foreach ($Name as $Key) {
-            if (!isset($Current[$Key]))
+            if (!isset($Current[$Key])) {
                 $Current[$Key] = array();
+            }
 
             $Current =& $Current[$Key];
         }
@@ -767,15 +770,19 @@ if (!function_exists('dateCompare')) {
      * @since 2.1
      */
     function dateCompare($Date1, $Date2) {
-        if (!is_numeric($Date1))
+        if (!is_numeric($Date1)) {
             $Date1 = strtotime($Date1);
-        if (!is_numeric($Date2))
+        }
+        if (!is_numeric($Date2)) {
             $Date2 = strtotime($Date2);
+        }
 
-        if ($Date1 == $Date2)
+        if ($Date1 == $Date2) {
             return 0;
-        if ($Date1 > $Date2)
+        }
+        if ($Date1 > $Date2) {
             return 1;
+        }
         return -1;
     }
 }
@@ -803,14 +810,15 @@ if (!function_exists('debugMethod')) {
         echo $MethodName."(";
         $SA = array();
         foreach ($MethodArgs as $FuncArg) {
-            if (is_null($FuncArg))
+            if (is_null($FuncArg)) {
                 $SA[] = 'null';
-            elseif (!is_array($FuncArg) && !is_object($FuncArg))
+            } elseif (!is_array($FuncArg) && !is_object($FuncArg)) {
                 $SA[] = "'{$FuncArg}'";
-            elseif (is_array($FuncArg))
+            } elseif (is_array($FuncArg)) {
                 $SA[] = "'Array(".sizeof($FuncArg).")'";
-            else
+            } else {
                 $SA[] = gettype($FuncArg)."/".get_class($FuncArg);
+            }
         }
         echo implode(', ', $SA);
         echo ")\n";
@@ -826,8 +834,9 @@ if (!function_exists('Deprecated')) {
      */
     function Deprecated($Name, $NewName = false) {
         $Msg = $Name.' is deprecated.';
-        if ($NewName)
+        if ($NewName) {
             $Msg .= " Use $NewName instead.";
+        }
 
         trigger_error($Msg, E_USER_DEPRECATED);
     }
@@ -858,10 +867,11 @@ if (!function_exists('ExternalUrl')) {
     function ExternalUrl($Path) {
         $Format = C('Garden.ExternalUrlFormat');
 
-        if ($Format && !StringBeginsWith($Path, 'http'))
+        if ($Format && !StringBeginsWith($Path, 'http')) {
             $Result = sprintf($Format, ltrim($Path, '/'));
-        else
+        } else {
             $Result = Url($Path, true);
+        }
 
         return $Result;
     }
@@ -884,8 +894,9 @@ if (!function_exists('FetchPageInfo')) {
             'Exception' => false
         );
         try {
-            if (!defined('HDOM_TYPE_ELEMENT'))
+            if (!defined('HDOM_TYPE_ELEMENT')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
+            }
 
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
@@ -893,8 +904,9 @@ if (!function_exists('FetchPageInfo')) {
                 'Timeout' => $Timeout
             ));
             $Dom = str_get_html($PageHtml);
-            if (!$Dom)
+            if (!$Dom) {
                 throw new Exception('Failed to load page for parsing.');
+            }
 
             /* Sample Facebook Open Graph code:
 
@@ -915,13 +927,15 @@ if (!function_exists('FetchPageInfo')) {
             Trace('Getting og:description');
             $PageInfo['Description'] = DomGetContent($Dom, 'meta[property=og:description]');
             foreach ($Dom->find('meta[property=og:image]') as $Image) {
-                if (isset($Image->content))
+                if (isset($Image->content)) {
                     $PageInfo['Images'][] = $Image->content;
+                }
             }
 
             // SECOND PASS: Look in the page for title, desc, images
-            if ($PageInfo['Title'] == '')
+            if ($PageInfo['Title'] == '') {
                 $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
+            }
 
             if ($PageInfo['Description'] == '') {
                 Trace('Getting meta description');
@@ -938,8 +952,9 @@ if (!function_exists('FetchPageInfo')) {
                         break;
                     }
                 }
-                if (strlen($PageInfo['Description']) > 400)
+                if (strlen($PageInfo['Description']) > 400) {
                     $PageInfo['Description'] = SliceParagraph($PageInfo['Description'], 400);
+                }
             }
 
             // Final: Still nothing? remove limitations
@@ -992,8 +1007,9 @@ if (!function_exists('DomGetImages')) {
         foreach ($Images as $ImageInfo) {
             $Image = $ImageInfo['Src'];
 
-            if (strpos($Image, 'doubleclick.') != false)
+            if (strpos($Image, 'doubleclick.') != false) {
                 continue;
+            }
 
             try {
                 if ($ImageInfo['Height'] && $ImageInfo['Width']) {
@@ -1007,16 +1023,19 @@ if (!function_exists('DomGetImages')) {
 
 //            Gdn::Controller()->Data['Foo'][] = array($Image, $Width, $Height, $Diag);
 
-                if (!$Width || !$Height)
+                if (!$Width || !$Height) {
                     continue;
+                }
 
                 // Require min 100x100 dimension image.
-                if ($Width < 100 && $Height < 100)
+                if ($Width < 100 && $Height < 100) {
                     continue;
+                }
 
                 // Don't take a banner-shaped image.
-                if ($Height * 4 < $Width)
+                if ($Height * 4 < $Width) {
                     continue;
+                }
 
                 // Prefer images that are less than 800px wide (banners?)
 //            if ($Diag > 141 && $Width < 800) { }
@@ -1030,8 +1049,9 @@ if (!function_exists('DomGetImages')) {
 
                 $i++;
 
-                if ($i > $MaxImages)
+                if ($i > $MaxImages) {
                     break;
+                }
             } catch (Exception $ex) {
                 // do nothing
             }
@@ -1121,8 +1141,9 @@ if (!function_exists('_FormatStringCallback')) {
         }
 
         $Match = $Match[1];
-        if ($Match == '{')
+        if ($Match == '{') {
             return $Match;
+        }
 
         // Parse out the field and format.
         $Parts = explode(',', $Match);
@@ -1188,18 +1209,21 @@ if (!function_exists('_FormatStringCallback')) {
                     }
                     break;
                 case 'plural':
-                    if (is_array($Value))
+                    if (is_array($Value)) {
                         $Value = count($Value);
-                    elseif (StringEndsWith($Field, 'UserID', true))
+                    } elseif (StringEndsWith($Field, 'UserID', true)) {
                         $Value = 1;
+                    }
 
                     if (!is_numeric($Value)) {
                         $Result = $Value;
                     } else {
-                        if (!$SubFormat)
+                        if (!$SubFormat) {
                             $SubFormat = rtrim("%s $Field", 's');
-                        if (!$FormatArgs)
+                        }
+                        if (!$FormatArgs) {
                             $FormatArgs = $SubFormat.'s';
+                        }
 
                         $Result = Plural($Value, $SubFormat, $FormatArgs);
                     }
@@ -1214,13 +1238,15 @@ if (!function_exists('_FormatStringCallback')) {
                     $Result = Gdn_Format::Date($Value, '%l:%M%p');
                     break;
                 case 'url':
-                    if (strpos($Field, '/') !== false)
+                    if (strpos($Field, '/') !== false) {
                         $Value = $Field;
+                    }
                     $Result = Url($Value, $SubFormat == 'domain');
                     break;
                 case 'exurl':
-                    if (strpos($Field, '/') !== false)
+                    if (strpos($Field, '/') !== false) {
                         $Value = $Field;
+                    }
                     $Result = ExternalUrl($Value);
                     break;
                 case 'urlencode':
@@ -1228,16 +1254,17 @@ if (!function_exists('_FormatStringCallback')) {
                     break;
                 case 'gender':
                     // Format in the form of FieldName,gender,male,female,unknown[,plural]
-
-                    if (is_array($Value) && count($Value) == 1)
+                    if (is_array($Value) && count($Value) == 1) {
                         $Value = array_shift($Value);
+                    }
 
                     $Gender = 'u';
 
                     if (!is_array($Value)) {
                         $User = Gdn::UserModel()->GetID($Value);
-                        if ($User)
+                        if ($User) {
                             $Gender = $User->Gender;
+                        }
                     } else {
                         $Gender = 'p';
                     }
@@ -1264,8 +1291,9 @@ if (!function_exists('_FormatStringCallback')) {
                 case 'your':
                     $Result = print_r($Value, true);
                     $ArgsBak = $Args;
-                    if (is_array($Value) && count($Value) == 1)
+                    if (is_array($Value) && count($Value) == 1) {
                         $Value = array_shift($Value);
+                    }
 
                     if (is_array($Value)) {
                         if (isset($Value['UserID'])) {
@@ -1355,8 +1383,9 @@ if (!function_exists('ForceSSL')) {
      */
     function ForceSSL() {
         if (C('Garden.AllowSSL')) {
-            if (Gdn::Request()->Scheme() != 'https')
+            if (Gdn::Request()->Scheme() != 'https') {
                 Redirect(Gdn::Request()->Url('', true, true));
+            }
         }
     }
 }
@@ -1369,8 +1398,9 @@ if (!function_exists('ForceNoSSL')) {
      * work.
      */
     function ForceNoSSL() {
-        if (Gdn::Request()->Scheme() != 'http')
+        if (Gdn::Request()->Scheme() != 'http') {
             Redirect(Gdn::Request()->Url('', true, false));
+        }
     }
 }
 
@@ -1442,8 +1472,9 @@ if (!function_exists('getallheaders')) {
      */
     function getallheaders() {
         foreach ($_SERVER as $name => $value)
-            if (substr($name, 0, 5) == 'HTTP_')
+            if (substr($name, 0, 5) == 'HTTP_') {
                 $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
         return $headers;
     }
 }
@@ -1468,8 +1499,9 @@ if (!function_exists('GetConnectionString')) {
         $Port = count($HostName) == 2 ? $HostName[1] : '';
         $HostName = $HostName[0];
         $String = $ServerType.':host='.$HostName;
-        if ($Port != '')
+        if ($Port != '') {
             $String .= ';port='.$Port;
+        }
         return $String .= ';dbname='.$DatabaseName;
     }
 }
@@ -1582,10 +1614,11 @@ if (!function_exists('GetRecord')) {
                 throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
         }
 
-        if ($ThrowError)
+        if ($ThrowError) {
             throw NotFoundException($RecordType);
-        else
+        } else {
             return false;
+        }
     }
 
 }
@@ -1605,12 +1638,14 @@ if (!function_exists('GetValue')) {
         $Result = $Default;
         if (is_array($Collection) && array_key_exists($Key, $Collection)) {
             $Result = $Collection[$Key];
-            if ($Remove)
+            if ($Remove) {
                 unset($Collection[$Key]);
+            }
         } elseif (is_object($Collection) && property_exists($Collection, $Key)) {
             $Result = $Collection->$Key;
-            if ($Remove)
+            if ($Remove) {
                 unset($Collection->$Key);
+            }
         }
 
         return $Result;
@@ -1681,10 +1716,18 @@ if (!function_exists('HtmlEntityDecode')):
      */
 
     function chr_utf8($num) {
-        if ($num < 128) return chr($num);
-        if ($num < 2048) return chr(($num >> 6) + 192).chr(($num & 63) + 128);
-        if ($num < 65536) return chr(($num >> 12) + 224).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
-        if ($num < 2097152) return chr(($num >> 18) + 240).chr((($num >> 12) & 63) + 128).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
+        if ($num < 128) {
+            return chr($num);
+        }
+        if ($num < 2048) {
+            return chr(($num >> 6) + 192).chr(($num & 63) + 128);
+        }
+        if ($num < 65536) {
+            return chr(($num >> 12) + 224).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
+        }
+        if ($num < 2097152) {
+            return chr(($num >> 18) + 240).chr((($num >> 12) & 63) + 128).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
+        }
         return '';
     }
 
@@ -1703,8 +1746,9 @@ if (!function_exists('ImplodeAssoc')) {
         $Result = '';
 
         foreach ($Array as $Key => $Value) {
-            if (strlen($Result) > 0)
+            if (strlen($Result) > 0) {
                 $Result .= $ElementGlue;
+            }
 
             $Result .= $Key.$KeyGlue.$Value;
         }
@@ -1719,8 +1763,9 @@ if (!function_exists('InArrayI')) {
     function InArrayI($Needle, $Haystack) {
         $Needle = strtolower($Needle);
         foreach ($Haystack as $Item) {
-            if (strtolower($Item) == $Needle)
+            if (strtolower($Item) == $Needle) {
                 return true;
+            }
         }
         return false;
     }
@@ -1732,8 +1777,9 @@ if (!function_exists('InSubArray')) {
      */
     function InSubArray($Needle, $Haystack) {
         foreach ($Haystack as $Key => $Val) {
-            if (is_array($Val) && in_array($Needle, $Val))
+            if (is_array($Val) && in_array($Needle, $Val)) {
                 return true;
+            }
         }
         return false;
     }
@@ -1794,8 +1840,9 @@ if (!function_exists('IsSearchEngine')) {
         $HttpUserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER, ''));
         if ($HttpUserAgent != '') {
             foreach ($Engines as $Engine) {
-                if (strpos($HttpUserAgent, $Engine) !== false)
+                if (strpos($HttpUserAgent, $Engine) !== false) {
                     return true;
+                }
             }
         }
         return false;
@@ -1821,12 +1868,15 @@ if (!function_exists('IsUrl')) {
      * @since 2.1
      */
     function IsUrl($Str) {
-        if (!$Str)
+        if (!$Str) {
             return false;
-        if (substr($Str, 0, 2) == '//')
+        }
+        if (substr($Str, 0, 2) == '//') {
             return true;
-        if (preg_match('`^https?://`i', $Str))
+        }
+        if (preg_match('`^https?://`i', $Str)) {
             return true;
+        }
         return false;
     }
 }
@@ -1849,13 +1899,15 @@ if (!function_exists('IsWritable')) {
         // Check tmp file for read/write capabilities
         $KeepPath = file_exists($Path);
         $File = @fopen($Path, 'a');
-        if ($File === false)
+        if ($File === false) {
             return false;
+        }
 
         fclose($File);
 
-        if (!$KeepPath)
+        if (!$KeepPath) {
             unlink($Path);
+        }
 
         return true;
     }
@@ -1870,16 +1922,19 @@ if (!function_exists('MarkString')):
      *    2.2   $Needle can now be an array of terms.
      */
     function MarkString($Needle, $Haystack) {
-        if (!$Needle)
+        if (!$Needle) {
             return $Haystack;
-        if (!is_array($Needle))
+        }
+        if (!is_array($Needle)) {
             $Needle = explode(' ', $Needle);
+        }
 
         foreach ($Needle as $n) {
-            if (strlen($n) <= 2 && preg_match('`^\w+$`', $n))
+            if (strlen($n) <= 2 && preg_match('`^\w+$`', $n)) {
                 $word = '\b';
-            else
+            } else {
                 $word = '';
+            }
 
             $Haystack = preg_replace('#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
         }
@@ -1908,8 +1963,9 @@ if (!function_exists('JoinRecords')):
 
         // Gather all of the ids to fetch.
         foreach ($Data as &$Row) {
-            if (!$Row['RecordType'])
+            if (!$Row['RecordType']) {
                 continue;
+            }
 
             $RecordType = ucfirst(StringEndsWith($Row['RecordType'], '-Total', true, true));
             $Row['RecordType'] = $RecordType;
@@ -1965,10 +2021,11 @@ if (!function_exists('JoinRecords')):
             }
             $Record['Url'] = $Url;
 
-            if ($Column)
+            if ($Column) {
                 $Row[$Column] = $Record;
-            else
+            } else {
                 $Row = array_merge($Row, $Record);
+            }
         }
 
         foreach ($Unsets as $Index) {
@@ -1978,8 +2035,9 @@ if (!function_exists('JoinRecords')):
         // Join the users.
         Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
 
-        if (!empty($Unsets))
+        if (!empty($Unsets)) {
             $Data = array_values($Data);
+        }
     }
 
 endif;
@@ -2057,10 +2115,12 @@ if (!function_exists('OffsetLimit')) {
             $Limit = $LimitOrPageSize;
         }
 
-        if ($Offset < 0)
+        if ($Offset < 0) {
             $Offset = 0;
-        if ($Limit < 0)
+        }
+        if ($Limit < 0) {
             $Limit = 50;
+        }
 
         return array($Offset, $Limit);
     }
@@ -2079,12 +2139,13 @@ if (!function_exists('PageNumber')) {
     function PageNumber($Offset, $Limit, $UrlParam = false, $First = true) {
         $Result = floor($Offset / $Limit) + 1;
 
-        if ($UrlParam !== false && !$First && $Result == 1)
+        if ($UrlParam !== false && !$First && $Result == 1) {
             $Result = '';
-        elseif ($UrlParam === true)
+        } elseif ($UrlParam === true) {
             $Result = 'p'.$Result;
-        elseif (is_string($UrlParam))
+        } elseif (is_string($UrlParam)) {
             $Result = $UrlParam.$Result;
+        }
 
         return $Result;
     }
@@ -2150,12 +2211,14 @@ if (!function_exists('TouchConfig')):
 
         $Save = array();
         foreach ($Name as $Key => $Value) {
-            if (!C($Key))
+            if (!C($Key)) {
                 $Save[$Key] = $Value;
+            }
         }
 
-        if (!empty($Save))
+        if (!empty($Save)) {
             SaveToConfig($Save);
+        }
     }
 endif;
 
@@ -2266,15 +2329,18 @@ if (!function_exists('BuildUrl')) {
         }
 
         if ($Parts['path'] != '') {
-            if (substr($Parts['path'], 0, 1) != '/')
+            if (substr($Parts['path'], 0, 1) != '/') {
                 $Return .= '/';
+            }
             $Return .= $Parts['path'];
         }
-        if ($Parts['query'] != '')
+        if ($Parts['query'] != '') {
             $Return .= '?'.$Parts['query'];
+        }
 
-        if ($Parts['fragment'] != '')
+        if ($Parts['fragment'] != '') {
             $Return .= '#'.$Parts['fragment'];
+        }
 
         return $Return;
     }
@@ -2305,33 +2371,39 @@ if (!function_exists('PrepareArray')) {
      * @param string $PrepareType Optional,
      */
     function PrepareArray($Key, &$Array, $PrepareType = 'array') {
-        if (!array_key_exists($Key, $Array))
+        if (!array_key_exists($Key, $Array)) {
             $Array[$Key] = null;
+        }
 
         switch ($PrepareType) {
             case 'array':
-                if (!is_array($Array[$Key]))
+                if (!is_array($Array[$Key])) {
                     $Array[$Key] = array();
+                }
                 break;
 
             case 'integer':
-                if (!is_integer($Array[$Key]))
+                if (!is_integer($Array[$Key])) {
                     $Array[$Key] = 0;
+                }
                 break;
 
             case 'float':
-                if (!is_float($Array[$Key]))
+                if (!is_float($Array[$Key])) {
                     $Array[$Key] = 0.0;
+                }
                 break;
 
             case 'null':
-                if (!is_null($Array[$Key]))
+                if (!is_null($Array[$Key])) {
                     $Array[$Key] = null;
+                }
                 break;
 
             case 'string':
-                if (!is_string($Array[$Key]))
+                if (!is_string($Array[$Key])) {
                     $Array[$Key] = '';
+                }
                 break;
         }
     }
@@ -2340,13 +2412,15 @@ if (!function_exists('PrepareArray')) {
 if (!function_exists('ProxyHead')) {
 
     function ProxyHead($Url, $Headers = null, $Timeout = false, $FollowRedirects = false) {
-        if (is_null($Headers))
+        if (is_null($Headers)) {
             $Headers = array();
+        }
 
         $OriginalHeaders = $Headers;
         $OriginalTimeout = $Timeout;
-        if (!$Timeout)
+        if (!$Timeout) {
             $Timeout = C('Garden.SocketTimeout', 1.0);
+        }
 
         $UrlParts = parse_url($Url);
         $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -2360,11 +2434,13 @@ if (!function_exists('ProxyHead')) {
         $EncodeCookies = C('Garden.Cookie.Urlencode', true);
 
         foreach ($_COOKIE as $Key => $Value) {
-            if (strncasecmp($Key, 'XDEBUG', 6) == 0)
+            if (strncasecmp($Key, 'XDEBUG', 6) == 0) {
                 continue;
+            }
 
-            if (strlen($Cookie) > 0)
+            if (strlen($Cookie) > 0) {
                 $Cookie .= '; ';
+            }
 
             $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
             $Cookie .= "{$Key}={$EValue}";
@@ -2396,13 +2472,14 @@ if (!function_exists('ProxyHead')) {
                 $Response = curl_error($Handler);
 
             curl_close($Handler);
-        } else if (function_exists('fsockopen')) {
+        } elseif (function_exists('fsockopen')) {
             $Referer = Gdn::Request()->WebRoot();
 
             // Make the request
             $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
-            if (!$Pointer)
+            if (!$Pointer) {
                 throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+            }
 
             $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
 
@@ -2416,8 +2493,9 @@ if (!function_exists('ProxyHead')) {
                 'Connection' => 'close'
             );
 
-            if (strlen($Cookie['Cookie']))
+            if (strlen($Cookie['Cookie'])) {
                 $Header = array_merge($Header, $Cookie);
+            }
 
             $Header = array_merge($Header, $Headers);
 
@@ -2487,8 +2565,9 @@ if (!function_exists('ProxyRequest')) {
      */
     function ProxyRequest($Url, $Timeout = false, $FollowRedirects = false) {
         $OriginalTimeout = $Timeout;
-        if ($Timeout === false)
+        if ($Timeout === false) {
             $Timeout = C('Garden.SocketTimeout', 1.0);
+        }
 
         $UrlParts = parse_url($Url);
         $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -2501,11 +2580,13 @@ if (!function_exists('ProxyRequest')) {
         $EncodeCookies = C('Garden.Cookie.Urlencode', true);
 
         foreach ($_COOKIE as $Key => $Value) {
-            if (strncasecmp($Key, 'XDEBUG', 6) == 0)
+            if (strncasecmp($Key, 'XDEBUG', 6) == 0) {
                 continue;
+            }
 
-            if (strlen($Cookie) > 0)
+            if (strlen($Cookie) > 0) {
                 $Cookie .= '; ';
+            }
 
             $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
             $Cookie .= "{$Key}={$EValue}";
@@ -2521,11 +2602,13 @@ if (!function_exists('ProxyRequest')) {
             curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
             curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
 
-            if ($Cookie != '')
+            if ($Cookie != '') {
                 curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+            }
 
-            if ($Timeout > 0)
+            if ($Timeout > 0) {
                 curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
+            }
 
             // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
             //
@@ -2547,12 +2630,14 @@ if (!function_exists('ProxyRequest')) {
 
             // Make the request
             $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
-            if (!$Pointer)
+            if (!$Pointer) {
                 throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+            }
 
             stream_set_timeout($Pointer, $Timeout);
-            if (strlen($Cookie) > 0)
+            if (strlen($Cookie) > 0) {
                 $Cookie = "Cookie: $Cookie\r\n";
+            }
 
             $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
             $Header = "GET $Path?$Query HTTP/1.1\r\n"
@@ -2565,8 +2650,9 @@ if (!function_exists('ProxyRequest')) {
                 ."Referer: {$Referer}\r\n"
                 ."Connection: close\r\n";
 
-            if ($Cookie != '')
+            if ($Cookie != '') {
                 $Header .= $Cookie;
+            }
 
             $Header .= "\r\n";
 
@@ -2589,8 +2675,9 @@ if (!function_exists('ProxyRequest')) {
             throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
         }
 
-        if (!$Success)
+        if (!$Success) {
             return $Response;
+        }
 
         $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
@@ -2670,8 +2757,9 @@ if (!function_exists('BetterRandomString')):
         );
 
         $Characters = '';
-        for ($i = 0; $i < strlen($CharacterOptions); $i++)
+        for ($i = 0; $i < strlen($CharacterOptions); $i++) {
             $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+        }
 
         $CharLen = strlen($Characters);
         $String = '';
@@ -2757,14 +2845,17 @@ if (!function_exists('ReflectArgs')) {
      * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
      */
     function ReflectArgs($Callback, $Args1, $Args2 = null) {
-        if (is_string($Callback) && !function_exists($Callback))
+        if (is_string($Callback) && !function_exists($Callback)) {
             throw new Exception("Function $Callback does not exist");
+        }
 
-        if (is_array($Callback) && !method_exists($Callback[0], $Callback[1]))
+        if (is_array($Callback) && !method_exists($Callback[0], $Callback[1])) {
             throw new Exception("Method {$Callback[1]} does not exist.");
+        }
 
-        if ($Args2 !== null)
+        if ($Args2 !== null) {
             $Args1 = array_merge($Args2, $Args1);
+        }
         $Args1 = array_change_key_case($Args1);
 
         if (is_string($Callback)) {
@@ -2789,13 +2880,13 @@ if (!function_exists('ReflectArgs')) {
             $ParamName = $MethParam->getName();
             $ParamNameL = strtolower($ParamName);
 
-            if (isset($Args1[$ParamNameL]))
+            if (isset($Args1[$ParamNameL])) {
                 $ParamValue = $Args1[$ParamNameL];
-            elseif (isset($Args1[$Index]))
+            } elseif (isset($Args1[$Index])) {
                 $ParamValue = $Args1[$Index];
-            elseif ($MethParam->isDefaultValueAvailable())
+            } elseif ($MethParam->isDefaultValueAvailable()) {
                 $ParamValue = $MethParam->getDefaultValue();
-            else {
+            } else {
                 $ParamValue = null;
                 $MissingArgs[] = '$'.$ParamName;
             }
@@ -2831,13 +2922,16 @@ if (!function_exists('RemoveFromConfig')) {
 // Functions relating to data/variable types and type casting
 if (!function_exists('RemoveKeyFromArray')) {
     function RemoveKeyFromArray($Array, $Key) {
-        if (!is_array($Key))
+        if (!is_array($Key)) {
             $Key = array($Key);
+        }
 
         $Count = count($Key);
         for ($i = 0; $i < $Count; $i++) {
             $KeyIndex = array_keys(array_keys($Array), $Key[$i]);
-            if (count($KeyIndex) > 0) array_splice($Array, $KeyIndex[0], 1);
+            if (count($KeyIndex) > 0) {
+                array_splice($Array, $KeyIndex[0], 1);
+            }
         }
         return $Array;
     }
@@ -2854,10 +2948,11 @@ if (!function_exists('RemoveKeysFromNestedArray')) {
                         $IsMatch = true;
                     }
                 }
-                if (!$IsMatch && (is_array($Value) || is_object($Value)))
+                if (!$IsMatch && (is_array($Value) || is_object($Value))) {
                     $Array[$Key] = RemoveKeysFromNestedArray($Value, $Matches);
+                }
             }
-        } else if (is_object($Array)) {
+        } elseif (is_object($Array)) {
             $Arr = get_object_vars($Array);
             foreach ($Arr as $Key => $Value) {
                 $IsMatch = false;
@@ -2867,8 +2962,9 @@ if (!function_exists('RemoveKeysFromNestedArray')) {
                         $IsMatch = true;
                     }
                 }
-                if (!$IsMatch && (is_array($Value) || is_object($Value)))
+                if (!$IsMatch && (is_array($Value) || is_object($Value))) {
                     $Array->$Key = RemoveKeysFromNestedArray($Value, $Matches);
+                }
             }
         }
         return $Array;
@@ -2895,16 +2991,19 @@ if (!function_exists('RemoveValueFromArray')) {
 if (!function_exists('SafeGlob')) {
     function SafeGlob($Pattern, $Extensions = array()) {
         $Result = glob($Pattern);
-        if (!is_array($Result))
+        if (!is_array($Result)) {
             $Result = array();
+        }
 
         // Check against allowed extensions.
         if (count($Extensions) > 0) {
             foreach ($Result as $Index => $Path) {
-                if (!$Path)
+                if (!$Path) {
                     continue;
-                if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), $Extensions))
+                }
+                if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), $Extensions)) {
                     unset($Result[$Index]);
+                }
             }
         }
 
@@ -2923,11 +3022,13 @@ if (!function_exists('SafeImage')) {
     function SafeImage($ImageUrl, $MinHeight = 0, $MinWidth = 0) {
         try {
             list($Width, $Height, $Type, $Attributes) = getimagesize($ImageUrl);
-            if ($MinHeight > 0 && $MinHeight < $Height)
+            if ($MinHeight > 0 && $MinHeight < $Height) {
                 return false;
+            }
 
-            if ($MinWidth > 0 && $MinWidth < $Width)
+            if ($MinWidth > 0 && $MinWidth < $Width) {
                 return false;
+            }
         } catch (Exception $ex) {
             return false;
         }
@@ -2969,10 +3070,11 @@ if (!function_exists('SafeRedirect')) {
      * @param int $StatusCode
      */
     function SafeRedirect($Destination = false, $StatusCode = null) {
-        if (!$Destination)
+        if (!$Destination) {
             $Destination = Url('', true);
-        else
+        } else {
             $Destination = Url($Destination, true);
+        }
 
         $Domain = parse_url($Destination, PHP_URL_HOST);
         if (in_array($Domain, TrustedDomains())) {
@@ -3025,8 +3127,9 @@ if (!function_exists('SetAppCookie')):
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $CurrentHost = Gdn::Request()->Host();
-        if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+        if (!StringEndsWith($CurrentHost, trim($Domain, '.'))) {
             $Domain = '';
+        }
 
         // Create the cookie.
         safeCookie($Key, $Value, $Expire, '/', $Domain, null, true);
@@ -3049,8 +3152,9 @@ if (!function_exists('SliceParagraph')) {
      * @return string
      */
     function SliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
-        if ($MaxLength >= strlen($String))
+        if ($MaxLength >= strlen($String)) {
             return $String;
+        }
 
 //      $String = preg_replace('`\s+\n`', "\n", $String);
 
@@ -3068,10 +3172,11 @@ if (!function_exists('SliceParagraph')) {
                 for ($i = 2; $i < count($Sentences); $i++) {
                     $Sentence = $Sentences[$i];
 
-                    if ((strlen($Result) + strlen($Sentence)) <= $MaxLength || preg_match('`[.!?:]\s+`', $Sentence))
+                    if ((strlen($Result) + strlen($Sentence)) <= $MaxLength || preg_match('`[.!?:]\s+`', $Sentence)) {
                         $Result .= $Sentence;
-                    else
+                    } else {
                         break;
+                    }
                 }
             }
 
@@ -3100,7 +3205,9 @@ if (!function_exists('SliceString')) {
 
         if (function_exists('mb_strimwidth')) {
             static $Charset;
-            if (is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+            if (is_null($Charset)) {
+                $Charset = Gdn::Config('Garden.Charset', 'utf-8');
+            }
             return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
         } else {
             $Trim = substr($String, 0, $Length);
@@ -3122,10 +3229,11 @@ if (!function_exists('SmartAsset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false)
+            if (strpos($Result, '?') === false) {
                 $Result .= '?';
-            else
+            } else {
                 $Result .= '&';
+            }
 
             // Figure out which version to put after the asset.
             $Version = APPLICATION_VERSION;
@@ -3169,16 +3277,18 @@ if (!function_exists('StringBeginsWith')) {
      * @return bool|string Returns true/false unless $Trim is true.
      */
     function StringBeginsWith($Haystack, $Needle, $CaseInsensitive = false, $Trim = false) {
-        if (strlen($Haystack) < strlen($Needle))
+        if (strlen($Haystack) < strlen($Needle)) {
             return $Trim ? $Haystack : false;
-        elseif (strlen($Needle) == 0) {
-            if ($Trim)
+        } elseif (strlen($Needle) == 0) {
+            if ($Trim) {
                 return $Haystack;
+            }
             return true;
         } else {
             $Result = substr_compare($Haystack, $Needle, 0, strlen($Needle), $CaseInsensitive) == 0;
-            if ($Trim)
+            if ($Trim) {
                 $Result = $Result ? substr($Haystack, strlen($Needle)) : $Haystack;
+            }
             return $Result;
         }
     }
@@ -3197,13 +3307,15 @@ if (!function_exists('StringEndsWith')) {
         if (strlen($Haystack) < strlen($Needle)) {
             return $Trim ? $Haystack : false;
         } elseif (strlen($Needle) == 0) {
-            if ($Trim)
+            if ($Trim) {
                 return $Haystack;
+            }
             return true;
         } else {
             $Result = substr_compare($Haystack, $Needle, -strlen($Needle), strlen($Needle), $CaseInsensitive) == 0;
-            if ($Trim)
+            if ($Trim) {
                 $Result = $Result ? substr($Haystack, 0, -strlen($Needle)) : $Haystack;
+            }
             return $Result;
         }
     }
@@ -3230,10 +3342,11 @@ if (!function_exists('SetValue')) {
      * @param mixed $Value The value to set.
      */
     function SetValue($Key, &$Collection, $Value) {
-        if (is_array($Collection))
+        if (is_array($Collection)) {
             $Collection[$Key] = $Value;
-        elseif (is_object($Collection))
+        } elseif (is_object($Collection)) {
             $Collection->$Key = $Value;
+        }
     }
 }
 
@@ -3284,10 +3397,11 @@ if (!function_exists('TouchValue')) {
      * @param mixed $Default The value to set.
      */
     function TouchValue($Key, &$Collection, $Default) {
-        if (is_array($Collection) && !array_key_exists($Key, $Collection))
+        if (is_array($Collection) && !array_key_exists($Key, $Collection)) {
             $Collection[$Key] = $Default;
-        elseif (is_object($Collection) && !property_exists($Collection, $Key))
+        } elseif (is_object($Collection) && !property_exists($Collection, $Key)) {
             $Collection->$Key = $Default;
+        }
 
         return GetValue($Key, $Collection);
     }
@@ -3302,8 +3416,9 @@ if (!function_exists('TouchFolder')) {
      * @since 2.1
      */
     function TouchFolder($Path, $Perms = 0777) {
-        if (!file_exists($Path))
+        if (!file_exists($Path)) {
             mkdir($Path, $Perms, true);
+        }
     }
 }
 
@@ -3311,11 +3426,13 @@ if (!function_exists('Trace')) {
     function Trace($Value = null, $Type = TRACE_INFO) {
         static $Traces = array();
 
-        if ($Value === null)
+        if ($Value === null) {
             return $Traces;
+        }
 
-        if ($Value)
+        if ($Value) {
             $Traces[] = array($Value, $Type);
+        }
     }
 }
 
@@ -3424,8 +3541,9 @@ if (!function_exists('viewLocation')) {
 
         // Now let's search the paths for the view.
         foreach ($Paths as $Path) {
-            if (file_exists($Path))
+            if (file_exists($Path)) {
                 return $Path;
+            }
         }
 
         Trace(array('view' => $View, 'controller' => $Controller, 'folder' => $Folder), 'View');
@@ -3458,14 +3576,18 @@ if (!function_exists('passwordStrength')) {
 
         // calculate $Entropy
         $Alphabet = 0;
-        if (preg_match('/[0-9]/', $Password))
+        if (preg_match('/[0-9]/', $Password)) {
             $Alphabet += 10;
-        if (preg_match('/[a-z]/', $Password))
+        }
+        if (preg_match('/[a-z]/', $Password)) {
             $Alphabet += 26;
-        if (preg_match('/[A-Z]/', $Password))
+        }
+        if (preg_match('/[A-Z]/', $Password)) {
             $Alphabet += 26;
-        if (preg_match('/[^a-zA-Z0-9]/', $Password))
+        }
+        if (preg_match('/[^a-zA-Z0-9]/', $Password)) {
             $Alphabet += 31;
+        }
 
         $Length = strlen($Password);
         $Entropy = log(pow($Alphabet, $Length), 2);
@@ -3495,13 +3617,13 @@ if (!function_exists('passwordStrength')) {
         if ($Entropy < 30) {
             $Response['Score'] = 1;
             $Response['Reason'] = $Translations[2];
-        } else if ($Entropy < 40) {
+        } elseif ($Entropy < 40) {
             $Response['Score'] = 2;
             $Response['Reason'] = $Translations[3];
-        } else if ($Entropy < 55) {
+        } elseif ($Entropy < 55) {
             $Response['Score'] = 3;
             $Response['Reason'] = $Translations[4];
-        } else if ($Entropy < 70) {
+        } elseif ($Entropy < 70) {
             $Response['Score'] = 4;
             $Response['Reason'] = $Translations[5];
         } else {

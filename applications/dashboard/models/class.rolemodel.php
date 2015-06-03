@@ -581,7 +581,7 @@ class RoleModel extends Gdn_Model {
         // Try and get all of the mappings from the cache.
         $Keys = array();
         foreach ($UserIDs as $UserID) {
-            $Keys[$UserID] = FormatString(UserModel::USERROLES_KEY, array('UserID' => $UserID));
+            $Keys[$UserID] = formatString(UserModel::USERROLES_KEY, array('UserID' => $UserID));
         }
         $UserRoles = Gdn::Cache()->Get($Keys);
         if (!is_array($UserRoles))

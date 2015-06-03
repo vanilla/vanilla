@@ -401,7 +401,7 @@ if (!function_exists('WriteCommentForm')):
                     <div class="Note Closed SignInOrRegister"><?php
                         $Popup = (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
                         $ReturnUrl = Gdn::Request()->PathAndQuery();
-                        echo FormatString(
+                        echo formatString(
                             T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'),
                             array(
                                 'SignInUrl' => Url(SignInUrl($ReturnUrl)),

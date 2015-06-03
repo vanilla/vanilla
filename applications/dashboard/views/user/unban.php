@@ -8,7 +8,7 @@
 
     <div class="DismissMessage WarningMessage">
         <?php
-        echo FormatString(T('You are about to unban {User.UserID,user}.'), $this->Data);
+        echo formatString(T('You are about to unban {User.UserID,user}.'), $this->Data);
 
         if ($this->Data('OtherReasons')) {
             echo "\n".T('This user is also banned for other reasons and may stay banned.');

@@ -77,7 +77,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
         $ID = GetValue('CommentNotifyUserID', $Activity->Data);
 
     if ($ID)
-        $SharedString = FormatString(T('Comments are between {UserID,you}.'), array('UserID' => array($Activity->NotifyUserID, $ID)));
+        $SharedString = formatString(T('Comments are between {UserID,you}.'), array('UserID' => array($Activity->NotifyUserID, $ID)));
 
     $AllowComments = $Activity->NotifyUserID < 0 || $SharedString;
 

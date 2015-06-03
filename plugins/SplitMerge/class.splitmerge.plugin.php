@@ -192,7 +192,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                             $RedirectDiscussion = array(
                                 'Name' => SliceString(sprintf(T('Merged: %s'), $Discussion['Name']), $MaxNameLength),
                                 'Type' => 'redirect',
-                                'Body' => FormatString(T('This discussion has been <a href="{url,html}">merged</a>.'), array('url' => DiscussionUrl($MergeDiscussion))),
+                                'Body' => formatString(T('This discussion has been <a href="{url,html}">merged</a>.'), array('url' => DiscussionUrl($MergeDiscussion))),
                                 'Format' => 'Html'
                             );
                             $DiscussionModel->SetField($Discussion['DiscussionID'], $RedirectDiscussion);

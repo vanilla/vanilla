@@ -1158,11 +1158,11 @@ if (!function_exists('ForeignIDHash')) {
     }
 }
 
-if (!function_exists('FormatString')) {
+if (!function_exists('formatString')) {
     /**
      * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
      *
-     * @param string $String The string to format with fields from its args enclosed in curly braces.
+     * @param string $string The string to format with fields from its args enclosed in curly braces.
      * The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:
      *  - date: Formats the value as a date. Valid arguments are short, medium, long.
      *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
@@ -1171,7 +1171,7 @@ if (!function_exists('FormatString')) {
      * You can pass a domain to include the domain.
      *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
      *  - html: Calls htmlspecialchars.
-     * @param array $Args The array of arguments.
+     * @param array $args The array of arguments.
      * If you want to nest arrays then the keys to the nested values can be separated by dots.
      * @return string The formatted string.
      * <code>
@@ -1180,16 +1180,16 @@ if (!function_exists('FormatString')) {
      * // Hello Frank, It's 12:59PM.
      * </code>
      */
-    function FormatString($String, $Args = array()) {
-        _FormatStringCallback($Args, true);
-        $Result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_FormatStringCallback', $String);
+    function formatString($string, $args = array()) {
+        _formatStringCallback($args, true);
+        $Result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_formatStringCallback', $string);
 
         return $Result;
     }
 }
 
-if (!function_exists('_FormatStringCallback')) {
-    function _FormatStringCallback($Match, $SetArgs = false) {
+if (!function_exists('_formatStringCallback')) {
+    function _formatStringCallback($Match, $SetArgs = false) {
         static $Args = array(), $ContextUserID = null;
         if ($SetArgs) {
             $Args = $Match;
@@ -1678,7 +1678,7 @@ if (!function_exists('GetRecord')) {
                 $Model = new ActivityModel();
                 $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
                 if ($Row) {
-                    $Row['Name'] = FormatString($Row['HeadlineFormat'], $Row);
+                    $Row['Name'] = formatString($Row['HeadlineFormat'], $Row);
                     $Row['Body'] = $Row['Story'];
                     return $Row;
                 }

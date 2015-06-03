@@ -805,7 +805,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $SQL->Delete('TagDiscussion', array('TagID' => $TagID));
             $SQL->Delete('Tag', array('TagID' => $TagID));
 
-            $Sender->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
+            $Sender->InformMessage(formatString(T('<b>{Name}</b> deleted.'), $Tag));
             $Sender->JsonTarget("#Tag_{$Tag['TagID']}", NULL, 'Remove');
         }
 

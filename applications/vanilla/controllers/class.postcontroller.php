@@ -406,10 +406,10 @@ class PostController extends VanillaController {
             $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
 
             if (!$Description && count($Images) == 0) {
-                $Body = FormatString('<p><a href="{Url}">{LinkText}</a></p>',
+                $Body = formatString('<p><a href="{Url}">{LinkText}</a></p>',
                     array('Url' => $vanilla_url, 'LinkText' => $LinkText));
             } else {
-                $Body = FormatString('
+                $Body = formatString('
             <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
                <p>{Excerpt}</p>
                <p><a href="{Url}">{LinkText}</a></p>
@@ -567,7 +567,7 @@ class PostController extends VanillaController {
 
                     if (isset($vanilla_url) && $vanilla_url && strpos(GetValue('Body', $Discussion), T('Undefined discussion subject.')) !== FALSE) {
                         $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
-                        $Set['Body'] = FormatString('<p><a href="{Url}">{LinkText}</a></p>',
+                        $Set['Body'] = formatString('<p><a href="{Url}">{LinkText}</a></p>',
                             array('Url' => $vanilla_url, 'LinkText' => $LinkText));
                     }
 

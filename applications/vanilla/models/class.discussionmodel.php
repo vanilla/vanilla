@@ -1045,7 +1045,7 @@ class DiscussionModel extends VanillaModel {
                 throw new Gdn_UserException(T("The page didn't contain any information."));
             }
 
-            $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
+            $Title = formatString(T('Undefined discussion subject.'), array('Url' => $Url));
         } else {
             if ($Strip = C('Vanilla.Embed.StripPrefix'))
                 $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
@@ -1057,7 +1057,7 @@ class DiscussionModel extends VanillaModel {
 
         $Description = GetValue('Description', $PageInfo, '');
         $Images = GetValue('Images', $PageInfo, array());
-        $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
+        $Body = formatString(T('EmbeddedDiscussionFormat'), array(
             'Title' => $Title,
             'Excerpt' => $Description,
             'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
@@ -1066,7 +1066,7 @@ class DiscussionModel extends VanillaModel {
         if ($Body == '')
             $Body = $Url;
         if ($Body == '')
-            $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
+            $Body = formatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
 
         $Result = array(
             'Name' => $Title,

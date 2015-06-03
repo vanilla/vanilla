@@ -49,7 +49,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Confirmed = GetValue('Confirmed', Gdn::Session()->User, true);
 
             if ($ConfirmEmail && !$Confirmed) {
-                $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
+                $Message = formatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
                 $Sender->InformMessage($Message, '');
             }
         }

@@ -202,7 +202,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
         // Figure out how much space we have for the title
         $MaxLength = 90;
-        $Stripped = FormatString($CollaborativeTitle, array(
+        $Stripped = formatString($CollaborativeTitle, array(
             'RegardingTitle' => ''
         ));
         $UsedLength = strlen($Stripped);
@@ -228,7 +228,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         if (strlen($Name) > $AvailableLength)
             $Name = substr($Name, 0, $AvailableLength - 3).'...';
 
-        $CollaborativeTitle = FormatString($CollaborativeTitle, array(
+        $CollaborativeTitle = formatString($CollaborativeTitle, array(
             'RegardingTitle' => $Name
         ));
 

@@ -121,7 +121,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function log($level, $message, array $context = array()) {
-        Trace(FormatString($message, $context), 'FormattedMessage');
+        Trace(formatString($message, $context), 'FormattedMessage');
         Trace($context, 'context');
 
     }

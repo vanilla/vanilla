@@ -9,7 +9,7 @@
 
     <div class="Warning">
         <?php
-        echo FormatString(T("You are about to delete all of a user's content.", "You are about to delete all of the content for {User.UserID,user}."), $this->Data);
+        echo formatString(T("You are about to delete all of a user's content.", "You are about to delete all of the content for {User.UserID,user}."), $this->Data);
         ?>
     </div>
     <?php

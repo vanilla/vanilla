@@ -66,11 +66,11 @@ class UserModel extends Gdn_Model {
     protected function _AddEmailHeaderFooter($Message, $Data) {
         $Header = T('EmailHeader', '');
         if ($Header)
-            $Message = FormatString($Header, $Data)."\n".$Message;
+            $Message = formatString($Header, $Data)."\n".$Message;
 
         $Footer = T('EmailFooter', '');
         if ($Footer)
-            $Message .= "\n".FormatString($Footer, $Data);
+            $Message .= "\n".formatString($Footer, $Data);
 
         return $Message;
     }
@@ -964,7 +964,7 @@ class UserModel extends Gdn_Model {
     public function DefinePermissions($UserID, $Serialize = TRUE) {
         if (Gdn::Cache()->ActiveEnabled()) {
             $PermissionsIncrement = $this->GetPermissionsIncrement();
-            $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array(
+            $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, array(
                 'UserID' => $UserID,
                 'PermissionsIncrement' => $PermissionsIncrement
             ));
@@ -1299,7 +1299,7 @@ class UserModel extends Gdn_Model {
                 if (!$UserID) {
                     continue;
                 }
-                $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
+                $Keys[] = formatString(self::USERID_KEY, array('UserID' => $UserID));
             }
 
             // Query cache layer
@@ -1451,7 +1451,7 @@ class UserModel extends Gdn_Model {
      * @return Gdn_DataSet
      */
     public function GetRoles($UserID) {
-        $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
+        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
         $RolesDataArray = Gdn::Cache()->Get($UserRolesKey);
 
         if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
@@ -3600,7 +3600,7 @@ class UserModel extends Gdn_Model {
         $Data['User'] = ArrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
         $Data['Title'] = $AppTitle;
 
-        $Message = FormatString($EmailFormat, $Data);
+        $Message = formatString($EmailFormat, $Data);
         $Message = $this->_AddEmailHeaderFooter($Message, $Data);
         $Email->Message($Message);
 
@@ -3640,7 +3640,7 @@ class UserModel extends Gdn_Model {
 
         // Check for the new email format.
         if (($EmailFormat = T("EmailWelcome{$RegisterType}", '#')) != '#') {
-            $Message = FormatString($EmailFormat, $Data);
+            $Message = formatString($EmailFormat, $Data);
         } else {
             $Message = sprintf(
                 T('EmailWelcome'),
@@ -3655,7 +3655,7 @@ class UserModel extends Gdn_Model {
 
         // Add the email confirmation key.
         if ($Data['EmailKey']) {
-            $Message .= "\n\n".FormatString(T('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
+            $Message .= "\n\n".formatString(T('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
         }
         $Message = $this->_AddEmailHeaderFooter($Message, $Data);
 
@@ -3687,7 +3687,7 @@ class UserModel extends Gdn_Model {
 
         $EmailFormat = T('EmailPassword');
         if (strpos($EmailFormat, '{') !== FALSE) {
-            $Message = FormatString($EmailFormat, $Data);
+            $Message = formatString($EmailFormat, $Data);
         } else {
             $Message = sprintf(
                 $EmailFormat,
@@ -3897,14 +3897,14 @@ class UserModel extends Gdn_Model {
         if (Gdn::Cache()->ActiveEnabled()) {
 
             // Rate limit using Gdn_Cache.
-            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
             $UserRate = (int)Gdn::Cache()->Get($UserRateKey);
             $UserRate += 1;
             Gdn::Cache()->Store($UserRateKey, 1, array(
                 Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
             ));
 
-            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
             $SourceRate = (int)Gdn::Cache()->Get($SourceRateKey);
             $SourceRate += 1;
             Gdn::Cache()->Store($SourceRateKey, 1, array(
@@ -3914,12 +3914,12 @@ class UserModel extends Gdn_Model {
         } elseif (C('Garden.Apc', false) && function_exists('apc_store')) {
 
             // Rate limit using the APC data store.
-            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
             $UserRate = (int)apc_fetch($UserRateKey);
             $UserRate += 1;
             apc_store($UserRateKey, 1, self::LOGIN_RATE);
 
-            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
             $SourceRate = (int)apc_fetch($SourceRateKey);
             $SourceRate += 1;
             apc_store($SourceRateKey, 1, self::LOGIN_RATE);
@@ -4019,7 +4019,7 @@ class UserModel extends Gdn_Model {
      */
     public function GetUserFromCache($UserToken, $TokenType) {
         if ($TokenType == 'name') {
-            $UserNameKey = FormatString(self::USERNAME_KEY, array('Name' => md5($UserToken)));
+            $UserNameKey = formatString(self::USERNAME_KEY, array('Name' => md5($UserToken)));
             $UserID = Gdn::Cache()->Get($UserNameKey);
 
             if ($UserID === Gdn_Cache::CACHEOP_FAILURE) return FALSE;
@@ -4032,7 +4032,7 @@ class UserModel extends Gdn_Model {
         if ($TokenType != 'userid') return FALSE;
 
         // Get from memcached
-        $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserToken));
+        $UserKey = formatString(self::USERID_KEY, array('UserID' => $UserToken));
         $User = Gdn::Cache()->Get($UserKey);
 
         return $User;
@@ -4075,12 +4075,12 @@ class UserModel extends Gdn_Model {
 
         $Cached = TRUE;
 
-        $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
+        $UserKey = formatString(self::USERID_KEY, array('UserID' => $UserID));
         $Cached = $Cached & Gdn::Cache()->Store($UserKey, $User, array(
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
 
-        $UserNameKey = FormatString(self::USERNAME_KEY, array('Name' => md5(GetValue('Name', $User))));
+        $UserNameKey = formatString(self::USERNAME_KEY, array('Name' => md5(GetValue('Name', $User))));
         $Cached = $Cached & Gdn::Cache()->Store($UserNameKey, $UserID, array(
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
@@ -4099,7 +4099,7 @@ class UserModel extends Gdn_Model {
 
         $Cached = TRUE;
 
-        $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
+        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
         $Cached = $Cached & Gdn::Cache()->Store($UserRolesKey, $RoleIDs);
         return $Cached;
     }
@@ -4117,12 +4117,12 @@ class UserModel extends Gdn_Model {
             $CacheTypesToClear = array('user', 'roles', 'permissions');
 
         if (in_array('user', $CacheTypesToClear)) {
-            $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
+            $UserKey = formatString(self::USERID_KEY, array('UserID' => $UserID));
             Gdn::Cache()->Remove($UserKey);
         }
 
         if (in_array('roles', $CacheTypesToClear)) {
-            $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
+            $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
             Gdn::Cache()->Remove($UserRolesKey);
         }
 
@@ -4130,7 +4130,7 @@ class UserModel extends Gdn_Model {
             Gdn::SQL()->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
 
             $PermissionsIncrement = $this->GetPermissionsIncrement();
-            $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
+            $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
             Gdn::Cache()->Remove($UserPermissionsKey);
         }
         return TRUE;

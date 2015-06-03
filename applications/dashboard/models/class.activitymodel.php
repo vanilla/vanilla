@@ -142,7 +142,7 @@ class ActivityModel extends Gdn_Model {
         $Row['Url'] = externalUrl($Row['Route']);
 
         if ($Row['HeadlineFormat']) {
-            $Row['Headline'] = FormatString($Row['HeadlineFormat'], $Row);
+            $Row['Headline'] = formatString($Row['HeadlineFormat'], $Row);
         } else {
             $Row['Headline'] = Gdn_Format::ActivityHeadline($Row);
         }
@@ -872,7 +872,7 @@ class ActivityModel extends Gdn_Model {
         if (GetValue('HeadlineFormat', $Activity)) {
             $SessionUserID = Gdn::Session()->UserID;
             Gdn::Session()->UserID = $User['UserID'];
-            $Activity['Headline'] = FormatString($Activity['HeadlineFormat'], $Activity);
+            $Activity['Headline'] = formatString($Activity['HeadlineFormat'], $Activity);
             Gdn::Session()->UserID = $SessionUserID;
         } else {
             if (!isset($Activity['ActivityGender'])) {

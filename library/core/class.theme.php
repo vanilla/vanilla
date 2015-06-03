@@ -108,7 +108,7 @@ class Gdn_Theme {
             if ($DataCount == count($Data))
                 $CssClass .= ' Last';
 
-            $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
+            $Label = '<span class="'.$CssClass.'">'.formatString($Format, $Row).'</span> ';
             $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
 
             $Count++;

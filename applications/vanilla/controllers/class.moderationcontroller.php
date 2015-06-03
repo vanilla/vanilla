@@ -390,7 +390,7 @@ class ModerationController extends VanillaController {
                         'DateInserted' => $Discussion['DateLastComment'],
                         'Type' => 'redirect',
                         'CategoryID' => $Discussion['CategoryID'],
-                        'Body' => FormatString(T('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
+                        'Body' => formatString(T('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
                         'Format' => 'Html',
                         'Closed' => TRUE
                     );

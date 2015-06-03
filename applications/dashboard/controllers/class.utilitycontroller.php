@@ -557,7 +557,7 @@ class UtilityController extends DashboardController {
      * Return some meta information about any page on the internet in JSON format.
      */
     public function FetchPageInfo($Url = '') {
-        $PageInfo = FetchPageInfo($Url);
+        $PageInfo = fetchPageInfo($Url);
         $this->SetData('PageInfo', $PageInfo);
         $this->MasterView = 'default';
         $this->RemoveCssFile('admin.css');

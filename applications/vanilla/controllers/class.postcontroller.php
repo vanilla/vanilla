@@ -393,7 +393,7 @@ class PostController extends VanillaController {
             $this->Form->AddHidden('vanilla_url', $vanilla_url);
             $this->Form->AddHidden('vanilla_category_id', $vanilla_category_id);
 
-            $PageInfo = FetchPageInfo($vanilla_url);
+            $PageInfo = fetchPageInfo($vanilla_url);
 
             if (!($Title = $this->Form->GetFormValue('Name'))) {
                 $Title = GetValue('Title', $PageInfo, '');

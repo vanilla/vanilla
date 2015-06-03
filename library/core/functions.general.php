@@ -941,21 +941,21 @@ if (!function_exists('externalUrl')) {
 }
 
 
-if (!function_exists('FetchPageInfo')) {
+if (!function_exists('fetchPageInfo')) {
     /**
      * Examine a page at {@link $Url} for title, description & images.
      *
      * Be sure to check the resultant array for any Exceptions that occurred while retrieving the page.
      *
-     * @param string $Url The url to examine.
-     * @param integer $Timeout How long to allow for this request.
+     * @param string $url The url to examine.
+     * @param integer $timeout How long to allow for this request.
      * Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
      * @return array Returns an array containing Url, Title, Description, Images (array) and Exception
      * (if there were problems retrieving the page).
      */
-    function FetchPageInfo($Url, $Timeout = 3) {
+    function fetchPageInfo($url, $timeout = 3) {
         $PageInfo = array(
-            'Url' => $Url,
+            'Url' => $url,
             'Title' => '',
             'Description' => '',
             'Images' => array(),
@@ -968,8 +968,8 @@ if (!function_exists('FetchPageInfo')) {
 
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
-                'URL' => $Url,
-                'Timeout' => $Timeout
+                'URL' => $url,
+                'Timeout' => $timeout
             ));
             $Dom = str_get_html($PageHtml);
             if (!$Dom) {
@@ -977,10 +977,10 @@ if (!function_exists('FetchPageInfo')) {
             }
 
             // FIRST PASS: Look for open graph title, desc, images
-            $PageInfo['Title'] = DomGetContent($Dom, 'meta[property=og:title]');
+            $PageInfo['Title'] = domGetContent($Dom, 'meta[property=og:title]');
 
             Trace('Getting og:description');
-            $PageInfo['Description'] = DomGetContent($Dom, 'meta[property=og:description]');
+            $PageInfo['Description'] = domGetContent($Dom, 'meta[property=og:description]');
             foreach ($Dom->find('meta[property=og:image]') as $Image) {
                 if (isset($Image->content)) {
                     $PageInfo['Images'][] = $Image->content;
@@ -994,7 +994,7 @@ if (!function_exists('FetchPageInfo')) {
 
             if ($PageInfo['Description'] == '') {
                 Trace('Getting meta description');
-                $PageInfo['Description'] = DomGetContent($Dom, 'meta[name=description]');
+                $PageInfo['Description'] = domGetContent($Dom, 'meta[name=description]');
             }
 
             // THIRD PASS: Look in the page contents
@@ -1025,7 +1025,7 @@ if (!function_exists('FetchPageInfo')) {
 
             // Page Images
             if (count($PageInfo['Images']) == 0) {
-                $Images = DomGetImages($Dom, $Url);
+                $Images = domGetImages($Dom, $url);
                 $PageInfo['Images'] = array_values($Images);
             }
 
@@ -1039,19 +1039,19 @@ if (!function_exists('FetchPageInfo')) {
     }
 }
 
-if (!function_exists('DomGetContent')) {
-    function DomGetContent($Dom, $Selector, $Default = '') {
-        $Element = $Dom->getElementsByTagName($Selector);
-        return isset($Element->content) ? $Element->content : $Default;
+if (!function_exists('domGetContent')) {
+    function domGetContent($dom, $selector, $default = '') {
+        $Element = $dom->getElementsByTagName($selector);
+        return isset($Element->content) ? $Element->content : $default;
     }
 }
 
-if (!function_exists('DomGetImages')) {
-    function DomGetImages($Dom, $Url, $MaxImages = 4) {
+if (!function_exists('domGetImages')) {
+    function domGetImages($dom, $url, $maxImages = 4) {
         $Images = array();
-        foreach ($Dom->find('img') as $element) {
+        foreach ($dom->find('img') as $element) {
             $Images[] = array(
-                'Src' => absoluteSource($element->src, $Url),
+                'Src' => absoluteSource($element->src, $url),
                 'Width' => $element->width,
                 'Height' => $element->height
             );
@@ -1108,7 +1108,7 @@ if (!function_exists('DomGetImages')) {
 
                 $i++;
 
-                if ($i > $MaxImages) {
+                if ($i > $maxImages) {
                     break;
                 }
             } catch (Exception $ex) {

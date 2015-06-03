@@ -58,7 +58,7 @@ define('TRACE_WARNING', 'Warning');
 define('TRACE_NOTICE', 'Notice');
 
 // Environment
-define('ENVIRONMENT_PHP_VERSION', '5.2.0');
+define('ENVIRONMENT_PHP_VERSION', '5.3.0');
 
 if (!defined('E_USER_DEPRECATED')) {
     define('E_USER_DEPRECATED', E_USER_WARNING);

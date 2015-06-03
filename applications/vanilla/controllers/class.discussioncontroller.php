@@ -554,7 +554,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = GetIncomingValue('Target', 'discussions');
+            $Target = getIncomingValue('Target', 'discussions');
             SafeRedirect($Target);
         }
 
@@ -597,7 +597,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = GetIncomingValue('Target', 'discussions');
+            $Target = getIncomingValue('Target', 'discussions');
             SafeRedirect($Target);
         }
 
@@ -706,7 +706,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $Target = GetIncomingValue('Target', $DefaultTarget);
+            $Target = getIncomingValue('Target', $DefaultTarget);
             SafeRedirect($Target);
         }
 
@@ -755,18 +755,18 @@ body { background: transparent !important; }
 
         // Define incoming variables (prefer querystring parameters over method parameters)
         $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
-        $DiscussionID = GetIncomingValue('vanilla_discussion_id', $DiscussionID);
-        $Offset = GetIncomingValue('Offset', $Offset);
-        $Limit = GetIncomingValue('Limit', $Limit);
-        $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
+        $DiscussionID = getIncomingValue('vanilla_discussion_id', $DiscussionID);
+        $Offset = getIncomingValue('Offset', $Offset);
+        $Limit = getIncomingValue('Limit', $Limit);
+        $vanilla_identifier = getIncomingValue('vanilla_identifier', '');
 
         // Only allow vanilla identifiers of 32 chars or less - md5 if larger
         if (strlen($vanilla_identifier) > 32) {
             $vanilla_identifier = md5($vanilla_identifier);
         }
-        $vanilla_type = GetIncomingValue('vanilla_type', 'page');
-        $vanilla_url = GetIncomingValue('vanilla_url', '');
-        $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
+        $vanilla_type = getIncomingValue('vanilla_type', 'page');
+        $vanilla_url = getIncomingValue('vanilla_url', '');
+        $vanilla_category_id = getIncomingValue('vanilla_category_id', '');
         $ForeignSource = array(
             'vanilla_identifier' => $vanilla_identifier,
             'vanilla_type' => $vanilla_type,

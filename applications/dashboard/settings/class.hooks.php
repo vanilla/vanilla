@@ -93,7 +93,7 @@ class DashboardHooks implements Gdn_IPlugin {
             // Record the remote url where the forum is being embedded.
             $RemoteUrl = C('Garden.Embed.RemoteUrl');
             if (!$RemoteUrl) {
-                $RemoteUrl = GetIncomingValue('remote');
+                $RemoteUrl = getIncomingValue('remote');
                 if ($RemoteUrl)
                     SaveToConfig('Garden.Embed.RemoteUrl', $RemoteUrl);
             }

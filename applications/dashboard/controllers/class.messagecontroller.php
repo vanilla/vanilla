@@ -68,7 +68,7 @@ class MessageController extends DashboardController {
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-            Redirect(GetIncomingValue('Target', '/discussions'));
+            Redirect(getIncomingValue('Target', '/discussions'));
 
         $this->Render();
     }

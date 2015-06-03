@@ -323,7 +323,7 @@ class UserController extends DashboardController {
      */
     public function AutoComplete() {
         $this->DeliveryType(DELIVERY_TYPE_NONE);
-        $Q = GetIncomingValue('q');
+        $Q = getIncomingValue('q');
         $UserModel = new UserModel();
         $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
         foreach ($Data->Result() as $User) {

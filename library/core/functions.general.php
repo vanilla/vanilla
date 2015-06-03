@@ -1611,7 +1611,7 @@ if (!function_exists('GetConnectionString')) {
     }
 }
 
-if (!function_exists('GetIncomingValue')) {
+if (!function_exists('getIncomingValue')) {
     /**
      * Grab {@link $FieldName} from either the GET or POST collections.
      *
@@ -1619,7 +1619,7 @@ if (!function_exists('GetIncomingValue')) {
      *
      * @deprecated Use the various methods on {@link Gdn::Request()}.
      */
-    function GetIncomingValue($FieldName, $Default = false) {
+    function getIncomingValue($FieldName, $Default = false) {
         if (array_key_exists($FieldName, $_POST) === true) {
             $Result = filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
         } elseif (array_key_exists($FieldName, $_GET) === true) {

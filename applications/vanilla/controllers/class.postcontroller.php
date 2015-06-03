@@ -183,7 +183,7 @@ class PostController extends VanillaController {
             // Save as a draft?
             $FormValues = $this->Form->FormValues();
             $FormValues = $this->DiscussionModel->FilterForm($FormValues);
-            $this->DeliveryType(GetIncomingValue('DeliveryType', $this->_DeliveryType));
+            $this->DeliveryType(getIncomingValue('DeliveryType', $this->_DeliveryType));
             if ($DraftID == 0)
                 $DraftID = $this->Form->GetFormValue('DraftID', 0);
 
@@ -552,7 +552,7 @@ class PostController extends VanillaController {
             if ($DraftID == 0)
                 $DraftID = $this->Form->GetFormValue('DraftID', 0);
 
-            $Type = GetIncomingValue('Type');
+            $Type = getIncomingValue('Type');
             $Draft = $Type == 'Draft';
             $this->EventArguments['Draft'] = $Draft;
             $Preview = $Type == 'Preview';

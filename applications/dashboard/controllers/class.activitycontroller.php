@@ -208,7 +208,7 @@ class ActivityController extends Gdn_Controller {
         $this->ActivityModel->Delete($ActivityID);
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-            Redirect(GetIncomingValue('Target', $this->SelfUrl));
+            Redirect(getIncomingValue('Target', $this->SelfUrl));
 
         // Still here? Getting a 404.
         $this->ControllerName = 'Home';

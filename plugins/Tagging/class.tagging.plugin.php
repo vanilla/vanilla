@@ -395,7 +395,7 @@ class TaggingPlugin extends Gdn_Plugin {
         // Allow per-category tags
         $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
         if ($CategorySearch)
-            $CategoryID = GetIncomingValue('CategoryID');
+            $CategoryID = getIncomingValue('CategoryID');
 
         if ($parent && !is_numeric($parent))
             $parent = Gdn::SQL()->GetWhere('Tag', array('Name' => $parent))->Value('TagID', -1);

@@ -21,7 +21,7 @@ class CategoryFollowToggleModule extends Gdn_Module {
         if (!$Session->IsValid())
             return;
 
-        $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
+        $ShowAllCategories = getIncomingValue('ShowAllCategories', '');
         if ($ShowAllCategories != '') {
             $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
             $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');

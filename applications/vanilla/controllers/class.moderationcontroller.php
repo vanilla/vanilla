@@ -208,7 +208,7 @@ class ModerationController extends VanillaController {
             Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
         }
 
-        Redirect(GetIncomingValue('Target', '/discussions'));
+        Redirect(getIncomingValue('Target', '/discussions'));
     }
 
     /**
@@ -219,7 +219,7 @@ class ModerationController extends VanillaController {
         if ($Session->ValidateTransientKey($TransientKey))
             Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
 
-        Redirect(GetIncomingValue('Target', '/discussions'));
+        Redirect(getIncomingValue('Target', '/discussions'));
     }
 
     /**

@@ -842,14 +842,20 @@ if (!function_exists('dateCompare')) {
 }
 
 if (!function_exists('debug')) {
-    function debug($Value = null) {
+    /**
+     * Get or set the current debug state of the application.
+     *
+     * @param bool? $value The new debug value or null to just return the current value.
+     * @return bool Returns the current debug level.
+     */
+    function debug($value = null) {
         static $Debug = false;
-        if ($Value === null) {
+        if ($value === null) {
             return $Debug;
         }
 
-        $Changed = $Debug != $Value;
-        $Debug = $Value;
+        $Changed = $Debug != $value;
+        $Debug = $value;
         if ($Debug) {
             Logger::logLevel(Logger::DEBUG);
         } else {
@@ -857,6 +863,7 @@ if (!function_exists('debug')) {
                 Logger::logLevel(C('Garden.LogLevel', Logger::INFO));
             }
         }
+        return $Debug;
     }
 }
 

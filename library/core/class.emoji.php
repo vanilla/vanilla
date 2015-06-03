@@ -282,7 +282,7 @@ class Emoji {
      * @return string
      */
     public function buildEmojiPath($emojiName) {
-        Deprecated('buildEmojiPath', 'getEmojiPath');
+        deprecated('buildEmojiPath', 'getEmojiPath');
         return $this->getEmojiPath($emojiName);
     }
 
@@ -376,7 +376,7 @@ class Emoji {
      * @return array List of Emojis that will appear in the editor.
      */
     public function getEmojiEditorList() {
-        Deprecated('getEmojiEditorList', 'getEditorList');
+        deprecated('getEmojiEditorList', 'getEditorList');
         return $this->getEditorList();
     }
 
@@ -420,7 +420,7 @@ class Emoji {
      * @param array $value The new editor list.
      */
     public function setEmojiEditorList($value) {
-        Deprecated('setEmojiEditorList', 'setEditorList');
+        deprecated('setEmojiEditorList', 'setEditorList');
         return $this->setEditorList($value);
     }
 

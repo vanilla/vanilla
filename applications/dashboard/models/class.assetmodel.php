@@ -281,7 +281,7 @@ class AssetModel extends Gdn_Model {
             $Filename = "/{$Filename}";
             $Path = PATH_ROOT.$Filename;
             if (file_exists($Path)) {
-                Deprecated("AssetModel::CssPath() with direct paths");
+                deprecated("AssetModel::CssPath() with direct paths");
                 return array($Path, $Filename);
             }
             return false;
@@ -326,7 +326,7 @@ class AssetModel extends Gdn_Model {
                 if (!empty($Info[2])) {
                     // This path is deprecated.
                     unset($Info[2]);
-                    Deprecated("The css file '$Filename' in folder '$Folder'");
+                    deprecated("The css file '$Filename' in folder '$Folder'");
                 }
 
                 return $Info;

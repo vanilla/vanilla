@@ -1749,7 +1749,7 @@ EOT;
      * @param string $TransientKey Unique value to prove intent.
      */
     public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
-        Deprecated(__FUNCTION__);
+        deprecated(__FUNCTION__);
         $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
         $this->FireEvent('BeforeLeave');
 

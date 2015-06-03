@@ -254,7 +254,7 @@ class Gdn_Validation {
      * @deprecated This method has been deprecated in favor of {@link Gdn_Validation::SetSchema()}.
      */
     public function ApplySchema($Schema) {
-        Deprecated('ApplySchema', 'SetSchema');
+        deprecated('ApplySchema', 'SetSchema');
         $this->SetSchema($Schema);
     }
 

@@ -880,14 +880,14 @@ if (!function_exists('debugMethod')) {
     }
 }
 
-if (!function_exists('Deprecated')) {
+if (!function_exists('deprecated')) {
     /**
      * Mark a function deprecated.
      *
      * @param string $Name The name of the deprecated function.
      * @param string $NewName The name of the new function that should be used instead.
      */
-    function Deprecated($Name, $NewName = '') {
+    function deprecated($Name, $NewName = '') {
         $Msg = $Name.' is deprecated.';
         if ($NewName) {
             $Msg .= " Use $NewName instead.";

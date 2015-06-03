@@ -1040,7 +1040,7 @@ class UserModel extends Gdn_Model {
     public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
         if (is_numeric($OrderFields)) {
             // They're using the old version that was a misnamed GetID()
-            Deprecated('UserModel->Get()', 'UserModel->GetID()');
+            deprecated('UserModel->Get()', 'UserModel->GetID()');
             $Result = $this->GetID($OrderFields);
         } else {
             $Result = parent::Get($OrderFields, $OrderDirection, $Limit, $Offset);

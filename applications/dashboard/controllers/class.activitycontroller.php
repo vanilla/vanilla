@@ -28,11 +28,11 @@ class ActivityController extends Gdn_Controller {
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':
-                Deprecated('ActivityController->CommentData', "ActivityController->Data('Activities')");
+                deprecated('ActivityController->CommentData', "ActivityController->Data('Activities')");
                 $Result = new Gdn_DataSet(array(), DATASET_TYPE_OBJECT);
                 return $Result;
             case 'ActivityData':
-                Deprecated('ActivityController->ActivityData', "ActivityController->Data('Activities')");
+                deprecated('ActivityController->ActivityData', "ActivityController->Data('Activities')");
                 $Result = new Gdn_DataSet($this->Data('Activities'), DATASET_TYPE_ARRAY);
                 $Result->DatasetType(DATASET_TYPE_OBJECT);
                 return $Result;

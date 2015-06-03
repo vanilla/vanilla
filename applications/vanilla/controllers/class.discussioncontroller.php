@@ -32,7 +32,7 @@ class DiscussionController extends VanillaController {
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':
-                Deprecated('DiscussionController->CommentData', "DiscussionController->Data('Comments')");
+                deprecated('DiscussionController->CommentData', "DiscussionController->Data('Comments')");
                 return $this->Data('Comments');
                 break;
         }

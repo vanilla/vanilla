@@ -10,7 +10,7 @@ $PluginInfo['Facebook'] = array(
     'Name' => 'Facebook Social Connect',
     'Description' => 'Users may sign into your site using their Facebook account.',
     'Version' => '1.2.0',
-    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'MobileFriendly' => TRUE,

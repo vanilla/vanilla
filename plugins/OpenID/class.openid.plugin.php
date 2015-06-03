@@ -12,7 +12,7 @@ $PluginInfo['OpenID'] = array(
     'Name' => 'OpenID',
     'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
     'Version' => '1.2.0',
-    'RequiredApplications' => array('Vanilla' => '2.0.14'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => TRUE,
     'SettingsUrl' => '/settings/openid',
     'SettingsPermission' => 'Garden.Settings.Manage',

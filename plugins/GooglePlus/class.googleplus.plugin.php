@@ -12,7 +12,7 @@ $PluginInfo['GooglePlus'] = array(
     'Name' => 'Google+ Social Connect',
     'Description' => 'Users may sign into your site using their Google Plus account.',
     'Version' => '1.1.0',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',

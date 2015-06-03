@@ -12,7 +12,7 @@ $PluginInfo['Twitter'] = array(
     'Name' => 'Twitter Social Connect',
     'Description' => 'Users may sign into your site using their Twitter account.',
     'Version' => '1.1.9',
-    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => TRUE,
     'SettingsUrl' => '/dashboard/social/twitter',
     'SettingsPermission' => 'Garden.Settings.Manage',

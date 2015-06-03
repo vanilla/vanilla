@@ -70,7 +70,14 @@ if (!function_exists('addActivity')) {
      * @return int
      * @deprecated
      */
-    function addActivity($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $Route = '', $SendEmail = '') {
+    function addActivity(
+        $ActivityUserID,
+        $ActivityType,
+        $Story = '',
+        $RegardingUserID = '',
+        $Route = '',
+        $SendEmail = ''
+    ) {
         $ActivityModel = new ActivityModel();
         return $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route, $SendEmail);
     }
@@ -190,6 +197,9 @@ if (!function_exists('array_column')) {
 if (!function_exists('arrayCombine')) {
     /**
      * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
+     *
+     * @param array $Array1 Array of keys to be used. Illegal values for key will be converted to string.
+     * @param array $Array2 Array of values to be used.
      */
     function arrayCombine($Array1, $Array2) {
         if (!is_array($Array1)) {
@@ -297,7 +307,6 @@ if (!function_exists('arrayTranslate')) {
     /**
      * Take all of the items specified in an array and make a new array with them specified by mappings.
      *
-     *
      * @param array $Array The input array to translate.
      * @param array $Mappings The mappings to translate the array.
      * @param bool $AddRemaining Whether or not to add the remaining items to the array.
@@ -380,8 +389,10 @@ if (!function_exists('arrayValueI')) {
 }
 
 if (!function_exists('arrayValuesToKeys')) {
-    /** Takes an array's values and applies them to a new array as both the keys
-     * and values.
+    /**
+     * Take an array's values and apply them to a new array as both the keys and values.
+     *
+     * @deprecated
      */
     function arrayValuesToKeys($Array) {
         return array_combine(array_values($Array), $Array);
@@ -395,7 +406,7 @@ if (!function_exists('asset')) {
      * @param string $Destination
      * @param boolean $WithDomain
      * @param boolean $AddVersion
-     * @param string $Version optional. forced version, skips auto-lookup.
+     * @param string $Version Forced version, skips auto-lookup.
      * @return string
      */
     function asset($Destination = '', $WithDomain = false, $AddVersion = false, $Version = null) {
@@ -453,8 +464,7 @@ if (!function_exists('asset')) {
 
 if (!function_exists('attribute')) {
     /**
-     * Takes an attribute (or array of attributes) and formats them in
-     * attribute="value" format.
+     * Takes an attribute (or array of attributes) and formats them in attribute="value" format.
      */
     function attribute($Name, $ValueOrExclude = '') {
         $Return = '';
@@ -480,12 +490,29 @@ if (!function_exists('attribute')) {
 if (!function_exists('c')) {
     /**
      * Retrieves a configuration setting.
-     * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+     *
+     * @param string|bool $Name The name of the configuration setting.
+     * Settings in different sections are separated by dots.
      * @param mixed $Default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::Config()
      */
     function c($Name = false, $Default = false) {
+        return Gdn::Config($Name, $Default);
+    }
+}
+
+if (!function_exists('config')) {
+    /**
+     * Retrieves a configuration setting.
+     *
+     * @param string|bool $Name The name of the configuration setting.
+     * Settings in different sections are separated by dots.
+     * @param mixed $Default The result to return if the configuration setting is not found.
+     * @return mixed The configuration setting.
+     * @see Gdn::Config()
+     */
+    function config($Name = false, $Default = false) {
         return Gdn::Config($Name, $Default);
     }
 }
@@ -516,6 +543,8 @@ if (!function_exists('cTo')) {
 
 if (!function_exists('calculateNumberOfPages')) {
     /**
+     * Calculate the total number of pages based on the total items and items per page.
+     *
      * Based on the total number of items and the number of items per page,
      * this function will calculate how many pages there are.
      * Returns the number of pages available
@@ -523,7 +552,7 @@ if (!function_exists('calculateNumberOfPages')) {
     function calculateNumberOfPages($ItemCount, $ItemsPerPage) {
         $TmpCount = ($ItemCount / $ItemsPerPage);
         $RoundedCount = intval($TmpCount);
-        $PageCount = 0;
+
         if ($TmpCount > 1) {
             if ($TmpCount > $RoundedCount) {
                 $PageCount = $RoundedCount + 1;
@@ -538,7 +567,8 @@ if (!function_exists('calculateNumberOfPages')) {
 }
 
 if (!function_exists('changeBasename')) {
-    /** Change the basename part of a filename for a given path.
+    /**
+     * Change the basename part of a filename for a given path.
      *
      * @param string $Path The path to alter.
      * @param string $NewBasename The new basename. A %s will be replaced by the old basename.
@@ -762,6 +792,7 @@ if (!function_exists('decho')) {
 if (!function_exists('dateCompare')) {
     /**
      * Compare two dates.
+     *
      * This function compares two dates in a way that is similar to strcmp().
      *
      * @param int|string $Date1
@@ -832,7 +863,7 @@ if (!function_exists('Deprecated')) {
      * @param string $Name The name of the deprecated function.
      * @param string $NewName The name of the new function that should be used instead.
      */
-    function Deprecated($Name, $NewName = false) {
+    function Deprecated($Name, $NewName = '') {
         $Msg = $Name.' is deprecated.';
         if ($NewName) {
             $Msg .= " Use $NewName instead.";
@@ -881,6 +912,7 @@ if (!function_exists('ExternalUrl')) {
 if (!function_exists('FetchPageInfo')) {
     /**
      * Examines the page at $Url for title, description & images. Be sure to check the resultant array for any Exceptions that occurred while retrieving the page.
+     *
      * @param string $Url The url to examine.
      * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
      * @return array an array containing Url, Title, Description, Images (array) and Exception (if there were problems retrieving the page).
@@ -1278,6 +1310,7 @@ if (!function_exists('_FormatStringCallback')) {
                             break;
                         case 'p':
                             $Result = GetValue(5, $Parts, GetValue(4, $Parts));
+                            break;
                         case 'u':
                         default:
                             $Result = GetValue(4, $Parts);
@@ -1681,7 +1714,7 @@ if (!function_exists('GetValueR')) {
     }
 }
 
-if (!function_exists('HtmlEntityDecode')):
+if (!function_exists('HtmlEntityDecode')) {
 
     /**
      * Decode ALL of the entities out of an html string.
@@ -1731,7 +1764,7 @@ if (!function_exists('HtmlEntityDecode')):
         return '';
     }
 
-endif;
+}
 
 if (!function_exists('ImplodeAssoc')) {
     /**
@@ -1913,7 +1946,7 @@ if (!function_exists('IsWritable')) {
     }
 }
 
-if (!function_exists('MarkString')):
+if (!function_exists('MarkString')) {
     /**
      * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle
      * on spaces. Returns $Haystack with replacements.
@@ -1940,9 +1973,9 @@ if (!function_exists('MarkString')):
         }
         return $Haystack;
     }
-endif;
+}
 
-if (!function_exists('JoinRecords')):
+if (!function_exists('JoinRecords')) {
 
     /**
      * Join external records to an array.
@@ -2040,7 +2073,7 @@ if (!function_exists('JoinRecords')):
         }
     }
 
-endif;
+}
 
 if (!function_exists('MergeArrays')) {
     /**
@@ -2048,6 +2081,7 @@ if (!function_exists('MergeArrays')) {
      *
      * @param array The "dominant" array, who's values will be chosen over those of the subservient.
      * @param array The "subservient" array, who's values will be disregarded over those of the dominant.
+     * @deprecated Use {@link array_merge_recursive()}
      */
     function MergeArrays(&$Dominant, $Subservient) {
         foreach ($Subservient as $Key => $Value) {
@@ -2196,7 +2230,7 @@ if (!function_exists('RecordType')) {
     }
 }
 
-if (!function_exists('TouchConfig')):
+if (!function_exists('TouchConfig')) {
     /**
      * Make sure the config has a setting.
      * This function is useful to call in the setup/structure of plugins to make sure they have some default config set.
@@ -2220,7 +2254,7 @@ if (!function_exists('TouchConfig')):
             SaveToConfig($Save);
         }
     }
-endif;
+}
 
 if (!function_exists('write_ini_string')) {
     function write_ini_string($Data) {
@@ -2261,6 +2295,7 @@ if (!function_exists('ParseUrl')) {
      * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
      * @param string $Url The url to parse.
      * @param constant Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH, PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
+     * @deprecated
      */
     function ParseUrl($Url, $Component = -1) {
         // Retrieve all the parts
@@ -2369,6 +2404,7 @@ if (!function_exists('PrepareArray')) {
      * @param string $Key Key to prepare
      * @param array $Array Array to repare
      * @param string $PrepareType Optional,
+     * @deprecated
      */
     function PrepareArray($Key, &$Array, $PrepareType = 'array') {
         if (!array_key_exists($Key, $Array)) {
@@ -2732,7 +2768,7 @@ if (!function_exists('RandomString')) {
     }
 }
 
-if (!function_exists('BetterRandomString')):
+if (!function_exists('BetterRandomString')) {
 
     /**
      * Generate a random string of characters with additional character options that can be cryptographically strong.
@@ -2778,7 +2814,7 @@ if (!function_exists('BetterRandomString')):
         }
         return $String;
     }
-endif;
+}
 
 if (!function_exists('Redirect')) {
     function Redirect($Destination = false, $StatusCode = null) {
@@ -3104,7 +3140,7 @@ if (!function_exists('SaveToConfig')) {
 }
 
 
-if (!function_exists('SetAppCookie')):
+if (!function_exists('SetAppCookie')) {
 
     /**
      * Set a cookie withe the appropriate application cookie prefix and other cookie information.
@@ -3135,7 +3171,7 @@ if (!function_exists('SetAppCookie')):
         safeCookie($Key, $Value, $Expire, '/', $Domain, null, true);
         $_COOKIE[$Key] = $Value;
     }
-endif;
+}
 
 if (!function_exists('SliceParagraph')) {
     /**

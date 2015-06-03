@@ -766,7 +766,7 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
      *
      * @deprecated Use {@link array_column()} instead.
      */
-    function ConsolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = null) {
+    function consolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = null) {
         $Return = array();
         foreach ($Array as $Index => $AssociativeArray) {
 
@@ -1153,7 +1153,7 @@ if (!function_exists('forceIPv4')) {
  * @return string 32 characters or less.
  */
 if (!function_exists('ForeignIDHash')) {
-    function ForeignIDHash($ForeignID) {
+    function foreignIDHash($ForeignID) {
         return strlen($ForeignID) > 32 ? md5($ForeignID) : $ForeignID;
     }
 }
@@ -1440,14 +1440,16 @@ if (!function_exists('forceBool')) {
     }
 }
 
-if (!function_exists('ForceSSL')) {
+if (!function_exists('forceSSL')) {
     /**
      * Checks the current url for SSL and redirects to an SSL version if not currently on it.
      *
      * Call at the beginning of any method you want forced to be in SSL.
      * Garden.AllowSSL must be true in order for this function to work.
+     *
+     * @deprecated
      */
-    function ForceSSL() {
+    function forceSSL() {
         if (C('Garden.AllowSSL')) {
             if (Gdn::Request()->Scheme() != 'https') {
                 Redirect(Gdn::Request()->Url('', true, true));
@@ -1456,14 +1458,16 @@ if (!function_exists('ForceSSL')) {
     }
 }
 
-if (!function_exists('ForceNoSSL')) {
+if (!function_exists('forceNoSSL')) {
     /**
      * Checks the current url for SSL and redirects to SSL version if not currently on it.
      *
      * Call at the beginning of any method you want forced to be in SSL.
      * Garden.AllowSSL must be true in order for this function to work.
+     *
+     * @deprecated
      */
-    function ForceNoSSL() {
+    function forceNoSSL() {
         if (Gdn::Request()->Scheme() != 'http') {
             Redirect(Gdn::Request()->Url('', true, false));
         }

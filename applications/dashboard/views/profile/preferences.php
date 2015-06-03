@@ -106,7 +106,7 @@
             </table>
         <?php
         }
-        $this->FireEvent('CustomNotificationPreferneces');
+        $this->FireEvent('CustomNotificationPreferences');
         echo $this->Form->Close('Save Preferences', '', array('class' => 'Button Primary'));
         $this->FireEvent("AfterPreferencesRender");
         ?>

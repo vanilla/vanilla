@@ -152,7 +152,7 @@ if (!function_exists('validateConnection')) {
         $DatabaseName = ArrayValue('Database.Name', $data, '~~Invalid~~');
         $DatabaseUser = ArrayValue('Database.User', $data, '~~Invalid~~');
         $DatabasePassword = ArrayValue('Database.Password', $data, '~~Invalid~~');
-        $ConnectionString = GetConnectionString($DatabaseName, $DatabaseHost);
+        $ConnectionString = getConnectionString($DatabaseName, $DatabaseHost);
         try {
             $Connection = new PDO(
                 $ConnectionString,

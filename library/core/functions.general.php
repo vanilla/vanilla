@@ -1584,7 +1584,7 @@ if (!function_exists('getallheaders')) {
     }
 }
 
-if (!function_exists('GetAppCookie')) {
+if (!function_exists('getAppCookie')) {
     /**
      * Get a cookie with the application prefix.
      *
@@ -1592,22 +1592,30 @@ if (!function_exists('GetAppCookie')) {
      * @param mixed $Default
      * @return string
      */
-    function GetAppCookie($Name, $Default = null) {
+    function getAppCookie($Name, $Default = null) {
         $Px = C('Garden.Cookie.Name');
         return GetValue("$Px-$Name", $_COOKIE, $Default);
     }
 }
 
-if (!function_exists('GetConnectionString')) {
-    function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
-        $HostName = explode(':', $HostName);
-        $Port = count($HostName) == 2 ? $HostName[1] : '';
-        $HostName = $HostName[0];
-        $String = $ServerType.':host='.$HostName;
+if (!function_exists('getConnectionString')) {
+    /**
+     * Construct a PDO connection string.
+     *
+     * @param string $databaseName
+     * @param string $hostName
+     * @param string $serverType
+     * @return string
+     */
+    function getConnectionString($databaseName, $hostName = 'localhost', $serverType = 'mysql') {
+        $hostName = explode(':', $hostName);
+        $Port = count($hostName) == 2 ? $hostName[1] : '';
+        $hostName = $hostName[0];
+        $String = $serverType.':host='.$hostName;
         if ($Port != '') {
             $String .= ';port='.$Port;
         }
-        return $String .= ';dbname='.$DatabaseName;
+        return $String .= ';dbname='.$databaseName;
     }
 }
 
@@ -1632,6 +1640,10 @@ if (!function_exists('getIncomingValue')) {
 }
 
 if (!function_exists('GetMentions')) {
+    /**
+     * @param $String
+     * @return array
+     */
     function GetMentions($String) {
         // Check for a custom mentions formatter and use it.
         $Formatter = Gdn::Factory('MentionsFormatter');

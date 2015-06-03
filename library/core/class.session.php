@@ -386,14 +386,14 @@ class Gdn_Session {
             } else {
                 $this->UserID = 0;
                 $this->User = FALSE;
-                $this->_TransientKey = GetAppCookie('tk');
+                $this->_TransientKey = getAppCookie('tk');
 
                 if ($SetIdentity)
                     Gdn::Authenticator()->SetIdentity(NULL);
             }
         } else {
             // Grab the transient key from the cookie. This doesn't always get set but we'll try it here anyway.
-            $this->_TransientKey = GetAppCookie('tk');
+            $this->_TransientKey = getAppCookie('tk');
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0)

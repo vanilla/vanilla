@@ -357,8 +357,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             ${$VariableName}[$Item]['ThemeRoot'] = dirname($ThemeFile);
 
             if (!array_key_exists('Name', ${$VariableName}[$Item])) {
-                $$VariableName
-            }[$Item]['Name'] = $Item;
+                ${$VariableName}[$Item]['Name'] = $Item;
+            }
 
             if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
                 ${$VariableName}[$Item]['Folder'] = basename(dirname($ThemeFile));
@@ -367,8 +367,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             return ${$VariableName}[$Item];
         } elseif ($VariableName !== null) {
             if (isset(${$VariableName})) {
-                return $$VariableName
-            };
+                return ${$VariableName};
+            }
         }
 
         return null;

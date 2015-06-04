@@ -1053,12 +1053,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             ${$VariableName}[$Item]['PluginRoot'] = dirname($PluginFile);
 
             if (!array_key_exists('Name', ${$VariableName}[$Item])) {
-                $$VariableName
-            }[$Item]['Name'] = $Item;
+                ${$VariableName}[$Item]['Name'] = $Item;
+            }
 
             if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
-                $$VariableName
-            }[$Item]['Folder'] = $Item;
+                ${$VariableName}[$Item]['Folder'] = $Item;
+            }
 
             return ${$VariableName}[$Item];
         } elseif ($VariableName !== null) {

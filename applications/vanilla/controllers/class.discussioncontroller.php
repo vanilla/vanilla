@@ -301,7 +301,6 @@ class DiscussionController extends VanillaController {
      */
     public function Initialize() {
         parent::Initialize();
-        $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
         $this->AddDefinition('ConfirmDeleteCommentHeading', T('ConfirmDeleteCommentHeading', 'Delete Comment'));
         $this->AddDefinition('ConfirmDeleteCommentText', T('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'));
         $this->Menu->HighlightRoute('/discussions');

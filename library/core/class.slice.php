@@ -43,7 +43,7 @@ class Gdn_Slice {
                     ->WithDeliveryType(DELIVERY_TYPE_VIEW);
 
                 ob_start();
-                $this->Dispatcher->Dispatch($Request, FALSE);
+                $this->Dispatcher->Dispatch($Request, false);
                 return ob_get_clean();
 
                 break;
@@ -52,6 +52,4 @@ class Gdn_Slice {
                 break;
         }
     }
-
 }
-

@@ -664,6 +664,4 @@ class Gdn_Model extends Gdn_Pluggable {
 
         return $Value;
     }
-
 }
-

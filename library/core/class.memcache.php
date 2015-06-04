@@ -59,8 +59,9 @@ class Gdn_Memcache extends Gdn_Cache {
      */
     public function autorun() {
         $Servers = Gdn_Cache::activeStore('memcache');
-        if (!is_array($Servers))
+        if (!is_array($Servers)) {
             $Servers = explode(',', $Servers);
+        }
 
         $Keys = array(
             Gdn_Cache::CONTAINER_LOCATION,
@@ -77,8 +78,9 @@ class Gdn_Memcache extends Gdn_Cache {
 
             foreach ($Keys as $KeyName) {
                 $Value = GetValue($KeyName, $CacheServer, null);
-                if (is_null($Value))
+                if (is_null($Value)) {
                     unset($CacheServer[$KeyName]);
+                }
             }
 
             $this->AddContainer($CacheServer);
@@ -140,8 +142,9 @@ class Gdn_Memcache extends Gdn_Cache {
 
         $Flags = 0;
         $Compress = 0;
-        if (GetValue(Gdn_Cache::FEATURE_COMPRESS, $FinalOptions))
+        if (GetValue(Gdn_Cache::FEATURE_COMPRESS, $FinalOptions)) {
             $Compress = (int)$this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
+        }
 
         $Flags |= $Compress;
 
@@ -175,8 +178,9 @@ class Gdn_Memcache extends Gdn_Cache {
 
         $Flags = 0;
         $Compress = 0;
-        if (GetValue(Gdn_Cache::FEATURE_COMPRESS, $FinalOptions))
+        if (GetValue(Gdn_Cache::FEATURE_COMPRESS, $FinalOptions)) {
             $Compress = (int)$this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
+        }
 
         $Flags |= $Compress;
 

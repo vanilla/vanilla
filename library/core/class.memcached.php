@@ -209,7 +209,6 @@ class Gdn_Memcached extends Gdn_Cache {
             $servers = array();
 
             if ($this->canAutoShard()) {
-
                 // Use getServerByKey to determine server keys
 
                 $i = $ns * 10;
@@ -226,7 +225,6 @@ class Gdn_Memcached extends Gdn_Cache {
             }
 
             if (!count($servers)) {
-
                 // Use random server keys
 
                 foreach ($serverList as $server) {
@@ -353,7 +351,6 @@ class Gdn_Memcached extends Gdn_Cache {
 
         // Sharding, write real keys
         if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
-
             $manifest = $this->shard($realKey, $value, $shards);
             $shards = $manifest->shards;
             unset($manifest->shards);
@@ -417,7 +414,6 @@ class Gdn_Memcached extends Gdn_Cache {
 
         // Sharding, write real keys
         if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
-
             $manifest = $this->shard($realKey, $value, $shards);
             $shards = $manifest->shards;
             unset($manifest->shards);
@@ -530,10 +526,8 @@ class Gdn_Memcached extends Gdn_Cache {
 
             $storeData = array();
             foreach ($data as $localKey => &$localValue) {
-
                 // Is this a sharded key manifest?
                 if (is_object($localValue) && $localValue instanceof MemcachedShard) {
-
                     $manifest = $localValue;
 
                     // MultiGet sub-keys

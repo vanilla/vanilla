@@ -150,8 +150,9 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     }
 
     public function GetValue($Key, $Default = false) {
-        if (array_key_exists($Key, $this->_DataHooks) && array_key_exists('value', $this->_DataHooks[$Key]))
+        if (array_key_exists($Key, $this->_DataHooks) && array_key_exists('value', $this->_DataHooks[$Key])) {
             return $this->_DataHooks[$Key]['value'];
+        }
 
         return $Default;
     }
@@ -176,7 +177,6 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
 
         $AuthenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
         if (is_null($Provider) || $Force === true) {
-
             if (!is_null($ProviderKey)) {
                 $ProviderData = $AuthModel->GetProviderByKey($ProviderKey);
             } else {

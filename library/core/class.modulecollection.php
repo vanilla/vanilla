@@ -30,23 +30,26 @@ class Gdn_ModuleCollection extends Gdn_Module {
 
             if (is_string($Item)) {
                 if (!empty($Item)) {
-                    if ($RenderedCount > 0)
+                    if ($RenderedCount > 0) {
                         $this->FireEvent('BetweenRenderAsset');
+                    }
 
                     echo $Item;
                     $RenderedCount++;
                 }
             } elseif ($Item instanceof Gdn_IModule) {
-                if (!GetValue('Visible', $Item, TRUE))
+                if (!GetValue('Visible', $Item, true)) {
                     continue;
+                }
 
                 $LengthBefore = ob_get_length();
                 $Item->Render();
                 $LengthAfter = ob_get_length();
 
-                if ($LengthBefore !== FALSE && $LengthAfter > $LengthBefore) {
-                    if ($RenderedCount > 0)
+                if ($LengthBefore !== false && $LengthAfter > $LengthBefore) {
+                    if ($RenderedCount > 0) {
                         $this->FireEvent('BetweenRenderAsset');
+                    }
                     $RenderedCount++;
                 }
             } else {

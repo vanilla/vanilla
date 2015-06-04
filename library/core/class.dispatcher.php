@@ -61,11 +61,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private $_ControllerMethodArgs = array();
 
     /** @var string|FALSE The delivery method to set on the controller. */
-    private $_DeliveryMethod = FALSE;
+    private $_DeliveryMethod = false;
 
 
     /** @var string|FALSE The delivery type to set on the controller. */
-    private $_DeliveryType = FALSE;
+    private $_DeliveryType = false;
 
     /**
      * @var array An associative collection of variables that will get passed into the
@@ -120,8 +120,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         return $this->ControllerMethod;
     }
 
-    public function ControllerArguments($Value = NULL) {
-        if ($Value !== NULL) {
+    public function ControllerArguments($Value = null) {
+        if ($Value !== null) {
             $this->_ControllerMethodArgs = $Value;
         }
         return $this->_ControllerMethodArgs;
@@ -134,10 +134,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      * Analyzes the supplied query string and decides how to dispatch the request.
      */
-    public function Dispatch($ImportRequest = NULL, $Permanent = TRUE) {
+    public function Dispatch($ImportRequest = null, $Permanent = true) {
 
-        if ($ImportRequest && is_string($ImportRequest))
+        if ($ImportRequest && is_string($ImportRequest)) {
             $ImportRequest = Gdn_Request::Create()->FromEnvironment()->WithURI($ImportRequest);
+        }
 
         if (is_a($ImportRequest, 'Gdn_Request') && $Permanent) {
             Gdn::Request($ImportRequest);
@@ -175,16 +176,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             $PathRequest = Gdn::Request()->Path();
             foreach ($BlockExceptions as $BlockException => $BlockLevel) {
-                if (preg_match($BlockException, $PathRequest))
+                if (preg_match($BlockException, $PathRequest)) {
                     throw new Exception("Block detected - {$BlockException}", $BlockLevel);
+                }
             }
 
             // Never block an admin
-            if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+            if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
                 throw new Exception("Block detected", self::BLOCK_NEVER);
+            }
 
-            if (Gdn::Session()->IsValid())
+            if (Gdn::Session()->IsValid()) {
                 throw new Exception("Block detected", self::BLOCK_PERMISSION);
+            }
 
         } catch (Exception $e) {
             // BlockLevel
@@ -195,7 +199,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         // If we're in updatemode and arent explicitly prevented from blocking, block
-        if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER) {
+        if (Gdn::Config('Garden.UpdateMode', false) && $CanBlock > self::BLOCK_NEVER) {
             $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
         }
 
@@ -206,8 +210,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // If we're in update mode and can block, redirect to signin
         if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
             if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
-                safeHeader('HTTP/1.0 401 Unauthorized', TRUE, 401);
-                safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), TRUE);
+                safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
+                safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), true);
                 echo json_encode(array('Code' => '401', 'Exception' => T('You must sign in.')));
             } else {
                 Redirect('/entry/signin?Target='.urlencode($this->Request));
@@ -249,8 +253,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
 
             // Pass along any data.
-            if (is_array($this->_Data))
+            if (is_array($this->_Data)) {
                 $Controller->Data = $this->_Data;
+            }
 
             // Set up a default controller method in case one isn't defined.
             $ControllerMethod = str_replace('_', '', $this->ControllerMethod);
@@ -265,8 +270,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     // $PluginManagerHasReplacementMethod = TRUE;
                     $ControllerMethod = 'x'.$ControllerMethod;
                 } else {
-                    if ($this->ControllerMethod != '')
+                    if ($this->ControllerMethod != '') {
                         array_unshift($this->_ControllerMethodArgs, $this->ControllerMethod);
+                    }
 
                     $this->ControllerMethod = 'Index';
                     $ControllerMethod = 'Index';
@@ -332,7 +338,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     exit();
                 }
             } else {
-                $this->EventArguments['Handled'] = FALSE;
+                $this->EventArguments['Handled'] = false;
                 $Handled =& $this->EventArguments['Handled'];
                 $this->FireEvent('NotFound');
 
@@ -366,20 +372,21 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param string The application folder related to the application name you want to return.
      */
     public function EnabledApplication($ApplicationFolder = '') {
-        if ($ApplicationFolder == '')
+        if ($ApplicationFolder == '') {
             $ApplicationFolder = $this->_ApplicationFolder;
+        }
 
         if (strpos($ApplicationFolder, 'plugins/') === 0) {
-            $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', FALSE, TRUE);
+            $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', false, true);
 
             if (array_key_exists($Plugin, Gdn::PluginManager()->AvailablePlugins())) {
                 return $Plugin;
             }
 
-            return FALSE;
+            return false;
         } else {
             foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
-                if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
+                if (GetValue('Folder', $ApplicationInfo, false) === $ApplicationFolder) {
                     $EnabledApplication = $ApplicationName;
                     $this->EventArguments['EnabledApplication'] = $EnabledApplication;
                     $this->FireEvent('AfterEnabledApplication');
@@ -387,7 +394,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 }
             }
         }
-        return FALSE;
+        return false;
     }
 
     /**
@@ -442,17 +449,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->ControllerName = '';
         $this->ControllerMethod = 'index';
         $this->_ControllerMethodArgs = array();
-        $this->Request = $Request->Path(FALSE);
+        $this->Request = $Request->Path(false);
 
         $PathAndQuery = $Request->PathAndQuery();
         $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
 
         // We have a route. Take action.
-        if ($MatchRoute !== FALSE) {
+        if ($MatchRoute !== false) {
             switch ($MatchRoute['Type']) {
                 case 'Internal':
                     $Request->PathAndQuery($MatchRoute['FinalDestination']);
-                    $this->Request = $Request->Path(FALSE);
+                    $this->Request = $Request->Path(false);
                     break;
 
                 case 'Temporary':
@@ -478,7 +485,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     break;
                 case 'Test':
                     $Request->PathAndQuery($MatchRoute['FinalDestination']);
-                    $this->Request = $Request->Path(FALSE);
+                    $this->Request = $Request->Path(false);
                     decho($MatchRoute, 'Route');
                     decho(array(
                         'Path' => $Request->Path(),
@@ -516,15 +523,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          */
         try {
             // if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
-            if (in_array($Parts[0], $this->EnabledApplicationFolders()))
+            if (in_array($Parts[0], $this->EnabledApplicationFolders())) {
                 $this->FindController(1, $Parts);
+            }
 
             // if no match, see if the first argument is a controller
             $this->FindController(0, $Parts);
 
             // 3] See if there is a plugin trying to create a root method.
-            list($MethodName, $DeliveryMethod) = $this->_SplitDeliveryMethod(GetValue(0, $Parts), TRUE);
-            if ($MethodName && Gdn::PluginManager()->HasNewMethod('RootController', $MethodName, TRUE)) {
+            list($MethodName, $DeliveryMethod) = $this->_SplitDeliveryMethod(GetValue(0, $Parts), true);
+            if ($MethodName && Gdn::PluginManager()->HasNewMethod('RootController', $MethodName, true)) {
                 $this->_DeliveryMethod = $DeliveryMethod;
                 $Parts[0] = $MethodName;
                 $Parts = array_merge(array('root'), $Parts);
@@ -533,7 +541,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             throw new GdnDispatcherControllerNotFoundException();
         } catch (GdnDispatcherControllerFoundException $e) {
-
             switch ($this->_DeliveryMethod) {
                 case DELIVERY_METHOD_JSON:
                 case DELIVERY_METHOD_XML:
@@ -550,9 +557,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     break;
             }
 
-            return TRUE;
+            return true;
         } catch (GdnDispatcherControllerNotFoundException $e) {
-            $this->EventArguments['Handled'] = FALSE;
+            $this->EventArguments['Handled'] = false;
             $Handled =& $this->EventArguments['Handled'];
             $this->FireEvent('NotFound');
 
@@ -565,12 +572,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     protected function FindController($ControllerKey, $Parts) {
-        $Controller = GetValue($ControllerKey, $Parts, NULL);
+        $Controller = GetValue($ControllerKey, $Parts, null);
         $Controller = ucfirst(strtolower($Controller));
-        $Application = GetValue($ControllerKey - 1, $Parts, NULL);
+        $Application = GetValue($ControllerKey - 1, $Parts, null);
 
         // Check for a file extension on the controller.
-        list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, FALSE);
+        list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, false);
 
         // If we're loading from a fully qualified path, prioritize this app's library
         if (!is_null($Application)) {
@@ -579,20 +586,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 $Application,
                 Gdn_Autoloader::MAP_CONTROLLER,
                 Gdn_Autoloader::PRIORITY_TYPE_RESTRICT,
-                Gdn_Autoloader::PRIORITY_ONCE);
+                Gdn_Autoloader::PRIORITY_ONCE
+            );
         }
 
         $ControllerName = $Controller.'Controller';
-        $ControllerPath = Gdn_Autoloader::lookup($ControllerName, array('MapType' => NULL));
+        $ControllerPath = Gdn_Autoloader::lookup($ControllerName, array('MapType' => null));
 
         try {
-
             // If the lookup succeeded, good to go
-            if (class_exists($ControllerName, false))
+            if (class_exists($ControllerName, false)) {
                 throw new GdnDispatcherControllerFoundException();
+            }
 
         } catch (GdnDispatcherControllerFoundException $Ex) {
-
             // This was a guess search with no specified application. Look up
             // the application folder from the controller path.
             if (is_null($Application)) {
@@ -602,10 +609,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     do {
                         $ControllerPath = $Reflect->getFilename();
                         $Found = (bool)preg_match('`\/controllers\/`i', $ControllerPath);
-                        if (!$Found)
+                        if (!$Found) {
                             $Reflect = $Reflect->getParentClass();
+                        }
                     } while (!$Found && $Reflect);
-                    if (!$Found) return false;
+                    if (!$Found) {
+                        return false;
+                    }
                 }
 
                 if ($ControllerPath) {
@@ -616,13 +626,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     $AddonType = array_pop($InterimPath);
                     switch ($AddonType) {
                         case 'plugins':
-                            if (!in_array($Application, Gdn::PluginManager()->EnabledPluginFolders()))
+                            if (!in_array($Application, Gdn::PluginManager()->EnabledPluginFolders())) {
                                 return false;
+                            }
                             $Application = 'plugins/'.$Application;
                             break;
                         case 'applications':
-                            if (!in_array($Application, $this->EnabledApplicationFolders()))
+                            if (!in_array($Application, $this->EnabledApplicationFolders())) {
                                 return false;
+                            }
                             break;
                         default:
                             return false;
@@ -641,7 +653,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     $Application,
                     Gdn_Autoloader::MAP_CONTROLLER,
                     Gdn_Autoloader::PRIORITY_TYPE_PREFER,
-                    Gdn_Autoloader::PRIORITY_PERSIST);
+                    Gdn_Autoloader::PRIORITY_PERSIST
+                );
 
                 require_once($ControllerPath);
             }
@@ -650,20 +663,22 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
 
             $Length = sizeof($Parts);
-            if ($Length > $ControllerKey + 1)
-                list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], FALSE);
+            if ($Length > $ControllerKey + 1) {
+                list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], false);
+            }
 
             if ($Length > $ControllerKey + 2) {
                 for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
-                    if ($Parts[$i] != '')
+                    if ($Parts[$i] != '') {
                         $this->_ControllerMethodArgs[] = $Parts[$i];
+                    }
                 }
             }
 
             throw $Ex;
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -676,27 +691,32 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private function _MapParts($Parts, $ControllerKey) {
         $Length = count($Parts);
-        if ($Length > $ControllerKey)
+        if ($Length > $ControllerKey) {
             $this->ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
+        }
 
-        if ($Length > $ControllerKey + 1)
+        if ($Length > $ControllerKey + 1) {
             list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
+        }
 
         if ($Length > $ControllerKey + 2) {
             for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
-                if ($Parts[$i] != '')
+                if ($Parts[$i] != '') {
                     $this->_ControllerMethodArgs[] = $Parts[$i];
+                }
             }
         }
     }
 
     protected function _ReflectControllerArgs($Controller) {
         // Reflect the controller arguments based on the get.
-        if (count($Controller->Request->Get()) == 0)
+        if (count($Controller->Request->Get()) == 0) {
             return;
+        }
 
-        if (!method_exists($Controller, $this->ControllerMethod))
+        if (!method_exists($Controller, $this->ControllerMethod)) {
             return;
+        }
 
         $Meth = new ReflectionMethod($Controller, $this->ControllerMethod);
         $MethArgs = $Meth->getParameters();
@@ -713,14 +733,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         foreach ($MethArgs as $Index => $MethParam) {
             $ParamName = strtolower($MethParam->getName());
 
-            if (isset($this->_ControllerMethodArgs[$Index]))
+            if (isset($this->_ControllerMethodArgs[$Index])) {
                 $Args[] = $this->_ControllerMethodArgs[$Index];
-            elseif (isset($Get[$ParamName]))
+            } elseif (isset($Get[$ParamName]))
                 $Args[] = $Get[$ParamName];
             elseif ($MethParam->isDefaultValueAvailable())
                 $Args[] = $MethParam->getDefaultValue();
             else {
-                $Args[] = NULL;
+                $Args[] = null;
                 $MissingArgs[] = "{$Index}: {$ParamName}";
             }
         }
@@ -739,7 +759,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param type $AllowAll Whether to allow delivery types that don't exist
      * @return type
      */
-    protected function _SplitDeliveryMethod($Name, $AllowAll = FALSE) {
+    protected function _SplitDeliveryMethod($Name, $AllowAll = false) {
         $Parts = explode('.', $Name);
         if (count($Parts) >= 2) {
             $DeliveryPart = array_pop($Parts);

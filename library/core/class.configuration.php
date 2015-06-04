@@ -44,16 +44,16 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @var Gdn_ConfigurationSource Dynamic (writable) config source.
      * This is the configuration source that is written to when saves or removes are occuring.
      */
-    protected $Dynamic = NULL;
+    protected $Dynamic = null;
 
     /** @var boolean Use caching to load and save configs? */
-    protected $UseCaching = FALSE;
+    protected $UseCaching = false;
 
     /** @var boolean Allow dot-delimited splitting? */
-    protected $Splitting = TRUE;
+    protected $Splitting = true;
 
     /** @var boolean Whether or not to autosave this config when it is destructed. */
-    protected $AutoSave = TRUE;
+    protected $AutoSave = true;
 
     /** @var string The default top level group for new configs. */
     protected $DefaultGroup = 'Configuration';
@@ -63,10 +63,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      * @param null $DefaultGroup
      */
-    public function __construct($DefaultGroup = NULL) {
+    public function __construct($DefaultGroup = null) {
         parent::__construct();
-        if (!is_null($DefaultGroup))
+        if (!is_null($DefaultGroup)) {
             $this->DefaultGroup = $DefaultGroup;
+        }
 
         if (defined('PATH_CONF_DEFAULT')) {
             $this->DefaultPath = PATH_CONF_DEFAULT;
@@ -80,7 +81,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      * @param bool $AutoSave
      */
-    public function AutoSave($AutoSave = TRUE) {
+    public function AutoSave($AutoSave = true) {
         $this->AutoSave = (boolean)$AutoSave;
     }
 
@@ -89,7 +90,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      * @param boolean $Splitting
      */
-    public function Splitting($Splitting = TRUE) {
+    public function Splitting($Splitting = true) {
         $this->Splitting = (boolean)$Splitting;
     }
 
@@ -108,9 +109,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param boolean $Caching Whether to use caching
      * @return boolean
      */
-    public function Caching($Caching = NULL) {
-        if (!is_null($Caching))
+    public function Caching($Caching = null) {
+        if (!is_null($Caching)) {
             $this->UseCaching = (bool)$Caching;
+        }
         return $this->UseCaching;
     }
 
@@ -124,7 +126,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $ConfigFile);
         if (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
             Gdn::Cache()->Remove($FileKey, array(
-                Gdn_Cache::FEATURE_NOPREFIX => TRUE
+                Gdn_Cache::FEATURE_NOPREFIX => true
             ));
         }
     }
@@ -150,20 +152,22 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param boolean $Create Whether or not to create the data if it isn't there already.
      * @return mixed A reference to the configuration data node.
      */
-    public function &Find($Name, $Create = TRUE) {
+    public function &Find($Name, $Create = true) {
         $Array = &$this->Data;
 
-        if ($Name == '')
+        if ($Name == '') {
             return $Array;
+        }
 
         $Keys = explode('.', $Name);
         // If splitting is off, HANDLE IT
         if (!$this->Splitting) {
             $FirstKey = GetValue(0, $Keys);
-            if ($FirstKey == $this->DefaultGroup)
+            if ($FirstKey == $this->DefaultGroup) {
                 $Keys = array(array_shift($Keys), implode('.', $Keys));
-            else
+            } else {
                 $Keys = array($Name);
+            }
         }
         $KeyCount = count($Keys);
 
@@ -172,10 +176,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
 
             if (!array_key_exists($Key, $Array)) {
                 if ($Create) {
-                    if ($i == $KeyCount - 1)
-                        $Array[$Key] = NULL;
-                    else
+                    if ($i == $KeyCount - 1) {
+                        $Array[$Key] = null;
+                    } else {
                         $Array[$Key] = array();
+                    }
                 } else {
                     $Array = &$this->NotFound;
                     break;
@@ -194,40 +199,45 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @return string
      */
     public static function Format($Data, $Options = array()) {
-        if (is_string($Options))
+        if (is_string($Options)) {
             $Options = array('VariableName' => $Options);
+        }
 
         $Defaults = array(
             'VariableName' => 'Configuration',
-            'WrapPHP' => TRUE,
-            'SafePHP' => TRUE,
-            'Headings' => TRUE,
-            'ByLine' => TRUE,
+            'WrapPHP' => true,
+            'SafePHP' => true,
+            'Headings' => true,
+            'ByLine' => true,
             'FormatStyle' => 'Array'
         );
         $Options = array_merge($Defaults, $Options);
         $VariableName = GetValue('VariableName', $Options);
-        $WrapPHP = GetValue('WrapPHP', $Options, TRUE);
-        $SafePHP = GetValue('SafePHP', $Options, TRUE);
-        $ByLine = GetValue('ByLine', $Options, FALSE);
-        $Headings = GetValue('Headings', $Options, TRUE);
+        $WrapPHP = GetValue('WrapPHP', $Options, true);
+        $SafePHP = GetValue('SafePHP', $Options, true);
+        $ByLine = GetValue('ByLine', $Options, false);
+        $Headings = GetValue('Headings', $Options, true);
         $FormatStyle = GetValue('FormatStyle', $Options);
         $Formatter = "Format{$FormatStyle}Assignment";
 
         $FirstLine = '';
         $Lines = array();
-        if ($WrapPHP)
+        if ($WrapPHP) {
             $FirstLine .= "<?php ";
-        if ($SafePHP)
+        }
+        if ($SafePHP) {
             $FirstLine .= "if (!defined('APPLICATION')) exit();";
+        }
 
-        if (!empty($FirstLine))
+        if (!empty($FirstLine)) {
             $Lines[] = $FirstLine;
+        }
 
-        if (!is_array($Data))
+        if (!is_array($Data)) {
             return $Lines[0];
+        }
 
-        $LastKey = FALSE;
+        $LastKey = false;
         foreach ($Data as $Key => $Value) {
             if ($Headings && $LastKey != $Key && is_array($Value)) {
                 $Lines[] = '';
@@ -235,10 +245,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
                 $LastKey = $Key;
             }
 
-            if ($FormatStyle == 'Array')
-                $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
-            if ($FormatStyle == 'Dotted')
-                $Prefix = '$'.$VariableName."['".trim(var_export($Key, TRUE), "'");
+            if ($FormatStyle == 'Array') {
+                $Prefix = '$'.$VariableName."[".var_export($Key, true)."]";
+            }
+            if ($FormatStyle == 'Dotted') {
+                $Prefix = '$'.$VariableName."['".trim(var_export($Key, true), "'");
+            }
 
             $Formatter($Lines, $Prefix, $Value);
         }
@@ -263,20 +275,23 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param mixed $DefaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function Get($Name, $DefaultValue = FALSE) {
+    public function Get($Name, $DefaultValue = false) {
 
         // Shortcut, get the whole config
-        if ($Name == '.') return $this->Data;
+        if ($Name == '.') {
+            return $this->Data;
+        }
 
         $Keys = explode('.', $Name);
         // If splitting is off, HANDLE IT
         if (!$this->Splitting) {
 //         $FirstKey = GetValue(0, $Keys);
             $FirstKey = $Keys[0];
-            if ($FirstKey == $this->DefaultGroup)
+            if ($FirstKey == $this->DefaultGroup) {
                 $Keys = array(array_shift($Keys), implode('.', $Keys));
-            else
+            } else {
                 $Keys = array($Name);
+            }
         }
         $KeyCount = count($Keys);
 
@@ -289,10 +304,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
             }
         }
 
-        if (is_string($Value))
+        if (is_string($Value)) {
             $Result = Gdn_Format::Unserialize($Value);
-        else
+        } else {
             $Result = $Value;
+        }
 
         return $Result;
     }
@@ -306,7 +322,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
      */
     public function GetSource($Type, $Identifier) {
         $SourceTag = "{$Type}:{$Identifier}";
-        if (!array_key_exists($SourceTag, $this->Sources)) return FALSE;
+        if (!array_key_exists($SourceTag, $this->Sources)) {
+            return false;
+        }
 
         return $this->Sources[$SourceTag];
     }
@@ -322,10 +340,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param boolean $Overwrite If the setting already exists, should it's value be overwritten? Defaults to true.
      * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::Save().
      */
-    public function Set($Name, $Value, $Overwrite = TRUE, $Save = TRUE) {
+    public function Set($Name, $Value, $Overwrite = true, $Save = true) {
         // Make sure the config settings are in the right format
-        if (!is_array($this->Data))
+        if (!is_array($this->Data)) {
             $this->Data = array();
+        }
 
         if (!is_array($Name)) {
             $Name = array(
@@ -337,15 +356,15 @@ class Gdn_Configuration extends Gdn_Pluggable {
 
         $Data = $Name;
         foreach ($Data as $Name => $Value) {
-
             $Keys = explode('.', $Name);
             // If splitting is off, HANDLE IT
             if (!$this->Splitting) {
                 $FirstKey = GetValue(0, $Keys);
-                if ($FirstKey == $this->DefaultGroup)
+                if ($FirstKey == $this->DefaultGroup) {
                     $Keys = array(array_shift($Keys), implode('.', $Keys));
-                else
+                } else {
                     $Keys = array($Name);
+                }
             }
             $KeyCount = count($Keys);
             $Settings = &$this->Data;
@@ -353,18 +372,21 @@ class Gdn_Configuration extends Gdn_Pluggable {
             for ($i = 0; $i < $KeyCount; ++$i) {
                 $Key = $Keys[$i];
 
-                if (!is_array($Settings)) $Settings = array();
+                if (!is_array($Settings)) {
+                    $Settings = array();
+                }
                 $KeyExists = array_key_exists($Key, $Settings);
 
                 if ($i == $KeyCount - 1) {
                     // If we are on the last iteration of the key, then set the value.
-                    if ($KeyExists === FALSE || $Overwrite === TRUE) {
+                    if ($KeyExists === false || $Overwrite === true) {
                         $Settings[$Key] = $Value;
                     }
                 } else {
                     // Build the array as we loop over the key. Doucement.
-                    if ($KeyExists === FALSE)
+                    if ($KeyExists === false) {
                         $Settings[$Key] = array();
+                    }
 
                     // Advance the pointer
                     $Settings = &$Settings[$Key];
@@ -386,46 +408,48 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @return boolean Wether or not the key was found.
      * @todo This method may have to be recursive to remove empty arrays.
      */
-    public function Remove($Name, $Save = TRUE) {
+    public function Remove($Name, $Save = true) {
         // Make sure the config settings are in the right format
-        if (!is_array($this->Data))
-            return FALSE;
+        if (!is_array($this->Data)) {
+            return false;
+        }
 
-        $Found = FALSE;
+        $Found = false;
         $Keys = explode('.', $Name);
         // If splitting is off, HANDLE IT
         if (!$this->Splitting) {
             $FirstKey = GetValue(0, $Keys);
-            if ($FirstKey == $this->DefaultGroup)
+            if ($FirstKey == $this->DefaultGroup) {
                 $Keys = array(array_shift($Keys), implode('.', $Keys));
-            else
+            } else {
                 $Keys = array($Name);
+            }
         }
         $KeyCount = count($Keys);
         $Settings = &$this->Data;
 
         for ($i = 0; $i < $KeyCount; ++$i) {
-
             $Key = $Keys[$i];
 
             // Key will always be in here if it is anywhere at all
             if (array_key_exists($Key, $Settings)) {
                 if ($i == ($KeyCount - 1)) {
                     // We are at the setting, so unset it.
-                    $Found = TRUE;
+                    $Found = true;
                     unset($Settings[$Key]);
                 } else {
                     // Advance the pointer
                     $Settings =& $Settings[$Key];
                 }
             } else {
-                $Found = FALSE;
+                $Found = false;
                 break;
             }
         }
 
-        if ($Save && $this->Dynamic)
+        if ($Save && $this->Dynamic) {
             $this->Dynamic->Remove($Name);
+        }
 
         return $Found;
     }
@@ -441,19 +465,24 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *   is called after all defaults are loaded.
      * @return boolean
      */
-    public function Load($File, $Name = 'Configuration', $Dynamic = FALSE) {
+    public function Load($File, $Name = 'Configuration', $Dynamic = false) {
         $ConfigurationSource = Gdn_ConfigurationSource::FromFile($this, $File, $Name);
-        if (!$ConfigurationSource) return FALSE;
+        if (!$ConfigurationSource) {
+            return false;
+        }
 
         $UseSplitting = $this->Splitting;
         $ConfigurationSource->Splitting($UseSplitting);
 
-        if (!$ConfigurationSource) return FALSE;
+        if (!$ConfigurationSource) {
+            return false;
+        }
         $SourceTag = "file:{$File}";
         $this->Sources[$SourceTag] = $ConfigurationSource;
 
-        if ($Dynamic)
+        if ($Dynamic) {
             $this->Dynamic = $ConfigurationSource;
+        }
 
         if (!$UseSplitting) {
             $this->MassImport($ConfigurationSource->Export());
@@ -478,9 +507,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *   is called after all defaults are loaded.
      * @return boolean
      */
-    public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE, $SaveCallback = NULL, $CallbackOptions = NULL) {
+    public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = true, $SaveCallback = null, $CallbackOptions = null) {
         $ConfigurationSource = Gdn_ConfigurationSource::FromString($this, $String, $Tag, $Name);
-        if (!$ConfigurationSource) return FALSE;
+        if (!$ConfigurationSource) {
+            return false;
+        }
 
         $UseSplitting = $this->Splitting;
         $ConfigurationSource->Splitting($UseSplitting);
@@ -488,8 +519,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $SourceTag = "string:{$Tag}";
         $this->Sources[$SourceTag] = $ConfigurationSource;
 
-        if ($Dynamic)
+        if ($Dynamic) {
             $this->Dynamic = $ConfigurationSource;
+        }
 
         if (!$UseSplitting) {
             $this->MassImport($ConfigurationSource->Export());
@@ -498,8 +530,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         // Callback for saving
-        if (!is_null($SaveCallback))
+        if (!is_null($SaveCallback)) {
             $ConfigurationSource->AssignCallback($SaveCallback, $CallbackOptions);
+        }
     }
 
 
@@ -517,9 +550,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *   is called after all defaults are loaded.
      * @return boolean
      */
-    public function LoadArray($ConfigData, $Tag, $Name = 'Configuration', $Dynamic = TRUE, $SaveCallback = NULL, $CallbackOptions = NULL) {
+    public function LoadArray($ConfigData, $Tag, $Name = 'Configuration', $Dynamic = true, $SaveCallback = null, $CallbackOptions = null) {
         $ConfigurationSource = Gdn_ConfigurationSource::FromArray($this, $ConfigData, $Tag, $Name);
-        if (!$ConfigurationSource) return FALSE;
+        if (!$ConfigurationSource) {
+            return false;
+        }
 
         $UseSplitting = $this->Splitting;
         $ConfigurationSource->Splitting($UseSplitting);
@@ -527,8 +562,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $SourceTag = "array:{$Tag}";
         $this->Sources[$SourceTag] = $ConfigurationSource;
 
-        if ($Dynamic)
+        if ($Dynamic) {
             $this->Dynamic = $ConfigurationSource;
+        }
 
         if (!$UseSplitting) {
             $this->MassImport($ConfigurationSource->Export());
@@ -537,8 +573,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         // Callback for saving
-        if (!is_null($SaveCallback))
+        if (!is_null($SaveCallback)) {
             $ConfigurationSource->AssignCallback($SaveCallback, $CallbackOptions);
+        }
     }
 
     /**
@@ -558,11 +595,14 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param type $Data
      */
     public function MassImport($Data) {
-        if ($this->Splitting) return;
+        if ($this->Splitting) {
+            return;
+        }
         $this->Data = array_replace($this->Data, $Data);
 
-        if ($this->Dynamic instanceof Gdn_ConfigurationSource)
+        if ($this->Dynamic instanceof Gdn_ConfigurationSource) {
             $this->Dynamic->MassImport($Data);
+        }
     }
 
     /**
@@ -592,7 +632,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
     protected static function isList(&$list) {
         $n = count($list);
         for ($i = 0; $i < $n; $i++) {
-            if (!isset($list[$i]) && !array_key_exists($i, $list)) return false;
+            if (!isset($list[$i]) && !array_key_exists($i, $list)) {
+                return false;
+            }
         }
         return true;
     }
@@ -630,14 +672,16 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *   Save => Whether to save or not
      */
     public function RemoveFromConfig($Name, $Options = array()) {
-        $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
+        $Save = $Options === false ? false : GetValue('Save', $Options, true);
 
-        if (!is_array($Name))
+        if (!is_array($Name)) {
             $Name = array($Name);
+        }
 
         // Remove specified entries
-        foreach ($Name as $k)
+        foreach ($Name as $k) {
             $this->Remove($k, $Save);
+        }
     }
 
     /**
@@ -647,28 +691,33 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param string $Group The name of the settings group to be saved to the $File.
      * @return boolean
      */
-    public function Save($File = NULL, $Group = NULL) {
+    public function Save($File = null, $Group = null) {
 
         // Plain calls to Gdn::Config()->Save() simply save the dynamic config and return
-        if (is_null($File))
+        if (is_null($File)) {
             return $this->Dynamic->Save();
+        }
 
         // ... otherwise we're trying to extract some of the config for some reason
-        if ($File == '')
+        if ($File == '') {
             trigger_error(ErrorMessage('You must specify a file path to be saved.', $Group, 'Save'), E_USER_ERROR);
+        }
 
-        if (!is_writable($File))
+        if (!is_writable($File)) {
             throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $File));
+        }
 
-        if (empty($Group))
+        if (empty($Group)) {
             $Group = $this->DefaultGroup;
+        }
 
         $Data = &$this->Data;
         ksort($Data);
 
         // Check for the case when the configuration is the group.
-        if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data))
+        if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
             $Data = $Data[$Group];
+        }
 
         // Do a sanity check on the config save.
         if ($File == $this->DefaultPath()) {
@@ -678,33 +727,34 @@ class Gdn_Configuration extends Gdn_Pluggable {
                     $Pm->EventArguments['Backtrace'] = debug_backtrace();
                     $Pm->FireEvent('ConfigError');
                 }
-                return FALSE;
+                return false;
             }
         }
 
         // Build string
         $FileContents = $this->Format($Data, array(
             'VariableName' => $Group,
-            'Headers' => TRUE,
-            'ByLine' => TRUE,
-            'WrapPHP' => TRUE
+            'Headers' => true,
+            'ByLine' => true,
+            'WrapPHP' => true
         ));
 
-        if ($FileContents === FALSE)
+        if ($FileContents === false) {
             trigger_error(ErrorMessage('Failed to define configuration file contents.', $Group, 'Save'), E_USER_ERROR);
+        }
 
         $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
         if ($this->Caching() && Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
             Gdn::Cache()->Store($FileKey, $Data, array(
-                Gdn_Cache::FEATURE_NOPREFIX => TRUE,
+                Gdn_Cache::FEATURE_NOPREFIX => true,
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
         }
 
         // Infrastructure deployment. Use old method.
         $TmpFile = tempnam(PATH_CONF, 'config');
-        $Result = FALSE;
-        if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
+        $Result = false;
+        if (file_put_contents($TmpFile, $FileContents) !== false) {
             chmod($TmpFile, 0775);
             $Result = rename($TmpFile, $File);
         }
@@ -742,19 +792,20 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @return bool|int
      */
     public function SaveToConfig($Name, $Value = '', $Options = array()) {
-        $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
+        $Save = $Options === false ? false : GetValue('Save', $Options, true);
         $RemoveEmpty = GetValue('RemoveEmpty', $Options);
 
-        if (!is_array($Name))
+        if (!is_array($Name)) {
             $Name = array($Name => $Value);
+        }
 
         // Apply changes one by one
-        $Result = TRUE;
+        $Result = true;
         foreach ($Name as $k => $v) {
             if (!$v && $RemoveEmpty) {
                 $this->Remove($k);
             } else {
-                $Result = $Result & $this->Set($k, $v, TRUE, $Save);
+                $Result = $Result & $this->Set($k, $v, true, $Save);
             }
         }
 
@@ -765,18 +816,19 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      */
     public function Shutdown() {
-        foreach ($this->Sources as $Source)
+        foreach ($this->Sources as $Source) {
             $Source->Shutdown();
+        }
     }
 
     /**
      *
      */
     public function __destruct() {
-        if ($this->AutoSave)
+        if ($this->AutoSave) {
             $this->Shutdown();
+        }
     }
-
 }
 
 /**
@@ -806,12 +858,15 @@ class Gdn_Configuration extends Gdn_Pluggable {
 function &ArrayMergeRecursiveDistinct(array &$array1, &$array2 = null) {
     $merged = $array1;
 
-    if (is_array($array2))
-        foreach ($array2 as $key => $val)
-            if (is_array($array2[$key]))
+    if (is_array($array2)) {
+        foreach ($array2 as $key => $val) {
+            if (is_array($array2[$key])) {
                 $merged[$key] = is_array($merged[$key]) ? ArrayMergeRecursiveDistinct($merged[$key], $array2[$key]) : $array2[$key];
-            else
-                $merged[$key] = $val;
+            }
+        }
+    } else {
+        $merged[$key] = $val;
+    }
 
     return $merged;
 }
@@ -870,11 +925,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         $this->Group = $Group;
         $this->Initial = $Settings;
         $this->Settings = $Settings;
-        $this->Dirty = FALSE;
-        $this->Splitting = TRUE;
+        $this->Dirty = false;
+        $this->Splitting = true;
 
-        $this->Callback = FALSE;
-        $this->CallbackOptions = NULL;
+        $this->Callback = false;
+        $this->CallbackOptions = null;
     }
 
     /**
@@ -884,8 +939,10 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @param array $Options Callback options
      * @return boolean
      */
-    public function AssignCallback($Callback, $Options = NULL) {
-        if (!is_callable($Callback)) return FALSE;
+    public function AssignCallback($Callback, $Options = null) {
+        if (!is_callable($Callback)) {
+            return false;
+        }
 
         $this->Callback = $Callback;
         $this->CallbackOptions = $Options;
@@ -896,7 +953,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      *
      * @param bool $Splitting
      */
-    public function Splitting($Splitting = TRUE) {
+    public function Splitting($Splitting = true) {
         $this->Splitting = (boolean)$Splitting;
     }
 
@@ -927,45 +984,48 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @return Gdn_ConfigurationSource
      */
     public static function FromFile($Parent, $File, $Name = 'Configuration') {
-        $LoadedFromCache = FALSE;
-        $UseCache = FALSE;
+        $LoadedFromCache = false;
+        $UseCache = false;
         if ($Parent && $Parent->Caching()) {
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
             if (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
-                $UseCache = TRUE;
+                $UseCache = true;
                 $CachedConfigData = Gdn::Cache()->Get($FileKey, array(
-                    Gdn_Cache::FEATURE_NOPREFIX => TRUE
+                    Gdn_Cache::FEATURE_NOPREFIX => true
                 ));
                 $LoadedFromCache = ($CachedConfigData !== Gdn_Cache::CACHEOP_FAILURE);
             }
         }
 
         // If we're not loading config from cache, check that the file exists
-        if (!$LoadedFromCache && !file_exists($File))
-            return FALSE;
+        if (!$LoadedFromCache && !file_exists($File)) {
+            return false;
+        }
 
         // Define the variable properly.
-        $$Name = NULL;
+        $$Name = null;
 
         // If we're not loading config from cache, directly include the conf file
-        if ($LoadedFromCache)
+        if ($LoadedFromCache) {
             $$Name = $CachedConfigData;
+        }
 
         if (is_null($$Name) || !is_array($$Name)) {
-            $LoadedFromCache = FALSE;
+            $LoadedFromCache = false;
             // Include the file.
             require($File);
         }
 
         // Make sure the config variable is here and is an array.
-        if (!is_array($$Name))
+        if (!is_array($$Name)) {
             $$Name = array();
+        }
 
         // We're caching, using the cache, and this data was not loaded from cache.
         // Write it there now.
         if ($Parent && $Parent->Caching() && $UseCache && !$LoadedFromCache) {
             Gdn::Cache()->Store($FileKey, $$Name, array(
-                Gdn_Cache::FEATURE_NOPREFIX => TRUE,
+                Gdn_Cache::FEATURE_NOPREFIX => true,
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
         }
@@ -984,8 +1044,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      */
     public static function FromString($Parent, $String, $Tag, $Name = 'Configuration') {
         $ConfigurationData = self::ParseString($String, $Name);
-        if ($ConfigurationData === FALSE)
+        if ($ConfigurationData === false) {
             throw new Exception('Could not parse config string.');
+        }
 
         return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $ConfigurationData);
     }
@@ -1000,8 +1061,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @return Gdn_ConfigurationSource
      */
     public static function FromArray($Parent, $ConfigData, $Tag, $Name = 'Configuration') {
-        if (!is_array($ConfigData))
+        if (!is_array($ConfigData)) {
             throw new Exception('Invalid config data.');
+        }
         return new Gdn_ConfigurationSource($Parent, 'array', $Tag, $Name, $ConfigData);
     }
 
@@ -1014,19 +1076,21 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      */
     public static function ParseString($String, $Name) {
         // Define the variable properly.
-        $$Name = NULL;
+        $$Name = null;
 
         // Parse the string
         if (!empty($String)) {
             $String = trim(str_replace(array('<?php', '<?', '?>'), '', $String));
             $Parsed = eval($String);
-            if ($Parsed === FALSE)
-                return FALSE;
+            if ($Parsed === false) {
+                return false;
+            }
         }
 
         // Make sure the config variable is here and is an array.
-        if (is_null($$Name) || !is_array($$Name))
+        if (is_null($$Name) || !is_array($$Name)) {
             $$Name = array();
+        }
 
         return $$Name;
     }
@@ -1039,18 +1103,22 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @param type $Data
      */
     public function MassImport($Data) {
-        if ($this->Splitting) return;
+        if ($this->Splitting) {
+            return;
+        }
 
         // Only do dirty checks if we aren't already dirty
-        if (!$this->Dirty)
+        if (!$this->Dirty) {
             $CheckCopy = $this->Settings;
+        }
 
         $this->Settings = array_replace($this->Settings, $Data);
 
         // Only do dirty checks if we aren't already dirty
         if (!$this->Dirty) {
-            if ($CheckCopy != $this->Settings)
-                $this->Dirty = TRUE;
+            if ($CheckCopy != $this->Settings) {
+                $this->Dirty = true;
+            }
         }
     }
 
@@ -1062,7 +1130,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     public function ToFile($File) {
         $this->Type = 'file';
         $this->Source = $File;
-        $this->Dirty = TRUE;
+        $this->Dirty = true;
     }
 
     /**
@@ -1081,7 +1149,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      */
     public function Import($Settings) {
         $this->Settings = $Settings;
-        $this->Dirty = TRUE;
+        $this->Dirty = true;
     }
 
     /**
@@ -1093,39 +1161,40 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      */
     public function Remove($Name) {
         // Make sure this source' config settings are in the right format
-        if (!is_array($this->Settings))
+        if (!is_array($this->Settings)) {
             $this->Settings = array();
+        }
 
-        $Found = FALSE;
+        $Found = false;
         $Keys = explode('.', $Name);
         // If splitting is off, HANDLE IT
         if (!$this->Splitting) {
             $FirstKey = GetValue(0, $Keys);
-            if ($FirstKey == $this->Group)
+            if ($FirstKey == $this->Group) {
                 $Keys = array(array_shift($Keys), implode('.', $Keys));
-            else
+            } else {
                 $Keys = array($Name);
+            }
         }
         $KeyCount = count($Keys);
         $Settings = &$this->Settings;
 
         for ($i = 0; $i < $KeyCount; ++$i) {
-
             $Key = $Keys[$i];
 
             // Key will always be in here if it is anywhere at all
             if (array_key_exists($Key, $Settings)) {
                 if ($i == ($KeyCount - 1)) {
                     // We are at the setting, so unset it.
-                    $Found = TRUE;
+                    $Found = true;
                     unset($Settings[$Key]);
-                    $this->Dirty = TRUE;
+                    $this->Dirty = true;
                 } else {
                     // Advance the pointer
                     $Settings = &$Settings[$Key];
                 }
             } else {
-                $Found = FALSE;
+                $Found = false;
                 break;
             }
         }
@@ -1140,10 +1209,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @param null $Value
      * @param bool $Overwrite
      */
-    public function Set($Name, $Value = NULL, $Overwrite = TRUE) {
+    public function Set($Name, $Value = null, $Overwrite = true) {
         // Make sure this source' config settings are in the right format
-        if (!is_array($this->Settings))
+        if (!is_array($this->Settings)) {
             $this->Settings = array();
+        }
 
         if (!is_array($Name)) {
             $Name = array(
@@ -1155,15 +1225,15 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
         $Data = $Name;
         foreach ($Data as $Name => $Value) {
-
             $Keys = explode('.', $Name);
             // If splitting is off, HANDLE IT
             if (!$this->Splitting) {
                 $FirstKey = GetValue(0, $Keys);
-                if ($FirstKey == $this->Group)
+                if ($FirstKey == $this->Group) {
                     $Keys = array(array_shift($Keys), implode('.', $Keys));
-                else
+                } else {
                     $Keys = array($Name);
+                }
             }
             $KeyCount = count($Keys);
             $Settings = &$this->Settings;
@@ -1171,13 +1241,15 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             for ($i = 0; $i < $KeyCount; ++$i) {
                 $Key = $Keys[$i];
 
-                if (!is_array($Settings)) $Settings = array();
+                if (!is_array($Settings)) {
+                    $Settings = array();
+                }
                 $KeyExists = array_key_exists($Key, $Settings);
 
                 if ($i == $KeyCount - 1) {
                     // If we are on the last iteration of the key, then set the value.
-                    if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                        $OldVal = GetValue($Key, $Settings, NULL);
+                    if ($KeyExists === false || $Overwrite === true) {
+                        $OldVal = GetValue($Key, $Settings, null);
                         $SetVal = $Value;
 
                         // Serialize if array or obj
@@ -1190,13 +1262,15 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                         }
                         */
                         $Settings[$Key] = $SetVal;
-                        if (!$KeyExists || $SetVal != $OldVal)
-                            $this->Dirty = TRUE;
+                        if (!$KeyExists || $SetVal != $OldVal) {
+                            $this->Dirty = true;
+                        }
                     }
                 } else {
                     // Build the array as we loop over the key. Doucement.
-                    if ($KeyExists === FALSE)
+                    if ($KeyExists === false) {
                         $Settings[$Key] = array();
+                    }
 
                     // Advance the pointer
                     $Settings = &$Settings[$Key];
@@ -1214,10 +1288,12 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @param mixed $DefaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function Get($Name, $DefaultValue = FALSE) {
+    public function Get($Name, $DefaultValue = false) {
 
         // Shortcut, get the whole config
-        if ($Name == '.') return $this->Settings;
+        if ($Name == '.') {
+            return $this->Settings;
+        }
 
         $Keys = explode('.', $Name);
         $KeyCount = count($Keys);
@@ -1231,10 +1307,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             }
         }
 
-        if (is_string($Value))
+        if (is_string($Value)) {
             $Result = Gdn_Format::Unserialize($Value);
-        else
+        } else {
             $Result = $Value;
+        }
 
         return $Result;
     }
@@ -1246,24 +1323,28 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @throws Exception
      */
     public function Save() {
-        if (!$this->Dirty) return NULL;
+        if (!$this->Dirty) {
+            return null;
+        }
 
         $this->EventArguments['ConfigDirty'] = &$this->Dirty;
-        $this->EventArguments['ConfigNoSave'] = FALSE;
+        $this->EventArguments['ConfigNoSave'] = false;
         $this->EventArguments['ConfigType'] = $this->Type;
         $this->EventArguments['ConfigSource'] = $this->Source;
         $this->EventArguments['ConfigData'] = $this->Settings;
         $this->FireEvent('BeforeSave');
 
         if ($this->EventArguments['ConfigNoSave']) {
-            $this->Dirty = FALSE;
-            return TRUE;
+            $this->Dirty = false;
+            return true;
         }
 
         // Check for and fire callback if one exists
         if ($this->Callback && is_callable($this->Callback)) {
             $CallbackOptions = array();
-            if (!is_array($this->CallbackOptions)) $this->CallbackOptions = array();
+            if (!is_array($this->CallbackOptions)) {
+                $this->CallbackOptions = array();
+            }
 
             $CallbackOptions = array_merge($CallbackOptions, $this->CallbackOptions, array(
                 'ConfigDirty' => $this->Dirty,
@@ -1276,34 +1357,37 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $ConfigSaved = call_user_func($this->Callback, $CallbackOptions);
 
             if ($ConfigSaved) {
-                $this->Dirty = FALSE;
-                return TRUE;
+                $this->Dirty = false;
+                return true;
             }
         }
 
         switch ($this->Type) {
             case 'file':
-                if (empty($this->Source))
+                if (empty($this->Source)) {
                     trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
+                }
 
                 $CheckWrite = $this->Source;
-                if (!file_exists($CheckWrite))
+                if (!file_exists($CheckWrite)) {
                     $CheckWrite = dirname($CheckWrite);
+                }
 
-                if (!is_writable($CheckWrite))
+                if (!is_writable($CheckWrite)) {
                     throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $this->Source));
+                }
 
                 $Group = $this->Group;
                 $Data = &$this->Settings;
                 ksort($Data);
 
                 // Check for the case when the configuration is the group.
-                if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data))
+                if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
                     $Data = $Data[$Group];
+                }
 
                 // Do a sanity check on the config save.
                 if ($this->Source == Gdn::Config()->DefaultPath()) {
-
                     // Log root config changes
                     try {
                         $LogData = $this->Initial;
@@ -1318,31 +1402,33 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                             $Pm->EventArguments['Backtrace'] = debug_backtrace();
                             $Pm->FireEvent('ConfigError');
                         }
-                        return FALSE;
+                        return false;
                     }
                 }
 
                 // Write config data to string format, ready for saving
                 $FileContents = Gdn_Configuration::Format($Data, array(
                     'VariableName' => $Group,
-                    'WrapPHP' => TRUE,
-                    'ByLine' => TRUE
+                    'WrapPHP' => true,
+                    'ByLine' => true
                 ));
 
-                if ($FileContents === FALSE)
+                if ($FileContents === false) {
                     trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
+                }
 
                 // Save to cache if we're into that sort of thing
                 $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $this->Source);
-                if ($this->Configuration && $this->Configuration->Caching() && Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled())
+                if ($this->Configuration && $this->Configuration->Caching() && Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
                     $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
-                        Gdn_Cache::FEATURE_NOPREFIX => TRUE,
+                        Gdn_Cache::FEATURE_NOPREFIX => true,
                         Gdn_Cache::FEATURE_EXPIRY => 3600
                     ));
+                }
 
                 $TmpFile = tempnam(PATH_CONF, 'config');
-                $Result = FALSE;
-                if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
+                $Result = false;
+                if (file_put_contents($TmpFile, $FileContents) !== false) {
                     chmod($TmpFile, 0775);
                     $Result = rename($TmpFile, $this->Source);
                 }
@@ -1356,7 +1442,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                     }
                 }
 
-                $this->Dirty = FALSE;
+                $this->Dirty = false;
                 return $Result;
                 break;
 
@@ -1367,8 +1453,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                  * How would these even save? String config data must be handled by
                  * an event hook or callback, if at all.
                  */
-                $this->Dirty = FALSE;
-                return FALSE;
+                $this->Dirty = false;
+                return false;
                 break;
         }
     }
@@ -1379,8 +1465,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      * @throws Exception
      */
     public function Shutdown() {
-        if ($this->Dirty)
+        if ($this->Dirty) {
             $this->Save();
+        }
     }
-
 }

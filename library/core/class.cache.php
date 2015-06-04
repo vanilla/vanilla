@@ -266,7 +266,6 @@ abstract class Gdn_Cache {
         }
 
         if (is_array($LocalStore)) {
-
             // Convert to ActiveStore format (with 'Active' key)
             $Save = false;
             $ActiveStore = array();

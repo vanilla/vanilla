@@ -130,7 +130,7 @@ class Logger {
             $userID = Gdn::Session()->UserID;
             $path = Gdn::Request()->Path();
             $key = "log:$event:$userID:$path";
-            if (Gdn::Cache()->Get($key) === FALSE) {
+            if (Gdn::Cache()->Get($key) === false) {
                 self::event($event, $level, $message, $context);
                 Gdn::Cache()->Store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
             }

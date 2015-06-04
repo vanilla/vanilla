@@ -29,10 +29,11 @@ class Gdn_Timer {
      * @return mixed
      */
     public function ElapsedTime() {
-        if (is_null($this->FinishTime))
-            $Result = microtime(TRUE) - $this->StartTime;
-        else
+        if (is_null($this->FinishTime)) {
+            $Result = microtime(true) - $this->StartTime;
+        } else {
             $Result = $this->FinishTime - $this->StartTime;
+        }
         return $Result;
     }
 
@@ -42,9 +43,10 @@ class Gdn_Timer {
      * @param string $Message
      */
     public function Finish($Message = '') {
-        $this->FinishTime = microtime(TRUE);
-        if ($Message)
+        $this->FinishTime = microtime(true);
+        if ($Message) {
             $this->Write($Message, $this->FinishTime, $this->StartTime);
+        }
     }
 
     /**
@@ -65,12 +67,13 @@ class Gdn_Timer {
      * @param string $Message
      */
     public function Start($Message = '') {
-        $this->StartTime = microtime(TRUE);
+        $this->StartTime = microtime(true);
         $this->SplitTime = $this->StartTime;
-        $this->FinishTime = NULL;
+        $this->FinishTime = null;
 
-        if ($Message)
+        if ($Message) {
             $this->Write($Message, $this->StartTime);
+        }
     }
 
     /**
@@ -80,8 +83,9 @@ class Gdn_Timer {
      */
     public function Split($Message = '') {
         $PrevSplit = $this->SplitTime;
-        $this->SplitTime = microtime(TRUE);
-        if ($Message) ;
+        $this->SplitTime = microtime(true);
+        if ($Message) {
+        }
         $this->Write($Message, $this->SplitTime, $PrevSplit);
     }
 
@@ -92,12 +96,14 @@ class Gdn_Timer {
      * @param null $Time
      * @param null $PrevTime
      */
-    public function Write($Message, $Time = NULL, $PrevTime = NULL) {
-        if ($Message)
+    public function Write($Message, $Time = null, $PrevTime = null) {
+        if ($Message) {
             echo $Message;
+        }
         if (!is_null($Time)) {
-            if ($Message)
+            if ($Message) {
                 echo ': ';
+            }
             echo date('Y-m-d H:i:s', $Time);
             if (!is_null($PrevTime)) {
                 $Span = $Time - $PrevTime;
@@ -108,5 +114,4 @@ class Gdn_Timer {
         }
         echo "\n";
     }
-
 }

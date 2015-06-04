@@ -607,7 +607,7 @@ class Emoji {
             } else {
                 return $m[0];
             }
-        }, $Text, TRUE);
+        }, $Text, true);
 
         return substr($Text, 1, -1);
     }

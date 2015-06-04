@@ -163,7 +163,6 @@ if (!function_exists('array_column')) {
         $resultArray = array();
 
         foreach ($paramsInput as $row) {
-
             $key = $value = null;
             $keySet = $valueSet = false;
 
@@ -769,7 +768,6 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     function consolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = null) {
         $Return = array();
         foreach ($Array as $Index => $AssociativeArray) {
-
             if (is_object($AssociativeArray)) {
                 if ($ValueKey === '') {
                     $Return[] = $AssociativeArray->$Key;
@@ -1694,7 +1692,6 @@ if (!function_exists('getPostValue')) {
 }
 
 if (!function_exists('getRecord')) {
-
     function getRecord($recordType, $id, $throw = false) {
         $Row = false;
 
@@ -1808,7 +1805,6 @@ if (!function_exists('getValueR')) {
 }
 
 if (!function_exists('htmlEntityDecode')) {
-
     /**
      * Decode all of the entities out of an HTML string.
      *
@@ -2080,7 +2076,6 @@ if (!function_exists('markString')) {
 }
 
 if (!function_exists('joinRecords')) {
-
     /**
      * Join external records to an array.
      *
@@ -2567,7 +2562,6 @@ if (!function_exists('prepareArray')) {
 }
 
 if (!function_exists('proxyHead')) {
-
     function proxyHead($Url, $Headers = null, $Timeout = false, $FollowRedirects = false) {
         if (is_null($Headers)) {
             $Headers = array();
@@ -2904,7 +2898,6 @@ if (!function_exists('randomString')) {
 }
 
 if (!function_exists('betterRandomString')) {
-
     /**
      * Generate a random string of characters with additional character options that can be cryptographically strong.
      *
@@ -3287,7 +3280,6 @@ if (!function_exists('saveToConfig')) {
 
 
 if (!function_exists('setAppCookie')) {
-
     /**
      * Set a cookie withe the appropriate application cookie prefix and other cookie information.
      *
@@ -3741,7 +3733,6 @@ if (!function_exists('viewLocation')) {
 }
 
 if (!function_exists('passwordStrength')) {
-
     /**
      * Check a password's strength.
      *
@@ -3824,7 +3815,6 @@ if (!function_exists('passwordStrength')) {
 }
 
 if (!function_exists('isSafeUrl')) {
-
     /**
      * Used to determine if a URL is on safe for use.
      *

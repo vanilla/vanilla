@@ -37,10 +37,11 @@ class Gdn_FileSystem {
      * existence.
      */
     public static function Exists($Files) {
-        if (!is_array($Files))
+        if (!is_array($Files)) {
             $Files = array($Files);
+        }
 
-        $Return = FALSE;
+        $Return = false;
         $Count = count($Files);
         for ($i = 0; $i < $Count; ++$i) {
             if (file_exists($Files[$i])) {
@@ -60,27 +61,31 @@ class Gdn_FileSystem {
      * @todo Documentation and variable type is needed for $SourceFolder.
      */
     public static function Folders($SourceFolders) {
-        if (!is_array($SourceFolders))
+        if (!is_array($SourceFolders)) {
             $SourceFolders = array($SourceFolders);
+        }
 
         $BlackList = Gdn::Config('Garden.FolderBlacklist');
-        if (!is_array($BlackList))
+        if (!is_array($BlackList)) {
             $BlackList = array('.', '..');
+        }
 
         $Result = array();
 
         foreach ($SourceFolders as $SourceFolder) {
             if ($DirectoryHandle = opendir($SourceFolder)) {
-                while (($Item = readdir($DirectoryHandle)) !== FALSE) {
+                while (($Item = readdir($DirectoryHandle)) !== false) {
                     $SubFolder = CombinePaths(array($SourceFolder, $Item));
-                    if (!in_array($Item, $BlackList) && is_dir($SubFolder))
+                    if (!in_array($Item, $BlackList) && is_dir($SubFolder)) {
                         $Result[] = $Item;
+                    }
                 }
                 closedir($DirectoryHandle);
             }
         }
-        if (count($Result) == 0)
-            return FALSE;
+        if (count($Result) == 0) {
+            return false;
+        }
         return $Result;
     }
 
@@ -95,12 +100,13 @@ class Gdn_FileSystem {
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function Find($SourceFolders, $FileName, $WhiteList = FALSE) {
-        $Return = self::_Find($SourceFolders, $WhiteList, $FileName, TRUE);
-        if (is_array($Return))
-            return count($Return) > 0 ? $Return[0] : FALSE;
-        else
+    public static function Find($SourceFolders, $FileName, $WhiteList = false) {
+        $Return = self::_Find($SourceFolders, $WhiteList, $FileName, true);
+        if (is_array($Return)) {
+            return count($Return) > 0 ? $Return[0] : false;
+        } else {
             return $Return;
+        }
     }
 
     /**
@@ -115,8 +121,8 @@ class Gdn_FileSystem {
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function FindAll($SourceFolders, $FileName, $WhiteList = FALSE) {
-        return self::_Find($SourceFolders, $WhiteList, $FileName, FALSE);
+    public static function FindAll($SourceFolders, $FileName, $WhiteList = false) {
+        return self::_Find($SourceFolders, $WhiteList, $FileName, false);
     }
 
     /**
@@ -135,29 +141,33 @@ class Gdn_FileSystem {
      * or should it return an array of every instance in which it is found?
      * Default is to return an array of every instance.
      */
-    private static function _Find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = FALSE) {
+    private static function _Find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = false) {
         $Return = array();
 
-        if (!is_array($SourceFolders))
+        if (!is_array($SourceFolders)) {
             $SourceFolders = array($SourceFolders);
+        }
 
         foreach ($SourceFolders as $SourceFolder) {
-            if ($WhiteList === FALSE) {
+            if ($WhiteList === false) {
                 $Path = CombinePaths(array($SourceFolder, $FileName));
                 if (file_exists($Path)) {
-                    if ($ReturnFirst)
+                    if ($ReturnFirst) {
                         return $Path;
-                    else
+                    } else {
                         $Return[] = array($Path);
+                    }
                 }
             } else {
                 if ($DirectoryHandle = opendir($SourceFolder)) {
-                    if ($DirectoryHandle === FALSE)
+                    if ($DirectoryHandle === false) {
                         trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
+                    }
 
                     // Search all subfolders
-                    if ($WhiteList === TRUE)
+                    if ($WhiteList === true) {
                         $WhiteList = scandir($SourceFolder);
+                    }
 
                     $SubFolders = array();
                     foreach ($WhiteList as $WhiteFolder) {
@@ -167,10 +177,11 @@ class Gdn_FileSystem {
                             $Path = CombinePaths(array($SubFolder, $FileName));
                             // echo '<div style="color: red;">Looking For: '.$Path.'</div>';
                             if (file_exists($Path)) {
-                                if ($ReturnFirst)
+                                if ($ReturnFirst) {
                                     return array($Path);
-                                else
+                                } else {
                                     $Return[] = $Path;
+                                }
                             }
                         }
                     }
@@ -179,7 +190,7 @@ class Gdn_FileSystem {
             }
         }
 
-        return count($Return) > 0 ? $Return : FALSE;
+        return count($Return) > 0 ? $Return : false;
     }
 
     /**
@@ -200,13 +211,14 @@ class Gdn_FileSystem {
     public static function FindByMapping($MappingCacheName, $SourceFolders, $FolderWhiteList, $LibraryName) {
 
         // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
-        if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1)
+        if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1) {
             $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
+        }
 
         $LibraryKey = str_replace('.', '__', $LibraryName);
         Gdn_LibraryMap::PrepareCache($MappingCacheName);
         $LibraryPath = Gdn_LibraryMap::GetCache($MappingCacheName, $LibraryKey);
-        if ($LibraryPath === NULL) {
+        if ($LibraryPath === null) {
             // $LibraryName wasn't contained in the mappings array.
             // I need to look through the folders in this application for the requested file.
             // Once I find it, I need to save the mapping so we don't have to search for it again.
@@ -220,7 +232,7 @@ class Gdn_FileSystem {
             $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
 
             // If the mapping was found
-            if ($LibraryPath !== FALSE) {
+            if ($LibraryPath !== false) {
                 Gdn_LibraryMap::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
             }
         }
@@ -233,10 +245,11 @@ class Gdn_FileSystem {
      */
     public static function GetContents() {
         $File = CombinePaths(func_get_args());
-        if (file_exists($File) && is_file($File))
+        if (file_exists($File) && is_file($File)) {
             return file_get_contents($File);
-        else
-            return FALSE;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -250,16 +263,19 @@ class Gdn_FileSystem {
         // Check that the folder exists and is writable
         $DirName = dirname($FileName);
         $FileBaseName = basename($FileName);
-        if (!is_dir($DirName))
+        if (!is_dir($DirName)) {
             throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.', $FileBaseName, $DirName));
+        }
 
-        if (!IsWritable($DirName))
+        if (!IsWritable($DirName)) {
             throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.', $FileBaseName, $DirName));
+        }
 
-        if (file_put_contents($FileName, $FileContents, $Flags) === FALSE)
+        if (file_put_contents($FileName, $FileContents, $Flags) === false) {
             throw new Exception(sprintf('Requested save operation [%1$s] could not be completed!', $FileBaseName));
+        }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -269,8 +285,9 @@ class Gdn_FileSystem {
      * @param string $FileName The full path to the file being touched.
      */
     public static function Touch($FileName) {
-        if (!file_exists($FileName))
+        if (!file_exists($FileName)) {
             file_put_contents($FileName, '', LOCK_EX);
+        }
     }
 
     /**
@@ -283,8 +300,8 @@ class Gdn_FileSystem {
      */
     public static function ServeFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
 
-        $FileIsLocal = (substr($File, 0, 4) == 'http') ? FALSE : TRUE;
-        $FileAvailable = ($FileIsLocal) ? is_readable($File) : TRUE;
+        $FileIsLocal = (substr($File, 0, 4) == 'http') ? false : true;
+        $FileAvailable = ($FileIsLocal) ? is_readable($File) : true;
 
         if ($FileAvailable) {
             // Close the database connection
@@ -334,13 +351,15 @@ class Gdn_FileSystem {
             @ob_end_clean();
 
             // required for IE, otherwise Content-Disposition may be ignored
-            if (ini_get('zlib.output_compression'))
+            if (ini_get('zlib.output_compression')) {
                 ini_set('zlib.output_compression', 'Off');
+            }
 
-            if ($ServeMode == 'inline')
+            if ($ServeMode == 'inline') {
                 safeHeader('Content-Disposition: inline; filename="'.$Name.'"');
-            else
+            } else {
                 safeHeader('Content-Disposition: attachment; filename="'.$Name.'"');
+            }
 
             safeHeader('Content-Type: '.$MimeType);
             safeHeader("Content-Transfer-Encoding: binary");
@@ -363,8 +382,9 @@ class Gdn_FileSystem {
      * @return void
      */
     public static function RemoveFolder($Path) {
-        if (!file_exists($Path))
+        if (!file_exists($Path)) {
             return;
+        }
 
         if (is_file($Path)) {
             unlink($Path);
@@ -376,15 +396,17 @@ class Gdn_FileSystem {
         // Get all of the files in the directory.
         if ($dh = opendir($Path)) {
             while (($File = readdir($dh)) !== false) {
-                if (trim($File, '.') == '')
+                if (trim($File, '.') == '') {
                     continue;
+                }
 
                 $SubPath = $Path.$File;
 
-                if (is_dir($SubPath))
+                if (is_dir($SubPath)) {
                     self::RemoveFolder($SubPath);
-                else
+                } else {
                     unlink($SubPath);
+                }
             }
             closedir($dh);
         }
@@ -402,25 +424,29 @@ class Gdn_FileSystem {
             $TestFolder = $Prepend.implode(DS, $CurrentPath);
 
             if ($Flags & Gdn_FileSystem::O_CREATE) {
-                if (!is_dir($TestFolder))
+                if (!is_dir($TestFolder)) {
                     @mkdir($TestFolder);
+                }
             }
 
-            if (!is_dir($TestFolder))
-                return FALSE;
+            if (!is_dir($TestFolder)) {
+                return false;
+            }
 
         }
 
         if ($Flags & Gdn_FileSystem::O_READ) {
-            if (!is_readable($Path))
-                return FALSE;
+            if (!is_readable($Path)) {
+                return false;
+            }
         }
 
         if ($Flags & Gdn_FileSystem::O_WRITE) {
-            if (!is_writable($Path))
-                return FALSE;
+            if (!is_writable($Path)) {
+                return false;
+            }
         }
-        return TRUE;
+        return true;
     }
 
     /**
@@ -497,5 +523,4 @@ class Gdn_FileSystem {
         }
         return $result;
     }
-
 }

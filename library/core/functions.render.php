@@ -171,7 +171,6 @@ if (!function_exists('buttonGroup')) {
 }
 
 if (!function_exists('category')) {
-
     /**
      * Get the current category on the page.
      *
@@ -212,7 +211,6 @@ if (!function_exists('category')) {
 }
 
 if (!function_exists('categoryUrl')) {
-
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
@@ -268,7 +266,6 @@ if (!function_exists('countString')) {
 }
 
 if (!function_exists('cssClass')) {
-
     /**
      * Add CSS class names to a row depending on other elements/values in that row.
      *
@@ -362,7 +359,6 @@ if (!function_exists('cssClass')) {
 }
 
 if (!function_exists('dateUpdated')) {
-
     function dateUpdated($Row, $Wrap = null) {
         $Result = '';
         $DateUpdated = GetValue('DateUpdated', $Row);
@@ -705,7 +701,6 @@ if (!function_exists('pluralTranslate')) {
 }
 
 if (!function_exists('searchExcerpt')) {
-
     function searchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
         if (empty($SearchTerms)) {
             return substrWord($PlainText, 0, $Length);

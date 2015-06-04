@@ -76,25 +76,30 @@ class Gdn_Condition {
      * @return bool
      */
     public static function Test($Conditions) {
-        if (!is_array($Conditions))
-            return FALSE;
+        if (!is_array($Conditions)) {
+            return false;
+        }
 
         foreach ($Conditions as $Condition) {
-            if (!is_array($Condition) || count($Condition) < 2)
+            if (!is_array($Condition) || count($Condition) < 2) {
                 continue;
+            }
 
-            $Expr = isset($Condition[2]) ? $Condition[2] : NULL;
+            $Expr = isset($Condition[2]) ? $Condition[2] : null;
 
             $Test = Gdn_Condition::TestOne($Condition[0], $Condition[1], $Expr);
-            if (!$Test && $this->CompareType == self::COMPARE_AND)
-                return FALSE;
-            if ($Test && $this->CompareType == self::COMPARE_OR)
-                return TRUE;
+            if (!$Test && $this->CompareType == self::COMPARE_AND) {
+                return false;
+            }
+            if ($Test && $this->CompareType == self::COMPARE_OR) {
+                return true;
+            }
         }
-        if ($this->CompareType == self::COMPARE_AND)
-            return TRUE;
-        else
-            return FALSE;
+        if ($this->CompareType == self::COMPARE_AND) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -105,13 +110,14 @@ class Gdn_Condition {
      * @param string $Expr The expression to test with.
      * @return bool
      */
-    public static function TestOne($Type, $Field, $Expr = NULL) {
+    public static function TestOne($Type, $Field, $Expr = null) {
         switch (strtolower($Type)) {
             case PERMISSION:
                 // Check to see if the user has the given permission.
                 $Result = Gdn::Session()->CheckPermission($Field);
-                if ($Value === FALSE)
+                if ($Value === false) {
                     return !$Result;
+                }
                 return $Result;
             case REQUEST:
                 // See if the field is a specific value.
@@ -123,9 +129,9 @@ class Gdn_Condition {
                         // See if the field is targetting a specific part of the request.
                         $Fields = explode('.', $Field, 2);
                         if (count($Fields) >= 2) {
-                            $Value = Gdn::Request()->GetValueFrom($Fields[0], $Fields[1], NULL);
+                            $Value = Gdn::Request()->GetValueFrom($Fields[0], $Fields[1], null);
                         } else {
-                            $Value = Gdn::Request()->GetValue($Field, NULL);
+                            $Value = Gdn::Request()->GetValue($Field, null);
                         }
                         break;
                 }
@@ -142,12 +148,13 @@ class Gdn_Condition {
                     } else {
                         $Result = Gdn_Condition::TestValue(GetValue('Name', $Role), $Expr);
                     }
-                    if ($Result)
-                        return TRUE;
+                    if ($Result) {
+                        return true;
+                    }
                 }
-                return FALSE;
+                return false;
         }
-        return FALSE;
+        return false;
     }
 
     /**
@@ -159,8 +166,9 @@ class Gdn_Condition {
      *  - <b>Otherwise</b>: A simple $Value == $Expr is tested.
      */
     public static function TestValue($Value, $Expr) {
-        if (!is_string($Expr))
-            return FALSE;
+        if (!is_string($Expr)) {
+            return false;
+        }
 
         if (stelen($Expr) > 1 && $Expr[0] === '`' && $Expr[strlen($Expr) - 1] == '`') {
             $Result = preg_match($Expr, $Value);
@@ -181,11 +189,12 @@ class Gdn_Condition {
         $Result = '';
 
         foreach ($Conditions as $Condition) {
-            if (!is_array($Condition) || count($Condition) < 2)
+            if (!is_array($Condition) || count($Condition) < 2) {
                 continue; // skip ill-formatted conditions.
-
-            if (strlen($Result) > 0)
+            }
+            if (strlen($Result) > 0) {
                 $Result .= "\n";
+            }
 
             $Result .= "{$Condition[0]},{$Condition[1]}";
             if (count($Condition) >= 3) {

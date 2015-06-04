@@ -73,9 +73,7 @@ class Gdn_Autoloader {
             case self::CONTEXT_PLUGIN:
 
                 if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
-
                     foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $SearchPathName) {
-
                         if ($SearchPathName === true || $SearchPathName == 1) {
                             $SearchPathName = md5($SearchPath);
                         }
@@ -166,7 +164,6 @@ class Gdn_Autoloader {
 
         // Binary flip - cacheonly or cache+fs
         foreach (array(true, false) as $MapOnly) {
-
             $SkipMaps = array();
             $ContextType = null;
             $SkipTillNextContext = false;
@@ -189,7 +186,6 @@ class Gdn_Autoloader {
 
                     if (array_key_exists($ContextType, $Priorities) && is_array($Priorities[$ContextType])) {
                         foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
-
                             // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
                             if ($PriorityMapHash == 'FAIL_CONTEXT_IF_NOT_FOUND') {
                                 $SkipTillNextContext = true;
@@ -403,7 +399,6 @@ class Gdn_Autoloader {
             $ResultMapHashes = self::$priorities[$ContextType][$PriorityType];
             $ResponseHashes = array();
             foreach ($ResultMapHashes as $MapHash => $PriorityInfo) {
-
                 if (val('duration', $PriorityInfo) == self::PRIORITY_ONCE) {
                     unset(self::$priorities[$ContextType][$PriorityType][$MapHash]);
                 }
@@ -970,10 +965,11 @@ class Gdn_Autoloader_Map {
         }
 
         foreach ($this->paths as $Path => $PathOptions) {
-
             $Recursive = val('recursive', $PathOptions);
             $Files = $this->findFiles($Path, $FileMasks, $Recursive);
-            if ($Files === false) continue;
+            if ($Files === false) {
+                continue;
+            }
 
             foreach ($Files as $File) {
                 $SplitTopic = val('topic', $PathOptions, self::TOPIC_DEFAULT);

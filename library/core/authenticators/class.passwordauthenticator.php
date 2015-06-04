@@ -25,10 +25,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     public function __construct() {
         $this->_DataSourceType = Gdn_Authenticator::DATA_FORM;
 
-        $this->HookDataField('Email', 'Email');
-        $this->HookDataField('Password', 'Password');
-        $this->HookDataField('RememberMe', 'RememberMe', false);
-        $this->HookDataField('ClientHour', 'ClientHour', false);
+        $this->hookDataField('Email', 'Email');
+        $this->hookDataField('Password', 'Password');
+        $this->hookDataField('RememberMe', 'RememberMe', false);
+        $this->hookDataField('ClientHour', 'ClientHour', false);
 
         // Initialize built-in authenticator functionality
         parent::__construct();
@@ -48,7 +48,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
         if (!$Email || !$Password) {
 
             // We werent given parameters, check if they exist in our DataSource
-            if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE) {
+            if ($this->currentStep() != Gdn_Authenticator::MODE_VALIDATE) {
                 return Gdn_Authenticator::AUTH_INSUFFICIENT;
             }
 
@@ -84,7 +84,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             $UserID = $SignInPermission ? $UserID : -1;
             if ($UserID > 0) {
                 // Create the session cookie
-                $this->SetIdentity($UserID, $PersistentSession);
+                $this->setIdentity($UserID, $PersistentSession);
 
                 // Update some information about the user...
                 $UserModel->UpdateVisit($UserID, $ClientHour);
@@ -106,7 +106,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     public function currentStep() {
         // Was data submitted through the form already?
         if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === true)) {
-            return $this->_CheckHookedFields();
+            return $this->_checkHookedFields();
         }
 
         return Gdn_Authenticator::MODE_GATHER;
@@ -116,7 +116,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      * Destroys the user's session cookie - essentially de-authenticating them.
      */
     public function deAuthenticate() {
-        $this->SetIdentity(null);
+        $this->setIdentity(null);
 
         return Gdn_Authenticator::AUTH_SUCCESS;
     }

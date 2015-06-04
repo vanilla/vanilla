@@ -89,8 +89,8 @@ class Gdn {
      *
      * @return Gdn_ApplicationManager
      */
-    public static function ApplicationManager() {
-        return self::Factory(self::AliasApplicationManager);
+    public static function applicationManager() {
+        return self::factory(self::AliasApplicationManager);
     }
 
     /**
@@ -98,8 +98,8 @@ class Gdn {
      *
      * @return Gdn_Auth
      */
-    public static function Authenticator() {
-        return self::Factory(self::AliasAuthenticator);
+    public static function authenticator() {
+        return self::factory(self::AliasAuthenticator);
     }
 
     /**
@@ -107,8 +107,8 @@ class Gdn {
      *
      * @return Gdn_Cache
      */
-    public static function Cache() {
-        return self::Factory(self::AliasCache);
+    public static function cache() {
+        return self::factory(self::AliasCache);
     }
 
     /**
@@ -118,12 +118,12 @@ class Gdn {
      * @param mixed $Default The result to return if the configuration setting is not found.
      * @return Gdn_Config|mixed The configuration setting.
      */
-    public static function Config($Name = false, $Default = false) {
+    public static function config($Name = false, $Default = false) {
         $Config = self::$_Config;
         if ($Name === false) {
             $Result = $Config;
         } else {
-            $Result = $Config->Get($Name, $Default);
+            $Result = $Config->get($Name, $Default);
         }
 
         return $Result;
@@ -135,7 +135,7 @@ class Gdn {
      * @param Gdn_Controller $Value
      * @return Gdn_Controller
      */
-    public static function Controller($Value = null) {
+    public static function controller($Value = null) {
         static $Controller = null;
 
         if ($Value !== null) {
@@ -150,8 +150,8 @@ class Gdn {
      *
      * @return Gdn_Dispatcher
      */
-    public static function Dispatcher() {
-        return self::Factory(self::AliasDispatcher);
+    public static function dispatcher() {
+        return self::factory(self::AliasDispatcher);
     }
 
     /**
@@ -159,8 +159,8 @@ class Gdn {
      *
      * @return Gdn_Database
      */
-    public static function Database() {
-        return self::Factory(self::AliasDatabase);
+    public static function database() {
+        return self::factory(self::AliasDatabase);
     }
 
     /**
@@ -170,10 +170,10 @@ class Gdn {
      * @param mixed $Args A variable number of arguments to pass to the constructor.
      * @see Gdn_Factory::Factory()
      */
-    public static function Factory($Alias = false) {
+    public static function factory($Alias = false) {
         if (is_null(self::$_Factory)) {
-            self::SetFactory(new Gdn_Factory());
-            self::FactoryOverwrite(false);
+            self::setFactory(new Gdn_Factory());
+            self::factoryOverwrite(false);
         }
 
         if ($Alias === false) {
@@ -184,7 +184,7 @@ class Gdn {
         //$Args = array($Arg1, $Arg2, $Arg3, $Arg4, $Arg5);
         $Args = func_get_args();
         array_shift($Args);
-        return self::$_Factory->Factory($Alias, $Args);
+        return self::$_Factory->factory($Alias, $Args);
     }
 
     /**
@@ -194,8 +194,8 @@ class Gdn {
      * @return boolean Whether or not a factory definintion exists.
      * @see Gdn_Factory::Exists()
      */
-    public static function FactoryExists($Alias) {
-        return self::Factory()->Exists($Alias);
+    public static function factoryExists($Alias) {
+        return self::factory()->exists($Alias);
     }
 
     /**
@@ -207,27 +207,27 @@ class Gdn {
      * @param string $FactoryType The way objects will be instantiated for the class. One of (Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton).
      * @see Gdn_Factory::Install()
      */
-    public static function FactoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = null) {
+    public static function factoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = null) {
         // Don't overwrite an existing definition.
-        if (self::$_FactoryOverwrite === false && self::FactoryExists($Alias)) {
+        if (self::$_FactoryOverwrite === false && self::factoryExists($Alias)) {
             return;
         }
 
-        self::Factory()->Install($Alias, $ClassName, $Path, $FactoryType, $Data);
+        self::Factory()->install($Alias, $ClassName, $Path, $FactoryType, $Data);
 
         // Cache some of the more commonly used factory objects as properties.
         switch ($Alias) {
             case self::AliasConfig:
-                self::$_Config = self::Factory($Alias);
+                self::$_Config = self::factory($Alias);
                 break;
             case self::AliasLocale:
-                self::$_Locale = self::Factory($Alias);
+                self::$_Locale = self::factory($Alias);
                 break;
             case self::AliasRequest:
-                self::$_Request = self::Factory($Alias);
+                self::$_Request = self::factory($Alias);
                 break;
             case self::AliasPluginManager:
-                self::$_PluginManager = self::Factory($Alias);
+                self::$_PluginManager = self::factory($Alias);
                 break;
             case self::AliasSession:
                 self::$_Session = null;
@@ -243,8 +243,8 @@ class Gdn {
      * @param string $SourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
      * @see Gdn_Factory::InstalDependency()
      */
-    public static function FactoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
-        self::Factory()->InstallDependency($Alias, $PropertyName, $SourceAlias);
+    public static function factoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
+        self::factory()->installDependency($Alias, $PropertyName, $SourceAlias);
     }
 
     /**
@@ -262,9 +262,9 @@ class Gdn {
      * - <b>Override</b> Optional.
      * All of these values are passed to the corresponding argument in inline{@link Gdn::FactoryInstallDependency()}.
      */
-    public static function FactoryInstallDependencyFromConfig($Config, $Alias = null) {
+    public static function factoryInstallDependencyFromConfig($Config, $Alias = null) {
         if (is_string($Config)) {
-            $Config = self::Config($Config);
+            $Config = self::config($Config);
         }
         if (is_null($Alias)) {
             $Alias = $Config['Alias'];
@@ -274,7 +274,7 @@ class Gdn {
         $SourceAlias = $Config['SourceAlias'];
         $Override = ArrayValue('Override', $Config, true);
 
-        self::FactoryInstallDependency($Alias, $PropertyName, $SourceAlias, $Override);
+        self::factoryInstallDependency($Alias, $PropertyName, $SourceAlias, $Override);
     }
 
     /**
@@ -293,9 +293,9 @@ class Gdn {
      * - <b>Dependencies</b> Optional. Dependencies for the class can be defined as a subarray. Each item in the subarray will be passed to inline{@link Gdn::FactoryInstallDependencyFromConfig}.
      * All of these values (except Dependencies) are passed to the corresponding argument in inline{@link Gdn::FactoryInstall()}.
      */
-    public static function FactoryInstallFromConfig($Config, $Alias = null) {
+    public static function factoryInstallFromConfig($Config, $Alias = null) {
         if (is_string($Config)) {
-            $Config = self::Config($Config);
+            $Config = self::config($Config);
         }
         if (is_null($Alias)) {
             $Alias = $Config['Alias'];
@@ -305,12 +305,12 @@ class Gdn {
         $Data = ArrayValue('Data', $Config, null);
         $Override = ArrayValue('Override', $Config, true);
 
-        self::FactoryInstall($Alias, $Config['ClassName'], $Config['Path'], $FactoryType, $Data, $Override);
+        self::factoryInstall($Alias, $Config['ClassName'], $Config['Path'], $FactoryType, $Data, $Override);
 
         if (array_key_exists('Dependencies', $Config)) {
             $Dependencies = $Config['Dependencies'];
             foreach ($Dependencies as $Index => $DependencyConfig) {
-                self::FactoryInstallFromConfig($DependencyConfig, $Alias);
+                self::factoryInstallFromConfig($DependencyConfig, $Alias);
             }
         }
     }
@@ -321,7 +321,7 @@ class Gdn {
      * @param null $Value
      * @return int
      */
-    public static function FactoryOverwrite($Value = null) {
+    public static function factoryOverwrite($Value = null) {
         $Result = (self::$_FactoryOverwrite & 1 > 0);
 
         if (!is_null($Value)) {
@@ -337,8 +337,8 @@ class Gdn {
      * @param string $Alias The alias of the class to uninstall.
      * @see Gdn_Factory::Uninstall()
      */
-    public static function FactoryUninstall($Alias) {
-        self::Factory()->Uninstall($Alias);
+    public static function factoryUninstall($Alias) {
+        self::factory()->uninstall($Alias);
     }
 
     /**
@@ -346,8 +346,8 @@ class Gdn {
      *
      * @see Gdn_Factory::UninstallDependency()
      */
-    public static function FactoryUninstallDependency($Alias, $PropertyName = null) {
-        self::Factory()->UninstallDependency($Alias, $PropertyName);
+    public static function factoryUninstallDependency($Alias, $PropertyName = null) {
+        self::factory()->uninstallDependency($Alias, $PropertyName);
     }
 
     /**
@@ -357,7 +357,7 @@ class Gdn {
      * @param string $SetInstallationID
      * @return string Installation ID or NULL
      */
-    public static function InstallationID($SetInstallationID = null) {
+    public static function installationID($SetInstallationID = null) {
         static $InstallationID = false;
         if (!is_null($SetInstallationID)) {
             if ($SetInstallationID !== false) {
@@ -382,7 +382,7 @@ class Gdn {
      * @param string $SetInstallationSecret
      * @return string Installation Secret or NULL
      */
-    public static function InstallationSecret($SetInstallationSecret = null) {
+    public static function installationSecret($SetInstallationSecret = null) {
         static $InstallationSecret = false;
         if (!is_null($SetInstallationSecret)) {
             if ($SetInstallationSecret !== false) {
@@ -405,9 +405,9 @@ class Gdn {
      *
      * @return Gdn_Locale
      */
-    public static function Locale() {
+    public static function locale() {
         if (is_null(self::$_Locale)) {
-            self::$_Locale = self::Factory(self::AliasLocale);
+            self::$_Locale = self::factory(self::AliasLocale);
         }
 
         return self::$_Locale;
@@ -418,8 +418,8 @@ class Gdn {
      *
      * @return PermissionModel
      */
-    public static function PermissionModel() {
-        return self::Factory(self::AliasPermissionModel);
+    public static function permissionModel() {
+        return self::factory(self::AliasPermissionModel);
     }
 
     /**
@@ -427,12 +427,12 @@ class Gdn {
      *
      * @return Gdn_PluginManager
      */
-    public static function PluginManager() {
+    public static function pluginManager() {
         return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
     }
 
-    public static function Regarding() {
-        return self::Factory('Regarding');
+    public static function regarding() {
+        return self::factory('Regarding');
     }
 
     /**
@@ -441,13 +441,13 @@ class Gdn {
      * @param Gdn_Request $NewRequest The new request or null to just get the request.
      * @return Gdn_Request
      */
-    public static function Request($NewRequest = null) {
+    public static function request($NewRequest = null) {
         $Request = self::$_Request; //self::Factory(self::AliasRequest);
         if (!is_null($NewRequest)) {
             if (is_string($NewRequest)) {
-                $Request->WithURI($NewRequest);
+                $Request->withURI($NewRequest);
             } elseif (is_object($NewRequest))
-                $Request->FromImport($NewRequest);
+                $Request->fromImport($NewRequest);
         }
 
         return $Request;
@@ -458,8 +458,8 @@ class Gdn {
      *
      * @return Gdn_Router
      */
-    public static function Router() {
-        return self::Factory(self::AliasRouter);
+    public static function router() {
+        return self::factory(self::AliasRouter);
     }
 
     /**
@@ -467,9 +467,9 @@ class Gdn {
      *
      * @return Gdn_Session
      */
-    public static function Session() {
+    public static function session() {
         if (is_null(self::$_Session)) {
-            self::$_Session = self::Factory(self::AliasSession);
+            self::$_Session = self::factory(self::AliasSession);
         }
         return self::$_Session;
     }
@@ -480,19 +480,19 @@ class Gdn {
      * @param string $Slice Slice to execute
      * @return Gdn_Slice
      */
-    public static function Slice($Slice) {
-        $Result = self::Factory(self::AliasSlice);
-        return $Result->Execute($Slice);
+    public static function slice($Slice) {
+        $Result = self::factory(self::AliasSlice);
+        return $Result->execute($Slice);
     }
 
-    public static function Set($Key, $Value = null) {
-        return Gdn::UserMetaModel()->SetUserMeta(0, $Key, $Value);
+    public static function set($Key, $Value = null) {
+        return Gdn::userMetaModel()->setUserMeta(0, $Key, $Value);
     }
 
-    public static function Get($Key, $Default = null) {
-        $Response = Gdn::UserMetaModel()->GetUserMeta(0, $Key, $Default);
+    public static function get($Key, $Default = null) {
+        $Response = Gdn::userMetaModel()->getUserMeta(0, $Key, $Default);
         if (sizeof($Response) == 1) {
-            return GetValue($Key, $Response, $Default);
+            return val($Key, $Response, $Default);
         }
         return $Default;
     }
@@ -504,7 +504,7 @@ class Gdn {
      * @see Gdn_Database::SQL()
      */
     public static function SQL() {
-        $Database = self::Database();
+        $Database = self::database();
         $Result = $Database->SQL();
         return $Result;
     }
@@ -514,8 +514,8 @@ class Gdn {
      *
      * @return Gdn_Statistics
      */
-    public static function Statistics() {
-        return self::Factory('Statistics');
+    public static function statistics() {
+        return self::factory('Statistics');
     }
 
     /**
@@ -523,9 +523,9 @@ class Gdn {
      *
      * @return Gdn_DatabaseStructure
      */
-    public static function Structure() {
-        $Database = self::Database();
-        $Result = $Database->Structure();
+    public static function structure() {
+        $Database = self::database();
+        $Result = $Database->structure();
         return $Result;
     }
 
@@ -534,8 +534,8 @@ class Gdn {
      *
      * @return Gdn_ThemeManager
      */
-    public static function ThemeManager() {
-        return self::Factory(self::AliasThemeManager);
+    public static function themeManager() {
+        return self::factory(self::AliasThemeManager);
     }
 
     /**
@@ -545,10 +545,10 @@ class Gdn {
      * @param string $Default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $Code if there is no value in $Default.
      */
-    public static function Translate($Code, $Default = false) {
-        $Locale = Gdn::Locale();
+    public static function translate($Code, $Default = false) {
+        $Locale = Gdn::locale();
         if ($Locale) {
-            return $Locale->Translate($Code, $Default);
+            return $Locale->translate($Code, $Default);
         } else {
             return $Default;
         }
@@ -559,8 +559,8 @@ class Gdn {
      *
      * @return UserModel
      */
-    public static function UserModel() {
-        return self::Factory(self::AliasUserModel);
+    public static function userModel() {
+        return self::factory(self::AliasUserModel);
     }
 
     /**
@@ -568,7 +568,7 @@ class Gdn {
      *
      * @return UserMetaModel
      */
-    public static function UserMetaModel() {
+    public static function userMetaModel() {
         static $UserMetaModel = null;
         if (is_null($UserMetaModel)) {
             $UserMetaModel = new UserMetaModel();
@@ -582,7 +582,7 @@ class Gdn {
      * @param Gdn_Factory $Factory The object used as the factory.
      * @param boolean $Override whether to override the property if it is already set.
      */
-    public static function SetFactory($Factory, $Override = true) {
+    public static function setFactory($Factory, $Override = true) {
         if ($Override || is_null(self::$_Factory)) {
             self::$_Factory = $Factory;
         }

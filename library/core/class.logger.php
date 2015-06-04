@@ -126,13 +126,13 @@ class Logger {
      */
     public static function logAccess($event, $level, $message, $context = array()) {
         // Throttle the log access to 1 event every 5 minutes.
-        if (Gdn::Cache()->activeEnabled()) {
-            $userID = Gdn::Session()->UserID;
-            $path = Gdn::Request()->Path();
+        if (Gdn::cache()->activeEnabled()) {
+            $userID = Gdn::session()->UserID;
+            $path = Gdn::request()->path();
             $key = "log:$event:$userID:$path";
-            if (Gdn::Cache()->Get($key) === false) {
+            if (Gdn::cache()->get($key) === false) {
                 self::event($event, $level, $message, $context);
-                Gdn::Cache()->Store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
+                Gdn::cache()->store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
             }
         }
     }
@@ -170,13 +170,13 @@ class Logger {
 
         // Add default fields to the context if they don't exist.
         $defaults = array(
-            'userid' => Gdn::Session()->UserID,
-            'username' => val("Name", Gdn::Session()->User, 'anonymous'),
-            'ip' => Gdn::Request()->IpAddress(),
+            'userid' => Gdn::session()->UserID,
+            'username' => val("Name", Gdn::session()->User, 'anonymous'),
+            'ip' => Gdn::request()->ipAddress(),
             'timestamp' => time(),
-            'method' => Gdn::Request()->RequestMethod(),
+            'method' => Gdn::request()->requestMethod(),
             'domain' => rtrim(Url('/', true), '/'),
-            'path' => Gdn::Request()->Path()
+            'path' => Gdn::request()->path()
         );
         $context = $context + $defaults;
         static::getLogger()->log($level, $message, $context);

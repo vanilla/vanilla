@@ -56,7 +56,7 @@ class ConditionModule extends Gdn_Module {
         } else {
         }
 
-        $this->Types = array_merge(array('' => '('.sprintf(T('Select a %s'), T('Condition Type', 'Type')).')'), Gdn_Condition::AllTypes());
+        $this->Types = array_merge(array('' => '('.sprintf(T('Select a %s'), T('Condition Type', 'Type')).')'), Gdn_Condition::allTypes());
         //die(print_r($this->Types));
 
         // Get all of the permissions that are valid for the permissions dropdown.

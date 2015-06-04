@@ -75,12 +75,12 @@ function WriteConditionEdit($Condition, $Sender) {
 
         // Write a blank row for a new condition.
         if (count($this->Conditions()) == 0) {
-            WriteConditionEdit(Gdn_Condition::Blank(), $this);
+            WriteConditionEdit(Gdn_Condition::blank(), $this);
         }
 
         // Write a template for new rows.
         echo '<tfoot style="display:none">';
-        WriteConditionEdit(Gdn_Condition::Blank(), $this);
+        WriteConditionEdit(Gdn_Condition::blank(), $this);
         echo '</tfoot>';
         ?>
     </table>

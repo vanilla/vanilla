@@ -86,7 +86,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
      * @param string $HandlerName
      * @return
      */
-    public function GetReturn($PluginName, $HandlerName) {
+    public function getReturn($PluginName, $HandlerName) {
         return $this->Returns[strtolower($HandlerName)][strtolower($PluginName)];
     }
 
@@ -95,13 +95,13 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
      *
      * @param mixed $Options Either the parent class, or an option array
      */
-    public function FireAs($Options) {
+    public function fireAs($Options) {
         if (!is_array($Options)) {
             $Options = array('FireClass' => $Options);
         }
 
         if (array_key_exists('FireClass', $Options)) {
-            $this->FireAs = GetValue('FireClass', $Options);
+            $this->FireAs = val('FireClass', $Options);
         }
 
         return $this;
@@ -115,7 +115,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
      *
      * @param string $EventName The name of the event being fired.
      */
-    public function FireEvent($EventName, $Arguments = null) {
+    public function fireEvent($EventName, $Arguments = null) {
         if (!$this->ClassName) {
             $RealClassName = get_class($this);
             throw new Exception("Event fired from pluggable class '{$RealClassName}', but Gdn_Pluggable::__construct() was never called.");
@@ -130,7 +130,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
         }
 
         // Look to the PluginManager to see if there are related event handlers and call them
-        return Gdn::PluginManager()->CallEventHandlers($this, $FireClass, $EventName);
+        return Gdn::pluginManager()->callEventHandlers($this, $FireClass, $EventName);
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
         // Make sure that $ActualMethodName exists before continuing:
         if (!method_exists($this, $ActualMethodName)) {
             // Make sure that a plugin is not handling the call
-            if (!Gdn::PluginManager()->HasNewMethod($this->ClassName, $ReferenceMethodName)) {
+            if (!Gdn::pluginManager()->hasNewMethod($this->ClassName, $ReferenceMethodName)) {
                 trigger_error(ErrorMessage('The "'.$this->ClassName.'" object does not have a "'.$ActualMethodName.'" method.', $this->ClassName, $ActualMethodName), E_USER_ERROR);
             }
         }
@@ -182,16 +182,16 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
         $this->EventArguments = $Arguments;
 
         // Call the "Before" event handlers
-        Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $ReferenceMethodName, 'Before');
+        Gdn::pluginManager()->callEventHandlers($this, $this->ClassName, $ReferenceMethodName, 'Before');
 
         // Call this object's method
-        if (Gdn::PluginManager()->HasMethodOverride($this->ClassName, $ReferenceMethodName)) {
+        if (Gdn::pluginManager()->hasMethodOverride($this->ClassName, $ReferenceMethodName)) {
             // The method has been overridden
             $this->HandlerType = HANDLER_TYPE_OVERRIDE;
-            $Return = Gdn::PluginManager()->CallMethodOverride($this, $this->ClassName, $ReferenceMethodName);
-        } elseif (Gdn::PluginManager()->HasNewMethod($this->ClassName, $ReferenceMethodName)) {
+            $Return = Gdn::pluginManager()->callMethodOverride($this, $this->ClassName, $ReferenceMethodName);
+        } elseif (Gdn::pluginManager()->hasNewMethod($this->ClassName, $ReferenceMethodName)) {
             $this->HandlerType = HANDLER_TYPE_NEW;
-            $Return = Gdn::PluginManager()->CallNewMethod($this, $this->ClassName, $ReferenceMethodName);
+            $Return = Gdn::pluginManager()->callNewMethod($this, $this->ClassName, $ReferenceMethodName);
         } else {
             // The method has not been overridden
             $Count = count($Arguments);
@@ -211,7 +211,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
         }
 
         // Call the "After" event handlers
-        Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $ReferenceMethodName, 'After');
+        Gdn::pluginManager()->callEventHandlers($this, $this->ClassName, $ReferenceMethodName, 'After');
 
         return $Return;
     }

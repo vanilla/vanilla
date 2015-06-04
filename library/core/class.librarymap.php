@@ -102,7 +102,7 @@ class Gdn_LibraryMap {
      * @return void
      */
     public static function ClearCache($CacheName = FALSE) {
-        Gdn_Autoloader::SmartFree();
+        Gdn_Autoloader::smartFree();
         if ($CacheName != 'locale') return;
 
         if (!array_key_exists($CacheName, self::$Caches))

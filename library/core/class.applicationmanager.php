@@ -244,7 +244,7 @@ class Gdn_ApplicationManager {
         }
 
         // Hook directly into the autoloader and force it to load the newly tested application
-        Gdn_Autoloader::AttachApplication($ApplicationFolder);
+        Gdn_Autoloader::attachApplication($ApplicationFolder);
 
         // Call the application's setup method
         $hooks = $applicationName.'Hooks';
@@ -305,7 +305,7 @@ class Gdn_ApplicationManager {
         );
 
         // Clear the object caches.
-        Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);
+        Gdn_Autoloader::smartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);
 
         // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, true);
         $Locale = Gdn::Locale();

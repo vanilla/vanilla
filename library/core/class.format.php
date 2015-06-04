@@ -174,7 +174,7 @@ class Gdn_Format {
      * Removes all non-alpha-numeric characters (except for _ and -) from
      *
      * @param string $Mixed An object, array, or string to be formatted.
-     * @return unknown
+     * @return string
      */
     public static function AlphaNumeric($Mixed) {
         if (!is_string($Mixed))

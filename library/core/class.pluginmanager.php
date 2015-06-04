@@ -202,7 +202,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      *
      */
     public function ForceAutoloaderIndex() {
-        $AutoloaderMap = Gdn_Autoloader::GetMap(Gdn_Autoloader::MAP_LIBRARY, Gdn_Autoloader::CONTEXT_PLUGIN);
+        $AutoloaderMap = Gdn_Autoloader::getMap(Gdn_Autoloader::MAP_LIBRARY, Gdn_Autoloader::CONTEXT_PLUGIN);
         if (!$AutoloaderMap) return;
 
         $ExtraPaths = array();
@@ -212,7 +212,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 'topic' => strtolower(GetValue('Folder', $AvailablePlugin))
             );
 
-        $AutoloaderMap->Index($ExtraPaths);
+        $AutoloaderMap->index($ExtraPaths);
     }
 
     /**
@@ -1186,7 +1186,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         if ($Plugin)
             $PluginName = $Plugin['Index'];
 
-        Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_PLUGIN, $Plugin);
+        Gdn_Autoloader::smartFree(Gdn_Autoloader::CONTEXT_PLUGIN, $Plugin);
 
         $enabled = $this->IsEnabled($PluginName);
 

@@ -574,7 +574,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // If we're loading from a fully qualified path, prioritize this app's library
         if (!is_null($Application)) {
-            Gdn_Autoloader::Priority(
+            Gdn_Autoloader::priority(
                 Gdn_Autoloader::CONTEXT_APPLICATION,
                 $Application,
                 Gdn_Autoloader::MAP_CONTROLLER,
@@ -583,7 +583,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         $ControllerName = $Controller.'Controller';
-        $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('MapType' => NULL));
+        $ControllerPath = Gdn_Autoloader::lookup($ControllerName, array('MapType' => NULL));
 
         try {
 
@@ -636,7 +636,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             // If we need to autoload the class, do it here
             if (!class_exists($ControllerName, false)) {
-                Gdn_Autoloader::Priority(
+                Gdn_Autoloader::priority(
                     Gdn_Autoloader::CONTEXT_APPLICATION,
                     $Application,
                     Gdn_Autoloader::MAP_CONTROLLER,

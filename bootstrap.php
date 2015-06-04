@@ -52,7 +52,7 @@ require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
 
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
-Gdn_Autoloader::Start();
+Gdn_Autoloader::start();
 
 // Guard against broken cache files
 if (!class_exists('Gdn')) {
@@ -101,7 +101,7 @@ Gdn::Request()->FromEnvironment();
 
 // ApplicationManager
 Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
+Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_APPLICATION);
 
 // ThemeManager
 Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
@@ -213,11 +213,11 @@ unset($Hooks_Path);
 
 // Themes startup
 Gdn::ThemeManager()->Start();
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
+Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_THEME);
 
 // Plugins startup
 Gdn::PluginManager()->Start();
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 /**
  * Locales

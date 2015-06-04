@@ -12,7 +12,7 @@
 
     <?php
     // Add some cache info.
-    if (Gdn::Cache()->ActiveEnabled()) {
+    if (Gdn::Cache()->activeEnabled()) {
         echo '<h3>Cache Information</h3>';
         echo '<pre>';
         echo '<b>Cache Revision</b>: '.Gdn::Cache()->GetRevision()."\n";

@@ -550,7 +550,7 @@ class RoleModel extends Gdn_Model {
             $Permissions = $PermissionModel->PivotPermissions($Permissions, array('RoleID' => $RoleID));
             $PermissionModel->SaveAll($Permissions, array('RoleID' => $RoleID));
 
-            if (Gdn::Cache()->ActiveEnabled()) {
+            if (Gdn::Cache()->activeEnabled()) {
                 // Don't update the user table if we are just using cached permissions.
                 $this->ClearCache();
                 Gdn::UserModel()->ClearPermissions();

@@ -39,7 +39,7 @@ class CommentModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Comment');
-        $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', false);
+        $this->pageCache = Gdn::Cache()->activeEnabled() && C('Properties.CommentModel.pageCache', false);
         $this->FireEvent('AfterConstruct');
     }
 

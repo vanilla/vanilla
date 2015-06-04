@@ -126,7 +126,7 @@ class Logger {
      */
     public static function logAccess($event, $level, $message, $context = array()) {
         // Throttle the log access to 1 event every 5 minutes.
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             $userID = Gdn::Session()->UserID;
             $path = Gdn::Request()->Path();
             $key = "log:$event:$userID:$path";

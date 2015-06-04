@@ -142,7 +142,7 @@ if (C('Debug')) {
     debug(TRUE);
 }
 
-Gdn_Cache::Trace(debug());
+Gdn_Cache::trace(debug());
 
 /**
  * Factory Services

@@ -44,7 +44,7 @@ class MessageModel extends Gdn_Model {
      * @param int The MessageID to filter to.
      */
     public function GetID($MessageID) {
-        if (Gdn::Cache()->ActiveEnabled())
+        if (Gdn::Cache()->activeEnabled())
             return self::Messages($MessageID);
         else
             return parent::GetID($MessageID);
@@ -123,7 +123,7 @@ class MessageModel extends Gdn_Model {
 
         list($Application, $Controller, $Method) = explode('/', strtolower($Location));
 
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             // Get the messages from the cache.
             $Messages = self::Messages();
             $Result = array();

@@ -448,10 +448,10 @@ class UtilityController extends DashboardController {
         $valid = true;
 
         // Test the cache.
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             $k = BetterRandomString(20);
             Gdn::Cache()->Store($k, 1);
-            Gdn::Cache()->Increment($k, 1);
+            Gdn::Cache()->increment($k, 1);
             $v = Gdn::Cache()->Get($k);
 
             if ($v !== 2) {

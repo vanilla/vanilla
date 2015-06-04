@@ -962,7 +962,7 @@ class UserModel extends Gdn_Model {
      * @return array
      */
     public function DefinePermissions($UserID, $Serialize = TRUE) {
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             $PermissionsIncrement = $this->GetPermissionsIncrement();
             $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, array(
                 'UserID' => $UserID,
@@ -978,7 +978,7 @@ class UserModel extends Gdn_Model {
         $Permissions = UserModel::CompilePermissions($Data);
 
         $PermissionsSerialized = NULL;
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             Gdn::Cache()->Store($UserPermissionsKey, $Permissions);
         } else {
             // Save the permissions to the user table
@@ -1500,7 +1500,7 @@ class UserModel extends Gdn_Model {
 
             // Otherwise normal loadings!
         } else {
-            if ($User && ($User->Permissions == '' || Gdn::Cache()->ActiveEnabled()))
+            if ($User && ($User->Permissions == '' || Gdn::Cache()->activeEnabled()))
                 $User->Permissions = $this->DefinePermissions($UserID);
         }
 
@@ -3894,7 +3894,7 @@ class UserModel extends Gdn_Model {
      * @param boolean $PasswordOK
      */
     public static function RateLimit($User, $PasswordOK) {
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
 
             // Rate limit using Gdn_Cache.
             $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
@@ -4140,7 +4140,7 @@ class UserModel extends Gdn_Model {
      *
      */
     public function ClearPermissions() {
-        if (!Gdn::Cache()->ActiveEnabled())
+        if (!Gdn::Cache()->activeEnabled())
             $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
 
         $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
@@ -4148,7 +4148,7 @@ class UserModel extends Gdn_Model {
         if ($PermissionsIncrement == 0)
             Gdn::Cache()->Store($PermissionsIncrementKey, 1);
         else
-            Gdn::Cache()->Increment($PermissionsIncrementKey);
+            Gdn::Cache()->increment($PermissionsIncrementKey);
     }
 
     /**

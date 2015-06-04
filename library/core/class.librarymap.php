@@ -47,7 +47,7 @@ class Gdn_LibraryMap {
                 'mode' => $CacheMode
             );
 
-            $UseCache = (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled());
+            $UseCache = (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled());
             if ($UseCache) {
 
                 $CacheKey = sprintf(Gdn_LibraryMap::CACHE_CACHE_NAME_FORMAT, $CacheName);
@@ -108,7 +108,7 @@ class Gdn_LibraryMap {
         if (!array_key_exists($CacheName, self::$Caches))
             return self::PrepareCache($CacheName);
 
-        $UseCache = (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled());
+        $UseCache = (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled());
         if ($UseCache) {
             $CacheKey = sprintf(Gdn_LibraryMap::CACHE_CACHE_NAME_FORMAT, $CacheName);
             $Deleted = Gdn::Cache()->Remove($CacheKey);
@@ -242,7 +242,7 @@ class Gdn_LibraryMap {
         if (!array_key_exists($CacheName, self::$Caches))
             return FALSE;
 
-        $UseCache = (Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled());
+        $UseCache = (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled());
         if ($UseCache) {
             $CacheKey = sprintf(Gdn_LibraryMap::CACHE_CACHE_NAME_FORMAT, $CacheName);
             $Stored = Gdn::Cache()->Store($CacheKey, self::$Caches[$CacheName]['cache']);

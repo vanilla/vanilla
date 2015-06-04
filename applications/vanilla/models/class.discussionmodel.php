@@ -1636,7 +1636,7 @@ class DiscussionModel extends VanillaModel {
                     $Fields['DiscussionID'] = $DiscussionID;
 
                     // Update the cache.
-                    if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+                    if ($DiscussionID && Gdn::Cache()->activeEnabled()) {
                         $CategoryCache = array(
                             'LastDiscussionID' => $DiscussionID,
                             'LastCommentID' => NULL,
@@ -2079,14 +2079,14 @@ class DiscussionModel extends VanillaModel {
         $IncrementBy = 0;
         if (
             C('Vanilla.Views.Denormalize', FALSE) &&
-            Gdn::Cache()->ActiveEnabled() &&
-            Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL
+            Gdn::Cache()->activeEnabled() &&
+            Gdn::Cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
         ) {
             $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
             $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
 
             // Increment. If not success, create key.
-            $Views = Gdn::Cache()->Increment($CacheKey);
+            $Views = Gdn::Cache()->increment($CacheKey);
             if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
                 Gdn::Cache()->Store($CacheKey, 1);
             }

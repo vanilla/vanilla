@@ -46,7 +46,7 @@ class UserMetaModel extends Gdn_Model {
      * @return array results or $Default
      */
     public function GetUserMeta($UserID, $Key = NULL, $Default = NULL) {
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             if (is_array($UserID)) {
                 $Result = array();
                 foreach ($UserID as $ID) {
@@ -138,7 +138,7 @@ class UserMetaModel extends Gdn_Model {
      * @return void
      */
     public function SetUserMeta($UserID, $Key, $Value = NULL) {
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::Cache()->activeEnabled()) {
             if (is_array($UserID)) {
                 foreach ($UserID as $ID) {
                     $this->SetUserMeta($ID, $Key, $Value);

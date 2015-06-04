@@ -800,13 +800,13 @@ class Gdn_Statistics extends Gdn_Plugin {
         try {
             if (
                 C('Garden.Analytics.Views.Denormalize', FALSE) &&
-                Gdn::Cache()->ActiveEnabled() &&
-                Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL
+                Gdn::Cache()->activeEnabled() &&
+                Gdn::Cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
             ) {
                 $CacheKey = "QueryCache.Analytics.CountViews";
 
                 // Increment. If not success, create key.
-                $Incremented = Gdn::Cache()->Increment($CacheKey);
+                $Incremented = Gdn::Cache()->increment($CacheKey);
                 if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
                     Gdn::Cache()->Store($CacheKey, 1);
 
@@ -817,7 +817,7 @@ class Gdn_Statistics extends Gdn_Plugin {
                     $EmbedCacheKey = "QueryCache.Analytics.CountEmbedViews";
 
                     // Increment. If not success, create key.
-                    $EmbedIncremented = Gdn::Cache()->Increment($EmbedCacheKey);
+                    $EmbedIncremented = Gdn::Cache()->increment($EmbedCacheKey);
                     if ($EmbedIncremented === Gdn_Cache::CACHEOP_FAILURE)
                         Gdn::Cache()->Store($EmbedCacheKey, 1);
 

@@ -290,7 +290,7 @@ class Gdn_Memcache extends Gdn_Cache {
 
     /**
      *
-     * 
+     *
      * @return bool
      */
     public function flush() {

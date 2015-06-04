@@ -42,7 +42,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      */
     public function __construct($Sender = '', $ApplicationFolder = false) {
         if (!$Sender) {
-            $Sender = Gdn::Controller();
+            $Sender = Gdn::controller();
         }
 
         if (is_object($Sender)) {
@@ -50,7 +50,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
             $this->_ThemeFolder = $Sender->Theme;
         } else {
             $this->_ApplicationFolder = 'dashboard';
-            $this->_ThemeFolder = Gdn::Config('Garden.Theme');
+            $this->_ThemeFolder = Gdn::config('Garden.Theme');
         }
         if ($ApplicationFolder !== false) {
             $this->_ApplicationFolder = $ApplicationFolder;
@@ -66,7 +66,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     /**
      * Returns the name of the asset where this component should be rendered.
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         trigger_error(ErrorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
     }
 
@@ -77,7 +77,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      * @param string $Default
      * @return array|mixed
      */
-    public function Data($Name = null, $Default = '') {
+    public function data($Name = null, $Default = '') {
         if ($Name == null) {
             $Result = $this->Data;
         } else {
@@ -91,8 +91,8 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      *
      * @return string
      */
-    public function FetchView($View = '') {
-        $ViewPath = $this->FetchViewLocation($View);
+    public function fetchView($View = '') {
+        $ViewPath = $this->fetchViewLocation($View);
         $String = '';
         ob_start();
         if (is_object($this->_Sender) && isset($this->_Sender->Data)) {
@@ -113,9 +113,9 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      * @param string $ApplicationFolder
      * @return array
      */
-    public function FetchViewLocation($View = '', $ApplicationFolder = '') {
+    public function fetchViewLocation($View = '', $ApplicationFolder = '') {
         if ($View == '') {
-            $View = strtolower($this->Name());
+            $View = strtolower($this->name());
         }
 
         if (substr($View, -6) == 'module') {
@@ -135,9 +135,9 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         $ViewPath = null;
 
         // Try to use Gdn_Controller's FetchViewLocation
-        if (Gdn::Controller() instanceof Gdn_Controller) {
+        if (Gdn::controller() instanceof Gdn_Controller) {
             try {
-                $ViewPath = Gdn::Controller()->FetchViewLocation($View, 'modules', $ApplicationFolder);
+                $ViewPath = Gdn::controller()->fetchViewLocation($View, 'modules', $ApplicationFolder);
             } catch (Exception $Ex) {
             }
         }
@@ -162,13 +162,13 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
             if ($this->_ApplicationFolder) {
                 $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View.'.php'));
             } else {
-                $ViewPaths[] = dirname($this->Path())."/../views/modules/$View.php";
+                $ViewPaths[] = dirname($this->path())."/../views/modules/$View.php";
             }
 
             // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
             $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View.'.php'));
 
-            $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
+            $ViewPath = Gdn_FileSystem::exists($ViewPaths);
         }
 
         if ($ViewPath === false) {
@@ -185,7 +185,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      *
      * @return string
      */
-    public function Name() {
+    public function name() {
         return get_class($this);
     }
 
@@ -195,7 +195,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      * @param bool $NewValue
      * @return bool|string
      */
-    public function Path($NewValue = false) {
+    public function path($NewValue = false) {
         static $Path = false;
         if ($NewValue !== false) {
             $Path = $NewValue;
@@ -207,10 +207,10 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     }
 
     /**
-     *
+     * Output HTML.
      */
-    public function Render() {
-        echo $this->ToString();
+    public function render() {
+        echo $this->toString();
     }
 
     /**
@@ -219,20 +219,21 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      * @param $Name
      * @param $Value
      */
-    public function SetData($Name, $Value) {
+    public function setData($Name, $Value) {
         $this->Data[$Name] = $Value;
     }
 
     /**
-     * Returns the component as a string to be rendered to the screen. Unless
-     * this method is overridden, it will attempt to find and return a view
+     * Returns the component as a string to be rendered to the screen.
+     *
+     * Unless this method is overridden, it will attempt to find and return a view
      * related to this module automatically.
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if ($this->Visible) {
-            return $this->FetchView();
+            return $this->fetchView();
         } else {
             return '';
         }
@@ -244,6 +245,6 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      * @return string
      */
     public function __toString() {
-        return $this->ToString();
+        return $this->toString();
     }
 }

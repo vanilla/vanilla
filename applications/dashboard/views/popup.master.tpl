@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{$CurrentLocale.Lang}">
 <head>
     {asset name='Head'}
 </head>

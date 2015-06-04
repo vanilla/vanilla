@@ -52,8 +52,7 @@ class BaseLogger implements LoggerInterface {
     }
 
     /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
+     * Runtime errors that do not require immediate action but should typically be logged and monitored.
      *
      * @param string $message
      * @param array $context

@@ -46,7 +46,6 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      */
     public function authenticate($Email = '', $Password = '') {
         if (!$Email || !$Password) {
-
             // We werent given parameters, check if they exist in our DataSource
             if ($this->currentStep() != Gdn_Authenticator::MODE_VALIDATE) {
                 return Gdn_Authenticator::AUTH_INSUFFICIENT;
@@ -154,5 +153,4 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
         // We aren't overriding anything
         return false;
     }
-
 }

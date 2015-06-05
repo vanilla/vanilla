@@ -45,17 +45,18 @@ class Gdn_SliceProvider {
         $CurrentPath = Gdn::Request()->Path();
         $ExplodedPath = explode('/', $CurrentPath);
         switch ($this instanceof Gdn_IPlugin) {
-            case TRUE:
+            case true:
                 $ReplacementIndex = 2;
                 break;
 
-            case FALSE:
+            case false:
                 $ReplacementIndex = 1;
                 break;
         }
 
-        if ($ExplodedPath[0] == strtolower(Gdn::Dispatcher()->Application()) && $ExplodedPath[1] == strtolower(Gdn::Dispatcher()->Controller()))
+        if ($ExplodedPath[0] == strtolower(Gdn::Dispatcher()->Application()) && $ExplodedPath[1] == strtolower(Gdn::Dispatcher()->Controller())) {
             $ReplacementIndex++;
+        }
 
         $ExplodedPath[$ReplacementIndex] = $SliceName;
         $SlicePath = implode('/', $ExplodedPath);
@@ -71,13 +72,15 @@ class Gdn_SliceProvider {
         $Extension = strtolower(array_pop($Trash = explode('.', basename($Asset))));
         switch ($Extension) {
             case 'css':
-                if (!in_array($Asset, $this->SliceConfig['css']))
+                if (!in_array($Asset, $this->SliceConfig['css'])) {
                     $this->SliceConfig['css'][] = $Asset;
+                }
                 break;
 
             case 'js':
-                if (!in_array($Asset, $this->SliceConfig['js']))
+                if (!in_array($Asset, $this->SliceConfig['js'])) {
                     $this->SliceConfig['js'][] = $Asset;
+                }
                 break;
         }
     }
@@ -90,5 +93,4 @@ class Gdn_SliceProvider {
     public function RenderSliceConfig() {
         return json_encode($this->SliceConfig);
     }
-
 }

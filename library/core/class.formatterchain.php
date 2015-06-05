@@ -39,9 +39,9 @@ class Gdn_FormatterChain {
      */
     public function Add($Formatter, $Priority = Gdn_FormatterChain::PRIORITY_DEFAULT) {
         // Make sure the priority isn't out of bounds.
-        if ($Priority < self::PRIORITY_LAST)
+        if ($Priority < self::PRIORITY_LAST) {
             $Priority = self::PRIORITY_LAST;
-        elseif ($Priority > self::PRIORITY_FIRST)
+        } elseif ($Priority > self::PRIORITY_FIRST)
             $Priority = self::PRIORITY_FIRST;
 
         $FArray = array($Formatter, $Priority);
@@ -65,7 +65,7 @@ class Gdn_FormatterChain {
         // Grab the existing formatter from the factory.
         $Formatter = Gdn::Factory($Type.'Formatter');
 
-        if ($Formatter === NULL) {
+        if ($Formatter === null) {
             $Chain = new Gdn_FormatterChain();
             Gdn::FactoryInstall($Type.'Formatter', 'Gdn_FormatterChain', __FILE__, Gdn::FactorySingleton, $Chain);
         } elseif (is_a($Formatter, 'Gdn_FormatterChain')) {
@@ -74,10 +74,11 @@ class Gdn_FormatterChain {
             Gdn::FactoryUninstall($Type.'Formatter');
 
             // Look for a priority on the existing object.
-            if (property_exists($Formatter, 'Priority'))
+            if (property_exists($Formatter, 'Priority')) {
                 $Priority = $Formatter->Priority;
-            else
+            } else {
                 $Priority = self::PRIORITY_DEFAULT;
+            }
 
             $Chain = new Gdn_FormatterChain();
             $Chain->Add($Formatter, $Priority);
@@ -94,12 +95,13 @@ class Gdn_FormatterChain {
      * @return int
      */
     public static function Compare($A, $B) {
-        if ($A[1] < $B[1])
+        if ($A[1] < $B[1]) {
             return 1;
-        elseif ($A[1] > $B[1])
+        } elseif ($A[1] > $B[1])
             return -1;
-        else
+        else {
             return 0;
+        }
     }
 
     /** Format a string with all of the formatters in turn.

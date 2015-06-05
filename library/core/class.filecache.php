@@ -78,12 +78,13 @@ class Gdn_Filecache extends Gdn_Cache {
 
         $CacheLocation = $Options[Gdn_Cache::CONTAINER_LOCATION];
         $CacheLocationOK = Gdn_FileSystem::CheckFolderR($CacheLocation, Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE);
-        if (!$CacheLocationOK)
+        if (!$CacheLocationOK) {
             return $this->failure("Supplied cache folder '{$CacheLocation}' could not be found, or created.");
+        }
 
         // Merge the options array with our local defaults
         $Defaults = array(
-            Gdn_Cache::CONTAINER_ONLINE => TRUE,
+            Gdn_Cache::CONTAINER_ONLINE => true,
             Gdn_Cache::CONTAINER_TIMEOUT => 1
         );
         $FinalContainer = array_merge($Defaults, $Options);
@@ -102,8 +103,11 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     protected function _getContainer($KeyHash) {
         // Get a container based on the key. For now, loop through until we find one that is online.
-        foreach ($this->containers as &$Container)
-            if ($Container[Gdn_Cache::CONTAINER_ONLINE]) return $Container;
+        foreach ($this->containers as &$Container) {
+            if ($Container[Gdn_Cache::CONTAINER_ONLINE]) {
+                return $Container;
+            }
+        }
 
         return Gdn_Cache::CACHEOP_FAILURE;
     }
@@ -132,16 +136,18 @@ class Gdn_Filecache extends Gdn_Cache {
         $TargetFolder = (string)($SplitValue % Gdn_Filecache::OPT_MOD_SPLIT);
 
         $Container = $this->_GetContainer($KeyHash);
-        if ($Container === Gdn_Cache::CACHEOP_FAILURE)
+        if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return $this->failure("Trying to fetch a container for hash '{$KeyHash}' but got back CACHEOP_FAILURE instead");
+        }
 
         $CacheLocation = $Container[Gdn_Cache::CONTAINER_LOCATION];
         $SplitCacheLocation = CombinePaths(array($CacheLocation, $TargetFolder));
 
         $Flags = ($Flags & Gdn_Filecache::O_CREATE) ? Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE : 0;
         $CacheLocationOK = Gdn_FileSystem::CheckFolderR($SplitCacheLocation, $Flags);
-        if (!$CacheLocationOK)
+        if (!$CacheLocationOK) {
             return $this->failure("Computed cache folder '{$SplitCacheLocation}' could not be found, or created.");
+        }
 
         $CacheFile = rtrim(CombinePaths(array($SplitCacheLocation, $KeyHash)), '/');
 
@@ -159,8 +165,9 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool
      */
     public function add($Key, $Value, $Options = array()) {
-        if ($this->Exists($Key) !== Gdn_Cache::CACHEOP_FAILURE)
+        if ($this->Exists($Key) !== Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
+        }
 
         return $this->Store($Key, $Value, $Options);
     }
@@ -168,7 +175,7 @@ class Gdn_Filecache extends Gdn_Cache {
     /**
      * This method is deprecated, but since cache files call it there will be low-level crashes without it.
      */
-    public static function prepareCache($CacheName, $ExistingCacheArray = NULL) {
+    public static function prepareCache($CacheName, $ExistingCacheArray = null) {
         Gdn_LibraryMap::PrepareCache($CacheName, $ExistingCacheArray);
     }
 
@@ -183,9 +190,9 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function store($Key, $Value, $Options = array()) {
         $Defaults = array(
-            Gdn_Cache::FEATURE_COMPRESS => FALSE,
-            Gdn_Cache::FEATURE_TIMEOUT => FALSE,
-            Gdn_Cache::FEATURE_EXPIRY => FALSE
+            Gdn_Cache::FEATURE_COMPRESS => false,
+            Gdn_Cache::FEATURE_TIMEOUT => false,
+            Gdn_Cache::FEATURE_EXPIRY => false
         );
         $FinalOptions = array_merge($Defaults, $Options);
 
@@ -193,15 +200,17 @@ class Gdn_Filecache extends Gdn_Cache {
             $Container = $FinalOptions[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
             $Container = $this->_GetKeyPath($Key, Gdn_Filecache::O_CREATE);
-            if ($Container === Gdn_Cache::CACHEOP_FAILURE)
+            if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
                 return Gdn_Cache::CACHEOP_FAILURE;
+            }
         }
         $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
 
         if ($FinalOptions[Gdn_Cache::FEATURE_COMPRESS] && $CompressionMethod = $this->hasFeature(Gdn_Cache::FEATURE_COMPRESS)) {
             $Compressor = $CompressionMethod[0];
-            if (!function_exists($Compressor))
+            if (!function_exists($Compressor)) {
                 return $this->failure("Trying to compress a value, but method '{$Compressor}' is not available.");
+            }
             $Value = call_user_func($Compressor, $Value);
         }
 
@@ -216,8 +225,9 @@ class Gdn_Filecache extends Gdn_Cache {
         } catch (Exception $e) {
             die("exp: ".$e->getMessage());
         }
-        if ($StoreOp === FALSE)
+        if ($StoreOp === false) {
             return $this->failure("Trying to save cache value to file '{$CacheFile}' but file_put_contents returned FALSE.");
+        }
 
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
@@ -235,16 +245,19 @@ class Gdn_Filecache extends Gdn_Cache {
             $Container = $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
             $Container = $this->_GetKeyPath($Key, Gdn_Filecache::O_CREATE);
-            if ($Container === Gdn_Cache::CACHEOP_FAILURE)
+            if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
                 return Gdn_Cache::CACHEOP_FAILURE;
+            }
         }
         $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
 
         $Cache = @fopen($CacheFile, 'r');
-        if (!$Cache) return Gdn_Cache::CACHEOP_FAILURE;
+        if (!$Cache) {
+            return Gdn_Cache::CACHEOP_FAILURE;
+        }
         $TimeoutMS = $Container[Gdn_Cache::CONTAINER_TIMEOUT] * 1000;
-        $EndTimeMS = microtime(TRUE) + $TimeoutMS;
-        $Data = NULL;
+        $EndTimeMS = microtime(true) + $TimeoutMS;
+        $Data = null;
         do {
             flock($Cache, LOCK_SH | LOCK_NB, $Block);
             if (!$Block) {
@@ -269,16 +282,18 @@ class Gdn_Filecache extends Gdn_Cache {
 
                 // Do a block-wise buffered read
                 $Contents = '';
-                while (!feof($Cache) && ($Buf = fread($Cache, 8192)) != '')
+                while (!feof($Cache) && ($Buf = fread($Cache, 8192)) != '') {
                     $Contents .= $Buf;
+                }
                 @fclose($Cache);
 
                 // Check Compression
                 if ($Compressed) {
                     if ($CompressionMethod = $this->hasFeature(Gdn_Cache::FEATURE_COMPRESS)) {
                         $DeCompressor = $CompressionMethod[1];
-                        if (!function_exists($DeCompressor))
+                        if (!function_exists($DeCompressor)) {
                             return $this->failure("Trying to decompress a value, but method '{$DeCompressor}' is not available.");
+                        }
                         $Data = call_user_func($DeCompressor, $Contents);
                     }
                 } else {
@@ -287,11 +302,12 @@ class Gdn_Filecache extends Gdn_Cache {
                 break;
             }
             usleep(50);
-        } while (microtime(TRUE) <= $EndTimeMS);
+        } while (microtime(true) <= $EndTimeMS);
         @fclose($Cache);
 
-        if (!is_null($Data))
+        if (!is_null($Data)) {
             return $Data;
+        }
 
         return Gdn_Cache::CACHEOP_FAILURE;
     }
@@ -317,12 +333,14 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     protected function _exists($Key) {
         $Container = $this->_GetKeyPath($Key);
-        if ($Container === Gdn_Cache::CACHEOP_FAILURE)
+        if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
+        }
 
         $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
-        if (!file_exists($CacheFile))
+        if (!file_exists($CacheFile)) {
             return Gdn_Cache::CACHEOP_FAILURE;
+        }
 
         return $Container;
     }
@@ -339,14 +357,15 @@ class Gdn_Filecache extends Gdn_Cache {
             $Container = $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
             $Container = $this->_GetKeyPath($Key, Gdn_Filecache::O_CREATE);
-            if ($Container === Gdn_Cache::CACHEOP_FAILURE)
+            if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
                 return Gdn_Cache::CACHEOP_FAILURE;
+            }
         }
         $CacheFile = $Container[Gdn_Filecache::CONTAINER_CACHEFILE];
 
         $Cache = fopen($CacheFile, 'r');
         $TimeoutMS = $Container[Gdn_Cache::CONTAINER_TIMEOUT] * 1000;
-        $EndTimeMS = microtime(TRUE) + $TimeoutMS;
+        $EndTimeMS = microtime(true) + $TimeoutMS;
         $Success = Gdn_Cache::CACHEOP_FAILURE;
         do {
             flock($Cache, LOCK_EX | LOCK_NB, $Block);
@@ -356,7 +375,7 @@ class Gdn_Filecache extends Gdn_Cache {
                 break;
             }
             usleep(50);
-        } while (microtime(TRUE) <= $EndTimeMS);
+        } while (microtime(true) <= $EndTimeMS);
         @fclose($Cache);
 
         return $Success;
@@ -372,8 +391,9 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function replace($Key, $Value, $Options = array()) {
         $Container = $this->_Exists($Key);
-        if ($Container === Gdn_Cache::CACHEOP_FAILURE)
+        if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
+        }
 
         $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER] = $Container;
         return $this->Store($Key, $Value, $Options);
@@ -389,13 +409,16 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function increment($Key, $Amount = 1, $Options = array()) {
         $Container = $this->_Exists($Key);
-        if ($Container !== Gdn_Cache::CACHEOP_FAILURE)
+        if ($Container !== Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
+        }
 
         $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER] = $Container;
         $Value = $this->Get($Key, $Options);
         if ($Value !== Gdn_Cache::CACHEOP_FAILURE) {
-            if (($Value + $Amount) < 0) return Gdn_Cache::CACHEOP_FAILURE;
+            if (($Value + $Amount) < 0) {
+                return Gdn_Cache::CACHEOP_FAILURE;
+            }
             $Value += $Amount;
             return $this->Store($Key, $Value, $Options);
         }
@@ -423,7 +446,7 @@ class Gdn_Filecache extends Gdn_Cache {
             $CacheLocation = $Container[Gdn_Filecache::CONTAINER_LOCATION];
             if (is_dir($CacheLocation)) {
                 Gdn_FileSystem::RemoveFolder($CacheLocation);
-                @mkdir($CacheLocation, 0755, TRUE);
+                @mkdir($CacheLocation, 0755, true);
             }
         }
     }

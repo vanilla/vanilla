@@ -15,7 +15,7 @@
 class Gdn_Smarty {
 
     /** @var Smarty The smarty object used for the template. */
-    protected $_Smarty = NULL;
+    protected $_Smarty = null;
 
     /**
      *
@@ -28,7 +28,7 @@ class Gdn_Smarty {
 
         // Get a friendly name for the controller.
         $ControllerName = get_class($Controller);
-        if (StringEndsWith($ControllerName, 'Controller', TRUE)) {
+        if (StringEndsWith($ControllerName, 'Controller', true)) {
             $ControllerName = substr($ControllerName, 0, -10);
         }
 
@@ -45,7 +45,7 @@ class Gdn_Smarty {
                 'Photo' => '',
                 'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
                 'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
-                'SignedIn' => TRUE);
+                'SignedIn' => true);
 
             $Photo = $Session->User->Photo;
             if ($Photo) {
@@ -53,16 +53,17 @@ class Gdn_Smarty {
                     $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
                 }
             } else {
-                if (function_exists('UserPhotoDefaultUrl'))
+                if (function_exists('UserPhotoDefaultUrl')) {
                     $Photo = UserPhotoDefaultUrl($Session->User, 'ProfilePhoto');
-                elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
+                } elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
                     $Photo = Gdn_Upload::Url($ConfigPhoto);
-                else
-                    $Photo = Asset('/applications/dashboard/design/images/defaulticon.png', TRUE);
+                else {
+                    $Photo = Asset('/applications/dashboard/design/images/defaulticon.png', true);
+                }
             }
             $User['Photo'] = $Photo;
         } else {
-            $User = FALSE; /*array(
+            $User = false; /*array(
             'Name' => '',
             'CountNotifications' => 0,
             'SignedIn' => FALSE);*/
@@ -78,8 +79,8 @@ class Gdn_Smarty {
             }
         }
 
-        $BodyClass = GetValue('CssClass', $Controller->Data, '', TRUE);
-        $Sections = Gdn_Theme::Section(NULL, 'get');
+        $BodyClass = GetValue('CssClass', $Controller->Data, '', true);
+        $Sections = Gdn_Theme::Section(null, 'get');
         if (is_array($Sections)) {
             foreach ($Sections as $Section) {
                 $BodyClass .= ' Section-'.$Section;
@@ -110,13 +111,17 @@ class Gdn_Smarty {
         $Smarty->assign($Controller->Data);
 
         $Smarty->Controller = $Controller; // for smarty plugins
-        $Smarty->security = TRUE;
+        $Smarty->security = true;
 
-        $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
-            array('Category', 'CheckPermission', 'InSection', 'InCategory', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url'));
+        $Smarty->security_settings['IF_FUNCS'] = array_merge(
+            $Smarty->security_settings['IF_FUNCS'],
+            array('Category', 'CheckPermission', 'InSection', 'InCategory', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url')
+        );
 
-        $Smarty->security_settings['MODIFIER_FUNCS'] = array_merge($Smarty->security_settings['MODIFIER_FUNCS'],
-            array('sprintf'));
+        $Smarty->security_settings['MODIFIER_FUNCS'] = array_merge(
+            $Smarty->security_settings['MODIFIER_FUNCS'],
+            array('sprintf')
+        );
 
         $Smarty->secure_dir = array($Path);
     }
@@ -131,11 +136,12 @@ class Gdn_Smarty {
         $Smarty = $this->Smarty();
         $this->Init($Path, $Controller);
         $CompileID = $Smarty->compile_id;
-        if (defined('CLIENT_NAME'))
+        if (defined('CLIENT_NAME')) {
             $CompileID = CLIENT_NAME;
+        }
 
         $Smarty->template_dir = dirname($Path);
-        $Smarty->display($Path, NULL, $CompileID);
+        $Smarty->display($Path, null, $CompileID);
     }
 
     /**
@@ -169,16 +175,17 @@ class Gdn_Smarty {
         $Smarty = $this->Smarty();
         $this->Init($Path, Gdn::Controller());
         $CompileID = $Smarty->compile_id;
-        if (defined('CLIENT_NAME'))
+        if (defined('CLIENT_NAME')) {
             $CompileID = CLIENT_NAME;
+        }
 
-        $Return = TRUE;
+        $Return = true;
         try {
-            $Result = $Smarty->fetch($Path, NULL, $CompileID);
+            $Result = $Smarty->fetch($Path, null, $CompileID);
             // echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
-            $Return = ($Result == '' || strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<h1>Something has gone wrong.</h1>') > 0) ? FALSE : TRUE;
+            $Return = ($Result == '' || strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<h1>Something has gone wrong.</h1>') > 0) ? false : true;
         } catch (Exception $ex) {
-            $Return = FALSE;
+            $Return = false;
         }
         return $Return;
     }

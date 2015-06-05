@@ -182,9 +182,9 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     public function save($Data, $Settings = false) {
         // Grab the current record.
         $Row = false;
-        if (isset($Data[$this->PrimaryKey]))
+        if (isset($Data[$this->PrimaryKey])) {
             $Row = $this->GetWhere(array($this->PrimaryKey => $Data[$this->PrimaryKey]))->FirstRow(DATASET_TYPE_ARRAY);
-        elseif ($PK = GetValue('PK', $Settings)) {
+        } elseif ($PK = GetValue('PK', $Settings)) {
             $Row = $this->GetWhere(array($PK => $Data[$PK]));
         }
 

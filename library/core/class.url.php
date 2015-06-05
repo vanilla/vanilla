@@ -21,13 +21,14 @@ class Gdn_Url {
      * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
      * @return string
      */
-    public static function WebRoot($WithDomain = FALSE) {
+    public static function WebRoot($WithDomain = false) {
         $WebRoot = Gdn::Request()->WebRoot();
 
-        if ($WithDomain)
+        if ($WithDomain) {
             $Result = Gdn::Request()->Domain().'/'.$WebRoot;
-        else
+        } else {
             $Result = $WebRoot;
+        }
 
         return $Result;
     }
@@ -72,10 +73,11 @@ class Gdn_Url {
      * @param boolean $RemoveSyndication
      * @return string
      */
-    public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
+    public static function Request($WithWebRoot = false, $WithDomain = false, $RemoveSyndication = false) {
         $Result = Gdn::Request()->Path();
-        if ($WithWebRoot)
+        if ($WithWebRoot) {
             $Result = self::WebRoot($WithDomain).'/'.$Result;
+        }
         return $Result;
     }
 }

@@ -30,9 +30,10 @@ class Gdn_Schema {
      * @param string Explicitly define the name of the table that this model represents. You can also explicitly set this value with $this->TableName.
      * @param Gdn_Database
      */
-    public function __construct($Table = '', $Database = NULL) {
-        if ($Table != '')
+    public function __construct($Table = '', $Database = null) {
+        if ($Table != '') {
             $this->Fetch($Table, $Database);
+        }
     }
 
     /**
@@ -43,15 +44,17 @@ class Gdn_Schema {
      * @param Gdn_Database
      * @return array
      */
-    public function Fetch($Table = FALSE, $Database = NULL) {
-        if ($Table !== FALSE)
+    public function Fetch($Table = false, $Database = null) {
+        if ($Table !== false) {
             $this->CurrentTable = $Table;
+        }
 
-        if (!is_array($this->_Schema))
+        if (!is_array($this->_Schema)) {
             $this->_Schema = array();
+        }
 
         if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
-            if ($Database !== NULL) {
+            if ($Database !== null) {
                 $SQL = $Database->SQL();
             } else {
                 $SQL = Gdn::SQL();
@@ -65,9 +68,10 @@ class Gdn_Schema {
      *
      * @return array
      */
-    public function Fields($Tablename = FALSE) {
-        if (!$Tablename)
+    public function Fields($Tablename = false) {
+        if (!$Tablename) {
             $Tablename = $this->CurrentTable;
+        }
 
         return $this->_Schema[$Tablename];
     }
@@ -79,15 +83,18 @@ class Gdn_Schema {
      * @param string If this value is specified, $this->CurrentTable will be switched to $Table.
      */
     public function GetField($Field, $Table = '') {
-        if ($Table != '')
+        if ($Table != '') {
             $this->CurrentTable = $Table;
+        }
 
-        if (!is_array($this->_Schema))
+        if (!is_array($this->_Schema)) {
             $this->_Schema = array();
+        }
 
-        $Result = FALSE;
-        if ($this->FieldExists($this->CurrentTable, $Field) === TRUE)
+        $Result = false;
+        if ($this->FieldExists($this->CurrentTable, $Field) === true) {
             $Result = $this->_Schema[$this->CurrentTable][$Field];
+        }
 
         return $Result;
     }
@@ -100,16 +107,18 @@ class Gdn_Schema {
      * @param string The default value to return if $Property is not found in $Field of $Table.
      * @param string If this value is specified, $this->CurrentTable will be switched to $Table.
      */
-    public function GetProperty($Field, $Property, $Default = FALSE, $Table = '') {
+    public function GetProperty($Field, $Property, $Default = false, $Table = '') {
         $Return = $Default;
-        if ($Table != '')
+        if ($Table != '') {
             $this->CurrentTable = $Table;
+        }
 
         $Properties = array('Name', 'PrimaryKey', 'Type', 'AllowNull', 'Default', 'Length', 'Enum');
         if (in_array($Property, $Properties)) {
             $Field = $this->GetField($Field, $this->CurrentTable);
-            if ($Field !== FALSE)
+            if ($Field !== false) {
                 $Return = $Field->$Property;
+            }
         }
 
         return $Return;
@@ -127,10 +136,11 @@ class Gdn_Schema {
             && is_array($this->_Schema[$Table])
             && array_key_exists($Field, $this->_Schema[$Table])
             && is_object($this->_Schema[$Table][$Field])
-        )
-            return TRUE;
-        else
-            return FALSE;
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -139,19 +149,21 @@ class Gdn_Schema {
      *
      * @param string The name of the table for which to find the primary key(s).
      */
-    public function PrimaryKey($Table, $Database = NULL) {
+    public function PrimaryKey($Table, $Database = null) {
         $Schema = $this->Fetch($Table, $Database);
         $PrimaryKeys = array();
         foreach ($Schema as $FieldName => $Properties) {
-            if ($Properties->PrimaryKey === TRUE)
+            if ($Properties->PrimaryKey === true) {
                 $PrimaryKeys[] = $FieldName;
+            }
         }
 
-        if (count($PrimaryKeys) == 0)
+        if (count($PrimaryKeys) == 0) {
             return '';
-        elseif (count($PrimaryKeys) == 1)
+        } elseif (count($PrimaryKeys) == 1)
             return $PrimaryKeys[0];
-        else
+        else {
             return $PrimaryKeys;
+        }
     }
 }

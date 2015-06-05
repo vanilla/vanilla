@@ -24,10 +24,10 @@ class Gdn_Format {
      * should contain rel="nofollow" links. The default setting is true, meaning all links will contain
      * the rel="nofollow" attribute.
      */
-    public static $DisplayNoFollow = TRUE;
+    public static $DisplayNoFollow = true;
 
     /** @var bool Whether or not to replace plain text links with anchors. */
-    public static $FormatLinks = TRUE;
+    public static $FormatLinks = true;
 
     /** @var string  */
     public static $MentionsUrlFormat = '/profile/{name}';
@@ -88,7 +88,7 @@ class Gdn_Format {
         if ($Activity->ActivityGender == 'm') {
             $Gender = T('his');
             $Gender2 = T('he');
-        } else if ($Activity->ActivityGender == 'f') {
+        } elseif ($Activity->ActivityGender == 'f') {
             $Gender = T('her');
             $Gender2 = T('she');
         }
@@ -97,9 +97,9 @@ class Gdn_Format {
             $Gender = $Gender2 = T('your');
         }
 
-        $IsYou = FALSE;
+        $IsYou = false;
         if ($ViewingUserID == $Activity->RegardingUserID) {
-            $IsYou = TRUE;
+            $IsYou = true;
             $RegardingName = T('you');
             $RegardingNameP = T('your');
             $GenderSuffixGender = $Activity->RegardingGender;
@@ -107,8 +107,9 @@ class Gdn_Format {
             $RegardingName = $Activity->RegardingName == '' ? T('somebody') : $Activity->RegardingName;
             $RegardingNameP = FormatPossessive($RegardingName);
 
-            if ($Activity->ActivityUserID != $ViewingUserID)
+            if ($Activity->ActivityUserID != $ViewingUserID) {
                 $GenderSuffixCode = 'Third';
+            }
         }
         $RegardingWall = '';
         $RegardingWallLink = '';
@@ -117,7 +118,7 @@ class Gdn_Format {
             // If the activityuser and regardinguser are the same, use the $Gender Ref as the RegardingName
             $RegardingName = $RegardingProfile = $Gender;
             $RegardingNameP = $RegardingProfileP = $Gender;
-        } else if ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
+        } elseif ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
             // If there is a regarding user and we're not looking at his/her profile, link the name.
             $RegardingNameD = urlencode($Activity->RegardingName);
             if (!$IsYou) {
@@ -130,15 +131,17 @@ class Gdn_Format {
             $RegardingWallLink = Url($RegardingWallActivityPath);
             $RegardingWall = Anchor(T('wall'), $RegardingWallActivityPath);
         }
-        if ($RegardingWall == '')
+        if ($RegardingWall == '') {
             $RegardingWall = T('wall');
+        }
 
         if ($Activity->Route == '') {
             $ActivityRouteLink = '';
-            if ($Activity->RouteCode)
+            if ($Activity->RouteCode) {
                 $Route = T($Activity->RouteCode);
-            else
+            } else {
                 $Route = '';
+            }
         } else {
             $ActivityRouteLink = Url($Activity->Route);
             $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
@@ -147,9 +150,9 @@ class Gdn_Format {
         // Translate the gender suffix.
         $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.$GenderSuffixGender";
         $GenderSuffix = T($GenderSuffixCode, '');
-        if ($GenderSuffix == $GenderSuffixCode)
+        if ($GenderSuffix == $GenderSuffixCode) {
             $GenderSuffix = ''; // in case translate doesn't support empty strings.
-
+        }
         /*
           Debug:
         return $ActivityName
@@ -177,10 +180,11 @@ class Gdn_Format {
      * @return string
      */
     public static function AlphaNumeric($Mixed) {
-        if (!is_string($Mixed))
+        if (!is_string($Mixed)) {
             return self::To($Mixed, 'ForAlphaNumeric');
-        else
+        } else {
             return preg_replace('/([^\w-])/', '', $Mixed);
+        }
     }
 
     /**
@@ -207,8 +211,9 @@ class Gdn_Format {
      * @todo could be just "return (object) $Array;"?
      */
     public static function ArrayAsObject($Array) {
-        if (!is_array($Array))
+        if (!is_array($Array)) {
             return $Array;
+        }
 
         $Return = new stdClass();
         foreach ($Array as $Property => $Value) {
@@ -239,7 +244,9 @@ class Gdn_Format {
      */
     public static function Auto($Mixed) {
         $Formatter = C('Garden.InputFormatter');
-        if (!method_exists('Gdn_Format', $Formatter)) return $Mixed;
+        if (!method_exists('Gdn_Format', $Formatter)) {
+            return $Mixed;
+        }
 
         return Gdn_Format::$Formatter($Mixed);
     }
@@ -322,13 +329,14 @@ class Gdn_Format {
      * @todo Make this locale aware.
      */
     public static function BigNumber($Number, $Format = '') {
-        if (!is_numeric($Number))
+        if (!is_numeric($Number)) {
             return $Number;
+        }
 
-        $Negative = FALSE;
+        $Negative = false;
         $WorkingNumber = $Number;
         if ($Number < 0) {
-            $Negative = TRUE;
+            $Negative = true;
             $WorkingNumber = $Number - ($Number * 2);
         }
 
@@ -341,24 +349,28 @@ class Gdn_Format {
         } elseif ($WorkingNumber >= 1000) {
             $Number2 = $WorkingNumber / 1000;
             $Suffix = "K";
-        } else
+        } else {
             $Number2 = $Number;
+        }
 
-        if ($Negative)
+        if ($Negative) {
             $Number2 = $Number2 - ($Number2 * 2);
+        }
 
         if (isset($Suffix)) {
             $Result = number_format($Number2, 1);
-            if (substr($Result, -2) == '.0')
+            if (substr($Result, -2) == '.0') {
                 $Result = substr($Result, 0, -2);
+            }
 
             $Result .= $Suffix;
         } else {
             $Result = $Number;
         }
 
-        if ($Format == 'html')
+        if ($Format == 'html') {
             $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
+        }
 
         return $Result;
     }
@@ -437,7 +449,9 @@ class Gdn_Format {
      * @return string
      */
     public static function Clean($Mixed) {
-        if (!is_string($Mixed)) return self::To($Mixed, 'Clean');
+        if (!is_string($Mixed)) {
+            return self::To($Mixed, 'Clean');
+        }
         $Mixed = strtr($Mixed, self::$_CleanChars);
         $Mixed = preg_replace('/[^A-Za-z0-9 ]/', '', urldecode($Mixed));
         $Mixed = preg_replace('/ +/', '-', trim($Mixed));
@@ -459,23 +473,25 @@ class Gdn_Format {
         static $GuestHourOffset;
 
         // Was a mysqldatetime passed?
-        if ($Timestamp !== NULL && !is_numeric($Timestamp)) {
+        if ($Timestamp !== null && !is_numeric($Timestamp)) {
             $Timestamp = self::ToTimestamp($Timestamp);
         }
 
         if (function_exists('FormatDateCustom') && (!$Format || strcasecmp($Format, 'html') == 0)) {
-            if (!$Timestamp)
+            if (!$Timestamp) {
                 $Timestamp = time();
+            }
 
             return FormatDateCustom($Timestamp, $Format);
         }
 
-        if ($Timestamp === NULL)
+        if ($Timestamp === null) {
             return T('Null Date', '-');
+        }
 
-        if (!$Timestamp)
+        if (!$Timestamp) {
             $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
-        $GmTimestamp = $Timestamp;
+        }        $GmTimestamp = $Timestamp;
 
         $Now = time();
 
@@ -509,10 +525,10 @@ class Gdn_Format {
             $Now += $SecondsOffset;
         }
 
-        $Html = FALSE;
+        $Html = false;
         if (strcasecmp($Format, 'html') == 0) {
             $Format = '';
-            $Html = TRUE;
+            $Html = true;
         }
 
         if ($Format == '') {
@@ -520,10 +536,10 @@ class Gdn_Format {
             if (date('Y m d', $Timestamp) == date('Y m d', $Now)) {
                 // Use the time format
                 $Format = T('Date.DefaultTimeFormat', '%l:%M%p');
-            } else if (date('Y', $Timestamp) == date('Y', $Now)) {
+            } elseif (date('Y', $Timestamp) == date('Y', $Now)) {
                 // If the timestamp is the same year, show the month and date
                 $Format = T('Date.DefaultDayFormat', '%B %e');
-            } else if (date('Y', $Timestamp) != date('Y', $Now)) {
+            } elseif (date('Y', $Timestamp) != date('Y', $Now)) {
                 // If the timestamp is not the same year, just show the year
                 $Format = T('Date.DefaultYearFormat', '%B %Y');
             } else {
@@ -535,10 +551,12 @@ class Gdn_Format {
         $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
 
         // Emulate %l and %e for Windows.
-        if (strpos($Format, '%l') !== false)
+        if (strpos($Format, '%l') !== false) {
             $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
-        if (strpos($Format, '%e') !== false)
+        }
+        if (strpos($Format, '%e') !== false) {
             $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
+        }
 
         $Result = strftime($Format, $Timestamp);
 
@@ -556,17 +574,18 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function DateFull($Timestamp, $Format = '') {
-        if ($Timestamp === NULL)
+        if ($Timestamp === null) {
             return T('Null Date', '-');
+        }
 
         // Was a mysqldatetime passed?
         if (!is_numeric($Timestamp)) {
             $Timestamp = self::ToTimestamp($Timestamp);
         }
 
-        if (!$Timestamp)
+        if (!$Timestamp) {
             $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
-        $GmTimestamp = $Timestamp;
+        }        $GmTimestamp = $Timestamp;
 
         $Now = time();
 
@@ -578,10 +597,10 @@ class Gdn_Format {
             $Now += $SecondsOffset;
         }
 
-        $Html = FALSE;
+        $Html = false;
         if (strcasecmp($Format, 'html') == 0) {
             $Format = '';
-            $Html = TRUE;
+            $Html = true;
         }
 
         $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
@@ -627,7 +646,7 @@ class Gdn_Format {
      * @param bool|null $is_mobile Whether or not you want the format for mobile browsers.
      * @return string
      */
-    public static function DefaultFormat($is_mobile = NULL) {
+    public static function DefaultFormat($is_mobile = null) {
         if ($is_mobile === true || ($is_mobile === null && IsMobile())) {
             return C('Garden.MobileInputFormatter', C('Garden.InputFormatter', 'Html'));
         } else {
@@ -643,9 +662,9 @@ class Gdn_Format {
      * @return string
      */
     public static function Display($Mixed) {
-        if (!is_string($Mixed))
+        if (!is_string($Mixed)) {
             return self::To($Mixed, 'Display');
-        else {
+        } else {
             $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', 'UTF-8'));
             $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
             $Mixed = self::Mentions($Mixed);
@@ -689,13 +708,14 @@ class Gdn_Format {
      * @return string
      */
     public static function Form($Mixed) {
-        if (!is_string($Mixed))
+        if (!is_string($Mixed)) {
             return self::To($Mixed, 'Form');
-        else {
-            if (C('Garden.Format.ReplaceNewlines', TRUE))
+        } else {
+            if (C('Garden.Format.ReplaceNewlines', true)) {
                 return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', 'UTF-8')));
-            else
+            } else {
                 return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', 'UTF-8'));
+            }
         }
     }
 
@@ -709,21 +729,33 @@ class Gdn_Format {
      * @param int optional $Timestamp, otherwise time() is used
      * @return string
      */
-    public static function FuzzyTime($Timestamp = NULL, $MorePrecise = FALSE) {
-        if (is_null($Timestamp))
+    public static function FuzzyTime($Timestamp = null, $MorePrecise = false) {
+        if (is_null($Timestamp)) {
             $Timestamp = time();
-        elseif (!is_numeric($Timestamp))
+        } elseif (!is_numeric($Timestamp))
             $Timestamp = self::ToTimestamp($Timestamp);
 
         $time = $Timestamp;
 
         $NOW = time();
-        if (!defined('ONE_MINUTE')) define('ONE_MINUTE', 60);
-        if (!defined('ONE_HOUR')) define('ONE_HOUR', 3600);
-        if (!defined('ONE_DAY')) define('ONE_DAY', 86400);
-        if (!defined('ONE_WEEK')) define('ONE_WEEK', ONE_DAY * 7);
-        if (!defined('ONE_MONTH')) define('ONE_MONTH', ONE_WEEK * 4);
-        if (!defined('ONE_YEAR')) define('ONE_YEAR', ONE_MONTH * 12);
+        if (!defined('ONE_MINUTE')) {
+            define('ONE_MINUTE', 60);
+        }
+        if (!defined('ONE_HOUR')) {
+            define('ONE_HOUR', 3600);
+        }
+        if (!defined('ONE_DAY')) {
+            define('ONE_DAY', 86400);
+        }
+        if (!defined('ONE_WEEK')) {
+            define('ONE_WEEK', ONE_DAY * 7);
+        }
+        if (!defined('ONE_MONTH')) {
+            define('ONE_MONTH', ONE_WEEK * 4);
+        }
+        if (!defined('ONE_YEAR')) {
+            define('ONE_YEAR', ONE_MONTH * 12);
+        }
 
         $SecondsAgo = $NOW - $time;
 
@@ -738,9 +770,9 @@ class Gdn_Format {
         if ($sod_now == $sod) {
             if ($time > $NOW - (ONE_MINUTE * 3)) {
                 return T('just now');
-            } else if ($time > $NOW - (ONE_MINUTE * 7)) {
+            } elseif ($time > $NOW - (ONE_MINUTE * 7)) {
                 return T('a few minutes ago');
-            } else if ($time > $NOW - (ONE_HOUR)) {
+            } elseif ($time > $NOW - (ONE_HOUR)) {
                 if ($MorePrecise) {
                     $MinutesAgo = ceil($SecondsAgo / 60);
                     return sprintf(T('%s minutes ago'), $MinutesAgo);
@@ -764,9 +796,9 @@ class Gdn_Format {
             $hour = date('G', $time);
             if ($hour < 12) {
                 $str .= T(' morning');
-            } else if ($hour < 17) {
+            } elseif ($hour < 17) {
                 $str .= T(' afternoon');
-            } else if ($hour < 20) {
+            } elseif ($hour < 20) {
                 $str .= T(' evening');
             } else {
                 $str .= T(' night');
@@ -778,7 +810,7 @@ class Gdn_Format {
         if (($sod_now - $sod) < (ONE_WEEK * 3.5)) {
             if (($sod_now - $sod) < (ONE_WEEK * 1.5)) {
                 return T('about a week ago');
-            } else if (($sod_now - $sod) < (ONE_DAY * 2.5)) {
+            } elseif (($sod_now - $sod) < (ONE_DAY * 2.5)) {
                 return T('about two weeks ago');
             } else {
                 return T('about three weeks ago');
@@ -827,7 +859,7 @@ class Gdn_Format {
                 $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
                 // nl2br
-                if (C('Garden.Format.ReplaceNewlines', TRUE)) {
+                if (C('Garden.Format.ReplaceNewlines', true)) {
                     $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                     $Mixed = FixNl2Br($Mixed);
                 }
@@ -844,7 +876,7 @@ class Gdn_Format {
                 $Result = Gdn_Format::Mentions($Result);
                 $Result = Gdn_Format::Links($Result);
                 $Result = Emoji::instance()->translateToHtml($Result);
-                if (C('Garden.Format.ReplaceNewlines', TRUE)) {
+                if (C('Garden.Format.ReplaceNewlines', true)) {
                     $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                     $Result = FixNl2Br($Result);
                 }
@@ -899,8 +931,9 @@ class Gdn_Format {
         if (is_string($Body)) {
             $Image = @unserialize($Body);
 
-            if (!$Image)
+            if (!$Image) {
                 return Gdn_Format::Html($Body);
+            }
         }
 
         $Url = GetValue('Image', $Image);
@@ -920,7 +953,7 @@ class Gdn_Format {
      * @return bool
      */
     protected static function IsHtml($Text) {
-        return strpos($Text, '<') !== FALSE || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Text);
+        return strpos($Text, '<') !== false || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Text);
     }
 
     /**
@@ -961,8 +994,9 @@ class Gdn_Format {
      * @return string
      */
     public static function RssHtml($Text, $Format = 'Html') {
-        if (!in_array($Text, array('Html', 'Raw')))
+        if (!in_array($Text, array('Html', 'Raw'))) {
             $Text = Gdn_Format::To($Text, $Format);
+        }
 
         if (function_exists('FormatRssHtmlCustom')) {
             return FormatRssHtmlCustom($Text);
@@ -971,7 +1005,7 @@ class Gdn_Format {
         }
     }
 
-    public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
+    public static function TagContent($Html, $Callback, $SkipAnchors = true) {
         $Regex = "`([<>])`i";
         $Parts = preg_split($Regex, $Html, null, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -980,17 +1014,17 @@ class Gdn_Format {
 //      echo htmlspecialchars(print_r($Parts, TRUE));
 //      echo '</pre>';
 
-        $InTag = FALSE;
-        $InAnchor = FALSE;
-        $TagName = FALSE;
+        $InTag = false;
+        $InAnchor = false;
+        $TagName = false;
 
         foreach ($Parts as $i => $Str) {
             switch ($Str) {
                 case '<':
-                    $InTag = TRUE;
+                    $InTag = true;
                     break;
                 case '>':
-                    $InTag = FALSE;
+                    $InTag = false;
                     break;
                 case '':
                     break;
@@ -1000,14 +1034,16 @@ class Gdn_Format {
                             $TagName = preg_split('`\s`', substr($Str, 1), 2);
                             $TagName = $TagName[0];
 
-                            if ($TagName == 'a')
-                                $InAnchor = FALSE;
+                            if ($TagName == 'a') {
+                                $InAnchor = false;
+                            }
                         } else {
                             $TagName = preg_split('`\s`', trim($Str), 2);
                             $TagName = $TagName[0];
 
-                            if ($TagName == 'a')
-                                $InAnchor = TRUE;
+                            if ($TagName == 'a') {
+                                $InAnchor = true;
+                            }
                         }
                     } else {
                         if (!$InAnchor || !$SkipAnchors) {
@@ -1028,7 +1064,7 @@ class Gdn_Format {
      * @return string
      */
     public static function Links($Mixed) {
-        if (!C('Garden.Format.Links', TRUE)) {
+        if (!C('Garden.Format.Links', true)) {
             return $Mixed;
         }
 
@@ -1044,12 +1080,14 @@ class Gdn_Format {
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
 //         echo '<pre>', print_r($Parts, TRUE), '</pre>';
 
-            self::LinksCallback(NULL);
+            self::LinksCallback(null);
 
             $Mixed = Gdn_Format::ReplaceButProtectCodeBlocks(
                 $Regex,
                 array('Gdn_Format', 'LinksCallback'),
-                $Mixed, TRUE);
+                $Mixed,
+                true
+            );
 
             Gdn::PluginManager()->FireAs('Format')->FireEvent('Links', array(
                 'Mixed' => &$Mixed
@@ -1072,9 +1110,9 @@ class Gdn_Format {
      * @return HTML string
      */
     public static function UnembedContent($Mixed) {
-        if (!is_string($Mixed))
+        if (!is_string($Mixed)) {
             return self::To($Mixed, 'UnembedContent');
-        else {
+        } else {
             if (C('Garden.Format.YouTube')) {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*youtube\.com/embed/([a-z0-9_-]*))".*</iframe>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
                 $Mixed = preg_replace('`<object.*value="((https?)://.*youtube\.com/v/([a-z0-9_-]*)[^"]*)".*</object>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
@@ -1083,7 +1121,7 @@ class Gdn_Format {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $Mixed);
                 $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
             }
-            if (C('Garden.Format.Getty', TRUE)) {
+            if (C('Garden.Format.Getty', true)) {
                 $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
             }
         }
@@ -1102,13 +1140,13 @@ class Gdn_Format {
      * @return string
      */
     protected static function LinksCallback($Matches) {
-        static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
+        static $Width, $Height, $InTag = 0, $InAnchor = false;
         if (!isset($Width)) {
             list($Width, $Height) = Gdn_Format::GetEmbedSize();
         }
-        if ($Matches === NULL) {
+        if ($Matches === null) {
             $InTag = 0;
-            $InAnchor = FALSE;
+            $InAnchor = false;
             return;
         }
 
@@ -1119,17 +1157,20 @@ class Gdn_Format {
 
         if ($InOut == '<') {
             $InTag++;
-            if ($Tag == 'a')
-                $InAnchor = TRUE;
+            if ($Tag == 'a') {
+                $InAnchor = true;
+            }
         } elseif ($InOut == '</') {
             $InTag++;
-            if ($Tag == 'a')
-                $InAnchor = FALSE;
+            if ($Tag == 'a') {
+                $InAnchor = false;
+            }
         } elseif ($Matches[3])
             $InTag--;
 
-        if (!isset($Matches[4]) || $InTag || $InAnchor)
+        if (!isset($Matches[4]) || $InTag || $InAnchor) {
             return $Matches[0];
+        }
         $Url = $Matches[4];
 
         // Supported youtube embed urls:
@@ -1163,7 +1204,6 @@ class Gdn_Format {
             && C('Garden.Format.YouTube', true)
             && !C('Garden.Format.DisableUrlEmbeds')
         ) {
-
             $videoId = val('videoId', $Matches);
             $listId = val('listId', $Matches);
 
@@ -1301,7 +1341,6 @@ EOT;
 
             // Formatted links
         } else {
-
             // Strip punctuation off of the end of the url.
             $Punc = '';
             if (preg_match('`^(.+)([.?,;:])$`', $Url, $Matches)) {
@@ -1311,7 +1350,7 @@ EOT;
 
             // Get human-readable text from url.
             $Text = $Url;
-            if (strpos($Text, '%') !== FALSE) {
+            if (strpos($Text, '%') !== false) {
                 $Text = rawurldecode($Text);
                 $Text = htmlspecialchars($Text, ENT_QUOTES, C('Garden.Charset', 'UTF-8'));
             }
@@ -1334,7 +1373,9 @@ EOT;
         $Content = explode("[*]", $Matches[1]);
         $Result = '';
         foreach ($Content as $Item) {
-            if (trim($Item) != '') $Result .= '<li>'.$Item.'</li>';
+            if (trim($Item) != '') {
+                $Result .= '<li>'.$Item.'</li>';
+            }
         }
         $Result = '<ul>'.$Result.'</ul>';
         return $Result;
@@ -1459,7 +1500,7 @@ EOT;
      *             preg_replace otherwise.
      * @return string
      */
-    public static function ReplaceButProtectCodeBlocks($Search, $Replace, $Subject, $IsCallback = FALSE) {
+    public static function ReplaceButProtectCodeBlocks($Search, $Replace, $Subject, $IsCallback = false) {
         // Take the code blocks out, replace with a hash of the string, and
         // keep track of what substring got replaced with what hash.
         $CodeBlockContents = array();
@@ -1514,8 +1555,9 @@ EOT;
      * @todo could be just "return (array) $Object;"?
      */
     public static function ObjectAsArray($Object) {
-        if (!is_object($Object))
+        if (!is_object($Object)) {
             return $Object;
+        }
 
         $Return = array();
         foreach (get_object_vars($Object) as $Property => $Value) {
@@ -1539,9 +1581,9 @@ EOT;
         $Months = round($Seconds / 2629743.83);
         $Years = round($Seconds / 31556926);
 
-        if ($Seconds < 60)
+        if ($Seconds < 60) {
             return sprintf(Plural($Seconds, '%s second', '%s seconds'), $Seconds);
-        elseif ($Minutes < 60)
+        } elseif ($Minutes < 60)
             return sprintf(Plural($Minutes, '%s minute', '%s minutes'), $Minutes);
         elseif ($Hours < 24)
             return sprintf(Plural($Hours, '%s hour', '%s hours'), $Hours);
@@ -1551,8 +1593,9 @@ EOT;
             return sprintf(Plural($Weeks, '%s week', '%s weeks'), $Weeks);
         elseif ($Months < 12)
             return sprintf(Plural($Months, '%s month', '%s months'), $Months);
-        else
+        else {
             return sprintf(Plural($Years, '%s year', '%s years'), $Years);
+        }
     }
 
     /**
@@ -1579,14 +1622,15 @@ EOT;
      * @param mixed $Mixed An object, array, or string to be formatted.
      * @return mixed
      */
-    public static function Text($Mixed, $AddBreaks = TRUE) {
-        if (!is_string($Mixed))
+    public static function Text($Mixed, $AddBreaks = true) {
+        if (!is_string($Mixed)) {
             return self::To($Mixed, 'Text');
-        else {
+        } else {
             $Charset = C('Garden.Charset', 'UTF-8');
             $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n", html_entity_decode($Mixed, ENT_QUOTES, $Charset))), ENT_NOQUOTES, $Charset);
-            if ($AddBreaks && C('Garden.Format.ReplaceNewlines', TRUE))
+            if ($AddBreaks && C('Garden.Format.ReplaceNewlines', true)) {
                 $Result = nl2br(trim($Result));
+            }
             return $Result;
         }
     }
@@ -1627,11 +1671,11 @@ EOT;
             } else {
                 $Mixed = Gdn_Format::Text($Mixed);
             }
-        } else if (is_array($Mixed)) {
+        } elseif (is_array($Mixed)) {
             foreach ($Mixed as $Key => $Val) {
                 $Mixed[$Key] = self::To($Val, $FormatMethod);
             }
-        } else if (is_object($Mixed)) {
+        } elseif (is_object($Mixed)) {
             foreach (get_object_vars($Mixed) as $Prop => $Val) {
                 $Mixed->$Prop = self::To($Val, $FormatMethod);
             }
@@ -1645,9 +1689,9 @@ EOT;
      * @return string The formatted date.
      */
     public static function ToDate($Timestamp = '') {
-        if ($Timestamp == '')
+        if ($Timestamp == '') {
             $Timestamp = time();
-        elseif (!is_numeric($Timestamp))
+        } elseif (!is_numeric($Timestamp))
             $Timestamp = self::ToTimestamp($Timestamp);
 
         return date('Y-m-d', $Timestamp);
@@ -1660,8 +1704,9 @@ EOT;
      * @return string The formatted date and time.
      */
     public static function ToDateTime($Timestamp = '') {
-        if ($Timestamp == '')
+        if ($Timestamp == '') {
             $Timestamp = time();
+        }
         return date('Y-m-d H:i:s', $Timestamp);
     }
 
@@ -1676,7 +1721,7 @@ EOT;
     public static function ToTimestamp($DateTime = '') {
         if ($DateTime === '0000-00-00 00:00:00') {
             return false;
-        } elseif (($TestTime = strtotime($DateTime)) !== FALSE) {
+        } elseif (($TestTime = strtotime($DateTime)) !== false) {
             return $TestTime;
         } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
             $Year = $Matches[1];
@@ -1694,7 +1739,7 @@ EOT;
             // } elseif ($DateTime == '') {
             //    return time();
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -1759,8 +1804,9 @@ EOT;
      * @return string
      */
     public static function Url($Mixed) {
-        if (!is_string($Mixed))
+        if (!is_string($Mixed)) {
             return self::To($Mixed, 'Url');
+        }
 
         // Preliminary decoding
         $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
@@ -1792,36 +1838,36 @@ EOT;
         $Result = $SerializedString;
 
         if (is_string($SerializedString)) {
-            if (substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0)
+            if (substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0) {
                 $Result = unserialize($SerializedString);
-            elseif (substr_compare('obj:', $SerializedString, 0, 4) === 0)
-                $Result = json_decode(substr($SerializedString, 4), FALSE);
+            } elseif (substr_compare('obj:', $SerializedString, 0, 4) === 0)
+                $Result = json_decode(substr($SerializedString, 4), false);
             elseif (substr_compare('arr:', $SerializedString, 0, 4) === 0)
-                $Result = json_decode(substr($SerializedString, 4), TRUE);
+                $Result = json_decode(substr($SerializedString, 4), true);
         }
         return $Result;
     }
 
     public static function VanillaSprintf($PlaceholderString, $ReplaceWith) {
         // Set replacement array inside callback
-        Gdn_Format::VanillaSprintfCallback(NULL, $ReplaceWith);
+        Gdn_Format::VanillaSprintfCallback(null, $ReplaceWith);
 
         $FinalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', array('Gdn_Format', 'VanillaSprintfCallback'), $PlaceholderString);
 
         // Cleanup replacement list
-        Gdn_Format::VanillaSprintfCallback(NULL, array());
+        Gdn_Format::VanillaSprintfCallback(null, array());
 
         return $FinalString;
     }
 
-    protected static function VanillaSprintfCallback($Match, $InternalReplacementList = FALSE) {
+    protected static function VanillaSprintfCallback($Match, $InternalReplacementList = false) {
         static $InternalReplacement = array();
 
         if (is_array($InternalReplacementList)) {
             $InternalReplacement = $InternalReplacementList;
         } else {
             $MatchStr = $Match[2];
-            $Format = (count($SplitMatch = explode(':', $MatchStr)) > 1) ? $SplitMatch[1] : FALSE;
+            $Format = (count($SplitMatch = explode(':', $MatchStr)) > 1) ? $SplitMatch[1] : false;
 
             if (array_key_exists($MatchStr, $InternalReplacement)) {
                 if ($Format) {
@@ -1836,8 +1882,9 @@ EOT;
 
     public static function Wysiwyg($Mixed) {
         static $CustomFormatter;
-        if (!isset($CustomFormatter))
-            $CustomFormatter = C('Garden.Format.WysiwygFunction', FALSE);
+        if (!isset($CustomFormatter)) {
+            $CustomFormatter = C('Garden.Format.WysiwygFunction', false);
+        }
 
         if (!is_string($Mixed)) {
             return self::To($Mixed, 'Wysiwyg');
@@ -1863,5 +1910,4 @@ EOT;
             return $Mixed;
         }
     }
-
 }

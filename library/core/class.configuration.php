@@ -705,7 +705,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $TmpFile = tempnam(PATH_CONF, 'config');
         $Result = FALSE;
         if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
-            chmod($TmpFile, 0775);
+            chmod($TmpFile, 0664);
             $Result = rename($TmpFile, $File);
         }
 

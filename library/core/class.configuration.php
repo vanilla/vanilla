@@ -245,7 +245,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
                 $LastKey = $Key;
             }
 
-            if ($FormatStyle == 'Array')
+            if ($FormatStyle == 'Array') {
                 $Prefix = '$'.$VariableName."[".var_export($Key, true)."]";
             }
             if ($FormatStyle == 'Dotted') {
@@ -468,7 +468,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      */
     public function load($File, $Name = 'Configuration', $Dynamic = false) {
         $ConfigurationSource = Gdn_ConfigurationSource::fromFile($this, $File, $Name);
-        if (!$ConfigurationSource) return false;
+        if (!$ConfigurationSource) {
             return false;
         }
 
@@ -531,7 +531,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         // Callback for saving
-        if (!is_null($SaveCallback))
+        if (!is_null($SaveCallback)) {
             $ConfigurationSource->assignCallback($SaveCallback, $CallbackOptions);
         }
     }
@@ -574,7 +574,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         // Callback for saving
-        if (!is_null($SaveCallback))
+        if (!is_null($SaveCallback)) {
             $ConfigurationSource->assignCallback($SaveCallback, $CallbackOptions);
         }
     }
@@ -859,14 +859,14 @@ class Gdn_Configuration extends Gdn_Pluggable {
 function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null) {
     $merged = $array1;
 
-    if (is_array($array2))
-        foreach ($array2 as $key => $val)
-            if (is_array($array2[$key]))
+    if (is_array($array2)) {
+        foreach ($array2 as $key => $val) {
+            if (is_array($array2[$key])) {
                 $merged[$key] = is_array($merged[$key]) ? arrayMergeRecursiveDistinct($merged[$key], $array2[$key]) : $array2[$key];
+            } else {
+                $merged[$key] = $val;
             }
         }
-    } else {
-                $merged[$key] = $val;
     }
 
     return $merged;

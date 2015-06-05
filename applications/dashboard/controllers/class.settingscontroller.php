@@ -376,7 +376,7 @@ class SettingsController extends DashboardController {
             )
         );
 
-        $Config = Gdn_Configuration::Format($ConfigData, array(
+        $Config = Gdn_Configuration::format($ConfigData, array(
             'FormatStyle' => 'Dotted',
             'WrapPHP' => FALSE,
             'SafePHP' => FALSE,

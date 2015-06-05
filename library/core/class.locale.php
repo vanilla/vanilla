@@ -133,7 +133,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @throws Exception
      */
     public function SaveTranslations($Translations, $LocaleName = FALSE) {
-        $this->LocaleContainer->Save();
+        $this->LocaleContainer->save();
     }
 
     /**
@@ -203,19 +203,19 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->DeveloperMode = C('Garden.Locales.DeveloperMode', FALSE);
         if ($this->DeveloperMode) {
             $this->DeveloperContainer = new Gdn_Configuration();
-            $this->DeveloperContainer->Splitting(FALSE);
-            $this->DeveloperContainer->Caching(FALSE);
+            $this->DeveloperContainer->splitting(FALSE);
+            $this->DeveloperContainer->caching(FALSE);
 
             $DeveloperCodeFile = PATH_CACHE."/locale-developer-{$LocaleName}.php";
             if (!file_exists($DeveloperCodeFile))
                 touch($DeveloperCodeFile);
 
-            $this->DeveloperContainer->Load($DeveloperCodeFile, 'Definition', TRUE);
+            $this->DeveloperContainer->load($DeveloperCodeFile, 'Definition', TRUE);
         }
 
         // Import core (static) translations
         if ($this->DeveloperMode)
-            $this->DeveloperContainer->MassImport($this->LocaleContainer->Get('.'));
+            $this->DeveloperContainer->massImport($this->LocaleContainer->get('.'));
 
         // Allow hooking custom definitions
         $this->FireEvent('AfterSet');
@@ -363,7 +363,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @param boolean $Dynamic Whether this locale file should be the dynamic one.
      */
     public function Load($Path, $Dynamic = FALSE) {
-        $this->LocaleContainer->Load($Path, 'Definition', $Dynamic);
+        $this->LocaleContainer->load($Path, 'Definition', $Dynamic);
     }
 
     /**
@@ -380,7 +380,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         if (!is_array($Code))
             $Code = array($Code => $Translation);
 
-        $this->LocaleContainer->SaveToConfig($Code, NULL, $Save);
+        $this->LocaleContainer->saveToConfig($Code, NULL, $Save);
     }
 
     /**
@@ -399,14 +399,14 @@ class Gdn_Locale extends Gdn_Pluggable {
         if (substr_compare('@', $Code, 0, 1) == 0)
             return substr($Code, 1);
 
-        $Translation = $this->LocaleContainer->Get($Code, $Default);
+        $Translation = $this->LocaleContainer->get($Code, $Default);
 
         // If developer mode is on, and this translation returned the default value,
         // remember it and save it to the developer locale.
         if ($this->DeveloperMode && $Translation == $Default) {
-            $DevKnows = $this->DeveloperContainer->Get($Code, FALSE);
+            $DevKnows = $this->DeveloperContainer->get($Code, FALSE);
             if ($DevKnows === FALSE)
-                $this->DeveloperContainer->SaveToConfig($Code, $Default);
+                $this->DeveloperContainer->saveToConfig($Code, $Default);
         }
 
         return $Translation;
@@ -418,11 +418,11 @@ class Gdn_Locale extends Gdn_Pluggable {
     public function Unload() {
         // If we're unloading, don't save first
         if ($this->LocaleContainer instanceof Gdn_Configuration)
-            $this->LocaleContainer->AutoSave(FALSE);
+            $this->LocaleContainer->autoSave(FALSE);
 
         $this->LocaleContainer = new Gdn_Configuration();
-        $this->LocaleContainer->Splitting(FALSE);
-        $this->LocaleContainer->Caching(FALSE);
+        $this->LocaleContainer->splitting(FALSE);
+        $this->LocaleContainer->caching(FALSE);
     }
 
     /**
@@ -451,7 +451,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * Get all definitions from the loaded locale
      */
     public function GetDefinitions() {
-        return $this->LocaleContainer->Get('.');
+        return $this->LocaleContainer->get('.');
     }
 
     /**
@@ -460,7 +460,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     public function GetDeveloperDefinitions() {
         if (!$this->DeveloperMode) return FALSE;
 
-        return $this->DeveloperContainer->Get('.');
+        return $this->DeveloperContainer->get('.');
     }
 
 }

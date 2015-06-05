@@ -22,9 +22,9 @@ class Gdn_Slice {
      */
     public function __construct() {
         $this->Dispatcher = new Gdn_Dispatcher();
-        $EnabledApplications = Gdn::Config('EnabledApplications');
-        $this->Dispatcher->EnabledApplicationFolders($EnabledApplications);
-        $this->Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
+        $EnabledApplications = Gdn::config('EnabledApplications');
+        $this->Dispatcher->enabledApplicationFolders($EnabledApplications);
+        $this->Dispatcher->passProperty('EnabledApplications', $EnabledApplications);
     }
 
     /**
@@ -32,18 +32,18 @@ class Gdn_Slice {
      *
      * @return string
      */
-    public function Execute() {
+    public function execute() {
         $SliceArgs = func_get_args();
         switch (count($SliceArgs)) {
             case 1:
                 //die('slice request: '.$SliceArgs[0]);
-                $Request = Gdn::Request()->Create()
-                    ->FromEnvironment()
-                    ->WithURI($SliceArgs[0])
-                    ->WithDeliveryType(DELIVERY_TYPE_VIEW);
+                $Request = Gdn::request()->create()
+                    ->fromEnvironment()
+                    ->withURI($SliceArgs[0])
+                    ->withDeliveryType(DELIVERY_TYPE_VIEW);
 
                 ob_start();
-                $this->Dispatcher->Dispatch($Request, false);
+                $this->Dispatcher->dispatch($Request, false);
                 return ob_get_clean();
 
                 break;

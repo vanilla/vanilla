@@ -23,8 +23,8 @@ class Gdn_Smarty {
      * @param $Path
      * @param $Controller
      */
-    public function Init($Path, $Controller) {
-        $Smarty = $this->Smarty();
+    public function init($Path, $Controller) {
+        $Smarty = $this->smarty();
 
         // Get a friendly name for the controller.
         $ControllerName = get_class($Controller);
@@ -33,18 +33,18 @@ class Gdn_Smarty {
         }
 
         // Get an ID for the body.
-        $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::AlphaNumeric(strtolower($Controller->RequestMethod)));
+        $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($Controller->RequestMethod)));
         $Smarty->assign('BodyID', $BodyIdentifier);
         //$Smarty->assign('Config', Gdn::Config());
 
         // Assign some information about the user.
-        $Session = Gdn::Session();
-        if ($Session->IsValid()) {
+        $Session = Gdn::session();
+        if ($Session->isValid()) {
             $User = array(
                 'Name' => $Session->User->Name,
                 'Photo' => '',
-                'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
-                'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
+                'CountNotifications' => (int)val('CountNotifications', $Session->User, 0),
+                'CountUnreadConversations' => (int)val('CountUnreadConversations', $Session->User, 0),
                 'SignedIn' => true);
 
             $Photo = $Session->User->Photo;
@@ -56,7 +56,7 @@ class Gdn_Smarty {
                 if (function_exists('UserPhotoDefaultUrl')) {
                     $Photo = UserPhotoDefaultUrl($Session->User, 'ProfilePhoto');
                 } elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
-                    $Photo = Gdn_Upload::Url($ConfigPhoto);
+                    $Photo = Gdn_Upload::url($ConfigPhoto);
                 else {
                     $Photo = Asset('/applications/dashboard/design/images/defaulticon.png', true);
                 }
@@ -73,14 +73,14 @@ class Gdn_Smarty {
         // Make sure that any datasets use arrays instead of objects.
         foreach ($Controller->Data as $Key => $Value) {
             if ($Value instanceof Gdn_DataSet) {
-                $Controller->Data[$Key] = $Value->ResultArray();
+                $Controller->Data[$Key] = $Value->resultArray();
             } elseif ($Value instanceof stdClass) {
                 $Controller->Data[$Key] = (array)$Value;
             }
         }
 
-        $BodyClass = GetValue('CssClass', $Controller->Data, '', true);
-        $Sections = Gdn_Theme::Section(null, 'get');
+        $BodyClass = val('CssClass', $Controller->Data, '', true);
+        $Sections = Gdn_Theme::section(null, 'get');
         if (is_array($Sections)) {
             foreach ($Sections as $Section) {
                 $BodyClass .= ' Section-'.$Section;
@@ -90,7 +90,7 @@ class Gdn_Smarty {
         $Controller->Data['BodyClass'] = $BodyClass;
 
         // Set the current locale for themes to take advantage of.
-        $Locale = Gdn::Locale()->Locale;
+        $Locale = Gdn::locale()->Locale;
         $CurrentLocale = array(
             'Key' => $Locale,
             'Lang' => str_replace('_', '-', $Locale) // mirrors html5 lang attribute
@@ -105,7 +105,7 @@ class Gdn_Smarty {
         $Smarty->assign('CurrentLocale', $CurrentLocale);
 
         $Smarty->assign('Assets', (array)$Controller->Assets);
-        $Smarty->assign('Path', Gdn::Request()->Path());
+        $Smarty->assign('Path', Gdn::request()->path());
 
         // Assign the controller data last so the controllers override any default data.
         $Smarty->assign($Controller->Data);
@@ -132,9 +132,9 @@ class Gdn_Smarty {
      * @param string $Path The path to the view's file.
      * @param Controller $Controller The controller that is rendering the view.
      */
-    public function Render($Path, $Controller) {
-        $Smarty = $this->Smarty();
-        $this->Init($Path, $Controller);
+    public function render($Path, $Controller) {
+        $Smarty = $this->smarty();
+        $this->init($Path, $Controller);
         $CompileID = $Smarty->compile_id;
         if (defined('CLIENT_NAME')) {
             $CompileID = CLIENT_NAME;
@@ -149,16 +149,16 @@ class Gdn_Smarty {
      *
      * @return Smarty The smarty object used for rendering.
      */
-    public function Smarty() {
+    public function smarty() {
         if (is_null($this->_Smarty)) {
-            $Smarty = Gdn::Factory('Smarty');
+            $Smarty = Gdn::factory('Smarty');
 
             $Smarty->cache_dir = PATH_CACHE.DS.'Smarty'.DS.'cache';
             $Smarty->compile_dir = PATH_CACHE.DS.'Smarty'.DS.'compile';
             $Smarty->plugins_dir[] = PATH_LIBRARY.DS.'vendors'.DS.'SmartyPlugins';
 
 //         Gdn::PluginManager()->Trace = TRUE;
-            Gdn::PluginManager()->CallEventHandlers($Smarty, 'Gdn_Smarty', 'Init');
+            Gdn::pluginManager()->callEventHandlers($Smarty, 'Gdn_Smarty', 'Init');
 
             $this->_Smarty = $Smarty;
         }
@@ -171,9 +171,9 @@ class Gdn_Smarty {
      * @param type $Path Path of template file to test.
      * @return boolean TRUE if template loads successfully.
      */
-    public function TestTemplate($Path) {
-        $Smarty = $this->Smarty();
-        $this->Init($Path, Gdn::Controller());
+    public function testTemplate($Path) {
+        $Smarty = $this->smarty();
+        $this->init($Path, Gdn::controller());
         $CompileID = $Smarty->compile_id;
         if (defined('CLIENT_NAME')) {
             $CompileID = CLIENT_NAME;

@@ -23,15 +23,15 @@ class Gdn_SliceProvider {
      *
      * @param $Sender
      */
-    public function EnableSlicing($Sender) {
+    public function enableSlicing($Sender) {
         $this->SliceHandler = $Sender;
         $this->SliceConfig = array(
             'css' => array(),
             'js' => array()
         );
-        $Sender->AddJsFile('/js/library/jquery.class.js');
-        $Sender->AddJsFile('/js/slice.js');
-        $Sender->AddCssFile('/applications/dashboard/design/slice.css');
+        $Sender->addJsFile('/js/library/jquery.class.js');
+        $Sender->addJsFile('/js/slice.js');
+        $Sender->addCssFile('/applications/dashboard/design/slice.css');
     }
 
     /**
@@ -41,8 +41,8 @@ class Gdn_SliceProvider {
      * @param array $Arguments
      * @return Gdn_Slice
      */
-    public function Slice($SliceName, $Arguments = array()) {
-        $CurrentPath = Gdn::Request()->Path();
+    public function slice($SliceName, $Arguments = array()) {
+        $CurrentPath = Gdn::request()->path();
         $ExplodedPath = explode('/', $CurrentPath);
         switch ($this instanceof Gdn_IPlugin) {
             case true:
@@ -54,7 +54,7 @@ class Gdn_SliceProvider {
                 break;
         }
 
-        if ($ExplodedPath[0] == strtolower(Gdn::Dispatcher()->Application()) && $ExplodedPath[1] == strtolower(Gdn::Dispatcher()->Controller())) {
+        if ($ExplodedPath[0] == strtolower(Gdn::dispatcher()->application()) && $ExplodedPath[1] == strtolower(Gdn::dispatcher()->controller())) {
             $ReplacementIndex++;
         }
 
@@ -68,7 +68,7 @@ class Gdn_SliceProvider {
      *
      * @param $Asset
      */
-    public function AddSliceAsset($Asset) {
+    public function addSliceAsset($Asset) {
         $Extension = strtolower(array_pop($Trash = explode('.', basename($Asset))));
         switch ($Extension) {
             case 'css':
@@ -90,7 +90,7 @@ class Gdn_SliceProvider {
      *
      * @return string
      */
-    public function RenderSliceConfig() {
+    public function renderSliceConfig() {
         return json_encode($this->SliceConfig);
     }
 }

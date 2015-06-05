@@ -20,9 +20,9 @@ class Gdn_UploadImage extends Gdn_Upload {
      *
      * @return bool
      */
-    public static function CanUploadImages() {
+    public static function canUploadImages() {
         // Is the Uploads directory available and correctly permissioned?
-        if (!Gdn_Upload::CanUpload()) {
+        if (!Gdn_Upload::canUpload()) {
             return false;
         }
 
@@ -44,8 +44,8 @@ class Gdn_UploadImage extends Gdn_Upload {
     /**
      *
      */
-    public function Clear() {
-        parent::Clear();
+    public function clear() {
+        parent::clear();
         $this->_AllowedFileExtensions = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico');
     }
 
@@ -57,7 +57,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @return array An array of [width, height, image type].
      * @since 2.1
      */
-    public static function ImageSize($Path, $Filename = false) {
+    public static function imageSize($Path, $Filename = false) {
         if (!$Filename) {
             $Filename = $Path;
         }
@@ -75,13 +75,13 @@ class Gdn_UploadImage extends Gdn_Upload {
     /**
      * Validates the uploaded image. Returns the temporary name of the uploaded file.
      */
-    public function ValidateUpload($InputName, $ThrowError = true) {
+    public function validateUpload($InputName, $ThrowError = true) {
         if (!function_exists('gd_info')) {
             throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
         }
 
         // Make sure that all standard file upload checks are performed.
-        $TmpFileName = parent::ValidateUpload($InputName, $ThrowError);
+        $TmpFileName = parent::validateUpload($InputName, $ThrowError);
 
         // Now perform image-specific checks.
         if ($TmpFileName) {
@@ -109,7 +109,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      *  - <b>SourceX, SourceY</b>: If you want to create a thumbnail that is a crop of the image these are the coordinates of the thumbnail.
      *  - <b>SourceHeight. SourceWidth</b>: If you want to create a thumbnail that is a crop of the image these are it's dimensions.
      */
-    public static function SaveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
+    public static function saveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
         $Crop = false;
         $OutputType = '';
         $ImageQuality = C('Garden.UploadImage.Quality', 75);
@@ -118,16 +118,16 @@ class Gdn_UploadImage extends Gdn_Upload {
         $Args = func_get_args();
         $SaveGif = false;
         if (count($Args) > 5) {
-            $Crop = GetValue(4, $Args, $Crop);
-            $OutputType = GetValue(5, $Args, $OutputType);
-            $ImageQuality = GetValue(6, $Args, $ImageQuality);
+            $Crop = val(4, $Args, $Crop);
+            $OutputType = val(5, $Args, $OutputType);
+            $ImageQuality = val(6, $Args, $ImageQuality);
         } elseif (is_bool($Options)) {
             $Crop = $Options;
         } else {
-            $Crop = GetValue('Crop', $Options, $Crop);
-            $OutputType = GetValue('OutputType', $Options, $OutputType);
-            $ImageQuality = GetValue('ImageQuality', $Options, $ImageQuality);
-            $SaveGif = GetValue('SaveGif', $Options);
+            $Crop = val('Crop', $Options, $Crop);
+            $OutputType = val('OutputType', $Options, $OutputType);
+            $ImageQuality = val('ImageQuality', $Options, $ImageQuality);
+            $SaveGif = val('SaveGif', $Options);
         }
 
         // Set some boundaries for $ImageQuality
@@ -147,8 +147,8 @@ class Gdn_UploadImage extends Gdn_Upload {
         $GdInfo = gd_info();
         $Size = getimagesize($Source);
         list($WidthSource, $HeightSource, $Type) = $Size;
-        $WidthSource = GetValue('SourceWidth', $Options, $WidthSource);
-        $HeightSource = GetValue('SourceHeight', $Options, $HeightSource);
+        $WidthSource = val('SourceWidth', $Options, $WidthSource);
+        $HeightSource = val('SourceHeight', $Options, $HeightSource);
 
         if ($Height == '' || !is_numeric($Height)) {
             $Height = $HeightSource;
@@ -160,14 +160,14 @@ class Gdn_UploadImage extends Gdn_Upload {
 
         if (!$OutputType) {
             $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
-            $OutputType = GetValue($Type, $OutputTypes, 'jpg');
+            $OutputType = val($Type, $OutputTypes, 'jpg');
         } elseif ($Type == 17 && $OutputType != 'ico') {
             // Icons cannot be converted
             throw new Exception(T('Upload cannot convert icons.'));
         }
 
         // Figure out the target path.
-        $TargetParsed = Gdn_Upload::Parse($Target);
+        $TargetParsed = Gdn_Upload::parse($Target);
         $TargetPath = PATH_UPLOADS.'/'.ltrim($TargetParsed['Name'], '/');
 
         if (!file_exists(dirname($TargetPath))) {
@@ -175,8 +175,8 @@ class Gdn_UploadImage extends Gdn_Upload {
         }
 
         // Don't resize if the source dimensions are smaller than the target dimensions or an icon
-        $XCoord = GetValue('SourceX', $Options, 0);
-        $YCoord = GetValue('SourceY', $Options, 0);
+        $XCoord = val('SourceX', $Options, 0);
+        $YCoord = val('SourceY', $Options, 0);
         if (($HeightSource > $Height || $WidthSource > $Width) && $Type != 17) {
             $AspectRatio = (float)$WidthSource / $HeightSource;
             if ($Crop === false) {
@@ -228,17 +228,17 @@ class Gdn_UploadImage extends Gdn_Upload {
             $SourceImage = false;
             switch ($Type) {
                 case 1:
-                    if (GetValue('GIF Read Support', $GdInfo) || GetValue('GIF Write Support', $GdInfo)) {
+                    if (val('GIF Read Support', $GdInfo) || val('GIF Write Support', $GdInfo)) {
                         $SourceImage = imagecreatefromgif($Source);
                     }
                     break;
                 case 2:
-                    if (GetValue('JPG Support', $GdInfo) || GetValue('JPEG Support', $GdInfo)) {
+                    if (val('JPG Support', $GdInfo) || val('JPEG Support', $GdInfo)) {
                         $SourceImage = imagecreatefromjpeg($Source);
                     }
                     break;
                 case 3:
-                    if (GetValue('PNG Support', $GdInfo)) {
+                    if (val('PNG Support', $GdInfo)) {
                         $SourceImage = imagecreatefrompng($Source);
                         imagealphablending($SourceImage, true);
                     }
@@ -291,7 +291,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             } elseif ($OutputType == 'png') {
                 imagepng($TargetImage, $TargetPath, 10 - (int)($ImageQuality / 10));
             } elseif ($OutputType == 'ico') {
-                self::ImageIco($TargetImage, $TargetPath);
+                self::imageIco($TargetImage, $TargetPath);
             } else {
                 imagejpeg($TargetImage, $TargetPath, $ImageQuality);
             }
@@ -303,12 +303,12 @@ class Gdn_UploadImage extends Gdn_Upload {
         $Sender = new stdClass();
         $Sender->EventArguments = array();
         $Sender->EventArguments['Path'] = $TargetPath;
-        $Parsed = self::Parse($TargetPath);
+        $Parsed = self::parse($TargetPath);
         $Parsed['Width'] = $Width;
         $Parsed['Height'] = $Height;
         $Sender->EventArguments['Parsed'] =& $Parsed;
         $Sender->Returns = array();
-        Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');
+        Gdn::pluginManager()->callEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');
         return $Sender->EventArguments['Parsed'];
     }
 
@@ -318,7 +318,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @param $GD
      * @param $TargetPath
      */
-    public static function ImageIco($GD, $TargetPath) {
+    public static function imageIco($GD, $TargetPath) {
         require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
         require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';
         $Ico = new phpthumb_ico();

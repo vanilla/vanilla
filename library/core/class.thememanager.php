@@ -43,18 +43,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * Finally, it parses all plugin files and extracts their events and plugged
      * methods.
      */
-    public function Start($Force = false) {
+    public function start($Force = false) {
 
         if (function_exists('apc_fetch') && C('Garden.Apc', false)) {
             $this->Apc = true;
         }
 
         // Build list of all available themes
-        $this->AvailableThemes($Force);
+        $this->availableThemes($Force);
 
         // If there is a hooks file in the theme folder, include it.
-        $ThemeName = $this->CurrentTheme();
-        $ThemeInfo = $this->GetThemeInfo($ThemeName);
+        $ThemeName = $this->currentTheme();
+        $ThemeInfo = $this->getThemeInfo($ThemeName);
         $ThemeHooks = val('RealHooksFile', $ThemeInfo, null);
         if (file_exists($ThemeHooks)) {
             include_once($ThemeHooks);
@@ -66,12 +66,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * an associative array of "Theme Name" => "Theme Info Array". It also adds
      * a "Folder" definition to the Theme Info Array for each.
      */
-    public function AvailableThemes($Force = false) {
+    public function availableThemes($Force = false) {
         if (is_null($this->ThemeCache) || $Force) {
             $this->ThemeCache = array();
 
             // Check cache freshness
-            foreach ($this->SearchPaths() as $SearchPath => $Trash) {
+            foreach ($this->searchPaths() as $SearchPath => $Trash) {
                 unset($SearchPathCache);
 
                 // Check Cache
@@ -79,7 +79,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 if ($this->Apc) {
                     $SearchPathCache = apc_fetch($SearchPathCacheKey);
                 } else {
-                    $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
+                    $SearchPathCache = Gdn::cache()->get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
                 }
 
                 $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
@@ -105,7 +105,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 if (val('CacheIntegrityHash', $SearchPathCache) != $PathIntegrityHash) {
                     // Trace('Need to re-index theme cache');
                     // Need to re-index this folder
-                    $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
+                    $PathIntegrityHash = $this->indexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
                     if ($PathIntegrityHash === false) {
                         continue;
                     }
@@ -114,7 +114,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                     if ($this->Apc) {
                         apc_store($SearchPathCacheKey, $SearchPathCache);
                     } else {
-                        Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => true));
+                        Gdn::cache()->store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => true));
                     }
                 }
 
@@ -133,7 +133,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param null $PathListing
      * @return bool|string
      */
-    public function IndexSearchPath($SearchPath, &$ThemeInfo, $PathListing = null) {
+    public function indexSearchPath($SearchPath, &$ThemeInfo, $PathListing = null) {
         if (is_null($PathListing) || !is_array($PathListing)) {
             $PathListing = scandir($SearchPath, 0);
             sort($PathListing);
@@ -149,14 +149,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             }
 
             $ThemePath = CombinePaths(array($SearchPath, $ThemeFolderName));
-            $ThemeFiles = $this->FindThemeFiles($ThemePath);
+            $ThemeFiles = $this->findThemeFiles($ThemePath);
 
             if (val('about', $ThemeFiles) === false) {
                 continue;
             }
 
             $ThemeAboutFile = val('about', $ThemeFiles);
-            $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
+            $SearchThemeInfo = $this->scanThemeFile($ThemeAboutFile);
 
             // Don't index archived themes.
 //         if (val('Archived', $SearchThemeInfo, FALSE))
@@ -194,13 +194,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @param null $SearchPaths
      */
-    public function ClearThemeCache($SearchPaths = null) {
+    public function clearThemeCache($SearchPaths = null) {
         if (!is_null($SearchPaths)) {
             if (!is_array($SearchPaths)) {
                 $SearchPaths = array($SearchPaths);
             }
         } else {
-            $SearchPaths = $this->SearchPaths();
+            $SearchPaths = $this->searchPaths();
         }
 
         foreach ($SearchPaths as $SearchPath => $SearchPathName) {
@@ -208,7 +208,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             if ($this->Apc) {
                 apc_delete($SearchPathCacheKey);
             } else {
-                Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
+                Gdn::cache()->remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
             }
         }
     }
@@ -222,7 +222,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
      * @return array Search paths
      */
-    public function SearchPaths($OnlyCustom = false) {
+    public function searchPaths($OnlyCustom = false) {
         if (is_null($this->ThemeSearchPaths) || is_null($this->AlternateThemeSearchPaths)) {
             $this->ThemeSearchPaths = array();
             $this->AlternateThemeSearchPaths = array();
@@ -266,7 +266,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param $ThemePath
      * @return array|bool
      */
-    public function FindThemeFiles($ThemePath) {
+    public function findThemeFiles($ThemePath) {
         if (!is_dir($ThemePath)) {
             return false;
         }
@@ -284,7 +284,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         foreach ($ThemeFiles as $ThemeFile) {
             foreach ($TestPatterns as $TestPattern => $FileType) {
                 if (preg_match('!'.$TestPattern.'!', $ThemeFile)) {
-                    $MatchedThemeFiles[$FileType] = CombinePaths(array($ThemePath, $ThemeFile));
+                    $MatchedThemeFiles[$FileType] = combinePaths(array($ThemePath, $ThemeFile));
                 }
             }
         }
@@ -299,7 +299,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param null $VariableName
      * @return null|void
      */
-    public function ScanThemeFile($ThemeFile, $VariableName = null) {
+    public function scanThemeFile($ThemeFile, $VariableName = null) {
         // Find the $PluginInfo array
         if (!file_exists($ThemeFile)) {
             return;
@@ -324,7 +324,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 $InfoBuffer = false;
             }
 
-            if (StringBeginsWith(trim($Line), $ParseVariableName)) {
+            if (stringBeginsWith(trim($Line), $ParseVariableName)) {
                 $InfoBuffer = true;
             }
 
@@ -380,8 +380,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param $ThemeName
      * @return mixed
      */
-    public function GetThemeInfo($ThemeName) {
-        return val($ThemeName, $this->AvailableThemes(), false);
+    public function getThemeInfo($ThemeName) {
+        return val($ThemeName, $this->availableThemes(), false);
     }
 
     /**
@@ -389,7 +389,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function CurrentTheme() {
+    public function currentTheme() {
         return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
     }
 
@@ -398,7 +398,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function DesktopTheme() {
+    public function desktopTheme() {
         return C('Garden.Theme', 'default');
     }
 
@@ -407,13 +407,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @throws Gdn_UserException
      */
-    public function DisableTheme() {
-        if ($this->CurrentTheme() == 'default') {
+    public function disableTheme() {
+        if ($this->currentTheme() == 'default') {
             throw new Gdn_UserException(T('You cannot disable the default theme.'));
         }
-        $oldTheme = $this->EnabledTheme();
+        $oldTheme = $this->enabledTheme();
         RemoveFromConfig('Garden.Theme');
-        $newTheme = $this->EnabledTheme();
+        $newTheme = $this->enabledTheme();
 
         if ($oldTheme != $newTheme) {
             Logger::event(
@@ -433,8 +433,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return Gdn_Config|mixed
      */
-    public function EnabledTheme() {
-        $ThemeName = Gdn::Config('Garden.Theme', 'default');
+    public function enabledTheme() {
+        $ThemeName = Gdn::config('Garden.Theme', 'default');
         return $ThemeName;
     }
 
@@ -444,9 +444,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param bool $ReturnInSourceFormat
      * @return array|mixed
      */
-    public function EnabledThemeInfo($ReturnInSourceFormat = false) {
-        $EnabledThemeName = $this->EnabledTheme();
-        $ThemeInfo = $this->GetThemeInfo($EnabledThemeName);
+    public function enabledThemeInfo($ReturnInSourceFormat = false) {
+        $EnabledThemeName = $this->enabledTheme();
+        $ThemeInfo = $this->getThemeInfo($EnabledThemeName);
 
         if ($ThemeInfo === false) {
             return array();
@@ -493,39 +493,39 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return bool
      * @throws Exception
      */
-    public function EnableTheme($ThemeName, $IsMobile = false) {
+    public function enableTheme($ThemeName, $IsMobile = false) {
         // Make sure to run the setup
-        $this->TestTheme($ThemeName);
+        $this->testTheme($ThemeName);
 
         // Set the theme.
-        $ThemeInfo = $this->GetThemeInfo($ThemeName);
+        $ThemeInfo = $this->getThemeInfo($ThemeName);
         $ThemeFolder = val('Folder', $ThemeInfo, '');
 
-        $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
+        $oldTheme = $IsMobile ? c('Garden.MobileTheme', 'mobile') : c('Garden.Theme', 'default');
 
         if ($ThemeFolder == '') {
-            throw new Exception(T('The theme folder was not properly defined.'));
+            throw new Exception(t('The theme folder was not properly defined.'));
         } else {
             $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
             if ($Options) {
                 if ($IsMobile) {
-                    SaveToConfig(array(
+                    saveToConfig(array(
                         'Garden.MobileTheme' => $ThemeName,
-                        'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                        'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->availableThemes(), $ThemeFolder)
                     ));
                 } else {
-                    SaveToConfig(array(
+                    saveToConfig(array(
                         'Garden.Theme' => $ThemeName,
-                        'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                        'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->availableThemes(), $ThemeFolder)
                     ));
                 }
             } else {
                 if ($IsMobile) {
-                    SaveToConfig('Garden.MobileTheme', $ThemeName);
-                    RemoveFromConfig('Garden.MobileThemeOptions');
+                    saveToConfig('Garden.MobileTheme', $ThemeName);
+                    removeFromConfig('Garden.MobileThemeOptions');
                 } else {
-                    SaveToConfig('Garden.Theme', $ThemeName);
-                    RemoveFromConfig('Garden.ThemeOptions');
+                    saveToConfig('Garden.Theme', $ThemeName);
+                    removeFromConfig('Garden.ThemeOptions');
                 }
             }
         }
@@ -544,7 +544,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         // Tell the locale cache to refresh itself.
-        Gdn::Locale()->Refresh();
+        Gdn::locale()->refresh();
         return true;
     }
 
@@ -555,21 +555,21 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return bool
      * @throws Gdn_UserException
      */
-    public function TestTheme($ThemeName) {
+    public function testTheme($ThemeName) {
         // Get some info about the currently enabled theme.
-        $EnabledTheme = $this->EnabledThemeInfo();
+        $EnabledTheme = $this->enabledThemeInfo();
         $EnabledThemeFolder = val('Folder', $EnabledTheme, '');
         $OldClassName = $EnabledThemeFolder.'ThemeHooks';
 
         // Make sure that the theme's requirements are met
         $ApplicationManager = new Gdn_ApplicationManager();
-        $EnabledApplications = $ApplicationManager->EnabledApplications();
+        $EnabledApplications = $ApplicationManager->enabledApplications();
 
-        $NewThemeInfo = $this->GetThemeInfo($ThemeName);
+        $NewThemeInfo = $this->getThemeInfo($ThemeName);
         $ThemeName = val('Index', $NewThemeInfo, $ThemeName);
-        $RequiredApplications = ArrayValue('RequiredApplications', $NewThemeInfo, false);
-        $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');
-        CheckRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
+        $RequiredApplications = arrayValue('RequiredApplications', $NewThemeInfo, false);
+        $ThemeFolder = arrayValue('Folder', $NewThemeInfo, '');
+        checkRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
 
         // If there is a hooks file, include it and run the setup method.
         $ClassName = "{$ThemeFolder}ThemeHooks";
@@ -598,7 +598,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function MobileTheme() {
+    public function mobileTheme() {
         return C('Garden.MobileTheme', 'default');
     }
 
@@ -608,11 +608,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param $Type
      * @return mixed
      */
-    public function ThemeFromType($Type) {
+    public function themeFromType($Type) {
         if ($Type === 'mobile') {
-            return $this->MobileTheme();
+            return $this->mobileTheme();
         } else {
-            return $this->DesktopTheme();
+            return $this->desktopTheme();
         }
     }
 }

@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * PrivateCommunity Plugin.
  *
@@ -29,8 +29,9 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function RoleController_AfterRolesInfo_Handler($Sender) {
-        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
             return;
+        }
 
         $Private = C('Garden.PrivateCommunity');
         echo '<div style="padding: 10px 0;">';
@@ -54,12 +55,11 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         $Session = Gdn::Session();
         $Switch = GetValue(0, $Sender->RequestArgs);
         $TransientKey = GetValue(1, $Sender->RequestArgs);
-        if (
-            in_array($Switch, array('on', 'off'))
+        if (in_array($Switch, array('on', 'off'))
             && $Session->ValidateTransientKey($TransientKey)
             && $Session->CheckPermission('Garden.Settings.Manage')
         ) {
-            SaveToConfig('Garden.PrivateCommunity', $Switch == 'on' ? FALSE : TRUE);
+            SaveToConfig('Garden.PrivateCommunity', $Switch == 'on' ? false : true);
         }
         Redirect('dashboard/role');
     }

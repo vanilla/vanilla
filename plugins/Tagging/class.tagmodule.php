@@ -24,10 +24,10 @@ class TagModule extends Gdn_Module {
      * @param string $Sender
      */
     public function __construct($Sender = '') {
-        $this->_TagData = FALSE;
-        $this->ParentID = NULL;
+        $this->_TagData = false;
+        $this->ParentID = null;
         $this->ParentType = 'Global';
-        $this->CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
+        $this->CategorySearch = C('Plugins.Tagging.CategorySearch', false);
         parent::__construct($Sender);
     }
 
@@ -48,7 +48,7 @@ class TagModule extends Gdn_Module {
      *
      * @param null $Hint
      */
-    protected function AutoContext($Hint = NULL) {
+    protected function AutoContext($Hint = null) {
         // If we're already configured, don't auto configure
         if (!is_null($this->ParentID) && is_null($Hint)) {
             return;
@@ -57,8 +57,8 @@ class TagModule extends Gdn_Module {
         // If no hint was given, determine by environment
         if (is_null($Hint)) {
             if (Gdn::Controller() instanceof Gdn_Controller) {
-                $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID', NULL);
-                $CategoryID = Gdn::Controller()->Data('Category.CategoryID', NULL);
+                $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID', null);
+                $CategoryID = Gdn::Controller()->Data('Category.CategoryID', null);
 
                 if ($DiscussionID) {
                     $Hint = 'Discussion';
@@ -118,7 +118,7 @@ class TagModule extends Gdn_Module {
 
             case 'Global':
                 $TagCacheKey = 'TagModule-Global';
-                $TagQuery->Where('t.CountDiscussions >', 0, FALSE)
+                $TagQuery->Where('t.CountDiscussions >', 0, false)
                     ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
 
                 if ($this->CategorySearch) {
@@ -171,16 +171,21 @@ class TagModule extends Gdn_Module {
         <div class="InlineTags Meta">
             <?php echo T('Tagged'); ?>:
             <ul>
-                <?php foreach ($this->_TagData->ResultArray() as $Tag): ?>
-                    <?php if ($Tag['Name'] != ''): ?>
+                <?php foreach ($this->_TagData->ResultArray() as $Tag) :
+?>
+                    <?php if ($Tag['Name'] != '') :
+?>
                         <li><?php
-                            echo Anchor(htmlspecialchars(TagFullName($Tag)),
+                            echo Anchor(
+                                htmlspecialchars(TagFullName($Tag)),
                                 TagUrl($Tag, '', '/'),
                                 array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
                             );
                             ?></li>
-                    <?php endif; ?>
-                <?php endforeach; ?>
+                    <?php
+endif; ?>
+                <?php
+endforeach; ?>
             </ul>
         </div>
         <?php
@@ -209,16 +214,21 @@ class TagModule extends Gdn_Module {
         <div class="Box Tags">
             <?php echo panelHeading(T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
             <ul class="TagCloud">
-                <?php foreach ($this->_TagData->Result() as $Tag): ?>
-                    <?php if ($Tag['Name'] != ''): ?>
+                <?php foreach ($this->_TagData->Result() as $Tag) :
+?>
+                    <?php if ($Tag['Name'] != '') :
+?>
                         <li><?php
-                            echo Anchor(TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
+                            echo Anchor(
+                                TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
                                 TagUrl($Tag, '', '/'),
                                 array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
                             );
                             ?></li>
-                    <?php endif; ?>
-                <?php endforeach; ?>
+                    <?php
+endif; ?>
+                <?php
+endforeach; ?>
             </ul>
         </div>
         <?php

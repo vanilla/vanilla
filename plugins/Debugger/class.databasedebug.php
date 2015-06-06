@@ -9,32 +9,49 @@
  * Class Gdn_DatabaseDebug
  */
 class Gdn_DatabaseDebug extends Gdn_Database {
-    /// PROPERTIES ///
 
+    /** @var int  */
     protected $_ExecutionTime = 0;
 
+    /** @var array  */
     protected $_Queries = array();
 
-    /// METHODS ///
-
+    /**
+     *
+     *
+     * @return int
+     */
     public function ExecutionTime() {
         return $this->_ExecutionTime;
     }
 
+    /**
+     *
+     *
+     * @param $Args
+     * @return string
+     */
     private static function FormatArgs($Args) {
-        if (!is_array($Args))
+        if (!is_array($Args)) {
             return '';
+        }
 
         $Result = '';
-
         foreach ($Args as $i => $Expr) {
-            if (strlen($Result) > 0)
+            if (strlen($Result) > 0) {
                 $Result .= ', ';
+            }
             $Result .= self::FormatExpr($Expr);
         }
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Expr
+     * @return string
+     */
     private static function FormatExpr($Expr) {
         if (is_array($Expr)) {
             if (count($Expr) > 3) {
@@ -42,8 +59,9 @@ class Gdn_DatabaseDebug extends Gdn_Database {
             } else {
                 $Result = '';
                 foreach ($Expr as $Key => $Value) {
-                    if (strlen($Result) > 0)
+                    if (strlen($Result) > 0) {
                         $Result .= ', ';
+                    }
                     $Result .= '\''.str_replace('\'', '\\\'', $Key).'\' => '.self::FormatExpr($Value);
                 }
             }
@@ -59,16 +77,29 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         }
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function Queries() {
         return $this->_Queries;
     }
 
-    public function Query($Sql, $InputParameters = NULL, $Options = array()) {
+    /**
+     *
+     *
+     * @param string $Sql
+     * @param null $InputParameters
+     * @param array $Options
+     * @return Gdn_DataSet|object|string
+     */
+    public function Query($Sql, $InputParameters = null, $Options = array()) {
         $Trace = debug_backtrace();
         $Method = '';
         foreach ($Trace as $Info) {
             $Class = GetValue('class', $Info, '');
-            if ($Class === '' || StringEndsWith($Class, 'Model', TRUE) || StringEndsWith($Class, 'Plugin', TRUE)) {
+            if ($Class === '' || StringEndsWith($Class, 'Model', true) || StringEndsWith($Class, 'Plugin', true)) {
                 $Type = ArrayValue('type', $Info, '');
 
                 $Method = $Class.$Type.$Info['function'].'('.self::FormatArgs($Info['args']).')';
@@ -79,12 +110,12 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         // Save the query for debugging
         // echo '<br />adding to queries: '.$Sql;
         $Query = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
-        $SaveQuery = TRUE;
+        $SaveQuery = true;
         if (isset($Options['Cache'])) {
             $CacheKeys = (array)$Options['Cache'];
             $Cache = array();
 
-            $AllSet = TRUE;
+            $AllSet = true;
             foreach ($CacheKeys as $CacheKey) {
                 $Value = Gdn::Cache()->Get($CacheKey);
                 $CacheValue = $Value !== Gdn_Cache::CACHEOP_FAILURE;
@@ -113,6 +144,11 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function QueryTimes() {
         return array();
     }

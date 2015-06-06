@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * Gravatar Plugin.
  *
@@ -15,7 +15,7 @@ $PluginInfo['Gravatar'] = array(
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
-    'MobileFriendly' => TRUE
+    'MobileFriendly' => true
 );
 
 // 1.1 Fixes - Used GetValue to retrieve array props instead of direct references
@@ -43,10 +43,11 @@ class GravatarPlugin extends Gdn_Plugin {
                 .'gravatar_id='.md5(strtolower($Email))
                 .'&amp;size='.C('Garden.Profile.MaxWidth', 200);
 
-            if (C('Plugins.Gravatar.UseVanillicon', TRUE))
+            if (C('Plugins.Gravatar.UseVanillicon', true)) {
                 $Url .= '&default='.urlencode(Gdn::Request()->Scheme().'://vanillicon.com/'.md5($Email).'_200.png');
-            else
-                $Url .= '&default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default_250.png'), TRUE));
+            } else {
+                $Url .= '&default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default_250.png'), true));
+            }
 
 
             $Sender->User->Photo = $Url;
@@ -70,10 +71,11 @@ if (!function_exists('UserPhotoDefaultUrl')) {
             .'gravatar_id='.md5(strtolower($Email))
             .'&amp;size='.C('Garden.Thumbnail.Width', 50);
 
-        if (C('Plugins.Gravatar.UseVanillicon', TRUE))
+        if (C('Plugins.Gravatar.UseVanillicon', true)) {
             $Url .= '&default='.urlencode(Gdn::Request()->Scheme().'://vanillicon.com/'.md5($Email).'.png');
-        else
-            $Url .= '&default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.png'), TRUE));
+        } else {
+            $Url .= '&default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.png'), true));
+        }
 
         return $Url;
     }

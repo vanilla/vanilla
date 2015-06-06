@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -8,11 +8,7 @@
 // Define the plugin:
 $PluginInfo['Debugger'] = array(
     'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
-    'Version' => '1.0.2',
-    'RequiredApplications' => FALSE,
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE, // This is an array of plugin names/versions that this plugin requires
-    'HasLocale' => FALSE, // Does this plugin have any locale definitions?
+    'Version' => '1.1',
     'RegisterPermissions' => array('Plugins.Debugger.View', 'Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
     'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
     'Author' => "Mark O'Sullivan",
@@ -21,27 +17,37 @@ $PluginInfo['Debugger'] = array(
     'MobileFriendly' => TRUE,
 );
 
-// Install the debugger database.
-$tmp = Gdn::FactoryOverwrite(TRUE);
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
-Gdn::FactoryOverwrite($tmp);
-unset($tmp);
-
 /**
  * Class DebuggerPlugin
  */
 class DebuggerPlugin extends Gdn_Plugin {
-    // Specifying "Base" as the class name allows us to make the method get called for every
-    // class that implements a base class's method. For example, Base_Render_After
-    // would allow all controllers that call Controller.Render() to have that method
-    // be called. It saves you from having to go:
-    // Table_Render_After, Row_Render_After, Item_Render_After,
-    // SignIn_Render_After, etc. and it essentially *_Render_After
 
+    /**
+     * Install the debugger database.
+     */
+    public function __construct() {
+        parent::__construct();
+        $tmp = Gdn::FactoryOverwrite(TRUE);
+        Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::FactoryOverwrite($tmp);
+        unset($tmp);
+    }
+
+    /**
+     * Add CSS file to all pages.
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function AssetModel_StyleCss_Handler($Sender, $Args) {
         $Sender->AddCssFile('debugger.css', 'plugins/Debugger');
     }
 
+    /**
+     * Add Debugger info to every page.
+     *
+     * @param $Sender
+     */
     public function Base_AfterBody_Handler($Sender) {
         $Session = Gdn::Session();
         if (!Debug() && !$Session->CheckPermission('Plugins.Debugger.View')) {
@@ -51,6 +57,13 @@ class DebuggerPlugin extends Gdn_Plugin {
         require $Sender->FetchViewLocation('Debug', '', 'plugins/Debugger');
     }
 
+    /**
+     * Build HTML.
+     *
+     * @param $Data
+     * @param string $Indent
+     * @return string
+     */
     public static function FormatData($Data, $Indent = '') {
         $Result = '';
         if (is_array($Data)) {
@@ -92,14 +105,25 @@ class DebuggerPlugin extends Gdn_Plugin {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function PluginController_Debugger_Create($Sender) {
         $Sender->Render();
     }
 
+    /**
+     *
+     */
     public function Setup() {
         SaveToConfig('Debug', TRUE);
     }
 
+    /**
+     *
+     */
     public function OnDisable() {
         SaveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
     }

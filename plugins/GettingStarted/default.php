@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * GettingStarted Plugin.
  *
@@ -15,7 +15,7 @@ $PluginInfo['GettingStarted'] = array(
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
-    'Hidden' => TRUE
+    'Hidden' => true
 );
 
 /**
@@ -33,20 +33,24 @@ class GettingStartedPlugin extends Gdn_Plugin {
      */
     public function SettingsController_Render_Before($Sender) {
         // Have they visited their dashboard?
-        if (strtolower($Sender->RequestMethod) != 'index')
+        if (strtolower($Sender->RequestMethod) != 'index') {
             $this->SaveStep('Plugins.GettingStarted.Dashboard');
+        }
 
         // Save the action if editing registration settings
-        if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
+        if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->AuthenticatedPostBack() === true) {
             $this->SaveStep('Plugins.GettingStarted.Registration');
+        }
 
         // Save the action if they reviewed plugins
-        if (strcasecmp($Sender->RequestMethod, 'plugins') == 0)
+        if (strcasecmp($Sender->RequestMethod, 'plugins') == 0) {
             $this->SaveStep('Plugins.GettingStarted.Plugins');
+        }
 
         // Save the action if they reviewed plugins
-        if (strcasecmp($Sender->RequestMethod, 'managecategories') == 0)
+        if (strcasecmp($Sender->RequestMethod, 'managecategories') == 0) {
             $this->SaveStep('Plugins.GettingStarted.Categories');
+        }
 
         // Add messages & their css on dashboard
         if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
@@ -63,7 +67,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
       </li>
       <li class="Two'.(C('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">
 	 <strong>'.Anchor(T("Where is your Community Forum?"), '/').'</strong>
-         <p>'.T('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').Anchor(T('clicking here'), '/').T('. The community forum is what all of your users &amp; customers will see when they visit ').Anchor(Gdn::Request()->Url('/', TRUE), Gdn::Request()->Url('/', TRUE)).'.</p>
+         <p>'.T('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').Anchor(T('clicking here'), '/').T('. The community forum is what all of your users &amp; customers will see when they visit ').Anchor(Gdn::Request()->Url('/', true), Gdn::Request()->Url('/', true)).'.</p>
       </li>
       <li class="Three'.(C('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor(T('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
@@ -90,12 +94,12 @@ class GettingStartedPlugin extends Gdn_Plugin {
     // Record when the various actions are taken
     // 1. If the user edits the registration settings
     public function SaveStep($Step) {
-        if (Gdn::Config($Step, '') != '1')
+        if (Gdn::Config($Step, '') != '1') {
             SaveToConfig($Step, '1');
+        }
 
         // If all of the steps are now completed, disable this plugin
-        if (
-            Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
+        if (Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
             && Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1'
             && Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1'
             && Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1'
@@ -107,14 +111,16 @@ class GettingStartedPlugin extends Gdn_Plugin {
 
     // If the user posts back any forms to their profile, they've completed step 4: profile customization
     public function ProfileController_Render_Before($Sender) {
-        if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === TRUE)
+        if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === true) {
             $this->SaveStep('Plugins.GettingStarted.Profile');
+        }
     }
 
     // If the user starts a discussion, they've completed step 5: profile customization
     public function PostController_Render_Before($Sender) {
-        if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
+        if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === true) {
             $this->SaveStep('Plugins.GettingStarted.Discussion');
+        }
     }
 
     public function PluginController_DismissGettingStarted_Create($Sender) {

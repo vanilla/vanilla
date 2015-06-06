@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * Tagging plugin.
  *
@@ -81,14 +81,16 @@ class TaggingPlugin extends Gdn_Plugin {
      */
     public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
         // Allow disabling of inline tags.
-        if (C('Plugins.Tagging.DisableInline', FALSE))
+        if (C('Plugins.Tagging.DisableInline', false)) {
             return;
+        }
 
         if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
             $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
 
-            if (!$DiscussionID)
+            if (!$DiscussionID) {
                 return;
+            }
 
             $TagModule = new TagModule($Sender);
             echo $TagModule->InlineDisplay();
@@ -143,15 +145,15 @@ class TaggingPlugin extends Gdn_Plugin {
         $Page = GetValue('page', $Get, $Page);
         $Category = CategoryModel::Categories($CategoryCode);
 
-        $Tag = StringEndsWith($Tag, '.rss', TRUE, TRUE);
+        $Tag = StringEndsWith($Tag, '.rss', true, true);
         list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
 
-        $MultipleTags = strpos($Tag, ',') !== FALSE;
+        $MultipleTags = strpos($Tag, ',') !== false;
 
-        $Sender->SetData('Tag', $Tag, TRUE);
+        $Sender->SetData('Tag', $Tag, true);
 
         $TagModel = TagModel::instance();
-        $RecordCount = FALSE;
+        $RecordCount = false;
         if (!$MultipleTags) {
             $Tags = $TagModel->GetWhere(array('Name' => $Tag))->ResultArray();
 
@@ -182,11 +184,11 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Title(htmlspecialchars($TagRow['FullName']));
         $UrlTag = rawurlencode($Tag);
         if (urlencode($Tag) == $Tag) {
-            $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, TRUE)), TRUE));
-            $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, TRUE, FALSE)), '//');
+            $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));
+            $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, true, false)), '//');
         } else {
-            $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.$UrlTag, TRUE));
-            $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE, FALSE), 'feed.rss').'?Tag='.$UrlTag, '//');
+            $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true)).'?Tag='.$UrlTag, true));
+            $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true, false), 'feed.rss').'?Tag='.$UrlTag, '//');
         }
 
         if ($Sender->Head) {
@@ -194,18 +196,19 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->Head->AddRss($FeedUrl, $Sender->Head->Title());
         }
 
-        if (!is_numeric($Offset) || $Offset < 0)
+        if (!is_numeric($Offset) || $Offset < 0) {
             $Offset = 0;
+        }
 
         // Add Modules
         $Sender->AddModule('NewDiscussionModule');
         $Sender->AddModule('DiscussionFilterModule');
         $Sender->AddModule('BookmarkedModule');
 
-        $Sender->SetData('Category', FALSE, TRUE);
+        $Sender->SetData('Category', false, true);
 
-        $Sender->AnnounceData = FALSE;
-        $Sender->SetData('Announcements', array(), TRUE);
+        $Sender->AnnounceData = false;
+        $Sender->SetData('Announcements', array(), true);
 
         $DiscussionModel = new DiscussionModel();
 
@@ -213,7 +216,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
         $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
 
-        $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
+        $Sender->SetData('Discussions', $Sender->DiscussionData, true);
         $Sender->SetJson('Loading', $Offset.' to '.$Limit);
 
         // Build a pager.
@@ -268,7 +271,6 @@ class TaggingPlugin extends Gdn_Plugin {
     protected function setTagBreadcrumbs($data) {
 
         if (isset($data['Tag']) && isset($data['Tags'])) {
-
             $ParentTag = array();
             $CurrentTag = $data['Tag'];
             $CurrentTags = $data['Tags'];
@@ -316,9 +318,10 @@ class TaggingPlugin extends Gdn_Plugin {
         $FormTags = TagModel::SplitTags($RawFormTags);
 
         // If we're associating with categories
-        $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
-        if ($CategorySearch)
-            $CategoryID = GetValue('CategoryID', $FormPostValues, FALSE);
+        $CategorySearch = C('Plugins.Tagging.CategorySearch', false);
+        if ($CategorySearch) {
+            $CategoryID = GetValue('CategoryID', $FormPostValues, false);
+        }
 
         // Let plugins add their information getting saved.
         $Types = array('');
@@ -360,7 +363,6 @@ class TaggingPlugin extends Gdn_Plugin {
             } elseif (count($Tags) > $NumTagsMax) {
                 $Sender->Validation->AddValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
             } else {
-
             }
         }
     }
@@ -380,7 +382,7 @@ class TaggingPlugin extends Gdn_Plugin {
         // Check if there are even any tags to delete
         if (count($RemovedTagIDs) > 0) {
             // Step 1: Reduce count
-            Gdn::SQL()->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', FALSE)->WhereIn('TagID', $RemovedTagIDs)->Put();
+            Gdn::SQL()->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', false)->WhereIn('TagID', $RemovedTagIDs)->Put();
 
             // Step 2: Delete mapping data between discussion and tag (tagdiscussion table)
             $Sender->SQL->Where('DiscussionID', $DiscussionID)->Delete('TagDiscussion');
@@ -393,12 +395,14 @@ class TaggingPlugin extends Gdn_Plugin {
     public function PluginController_TagSearch_Create($Sender, $q = '', $id = false, $parent = false, $type = 'default') {
 
         // Allow per-category tags
-        $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
-        if ($CategorySearch)
+        $CategorySearch = C('Plugins.Tagging.CategorySearch', false);
+        if ($CategorySearch) {
             $CategoryID = GetIncomingValue('CategoryID');
+        }
 
-        if ($parent && !is_numeric($parent))
+        if ($parent && !is_numeric($parent)) {
             $parent = Gdn::SQL()->GetWhere('Tag', array('Name' => $parent))->Value('TagID', -1);
+        }
 
         $Query = $q;
         $Data = array();
@@ -421,8 +425,9 @@ class TaggingPlugin extends Gdn_Plugin {
             }
 
             // Allow per-category tags
-            if ($CategorySearch)
+            if ($CategorySearch) {
                 $TagQuery->Where('CategoryID', $CategoryID);
+            }
 
             if ($parent) {
                 $TagQuery->Where('ParentTagID', $parent);
@@ -492,16 +497,19 @@ class TaggingPlugin extends Gdn_Plugin {
                 ->Limit($Limit, $Offset)
                 ->WhereIn('td.TagID', $TagIDs);
 
-            if ($Op == 'and')
+            if ($Op == 'and') {
                 $SortField = 'd.DiscussionID';
+            }
         }
 
         // Set up the sort field and direction.
-        SaveToConfig(array(
+        SaveToConfig(
+            array(
             'Vanilla.Discussions.SortField' => $SortField,
             'Vanilla.Discussions.SortDirection' => $SortDirection),
             '',
-            FALSE);
+            false
+        );
     }
 
     /**
@@ -600,7 +608,7 @@ class TaggingPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $Sender
      */
-    public function SettingsController_Tagging_Create($Sender, $Search = NULL, $Type = NULL, $Page = NULL) {
+    public function SettingsController_Tagging_Create($Sender, $Search = null, $Type = null, $Page = null) {
 
         $Sender->Title('Tagging');
         $Sender->AddSideMenu('settings/tagging');
@@ -628,11 +636,12 @@ class TaggingPlugin extends Gdn_Plugin {
         }
 
         if (!$Search) {
-            if ($Type !== NULL) {
-                if ($Type === 'null')
-                    $Type = NULL;
+            if ($Type !== null) {
+                if ($Type === 'null') {
+                    $Type = null;
+                }
                 $SQL->Where('Type', $Type);
-            } else if ($Type == '') {
+            } elseif ($Type == '') {
                 $SQL->Where('Type', '');
             }
         } else {
@@ -716,14 +725,15 @@ class TaggingPlugin extends Gdn_Plugin {
         if (strtolower($TagType) != 'tags'
             && $TagModel->CanAddTagForType($TagType)
         ) {
-            $Sender->Form->AddHidden('Type', $TagType, TRUE);
+            $Sender->Form->AddHidden('Type', $TagType, true);
         }
 
         if ($Sender->Form->AuthenticatedPostBack()) {
             // Make sure the tag is valid
             $TagName = $Sender->Form->GetFormValue('Name');
-            if (!TagModel::ValidateTag($TagName))
+            if (!TagModel::ValidateTag($TagName)) {
                 $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
+            }
 
             $TagType = $Sender->Form->GetFormValue('Type');
             if (!$TagModel->CanAddTagForType($TagType)) {
@@ -736,8 +746,9 @@ class TaggingPlugin extends Gdn_Plugin {
             }
 
             $Saved = $Sender->Form->Save();
-            if ($Saved)
+            if ($Saved) {
                 $Sender->InformMessage(T('Your changes have been saved.'));
+            }
         }
 
         $Sender->Render('addedit', '', 'plugins/Tagging');
@@ -770,19 +781,21 @@ class TaggingPlugin extends Gdn_Plugin {
         if ($Sender->Form->AuthenticatedPostBack()) {
             // Make sure the tag is valid
             $TagData = $Sender->Form->GetFormValue('Name');
-            if (!TagModel::ValidateTag($TagData))
+            if (!TagModel::ValidateTag($TagData)) {
                 $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
+            }
 
             // Make sure that the tag name is not already in use.
             if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $TagData))->NumRows() > 0) {
-                $Sender->SetData('MergeTagVisible', TRUE);
+                $Sender->SetData('MergeTagVisible', true);
                 if (!$Sender->Form->GetFormValue('MergeTag')) {
                     $Sender->Form->AddError('The specified tag name is already in use.');
                 }
             }
 
-            if ($Sender->Form->Save())
+            if ($Sender->Form->Save()) {
                 $Sender->InformMessage(T('Your changes have been saved.'));
+            }
         }
 
         $Sender->Render('addedit', '', 'plugins/Tagging');
@@ -806,7 +819,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $SQL->Delete('Tag', array('TagID' => $TagID));
 
             $Sender->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
-            $Sender->JsonTarget("#Tag_{$Tag['TagID']}", NULL, 'Remove');
+            $Sender->JsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
         }
 
         $Sender->SetData('Title', T('Delete Tag'));
@@ -849,21 +862,22 @@ class TaggingPlugin extends Gdn_Plugin {
         $TagModule = new TagModule($Sender);
         $Sender->AddModule($TagModule);
     }
-
 }
 
-if (!function_exists('TagUrl')):
-    function TagUrl($Row, $Page = '', $WithDomain = FALSE) {
+if (!function_exists('TagUrl')) :
+    function TagUrl($Row, $Page = '', $WithDomain = false) {
         static $UseCategories;
-        if (!isset($UseCategories))
+        if (!isset($UseCategories)) {
             $UseCategories = C('Plugins.Tagging.UseCategories');
+        }
 
         // Add the p before a numeric page.
         if (is_numeric($Page)) {
-            if ($Page > 1)
+            if ($Page > 1) {
                 $Page = 'p'.$Page;
-            else
+            } else {
                 $Page = '';
+            }
         }
         if ($Page) {
             $Page = '/'.$Page;
@@ -873,10 +887,11 @@ if (!function_exists('TagUrl')):
 
         if ($UseCategories) {
             $Category = CategoryModel::Categories($Row['CategoryID']);
-            if ($Category && $Category['CategoryID'] > 0)
+            if ($Category && $Category['CategoryID'] > 0) {
                 $Category = rawurlencode(GetValue('UrlCode', $Category, 'x'));
-            else
+            } else {
                 $Category = 'x';
+            }
             $Result = "/discussions/tagged/$Category/$Tag{$Page}";
         } else {
             $Result = "/discussions/tagged/$Tag{$Page}";
@@ -886,12 +901,12 @@ if (!function_exists('TagUrl')):
     }
 endif;
 
-if (!function_exists('TagFullName')):
-
+if (!function_exists('TagFullName')) :
     function TagFullName($Row) {
         $Result = GetValue('FullName', $Row);
-        if (!$Result)
+        if (!$Result) {
             $Result = GetValue('Name', $Row);
+        }
         return $Result;
     }
 

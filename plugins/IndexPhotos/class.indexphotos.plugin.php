@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * IndexPhotos Plugin.
  *
@@ -12,8 +12,8 @@ $PluginInfo['IndexPhotos'] = array(
     'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed. Note that this plugin will not have any affect when table layouts are enabled.",
     'Version' => '1.2.2',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'RegisterPermissions' => FALSE,
-    'MobileFriendly' => TRUE,
+    'RegisterPermissions' => false,
+    'MobileFriendly' => true,
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'
@@ -40,8 +40,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      */
     public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
-            if (GetValue('FirstUser', $Args))
+            if (GetValue('FirstUser', $Args)) {
                 echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+            }
         }
     }
 
@@ -53,8 +54,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      */
     public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
-            if (GetValue('FirstUser', $Args))
+            if (GetValue('FirstUser', $Args)) {
                 echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * 'All Viewed' plugin for Vanilla Forums.
  *
@@ -13,15 +13,26 @@ $PluginInfo['AllViewed'] = array(
     'Name' => 'All Viewed',
     'Description' => 'Allows users to mark all discussions as viewed and mark category viewed.',
     'Version' => '2.1',
-    'Author' => "Matt Lincoln Russell, Oliver Chung",
+    'Author' => "Lincoln Russell, Oliver Chung",
     'AuthorEmail' => 'lincoln@vanillaforums.com, shoat@cs.washington.edu',
     'AuthorUrl' => 'http://lincolnwebs.com',
     'License' => 'GNU GPLv2',
-    'MobileFriendly' => TRUE
+    'MobileFriendly' => true
 );
 
 /**
  * Allows users to mark all discussions as viewed and mark category viewed.
+ *
+ * AllViewed allows members to mark all discussions as viewed by clicking "Mark All Viewed"
+ * in the main nav (path: /discussions/markallviewed)
+ *
+ * This resets their counters for how many comments were previously in the discussion.
+ * Therefore, if there are 3 subsequent comments, the discussion will simply say "New",
+ * not "3 New" because it no longer knows how many comments there were.
+ *
+ * Normally viewing the discussion will put it back on a "X New"-style counter.
+ * This behavior is to circumvent potential problems with massive updates to the
+ * UserDiscussion table when "Mark All Viewed" is clicked.
  *
  * v1.2
  * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
@@ -49,7 +60,7 @@ class AllViewedPlugin extends Gdn_Plugin {
     public function Base_Render_Before($Sender) {
         // Add "Mark All Viewed" to main menu
         if ($Sender->Menu && Gdn::Session()->IsValid()) {
-            if (C('Plugins.AllViewed.ShowInMenu', TRUE)) {
+            if (C('Plugins.AllViewed.ShowInMenu', true)) {
                 $Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
             }
         }
@@ -148,7 +159,9 @@ class AllViewedPlugin extends Gdn_Plugin {
      */
     public function GetCommentCountSince($DiscussionID, $DateAllViewed) {
         // Only for members
-        if (!Gdn::Session()->IsValid()) return;
+        if (!Gdn::Session()->IsValid()) {
+            return;
+        }
 
         // Validate DiscussionID
         $DiscussionID = (int)$DiscussionID;
@@ -198,7 +211,9 @@ class AllViewedPlugin extends Gdn_Plugin {
      */
     public function DiscussionModel_SetCalculatedFields_Handler($Sender) {
         // Only for members
-        if (!Gdn::Session()->IsValid()) return;
+        if (!Gdn::Session()->IsValid()) {
+            return;
+        }
 
         // Recalculate New count with each category's DateMarkedRead
         $Discussion = &$Sender->EventArguments['Discussion'];

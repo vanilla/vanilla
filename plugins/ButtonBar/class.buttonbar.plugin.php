@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * ButtonBar Plugin
  *
@@ -12,10 +12,10 @@ $PluginInfo['ButtonBar'] = array(
     'Name' => 'Button Bar',
     'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
     'Version' => '1.7',
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -49,7 +49,9 @@ class ButtonBarPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      */
     protected function AttachButtonBarResources($Sender, $Formatter) {
-        if (!in_array($Formatter, $this->Formats)) return;
+        if (!in_array($Formatter, $this->Formats)) {
+            return;
+        }
         $Sender->AddJsFile('buttonbar.js', 'plugins/ButtonBar');
         $Sender->AddJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
 
@@ -69,8 +71,9 @@ class ButtonBarPlugin extends Gdn_Plugin {
      */
     public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
         $Wrap = false;
-        if (Gdn::Controller() instanceof PostController)
+        if (Gdn::Controller() instanceof PostController) {
             $Wrap = true;
+        }
         $this->AttachButtonBar($Sender, $Wrap);
     }
 //   public function DiscussionController_BeforeBodyField_Handler($Sender) {
@@ -89,16 +92,18 @@ class ButtonBarPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    protected function AttachButtonBar($Sender, $Wrap = FALSE) {
+    protected function AttachButtonBar($Sender, $Wrap = false) {
         $Formatter = C('Garden.InputFormatter', 'Html');
-        if (!in_array($Formatter, $this->Formats)) return;
+        if (!in_array($Formatter, $this->Formats)) {
+            return;
+        }
 
         $View = Gdn::Controller()->FetchView('buttonbar', '', 'plugins/ButtonBar');
 
-        if ($Wrap)
+        if ($Wrap) {
             echo Wrap($View, 'div', array('class' => 'P'));
-        else
+        } else {
             echo $View;
+        }
     }
-
 }

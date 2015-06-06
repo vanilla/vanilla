@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * StopForumSpam plugin.
  *
@@ -37,21 +37,21 @@ class StopForumSpamPlugin extends Gdn_Plugin {
 
 
         if (isset($Data['IPAddress'])) {
-            $AddIP = TRUE;
+            $AddIP = true;
             // Don't check against the localhost.
             foreach (array(
                          '127.0.0.1/0',
                          '10.0.0.0/8',
                          '172.16.0.0/12',
                          '192.168.0.0/16') as $LocalCIDR) {
-
                 if (Gdn_Statistics::CIDRCheck($Data['IPAddress'], $LocalCIDR)) {
-                    $AddIP = FALSE;
+                    $AddIP = false;
                     break;
                 }
             }
-            if ($AddIP)
+            if ($AddIP) {
                 $Get['ip'] = $Data['IPAddress'];
+            }
         }
         if (isset($Data['Username'])) {
             $Get['username'] = $Data['Username'];
@@ -60,8 +60,9 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             $Get['email'] = $Data['Email'];
         }
 
-        if (empty($Get))
-            return FALSE;
+        if (empty($Get)) {
+            return false;
+        }
 
         $Get['f'] = 'json';
 
@@ -76,21 +77,21 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         curl_close($Curl);
 
         if ($ResultString) {
-            $Result = json_decode($ResultString, TRUE);
+            $Result = json_decode($ResultString, true);
 
             $IPFrequency = GetValueR('ip.frequency', $Result, 0);
             $EmailFrequency = GetValueR('email.frequency', $Result, 0);
 
-            $IsSpam = FALSE;
+            $IsSpam = false;
 
             // Flag registrations as spam above a certain threshold.
             if ($IPFrequency >= C('Plugins.StopForumSpam.IPThreshold1', 5) || $EmailFrequency >= C('Plugins.StopForumSpam.EmailThreshold1', 20)) {
-                $IsSpam = TRUE;
+                $IsSpam = true;
             }
 
             // Don't even log registrations that are above another threahold.
             if ($IPFrequency >= C('Plugins.StopForumSpam.IPThreshold2', 20) || $EmailFrequency >= C('Plugins.StopForumSpam.EmailThreshold2', 50)) {
-                $Options['Log'] = FALSE;
+                $Options['Log'] = false;
             }
 
             if ($Result) {
@@ -100,7 +101,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             return $IsSpam;
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -127,14 +128,14 @@ class StopForumSpamPlugin extends Gdn_Plugin {
                 'Admin' => '2'
             ));
         }
-        SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => TRUE));
+        SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => true));
     }
 
     /**
      * @return mixed
      */
     public function UserID() {
-        return C('Plugins.StopForumSpam.UserID', NULL);
+        return C('Plugins.StopForumSpam.UserID', null);
     }
 
     /**
@@ -145,8 +146,9 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      */
     public function Base_CheckSpam_Handler($Sender, $Args) {
         // Don't check for spam if another plugin has already determined it is.
-        if ($Sender->EventArguments['IsSpam'])
+        if ($Sender->EventArguments['IsSpam']) {
             return;
+        }
 
         $RecordType = $Args['RecordType'];
         $Data =& $Args['Data'];
@@ -155,14 +157,14 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         // Detect our favorite bot and short-circuit
         if ($Reason = GetValue('DiscoveryText', $Data)) {
             if (substr($Reason, 0, 1) === '{') {
-                $Sender->EventArguments['IsSpam'] = TRUE;
+                $Sender->EventArguments['IsSpam'] = true;
                 $Data['Log_InsertUserID'] = $this->UserID();
                 $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
                 return;
             }
         }
 
-        $Result = FALSE;
+        $Result = false;
         switch ($RecordType) {
             case 'Registration':
                 $Result = self::Check($Data, $Options);

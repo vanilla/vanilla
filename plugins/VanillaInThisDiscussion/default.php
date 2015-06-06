@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * InThisDiscussion plugin.
  *
@@ -12,12 +14,12 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
     'Name' => 'In This Discussion',
     'Description' => "Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.",
     'Version' => '1',
-    'Requires' => FALSE, // This would normally be an array of plugin names/versions that this plugin requires
-    'HasLocale' => FALSE,
+    'Requires' => false, // This would normally be an array of plugin names/versions that this plugin requires
+    'HasLocale' => false,
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
-    'RegisterPermissions' => FALSE,
+    'RegisterPermissions' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'SettingsUrl' => '/settings/inthisdiscussion'
 );

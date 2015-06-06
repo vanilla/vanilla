@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php
 /**
  * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -129,16 +129,17 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                     'icon' => 'icon.png'
 
                 ),
-                '/resources/emoji');
+                '/resources/emoji'
+            );
 
-            $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter");
-            $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
-            $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
-            $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
+                $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter");
+                $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
+                $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
+                $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
 
-            $this->fireEvent('Init');
+                $this->fireEvent('Init');
 
-            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
+                $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
         }
 
         return $this->emojiSets;
@@ -198,5 +199,4 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $sender->SetData('Title', sprintf(T('%s Settings'), 'Emoji'));
         $cf->RenderAll();
     }
-
 }

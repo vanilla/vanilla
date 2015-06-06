@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * GooglePrettify Plugin.
  *
@@ -13,7 +13,7 @@ $PluginInfo['GooglePrettify'] = array(
     'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
     'Version' => '1.2',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -44,7 +44,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * Add Tabby to a page's text areas.
      */
     public function AddTabby($Sender) {
-        if (C('Plugins.GooglePrettify.UseTabby', FALSE)) {
+        if (C('Plugins.GooglePrettify.UseTabby', false)) {
             $Sender->AddJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
             $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
      $("textarea").livequery(function () {$("textarea").tabby();})
@@ -59,8 +59,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      */
     public function GetJs() {
         $Class = '';
-        if (C('Plugins.GooglePrettify.LineNumbers'))
+        if (C('Plugins.GooglePrettify.LineNumbers')) {
             $Class .= ' linenums';
+        }
         if ($Language = C('Plugins.GooglePrettify.Language')) {
             $Class .= " lang-$Language";
         }
@@ -82,13 +83,15 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     }
 
     public function AssetModel_StyleCss_Handler($Sender) {
-        if (!C('Plugins.GooglePrettify.NoCssFile'))
+        if (!C('Plugins.GooglePrettify.NoCssFile')) {
             $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
+        }
     }
 
     public function AssetModel_GenerateETag_Handler($Sender, $Args) {
-        if (!C('Plugins.GooglePrettify.NoCssFile'))
-            $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = TRUE;
+        if (!C('Plugins.GooglePrettify.NoCssFile')) {
+            $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = true;
+        }
     }
 
     /**
@@ -119,7 +122,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      */
     public function SettingsController_GooglePrettify_Create($Sender, $Args) {
         $Cf = new ConfigurationModule($Sender);
-        $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', TRUE);
+        $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', true);
 
         $Languages = array(
             'apollo' => 'apollo',
@@ -143,10 +146,10 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         );
 
         $Cf->Initialize(array(
-            'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => FALSE),
-            'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => FALSE),
-            'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => FALSE),
-            'Plugins.GooglePrettify.Language' => array('Control' => 'DropDown', 'Items' => $Languages, 'Options' => array('IncludeNull' => TRUE),
+            'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => false),
+            'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => false),
+            'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => false),
+            'Plugins.GooglePrettify.Language' => array('Control' => 'DropDown', 'Items' => $Languages, 'Options' => array('IncludeNull' => true),
                 'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
         ));
 

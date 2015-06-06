@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * ProfileExtender Plugin.
  *
@@ -13,7 +13,7 @@ $PluginInfo['ProfileExtender'] = array(
     'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
     'Version' => '3.0.2',
     'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
     'SettingsUrl' => '/dashboard/settings/profileextender',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -82,8 +82,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $ProfileFields = $this->GetProfileFields();
         $Sender->RegistrationFields = array();
         foreach ($ProfileFields as $Name => $Field) {
-            if (GetValue('OnRegister', $Field) && GetValue('FormType', $Field) != 'CheckBox')
+            if (GetValue('OnRegister', $Field) && GetValue('FormType', $Field) != 'CheckBox') {
                 $Sender->RegistrationFields[$Name] = $Field;
+            }
         }
         include($this->GetView('registrationfields.php'));
     }
@@ -95,8 +96,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $ProfileFields = $this->GetProfileFields();
         $Sender->RegistrationFields = array();
         foreach ($ProfileFields as $Name => $Field) {
-            if (GetValue('OnRegister', $Field) && GetValue('FormType', $Field) == 'CheckBox')
+            if (GetValue('OnRegister', $Field) && GetValue('FormType', $Field) == 'CheckBox') {
                 $Sender->RegistrationFields[$Name] = $Field;
+            }
         }
         include($this->GetView('registrationfields.php'));
     }
@@ -109,25 +111,29 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $ProfileFields = $this->GetProfileFields();
         foreach ($ProfileFields as $Name => $Field) {
             // Check both so you can't break register form by requiring omitted field
-            if (GetValue('Required', $Field) && GetValue('OnRegister', $Field))
+            if (GetValue('Required', $Field) && GetValue('OnRegister', $Field)) {
                 $Sender->UserModel->Validation->ApplyRule($Name, 'Required', $Field['Label']." is required.");
+            }
         }
 
         // DateOfBirth zeroes => NULL
-        if ('0-00-00' == $Sender->Form->GetFormValue('DateOfBirth'))
-            $Sender->Form->SetFormValue('DateOfBirth', NULL);
+        if ('0-00-00' == $Sender->Form->GetFormValue('DateOfBirth')) {
+            $Sender->Form->SetFormValue('DateOfBirth', null);
+        }
     }
 
     /**
      * Special manipulations.
      */
     public function ParseSpecialFields($Fields = array()) {
-        if (!is_array($Fields))
+        if (!is_array($Fields)) {
             return $Fields;
+        }
 
         foreach ($Fields as $Label => $Value) {
-            if ($Value == '')
+            if ($Value == '') {
                 continue;
+            }
 
             // Use plaintext for building these
             $Value = Gdn_Format::Text($Value);
@@ -181,8 +187,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     private function GetProfileFields() {
         $Fields = C('ProfileExtender.Fields', array());
 
-        if (!is_array($Fields))
+        if (!is_array($Fields)) {
             $Fields = array();
+        }
 
         // Data checks
         foreach ($Fields as $Name => $Field) {
@@ -193,9 +200,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Verify field form type
-            if (!isset($Field['FormType']))
+            if (!isset($Field['FormType'])) {
                 $Fields[$Name]['FormType'] = 'TextBox';
-            elseif (!array_key_exists($Field['FormType'], $this->FormTypes))
+            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes))
                 unset($this->ProfileFields[$Name]);
         }
 
@@ -216,8 +223,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      */
     private function GetProfileField($Name) {
         $Field = C('ProfileExtender.Fields.'.$Name, array());
-        if (!isset($Field['FormType']))
+        if (!isset($Field['FormType'])) {
             $Field['FormType'] = 'TextBox';
+        }
         return $Field;
     }
 
@@ -247,8 +255,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     public function SettingsController_ProfileExtender_Create($Sender) {
         $Sender->Permission('Garden.Settings.Manage');
         // Detect if we need to upgrade settings
-        if (!C('ProfileExtender.Fields'))
+        if (!C('ProfileExtender.Fields')) {
             $this->Setup();
+        }
 
         // Set data
         $Data = $this->GetProfileFields();
@@ -270,15 +279,17 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Get whitelisted properties
             $FormPostValues = $Sender->Form->FormValues();
             foreach ($FormPostValues as $Key => $Value) {
-                if (!in_array($Key, $this->FieldProperties))
+                if (!in_array($Key, $this->FieldProperties)) {
                     unset ($FormPostValues[$Key]);
+                }
             }
 
             // Make Options an array
             if ($Options = GetValue('Options', $FormPostValues)) {
                 $Options = explode("\n", preg_replace('/[^\w\s()-]/u', '', $Options));
-                if (count($Options) < 2)
+                if (count($Options) < 2) {
                     $Sender->Form->AddError('Must have at least 2 options.', 'Options');
+                }
                 SetValue('Options', $FormPostValues, $Options);
             }
 
@@ -297,8 +308,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
             // Force CheckBox options
             if (GetValue('FormType', $FormPostValues) == 'CheckBox') {
-                SetValue('Required', $FormPostValues, TRUE);
-                SetValue('OnRegister', $FormPostValues, TRUE);
+                SetValue('Required', $FormPostValues, true);
+                SetValue('OnRegister', $FormPostValues, true);
             }
 
             // Merge updated data into config
@@ -322,8 +333,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         } elseif (isset($Args[0])) {
             // Editing
             $Data = $this->GetProfileField($Args[0]);
-            if (isset($Data['Options']) && is_array($Data['Options']))
+            if (isset($Data['Options']) && is_array($Data['Options'])) {
                 $Data['Options'] = implode("\n", $Data['Options']);
+            }
             $Sender->Form->SetData($Data);
             $Sender->Form->AddHidden('Name', $Args[0]);
             $Sender->SetData('Title', T('Edit Profile Field'));
@@ -356,8 +368,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             if ($Sender->Form->AuthenticatedPostBack()) {
                 RemoveFromConfig('ProfileExtender.Fields.'.$Args[0]);
                 $Sender->RedirectUrl = Url('/settings/profileextender');
-            } else
+            } else {
                 $Sender->SetData('Field', $this->GetProfileField($Args[0]));
+            }
         }
         $Sender->Render('delete', '', 'plugins/ProfileExtender');
     }
@@ -384,12 +397,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $ProfileFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
 
             // Import from CustomProfileFields if available
-            if (!count($ProfileFields) && is_object($Sender->User) && C('Plugins.CustomProfileFields.SuggestedFields', FALSE)) {
-                $ProfileFields = Gdn::UserModel()->GetAttribute($Sender->User->UserID, 'CustomProfileFields', FALSE);
+            if (!count($ProfileFields) && is_object($Sender->User) && C('Plugins.CustomProfileFields.SuggestedFields', false)) {
+                $ProfileFields = Gdn::UserModel()->GetAttribute($Sender->User->UserID, 'CustomProfileFields', false);
                 if ($ProfileFields) {
                     // Migrate to UserMeta & delete original
                     Gdn::UserModel()->SetMeta($Sender->User->UserID, $ProfileFields, 'Profile.');
-                    Gdn::UserModel()->SaveAttribute($Sender->User->UserID, 'CustomProfileFields', FALSE);
+                    Gdn::UserModel()->SaveAttribute($Sender->User->UserID, 'CustomProfileFields', false);
                 }
             }
 
@@ -409,7 +422,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $BirthdayStamp = Gdn_Format::ToTimestamp($Sender->User->DateOfBirth);
                 if ($BirthdayStamp) {
                     $ProfileFields['DateOfBirth'] = date(T('Birthday Format', 'F j, Y'), $BirthdayStamp);
-                    $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
+                    $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => true);
                 }
             }
 

@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * VanillaStats Plugin
  *
@@ -12,9 +12,8 @@ $PluginInfo['VanillaStats'] = array(
     'Name' => 'Vanilla Statistics',
     'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
     'Version' => '2.0.6',
-    'MobileFriendly' => FALSE,
+    'MobileFriendly' => false,
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'HasLocale' => TRUE,
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -30,12 +29,16 @@ $PluginInfo['VanillaStats'] = array(
  */
 class VanillaStatsPlugin extends Gdn_Plugin {
 
+    /**  */
     const RESOLUTION_DAY = 'day';
 
+    /**  */
     const RESOLUTION_MONTH = 'month';
 
+    /** @var mixed  */
     public $AnalyticsServer;
 
+    /** @var string  */
     public $VanillaID;
 
     /**
@@ -59,8 +62,9 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
     public function SecurityTokenCallback($JsonResponse, $RawResponse) {
         $SecurityToken = val('SecurityToken', $JsonResponse, null);
-        if (!is_null($SecurityToken))
+        if (!is_null($SecurityToken)) {
             $this->SecurityToken($SecurityToken);
+        }
     }
 
     /**
@@ -166,8 +170,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->OrderBy('d.CountComments', 'desc')
             ->OrderBy('d.CountBookmarks', 'desc')
             ->Limit(10, 0)
-            ->Get()
-        );
+            ->Get());
 
         // Load the most active users during this date range
         $Sender->SetData('UserData', $UserModel->SQL
@@ -180,8 +183,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->Where('c.DateInserted <=', $Sender->DateEnd)
             ->OrderBy('CountComments', 'desc')
             ->Limit(10, 0)
-            ->Get()
-        );
+            ->Get());
 
         // Render the custom dashboard view
         $Sender->Render('dashboardsummaries', '', 'plugins/VanillaStats');
@@ -248,5 +250,4 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->BoundaryStart = Gdn_Format::Date($Data ? $Data->DateInserted : $Sender->DateStart, '%Y-%m-%d');
         $Sender->BoundaryEnd = Gdn_Format::Date($Sender->DateEnd, '%Y-%m-%d');
     }
-
 }

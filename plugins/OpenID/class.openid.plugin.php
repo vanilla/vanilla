@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * OpenID Plugin.
  *
@@ -13,7 +13,7 @@ $PluginInfo['OpenID'] = array(
     'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
     'Version' => '1.2.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'SettingsUrl' => '/settings/openid',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Todd Burry",
@@ -37,18 +37,20 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @param bool $Popup
      * @return string
      */
-    protected function _AuthorizeHref($Popup = FALSE) {
-        $Url = Url('/entry/openid', TRUE);
+    protected function _AuthorizeHref($Popup = false) {
+        $Url = Url('/entry/openid', true);
         $UrlParts = explode('?', $Url);
         parse_str(GetValue(1, $UrlParts, ''), $Query);
 
         $Path = '/'.Gdn::Request()->Path();
         $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
 
-        if (isset($_GET['Target']))
+        if (isset($_GET['Target'])) {
             $Query['Target'] = $_GET['Target'];
-        if ($Popup)
+        }
+        if ($Popup) {
             $Query['display'] = 'popup';
+        }
 
         $Result = $UrlParts[0].'?'.http_build_query($Query);
         return $Result;
@@ -88,7 +90,7 @@ class OpenIDPlugin extends Gdn_Plugin {
             $OpenID->identity = $url;
         }
 
-        $Url = Url('/entry/connect/openid', TRUE);
+        $Url = Url('/entry/connect/openid', true);
         $UrlParts = explode('?', $Url);
         parse_str(GetValue(1, $UrlParts, ''), $Query);
         $Query = array_merge($Query, ArrayTranslate($_GET, array('display', 'Target')));
@@ -143,22 +145,24 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function Base_ConnectData_Handler($Sender, $Args) {
-        if (GetValue(0, $Args) != 'openid')
+        if (GetValue(0, $Args) != 'openid') {
             return;
+        }
 
         $Mode = $Sender->Request->Get('openid_mode');
-        if ($Mode != 'id_res')
+        if ($Mode != 'id_res') {
             return; // this will error out
-
+        }
         $this->EventArguments = $Args;
 
         // Check session before retrieving
         $Session = Gdn::Session();
-        $OpenID = $Session->Stash('OpenID', '', FALSE);
-        if (!$OpenID)
+        $OpenID = $Session->Stash('OpenID', '', false);
+        if (!$OpenID) {
             $OpenID = $this->GetOpenID();
+        }
 
-        if ($Session->Stash('OpenID', '', FALSE) || $OpenID->validate()) {
+        if ($Session->Stash('OpenID', '', false) || $OpenID->validate()) {
             $Attr = $OpenID->getAttributes();
 
             $Form = $Sender->Form; //new Gdn_Form();
@@ -173,7 +177,7 @@ class OpenIDPlugin extends Gdn_Plugin {
                 $Form->SetFormValue('Email', $Email);
             }
 
-            $Sender->SetData('Verified', TRUE);
+            $Sender->SetData('Verified', true);
             $Session->Stash('OpenID', $OpenID);
 
             $this->EventArguments['OpenID'] = $OpenID;
@@ -257,7 +261,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function SignInAllowed() {
-        return !C('Plugins.OpenID.DisableSignIn', FALSE);
+        return !C('Plugins.OpenID.DisableSignIn', false);
     }
 
     /**
@@ -308,8 +312,9 @@ class OpenIDPlugin extends Gdn_Plugin {
         // if (!IsMobile())
         // 	return;
 
-        if (!Gdn::Session()->IsValid() && $this->SignInAllowed())
+        if (!Gdn::Session()->IsValid() && $this->SignInAllowed()) {
             echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect OpenIDConnect'));
+        }
     }
 
     /**
@@ -322,7 +327,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->Initialize(array(
-            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Disable OpenID sign in', 'Default' => FALSE)
+            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
         ));
 
         $Sender->AddSideMenu();

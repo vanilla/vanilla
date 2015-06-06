@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * InThisDiscussion module.
  *
@@ -15,7 +15,7 @@ class InThisDiscussionModule extends Gdn_Module {
     protected $_UserData;
 
     public function __construct($Sender = '') {
-        $this->_UserData = FALSE;
+        $this->_UserData = false;
         parent::__construct($Sender);
     }
 
@@ -38,8 +38,9 @@ class InThisDiscussionModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if ($this->_UserData->NumRows() == 0)
+        if ($this->_UserData->NumRows() == 0) {
             return '';
+        }
 
         $String = '';
         ob_start();
@@ -47,7 +48,8 @@ class InThisDiscussionModule extends Gdn_Module {
         <div class="Box">
             <?php echo panelHeading(T('In this Discussion')); ?>
             <ul class="PanelInfo">
-                <?php foreach ($this->_UserData->Result() as $User): ?>
+                <?php foreach ($this->_UserData->Result() as $User) :
+?>
                     <li>
                         <?php
                         echo Anchor(
@@ -57,7 +59,8 @@ class InThisDiscussionModule extends Gdn_Module {
                         )
                         ?>
                     </li>
-                <?php endforeach; ?>
+                <?php
+endforeach; ?>
             </ul>
         </div>
         <?php

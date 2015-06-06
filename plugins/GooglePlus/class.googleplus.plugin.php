@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * GooglePlus Plugin.
  *
@@ -13,15 +13,15 @@ $PluginInfo['GooglePlus'] = array(
     'Description' => 'Users may sign into your site using their Google Plus account.',
     'Version' => '1.1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SettingsUrl' => '/dashboard/social/googleplus',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'Hidden' => FALSE,
-    'SocialConnect' => TRUE,
-    'RequiresRegistration' => FALSE
+    'Hidden' => false,
+    'SocialConnect' => true,
+    'RequiresRegistration' => false
 );
 
 /**
@@ -36,7 +36,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     const APIUrl = 'https://www.googleapis.com/oauth2/v1';
 
     /** @var string */
-    protected $_AccessToken = NULL;
+    protected $_AccessToken = null;
 
     /**
      *
@@ -44,14 +44,16 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param bool $NewValue
      * @return bool|mixed|null
      */
-    public function AccessToken($NewValue = FALSE) {
-        if (!$this->IsConfigured())
-            return FALSE;
+    public function AccessToken($NewValue = false) {
+        if (!$this->IsConfigured()) {
+            return false;
+        }
 
-        if ($NewValue !== FALSE)
+        if ($NewValue !== false) {
             $this->_AccessToken = $NewValue;
+        }
 
-        if ($this->_AccessToken === NULL) {
+        if ($this->_AccessToken === null) {
             $this->_AccessToken = GetValueR(self::ProviderKey.'.AccessToken', Gdn::Session()->User->Attributes);
         }
 
@@ -68,10 +70,11 @@ class GooglePlusPlugin extends Gdn_Plugin {
      */
     public function API($Path, $Post = array()) {
         $Url = self::APIUrl.'/'.ltrim($Path, '/');
-        if (strpos($Url, '?') === FALSE)
+        if (strpos($Url, '?') === false) {
             $Url .= '?';
-        else
+        } else {
             $Url .= '&';
+        }
         $Url .= 'access_token='.urlencode($this->AccessToken());
 
         $Result = $this->Curl($Url, empty($Post) ? 'GET' : 'POST', $Post);
@@ -89,7 +92,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $Get = array(
             'response_type' => 'code',
             'client_id' => C('Plugins.GooglePlus.ClientID'),
-            'redirect_uri' => Url('/entry/googleplus', TRUE),
+            'redirect_uri' => Url('/entry/googleplus', true),
             'scope' => 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
         );
 
@@ -113,7 +116,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             'code' => $Code,
             'client_id' => C('Plugins.GooglePlus.ClientID'),
             'client_secret' => C('Plugins.GooglePlus.Secret'),
-            'redirect_uri' => Url('/entry/googleplus', TRUE),
+            'redirect_uri' => Url('/entry/googleplus', true),
             'grant_type' => 'authorization_code'
         );
 
@@ -147,7 +150,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @return mixed
      */
     public function SocialSharing() {
-        return C('Plugins.GooglePlus.SocialSharing', TRUE);
+        return C('Plugins.GooglePlus.SocialSharing', true);
     }
 
     /**
@@ -156,7 +159,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @return mixed
      */
     public function SocialReactions() {
-        return C('Plugins.GooglePlus.SocialReactions', TRUE);
+        return C('Plugins.GooglePlus.SocialReactions', true);
     }
 
     /**
@@ -189,7 +192,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $ContentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
 
-        $Result = @json_decode($Response, TRUE);
+        $Result = @json_decode($Response, true);
         if (!$Result) {
             $Result = $Response;
         }
@@ -231,9 +234,12 @@ class GooglePlusPlugin extends Gdn_Plugin {
         Gdn::SQL()->Put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Google+'));
 
         // Save the google+ provider type.
-        Gdn::SQL()->Replace('UserAuthenticationProvider',
+        Gdn::SQL()->Replace(
+            'UserAuthenticationProvider',
             array('AuthenticationSchemeAlias' => self::ProviderKey, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'),
-            array('AuthenticationKey' => self::ProviderKey), TRUE);
+            array('AuthenticationKey' => self::ProviderKey),
+            true
+        );
     }
 
     /**
@@ -266,7 +272,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
 //         $Url = Url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE);
 //         $CssClass = 'ReactButton Hijack';
 //      } else {
-        $Url = Url("post/googleplus/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE);
+        $Url = Url("post/googleplus/{$Args['RecordType']}?id={$Args['RecordID']}", true);
         $CssClass = 'ReactButton PopupWindow';
 //      }
 
@@ -280,11 +286,12 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function Base_ConnectData_Handler($Sender, $Args) {
-        if (GetValue(0, $Args) != 'googleplus')
+        if (GetValue(0, $Args) != 'googleplus') {
             return;
+        }
 
         // Grab the google plus profile from the session staff.
-        $GooglePlus = Gdn::Session()->Stash(self::ProviderKey, '', FALSE);
+        $GooglePlus = Gdn::Session()->Stash(self::ProviderKey, '', false);
         $AccessToken = val('AccessToken', $GooglePlus);
         $Profile = val('Profile', $GooglePlus);
 
@@ -294,7 +301,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $Form->SetFormValue('ProviderName', 'Google+');
         $Form->SetFormValue('FullName', val('name', $Profile));
         $Form->SetFormValue('Email', val('email', $Profile));
-        if (C('Plugins.GooglePlus.UseAvatars', TRUE)) {
+        if (C('Plugins.GooglePlus.UseAvatars', true)) {
             $Form->SetFormValue('Photo', val('picture', $Profile));
         }
 
@@ -303,8 +310,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
             SaveToConfig(array(
                 'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
                 'Garden.User.ValidationLength' => '{3,50}',
-                'Garden.Registration.NameUnique' => FALSE
-            ), '', FALSE);
+                'Garden.Registration.NameUnique' => false
+            ), '', false);
         }
 
         // Save some original data in the attributes of the connection for later API calls.
@@ -314,7 +321,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             'Profile' => $Profile
         );
         $Form->SetFormValue('Attributes', $Attributes);
-        $Sender->SetData('Verified', TRUE);
+        $Sender->SetData('Verified', true);
 
         $this->EventArguments['Form'] = $Form;
         $this->FireEvent('AfterConnectData');
@@ -376,7 +383,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param string $State
      * @throws Gdn_UserException
      */
-    public function EntryController_GooglePlus_Create($Sender, $Code = FALSE, $State = FALSE) {
+    public function EntryController_GooglePlus_Create($Sender, $Code = false, $State = false) {
         if ($Error = $Sender->Request->Get('error')) {
             throw new Gdn_UserException($Error);
         }
@@ -392,7 +399,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         if ($State) {
             parse_str($State, $State);
         } else {
-            $State = array('r' => 'entry', 'uid' => NULL);
+            $State = array('r' => 'entry', 'uid' => null);
         }
 
         switch ($State['r']) {
@@ -511,9 +518,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $Conf->Initialize(array(
             'Plugins.GooglePlus.ClientID' => array('LabelCode' => 'Client ID', 'Options' => array('class' => 'InputBox BigInput')),
             'Plugins.GooglePlus.Secret' => array('LabelCode' => 'Client secret', 'Options' => array('class' => 'InputBox BigInput')),
-            'Plugins.GooglePlus.SocialReactions' => array('Control' => 'checkbox', 'Default' => TRUE),
-            'Plugins.GooglePlus.SocialSharing' => array('Control' => 'checkbox', 'Default' => TRUE),
-            'Plugins.GooglePlus.UseAvatars' => array('Control' => 'checkbox', 'Default' => TRUE),
+            'Plugins.GooglePlus.SocialReactions' => array('Control' => 'checkbox', 'Default' => true),
+            'Plugins.GooglePlus.SocialSharing' => array('Control' => 'checkbox', 'Default' => true),
+            'Plugins.GooglePlus.UseAvatars' => array('Control' => 'checkbox', 'Default' => true),
             'Plugins.GooglePlus.Default' => array('Control' => 'checkbox', 'LabelCode' => 'Make this connection your default signin method.')
         ));
 

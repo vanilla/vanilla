@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * Quotes Plugin.
  *
@@ -13,12 +13,12 @@ $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
     'Version' => '1.6.10',
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => TRUE,
-    'RegisterPermissions' => FALSE,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => true,
+    'RegisterPermissions' => false,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -39,7 +39,7 @@ $PluginInfo['Quotes'] = array(
 class QuotesPlugin extends Gdn_Plugin {
 
     /** @var bool */
-    public $HandleRenderQuotes = TRUE;
+    public $HandleRenderQuotes = true;
 
     /**
      *
@@ -54,7 +54,7 @@ class QuotesPlugin extends Gdn_Plugin {
         }
 
         // Whether to handle drawing quotes or leave it up to some other plugin
-        $this->HandleRenderQuotes = C('Plugins.Quotes.RenderQuotes', TRUE);
+        $this->HandleRenderQuotes = C('Plugins.Quotes.RenderQuotes', true);
     }
 
     /**
@@ -71,7 +71,7 @@ class QuotesPlugin extends Gdn_Plugin {
         $ViewingUserID = Gdn::Session()->UserID;
 
         if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+            $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup'));
         } else {
             $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
         }
@@ -109,7 +109,7 @@ class QuotesPlugin extends Gdn_Plugin {
             $UserID = $Sender->User->UserID;
             $Sender->SetData('ForceEditing', $Sender->User->Name);
         } else {
-            $Sender->SetData('ForceEditing', FALSE);
+            $Sender->SetData('ForceEditing', false);
         }
 
         $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
@@ -181,12 +181,13 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Selector
      * @param bool $Format
      */
-    public function DiscussionController_GetQuote_Create($Sender, $Selector, $Format = FALSE) {
+    public function DiscussionController_GetQuote_Create($Sender, $Selector, $Format = false) {
         $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
         $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
 
-        if (!$Format)
+        if (!$Format) {
             $Format = C('Garden.InputFormatter');
+        }
 
         $QuoteData = array(
             'status' => 'failed'
@@ -247,14 +248,14 @@ class QuotesPlugin extends Gdn_Plugin {
         if (isset($Args['Comment'])) {
             $Object = $Args['Comment'];
             $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
-        } else if (isset($Args['Discussion'])) {
+        } elseif (isset($Args['Discussion'])) {
             $Object = $Args['Discussion'];
             $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
         } else {
             return;
         }
 
-        echo Anchor(Sprite('ReactQuote', 'ReactSprite').' '.T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", TRUE), 'ReactButton Quote Visible').' ';
+        echo Anchor(Sprite('ReactQuote', 'ReactSprite').' '.T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender) {
@@ -283,7 +284,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        static $ValidateUsernameRegex = NULL;
+        static $ValidateUsernameRegex = null;
 
         if (is_null($ValidateUsernameRegex)) {
             $ValidateUsernameRegex = sprintf("[%s]+", C('Garden.User.ValidationRegex', "\d\w_ "));
@@ -384,7 +385,7 @@ BLOCKQUOTE;
      * @param $QuoteData
      * @param bool $Format
      */
-    protected function FormatQuote($Type, $ID, &$QuoteData, $Format = FALSE) {
+    protected function FormatQuote($Type, $ID, &$QuoteData, $Format = false) {
         // Temporarily disable Emoji parsing (prevent double-parsing to HTML)
         $emojiEnabled = Emoji::instance()->enabled;
         Emoji::instance()->enabled = false;
@@ -394,7 +395,7 @@ BLOCKQUOTE;
         }
 
         $Type = strtolower($Type);
-        $Model = FALSE;
+        $Model = false;
         switch ($Type) {
             case 'comment':
                 $Model = new CommentModel();
@@ -451,8 +452,9 @@ BLOCKQUOTE;
 
                 case 'BBCode':
                     $Author = htmlspecialchars($Data->InsertName);
-                    if ($ID)
+                    if ($ID) {
                         $IDString = ';'.htmlspecialchars($ID);
+                    }
 
                     $QuoteBody = $Data->Body;
 
@@ -479,7 +481,7 @@ BQ;
 
                     break;
                 case 'Wysiwyg':
-                    $Attribution = sprintf(T('%s said:'), UserAnchor($Data, NULL, array('Px' => 'Insert')));
+                    $Attribution = sprintf(T('%s said:'), UserAnchor($Data, null, array('Px' => 'Insert')));
                     $QuoteBody = $Data->Body;
 
                     // TODO: Strip inner quotes...
@@ -546,7 +548,9 @@ BLOCKQUOTE;
      */
     protected static function _StripMentions($Text) {
         $Text = preg_replace(
-            '/(^|[\s,\.>])@(\w{1,50})\b/i', '$1$2', $Text
+            '/(^|[\s,\.>])@(\w{1,50})\b/i',
+            '$1$2',
+            $Text
         );
 
         return $Text;

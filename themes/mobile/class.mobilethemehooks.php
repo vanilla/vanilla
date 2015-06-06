@@ -27,7 +27,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
         if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
             Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
         }
-        SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
+        SaveToConfig('Garden.Format.EmbedSize', '240x135', false);
     }
 
     /**
@@ -53,8 +53,8 @@ class MobileThemeHooks implements Gdn_IPlugin {
      * Add button, remove options, increase click area on discussions list.
      */
     public function CategoriesController_Render_Before($Sender) {
-        $Sender->ShowOptions = FALSE;
-        SaveToConfig('Vanilla.AdminCheckboxes.Use', FALSE, FALSE);
+        $Sender->ShowOptions = false;
+        SaveToConfig('Vanilla.AdminCheckboxes.Use', false, false);
         $this->AddButton($Sender, 'Discussion');
         $this->DiscussionsClickable($Sender);
     }
@@ -63,8 +63,8 @@ class MobileThemeHooks implements Gdn_IPlugin {
      * Add button, remove options, increase click area on discussions list.
      */
     public function DiscussionsController_Render_Before($Sender) {
-        $Sender->ShowOptions = FALSE;
-        SaveToConfig('Vanilla.AdminCheckboxes.Use', FALSE, FALSE);
+        $Sender->ShowOptions = false;
+        SaveToConfig('Vanilla.AdminCheckboxes.Use', false, false);
         $this->AddButton($Sender, 'Discussion');
         $this->DiscussionsClickable($Sender);
     }
@@ -102,9 +102,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
      */
     private function AddButton($Sender, $ButtonType) {
         if (is_object($Sender->Menu)) {
-            if ($ButtonType == 'Discussion')
+            if ($ButtonType == 'Discussion') {
                 $Sender->Menu->AddLink('NewDiscussion', Img('themes/mobile/design/images/new.png', array('alt' => T('New Discussion'))), '/post/discussion'.(array_key_exists('CategoryID', $Sender->Data) ? '/'.$Sender->Data['CategoryID'] : ''), array('Garden.SignIn.Allow'), array('class' => 'NewDiscussion'));
-            elseif ($ButtonType == 'Conversation')
+            } elseif ($ButtonType == 'Conversation')
                 $Sender->Menu->AddLink('NewConversation', Img('themes/mobile/design/images/new.png', array('alt' => T('New Conversation'))), '/messages/add', '', array('class' => 'NewConversation'));
         }
     }

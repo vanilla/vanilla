@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * HtmLawed Plugin.
  *
@@ -10,14 +10,14 @@
 $PluginInfo['HtmLawed'] = array(
     'Description' => 'Adapts HtmLawed to work with Vanilla.',
     'Version' => '1.1',
-    'RequiredApplications' => NULL,
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
+    'RequiredApplications' => null,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-    'Hidden' => TRUE
+    'Hidden' => true
 );
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLawedPlugin', __FILE__, Gdn::FactorySingleton);
@@ -125,7 +125,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
     }
 
     /** @var bool  */
-    public $SafeStyles = TRUE;
+    public $SafeStyles = true;
 
     /**
      *
@@ -215,7 +215,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('FormatRssCustom')):
+if (!function_exists('FormatRssCustom')) :
     /**
      *
      *
@@ -262,8 +262,9 @@ function HTMLawedHookTag($Element, $Attributes = 0) {
     $Attribs = '';
     foreach ($Attributes as $Key => $Value) {
         if (strcasecmp($Key, 'style') == 0) {
-            if (strpos($Value, 'position') !== FALSE || strpos($Value, 'z-index') !== FALSE || strpos($Value, 'opacity') !== FALSE)
+            if (strpos($Value, 'position') !== false || strpos($Value, 'z-index') !== false || strpos($Value, 'opacity') !== false) {
                 continue;
+            }
         }
 
         $Attribs .= " {$Key}=\"{$Value}\"";

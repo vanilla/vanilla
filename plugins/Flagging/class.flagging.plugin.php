@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -10,13 +10,13 @@ $PluginInfo['Flagging'] = array(
     'Name' => 'Flagging',
     'Description' => 'Allows users to report content that violates forum rules.',
     'Version' => '1.1.1',
-    'RequiredApplications' => FALSE,
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
+    'RequiredApplications' => false,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
     'SettingsUrl' => '/dashboard/plugin/flagging',
     'SettingsPermission' => 'Garden.Moderation.Manage',
-    'HasLocale' => TRUE,
-    'MobileFriendly' => TRUE,
+    'HasLocale' => true,
+    'MobileFriendly' => true,
     'RegisterPermissions' => array('Plugins.Flagging.Notify'),
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
@@ -34,8 +34,9 @@ class FlaggingPlugin extends Gdn_Plugin {
             ->Get()->NumRows();
 
         $LinkText = T('Flagged Content');
-        if ($NumFlaggedItems)
+        if ($NumFlaggedItems) {
             $LinkText .= ' <span class="Alert">'.$NumFlaggedItems.'</span>';
+        }
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
         $Menu->AddLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Moderation.Manage');
@@ -60,16 +61,16 @@ class FlaggingPlugin extends Gdn_Plugin {
                 // Shorten our arguments
                 $UserID = $Sender->EventArguments['UserID'];
                 $Prefs = $Sender->EventArguments['Name'];
-                $FlagPref = GetValue('Email.Flag', $Prefs, NULL);
+                $FlagPref = GetValue('Email.Flag', $Prefs, null);
 
-                if ($FlagPref !== NULL) {
+                if ($FlagPref !== null) {
                     // Add or remove user from config array
                     $NotifyUsers = C('Plugins.Flagging.NotifyUsers', array());
                     $IsNotified = array_search($UserID, $NotifyUsers); // beware '0' key
-                    if ($IsNotified !== FALSE && !$FlagPref) {
+                    if ($IsNotified !== false && !$FlagPref) {
                         // Remove from NotifyUsers
                         unset($NotifyUsers[$IsNotified]);
-                    } elseif ($IsNotified === FALSE && $FlagPref) {
+                    } elseif ($IsNotified === false && $FlagPref) {
                         // Add to NotifyUsers
                         $NotifyUsers[] = $UserID;
                     }
@@ -99,7 +100,7 @@ class FlaggingPlugin extends Gdn_Plugin {
      */
     public function Controller_Index($Sender) {
         $Sender->AddCssFile('admin.css');
-        $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
+        $Sender->AddCssFile($this->GetResource('design/flagging.css', false, false));
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -112,7 +113,7 @@ class FlaggingPlugin extends Gdn_Plugin {
         $Sender->Form->SetModel($ConfigurationModel);
 
         // If seeing the form for the first time...
-        if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+        if ($Sender->Form->AuthenticatedPostBack() === false) {
             // Apply the config settings to the form.
             $Sender->Form->SetData($ConfigurationModel->Data);
         } else {
@@ -144,7 +145,9 @@ class FlaggingPlugin extends Gdn_Plugin {
      */
     public function Controller_Dismiss($Sender) {
         $Arguments = $Sender->RequestArgs;
-        if (sizeof($Arguments) != 2) return;
+        if (sizeof($Arguments) != 2) {
+            return;
+        }
         list($Controller, $EncodedURL) = $Arguments;
 
         $URL = base64_decode(str_replace('-', '=', $EncodedURL));
@@ -160,7 +163,7 @@ class FlaggingPlugin extends Gdn_Plugin {
      * Add Flagging styling to Discussion.
      */
     public function DiscussionController_BeforeCommentsRender_Handler($Sender) {
-        $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
+        $Sender->AddCssFile($this->GetResource('design/flagging.css', false, false));
     }
 
     /**
@@ -168,8 +171,9 @@ class FlaggingPlugin extends Gdn_Plugin {
      */
     public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {
         // Signed in users only. No guest reporting!
-        if (Gdn::Session()->UserID)
+        if (Gdn::Session()->UserID) {
             $this->AddFlagButton($Sender, $Args, 'discussion');
+        }
     }
 
     /**
@@ -177,8 +181,9 @@ class FlaggingPlugin extends Gdn_Plugin {
      */
     public function DiscussionController_InsideCommentMeta_Handler($Sender, $Args) {
         // Signed in users only. No guest reporting!
-        if (Gdn::Session()->UserID)
+        if (Gdn::Session()->UserID) {
             $this->AddFlagButton($Sender, $Args);
+        }
     }
 
     /**
@@ -216,11 +221,15 @@ class FlaggingPlugin extends Gdn_Plugin {
      */
     public function DiscussionController_Flag_Create($Sender) {
         // Signed in users only.
-        if (!($UserID = Gdn::Session()->UserID)) return;
+        if (!($UserID = Gdn::Session()->UserID)) {
+            return;
+        }
         $UserName = Gdn::Session()->User->Name;
 
         $Arguments = $Sender->RequestArgs;
-        if (sizeof($Arguments) != 5) return;
+        if (sizeof($Arguments) != 5) {
+            return;
+        }
         list($Context, $ElementID, $ElementAuthorID, $ElementAuthor, $EncodedURL) = $Arguments;
         $URL = htmlspecialchars(base64_decode(str_replace('-', '=', $EncodedURL)));
 
@@ -269,7 +278,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                 ));
 
                 // Assume no discussion exists
-                $this->DiscussionID = NULL;
+                $this->DiscussionID = null;
 
                 // Get discussion ID if already flagged
                 $FlagResult = Gdn::SQL()
@@ -363,20 +372,20 @@ class FlaggingPlugin extends Gdn_Plugin {
         $Structure = Gdn::Structure();
         $Structure
             ->Table('Flag')
-            ->Column('DiscussionID', 'int(11)', TRUE)
-            ->Column('InsertUserID', 'int(11)', FALSE, 'key')
+            ->Column('DiscussionID', 'int(11)', true)
+            ->Column('InsertUserID', 'int(11)', false, 'key')
             ->Column('InsertName', 'varchar(64)')
             ->Column('AuthorID', 'int(11)')
             ->Column('AuthorName', 'varchar(64)')
-            ->Column('ForeignURL', 'varchar(255)', FALSE, 'key')
+            ->Column('ForeignURL', 'varchar(255)', false, 'key')
             ->Column('ForeignID', 'int(11)')
             ->Column('ForeignType', 'varchar(32)')
             ->Column('Comment', 'text')
             ->Column('DateInserted', 'datetime')
-            ->Set(FALSE, FALSE);
+            ->Set(false, false);
 
         // Turn off disabled Flagging plugin (deprecated)
-        if (C('Plugins.Flagging.Enabled', NULL) === FALSE) {
+        if (C('Plugins.Flagging.Enabled', null) === false) {
             RemoveFromConfig('EnabledPlugins.Flagging');
         }
     }
@@ -384,5 +393,4 @@ class FlaggingPlugin extends Gdn_Plugin {
     public function Setup() {
         $this->Structure();
     }
-
 }

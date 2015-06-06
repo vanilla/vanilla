@@ -18,7 +18,7 @@ class ConversationsHooks implements Gdn_IPlugin {
      *
      * @param DbaController $Sender
      */
-    public function DbaController_CountJobs_Handler($Sender) {
+    public function dbaController_countJobs_Hhndler($Sender) {
         $Counts = array(
             'Conversation' => array('CountMessages', 'CountParticipants', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID')
 //          'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID')
@@ -34,42 +34,37 @@ class ConversationsHooks implements Gdn_IPlugin {
         }
     }
 
-    public function UserModel_SessionQuery_Handler($Sender) {
-        // Add some extra fields to the session query
-        //$Sender->SQL->Select('u.CountUnreadConversations');
-    }
-
     /**
      * Remove data when deleting a user.
      *
      * @since 2.0.0
      * @access public
      */
-    public function UserModel_BeforeDeleteUser_Handler($Sender) {
-        $UserID = GetValue('UserID', $Sender->EventArguments);
-        $Options = GetValue('Options', $Sender->EventArguments, array());
+    public function userModel_beforeDeleteUser_handler($Sender) {
+        $UserID = val('UserID', $Sender->EventArguments);
+        $Options = val('Options', $Sender->EventArguments, array());
         $Options = is_array($Options) ? $Options : array();
 
-        $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
+        $DeleteMethod = val('DeleteMethod', $Options, 'delete');
         if ($DeleteMethod == 'delete') {
-            $Sender->SQL->Delete('Conversation', array('InsertUserID' => $UserID));
-            $Sender->SQL->Delete('Conversation', array('UpdateUserID' => $UserID));
-            $Sender->SQL->Delete('UserConversation', array('UserID' => $UserID));
-            $Sender->SQL->Delete('ConversationMessage', array('InsertUserID' => $UserID));
+            $Sender->SQL->delete('Conversation', array('InsertUserID' => $UserID));
+            $Sender->SQL->delete('Conversation', array('UpdateUserID' => $UserID));
+            $Sender->SQL->delete('UserConversation', array('UserID' => $UserID));
+            $Sender->SQL->delete('ConversationMessage', array('InsertUserID' => $UserID));
         } elseif ($DeleteMethod == 'wipe') {
-            $Sender->SQL->Update('ConversationMessage')
-                ->Set('Body', T('The user and all related content has been deleted.'))
-                ->Set('Format', 'Deleted')
-                ->Where('InsertUserID', $UserID)
-                ->Put();
+            $Sender->SQL->update('ConversationMessage')
+                ->set('Body', t('The user and all related content has been deleted.'))
+                ->set('Format', 'Deleted')
+                ->where('InsertUserID', $UserID)
+                ->put();
         } else {
             // Leave conversation messages
         }
         // Remove the user's profile information related to this application
-        $Sender->SQL->Update('User')
-            ->Set('CountUnreadConversations', 0)
-            ->Where('UserID', $UserID)
-            ->Put();
+        $Sender->SQL->update('User')
+            ->set('CountUnreadConversations', 0)
+            ->where('UserID', $UserID)
+            ->put();
     }
 
     /**
@@ -78,15 +73,15 @@ class ConversationsHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @access public
      */
-    public function ProfileController_AddProfileTabs_Handler($Sender) {
-        if (Gdn::Session()->IsValid()) {
-            $Inbox = T('Inbox');
-            $InboxHtml = Sprite('SpInbox').' '.$Inbox;
+    public function profileController_addProfileTabs_handler($Sender) {
+        if (Gdn::session()->isValid()) {
+            $Inbox = t('Inbox');
+            $InboxHtml = sprite('SpInbox').' '.$Inbox;
             $InboxLink = '/messages/all';
 
-            if (Gdn::Session()->UserID != $Sender->User->UserID) {
+            if (Gdn::session()->UserID != $Sender->User->UserID) {
                 // Accomodate admin access
-                if (C('Conversations.Moderation.Allow', false) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+                if (C('Conversations.Moderation.Allow', false) && Gdn::session()->checkPermission('Conversations.Moderation.Manage')) {
                     $CountUnread = $Sender->User->CountUnreadConversations;
                     $InboxLink .= "?userid={$Sender->User->UserID}";
                 } else {
@@ -94,21 +89,21 @@ class ConversationsHooks implements Gdn_IPlugin {
                 }
             } else {
                 // Current user
-                $CountUnread = Gdn::Session()->User->CountUnreadConversations;
+                $CountUnread = Gdn::session()->User->CountUnreadConversations;
             }
 
             if (is_numeric($CountUnread) && $CountUnread > 0) {
                 $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
             }
-            $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
+            $Sender->addProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
         }
     }
 
     /**
      * Add "Message" option to profile options.
      */
-    public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
-        if (!$Sender->EditMode && Gdn::Session()->IsValid() && Gdn::Session()->UserID != $Sender->User->UserID) {
+    public function profileController_beforeProfileOptions_handler($Sender, $Args) {
+        if (!$Sender->EditMode && Gdn::session()->isValid() && Gdn::session()->UserID != $Sender->User->UserID) {
             $Sender->EventArguments['MemberOptions'][] = array(
                 'Text' => Sprite('SpMessage').' '.T('Message'),
                 'Url' => '/messages/add/'.$Sender->User->Name,
@@ -124,9 +119,9 @@ class ConversationsHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @access public
      */
-    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
-        $Sender->Preferences['Notifications']['Email.ConversationMessage'] = T('Notify me of private messages.');
-        $Sender->Preferences['Notifications']['Popup.ConversationMessage'] = T('Notify me of private messages.');
+    public function profileController_afterPreferencesDefined_handler($Sender) {
+        $Sender->Preferences['Notifications']['Email.ConversationMessage'] = t('Notify me of private messages.');
+        $Sender->Preferences['Notifications']['Popup.ConversationMessage'] = t('Notify me of private messages.');
     }
 
     /**
@@ -135,24 +130,24 @@ class ConversationsHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @access public
      */
-    public function Base_Render_Before($Sender) {
+    public function base_render_before($Sender) {
         // Add the menu options for conversations
-        if ($Sender->Menu && Gdn::Session()->IsValid()) {
-            $Inbox = T('Inbox');
-            $CountUnreadConversations = GetValue('CountUnreadConversations', Gdn::Session()->User);
+        if ($Sender->Menu && Gdn::session()->isValid()) {
+            $Inbox = t('Inbox');
+            $CountUnreadConversations = val('CountUnreadConversations', Gdn::session()->User);
             if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0) {
                 $Inbox .= ' <span class="Alert">'.$CountUnreadConversations.'</span>';
             }
 
-            $Sender->Menu->AddLink('Conversations', $Inbox, '/messages/all', false, array('Standard' => true));
+            $Sender->Menu->addLink('Conversations', $Inbox, '/messages/all', false, array('Standard' => true));
         }
     }
 
     /**
      * Let us add Messages to the Inbox page.
      */
-    public function Base_AfterGetLocationData_Handler($Sender, $Args) {
-        $Args['ControllerData']['Conversations/messages/inbox'] = T('Inbox Page');
+    public function base_afterGetLocationData_handler($Sender, $Args) {
+        $Args['ControllerData']['Conversations/messages/inbox'] = t('Inbox Page');
     }
 
     /**
@@ -160,24 +155,18 @@ class ConversationsHooks implements Gdn_IPlugin {
      *
      * @param PermissionModel $Sender Instance of permission model that fired the event
      */
-    public function PermissionModel_DefaultPermissions_Handler($Sender) {
-        $Sender->AddDefault(
+    public function permissionModel_defaultPermissions_handler($Sender) {
+        $Sender->addDefault(
             RoleModel::TYPE_MEMBER,
-            array(
-                'Conversations.Conversations.Add' => 1
-            )
+            array('Conversations.Conversations.Add' => 1)
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
-            array(
-                'Conversations.Conversations.Add' => 1
-            )
+            array( 'Conversations.Conversations.Add' => 1)
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
-            array(
-                'Conversations.Conversations.Add' => 1
-            )
+            array('Conversations.Conversations.Add' => 1)
         );
     }
 
@@ -187,7 +176,7 @@ class ConversationsHooks implements Gdn_IPlugin {
      * @since 2.0.?
      * @access public
      */
-    public function SettingsController_DashboardData_Handler($Sender) {
+    //public function settingsController_dashboardData_handler($Sender) {
         /*
         $ConversationModel = new ConversationModel();
         // Number of Conversations
@@ -209,7 +198,7 @@ class ConversationsHooks implements Gdn_IPlugin {
         // Number of New Messages in the last week
         $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
         */
-    }
+    //}
 
     /**
      * Database & config changes to be done upon enable.
@@ -217,9 +206,9 @@ class ConversationsHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @access public
      */
-    public function Setup() {
-        $Database = Gdn::Database();
-        $Config = Gdn::Factory(Gdn::AliasConfig);
+    public function setup() {
+        $Database = Gdn::database();
+        $Config = Gdn::factory(Gdn::AliasConfig);
         $Drop = false; //C('Conversations.Version') === FALSE ? TRUE : FALSE;
         $Explicit = true;
         $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
@@ -227,8 +216,8 @@ class ConversationsHooks implements Gdn_IPlugin {
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'stub.php');
 
         $ApplicationInfo = array();
-        include(CombinePaths(array(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'about.php')));
-        $Version = ArrayValue('Version', ArrayValue('Conversations', $ApplicationInfo, array()), 'Undefined');
-        SaveToConfig('Conversations.Version', $Version);
+        include(combinePaths(array(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'about.php')));
+        $Version = arrayValue('Version', arrayValue('Conversations', $ApplicationInfo, array()), 'Undefined');
+        saveToConfig('Conversations.Version', $Version);
     }
 }

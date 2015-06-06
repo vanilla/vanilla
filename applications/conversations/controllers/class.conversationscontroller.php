@@ -17,7 +17,7 @@ class ConversationsController extends Gdn_Controller {
      *
      * @return array
      */
-    public function GetSettingsPages(&$Menu) {
+    public function getSettingsPages(&$Menu) {
         // There are no configuration pages for Conversations
     }
 
@@ -38,27 +38,27 @@ class ConversationsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Initialize() {
+    public function initialize() {
         // You've got to be signed in to send private messages.
-        if (!Gdn::Session()->IsValid()) {
+        if (!Gdn::session()->isValid()) {
             Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         }
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
-            $this->AddJsFile('jquery.js');
-            $this->AddJsFile('jquery.livequery.js');
-            $this->AddJsFile('jquery.form.js');
-            $this->AddJsFile('jquery.popup.js');
-            $this->AddJsFile('jquery.gardenhandleajaxform.js');
-            $this->AddJsFile('jquery.autosize.min.js');
-            $this->AddJsFile('jquery.tokeninput.js');
-            $this->AddJsFile('global.js');
-            $this->AddJsFile('conversations.js');
+            $this->addJsFile('jquery.js');
+            $this->addJsFile('jquery.livequery.js');
+            $this->addJsFile('jquery.form.js');
+            $this->addJsFile('jquery.popup.js');
+            $this->addJsFile('jquery.gardenhandleajaxform.js');
+            $this->addJsFile('jquery.autosize.min.js');
+            $this->addJsFile('jquery.tokeninput.js');
+            $this->addJsFile('global.js');
+            $this->addJsFile('conversations.js');
         }
 
-        $this->AddCssFile('style.css');
-        $this->AddCssFile('vanillicon.css', 'static');
-        parent::Initialize();
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
+        parent::initialize();
     }
 }

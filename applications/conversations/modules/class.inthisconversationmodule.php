@@ -13,17 +13,17 @@
  */
 class InThisConversationModule extends Gdn_Module {
 
-    public function SetData($Data) {
+    public function setData($Data) {
         $this->Data = $Data;
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
-        if (is_object($this->Data) && $this->Data->NumRows() > 0) {
-            return parent::ToString();
+    public function toString() {
+        if (is_object($this->Data) && $this->Data->numRows() > 0) {
+            return parent::toString();
         }
 
         return '';

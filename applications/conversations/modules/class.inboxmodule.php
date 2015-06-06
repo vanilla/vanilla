@@ -22,13 +22,13 @@ class InboxModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'conversations';
-        $this->UserID = Gdn::Session()->UserID;
+        $this->UserID = Gdn::session()->UserID;
     }
 
-    public function GetData() {
+    public function getData() {
         // Fetch from model.
         $Model = new ConversationModel();
-        $Result = $Model->Get(
+        $Result = $Model->get(
             $this->UserID,
             0,
             $this->Limit,
@@ -36,19 +36,19 @@ class InboxModule extends Gdn_Module {
         );
 
         // Join in the participants.
-        $Model->JoinParticipants($Result);
-        $this->SetData('Conversations', $Result);
+        $Model->joinParticipants($Result);
+        $this->setData('Conversations', $Result);
     }
 
-    public function ToString() {
-        if (!Gdn::Session()->IsValid()) {
+    public function toString() {
+        if (!Gdn::session()->isValid()) {
             return '';
         }
 
-        if (!$this->Data('Conversations')) {
-            $this->GetData();
+        if (!$this->data('Conversations')) {
+            $this->getData();
         }
 
-        return parent::ToString();
+        return parent::toString();
     }
 }

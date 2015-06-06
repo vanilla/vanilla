@@ -13,7 +13,7 @@
  */
 class NewConversationModule extends Gdn_Module {
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 }

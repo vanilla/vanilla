@@ -608,7 +608,7 @@ class Gdn_Auth extends Gdn_Pluggable {
 
         // If it doesn't know, get the default from our config file
         if (!$Return) {
-            $Return = C('Garden.Authenticator.'.$URLType, false);
+            $Return = c('Garden.Authenticator.'.$URLType, false);
         }
         if (!$Return) {
             return false;

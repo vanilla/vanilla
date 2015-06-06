@@ -124,8 +124,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
      */
     public function clearCache($ConfigFile) {
         $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $ConfigFile);
-        if (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
-            Gdn::Cache()->Remove($FileKey, array(
+        if (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
+            Gdn::cache()->remove($FileKey, array(
                 Gdn_Cache::FEATURE_NOPREFIX => true
             ));
         }
@@ -256,10 +256,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if ($ByLine) {
-            $Session = Gdn::Session();
+            $Session = Gdn::session();
             $User = $Session->UserID > 0 && is_object($Session->User) ? $Session->User->Name : 'Unknown';
             $Lines[] = '';
-            $Lines[] = '// Last edited by '.$User.' ('.RemoteIp().')'.Gdn_Format::ToDateTime();
+            $Lines[] = '// Last edited by '.$User.' ('.RemoteIp().')'.Gdn_Format::toDateTime();
         }
 
         $Result = implode(PHP_EOL, $Lines);
@@ -305,7 +305,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if (is_string($Value)) {
-            $Result = Gdn_Format::Unserialize($Value);
+            $Result = Gdn_Format::unserialize($Value);
         } else {
             $Result = $Value;
         }
@@ -407,7 +407,6 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      * @param string $Name The name of the configuration setting with dot notation.
      * @return boolean Wether or not the key was found.
-     * @todo This method may have to be recursive to remove empty arrays.
      */
     public function remove($Name, $Save = true) {
         // Make sure the config settings are in the right format
@@ -673,7 +672,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *   Save => Whether to save or not
      */
     public function removeFromConfig($Name, $Options = array()) {
-        $Save = $Options === false ? false : GetValue('Save', $Options, true);
+        $Save = $Options === false ? false : val('Save', $Options, true);
 
         if (!is_array($Name)) {
             $Name = array($Name);
@@ -701,11 +700,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
 
         // ... otherwise we're trying to extract some of the config for some reason
         if ($File == '') {
-            trigger_error(ErrorMessage('You must specify a file path to be saved.', $Group, 'Save'), E_USER_ERROR);
+            trigger_error(errorMessage('You must specify a file path to be saved.', $Group, 'Save'), E_USER_ERROR);
         }
 
         if (!is_writable($File)) {
-            throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $File));
+            throw new Exception(sprintf(t("Unable to write to config file '%s' when saving."), $File));
         }
 
         if (empty($Group)) {
@@ -723,10 +722,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
         // Do a sanity check on the config save.
         if ($File == $this->defaultPath()) {
             if (!isset($Data['Database'])) {
-                if ($Pm = Gdn::PluginManager()) {
+                if ($Pm = Gdn::pluginManager()) {
                     $Pm->EventArguments['Data'] = $Data;
                     $Pm->EventArguments['Backtrace'] = debug_backtrace();
-                    $Pm->FireEvent('ConfigError');
+                    $Pm->fireEvent('ConfigError');
                 }
                 return false;
             }
@@ -745,8 +744,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
-        if ($this->caching() && Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
-            Gdn::Cache()->Store($FileKey, $Data, array(
+        if ($this->caching() && Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
+            Gdn::cache()->store($FileKey, $Data, array(
                 Gdn_Cache::FEATURE_NOPREFIX => true,
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
@@ -793,8 +792,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @return bool|int
      */
     public function saveToConfig($Name, $Value = '', $Options = array()) {
-        $Save = $Options === false ? false : GetValue('Save', $Options, true);
-        $RemoveEmpty = GetValue('RemoveEmpty', $Options);
+        $Save = $Options === false ? false : val('Save', $Options, true);
+        $RemoveEmpty = val('RemoveEmpty', $Options);
 
         if (!is_array($Name)) {
             $Name = array($Name => $Value);
@@ -818,7 +817,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      */
     public function shutdown() {
         foreach ($this->sources as $Source) {
-            $Source->Shutdown();
+            $Source->shutdown();
         }
     }
 
@@ -989,7 +988,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         $UseCache = false;
         if ($Parent && $Parent->caching()) {
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
-            if (Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
+            if (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
                 $UseCache = true;
                 $CachedConfigData = Gdn::Cache()->Get($FileKey, array(
                     Gdn_Cache::FEATURE_NOPREFIX => true
@@ -1025,7 +1024,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         // We're caching, using the cache, and this data was not loaded from cache.
         // Write it there now.
         if ($Parent && $Parent->caching() && $UseCache && !$LoadedFromCache) {
-            Gdn::Cache()->Store($FileKey, $$Name, array(
+            Gdn::cache()->store($FileKey, $$Name, array(
                 Gdn_Cache::FEATURE_NOPREFIX => true,
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
@@ -1170,7 +1169,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         $Keys = explode('.', $Name);
         // If splitting is off, HANDLE IT
         if (!$this->Splitting) {
-            $FirstKey = GetValue(0, $Keys);
+            $FirstKey = val(0, $Keys);
             if ($FirstKey == $this->Group) {
                 $Keys = array(array_shift($Keys), implode('.', $Keys));
             } else {
@@ -1229,7 +1228,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $Keys = explode('.', $Name);
             // If splitting is off, HANDLE IT
             if (!$this->Splitting) {
-                $FirstKey = GetValue(0, $Keys);
+                $FirstKey = val(0, $Keys);
                 if ($FirstKey == $this->Group) {
                     $Keys = array(array_shift($Keys), implode('.', $Keys));
                 } else {
@@ -1250,25 +1249,16 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                 if ($i == $KeyCount - 1) {
                     // If we are on the last iteration of the key, then set the value.
                     if ($KeyExists === false || $Overwrite === true) {
-                        $OldVal = GetValue($Key, $Settings, null);
+                        $OldVal = val($Key, $Settings, null);
                         $SetVal = $Value;
 
-                        // Serialize if array or obj
-                        /*
-                        if (is_array($Value) || is_object($Value)) {
-                           $SetVal = Gdn_Format::Serialize($Value);
-                        // ArrayValueEncode if string
-                        } elseif (is_string($Value) && !is_numeric($Value) && !is_bool($Value)) {
-                           $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
-                        }
-                        */
                         $Settings[$Key] = $SetVal;
                         if (!$KeyExists || $SetVal != $OldVal) {
                             $this->Dirty = true;
                         }
                     }
                 } else {
-                    // Build the array as we loop over the key. Doucement.
+                    // Build the array as we loop over the key.
                     if ($KeyExists === false) {
                         $Settings[$Key] = array();
                     }
@@ -1309,7 +1299,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         }
 
         if (is_string($Value)) {
-            $Result = Gdn_Format::Unserialize($Value);
+            $Result = Gdn_Format::unserialize($Value);
         } else {
             $Result = $Value;
         }
@@ -1333,7 +1323,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         $this->EventArguments['ConfigType'] = $this->Type;
         $this->EventArguments['ConfigSource'] = $this->Source;
         $this->EventArguments['ConfigData'] = $this->Settings;
-        $this->FireEvent('BeforeSave');
+        $this->fireEvent('BeforeSave');
 
         if ($this->EventArguments['ConfigNoSave']) {
             $this->Dirty = false;
@@ -1366,7 +1356,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         switch ($this->Type) {
             case 'file':
                 if (empty($this->Source)) {
-                    trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
+                    trigger_error(errorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
                 }
 
                 $CheckWrite = $this->Source;
@@ -1375,7 +1365,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                 }
 
                 if (!is_writable($CheckWrite)) {
-                    throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $this->Source));
+                    throw new Exception(sprintf(t("Unable to write to config file '%s' when saving."), $this->Source));
                 }
 
                 $Group = $this->Group;
@@ -1388,20 +1378,20 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                 }
 
                 // Do a sanity check on the config save.
-                if ($this->Source == Gdn::Config()->DefaultPath()) {
+                if ($this->Source == Gdn::config()->defaultPath()) {
                     // Log root config changes
                     try {
                         $LogData = $this->Initial;
                         $LogData['_New'] = $this->Settings;
-                        LogModel::Insert('Edit', 'Configuration', $LogData);
+                        LogModel::insert('Edit', 'Configuration', $LogData);
                     } catch (Exception $Ex) {
                     }
 
                     if (!isset($Data['Database'])) {
-                        if ($Pm = Gdn::PluginManager()) {
+                        if ($Pm = Gdn::pluginManager()) {
                             $Pm->EventArguments['Data'] = $Data;
                             $Pm->EventArguments['Backtrace'] = debug_backtrace();
-                            $Pm->FireEvent('ConfigError');
+                            $Pm->fireEvent('ConfigError');
                         }
                         return false;
                     }
@@ -1420,8 +1410,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
                 // Save to cache if we're into that sort of thing
                 $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $this->Source);
-                if ($this->Configuration && $this->Configuration->caching() && Gdn::Cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->activeEnabled()) {
-                    $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
+                if ($this->Configuration && $this->Configuration->caching() && Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
+                    $CachedConfigData = Gdn::cache()->store($FileKey, $Data, array(
                         Gdn_Cache::FEATURE_NOPREFIX => true,
                         Gdn_Cache::FEATURE_EXPIRY => 3600
                     ));

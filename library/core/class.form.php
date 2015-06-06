@@ -2553,7 +2553,7 @@ PASSWORDMETER;
 
     /**
      * Gets the validation results in the form.
-     * 
+     *
      * @return array
      */
     public function validationResults() {

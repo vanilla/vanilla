@@ -23,10 +23,13 @@ if (!defined('VANILLA_FILE_PUT_FLAGS')) {
  */
 class Gdn_FileSystem {
 
+    /** Op. */
     const O_CREATE = 1;
 
+    /** Op. */
     const O_WRITE = 2;
 
+    /** Op. */
     const O_READ = 4;
 
     /**
@@ -36,7 +39,7 @@ class Gdn_FileSystem {
      * @param mixed $Files The path (or array of paths) to files which should be checked for
      * existence.
      */
-    public static function Exists($Files) {
+    public static function exists($Files) {
         if (!is_array($Files)) {
             $Files = array($Files);
         }
@@ -58,14 +61,13 @@ class Gdn_FileSystem {
      * if SourceFolder does not exist.
      *
      * @param string $SourceFolder
-     * @todo Documentation and variable type is needed for $SourceFolder.
      */
-    public static function Folders($SourceFolders) {
+    public static function folders($SourceFolders) {
         if (!is_array($SourceFolders)) {
             $SourceFolders = array($SourceFolders);
         }
 
-        $BlackList = Gdn::Config('Garden.FolderBlacklist');
+        $BlackList = Gdn::config('Garden.FolderBlacklist');
         if (!is_array($BlackList)) {
             $BlackList = array('.', '..');
         }
@@ -75,7 +77,7 @@ class Gdn_FileSystem {
         foreach ($SourceFolders as $SourceFolder) {
             if ($DirectoryHandle = opendir($SourceFolder)) {
                 while (($Item = readdir($DirectoryHandle)) !== false) {
-                    $SubFolder = CombinePaths(array($SourceFolder, $Item));
+                    $SubFolder = combinePaths(array($SourceFolder, $Item));
                     if (!in_array($Item, $BlackList) && is_dir($SubFolder)) {
                         $Result[] = $Item;
                     }
@@ -100,8 +102,8 @@ class Gdn_FileSystem {
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function Find($SourceFolders, $FileName, $WhiteList = false) {
-        $Return = self::_Find($SourceFolders, $WhiteList, $FileName, true);
+    public static function find($SourceFolders, $FileName, $WhiteList = false) {
+        $Return = self::_find($SourceFolders, $WhiteList, $FileName, true);
         if (is_array($Return)) {
             return count($Return) > 0 ? $Return[0] : false;
         } else {
@@ -121,8 +123,8 @@ class Gdn_FileSystem {
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function FindAll($SourceFolders, $FileName, $WhiteList = false) {
-        return self::_Find($SourceFolders, $WhiteList, $FileName, false);
+    public static function findAll($SourceFolders, $FileName, $WhiteList = false) {
+        return self::_find($SourceFolders, $WhiteList, $FileName, false);
     }
 
     /**
@@ -141,7 +143,7 @@ class Gdn_FileSystem {
      * or should it return an array of every instance in which it is found?
      * Default is to return an array of every instance.
      */
-    private static function _Find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = false) {
+    private static function _find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = false) {
         $Return = array();
 
         if (!is_array($SourceFolders)) {
@@ -171,10 +173,10 @@ class Gdn_FileSystem {
 
                     $SubFolders = array();
                     foreach ($WhiteList as $WhiteFolder) {
-                        $SubFolder = CombinePaths(array($SourceFolder, $WhiteFolder));
+                        $SubFolder = combinePaths(array($SourceFolder, $WhiteFolder));
                         if (is_dir($SubFolder)) {
                             $SubFolders[] = $SubFolder;
-                            $Path = CombinePaths(array($SubFolder, $FileName));
+                            $Path = combinePaths(array($SubFolder, $FileName));
                             // echo '<div style="color: red;">Looking For: '.$Path.'</div>';
                             if (file_exists($Path)) {
                                 if ($ReturnFirst) {
@@ -208,16 +210,16 @@ class Gdn_FileSystem {
      * @param string $LibraryName The name of the library to search for. This is a valid file name.
      * ie. "class.database.php"
      */
-    public static function FindByMapping($MappingCacheName, $SourceFolders, $FolderWhiteList, $LibraryName) {
+    public static function findByMapping($MappingCacheName, $SourceFolders, $FolderWhiteList, $LibraryName) {
 
         // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
         if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1) {
-            $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
+            $LibraryName = combinePaths(array($FolderWhiteList[0], $LibraryName));
         }
 
         $LibraryKey = str_replace('.', '__', $LibraryName);
-        Gdn_LibraryMap::PrepareCache($MappingCacheName);
-        $LibraryPath = Gdn_LibraryMap::GetCache($MappingCacheName, $LibraryKey);
+        Gdn_LibraryMap::prepareCache($MappingCacheName);
+        $LibraryPath = Gdn_LibraryMap::getCache($MappingCacheName, $LibraryKey);
         if ($LibraryPath === null) {
             // $LibraryName wasn't contained in the mappings array.
             // I need to look through the folders in this application for the requested file.
@@ -229,11 +231,11 @@ class Gdn_FileSystem {
             } else {
                $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
             }*/
-            $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
+            $LibraryPath = self::find($SourceFolders, $LibraryName, $FolderWhiteList);
 
             // If the mapping was found
             if ($LibraryPath !== false) {
-                Gdn_LibraryMap::Cache($MappingCacheName, $LibraryKey, $LibraryPath);
+                Gdn_LibraryMap::cache($MappingCacheName, $LibraryKey, $LibraryPath);
             }
         }
         return $LibraryPath;
@@ -243,8 +245,8 @@ class Gdn_FileSystem {
      * Returns the contents of the specified file, or FALSE if it does not
      * exist.
      */
-    public static function GetContents() {
-        $File = CombinePaths(func_get_args());
+    public static function getContents() {
+        $File = combinePaths(func_get_args());
         if (file_exists($File) && is_file($File)) {
             return file_get_contents($File);
         } else {
@@ -258,7 +260,7 @@ class Gdn_FileSystem {
      * @param string $FileName The full path and name of the file to be saved.
      * @param string $FileContents The contents of the file being saved.
      */
-    public static function SaveFile($FileName, $FileContents, $Flags = VANILLA_FILE_PUT_FLAGS) {
+    public static function saveFile($FileName, $FileContents, $Flags = VANILLA_FILE_PUT_FLAGS) {
 
         // Check that the folder exists and is writable
         $DirName = dirname($FileName);
@@ -284,7 +286,7 @@ class Gdn_FileSystem {
      *
      * @param string $FileName The full path to the file being touched.
      */
-    public static function Touch($FileName) {
+    public static function touch($FileName) {
         if (!file_exists($FileName)) {
             file_put_contents($FileName, '', LOCK_EX);
         }
@@ -298,14 +300,14 @@ class Gdn_FileSystem {
      * @param string $MimeType The mime type of the file.
      * @param string $ServeMode Whether to download the file as an attachment, or inline
      */
-    public static function ServeFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
+    public static function serveFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
 
         $FileIsLocal = (substr($File, 0, 4) == 'http') ? false : true;
         $FileAvailable = ($FileIsLocal) ? is_readable($File) : true;
 
         if ($FileAvailable) {
             // Close the database connection
-            Gdn::Database()->CloseConnection();
+            Gdn::database()->closeConnection();
 
             // Determine if Path extension should be appended to Name
             $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
@@ -313,7 +315,7 @@ class Gdn_FileSystem {
             if ($NameExtension == '') {
                 if ($Name == '') {
                     $Name = pathinfo($File, PATHINFO_FILENAME).'.'.$FileExtension;
-                } elseif (!StringEndsWith($Name, '.'.$FileExtension)) {
+                } elseif (!stringEndsWith($Name, '.'.$FileExtension)) {
                     $Name .= '.'.$FileExtension;
                 }
             } else {
@@ -381,7 +383,7 @@ class Gdn_FileSystem {
      * @param string $Dir
      * @return void
      */
-    public static function RemoveFolder($Path) {
+    public static function removeFolder($Path) {
         if (!file_exists($Path)) {
             return;
         }
@@ -403,7 +405,7 @@ class Gdn_FileSystem {
                 $SubPath = $Path.$File;
 
                 if (is_dir($SubPath)) {
-                    self::RemoveFolder($SubPath);
+                    self::removeFolder($SubPath);
                 } else {
                     unlink($SubPath);
                 }
@@ -413,7 +415,7 @@ class Gdn_FileSystem {
         rmdir($Path);
     }
 
-    public static function CheckFolderR($Path, $Flags = 0) {
+    public static function checkFolderR($Path, $Flags = 0) {
         $TrimPath = ltrim($Path, '/');
         $PathParts = explode('/', $TrimPath);
         $Prepend = (strlen($Path) !== strlen($TrimPath)) ? DS : '';
@@ -468,7 +470,7 @@ class Gdn_FileSystem {
      * @param $options //folderPermission,filePermission
      * @return boolean
      */
-    public static function Copy($source, $dest, $options = array('folderPermission' => 0755, 'filePermission' => 0755)) {
+    public static function copy($source, $dest, $options = array('folderPermission' => 0755, 'filePermission' => 0755)) {
         $result = false;
 
         if (is_file($source)) {
@@ -513,7 +515,7 @@ class Gdn_FileSystem {
                     } else {
                         $__dest = $dest."/".$file;
                     }
-                    $result = Gdn_FileSystem::Copy($source."/".$file, $__dest, $options);
+                    $result = Gdn_FileSystem::copy($source."/".$file, $__dest, $options);
                 }
             }
             closedir($dirHandle);

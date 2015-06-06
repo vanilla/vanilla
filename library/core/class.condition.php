@@ -114,7 +114,7 @@ class Gdn_Condition {
         switch (strtolower($Type)) {
             case PERMISSION:
                 // Check to see if the user has the given permission.
-                $Result = Gdn::Session()->CheckPermission($Field);
+                $Result = Gdn::session()->checkPermission($Field);
                 if ($Expr === false) {
                     return !$Result;
                 }
@@ -123,15 +123,15 @@ class Gdn_Condition {
                 // See if the field is a specific value.
                 switch (strtolower($Field)) {
                     case 'path':
-                        $Value = Gdn::Request()->Path();
+                        $Value = Gdn::request()->path();
                         break;
                     default:
                         // See if the field is targetting a specific part of the request.
                         $Fields = explode('.', $Field, 2);
                         if (count($Fields) >= 2) {
-                            $Value = Gdn::Request()->GetValueFrom($Fields[0], $Fields[1], null);
+                            $Value = Gdn::request()->getValueFrom($Fields[0], $Fields[1], null);
                         } else {
-                            $Value = Gdn::Request()->GetValue($Field, null);
+                            $Value = Gdn::request()->getValue($Field, null);
                         }
                         break;
                 }
@@ -141,12 +141,12 @@ class Gdn_Condition {
             case ROLE:
                 // See if the user is in the given role.
                 $RoleModel = new RoleModel();
-                $Roles = $RoleModel->GetByUserID(Gdn::Session()->UserID)->ResultArray();
+                $Roles = $RoleModel->getByUserID(Gdn::session()->UserID)->resultArray();
                 foreach ($Roles as $Role) {
                     if (is_numeric($Expr)) {
-                        $Result = $Expr == GetValue('RoleID', $Role);
+                        $Result = $Expr == val('RoleID', $Role);
                     } else {
-                        $Result = Gdn_Condition::testValue(GetValue('Name', $Role), $Expr);
+                        $Result = Gdn_Condition::testValue(val('Name', $Role), $Expr);
                     }
                     if ($Result) {
                         return true;

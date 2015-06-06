@@ -60,8 +60,8 @@ class Gdn_Autoloader {
         switch ($ExtensionType) {
             case self::CONTEXT_APPLICATION:
 
-                if (Gdn::ApplicationManager() instanceof Gdn_ApplicationManager) {
-                    $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
+                if (Gdn::applicationManager() instanceof Gdn_ApplicationManager) {
+                    $EnabledApplications = Gdn::applicationManager()->enabledApplicationFolders();
 
                     foreach ($EnabledApplications as $EnabledApplication) {
                         self::attachApplication($EnabledApplication);
@@ -72,17 +72,17 @@ class Gdn_Autoloader {
 
             case self::CONTEXT_PLUGIN:
 
-                if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
-                    foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $SearchPathName) {
+                if (Gdn::pluginManager() instanceof Gdn_PluginManager) {
+                    foreach (Gdn::pluginManager()->searchPaths() as $SearchPath => $SearchPathName) {
                         if ($SearchPathName === true || $SearchPathName == 1) {
                             $SearchPathName = md5($SearchPath);
                         }
 
                         // If we have already loaded the plugin manager, use its internal folder list
-                        if (Gdn::PluginManager()->Started()) {
-                            $Folders = Gdn::PluginManager()->EnabledPluginFolders($SearchPath);
+                        if (Gdn::pluginManager()->started()) {
+                            $Folders = Gdn::pluginManager()->enabledPluginFolders($SearchPath);
                             foreach ($Folders as $PluginFolder) {
-                                $FullPluginPath = CombinePaths(array($SearchPath, $PluginFolder));
+                                $FullPluginPath = combinePaths(array($SearchPath, $PluginFolder));
                                 self::registerMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN, $FullPluginPath, array(
                                     'SearchSubfolders' => true,
                                     'Extension' => $SearchPathName,
@@ -94,7 +94,7 @@ class Gdn_Autoloader {
 
                             $PluginMap = self::getMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN);
                             if ($PluginMap && !$PluginMap->mapIsOnDisk()) {
-                                Gdn::PluginManager()->ForceAutoloaderIndex();
+                                Gdn::pluginManager()->forceAutoloaderIndex();
                             }
                         }
                     }
@@ -115,29 +115,29 @@ class Gdn_Autoloader {
      * @param string $Application The name of the application.
      */
     public static function attachApplication($Application) {
-        $ApplicationPath = CombinePaths(array(PATH_APPLICATIONS."/{$Application}"));
+        $ApplicationPath = combinePaths(array(PATH_APPLICATIONS."/{$Application}"));
 
-        $AppControllers = CombinePaths(array($ApplicationPath."/controllers"));
+        $AppControllers = combinePaths(array($ApplicationPath."/controllers"));
         self::registerMap(self::MAP_CONTROLLER, self::CONTEXT_APPLICATION, $AppControllers, array(
             'SearchSubfolders' => false,
             'Extension' => $Application
         ));
 
-        $AppModels = CombinePaths(array($ApplicationPath."/models"));
+        $AppModels = combinePaths(array($ApplicationPath."/models"));
         self::registerMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppModels, array(
             'SearchSubfolders' => false,
             'Extension' => $Application,
             'ClassFilter' => '*model'
         ));
 
-        $AppModules = CombinePaths(array($ApplicationPath."/modules"));
+        $AppModules = combinePaths(array($ApplicationPath."/modules"));
         self::registerMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppModules, array(
             'SearchSubfolders' => false,
             'Extension' => $Application,
             'ClassFilter' => '*module'
         ));
 
-        $AppLibrary = CombinePaths(array($ApplicationPath."/library"));
+        $AppLibrary = combinePaths(array($ApplicationPath."/library"));
         self::registerMap(self::MAP_LIBRARY, self::CONTEXT_APPLICATION, $AppLibrary, array(
             'SearchSubfolders' => false,
             'Extension' => $Application,
@@ -170,7 +170,7 @@ class Gdn_Autoloader {
 
             // Drill to the caches associated with this map type
             foreach (self::$maps as $MapHash => &$Map) {
-                if ($MapType !== null && $Map->MapType() != $MapType) {
+                if ($MapType !== null && $Map->mapType() != $MapType) {
                     continue;
                 }
 
@@ -181,7 +181,7 @@ class Gdn_Autoloader {
                     $ContextType = $MapContext;
 
                     if (!array_key_exists($ContextType, $Priorities)) {
-                        $Priorities[$ContextType] = self::Priorities($ContextType, $MapType);
+                        $Priorities[$ContextType] = self::priorities($ContextType, $MapType);
                     }
 
                     if (array_key_exists($ContextType, $Priorities) && is_array($Priorities[$ContextType])) {
@@ -211,7 +211,7 @@ class Gdn_Autoloader {
                 }
 
                 // Finally, search this map.
-                $File = $Map->Lookup($ClassName, $MapOnly);
+                $File = $Map->lookup($ClassName, $MapOnly);
                 if ($File !== false) {
                     return $File;
                 }
@@ -476,7 +476,7 @@ class Gdn_Autoloader {
 
         ksort(self::$maps, SORT_REGULAR);
 
-        $AddPathResult = self::$maps[$MapHash]->AddPath($SearchPath, $Options);
+        $AddPathResult = self::$maps[$MapHash]->addPath($SearchPath, $Options);
 
         /*
          * Build a unique identifier that refers to this cached list (context and extension)
@@ -608,7 +608,7 @@ class Gdn_Autoloader {
      */
     public static function shutdown() {
         foreach (self::$maps as $MapHash => &$Map) {
-            $Map->Shutdown();
+            $Map->shutdown();
         }
     }
 }
@@ -1122,7 +1122,7 @@ class Gdn_Autoloader_Map {
         }
 
         try {
-            Gdn_FileSystem::SaveFile($FileName, $MapContents, LOCK_EX);
+            Gdn_FileSystem::saveFile($FileName, $MapContents, LOCK_EX);
             $this->mapInfo['dirty'] = false;
         } catch (Exception $e) {
             return false;

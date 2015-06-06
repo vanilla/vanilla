@@ -156,12 +156,12 @@ abstract class Gdn_Cache {
         }
 
         if (method_exists($CacheObject, 'Autorun')) {
-            $CacheObject->Autorun();
+            $CacheObject->autorun();
         }
 
         // This should only fire when cache is loading automatically
-        if (!func_num_args() && Gdn::PluginManager() instanceof Gdn_PluginManager) {
-            Gdn::PluginManager()->FireEvent('AfterActiveCache');
+        if (!func_num_args() && Gdn::pluginManager() instanceof Gdn_PluginManager) {
+            Gdn::pluginManager()->fireEvent('AfterActiveCache');
         }
 
         return $CacheObject;
@@ -190,9 +190,9 @@ abstract class Gdn_Cache {
         }
 
         // This should only fire when cache is loading automatically
-        if (!func_num_args() && Gdn::PluginManager() instanceof Gdn_PluginManager) {
-            Gdn::PluginManager()->EventArguments['ActiveCache'] = &$ActiveCache;
-            Gdn::PluginManager()->FireEvent('BeforeActiveCache');
+        if (!func_num_args() && Gdn::pluginManager() instanceof Gdn_PluginManager) {
+            Gdn::pluginManager()->EventArguments['ActiveCache'] = &$ActiveCache;
+            Gdn::pluginManager()->fireEvent('BeforeActiveCache');
         }
 
         return $ActiveCache;
@@ -297,7 +297,7 @@ abstract class Gdn_Cache {
 
         // No local copy, get from config
         if (is_null($ActiveStore)) {
-            $ActiveStore = C($ActiveStoreKey, false);
+            $ActiveStore = c($ActiveStoreKey, false);
 
             // Convert to LocalStore format
             $LocalStore = array();
@@ -350,10 +350,10 @@ abstract class Gdn_Cache {
         $activeStoreKey = "Cache.{$activeCache}.Store";
 
         // Get the local store.
-        $localStore = GetValue($activeCache, Gdn_Cache::$stores, null);
+        $localStore = val($activeCache, Gdn_Cache::$stores, null);
         if (is_null($localStore)) {
             Gdn_Cache::activeStore();
-            $localStore = GetValue($activeCache, Gdn_Cache::$stores, null);
+            $localStore = val($activeCache, Gdn_Cache::$stores, null);
             if (is_null($localStore)) {
                 return false;
             }
@@ -413,11 +413,11 @@ abstract class Gdn_Cache {
     abstract public function add($Key, $Value, $Options = array());
 
     public function stripKey($Key, $Options) {
-        $UsePrefix = !GetValue(Gdn_Cache::FEATURE_NOPREFIX, $Options, false);
-        $ForcePrefix = GetValue(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, null);
+        $UsePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $Options, false);
+        $ForcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, null);
 
         if ($UsePrefix) {
-            $Key = substr($Key, strlen($this->GetPrefix($ForcePrefix)) + 1);
+            $Key = substr($Key, strlen($this->getPrefix($ForcePrefix)) + 1);
         }
         return $Key;
 
@@ -536,7 +536,7 @@ abstract class Gdn_Cache {
      * @return mixed
      */
     protected function fallback($Key, $Options) {
-        $Fallback = GetValue(Gdn_Cache::FEATURE_FALLBACK, $Options, null);
+        $Fallback = val(Gdn_Cache::FEATURE_FALLBACK, $Options, null);
         if (is_null($Fallback)) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -546,12 +546,12 @@ abstract class Gdn_Cache {
             case 'query':
                 $QueryFallbackField = array_shift($Fallback);
                 $QueryFallbackCode = array_shift($Fallback);
-                $FallbackResult = Gdn::Database()->Query($QueryFallbackCode);
-                if ($FallbackResult->NumRows()) {
+                $FallbackResult = Gdn::database()->query($QueryFallbackCode);
+                if ($FallbackResult->numRows()) {
                     if (!is_null($QueryFallbackField)) {
-                        $FallbackResult = GetValue($QueryFallbackField, $FallbackResult->FirstRow(DATASET_TYPE_ARRAY));
+                        $FallbackResult = val($QueryFallbackField, $FallbackResult->firstRow(DATASET_TYPE_ARRAY));
                     } else {
-                        $FallbackResult = $FallbackResult->ResultArray();
+                        $FallbackResult = $FallbackResult->resultArray();
                     }
                 }
                 break;
@@ -561,7 +561,7 @@ abstract class Gdn_Cache {
                 $FallbackResult = call_user_func_array($CallbackFallbackMethod, $CallbackFallbackArgs);
                 break;
         }
-        Gdn::Cache()->Store($Key, $FallbackResult);
+        Gdn::cache()->store($Key, $FallbackResult);
         return $FallbackResult;
     }
 
@@ -588,7 +588,7 @@ abstract class Gdn_Cache {
         // Lookup Revision if we have a prefix.
         $RevisionNumber = false;
         if ($WithRevision && $ConfigPrefix !== false) {
-            $CacheRevision = $this->GetRevision($ConfigPrefix);
+            $CacheRevision = $this->getRevision($ConfigPrefix);
             if (!is_null($CacheRevision)) {
                 $RevisionNumber = $CacheRevision;
             }
@@ -608,11 +608,11 @@ abstract class Gdn_Cache {
         if ($CacheRevision === false || $Force) {
             $ConfigPrefix = $ForcePrefix;
             if (is_null($ConfigPrefix)) {
-                $ConfigPrefix = $this->GetPrefix(null, false);
+                $ConfigPrefix = $this->getPrefix(null, false);
             }
 
             $CacheRevisionKey = "{$ConfigPrefix}.Revision";
-            $CacheRevision = $this->Get($CacheRevisionKey, array(
+            $CacheRevision = $this->get($CacheRevisionKey, array(
                 Gdn_Cache::FEATURE_NOPREFIX => true
             ));
 
@@ -625,7 +625,7 @@ abstract class Gdn_Cache {
     }
 
     public function incrementRevision() {
-        $CachePrefix = $this->GetPrefix(null, false);
+        $CachePrefix = $this->getPrefix(null, false);
         if ($CachePrefix === false) {
             return false;
         }
@@ -636,7 +636,7 @@ abstract class Gdn_Cache {
         ));
 
         if (!$Incremented) {
-            return $this->Store($CacheRevisionKey, 2, array(
+            return $this->store($CacheRevisionKey, 2, array(
                 Gdn_Cache::FEATURE_NOPREFIX => true
             ));
         }
@@ -650,7 +650,7 @@ abstract class Gdn_Cache {
 
         $Prefix = '';
         if ($UsePrefix) {
-            $Prefix = $this->GetPrefix($ForcePrefix).'!';
+            $Prefix = $this->getPrefix($ForcePrefix).'!';
         }
 
         if (is_array($Key)) {
@@ -680,7 +680,7 @@ abstract class Gdn_Cache {
         if (is_null($ActiveOptions)) {
             $ActiveCacheShortName = ucfirst($this->activeCache());
             $OptionKey = "Cache.{$ActiveCacheShortName}.Option";
-            $ActiveOptions = C($OptionKey, array());
+            $ActiveOptions = c($OptionKey, array());
         }
 
         if (is_null($Option) || !array_key_exists($Option, $ActiveOptions)) {
@@ -705,7 +705,7 @@ abstract class Gdn_Cache {
         if (is_null($ActiveConfig)) {
             $ActiveCacheShortName = ucfirst($this->activeCache());
             $ConfigKey = "Cache.{$ActiveCacheShortName}.Config";
-            $ActiveConfig = C($ConfigKey, array());
+            $ActiveConfig = c($ConfigKey, array());
         }
 
         if (is_null($Key)) {
@@ -716,7 +716,7 @@ abstract class Gdn_Cache {
             return $Default;
         }
 
-        return GetValue($Key, $ActiveConfig, $Default);
+        return val($Key, $ActiveConfig, $Default);
     }
 
     /**

@@ -29,9 +29,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     /**
      * Drops $this->Table() from the database.
      */
-    public function Drop() {
-        if ($this->TableExists()) {
-            return $this->Query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
+    public function drop() {
+        if ($this->tableExists()) {
+            return $this->query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
         }
     }
 
@@ -41,8 +41,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param string $Name The name of the column to drop from $this->Table().
      * @return boolean
      */
-    public function DropColumn($Name) {
-        if (!$this->Query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`')) {
+    public function dropColumn($Name) {
+        if (!$this->query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`')) {
             throw new Exception(sprintf(T('Failed to remove the `%1$s` column from the `%2$s` table.'), $Name, $this->_DatabasePrefix.$this->_TableName));
         }
 
@@ -55,13 +55,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param $Engine
      * @return bool
      */
-    public function HasEngine($Engine) {
+    public function hasEngine($Engine) {
         static $ViableEngines = null;
 
         if ($ViableEngines === null) {
-            $EngineList = $this->Database->Query("SHOW ENGINES;");
+            $EngineList = $this->Database->query("SHOW ENGINES;");
             $ViableEngines = array();
-            while ($EngineList && $StorageEngine = $EngineList->Value('Engine', false)) {
+            while ($EngineList && $StorageEngine = $EngineList->value('Engine', false)) {
                 $EngineName = strtolower($StorageEngine);
                 $ViableEngines[$EngineName] = true;
             }
@@ -81,9 +81,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param bool $CheckAvailability
      * @return $this
      */
-    public function Engine($Engine, $CheckAvailability = true) {
+    public function engine($Engine, $CheckAvailability = true) {
         $Engine = strtolower($Engine);
-
 
         if ($CheckAvailability) {
             if (!$this->HasEngine($Engine)) {
@@ -102,9 +101,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param string $NewName The new name for the column being renamed.
      * @param string $TableName
      * @return boolean
-     * @todo $TableName needs a description.
      */
-    public function RenameColumn($OldName, $NewName, $TableName = '') {
+    public function renameColumn($OldName, $NewName, $TableName = '') {
         if ($TableName != '') {
             $this->_TableName = $TableName;
         }
@@ -112,28 +110,28 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Get the schema for this table
         $OldPrefix = $this->Database->DatabasePrefix;
         $this->Database->DatabasePrefix = $this->_DatabasePrefix;
-        $Schema = $this->Database->SQL()->FetchTableSchema($this->_TableName);
+        $Schema = $this->Database->sql()->fetchTableSchema($this->_TableName);
         $this->Database->DatabasePrefix = $OldPrefix;
 
         // Get the definition for this column
-        $OldColumn = ArrayValue($OldName, $Schema);
-        $NewColumn = ArrayValue($NewName, $Schema);
+        $OldColumn = arrayValue($OldName, $Schema);
+        $NewColumn = arrayValue($NewName, $Schema);
 
         // Make sure that one column, or the other exists
         if (!$OldColumn && !$NewColumn) {
-            throw new Exception(sprintf(T('The `%1$s` column does not exist.'), $OldName));
+            throw new Exception(sprintf(t('The `%1$s` column does not exist.'), $OldName));
         }
 
         // Make sure the new column name isn't already taken
         if ($OldColumn && $NewColumn) {
-            throw new Exception(sprintf(T('You cannot rename the `%1$s` column to `%2$s` because that column already exists.'), $OldName, $NewName));
+            throw new Exception(sprintf(t('You cannot rename the `%1$s` column to `%2$s` because that column already exists.'), $OldName, $NewName));
         }
 
         // Rename the column
         // The syntax for renaming a column is:
         // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
-        if (!$this->Query('alter table `'.$OldPrefix.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_DefineColumn($OldColumn))) {
-            throw new Exception(sprintf(T('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
+        if (!$this->query('alter table `'.$OldPrefix.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_defineColumn($OldColumn))) {
+            throw new Exception(sprintf(t('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
         }
 
         return true;
@@ -148,9 +146,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * before $OldName and $NewName.
      * @return boolean
      */
-    public function RenameTable($OldName, $NewName, $UsePrefix = false) {
-        if (!$this->Query('rename table `'.$OldName.'` to `'.$NewName.'`')) {
-            throw new Exception(sprintf(T('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
+    public function renameTable($OldName, $NewName, $UsePrefix = false) {
+        if (!$this->query('rename table `'.$OldName.'` to `'.$NewName.'`')) {
+            throw new Exception(sprintf(t('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
         }
 
         return true;
@@ -163,24 +161,24 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param string $Query The actual query to create as the view. Typically
      * this can be generated with the $Database object.
      */
-    public function View($Name, $SQL) {
+    public function view($Name, $SQL) {
         if (is_string($SQL)) {
             $SQLString = $SQL;
             $SQL = null;
         } else {
-            $SQLString = $SQL->GetSelect();
+            $SQLString = $SQL->getSelect();
         }
 
-        $Result = $this->Query('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
+        $Result = $this->query('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
         if (!is_null($SQL)) {
-            $SQL->Reset();
+            $SQL->reset();
         }
     }
 
     /**
      * Creates the table defined with $this->Table() and $this->Column().
      */
-    protected function _Create() {
+    protected function _create() {
         $PrimaryKey = array();
         $UniqueKey = array();
         $FullTextKey = array();
@@ -192,7 +190,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $ForceDatabaseEngine = C('Database.ForceStorageEngine');
         if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
             $this->_TableStorageEngine = $ForceDatabaseEngine;
-            $AllowFullText = $this->_SupportsFulltext();
+            $AllowFullText = $this->_supportsFulltext();
         }
 
         foreach ($this->_Columns as $ColumnName => $Column) {
@@ -200,14 +198,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $Sql .= ',';
             }
 
-            $Sql .= "\n".$this->_DefineColumn($Column);
+            $Sql .= "\n".$this->_defineColumn($Column);
 
             $ColumnKeyTypes = (array)$Column->KeyType;
 
             foreach ($ColumnKeyTypes as $ColumnKeyType) {
                 $KeyTypeParts = explode('.', $ColumnKeyType, 2);
                 $ColumnKeyType = $KeyTypeParts[0];
-                $IndexGroup = GetValue(1, $KeyTypeParts, '');
+                $IndexGroup = val(1, $KeyTypeParts, '');
 
                 if ($ColumnKeyType == 'primary') {
                     $PrimaryKey[] = $ColumnName;
@@ -227,15 +225,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
         // Build unique keys.
         if (count($UniqueKey) > 0) {
-            $Keys .= ",\nunique index `".Gdn_Format::AlphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
+            $Keys .= ",\nunique index `".Gdn_Format::alphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
         }
         // Build full text index.
         if (count($FullTextKey) > 0) {
-            $Keys .= ",\nfulltext index `".Gdn_Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
+            $Keys .= ",\nfulltext index `".Gdn_Format::alphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
         }
         // Build the rest of the keys.
         foreach ($Indexes as $IndexType => $IndexGroups) {
-            $CreateString = ArrayValue($IndexType, array('FK' => 'key', 'IX' => 'index'));
+            $CreateString = arrayValue($IndexType, array('FK' => 'key', 'IX' => 'index'));
             foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
                 if (!$IndexGroup) {
                     foreach ($ColumnNames as $ColumnName) {
@@ -269,7 +267,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $this->_TableStorageEngine = C('Database.DefaultStorageEngine', 'innodb');
             }
 
-            if (!$this->HasEngine($this->_TableStorageEngine)) {
+            if (!$this->hasEngine($this->_TableStorageEngine)) {
                 $this->_TableStorageEngine = 'myisam';
             }
         }
@@ -288,8 +286,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $Sql .= ';';
 
-        $Result = $this->Query($Sql);
-        $this->Reset();
+        $Result = $this->query($Sql);
+        $this->reset();
 
         return $Result;
     }
@@ -305,7 +303,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $collation = strtolower($collation);
 
         if (!isset($cache[$collation])) {
-            $collationRow = $this->Database->Query('show collation where Collation = :c', array(':c' => $collation))->FirstRow(DATASET_TYPE_ARRAY);
+            $collationRow = $this->Database->query('show collation where Collation = :c', array(':c' => $collation))->firstRow(DATASET_TYPE_ARRAY);
             $cache[$collation] = val('Charset', $collationRow, '');
         }
 
@@ -320,7 +318,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      */
     protected function getTableInfo($tableName) {
         $pxName = $this->_DatabasePrefix.$tableName;
-        $status = $this->Database->Query("show table status where name = '$pxName'")->FirstRow(DATASET_TYPE_ARRAY);
+        $status = $this->Database->query("show table status where name = '$pxName'")->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$status) {
             return null;
@@ -340,7 +338,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param bool $KeyType
      * @return array
      */
-    protected function _IndexSql($Columns, $KeyType = false) {
+    protected function _indexSql($Columns, $KeyType = false) {
 //      if ($this->TableName() != 'Comment')
 //         return array();
 
@@ -356,14 +354,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             foreach ($ColumnKeyTypes as $ColumnKeyType) {
                 $Parts = explode('.', $ColumnKeyType, 2);
                 $ColumnKeyType = $Parts[0];
-                $IndexGroup = GetValue(1, $Parts, '');
+                $IndexGroup = val(1, $Parts, '');
 
                 if (!$ColumnKeyType || ($KeyType && $KeyType != $ColumnKeyType)) {
                     continue;
                 }
 
                 // Don't add a fulltext if we don't support.
-                if ($ColumnKeyType == 'fulltext' && !$this->_SupportsFulltext()) {
+                if ($ColumnKeyType == 'fulltext' && !$this->_supportsFulltext()) {
                     continue;
                 }
 
@@ -404,8 +402,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      *
      * @return array
      */
-    public function IndexSqlDb() {
-        return $this->_IndexSqlDb();
+    public function indexSqlDb() {
+        return $this->_indexSqlDb();
     }
 
     /**
@@ -413,9 +411,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      *
      * @return array
      */
-    protected function _IndexSqlDb() {
+    protected function _indexSqlDb() {
         // We don't want this to be captured so send it directly.
-        $Data = $this->Database->Query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
+        $Data = $this->Database->query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
 
         $Result = array();
         foreach ($Data as $Row) {
@@ -468,7 +466,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param boolean $Explicit If TRUE, this method will remove any columns from the table that were not
      * defined with $this->Column().
      */
-    protected function _Modify($Explicit = false) {
+    protected function _modify($Explicit = false) {
         $Px = $this->_DatabasePrefix;
         $AdditionalSql = array(); // statements executed at the end
         $tableInfo = $this->getTableInfo($this->_TableName);
@@ -476,7 +474,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Returns an array of schema data objects for each field in the specified
         // table. The returned array of objects contains the following properties:
         // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
-        $ExistingColumns = $this->ExistingColumns();
+        $ExistingColumns = $this->existingColumns();
         $AlterSql = array();
 
         // 1. Remove any unnecessary columns if this is an explicit modification
@@ -494,32 +492,32 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName."`\n";
 
         // 2. Alter the table storage engine.
-        $ForceDatabaseEngine = C('Database.ForceStorageEngine');
+        $ForceDatabaseEngine = c('Database.ForceStorageEngine');
         if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
             $this->_TableStorageEngine = $ForceDatabaseEngine;
         }
-        $Indexes = $this->_IndexSql($this->_Columns);
-        $IndexesDb = $this->_IndexSqlDb();
+        $Indexes = $this->_indexSql($this->_Columns);
+        $IndexesDb = $this->_indexSqlDb();
 
         if ($this->_TableStorageEngine) {
             $CurrentEngine = val('engine', $tableInfo);
 
             if (strcasecmp($CurrentEngine, $this->_TableStorageEngine)) {
                 // Check to drop a fulltext index if we don't support it.
-                if (!$this->_SupportsFulltext()) {
+                if (!$this->_supportsFulltext()) {
                     foreach ($IndexesDb as $IndexName => $IndexSql) {
                         if (StringBeginsWith($IndexSql, 'fulltext', true)) {
                             $DropIndexQuery = "$AlterSqlPrefix drop index $IndexName;\n";
-                            if (!$this->Query($DropIndexQuery)) {
-                                throw new Exception(sprintf(T('Failed to drop the index `%1$s` on table `%2$s`.'), $IndexName, $this->_TableName));
+                            if (!$this->query($DropIndexQuery)) {
+                                throw new Exception(sprintf(t('Failed to drop the index `%1$s` on table `%2$s`.'), $IndexName, $this->_TableName));
                             }
                         }
                     }
                 }
 
                 $EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
-                if (!$this->Query($EngineQuery)) {
-                    throw new Exception(sprintf(T('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
+                if (!$this->query($EngineQuery)) {
+                    throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
                 }
             }
         }
@@ -533,7 +531,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         foreach ($this->_Columns as $ColumnName => $Column) {
             if (!array_key_exists($ColumnName, $ExistingColumns)) {
                 // This column name is not in the existing column collection, so add the column
-                $AddColumnSql = 'add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns));
+                $AddColumnSql = 'add '.$this->_defineColumn(val($ColumnName, $this->_Columns));
                 if ($PrevColumnName !== false) {
                     $AddColumnSql .= " after `$PrevColumnName`";
                 }
@@ -545,13 +543,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             } else {
                 $ExistingColumn = $ExistingColumns[$ColumnName];
 
-                $ExistingColumnDef = $this->_DefineColumn($ExistingColumn);
-                $ColumnDef = $this->_DefineColumn($Column);
+                $ExistingColumnDef = $this->_defineColumn($ExistingColumn);
+                $ColumnDef = $this->_defineColumn($Column);
                 $Comment = "/* Existing: $ExistingColumnDef, New: $ColumnDef */\n";
 
                 if ($ExistingColumnDef != $ColumnDef) {  //$Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
                     // The existing & new column types do not match, so modify the column.
-                    $ChangeSql = $Comment.'change `'.$ColumnName.'` '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns));
+                    $ChangeSql = $Comment.'change `'.$ColumnName.'` '.$this->_defineColumn(val($ColumnName, $this->_Columns));
                     $AlterSql[] = $ChangeSql;
 //					if (!$this->Query($AlterSqlPrefix.$ChangeSql))
 //						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
@@ -559,7 +557,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 //                     $this->_DatabasePrefix.$this->_TableName));
 
                     // Check for a modification from an enum to an int.
-                    if (strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->Types('int'))) {
+                    if (strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->types('int'))) {
                         $Sql = "update `$Px{$this->_TableName}` set `$ColumnName` = case `$ColumnName`";
                         foreach ($ExistingColumn->Enum as $Index => $NewValue) {
                             $OldValue = $Index + 1;
@@ -594,7 +592,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         if (count($AlterSql) > 0) {
-            if (!$this->Query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
+            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
                 throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }
@@ -632,7 +630,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Modify all of the indexes.
         foreach ($IndexSql as $Name => $Sqls) {
             foreach ($Sqls as $Sql) {
-                if (!$this->Query($Sql)) {
+                if (!$this->query($Sql)) {
                     throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $Name, $this->_TableName));
                 }
             }
@@ -640,12 +638,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         // Run any additional Sql.
         foreach ($AdditionalSql as $Description => $Sql) {
-            if (!$this->Query($Sql)) {
+            if (!$this->query($Sql)) {
                 throw new Exception("Error modifying table: {$Description}.");
             }
         }
 
-        $this->Reset();
+        $this->reset();
         return true;
     }
 
@@ -654,7 +652,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      *
      * @param string $Column
      */
-    protected function _DefineColumn($Column) {
+    protected function _defineColumn($Column) {
         $ValidColumnTypes = array(
             'tinyint',
             'smallint',
@@ -683,12 +681,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         );
 
         if (!is_array($Column->Type) && !in_array(strtolower($Column->Type), $ValidColumnTypes)) {
-            throw new Exception(sprintf(T('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
+            throw new Exception(sprintf(t('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
         }
 
         $Return = '`'.$Column->Name.'` '.$Column->Type;
 
-        $LengthTypes = $this->Types('length');
+        $LengthTypes = $this->types('length');
         if ($Column->Length != '' && in_array(strtolower($Column->Type), $LengthTypes)) {
             if ($Column->Precision != '') {
                 $Return .= '('.$Column->Length.', '.$Column->Precision.')';
@@ -711,7 +709,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         if (!(is_null($Column->Default)) && strcasecmp($Column->Type, 'timestamp') != 0) {
-            $Return .= " default ".self::_QuoteValue($Column->Default);
+            $Return .= " default ".self::_quoteValue($Column->Default);
         }
 
         if ($Column->AutoIncrement) {
@@ -727,7 +725,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @param $Value
      * @return string
      */
-    protected static function _QuoteValue($Value) {
+    protected static function _quoteValue($Value) {
         if (is_numeric($Value)) {
             return $Value;
         } elseif (is_bool($Value)) {
@@ -742,7 +740,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      *
      * @return bool
      */
-    protected function _SupportsFulltext() {
+    protected function _supportsFulltext() {
         return strcasecmp($this->_TableStorageEngine, 'myisam') == 0;
     }
 }

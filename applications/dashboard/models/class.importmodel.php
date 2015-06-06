@@ -100,7 +100,7 @@ class ImportModel extends Gdn_Model {
     );
 
     /** @var Gdn_Timer Used for timing various long running methods to break them up into pieces. */
-    public $Timer = NULL;
+    public $Timer = null;
 
     /**
      * Set the import path.
@@ -125,7 +125,7 @@ class ImportModel extends Gdn_Model {
 
         $ActivityModel = new ActivityModel();
         $ActivityModel->Add(Gdn::Session()->UserID, 'Import', $Story);
-        return TRUE;
+        return true;
     }
 
     /**
@@ -153,12 +153,12 @@ class ImportModel extends Gdn_Model {
 
         // Get the max UserID so we can increment new users.
         $MaxID = $this->Query('select max(UserID) as MaxID from :_User')->Value('MaxID', 0);
-        $MinID = $this->Query('select min(UserID) as MinID from :_zUser where _NewID is null')->Value('MinID', NULL);
+        $MinID = $this->Query('select min(UserID) as MinID from :_zUser where _NewID is null')->Value('MinID', null);
 
         if (is_null($MinID)) {
             //$this->Timer->Split('No more IDs to update');
             // No more IDs to update.
-            return TRUE;
+            return true;
         }
 
         $IDInc = $MaxID - $MinID + self::ID_PADDING;
@@ -179,7 +179,7 @@ class ImportModel extends Gdn_Model {
          where i._NewID is null";
         $this->Query($Sql);
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -193,7 +193,7 @@ class ImportModel extends Gdn_Model {
         $this->_AssignIDs('Discussion');
         $this->_AssignIDs('Comment');
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -204,12 +204,14 @@ class ImportModel extends Gdn_Model {
      * @param null $SecondaryKey
      * @return bool|void
      */
-    protected function _AssignIDs($TableName, $PrimaryKey = NULL, $SecondaryKey = NULL) {
-        if (!array_key_exists($TableName, $this->Tables()))
+    protected function _AssignIDs($TableName, $PrimaryKey = null, $SecondaryKey = null) {
+        if (!array_key_exists($TableName, $this->Tables())) {
             return;
+        }
 
-        if (!$PrimaryKey)
+        if (!$PrimaryKey) {
             $PrimaryKey = $TableName.'ID';
+        }
 
         // Assign existing IDs.
         if ($SecondaryKey) {
@@ -222,17 +224,18 @@ class ImportModel extends Gdn_Model {
 
         // Get new IDs.
         $MaxID = $this->Query("select max($PrimaryKey) as MaxID from :_$TableName")->Value('MaxID', 0);
-        $MinID = $this->Query("select min($PrimaryKey) as MinID from :_z$TableName where _NewID is null")->Value('MinID', NULL);
+        $MinID = $this->Query("select min($PrimaryKey) as MinID from :_z$TableName where _NewID is null")->Value('MinID', null);
 
         if (is_null($MinID)) {
             //$this->Timer->Split('No more IDs to update');
             // No more IDs to update.
-            return TRUE;
+            return true;
         }
-        if ($MaxID == 0)
+        if ($MaxID == 0) {
             $IDInc = 0;
-        else
+        } else {
             $IDInc = $MaxID - $MinID + self::ID_PADDING;
+        }
 
         $Sql = "update :_z$TableName i
          set i._NewID = i.$PrimaryKey + $IDInc, i._Action = 'Insert'
@@ -251,9 +254,9 @@ class ImportModel extends Gdn_Model {
 
         $Data = Gdn::SQL()->GetWhere('zUser', array('Email' => $OverwriteEmail));
         if ($Data->NumRows() == 0) {
-            $Result = FALSE;
+            $Result = false;
         } else {
-            $Result = TRUE;
+            $Result = true;
         }
         if (!$Result) {
             $this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
@@ -273,10 +276,11 @@ class ImportModel extends Gdn_Model {
         PermissionModel::ResetAllRoles();
 
         $Imp = $this->GetCustomImportModel();
-        if ($Imp !== NULL)
+        if ($Imp !== null) {
             $Imp->AfterImport();
+        }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -286,8 +290,8 @@ class ImportModel extends Gdn_Model {
      * @param null $Value
      * @return mixed
      */
-    public function Data($Key, $Value = NULL) {
-        if ($Value === NULL) {
+    public function Data($Key, $Value = null) {
+        if ($Value === null) {
             return GetValue($Key, $this->Data);
         }
         $this->Data[$Key] = $Value;
@@ -307,8 +311,9 @@ class ImportModel extends Gdn_Model {
 
         foreach ($Tables as $Table => $TableInfo) {
             $Columns = $TableInfo['Columns'];
-            if (!is_array($Columns) || count($Columns) == 0)
+            if (!is_array($Columns) || count($Columns) == 0) {
                 throw new Gdn_UserException(sprintf(T('The %s table is not in the correct format.', $Table)));
+            }
 
 
             $St->Table(self::TABLE_PREFIX.$Table);
@@ -317,15 +322,16 @@ class ImportModel extends Gdn_Model {
                 $DestStructure->Reset()->Get($Table);
             } catch (Exception $Ex) {
                 // Trying to import into a non-existant table.
-                $Tables[$Table]['Skip'] = TRUE;
+                $Tables[$Table]['Skip'] = true;
                 continue;
             }
             //$DestColumns = $DestStructure->Columns();
-            $DestModified = FALSE;
+            $DestModified = false;
 
             foreach ($Columns as $Name => $Type) {
-                if (!$Name)
+                if (!$Name) {
                     throw new Gdn_UserException(sprintf(T('The %s table is not in the correct format.'), $Table));
+                }
 
                 if ($DestStructure->ColumnExists($Name)) {
                     $StructureType = $DestStructure->ColumnTypeString($DestStructure->Columns($Name));
@@ -339,41 +345,44 @@ class ImportModel extends Gdn_Model {
                 } elseif (!StringBeginsWith($Name, '_')) {
                     $StructureType = $Type;
 
-                    if (!$StructureType)
+                    if (!$StructureType) {
                         $StructureType = 'varchar(255)';
+                    }
 
                     // This is a new column so it needs to be added to the destination table too.
-                    $DestStructure->Column($Name, $StructureType, NULL);
-                    $DestModified = TRUE;
+                    $DestStructure->Column($Name, $StructureType, null);
+                    $DestModified = true;
                 } elseif ($Type) {
                     $StructureType = $Type;
                 } else {
                     $StructureType = 'varchar(255)';
                 }
 
-                $St->Column($Name, $StructureType, NULL);
+                $St->Column($Name, $StructureType, null);
             }
             // Add a new ID column.
             if (array_key_exists($Table.'ID', $Columns)) {
                 $St
-                    ->Column('_NewID', $DestStructure->ColumnTypeString($Table.'ID'), NULL)
-                    ->Column('_Action', array('Insert', 'Update'), NULL);
+                    ->Column('_NewID', $DestStructure->ColumnTypeString($Table.'ID'), null)
+                    ->Column('_Action', array('Insert', 'Update'), null);
             }
 
             try {
-                if (!$this->IsDbSource())
-                    $St->Set(TRUE, TRUE);
-                else
+                if (!$this->IsDbSource()) {
+                    $St->Set(true, true);
+                } else {
                     $St->Reset();
+                }
 
-                if ($DestModified)
+                if ($DestModified) {
                     $DestStructure->Set();
+                }
             } catch (Exception $Ex) {
                 // Since these exceptions are likely caused by a faulty import file they should be considered user exceptions.
                 throw new Gdn_UserException(sprintf(T('There was an error while trying to create the %s table (%s).'), $Table, $Ex->getMessage())); //, $Ex);
             }
         }
-        return TRUE;
+        return true;
     }
 
     /**
@@ -387,8 +396,9 @@ class ImportModel extends Gdn_Model {
         $DestStructure = clone Gdn::Structure();
 
         foreach ($this->Tables() as $Table => $TableInfo) {
-            if (GetValue('Skip', $TableInfo))
+            if (GetValue('Skip', $TableInfo)) {
                 continue;
+            }
 
             $St->Table(self::TABLE_PREFIX.$Table);
             $Columns = $TableInfo['Columns'];
@@ -398,34 +408,38 @@ class ImportModel extends Gdn_Model {
 
             // Check to index the primary key.
             $Col = $Table.'ID';
-            if (array_key_exists($Col, $Columns))
-                $St->Column($Col, $Columns[$Col] ? $Columns[$Col] : $DestStructure->ColumnTypeString($Col), NULL, 'index');
+            if (array_key_exists($Col, $Columns)) {
+                $St->Column($Col, $Columns[$Col] ? $Columns[$Col] : $DestStructure->ColumnTypeString($Col), null, 'index');
+            }
 
             if ($Table == 'User') {
                 $St
-                    ->Column('Name', $DestStructure->ColumnTypeString('Name'), NULL, 'index')
-                    ->Column('Email', $DestStructure->ColumnTypeString('Email'), NULL, 'index')
-                    ->Column('_NewID', 'int', NULL, 'index');
+                    ->Column('Name', $DestStructure->ColumnTypeString('Name'), null, 'index')
+                    ->Column('Email', $DestStructure->ColumnTypeString('Email'), null, 'index')
+                    ->Column('_NewID', 'int', null, 'index');
             }
 
-            if (count($St->Columns()) > 0)
+            if (count($St->Columns()) > 0) {
                 $St->Set();
+            }
         }
-        return TRUE;
+        return true;
     }
 
     /**
      *
      */
     public function DeleteFiles() {
-        if (StringBeginsWith($this->ImportPath, 'Db:', TRUE))
+        if (StringBeginsWith($this->ImportPath, 'Db:', true)) {
             return;
+        }
 
         $St = Gdn::Structure();
         foreach (GetValue('Tables', $this->Data, array()) as $Table => $TableInfo) {
             $Path = GetValue('Path', $TableInfo, '');
-            if (file_exists($Path))
+            if (file_exists($Path)) {
                 unlink($Path);
+            }
 
             // Drop the import table.
             $St->Table("z$Table")->Drop();
@@ -454,26 +468,29 @@ class ImportModel extends Gdn_Model {
             // Make sure the table exists.
             $Exists = Gdn::Structure()->Table($Table)->TableExists();
             Gdn::Structure()->Reset();
-            if (!$Exists)
+            if (!$Exists) {
                 continue;
+            }
 
             $this->Data['CurrentStepMessage'] = $Table;
 
-            if ($Table == 'Permission')
+            if ($Table == 'Permission') {
                 $this->SQL->Delete($Table, array('RoleID <>' => 0));
-            else
+            } else {
                 $this->SQL->Truncate($Table);
+            }
             if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
                 // The step's taken too long. Save the state and return.
                 $this->Data['CurrentSubstep'] = $i + 1;
-                return FALSE;
+                return false;
             }
         }
-        if (isset($this->Data['CurrentSubstep']))
+        if (isset($this->Data['CurrentSubstep'])) {
             unset($this->Data['CurrentSubstep']);
+        }
 
         $this->Data['CurrentStepMessage'] = '';
-        return TRUE;
+        return true;
     }
 
     /**
@@ -489,12 +506,15 @@ class ImportModel extends Gdn_Model {
      * @param $Post
      */
     public function FromPost($Post) {
-        if (isset($Post['Overwrite']))
+        if (isset($Post['Overwrite'])) {
             $this->Data['Overwrite'] = $Post['Overwrite'];
-        if (isset($Post['Email']))
+        }
+        if (isset($Post['Email'])) {
             $this->Data['OverwriteEmail'] = $Post['Email'];
-        if (isset($Post['GenerateSQL']))
+        }
+        if (isset($Post['GenerateSQL'])) {
             $this->Data['GenerateSQL'] = $Post['GenerateSQL'];
+        }
     }
 
     /**
@@ -503,7 +523,7 @@ class ImportModel extends Gdn_Model {
      * @param null $Value
      * @return mixed
      */
-    public function GenerateSQL($Value = NULL) {
+    public function GenerateSQL($Value = null) {
         return $this->Data('GenerateSQL', $Value);
     }
 
@@ -519,8 +539,15 @@ class ImportModel extends Gdn_Model {
      * @param string $ChildJoinColumn
      * @return Gdn_DataSet
      */
-    public function GetCountSQL($Aggregate, $ParentTable, $ChildTable,
-        $ParentColumnName = '', $ChildColumnName = '', $ParentJoinColumn = '', $ChildJoinColumn = '') {
+    public function GetCountSQL(
+        $Aggregate,
+        $ParentTable,
+        $ChildTable,
+        $ParentColumnName = '',
+        $ChildColumnName = '',
+        $ParentJoinColumn = '',
+        $ChildJoinColumn = ''
+    ) {
 
         if (!$ParentColumnName) {
             switch (strtolower($Aggregate)) {
@@ -539,13 +566,16 @@ class ImportModel extends Gdn_Model {
             }
         }
 
-        if (!$ChildColumnName)
+        if (!$ChildColumnName) {
             $ChildColumnName = $ChildTable.'ID';
+        }
 
-        if (!$ParentJoinColumn)
+        if (!$ParentJoinColumn) {
             $ParentJoinColumn = $ParentTable.'ID';
-        if (!$ChildJoinColumn)
+        }
+        if (!$ChildJoinColumn) {
             $ChildJoinColumn = $ParentJoinColumn;
+        }
 
         $Result = "update :_$ParentTable p
                   set p.$ParentColumnName = (
@@ -559,7 +589,7 @@ class ImportModel extends Gdn_Model {
      * Get a custom import model based on the import's source.
      */
     public function GetCustomImportModel() {
-        $Result = NULL;
+        $Result = null;
 
         // Get import type name.
         $Header = $this->GetImportHeader();
@@ -584,7 +614,7 @@ class ImportModel extends Gdn_Model {
         $D = $this->Data;
         $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
         $Post['Email'] = GetValue('OverwriteEmail', $D, '');
-        $Post['GenerateSQL'] = GetValue('GenerateSQL', $D, FALSE);
+        $Post['GenerateSQL'] = GetValue('GenerateSQL', $D, false);
     }
 
     /**
@@ -598,20 +628,22 @@ class ImportModel extends Gdn_Model {
      */
     public static function FGetCSV2($fp, $Delim = ',', $Quote = '"', $Escape = "\\") {
         // Get the full line, considering escaped returns.
-        $Line = FALSE;
+        $Line = false;
         do {
             $s = fgets($fp);
             //echo "<fgets>$s</fgets><br/>\n";
 
-            if ($s === FALSE) {
-                if ($Line === FALSE)
-                    return FALSE;
+            if ($s === false) {
+                if ($Line === false) {
+                    return false;
+                }
             }
 
-            if ($Line === FALSE)
+            if ($Line === false) {
                 $Line = $s;
-            else
+            } else {
                 $Line .= $s;
+            }
         } while (strlen($s) > 1 && substr($s, -2, 1) === $Escape);
 
         $Line = trim($Line, "\n");
@@ -621,8 +653,8 @@ class ImportModel extends Gdn_Model {
 
         // Loop through the line and split on the delimiter.
         $Strlen = strlen($Line);
-        $InEscape = FALSE;
-        $InQuote = FALSE;
+        $InEscape = false;
+        $InQuote = false;
         $Token = '';
         for ($i = 0; $i < $Strlen; ++$i) {
             $c = $Line[$i];
@@ -630,15 +662,15 @@ class ImportModel extends Gdn_Model {
             if ($InEscape) {
                 // Check for an escaped null.
                 if ($c == 'N' && strlen($Token) == 0) {
-                    $Token = NULL;
+                    $Token = null;
                 } else {
                     $Token .= $c;
                 }
-                $InEscape = FALSE;
+                $InEscape = false;
             } else {
                 switch ($c) {
                     case $Escape:
-                        $InEscape = TRUE;
+                        $InEscape = true;
                         break;
                     case $Delim:
                         $Result[] = $Token;
@@ -665,33 +697,37 @@ class ImportModel extends Gdn_Model {
      * @return array|mixed|string
      * @throws Gdn_UserException
      */
-    public function GetImportHeader($fpin = NULL) {
+    public function GetImportHeader($fpin = null) {
         $Header = GetValue('Header', $this->Data);
-        if ($Header)
+        if ($Header) {
             return $Header;
+        }
 
         if (is_null($fpin)) {
-            if (!$this->ImportPath || !file_exists($this->ImportPath))
+            if (!$this->ImportPath || !file_exists($this->ImportPath)) {
                 return array();
-            ini_set('auto_detect_line_endings', TRUE);
+            }
+            ini_set('auto_detect_line_endings', true);
 
             if (!is_readable($this->ImportPath)) {
                 throw new Gdn_UserException(T('The input file is not readable.', 'The input file is not readable.  Please check permissions and try again.'));
             }
 
             $fpin = gzopen($this->ImportPath, 'rb');
-            $fpopened = TRUE;
+            $fpopened = true;
         }
 
         $Header = fgets($fpin);
         if (!$Header || strlen($Header) < 7 || substr_compare('Vanilla', $Header, 0, 7) != 0) {
-            if (isset($fpopened))
+            if (isset($fpopened)) {
                 fclose($fpin);
+            }
             throw new Gdn_UserException(T('The import file is not in the correct format.'));
         }
         $Header = $this->ParseInfoLine($Header);
-        if (isset($fpopened))
+        if (isset($fpopened)) {
             fclose($fpin);
+        }
         $this->Data['Header'] = $Header;
         return $Header;
     }
@@ -704,18 +740,23 @@ class ImportModel extends Gdn_Model {
      */
     public function GetPasswordHashMethod() {
         $HashMethod = GetValue('HashMethod', $this->GetImportHeader());
-        if ($HashMethod)
+        if ($HashMethod) {
             return $HashMethod;
+        }
 
         $Source = GetValue('Source', $this->GetImportHeader());
-        if (!$Source)
+        if (!$Source) {
             return 'Unknown';
-        if (substr_compare('Vanilla', $Source, 0, 7, FALSE) == 0)
+        }
+        if (substr_compare('Vanilla', $Source, 0, 7, false) == 0) {
             return 'Vanilla';
-        if (substr_compare('vBulletin', $Source, 0, 9, FALSE) == 0)
+        }
+        if (substr_compare('vBulletin', $Source, 0, 9, false) == 0) {
             return 'vBulletin';
-        if (substr_compare('phpBB', $Source, 0, 5, FALSE) == 0)
+        }
+        if (substr_compare('phpBB', $Source, 0, 5, false) == 0) {
             return 'phpBB';
+        }
         return 'Unknown';
     }
 
@@ -726,14 +767,16 @@ class ImportModel extends Gdn_Model {
      * @return bool
      */
     public function ImportExists($Table, $Column = '') {
-        if (!array_key_exists('Tables', $this->Data) || !array_key_exists($Table, $this->Data['Tables']))
+        if (!array_key_exists('Tables', $this->Data) || !array_key_exists($Table, $this->Data['Tables'])) {
             return false;
-        if (!$Column)
-            return TRUE;
+        }
+        if (!$Column) {
+            return true;
+        }
         $Tables = $this->Data['Tables'];
 
-        $Exists = GetValueR("Tables.$Table.Columns.$Column", $this->Data, FALSE);
-        return $Exists !== FALSE;
+        $Exists = GetValueR("Tables.$Table.Columns.$Column", $this->Data, false);
+        return $Exists !== false;
     }
 
     /**
@@ -743,8 +786,8 @@ class ImportModel extends Gdn_Model {
      */
     public function Initialize() {
         if ($this->GenerateSQL()) {
-            $this->SQL->CaptureModifications = TRUE;
-            Gdn::Structure()->CaptureOnly = TRUE;
+            $this->SQL->CaptureModifications = true;
+            Gdn::Structure()->CaptureOnly = true;
             $this->Database->CapturedSql = array();
 
             $SQLPath = $this->Data('SQLPath');
@@ -758,7 +801,7 @@ class ImportModel extends Gdn_Model {
             RemoveFromConfig('Garden.SystemUserID');
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -836,19 +879,22 @@ class ImportModel extends Gdn_Model {
                     }
                 }
 
-                $Tables[$TableName]['Inserted'] = TRUE;
-                if (isset($RowCount))
+                $Tables[$TableName]['Inserted'] = true;
+                if (isset($RowCount)) {
                     $Tables[$TableName]['RowCount'] = $RowCount;
+                }
                 $InsertedCount++;
                 // Make sure the loading isn't taking too long.
-                if ($Timer->ElapsedTime() > $this->MaxStepTime)
+                if ($Timer->ElapsedTime() > $this->MaxStepTime) {
                     break;
+                }
             }
         }
 
         $Result = $InsertedCount == count($this->Tables());
-        if ($Result)
+        if ($Result) {
             $this->Data['CurrentStepMessage'] = '';
+        }
         return $Result;
     }
 
@@ -870,18 +916,21 @@ class ImportModel extends Gdn_Model {
      * @return bool|int|void
      */
     protected function _InsertTable($TableName, $Sets = array()) {
-        if (!array_key_exists($TableName, $this->Tables()))
+        if (!array_key_exists($TableName, $this->Tables())) {
             return;
+        }
 
-        if (!Gdn::Structure()->TableExists($TableName))
+        if (!Gdn::Structure()->TableExists($TableName)) {
             return 0;
+        }
 
         $TableInfo =& $this->Tables($TableName);
         $Columns = $TableInfo['Columns'];
 
         foreach ($Columns as $Key => $Value) {
-            if (StringBeginsWith($Key, '_'))
+            if (StringBeginsWith($Key, '_')) {
                 unset($Columns[$Key]);
+            }
         }
 
         // Build the column insert list.
@@ -952,7 +1001,7 @@ class ImportModel extends Gdn_Model {
         if ($RowCount > 0) {
             return (int)$RowCount;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -977,9 +1026,9 @@ class ImportModel extends Gdn_Model {
 
         if ($this->ImportExists('Permission', 'JunctionTable')) {
             $ColumnSets = array(array_merge($GlobalColumns, $JunctionColumns));
-            $ColumnSets[0]['JunctionTable'] = NULL;
-            $ColumnSets[0]['JunctionColumn'] = NULL;
-            $ColumnSets[0]['JunctionID'] = NULL;
+            $ColumnSets[0]['JunctionTable'] = null;
+            $ColumnSets[0]['JunctionColumn'] = null;
+            $ColumnSets[0]['JunctionID'] = null;
         } else {
             $ColumnSets = array($GlobalColumns, $JunctionColumns);
         }
@@ -993,7 +1042,7 @@ class ImportModel extends Gdn_Model {
                 $Set['RoleID'] = $Row['RoleID'];
 
                 foreach ($Presets as $Preset) {
-                    if (strpos($Preset, '.') !== FALSE) {
+                    if (strpos($Preset, '.') !== false) {
                         // This preset is a specific permission.
 
                         if (array_key_exists($Preset, $ColumnSet)) {
@@ -1005,18 +1054,19 @@ class ImportModel extends Gdn_Model {
 
 
                     foreach ($ColumnSet as $ColumnName => $Default) {
-                        if (isset($Row[$ColumnName]))
+                        if (isset($Row[$ColumnName])) {
                             $Value = $Row[$ColumnName];
-                        elseif (strpos($ColumnName, '.') === FALSE)
+                        } elseif (strpos($ColumnName, '.') === false)
                             $Value = $Default;
                         elseif ($Preset == 'all')
                             $Value = 1;
                         elseif ($Preset == 'view')
-                            $Value = StringEndsWith($ColumnName, 'View', TRUE) && !in_array($ColumnName, array('Garden.Settings.View'));
+                            $Value = StringEndsWith($ColumnName, 'View', true) && !in_array($ColumnName, array('Garden.Settings.View'));
                         elseif ($Preset == $ColumnName)
                             $Value = 1;
-                        else
+                        else {
                             $Value = $Default & 1;
+                        }
 
                         $Set["`$ColumnName`"] = $Value;
                     }
@@ -1025,7 +1075,7 @@ class ImportModel extends Gdn_Model {
                 unset($Set);
             }
         }
-        return TRUE;
+        return true;
     }
 
     /**
@@ -1043,11 +1093,12 @@ class ImportModel extends Gdn_Model {
 
         // Load the new user table.
         $UserTableInfo =& $this->Data['Tables']['User'];
-        if (!$this->ImportExists('User', 'HashMethod'))
+        if (!$this->ImportExists('User', 'HashMethod')) {
             $this->_InsertTable('User', array('HashMethod' => $this->GetPasswordHashMethod()));
-        else
+        } else {
             $this->_InsertTable('User');
-        $UserTableInfo['Inserted'] = TRUE;
+        }
+        $UserTableInfo['Inserted'] = true;
 
         $AdminEmail = GetValue('OverwriteEmail', $this->Data);
         $SqlArgs = array(':Email' => $AdminEmail);
@@ -1076,12 +1127,13 @@ class ImportModel extends Gdn_Model {
 
         // Start the new session.
         $User = Gdn::UserModel()->GetByEmail(GetValue('OverwriteEmail', $this->Data));
-        if (!$User)
+        if (!$User) {
             $User = Gdn::UserModel()->GetByUsername(GetValue('OverwriteEmail', $this->Data));
+        }
 
-        Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
+        Gdn::Session()->Start(GetValue('UserID', $User), true);
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -1090,7 +1142,7 @@ class ImportModel extends Gdn_Model {
      * @return bool|string
      */
     public function IsDbSource() {
-        return StringBeginsWith($this->ImportPath, 'Db:', TRUE);
+        return StringBeginsWith($this->ImportPath, 'Db:', true);
     }
 
     /**
@@ -1101,12 +1153,14 @@ class ImportModel extends Gdn_Model {
      * @throws Gdn_UserException
      */
     public function LoadUserTable() {
-        if (!$this->ImportExists('User'))
+        if (!$this->ImportExists('User')) {
             throw new Gdn_UserException(T('The user table was not in the import file.'));
+        }
         $UserTableInfo =& $this->Data['Tables']['User'];
         $Result = $this->LoadTable('User', $UserTableInfo['Path']);
-        if ($Result)
-            $UserTableInfo['Loaded'] = TRUE;
+        if ($Result) {
+            $UserTableInfo['Loaded'] = true;
+        }
 
         return $Result;
     }
@@ -1136,19 +1190,21 @@ class ImportModel extends Gdn_Model {
                 $this->Data['CurrentStepMessage'] = $Table;
                 $LoadResult = $this->LoadTable($Table, $TableInfo['Path']);
                 if ($LoadResult) {
-                    $this->Data['Tables'][$Table]['Loaded'] = TRUE;
+                    $this->Data['Tables'][$Table]['Loaded'] = true;
                     $LoadedCount++;
                 } else {
                     break;
                 }
             }
             // Make sure the loading isn't taking too long.
-            if ($this->Timer->ElapsedTime() > $this->MaxStepTime)
+            if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
                 break;
+            }
         }
         $Result = $LoadedCount >= count($this->Data['Tables']);
-        if ($Result)
+        if ($Result) {
             $this->Data['CurrentStepMessage'] = '';
+        }
         return $Result;
     }
 
@@ -1162,7 +1218,7 @@ class ImportModel extends Gdn_Model {
      */
     public function LoadTable($Tablename, $Path) {
         $Type = $this->LoadTableType();
-        $Result = TRUE;
+        $Result = true;
 
         switch ($Type) {
             case 'LoadTableOnSameServer':
@@ -1225,10 +1281,10 @@ class ImportModel extends Gdn_Model {
          ignore 1 lines";
 
         // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
-        $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Database.Password'), FALSE, 128);
+        $dblink = mysql_connect(C('Database.Host'), C('Database.User'), C('Database.Password'), false, 128);
         mysql_select_db(C('Database.Name'), $dblink);
         $Result = mysql_query($Sql, $dblink);
-        if ($Result === FALSE) {
+        if ($Result === false) {
             $Ex = new Exception(mysql_error($dblink));
             mysql_close($dblink);
             throw new $Ex;
@@ -1252,7 +1308,7 @@ class ImportModel extends Gdn_Model {
         $ColumnCount = count($St->Columns());
         $St->Reset();
 
-        ini_set('auto_detect_line_endings', TRUE);
+        ini_set('auto_detect_line_endings', true);
         $fp = fopen($Path, 'rb');
 
         // Figure out the current position.
@@ -1284,8 +1340,9 @@ class ImportModel extends Gdn_Model {
             }
 
             // Add the insert values to the sql.
-            if (strlen($Inserts) > 0)
+            if (strlen($Inserts) > 0) {
                 $Inserts .= ',';
+            }
             $Inserts .= '('.implode(',', $Row).')';
 
             if ($Count >= 25) {
@@ -1308,7 +1365,7 @@ class ImportModel extends Gdn_Model {
                     }
 
                     fclose($fp);
-                    return FALSE;
+                    return false;
                 }
             }
         }
@@ -1320,7 +1377,7 @@ class ImportModel extends Gdn_Model {
         }
         unset($this->Data['CurrentLoadPosition']);
         unset($this->Data['CurrentStepMessage']);
-        return TRUE;
+        return true;
     }
 
     /**
@@ -1330,19 +1387,21 @@ class ImportModel extends Gdn_Model {
      * @return bool|mixed|string
      * @throws Exception
      */
-    public function LoadTableType($Save = TRUE) {
-        $Result = GetValue('LoadTableType', $this->Data, FALSE);
+    public function LoadTableType($Save = true) {
+        $Result = GetValue('LoadTableType', $this->Data, false);
 
-        if (is_string($Result))
+        if (is_string($Result)) {
             return $Result;
+        }
 
         // Create a table to test loading.
         $St = Gdn::Structure();
-        $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(TRUE, TRUE);
+        $St->Table(self::TABLE_PREFIX.'Test')->Column('ID', 'int')->Set(true, true);
 
         // Create a test file to load.
-        if (!file_exists(PATH_UPLOADS.'/import'))
+        if (!file_exists(PATH_UPLOADS.'/import')) {
             mkdir(PATH_UPLOADS.'/import');
+        }
 
         $TestPath = PATH_UPLOADS.'/import/test.txt';
         $TestValue = 123;
@@ -1353,10 +1412,11 @@ class ImportModel extends Gdn_Model {
         try {
             $this->_LoadTableOnSameServer('Test', $TestPath);
             $Value = $this->SQL->Get(self::TABLE_PREFIX.'Test')->Value('ID');
-            if ($Value == $TestValue)
+            if ($Value == $TestValue) {
                 $Result = 'LoadTableOnSameServer';
+            }
         } catch (Exception $Ex) {
-            $Result = FALSE;
+            $Result = false;
         }
 
         // Try LoadTableLocalInfile.
@@ -1364,23 +1424,26 @@ class ImportModel extends Gdn_Model {
             try {
                 $this->_LoadTableLocalInfile('Test', $TestPath);
                 $Value = $this->SQL->Get(self::TABLE_PREFIX.'Test')->Value('ID');
-                if ($Value == $TestValue)
+                if ($Value == $TestValue) {
                     $Result = 'LoadTableLocalInfile';
+                }
             } catch (Exception $Ex) {
-                $Result = FALSE;
+                $Result = false;
             }
         }
 
         // If those two didn't work then default to LoadTableWithInsert.
-        if (!$Result)
+        if (!$Result) {
             $Result = 'LoadTableWithInsert';
+        }
 
         // Cleanup.
         @unlink($TestPath);
         $St->Table(self::TABLE_PREFIX.'Test')->Drop();
 
-        if ($Save)
+        if ($Save) {
             $this->Data['LoadTableType'] = $Result;
+        }
         return $Result;
     }
 
@@ -1392,10 +1455,11 @@ class ImportModel extends Gdn_Model {
     public function LocalInfileSupported() {
         $Sql = "show variables like 'local_infile'";
         $Data = $this->Query($Sql)->ResultArray();
-        if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0)
-            return TRUE;
-        else
-            return FALSE;
+        if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -1407,17 +1471,20 @@ class ImportModel extends Gdn_Model {
      * @return mixed
      */
     public function Overwrite($Overwrite = '', $Email = '', $Password = '') {
-        if ($Overwrite == '')
+        if ($Overwrite == '') {
             return GetValue('Overwrite', $this->Data);
+        }
         $this->Data['Overwrite'] = $Overwrite;
         if (strcasecmp($Overwrite, 'Overwrite') == 0) {
             $this->Data['OverwriteEmail'] = $Email;
             $this->Data['OverwritePassword'] = $Password;
         } else {
-            if (isset($this->Data['OverwriteEmail']))
+            if (isset($this->Data['OverwriteEmail'])) {
                 unset($this->Data['OverwriteEmail']);
-            if (isset($this->Data['OverwritePassword']))
+            }
+            if (isset($this->Data['OverwritePassword'])) {
                 unset($this->Data['OverwritePassword']);
+            }
         }
     }
 
@@ -1432,10 +1499,11 @@ class ImportModel extends Gdn_Model {
         $Result = array();
         foreach ($Info as $Item) {
             $PropVal = explode(':', $Item);
-            if (array_key_exists(1, $PropVal))
+            if (array_key_exists(1, $PropVal)) {
                 $Result[trim($PropVal[0])] = trim($PropVal[1]);
-            else
+            } else {
                 $Result[trim($Item)] = '';
+            }
         }
 
         return $Result;
@@ -1454,8 +1522,8 @@ class ImportModel extends Gdn_Model {
 
         $Tables = array();
         foreach ($TableNames as $TableName) {
-            $TableName = StringBeginsWith($TableName, $this->Database->DatabasePrefix, TRUE, TRUE);
-            $DestTableName = StringBeginsWith($TableName, 'z', TRUE, TRUE);
+            $TableName = StringBeginsWith($TableName, $this->Database->DatabasePrefix, true, true);
+            $DestTableName = StringBeginsWith($TableName, 'z', true, true);
             $TableInfo = array('Table' => $DestTableName);
 
             $ColumnInfos = $this->SQL->FetchTableSchema($TableName);
@@ -1467,7 +1535,7 @@ class ImportModel extends Gdn_Model {
             $Tables[$DestTableName] = $TableInfo;
         }
         $this->Data['Tables'] = $Tables;
-        return TRUE;
+        return true;
     }
 
     /**
@@ -1492,9 +1560,9 @@ class ImportModel extends Gdn_Model {
         }
 
         // Open the import file.
-        ini_set('auto_detect_line_endings', TRUE);
+        ini_set('auto_detect_line_endings', true);
         $fpin = gzopen($Path, 'rb');
-        $fpout = NULL;
+        $fpout = null;
 
         // Make sure it has the proper header.
         try {
@@ -1506,7 +1574,7 @@ class ImportModel extends Gdn_Model {
 
         $RowCount = 0;
         $LineNumber = 0;
-        while (($Line = fgets($fpin)) !== FALSE) {
+        while (($Line = fgets($fpin)) !== false) {
             $LineNumber++;
 
             if ($Line == "\n") {
@@ -1536,7 +1604,7 @@ class ImportModel extends Gdn_Model {
                 unset($TableInfo['Table']);
 
                 // Get the column headers from the next line.
-                if (($Line = fgets($fpin)) !== FALSE) {
+                if (($Line = fgets($fpin)) !== false) {
                     $LineNumber++;
 
                     // Strip \r out of line.
@@ -1550,8 +1618,9 @@ class ImportModel extends Gdn_Model {
             }
         }
         gzclose($fpin);
-        if ($fpout)
+        if ($fpout) {
             fclose($fpout);
+        }
 
         if (count($Tables) == 0) {
             throw new Gdn_UserException(T('The import file does not contain any data.'));
@@ -1559,7 +1628,7 @@ class ImportModel extends Gdn_Model {
 
         $this->Data['Tables'] = $Tables;
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -1570,8 +1639,9 @@ class ImportModel extends Gdn_Model {
      */
     public function RunStep($Step = 1) {
         $Started = $this->Stat('Started');
-        if ($Started === NULL)
-            $this->Stat('Started', microtime(TRUE), 'time');
+        if ($Started === null) {
+            $this->Stat('Started', microtime(true), 'time');
+        }
 
         $Steps = $this->Steps();
         $LastStep = end(array_keys($Steps));
@@ -1579,7 +1649,7 @@ class ImportModel extends Gdn_Model {
             return 'COMPLETE';
         }
         if (!$this->Timer) {
-            $NewTimer = TRUE;
+            $NewTimer = true;
             $this->Timer = new Gdn_Timer();
             $this->Timer->Start('');
         }
@@ -1599,11 +1669,13 @@ class ImportModel extends Gdn_Model {
         $ElapsedTime = $this->Timer->ElapsedTime();
         $this->Stat('Time Spent on Import', $ElapsedTime, 'add');
 
-        if (isset($NewTimer))
+        if (isset($NewTimer)) {
             $this->Timer->Finish('');
+        }
 
-        if ($Result && !array_key_exists($Step + 1, $this->Steps()))
-            $this->Stat('Finished', microtime(TRUE), 'time');
+        if ($Result && !array_key_exists($Step + 1, $this->Steps())) {
+            $this->Stat('Finished', microtime(true), 'time');
+        }
 
         return $Result;
     }
@@ -1617,16 +1689,16 @@ class ImportModel extends Gdn_Model {
      * @param array $Parameters PDO parameters to pass to the query.
      * @return Gdn_DataSet
      */
-    public function Query($Sql, $Parameters = NULL) {
+    public function Query($Sql, $Parameters = null) {
         $Db = Gdn::Database();
 
         // Replace db prefixes.
         $Sql = str_replace(array(':_z', ':_'), array($Db->DatabasePrefix.self::TABLE_PREFIX, $Db->DatabasePrefix), $Sql);
 
         // Figure out the type of the type of the query.
-        if (StringBeginsWith($Sql, 'select'))
+        if (StringBeginsWith($Sql, 'select')) {
             $Type = 'select';
-        elseif (StringBeginsWith($Sql, 'truncate'))
+        } elseif (StringBeginsWith($Sql, 'truncate'))
             $Type = 'truncate';
         elseif (StringBeginsWith($Sql, 'insert'))
             $Type = 'insert';
@@ -1634,12 +1706,14 @@ class ImportModel extends Gdn_Model {
             $Type = 'update';
         elseif (StringBeginsWith($Sql, 'delete'))
             $Type = 'delete';
-        else
+        else {
             $Type = 'select';
+        }
 
         // Execute the query.
-        if (is_array($Parameters))
+        if (is_array($Parameters)) {
             $this->SQL->NamedParameters($Parameters);
+        }
 
         $Result = $this->SQL->Query($Sql, $Type);
 
@@ -1701,8 +1775,9 @@ class ImportModel extends Gdn_Model {
      */
     protected function _SetCategoryPermissionIDs($Category, $PermissionID, $IDs) {
         static $CategoryModel;
-        if (!isset($CategoryModel))
+        if (!isset($CategoryModel)) {
             $CategoryModel = new CategoryModel();
+        }
 
         $CategoryID = $Category['CategoryID'];
         if (isset($IDs[$CategoryID])) {
@@ -1716,8 +1791,9 @@ class ImportModel extends Gdn_Model {
         $ChildIDs = GetValue('ChildIDs', $Category, array());
         foreach ($ChildIDs as $ChildID) {
             $ChildCategory = CategoryModel::Categories($ChildID);
-            if ($ChildCategory)
+            if ($ChildCategory) {
                 $this->_SetCategoryPermissionIDs($ChildCategory, $PermissionID, $IDs);
+            }
         }
     }
 
@@ -1725,27 +1801,29 @@ class ImportModel extends Gdn_Model {
      *
      */
     public function SetRoleDefaults() {
-        if (!$this->ImportExists('Role', 'RoleID'))
+        if (!$this->ImportExists('Role', 'RoleID')) {
             return;
+        }
 
         $Data = $this->SQL->Get('zRole')->ResultArray();
 
         $RoleDefaults = array(
-            'Garden.Registration.ConfirmEmail' => FALSE
+            'Garden.Registration.ConfirmEmail' => false
         );
         $RoleTypes = array();
 
         foreach ($Data as $Row) {
-            if ($this->ImportExists('Role', '_Default'))
+            if ($this->ImportExists('Role', '_Default')) {
                 $Name = $Row['_Default'];
-            else
+            } else {
                 $Name = GetValue('Name', $Row);
+            }
 
             $RoleID = $Row['RoleID'];
 
-            if (preg_match('`anonymous`', $Name))
+            if (preg_match('`anonymous`', $Name)) {
                 $Name = 'guest';
-            elseif (preg_match('`admin`', $Name))
+            } elseif (preg_match('`admin`', $Name))
                 $Name = 'administrator';
 
             switch (strtolower($Name)) {
@@ -1754,7 +1832,7 @@ class ImportModel extends Gdn_Model {
                 case 'users awaiting email confirmation':
                 case 'pending':
                     $RoleTypes[$RoleID] = RoleModel::TYPE_UNCONFIRMED;
-                    $RoleDefaults['Garden.Registration.ConfirmEmail'] = TRUE;
+                    $RoleDefaults['Garden.Registration.ConfirmEmail'] = true;
                     break;
                 case 'member':
                 case 'members':
@@ -1790,13 +1868,14 @@ class ImportModel extends Gdn_Model {
      * @param string $Op
      * @return mixed
      */
-    public function Stat($Key, $Value = NULL, $Op = 'set') {
-        if (!isset($this->Data['Stats']))
+    public function Stat($Key, $Value = null, $Op = 'set') {
+        if (!isset($this->Data['Stats'])) {
             $this->Data['Stats'] = array();
+        }
 
         $Stats =& $this->Data['Stats'];
 
-        if ($Value !== NULL) {
+        if ($Value !== null) {
             switch (strtolower($Op)) {
                 case 'add':
                     $Value += GetValue($Key, $Stats, 0);
@@ -1810,7 +1889,7 @@ class ImportModel extends Gdn_Model {
             }
             return $Stats[$Key];
         } else {
-            return GetValue($Key, $Stats, NULL);
+            return GetValue($Key, $Stats, null);
         }
     }
 
@@ -1821,12 +1900,14 @@ class ImportModel extends Gdn_Model {
      */
     public function Steps() {
         if (strcasecmp($this->Overwrite(), 'Overwrite') == 0) {
-            if ($this->IsDbSource())
+            if ($this->IsDbSource()) {
                 return $this->_OverwriteStepsDb;
-            else
+            } else {
                 return $this->_OverwriteSteps;
-        } else
+            }
+        } else {
             return $this->_MergeSteps;
+        }
     }
 
     /**
@@ -1836,10 +1917,11 @@ class ImportModel extends Gdn_Model {
      * @return mixed
      */
     public function &Tables($TableName = '') {
-        if ($TableName)
+        if ($TableName) {
             return $this->Data['Tables'][$TableName];
-        else
+        } else {
             return $this->Data['Tables'];
+        }
     }
 
     /**
@@ -1854,8 +1936,9 @@ class ImportModel extends Gdn_Model {
         // Define the necessary SQL.
         $Sqls = array();
 
-        if (!$this->ImportExists('Discussion', 'LastCommentID'))
+        if (!$this->ImportExists('Discussion', 'LastCommentID')) {
             $Sqls['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
+        }
 
         if (!$this->ImportExists('Discussion', 'DateLastComment')) {
             $Sqls['Discussion.DateLastComment'] = "update :_Discussion d
@@ -1873,8 +1956,9 @@ class ImportModel extends Gdn_Model {
 
         if (!$this->ImportExists('Discussion', 'Body')) {
             // Update the body of the discussion if it isn't there.
-            if (!$this->ImportExists('Discussion', 'FirstCommentID'))
+            if (!$this->ImportExists('Discussion', 'FirstCommentID')) {
                 $Sqls['Discussion.FirstCommentID'] = $this->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID', 'CommentID');
+            }
 
             $Sqls['Discussion.Body'] = "update :_Discussion d
          join :_Comment c
@@ -1895,8 +1979,9 @@ class ImportModel extends Gdn_Model {
            on d.FirstCommentID = c.CommentID";
         }
 
-        if (!$this->ImportExists('Discussion', 'CountComments'))
+        if (!$this->ImportExists('Discussion', 'CountComments')) {
             $Sqls['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
+        }
 
         if ($this->ImportExists('UserDiscussion') && !$this->ImportExists('UserDiscussion', 'CountComments') && $this->ImportExists('UserDiscussion', 'DateLastViewed')) {
             $Sqls['UserDiscussuion.CountComments'] = "update :_UserDiscussion ud
@@ -1940,13 +2025,16 @@ class ImportModel extends Gdn_Model {
         if ($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
             $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
 
-            if (!$this->ImportExists('Conversation', 'CountMessages'))
+            if (!$this->ImportExists('Conversation', 'CountMessages')) {
                 $Sqls['Conversation.CountMessages'] = $this->GetCountSQL('count', 'Conversation', 'ConversationMessage', 'CountMessages', 'MessageID');
-            if (!$this->ImportExists('Conversation', 'LastMessageID'))
+            }
+            if (!$this->ImportExists('Conversation', 'LastMessageID')) {
                 $Sqls['Conversation.LastMessageID'] = $this->GetCountSQL('max', 'Conversation', 'ConversationMessage', 'LastMessageID', 'MessageID');
+            }
 
-            if (!$this->ImportExists('Conversation', 'DateUpdated'))
+            if (!$this->ImportExists('Conversation', 'DateUpdated')) {
                 $Sqls['Converstation.DateUpdated'] = "update :_Conversation c join :_ConversationMessage m on c.LastMessageID = m.MessageID set c.DateUpdated = m.DateInserted";
+            }
 
             if ($this->ImportExists('UserConversation')) {
                 if (!$this->ImportExists('UserConversation', 'LastMessageID')) {
@@ -2034,11 +2122,12 @@ class ImportModel extends Gdn_Model {
             $this->Query($Sql);
             if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
                 $this->Data['CurrentSubstep'] = $i + 1;
-                return FALSE;
+                return false;
             }
         }
-        if (isset($this->Data['CurrentSubstep']))
+        if (isset($this->Data['CurrentSubstep'])) {
             unset($this->Data['CurrentSubstep']);
+        }
 
         $this->Data['CurrentStepMessage'] = '';
 
@@ -2060,15 +2149,17 @@ class ImportModel extends Gdn_Model {
                     if ($ParentCategory && $ParentCategory['CategoryID'] != -1) {
                         $UrlCode = Gdn_Format::Url($ParentCategory['Name']).'-'.$UrlCode;
                     }
-                    if (in_array($UrlCode, $TakenCodes))
+                    if (in_array($UrlCode, $TakenCodes)) {
                         $UrlCode = $Category['CategoryID'];
+                    }
                 }
 
                 $TakenCodes[] = $UrlCode;
                 Gdn::SQL()->Put(
                     'Category',
                     array('UrlCode' => $UrlCode),
-                    array('CategoryID' => $Category['CategoryID']));
+                    array('CategoryID' => $Category['CategoryID'])
+                );
             }
         }
         // Rebuild the category tree.
@@ -2076,7 +2167,7 @@ class ImportModel extends Gdn_Model {
         $CategoryModel->RebuildTree();
         $this->SetCategoryPermissionIDs();
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -2128,7 +2219,7 @@ class ImportModel extends Gdn_Model {
             ->From('User u')
             ->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')
             ->LeftJoin('Role r', 'ur.RoleID = r.RoleID')
-            ->Where('r.Name', NULL)
+            ->Where('r.Name', null)
             ->Get()
             ->Count();
         $this->Stat(
@@ -2136,6 +2227,6 @@ class ImportModel extends Gdn_Model {
             $UsersWithoutRoles
         );
 
-        return TRUE;
+        return true;
     }
 }

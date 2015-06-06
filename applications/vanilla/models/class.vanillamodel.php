@@ -41,15 +41,17 @@ abstract class VanillaModel extends Gdn_Model {
         $Session = Gdn::Session();
 
         // If spam checking is disabled or user is an admin, skip
-        $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
-        if ($SpamCheckEnabled === FALSE || $Session->User->Admin || $Session->CheckPermission('Garden.Moderation.Manage'))
-            return FALSE;
+        $SpamCheckEnabled = GetValue('SpamCheck', $this, true);
+        if ($SpamCheckEnabled === false || $Session->User->Admin || $Session->CheckPermission('Garden.Moderation.Manage')) {
+            return false;
+        }
 
-        $Spam = FALSE;
+        $Spam = false;
 
         // Validate $Type
-        if (!in_array($Type, array('Comment', 'Discussion')))
+        if (!in_array($Type, array('Comment', 'Discussion'))) {
             trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
+        }
 
         $CountSpamCheck = $Session->GetAttribute('Count'.$Type.'SpamCheck', 0);
         $DateSpamCheck = $Session->GetAttribute('Date'.$Type.'SpamCheck', 0);
@@ -57,20 +59,20 @@ abstract class VanillaModel extends Gdn_Model {
 
         // Get spam config settings
         $SpamCount = Gdn::Config('Vanilla.'.$Type.'.SpamCount');
-        if (!is_numeric($SpamCount) || $SpamCount < 1)
+        if (!is_numeric($SpamCount) || $SpamCount < 1) {
             $SpamCount = 1; // 1 spam minimum
-
+        }
         $SpamTime = Gdn::Config('Vanilla.'.$Type.'.SpamTime');
-        if (!is_numeric($SpamTime) || $SpamTime < 30)
+        if (!is_numeric($SpamTime) || $SpamTime < 30) {
             $SpamTime = 30; // 30 second minimum spam span
-
+        }
         $SpamLock = Gdn::Config('Vanilla.'.$Type.'.SpamLock');
-        if (!is_numeric($SpamLock) || $SpamLock < 60)
+        if (!is_numeric($SpamLock) || $SpamLock < 60) {
             $SpamLock = 60; // 60 second minimum lockout
-
+        }
         // Apply a spam lock if necessary
         $Attributes = array();
-        if ($SecondsSinceSpamCheck < $SpamLock && $CountSpamCheck >= $SpamCount && $DateSpamCheck !== FALSE) {
+        if ($SecondsSinceSpamCheck < $SpamLock && $CountSpamCheck >= $SpamCount && $DateSpamCheck !== false) {
             // TODO: REMOVE DEBUGGING INFO AFTER THIS IS WORKING PROPERLY
             /*
             echo '<div>SecondsSinceSpamCheck: '.$SecondsSinceSpamCheck.'</div>';
@@ -80,7 +82,7 @@ abstract class VanillaModel extends Gdn_Model {
             echo '<div>DateSpamCheck: '.$DateSpamCheck.'</div>';
             echo '<div>SpamTime: '.$SpamTime.'</div>';
             */
-            $Spam = TRUE;
+            $Spam = true;
             $this->Validation->AddValidationResult(
                 'Body',
                 '@'.sprintf(
@@ -103,8 +105,9 @@ abstract class VanillaModel extends Gdn_Model {
         }
         // Update the user profile after every comment
         $UserModel = Gdn::UserModel();
-        if ($Session->UserID)
+        if ($Session->UserID) {
             $UserModel->SaveAttribute($Session->UserID, $Attributes);
+        }
 
         return $Spam;
     }

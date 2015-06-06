@@ -34,8 +34,9 @@ class DraftsController extends VanillaController {
         $this->Title(T('My Drafts'));
 
         // Validate $Offset
-        if (!is_numeric($Offset) || $Offset < 0)
+        if (!is_numeric($Offset) || $Offset < 0) {
             $Offset = 0;
+        }
 
         // Set criteria & get drafts data
         $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
@@ -88,16 +89,16 @@ class DraftsController extends VanillaController {
     public function Delete($DraftID = '', $TransientKey = '') {
         $Form = Gdn::Factory('Form');
         $Session = Gdn::Session();
-        if (
-            is_numeric($DraftID)
+        if (is_numeric($DraftID)
             && $DraftID > 0
             && $Session->UserID > 0
             && $Session->ValidateTransientKey($TransientKey)
         ) {
             // Delete the draft
             $Draft = $this->DraftModel->GetID($DraftID);
-            if ($Draft && !$this->DraftModel->Delete($DraftID))
+            if ($Draft && !$this->DraftModel->Delete($DraftID)) {
                 $Form->AddError('Failed to delete discussion');
+            }
         } else {
             // Log an error
             $Form->AddError('ErrPermission');
@@ -110,8 +111,9 @@ class DraftsController extends VanillaController {
         }
 
         // Return any errors
-        if ($Form->ErrorCount() > 0)
+        if ($Form->ErrorCount() > 0) {
             $this->SetJson('ErrorMessage', $Form->Errors());
+        }
 
         // Render default view
         $this->Render();

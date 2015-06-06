@@ -54,10 +54,10 @@ class HomeController extends Gdn_Controller {
 
         $this->CssClass = 'SplashMessage NoPanel';
 
-        $this->SetData('_NoMessages', TRUE);
+        $this->SetData('_NoMessages', true);
 
         $Code = $this->Data('Code', 400);
-        safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), TRUE, $Code);
+        safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
         Gdn_Theme::Section('Error');
 
         $this->Render();
@@ -83,14 +83,15 @@ class HomeController extends Gdn_Controller {
             Trace($this->Data('ViewPaths'), 'View Paths');
         }
 
-        $this->SetData('_NoMessages', TRUE);
+        $this->SetData('_NoMessages', true);
         Gdn_Theme::Section('Error');
 
         if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
-            safeHeader("HTTP/1.0 404", TRUE, 404);
+            safeHeader("HTTP/1.0 404", true, 404);
             $this->Render();
-        } else
+        } else {
             $this->RenderException(NotFoundException());
+        }
     }
 
     /**
@@ -100,8 +101,8 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function UpdateMode() {
-        safeHeader("HTTP/1.0 503", TRUE, 503);
-        $this->SetData('UpdateMode', TRUE);
+        safeHeader("HTTP/1.0 503", true, 503);
+        $this->SetData('UpdateMode', true);
         $this->Render();
     }
 
@@ -112,7 +113,7 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function Deleted() {
-        safeHeader("HTTP/1.0 410", TRUE, 410);
+        safeHeader("HTTP/1.0 410", true, 410);
         Gdn_Theme::Section('Error');
         $this->Render();
     }
@@ -147,10 +148,10 @@ class HomeController extends Gdn_Controller {
         Gdn_Theme::Section('Error');
 
         if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
-            safeHeader("HTTP/1.0 401", TRUE, 401);
+            safeHeader("HTTP/1.0 401", true, 401);
             $this->Render();
-        } else
+        } else {
             $this->RenderException(PermissionException());
+        }
     }
-
 }

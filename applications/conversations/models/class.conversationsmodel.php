@@ -32,13 +32,14 @@ abstract class ConversationsModel extends Gdn_Model {
      * @since 2.2
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
-    public function CheckForSpam($Type, $SkipSpamCheck = FALSE) {
+    public function CheckForSpam($Type, $SkipSpamCheck = false) {
         // If spam checking is disabled or user is an admin, skip
-        $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
-        if ($SkipSpamCheck == TRUE || $SpamCheckEnabled === FALSE || CheckPermission('Garden.Moderation.Manage'))
-            return FALSE;
+        $SpamCheckEnabled = GetValue('SpamCheck', $this, true);
+        if ($SkipSpamCheck == true || $SpamCheckEnabled === false || CheckPermission('Garden.Moderation.Manage')) {
+            return false;
+        }
 
-        $Spam = FALSE;
+        $Spam = false;
 
         // Validate $Type
         if (!in_array($Type, array('Conversation', 'ConversationMessage'))) {
@@ -47,23 +48,23 @@ abstract class ConversationsModel extends Gdn_Model {
 
         // Get spam config settings
         $SpamCount = C("Conversations.$Type.SpamCount", 1);
-        if (!is_numeric($SpamCount) || $SpamCount < 1)
+        if (!is_numeric($SpamCount) || $SpamCount < 1) {
             $SpamCount = 1; // 1 spam minimum
-
+        }
         $SpamTime = C("Conversations.$Type.SpamTime", 30);
-        if (!is_numeric($SpamTime) || $SpamTime < 30)
+        if (!is_numeric($SpamTime) || $SpamTime < 30) {
             $SpamTime = 30; // 30 second minimum spam span
-
+        }
         $SpamLock = C("Conversations.$Type.SpamLock", 60);
-        if (!is_numeric($SpamLock) || $SpamLock < 60)
+        if (!is_numeric($SpamLock) || $SpamLock < 60) {
             $SpamLock = 60; // 60 second minimum lockout
-
+        }
         // Check for a spam lock first.
         $Now = time();
         $TimeSpamLock = (int)Gdn::Session()->GetAttribute("Time{$Type}SpamLock", 0);
         $WaitTime = $SpamLock - ($Now - $TimeSpamLock);
         if ($WaitTime > 0) {
-            $Spam = TRUE;
+            $Spam = true;
             $this->Validation->AddValidationResult(
                 'Body',
                 '@'.sprintf(
@@ -83,7 +84,7 @@ abstract class ConversationsModel extends Gdn_Model {
         // Apply a spam lock if necessary
         $Attributes = array();
         if ($SecondsSinceSpamCheck < $SpamTime && $CountSpamCheck >= $SpamCount) {
-            $Spam = TRUE;
+            $Spam = true;
             $this->Validation->AddValidationResult(
                 'Body',
                 '@'.sprintf(
@@ -107,8 +108,9 @@ abstract class ConversationsModel extends Gdn_Model {
         }
         // Update the user profile after every comment
         $UserModel = Gdn::UserModel();
-        if (Gdn::Session()->UserID)
+        if (Gdn::Session()->UserID) {
             $UserModel->SaveAttribute(Gdn::Session()->UserID, $Attributes);
+        }
 
         return $Spam;
     }

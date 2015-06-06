@@ -17,7 +17,7 @@ class SpamModel extends Gdn_Pluggable {
     protected static $_Instance;
 
     /** @var bool */
-    public static $Disabled = FALSE;
+    public static $Disabled = false;
 
     /**
      *
@@ -25,8 +25,9 @@ class SpamModel extends Gdn_Pluggable {
      * @return SpamModel
      */
     protected static function _Instance() {
-        if (!self::$_Instance)
+        if (!self::$_Instance) {
             self::$_Instance = new SpamModel();
+        }
 
         return self::$_Instance;
     }
@@ -55,8 +56,9 @@ class SpamModel extends Gdn_Pluggable {
      *  - Log: Log the record if it is found to be spam.
      */
     public static function IsSpam($RecordType, $Data, $Options = array()) {
-        if (self::$Disabled)
-            return FALSE;
+        if (self::$Disabled) {
+            return false;
+        }
 
         // Set some information about the user in the data.
         if ($RecordType == 'Registration') {
@@ -69,7 +71,7 @@ class SpamModel extends Gdn_Pluggable {
             if ($User) {
                 if (GetValue('Verified', $User)) {
                     // The user has been verified and isn't a spammer.
-                    return FALSE;
+                    return false;
                 }
                 TouchValue('Username', $Data, $User['Name']);
                 TouchValue('Email', $Data, $User['Email']);
@@ -88,13 +90,13 @@ class SpamModel extends Gdn_Pluggable {
         $Sp->EventArguments['RecordType'] = $RecordType;
         $Sp->EventArguments['Data'] =& $Data;
         $Sp->EventArguments['Options'] =& $Options;
-        $Sp->EventArguments['IsSpam'] = FALSE;
+        $Sp->EventArguments['IsSpam'] = false;
 
         $Sp->FireEvent('CheckSpam');
         $Spam = $Sp->EventArguments['IsSpam'];
 
         // Log the spam entry.
-        if ($Spam && GetValue('Log', $Options, TRUE)) {
+        if ($Spam && GetValue('Log', $Options, true)) {
             $LogOptions = array();
             switch ($RecordType) {
                 case 'Registration':

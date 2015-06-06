@@ -133,7 +133,7 @@ class PromotedContentModule extends Gdn_Module {
      * Get data based on class properties.
      */
     public function GetData() {
-        $this->SetData('Content', FALSE);
+        $this->SetData('Content', false);
         $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
         if (method_exists($this, $SelectorMethod)) {
             $this->SetData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
@@ -152,7 +152,7 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $RoleID = $Parameters;
         } else {
-            $RoleID = GetValue('RoleID', $Parameters, NULL);
+            $RoleID = GetValue('RoleID', $Parameters, null);
         }
 
         // Lookup role name -> roleID
@@ -183,7 +183,6 @@ class PromotedContentModule extends Gdn_Module {
         $Content = Gdn::Cache()->Get($SelectorRoleCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-
             // Get everyone with this Role
             $UserIDs = Gdn::SQL()->Select('ur.UserID')
                 ->From('UserRole ur')
@@ -249,7 +248,7 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $RankID = $Parameters;
         } else {
-            $RankID = GetValue('RankID', $Parameters, NULL);
+            $RankID = GetValue('RankID', $Parameters, null);
         }
 
         // Check for Rank passed by name.
@@ -269,7 +268,6 @@ class PromotedContentModule extends Gdn_Module {
         $Content = Gdn::Cache()->Get($SelectorRankCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-
             // Get everyone with this Role
             $UserIDs = Gdn::SQL()->Select('u.UserID')
                 ->From('User u')
@@ -330,7 +328,7 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $CategoryID = $Parameters;
         } else {
-            $CategoryID = GetValue('CategoryID', $Parameters, NULL);
+            $CategoryID = GetValue('CategoryID', $Parameters, null);
         }
 
         // Allow category names, and validate category exists.
@@ -347,7 +345,6 @@ class PromotedContentModule extends Gdn_Module {
         $Content = Gdn::Cache()->Get($SelectorCategoryCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-
             // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
@@ -420,7 +417,6 @@ class PromotedContentModule extends Gdn_Module {
         $Content = Gdn::Cache()->Get($SelectorScoreCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-
             // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
@@ -428,7 +424,7 @@ class PromotedContentModule extends Gdn_Module {
                     ->From('Discussion d')
                     ->OrderBy('DateInserted', 'DESC')
                     ->Limit($this->Limit);
-                if ($MinScore !== FALSE) {
+                if ($MinScore !== false) {
                     $Discussions->Where('Score >', $MinScore);
                 }
                 $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
@@ -441,7 +437,7 @@ class PromotedContentModule extends Gdn_Module {
                     ->From('Comment c')
                     ->OrderBy('DateInserted', 'DESC')
                     ->Limit($this->Limit);
-                if ($MinScore !== FALSE) {
+                if ($MinScore !== false) {
                     $Comments->Where('Score >', $MinScore);
                 }
                 $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
@@ -494,7 +490,8 @@ class PromotedContentModule extends Gdn_Module {
             array('TagID' => $PromotedTagID, 'RecordType' => $RecordTypes),
             'DateInserted',
             'desc',
-            $this->Limit);
+            $this->Limit
+        );
 
         $this->Prepare($Content);
 
@@ -510,7 +507,7 @@ class PromotedContentModule extends Gdn_Module {
         $DiscussionIDs = array();
 
         foreach ($Comments as &$Comment) {
-            $DiscussionIDs[$Comment['DiscussionID']] = TRUE;
+            $DiscussionIDs[$Comment['DiscussionID']] = true;
         }
         $DiscussionIDs = array_keys($DiscussionIDs);
 
@@ -539,11 +536,15 @@ class PromotedContentModule extends Gdn_Module {
      * @return array
      */
     protected function Union($Field, $Sections) {
-        if (!is_array($Sections)) return;
+        if (!is_array($Sections)) {
+            return;
+        }
 
         $Interleaved = array();
         foreach ($Sections as $SectionType => $Section) {
-            if (!is_array($Section)) continue;
+            if (!is_array($Section)) {
+                continue;
+            }
 
             foreach ($Section as $Item) {
                 $ItemField = GetValue($Field, $Item);
@@ -591,7 +592,7 @@ class PromotedContentModule extends Gdn_Module {
                 $item['CategoryName'] = val('Name', $category);
                 $item['CategoryUrl'] = CategoryUrl($category);
             }
-            $itemFields = array_fill_keys($itemFields, TRUE);
+            $itemFields = array_fill_keys($itemFields, true);
             $filteredItem = array_intersect_key($item, $itemFields);
             $itemProperties = array_merge($itemProperties, $filteredItem);
             $item = $itemProperties;
@@ -614,7 +615,7 @@ class PromotedContentModule extends Gdn_Module {
                 'CssClass' => val('_CssClass', $user)
             );
             $user = (array)$user;
-            $userFields = array_fill_keys($userFields, TRUE);
+            $userFields = array_fill_keys($userFields, true);
             $filteredUser = array_intersect_key($user, $userFields);
             $userProperties = array_merge($filteredUser, $userProperties);
             $item['Author'] = $userProperties;
@@ -640,8 +641,8 @@ class PromotedContentModule extends Gdn_Module {
      * @return bool
      */
     protected function SecurityFilter($ContentItem) {
-        $CategoryID = GetValue('CategoryID', $ContentItem, NULL);
-        if (is_null($CategoryID) || $CategoryID === FALSE) {
+        $CategoryID = GetValue('CategoryID', $ContentItem, null);
+        if (is_null($CategoryID) || $CategoryID === false) {
             return false;
         }
 
@@ -697,7 +698,7 @@ class PromotedContentModule extends Gdn_Module {
      * @return string
      */
     public function ToString() {
-        if ($this->Data('Content', NULL) == NULL) {
+        if ($this->Data('Content', null) == null) {
             $this->GetData();
         }
 

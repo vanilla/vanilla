@@ -24,8 +24,9 @@ class SessionController extends DashboardController {
         $Name = TrueStripSlashes(GetValue('Name', $_POST, ''));
         $Value = TrueStripSlashes(GetValue('Value', $_POST, ''));
         $Response = Gdn::Session()->Stash($Name, $Value);
-        if ($Name != '' && $Value == '')
+        if ($Name != '' && $Value == '') {
             $this->SetJson('Unstash', $Response);
+        }
 
         $this->Render();
     }

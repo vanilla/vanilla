@@ -23,5 +23,4 @@ class ClearHistoryModule extends Gdn_Module {
     public function AssetTarget() {
         return 'Panel';
     }
-
 }

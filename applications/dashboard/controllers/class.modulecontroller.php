@@ -22,8 +22,9 @@ class ModuleController extends Gdn_Controller {
      * @throws NotFoundException
      */
     public function Index($Module, $AppFolder = '', $DeliveryType = '') {
-        if (!$DeliveryType)
+        if (!$DeliveryType) {
             $this->DeliveryType(DELIVERY_TYPE_VIEW);
+        }
 
         $ModuleClassExists = class_exists($Module);
 
@@ -45,7 +46,7 @@ class ModuleController extends Gdn_Controller {
 
 
                 $ModuleInstance = new $Module($this);
-                $ModuleInstance->Visible = TRUE;
+                $ModuleInstance->Visible = true;
 
                 $WhiteList = array('Limit', 'Help');
                 foreach ($this->Request->Get() as $Key => $Value) {
@@ -55,7 +56,7 @@ class ModuleController extends Gdn_Controller {
                 }
 
                 $this->SetData('_Module', $ModuleInstance);
-                $this->Render('Index', FALSE, 'dashboard');
+                $this->Render('Index', false, 'dashboard');
                 return;
             }
         }

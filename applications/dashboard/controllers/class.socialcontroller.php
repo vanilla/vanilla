@@ -54,20 +54,25 @@ class SocialController extends DashboardController {
     protected function GetConnections() {
         $this->FireEvent('GetConnections');
         $Connections = $this->Data('Connections', array());
-        if (!is_array($Connections)) $Connections = array();
+        if (!is_array($Connections)) {
+            $Connections = array();
+        }
 
         foreach (Gdn::PluginManager()->AvailablePlugins() as $PluginKey => $PluginInfo) {
-            if (!array_key_exists('SocialConnect', $PluginInfo)) continue;
+            if (!array_key_exists('SocialConnect', $PluginInfo)) {
+                continue;
+            }
 
-            if (!array_key_exists($PluginKey, $Connections))
+            if (!array_key_exists($PluginKey, $Connections)) {
                 $Connections[$PluginKey] = array();
+            }
 
             $ConnectionName = $PluginInfo['Index'];
 
             if (Gdn::PluginManager()->CheckPlugin($PluginKey)) {
                 $Configured = Gdn::PluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
             } else {
-                $Configured = NULL;
+                $Configured = null;
             }
 
             $Connections[$PluginKey] = array_merge($Connections[$PluginKey], $PluginInfo, array(
@@ -128,7 +133,7 @@ class SocialController extends DashboardController {
             throw NotFoundException('SocialConnect Plugin');
         }
 
-        Gdn::PluginManager()->EnablePlugin($Plugin, NULL);
+        Gdn::PluginManager()->EnablePlugin($Plugin, null);
 
         $Connections = $this->GetConnections();
         $Connection = GetValue($Plugin, $Connections);
@@ -144,5 +149,4 @@ class SocialController extends DashboardController {
         unset($this->Data['Connections']);
         $this->Render('blank', 'utility');
     }
-
 }

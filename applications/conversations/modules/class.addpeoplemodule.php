@@ -20,7 +20,7 @@ class AddPeopleModule extends Gdn_Module {
     public $Form;
 
     /** @var bool Whether user is allowed to use this form. */
-    public $AddUserAllowed = TRUE;
+    public $AddUserAllowed = true;
 
     /**
      *
@@ -30,8 +30,9 @@ class AddPeopleModule extends Gdn_Module {
      */
     public function __construct($Sender = '') {
         $Session = Gdn::Session();
-        if (property_exists($Sender, 'Conversation'))
+        if (property_exists($Sender, 'Conversation')) {
             $this->Conversation = $Sender->Conversation;
+        }
 
         // Allowed to use this module?
         $this->AddUserAllowed = $Sender->ConversationModel->AddUserAllowed($this->Conversation->ConversationID);
@@ -51,8 +52,9 @@ class AddPeopleModule extends Gdn_Module {
             foreach ($NewRecipients as $Name) {
                 if (trim($Name) != '') {
                     $User = $UserModel->GetByUsername(trim($Name));
-                    if (is_object($User))
+                    if (is_object($User)) {
                         $NewRecipientUserIDs[] = $User->UserID;
+                    }
                 }
             }
             $Sender->ConversationModel->AddUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);

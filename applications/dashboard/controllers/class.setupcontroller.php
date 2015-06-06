@@ -27,7 +27,7 @@ class SetupController extends DashboardController {
         $this->AddCssFile('setup.css');
         $this->AddJsFile('jquery.js');
         // Make sure all errors are displayed.
-        SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => FALSE));
+        SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => false));
     }
 
     /**
@@ -57,7 +57,7 @@ class SetupController extends DashboardController {
 
             // Make sure the user has copied the htaccess file over.
             if (!file_exists(PATH_ROOT.'/.htaccess') && !$this->Form->GetFormValue('SkipHtaccess')) {
-                $this->SetData('NoHtaccess', TRUE);
+                $this->SetData('NoHtaccess', true);
                 $this->Form->AddError(T('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
             }
 
@@ -76,14 +76,14 @@ class SetupController extends DashboardController {
                         $ApplicationManager->EnableApplication($AppName, $Validation);
                     }
 
-                    Gdn::PluginManager()->Start(TRUE);
+                    Gdn::PluginManager()->Start(true);
                 } catch (Exception $ex) {
                     $this->Form->AddError($ex);
                 }
                 if ($this->Form->ErrorCount() == 0) {
                     // Save a variable so that the application knows it has been installed.
                     // Now that the application is installed, select a more user friendly error page.
-                    $Config = array('Garden.Installed' => TRUE);
+                    $Config = array('Garden.Installed' => true);
                     SaveToConfig($Config);
                     $this->FireEvent('Installed');
 
@@ -163,7 +163,7 @@ class SetupController extends DashboardController {
             $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
 
             $ConfigurationFormValues = $this->Form->FormValues();
-            if ($ConfigurationModel->Validate($ConfigurationFormValues) !== TRUE || $this->Form->ErrorCount() > 0) {
+            if ($ConfigurationModel->Validate($ConfigurationFormValues) !== true || $this->Form->ErrorCount() > 0) {
                 // Apply the validation results to the form(s)
                 $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
             } else {
@@ -171,36 +171,37 @@ class SetupController extends DashboardController {
                 $Domain = Gdn::Request()->Domain();
 
                 // Set up cookies now so that the user can be signed in.
-                $ExistingSalt = C('Garden.Cookie.Salt', FALSE);
+                $ExistingSalt = C('Garden.Cookie.Salt', false);
                 $ConfigurationFormValues['Garden.Cookie.Salt'] = ($ExistingSalt) ? $ExistingSalt : RandomString(10);
                 $ConfigurationFormValues['Garden.Cookie.Domain'] = ''; // Don't set this to anything by default. # Tim - 2010-06-23
                 // Additional default setup values.
-                $ConfigurationFormValues['Garden.Registration.ConfirmEmail'] = TRUE;
+                $ConfigurationFormValues['Garden.Registration.ConfirmEmail'] = true;
                 $ConfigurationFormValues['Garden.Email.SupportName'] = $ConfigurationFormValues['Garden.Title'];
 
-                $ConfigurationModel->Save($ConfigurationFormValues, TRUE);
+                $ConfigurationModel->Save($ConfigurationFormValues, true);
 
                 // If changing locale, redefine locale sources:
                 $NewLocale = 'en-CA'; // $this->Form->GetFormValue('Garden.Locale', FALSE);
-                if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
+                if ($NewLocale !== false && Gdn::Config('Garden.Locale') != $NewLocale) {
                     $ApplicationManager = new Gdn_ApplicationManager();
                     $Locale = Gdn::Locale();
-                    $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
+                    $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), true);
                 }
 
                 // Install db structure & basic data.
                 $Database = Gdn::Database();
                 $Database->Init();
-                $Drop = FALSE; // Gdn::Config('Garden.Version') === FALSE ? TRUE : FALSE;
-                $Explicit = FALSE;
+                $Drop = false; // Gdn::Config('Garden.Version') === FALSE ? TRUE : FALSE;
+                $Explicit = false;
                 try {
                     include(PATH_APPLICATIONS.DS.'dashboard'.DS.'settings'.DS.'structure.php');
                 } catch (Exception $ex) {
                     $this->Form->AddError($ex);
                 }
 
-                if ($this->Form->ErrorCount() > 0)
-                    return FALSE;
+                if ($this->Form->ErrorCount() > 0) {
+                    return false;
+                }
 
                 // Create the administrative user
                 $UserModel = Gdn::UserModel();
@@ -216,13 +217,14 @@ class SetupController extends DashboardController {
                     $this->Form->SetValidationResults($UserModel->ValidationResults());
                 } else {
                     // The user has been created successfully, so sign in now.
-                    SaveToConfig('Garden.Installed', TRUE, array('Save' => FALSE));
-                    Gdn::Session()->Start($AdminUserID, TRUE);
-                    SaveToConfig('Garden.Installed', FALSE, array('Save' => FALSE));
+                    SaveToConfig('Garden.Installed', true, array('Save' => false));
+                    Gdn::Session()->Start($AdminUserID, true);
+                    SaveToConfig('Garden.Installed', false, array('Save' => false));
                 }
 
-                if ($this->Form->ErrorCount() > 0)
-                    return FALSE;
+                if ($this->Form->ErrorCount() > 0) {
+                    return false;
+                }
 
                 // Assign some extra settings to the configuration file if everything succeeded.
                 $ApplicationInfo = array();
@@ -240,7 +242,7 @@ class SetupController extends DashboardController {
                 ));
             }
         }
-        return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
+        return $this->Form->ErrorCount() == 0 ? true : false;
     }
 
     /**
@@ -252,36 +254,43 @@ class SetupController extends DashboardController {
      */
     private function _CheckPrerequisites() {
         // Make sure we are running at least PHP 5.1
-        if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0)
+        if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
             $this->Form->AddError(sprintf(T('You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'), phpversion(), ENVIRONMENT_PHP_VERSION));
+        }
 
         // Make sure PDO is available
-        if (!class_exists('PDO'))
+        if (!class_exists('PDO')) {
             $this->Form->AddError(T('You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'));
+        }
 
-        if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
+        if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY')) {
             $this->Form->AddError(T('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'));
+        }
 
         // Make sure that the correct filesystem permissions are in place
-        $PermissionProblem = FALSE;
+        $PermissionProblem = false;
 
         // Make sure the appropriate folders are writeable.
         $ProblemDirectories = array();
-        if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF))
+        if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF)) {
             $ProblemDirectories[] = PATH_CONF;
+        }
 
-        if (!is_readable(PATH_UPLOADS) || !IsWritable(PATH_UPLOADS))
+        if (!is_readable(PATH_UPLOADS) || !IsWritable(PATH_UPLOADS)) {
             $ProblemDirectories[] = PATH_UPLOADS;
+        }
 
-        if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE))
+        if (!is_readable(PATH_CACHE) || !IsWritable(PATH_CACHE)) {
             $ProblemDirectories[] = PATH_CACHE;
+        }
 
         if (count($ProblemDirectories) > 0) {
-            $PermissionProblem = TRUE;
+            $PermissionProblem = true;
 
             $PermissionError = T(
                 'Some folders don\'t have correct permissions.',
-                '<p>Some of your folders do not have the correct permissions.</p><p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>');
+                '<p>Some of your folders do not have the correct permissions.</p><p>Using your ftp client, or via command line, make sure that the following permissions are set for your vanilla installation:</p>'
+            );
 
             $PermissionHelp = '<pre>chmod -R 777 '.implode("\nchmod -R 777 ", $ProblemDirectories).'</pre>';
 
@@ -291,24 +300,31 @@ class SetupController extends DashboardController {
         // Make sure the config folder is writeable
         if (!$PermissionProblem) {
             $ConfigFile = Gdn::Config()->DefaultPath();
-            if (!file_exists($ConfigFile))
+            if (!file_exists($ConfigFile)) {
                 file_put_contents($ConfigFile, '');
+            }
 
             // Make sure the config file is writeable
             if (!is_readable($ConfigFile) || !IsWritable($ConfigFile)) {
                 $this->Form->AddError(sprintf(T('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
-                $PermissionProblem = TRUE;
+                $PermissionProblem = true;
             }
         }
 
         // Make sure the cache folder is writeable
         if (!$PermissionProblem) {
-            if (!file_exists(PATH_CACHE.'/Smarty')) mkdir(PATH_CACHE.'/Smarty');
-            if (!file_exists(PATH_CACHE.'/Smarty/cache')) mkdir(PATH_CACHE.'/Smarty/cache');
-            if (!file_exists(PATH_CACHE.'/Smarty/compile')) mkdir(PATH_CACHE.'/Smarty/compile');
+            if (!file_exists(PATH_CACHE.'/Smarty')) {
+                mkdir(PATH_CACHE.'/Smarty');
+            }
+            if (!file_exists(PATH_CACHE.'/Smarty/cache')) {
+                mkdir(PATH_CACHE.'/Smarty/cache');
+            }
+            if (!file_exists(PATH_CACHE.'/Smarty/compile')) {
+                mkdir(PATH_CACHE.'/Smarty/compile');
+            }
         }
 
-        return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
+        return $this->Form->ErrorCount() == 0 ? true : false;
     }
 
     public function TestUrlRewrites() {

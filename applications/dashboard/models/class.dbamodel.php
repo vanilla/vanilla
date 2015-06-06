@@ -26,7 +26,7 @@ class DBAModel extends Gdn_Model {
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function Counts($Table, $Column, $From = FALSE, $To = FALSE) {
+    public function Counts($Table, $Column, $From = false, $To = false) {
         $Model = $this->CreateModel($Table);
 
         if (!method_exists($Model, 'Counts')) {
@@ -65,11 +65,16 @@ class DBAModel extends Gdn_Model {
      * @return type
      */
     public static function GetCountSQL(
-        $Aggregate, // count, max, min, etc.
-        $ParentTable, $ChildTable,
-        $ParentColumnName = '', $ChildColumnName = '',
-        $ParentJoinColumn = '', $ChildJoinColumn = '',
-        $Where = array()) {
+        $Aggregate,
+        // count, max, min, etc.
+        $ParentTable,
+        $ChildTable,
+        $ParentColumnName = '',
+        $ChildColumnName = '',
+        $ParentJoinColumn = '',
+        $ChildJoinColumn = '',
+        $Where = array()
+    ) {
 
         if (!$ParentColumnName) {
             switch (strtolower($Aggregate)) {
@@ -88,13 +93,16 @@ class DBAModel extends Gdn_Model {
             }
         }
 
-        if (!$ChildColumnName)
+        if (!$ChildColumnName) {
             $ChildColumnName = $ChildTable.'ID';
+        }
 
-        if (!$ParentJoinColumn)
+        if (!$ParentJoinColumn) {
             $ParentJoinColumn = $ParentTable.'ID';
-        if (!$ChildJoinColumn)
+        }
+        if (!$ChildJoinColumn) {
             $ChildJoinColumn = $ParentJoinColumn;
+        }
 
         $Result = "update :_$ParentTable p
                   set p.$ParentColumnName = (
@@ -139,7 +147,7 @@ class DBAModel extends Gdn_Model {
 
         $Result = array();
         $Result['Count'] = count($Data);
-        $Result['Complete'] = FALSE;
+        $Result['Complete'] = false;
         $Result['Decoded'] = array();
         $Result['NotDecoded'] = array();
 
@@ -222,7 +230,7 @@ class DBAModel extends Gdn_Model {
             }
         }
 
-        return array('Complete' => TRUE);
+        return array('Complete' => true);
     }
 
     public function FixUrlCodes($Table, $Column) {
@@ -247,7 +255,7 @@ class DBAModel extends Gdn_Model {
             }
         }
 
-        return array('Complete' => TRUE);
+        return array('Complete' => true);
     }
 
     /**
@@ -279,7 +287,7 @@ class DBAModel extends Gdn_Model {
      */
     public function ResetBatch($Table, $Key) {
         $Key = "DBA.Range.$Key";
-        Gdn::Set($Key, NULL);
+        Gdn::Set($Key, null);
     }
 
     /**
@@ -291,7 +299,7 @@ class DBAModel extends Gdn_Model {
      * @param bool $Max
      * @return array|mixed
      */
-    public function GetBatch($Table, $Key, $Limit = 10000, $Max = FALSE) {
+    public function GetBatch($Table, $Key, $Limit = 10000, $Max = false) {
         $Key = "DBA.Range.$Key";
 
         // See if there is already a range.
@@ -318,8 +326,9 @@ class DBAModel extends Gdn_Model {
             $Complete = $Current['Max'] - $Current['From'];
 
             $Percent = 100 * $Complete / $Total;
-            if ($Percent > 100)
+            if ($Percent > 100) {
                 $Percent = 100;
+            }
             $Current['Percent'] = round($Percent).'%';
         }
 
@@ -341,9 +350,10 @@ class DBAModel extends Gdn_Model {
             ->From($Table)
             ->Get()->FirstRow(DATASET_TYPE_ARRAY);
 
-        if ($Data)
+        if ($Data) {
             return array($Data['MinValue'], $Data['MaxValue']);
-        else
+        } else {
             return array(0, 0);
+        }
     }
 }

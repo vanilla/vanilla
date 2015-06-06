@@ -34,13 +34,13 @@ class ExportModel {
     const QUOTE = '"';
 
     /** @var object|null File pointer. */
-    protected $_File = NULL;
+    protected $_File = null;
 
     /** @var object|null PDO connection. */
-    protected $_PDO = NULL;
+    protected $_PDO = null;
 
     /** @var bool Whether or not to use compression when creating the file.  */
-    public $UseCompression = TRUE;
+    public $UseCompression = true;
 
     /** @var string The database prefix that ExportTable() it will replace :_ with in a query string. */
     public $Prefix = '';
@@ -65,18 +65,20 @@ class ExportModel {
      * @param string $Source The source program that created the export. This may be used by the import routine to do additional processing.
      */
     public function BeginExport($Path, $Source = '') {
-        $this->BeginTime = microtime(TRUE);
+        $this->BeginTime = microtime(true);
         $TimeStart = list($sm, $ss) = explode(' ', microtime());
 
-        if ($this->UseCompression && function_exists('gzopen'))
+        if ($this->UseCompression && function_exists('gzopen')) {
             $fp = gzopen($Path, 'wb');
-        else
+        } else {
             $fp = fopen($Path, 'wb');
+        }
         $this->_File = $fp;
 
         fwrite($fp, 'Vanilla Export: '.$this->Version());
-        if ($Source)
+        if ($Source) {
             fwrite($fp, self::DELIM.' Source: '.$Source);
+        }
         fwrite($fp, self::NEWLINE.self::NEWLINE);
         $this->Comment('Exported Started: '.date('Y-m-d H:i:s'));
     }
@@ -87,10 +89,11 @@ class ExportModel {
      * @param string $Message The message to write.
      * @param bool $Echo Whether or not to echo the message in addition to writing it to the file.
      */
-    public function Comment($Message, $Echo = TRUE) {
+    public function Comment($Message, $Echo = true) {
         fwrite($this->_File, self::COMMENT.' '.str_replace(self::NEWLINE, self::NEWLINE.self::COMMENT.' ', $Message).self::NEWLINE);
-        if ($Echo)
+        if ($Echo) {
             echo $Message, "\n";
+        }
     }
 
     /**
@@ -99,17 +102,18 @@ class ExportModel {
      * This method must be called if BeginExport() has been called or else the export file will not be closed.
      */
     public function EndExport() {
-        $this->EndTime = microtime(TRUE);
+        $this->EndTime = microtime(true);
         $this->TotalTime = $this->EndTime - $this->BeginTime;
         $m = floor($this->TotalTime / 60);
         $s = $this->TotalTime - $m * 60;
 
         $this->Comment('Exported Completed: '.date('Y-m-d H:i:s').sprintf(', Elapsed Time: %02d:%02.2f', $m, $s));
 
-        if ($this->UseCompression && function_exists('gzopen'))
+        if ($this->UseCompression && function_exists('gzopen')) {
             gzclose($this->_File);
-        else
+        } else {
             fclose($this->_File);
+        }
     }
 
     /**
@@ -123,14 +127,15 @@ class ExportModel {
      * @param string $Password The password for the database if a dsn is specified.
      * @return PDO The current database connection.
      */
-    public function PDO($DsnOrPDO = NULL, $Username = NULL, $Password = NULL) {
+    public function PDO($DsnOrPDO = null, $Username = null, $Password = null) {
         if (!is_null($DsnOrPDO)) {
-            if ($DsnOrPDO instanceof PDO)
+            if ($DsnOrPDO instanceof PDO) {
                 $this->_PDO = $DsnOrPDO;
-            else {
+            } else {
                 $this->_PDO = new PDO($DsnOrPDO, $Username, $Password);
-                if (strncasecmp($DsnOrPDO, 'mysql', 5) == 0)
+                if (strncasecmp($DsnOrPDO, 'mysql', 5) == 0) {
                     $this->_PDO->exec('set names utf8');
+                }
             }
         }
         return $this->_PDO;
@@ -180,7 +185,7 @@ class ExportModel {
         // Loop through the data and write it to the file.
         foreach ($Data as $Row) {
             $Row = (array)$Row;
-            $First = TRUE;
+            $First = true;
 
             // Loop through the columns in the export structure and grab their values from the row.
             $ExRow = array();
@@ -193,7 +198,7 @@ class ExportModel {
                     // The column is mapped.
                     $Value = $Row[$Mappings[$Field]];
                 } else {
-                    $Value = NULL;
+                    $Value = null;
                 }
                 // Format the value for writing.
                 if (is_null($Value)) {
@@ -225,8 +230,9 @@ class ExportModel {
         // Write an empty line to signify the end of the table.
         fwrite($fp, self::NEWLINE);
 
-        if ($Data instanceof PDOStatement)
+        if ($Data instanceof PDOStatement) {
             $Data->closeCursor();
+        }
     }
 
 

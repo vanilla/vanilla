@@ -27,8 +27,9 @@ class TraceModule extends Gdn_Module {
     public function ToString() {
         try {
             $Traces = Trace();
-            if (!$Traces)
+            if (!$Traces) {
                 return '';
+            }
 
             $this->SetData('Traces', $Traces);
 

@@ -37,8 +37,9 @@ class SiteTotalsModule extends Gdn_Module {
         // Try and get the count from the cache.
         $Key = "$Table.CountRows";
         $Count = Gdn::Cache()->Get($Key);
-        if ($Count !== Gdn_Cache::CACHEOP_FAILURE)
+        if ($Count !== Gdn_Cache::CACHEOP_FAILURE) {
             return $Count;
+        }
 
         // The count wasn't in the cache so grab it from the table.
         $Count = Gdn::SQL()

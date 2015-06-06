@@ -28,8 +28,9 @@ class RoleController extends DashboardController {
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');
-        if ($this->Menu)
+        if ($this->Menu) {
             $this->Menu->HighlightRoute('/dashboard/settings');
+        }
     }
 
     /**
@@ -39,8 +40,9 @@ class RoleController extends DashboardController {
      * @access public
      */
     public function Add() {
-        if (!$this->_Permission())
+        if (!$this->_Permission()) {
             return;
+        }
 
         $this->Title(T('Add Role'));
 
@@ -55,16 +57,18 @@ class RoleController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Delete($RoleID = FALSE) {
-        if (!$this->_Permission($RoleID))
+    public function Delete($RoleID = false) {
+        if (!$this->_Permission($RoleID)) {
             return;
+        }
 
         $this->Title(T('Delete Role'));
         $this->AddSideMenu('dashboard/role');
 
         $Role = $this->RoleModel->GetByRoleID($RoleID);
-        if ($Role->Deletable == '0')
+        if ($Role->Deletable == '0') {
             $this->Form->AddError('You cannot delete this role.');
+        }
 
         // Make sure the form knows which item we are deleting.
         $this->Form->AddHidden('RoleID', $RoleID);
@@ -73,7 +77,7 @@ class RoleController extends DashboardController {
         $this->AffectedUsers = $this->RoleModel->GetUserCount($RoleID);
 
         // Figure out how many users will be orphaned by this deletion
-        $this->OrphanedUsers = $this->RoleModel->GetUserCount($RoleID, TRUE);
+        $this->OrphanedUsers = $this->RoleModel->GetUserCount($RoleID, true);
 
         // Get a list of roles other than this one that can act as a replacement
         $this->ReplacementRoles = $this->RoleModel->GetByNotRoleID($RoleID);
@@ -112,13 +116,14 @@ class RoleController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Edit($RoleID = FALSE) {
+    public function Edit($RoleID = false) {
         if (!$this->_Permission($RoleID)) {
             return;
         }
 
-        if ($this->Head && $this->Head->Title() == '')
+        if ($this->Head && $this->Head->Title() == '') {
             $this->Head->Title(T('Edit Role'));
+        }
 
         $this->AddSideMenu('dashboard/role');
         $PermissionModel = Gdn::PermissionModel();
@@ -135,7 +140,7 @@ class RoleController extends DashboardController {
         $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
 
         // If seeing the form for the first time...
-        if ($this->Form->AuthenticatedPostBack() === FALSE) {
+        if ($this->Form->AuthenticatedPostBack() === false) {
             // Get the role data for the requested $RoleID and put it into the form.
             $Permissions = $PermissionModel->GetPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
             // Remove permissions the user doesn't have access to.
@@ -177,7 +182,7 @@ class RoleController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Index($RoleID = NULL) {
+    public function Index($RoleID = null) {
         $this->_Permission();
 
         $this->AddSideMenu('dashboard/role');
@@ -190,12 +195,12 @@ class RoleController extends DashboardController {
 
             // Check to see which roles can be modified.
             foreach ($RoleData as &$Row) {
-                $CanModify = TRUE;
+                $CanModify = true;
 
                 if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
                     foreach ($this->RoleModel->RankPermissions as $Permission) {
                         if ($Row[$Permission] && !Gdn::Session()->CheckPermission($Permission)) {
-                            $CanModify = FALSE;
+                            $CanModify = false;
                             break;
                         }
                     }
@@ -217,8 +222,8 @@ class RoleController extends DashboardController {
      * @since 2.0.0
      * @access protected
      */
-    protected function _Permission($RoleID = NULL) {
-        $this->Permission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), FALSE);
+    protected function _Permission($RoleID = null) {
+        $this->Permission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false);
 
         if ($RoleID && !CheckPermission('Garden.Settings.Manage')) {
             // Make sure the user can assign this role.
@@ -227,7 +232,7 @@ class RoleController extends DashboardController {
                 throw PermissionException('@'.T("You don't have permission to modify this role."));
             }
         }
-        return TRUE;
+        return true;
     }
 
     protected function RemoveRankPermissions() {

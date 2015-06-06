@@ -62,15 +62,15 @@ class ConversationModel extends ConversationsModel {
         }
     }
 
-    public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
-        $Result = array('Complete' => TRUE);
+    public function Counts($Column, $From = false, $To = false, $Max = false) {
+        $Result = array('Complete' => true);
         switch ($Column) {
             case 'CountMessages':
                 $this->Database->Query(DBAModel::GetCountSQL('count', 'Conversation', 'ConversationMessage', $Column, 'MessageID'));
                 break;
             case 'CountParticipants':
                 $this->SQL->Update('Conversation c')
-                    ->Set('c.CountParticipants', '(select count(uc.ConversationID) from GDN_UserConversation uc where uc.ConversationID = c.ConversationID and uc.Deleted = 0)', FALSE, FALSE)
+                    ->Set('c.CountParticipants', '(select count(uc.ConversationID) from GDN_UserConversation uc where uc.ConversationID = c.ConversationID and uc.Deleted = 0)', false, false)
                     ->Put();
                 break;
             case 'FirstMessageID':
@@ -86,7 +86,7 @@ class ConversationModel extends ConversationsModel {
                 $this->SQL
                     ->Update('Conversation c')
                     ->Join('ConversationMessage m', 'c.LastMessageID = m.MessageID')
-                    ->Set('c.UpdateUserID', 'm.InsertUserID', FALSE, FALSE)
+                    ->Set('c.UpdateUserID', 'm.InsertUserID', false, false)
                     ->Put();
                 break;
             default:
@@ -109,8 +109,9 @@ class ConversationModel extends ConversationsModel {
      * @return Gdn_DataSet SQL results.
      */
     public function Get($ViewingUserID, $Offset = '0', $Limit = '') {
-        if ($Limit == '')
+        if ($Limit == '') {
             $Limit = Gdn::Config('Conversations.Conversations.PerPage', 30);
+        }
 
         $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
 
@@ -138,9 +139,10 @@ class ConversationModel extends ConversationsModel {
      * @param int $Offset Number to skip.
      * @param int $Limit Maximum to return.
      */
-    public function Get2($UserID, $Offset = 0, $Limit = FALSE) {
-        if (!$Limit)
+    public function Get2($UserID, $Offset = 0, $Limit = false) {
+        if (!$Limit) {
             $Limit = C('Conversations.Conversations.PerPage', 30);
+        }
 
         // The self join is intentional in order to force the query to us an index-scan instead of a table-scan.
         $Data = $this->SQL
@@ -162,8 +164,9 @@ class ConversationModel extends ConversationsModel {
 
         // Add some calculated fields.
         foreach ($Result as &$Row) {
-            if ($Row['UserLastMessageID'])
+            if ($Row['UserLastMessageID']) {
                 $Row['LastMessageID'] = $Row['UserLastMessageID'];
+            }
             $Row['CountNewMessages'] = $Row['CountMessages'] - $Row['CountReadMessages'];
             unset($Row['UserLastMessageID']);
         }
@@ -172,13 +175,15 @@ class ConversationModel extends ConversationsModel {
         $this->JoinParticipants($Result);
 
         // Join in the last message.
-        Gdn_DataSet::Join($Result,
+        Gdn_DataSet::Join(
+            $Result,
             array(
                 'table' => 'ConversationMessage',
                 'prefix' => 'Last',
                 'parent' => 'LastMessageID',
                 'child' => 'MessageID',
-                'InsertUserID', 'DateInserted', 'Body', 'Format'));
+                'InsertUserID', 'DateInserted', 'Body', 'Format')
+        );
 
         return $Data;
     }
@@ -194,8 +199,9 @@ class ConversationModel extends ConversationsModel {
      * @return int Number of messages.
      */
     public function GetCount($ViewingUserID, $Wheres = '') {
-        if (is_array($Wheres))
+        if (is_array($Wheres)) {
             $this->SQL->Where($Wheres);
+        }
 
         return $this->SQL
             ->Select('uc.UserID', 'count', 'Count')
@@ -215,16 +221,18 @@ class ConversationModel extends ConversationsModel {
      * @return int Number of messages.
      */
     public function GetCountWhere($Wheres = '') {
-        if (is_array($Wheres))
+        if (is_array($Wheres)) {
             $this->SQL->Where($Wheres);
+        }
 
         $Data = $this->SQL
             ->Select('ConversationID', 'count', 'Count')
             ->From('Conversation')
             ->Get();
 
-        if ($Data->NumRows() > 0)
+        if ($Data->NumRows() > 0) {
             return $Data->FirstRow()->Count;
+        }
 
         return 0;
     }
@@ -239,14 +247,15 @@ class ConversationModel extends ConversationsModel {
      * @param int $ViewingUserID Unique ID of current user.
      * @return Gdn_DataSet SQL result (single row).
      */
-    public function GetID($ConversationID, $ViewingUserID = FALSE) {
+    public function GetID($ConversationID, $ViewingUserID = false) {
         // Get the conversation.
         $Conversation = $this->GetWhere(array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
 
         if ($ViewingUserID) {
             $Data = $this->SQL->GetWhere(
                 'UserConversation',
-                array('ConversationID' => $ConversationID, 'UserID' => $ViewingUserID))
+                array('ConversationID' => $ConversationID, 'UserID' => $ViewingUserID)
+            )
                 ->FirstRow(DATASET_TYPE_ARRAY);
 
             // Convert the array.
@@ -285,8 +294,9 @@ class ConversationModel extends ConversationsModel {
         // Loop through the data and find the conversations with >= $Max participants.
         $IDs = array();
         foreach ($Data as $Row) {
-            if ($Row['CountParticipants'] <= $Max)
+            if ($Row['CountParticipants'] <= $Max) {
                 $IDs[] = $Row['ConversationID'];
+            }
         }
 
         $Users = $this->SQL
@@ -296,7 +306,7 @@ class ConversationModel extends ConversationsModel {
             ->Get()->ResultArray();
         Gdn::UserModel()->JoinUsers($Users, array('UserID'));
 
-        $Users = Gdn_DataSet::Index($Users, array('ConversationID'), array('Unique' => FALSE));
+        $Users = Gdn_DataSet::Index($Users, array('ConversationID'), array('Unique' => false));
 
 
         foreach ($Data as &$Row) {
@@ -318,9 +328,9 @@ class ConversationModel extends ConversationsModel {
     public function InConversation($ConversationID, $UserID) {
         $Row = $this->SQL->GetWhere('UserConversation', array('ConversationID' => $ConversationID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
         if (!$Row) {
-            return FALSE;
+            return false;
         } elseif (!$Row['Deleted']) {
-            return TRUE;
+            return true;
         } else {
             return (int)$Row['Deleted'];
         }
@@ -331,8 +341,9 @@ class ConversationModel extends ConversationsModel {
         $IDs = array();
         foreach ($Data as &$Row) {
             $Row['CountNewMessages'] = $Row['CountMessages'] - $Row['CountReadMessages'];
-            if ($Row['UserLastMessageID'])
+            if ($Row['UserLastMessageID']) {
                 $Row['LastMessageID'] = $Row['UserLastMessageID'];
+            }
             $IDs[] = $Row['LastMessageID'];
         }
 
@@ -351,8 +362,8 @@ class ConversationModel extends ConversationsModel {
             } else {
                 $Row['LastMessageUserID'] = $Row['InsertUserID'];
                 $Row['DateLastMessage'] = $Row['DateInserted'];
-                $Row['LastMessage'] = NULL;
-                $Row['Format'] = NULL;
+                $Row['LastMessage'] = null;
+                $Row['Format'] = null;
             }
         }
 
@@ -367,18 +378,18 @@ class ConversationModel extends ConversationsModel {
      * @param array|object $Participants
      * @return string Returns a title for the conversation.
      */
-    public static function ParticipantTitle($Conversation, $Html = TRUE, $Max = 3) {
+    public static function ParticipantTitle($Conversation, $Html = true, $Max = 3) {
         $Participants = GetValue('Participants', $Conversation);
         $Total = (int)GetValue('CountParticipants', $Conversation);
         $MyID = Gdn::Session()->UserID;
-        $FoundMe = FALSE;
+        $FoundMe = false;
 
         // Try getting people that haven't left the conversation and aren't you.
         $Users = array();
         $i = 0;
         foreach ($Participants as $Row) {
             if (GetValue('UserID', $Row) == $MyID) {
-                $FoundMe = TRUE;
+                $FoundMe = true;
                 continue;
             }
             if (GetValue('Deleted', $Row)) {
@@ -391,19 +402,21 @@ class ConversationModel extends ConversationsModel {
             }
 
             $i++;
-            if ($i > $Max || ($Total > $Max && $i === $Max))
+            if ($i > $Max || ($Total > $Max && $i === $Max)) {
                 break;
+            }
         }
 
         $Count = count($Users);
 
         if ($Count === 0) {
-            if ($FoundMe)
+            if ($FoundMe) {
                 $Result = T('Just you');
-            elseif ($Total)
+            } elseif ($Total)
                 $Result = Plural($Total, '%s person', '%s people');
-            else
+            else {
                 $Result = T('Nobody');
+            }
         } else {
             $Px = implode(', ', $Users);
 
@@ -468,9 +481,8 @@ class ConversationModel extends ConversationsModel {
         $this->AddUpdateFields($FormPostValues);
 
         // Validate the form posted values
-        $ConversationID = FALSE;
-        if (
-            $this->Validate($FormPostValues)
+        $ConversationID = false;
+        if ($this->Validate($FormPostValues)
             && $MessageModel->Validate($FormPostValues)
             && !$this->CheckForSpam('Conversation')
         ) {
@@ -480,8 +492,9 @@ class ConversationModel extends ConversationsModel {
             // Define the recipients, and make sure that the sender is in the list
             $RecipientUserIDs = GetValue('RecipientUserID', $Fields, 0);
 
-            if (!in_array($FormPostValues['InsertUserID'], $RecipientUserIDs))
+            if (!in_array($FormPostValues['InsertUserID'], $RecipientUserIDs)) {
                 $RecipientUserIDs[] = $FormPostValues['InsertUserID'];
+            }
 
             // Also make sure there are no duplicates in the recipient list
             $RecipientUserIDs = array_unique($RecipientUserIDs);
@@ -496,8 +509,8 @@ class ConversationModel extends ConversationsModel {
             // messages each have a separate counter. Without this, a new
             // conversation will cause itself AND the message model spam counter
             // to increment by 1.
-            $MessageID = $MessageModel->Save($FormPostValues, NULL, array(
-                'NewConversation' => TRUE
+            $MessageID = $MessageModel->Save($FormPostValues, null, array(
+                'NewConversation' => true
             ));
 
             $this->SQL
@@ -509,7 +522,7 @@ class ConversationModel extends ConversationsModel {
             // Now that the message & conversation have been inserted, insert all of the recipients
             foreach ($RecipientUserIDs as $UserID) {
                 $CountReadMessages = $UserID == $FormPostValues['InsertUserID'] ? 1 : 0;
-                $this->SQL->Options('Ignore', TRUE)->Insert('UserConversation', array(
+                $this->SQL->Options('Ignore', true)->Insert('UserConversation', array(
                     'UserID' => $UserID,
                     'ConversationID' => $ConversationID,
                     'LastMessageID' => $MessageID,
@@ -602,7 +615,7 @@ class ConversationModel extends ConversationsModel {
      * @param bool $Save Whether to update user record.
      * @return int
      */
-    public function CountUnread($UserID, $Save = TRUE) {
+    public function CountUnread($UserID, $Save = true) {
         // Also update the unread conversation count for this user
         $CountUnread = $this->SQL
             ->Select('c.ConversationID', 'count', 'CountUnread')
@@ -612,8 +625,9 @@ class ConversationModel extends ConversationsModel {
             ->Where('uc.Deleted', 0)
             ->Get()->Value('CountUnread', 0);
 
-        if ($Save)
+        if ($Save) {
             Gdn::UserModel()->SetField($UserID, 'CountUnreadConversations', $CountUnread);
+        }
 
         return $CountUnread;
     }
@@ -631,9 +645,9 @@ class ConversationModel extends ConversationsModel {
         // Update the the read conversation count for the user.
         $this->SQL->Update('UserConversation uc')
             ->Join('Conversation c', 'c.ConversationID = uc.ConversationID')
-            ->Set('uc.CountReadMessages', 'c.CountMessages', FALSE)
+            ->Set('uc.CountReadMessages', 'c.CountMessages', false)
             ->Set('uc.DateLastViewed', Gdn_Format::ToDateTime())
-            ->Set('uc.LastMessageID', 'c.LastMessageID', FALSE)
+            ->Set('uc.LastMessageID', 'c.LastMessageID', false)
             ->Where('c.ConversationID', $ConversationID)
             ->Where('uc.ConversationID', $ConversationID)
             ->Where('uc.UserID', $ReadingUserID)
@@ -643,8 +657,9 @@ class ConversationModel extends ConversationsModel {
         $CountUnread = $this->CountUnread($ReadingUserID);
 
         // Also write through to the current session user.
-        if ($ReadingUserID > 0 && $ReadingUserID == Gdn::Session()->UserID)
+        if ($ReadingUserID > 0 && $ReadingUserID == Gdn::Session()->UserID) {
             Gdn::Session()->User->CountUnreadConversations = $CountUnread;
+        }
     }
 
     /**
@@ -658,7 +673,7 @@ class ConversationModel extends ConversationsModel {
      * @return bool Whether it is currently bookmarked.
      */
     public function Bookmark($ConversationID, $UserID) {
-        $Bookmark = FALSE;
+        $Bookmark = false;
         $Discussion = $this->GetID($ConversationID, $UserID);
         if (is_object($Discussion)) {
             $Bookmark = $Discussion->Bookmark == '0' ? '1' : '0';
@@ -667,7 +682,7 @@ class ConversationModel extends ConversationsModel {
                 ->Where('ConversationID', $ConversationID)
                 ->Where('UserID', $UserID)
                 ->Put();
-            $Bookmark == '1' ? TRUE : FALSE;
+            $Bookmark == '1' ? true : false;
         }
         return $Bookmark;
     }
@@ -682,8 +697,9 @@ class ConversationModel extends ConversationsModel {
      * @param int $UserID Unique ID of current user.
      */
     public function AddUserToConversation($ConversationID, $UserID) {
-        if (!is_array($UserID))
+        if (!is_array($UserID)) {
             $UserID = array($UserID);
+        }
 
         // First define the current users in the conversation
         $OldContributorData = $this->GetRecipients($ConversationID);
@@ -714,20 +730,23 @@ class ConversationModel extends ConversationsModel {
             } elseif ($OldContributorData[$NewUserID]->Deleted) {
                 $AddedUserIDs[] = $NewUserID;
 
-                $this->SQL->Put('UserConversation',
+                $this->SQL->Put(
+                    'UserConversation',
                     array('Deleted' => 0),
-                    array('ConversationID' => $ConversationID, 'UserID' => $NewUserID));
+                    array('ConversationID' => $ConversationID, 'UserID' => $NewUserID)
+                );
             }
         }
         if (count($AddedUserIDs) > 0) {
             $ActivityModel = new ActivityModel();
             foreach ($AddedUserIDs as $AddedUserID) {
-                $ActivityModel->Queue(array(
+                $ActivityModel->Queue(
+                    array(
                     'ActivityType' => 'AddedToConversation',
                     'NotifyUserID' => $AddedUserID,
                     'HeadlineFormat' => T('You were added to a conversation.', '{ActivityUserID,User} added you to a <a href="{Url,htmlencode}">conversation</a>.'),
                     'Route' => '/messages/'.$ConversationID
-                ),
+                    ),
                     'ConversationMessage'
                 );
             }
@@ -749,7 +768,7 @@ class ConversationModel extends ConversationsModel {
      */
     public function AddUserAllowed($ConversationID = 0, $CountRecipients = 0) {
         // Determine whether recipients can be added
-        $CanAddRecipients = TRUE;
+        $CanAddRecipients = true;
         $MaxCount = C('Conversations.MaxRecipients');
 
         // Avoid a query if we already know we can add. MaxRecipients being unset means unlimited.
@@ -773,8 +792,9 @@ class ConversationModel extends ConversationsModel {
      * @param int $ConversationID
      */
     public function UpdateParticipantCount($ConversationID) {
-        if (!$ConversationID)
+        if (!$ConversationID) {
             return;
+        }
 
         $Count = $this->SQL
             ->Select('uc.UserID', 'count', 'CountParticipants')
@@ -792,16 +812,17 @@ class ConversationModel extends ConversationsModel {
      * @param array $UserIDs Array of ints.
      * @param bool $SkipSelf Whether to omit current user.
      */
-    public function UpdateUserUnreadCount($UserIDs, $SkipSelf = FALSE) {
+    public function UpdateUserUnreadCount($UserIDs, $SkipSelf = false) {
 
         // Get the current user out of this array
-        if ($SkipSelf)
+        if ($SkipSelf) {
             $UserIDs = array_diff($UserIDs, array(Gdn::Session()->UserID));
+        }
 
         // Update the CountUnreadConversations count on each user related to the discussion.
         $this->SQL
             ->Update('User')
-            ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', FALSE)
+            ->Set('CountUnreadConversations', 'coalesce(CountUnreadConversations, 0) + 1', false)
             ->WhereIn('UserID', $UserIDs)
             ->Put();
 

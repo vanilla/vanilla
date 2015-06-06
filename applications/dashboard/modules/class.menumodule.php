@@ -8,7 +8,7 @@
  * @since 2.0
  */
 
-if (!class_exists('MenuModule', FALSE)) {
+if (!class_exists('MenuModule', false)) {
     /**
      * Manages the items in the page menu and eventually returns the menu as a
      * string with ToString();
@@ -54,9 +54,10 @@ if (!class_exists('MenuModule', FALSE)) {
          * @param string $Attributes
          * @param string $AnchorAttributes
          */
-        public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '', $AnchorAttributes = '') {
-            if (!array_key_exists($Group, $this->Items))
+        public function AddLink($Group, $Text, $Url, $Permission = false, $Attributes = '', $AnchorAttributes = '') {
+            if (!array_key_exists($Group, $this->Items)) {
                 $this->Items[$Group] = array();
+            }
 
             $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes);
         }
@@ -69,11 +70,12 @@ if (!class_exists('MenuModule', FALSE)) {
          * @param bool $Permission
          * @param string $Attributes
          */
-        public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
-            if (!array_key_exists($Group, $this->Items))
+        public function AddItem($Group, $Text, $Permission = false, $Attributes = '') {
+            if (!array_key_exists($Group, $this->Items)) {
                 $this->Items[$Group] = array();
+            }
 
-            $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
+            $this->Items[$Group][] = array('Text' => $Text, 'Url' => false, 'Permission' => $Permission, 'Attributes' => $Attributes);
         }
 
         /**
@@ -130,8 +132,9 @@ if (!class_exists('MenuModule', FALSE)) {
          * Removes an entire group of links, and the group itself, from the menu.
          */
         public function RemoveGroup($Group) {
-            if (array_key_exists($Group, $this->Items))
+            if (array_key_exists($Group, $this->Items)) {
                 unset($this->Items[$Group]);
+            }
         }
 
         /**
@@ -142,11 +145,13 @@ if (!class_exists('MenuModule', FALSE)) {
          * @throws Exception
          */
         public function ToString($HighlightRoute = '') {
-            if ($HighlightRoute == '')
+            if ($HighlightRoute == '') {
                 $HighlightRoute = $this->_HighlightRoute;
+            }
 
-            if ($HighlightRoute == '')
+            if ($HighlightRoute == '') {
                 $HighlightRoute = Gdn_Url::Request();
+            }
 
             $this->FireEvent('BeforeToString');
 
@@ -155,15 +160,15 @@ if (!class_exists('MenuModule', FALSE)) {
             $Session_TransientKey = '';
             $Permissions = array();
             $Session = Gdn::Session();
-            $HasPermissions = FALSE;
-            $Admin = FALSE;
-            if ($Session->IsValid() === TRUE) {
+            $HasPermissions = false;
+            $Admin = false;
+            if ($Session->IsValid() === true) {
                 $UserID = $Session->User->UserID;
                 $Username = $Session->User->Name;
                 $Session_TransientKey = $Session->TransientKey();
                 $Permissions = $Session->GetPermissions();
                 $HasPermissions = count($Permissions) > 0;
-                $Admin = $Session->User->Admin > 0 ? TRUE : FALSE;
+                $Admin = $Session->User->Admin > 0 ? true : false;
             }
 
             $Menu = '';
@@ -188,23 +193,24 @@ if (!class_exists('MenuModule', FALSE)) {
                 foreach ($Items as $GroupName => $Links) {
                     $ItemCount = 0;
                     $LinkCount = 0;
-                    $OpenGroup = FALSE;
+                    $OpenGroup = false;
                     $Group = '';
                     foreach ($Links as $Key => $Link) {
-                        $CurrentLink = FALSE;
-                        $ShowLink = FALSE;
-                        $RequiredPermissions = array_key_exists('Permission', $Link) ? $Link['Permission'] : FALSE;
-                        if ($RequiredPermissions !== FALSE && !is_array($RequiredPermissions))
+                        $CurrentLink = false;
+                        $ShowLink = false;
+                        $RequiredPermissions = array_key_exists('Permission', $Link) ? $Link['Permission'] : false;
+                        if ($RequiredPermissions !== false && !is_array($RequiredPermissions)) {
                             $RequiredPermissions = explode(',', $RequiredPermissions);
+                        }
 
                         // Show if there are no permissions or the user has ANY of the specified permissions or the user is admin
-                        $ShowLink = $Admin || $RequiredPermissions === FALSE || ArrayInArray($RequiredPermissions, $Permissions, FALSE) === TRUE;
+                        $ShowLink = $Admin || $RequiredPermissions === false || ArrayInArray($RequiredPermissions, $Permissions, false) === true;
 
-                        if ($ShowLink === TRUE) {
+                        if ($ShowLink === true) {
                             if ($ItemCount == 1) {
                                 $Group .= '<ul>';
-                                $OpenGroup = TRUE;
-                            } else if ($ItemCount > 1) {
+                                $OpenGroup = true;
+                            } elseif ($ItemCount > 1) {
                                 $Group .= "</li>\r\n";
                             }
 
@@ -216,13 +222,14 @@ if (!class_exists('MenuModule', FALSE)) {
                             }
                             $Attributes = ArrayValue('Attributes', $Link, array());
                             $AnchorAttributes = ArrayValue('AnchorAttributes', $Link, array());
-                            if ($Url !== FALSE) {
+                            if ($Url !== false) {
                                 $Url = Url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
                                 $CurrentLink = $Url == Url($HighlightRoute);
 
                                 $CssClass = ArrayValue('class', $Attributes, '');
-                                if ($CurrentLink)
+                                if ($CurrentLink) {
                                     $Attributes['class'] = $CssClass.' Highlight';
+                                }
 
                                 $Group .= '<li'.Attribute($Attributes).'><a'.Attribute($AnchorAttributes).' href="'.$Url.'">'.$Text.'</a>';
                                 ++$LinkCount;
@@ -232,14 +239,17 @@ if (!class_exists('MenuModule', FALSE)) {
                             ++$ItemCount;
                         }
                     }
-                    if ($OpenGroup === TRUE)
+                    if ($OpenGroup === true) {
                         $Group .= "</li>\r\n</ul>\r\n";
+                    }
 
-                    if ($Group != '' && $LinkCount > 0)
+                    if ($Group != '' && $LinkCount > 0) {
                         $Menu .= $Group."</li>\r\n";
+                    }
                 }
-                if ($Menu != '')
+                if ($Menu != '') {
                     $Menu = '<ul id="'.$this->HtmlId.'"'.($this->CssClass != '' ? ' class="'.$this->CssClass.'"' : '').'>'.$Menu.'</ul>';
+                }
             }
             return $Menu;
         }

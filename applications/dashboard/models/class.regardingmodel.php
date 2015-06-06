@@ -79,5 +79,4 @@ class RegardingModel extends Gdn_Model {
             ->WhereIn('ForeignID', $ForeignIDs)
             ->Get();
     }
-
 }

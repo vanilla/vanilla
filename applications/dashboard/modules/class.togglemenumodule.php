@@ -17,7 +17,7 @@ class ToggleMenuModule extends Gdn_Module {
     private $_Labels = array();
 
     /** @var bool  */
-    private $_CurrentLabelCode = FALSE;
+    private $_CurrentLabelCode = false;
 
     /**
      *
@@ -27,8 +27,9 @@ class ToggleMenuModule extends Gdn_Module {
      * @param string $Url
      */
     public function AddLabel($Name, $Code = '', $Url = '') {
-        if ($Code == '')
+        if ($Code == '') {
             $Code = Gdn_Format::Url(ucwords(trim(Gdn_Format::PlainText($Name))));
+        }
 
         $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
     }
@@ -40,12 +41,14 @@ class ToggleMenuModule extends Gdn_Module {
      * @return bool|string
      */
     public function CurrentLabelCode($Label = '') {
-        if ($Label != '')
+        if ($Label != '') {
             $this->_CurrentLabelCode = $Label;
+        }
 
         // If the current code hasn't been assigned, use the first available label
-        if (!$this->_CurrentLabelCode && count($this->_Labels) > 0)
+        if (!$this->_CurrentLabelCode && count($this->_Labels) > 0) {
             return $this->_Labels[0]['Code'];
+        }
 
         return $this->_CurrentLabelCode;
     }
@@ -59,8 +62,9 @@ class ToggleMenuModule extends Gdn_Module {
         $Return = '<ul class="FilterMenu ToggleMenu">';
         foreach ($this->_Labels as $Label) {
             $Url = GetValue('Url', $Label, '');
-            if ($Url == '')
+            if ($Url == '') {
                 $Url = '#';
+            }
 
             $Name = GetValue('Name', $Label, '');
             $Code = GetValue('Code', $Label, '');

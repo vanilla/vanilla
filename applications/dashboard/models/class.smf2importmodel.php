@@ -39,21 +39,24 @@ class Smf2ImportModel extends Gdn_Model {
 
                 $ImageBaseName = pathinfo($Image, PATHINFO_BASENAME) + 1;
 
-                if (!file_exists($Image))
+                if (!file_exists($Image)) {
                     rename(substr($Image, 0, -$ImageExtension), $Image);
+                }
 
                 // Make sure the avatars folder exists.
-                if (!file_exists(PATH_ROOT.'/uploads/userpics'))
+                if (!file_exists(PATH_ROOT.'/uploads/userpics')) {
                     mkdir(PATH_ROOT.'/uploads/userpics');
+                }
 
                 // Save the uploaded image in profile size
-                if (!file_exists(PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName))
+                if (!file_exists(PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName)) {
                     $UploadImage->SaveImageAs(
                         $Image,
                         PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName,
                         Gdn::Config('Garden.Profile.MaxHeight', 1000),
                         Gdn::Config('Garden.Profile.MaxWidth', 250)
                     );
+                }
 
                 // Save the uploaded image in preview size
                 /*if (!file_exists(PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName))
@@ -66,14 +69,15 @@ class Smf2ImportModel extends Gdn_Model {
 
                 // Save the uploaded image in thumbnail size
                 $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
-                if (!file_exists(PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName))
+                if (!file_exists(PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName)) {
                     $UploadImage->SaveImageAs(
                         $Image,
                         PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName,
                         $ThumbSize,
                         $ThumbSize,
-                        TRUE
+                        true
                     );
+                }
 
             } catch (Exception $ex) {
             }

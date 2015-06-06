@@ -61,7 +61,7 @@
 class AttachmentModel extends Gdn_Model {
 
     /** @var AttachmentModel */
-    static $Instance = NULL;
+    static $Instance = null;
 
     /**
      * Set up the attachment.
@@ -102,7 +102,7 @@ class AttachmentModel extends Gdn_Model {
      * @return bool
      */
     public static function Enabled() {
-        return C('Garden.AttachmentsEnabled', FALSE);
+        return C('Garden.AttachmentsEnabled', false);
     }
 
     /**
@@ -171,7 +171,7 @@ class AttachmentModel extends Gdn_Model {
      * in addition; We CalculateRow for each record found (Add Attachments)
      * @see Gdn_Model::GetWhere
      */
-    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+    public function GetWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
 
         $Data = parent::GetWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
         $Rows =& $Data->ResultArray();
@@ -206,18 +206,19 @@ class AttachmentModel extends Gdn_Model {
      * @param $Data2 - Optional set of Data to which to attach comments
      *
      */
-    public function JoinAttachments(&$Data, &$Data2 = NULL) {
-        if ($Data == NULL) {
+    public function JoinAttachments(&$Data, &$Data2 = null) {
+        if ($Data == null) {
             return;
         }
         // Gather the Ids.
         $ForeignIDs = array();
         self::GatherIDs($Data, $ForeignIDs);
-        if ($Data2)
+        if ($Data2) {
             self::GatherIDs($Data2, $ForeignIDs);
+        }
         // Get the attachments.
         $Attachments = $this->GetWhere(array('ForeignID' => array_keys($ForeignIDs)), 'DateInserted', 'desc')->ResultArray();
-        $Attachments = Gdn_DataSet::Index($Attachments, 'ForeignID', array('Unique' => FALSE));
+        $Attachments = Gdn_DataSet::Index($Attachments, 'ForeignID', array('Unique' => false));
 
         // Join the attachments.
         $this->JoinAttachmentsTo($Data, $Attachments);
@@ -236,13 +237,13 @@ class AttachmentModel extends Gdn_Model {
     public function JoinAttachmentsToUser($Sender, $Args, $Where = array(), $Limit = 20) {
         $User = $Sender->User;
         if (!is_object($User)) {
-            return FALSE;
+            return false;
         }
         $Where = array_merge(array('ForeignUserID' => $User->UserID), $Where);
 
         $Attachments = $this->GetWhere($Where, '', 'desc', $Limit)->ResultArray();
         $Sender->SetData('Attachments', $Attachments);
-        return TRUE;
+        return true;
     }
 
     protected function JoinAttachmentsTo(&$Data, $Attachments) {
@@ -270,7 +271,7 @@ class AttachmentModel extends Gdn_Model {
      * @param bool $Settings
      * @return bool|mixed Primary Key Value
      */
-    public function Save($Data, $Settings = FALSE) {
+    public function Save($Data, $Settings = false) {
         $this->DefineSchema();
         $SchemaFields = $this->Schema->Fields();
 
@@ -282,26 +283,28 @@ class AttachmentModel extends Gdn_Model {
             $PrimaryKeyVal = $Data['AttachmentID'];
             $CurrentAttachment = $this->SQL->GetWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
             if ($CurrentAttachment) {
-
                 $Attributes = @unserialize($CurrentAttachment['Attributes']);
-                if (!$Attributes)
+                if (!$Attributes) {
                     $Attributes = array();
+                }
 
-                $Insert = FALSE;
-            } else
-                $Insert = TRUE;
+                $Insert = false;
+            } else {
+                $Insert = true;
+            }
         } else {
-            $PrimaryKeyVal = FALSE;
-            $Insert = TRUE;
+            $PrimaryKeyVal = false;
+            $Insert = true;
         }
 
         // Grab any values that aren't in the db schema and stick them in attributes.
         foreach ($Data as $Name => $Value) {
-            if ($Name == 'Attributes')
+            if ($Name == 'Attributes') {
                 continue;
+            }
             if (isset($SchemaFields[$Name])) {
                 $SaveData[$Name] = $Value;
-            } elseif ($Value === NULL) {
+            } elseif ($Value === null) {
                 unset($Attributes[$Name]);
             } else {
                 $Attributes[$Name] = $Value;
@@ -310,7 +313,7 @@ class AttachmentModel extends Gdn_Model {
         if (sizeof($Attributes)) {
             $SaveData['Attributes'] = $Attributes;
         } else {
-            $SaveData['Attributes'] = NULL;
+            $SaveData['Attributes'] = null;
         }
 
         if ($Insert) {
@@ -320,17 +323,17 @@ class AttachmentModel extends Gdn_Model {
         }
 
         // Validate the form posted values.
-        if ($this->Validate($SaveData, $Insert) === TRUE) {
+        if ($this->Validate($SaveData, $Insert) === true) {
             $Fields = $this->Validation->ValidationFields();
 
-            if ($Insert === FALSE) {
+            if ($Insert === false) {
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
                 $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {
                 $PrimaryKeyVal = $this->Insert($Fields);
             }
         } else {
-            $PrimaryKeyVal = FALSE;
+            $PrimaryKeyVal = false;
         }
         return $PrimaryKeyVal;
     }
@@ -347,5 +350,4 @@ class AttachmentModel extends Gdn_Model {
         $method = str_replace(' ', '', $method);
         return 'Write'.$method.'Attachment';
     }
-
 }

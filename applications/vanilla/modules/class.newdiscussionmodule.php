@@ -14,7 +14,7 @@
 class NewDiscussionModule extends Gdn_Module {
 
     /** @var int Which category we are viewing (if any). */
-    public $CategoryID = NULL;
+    public $CategoryID = null;
 
     /** @var string Which button will be used as the default. */
     public $DefaultButton;
@@ -40,10 +40,10 @@ class NewDiscussionModule extends Gdn_Module {
      * @param string $Sender
      * @param bool $ApplicationFolder Unused.
      */
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+    public function __construct($Sender = '', $ApplicationFolder = false) {
         parent::__construct($Sender, 'Vanilla');
         // Customize main button by setting Vanilla.DefaultNewButton to URL code. Example: "post/question"
-        $this->DefaultButton = C('Vanilla.DefaultNewButton', FALSE);
+        $this->DefaultButton = C('Vanilla.DefaultNewButton', false);
     }
 
     /**
@@ -72,8 +72,8 @@ class NewDiscussionModule extends Gdn_Module {
      */
     public function ToString() {
         // Set CategoryID if we have one.
-        if ($this->CategoryID === NULL) {
-            $this->CategoryID = Gdn::Controller()->Data('Category.CategoryID', FALSE);
+        if ($this->CategoryID === null) {
+            $this->CategoryID = Gdn::Controller()->Data('Category.CategoryID', false);
         }
 
         // Allow plugins and themes to modify parameters.
@@ -84,9 +84,9 @@ class NewDiscussionModule extends Gdn_Module {
         $PermissionCategory = CategoryModel::PermissionCategory($this->CategoryID);
         if ($this->CategoryID) {
             $Category = CategoryModel::Categories($this->CategoryID);
-            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', GetValue('CategoryID', $PermissionCategory));
+            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', true, 'Category', GetValue('CategoryID', $PermissionCategory));
         } else {
-            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', 'any');
+            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', true, 'Category', 'any');
         }
 
         // Determine if this is a guest & we're using "New Discussion" button as call to action.
@@ -122,7 +122,7 @@ class NewDiscussionModule extends Gdn_Module {
         // Add QueryString to URL if one is defined.
         if ($this->QueryString && $HasPermission) {
             foreach ($this->Buttons as &$Row) {
-                $Row['Url'] .= (strpos($Row['Url'], '?') !== FALSE ? '&' : '?').$this->QueryString;
+                $Row['Url'] .= (strpos($Row['Url'], '?') !== false ? '&' : '?').$this->QueryString;
             }
         }
 

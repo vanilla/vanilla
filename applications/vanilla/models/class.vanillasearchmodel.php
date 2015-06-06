@@ -14,7 +14,7 @@
 class VanillaSearchModel extends Gdn_Model {
 
     /** @var object DiscussionModel */
-    protected $_DiscussionModel = FALSE;
+    protected $_DiscussionModel = false;
 
     /**
      * Makes a discussion model available.
@@ -25,11 +25,11 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $Value DiscussionModel.
      * @return object DiscussionModel.
      */
-    public function DiscussionModel($Value = FALSE) {
-        if ($Value !== FALSE) {
+    public function DiscussionModel($Value = false) {
+        if ($Value !== false) {
             $this->_DiscussionModel = $Value;
         }
-        if ($this->_DiscussionModel === FALSE) {
+        if ($this->_DiscussionModel === false) {
             require_once(dirname(__FILE__).DS.'class.discussionmodel.php');
             $this->_DiscussionModel = new DiscussionModel();
         }
@@ -45,12 +45,12 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $SearchModel SearchModel (Dashboard)
      * @return object SQL result.
      */
-    public function DiscussionSql($SearchModel, $AddMatch = TRUE) {
+    public function DiscussionSql($SearchModel, $AddMatch = true) {
         // Get permission and limit search categories if necessary.
         if ($AddMatch) {
             $Perms = CategoryModel::CategoryWatch();
 
-            if ($Perms !== TRUE) {
+            if ($Perms !== true) {
                 $this->SQL->WhereIn('d.CategoryID', $Perms);
             }
 
@@ -89,11 +89,11 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $SearchModel SearchModel (Dashboard)
      * @return object SQL result.
      */
-    public function CommentSql($SearchModel, $AddMatch = TRUE) {
+    public function CommentSql($SearchModel, $AddMatch = true) {
         if ($AddMatch) {
             // Get permission and limit search categories if necessary.
             $Perms = CategoryModel::CategoryWatch();
-            if ($Perms !== TRUE) {
+            if ($Perms !== true) {
                 $this->SQL->WhereIn('d.CategoryID', $Perms);
             }
 

@@ -22,10 +22,10 @@ class InThisConversationModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (is_object($this->Data) && $this->Data->NumRows() > 0)
+        if (is_object($this->Data) && $this->Data->NumRows() > 0) {
             return parent::ToString();
+        }
 
         return '';
     }
-
 }

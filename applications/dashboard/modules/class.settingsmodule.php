@@ -41,19 +41,18 @@ class SettingsModule extends Gdn_Module {
                 break;
             case self::TYPE_PLUGIN:
                 if ($IsRemovable = !array_key_exists($Name, Gdn::PluginManager()->EnabledPlugins())) {
-                    $PluginInfo = ArrayValue($Name, Gdn::PluginManager()->AvailablePlugins(), FALSE);
-                    $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
+                    $PluginInfo = ArrayValue($Name, Gdn::PluginManager()->AvailablePlugins(), false);
+                    $PluginFolder = ArrayValue('Folder', $PluginInfo, false);
 
                     $IsRemovable = IsWritable(PATH_PLUGINS.DS.$PluginFolder);
                 }
                 break;
             case self::TYPE_THEME:
                 // TODO
-                $IsRemovable = FALSE;
+                $IsRemovable = false;
                 break;
         }
 
         return $IsRemovable;
     }
-
 }

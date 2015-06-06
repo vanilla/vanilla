@@ -11,7 +11,7 @@
 class ConditionModule extends Gdn_Module {
 
     /** @var null  */
-    protected $_Conditions = NULL;
+    protected $_Conditions = null;
 
     /** @var string  */
     public $Prefix = 'Cond';
@@ -22,10 +22,10 @@ class ConditionModule extends Gdn_Module {
      * @param null $Value
      * @return array|null
      */
-    public function Conditions($Value = NULL) {
-        if (is_array($Value))
+    public function Conditions($Value = null) {
+        if (is_array($Value)) {
             $this->_Conditions = $Value;
-        elseif ($this->_Conditions === NULL) {
+        } elseif ($this->_Conditions === null) {
             if ($this->_Sender->Form->AuthenticatedPostBack()) {
                 $this->_Conditions = $this->_FromForm();
             } else {
@@ -33,12 +33,13 @@ class ConditionModule extends Gdn_Module {
             }
         }
 
-        if ($Value === TRUE) {
+        if ($Value === true) {
             // Remove blank conditions from the array. This is used for saving.
             $Result = array();
             foreach ($this->_Conditions as $Condition) {
-                if (count($Condition) < 2 || !$Condition[0])
+                if (count($Condition) < 2 || !$Condition[0]) {
                     continue;
+                }
                 $Result[] = $Condition;
             }
             return $Result;
@@ -90,8 +91,7 @@ class ConditionModule extends Gdn_Module {
         $Expressions = (array)$Form->GetFormValue($Px.'Expr', array());
 
         $Conditions = array();
-        for ($i = 0; $i < count($Types) - 1; $i++) { // last condition always template row.
-
+        for ($i = 0; $i < count($Types) - 1; $i++) {
             $Condition = array($Types[$i]);
             switch ($Types[$i]) {
                 case Gdn_Condition::PERMISSION:

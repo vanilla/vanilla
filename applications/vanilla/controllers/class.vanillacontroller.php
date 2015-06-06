@@ -42,5 +42,4 @@ class VanillaController extends Gdn_Controller {
 
         parent::Initialize();
     }
-
 }

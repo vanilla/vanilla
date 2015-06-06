@@ -44,25 +44,26 @@ class SearchModel extends Gdn_Model {
      */
     public function AddMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
         if ($this->_SearchMode == 'like') {
-            if ($LikeRelavenceColumn)
+            if ($LikeRelavenceColumn) {
                 $Sql->Select($LikeRelavenceColumn, '', 'Relavence');
-            else
+            } else {
                 $Sql->Select(1, '', 'Relavence');
+            }
 
             $Sql->BeginWhereGroup();
 
             $ColumnsArray = explode(',', $Columns);
 
-            $First = TRUE;
+            $First = true;
             foreach ($ColumnsArray as $Column) {
                 $Column = trim($Column);
 
                 $Param = $this->Parameter();
                 if ($First) {
-                    $Sql->Where("$Column like $Param", NULL, FALSE, FALSE);
-                    $First = FALSE;
+                    $Sql->Where("$Column like $Param", null, false, false);
+                    $First = false;
                 } else {
-                    $Sql->OrWhere("$Column like $Param", NULL, FALSE, FALSE);
+                    $Sql->OrWhere("$Column like $Param", null, false, false);
                 }
             }
 
@@ -73,7 +74,7 @@ class SearchModel extends Gdn_Model {
             $Param = $this->Parameter();
             $Sql->Select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
             $Param = $this->Parameter();
-            $Sql->Where("match($Columns) against ($Param{$Boolean})", NULL, FALSE, FALSE);
+            $Sql->Where("match($Columns) against ($Param{$Boolean})", null, false, false);
         }
     }
 
@@ -107,39 +108,45 @@ class SearchModel extends Gdn_Model {
      */
     public function Search($Search, $Offset = 0, $Limit = 20) {
         // If there are no searches then return an empty array.
-        if (trim($Search) == '')
+        if (trim($Search) == '') {
             return array();
+        }
 
         // Figure out the exact search mode.
-        if ($this->ForceSearchMode)
+        if ($this->ForceSearchMode) {
             $SearchMode = $this->ForceSearchMode;
-        else
+        } else {
             $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
+        }
 
         if ($SearchMode == 'matchboolean') {
-            if (strpos($Search, '+') !== FALSE || strpos($Search, '-') !== FALSE)
+            if (strpos($Search, '+') !== false || strpos($Search, '-') !== false) {
                 $SearchMode = 'boolean';
-            else
+            } else {
                 $SearchMode = 'match';
+            }
         } else {
             $this->_SearchMode = $SearchMode;
         }
 
         if ($ForceDatabaseEngine = C('Database.ForceStorageEngine')) {
-            if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0)
+            if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0) {
                 $SearchMode = 'like';
+            }
         }
 
-        if (strlen($Search) <= 4)
+        if (strlen($Search) <= 4) {
             $SearchMode = 'like';
+        }
 
         $this->_SearchMode = $SearchMode;
 
         $this->EventArguments['Search'] = $Search;
         $this->FireEvent('Search');
 
-        if (count($this->_SearchSql) == 0)
+        if (count($this->_SearchSql) == 0) {
             return array();
+        }
 
         // Perform the search by unioning all of the sql together.
         $Sql = $this->SQL
@@ -153,8 +160,9 @@ class SearchModel extends Gdn_Model {
 
         $this->FireEvent('AfterBuildSearchQuery');
 
-        if ($this->_SearchMode == 'like')
+        if ($this->_SearchMode == 'like') {
             $Search = '%'.$Search.'%';
+        }
 
         foreach ($this->_Parameters as $Key => $Value) {
             $this->_Parameters[$Key] = $Search;
@@ -188,9 +196,10 @@ class SearchModel extends Gdn_Model {
      * @param null $Value
      * @return null|string
      */
-    public function SearchMode($Value = NULL) {
-        if ($Value !== NULL)
+    public function SearchMode($Value = null) {
+        if ($Value !== null) {
             $this->_SearchMode = $Value;
+        }
         return $this->_SearchMode;
     }
 }

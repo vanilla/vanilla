@@ -63,7 +63,7 @@ class AssetModel extends Gdn_Model {
 
         safeHeader("Content-Type: text/css");
         if (!in_array($Basename, array('Style', 'Admin'))) {
-            safeHeader("HTTP/1.0 404", TRUE, 404);
+            safeHeader("HTTP/1.0 404", true, 404);
 
             echo "/* Could not find $Basename/$ETag */";
             die();
@@ -76,7 +76,7 @@ class AssetModel extends Gdn_Model {
         $RequestETags = explode(',', $RequestETags);
         foreach ($RequestETags as $RequestETag) {
             if ($RequestETag == $ETag) {
-                safeHeader("HTTP/1.0 304", TRUE, 304);
+                safeHeader("HTTP/1.0 304", true, 304);
                 die();
             }
         }
@@ -131,10 +131,10 @@ class AssetModel extends Gdn_Model {
             }
 
             $Css = Minify_CSS::minify($Css, array(
-                'preserveComments' => TRUE,
+                'preserveComments' => true,
                 'prependRelativePath' => $this->UrlPrefix.Asset(dirname($UrlPath).'/'),
                 'currentDir' => dirname($Path),
-                'minify' => TRUE
+                'minify' => true
             ));
             echo $Css;
 
@@ -144,7 +144,7 @@ class AssetModel extends Gdn_Model {
         // Create a cached copy of the file.
         $Css = ob_get_flush();
         if (!file_exists(dirname($CachePath))) {
-            mkdir(dirname($CachePath), 0775, TRUE);
+            mkdir(dirname($CachePath), 0775, true);
         }
         file_put_contents($CachePath, $Css);
     }
@@ -159,7 +159,7 @@ class AssetModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function GetCssFiles($ThemeType, $Basename, $ETag, &$NotFound = NULL) {
+    public function GetCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
         $NotFound = array();
 
         // Gather all of the css paths.
@@ -212,12 +212,10 @@ class AssetModel extends Gdn_Model {
             $Css = val('Css', $Options);
 
             if ($Css) {
-
                 // Add some literal Css.
                 $Paths[] = array(false, $Folder, $Options);
 
             } else {
-
                 list($Path, $UrlPath) = self::CssPath($Filename, $Folder, $ThemeType);
                 if ($Path) {
                     $Paths[] = array($Path, $UrlPath, $Options);
@@ -301,7 +299,7 @@ class AssetModel extends Gdn_Model {
                 $Paths[] = array(PATH_ROOT.$Path, $Path);
 
                 // A plugin-relative path was given
-            } else if (stringBeginsWith($Folder, 'plugins/')) {
+            } elseif (stringBeginsWith($Folder, 'plugins/')) {
                 $Folder = substr($Folder, strlen('plugins/'));
                 $Path = "/{$Folder}/design/{$Filename}";
                 $Paths[] = array(PATH_PLUGINS.$Path, "/plugins$Path");
@@ -344,29 +342,29 @@ class AssetModel extends Gdn_Model {
      **/
     public static function ETag() {
         $Data = array();
-        $Data['vanilla-core-'.APPLICATION_VERSION] = TRUE;
+        $Data['vanilla-core-'.APPLICATION_VERSION] = true;
 
         $Plugins = Gdn::PluginManager()->EnabledPlugins();
         foreach ($Plugins as $Info) {
-            $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = true;
         }
 //      echo(Gdn_Upload::FormatFileSize(strlen(serialize($Plugins))));
 //      decho($Plugins);
 
         $Applications = Gdn::ApplicationManager()->EnabledApplications();
         foreach ($Applications as $Info) {
-            $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = true;
         }
 
         // Add the desktop theme version.
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->DesktopTheme());
         if (!empty($Info)) {
             $Version = val('Version', $Info, 'v0');
-            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
 
             if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
                 $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
-                $Data[$Filenames] = TRUE;
+                $Data[$Filenames] = true;
             }
         }
 
@@ -374,7 +372,7 @@ class AssetModel extends Gdn_Model {
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->MobileTheme());
         if (!empty($Info)) {
             $Version = val('Version', $Info, 'v0');
-            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
         }
 
         Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;

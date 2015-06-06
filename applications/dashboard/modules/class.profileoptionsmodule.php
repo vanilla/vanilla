@@ -48,8 +48,9 @@ class ProfileOptionsModule extends Gdn_Module {
             }
 
             // Delete content.
-            if (CheckPermission('Garden.Moderation.Manage'))
+            if (CheckPermission('Garden.Moderation.Manage')) {
                 $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            }
         }
         return parent::ToString();
     }

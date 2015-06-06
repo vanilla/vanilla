@@ -16,7 +16,7 @@ class CategoryController extends VanillaController {
     /** @var Gdn_CategoryModel */
     public $CategoryModel;
 
-    public function  __construct() {
+    public function __construct() {
         parent::__construct();
         $this->CategoryModel = new CategoryModel();
     }
@@ -26,8 +26,9 @@ class CategoryController extends VanillaController {
             $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => !(bool)$Value));
         }
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+        if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
             Redirect('/categories');
+        }
 
         $this->Render();
     }
@@ -36,8 +37,9 @@ class CategoryController extends VanillaController {
         if (Gdn::Session()->ValidateTransientKey($TKey)) {
             $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
         }
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+        if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
             Redirect('/categories');
+        }
 
         $this->Render();
     }

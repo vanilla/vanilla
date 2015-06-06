@@ -35,19 +35,20 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Delete($MessageID = '', $TransientKey = FALSE) {
+    public function Delete($MessageID = '', $TransientKey = false) {
         $this->Permission('Garden.Community.Manage');
         $this->DeliveryType(DELIVERY_TYPE_BOOL);
         $Session = Gdn::Session();
 
-        if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
+        if ($TransientKey !== false && $Session->ValidateTransientKey($TransientKey)) {
             $Message = $this->MessageModel->Delete(array('MessageID' => $MessageID));
             // Reset the message cache
             $this->MessageModel->SetMessageCache();
         }
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('dashboard/message');
+        }
 
         $this->Render();
     }
@@ -58,17 +59,18 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Dismiss($MessageID = '', $TransientKey = FALSE) {
+    public function Dismiss($MessageID = '', $TransientKey = false) {
         $Session = Gdn::Session();
 
-        if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
+        if ($TransientKey !== false && $Session->ValidateTransientKey($TransientKey)) {
             $Prefs = $Session->GetPreference('DismissedMessages', array());
             $Prefs[] = $MessageID;
             $Session->SetPreference('DismissedMessages', $Prefs);
         }
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect(GetIncomingValue('Target', '/discussions'));
+        }
 
         $this->Render();
     }
@@ -96,14 +98,16 @@ class MessageController extends DashboardController {
         $this->Message = $this->MessageModel->DefineLocation($this->Message);
 
         // Make sure the form knows which item we are editing.
-        if (is_numeric($MessageID) && $MessageID > 0)
+        if (is_numeric($MessageID) && $MessageID > 0) {
             $this->Form->AddHidden('MessageID', $MessageID);
+        }
 
         $CategoriesData = CategoryModel::Categories();
         $Categories = array();
         foreach ($CategoriesData as $Row) {
-            if ($Row['CategoryID'] < 0)
+            if ($Row['CategoryID'] < 0) {
                 continue;
+            }
 
             $Categories[$Row['CategoryID']] = str_repeat('&nbsp;&nbsp;&nbsp;', max(0, $Row['Depth'] - 1)).$Row['Name'];
         }
@@ -154,8 +158,9 @@ class MessageController extends DashboardController {
     public function Initialize() {
         parent::Initialize();
         Gdn_Theme::Section('Dashboard');
-        if ($this->Menu)
+        if ($this->Menu) {
             $this->Menu->HighlightRoute('/dashboard/settings');
+        }
     }
 
     /**

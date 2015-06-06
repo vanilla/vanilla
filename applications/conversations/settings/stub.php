@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Conversations stub content for a new site.
  *
@@ -11,8 +13,9 @@
  */
 
 // Only do this once, ever.
-if (!$Drop)
+if (!$Drop) {
     return;
+}
 
 $SQL = Gdn::Database()->SQL();
 

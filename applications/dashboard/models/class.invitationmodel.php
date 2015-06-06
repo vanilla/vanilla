@@ -62,8 +62,9 @@ class InvitationModel extends Gdn_Model {
             ->Limit($Limit, $Offset);
 
 
-        if (is_numeric($InvitationID))
+        if (is_numeric($InvitationID)) {
             $this->SQL->Where('Invitation.InvitationID', $InvitationID);
+        }
 
         return $this->SQL->Get();
     }
@@ -171,7 +172,7 @@ class InvitationModel extends Gdn_Model {
     public function Send($InvitationID) {
         $Invitation = $this->GetByInvitationID($InvitationID);
         $Session = Gdn::Session();
-        if ($Invitation === FALSE) {
+        if ($Invitation === false) {
             throw new Exception(T('ErrorRecordNotFound'));
         } elseif ($Session->UserID != $Invitation->SenderUserID) {
             throw new Exception(T('InviteErrorPermission', T('ErrorPermission')));
@@ -210,12 +211,14 @@ class InvitationModel extends Gdn_Model {
         $Invitation = $this->GetID($InvitationID, DATASET_TYPE_ARRAY);
 
         // Does the invitation exist?
-        if (!$Invitation)
+        if (!$Invitation) {
             throw NotFoundException('Invitation');
+        }
 
         // Does this user own the invitation?
-        if ($UserID != $Invitation['InsertUserID'] && !$Session->CheckPermission('Garden.Moderation.Manage'))
+        if ($UserID != $Invitation['InsertUserID'] && !$Session->CheckPermission('Garden.Moderation.Manage')) {
             throw PermissionException('@'.T('InviteErrorPermission', T('ErrorPermission')));
+        }
 
         // Delete it.
         $this->SQL->Delete($this->Name, array('InvitationID' => $InvitationID));
@@ -225,7 +228,7 @@ class InvitationModel extends Gdn_Model {
             Gdn::UserModel()->IncreaseInviteCount($UserID);
         }
 
-        return TRUE;
+        return true;
     }
 
     /**

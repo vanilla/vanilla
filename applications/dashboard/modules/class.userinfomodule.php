@@ -25,7 +25,7 @@ class UserInfoModule extends Gdn_Module {
      * @param string $Sender
      */
     public function __construct($Sender = '') {
-        $this->User = FALSE;
+        $this->User = false;
         $this->Path(__FILE__);
         parent::__construct($Sender);
     }
@@ -45,11 +45,13 @@ class UserInfoModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!$this->User)
+        if (!$this->User) {
             $this->LoadData();
+        }
 
-        if (is_object($this->User))
+        if (is_object($this->User)) {
             return parent::ToString();
+        }
 
         return '';
     }

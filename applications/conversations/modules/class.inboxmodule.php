@@ -17,7 +17,7 @@ class InboxModule extends Gdn_Module {
     public $Limit = 10;
 
     /** @var int */
-    public $UserID = NULL;
+    public $UserID = null;
 
     public function __construct() {
         parent::__construct();
@@ -41,11 +41,13 @@ class InboxModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!Gdn::Session()->IsValid())
+        if (!Gdn::Session()->IsValid()) {
             return '';
+        }
 
-        if (!$this->Data('Conversations'))
+        if (!$this->Data('Conversations')) {
             $this->GetData();
+        }
 
         return parent::ToString();
     }

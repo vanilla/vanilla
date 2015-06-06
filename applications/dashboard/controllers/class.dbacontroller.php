@@ -14,10 +14,10 @@
 class DbaController extends DashboardController {
 
     /** @var Gdn_Form */
-    public $Form = NULL;
+    public $Form = null;
 
     /** @var DBAModel */
-    public $Model = NULL;
+    public $Model = null;
 
     /**
      * Runs before every call to this controller.
@@ -43,15 +43,17 @@ class DbaController extends DashboardController {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function Counts($Table = FALSE, $Column = FALSE, $From = FALSE, $To = FALSE, $Max = FALSE) {
+    public function Counts($Table = false, $Column = false, $From = false, $To = false, $Max = false) {
         set_time_limit(300);
         $this->Permission('Garden.Settings.Manage');
 
         if ($Table && $Column && strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
-            if (!ValidateRequired($Table))
+            if (!ValidateRequired($Table)) {
                 throw new Gdn_UserException("Table is required.");
-            if (!ValidateRequired($Column))
+            }
+            if (!ValidateRequired($Column)) {
                 throw new Gdn_UserException("Column is required.");
+            }
 
             $Result = $this->Model->Counts($Table, $Column, $From, $To);
             $this->SetData('Result', $Result);
@@ -94,7 +96,7 @@ class DbaController extends DashboardController {
         if ($this->Request->IsAuthenticatedPostBack()) {
             $CategoryModel = new CategoryModel();
             $CategoryModel->RebuildTree();
-            $this->SetData('Result', array('Complete' => TRUE));
+            $this->SetData('Result', array('Complete' => true));
         }
 
         $this->SetData('Title', "Fix category tree from an import.");

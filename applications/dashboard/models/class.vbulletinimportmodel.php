@@ -72,8 +72,9 @@ class vBulletinImportModel extends Gdn_Model {
         $UserData = $this->SQL->Select('u.Photo')->From('User u')->Where('u.Photo is not null')->Get();
 
         // Make sure the avatars folder exists.
-        if (!file_exists(PATH_UPLOADS.'/userpics'))
+        if (!file_exists(PATH_UPLOADS.'/userpics')) {
             mkdir(PATH_UPLOADS.'/userpics');
+        }
 
         // Get sizes
         $ProfileHeight = C('Garden.Profile.MaxHeight', 1000);
@@ -81,7 +82,7 @@ class vBulletinImportModel extends Gdn_Model {
         $ThumbSize = C('Garden.Thumbnail.Size', 40);
 
         // Temporarily set maximum quality
-        SaveToConfig('Garden.UploadImage.Quality', 100, FALSE);
+        SaveToConfig('Garden.UploadImage.Quality', 100, false);
 
         // Create profile and thumbnail sizes
         foreach ($UserData->Result() as $User) {
@@ -103,7 +104,7 @@ class vBulletinImportModel extends Gdn_Model {
                     PATH_UPLOADS.'/userpics/n'.$ImageBaseName,
                     $ThumbSize,
                     $ThumbSize,
-                    TRUE
+                    true
                 );
             } catch (Exception $ex) {
             }
@@ -122,7 +123,8 @@ class vBulletinImportModel extends Gdn_Model {
                 $ExistingKeys[] = $Name;
             }
         }
-        if (count($ExistingKeys))
+        if (count($ExistingKeys)) {
             SaveToConfig('Plugins.ProfileExtender.ProfileFields', implode(',', $ExistingKeys));
+        }
     }
 }

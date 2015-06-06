@@ -23,7 +23,7 @@ class PagerModule extends Gdn_Module {
     public $CssClass;
 
     /** @var int The number of records in the current page. */
-    public $CurrentRecords = FALSE;
+    public $CurrentRecords = false;
 
     /** @var int The default number of records per page. */
     public static $DefaultPageSize = 30;
@@ -91,14 +91,14 @@ class PagerModule extends Gdn_Module {
         $this->CssClass = 'Pager';
         $this->Offset = 0;
         $this->Limit = self::$DefaultPageSize;
-        $this->TotalRecords = FALSE;
+        $this->TotalRecords = false;
         $this->Wrapper = '<div class="PagerWrap"><div %1$s>%2$s</div></div>';
         $this->PagerEmpty = '';
         $this->MoreCode = '»';
         $this->LessCode = '«';
         $this->Url = '/controller/action/$s/';
-        $this->_PropertiesDefined = FALSE;
-        $this->_Totalled = FALSE;
+        $this->_PropertiesDefined = false;
+        $this->_Totalled = false;
         $this->_LastOffset = 0;
         parent::__construct($Sender);
     }
@@ -109,7 +109,7 @@ class PagerModule extends Gdn_Module {
      * @return bool
      */
     function AssetTarget() {
-        return FALSE;
+        return false;
     }
 
     /**
@@ -122,13 +122,14 @@ class PagerModule extends Gdn_Module {
      * @param bool $ForceConfigure
      * @throws Exception
      */
-    public function Configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = FALSE) {
-        if ($this->_PropertiesDefined === FALSE || $ForceConfigure === TRUE) {
+    public function Configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = false) {
+        if ($this->_PropertiesDefined === false || $ForceConfigure === true) {
             if (is_array($Url)) {
-                if (count($Url) == 1)
+                if (count($Url) == 1) {
                     $this->UrlCallBack = array_pop($Url);
-                else
+                } else {
                     $this->UrlCallBack = $Url;
+                }
             } else {
                 $this->Url = $Url;
             }
@@ -137,11 +138,12 @@ class PagerModule extends Gdn_Module {
             $this->Limit = is_numeric($Limit) && $Limit > 0 ? $Limit : $this->Limit;
             $this->TotalRecords = $TotalRecords;
             $this->_LastOffset = $this->Offset + $this->Limit;
-            $this->_Totalled = ($this->TotalRecords >= $this->Limit) ? FALSE : TRUE;
-            if ($this->_LastOffset > $this->TotalRecords)
+            $this->_Totalled = ($this->TotalRecords >= $this->Limit) ? false : true;
+            if ($this->_LastOffset > $this->TotalRecords) {
                 $this->_LastOffset = $this->TotalRecords;
+            }
 
-            $this->_PropertiesDefined = TRUE;
+            $this->_PropertiesDefined = true;
 
             Gdn::Controller()->EventArguments['Pager'] = $this;
             Gdn::Controller()->FireEvent('PagerInit');
@@ -163,10 +165,10 @@ class PagerModule extends Gdn_Module {
      * @param null $Value
      * @return null|PagerModule
      */
-    public static function Current($Value = NULL) {
-        if ($Value !== NULL) {
+    public static function Current($Value = null) {
+        if ($Value !== null) {
             self::$_CurrentPager = $Value;
-        } elseif (self::$_CurrentPager == NULL) {
+        } elseif (self::$_CurrentPager == null) {
             self::$_CurrentPager = new PagerModule(Gdn::Controller());
         }
 
@@ -180,14 +182,15 @@ class PagerModule extends Gdn_Module {
      * @return bool|string Built string.
      */
     public function Details($FormatString = '') {
-        if ($this->_PropertiesDefined === FALSE)
+        if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
+        }
 
-        $Details = FALSE;
+        $Details = false;
         if ($this->TotalRecords > 0) {
             if ($FormatString != '') {
                 $Details = sprintf(T($FormatString), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
-            } else if ($this->_Totalled === TRUE) {
+            } elseif ($this->_Totalled === true) {
                 $Details = sprintf(T('%1$s to %2$s of %3$s'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
             } else {
                 $Details = sprintf(T('%1$s to %2$s'), $this->Offset, $this->_LastOffset);
@@ -216,10 +219,11 @@ class PagerModule extends Gdn_Module {
      */
     public static function FormatUrl($Url, $Page, $Limit = '') {
         // Check for new style page.
-        if (strpos($Url, '{Page}') !== FALSE)
+        if (strpos($Url, '{Page}') !== false) {
             return str_replace(array('{Page}', '{Size}'), array($Page, $Limit), $Url);
-        else
+        } else {
             return sprintf($Url, $Page, $Limit);
+        }
     }
 
     /**
@@ -239,12 +243,12 @@ class PagerModule extends Gdn_Module {
      * @return null|string
      */
     public static function Rel($Page, $CurrentPage) {
-        if ($Page == $CurrentPage - 1)
+        if ($Page == $CurrentPage - 1) {
             return 'prev';
-        elseif ($Page == $CurrentPage + 1)
+        } elseif ($Page == $CurrentPage + 1)
             return 'next';
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -268,13 +272,14 @@ class PagerModule extends Gdn_Module {
      * @return string HTML page navigation links.
      */
     public function ToString($Type = 'more') {
-        if ($this->_PropertiesDefined === FALSE)
+        if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
+        }
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
         $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);
 
-        if ($this->TotalRecords === FALSE) {
+        if ($this->TotalRecords === false) {
             return $this->ToStringPrevNext($Type);
         }
 
@@ -315,13 +320,13 @@ class PagerModule extends Gdn_Module {
         if ($PageCount <= 1) {
             // Don't build anything
 
-        } else if ($PageCount <= $PagesToDisplay) {
+        } elseif ($PageCount <= $PagesToDisplay) {
             // We don't need elipsis (ie. 1 2 3 4 5 6 7)
             for ($i = 1; $i <= $PageCount; $i++) {
                 $Pager .= Anchor($i, $this->PageUrl($i), $this->_GetCssClass($i, $CurrentPage), array('rel' => self::Rel($i, $CurrentPage)));
             }
 
-        } else if ($CurrentPage + $Range <= $PagesToDisplay + 1) { // +1 prevents 1 ... 2
+        } elseif ($CurrentPage + $Range <= $PagesToDisplay + 1) { // +1 prevents 1 ... 2
             // We're on a page that is before the first elipsis (ex: 1 2 3 4 5 6 7 ... 81)
             for ($i = 1; $i <= $PagesToDisplay; $i++) {
                 $PageParam = 'p'.$i;
@@ -331,7 +336,7 @@ class PagerModule extends Gdn_Module {
             $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
             $Pager .= Anchor($PageCount, $this->PageUrl($PageCount), $this->_GetCssClass($PageCount, $CurrentPage));
 
-        } else if ($CurrentPage + $Range >= $PageCount - 1) { // -1 prevents 80 ... 81
+        } elseif ($CurrentPage + $Range >= $PageCount - 1) { // -1 prevents 80 ... 81
             // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
             $Pager .= Anchor(1, $this->PageUrl(1), $this->_GetCssClass(1, $CurrentPage));
             $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
@@ -362,8 +367,9 @@ class PagerModule extends Gdn_Module {
             $PageParam = 'p'.($CurrentPage + 1);
             $Pager .= Anchor($NextText, $this->PageUrl($CurrentPage + 1), 'Next', array('rel' => 'next')); // extra sprintf parameter in case old url style is set
         }
-        if ($PageCount <= 1)
+        if ($PageCount <= 1) {
             $Pager = '';
+        }
 
         $ClientID = $this->ClientID;
         $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';
@@ -397,9 +403,10 @@ class PagerModule extends Gdn_Module {
             $Pager .= Anchor(T('Previous'), $this->PageUrl($CurrentPage - 1), 'Previous', array('rel' => 'prev'));
         }
 
-        $HasNext = TRUE;
-        if ($this->CurrentRecords !== FALSE && $this->CurrentRecords < $this->Limit)
-            $HasNext = FALSE;
+        $HasNext = true;
+        if ($this->CurrentRecords !== false && $this->CurrentRecords < $this->Limit) {
+            $HasNext = false;
+        }
 
         if ($HasNext) {
             $PageParam = 'p'.($CurrentPage + 1);
@@ -447,7 +454,7 @@ class PagerModule extends Gdn_Module {
 
         // Try and figure out the offset based on the parameters coming in to the controller.
         if (!$Pager->Offset) {
-            $Page = $Pager->Controller()->Request->Get('Page', FALSE);
+            $Page = $Pager->Controller()->Request->Get('Page', false);
             if (!$Page) {
                 $Page = 'p1';
                 foreach ($Pager->Controller()->RequestArgs as $Arg) {
@@ -458,7 +465,7 @@ class PagerModule extends Gdn_Module {
                 }
             }
             list($Offset, $Limit) = OffsetLimit($Page, $Pager->Limit);
-            $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', FALSE));
+            $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', false));
 
             $Get = $Pager->Controller()->Request->Get();
             unset($Get['Page'], $Get['DeliveryType'], $Get['DeliveryMethod']);
@@ -493,9 +500,9 @@ class PagerModule extends Gdn_Module {
         $Result = $ThisPage == $HighlightPage ? 'Highlight' : '';
 
         $Result .= " p-$ThisPage";
-        if ($ThisPage == 1)
+        if ($ThisPage == 1) {
             $Result .= ' FirstPage';
-        elseif ($ThisPage == $this->_PageCount)
+        } elseif ($ThisPage == $this->_PageCount)
             $Result .= ' LastPage';
 
         return $Result;

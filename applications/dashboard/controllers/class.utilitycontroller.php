@@ -243,9 +243,8 @@ class UtilityController extends DashboardController {
     public function Set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Session = Gdn::Session();
-        $Success = FALSE;
-        if (
-            in_array($UserPropertyColumn, array('preference', 'attribute'))
+        $Success = false;
+        if (in_array($UserPropertyColumn, array('preference', 'attribute'))
             && $Name != ''
             && $Value != ''
             && $Session->UserID > 0
@@ -256,14 +255,16 @@ class UtilityController extends DashboardController {
             $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
         }
 
-        if (!$Success)
+        if (!$Success) {
             $this->Form->AddError('ErrorBool');
+        }
 
         // Redirect back where the user came from if necessary
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
+        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             Redirect($_SERVER['HTTP_REFERER']);
-        else
+        } else {
             $this->Render();
+        }
     }
 
     public function Sprites() {
@@ -273,7 +274,7 @@ class UtilityController extends DashboardController {
         $this->MasterView = 'default';
 
         $this->CssClass = 'SplashMessage NoPanel';
-        $this->SetData('_NoMessages', TRUE);
+        $this->SetData('_NoMessages', true);
         $this->SetData('Title', 'Sprite Sheet');
         $this->Render();
     }
@@ -307,8 +308,8 @@ class UtilityController extends DashboardController {
         }
         $Validation = new Gdn_Validation();
         $Database = Gdn::Database();
-        $Drop = $Drop == '0' ? FALSE : TRUE;
-        $Explicit = $Explicit == '0' ? FALSE : TRUE;
+        $Drop = $Drop == '0' ? false : true;
+        $Explicit = $Explicit == '0' ? false : true;
         $CaptureOnly = !($CaptureOnly == '0');
         $Structure = Gdn::Structure();
         $Structure->CaptureOnly = $CaptureOnly;
@@ -319,10 +320,10 @@ class UtilityController extends DashboardController {
         $this->SetData('Explicit', $Explicit);
         $this->SetData('ApplicationName', $AppName);
         $this->SetData('Status', '');
-        $FoundStructureFile = FALSE;
+        $FoundStructureFile = false;
         foreach ($Files as $File) {
             if (file_exists($File)) {
-                $FoundStructureFile = TRUE;
+                $FoundStructureFile = true;
                 try {
                     include($File);
                 } catch (Exception $Ex) {
@@ -335,17 +336,20 @@ class UtilityController extends DashboardController {
         $Plugins = Gdn::PluginManager()->EnabledPlugins();
         foreach ($Plugins as $PluginKey => $Plugin) {
             $PluginInstance = Gdn::PluginManager()->GetPluginInstance($PluginKey, Gdn_PluginManager::ACCESS_PLUGINNAME);
-            if (method_exists($PluginInstance, 'Structure'))
+            if (method_exists($PluginInstance, 'Structure')) {
                 $PluginInstance->Structure();
+            }
         }
 
-        if (property_exists($Structure->Database, 'CapturedSql'))
+        if (property_exists($Structure->Database, 'CapturedSql')) {
             $this->SetData('CapturedSql', (array)$Structure->Database->CapturedSql);
-        else
+        } else {
             $this->SetData('CapturedSql', array());
+        }
 
-        if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
+        if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile) {
             $this->SetData('Status', 'The structure was successfully executed.');
+        }
 
         $this->AddSideMenu('dashboard/settings/configure');
         $this->AddCssFile('admin.css');
@@ -390,11 +394,12 @@ class UtilityController extends DashboardController {
             // Run the structure.
             $UpdateModel = new UpdateModel();
             $UpdateModel->RunStructure();
-            $this->SetData('Success', TRUE);
+            $this->SetData('Success', true);
         } catch (Exception $Ex) {
-            $this->SetData('Success', FALSE);
-            if (Debug())
+            $this->SetData('Success', false);
+            if (Debug()) {
                 throw $Ex;
+            }
         }
 
         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
@@ -429,7 +434,7 @@ class UtilityController extends DashboardController {
      * @access public
      */
     public function Alive() {
-        $this->SetData('Success', TRUE);
+        $this->SetData('Success', true);
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
 
@@ -441,7 +446,7 @@ class UtilityController extends DashboardController {
     public function Ping() {
         $start = microtime(true);
 
-        $this->SetData('pong', TRUE);
+        $this->SetData('pong', true);
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
 
@@ -500,14 +505,14 @@ class UtilityController extends DashboardController {
      */
     public function SetClientHour($ClientHour = '', $TransientKey = '') {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-        $Success = FALSE;
+        $Success = false;
 
         if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
             $HourOffset = $ClientHour - date('G', time());
 
             if (Gdn::Session()->IsValid() && Gdn::Session()->ValidateTransientKey($TransientKey)) {
                 Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
-                $Success = TRUE;
+                $Success = true;
             }
         }
 
@@ -525,7 +530,7 @@ class UtilityController extends DashboardController {
             $HourOffset = $Form->GetFormValue('HourOffset');
             Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
 
-            $this->SetData('Result', TRUE);
+            $this->SetData('Result', true);
             $this->SetData('HourOffset', $HourOffset);
 
             $time = time();
@@ -564,7 +569,7 @@ class UtilityController extends DashboardController {
         $this->AddCssFile('style.css');
         $this->AddCssFile('vanillicon.css', 'static');
 
-        $this->SetData('_NoPanel', TRUE);
+        $this->SetData('_NoPanel', true);
         $this->Render();
     }
 }

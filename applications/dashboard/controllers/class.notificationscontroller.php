@@ -60,8 +60,9 @@ class NotificationsController extends Gdn_Controller {
      */
     public static function InformNotifications($Sender) {
         $Session = Gdn::Session();
-        if (!$Session->IsValid())
+        if (!$Session->IsValid()) {
             return;
+        }
 
         $ActivityModel = new ActivityModel();
         // Get five pending notifications.
@@ -81,13 +82,15 @@ class NotificationsController extends Gdn_Controller {
         $Sender->FireEvent('InformNotifications');
 
         foreach ($Activities as $Activity) {
-            if ($Activity['Photo'])
+            if ($Activity['Photo']) {
                 $UserPhoto = Anchor(
                     Img($Activity['Photo'], array('class' => 'ProfilePhotoMedium')),
                     $Activity['Url'],
-                    'Icon');
-            else
+                    'Icon'
+                );
+            } else {
                 $UserPhoto = '';
+            }
             $Excerpt = Gdn_Format::PlainText($Activity['Story']);
             $ActivityClass = ' Activity-'.$Activity['ActivityType'];
 

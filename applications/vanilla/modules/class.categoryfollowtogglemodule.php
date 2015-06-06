@@ -18,15 +18,17 @@ class CategoryFollowToggleModule extends Gdn_Module {
      */
     public function SetToggle() {
         $Session = Gdn::Session();
-        if (!$Session->IsValid())
+        if (!$Session->IsValid()) {
             return;
+        }
 
         $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
         if ($ShowAllCategories != '') {
-            $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
+            $ShowAllCategories = $ShowAllCategories == 'true' ? true : false;
             $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
-            if ($ShowAllCategories != $ShowAllCategoriesPref)
+            if ($ShowAllCategories != $ShowAllCategoriesPref) {
                 $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+            }
 
             Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
         }
@@ -37,8 +39,9 @@ class CategoryFollowToggleModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (Gdn::Session()->IsValid())
+        if (Gdn::Session()->IsValid()) {
             return parent::ToString();
+        }
 
         return '';
     }

@@ -28,9 +28,10 @@ class RootController extends Gdn_Controller {
      * @return bool|mixed
      * @throws Exception
      */
-    public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $ThrowError = TRUE) {
-        if (!$ControllerName)
+    public function FetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true) {
+        if (!$ControllerName) {
             $ControllerName = '';
+        }
         return parent::FetchViewLocation($View, $ControllerName, $ApplicationFolder, $ThrowError);
     }
 }

@@ -73,7 +73,7 @@ class SearchController extends Gdn_Controller {
         $this->AddJsFile('search.js');
         $this->Title(T('Search'));
 
-        SaveToConfig('Garden.Format.EmbedSize', '160x90', FALSE);
+        SaveToConfig('Garden.Format.EmbedSize', '160x90', false);
         Gdn_Theme::Section('SearchResults');
 
         list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
@@ -81,8 +81,9 @@ class SearchController extends Gdn_Controller {
 
         $Search = $this->Form->GetFormValue('Search');
         $Mode = $this->Form->GetFormValue('Mode');
-        if ($Mode)
+        if ($Mode) {
             $this->SearchModel->ForceSearchMode = $Mode;
+        }
         try {
             $ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
         } catch (Gdn_UserException $Ex) {
@@ -103,14 +104,16 @@ class SearchController extends Gdn_Controller {
             $Row['Format'] = 'Html';
         }
 
-        $this->SetData('SearchResults', $ResultSet, TRUE);
-        $this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
-        if ($ResultSet)
+        $this->SetData('SearchResults', $ResultSet, true);
+        $this->SetData('SearchTerm', Gdn_Format::Text($Search), true);
+        if ($ResultSet) {
             $NumResults = count($ResultSet);
-        else
+        } else {
             $NumResults = 0;
-        if ($NumResults == $Offset + $Limit)
+        }
+        if ($NumResults == $Offset + $Limit) {
             $NumResults++;
+        }
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
@@ -131,7 +134,7 @@ class SearchController extends Gdn_Controller {
 //         $this->View = 'results';
 //      }
 
-        $this->CanonicalUrl(Url('search', TRUE));
+        $this->CanonicalUrl(Url('search', true));
 
         $this->Render();
     }

@@ -15,7 +15,7 @@ class CategoryModeratorsModule extends Gdn_Module {
 
     public function __construct($Sender = '') {
         parent::__construct($Sender);
-        $this->ModeratorData = FALSE;
+        $this->ModeratorData = false;
     }
 
     public function GetData($Category) {
@@ -28,13 +28,13 @@ class CategoryModeratorsModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (
-            is_array($this->ModeratorData)
+        if (is_array($this->ModeratorData)
             && count($this->ModeratorData) > 0
             && is_array($this->ModeratorData[0]->Moderators)
             && count($this->ModeratorData[0]->Moderators) > 0
-        )
+        ) {
             return parent::ToString();
+        }
 
         return '';
     }

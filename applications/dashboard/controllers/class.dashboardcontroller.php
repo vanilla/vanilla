@@ -46,8 +46,9 @@ class DashboardController extends Gdn_Controller {
             $this->AddCssFile('style.css');
             $this->AddCssFile('vanillicon.css', 'static');
         } else {
-            if (!C('Garden.Cdns.Disable', FALSE))
+            if (!C('Garden.Cdns.Disable', false)) {
                 $this->AddCssFile('https://fonts.googleapis.com/css?family=Rokkitt');
+            }
             $this->AddCssFile('admin.css');
             $this->AddCssFile('magnific-popup.css');
         }
@@ -64,9 +65,10 @@ class DashboardController extends Gdn_Controller {
      *
      * @param string $CurrentUrl Used to highlight correct route in menu.
      */
-    public function AddSideMenu($CurrentUrl = FALSE) {
-        if (!$CurrentUrl)
+    public function AddSideMenu($CurrentUrl = false) {
+        if (!$CurrentUrl) {
             $CurrentUrl = strtolower($this->SelfUrl);
+        }
 
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {

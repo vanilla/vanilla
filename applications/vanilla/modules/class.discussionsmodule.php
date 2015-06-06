@@ -38,7 +38,7 @@ class DiscussionsModule extends Gdn_Module {
      *
      * @param int|bool $limit Override the number of discussions to display.
      */
-    public function GetData($limit = FALSE) {
+    public function GetData($limit = false) {
         if (!$limit) {
             $limit = $this->Limit;
         }
@@ -51,7 +51,7 @@ class DiscussionsModule extends Gdn_Module {
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
-            $discussionModel->Watching = TRUE;
+            $discussionModel->Watching = true;
         }
 
         $this->SetData('Discussions', $discussionModel->Get(0, $limit, $where));

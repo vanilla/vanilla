@@ -32,23 +32,25 @@ class LogController extends DashboardController {
      * @param array $LogIDs Numeric IDs of items to confirm.
      */
     public function Confirm($Action, $LogIDs = '') {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
 
         $this->Form->InputPrefix = '';
         $this->Form->IDPrefix = 'Confirm_';
 
-        if (trim($LogIDs))
+        if (trim($LogIDs)) {
             $LogIDArray = explode(',', $LogIDs);
-        else
+        } else {
             $LogIDArray = array();
+        }
 
         // We also want to collect the users from the log.
         $Logs = $this->LogModel->GetIDs($LogIDArray);
         $Users = array();
         foreach ($Logs as $Log) {
             $UserID = $Log['RecordUserID'];
-            if (!$UserID)
+            if (!$UserID) {
                 continue;
+            }
             $Users[$UserID] = array('UserID' => $UserID);
         }
         Gdn::UserModel()->JoinUsers($Users, array('UserID'));
@@ -71,22 +73,24 @@ class LogController extends DashboardController {
      */
     public function Count($Operation) {
         // Don't use Gdn_Controller->Permission() here because this isn't a "real page".
-        if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
+        if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
             $this->StatusCode(403);
             echo '';
             return;
         }
 
-        if ($Operation == 'edits')
+        if ($Operation == 'edits') {
             $Operation = array('edit', 'delete');
-        else
+        } else {
             $Operation = explode(',', $Operation);
+        }
         array_map('ucfirst', $Operation);
 
         $Count = $this->LogModel->GetCountWhere(array('Operation' => $Operation));
 
-        if ($Count > 0)
+        if ($Count > 0) {
             echo '<span class="Alert">', $Count, '</span>';
+        }
     }
 
     /**
@@ -98,7 +102,7 @@ class LogController extends DashboardController {
      * @param array $LogIDs Numeric IDs of logs to delete.
      */
     public function Delete($LogIDs) {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false);
         // Grab the logs.
         $this->LogModel->Delete($LogIDs);
         $this->Render('Blank', 'Utility');
@@ -109,17 +113,19 @@ class LogController extends DashboardController {
      * @param type $LogIDs
      */
     public function DeleteSpam($LogIDs) {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
 
-        if (!$this->Request->IsPostBack())
+        if (!$this->Request->IsPostBack()) {
             throw PermissionException('Javascript');
+        }
 
         $LogIDs = explode(',', $LogIDs);
 
         // Ban the appropriate users.
         $UserIDs = $this->Form->GetFormValue('UserID', array());
-        if (!is_array($UserIDs))
+        if (!is_array($UserIDs)) {
             $UserIDs = array();
+        }
 
         if (!empty($UserIDs)) {
             // Grab the rest of the log entries.
@@ -128,7 +134,7 @@ class LogController extends DashboardController {
             $LogIDs = array_merge($LogIDs, $OtherLogIDs);
 
             foreach ($UserIDs as $UserID) {
-                Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
+                Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => true, 'Log' => true));
             }
         }
 
@@ -145,14 +151,15 @@ class LogController extends DashboardController {
      *
      * @param int $Page Page number.
      */
-    public function Edits($Type = '', $Page = '', $Op = FALSE) {
+    public function Edits($Type = '', $Page = '', $Op = false) {
         $this->Permission('Garden.Moderation.Manage');
         list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->SetData('Title', T('Change Log'));
 
         $Operations = array('Edit', 'Delete', 'Ban');
-        if ($Op && in_array(ucfirst($Op), $Operations))
+        if ($Op && in_array(ucfirst($Op), $Operations)) {
             $Operations = ucfirst($Op);
+        }
 
         $Where = array(
             'Operation' => $Operations//,
@@ -166,22 +173,25 @@ class LogController extends DashboardController {
             $this->Permission('Garden.Settings.Manage');
             $Where['RecordType'] = array('Configuration');
         } else {
-            if (in_array(ucfirst($Type), $AllowedTypes))
+            if (in_array(ucfirst($Type), $AllowedTypes)) {
                 $Where['RecordType'] = ucfirst($Type);
-            else
+            } else {
                 $Where['RecordType'] = $AllowedTypes;
+            }
         }
 
         $RecordCount = $this->LogModel->GetCountWhere($Where);
         $this->SetData('RecordCount', $RecordCount);
-        if ($Offset >= $RecordCount)
+        if ($Offset >= $RecordCount) {
             $Offset = $RecordCount - $Limit;
+        }
 
         $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
         $this->SetData('Log', $Log);
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW) {
             $this->View = 'Table';
+        }
 
         $this->AddSideMenu('dashboard/log/edits');
         $this->Render();
@@ -207,14 +217,16 @@ class LogController extends DashboardController {
 
         $RecordCount = $this->LogModel->GetCountWhere($Where);
         $this->SetData('RecordCount', $RecordCount);
-        if ($Offset >= $RecordCount)
+        if ($Offset >= $RecordCount) {
             $Offset = $RecordCount - $Limit;
+        }
 
         $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
         $this->SetData('Log', $Log);
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW) {
             $this->View = 'Table';
+        }
 
         $this->AddSideMenu('dashboard/log/edits');
         $this->Render();
@@ -257,7 +269,7 @@ class LogController extends DashboardController {
      * @param int $Page Page number.
      */
     public function Moderation($Page = '') {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false);
 
         $Where = array('Operation' => array('Moderate', 'Pending'));
 
@@ -272,14 +284,16 @@ class LogController extends DashboardController {
 
         $RecordCount = $this->LogModel->GetCountWhere($Where);
         $this->SetData('RecordCount', $RecordCount);
-        if ($Offset >= $RecordCount)
+        if ($Offset >= $RecordCount) {
             $Offset = $RecordCount - $Limit;
+        }
 
         $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
         $this->SetData('Log', $Log);
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW) {
             $this->View = 'Table';
+        }
 
         $this->AddSideMenu('dashboard/log/moderation');
         $this->Render();
@@ -294,7 +308,7 @@ class LogController extends DashboardController {
      * @param array $LogIDs List of log IDs.
      */
     public function Restore($LogIDs) {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
 
         // Grab the logs.
         $Logs = $this->LogModel->GetIDs($LogIDs);
@@ -310,20 +324,22 @@ class LogController extends DashboardController {
     }
 
     public function NotSpam($LogIDs) {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
 
-        if (!$this->Request->IsPostBack())
+        if (!$this->Request->IsPostBack()) {
             throw PermissionException('Javascript');
+        }
 
         $Logs = array();
 
         // Verify the appropriate users.
         $UserIDs = $this->Form->GetFormValue('UserID', array());
-        if (!is_array($UserIDs))
+        if (!is_array($UserIDs)) {
             $UserIDs = array();
+        }
 
         foreach ($UserIDs as $UserID) {
-            Gdn::UserModel()->SetField($UserID, 'Verified', TRUE);
+            Gdn::UserModel()->SetField($UserID, 'Verified', true);
             $Logs = array_merge($Logs, $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserID)));
         }
 
@@ -353,7 +369,7 @@ class LogController extends DashboardController {
      * @param int $Page Page number.
      */
     public function Spam($Page = '') {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
+        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
         list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->SetData('Title', T('Spam Queue'));
 
@@ -361,14 +377,16 @@ class LogController extends DashboardController {
 
         $RecordCount = $this->LogModel->GetCountWhere($Where);
         $this->SetData('RecordCount', $RecordCount);
-        if ($Offset >= $RecordCount)
+        if ($Offset >= $RecordCount) {
             $Offset = $RecordCount - $Limit;
+        }
 
         $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
         $this->SetData('Log', $Log);
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+        if ($this->DeliveryType() == DELIVERY_TYPE_VIEW) {
             $this->View = 'Table';
+        }
 
         $this->AddSideMenu('dashboard/log/spam');
         $this->Render();

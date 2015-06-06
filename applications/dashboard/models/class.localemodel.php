@@ -14,7 +14,7 @@
 class LocaleModel {
 
     /** @var array|null Locales in the system.  */
-    protected $_AvailableLocalePacks = NULL;
+    protected $_AvailableLocalePacks = null;
 
     /**
      *
@@ -22,7 +22,7 @@ class LocaleModel {
      * @return array|null
      */
     public function AvailableLocalePacks() {
-        if ($this->_AvailableLocalePacks === NULL) {
+        if ($this->_AvailableLocalePacks === null) {
             $LocaleInfoPaths = SafeGlob(PATH_ROOT."/locales/*/definitions.php");
             $AvailableLocales = array();
             foreach ($LocaleInfoPaths as $InfoPath) {
@@ -100,7 +100,7 @@ class LocaleModel {
      * @param bool $GetInfo
      * @return array
      */
-    public function EnabledLocalePacks($GetInfo = FALSE) {
+    public function EnabledLocalePacks($GetInfo = false) {
         $Result = (array)C('EnabledLocales', array());
 
         if ($GetInfo) {
@@ -126,14 +126,15 @@ class LocaleModel {
      * @param null $Skip
      * @return array
      */
-    public function LoadDefinitions($Path, $Skip = NULL) {
+    public function LoadDefinitions($Path, $Skip = null) {
         $Skip = (array)$Skip;
 
         $Paths = SafeGlob($Path.'/*.php');
         $Definition = array();
         foreach ($Paths as $Path) {
-            if (in_array($Path, $Skip))
+            if (in_array($Path, $Skip)) {
                 continue;
+            }
             include $Path;
         }
         return $Definition;
@@ -148,8 +149,8 @@ class LocaleModel {
      * @return null|string
      * @throws Exception
      */
-    public function GenerateChanges($Path, $BasePath, $DestPath = NULL) {
-        if ($DestPath == NULL) {
+    public function GenerateChanges($Path, $BasePath, $DestPath = null) {
+        if ($DestPath == null) {
             $DestPath = $BasePath.'/changes.php';
         }
 
@@ -208,8 +209,9 @@ class LocaleModel {
      */
     public function TestLocale($LocaleKey) {
         $Available = $this->AvailableLocalePacks();
-        if (!isset($Available[$LocaleKey]))
+        if (!isset($Available[$LocaleKey])) {
             throw NotFoundException('Locale');
+        }
 
         // Grab all of the definition files from the locale.
         $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
@@ -219,7 +221,7 @@ class LocaleModel {
 
         // Load each locale file, checking for errors
         foreach ($Paths as $Path) {
-            Gdn::Locale()->Load($Path, FALSE);
+            Gdn::Locale()->Load($Path, false);
         }
     }
 
@@ -240,7 +242,7 @@ class LocaleModel {
                 $LastC = $Key[0];
             }
 
-            $Str = '$Definition['.var_export($Key, TRUE).'] = '.var_export($Value, TRUE).";\n";
+            $Str = '$Definition['.var_export($Key, true).'] = '.var_export($Value, true).";\n";
             fwrite($fp, $Str);
         }
     }

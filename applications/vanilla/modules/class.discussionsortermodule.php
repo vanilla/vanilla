@@ -35,11 +35,12 @@ class DiscussionSorterModule extends Gdn_Module {
     }
 
     public function AssetTarget() {
-        return FALSE;
+        return false;
     }
 
     public function ToString() {
-        if (Gdn::Session()->IsValid())
+        if (Gdn::Session()->IsValid()) {
             return parent::ToString();
+        }
     }
 }

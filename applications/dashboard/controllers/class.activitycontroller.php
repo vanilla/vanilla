@@ -82,8 +82,9 @@ class ActivityController extends Gdn_Controller {
         $this->AddJsFile('activity.js');
         $this->Title(T('Activity Item'));
 
-        if (!is_numeric($ActivityID) || $ActivityID < 0)
+        if (!is_numeric($ActivityID) || $ActivityID < 0) {
             $ActivityID = 0;
+        }
 
         $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
         $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
@@ -101,7 +102,7 @@ class ActivityController extends Gdn_Controller {
      *
      * @param int $Offset Number of activity items to skip.
      */
-    public function Index($Filter = FALSE, $Page = FALSE) {
+    public function Index($Filter = false, $Page = false) {
         switch (strtolower($Filter)) {
             case 'mods':
                 $this->Title(T('Recent Moderator Activity'));
@@ -127,14 +128,16 @@ class ActivityController extends Gdn_Controller {
         // Which page to load
         list($Offset, $Limit) = OffsetLimit($Page, 30);
         $Offset = is_numeric($Offset) ? $Offset : 0;
-        if ($Offset < 0)
+        if ($Offset < 0) {
             $Offset = 0;
+        }
 
         // Page meta.
         $this->AddJsFile('activity.js');
 
-        if ($this->Head)
-            $this->Head->AddRss(Url('/activity/feed.rss', TRUE), $this->Head->Title());
+        if ($this->Head) {
+            $this->Head->AddRss(Url('/activity/feed.rss', true), $this->Head->Title());
+        }
 
         // Comment submission
         $Session = Gdn::Session();
@@ -207,8 +210,9 @@ class ActivityController extends Gdn_Controller {
 
         $this->ActivityModel->Delete($ActivityID);
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect(GetIncomingValue('Target', $this->SelfUrl));
+        }
 
         // Still here? Getting a 404.
         $this->ControllerName = 'Home';
@@ -259,8 +263,9 @@ class ActivityController extends Gdn_Controller {
         // Redirect back to the sending location if this isn't an ajax request
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = $this->Form->GetValue('Return');
-            if (!$Target)
+            if (!$Target) {
                 $Target = '/activity';
+            }
             Redirect($Target);
         } else {
             // Load the newly added comment.
@@ -274,10 +279,10 @@ class ActivityController extends Gdn_Controller {
         $this->Render();
     }
 
-    public function Post($Notify = FALSE, $UserID = FALSE) {
+    public function Post($Notify = false, $UserID = false) {
         if (is_numeric($Notify)) {
             $UserID = $Notify;
-            $Notify = FALSE;
+            $Notify = false;
         }
 
         if (!$UserID) {
@@ -304,8 +309,9 @@ class ActivityController extends Gdn_Controller {
         if ($this->Form->AuthenticatedPostBack()) {
             $Data = $this->Form->FormValues();
             $Data = $this->ActivityModel->FilterForm($Data);
-            if (!isset($Data['Format']) || strcasecmp($Data['Format'], 'Raw') == 0)
+            if (!isset($Data['Format']) || strcasecmp($Data['Format'], 'Raw') == 0) {
                 $Data['Format'] = C('Garden.InputFormatter');
+            }
 
             if ($UserID != Gdn::Session()->UserID) {
                 // This is a wall post.
@@ -316,7 +322,7 @@ class ActivityController extends Gdn_Controller {
                     'HeadlineFormat' => T('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
                     'Story' => $Data['Comment'],
                     'Format' => $Data['Format'],
-                    'Data' => array('Bump' => TRUE)
+                    'Data' => array('Bump' => true)
                 );
             } else {
                 // This is a status update.
@@ -326,12 +332,12 @@ class ActivityController extends Gdn_Controller {
                     'Story' => $Data['Comment'],
                     'Format' => $Data['Format'],
                     'NotifyUserID' => $NotifyUserID,
-                    'Data' => array('Bump' => TRUE)
+                    'Data' => array('Bump' => true)
                 );
                 $this->SetJson('StatusMessage', Gdn_Format::PlainText($Activity['Story'], $Activity['Format']));
             }
 
-            $Activity = $this->ActivityModel->Save($Activity, FALSE, array('CheckSpam' => TRUE));
+            $Activity = $this->ActivityModel->Save($Activity, false, array('CheckSpam' => true));
             if ($Activity == SPAM || $Activity == UNAPPROVED) {
                 $this->StatusMessage = T('ActivityRequiresApproval', 'Your post will appear after it is approved.');
                 $this->Render('Blank', 'Utility');
@@ -339,8 +345,9 @@ class ActivityController extends Gdn_Controller {
             }
 
             if ($Activity) {
-                if ($UserID == Gdn::Session()->UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC)
+                if ($UserID == Gdn::Session()->UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC) {
                     Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', Gdn_Format::PlainText($Activity['Story'], $Activity['Format']));
+                }
 
                 $Activities = array($Activity);
                 ActivityModel::JoinUsers($Activities);

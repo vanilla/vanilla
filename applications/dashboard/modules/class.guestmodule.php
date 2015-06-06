@@ -25,9 +25,10 @@ class GuestModule extends Gdn_Module {
      * @param string $Sender
      * @param bool $ApplicationFolder
      */
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
-        if (!$ApplicationFolder)
+    public function __construct($Sender = '', $ApplicationFolder = false) {
+        if (!$ApplicationFolder) {
             $ApplicationFolder = 'Dashboard';
+        }
         parent::__construct($Sender, $ApplicationFolder);
 
         $this->Visible = C('Garden.Modules.ShowGuestModule');
@@ -48,10 +49,10 @@ class GuestModule extends Gdn_Module {
      * @return string
      */
     public function ToString() {
-        if (!Gdn::Session()->IsValid())
+        if (!Gdn::Session()->IsValid()) {
             return parent::ToString();
+        }
 
         return '';
     }
-
 }

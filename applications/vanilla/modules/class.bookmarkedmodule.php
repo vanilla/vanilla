@@ -17,7 +17,7 @@ class BookmarkedModule extends Gdn_Module {
     public $Limit = 10;
 
     /** @var bool */
-    public $Help = FALSE;
+    public $Help = false;
 
     /** @var string */
     public $ListID = 'Bookmark_List';
@@ -25,7 +25,7 @@ class BookmarkedModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
-        $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
+        $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', true);
     }
 
     public function GetData() {
@@ -51,7 +51,6 @@ class BookmarkedModule extends Gdn_Module {
                 );
                 $this->SetData('Bookmarks', $Bookmarks);
             } else {
-
                 $this->SetData('Bookmarks', new Gdn_DataSet());
             }
         }
@@ -62,13 +61,15 @@ class BookmarkedModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!$this->Data('Bookmarks'))
+        if (!$this->Data('Bookmarks')) {
             $this->GetData();
+        }
 
         $Bookmarks = $this->Data('Bookmarks');
 
-        if (is_object($Bookmarks) && ($Bookmarks->NumRows() > 0 || $this->Help))
+        if (is_object($Bookmarks) && ($Bookmarks->NumRows() > 0 || $this->Help)) {
             return parent::ToString();
+        }
 
         return '';
     }

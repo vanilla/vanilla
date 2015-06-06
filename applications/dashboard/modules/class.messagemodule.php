@@ -22,7 +22,7 @@ class MessageModule extends Gdn_Module {
      * @param string $Sender
      * @param bool $Message
      */
-    public function __construct($Sender = '', $Message = FALSE) {
+    public function __construct($Sender = '', $Message = false) {
         parent::__construct($Sender);
 
         $this->_ApplicationFolder = 'dashboard';
@@ -35,7 +35,6 @@ class MessageModule extends Gdn_Module {
      * @return mixed|string
      */
     public function AssetTarget() {
-        return $this->_Message == FALSE ? 'Content' : GetValue('AssetTarget', $this->_Message);
+        return $this->_Message == false ? 'Content' : GetValue('AssetTarget', $this->_Message);
     }
-
 }

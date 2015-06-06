@@ -33,9 +33,9 @@ class MessageModel extends Gdn_Model {
      * @param bool $Limit
      * @param bool $ResetData
      */
-    public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
+    public function Delete($Where = '', $Limit = false, $ResetData = false) {
         parent::Delete($Where, $Limit, $ResetData);
-        self::Messages(NULL);
+        self::Messages(null);
     }
 
     /**
@@ -44,10 +44,11 @@ class MessageModel extends Gdn_Model {
      * @param int The MessageID to filter to.
      */
     public function GetID($MessageID) {
-        if (Gdn::Cache()->ActiveEnabled())
+        if (Gdn::Cache()->ActiveEnabled()) {
             return self::Messages($MessageID);
-        else
+        } else {
             return parent::GetID($MessageID);
+        }
     }
 
     /**
@@ -65,10 +66,12 @@ class MessageModel extends Gdn_Model {
             SetValue('Location', $Message, $Controller);
         } else {
             SetValue('Location', $Message, $Application);
-            if (!StringIsNullOrEmpty($Controller))
+            if (!StringIsNullOrEmpty($Controller)) {
                 SetValue('Location', $Message, GetValue('Location', $Message).'/'.$Controller);
-            if (!StringIsNullOrEmpty($Method))
+            }
+            if (!StringIsNullOrEmpty($Method)) {
                 SetValue('Location', $Message, GetValue('Location', $Message).'/'.$Method);
+            }
         }
 
         return $Message;
@@ -82,27 +85,31 @@ class MessageModel extends Gdn_Model {
      * @param bool $IncludeSubcategories
      * @return bool
      */
-    protected function InCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = FALSE) {
-        if (!$HaystackCategoryID)
-            return TRUE;
+    protected function InCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
+        if (!$HaystackCategoryID) {
+            return true;
+        }
 
-        if ($NeedleCategoryID == $HaystackCategoryID)
-            return TRUE;
+        if ($NeedleCategoryID == $HaystackCategoryID) {
+            return true;
+        }
 
         if ($IncludeSubcategories) {
             $Cat = CategoryModel::Categories($NeedleCategoryID);
             for ($i = 0; $i < 10; $i++) {
-                if (!$Cat)
+                if (!$Cat) {
                     break;
+                }
 
-                if ($Cat['CategoryID'] == $HaystackCategoryID)
-                    return TRUE;
+                if ($Cat['CategoryID'] == $HaystackCategoryID) {
+                    return true;
+                }
 
                 $Cat = CategoryModel::Categories($Cat['ParentCategoryID']);
             }
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -113,11 +120,12 @@ class MessageModel extends Gdn_Model {
      * @param null $CategoryID
      * @return array|null
      */
-    public function GetMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = NULL) {
+    public function GetMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = null) {
         $Session = Gdn::Session();
         $Prefs = $Session->GetPreference('DismissedMessages', array());
-        if (count($Prefs) == 0)
+        if (count($Prefs) == 0) {
             $Prefs[] = 0;
+        }
 
         $Exceptions = array_map('strtolower', $Exceptions);
 
@@ -128,25 +136,28 @@ class MessageModel extends Gdn_Model {
             $Messages = self::Messages();
             $Result = array();
             foreach ($Messages as $MessageID => $Message) {
-                if (in_array($MessageID, $Prefs) || !$Message['Enabled'])
+                if (in_array($MessageID, $Prefs) || !$Message['Enabled']) {
                     continue;
+                }
 
                 $MApplication = strtolower($Message['Application']);
                 $MController = strtolower($Message['Controller']);
                 $MMethod = strtolower($Message['Method']);
 
-                $Visible = FALSE;
+                $Visible = false;
 
-                if (in_array($MController, $Exceptions))
-                    $Visible = TRUE;
-                elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
-                    $Visible = TRUE;
+                if (in_array($MController, $Exceptions)) {
+                    $Visible = true;
+                } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
+                    $Visible = true;
 
-                if ($Visible && !$this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message)))
-                    $Visible = FALSE;
+                if ($Visible && !$this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message))) {
+                    $Visible = false;
+                }
 
-                if ($Visible)
+                if ($Visible) {
                     $Result[] = $Message;
+                }
             }
             return $Result;
         }
@@ -192,8 +203,12 @@ class MessageModel extends Gdn_Model {
                 $Locations[] = $Row->Controller;
             } else {
                 $Location = $Row->Application;
-                if ($Row->Controller != '') $Location .= '/'.$Row->Controller;
-                if ($Row->Method != '') $Location .= '/'.$Row->Method;
+                if ($Row->Controller != '') {
+                    $Location .= '/'.$Row->Controller;
+                }
+                if ($Row->Method != '') {
+                    $Location .= '/'.$Row->Method;
+                }
                 $Locations[] = $Location;
             }
         }
@@ -206,8 +221,8 @@ class MessageModel extends Gdn_Model {
      * @param bool $ID
      * @return array|mixed|null|type|void
      */
-    public static function Messages($ID = FALSE) {
-        if ($ID === NULL) {
+    public static function Messages($ID = false) {
+        if ($ID === null) {
             Gdn::Cache()->Remove('Messages');
             return;
         }
@@ -218,10 +233,11 @@ class MessageModel extends Gdn_Model {
             $Messages = Gdn_DataSet::Index($Messages, array('MessageID'));
             Gdn::Cache()->Store('Messages', $Messages);
         }
-        if ($ID === FALSE)
+        if ($ID === false) {
             return $Messages;
-        else
+        } else {
             return GetValue($ID, $Messages);
+        }
     }
 
     /**
@@ -231,16 +247,16 @@ class MessageModel extends Gdn_Model {
      * @param bool $Settings
      * @return unknown
      */
-    public function Save($FormPostValues, $Settings = FALSE) {
+    public function Save($FormPostValues, $Settings = false) {
         // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
         $Location = ArrayValue('Location', $FormPostValues, '');
         if ($Location != '') {
             $Location = explode('/', $Location);
             $Application = GetValue(0, $Location, '');
             if (in_array($Application, $this->_SpecialLocations)) {
-                $FormPostValues['Application'] = NULL;
+                $FormPostValues['Application'] = null;
                 $FormPostValues['Controller'] = $Application;
-                $FormPostValues['Method'] = NULL;
+                $FormPostValues['Method'] = null;
             } else {
                 $FormPostValues['Application'] = $Application;
                 $FormPostValues['Controller'] = GetValue(1, $Location, '');

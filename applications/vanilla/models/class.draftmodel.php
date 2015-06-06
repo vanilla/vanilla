@@ -48,11 +48,13 @@ class DraftModel extends VanillaModel {
      * @return object Gdn_DataSet SQL results.
      */
     public function Get($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
-        if (!is_numeric($Offset) || $Offset < 0)
+        if (!is_numeric($Offset) || $Offset < 0) {
             $Offset = 0;
+        }
 
-        if (!is_numeric($Limit) || $Limit < 1)
+        if (!is_numeric($Limit) || $Limit < 1) {
             $Limit = 100;
+        }
 
         $this->DraftQuery();
         $this->SQL
@@ -62,8 +64,9 @@ class DraftModel extends VanillaModel {
             ->OrderBy('d.DateInserted', 'desc')
             ->Limit($Limit, $Offset);
 
-        if (is_numeric($DiscussionID) && $DiscussionID > 0)
+        if (is_numeric($DiscussionID) && $DiscussionID > 0) {
             $this->SQL->Where('d.DiscussionID', $DiscussionID);
+        }
 
         return $this->SQL->Get();
     }
@@ -129,20 +132,22 @@ class DraftModel extends VanillaModel {
 
         // Get the DraftID from the form so we know if we are inserting or updating.
         $DraftID = ArrayValue('DraftID', $FormPostValues, '');
-        $Insert = $DraftID == '' ? TRUE : FALSE;
+        $Insert = $DraftID == '' ? true : false;
 
         if (!$DraftID) {
             unset($FormPostValues['DraftID']);
         }
 
         // Remove the discussionid from the form value collection if it's empty
-        if (array_key_exists('DiscussionID', $FormPostValues) && $FormPostValues['DiscussionID'] == '')
+        if (array_key_exists('DiscussionID', $FormPostValues) && $FormPostValues['DiscussionID'] == '') {
             unset($FormPostValues['DiscussionID']);
+        }
 
         if ($Insert) {
             // If no categoryid is defined, grab the first available.
-            if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
+            if (ArrayValue('CategoryID', $FormPostValues) === false) {
                 $FormPostValues['CategoryID'] = $this->SQL->Get('Category', '', '', 1)->FirstRow()->CategoryID;
+            }
 
         }
         // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
@@ -150,14 +155,17 @@ class DraftModel extends VanillaModel {
         $this->AddUpdateFields($FormPostValues);
 
         // Remove checkboxes from the fields if they were unchecked
-        if (ArrayValue('Announce', $FormPostValues, '') === FALSE)
+        if (ArrayValue('Announce', $FormPostValues, '') === false) {
             unset($FormPostValues['Announce']);
+        }
 
-        if (ArrayValue('Closed', $FormPostValues, '') === FALSE)
+        if (ArrayValue('Closed', $FormPostValues, '') === false) {
             unset($FormPostValues['Closed']);
+        }
 
-        if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
+        if (ArrayValue('Sink', $FormPostValues, '') === false) {
             unset($FormPostValues['Sink']);
+        }
 
         // Validate the form posted values
         if ($this->Validate($FormPostValues, $Insert)) {
@@ -201,10 +209,11 @@ class DraftModel extends VanillaModel {
             ->FirstRow();
 
         $this->SQL->Delete('Draft', array('DraftID' => $DraftID));
-        if (is_object($DraftUser))
+        if (is_object($DraftUser)) {
             $this->UpdateUser($DraftUser->InsertUserID);
+        }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -222,5 +231,4 @@ class DraftModel extends VanillaModel {
         // Update CountDrafts column of user table fot this user
         Gdn::UserModel()->SetField($UserID, 'CountDrafts', $CountDrafts);
     }
-
 }

@@ -16,13 +16,13 @@
  */
 class Gdn_Filecache extends Gdn_Cache {
 
-    /**  */
+    /** Option. */
     const OPT_MOD_SPLIT = 65000;
 
-    /**  */
+    /** Option. */
     const OPT_PASSTHRU_CONTAINER = 'passthru';
 
-    /**  */
+    /** Op. */
     const O_CREATE = 1;
 
     /** Cache fuke, */
@@ -51,7 +51,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * config file.
      */
     public function autorun() {
-        $this->AddContainer(array(
+        $this->addContainer(array(
             Gdn_Cache::CONTAINER_LOCATION => C('Cache.Filecache.Store')
         ));
     }
@@ -77,7 +77,7 @@ class Gdn_Filecache extends Gdn_Cache {
         }
 
         $CacheLocation = $Options[Gdn_Cache::CONTAINER_LOCATION];
-        $CacheLocationOK = Gdn_FileSystem::CheckFolderR($CacheLocation, Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE);
+        $CacheLocationOK = Gdn_FileSystem::checkFolderR($CacheLocation, Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE);
         if (!$CacheLocationOK) {
             return $this->failure("Supplied cache folder '{$CacheLocation}' could not be found, or created.");
         }
@@ -135,7 +135,7 @@ class Gdn_Filecache extends Gdn_Cache {
         $SplitValue = intval('0x'.substr($KeyHash, 0, 8), 16);
         $TargetFolder = (string)($SplitValue % Gdn_Filecache::OPT_MOD_SPLIT);
 
-        $Container = $this->_GetContainer($KeyHash);
+        $Container = $this->_getContainer($KeyHash);
         if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return $this->failure("Trying to fetch a container for hash '{$KeyHash}' but got back CACHEOP_FAILURE instead");
         }
@@ -144,7 +144,7 @@ class Gdn_Filecache extends Gdn_Cache {
         $SplitCacheLocation = CombinePaths(array($CacheLocation, $TargetFolder));
 
         $Flags = ($Flags & Gdn_Filecache::O_CREATE) ? Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE : 0;
-        $CacheLocationOK = Gdn_FileSystem::CheckFolderR($SplitCacheLocation, $Flags);
+        $CacheLocationOK = Gdn_FileSystem::checkFolderR($SplitCacheLocation, $Flags);
         if (!$CacheLocationOK) {
             return $this->failure("Computed cache folder '{$SplitCacheLocation}' could not be found, or created.");
         }
@@ -165,18 +165,18 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool
      */
     public function add($Key, $Value, $Options = array()) {
-        if ($this->Exists($Key) !== Gdn_Cache::CACHEOP_FAILURE) {
+        if ($this->exists($Key) !== Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
 
-        return $this->Store($Key, $Value, $Options);
+        return $this->store($Key, $Value, $Options);
     }
 
     /**
      * This method is deprecated, but since cache files call it there will be low-level crashes without it.
      */
     public static function prepareCache($CacheName, $ExistingCacheArray = null) {
-        Gdn_LibraryMap::PrepareCache($CacheName, $ExistingCacheArray);
+        Gdn_LibraryMap::prepareCache($CacheName, $ExistingCacheArray);
     }
 
     /**
@@ -199,7 +199,7 @@ class Gdn_Filecache extends Gdn_Cache {
         if (array_key_exists(Gdn_Filecache::OPT_PASSTHRU_CONTAINER, $FinalOptions)) {
             $Container = $FinalOptions[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
-            $Container = $this->_GetKeyPath($Key, Gdn_Filecache::O_CREATE);
+            $Container = $this->_getKeyPath($Key, Gdn_Filecache::O_CREATE);
             if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
                 return Gdn_Cache::CACHEOP_FAILURE;
             }
@@ -244,7 +244,7 @@ class Gdn_Filecache extends Gdn_Cache {
         if (array_key_exists(Gdn_Filecache::OPT_PASSTHRU_CONTAINER, $Options)) {
             $Container = $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
-            $Container = $this->_GetKeyPath($Key, Gdn_Filecache::O_CREATE);
+            $Container = $this->_getKeyPath($Key, Gdn_Filecache::O_CREATE);
             if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
                 return Gdn_Cache::CACHEOP_FAILURE;
             }
@@ -272,7 +272,7 @@ class Gdn_Filecache extends Gdn_Cache {
                     // Expired
                     if ((intval($Set) + intval($Expires)) < time()) {
                         @fclose($Cache);
-                        $this->Remove($Key);
+                        $this->remove($Key);
                         return Gdn_Cache::CACHEOP_FAILURE;
                     }
                 }
@@ -319,7 +319,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool
      */
     public function exists($Key) {
-        return ($this->_Exists($Key) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
+        return ($this->_exists($Key) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
         return Gdn_Cache::CACHEOP_FAILURE;
 
         return Gdn_Cache::CACHEOP_SUCCESS;
@@ -332,7 +332,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return array|bool
      */
     protected function _exists($Key) {
-        $Container = $this->_GetKeyPath($Key);
+        $Container = $this->_getKeyPath($Key);
         if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -356,7 +356,7 @@ class Gdn_Filecache extends Gdn_Cache {
         if (array_key_exists(Gdn_Filecache::OPT_PASSTHRU_CONTAINER, $Options)) {
             $Container = $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
-            $Container = $this->_GetKeyPath($Key, Gdn_Filecache::O_CREATE);
+            $Container = $this->_getKeyPath($Key, Gdn_Filecache::O_CREATE);
             if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
                 return Gdn_Cache::CACHEOP_FAILURE;
             }
@@ -390,13 +390,13 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool
      */
     public function replace($Key, $Value, $Options = array()) {
-        $Container = $this->_Exists($Key);
+        $Container = $this->_exists($Key);
         if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
 
         $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER] = $Container;
-        return $this->Store($Key, $Value, $Options);
+        return $this->store($Key, $Value, $Options);
     }
 
     /**
@@ -408,19 +408,19 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool
      */
     public function increment($Key, $Amount = 1, $Options = array()) {
-        $Container = $this->_Exists($Key);
+        $Container = $this->_exists($Key);
         if ($Container !== Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
 
         $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER] = $Container;
-        $Value = $this->Get($Key, $Options);
+        $Value = $this->get($Key, $Options);
         if ($Value !== Gdn_Cache::CACHEOP_FAILURE) {
             if (($Value + $Amount) < 0) {
                 return Gdn_Cache::CACHEOP_FAILURE;
             }
             $Value += $Amount;
-            return $this->Store($Key, $Value, $Options);
+            return $this->store($Key, $Value, $Options);
         }
 
         return Gdn_Cache::CACHEOP_FAILURE;
@@ -445,7 +445,7 @@ class Gdn_Filecache extends Gdn_Cache {
         foreach ($this->containers as &$Container) {
             $CacheLocation = $Container[Gdn_Filecache::CONTAINER_LOCATION];
             if (is_dir($CacheLocation)) {
-                Gdn_FileSystem::RemoveFolder($CacheLocation);
+                Gdn_FileSystem::removeFolder($CacheLocation);
                 @mkdir($CacheLocation, 0755, true);
             }
         }

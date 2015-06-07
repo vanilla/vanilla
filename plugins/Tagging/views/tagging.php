@@ -2,9 +2,9 @@
 
 <?php
 
-$TagType = $this->Data('_TagType');
-$TagTypes = $this->Data('_TagTypes');
-$CanAddTags = $this->Data('_CanAddTags');
+$TagType = $this->data('_TagType');
+$TagTypes = $this->data('_TagTypes');
+$CanAddTags = $this->data('_CanAddTags');
 
 ?>
 
@@ -22,7 +22,7 @@ $CanAddTags = $this->Data('_CanAddTags');
 
         echo $this->Form->textBox('Search');
         echo ' '.$this->Form->button(T('Go'));
-        //printf(T('%s tag(s) found.'), $this->Data('RecordCount'));
+        //printf(T('%s tag(s) found.'), $this->data('RecordCount'));
         ?>
     </div>
     <div class="Wrap">
@@ -67,7 +67,7 @@ $CanAddTags = $this->Data('_CanAddTags');
             <li>
                 <a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>">
                     <?php echo ucwords(strtolower($TagName)); ?>
-                    <?php if ($CurrentTab) echo "({$this->Data('RecordCount')})"; ?>
+                    <?php if ($CurrentTab) echo "({$this->data('RecordCount')})"; ?>
                 </a>
             </li>
 
@@ -78,11 +78,11 @@ $CanAddTags = $this->Data('_CanAddTags');
     <div class="Tags">
         <?php
         $Session = Gdn::session();
-        $TagCount = $this->Data('RecordCount');
+        $TagCount = $this->data('RecordCount');
         if ($TagCount == 0) {
             echo T("There are no tags in the system yet.");
         } else {
-            $Tags = $this->Data('Tags');
+            $Tags = $this->data('Tags');
             foreach ($Tags as $Tag) {
                 $CssClass = 'TagAdmin';
                 $Title = '';

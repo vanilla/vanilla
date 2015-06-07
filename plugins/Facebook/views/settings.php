@@ -58,7 +58,7 @@
             width: 280px;
         }
     </style>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -83,27 +83,27 @@ echo $this->Form->errors();
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('UseFacebookNames', 'Use Facebook names for usernames.');
+                    echo $this->Form->checkBox('UseFacebookNames', 'Use Facebook names for usernames.');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SendConnectEmail', 'Send users a welcome email.');
+                    echo $this->Form->checkBox('SendConnectEmail', 'Send users a welcome email.');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSignIn', 'Enable Social Sign In');
+                    echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
+                    echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSharing', 'Enable automatic Social Share.');
+                    echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
                     ?>
                 </li>
             </ul>
@@ -118,7 +118,7 @@ echo $this->Form->errors();
             <p>
                 When you create the Facebook application, you can choose what to enter in most fields, but make sure you
                 enter the following value in the "Site Url" field:
-                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::request()->Domain(), '/').'/'; ?>"/>
+                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::request()->domain(), '/').'/'; ?>"/>
             </p>
 
             <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into

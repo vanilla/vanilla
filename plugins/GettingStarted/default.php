@@ -54,7 +54,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
 
         // Add messages & their css on dashboard
         if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
-            $Sender->AddCssFile('getting-started.css', 'plugins/GettingStarted');
+            $Sender->addCssFile('getting-started.css', 'plugins/GettingStarted');
 
             $Session = Gdn::session();
             $WelcomeMessage = '<div class="GettingStarted">'

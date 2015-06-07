@@ -106,7 +106,7 @@ class TagModel extends Gdn_Model {
 
             return $ToID;
         } else {
-            if (Gdn::session()->CheckPermission('Plugins.Tagging.Add')) {
+            if (Gdn::session()->checkPermission('Plugins.Tagging.Add')) {
                 return parent::Save($FormPostValues, $Settings);
             } else {
                 return false;
@@ -370,7 +370,7 @@ class TagModel extends Gdn_Model {
         }
 
         // Add any remaining tags that need to be added.
-        if (Gdn::session()->CheckPermission('Plugins.Tagging.Add')) {
+        if (Gdn::session()->checkPermission('Plugins.Tagging.Add')) {
             foreach ($new_tags as $name => $full_name) {
                 $new_tag = array(
                     'Name' => trim(str_replace(' ', '-', strtolower($name)), '-'),

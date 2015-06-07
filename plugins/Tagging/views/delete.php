@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 
 <?php
 echo $this->Form->open();

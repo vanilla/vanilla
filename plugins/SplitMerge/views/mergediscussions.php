@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
 
-$Discussions = $this->Data('Discussions');
+$Discussions = $this->data('Discussions');
 if (count($Discussions) < 2) {
     echo wrap(T('You have to select at least 2 discussions to merge.'), 'p');
 } else {
@@ -18,7 +18,7 @@ if (count($Discussions) < 2) {
     echo '</li></ul>';
 
     echo '<div class="P">'.
-        $this->Form->CheckBox('RedirectLink', 'Leave a redirect links from the old discussions.').
+        $this->Form->checkBox('RedirectLink', 'Leave a redirect links from the old discussions.').
         '</div>';
 
     echo '<div class="Buttons">'.

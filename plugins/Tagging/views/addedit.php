@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -17,10 +17,10 @@ echo $this->Form->errors();
             echo $this->Form->textBox('Name');
             ?>
         </li>
-        <?php if ($this->Data('MergeTagVisible')): ?>
+        <?php if ($this->data('MergeTagVisible')): ?>
             <li>
                 <?php
-                echo $this->Form->CheckBox('MergeTag', 'Merge this tag with the existing one');
+                echo $this->Form->checkBox('MergeTag', 'Merge this tag with the existing one');
                 ?>
             </li>
         <?php endif; ?>

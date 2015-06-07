@@ -263,7 +263,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Add 'Google+' option to the row.
      */
-    public function Base_AfterReactions_Handler($Sender, $Args) {
+    public function base_AfterReactions_handler($Sender, $Args) {
         if (!$this->SocialReactions()) {
             return;
         }
@@ -285,7 +285,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param EntryController $Sender
      * @param array $Args
      */
-    public function Base_ConnectData_Handler($Sender, $Args) {
+    public function base_ConnectData_handler($Sender, $Args) {
         if (val(0, $Args) != 'googleplus') {
             return;
         }
@@ -321,7 +321,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             'Profile' => $Profile
         );
         $Form->setFormValue('Attributes', $Attributes);
-        $Sender->SetData('Verified', true);
+        $Sender->setData('Verified', true);
 
         $this->EventArguments['Form'] = $Form;
         $this->fireEvent('AfterConnectData');
@@ -333,7 +333,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_SignInIcons_Handler($Sender, $Args) {
+    public function base_SignInIcons_handler($Sender, $Args) {
         if (!$this->IsDefault()) {
             echo ' '.$this->SignInButton('icon').' ';
         }
@@ -345,7 +345,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+    public function base_BeforeSignInButton_handler($Sender, $Args) {
         if (!$this->IsDefault()) {
             echo ' '.$this->SignInButton('icon').' ';
         }
@@ -357,7 +357,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_GetConnections_Handler($Sender, $Args) {
+    public function base_GetConnections_handler($Sender, $Args) {
         $GPlus = valr('User.Attributes.'.self::ProviderKey, $Args);
         $Profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
 
@@ -448,7 +448,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function EntryController_SignIn_Handler($Sender, $Args) {
+    public function EntryController_SignIn_handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
 
         if (isset($Sender->Data['Methods'])) {
@@ -470,7 +470,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param EntryController $Sender
      * @param array $Args
      */
-    public function EntryController_OverrideSignIn_Handler($Sender, $Args) {
+    public function EntryController_OverrideSignIn_handler($Sender, $Args) {
         if (valr('DefaultProvider.AuthenticationKey', $Args) !== self::ProviderKey || !$this->IsConfigured()) {
             return;
         }
@@ -502,7 +502,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             redirect($Url);
         }
 
-        $Sender->Render('Blank', 'Utility', 'Dashboard');
+        $Sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -512,10 +512,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param $Args
      */
     public function SocialController_GooglePlus_Create($Sender, $Args) {
-        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
+        $Conf->initialize(array(
             'Plugins.GooglePlus.ClientID' => array('LabelCode' => 'Client ID', 'Options' => array('class' => 'InputBox BigInput')),
             'Plugins.GooglePlus.Secret' => array('LabelCode' => 'Client secret', 'Options' => array('class' => 'InputBox BigInput')),
             'Plugins.GooglePlus.SocialReactions' => array('Control' => 'checkbox', 'Default' => true),
@@ -529,9 +529,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
             $Model->Save(array('AuthenticationKey' => self::ProviderKey, 'IsDefault' => c('Plugins.GooglePlus.Default')));
         }
 
-        $Sender->AddSideMenu('dashboard/social');
-        $Sender->SetData('Title', sprintf(T('%s Settings'), 'Google+'));
+        $Sender->addSideMenu('dashboard/social');
+        $Sender->setData('Title', sprintf(T('%s Settings'), 'Google+'));
         $Sender->ConfigurationModule = $Conf;
-        $Sender->Render('Settings', '', 'plugins/GooglePlus');
+        $Sender->render('Settings', '', 'plugins/GooglePlus');
     }
 }

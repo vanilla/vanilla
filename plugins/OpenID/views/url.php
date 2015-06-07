@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 echo '<div class="Connect">';
-echo '<h1>', $this->Data('Title'), '</h1>';
+echo '<h1>', $this->data('Title'), '</h1>';
 $Form = $this->Form; //new Gdn_Form();
 //$Form->Method = 'get';
 echo $Form->open(array('Action' => url(Gdn::request()->Path()), 'Method' => 'get'));

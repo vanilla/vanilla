@@ -28,8 +28,8 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function RoleController_AfterRolesInfo_Handler($Sender) {
-        if (!Gdn::session()->CheckPermission('Garden.Settings.Manage')) {
+    public function RoleController_AfterRolesInfo_handler($Sender) {
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
 
@@ -57,7 +57,7 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         $TransientKey = val(1, $Sender->RequestArgs);
         if (in_array($Switch, array('on', 'off'))
             && $Session->validateTransientKey($TransientKey)
-            && $Session->CheckPermission('Garden.Settings.Manage')
+            && $Session->checkPermission('Garden.Settings.Manage')
         ) {
             saveToConfig('Garden.PrivateCommunity', $Switch == 'on' ? false : true);
         }

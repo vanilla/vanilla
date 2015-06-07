@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$VanillaID = $this->Data('VanillaID');
-$VanillaVersion = $this->Data('VanillaVersion');
-$SecurityToken = $this->Data('SecurityToken');
+$VanillaID = $this->data('VanillaID');
+$VanillaVersion = $this->data('VanillaVersion');
+$SecurityToken = $this->data('SecurityToken');
 
 function Capitalize($Word) {
     return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
@@ -39,7 +39,7 @@ function WriteRangeTab($Range, $Sender) {
 </div>
 <div class="Picker"></div>
 <script type="text/javascript"
-        src="<?php echo $this->Data('VanillaStatsUrl'); ?>/applications/vanillastats/js/remote.js"></script>
+        src="<?php echo $this->data('VanillaStatsUrl'); ?>/applications/vanillastats/js/remote.js"></script>
 <div class="DashboardSummaries">
     <div class="Loading"></div>
 </div>

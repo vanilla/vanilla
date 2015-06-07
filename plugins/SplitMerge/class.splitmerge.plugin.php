@@ -26,10 +26,10 @@ class SplitMergePlugin extends Gdn_Plugin {
     /**
      * Add "split" action link.
      */
-    public function Base_BeforeCheckComments_Handler($Sender) {
+    public function base_BeforeCheckComments_handler($Sender) {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
         $Discussion = $Sender->EventArguments['Discussion'];
-        if (Gdn::session()->CheckPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
+        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
             $ActionMessage .= ' '.anchor(T('Split'), 'vanilla/moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
         }
     }
@@ -37,9 +37,9 @@ class SplitMergePlugin extends Gdn_Plugin {
     /**
      * Add "merge" action link.
      */
-    public function Base_BeforeCheckDiscussions_Handler($Sender) {
+    public function base_BeforeCheckDiscussions_handler($Sender) {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
-        if (Gdn::session()->CheckPermission('Vanilla.Discussions.Edit', true, 'Category', 'any')) {
+        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', 'any')) {
             $ActionMessage .= ' '.anchor(T('Merge'), 'vanilla/moderation/mergediscussions/', 'Merge Popup');
         }
     }
@@ -65,7 +65,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         }
 
         // Verify that the user has permission to perform the split
-        $Sender->Permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+        $Sender->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
 
         $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
         if (!is_array($CheckedComments)) {
@@ -83,7 +83,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         // Load category data.
         $Sender->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
         $CountCheckedComments = count($CommentIDs);
-        $Sender->SetData('CountCheckedComments', $CountCheckedComments);
+        $Sender->setData('CountCheckedComments', $CountCheckedComments);
         // Perform the split
         if ($Sender->Form->authenticatedPostBack()) {
             // Create a new discussion record
@@ -120,7 +120,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Sender->Form->setValue('CategoryID', val('CategoryID', $Discussion));
         }
 
-        $Sender->Render($this->GetView('splitcomments.php'));
+        $Sender->render($this->GetView('splitcomments.php'));
     }
 
     /**
@@ -139,11 +139,11 @@ class SplitMergePlugin extends Gdn_Plugin {
         }
 
         $DiscussionIDs = $CheckedDiscussions;
-        $Sender->SetData('DiscussionIDs', $DiscussionIDs);
+        $Sender->setData('DiscussionIDs', $DiscussionIDs);
         $CountCheckedDiscussions = count($DiscussionIDs);
-        $Sender->SetData('CountCheckedDiscussions', $CountCheckedDiscussions);
+        $Sender->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
         $Discussions = $DiscussionModel->SQL->whereIn('DiscussionID', $DiscussionIDs)->get('Discussion')->resultArray();
-        $Sender->SetData('Discussions', $Discussions);
+        $Sender->setData('Discussions', $Discussions);
 
         // Perform the merge
         if ($Sender->Form->authenticatedPostBack()) {
@@ -229,7 +229,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             }
         }
 
-        $Sender->Render('MergeDiscussions', '', 'plugins/SplitMerge');
+        $Sender->render('MergeDiscussions', '', 'plugins/SplitMerge');
     }
 
     public function Setup() {

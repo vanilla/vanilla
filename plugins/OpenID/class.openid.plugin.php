@@ -108,7 +108,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * Act as a mini dispatcher for API requests to the plugin app
      */
 //   public function PluginController_OpenID_Create($Sender) {
-//      $Sender->Permission('Garden.Settings.Manage');
+//      $Sender->permission('Garden.Settings.Manage');
 //		$this->dispatch($Sender, $Sender->RequestArgs);
 //   }
 
@@ -120,10 +120,10 @@ class OpenIDPlugin extends Gdn_Plugin {
 //      if (isset($Sender->ChooserList)) {
 //         $Sender->ChooserList['openid'] = 'OpenID';
 //      }
-//      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
-//         $List = $Sender->Data('AuthenticationConfigureList');
+//      if (is_array($Sender->data('AuthenticationConfigureList'))) {
+//         $List = $Sender->data('AuthenticationConfigureList');
 //         $List['openid'] = '/dashboard/plugin/openid';
-//         $Sender->SetData('AuthenticationConfigureList', $List);
+//         $Sender->setData('AuthenticationConfigureList', $List);
 //      }
 //   }
 
@@ -144,7 +144,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function Base_ConnectData_Handler($Sender, $Args) {
+    public function base_ConnectData_handler($Sender, $Args) {
         if (val(0, $Args) != 'openid') {
             return;
         }
@@ -177,7 +177,7 @@ class OpenIDPlugin extends Gdn_Plugin {
                 $Form->setFormValue('Email', $Email);
             }
 
-            $Sender->SetData('Verified', true);
+            $Sender->setData('Verified', true);
             $Session->Stash('OpenID', $OpenID);
 
             $this->EventArguments['OpenID'] = $OpenID;
@@ -201,13 +201,13 @@ class OpenIDPlugin extends Gdn_Plugin {
             $OpenID = $this->GetOpenID();
         } catch (Gdn_UserException $ex) {
             $Sender->Form->addError('@'.$ex->getMessage());
-            $Sender->Render('Url', '', 'plugins/OpenID');
+            $Sender->render('Url', '', 'plugins/OpenID');
         }
 
         $Mode = $Sender->Request->get('openid_mode');
         switch ($Mode) {
             case 'cancel':
-                $Sender->Render('Cancel', '', 'plugins/OpenID');
+                $Sender->render('Cancel', '', 'plugins/OpenID');
                 break;
             case 'id_res':
                 if ($OpenID->validate()) {
@@ -219,15 +219,15 @@ class OpenIDPlugin extends Gdn_Plugin {
             default:
                 if (!$OpenID->identity) {
                     $Sender->CssClass = 'Dashboard Entry connect';
-                    $Sender->SetData('Title', T('Sign In with OpenID'));
-                    $Sender->Render('Url', '', 'plugins/OpenID');
+                    $Sender->setData('Title', T('Sign In with OpenID'));
+                    $Sender->render('Url', '', 'plugins/OpenID');
                 } else {
                     try {
                         $Url = $OpenID->authUrl();
                         redirect($Url);
                     } catch (Exception $Ex) {
                         $Sender->Form->addError($Ex);
-                        $Sender->Render('Url', '', 'plugins/OpenID');
+                        $Sender->render('Url', '', 'plugins/OpenID');
                     }
                 }
                 break;
@@ -239,7 +239,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function EntryController_SignIn_Handler($Sender, $Args) {
+    public function EntryController_SignIn_handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
 
         if (isset($Sender->Data['Methods']) && $this->SignInAllowed()) {
@@ -270,7 +270,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_SignInIcons_Handler($Sender, $Args) {
+    public function base_SignInIcons_handler($Sender, $Args) {
         if ($this->SignInAllowed()) {
             echo "\n".$this->_GetButton();
         }
@@ -282,7 +282,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+    public function base_BeforeSignInButton_handler($Sender, $Args) {
         if ($this->SignInAllowed()) {
             echo "\n".$this->_GetButton();
         }
@@ -305,7 +305,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Base_BeforeSignInLink_Handler($Sender) {
+    public function base_BeforeSignInLink_handler($Sender) {
 //      if (!$this->IsEnabled())
 //			return;
 
@@ -323,16 +323,16 @@ class OpenIDPlugin extends Gdn_Plugin {
      * Let's allow users to remove the ability to sign in with OpenID.
      */
     public function SettingsController_OpenID_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
+        $Conf->initialize(array(
             'Plugins.OpenID.DisableSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
         ));
 
-        $Sender->AddSideMenu();
-        $Sender->SetData('Title', sprintf(T('%s Settings'), T('OpenID')));
+        $Sender->addSideMenu();
+        $Sender->setData('Title', sprintf(T('%s Settings'), T('OpenID')));
         $Sender->ConfigurationModule = $Conf;
-        $Conf->RenderAll();
+        $Conf->renderAll();
     }
 }

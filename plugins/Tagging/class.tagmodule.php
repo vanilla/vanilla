@@ -57,8 +57,8 @@ class TagModule extends Gdn_Module {
         // If no hint was given, determine by environment
         if (is_null($Hint)) {
             if (Gdn::controller() instanceof Gdn_Controller) {
-                $DiscussionID = Gdn::controller()->Data('Discussion.DiscussionID', null);
-                $CategoryID = Gdn::controller()->Data('Category.CategoryID', null);
+                $DiscussionID = Gdn::controller()->data('Discussion.DiscussionID', null);
+                $CategoryID = Gdn::controller()->data('Category.CategoryID', null);
 
                 if ($DiscussionID) {
                     $Hint = 'Discussion';
@@ -73,14 +73,14 @@ class TagModule extends Gdn_Module {
         switch ($Hint) {
             case 'Discussion':
                 $this->ParentType = 'Discussion';
-                $DiscussionID = Gdn::controller()->Data('Discussion.DiscussionID');
+                $DiscussionID = Gdn::controller()->data('Discussion.DiscussionID');
                 $this->ParentID = $DiscussionID;
                 break;
 
             case 'Category':
                 if ($this->CategorySearch) {
                     $this->ParentType = 'Category';
-                    $CategoryID = Gdn::controller()->Data('Category.CategoryID');
+                    $CategoryID = Gdn::controller()->data('Category.CategoryID');
                     $this->ParentID = $CategoryID;
                 }
                 break;

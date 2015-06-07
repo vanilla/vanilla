@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Fields = $this->Data('ExtendedFields');
+$Fields = $this->data('ExtendedFields');
 
 ?>
 

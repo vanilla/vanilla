@@ -34,7 +34,7 @@ class GravatarPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function ProfileController_AfterAddSideMenu_Handler($Sender, $Args) {
+    public function ProfileController_AfterAddSideMenu_handler($Sender, $Args) {
         if (!$Sender->User->Photo) {
             $Email = val('Email', $Sender->User);
             $Protocol = Gdn::request()->Scheme() == 'https' ? 'https://secure.' : 'http://www.';

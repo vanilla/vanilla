@@ -144,7 +144,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_CheckSpam_Handler($Sender, $Args) {
+    public function base_CheckSpam_handler($Sender, $Args) {
         // Don't check for spam if another plugin has already determined it is.
         if ($Sender->EventArguments['IsSpam']) {
             return;
@@ -189,18 +189,18 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function SettingsController_StopForumSpam_Create($Sender, $Args = array()) {
-        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
         $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
+        $Conf->initialize(array(
             'Plugins.StopForumSpam.IPThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'IP addresses reported this many times will be flagged as spam.'),
             'Plugins.StopForumSpam.EmailThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'Email addresses reported this many times will be flagged as spam.'),
             'Plugins.StopForumSpam.IPThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'IP addresses reported this many times will be completely rejected.'),
             'Plugins.StopForumSpam.EmailThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 50, 'Description' => 'Email addresses reported this many times will be completely rejected.'),
         ));
 
-        $Sender->AddSideMenu('dashboard/settings/plugins');
-        $Sender->SetData('Title', T('Stop Forum Spam Settings'));
+        $Sender->addSideMenu('dashboard/settings/plugins');
+        $Sender->setData('Title', T('Stop Forum Spam Settings'));
         $Sender->ConfigurationModule = $Conf;
-        $Conf->RenderAll();
+        $Conf->renderAll();
     }
 }

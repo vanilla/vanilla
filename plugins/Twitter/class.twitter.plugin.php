@@ -80,10 +80,10 @@ class TwitterPlugin extends Gdn_Plugin {
 //      if (isset($Sender->ChooserList)) {
 //         $Sender->ChooserList['twitter'] = 'Twitter';
 //      }
-//      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
-//         $List = $Sender->Data('AuthenticationConfigureList');
+//      if (is_array($Sender->data('AuthenticationConfigureList'))) {
+//         $List = $Sender->data('AuthenticationConfigureList');
 //         $List['twitter'] = '/dashboard/settings/twitter';
-//         $Sender->SetData('AuthenticationConfigureList', $List);
+//         $Sender->setData('AuthenticationConfigureList', $List);
 //      }
 //   }
 
@@ -119,7 +119,7 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function EntryController_SignIn_Handler($Sender, $Args) {
+    public function EntryController_SignIn_handler($Sender, $Args) {
         if (isset($Sender->Data['Methods'])) {
             if (!$this->SocialSignIn()) {
                 return;
@@ -143,7 +143,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_SignInIcons_Handler($Sender, $Args) {
+    public function base_SignInIcons_handler($Sender, $Args) {
         if (!$this->SocialSignIn()) {
             return;
         }
@@ -157,7 +157,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+    public function base_BeforeSignInButton_handler($Sender, $Args) {
         if (!$this->SocialSignIn()) {
             return;
         }
@@ -170,7 +170,7 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Base_BeforeSignInLink_Handler($Sender) {
+    public function base_BeforeSignInLink_handler($Sender) {
         if (!$this->SocialSignIn()) {
             return;
         }
@@ -189,7 +189,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_DiscussionFormOptions_Handler($Sender, $Args) {
+    public function base_DiscussionFormOptions_handler($Sender, $Args) {
         if (!$this->SocialSharing()) {
             return;
         }
@@ -201,7 +201,7 @@ class TwitterPlugin extends Gdn_Plugin {
         $Options =& $Args['Options'];
 
         $Options .= ' <li>'.
-            $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
+            $Sender->Form->checkBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
             '</li> ';
     }
 
@@ -211,7 +211,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function DiscussionController_AfterBodyField_Handler($Sender, $Args) {
+    public function DiscussionController_AfterBodyField_handler($Sender, $Args) {
         if (!$this->SocialSharing()) {
             return;
         }
@@ -221,7 +221,7 @@ class TwitterPlugin extends Gdn_Plugin {
         }
 
         echo ' '.
-            $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
+            $Sender->Form->checkBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
             ' ';
     }
 
@@ -232,7 +232,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Args
      * @throws Gdn_UserException
      */
-    public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
+    public function DiscussionModel_AfterSaveDiscussion_handler($Sender, $Args) {
         if (!$this->SocialSharing()) {
             return;
         }
@@ -265,7 +265,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Args
      * @throws Gdn_UserException
      */
-    public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
+    public function CommentModel_AfterSaveComment_handler($Sender, $Args) {
         if (!$this->SocialSharing()) {
             return;
         }
@@ -433,7 +433,7 @@ class TwitterPlugin extends Gdn_Plugin {
 //         echo $Message.strlen($Message);
 
             if ($this->AccessToken()) {
-                Gdn::controller()->SetData('Message', $Message);
+                Gdn::controller()->setData('Message', $Message);
 
                 $Message .= ' '.$Row['ShareUrl'];
                 $R = $this->API(
@@ -456,7 +456,7 @@ class TwitterPlugin extends Gdn_Plugin {
             }
         }
 
-        $Sender->Render('Blank', 'Utility', 'Dashboard');
+        $Sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -469,7 +469,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param type $oauth_verifier
      */
     public function ProfileController_TwitterConnect_Create($Sender, $UserReference = '', $Username = '', $oauth_token = '', $oauth_verifier = '') {
-        $Sender->Permission('Garden.SignIn.Allow');
+        $Sender->permission('Garden.SignIn.Allow');
 
         $Sender->getUserInfo($UserReference, $Username, '', true);
 
@@ -566,7 +566,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      * @param array $Args
      */
-    public function Base_ConnectData_Handler($Sender, $Args) {
+    public function base_ConnectData_handler($Sender, $Args) {
         if (val(0, $Args) != 'twitter') {
             return;
         }
@@ -661,7 +661,7 @@ class TwitterPlugin extends Gdn_Plugin {
         ));
         $Form->setFormValue('Attributes', $Attributes);
 
-        $Sender->SetData('Verified', true);
+        $Sender->setData('Verified', true);
     }
 
     /**
@@ -670,7 +670,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_GetConnections_Handler($Sender, $Args) {
+    public function base_GetConnections_handler($Sender, $Args) {
         $Profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
 
         $Sender->Data["Connections"][self::ProviderKey] = array(
@@ -913,7 +913,7 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Add 'Twitter' option to the row.
      */
-    public function Base_AfterReactions_Handler($Sender, $Args) {
+    public function base_AfterReactions_handler($Sender, $Args) {
         if (!$this->SocialReactions()) {
             return;
         }
@@ -944,7 +944,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Args
      */
     public function SocialController_Twitter_Create($Sender, $Args) {
-        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
         if ($Sender->Form->authenticatedPostBack()) {
             $Settings = array(
                 'Plugins.Twitter.ConsumerKey' => $Sender->Form->getFormValue('ConsumerKey'),
@@ -965,9 +965,9 @@ class TwitterPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->SocialSharing());
         }
 
-        $Sender->AddSideMenu('dashboard/social');
-        $Sender->SetData('Title', T('Twitter Settings'));
-        $Sender->Render('Settings', '', 'plugins/Twitter');
+        $Sender->addSideMenu('dashboard/social');
+        $Sender->setData('Title', T('Twitter Settings'));
+        $Sender->render('Settings', '', 'plugins/Twitter');
     }
 
     /**

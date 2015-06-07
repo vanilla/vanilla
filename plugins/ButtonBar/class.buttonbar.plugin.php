@@ -32,13 +32,13 @@ class ButtonBarPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function Base_Render_Before($Sender) {
+    public function base_render_before($Sender) {
         $Formatter = c('Garden.InputFormatter', 'Html');
-        $this->AttachButtonBarResources($Sender, $Formatter);
+        $this->attachButtonBarResources($Sender, $Formatter);
     }
 
-    public function AssetModel_StyleCss_Handler($Sender) {
-        $Sender->AddCssFile('buttonbar.css', 'plugins/ButtonBar');
+    public function assetModel_styleCss_handler($Sender) {
+        $Sender->addCssFile('buttonbar.css', 'plugins/ButtonBar');
     }
 
     /**
@@ -48,7 +48,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    protected function AttachButtonBarResources($Sender, $Formatter) {
+    protected function attachButtonBarResources($Sender, $Formatter) {
         if (!in_array($Formatter, $this->Formats)) {
             return;
         }
@@ -69,17 +69,17 @@ class ButtonBarPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
+    public function gdn_form_beforeBodyBox_handler($Sender) {
         $Wrap = false;
         if (Gdn::controller() instanceof PostController) {
             $Wrap = true;
         }
-        $this->AttachButtonBar($Sender, $Wrap);
+        $this->attachButtonBar($Sender, $Wrap);
     }
-//   public function DiscussionController_BeforeBodyField_Handler($Sender) {
+//   public function DiscussionController_BeforeBodyField_handler($Sender) {
 //      $this->AttachButtonBar($Sender);
 //   }
-//   public function PostController_BeforeBodyField_Handler($Sender) {
+//   public function PostController_BeforeBodyField_handler($Sender) {
 //      $this->AttachButtonBar($Sender);
 //   }
 
@@ -92,7 +92,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    protected function AttachButtonBar($Sender, $Wrap = false) {
+    protected function attachButtonBar($Sender, $Wrap = false) {
         $Formatter = c('Garden.InputFormatter', 'Html');
         if (!in_array($Formatter, $this->Formats)) {
             return;

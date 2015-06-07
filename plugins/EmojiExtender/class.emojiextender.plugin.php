@@ -151,7 +151,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param Emoji $sender
      * @param array $args
      */
-    public function Emoji_Init_Handler($sender, $args) {
+    public function emoji_init_handler($sender, $args) {
         // Get the currently selected emoji set & switch to it.
         $emojiSetKey = c('Garden.EmojiSet');
         if (!$emojiSetKey || !array_key_exists($emojiSetKey, $this->getEmojiSets())) {
@@ -166,9 +166,8 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      * @param array $args
      */
-    public function SettingsController_EmojiExtender_Create($sender, $args) {
+    public function settingsController_emojiExtender_create($sender, $args) {
         $cf = new ConfigurationModule($sender);
-
         $items = array();
 
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
@@ -179,10 +178,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
                 (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
-                (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::Wysiwyg($manifest['description']).'</p>').
+                (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::wysiwyg($manifest['description']).'</p>').
                 '</div>';
         }
-        $cf->Initialize(array(
+        $cf->initialize(array(
             'Garden.EmojiSet' => array(
                 'LabelCode' => 'Emoji Set',
                 'Control' => 'radiolist',
@@ -194,9 +193,9 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
 
-        $sender->AddCssFile('settings.css', 'plugins/EmojiExtender');
-        $sender->AddSideMenu();
-        $sender->SetData('Title', sprintf(T('%s Settings'), 'Emoji'));
-        $cf->RenderAll();
+        $sender->addCssFile('settings.css', 'plugins/EmojiExtender');
+        $sender->addSideMenu();
+        $sender->setData('Title', sprintf(t('%s Settings'), 'Emoji'));
+        $cf->renderAll();
     }
 }

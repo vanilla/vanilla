@@ -1,9 +1,9 @@
 <?php
 
-$format = strtolower($this->Data('_EditorInputFormat'));
+$format = strtolower($this->data('_EditorInputFormat'));
 $html_toolbar = ''; // for regular text
 
-$css_upload_class = ($this->Data('_canUpload'))
+$css_upload_class = ($this->data('_canUpload'))
    ? 'editor-uploads'
    : 'editor-uploads-disabled';
 
@@ -13,9 +13,9 @@ $css_ismobile_class = (IsMobile())
 
 $html_toolbar = '<div class="editor editor-format-'.$format.' '.$css_upload_class.' '.$css_ismobile_class.'">';
 $html_arrow_down = '<span class="icon icon-caret-down"></span>';
-$editor_file_input_name = $this->Data('_editorFileInputName');
+$editor_file_input_name = $this->data('_editorFileInputName');
 
-foreach ($this->Data('_EditorToolbar') as $button) {
+foreach ($this->data('_EditorToolbar') as $button) {
 
    // If the type is not an array, it's a regular button (type==button)
    if (!is_array($button['type'])) {

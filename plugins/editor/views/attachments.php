@@ -1,7 +1,7 @@
 <?php
 
-$attachments = $this->Data('_attachments');
-$editorkey = $this->Data('_editorkey');
+$attachments = $this->data('_attachments');
+$editorkey = $this->data('_editorkey');
 
 ?>
 
@@ -15,7 +15,7 @@ $editorkey = $this->Data('_editorkey');
       $viewerCssClass = ($isOwner)
          ? 'file-owner'
          : 'file-readonly';
-      if (Gdn::session()->CheckPermission('Garden.Moderation.Manage')) {
+      if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
          $viewerCssClass = 'file-owner';
       }
       if (val('InBody', $attachment)) {

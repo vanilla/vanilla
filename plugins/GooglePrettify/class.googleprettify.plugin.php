@@ -82,13 +82,13 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         return $Result;
     }
 
-    public function AssetModel_StyleCss_Handler($Sender) {
+    public function assetModel_styleCss_handler($Sender) {
         if (!c('Plugins.GooglePrettify.NoCssFile')) {
-            $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
+            $Sender->addCssFile('prettify.css', 'plugins/GooglePrettify');
         }
     }
 
-    public function AssetModel_GenerateETag_Handler($Sender, $Args) {
+    public function AssetModel_GenerateETag_handler($Sender, $Args) {
         if (!c('Plugins.GooglePrettify.NoCssFile')) {
             $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = true;
         }
@@ -145,7 +145,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
             'yaml' => 'yaml'
         );
 
-        $Cf->Initialize(array(
+        $Cf->initialize(array(
             'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => false),
             'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => false),
             'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => false),
@@ -153,8 +153,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                 'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
         ));
 
-        $Sender->AddSideMenu();
-        $Sender->SetData('Title', T('Syntax Prettifier Settings'));
-        $Cf->RenderAll();
+        $Sender->addSideMenu();
+        $Sender->setData('Title', T('Syntax Prettifier Settings'));
+        $Cf->renderAll();
     }
 }

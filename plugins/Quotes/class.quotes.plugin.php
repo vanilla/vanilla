@@ -62,8 +62,8 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-        if (!Gdn::session()->CheckPermission('Garden.SignIn.Allow')) {
+    public function ProfileController_AfterAddSideMenu_handler($Sender) {
+        if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
             return;
         }
 
@@ -83,7 +83,7 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function ProfileController_Quotes_Create($Sender) {
-        $Sender->Permission('Garden.SignIn.Allow');
+        $Sender->permission('Garden.SignIn.Allow');
         $Sender->Title(T("Quotes Settings"));
 
         $Args = $Sender->RequestArgs;
@@ -105,17 +105,17 @@ class QuotesPlugin extends Gdn_Plugin {
         $ViewingUserID = $UserID;
 
         if ($Sender->User->UserID != $ViewingUserID) {
-            $Sender->Permission('Garden.Users.Edit');
+            $Sender->permission('Garden.Users.Edit');
             $UserID = $Sender->User->UserID;
-            $Sender->SetData('ForceEditing', $Sender->User->Name);
+            $Sender->setData('ForceEditing', $Sender->User->Name);
         } else {
-            $Sender->SetData('ForceEditing', false);
+            $Sender->setData('ForceEditing', false);
         }
 
         $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
         $Sender->Form->setValue('QuoteFolding', $QuoteFolding);
 
-        $Sender->SetData('QuoteFoldingOptions', array(
+        $Sender->setData('QuoteFoldingOptions', array(
             'None' => T("Don't fold quotes"),
             '1' => plural(1, '%s level deep', '%s levels deep'),
             '2' => plural(2, '%s level deep', '%s levels deep'),
@@ -126,14 +126,14 @@ class QuotesPlugin extends Gdn_Plugin {
 
         // Form submission handling.
         if ($Sender->Form->authenticatedPostBack()) {
-            $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
+            $NewFoldingLevel = $Sender->Form->getValue('QuoteFolding', '1');
             if ($NewFoldingLevel != $QuoteFolding) {
                 Gdn::userModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
                 $Sender->informMessage(T("Your changes have been saved."));
             }
         }
 
-        $Sender->Render('quotes', '', 'plugins/Quotes');
+        $Sender->render('quotes', '', 'plugins/Quotes');
     }
 
     /**
@@ -141,7 +141,7 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+    public function DiscussionController_BeforeDiscussionRender_handler($Sender) {
         if (!Gdn::session()->isValid()) {
             return;
         }
@@ -198,7 +198,7 @@ class QuotesPlugin extends Gdn_Plugin {
         $this->FormatQuote($Type, $ID, $QuoteData, $Format);
 
         $Sender->setJson('Quote', $QuoteData);
-        $Sender->Render('GetQuote', '', 'plugins/Quotes');
+        $Sender->render('GetQuote', '', 'plugins/Quotes');
     }
 
     /**
@@ -232,7 +232,7 @@ class QuotesPlugin extends Gdn_Plugin {
     /**
      * Add 'Quote' option to Discussion.
      */
-    public function Base_AfterFlag_Handler($Sender, $Args) {
+    public function base_AfterFlag_handler($Sender, $Args) {
         echo Gdn_Theme::BulletItem('Flags');
         $this->AddQuoteButton($Sender, $Args);
     }
@@ -258,19 +258,19 @@ class QuotesPlugin extends Gdn_Plugin {
         echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 
-    public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender) {
+    public function DiscussionController_BeforeDiscussionDisplay_handler($Sender) {
         $this->RenderQuotes($Sender);
     }
 
-    public function PostController_BeforeDiscussionDisplay_Handler($Sender) {
+    public function PostController_BeforeDiscussionDisplay_handler($Sender) {
         $this->RenderQuotes($Sender);
     }
 
-    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+    public function DiscussionController_BeforeCommentDisplay_handler($Sender) {
         $this->RenderQuotes($Sender);
     }
 
-    public function PostController_BeforeCommentDisplay_Handler($Sender) {
+    public function PostController_BeforeCommentDisplay_handler($Sender) {
         $this->RenderQuotes($Sender);
     }
 
@@ -350,7 +350,7 @@ BLOCKQUOTE;
             return;
         }
         $Selector = $Sender->RequestArgs[1];
-        $Sender->SetData('Plugin.Quotes.QuoteSource', $Selector);
+        $Sender->setData('Plugin.Quotes.QuoteSource', $Selector);
         $Sender->View = 'comment';
         return $Sender->Comment();
     }
@@ -360,7 +360,7 @@ BLOCKQUOTE;
      *
      * @param $Sender
      */
-    public function PostController_BeforeCommentRender_Handler($Sender) {
+    public function PostController_BeforeCommentRender_handler($Sender) {
         if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
             if (sizeof($Sender->RequestArgs) < 2) {
                 return;

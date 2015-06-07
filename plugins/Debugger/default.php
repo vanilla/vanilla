@@ -27,9 +27,9 @@ class DebuggerPlugin extends Gdn_Plugin {
      */
     public function __construct() {
         parent::__construct();
-        $tmp = Gdn::FactoryOverwrite(TRUE);
-        Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
-        Gdn::FactoryOverwrite($tmp);
+        $tmp = Gdn::factoryOverwrite(TRUE);
+        Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryOverwrite($tmp);
         unset($tmp);
     }
 
@@ -39,8 +39,8 @@ class DebuggerPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-        $Sender->AddCssFile('debugger.css', 'plugins/Debugger');
+    public function assetModel_styleCss_handler($Sender, $Args) {
+        $Sender->addCssFile('debugger.css', 'plugins/Debugger');
     }
 
     /**
@@ -48,9 +48,9 @@ class DebuggerPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Base_AfterBody_Handler($Sender) {
+    public function base_afterBody_handler($Sender) {
         $Session = Gdn::session();
-        if (!Debug() && !$Session->CheckPermission('Plugins.Debugger.View')) {
+        if (!Debug() && !$Session->checkPermission('Plugins.Debugger.View')) {
             return;
         }
 
@@ -64,7 +64,7 @@ class DebuggerPlugin extends Gdn_Plugin {
      * @param string $Indent
      * @return string
      */
-    public static function FormatData($Data, $Indent = '') {
+    public static function formatData($Data, $Indent = '') {
         $Result = '';
         if (is_array($Data)) {
             foreach ($Data as $Key => $Value) {
@@ -82,11 +82,11 @@ class DebuggerPlugin extends Gdn_Plugin {
 
                     $Result .=
                         "\n"
-                        .self::FormatData($Value, $Indent.'   ');
+                        .self::formatData($Value, $Indent.'   ');
                 }
             }
         } elseif (is_a($Data, 'Gdn_DataSet')) {
-            $Data = $Data->Result();
+            $Data = $Data->result();
             if (count($Data) == 0)
                 return $Result.'EMPTY<br />';
 
@@ -96,7 +96,7 @@ class DebuggerPlugin extends Gdn_Plugin {
             return $Result;
         } elseif (is_a($Data, 'stdClass')) {
             $Data = (array)$Data;
-            return self::FormatData($Data, $Indent);
+            return self::formatData($Data, $Indent);
         } elseif (is_object($Data)) {
             $Result .= $Indent.get_class($Data);
         } else {
@@ -110,21 +110,21 @@ class DebuggerPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function PluginController_Debugger_Create($Sender) {
-        $Sender->Render();
+    public function pluginController_debugger_create($Sender) {
+        $Sender->render();
     }
 
     /**
      *
      */
-    public function Setup() {
+    public function setup() {
         saveToConfig('Debug', true);
     }
 
     /**
      *
      */
-    public function OnDisable() {
+    public function onDisable() {
         saveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
     }
 }

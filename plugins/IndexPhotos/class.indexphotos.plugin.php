@@ -29,16 +29,16 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function AssetModel_StyleCss_Handler($Sender) {
+    public function assetModel_styleCss_handler($Sender) {
         if (!$this->hasLayoutTables() || IsMobile()) {
-            $Sender->AddCssFile('indexphotos.css', 'plugins/IndexPhotos');
+            $Sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
         }
     }
 
     /**
      * Add OP name to start of discussion meta.
      */
-    public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
+    public function DiscussionsController_AfterDiscussionLabels_handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
             if (val('FirstUser', $Args)) {
                 echo '<span class="MItem DiscussionAuthor">'.UserAnchor(val('FirstUser', $Args)).'</span>';
@@ -52,7 +52,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
+    public function CategoriesController_AfterDiscussionLabels_handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
             if (val('FirstUser', $Args)) {
                 echo '<span class="MItem DiscussionAuthor">'.UserAnchor(val('FirstUser', $Args)).'</span>';
@@ -63,7 +63,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     /**
      * Trigger on All Discussions.
      */
-    public function DiscussionsController_BeforeDiscussionContent_Handler($Sender) {
+    public function DiscussionsController_BeforeDiscussionContent_handler($Sender) {
         if (!$this->hasLayoutTables() || IsMobile()) {
             $this->DisplayPhoto($Sender);
         }
@@ -72,7 +72,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     /**
      * Trigger on Categories.
      */
-    public function CategoriesController_BeforeDiscussionContent_Handler($Sender) {
+    public function CategoriesController_BeforeDiscussionContent_handler($Sender) {
         if (!$this->hasLayoutTables()) {
             $this->DisplayPhoto($Sender);
         }

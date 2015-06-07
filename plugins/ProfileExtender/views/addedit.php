@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -8,16 +8,16 @@ echo $this->Form->errors();
         <li>
             <?php
             echo $this->Form->label('Type', 'FormType');
-            echo $this->Form->Dropdown('FormType', $this->Data('FormTypes'));
+            echo $this->Form->Dropdown('FormType', $this->data('FormTypes'));
             ?>
         </li>
-        <li class="Label<?php if ($this->Form->GetValue('FormType') == 'DateOfBirth') echo ' Hidden'; ?>">
+        <li class="Label<?php if ($this->Form->getValue('FormType') == 'DateOfBirth') echo ' Hidden'; ?>">
             <?php
             echo $this->Form->label('Label', 'Label');
             echo $this->Form->textBox('Label');
             ?>
         </li>
-        <li class="Options<?php if ($this->Form->GetValue('FormType') != 'Dropdown') echo ' Hidden'; ?>">
+        <li class="Options<?php if ($this->Form->getValue('FormType') != 'Dropdown') echo ' Hidden'; ?>">
             <?php
 
             echo $this->Form->label('Options', 'Options');
@@ -26,16 +26,16 @@ echo $this->Form->errors();
             ?>
         </li>
         <li>
-            <?php echo $this->Form->CheckBox('Required', 'Required for all users'); ?>
+            <?php echo $this->Form->checkBox('Required', 'Required for all users'); ?>
         </li>
         <li>
-            <?php echo $this->Form->CheckBox('OnRegister', 'Show on registration'); ?>
+            <?php echo $this->Form->checkBox('OnRegister', 'Show on registration'); ?>
         </li>
         <li class="ShowOnProfiles">
-            <?php echo $this->Form->CheckBox('OnProfile', 'Show on profiles'); ?>
+            <?php echo $this->Form->checkBox('OnProfile', 'Show on profiles'); ?>
         </li>
         <!--<li>
-         <?php echo $this->Form->CheckBox('OnDiscussion', 'Show on discussions'); ?>
+         <?php echo $this->Form->checkBox('OnDiscussion', 'Show on discussions'); ?>
       </li>-->
     </ul>
     <script>

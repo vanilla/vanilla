@@ -52,7 +52,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**
      * Override the default dashboard page with the new stats one.
      */
-    public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
+    public function Gdn_Dispatcher_BeforeDispatch_handler($Sender) {
         $Enabled = c('Garden.Analytics.Enabled', true);
 
         if ($Enabled && !Gdn::pluginManager()->HasNewMethod('SettingsController', 'Index')) {
@@ -102,7 +102,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
         // Tell the page where to find the Vanilla Analytics provider
         $Sender->addDefinition('VanillaStatsUrl', $StatsUrl);
-        $Sender->SetData('VanillaStatsUrl', $StatsUrl);
+        $Sender->setData('VanillaStatsUrl', $StatsUrl);
 
         // Load javascript & css, check permissions, and load side menu for this page.
         $Sender->addJsFile('settings.js');
@@ -115,11 +115,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
         $Sender->fireEvent('DefineAdminPermissions');
-        $Sender->Permission($Sender->RequiredAdminPermissions, '', false);
-        $Sender->AddSideMenu('dashboard/settings');
+        $Sender->permission($Sender->RequiredAdminPermissions, '', false);
+        $Sender->addSideMenu('dashboard/settings');
 
         if (!Gdn_Statistics::CheckIsEnabled() && Gdn_Statistics::CheckIsLocalhost()) {
-            $Sender->Render('dashboardlocalhost', '', 'plugins/VanillaStats');
+            $Sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');
         } else {
             $Sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
             $Sender->addJsFile('picker.js', 'plugins/VanillaStats');
@@ -128,12 +128,12 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $this->ConfigureRange($Sender);
 
             $VanillaID = Gdn::InstallationID();
-            $Sender->SetData('VanillaID', $VanillaID);
-            $Sender->SetData('VanillaVersion', APPLICATION_VERSION);
-            $Sender->SetData('SecurityToken', $this->SecurityToken());
+            $Sender->setData('VanillaID', $VanillaID);
+            $Sender->setData('VanillaVersion', APPLICATION_VERSION);
+            $Sender->setData('SecurityToken', $this->SecurityToken());
 
             // Render the custom dashboard view
-            $Sender->Render('dashboard', '', 'plugins/VanillaStats');
+            $Sender->render('dashboard', '', 'plugins/VanillaStats');
         }
     }
 
@@ -154,14 +154,14 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
 
         $Sender->fireEvent('DefineAdminPermissions');
-        $Sender->Permission($Sender->RequiredAdminPermissions, '', false);
-        $Sender->AddSideMenu('dashboard/settings');
+        $Sender->permission($Sender->RequiredAdminPermissions, '', false);
+        $Sender->addSideMenu('dashboard/settings');
 
         $this->ConfigureRange($Sender);
 
         // Load the most active discussions during this date range
         $UserModel = new UserModel();
-        $Sender->SetData('DiscussionData', $UserModel->SQL
+        $Sender->setData('DiscussionData', $UserModel->SQL
             ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID')
             ->from('Discussion d')
             ->where('d.DateLastComment >=', $Sender->DateStart)
@@ -173,7 +173,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->get());
 
         // Load the most active users during this date range
-        $Sender->SetData('UserData', $UserModel->SQL
+        $Sender->setData('UserData', $UserModel->SQL
             ->select('u.UserID, u.Name')
             ->select('c.CommentID', 'count', 'CountComments')
             ->from('User u')
@@ -186,7 +186,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->get());
 
         // Render the custom dashboard view
-        $Sender->Render('dashboardsummaries', '', 'plugins/VanillaStats');
+        $Sender->render('dashboardsummaries', '', 'plugins/VanillaStats');
     }
 
     /**

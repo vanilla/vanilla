@@ -12,7 +12,7 @@ echo $this->Form->errors();
 ?>
 <h3><?php echo T('Flagging Settings'); ?></h3>
 <ul>
-    <li><?php echo $this->Form->CheckBox('Plugins.Flagging.UseDiscussions', T('Create Discussions')); ?></li>
+    <li><?php echo $this->Form->checkBox('Plugins.Flagging.UseDiscussions', T('Create Discussions')); ?></li>
     <li>
         <?php
         echo $this->Form->label('Category to Use', 'Plugins.Flagging.CategoryID');

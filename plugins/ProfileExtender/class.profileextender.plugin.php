@@ -70,7 +70,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add the Dashboard menu item.
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_GetAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Users', T('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
     }
@@ -78,7 +78,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add non-checkbox fields to registration forms.
      */
-    public function EntryController_RegisterBeforePassword_Handler($Sender) {
+    public function EntryController_RegisterBeforePassword_handler($Sender) {
         $ProfileFields = $this->GetProfileFields();
         $Sender->RegistrationFields = array();
         foreach ($ProfileFields as $Name => $Field) {
@@ -92,7 +92,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add checkbox fields to registration forms.
      */
-    public function EntryController_RegisterFormBeforeTerms_Handler($Sender) {
+    public function EntryController_RegisterFormBeforeTerms_handler($Sender) {
         $ProfileFields = $this->GetProfileFields();
         $Sender->RegistrationFields = array();
         foreach ($ProfileFields as $Name => $Field) {
@@ -106,7 +106,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Required fields on registration forms.
      */
-    public function EntryController_RegisterValidation_Handler($Sender) {
+    public function EntryController_RegisterValidation_handler($Sender) {
         // Require new fields
         $ProfileFields = $this->GetProfileFields();
         foreach ($ProfileFields as $Name => $Field) {
@@ -167,14 +167,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add fields to edit profile form.
      */
-    public function ProfileController_EditMyAccountAfter_Handler($Sender) {
+    public function ProfileController_EditMyAccountAfter_handler($Sender) {
         $this->ProfileFields($Sender);
     }
 
     /**
      * Add custom fields to discussions.
      */
-    public function Base_AuthorInfo_Handler($Sender, $Args) {
+    public function base_AuthorInfo_handler($Sender, $Args) {
         //echo ' '.WrapIf(htmlspecialchars(val('Department', $Args['Author'])), 'span', array('class' => 'MItem AuthorDepartment'));
         //echo ' '.WrapIf(htmlspecialchars(val('Organization', $Args['Author'])), 'span', array('class' => 'MItem AuthorOrganization'));
     }
@@ -239,7 +239,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $this->ProfileFields = $this->GetProfileFields();
 
         // Get user-specific data
-        $this->UserFields = Gdn::userModel()->GetMeta($Sender->Data("User.UserID"), 'Profile.%', 'Profile.');
+        $this->UserFields = Gdn::userModel()->GetMeta($Sender->data("User.UserID"), 'Profile.%', 'Profile.');
 
         // Fill in user data on form
         foreach ($this->UserFields as $Field => $Value) {
@@ -253,7 +253,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * Settings page.
      */
     public function SettingsController_ProfileExtender_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
         // Detect if we need to upgrade settings
         if (!c('ProfileExtender.Fields')) {
             $this->Setup();
@@ -261,19 +261,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Set data
         $Data = $this->GetProfileFields();
-        $Sender->SetData('ExtendedFields', $Data);
+        $Sender->setData('ExtendedFields', $Data);
 
-        $Sender->AddSideMenu('settings/profileextender');
-        $Sender->SetData('Title', T('Profile Fields'));
-        $Sender->Render('settings', '', 'plugins/ProfileExtender');
+        $Sender->addSideMenu('settings/profileextender');
+        $Sender->setData('Title', T('Profile Fields'));
+        $Sender->render('settings', '', 'plugins/ProfileExtender');
     }
 
     /**
      * Add/edit a field.
      */
     public function SettingsController_ProfileFieldAddEdit_Create($Sender, $Args) {
-        $Sender->Permission('Garden.Settings.Manage');
-        $Sender->SetData('Title', T('Add Profile Field'));
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->setData('Title', T('Add Profile Field'));
 
         if ($Sender->Form->authenticatedPostBack()) {
             // Get whitelisted properties
@@ -336,9 +336,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             if (isset($Data['Options']) && is_array($Data['Options'])) {
                 $Data['Options'] = implode("\n", $Data['Options']);
             }
-            $Sender->Form->SetData($Data);
+            $Sender->Form->setData($Data);
             $Sender->Form->addHidden('Name', $Args[0]);
-            $Sender->SetData('Title', T('Edit Profile Field'));
+            $Sender->setData('Title', T('Edit Profile Field'));
         }
 
         $CurrentFields = $this->GetProfileFields();
@@ -348,37 +348,37 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          * We only allow one DateOfBirth field, since it is a special case.  Remove it as an option if we already
          * have one, unless we're editing the one instance we're allowing.
          */
-        if (array_key_exists('DateOfBirth', $CurrentFields) && $Sender->Form->GetValue('FormType') != 'DateOfBirth') {
+        if (array_key_exists('DateOfBirth', $CurrentFields) && $Sender->Form->getValue('FormType') != 'DateOfBirth') {
             unset($FormTypes['DateOfBirth']);
         }
 
-        $Sender->SetData('FormTypes', $FormTypes);
-        $Sender->SetData('CurrentFields', $CurrentFields);
+        $Sender->setData('FormTypes', $FormTypes);
+        $Sender->setData('CurrentFields', $CurrentFields);
 
-        $Sender->Render('addedit', '', 'plugins/ProfileExtender');
+        $Sender->render('addedit', '', 'plugins/ProfileExtender');
     }
 
     /**
      * Delete a field.
      */
     public function SettingsController_ProfileFieldDelete_Create($Sender, $Args) {
-        $Sender->Permission('Garden.Settings.Manage');
-        $Sender->SetData('Title', 'Delete Field');
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->setData('Title', 'Delete Field');
         if (isset($Args[0])) {
             if ($Sender->Form->authenticatedPostBack()) {
                 RemoveFromConfig('ProfileExtender.Fields.'.$Args[0]);
                 $Sender->RedirectUrl = url('/settings/profileextender');
             } else {
-                $Sender->SetData('Field', $this->GetProfileField($Args[0]));
+                $Sender->setData('Field', $this->GetProfileField($Args[0]));
             }
         }
-        $Sender->Render('delete', '', 'plugins/ProfileExtender');
+        $Sender->render('delete', '', 'plugins/ProfileExtender');
     }
 
     /**
      * Display custom fields on Edit User form.
      */
-    public function UserController_AfterFormInputs_Handler($Sender) {
+    public function UserController_AfterFormInputs_handler($Sender) {
         echo '<ul>';
         $this->ProfileFields($Sender);
         echo '</ul>';
@@ -387,7 +387,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Display custom fields on Profile.
      */
-    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
+    public function UserInfoModule_OnBasicInfo_handler($Sender) {
         if ($Sender->User->Banned) {
             return;
         }
@@ -453,7 +453,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param $Sender object
      * @param $Args array
      */
-    public function UserModel_AfterSave_Handler($Sender, $Args) {
+    public function UserModel_AfterSave_handler($Sender, $Args) {
         $this->UpdateUserFields($Args['UserID'], $Args['FormPostValues']);
     }
 
@@ -463,7 +463,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param $Sender object
      * @param $Args array
      */
-    public function UserModel_AfterInsertUser_Handler($Sender, $Args) {
+    public function UserModel_AfterInsertUser_handler($Sender, $Args) {
         $this->UpdateUserFields($Args['InsertUserID'], $Args['User']);
     }
 

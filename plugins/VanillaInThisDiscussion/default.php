@@ -31,12 +31,12 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
 
     // Setup settings page
     public function SettingsController_InThisDiscussion_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
-        $Sender->SetData('Title', T('In This Discussion Settings'));
-        $Sender->AddSideMenu('dashboard/settings/plugins');
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->setData('Title', T('In This Discussion Settings'));
+        $Sender->addSideMenu('dashboard/settings/plugins');
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
+        $Conf->initialize(array(
             'Plugins.VanillaInThisDiscussion.Limit' => array(
                 'Description' => T('User Limit'),
                 'Default' => 20,
@@ -45,17 +45,17 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
         ));
 
 
-        $Conf->RenderAll();
+        $Conf->renderAll();
     }
 
-    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+    public function DiscussionController_BeforeDiscussionRender_handler($Sender) {
         // Handle limit
         $Limit = c('Plugins.VanillaInThisDiscussion.Limit', 20);
 
         // Render
         include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
         $InThisDiscussionModule = new InThisDiscussionModule($Sender);
-        $InThisDiscussionModule->GetData($Sender->Data('Discussion.DiscussionID'), $Limit);
+        $InThisDiscussionModule->GetData($Sender->data('Discussion.DiscussionID'), $Limit);
         $Sender->addModule($InThisDiscussionModule);
 
     }

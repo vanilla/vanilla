@@ -47,7 +47,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     * @param ProfileController $Sender
     * @param array $Args
     */
-    public function ProfileController_AfterAddSideMenu_Handler($Sender, $Args) {
+    public function ProfileController_AfterAddSideMenu_handler($Sender, $Args) {
         if (!$Sender->User->Photo) {
             $Sender->User->Photo = UserPhotoDefaultUrl($Sender->User, array('Size' => 200));
         }
@@ -59,7 +59,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $sender
     */
     public function SettingsController_Vanillicon_Create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
         $cf = new ConfigurationModule($sender);
 
         $items = array(
@@ -67,7 +67,7 @@ class VanilliconPlugin extends Gdn_Plugin {
          'v2' => 'Vanillicon 2 (beta)'
         );
 
-        $cf->Initialize(array(
+        $cf->initialize(array(
          'Plugins.Vanillicon.Type' => array(
             'LabelCode' => 'Vanillicon Set',
             'Control' => 'radiolist',
@@ -78,9 +78,9 @@ class VanilliconPlugin extends Gdn_Plugin {
          )
         ));
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', sprintf(T('%s Settings'), 'Vanillicon'));
-        $cf->RenderAll();
+        $sender->addSideMenu();
+        $sender->setData('Title', sprintf(T('%s Settings'), 'Vanillicon'));
+        $cf->renderAll();
     }
 }
 

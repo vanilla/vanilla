@@ -57,11 +57,11 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 1.0
      * @access public
      */
-    public function Base_Render_Before($Sender) {
+    public function base_render_before($Sender) {
         // Add "Mark All Viewed" to main menu
         if ($Sender->Menu && Gdn::session()->isValid()) {
-            if (C('Plugins.AllViewed.ShowInMenu', true)) {
-                $Sender->Menu->addLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
+            if (c('Plugins.AllViewed.ShowInMenu', true)) {
+                $Sender->Menu->addLink('AllViewed', t('Mark All Viewed'), '/discussions/markallviewed');
             }
         }
     }
@@ -72,7 +72,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 2.0
      * @access public
      */
-    public function MeModule_FlyoutMenu_Handler($Sender) {
+    public function meModule_flyoutMenu_handler($Sender) {
         // Add "Mark All Viewed" to menu
         if (Gdn::session()->isValid()) {
             echo wrap(Anchor(sprite('SpMarkAllViewed').' '.t('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
@@ -90,8 +90,8 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 2.0
      * @access private
      */
-    private function MarkCategoryRead($CategoryModel, $CategoryID) {
-        $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
+    private function markCategoryRead($CategoryModel, $CategoryID) {
+        $CategoryModel->saveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
     }
 
     /**
@@ -101,14 +101,14 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 1.0
      * @access public
      */
-    public function DiscussionsController_MarkCategoryViewed_Create($Sender, $CategoryID) {
+    public function discussionsController_markCategoryViewed_create($Sender, $CategoryID) {
         if (strlen($CategoryID) > 0 && (int)$CategoryID > 0) {
             $CategoryModel = new CategoryModel();
-            $this->MarkCategoryRead($CategoryModel, $CategoryID);
-            $this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), array($CategoryID));
+            $this->markCategoryRead($CategoryModel, $CategoryID);
+            $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), array($CategoryID));
         }
 
-        redirect(Gdn::request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
+        redirect(Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
     }
 
     /**
@@ -117,12 +117,12 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 2.0
      * @access private
      */
-    private function RecursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
+    private function recursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
         $CurrentUnprocessedCategories = array();
         $CurrentParentIDs = $ParentIDs;
         foreach ($UnprocessedCategories as $Category) {
             if (in_array($Category["ParentCategoryID"], $ParentIDs)) {
-                $this->MarkCategoryRead($CategoryModel, $Category["CategoryID"]);
+                $this->markCategoryRead($CategoryModel, $Category["CategoryID"]);
                 // Don't add duplicate ParentIDs
                 if (!in_array($Category["CategoryID"], $CurrentParentIDs)) {
                     $CurrentParentIDs[] = $Category["CategoryID"];
@@ -134,7 +134,7 @@ class AllViewedPlugin extends Gdn_Plugin {
         }
         // Base case: if we have not found any new parent ids, we don't need to recurse
         if (count($ParentIDs) != count($CurrentParentIDs)) {
-            $this->RecursiveMarkCategoryRead($CategoryModel, $CurrentUnprocessedCategories, $CurrentParentIDs);
+            $this->recursiveMarkCategoryRead($CategoryModel, $CurrentUnprocessedCategories, $CurrentParentIDs);
         }
     }
 
@@ -144,11 +144,11 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 1.0
      * @access public
      */
-    public function DiscussionsController_MarkAllViewed_Create($Sender) {
+    public function discussionsController_markAllViewed_create($Sender) {
         $CategoryModel = new CategoryModel();
-        $this->MarkCategoryRead($CategoryModel, -1);
-        $this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), array(-1));
-        redirect($_SERVER["HTTP_REFERER"]);
+        $this->markCategoryRead($CategoryModel, -1);
+        $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), array(-1));
+        redirect($_SERVER["HTTP_REFERER"]); // TODO nope
     }
 
     /**
@@ -157,7 +157,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 1.0
      * @access public
      */
-    public function GetCommentCountSince($DiscussionID, $DateAllViewed) {
+    public function getCommentCountSince($DiscussionID, $DateAllViewed) {
         // Only for members
         if (!Gdn::session()->isValid()) {
             return;
@@ -183,7 +183,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 2.0
      * @access private
      */
-    private function CheckDiscussionDate($Discussion, $DateAllViewed) {
+    private function checkDiscussionDate($Discussion, $DateAllViewed) {
         if (Gdn_Format::toTimestamp($Discussion->DateInserted) > $DateAllViewed) {
             // Discussion is newer than DateAllViewed
             return;
@@ -195,7 +195,7 @@ class AllViewedPlugin extends Gdn_Plugin {
         } elseif (Gdn_Format::toTimestamp($Discussion->DateLastViewed) == $DateAllViewed || !$Discussion->DateLastViewed) {
             // User clicked AllViewed. Discussion is older than click. Last comment is newer than click.
             // No UserDiscussion record found OR UserDiscussion was set by AllViewed
-            $Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
+            $Discussion->CountUnreadComments = $this->getCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
         }
     }
 
@@ -209,7 +209,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @since 1.0
      * @access public
      */
-    public function DiscussionModel_SetCalculatedFields_Handler($Sender) {
+    public function discussionModel_setCalculatedFields_handler($Sender) {
         // Only for members
         if (!Gdn::session()->isValid()) {
             return;
@@ -220,7 +220,7 @@ class AllViewedPlugin extends Gdn_Plugin {
         $Category = CategoryModel::categories($Discussion->CategoryID);
         $CategoryLastDate = Gdn_Format::toTimestamp($Category["DateMarkedRead"]);
         if ($CategoryLastDate != 0) {
-            $this->CheckDiscussionDate($Discussion, $CategoryLastDate);
+            $this->checkDiscussionDate($Discussion, $CategoryLastDate);
         }
     }
 }

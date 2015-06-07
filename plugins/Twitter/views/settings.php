@@ -51,7 +51,7 @@
             padding: 4px 3px;
         }
     </style>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -76,17 +76,17 @@ echo $this->Form->errors();
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSignIn', 'Enable Social Sign In');
+                    echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
+                    echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSharing', 'Enable automatic Social Share.');
+                    echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
                     ?>
                 </li>
             </ul>

@@ -14,30 +14,30 @@
 interface Gdn_IHandshake {
 
     /**
-     * Get the handshake data, such as temporary foreign user identity info
+     * Get handshake data, such as temporary foreign user identity info.
      *
      * In VanillaConnect and ProxyConnect, this function retrieves the temporary handshake data
      * stored in the authenticator's cookie. This information is used as a parameter when calling
-     * the Get____FromHandshake() methods decribed below.
+     * the Get____FromHandshake() methods described below.
      */
-    public function GetHandshake();
+    public function getHandshake();
 
     /**
-     * Fetches the remote user key from the parsed handshake package
+     * Fetch the remote user key from the parsed handshake package.
      *
-     * @param mixed $Handshake
+     * @param mixed $handshake The handshake data to check.
      */
-    public function GetUserKeyFromHandshake($Handshake);
+    public function getUserKeyFromHandshake($handshake);
 
-    public function GetUserNameFromHandshake($Handshake);
+    public function getUserNameFromHandshake($handshake);
 
-    public function GetProviderKeyFromHandshake($Handshake);
+    public function getProviderKeyFromHandshake($handshake);
 
-    public function GetTokenKeyFromHandshake($Handshake);
+    public function getTokenKeyFromHandshake($handshake);
 
-    public function GetUserEmailFromHandshake($Handshake);
+    public function getUserEmailFromHandshake($handshake);
 
-    public function Finalize($UserKey, $UserID, $ConsumerKey, $TokenKey, $Payload);
+    public function finalize($userKey, $userID, $consumerKey, $tokenKey, $payload);
 
-    public function GetHandshakeMode();
+    public function getHandshakeMode();
 }

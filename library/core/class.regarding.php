@@ -33,9 +33,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
      * @return Gdn_RegardingEntity
      */
-    public function Comment($CommentID, $Verify = TRUE, $AutoParent = TRUE) {
-        $Regarding = $this->Regarding('Comment', $CommentID, $Verify);
-        if ($Verify && $AutoParent) $Regarding->AutoParent('discussion');
+    public function comment($CommentID, $Verify = true, $AutoParent = true) {
+        $Regarding = $this->regarding('Comment', $CommentID, $Verify);
+        if ($Verify && $AutoParent) {
+            $Regarding->autoParent('discussion');
+        }
         return $Regarding;
     }
 
@@ -46,8 +48,8 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $Verify optional boolean whether or not to verify this. default true.
      * @return Gdn_RegardingEntity
      */
-    public function Discussion($DiscussionID, $Verify = TRUE) {
-        return $this->Regarding('Discussion', $DiscussionID, $Verify);
+    public function discussion($DiscussionID, $Verify = true) {
+        return $this->regarding('Discussion', $DiscussionID, $Verify);
     }
 
     /**
@@ -60,9 +62,11 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
      * @return Gdn_RegardingEntity
      */
-    public function Message($MessageID, $Verify = TRUE, $AutoParent = TRUE) {
-        $Regarding = $this->Regarding('ConversationMessage', $MessageID, $Verify);
-        if ($Verify && $AutoParent) $Regarding->AutoParent('conversation');
+    public function message($MessageID, $Verify = true, $AutoParent = true) {
+        $Regarding = $this->regarding('ConversationMessage', $MessageID, $Verify);
+        if ($Verify && $AutoParent) {
+            $Regarding->autoParent('conversation');
+        }
         return $Regarding;
     }
 
@@ -73,8 +77,8 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $Verify optional boolean whether or not to verify this. default true.
      * @return Gdn_RegardingEntity
      */
-    public function Conversation($ConversationID, $Verify = TRUE) {
-        return $this->Regarding('Conversation', $ConversationID, $Verify);
+    public function conversation($ConversationID, $Verify = true) {
+        return $this->regarding('Conversation', $ConversationID, $Verify);
     }
 
     /**
@@ -86,28 +90,31 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @return Gdn_RegardingEntity
      * @throws Exception
      */
-    protected function Regarding($ThingType, $ThingID, $Verify = TRUE) {
-        $Verified = FALSE;
+    protected function regarding($ThingType, $ThingID, $Verify = true) {
+        $Verified = false;
         if ($Verify) {
             $ModelName = ucfirst($ThingType).'Model';
 
-            if (!class_exists($ModelName))
+            if (!class_exists($ModelName)) {
                 throw new Exception(sprintf(T("Could not find a model for %s objects."), ucfirst($ThingType)));
+            }
 
             // If we can lookup this object, it is verified
             $VerifyModel = new $ModelName;
-            $SourceElement = $VerifyModel->GetID($ThingID);
-            if ($SourceElement !== FALSE)
-                $Verified = TRUE;
+            $SourceElement = $VerifyModel->getID($ThingID);
+            if ($SourceElement !== false) {
+                $Verified = true;
+            }
 
         } else {
-            $Verified = NULL;
+            $Verified = null;
         }
 
-        if ($Verified !== FALSE) {
+        if ($Verified !== false) {
             $Regarding = new Gdn_RegardingEntity($ThingType, $ThingID);
-            if ($Verify)
-                $Regarding->VerifiedAs($SourceElement);
+            if ($Verify) {
+                $Regarding->verifiedAs($SourceElement);
+            }
 
             return $Regarding;
         }
@@ -120,7 +127,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      *
      * @return mixed
      */
-    public function That() {
+    public function that() {
         $Args = func_get_args();
         $ThingType = array_shift($Args);
 
@@ -135,31 +142,42 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param null $ForeignID
      * @return array|bool
      */
-    public function MatchEvent($RegardingType, $ForeignType, $ForeignID = NULL) {
-        $RegardingData = GetValue('RegardingData', $this->EventArguments);
+    public function matchEvent($RegardingType, $ForeignType, $ForeignID = null) {
+        $RegardingData = val('RegardingData', $this->EventArguments);
 
         $FoundRegardingType = strtolower(GetValue('Type', $RegardingData));
-        if (!is_array($RegardingType))
+        if (!is_array($RegardingType)) {
             $RegardingType = array($RegardingType);
-        $Found = FALSE;
-        foreach ($RegardingType as $RegardingTypeInstance)
-            if (fnmatch($RegardingTypeInstance, $FoundRegardingType))
-                $Found = TRUE;
-        if (!$Found) return FALSE;
+        }
+        $Found = false;
+        foreach ($RegardingType as $RegardingTypeInstance) {
+            if (fnmatch($RegardingTypeInstance, $FoundRegardingType)) {
+                $Found = true;
+            }
+        }
+        if (!$Found) {
+            return false;
+        }
 
-        $FoundForeignType = strtolower(GetValue('ForeignType', $RegardingData));
-        if (!is_array($ForeignType))
+        $FoundForeignType = strtolower(val('ForeignType', $RegardingData));
+        if (!is_array($ForeignType)) {
             $ForeignType = array($ForeignType);
-        $Found = FALSE;
-        foreach ($ForeignType as $ForeignTypeInstance)
-            if (fnmatch($ForeignTypeInstance, $FoundForeignType))
-                $Found = TRUE;
-        if (!$Found) return FALSE;
+        }
+        $Found = false;
+        foreach ($ForeignType as $ForeignTypeInstance) {
+            if (fnmatch($ForeignTypeInstance, $FoundForeignType)) {
+                $Found = true;
+            }
+        }
+        if (!$Found) {
+            return false;
+        }
 
         if (!is_null($ForeignID)) {
-            $FoundForeignID = GetValue('ForeignID', $RegardingData);
-            if ($FoundForeignID != $ForeignID)
-                return FALSE;
+            $FoundForeignID = val('ForeignID', $RegardingData);
+            if ($FoundForeignID != $ForeignID) {
+                return false;
+            }
         }
 
         return $this->EventArguments;
@@ -195,10 +213,10 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $ForeignType
      * @param $ForeignIDs
      */
-    protected function CacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
+    protected function cacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
         $Sender->RegardingCache = array();
-        $ChildRegardingData = $this->RegardingModel()->GetAll($ForeignType, $ForeignIDs);
-        $ParentRegardingData = $this->RegardingModel()->Get($ParentType, $ParentID);
+        $ChildRegardingData = $this->regardingModel()->getAll($ForeignType, $ForeignIDs);
+        $ParentRegardingData = $this->regardingModel()->get($ParentType, $ParentID);
 
         /*
               $MediaArray = array();
@@ -219,25 +237,27 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      *
      * @param $Sender
      */
-    public function DiscussionController_BeforeCommentBody_Handler($Sender) {
+    public function discussionController_beforeCommentBody_handler($Sender) {
         $Context = strtolower($Sender->EventArguments['Type']);
 
-        $RegardingID = GetValue('RegardingID', $Sender->EventArguments['Object'], NULL);
-        if (is_null($RegardingID) || $RegardingID < 0) return;
+        $RegardingID = val('RegardingID', $Sender->EventArguments['Object'], null);
+        if (is_null($RegardingID) || $RegardingID < 0) {
+            return;
+        }
 
         try {
-            $RegardingData = $this->RegardingModel()->GetID($RegardingID);
-            $EntityModelName = ucfirst(GetValue('ForeignType', $RegardingData)).'Model';
+            $RegardingData = $this->regardingModel()->getID($RegardingID);
+            $EntityModelName = ucfirst(val('ForeignType', $RegardingData)).'Model';
             if (class_exists($EntityModelName)) {
                 $EntityModel = new $EntityModelName();
-                $Entity = $EntityModel->GetID(GetValue('ForeignID', $RegardingData));
+                $Entity = $EntityModel->getID(val('ForeignID', $RegardingData));
                 $this->EventArguments = array_merge($this->EventArguments, array(
                     'EventSender' => $Sender,
                     'Entity' => $Entity,
                     'RegardingData' => $RegardingData,
-                    'Options' => NULL
+                    'Options' => null
                 ));
-                $this->FireEvent('RegardingDisplay');
+                $this->fireEvent('RegardingDisplay');
             }
         } catch (Exception $e) {
         }
@@ -248,17 +268,17 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      *
      * @return RegardingModel
      */
-    public function RegardingModel() {
-        static $RegardingModel = NULL;
-        if (is_null($RegardingModel))
+    public function regardingModel() {
+        static $RegardingModel = null;
+        if (is_null($RegardingModel)) {
             $RegardingModel = new RegardingModel();
+        }
         return $RegardingModel;
     }
 
     /**
      * Do nothing.
      */
-    public function Setup() {
+    public function setup() {
     }
-
 }

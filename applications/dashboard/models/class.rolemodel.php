@@ -550,7 +550,7 @@ class RoleModel extends Gdn_Model {
             $Permissions = $PermissionModel->PivotPermissions($Permissions, array('RoleID' => $RoleID));
             $PermissionModel->SaveAll($Permissions, array('RoleID' => $RoleID));
 
-            if (Gdn::Cache()->activeEnabled()) {
+            if (Gdn::Cache()->ActiveEnabled()) {
                 // Don't update the user table if we are just using cached permissions.
                 $this->ClearCache();
                 Gdn::UserModel()->ClearPermissions();
@@ -581,7 +581,7 @@ class RoleModel extends Gdn_Model {
         // Try and get all of the mappings from the cache.
         $Keys = array();
         foreach ($UserIDs as $UserID) {
-            $Keys[$UserID] = formatString(UserModel::USERROLES_KEY, array('UserID' => $UserID));
+            $Keys[$UserID] = FormatString(UserModel::USERROLES_KEY, array('UserID' => $UserID));
         }
         $UserRoles = Gdn::Cache()->Get($Keys);
         if (!is_array($UserRoles))

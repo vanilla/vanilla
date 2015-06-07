@@ -285,7 +285,7 @@ class PagerModule extends Gdn_Module {
         $this->EventArguments['PageCount'] = &$PageCount;
         $this->FireEvent('BeforePagerSetsCount');
         $this->_PageCount = $PageCount;
-        $CurrentPage = pageNumber($this->Offset, $this->Limit);
+        $CurrentPage = PageNumber($this->Offset, $this->Limit);
 
         // Show $Range pages on either side of current
         $Range = C('Garden.Modules.PagerRange', 3);
@@ -388,7 +388,7 @@ class PagerModule extends Gdn_Module {
      */
     public function ToStringPrevNext($Type = 'more') {
         $this->CssClass = ConcatSep(' ', $this->CssClass, 'PrevNextPager');
-        $CurrentPage = pageNumber($this->Offset, $this->Limit);
+        $CurrentPage = PageNumber($this->Offset, $this->Limit);
 
         $Pager = '';
 
@@ -457,7 +457,7 @@ class PagerModule extends Gdn_Module {
                     }
                 }
             }
-            list($Offset, $Limit) = offsetLimit($Page, $Pager->Limit);
+            list($Offset, $Limit) = OffsetLimit($Page, $Pager->Limit);
             $TotalRecords = GetValue('RecordCount', $Options, $Pager->Controller()->Data('RecordCount', FALSE));
 
             $Get = $Pager->Controller()->Request->Get();

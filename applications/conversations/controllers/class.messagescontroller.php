@@ -190,7 +190,7 @@ class MessagesController extends ConversationsController {
         $this->Title(T('Inbox'));
         Gdn_Theme::Section('ConversationList');
 
-        list($Offset, $Limit) = offsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
+        list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
 
         // Calculate offset
         $this->Offset = $Offset;

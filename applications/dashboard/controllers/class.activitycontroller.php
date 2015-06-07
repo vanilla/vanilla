@@ -28,11 +28,11 @@ class ActivityController extends Gdn_Controller {
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':
-                deprecated('ActivityController->CommentData', "ActivityController->Data('Activities')");
+                Deprecated('ActivityController->CommentData', "ActivityController->Data('Activities')");
                 $Result = new Gdn_DataSet(array(), DATASET_TYPE_OBJECT);
                 return $Result;
             case 'ActivityData':
-                deprecated('ActivityController->ActivityData', "ActivityController->Data('Activities')");
+                Deprecated('ActivityController->ActivityData', "ActivityController->Data('Activities')");
                 $Result = new Gdn_DataSet($this->Data('Activities'), DATASET_TYPE_ARRAY);
                 $Result->DatasetType(DATASET_TYPE_OBJECT);
                 return $Result;
@@ -125,7 +125,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         // Which page to load
-        list($Offset, $Limit) = offsetLimit($Page, 30);
+        list($Offset, $Limit) = OffsetLimit($Page, 30);
         $Offset = is_numeric($Offset) ? $Offset : 0;
         if ($Offset < 0)
             $Offset = 0;
@@ -208,7 +208,7 @@ class ActivityController extends Gdn_Controller {
         $this->ActivityModel->Delete($ActivityID);
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-            Redirect(getIncomingValue('Target', $this->SelfUrl));
+            Redirect(GetIncomingValue('Target', $this->SelfUrl));
 
         // Still here? Getting a 404.
         $this->ControllerName = 'Home';

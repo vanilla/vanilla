@@ -49,7 +49,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Confirmed = GetValue('Confirmed', Gdn::Session()->User, true);
 
             if ($ConfirmEmail && !$Confirmed) {
-                $Message = formatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
+                $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
                 $Sender->InformMessage($Message, '');
             }
         }
@@ -70,7 +70,7 @@ class DashboardHooks implements Gdn_IPlugin {
         if ($SignInOnly)
             $Exceptions = array();
 
-        if ($Sender->MasterView != 'admin' && !$Sender->Data('_NoMessages') && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && arrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
+        if ($Sender->MasterView != 'admin' && !$Sender->Data('_NoMessages') && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
             $MessageModel = new MessageModel();
             $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions, $Sender->Data('Category.CategoryID'));
             foreach ($MessageData as $Message) {
@@ -93,7 +93,7 @@ class DashboardHooks implements Gdn_IPlugin {
             // Record the remote url where the forum is being embedded.
             $RemoteUrl = C('Garden.Embed.RemoteUrl');
             if (!$RemoteUrl) {
-                $RemoteUrl = getIncomingValue('remote');
+                $RemoteUrl = GetIncomingValue('remote');
                 if ($RemoteUrl)
                     SaveToConfig('Garden.Embed.RemoteUrl', $RemoteUrl);
             }

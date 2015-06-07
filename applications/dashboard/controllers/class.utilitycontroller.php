@@ -393,7 +393,7 @@ class UtilityController extends DashboardController {
             $this->SetData('Success', TRUE);
         } catch (Exception $Ex) {
             $this->SetData('Success', FALSE);
-            if (debug())
+            if (Debug())
                 throw $Ex;
         }
 
@@ -448,10 +448,10 @@ class UtilityController extends DashboardController {
         $valid = true;
 
         // Test the cache.
-        if (Gdn::Cache()->activeEnabled()) {
+        if (Gdn::Cache()->ActiveEnabled()) {
             $k = BetterRandomString(20);
             Gdn::Cache()->Store($k, 1);
-            Gdn::Cache()->increment($k, 1);
+            Gdn::Cache()->Increment($k, 1);
             $v = Gdn::Cache()->Get($k);
 
             if ($v !== 2) {
@@ -557,7 +557,7 @@ class UtilityController extends DashboardController {
      * Return some meta information about any page on the internet in JSON format.
      */
     public function FetchPageInfo($Url = '') {
-        $PageInfo = fetchPageInfo($Url);
+        $PageInfo = FetchPageInfo($Url);
         $this->SetData('PageInfo', $PageInfo);
         $this->MasterView = 'default';
         $this->RemoveCssFile('admin.css');

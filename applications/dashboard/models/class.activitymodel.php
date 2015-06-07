@@ -139,10 +139,10 @@ class ActivityModel extends Gdn_Model {
         }
 
 
-        $Row['Url'] = externalUrl($Row['Route']);
+        $Row['Url'] = ExternalUrl($Row['Route']);
 
         if ($Row['HeadlineFormat']) {
-            $Row['Headline'] = formatString($Row['HeadlineFormat'], $Row);
+            $Row['Headline'] = FormatString($Row['HeadlineFormat'], $Row);
         } else {
             $Row['Headline'] = Gdn_Format::ActivityHeadline($Row);
         }
@@ -813,7 +813,7 @@ class ActivityModel extends Gdn_Model {
                 $Message = sprintf(
                     $Story == '' ? T('EmailNotification', "%1\$s\n\n%2\$s") : T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
                     $ActivityHeadline,
-                    externalUrl($Activity->Route == '' ? '/' : $Activity->Route),
+                    ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
                     $Story
                 );
                 $Email->Message($Message);
@@ -872,7 +872,7 @@ class ActivityModel extends Gdn_Model {
         if (GetValue('HeadlineFormat', $Activity)) {
             $SessionUserID = Gdn::Session()->UserID;
             Gdn::Session()->UserID = $User['UserID'];
-            $Activity['Headline'] = formatString($Activity['HeadlineFormat'], $Activity);
+            $Activity['Headline'] = FormatString($Activity['HeadlineFormat'], $Activity);
             Gdn::Session()->UserID = $SessionUserID;
         } else {
             if (!isset($Activity['ActivityGender'])) {
@@ -894,7 +894,7 @@ class ActivityModel extends Gdn_Model {
         $Email->Subject(sprintf(T('[%1$s] %2$s'), C('Garden.Title'), Gdn_Format::PlainText($Activity['Headline'])));
         $Email->To($User);
 
-        $Url = externalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
+        $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
 
         if ($Activity['Story']) {
             $Message = sprintf(T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
@@ -1152,7 +1152,7 @@ class ActivityModel extends Gdn_Model {
                 $Message = sprintf(
                     $Story == '' ? T('EmailNotification', "%1\$s\n\n%2\$s") : T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
                     $ActivityHeadline,
-                    externalUrl($Activity->Route == '' ? '/' : $Activity->Route),
+                    ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
                     $Story
                 );
                 $Email->Message($Message);

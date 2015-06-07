@@ -39,7 +39,7 @@ class CommentModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Comment');
-        $this->pageCache = Gdn::Cache()->activeEnabled() && C('Properties.CommentModel.pageCache', false);
+        $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', false);
         $this->FireEvent('AfterConstruct');
     }
 
@@ -138,7 +138,7 @@ class CommentModel extends VanillaModel {
         $this->EventArguments['Offset'] =& $Offset;
         $this->FireEvent('BeforeGet');
 
-        $Page = pageNumber($Offset, $Limit);
+        $Page = PageNumber($Offset, $Limit);
         $PageWhere = $this->PageWhere($DiscussionID, $Page, $Limit);
 
         if ($PageWhere) {
@@ -1011,7 +1011,7 @@ class CommentModel extends VanillaModel {
             }
 
             // Notify any users who were mentioned in the comment.
-            $Usernames = getMentions($Fields['Body']);
+            $Usernames = GetMentions($Fields['Body']);
             foreach ($Usernames as $i => $Username) {
                 $User = $UserModel->GetByUsername($Username);
                 if (!$User) {
@@ -1111,7 +1111,7 @@ class CommentModel extends VanillaModel {
 
         $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
         $Limit = C('Vanilla.Comments.PerPage', 30);
-        $PageCount = pageNumber($CountComments, $Limit) + 1;
+        $PageCount = PageNumber($CountComments, $Limit) + 1;
 
         for ($Page = $From; $Page <= $PageCount; $Page++) {
             $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";

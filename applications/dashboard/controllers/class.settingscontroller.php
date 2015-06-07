@@ -282,7 +282,7 @@ class SettingsController extends DashboardController {
         $this->Title(T('Banning Options'));
         $this->AddJsFile('bans.js');
 
-        list($Offset, $Limit) = offsetLimit($Page, 20);
+        list($Offset, $Limit) = OffsetLimit($Page, 20);
 
         $BanModel = new BanModel();
         $this->_BanModel = $BanModel;
@@ -376,7 +376,7 @@ class SettingsController extends DashboardController {
             )
         );
 
-        $Config = Gdn_Configuration::format($ConfigData, array(
+        $Config = Gdn_Configuration::Format($ConfigData, array(
             'FormatStyle' => 'Dotted',
             'WrapPHP' => FALSE,
             'SafePHP' => FALSE,
@@ -856,7 +856,7 @@ class SettingsController extends DashboardController {
             try {
                 $AddonManager->$TestMethod($AddonName, $Validation);
             } catch (Exception $Ex) {
-                if (debug())
+                if (Debug())
                     throw $Ex;
                 else {
                     echo $Ex->getMessage();

@@ -144,7 +144,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $Category = CategoryModel::Categories($CategoryCode);
 
         $Tag = StringEndsWith($Tag, '.rss', TRUE, TRUE);
-        list($Offset, $Limit) = offsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
 
         $MultipleTags = strpos($Tag, ',') !== FALSE;
 
@@ -182,11 +182,11 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Title(htmlspecialchars($TagRow['FullName']));
         $UrlTag = rawurlencode($Tag);
         if (urlencode($Tag) == $Tag) {
-            $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", pageNumber($Offset, $Limit, TRUE)), TRUE));
-            $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", pageNumber($Offset, $Limit, TRUE, FALSE)), '//');
+            $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, TRUE)), TRUE));
+            $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, TRUE, FALSE)), '//');
         } else {
-            $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', pageNumber($Offset, $Limit, TRUE)).'?Tag='.$UrlTag, TRUE));
-            $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', pageNumber($Offset, $Limit, TRUE, FALSE), 'feed.rss').'?Tag='.$UrlTag, '//');
+            $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.$UrlTag, TRUE));
+            $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE, FALSE), 'feed.rss').'?Tag='.$UrlTag, '//');
         }
 
         if ($Sender->Head) {
@@ -395,7 +395,7 @@ class TaggingPlugin extends Gdn_Plugin {
         // Allow per-category tags
         $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
         if ($CategorySearch)
-            $CategoryID = getIncomingValue('CategoryID');
+            $CategoryID = GetIncomingValue('CategoryID');
 
         if ($parent && !is_numeric($parent))
             $parent = Gdn::SQL()->GetWhere('Tag', array('Name' => $parent))->Value('TagID', -1);
@@ -614,7 +614,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Form->Method = 'get';
         $Sender->Form->InputPrefix = '';
 
-        list($Offset, $Limit) = offsetLimit($Page, 100);
+        list($Offset, $Limit) = OffsetLimit($Page, 100);
         $Sender->SetData('_Limit', $Limit);
 
         if ($Search) {
@@ -805,7 +805,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $SQL->Delete('TagDiscussion', array('TagID' => $TagID));
             $SQL->Delete('Tag', array('TagID' => $TagID));
 
-            $Sender->InformMessage(formatString(T('<b>{Name}</b> deleted.'), $Tag));
+            $Sender->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
             $Sender->JsonTarget("#Tag_{$Tag['TagID']}", NULL, 'Remove');
         }
 

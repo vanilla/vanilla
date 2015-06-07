@@ -12,7 +12,7 @@ $PluginInfo['GooglePlus'] = array(
     'Name' => 'Google+ Social Connect',
     'Description' => 'Users may sign into your site using their Google Plus account.',
     'Version' => '1.1.0',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -483,7 +483,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @throws type
      */
     public function PostController_GooglePlus_Create($Sender, $RecordType, $ID) {
-        $Row = getRecord($RecordType, $ID);
+        $Row = GetRecord($RecordType, $ID);
         if ($Row) {
             $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
 

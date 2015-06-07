@@ -9,7 +9,7 @@
             ?>
         </div>
     </div>
-    <?php if (debug() && $this->Data('Trace')): ?>
+    <?php if (Debug() && $this->Data('Trace')): ?>
         <h2>Error</h2>
         <?php echo $this->Data('Code').' '.htmlspecialchars(Gdn_Controller::GetStatusMessage($this->Data('Code'))); ?>
         <h2>Trace</h2>

@@ -195,7 +195,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      */
     private function ConfigureRange($Sender) {
         // Grab the range resolution from the url or form. Default to "day" range.
-        $Sender->Range = getIncomingValue('Range');
+        $Sender->Range = GetIncomingValue('Range');
         if (!in_array($Sender->Range, array(VanillaStatsPlugin::RESOLUTION_DAY, VanillaStatsPlugin::RESOLUTION_MONTH))) {
             $Sender->Range = VanillaStatsPlugin::RESOLUTION_DAY;
         }
@@ -208,7 +208,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->MonthDateStart = Gdn_Format::ToDate($Sender->MonthStampStart);
 
         // Validate that any values coming from the url or form are valid
-        $Sender->DateRange = getIncomingValue('DateRange');
+        $Sender->DateRange = GetIncomingValue('DateRange');
         $DateRangeParts = explode('-', $Sender->DateRange);
         $Sender->StampStart = strtotime(GetValue(0, $DateRangeParts));
         $Sender->StampEnd = strtotime(GetValue(1, $DateRangeParts));

@@ -66,11 +66,11 @@ class UserModel extends Gdn_Model {
     protected function _AddEmailHeaderFooter($Message, $Data) {
         $Header = T('EmailHeader', '');
         if ($Header)
-            $Message = formatString($Header, $Data)."\n".$Message;
+            $Message = FormatString($Header, $Data)."\n".$Message;
 
         $Footer = T('EmailFooter', '');
         if ($Footer)
-            $Message .= "\n".formatString($Footer, $Data);
+            $Message .= "\n".FormatString($Footer, $Data);
 
         return $Message;
     }
@@ -324,7 +324,7 @@ class UserModel extends Gdn_Model {
 
         $UserSet = array();
         $OldUserSet = array();
-        if (dateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0)
+        if (DateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0)
             $UserSet['DateFirstVisit'] = $OldUser['DateFirstVisit'];
 
         if (!isset($Row['Attributes']['User']['CountVisits'])) {
@@ -962,9 +962,9 @@ class UserModel extends Gdn_Model {
      * @return array
      */
     public function DefinePermissions($UserID, $Serialize = TRUE) {
-        if (Gdn::Cache()->activeEnabled()) {
+        if (Gdn::Cache()->ActiveEnabled()) {
             $PermissionsIncrement = $this->GetPermissionsIncrement();
-            $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, array(
+            $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array(
                 'UserID' => $UserID,
                 'PermissionsIncrement' => $PermissionsIncrement
             ));
@@ -978,7 +978,7 @@ class UserModel extends Gdn_Model {
         $Permissions = UserModel::CompilePermissions($Data);
 
         $PermissionsSerialized = NULL;
-        if (Gdn::Cache()->activeEnabled()) {
+        if (Gdn::Cache()->ActiveEnabled()) {
             Gdn::Cache()->Store($UserPermissionsKey, $Permissions);
         } else {
             // Save the permissions to the user table
@@ -1040,7 +1040,7 @@ class UserModel extends Gdn_Model {
     public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
         if (is_numeric($OrderFields)) {
             // They're using the old version that was a misnamed GetID()
-            deprecated('UserModel->Get()', 'UserModel->GetID()');
+            Deprecated('UserModel->Get()', 'UserModel->GetID()');
             $Result = $this->GetID($OrderFields);
         } else {
             $Result = parent::Get($OrderFields, $OrderDirection, $Limit, $Offset);
@@ -1299,7 +1299,7 @@ class UserModel extends Gdn_Model {
                 if (!$UserID) {
                     continue;
                 }
-                $Keys[] = formatString(self::USERID_KEY, array('UserID' => $UserID));
+                $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
             }
 
             // Query cache layer
@@ -1451,7 +1451,7 @@ class UserModel extends Gdn_Model {
      * @return Gdn_DataSet
      */
     public function GetRoles($UserID) {
-        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
+        $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
         $RolesDataArray = Gdn::Cache()->Get($UserRolesKey);
 
         if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
@@ -1500,7 +1500,7 @@ class UserModel extends Gdn_Model {
 
             // Otherwise normal loadings!
         } else {
-            if ($User && ($User->Permissions == '' || Gdn::Cache()->activeEnabled()))
+            if ($User && ($User->Permissions == '' || Gdn::Cache()->ActiveEnabled()))
                 $User->Permissions = $this->DefinePermissions($UserID);
         }
 
@@ -1794,13 +1794,13 @@ class UserModel extends Gdn_Model {
         // Make sure that checkbox vals are saved as the appropriate value
 
         if (array_key_exists('ShowEmail', $FormPostValues))
-            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
 
         if (array_key_exists('Banned', $FormPostValues))
-            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
         if (array_key_exists('Confirmed', $FormPostValues))
-            $FormPostValues['Confirmed'] = forceBool($FormPostValues['Confirmed'], '0', '1', '0');
+            $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
 
         unset($FormPostValues['Admin']);
 
@@ -2405,10 +2405,10 @@ class UserModel extends Gdn_Model {
         // Make sure that the checkbox val for email is saved as the appropriate enum
         // TODO: DO I REALLY NEED THIS???
         if (array_key_exists('ShowEmail', $FormPostValues))
-            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
 
         if (array_key_exists('Banned', $FormPostValues))
-            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
         $this->AddInsertFields($FormPostValues);
 
@@ -2532,10 +2532,10 @@ class UserModel extends Gdn_Model {
 
         // Make sure that the checkbox val for email is saved as the appropriate enum
         if (array_key_exists('ShowEmail', $FormPostValues))
-            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
 
         if (array_key_exists('Banned', $FormPostValues))
-            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
         $this->AddInsertFields($FormPostValues);
 
@@ -2607,10 +2607,10 @@ class UserModel extends Gdn_Model {
         // TODO: DO I NEED THIS?!
         // Make sure that the checkbox val for email is saved as the appropriate enum
         if (array_key_exists('ShowEmail', $FormPostValues))
-            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
 
         if (array_key_exists('Banned', $FormPostValues))
-            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
         $this->AddInsertFields($FormPostValues);
 
@@ -2726,7 +2726,7 @@ class UserModel extends Gdn_Model {
         if (!is_array($AllIPs))
             $AllIPs = array();
         if ($IP = GetValue('InsertIPAddress', $User))
-            array_unshift($AllIPs, forceIPv4($IP));
+            array_unshift($AllIPs, ForceIPv4($IP));
         if ($IP = GetValue('LastIPAddress', $User))
             array_unshift($AllIPs, $IP);
         // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
@@ -2974,7 +2974,7 @@ class UserModel extends Gdn_Model {
             $User = $this->GetID($UserID);
             if ($User) {
                 $Email->Subject(sprintf(T('[%1$s] Membership Approved'), C('Garden.Title')));
-                $Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, externalUrl(SignInUrl())));
+                $Email->Message(sprintf(T('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
                 $Email->To($User->Email);
                 //$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
                 $Email->Send();
@@ -3463,7 +3463,7 @@ class UserModel extends Gdn_Model {
             if (is_string($v)) {
                 $IPAddresses = explode(',', $v);
                 foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = forceIPv4($IPAddress);
+                    $IPAddresses[$i] = ForceIPv4($IPAddress);
                 }
                 SetValue('AllIPAddresses', $User, $IPAddresses);
             }
@@ -3600,7 +3600,7 @@ class UserModel extends Gdn_Model {
         $Data['User'] = ArrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
         $Data['Title'] = $AppTitle;
 
-        $Message = formatString($EmailFormat, $Data);
+        $Message = FormatString($EmailFormat, $Data);
         $Message = $this->_AddEmailHeaderFooter($Message, $Data);
         $Email->Message($Message);
 
@@ -3640,14 +3640,14 @@ class UserModel extends Gdn_Model {
 
         // Check for the new email format.
         if (($EmailFormat = T("EmailWelcome{$RegisterType}", '#')) != '#') {
-            $Message = formatString($EmailFormat, $Data);
+            $Message = FormatString($EmailFormat, $Data);
         } else {
             $Message = sprintf(
                 T('EmailWelcome'),
                 $User->Name,
                 $Sender->Name,
                 $AppTitle,
-                externalUrl('/'),
+                ExternalUrl('/'),
                 $Password,
                 $User->Email
             );
@@ -3655,7 +3655,7 @@ class UserModel extends Gdn_Model {
 
         // Add the email confirmation key.
         if ($Data['EmailKey']) {
-            $Message .= "\n\n".formatString(T('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
+            $Message .= "\n\n".FormatString(T('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
         }
         $Message = $this->_AddEmailHeaderFooter($Message, $Data);
 
@@ -3687,14 +3687,14 @@ class UserModel extends Gdn_Model {
 
         $EmailFormat = T('EmailPassword');
         if (strpos($EmailFormat, '{') !== FALSE) {
-            $Message = formatString($EmailFormat, $Data);
+            $Message = FormatString($EmailFormat, $Data);
         } else {
             $Message = sprintf(
                 $EmailFormat,
                 $User->Name,
                 $Sender->Name,
                 $AppTitle,
-                externalUrl('/'),
+                ExternalUrl('/'),
                 $Password,
                 $User->Email
             );
@@ -3850,7 +3850,7 @@ class UserModel extends Gdn_Model {
                     T('PasswordRequest'),
                     $User->Name,
                     $AppTitle,
-                    externalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
+                    ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
                 )
             );
             $Email->Send();
@@ -3894,17 +3894,17 @@ class UserModel extends Gdn_Model {
      * @param boolean $PasswordOK
      */
     public static function RateLimit($User, $PasswordOK) {
-        if (Gdn::Cache()->activeEnabled()) {
+        if (Gdn::Cache()->ActiveEnabled()) {
 
             // Rate limit using Gdn_Cache.
-            $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
             $UserRate = (int)Gdn::Cache()->Get($UserRateKey);
             $UserRate += 1;
             Gdn::Cache()->Store($UserRateKey, 1, array(
                 Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
             ));
 
-            $SourceRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
             $SourceRate = (int)Gdn::Cache()->Get($SourceRateKey);
             $SourceRate += 1;
             Gdn::Cache()->Store($SourceRateKey, 1, array(
@@ -3914,12 +3914,12 @@ class UserModel extends Gdn_Model {
         } elseif (C('Garden.Apc', false) && function_exists('apc_store')) {
 
             // Rate limit using the APC data store.
-            $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
             $UserRate = (int)apc_fetch($UserRateKey);
             $UserRate += 1;
             apc_store($UserRateKey, 1, self::LOGIN_RATE);
 
-            $SourceRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
             $SourceRate = (int)apc_fetch($SourceRateKey);
             $SourceRate += 1;
             apc_store($SourceRateKey, 1, self::LOGIN_RATE);
@@ -3975,7 +3975,7 @@ class UserModel extends Gdn_Model {
 
         if (isset($Property['AllIPAddresses'])) {
             if (is_array($Property['AllIPAddresses'])) {
-                $IPs = array_map('forceIPv4', $Property['AllIPAddresses']);
+                $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
                 $IPs = array_unique($IPs);
                 $Property['AllIPAddresses'] = implode(',', $IPs);
                 // Ensure this isn't too big for our column
@@ -4019,7 +4019,7 @@ class UserModel extends Gdn_Model {
      */
     public function GetUserFromCache($UserToken, $TokenType) {
         if ($TokenType == 'name') {
-            $UserNameKey = formatString(self::USERNAME_KEY, array('Name' => md5($UserToken)));
+            $UserNameKey = FormatString(self::USERNAME_KEY, array('Name' => md5($UserToken)));
             $UserID = Gdn::Cache()->Get($UserNameKey);
 
             if ($UserID === Gdn_Cache::CACHEOP_FAILURE) return FALSE;
@@ -4032,7 +4032,7 @@ class UserModel extends Gdn_Model {
         if ($TokenType != 'userid') return FALSE;
 
         // Get from memcached
-        $UserKey = formatString(self::USERID_KEY, array('UserID' => $UserToken));
+        $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserToken));
         $User = Gdn::Cache()->Get($UserKey);
 
         return $User;
@@ -4075,12 +4075,12 @@ class UserModel extends Gdn_Model {
 
         $Cached = TRUE;
 
-        $UserKey = formatString(self::USERID_KEY, array('UserID' => $UserID));
+        $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
         $Cached = $Cached & Gdn::Cache()->Store($UserKey, $User, array(
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
 
-        $UserNameKey = formatString(self::USERNAME_KEY, array('Name' => md5(GetValue('Name', $User))));
+        $UserNameKey = FormatString(self::USERNAME_KEY, array('Name' => md5(GetValue('Name', $User))));
         $Cached = $Cached & Gdn::Cache()->Store($UserNameKey, $UserID, array(
                 Gdn_Cache::FEATURE_EXPIRY => 3600
             ));
@@ -4099,7 +4099,7 @@ class UserModel extends Gdn_Model {
 
         $Cached = TRUE;
 
-        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
+        $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
         $Cached = $Cached & Gdn::Cache()->Store($UserRolesKey, $RoleIDs);
         return $Cached;
     }
@@ -4117,12 +4117,12 @@ class UserModel extends Gdn_Model {
             $CacheTypesToClear = array('user', 'roles', 'permissions');
 
         if (in_array('user', $CacheTypesToClear)) {
-            $UserKey = formatString(self::USERID_KEY, array('UserID' => $UserID));
+            $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
             Gdn::Cache()->Remove($UserKey);
         }
 
         if (in_array('roles', $CacheTypesToClear)) {
-            $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
+            $UserRolesKey = FormatString(self::USERROLES_KEY, array('UserID' => $UserID));
             Gdn::Cache()->Remove($UserRolesKey);
         }
 
@@ -4130,7 +4130,7 @@ class UserModel extends Gdn_Model {
             Gdn::SQL()->Put('User', array('Permissions' => ''), array('UserID' => $UserID));
 
             $PermissionsIncrement = $this->GetPermissionsIncrement();
-            $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
+            $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
             Gdn::Cache()->Remove($UserPermissionsKey);
         }
         return TRUE;
@@ -4140,7 +4140,7 @@ class UserModel extends Gdn_Model {
      *
      */
     public function ClearPermissions() {
-        if (!Gdn::Cache()->activeEnabled())
+        if (!Gdn::Cache()->ActiveEnabled())
             $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
 
         $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
@@ -4148,7 +4148,7 @@ class UserModel extends Gdn_Model {
         if ($PermissionsIncrement == 0)
             Gdn::Cache()->Store($PermissionsIncrementKey, 1);
         else
-            Gdn::Cache()->increment($PermissionsIncrementKey);
+            Gdn::Cache()->Increment($PermissionsIncrementKey);
     }
 
     /**

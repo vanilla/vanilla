@@ -111,8 +111,8 @@ class LogModel extends Gdn_Pluggable {
         $New = $Data['_New'];
         unset($Old['_New']);
 
-        $Old = Gdn_Configuration::format($Old);
-        $New = Gdn_Configuration::format($New);
+        $Old = Gdn_Configuration::Format($Old);
+        $New = Gdn_Configuration::Format($New);
         $Diffs = $this->FormatDiff($Old, $New, 'raw');
 
         $Result = array();

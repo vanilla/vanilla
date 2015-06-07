@@ -208,7 +208,7 @@ class ModerationController extends VanillaController {
             Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
         }
 
-        Redirect(getIncomingValue('Target', '/discussions'));
+        Redirect(GetIncomingValue('Target', '/discussions'));
     }
 
     /**
@@ -219,7 +219,7 @@ class ModerationController extends VanillaController {
         if ($Session->ValidateTransientKey($TransientKey))
             Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
 
-        Redirect(getIncomingValue('Target', '/discussions'));
+        Redirect(GetIncomingValue('Target', '/discussions'));
     }
 
     /**
@@ -390,7 +390,7 @@ class ModerationController extends VanillaController {
                         'DateInserted' => $Discussion['DateLastComment'],
                         'Type' => 'redirect',
                         'CategoryID' => $Discussion['CategoryID'],
-                        'Body' => formatString(T('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
+                        'Body' => FormatString(T('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
                         'Format' => 'Html',
                         'Closed' => TRUE
                     );

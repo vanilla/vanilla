@@ -16,7 +16,7 @@
 
     <div class="DismissMessage WarningMessage">
         <?php
-        echo formatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
+        echo FormatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
         ?>
     </div>
 

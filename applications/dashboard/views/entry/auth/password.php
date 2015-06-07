@@ -30,7 +30,7 @@
         <?php if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0): ?>
             <li class="CreateAccount">
                 <?php
-                $Target = getIncomingValue('Target', '');
+                $Target = GetIncomingValue('Target', '');
                 if ($Target != '') {
                     $Target = '?Target='.$Target;
                 }

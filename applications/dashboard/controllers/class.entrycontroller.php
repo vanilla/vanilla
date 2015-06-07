@@ -395,7 +395,7 @@ EOT;
             $this->Form->AddError($Ex);
             return $this->Render('ConnectError');
         } catch (Exception $Ex) {
-            if (debug())
+            if (Debug())
                 $this->Form->AddError($Ex);
             else
                 $this->Form->AddError('There was an error fetching the connection data.');
@@ -1279,7 +1279,7 @@ EOT;
 
                     // Notification text
                     $Label = T('NewApplicantEmail', 'New applicant:');
-                    $Story = Anchor(Gdn_Format::Text($Label.' '.$Values['Name']), externalUrl('dashboard/user/applicants'));
+                    $Story = Anchor(Gdn_Format::Text($Label.' '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
 
                     $this->EventArguments['AuthUserID'] = $AuthUserID;
                     $this->EventArguments['Story'] = &$Story;
@@ -1749,7 +1749,7 @@ EOT;
      * @param string $TransientKey Unique value to prove intent.
      */
     public function Leave($AuthenticationSchemeAlias = 'default', $TransientKey = '') {
-        deprecated(__FUNCTION__);
+        Deprecated(__FUNCTION__);
         $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
         $this->FireEvent('BeforeLeave');
 

@@ -880,7 +880,7 @@ class UpdateModel extends Gdn_Model {
                 }
             } catch (Exception $Ex) {
                 // Do nothing, plugin wouldn't load/structure.
-                if (debug())
+                if (Debug())
                     throw $Ex;
             }
         }

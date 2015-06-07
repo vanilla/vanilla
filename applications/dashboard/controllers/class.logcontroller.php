@@ -147,7 +147,7 @@ class LogController extends DashboardController {
      */
     public function Edits($Type = '', $Page = '', $Op = FALSE) {
         $this->Permission('Garden.Moderation.Manage');
-        list($Offset, $Limit) = offsetLimit($Page, 10);
+        list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->SetData('Title', T('Change Log'));
 
         $Operations = array('Edit', 'Delete', 'Ban');
@@ -195,7 +195,7 @@ class LogController extends DashboardController {
      */
     public function Record($RecordType, $RecordID, $Page = '') {
         $this->Permission('Garden.Moderation.Manage');
-        list($Offset, $Limit) = offsetLimit($Page, 10);
+        list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->SetData('Title', T('Change Log'));
 
         $RecordType = ucfirst($RecordType);
@@ -267,7 +267,7 @@ class LogController extends DashboardController {
             $Where['CategoryID'] = $CategoryID;
         }
 
-        list($Offset, $Limit) = offsetLimit($Page, 10);
+        list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->SetData('Title', T('Moderation Queue'));
 
         $RecordCount = $this->LogModel->GetCountWhere($Where);
@@ -354,7 +354,7 @@ class LogController extends DashboardController {
      */
     public function Spam($Page = '') {
         $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
-        list($Offset, $Limit) = offsetLimit($Page, 10);
+        list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->SetData('Title', T('Spam Queue'));
 
         $Where = array('Operation' => array('Spam'));

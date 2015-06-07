@@ -7,7 +7,7 @@ $Reason = $this->Data['Plugin.Flagging.Reason'];
 
 echo T('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Report['DiscussionName']; ?>
 
-<?php echo externalUrl($Flag['URL']); ?>
+<?php echo ExternalUrl($Flag['URL']); ?>
 
 
 <?php echo T('Reason').': '.$Reason; ?>
@@ -15,4 +15,4 @@ echo T('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Repo
 
 <?php echo T('FlaggedBy', 'Reported by:').' '.$Flag['UserName']; ?>
 
-<?php if ($DiscussionID) echo T('FlagDiscuss', 'Discuss it').': '.externalUrl('discussion/'.$DiscussionID); ?>
+<?php if ($DiscussionID) echo T('FlagDiscuss', 'Discuss it').': '.ExternalUrl('discussion/'.$DiscussionID); ?>

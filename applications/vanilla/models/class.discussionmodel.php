@@ -1037,7 +1037,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     public function FetchPageInfo($Url, $ThrowError = FALSE) {
-        $PageInfo = fetchPageInfo($Url, 3, $ThrowError);
+        $PageInfo = FetchPageInfo($Url, 3, $ThrowError);
 
         $Title = GetValue('Title', $PageInfo, '');
         if ($Title == '') {
@@ -1045,7 +1045,7 @@ class DiscussionModel extends VanillaModel {
                 throw new Gdn_UserException(T("The page didn't contain any information."));
             }
 
-            $Title = formatString(T('Undefined discussion subject.'), array('Url' => $Url));
+            $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
         } else {
             if ($Strip = C('Vanilla.Embed.StripPrefix'))
                 $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
@@ -1057,7 +1057,7 @@ class DiscussionModel extends VanillaModel {
 
         $Description = GetValue('Description', $PageInfo, '');
         $Images = GetValue('Images', $PageInfo, array());
-        $Body = formatString(T('EmbeddedDiscussionFormat'), array(
+        $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
             'Title' => $Title,
             'Excerpt' => $Description,
             'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
@@ -1066,7 +1066,7 @@ class DiscussionModel extends VanillaModel {
         if ($Body == '')
             $Body = $Url;
         if ($Body == '')
-            $Body = formatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
+            $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
 
         $Result = array(
             'Name' => $Title,
@@ -1636,7 +1636,7 @@ class DiscussionModel extends VanillaModel {
                     $Fields['DiscussionID'] = $DiscussionID;
 
                     // Update the cache.
-                    if ($DiscussionID && Gdn::Cache()->activeEnabled()) {
+                    if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
                         $CategoryCache = array(
                             'LastDiscussionID' => $DiscussionID,
                             'LastCommentID' => NULL,
@@ -1699,7 +1699,7 @@ class DiscussionModel extends VanillaModel {
                         $Activity['Story'] = $Story;
 
                     // Notify all of the users that were mentioned in the discussion.
-                    $Usernames = getMentions($DiscussionName.' '.$Story);
+                    $Usernames = GetMentions($DiscussionName.' '.$Story);
                     $Usernames = array_unique($Usernames);
 
                     // Use our generic Activity for events, not mentions
@@ -2079,14 +2079,14 @@ class DiscussionModel extends VanillaModel {
         $IncrementBy = 0;
         if (
             C('Vanilla.Views.Denormalize', FALSE) &&
-            Gdn::Cache()->activeEnabled() &&
-            Gdn::Cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
+            Gdn::Cache()->ActiveEnabled() &&
+            Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL
         ) {
             $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
             $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
 
             // Increment. If not success, create key.
-            $Views = Gdn::Cache()->increment($CacheKey);
+            $Views = Gdn::Cache()->Increment($CacheKey);
             if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
                 Gdn::Cache()->Store($CacheKey, 1);
             }

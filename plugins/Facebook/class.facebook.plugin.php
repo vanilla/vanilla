@@ -10,7 +10,7 @@ $PluginInfo['Facebook'] = array(
     'Name' => 'Facebook Social Connect',
     'Description' => 'Users may sign into your site using their Facebook account.',
     'Version' => '1.2.0',
-    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'MobileFriendly' => TRUE,
@@ -290,7 +290,7 @@ class FacebookPlugin extends Gdn_Plugin {
             throw PermissionException();
         }
 
-        $Row = getRecord($RecordType, $ID, TRUE);
+        $Row = GetRecord($RecordType, $ID, TRUE);
         if ($Row) {
             $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
 

@@ -133,7 +133,7 @@ class SetupController extends DashboardController {
             $DatabaseName = $this->Form->GetFormValue('Database.Name', '~~Invalid~~');
             $DatabaseUser = $this->Form->GetFormValue('Database.User', '~~Invalid~~');
             $DatabasePassword = $this->Form->GetFormValue('Database.Password', '~~Invalid~~');
-            $ConnectionString = getConnectionString($DatabaseName, $DatabaseHost);
+            $ConnectionString = GetConnectionString($DatabaseName, $DatabaseHost);
             try {
                 $Connection = new PDO(
                     $ConnectionString,

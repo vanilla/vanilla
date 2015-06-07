@@ -56,7 +56,7 @@ class CategoriesController extends VanillaController {
         $To = gmdate('Y-m-01', strtotime('+1 month', strtotime($From)));
 
         // Grab the discussions.
-        list($Offset, $Limit) = offsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
         $Where = array(
             'CategoryID' => $Category['CategoryID'],
             'Announce' => 'all',
@@ -71,7 +71,7 @@ class CategoriesController extends VanillaController {
         $this->SetData('_Limit', $Limit);
 
         $Canonical = '/categories/archives/'.rawurlencode($Category['UrlCode']).'/'.gmdate('Y-m', $Timestamp);
-        $Page = pageNumber($Offset, $Limit, TRUE, FALSE);
+        $Page = PageNumber($Offset, $Limit, TRUE, FALSE);
         $this->CanonicalUrl(Url($Canonical.($Page ? '?page='.$Page : ''), TRUE));
 
         PagerModule::Current()->Configure($Offset, $Limit, FALSE, $Canonical.'?page={Page}');
@@ -240,11 +240,11 @@ class CategoriesController extends VanillaController {
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
             $this->FireEvent('BeforeGetDiscussions');
-            list($Offset, $Limit) = offsetLimit($Page, $this->EventArguments['PerPage']);
+            list($Offset, $Limit) = OffsetLimit($Page, $this->EventArguments['PerPage']);
             if (!is_numeric($Offset) || $Offset < 0)
                 $Offset = 0;
 
-            $Page = pageNumber($Offset, $Limit);
+            $Page = PageNumber($Offset, $Limit);
 
             // Allow page manipulation
             $this->EventArguments['Page'] = &$Page;
@@ -293,7 +293,7 @@ class CategoriesController extends VanillaController {
             $this->FireEvent('AfterBuildPager');
 
             // Set the canonical Url.
-            $this->CanonicalUrl(CategoryUrl($Category, pageNumber($Offset, $Limit)));
+            $this->CanonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
 
             // Change the controller name so that it knows to grab the discussion views
             $this->ControllerName = 'DiscussionsController';

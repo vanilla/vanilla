@@ -183,7 +183,7 @@ class PostController extends VanillaController {
             // Save as a draft?
             $FormValues = $this->Form->FormValues();
             $FormValues = $this->DiscussionModel->FilterForm($FormValues);
-            $this->DeliveryType(getIncomingValue('DeliveryType', $this->_DeliveryType));
+            $this->DeliveryType(GetIncomingValue('DeliveryType', $this->_DeliveryType));
             if ($DraftID == 0)
                 $DraftID = $this->Form->GetFormValue('DraftID', 0);
 
@@ -393,7 +393,7 @@ class PostController extends VanillaController {
             $this->Form->AddHidden('vanilla_url', $vanilla_url);
             $this->Form->AddHidden('vanilla_category_id', $vanilla_category_id);
 
-            $PageInfo = fetchPageInfo($vanilla_url);
+            $PageInfo = FetchPageInfo($vanilla_url);
 
             if (!($Title = $this->Form->GetFormValue('Name'))) {
                 $Title = GetValue('Title', $PageInfo, '');
@@ -406,10 +406,10 @@ class PostController extends VanillaController {
             $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
 
             if (!$Description && count($Images) == 0) {
-                $Body = formatString('<p><a href="{Url}">{LinkText}</a></p>',
+                $Body = FormatString('<p><a href="{Url}">{LinkText}</a></p>',
                     array('Url' => $vanilla_url, 'LinkText' => $LinkText));
             } else {
-                $Body = formatString('
+                $Body = FormatString('
             <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
                <p>{Excerpt}</p>
                <p><a href="{Url}">{LinkText}</a></p>
@@ -552,7 +552,7 @@ class PostController extends VanillaController {
             if ($DraftID == 0)
                 $DraftID = $this->Form->GetFormValue('DraftID', 0);
 
-            $Type = getIncomingValue('Type');
+            $Type = GetIncomingValue('Type');
             $Draft = $Type == 'Draft';
             $this->EventArguments['Draft'] = $Draft;
             $Preview = $Type == 'Preview';
@@ -567,7 +567,7 @@ class PostController extends VanillaController {
 
                     if (isset($vanilla_url) && $vanilla_url && strpos(GetValue('Body', $Discussion), T('Undefined discussion subject.')) !== FALSE) {
                         $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
-                        $Set['Body'] = formatString('<p><a href="{Url}">{LinkText}</a></p>',
+                        $Set['Body'] = FormatString('<p><a href="{Url}">{LinkText}</a></p>',
                             array('Url' => $vanilla_url, 'LinkText' => $LinkText));
                     }
 

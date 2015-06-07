@@ -1036,7 +1036,7 @@ class CategoryModel extends Gdn_Model {
      * @return object DataSet
      */
     public function GetDescendantsByCode($Code) {
-        deprecated('CategoryModel::GetDescendantsByCode', 'CategoryModel::GetAncestors');
+        Deprecated('CategoryModel::GetDescendantsByCode', 'CategoryModel::GetAncestors');
 
         // SELECT title FROM tree WHERE lft < 4 AND rgt > 5 ORDER BY lft ASC;
         return $this->SQL

@@ -32,7 +32,7 @@ class DiscussionController extends VanillaController {
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':
-                deprecated('DiscussionController->CommentData', "DiscussionController->Data('Comments')");
+                Deprecated('DiscussionController->CommentData', "DiscussionController->Data('Comments')");
                 return $this->Data('Comments');
                 break;
         }
@@ -70,7 +70,7 @@ class DiscussionController extends VanillaController {
         $Limit = C('Vanilla.Comments.PerPage', 30);
 
         $OffsetProvided = $Page != '';
-        list($Offset, $Limit) = offsetLimit($Page, $Limit);
+        list($Offset, $Limit) = OffsetLimit($Page, $Limit);
 
         // Check permissions
         $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
@@ -131,14 +131,14 @@ class DiscussionController extends VanillaController {
         $this->SetData('_LatestItem', $LatestItem);
 
         // Set the canonical url to have the proper page title.
-        $this->CanonicalUrl(DiscussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, FALSE)));
+        $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, 0, FALSE)));
 
 //      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
 
         // Load the comments
         $this->SetData('Comments', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset));
 
-        $PageNumber = pageNumber($this->Offset, $Limit);
+        $PageNumber = PageNumber($this->Offset, $Limit);
         $this->SetData('Page', $PageNumber);
         $this->_SetOpenGraph();
 
@@ -149,7 +149,7 @@ class DiscussionController extends VanillaController {
             // Add images to head for open graph
             $Dom = str_get_html(Gdn_Format::To($this->Discussion->Body, $this->Discussion->Format));
         } else {
-            $this->Data['Title'] .= sprintf(T(' - Page %s'), pageNumber($this->Offset, $Limit));
+            $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
 
             $FirstComment = $this->Data('Comments')->FirstRow();
             $FirstBody = GetValue('Body', $FirstComment);
@@ -327,7 +327,7 @@ class DiscussionController extends VanillaController {
         $Offset = $this->CommentModel->GetOffset($Comment);
         $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
 
-        $PageNumber = pageNumber($Offset, $Limit, TRUE);
+        $PageNumber = PageNumber($Offset, $Limit, TRUE);
         $this->SetData('Page', $PageNumber);
 
         $this->View = 'index';
@@ -554,7 +554,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = getIncomingValue('Target', 'discussions');
+            $Target = GetIncomingValue('Target', 'discussions');
             SafeRedirect($Target);
         }
 
@@ -597,7 +597,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = getIncomingValue('Target', 'discussions');
+            $Target = GetIncomingValue('Target', 'discussions');
             SafeRedirect($Target);
         }
 
@@ -706,7 +706,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $Target = getIncomingValue('Target', $DefaultTarget);
+            $Target = GetIncomingValue('Target', $DefaultTarget);
             SafeRedirect($Target);
         }
 
@@ -755,18 +755,18 @@ body { background: transparent !important; }
 
         // Define incoming variables (prefer querystring parameters over method parameters)
         $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
-        $DiscussionID = getIncomingValue('vanilla_discussion_id', $DiscussionID);
-        $Offset = getIncomingValue('Offset', $Offset);
-        $Limit = getIncomingValue('Limit', $Limit);
-        $vanilla_identifier = getIncomingValue('vanilla_identifier', '');
+        $DiscussionID = GetIncomingValue('vanilla_discussion_id', $DiscussionID);
+        $Offset = GetIncomingValue('Offset', $Offset);
+        $Limit = GetIncomingValue('Limit', $Limit);
+        $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
 
         // Only allow vanilla identifiers of 32 chars or less - md5 if larger
         if (strlen($vanilla_identifier) > 32) {
             $vanilla_identifier = md5($vanilla_identifier);
         }
-        $vanilla_type = getIncomingValue('vanilla_type', 'page');
-        $vanilla_url = getIncomingValue('vanilla_url', '');
-        $vanilla_category_id = getIncomingValue('vanilla_category_id', '');
+        $vanilla_type = GetIncomingValue('vanilla_type', 'page');
+        $vanilla_url = GetIncomingValue('vanilla_url', '');
+        $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
         $ForeignSource = array(
             'vanilla_identifier' => $vanilla_identifier,
             'vanilla_type' => $vanilla_type,
@@ -805,7 +805,7 @@ body { background: transparent !important; }
                 $Limit = C('Garden.Embed.CommentsPerPage', 30);
 
             $OffsetProvided = $Offset != '';
-            list($Offset, $Limit) = offsetLimit($Offset, $Limit);
+            list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
             $this->Offset = $Offset;
             if (C('Vanilla.Comments.AutoOffset')) {
                 if ($ActualResponses <= $Limit)
@@ -820,7 +820,7 @@ body { background: transparent !important; }
                 $this->Offset = 0;
 
             // Set the canonical url to have the proper page title.
-            $this->CanonicalUrl(DiscussionUrl($Discussion, pageNumber($this->Offset, $Limit)));
+            $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
             // Load the comments.
             $CurrentOrderBy = $this->CommentModel->OrderBy();

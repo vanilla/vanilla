@@ -88,7 +88,7 @@ class AssetModel extends Gdn_Model {
 
         $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$ThemeType.'-'.strtolower($Basename)."-$CurrentETag.css";
 
-        if (!debug() && file_exists($CachePath)) {
+        if (!Debug() && file_exists($CachePath)) {
             readfile($CachePath);
             die();
         }
@@ -281,7 +281,7 @@ class AssetModel extends Gdn_Model {
             $Filename = "/{$Filename}";
             $Path = PATH_ROOT.$Filename;
             if (file_exists($Path)) {
-                deprecated("AssetModel::CssPath() with direct paths");
+                Deprecated("AssetModel::CssPath() with direct paths");
                 return array($Path, $Filename);
             }
             return false;
@@ -326,7 +326,7 @@ class AssetModel extends Gdn_Model {
                 if (!empty($Info[2])) {
                     // This path is deprecated.
                     unset($Info[2]);
-                    deprecated("The css file '$Filename' in folder '$Folder'");
+                    Deprecated("The css file '$Filename' in folder '$Folder'");
                 }
 
                 return $Info;

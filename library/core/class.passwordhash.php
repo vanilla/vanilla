@@ -19,14 +19,14 @@ include_once PATH_LIBRARY.'/vendors/phpass/PasswordHash.php';
 class Gdn_PasswordHash extends PasswordHash {
 
     /** @var bool  */
-    public $Weak = FALSE;
+    public $Weak = false;
 
     /**
      * Constructor.
      */
     function __construct() {
         // 8 iteration to create a Portable hash
-        parent::PasswordHash(8, FALSE);
+        parent::passwordHash(8, false);
     }
 
     /**
@@ -36,8 +36,8 @@ class Gdn_PasswordHash extends PasswordHash {
      * @param $StoredHash
      * @return bool
      */
-    function CheckDjango($Password, $StoredHash) {
-        if (strpos($StoredHash, '$') === FALSE) {
+    function checkDjango($Password, $StoredHash) {
+        if (strpos($StoredHash, '$') === false) {
             return md5($Password) == $StoredHash;
         } else {
             list($Method, $Salt, $Hash) = explode('$', $StoredHash);
@@ -62,7 +62,7 @@ class Gdn_PasswordHash extends PasswordHash {
      * @param $StoredHash
      * @return bool
      */
-    function CheckIPB($Password, $StoredHash) {
+    function checkIPB($Password, $StoredHash) {
         $Parts = explode('$', $StoredHash, 2);
         if (count($Parts) == 2) {
             $Hash = $Parts[0];
@@ -71,7 +71,7 @@ class Gdn_PasswordHash extends PasswordHash {
             $CalcHash = md5(md5($Salt).md5($Password));
             return $CalcHash == $Hash;
         }
-        return FALSE;
+        return false;
     }
 
     /**
@@ -86,27 +86,27 @@ class Gdn_PasswordHash extends PasswordHash {
      * @param string $Username
      * @return boolean
      */
-    function CheckPassword($Password, $StoredHash, $Method = FALSE, $Username = NULL) {
-        $Result = FALSE;
-        $ResetUrl = Url('entry/passwordrequest'.(Gdn::Request()->Get('display') ? '?display='.urlencode(Gdn::Request()->Get('display')) : ''));
+    function checkPassword($Password, $StoredHash, $Method = false, $Username = null) {
+        $Result = false;
+        $ResetUrl = Url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
         switch (strtolower($Method)) {
             case 'crypt':
                 $Result = (crypt($Password, $StoredHash) === $StoredHash);
                 break;
             case 'django':
-                $Result = $this->CheckDjango($Password, $StoredHash);
+                $Result = $this->checkDjango($Password, $StoredHash);
                 break;
             case 'drupal':
                 require_once PATH_LIBRARY.'/vendors/drupal/password.inc.php';
                 $Result = Drupal\user_check_password($Password, $StoredHash);
                 break;
             case 'ipb':
-                $Result = $this->CheckIPB($Password, $StoredHash);
+                $Result = $this->checkIPB($Password, $StoredHash);
                 break;
             case 'joomla':
                 $Parts = explode(':', $StoredHash, 2);
-                $Hash = GetValue(0, $Parts);
-                $Salt = GetValue(1, $Parts);
+                $Hash = val(0, $Parts);
+                $Salt = val(1, $Parts);
                 $ComputedHash = md5($Password.$Salt);
                 $Result = $ComputedHash == $Hash;
                 break;
@@ -124,17 +124,18 @@ class Gdn_PasswordHash extends PasswordHash {
                 break;
             case 'punbb':
                 $Parts = explode('$', $StoredHash);
-                $StoredHash = GetValue(0, $Parts);
-                $StoredSalt = GetValue(1, $Parts);
+                $StoredHash = val(0, $Parts);
+                $StoredSalt = val(1, $Parts);
 
-                if (md5($Password) == $StoredHash)
-                    $Result = TRUE;
-                elseif (sha1($Password) == $StoredHash)
-                    $Result = TRUE;
+                if (md5($Password) == $StoredHash) {
+                    $Result = true;
+                } elseif (sha1($Password) == $StoredHash)
+                    $Result = true;
                 elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
-                    $Result = TRUE;
-                else
-                    $Result = FALSE;
+                    $Result = true;
+                else {
+                    $Result = false;
+                }
 
                 break;
             case 'reset':
@@ -161,21 +162,22 @@ class Gdn_PasswordHash extends PasswordHash {
                 break;
             case 'xenforo':
                 $Data = @unserialize($StoredHash);
-                if (!is_array($Data))
-                    $Result = FALSE;
-                else {
-                    $Hash = GetValue('hash', $Data);
-                    $Function = GetValue('hashFunc', $Data);
-                    if (!$Function)
+                if (!is_array($Data)) {
+                    $Result = false;
+                } else {
+                    $Hash = val('hash', $Data);
+                    $Function = val('hashFunc', $Data);
+                    if (!$Function) {
                         $Function = strlen($Hash) == 32 ? 'md5' : 'sha1';
-                    $Salt = GetValue('salt', $Data);
+                    }
+                    $Salt = val('salt', $Data);
                     $ComputedHash = hash($Function, hash($Function, $Password).$Salt);
 
                     $Result = $ComputedHash == $Hash;
                 }
                 break;
             case 'yaf':
-                $Result = $this->CheckYaf($Password, $StoredHash);
+                $Result = $this->checkYAF($Password, $StoredHash);
                 break;
             case 'webwiz':
                 require_once PATH_LIBRARY.'/vendors/misc/functions.webwizhash.php';
@@ -183,7 +185,7 @@ class Gdn_PasswordHash extends PasswordHash {
                 break;
             case 'vanilla':
             default:
-                $Result = $this->CheckVanilla($Password, $StoredHash);
+                $Result = $this->checkVanilla($Password, $StoredHash);
         }
         return $Result;
     }
@@ -195,26 +197,28 @@ class Gdn_PasswordHash extends PasswordHash {
      * @param $StoredHash
      * @return bool
      */
-    function CheckVanilla($Password, $StoredHash) {
-        $this->Weak = FALSE;
-        if (!isset($StoredHash[0]))
-            return FALSE;
+    function checkVanilla($Password, $StoredHash) {
+        $this->Weak = false;
+        if (!isset($StoredHash[0])) {
+            return false;
+        }
 
         if ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
-            $Result = parent::CheckPassword($Password, $StoredHash);
+            $Result = parent::checkPassword($Password, $StoredHash);
 
             // Check to see if this password should be rehashed to crypt-blowfish.
-            if (!$this->portable_hashes && CRYPT_BLOWFISH == 1 && substr($StoredHash, 0, 3) === '$P$')
-                $this->Weak = TRUE;
+            if (!$this->portable_hashes && CRYPT_BLOWFISH == 1 && substr($StoredHash, 0, 3) === '$P$') {
+                $this->Weak = true;
+            }
 
             return $Result;
-        } else if ($Password && $StoredHash !== '*'
+        } elseif ($Password && $StoredHash !== '*'
             && ($Password === $StoredHash || md5($Password) === $StoredHash)
         ) {
-            $this->Weak = TRUE;
-            return TRUE;
+            $this->Weak = true;
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
     /**
@@ -224,8 +228,8 @@ class Gdn_PasswordHash extends PasswordHash {
      * @param $StoredHash
      * @return bool
      */
-    function CheckYaf($Password, $StoredHash) {
-        if (strpos($StoredHash, '$') === FALSE) {
+    function checkYAF($Password, $StoredHash) {
+        if (strpos($StoredHash, '$') === false) {
             return md5($Password) == $StoredHash;
         } else {
             ini_set('mbstring.func_overload', "0");

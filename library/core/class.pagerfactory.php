@@ -22,14 +22,16 @@ class Gdn_PagerFactory {
      * @param $Sender
      * @return bool
      */
-    public function GetPager($PagerType, $Sender) {
+    public function getPager($PagerType, $Sender) {
         $PagerType = $PagerType.'Module';
 
-        if (!class_exists($PagerType))
+        if (!class_exists($PagerType)) {
             $PagerType = 'PagerModule';
+        }
 
-        if (!class_exists($PagerType))
-            return FALSE;
+        if (!class_exists($PagerType)) {
+            return false;
+        }
 
         return new $PagerType($Sender);
     }

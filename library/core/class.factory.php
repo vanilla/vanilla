@@ -38,7 +38,7 @@ class Gdn_Factory {
      * @param string $Alias The alias of the factory to check for.
      * @return boolean Whether or not a factory definintion exists.
      */
-    public function Exists($Alias) {
+    public function exists($Alias) {
         $Result = array_key_exists($Alias, $this->_Objects);
         return $Result;
     }
@@ -49,10 +49,11 @@ class Gdn_Factory {
      * @param $Alias The class code of the object to create.
      * @param $Args The arguments to pass to the constructor of the object.
      */
-    public function Factory($Alias, $Args = NULL) {
+    public function factory($Alias, $Args = null) {
         //if (!$this->Exists($Alias))
-        if (!array_key_exists($Alias, $this->_Objects))
-            return NULL;
+        if (!array_key_exists($Alias, $this->_Objects)) {
+            return null;
+        }
 
         $Def = &$this->_Objects[$Alias];
         $ClassName = $Def['ClassName'];
@@ -66,22 +67,23 @@ class Gdn_Factory {
                 $Def['Path'] = $Path;
             }
 
-            if (file_exists($Path))
+            if (file_exists($Path)) {
                 require_once($Path);
+            }
         }
 
-        if (!class_exists($ClassName, FALSE)) {
+        if (!class_exists($ClassName, false)) {
             throw new Exception(sprintf('Class %s not found while trying to get an object for %s. Check the path %s.', $ClassName, $Alias, $Def['Path']));
         }
 
         // Create the object differently depending on the type.
-        $Result = NULL;
+        $Result = null;
         $FactoryType = $Def['FactoryType'];
-        $FactorySupplimentData = isset($Def[$FactoryType]) ? $Def[$FactoryType] : NULL;
+        $FactorySupplimentData = isset($Def[$FactoryType]) ? $Def[$FactoryType] : null;
         switch ($FactoryType) {
             case Gdn::FactoryInstance:
                 // Instantiate a new instance of the class.
-                $Result = $this->_InstantiateObject($Alias, $ClassName, $Args);
+                $Result = $this->_instantiateObject($Alias, $ClassName, $Args);
                 break;
             case Gdn::FactoryPrototype:
                 $Prototype = $FactorySupplimentData;
@@ -91,7 +93,7 @@ class Gdn_Factory {
                 $SingletonDef = $FactorySupplimentData;
                 if (is_array($SingletonDef)) {
                     // The singleton has arguments for instantiation.
-                    $Singleton = NULL;
+                    $Singleton = null;
                     $Args = $SingletonDef;
                 } else {
                     $Singleton = $SingletonDef;
@@ -99,7 +101,7 @@ class Gdn_Factory {
 
                 if (is_null($Singleton)) {
                     // Lazy create the singleton instance.
-                    $Singleton = $this->_InstantiateObject($Alias, $ClassName, $Args);
+                    $Singleton = $this->_instantiateObject($Alias, $ClassName, $Args);
                     $Def[$FactoryType] = $Singleton;
                 }
                 $Result = $Def[$FactoryType];
@@ -109,7 +111,7 @@ class Gdn_Factory {
 
                 // Not yet stored as an object... need to instantiate
                 if (!is_object($RealSingletonDef)) {
-                    $RealSingleton = NULL;
+                    $RealSingleton = null;
                 } else {
                     $RealSingleton = $RealSingletonDef;
                 }
@@ -117,13 +119,12 @@ class Gdn_Factory {
                 if (is_null($RealSingleton)) {
                     // Lazy create the singleton instance.
                     $RealSingleton = call_user_func_array(array($ClassName, $RealSingletonDef), $Args);
-                    $this->_SetDependancies($Alias, $RealSingleton);
+                    $this->setDependancies($Alias, $RealSingleton);
                     $Def[$FactoryType] = $RealSingleton;
                 }
                 $Result = $Def[$FactoryType];
                 break;
             default:
-                /** @todo Throw an exception. */
                 throw new Exception();
                 break;
         }
@@ -146,7 +147,7 @@ class Gdn_Factory {
      *   You can also pass an array to $Data and it will be used as the arguments for the lazy construction.</li>
      * </ul>
      */
-    public function Install($Alias, $ClassName, $Path = '', $FactoryType = Gdn::FactorySingleton, $Data = NULL) {
+    public function install($Alias, $ClassName, $Path = '', $FactoryType = Gdn::FactorySingleton, $Data = null) {
         $FactoryType = ucfirst($FactoryType);
         if (!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton))) {
             throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton));
@@ -187,7 +188,7 @@ class Gdn_Factory {
      * @param string $SourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
      *
      */
-    public function InstallDependency($Alias, $PropertyName, $SourceAlias) {
+    public function installDependency($Alias, $PropertyName, $SourceAlias) {
         if (!array_key_exists($Alias, $this->_Dependencies)) {
             $this->_Dependencies[$Alias] = array($PropertyName => $SourceAlias);
         } else {
@@ -202,9 +203,11 @@ class Gdn_Factory {
      * @param array $Args The arguments to pass to the constructor.
      * Note: This function currently only supports a maximum of 8 arguments.
      */
-    protected function _InstantiateObject($Alias, $ClassName, $Args = NULL) {
-        if (is_null($Args)) $Args = array();
-        $Result = NULL;
+    protected function _instantiateObject($Alias, $ClassName, $Args = null) {
+        if (is_null($Args)) {
+            $Args = array();
+        }
+        $Result = null;
 
         // Instantiate the object with the correct arguments.
         // This odd looking case statement is purely for speed optimization.
@@ -240,16 +243,23 @@ class Gdn_Factory {
                 throw new Exception();
         }
 
-        $this->_SetDependancies($Alias, $Result);
+        $this->setDependancies($Alias, $Result);
         return $Result;
     }
 
-    private function _SetDependancies($Alias, $Object) {
+    /**
+     *
+     *
+     * @param $Alias
+     * @param $Object
+     * @throws Exception
+     */
+    private function setDependancies($Alias, $Object) {
         // Set any dependancies for the object.
         if (array_key_exists($Alias, $this->_Dependencies)) {
             $Dependencies = $this->_Dependencies[$Alias];
             foreach ($Dependencies as $PropertyName => $SourceAlias) {
-                $PropertyValue = $this->Factory($SourceAlias);
+                $PropertyValue = $this->factory($SourceAlias);
                 $Object->$PropertyName = $PropertyValue;
             }
         }
@@ -260,9 +270,10 @@ class Gdn_Factory {
      *
      * @param string $Alias The object alias to uninstall.
      */
-    public function Uninstall($Alias) {
-        if (array_key_exists($Alias, $this->_Objects))
+    public function uninstall($Alias) {
+        if (array_key_exists($Alias, $this->_Objects)) {
             unset($this->_Objects[$Alias]);
+        }
     }
 
     /**
@@ -270,16 +281,21 @@ class Gdn_Factory {
      *
      * Also calls 'Cleanup' on compatible instances.
      */
-    public function Cleanup() {
+    public function cleanup() {
         foreach ($this->_Objects as $FactoryInstanceName => &$FactoryInstance) {
-            if (!is_array($FactoryInstance)) continue;
+            if (!is_array($FactoryInstance)) {
+                continue;
+            }
             $FactoryType = $FactoryInstance['FactoryType'];
 
-            if (!array_key_exists($FactoryType, $FactoryInstance)) continue;
+            if (!array_key_exists($FactoryType, $FactoryInstance)) {
+                continue;
+            }
             $FactoryObject = &$FactoryInstance[$FactoryType];
 
-            if (method_exists($FactoryObject, 'Cleanup'))
-                $FactoryObject->Cleanup();
+            if (method_exists($FactoryObject, 'Cleanup')) {
+                $FactoryObject->cleanup();
+            }
 
             unset($FactoryInstance);
         }
@@ -292,11 +308,11 @@ class Gdn_Factory {
      * @param string $PropertyName The name of the property dependency to uninstall.
      * Note: If $PropertyName is null then all of the dependencies will be uninstalled for $Alias.
      */
-    public function UninstallDependency($Alias, $PropertyName = NULL) {
+    public function uninstallDependency($Alias, $PropertyName = null) {
         if (array_key_exists($Alias, $this->_Dependencies)) {
-            if (is_null($PropertyName))
+            if (is_null($PropertyName)) {
                 unset($this->_Dependencies[$Alias]);
-            elseif (array_key_exists($PropertyName, $this->_Dependencies[$Alias]))
+            } elseif (array_key_exists($PropertyName, $this->_Dependencies[$Alias]))
                 unset($this->_Dependencies[$Alias][$PropertyName]);
         }
     }

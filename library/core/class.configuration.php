@@ -753,9 +753,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
 
         // Infrastructure deployment. Use old method.
         $TmpFile = tempnam(PATH_CONF, 'config');
-        $Result = false;
-        if (file_put_contents($TmpFile, $FileContents) !== false) {
-            chmod($TmpFile, 0775);
+        $Result = FALSE;
+        if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
+            chmod($TmpFile, 0664);
             $Result = rename($TmpFile, $File);
         }
 

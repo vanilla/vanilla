@@ -97,7 +97,7 @@ class DiscussionController extends VanillaController {
         $ActualResponses = $this->Discussion->CountComments;
 
         $this->Offset = $Offset;
-        if (C('Vanilla.Comments.AutoOffset')) {
+        if (c('Vanilla.Comments.AutoOffset')) {
 //         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
 //            $this->addDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
             if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
@@ -152,7 +152,7 @@ class DiscussionController extends VanillaController {
 
         include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
         if ($PageNumber == 1) {
-            $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
+            $this->Description(SliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160));
             // Add images to head for open graph
             $Dom = str_get_html(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
         } else {
@@ -161,7 +161,7 @@ class DiscussionController extends VanillaController {
             $FirstComment = $this->data('Comments')->firstRow();
             $FirstBody = val('Body', $FirstComment);
             $FirstFormat = val('Format', $FirstComment);
-            $this->Description(SliceParagraph(Gdn_Format::PlainText($FirstBody, $FirstFormat), 160));
+            $this->Description(SliceParagraph(Gdn_Format::plainText($FirstBody, $FirstFormat), 160));
             // Add images to head for open graph
             $Dom = str_get_html(Gdn_Format::to($FirstBody, $FirstFormat));
         }
@@ -271,7 +271,7 @@ class DiscussionController extends VanillaController {
      * @param int $DiscussionID Unique discussion ID
      * @param int $LastCommentID Only shows comments posted after this one
      */
-    public function GetNew($DiscussionID, $LastCommentID = 0) {
+    public function getNew($DiscussionID, $LastCommentID = 0) {
         $this->setData('Discussion', $this->DiscussionModel->getID($DiscussionID), true);
 
         // Check permissions.
@@ -325,7 +325,7 @@ class DiscussionController extends VanillaController {
      *
      * @param int $CommentID Unique comment ID
      */
-    public function Comment($CommentID) {
+    public function comment($CommentID) {
         // Get the discussionID
         $Comment = $this->CommentModel->getID($CommentID);
         if (!$Comment) {
@@ -357,7 +357,7 @@ class DiscussionController extends VanillaController {
      * @param int $DiscussionID Unique discussion ID.
      * @param string $TransientKey Single-use hash to prove intent.
      */
-    public function DismissAnnouncement($DiscussionID = '') {
+    public function dismissAnnouncement($DiscussionID = '') {
         // Confirm announcements may be dismissed
         if (!c('Vanilla.Discussions.Dismiss', 1)) {
             throw permissionException('Vanilla.Discussions.Dismiss');
@@ -397,7 +397,7 @@ class DiscussionController extends VanillaController {
      *
      * @param int $DiscussionID Unique discussion ID.
      */
-    public function Bookmark($DiscussionID = null) {
+    public function bookmark($DiscussionID = null) {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack()) {
             throw permissionException('Javascript');
@@ -498,7 +498,7 @@ class DiscussionController extends VanillaController {
      * @param int $DiscussionID Unique discussion ID.
      * @param string $TransientKey Single-use hash to prove intent.
      */
-    public function Announce($DiscussionID = '', $Target = '') {
+    public function announce($DiscussionID = '', $Target = '') {
         $Discussion = $this->DiscussionModel->getID($DiscussionID);
         if (!$Discussion) {
             throw notFoundException('Discussion');
@@ -534,7 +534,7 @@ class DiscussionController extends VanillaController {
         $this->render();
     }
 
-    public function SendOptions($Discussion) {
+    public function sendOptions($Discussion) {
         require_once $this->fetchViewLocation('helper_functions', 'Discussion');
         ob_start();
         WriteDiscussionOptions($Discussion);
@@ -556,7 +556,7 @@ class DiscussionController extends VanillaController {
      * @param int $DiscussionID Unique discussion ID.
      * @param bool $Sink Whether or not to unsink the discussion.
      */
-    public function Sink($DiscussionID = '', $Sink = true, $From = 'list') {
+    public function sink($DiscussionID = '', $Sink = true, $From = 'list') {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack()) {
             throw permissionException('Javascript');
@@ -601,7 +601,7 @@ class DiscussionController extends VanillaController {
      * @param int $DiscussionID Unique discussion ID.
      * @param bool $Close Whether or not to close the discussion.
      */
-    public function Close($DiscussionID = '', $Close = true, $From = 'list') {
+    public function close($DiscussionID = '', $Close = true, $From = 'list') {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack()) {
             throw permissionException('Javascript');
@@ -652,7 +652,7 @@ class DiscussionController extends VanillaController {
      *
      * @param int $DiscussionID Unique discussion ID.
      */
-    public function Delete($DiscussionID, $Target = '') {
+    public function delete($DiscussionID, $Target = '') {
         $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
         if (!$Discussion) {
@@ -697,7 +697,7 @@ class DiscussionController extends VanillaController {
      * @param int $CommentID Unique comment ID.
      * @param string $TransientKey Single-use hash to prove intent.
      */
-    public function DeleteComment($CommentID = '', $TransientKey = '') {
+    public function deleteComment($CommentID = '', $TransientKey = '') {
         $Session = Gdn::session();
         $DefaultTarget = '/discussions/';
         $ValidCommentID = is_numeric($CommentID) && $CommentID > 0;
@@ -758,7 +758,7 @@ class DiscussionController extends VanillaController {
      * @param int $Offset
      * @param int $Limit
      */
-    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+    public function embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
         $this->title(t('Comments'));
 
         // Add theme data
@@ -840,7 +840,7 @@ body { background: transparent !important; }
             $OffsetProvided = $Offset != '';
             list($Offset, $Limit) = offsetLimit($Offset, $Limit);
             $this->Offset = $Offset;
-            if (C('Vanilla.Comments.AutoOffset')) {
+            if (c('Vanilla.Comments.AutoOffset')) {
                 if ($ActualResponses <= $Limit) {
                     $this->Offset = 0;
                 }
@@ -960,7 +960,7 @@ body { background: transparent !important; }
      * Redirect to the url specified by the discussion.
      * @param array|object $Discussion
      */
-    protected function RedirectDiscussion($Discussion) {
+    protected function redirectDiscussion($Discussion) {
         $Body = Gdn_Format::to(val('Body', $Discussion), val('Format', $Discussion));
         if (preg_match('`href="([^"]+)"`i', $Body, $Matches)) {
             $Url = $Matches[1];
@@ -972,7 +972,7 @@ body { background: transparent !important; }
      * Re-fetch a discussion's content based on its foreign url.
      * @param type $DiscussionID
      */
-    public function RefetchPageInfo($DiscussionID) {
+    public function refetchPageInfo($DiscussionID) {
         // Make sure we are posting back.
         if (!$this->Request->isPostBack()) {
             throw permissionException('Javascript');

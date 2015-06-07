@@ -8,7 +8,7 @@ echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.
 echo $this->Form->open();
 ?>
     <div class="FilterMenu"><?php
-        if (C('Vanilla.Categories.Use')) {
+        if (c('Vanilla.Categories.Use')) {
             echo wrap(sprintf(
                     t('Vanilla.Moderation.FilterBy', 'Show moderation queue for %1$s'),
                     $this->Form->CategoryDropDown('CategoryID', array(

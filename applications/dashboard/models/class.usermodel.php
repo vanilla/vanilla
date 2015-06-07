@@ -82,7 +82,7 @@ class UserModel extends Gdn_Model {
      *
      * @param Gdn_Controller $Controller
      */
-    public function AddPasswordStrength($Controller) {
+    public function addPasswordStrength($Controller) {
         $Controller->addJsFile('password.js');
         $Controller->addDefinition('MinPassLength', c('Garden.Registration.MinPasswordLength'));
         $Controller->addDefinition(
@@ -104,7 +104,7 @@ class UserModel extends Gdn_Model {
      * @param array|object $user
      * @return array
      */
-    public static function Attributes($user) {
+    public static function attributes($user) {
         $user = (array)$user;
         $attributes = $user['Attributes'];
         if (is_string($attributes)) {
@@ -123,7 +123,7 @@ class UserModel extends Gdn_Model {
      * @param array $Options Additional options for the ban.
      * @throws Exception Throws an exception if something goes wrong during the banning.
      */
-    public function Ban($UserID, $Options) {
+    public function ban($UserID, $Options) {
         $User = $this->getID($UserID);
         $Banned = val('Banned', $User, 0);
 
@@ -216,7 +216,7 @@ class UserModel extends Gdn_Model {
      * @param int $OldUserID
      * @param int $NewUserID
      */
-    public function Merge($OldUserID, $NewUserID) {
+    public function merge($OldUserID, $NewUserID) {
         $OldUser = $this->getID($OldUserID, DATASET_TYPE_ARRAY);
         $NewUser = $this->getID($NewUserID, DATASET_TYPE_ARRAY);
 
@@ -275,7 +275,7 @@ class UserModel extends Gdn_Model {
      * @param $NewUserID
      * @param null $PK
      */
-    protected function MergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID, $PK = null) {
+    protected function mergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID, $PK = null) {
         if (!$PK) {
             $PK = $Table.'ID';
         }
@@ -306,7 +306,7 @@ class UserModel extends Gdn_Model {
      * @return unknown
      * @throws Gdn_UserException
      */
-    protected function MergeStart($OldUserID, $NewUserID) {
+    protected function mergeStart($OldUserID, $NewUserID) {
         $Model = new Gdn_Model('UserMerge');
 
         // Grab the users.
@@ -377,7 +377,7 @@ class UserModel extends Gdn_Model {
      *
      * @param $MergeID
      */
-    protected function MergeFinish($MergeID) {
+    protected function mergeFinish($MergeID) {
         $Row = Gdn::sql()->getWhere('UserMerge', array('MergeID' => $MergeID))->firstRow(DATASET_TYPE_ARRAY);
 
         if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {
@@ -400,7 +400,7 @@ class UserModel extends Gdn_Model {
      * @param $Column
      * @param null $UserID
      */
-    public function Counts($Column, $UserID = null) {
+    public function counts($Column, $UserID = null) {
         if ($UserID) {
             $Where = array('UserID' => $UserID);
         } else {
@@ -426,7 +426,7 @@ class UserModel extends Gdn_Model {
      *
      * @return bool
      */
-    public static function RequireConfirmEmail() {
+    public static function requireConfirmEmail() {
         return c('Garden.Registration.ConfirmEmail') && !self::noEmail();
     }
 
@@ -435,7 +435,7 @@ class UserModel extends Gdn_Model {
      *
      * @return bool
      */
-    public static function NoEmail() {
+    public static function noEmail() {
         return c('Garden.Registration.NoEmail');
     }
 
@@ -447,7 +447,7 @@ class UserModel extends Gdn_Model {
      * @param int $UserID
      * @param array $Options
      */
-    public function UnBan($UserID, $Options = array()) {
+    public function unBan($UserID, $Options = array()) {
         $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
         if (!$User) {
             throw notFoundException();
@@ -519,7 +519,7 @@ class UserModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function ConfirmEmail($User, $EmailKey) {
+    public function confirmEmail($User, $EmailKey) {
         $Attributes = val('Attributes', $User);
         $StoredEmailKey = val('EmailKey', $Attributes);
         $UserID = val('UserID', $User);
@@ -566,7 +566,7 @@ class UserModel extends Gdn_Model {
      * @param bool $ThrowError
      * @return int|void
      */
-    public function SSO($String, $ThrowError = false) {
+    public function sSO($String, $ThrowError = false) {
         if (!$String) {
             return;
         }
@@ -666,7 +666,7 @@ class UserModel extends Gdn_Model {
             trace('Not setting photo.');
         }
 
-        if (C('Garden.SSO.SyncRoles')) {
+        if (c('Garden.SSO.SyncRoles')) {
             // Translate the role names to IDs.
             $Roles = val('Roles', $NewUser, '');
             if (is_string($Roles)) {
@@ -736,7 +736,7 @@ class UserModel extends Gdn_Model {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
 
             // Check to auto-connect based on email address.
-            if (C('Garden.SSO.AutoConnect', c('Garden.Registration.AutoConnect')) && isset($UserData['Email'])) {
+            if (c('Garden.SSO.AutoConnect', c('Garden.Registration.AutoConnect')) && isset($UserData['Email'])) {
                 $User = $this->getByEmail($UserData['Email']);
                 trace($User, "Autoconnect User");
                 if ($User) {
@@ -886,7 +886,7 @@ class UserModel extends Gdn_Model {
         }
 
         // Approval registration requires an email confirmation.
-        if ($UserID && isset($ConfirmationCode) && strtolower(C('Garden.Registration.Method')) == 'approval') {
+        if ($UserID && isset($ConfirmationCode) && strtolower(c('Garden.Registration.Method')) == 'approval') {
             // Send the confirmation email.
             $this->sendEmailConfirmationEmail($UserID);
         }
@@ -1072,7 +1072,7 @@ class UserModel extends Gdn_Model {
      * @since 2.0.0
      * @return object DataSet
      */
-    public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         if (is_numeric($OrderFields)) {
             // They're using the old version that was a misnamed GetID()
             Deprecated('UserModel->get()', 'UserModel->getID()');
@@ -1089,7 +1089,7 @@ class UserModel extends Gdn_Model {
      * @param $Username
      * @return bool|object
      */
-    public function GetByUsername($Username) {
+    public function getByUsername($Username) {
         if ($Username == '') {
             return false;
         }
@@ -2514,7 +2514,7 @@ class UserModel extends Gdn_Model {
             $InviteExpiration = Gdn_Format::toTimestamp($InviteExpiration);
         } else {
             $DefaultExpire = '1 week';
-            $InviteExpiration = strtotime(C('Garden.Registration.InviteExpiration', '1 week'), Gdn_Format::toTimestamp($Invitation->DateInserted));
+            $InviteExpiration = strtotime(c('Garden.Registration.InviteExpiration', '1 week'), Gdn_Format::toTimestamp($Invitation->DateInserted));
             if ($InviteExpiration === false) {
                 $InviteExpiration = strtotime($DefaultExpire);
             }
@@ -2605,7 +2605,7 @@ class UserModel extends Gdn_Model {
      * @param array $Options
      * @return int UserID.
      */
-    public function InsertForApproval($FormPostValues, $Options = array()) {
+    public function insertForApproval($FormPostValues, $Options = array()) {
         $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
         if (empty($RoleIDs)) {
             throw new Exception(t('The default role has not been configured.'), 400);
@@ -2676,7 +2676,7 @@ class UserModel extends Gdn_Model {
      * @return bool|int|string
      * @throws Exception
      */
-    public function InsertForBasic($FormPostValues, $CheckCaptcha = true, $Options = array()) {
+    public function insertForBasic($FormPostValues, $CheckCaptcha = true, $Options = array()) {
         $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         if (!is_array($RoleIDs) || count($RoleIDs) == 0) {
             throw new Exception(t('The default role has not been configured.'), 400);
@@ -2765,7 +2765,7 @@ class UserModel extends Gdn_Model {
      *
      * @param array $Fields
      */
-    public function AddInsertFields(&$Fields) {
+    public function addInsertFields(&$Fields) {
         $this->defineSchema();
 
         // Set the hour offset based on the client's clock.
@@ -2790,7 +2790,7 @@ class UserModel extends Gdn_Model {
      * @param int $UserID
      * @param string|int|float $ClientHour
      */
-    function UpdateVisit($UserID, $ClientHour = false) {
+    function updateVisit($UserID, $ClientHour = false) {
         $UserID = (int)$UserID;
         if (!$UserID) {
             throw new Exception('A valid User ID is required.');
@@ -2873,7 +2873,7 @@ class UserModel extends Gdn_Model {
      * @param bool $Insert
      * @return bool|array
      */
-    public function Validate($FormPostValues, $Insert = false) {
+    public function validate($FormPostValues, $Insert = false) {
         $this->defineSchema();
 
         if (self::noEmail()) {
@@ -2899,7 +2899,7 @@ class UserModel extends Gdn_Model {
      * @param string $Password
      * @return object
      */
-    public function ValidateCredentials($Email = '', $ID = 0, $Password) {
+    public function validateCredentials($Email = '', $ID = 0, $Password) {
         $this->EventArguments['Credentials'] = array('Email' => $Email, 'ID' => $ID, 'Password' => $Password);
         $this->fireEvent('BeforeValidateCredentials');
 
@@ -2978,7 +2978,7 @@ class UserModel extends Gdn_Model {
      * @return bool|string
      * @since 2.1
      */
-    public function ValidateSpamRegistration($User) {
+    public function validateSpamRegistration($User) {
         $DiscoveryText = val('DiscoveryText', $User);
         $Log = ValidateRequired($DiscoveryText);
         $Spam = SpamModel::IsSpam('Registration', $User, array('Log' => $Log));
@@ -3004,7 +3004,7 @@ class UserModel extends Gdn_Model {
      * @param bool $Return
      * @return array|bool
      */
-    public function ValidateUniqueFields($Username, $Email, $UserID = '', $Return = false) {
+    public function validateUniqueFields($Username, $Email, $UserID = '', $Return = false) {
         $Valid = true;
         $Where = array();
         if (is_numeric($UserID)) {
@@ -3014,7 +3014,7 @@ class UserModel extends Gdn_Model {
         $Result = array('Name' => true, 'Email' => true);
 
         // Make sure the username & email aren't already being used
-        if (C('Garden.Registration.NameUnique', true) && $Username) {
+        if (c('Garden.Registration.NameUnique', true) && $Username) {
             $Where['Name'] = $Username;
             $TestData = $this->getWhere($Where);
             if ($TestData->numRows() > 0) {
@@ -3024,7 +3024,7 @@ class UserModel extends Gdn_Model {
             unset($Where['Name']);
         }
 
-        if (C('Garden.Registration.EmailUnique', true) && $Email) {
+        if (c('Garden.Registration.EmailUnique', true) && $Email) {
             $Where['Email'] = $Email;
             $TestData = $this->getWhere($Where);
             if ($TestData->numRows() > 0) {
@@ -3054,7 +3054,7 @@ class UserModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function Approve($UserID, $Email) {
+    public function approve($UserID, $Email) {
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
         // Make sure the $UserID is an applicant
@@ -3084,7 +3084,7 @@ class UserModel extends Gdn_Model {
                 $Email->subject(sprintf(t('[%1$s] Membership Approved'), c('Garden.Title')));
                 $Email->message(sprintf(t('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
                 $Email->to($User->Email);
-                //$Email->from(C('Garden.SupportEmail'), c('Garden.SupportName'));
+                //$Email->from(c('Garden.SupportEmail'), c('Garden.SupportName'));
                 $Email->send();
 
                 // Report that the user was approved.
@@ -3126,7 +3126,7 @@ class UserModel extends Gdn_Model {
      * @param int $UserID
      * @param array $Options See DeleteContent(), GetDelete()
      */
-    public function Delete($UserID, $Options = array()) {
+    public function delete($UserID, $Options = array()) {
         if ($UserID == $this->GetSystemUserID()) {
             $this->Validation->addValidationResult('', 'You cannot delete the system user.');
             return false;
@@ -3186,7 +3186,7 @@ class UserModel extends Gdn_Model {
      * @return bool|int
      * @throws Exception
      */
-    public function DeleteContent($UserID, $Options = array(), $Content = array()) {
+    public function deleteContent($UserID, $Options = array(), $Content = array()) {
         $Log = val('Log', $Options);
         if ($Log === true) {
             $Log = 'Delete';
@@ -3250,7 +3250,7 @@ class UserModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function Decline($UserID) {
+    public function decline($UserID) {
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
         // Make sure the user is an applicant
@@ -3279,7 +3279,7 @@ class UserModel extends Gdn_Model {
      * @param $UserID
      * @return int
      */
-    public function GetInvitationCount($UserID) {
+    public function getInvitationCount($UserID) {
         // If this user is master admin, they should have unlimited invites.
         if ($this->SQL
                 ->select('UserID')
@@ -3370,7 +3370,7 @@ class UserModel extends Gdn_Model {
      * @param array $Data The data to put the result.
      * @since 2.1
      */
-    public function GetDelete($Table, $Where, &$Data) {
+    public function getDelete($Table, $Where, &$Data) {
         if (is_array($Data)) {
             // Grab the records.
             $Result = $this->SQL->getWhere($Table, $Where)->resultArray();
@@ -3396,7 +3396,7 @@ class UserModel extends Gdn_Model {
      * @param int The unique id of the user being affected.
      * @param int The number to reduce CountInvitations by.
      */
-    public function ReduceInviteCount($UserID, $ReduceBy = 1) {
+    public function reduceInviteCount($UserID, $ReduceBy = 1) {
         $CurrentCount = $this->GetInvitationCount($UserID);
 
         // Do not reduce if the user has unlimited invitations
@@ -3421,7 +3421,7 @@ class UserModel extends Gdn_Model {
      * @param int The unique id of the user being affected.
      * @param int The number to increase CountInvitations by.
      */
-    public function IncreaseInviteCount($UserID, $IncreaseBy = 1) {
+    public function increaseInviteCount($UserID, $IncreaseBy = 1) {
         $CurrentCount = $this->GetInvitationCount($UserID);
 
         // Do not alter if the user has unlimited invitations
@@ -3441,7 +3441,7 @@ class UserModel extends Gdn_Model {
      * @param int The UserID to save.
      * @param string The about message being saved.
      */
-    public function SaveAbout($UserID, $About) {
+    public function saveAbout($UserID, $About) {
         $About = substr($About, 0, 1000);
         $this->setField($UserID, 'About', $About);
     }
@@ -3457,7 +3457,7 @@ class UserModel extends Gdn_Model {
      * @param mixed The name of the value being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
      * @param mixed The value being saved.
      */
-    public function SaveToSerializedColumn($Column, $UserID, $Name, $Value = '') {
+    public function saveToSerializedColumn($Column, $UserID, $Name, $Value = '') {
         // Load the existing values
         $UserData = $this->getID($UserID, DATASET_TYPE_OBJECT);
 
@@ -3520,7 +3520,7 @@ class UserModel extends Gdn_Model {
      * @param mixed The name of the preference being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
      * @param mixed The value being saved.
      */
-    public function SavePreference($UserID, $Preference, $Value = '') {
+    public function savePreference($UserID, $Preference, $Value = '') {
         // Make sure that changes to the current user become effective immediately.
         $Session = Gdn::session();
         if ($UserID == $Session->UserID) {
@@ -3539,7 +3539,7 @@ class UserModel extends Gdn_Model {
      * @param mixed The name of the attribute being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
      * @param mixed The value being saved.
      */
-    public function SaveAttribute($UserID, $Attribute, $Value = '') {
+    public function saveAttribute($UserID, $Attribute, $Value = '') {
         // Make sure that changes to the current user become effective immediately.
         $Session = Gdn::session();
         if ($UserID == $Session->UserID) {
@@ -3555,7 +3555,7 @@ class UserModel extends Gdn_Model {
      * @param $Data
      * @return Gdn_DataSet|string
      */
-    public function SaveAuthentication($Data) {
+    public function saveAuthentication($Data) {
         $Cn = $this->Database->connection();
         $Px = $this->Database->DatabasePrefix;
 
@@ -3574,7 +3574,7 @@ class UserModel extends Gdn_Model {
      * @param $User
      * @throws Exception
      */
-    public function SetCalculatedFields(&$User) {
+    public function setCalculatedFields(&$User) {
         if ($v = val('Attributes', $User)) {
             if (is_string($v)) {
                 setValue('Attributes', $User, @unserialize($v));
@@ -3625,7 +3625,7 @@ class UserModel extends Gdn_Model {
      * @param $Meta
      * @param string $Prefix
      */
-    public static function SetMeta($UserID, $Meta, $Prefix = '') {
+    public static function setMeta($UserID, $Meta, $Prefix = '') {
         $Deletes = array();
         $Px = Gdn::database()->DatabasePrefix;
         $Sql = "insert {$Px}UserMeta (UserID, Name, Value) values(:UserID, :Name, :Value) on duplicate key update Value = :Value1";
@@ -3650,7 +3650,7 @@ class UserModel extends Gdn_Model {
      * @param string $ExplicitKey
      * @return string
      */
-    public function SetTransientKey($UserID, $ExplicitKey = '') {
+    public function setTransientKey($UserID, $ExplicitKey = '') {
         $Key = $ExplicitKey == '' ? RandomString(12) : $ExplicitKey;
         $this->saveAttribute($UserID, 'TransientKey', $Key);
         return $Key;
@@ -3664,7 +3664,7 @@ class UserModel extends Gdn_Model {
      * @param bool $DefaultValue
      * @return mixed
      */
-    public function GetAttribute($UserID, $Attribute, $DefaultValue = false) {
+    public function getAttribute($UserID, $Attribute, $DefaultValue = false) {
 //
 //      $Result = $DefaultValue;
 //      if ($Data !== FALSE) {
@@ -3687,7 +3687,7 @@ class UserModel extends Gdn_Model {
      * @param bool $Force
      * @throws Exception
      */
-    public function SendEmailConfirmationEmail($User = null, $Force = false) {
+    public function sendEmailConfirmationEmail($User = null, $Force = false) {
 
         if (!$User) {
             $User = Gdn::session()->User;
@@ -3760,7 +3760,7 @@ class UserModel extends Gdn_Model {
      * @param null $AdditionalData
      * @throws Exception
      */
-    public function SendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = null) {
+    public function sendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = null) {
         $Session = Gdn::session();
         $Sender = $this->getID($Session->UserID);
         $User = $this->getID($UserID);
@@ -3817,7 +3817,7 @@ class UserModel extends Gdn_Model {
      * @param $Password
      * @throws Exception
      */
-    public function SendPasswordEmail($UserID, $Password) {
+    public function sendPasswordEmail($UserID, $Password) {
         $Session = Gdn::session();
         $Sender = $this->getID($Session->UserID);
         $User = $this->getID($UserID);
@@ -3859,7 +3859,7 @@ class UserModel extends Gdn_Model {
      * @param array $Data Information to put in the user table.
      * @return int The ID of the user.
      */
-    public function Synchronize($UserKey, $Data) {
+    public function synchronize($UserKey, $Data) {
         $UserID = 0;
 
         $Attributes = arrayValue('Attributes', $Data);
@@ -3928,7 +3928,7 @@ class UserModel extends Gdn_Model {
      * @return array
      * @throws Gdn_UserException
      */
-    public function NewUserRoleIDs() {
+    public function newUserRoleIDs() {
         // Registration method
         $RegistrationMethod = c('Garden.Registration.Method', 'Captcha');
         $DefaultRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
@@ -3962,7 +3962,7 @@ class UserModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function PasswordRequest($Email) {
+    public function passwordRequest($Email) {
         if (!$Email) {
             return false;
         }
@@ -4024,7 +4024,7 @@ class UserModel extends Gdn_Model {
      * @return array|bool|null|object|type
      * @throws Exception
      */
-    public function PasswordReset($UserID, $Password) {
+    public function passwordReset($UserID, $Password) {
         // Encrypt the password before saving
         $PasswordHash = new Gdn_PasswordHash();
         $Password = $PasswordHash->HashPassword($Password);
@@ -4045,7 +4045,7 @@ class UserModel extends Gdn_Model {
      * @param array $User
      * @param boolean $PasswordOK
      */
-    public static function RateLimit($User, $PasswordOK) {
+    public static function rateLimit($User, $PasswordOK) {
         if (Gdn::cache()->activeEnabled()) {
             // Rate limit using Gdn_Cache.
             $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
@@ -4062,7 +4062,7 @@ class UserModel extends Gdn_Model {
                 Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
             ));
 
-        } elseif (C('Garden.Apc', false) && function_exists('apc_store')) {
+        } elseif (c('Garden.Apc', false) && function_exists('apc_store')) {
             // Rate limit using the APC data store.
             $UserRateKey = formatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
             $UserRate = (int)apc_fetch($UserRateKey);
@@ -4117,7 +4117,7 @@ class UserModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function SetField($RowID, $Property, $Value = false) {
+    public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
             $Property = array($Property => $Value);
         }
@@ -4171,7 +4171,7 @@ class UserModel extends Gdn_Model {
      * @param string $TokenType either 'userid' or 'name'
      * @return type user array or FALSE
      */
-    public function GetUserFromCache($UserToken, $TokenType) {
+    public function getUserFromCache($UserToken, $TokenType) {
         if ($TokenType == 'name') {
             $UserNameKey = formatString(self::USERNAME_KEY, array('Name' => md5($UserToken)));
             $UserID = Gdn::cache()->get($UserNameKey);
@@ -4203,7 +4203,7 @@ class UserModel extends Gdn_Model {
      * @param $Field
      * @param null $Value
      */
-    public function UpdateUserCache($UserID, $Field, $Value = null) {
+    public function updateUserCache($UserID, $Field, $Value = null) {
         // Try and get the user from the cache.
         $User = $this->GetUserFromCache($UserID, 'userid');
 
@@ -4228,7 +4228,7 @@ class UserModel extends Gdn_Model {
      * @param type $User
      * @return type
      */
-    public function UserCache($User, $UserID = null) {
+    public function userCache($User, $UserID = null) {
         if (!$UserID) {
             $UserID = val('UserID', $User, null);
         }
@@ -4257,7 +4257,7 @@ class UserModel extends Gdn_Model {
      * @param type $RoleIDs
      * @return type
      */
-    public function UserCacheRoles($UserID, $RoleIDs) {
+    public function userCacheRoles($UserID, $RoleIDs) {
         if (is_null($UserID) || !$UserID) {
             return false;
         }
@@ -4275,7 +4275,7 @@ class UserModel extends Gdn_Model {
      * @param type $UserID
      * @return type
      */
-    public function ClearCache($UserID, $CacheTypesToClear = null) {
+    public function clearCache($UserID, $CacheTypesToClear = null) {
         if (is_null($UserID) || !$UserID) {
             return false;
         }
@@ -4307,7 +4307,7 @@ class UserModel extends Gdn_Model {
     /**
      *
      */
-    public function ClearPermissions() {
+    public function clearPermissions() {
         if (!Gdn::cache()->activeEnabled()) {
             $this->SQL->put('User', array('Permissions' => ''), array('Permissions <>' => ''));
         }
@@ -4326,7 +4326,7 @@ class UserModel extends Gdn_Model {
      *
      * @return bool|int|mixed
      */
-    public function GetPermissionsIncrement() {
+    public function getPermissionsIncrement() {
         $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
         $PermissionsKeyValue = Gdn::cache()->get($PermissionsIncrementKey);
 

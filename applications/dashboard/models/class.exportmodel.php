@@ -64,7 +64,7 @@ class ExportModel {
      * @param string $Path The path to the export file.
      * @param string $Source The source program that created the export. This may be used by the import routine to do additional processing.
      */
-    public function BeginExport($Path, $Source = '') {
+    public function beginExport($Path, $Source = '') {
         $this->BeginTime = microtime(true);
         $TimeStart = list($sm, $ss) = explode(' ', microtime());
 
@@ -89,7 +89,7 @@ class ExportModel {
      * @param string $Message The message to write.
      * @param bool $Echo Whether or not to echo the message in addition to writing it to the file.
      */
-    public function Comment($Message, $Echo = true) {
+    public function comment($Message, $Echo = true) {
         fwrite($this->_File, self::COMMENT.' '.str_replace(self::NEWLINE, self::NEWLINE.self::COMMENT.' ', $Message).self::NEWLINE);
         if ($Echo) {
             echo $Message, "\n";
@@ -101,7 +101,7 @@ class ExportModel {
      *
      * This method must be called if BeginExport() has been called or else the export file will not be closed.
      */
-    public function EndExport() {
+    public function endExport() {
         $this->EndTime = microtime(true);
         $this->TotalTime = $this->EndTime - $this->BeginTime;
         $m = floor($this->TotalTime / 60);
@@ -127,7 +127,7 @@ class ExportModel {
      * @param string $Password The password for the database if a dsn is specified.
      * @return PDO The current database connection.
      */
-    public function PDO($DsnOrPDO = null, $Username = null, $Password = null) {
+    public function pDO($DsnOrPDO = null, $Username = null, $Password = null) {
         if (!is_null($DsnOrPDO)) {
             if ($DsnOrPDO instanceof PDO) {
                 $this->_PDO = $DsnOrPDO;
@@ -152,7 +152,7 @@ class ExportModel {
      * @param array $Mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
      *  For a list of the export tables and columns see $this->Structure().
      */
-    public function ExportTable($TableName, $Query, $Mappings = array()) {
+    public function exportTable($TableName, $Query, $Mappings = array()) {
         $fp = $this->_File;
 
         // Make sure the table is valid for export.
@@ -243,7 +243,7 @@ class ExportModel {
      * @return array
      * @see vnExport::ExportTable()
      */
-    public function Structures() {
+    public function structures() {
         return $this->_Structures;
     }
 
@@ -252,7 +252,7 @@ class ExportModel {
      * The version is used when importing to determine the format of this file.
      * @return string
      */
-    public function Version() {
+    public function version() {
         return '1.0';
     }
 }

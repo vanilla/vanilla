@@ -6,7 +6,7 @@ if (!function_exists('UserVerified')):
      * @param array|object $User
      * @return string
      */
-    function UserVerified($User) {
+    function userVerified($User) {
         $UserID = val('UserID', $User);
 
         if (val('Verified', $User)) {

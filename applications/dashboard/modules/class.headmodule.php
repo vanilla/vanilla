@@ -64,7 +64,7 @@ if (!class_exists('HeadModule', false)) {
          * @param bool $AddVersion Whether to append version number as query string.
          * @param array $Options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
          */
-        public function AddCss($HRef, $Media = '', $AddVersion = true, $Options = null) {
+        public function addCss($HRef, $Media = '', $AddVersion = true, $Options = null) {
             $Properties = array(
                 'rel' => 'stylesheet',
                 'type' => 'text/css',
@@ -87,7 +87,7 @@ if (!class_exists('HeadModule', false)) {
          * @param $HRef
          * @param $Title
          */
-        public function AddRss($HRef, $Title) {
+        public function addRss($HRef, $Title) {
             $this->addTag('link', array(
                 'rel' => 'alternate',
                 'type' => 'application/rss+xml',
@@ -103,7 +103,7 @@ if (!class_exists('HeadModule', false)) {
          * @param array An associative array of property => value pairs to be placed in the tag.
          * @param string an index to give the tag for later manipulation.
          */
-        public function AddTag($Tag, $Properties, $Content = null, $Index = null) {
+        public function addTag($Tag, $Properties, $Content = null, $Index = null) {
             $Tag = array_merge(array(self::TAG_KEY => strtolower($Tag)), array_change_key_case($Properties));
             if ($Content) {
                 $Tag[self::CONTENT_KEY] = $Content;
@@ -133,7 +133,7 @@ if (!class_exists('HeadModule', false)) {
          *  - array: An array of options (ex. sort, hint, version).
          *
          */
-        public function AddScript($Src, $Type = 'text/javascript', $Options = array()) {
+        public function addScript($Src, $Type = 'text/javascript', $Options = array()) {
             if (is_numeric($Options)) {
                 $Options = array('sort' => $Options);
             } elseif (is_string($Options)) {
@@ -163,7 +163,7 @@ if (!class_exists('HeadModule', false)) {
          *
          * @param string The string to be inserted.
          */
-        public function AddString($String) {
+        public function addString($String) {
             $this->_Strings[] = $String;
         }
 
@@ -172,21 +172,21 @@ if (!class_exists('HeadModule', false)) {
          *
          * @return string
          */
-        public function AssetTarget() {
+        public function assetTarget() {
             return 'Head';
         }
 
         /**
          * Removes any added stylesheets from the head.
          */
-        public function ClearCSS() {
+        public function clearCSS() {
             $this->ClearTag('link', array('rel' => 'stylesheet'));
         }
 
         /**
          * Removes any script include tags from the head.
          */
-        public function ClearScripts() {
+        public function clearScripts() {
             $this->ClearTag('script');
         }
 
@@ -200,7 +200,7 @@ if (!class_exists('HeadModule', false)) {
          *    - If this is an array then it will be treated as a query of attribute/value pairs to match against.
          * @param string Any value to search for in the specified property.
          */
-        public function ClearTag($Tag, $Property = '', $Value = '') {
+        public function clearTag($Tag, $Property = '', $Value = '') {
             $Tag = strtolower($Tag);
             if (is_array($Property)) {
                 $Query = array_change_key_case($Property);
@@ -226,14 +226,14 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Return all strings.
          */
-        public function GetStrings() {
+        public function getStrings() {
             return $this->_Strings;
         }
 
         /**
          * Return all Tags of the specified type (or all tags).
          */
-        public function GetTags($RequestedType = '') {
+        public function getTags($RequestedType = '') {
             // Make sure that css loads before js (for jquery)
             usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
 
@@ -257,7 +257,7 @@ if (!class_exists('HeadModule', false)) {
          *
          * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
          */
-        public function SetFavIcon($HRef) {
+        public function setFavIcon($HRef) {
             if (!$this->_FavIconSet) {
                 $this->_FavIconSet = true;
                 $this->addTag(
@@ -274,7 +274,7 @@ if (!class_exists('HeadModule', false)) {
          *
          * @param array $Value .
          */
-        public function Tags($Value = null) {
+        public function tags($Value = null) {
             if ($Value != null) {
                 $this->_Tags = $Value;
             }
@@ -288,7 +288,7 @@ if (!class_exists('HeadModule', false)) {
          * @param bool $NoSubTitle
          * @return mixed|string
          */
-        public function Title($Title = '', $NoSubTitle = false) {
+        public function title($Title = '', $NoSubTitle = false) {
             if ($Title != '') {
                 // Apply $Title to $this->_Title and return it;
                 $this->_Title = $Title;
@@ -314,7 +314,7 @@ if (!class_exists('HeadModule', false)) {
          * @param $B
          * @return int
          */
-        public static function TagCmp($A, $B) {
+        public static function tagCmp($A, $B) {
             if ($A[self::TAG_KEY] == 'title') {
                 return -1;
             }
@@ -337,7 +337,7 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Render the entire head module.
          */
-        public function ToString() {
+        public function toString() {
             // Add the canonical Url if necessary.
             if (method_exists($this->_Sender, 'CanonicalUrl') && !c('Garden.Modules.NoCanonicalUrl', false)) {
                 $CanonicalUrl = $this->_Sender->canonicalUrl();

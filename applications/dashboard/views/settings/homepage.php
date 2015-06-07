@@ -9,7 +9,7 @@ $CurrentCategoriesLayout = c('Vanilla.Categories.Layout', 'modern');
 if ($CurrentCategoriesLayout == '')
     $CurrentCategoriesLayout = 'modern';
 
-function WriteHomepageOption($Title, $Url, $CssClass, $Current, $Description = '') {
+function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '') {
     $SpriteClass = $CssClass;
     if ($Current == $Url)
         $CssClass .= ' Current';

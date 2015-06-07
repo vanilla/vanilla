@@ -62,7 +62,7 @@ class ActivityModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      */
-    public function ActivityQuery($Join = true) {
+    public function activityQuery($Join = true) {
         $this->SQL
             ->select('a.*')
             ->select('t.FullHeadline, t.ProfileHeadline, t.AllowComments, t.ShowIcon, t.RouteCode')
@@ -92,7 +92,7 @@ class ActivityModel extends Gdn_Model {
      *
      * @param $Data
      */
-    public function CalculateData(&$Data) {
+    public function calculateData(&$Data) {
         foreach ($Data as &$Row) {
             $this->CalculateRow($Row);
         }
@@ -103,7 +103,7 @@ class ActivityModel extends Gdn_Model {
      *
      * @param $Row
      */
-    public function CalculateRow(&$Row) {
+    public function calculateRow(&$Row) {
         $ActivityType = self::GetActivityType($Row['ActivityTypeID']);
         $Row['ActivityType'] = val('Name', $ActivityType);
         if (is_string($Row['Data'])) {
@@ -612,7 +612,7 @@ class ActivityModel extends Gdn_Model {
      * @param int $UserID Unique ID of user.
      * @return int Number of notifications.
      */
-    /*public function GetCountNotifications($UserID) {
+    /*public function getCountNotifications($UserID) {
        $this->SQL
           ->select('a.ActivityID', 'count', 'ActivityCount')
           ->from('Activity a')
@@ -914,7 +914,7 @@ class ActivityModel extends Gdn_Model {
 
         // Build the email to send.
         $Email = new Gdn_Email();
-        $Email->subject(sprintf(t('[%1$s] %2$s'), c('Garden.Title'), Gdn_Format::PlainText($Activity['Headline'])));
+        $Email->subject(sprintf(t('[%1$s] %2$s'), c('Garden.Title'), Gdn_Format::plainText($Activity['Headline'])));
         $Email->to($User);
 
         $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
@@ -922,12 +922,12 @@ class ActivityModel extends Gdn_Model {
         if ($Activity['Story']) {
             $Message = sprintf(
                 t('EmailStoryNotification', "%3\$s\n\n%2\$s"),
-                Gdn_Format::PlainText($Activity['Headline']),
+                Gdn_Format::plainText($Activity['Headline']),
                 $Url,
-                Gdn_Format::PlainText($Activity['Story'])
+                Gdn_Format::plainText($Activity['Story'])
             );
         } else {
-            $Message = sprintf(t('EmailNotification', "%1\$s\n\n%2\$s"), Gdn_Format::PlainText($Activity['Headline']), $Url);
+            $Message = sprintf(t('EmailNotification', "%1\$s\n\n%2\$s"), Gdn_Format::plainText($Activity['Headline']), $Url);
         }
         $Email->message($Message);
 

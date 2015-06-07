@@ -86,7 +86,7 @@ class DraftsController extends VanillaController {
      * @param int $DraftID Unique ID of draft to be deleted.
      * @param string $TransientKey Single-use hash to prove intent.
      */
-    public function Delete($DraftID = '', $TransientKey = '') {
+    public function delete($DraftID = '', $TransientKey = '') {
         $Form = Gdn::Factory('Form');
         $Session = Gdn::session();
         if (is_numeric($DraftID)

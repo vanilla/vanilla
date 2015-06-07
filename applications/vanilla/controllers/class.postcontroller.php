@@ -53,12 +53,12 @@ class PostController extends VanillaController {
         $this->render();
     }
 
-    public function AnnounceOptions() {
+    public function announceOptions() {
         $Result = array(
             '0' => '@'.t("Don't announce.")
         );
 
-        if (C('Vanilla.Categories.Use')) {
+        if (c('Vanilla.Categories.Use')) {
             $Result = array_replace($Result, array(
                 '2' => '@'.sprintf(t('In <b>%s.</b>'), t('the category')),
                 '1' => '@'.sprintf(sprintf(t('In <b>%s</b> and recent discussions.'), t('the category'))),
@@ -80,7 +80,7 @@ class PostController extends VanillaController {
      *
      * @param int $CategoryID Unique ID of the category to add the discussion to.
      */
-    public function Discussion($CategoryUrlCode = '') {
+    public function discussion($CategoryUrlCode = '') {
         // Override CategoryID if categories are disabled
         $UseCategories = $this->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
         if (!$UseCategories) {
@@ -332,7 +332,7 @@ class PostController extends VanillaController {
      * @param int $DiscussionID Unique ID of the discussion to edit.
      * @param int $DraftID Unique ID of draft discussion to edit.
      */
-    public function EditDiscussion($DiscussionID = '', $DraftID = '') {
+    public function editDiscussion($DiscussionID = '', $DraftID = '') {
         if ($DraftID != '') {
             $this->Draft = $this->DraftModel->getID($DraftID);
             $this->CategoryID = $this->Draft->CategoryID;
@@ -346,7 +346,7 @@ class PostController extends VanillaController {
             $this->CategoryID = $this->Discussion->CategoryID;
         }
 
-        if (C('Garden.ForceInputFormatter')) {
+        if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');
         }
 
@@ -363,7 +363,7 @@ class PostController extends VanillaController {
      *
      * @param int $DiscussionID Unique ID to add the comment to. If blank, this method will throw an error.
      */
-    public function Comment($DiscussionID = '') {
+    public function comment($DiscussionID = '') {
         // Get $DiscussionID from RequestArgs if valid
         if ($DiscussionID == '' && count($this->RequestArgs)) {
             if (is_numeric($this->RequestArgs[0])) {
@@ -804,7 +804,7 @@ class PostController extends VanillaController {
      * @param int $CommentID Unique ID of the comment.
      * @param bool $Inserted
      */
-    public function Comment2($CommentID, $Inserted = false) {
+    public function comment2($CommentID, $Inserted = false) {
         $this->CommentModel->Save2($CommentID, $Inserted);
         $this->render('Blank', 'Utility', 'Dashboard');
     }
@@ -820,7 +820,7 @@ class PostController extends VanillaController {
      * @param int $CommentID Unique ID of the comment to edit.
      * @param int $DraftID Unique ID of the draft to edit.
      */
-    public function EditComment($CommentID = '', $DraftID = '') {
+    public function editComment($CommentID = '', $DraftID = '') {
         if (is_numeric($CommentID) && $CommentID > 0) {
             $this->Form->setModel($this->CommentModel);
             $this->Comment = $this->CommentModel->getID($CommentID);
@@ -829,7 +829,7 @@ class PostController extends VanillaController {
             $this->Comment = $this->DraftModel->getID($DraftID);
         }
 
-        if (C('Garden.ForceInputFormatter')) {
+        if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');
         }
 
@@ -850,7 +850,7 @@ class PostController extends VanillaController {
         $this->addModule('NewDiscussionModule');
     }
 
-    public function NotifyNewDiscussion($DiscussionID) {
+    public function notifyNewDiscussion($DiscussionID) {
         if (!c('Vanilla.QueueNotifications')) {
             throw forbiddenException('NotifyNewDiscussion');
         }
@@ -901,7 +901,7 @@ class PostController extends VanillaController {
      * @param Gdn_Form $Form
      * @param bool $LimitCategories Whether to turn off the category dropdown if there is only one category to show.
      */
-    protected function PopulateForm($Form) {
+    protected function populateForm($Form) {
         $Get = $this->Request->get();
         $Get = array_change_key_case($Get);
         $Values = arrayTranslate($Get, array('name' => 'Name', 'tags' => 'Tags', 'body' => 'Body'));
@@ -918,7 +918,7 @@ class PostController extends VanillaController {
     }
 }
 
-function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
+function checkOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
     $Form = Gdn::controller()->Form;
 
     if (count($ListOptions) == 2 && array_key_exists(0, $ListOptions)) {

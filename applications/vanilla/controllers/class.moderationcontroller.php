@@ -18,7 +18,7 @@ class ModerationController extends VanillaController {
      * have been checked for administration, and if so, puts an inform message on
      * the screen to take action.
      */
-    public function CheckedComments() {
+    public function checkedComments() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         ModerationController::InformCheckedComments($this);
@@ -30,7 +30,7 @@ class ModerationController extends VanillaController {
      * have been checked for administration, and if so, puts an inform message on
      * the screen to take action.
      */
-    public function CheckedDiscussions() {
+    public function checkedDiscussions() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         ModerationController::InformCheckedDiscussions($this);
@@ -42,7 +42,7 @@ class ModerationController extends VanillaController {
      * have been checked for administration, and if so, adds an inform message to
      * $Sender to take action.
      */
-    public static function InformCheckedComments($Sender) {
+    public static function informCheckedComments($Sender) {
         $Session = Gdn::session();
         $HadCheckedComments = false;
         $TransientKey = val('TransientKey', $_POST);
@@ -139,7 +139,7 @@ class ModerationController extends VanillaController {
      * have been checked for administration, and if so, adds an inform message to
      * $Sender to take action.
      */
-    public static function InformCheckedDiscussions($Sender, $Force = false) {
+    public static function informCheckedDiscussions($Sender, $Force = false) {
         $Session = Gdn::session();
         $HadCheckedDiscussions = $Force;
         if ($Session->isValid() && Gdn::request()->isAuthenticatedPostBack()) {
@@ -211,7 +211,7 @@ class ModerationController extends VanillaController {
     /**
      * Remove all comments checked for administration from the user's attributes.
      */
-    public function ClearCommentSelections($DiscussionID = '', $TransientKey = '') {
+    public function clearCommentSelections($DiscussionID = '', $TransientKey = '') {
         $Session = Gdn::session();
         if ($Session->validateTransientKey($TransientKey)) {
             $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
@@ -225,7 +225,7 @@ class ModerationController extends VanillaController {
     /**
      * Remove all discussions checked for administration from the user's attributes.
      */
-    public function ClearDiscussionSelections($TransientKey = '') {
+    public function clearDiscussionSelections($TransientKey = '') {
         $Session = Gdn::session();
         if ($Session->validateTransientKey($TransientKey)) {
             Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
@@ -238,7 +238,7 @@ class ModerationController extends VanillaController {
      * Form to confirm that the administrator wants to delete the selected
      * comments (and has permission to do so).
      */
-    public function ConfirmCommentDeletes($DiscussionID = '') {
+    public function confirmCommentDeletes($DiscussionID = '') {
         $Session = Gdn::session();
         $this->Form = new Gdn_Form();
         $DiscussionModel = new DiscussionModel();
@@ -292,7 +292,7 @@ class ModerationController extends VanillaController {
      * Form to confirm that the administrator wants to delete the selected
      * discussions (and has permission to do so).
      */
-    public function ConfirmDiscussionDeletes() {
+    public function confirmDiscussionDeletes() {
         $Session = Gdn::session();
         $this->Form = new Gdn_Form();
         $DiscussionModel = new DiscussionModel();
@@ -344,7 +344,7 @@ class ModerationController extends VanillaController {
     /**
      * Form to ask for the destination of the move, confirmation and permission check.
      */
-    public function ConfirmDiscussionMoves($DiscussionID = null) {
+    public function confirmDiscussionMoves($DiscussionID = null) {
         $Session = Gdn::session();
         $this->Form = new Gdn_Form();
         $DiscussionModel = new DiscussionModel();
@@ -415,7 +415,7 @@ class ModerationController extends VanillaController {
                     );
 
                     // Pass a forced input formatter around this exception.
-                    if (C('Garden.ForceInputFormatter')) {
+                    if (c('Garden.ForceInputFormatter')) {
                         $InputFormat = c('Garden.InputFormatter');
                         saveToConfig('Garden.InputFormatter', 'Html', false);
                     }
@@ -423,7 +423,7 @@ class ModerationController extends VanillaController {
                     $RedirectID = $DiscussionModel->save($RedirectDiscussion);
 
                     // Reset the input formatter
-                    if (C('Garden.ForceInputFormatter')) {
+                    if (c('Garden.ForceInputFormatter')) {
                         saveToConfig('Garden.InputFormatter', $InputFormat, false);
                     }
 

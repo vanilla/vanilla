@@ -73,7 +73,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @param array $Parameters Use lowercase key names that map to class properties.
      */
-    public function Load($Parameters = array()) {
+    public function load($Parameters = array()) {
         $Result = $this->validate($Parameters);
         if ($Result === true) {
             // Match existing properties to validates parameters.
@@ -99,7 +99,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Parameters .
      * @return string|true True on success or string (message) on error.
      */
-    public function Validate($Parameters = array()) {
+    public function validate($Parameters = array()) {
         $validation = new Gdn_Validation();
 
         // Validate integer properties.
@@ -132,7 +132,7 @@ class PromotedContentModule extends Gdn_Module {
     /**
      * Get data based on class properties.
      */
-    public function GetData() {
+    public function getData() {
         $this->setData('Content', false);
         $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
         if (method_exists($this, $SelectorMethod)) {
@@ -148,7 +148,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array|int $Parameters
      * @return array|false
      */
-    protected function SelectByRole($Parameters) {
+    protected function selectByRole($Parameters) {
         if (!is_array($Parameters)) {
             $RoleID = $Parameters;
         } else {
@@ -239,7 +239,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array|int $Parameters
      * @return array|false
      */
-    protected function SelectByRank($Parameters) {
+    protected function selectByRank($Parameters) {
         // Must have Ranks enabled.
         if (!class_exists('RankModel')) {
             return false;
@@ -324,7 +324,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array|int $Parameters
      * @return array|false
      */
-    protected function SelectByCategory($Parameters) {
+    protected function selectByCategory($Parameters) {
         if (!is_array($Parameters)) {
             $CategoryID = $Parameters;
         } else {
@@ -401,7 +401,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array|int $Parameters
      * @return array|false
      */
-    protected function SelectByScore($Parameters) {
+    protected function selectByScore($Parameters) {
         if (!is_array($Parameters)) {
             $MinScore = $Parameters;
         } else {
@@ -471,7 +471,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Parameters Not used.
      * @return array|false $Content
      */
-    protected function SelectByPromoted($Parameters) {
+    protected function selectByPromoted($Parameters) {
         if (!class_exists('ReactionModel')) {
             return;
         }
@@ -503,7 +503,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @param array $Comments
      */
-    protected function JoinCategory(&$Comments) {
+    protected function joinCategory(&$Comments) {
         $DiscussionIDs = array();
 
         foreach ($Comments as &$Comment) {
@@ -535,7 +535,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Sections Array of result arrays
      * @return array
      */
-    protected function Union($Field, $Sections) {
+    protected function union($Field, $Sections) {
         if (!is_array($Sections)) {
             return;
         }
@@ -563,7 +563,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @param Array $content By reference
      */
-    protected function Prepare(&$content) {
+    protected function prepare(&$content) {
 
         foreach ($content as &$item) {
             $contentType = val('RecordType', $item);
@@ -627,7 +627,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @param array $Content Content array, by reference
      */
-    protected function Security(&$Content) {
+    protected function security(&$Content) {
         if (!is_array($Content)) {
             return;
         }
@@ -640,7 +640,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param $ContentItem
      * @return bool
      */
-    protected function SecurityFilter($ContentItem) {
+    protected function securityFilter($ContentItem) {
         $CategoryID = val('CategoryID', $ContentItem, null);
         if (is_null($CategoryID) || $CategoryID === false) {
             return false;
@@ -661,7 +661,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Content
      * @param array $Limit
      */
-    protected function Condense(&$Content, $Limit) {
+    protected function condense(&$Content, $Limit) {
         $Content = array_slice($Content, 0, $Limit);
     }
 
@@ -670,7 +670,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @return bool
      */
-    public function ShowComments() {
+    public function showComments() {
         return ($this->ContentType == 'all' || $this->ContentType == 'comments') ? true : false;
     }
 
@@ -679,7 +679,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @return bool
      */
-    public function ShowDiscussions() {
+    public function showDiscussions() {
         return ($this->ContentType == 'all' || $this->ContentType == 'discussions') ? true : false;
     }
 
@@ -688,7 +688,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @return string
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
@@ -697,7 +697,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if ($this->data('Content', null) == null) {
             $this->GetData();
         }

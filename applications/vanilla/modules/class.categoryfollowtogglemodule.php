@@ -16,7 +16,7 @@ class CategoryFollowToggleModule extends Gdn_Module {
     /**
      * Set the preference in the user's session.
      */
-    public function SetToggle() {
+    public function setToggle() {
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             return;
@@ -34,11 +34,11 @@ class CategoryFollowToggleModule extends Gdn_Module {
         }
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (Gdn::session()->isValid()) {
             return parent::ToString();
         }

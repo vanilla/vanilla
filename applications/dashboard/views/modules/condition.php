@@ -6,7 +6,7 @@ function _DN($Current, $Type) {
     return '';
 }
 
-function WriteConditionEdit($Condition, $Sender) {
+function writeConditionEdit($Condition, $Sender) {
     $Px = $Sender->Prefix;
     $Form = new Gdn_Form();
 

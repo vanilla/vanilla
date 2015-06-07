@@ -17,16 +17,16 @@
             if ($Row['Subject']) {
                 $Subject = Gdn_Format::text($Row['Subject']);
             } else {
-                $Subject = ConversationModel::ParticipantTitle($Row, false);
+                $Subject = ConversationModel::participantTitle($Row, false);
             }
-            $PhotoUser = UserBuilder($Row, 'LastInsert');
+            $PhotoUser = userBuilder($Row, 'LastInsert');
             ?>
             <li class="Item" rel="<?php echo url("/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?>">
                 <div class="Author Photo"><?php echo userPhoto($PhotoUser); ?></div>
                 <div class="ItemContent">
                     <b class="Subject"><?php echo anchor($Subject, "/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?></b>
                     <?php
-                    $Excerpt = SliceString(Gdn_Format::PlainText($Row['LastBody'], $Row['LastFormat']), 80);
+                    $Excerpt = sliceString(Gdn_Format::plainText($Row['LastBody'], $Row['LastFormat']), 80);
                     echo wrap(nl2br(htmlspecialchars($Excerpt)), 'div', array('class' => 'Excerpt'));
                     ?>
                     <div class="Meta">

@@ -51,7 +51,7 @@ class NewDiscussionModule extends Gdn_Module {
      *
      * @return string
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
@@ -61,7 +61,7 @@ class NewDiscussionModule extends Gdn_Module {
      * @param $Text
      * @param $Url
      */
-    public function AddButton($Text, $Url) {
+    public function addButton($Text, $Url) {
         $this->Buttons[] = array('Text' => $Text, 'Url' => $Url);
     }
 
@@ -70,7 +70,7 @@ class NewDiscussionModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         // Set CategoryID if we have one.
         if ($this->CategoryID === null) {
             $this->CategoryID = Gdn::controller()->data('Category.CategoryID', false);

@@ -19,7 +19,7 @@ class Vanilla1ImportModel extends Gdn_Model {
     /**
      * Custom finalization.
      */
-    public function AfterImport() {
+    public function afterImport() {
         // Set up the routes to redirect from their older counterparts.
         $Router = Gdn::router();
         $Router->SetRoute('\?CategoryID=(\d+)(?:&page=(\d+))?', 'categories/$1/p$2', 'Permanent');

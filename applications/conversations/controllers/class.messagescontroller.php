@@ -536,7 +536,7 @@ class MessagesController extends ConversationsController {
      * @param int $Offset Number to skip.
      * @param string $Limit Number to show.
      */
-//   public function Bookmarked($Offset = 0, $Limit = '') {
+//   public function bookmarked($Offset = 0, $Limit = '') {
 //      $this->View = 'All';
 //      $this->All($Offset, $Limit, true);
 //   }

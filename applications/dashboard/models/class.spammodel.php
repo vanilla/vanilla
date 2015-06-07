@@ -38,7 +38,7 @@ class SpamModel extends Gdn_Pluggable {
      * @param bool|null $value
      * @return bool
      */
-    public static function Disabled($value = null) {
+    public static function disabled($value = null) {
         if ($value !== null) {
             self::$Disabled = $value;
         }
@@ -55,7 +55,7 @@ class SpamModel extends Gdn_Pluggable {
      * @param array $Options Options for fine-tuning this method call.
      *  - Log: Log the record if it is found to be spam.
      */
-    public static function IsSpam($RecordType, $Data, $Options = array()) {
+    public static function isSpam($RecordType, $Data, $Options = array()) {
         if (self::$Disabled) {
             return false;
         }

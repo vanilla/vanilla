@@ -20,7 +20,7 @@ class LogModel extends Gdn_Pluggable {
     /**
      *
      */
-    public static function BeginTransaction() {
+    public static function beginTransaction() {
         self::$_TransactionID = true;
     }
 
@@ -29,13 +29,13 @@ class LogModel extends Gdn_Pluggable {
      *
      * @param $LogIDs
      */
-    public function Delete($LogIDs) {
+    public function delete($LogIDs) {
         if (!is_array($LogIDs)) {
             $LogIDs = explode(',', $LogIDs);
         }
 
         // Get the log entries.
-        $Logs = $this->GetIDs($LogIDs);
+        $Logs = $this->getIDs($LogIDs);
         $Models = array();
         $Models['Discussion'] = new DiscussionModel();
         $Models['Comment'] = new CommentModel();
@@ -54,7 +54,7 @@ class LogModel extends Gdn_Pluggable {
     /**
      *
      */
-    public static function EndTransaction() {
+    public static function endTransaction() {
         self::$_TransactionID = null;
     }
 
@@ -64,7 +64,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $Log
      * @return array|string
      */
-    public function FormatContent($Log) {
+    public function formatContent($Log) {
         $Data = $Log['Data'];
 
         // TODO: Check for a custom log type handler.
@@ -107,7 +107,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $Data
      * @return array|string
      */
-    public function FormatConfiguration($Data) {
+    public function formatConfiguration($Data) {
         $Old = $Data;
         $New = $Data['_New'];
         unset($Old['_New']);
@@ -143,7 +143,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $Data
      * @return string
      */
-    public function FormatKey($Key, $Data) {
+    public function formatKey($Key, $Data) {
         if (!is_array($Data)) {
             $Data = (array)$Data;
         }
@@ -164,7 +164,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $Data
      * @return array|string
      */
-    public function FormatRecord($Keys, $Data) {
+    public function formatRecord($Keys, $Data) {
         $Result = array();
         foreach ($Keys as $Index => $Key) {
             if (is_numeric($Index)) {
@@ -188,7 +188,7 @@ class LogModel extends Gdn_Pluggable {
      * @param string $Method
      * @return string
      */
-    public function FormatDiff($Old, $New, $Method = 'html') {
+    public function formatDiff($Old, $New, $Method = 'html') {
         static $TinyDiff = null;
 
         if ($TinyDiff === null) {
@@ -206,7 +206,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $IDs
      * @return array|null
      */
-    public function GetIDs($IDs) {
+    public function getIDs($IDs) {
         if (is_string($IDs)) {
             $IDs = explode(',', $IDs);
         }
@@ -237,7 +237,7 @@ class LogModel extends Gdn_Pluggable {
      * @return array|null
      * @throws Exception
      */
-    public function GetWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Offset = false, $Limit = false) {
+    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Offset = false, $Limit = false) {
         if ($Offset < 0) {
             $Offset = 0;
         }
@@ -275,7 +275,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $Where
      * @return mixed
      */
-    public function GetCountWhere($Where) {
+    public function getCountWhere($Where) {
         if (isset($Where['Operation'])) {
             Gdn::sql()->whereIn('Operation', (array)$Where['Operation']);
             unset($Where['Operation']);
@@ -296,7 +296,7 @@ class LogModel extends Gdn_Pluggable {
      * @param string $Operation Comma-delimited list of operation types to get (sum of) counts for.
      * @return int
      */
-    public function GetOperationCount($Operation) {
+    public function getOperationCount($Operation) {
         if ($Operation == 'edits') {
             $Operation = array('edit', 'delete');
         } else {
@@ -332,7 +332,7 @@ class LogModel extends Gdn_Pluggable {
      *  - You can pass an additional _New element to tell the logger what the new data is.
      * @return int The log id.
      */
-    public static function Insert($Operation, $RecordType, $Data, $Options = array()) {
+    public static function insert($Operation, $RecordType, $Data, $Options = array()) {
         if ($Operation === false) {
             return;
         }
@@ -507,7 +507,7 @@ class LogModel extends Gdn_Pluggable {
      * @param $NewData
      * @param null $OldData
      */
-    public static function LogChange($Operation, $RecordType, $NewData, $OldData = null) {
+    public static function logChange($Operation, $RecordType, $NewData, $OldData = null) {
         $RecordID = isset($NewData['RecordID']) ? $NewData['RecordID'] : val($RecordType.'ID', $NewData);
 
         // Grab the record from the DB.
@@ -559,7 +559,7 @@ class LogModel extends Gdn_Pluggable {
      *
      * @throws Exception
      */
-    public function Recalculate() {
+    public function recalculate() {
         if ($DiscussionIDs = val('Discussion', $this->_RecalcIDs)) {
             $In = implode(',', array_keys($DiscussionIDs));
 
@@ -632,7 +632,7 @@ class LogModel extends Gdn_Pluggable {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function Restore($Log, $DeleteLog = true) {
+    public function restore($Log, $DeleteLog = true) {
         static $Columns = array();
 
         if (is_numeric($Log)) {

@@ -19,7 +19,7 @@ class StatisticsController extends DashboardController {
     /**
      * Output available info.
      */
-    public function Info() {
+    public function info() {
         $this->setData('FirstDate', Gdn::statistics()->firstDate());
         $this->render();
     }

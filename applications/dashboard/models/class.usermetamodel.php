@@ -45,7 +45,7 @@ class UserMetaModel extends Gdn_Model {
      * @param $Default optional default return value if key is not found
      * @return array results or $Default
      */
-    public function GetUserMeta($UserID, $Key = null, $Default = null) {
+    public function getUserMeta($UserID, $Key = null, $Default = null) {
         if (Gdn::cache()->activeEnabled()) {
             if (is_array($UserID)) {
                 $Result = array();
@@ -143,7 +143,7 @@ class UserMetaModel extends Gdn_Model {
      * @param $Value mixed optional value to set, null to delete
      * @return void
      */
-    public function SetUserMeta($UserID, $Key, $Value = null) {
+    public function setUserMeta($UserID, $Key, $Value = null) {
         if (Gdn::cache()->activeEnabled()) {
             if (is_array($UserID)) {
                 foreach ($UserID as $ID) {

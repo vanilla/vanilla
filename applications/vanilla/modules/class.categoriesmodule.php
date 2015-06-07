@@ -26,14 +26,14 @@ class CategoriesModule extends Gdn_Module {
         $this->Visible = c('Vanilla.Categories.Use') && !c('Vanilla.Categories.HideModule');
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
     /**
      * Get the data for this module.
      */
-    protected function GetData() {
+    protected function getData() {
         // Allow plugins to set different data.
         $this->fireEvent('GetData');
         if ($this->Data) {
@@ -66,7 +66,7 @@ class CategoriesModule extends Gdn_Module {
         }
     }
 
-    public function ToString() {
+    public function toString() {
         if (!$this->Data) {
             $this->GetData();
         }

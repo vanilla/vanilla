@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->fetchViewLocation('helper_functions');
-function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
+function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
     $Tutorial = GetTutorials($TutorialCode);
     if (!$Tutorial)
         return '';

@@ -34,7 +34,7 @@ class SocialController extends DashboardController {
     /**
      * Settings page.
      */
-    public function Manage() {
+    public function manage() {
         $this->permission('Garden.Settings.Manage');
         $this->title("Social Integration");
         $this->addSideMenu('dashboard/social');
@@ -51,7 +51,7 @@ class SocialController extends DashboardController {
      * @return array|mixed
      * @throws Exception
      */
-    protected function GetConnections() {
+    protected function getConnections() {
         $this->fireEvent('GetConnections');
         $Connections = $this->data('Connections', array());
         if (!is_array($Connections)) {
@@ -92,7 +92,7 @@ class SocialController extends DashboardController {
      * @param $Plugin
      * @throws Exception
      */
-    public function Disable($Plugin) {
+    public function disable($Plugin) {
         $this->permission('Garden.Settings.Manage');
         $Connections = $this->GetConnections();
         unset($this->Data['Connections']);
@@ -125,7 +125,7 @@ class SocialController extends DashboardController {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function Enable($Plugin) {
+    public function enable($Plugin) {
         $this->permission('Garden.Settings.Manage');
         $Connections = $this->GetConnections();
 

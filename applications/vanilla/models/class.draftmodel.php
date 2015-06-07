@@ -29,7 +29,7 @@ class DraftModel extends VanillaModel {
      * @since 2.0.0
      * @access public
      */
-    public function DraftQuery() {
+    public function draftQuery() {
         $this->SQL
             ->select('d.*')
             ->from('Draft d');
@@ -47,7 +47,7 @@ class DraftModel extends VanillaModel {
      * @param int $DiscussionID Limits drafts returned to a single discussion.
      * @return object Gdn_DataSet SQL results.
      */
-    public function Get($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
+    public function get($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
         if (!is_numeric($Offset) || $Offset < 0) {
             $Offset = 0;
         }
@@ -80,7 +80,7 @@ class DraftModel extends VanillaModel {
      * @param int $DraftID Unique ID of draft to get data for.
      * @return object SQL results.
      */
-    public function GetID($DraftID) {
+    public function getID($DraftID) {
         $this->DraftQuery();
         return $this->SQL
             ->where('d.DraftID', $DraftID)
@@ -97,7 +97,7 @@ class DraftModel extends VanillaModel {
      * @param int $UserID Unique ID of user to count drafts for.
      * @return int Total drafts.
      */
-    public function GetCount($UserID) {
+    public function getCount($UserID) {
         return $this->SQL
             ->select('DraftID', 'count', 'CountDrafts')
             ->from('Draft')
@@ -116,7 +116,7 @@ class DraftModel extends VanillaModel {
      * @param array $FormPostValues Form values sent from form model.
      * @return int Unique ID of draft.
      */
-    public function Save($FormPostValues) {
+    public function save($FormPostValues) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -199,7 +199,7 @@ class DraftModel extends VanillaModel {
      * @param int $DraftID Unique ID of the draft to be deleted.
      * @return bool Always returns TRUE.
      */
-    public function Delete($DraftID) {
+    public function delete($DraftID) {
         // Get some information about this draft
         $DraftUser = $this->SQL
             ->select('InsertUserID')
@@ -224,7 +224,7 @@ class DraftModel extends VanillaModel {
      *
      * @param int $UserID Unique ID of the user to be updated.
      */
-    public function UpdateUser($UserID) {
+    public function updateUser($UserID) {
         // Retrieve a draft count
         $CountDrafts = $this->getCount($UserID);
 

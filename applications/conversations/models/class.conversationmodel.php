@@ -467,7 +467,7 @@ class ConversationModel extends ConversationsModel {
             $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
         }
 
-        if (C('Garden.ForceInputFormatter')) {
+        if (c('Garden.ForceInputFormatter')) {
             $FormPostValues['Format'] = c('Garden.InputFormatter');
         }
 

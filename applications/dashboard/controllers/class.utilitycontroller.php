@@ -36,7 +36,7 @@ class UtilityController extends DashboardController {
      * @param string $Filename The basename of the file to
      * @since 2.1
      */
-    public function Css($ThemeType, $Filename) {
+    public function css($ThemeType, $Filename) {
         $AssetModel = new AssetModel();
         $AssetModel->ServeCss($ThemeType, $Filename);
     }
@@ -53,7 +53,7 @@ class UtilityController extends DashboardController {
 //   /**
 //    * Call a method on the given model.
 //    */
-//   public function Model() {
+//   public function model() {
 //      $this->permission('Garden.Settings.Manage');
 //
 //      $this->deliveryMethod(DELIVERY_METHOD_JSON);
@@ -189,7 +189,7 @@ class UtilityController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Sort() {
+    public function sort() {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::request()->isAuthenticatedPostBack()) {

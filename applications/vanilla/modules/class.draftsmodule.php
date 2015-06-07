@@ -16,7 +16,7 @@ class DraftsModule extends Gdn_Module {
     /** @var  Gdn_Form */
     public $Form;
 
-    public function GetData($Limit = 20, $DiscussionID = '') {
+    public function getData($Limit = 20, $DiscussionID = '') {
         $Session = Gdn::session();
         if ($Session->isValid()) {
             $DraftModel = new DraftModel();
@@ -25,11 +25,11 @@ class DraftsModule extends Gdn_Module {
         $this->Form = $this->_Sender->Form;
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (is_object($this->Data) && $this->Data->numRows() > 0) {
             return parent::ToString();
         }

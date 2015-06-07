@@ -30,11 +30,11 @@ class UserInfoModule extends Gdn_Module {
         parent::__construct($Sender);
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function LoadData() {
+    public function loadData() {
         $UserID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
         $this->User = Gdn::userModel()->getID($UserID);
         $this->Roles = Gdn::userModel()->GetRoles($UserID)->resultArray();
@@ -44,7 +44,7 @@ class UserInfoModule extends Gdn_Module {
         }
     }
 
-    public function ToString() {
+    public function toString() {
         if (!$this->User) {
             $this->LoadData();
         }

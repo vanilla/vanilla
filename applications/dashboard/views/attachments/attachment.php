@@ -11,7 +11,7 @@ if (!function_exists('WriteAttachment')) {
      * @param array $Attachment Attachment
      * @return string
      */
-    function WriteAttachment($Attachment) {
+    function writeAttachment($Attachment) {
 
         $customMethod = AttachmentModel::GetWriteAttachmentMethodName($Attachment['Type']);
         if (function_exists($customMethod)) {
@@ -30,7 +30,7 @@ if (!function_exists('WriteAttachment')) {
 }
 
 if (!function_exists('WriteAttachments')) {
-    function WriteAttachments($Attachments) {
+    function writeAttachments($Attachments) {
         foreach ($Attachments as $Attachment) {
             ?>
             <div class="item-attachments">
@@ -42,7 +42,7 @@ if (!function_exists('WriteAttachments')) {
 }
 
 if (!function_exists('WriteSkeletonAttachment')) {
-    function WriteSkeletonAttachment($Attachment) {
+    function writeSkeletonAttachment($Attachment) {
         ?>
         <div class="item-attachment">
             <div class="alert">
@@ -93,7 +93,7 @@ if (!function_exists('WriteErrorAttachment')) {
      * @param array $Attachment
      * @return string
      */
-    function WriteErrorAttachment($Attachment) {
+    function writeErrorAttachment($Attachment) {
         WriteGenericAttachment(array(
             'Type' => 'Warning',
             'Icon' => 'warning-sign',
@@ -109,7 +109,7 @@ if (!function_exists('WriteGenericAttachment')) {
      * @param array $Attachment
      * @return string
      */
-    function WriteGenericAttachment($Attachment) {
+    function writeGenericAttachment($Attachment) {
         $Type = val('Type', $Attachment);
         $Icon = val('Icon', $Attachment, 'sign-blank');
         $Title = val('Title', $Attachment);

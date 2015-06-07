@@ -26,7 +26,7 @@ class SettingsModule extends Gdn_Module {
      * @param string $Name
      * @return boolean
      */
-    public static function IsRemovable($Type, $Name) {
+    public static function isRemovable($Type, $Name) {
 
         switch ($Type) {
             case self::TYPE_APPLICATION:

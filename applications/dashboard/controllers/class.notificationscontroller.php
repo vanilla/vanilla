@@ -36,12 +36,12 @@ class NotificationsController extends Gdn_Controller {
      * @since 2.0.18
      * @access public
      */
-    public function Inform() {
+    public function inform() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
 
         // Retrieve all notifications and inform them.
-        NotificationsController::InformNotifications($this);
+        NotificationsController::informNotifications($this);
         $this->fireEvent('BeforeInformNotifications');
 
         $this->render();
@@ -58,7 +58,7 @@ class NotificationsController extends Gdn_Controller {
      *
      * @param Gdn_Controller $Sender The object calling this method.
      */
-    public static function InformNotifications($Sender) {
+    public static function informNotifications($Sender) {
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             return;
@@ -76,7 +76,7 @@ class NotificationsController extends Gdn_Controller {
         $Activities = $ActivityModel->getWhere($Where, 0, 5)->resultArray();
 
         $ActivityIDs = array_column($Activities, 'ActivityID');
-        $ActivityModel->SetNotified($ActivityIDs);
+        $ActivityModel->setNotified($ActivityIDs);
 
         $Sender->EventArguments['Activities'] = &$Activities;
         $Sender->fireEvent('InformNotifications');
@@ -91,7 +91,7 @@ class NotificationsController extends Gdn_Controller {
             } else {
                 $UserPhoto = '';
             }
-            $Excerpt = Gdn_Format::PlainText($Activity['Story']);
+            $Excerpt = Gdn_Format::plainText($Activity['Story']);
             $ActivityClass = ' Activity-'.$Activity['ActivityType'];
 
 

@@ -45,11 +45,11 @@
  * each word capitalized,'
  *  Example:
  *   Add to Plugin:
- *    public function DiscussionController_FetchAttachmentViews_Handler($Sender) {
+ *    public function discussionController_FetchAttachmentViews_Handler($Sender) {
  *       require_once $Sender->fetchViewLocation('attachment', '', 'plugins/PluginID');
  *    }
  *  Now inside plugins views we add attachment.php with a function like:
- *    function WriteMyTypeAttachment($attachment) {}     ... would be called if Type = my-type
+ *    function writeMyTypeAttachment($attachment) {}     ... would be called if Type = my-type
  *  You can see a skeleton for this in ./applications/dashboard/views/attachments/attachment.php
  *  function: WriteSkeletonAttachment
  *

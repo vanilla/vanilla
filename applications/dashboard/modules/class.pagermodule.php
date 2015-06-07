@@ -108,7 +108,7 @@ class PagerModule extends Gdn_Module {
      *
      * @return bool
      */
-    function AssetTarget() {
+    function assetTarget() {
         return false;
     }
 
@@ -122,7 +122,7 @@ class PagerModule extends Gdn_Module {
      * @param bool $ForceConfigure
      * @throws Exception
      */
-    public function Configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = false) {
+    public function configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = false) {
         if ($this->_PropertiesDefined === false || $ForceConfigure === true) {
             if (is_array($Url)) {
                 if (count($Url) == 1) {
@@ -155,7 +155,7 @@ class PagerModule extends Gdn_Module {
      *
      * @return Gdn_Controller.
      */
-    public function Controller() {
+    public function controller() {
         return $this->_Sender;
     }
 
@@ -165,7 +165,7 @@ class PagerModule extends Gdn_Module {
      * @param null $Value
      * @return null|PagerModule
      */
-    public static function Current($Value = null) {
+    public static function current($Value = null) {
         if ($Value !== null) {
             self::$_CurrentPager = $Value;
         } elseif (self::$_CurrentPager == null) {
@@ -181,7 +181,7 @@ class PagerModule extends Gdn_Module {
      * @param string $FormatString
      * @return bool|string Built string.
      */
-    public function Details($FormatString = '') {
+    public function details($FormatString = '') {
         if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
         }
@@ -204,7 +204,7 @@ class PagerModule extends Gdn_Module {
      *
      * @return bool True if this is the first page.
      */
-    public function FirstPage() {
+    public function firstPage() {
         $Result = $this->Offset == 0;
         return $Result;
     }
@@ -217,7 +217,7 @@ class PagerModule extends Gdn_Module {
      * @param string $Limit
      * @return mixed|string
      */
-    public static function FormatUrl($Url, $Page, $Limit = '') {
+    public static function formatUrl($Url, $Page, $Limit = '') {
         // Check for new style page.
         if (strpos($Url, '{Page}') !== false) {
             return str_replace(array('{Page}', '{Size}'), array($Page, $Limit), $Url);
@@ -231,7 +231,7 @@ class PagerModule extends Gdn_Module {
      *
      * @return bool True if this is the last page.
      */
-    public function LastPage() {
+    public function lastPage() {
         return $this->Offset + $this->Limit >= $this->TotalRecords;
     }
 
@@ -242,7 +242,7 @@ class PagerModule extends Gdn_Module {
      * @param $CurrentPage
      * @return null|string
      */
-    public static function Rel($Page, $CurrentPage) {
+    public static function rel($Page, $CurrentPage) {
         if ($Page == $CurrentPage - 1) {
             return 'prev';
         } elseif ($Page == $CurrentPage + 1)
@@ -257,7 +257,7 @@ class PagerModule extends Gdn_Module {
      * @param $Page
      * @return mixed|string
      */
-    public function PageUrl($Page) {
+    public function pageUrl($Page) {
         if ($this->UrlCallBack) {
             return call_user_func($this->UrlCallBack, $this->Record, $Page);
         } else {
@@ -271,7 +271,7 @@ class PagerModule extends Gdn_Module {
      * @param string $Type Type of link to return: 'more' or 'less'.
      * @return string HTML page navigation links.
      */
-    public function ToString($Type = 'more') {
+    public function toString($Type = 'more') {
         if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
@@ -392,7 +392,7 @@ class PagerModule extends Gdn_Module {
      * @param string $Type
      * @return string
      */
-    public function ToStringPrevNext($Type = 'more') {
+    public function toStringPrevNext($Type = 'more') {
         $this->CssClass = ConcatSep(' ', $this->CssClass, 'PrevNextPager');
         $CurrentPage = PageNumber($this->Offset, $this->Limit);
 
@@ -429,7 +429,7 @@ class PagerModule extends Gdn_Module {
      * @param array $Options
      * @throws Exception
      */
-    public static function Write($Options = array()) {
+    public static function write($Options = array()) {
         static $WriteCount = 0;
 
         if (!self::$_CurrentPager) {
@@ -511,7 +511,7 @@ class PagerModule extends Gdn_Module {
     /**
      * Are there more pages after the current one?
      */
-    public function HasMorePages() {
+    public function hasMorePages() {
         return $this->TotalRecords > $this->Offset + $this->Limit;
     }
 }

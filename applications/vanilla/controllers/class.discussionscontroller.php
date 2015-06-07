@@ -35,7 +35,7 @@ class DiscussionsController extends VanillaController {
      *
      * @param int $Page Multiplied by PerPage option to determine offset.
      */
-    public function Table($Page = '0') {
+    public function table($Page = '0') {
         if ($this->SyndicationMethod == SYNDICATION_NONE) {
             $this->View = 'table';
         }
@@ -100,7 +100,7 @@ class DiscussionsController extends VanillaController {
             }
         }
         if (!$this->Description()) {
-            $this->Description(C('Garden.Description', null));
+            $this->Description(c('Garden.Description', null));
         }
         if ($this->Head) {
             $this->Head->AddRss(url('/discussions/feed.rss', true), $this->Head->title());
@@ -178,7 +178,7 @@ class DiscussionsController extends VanillaController {
         $this->render();
     }
 
-    public function Unread($Page = '0') {
+    public function unread($Page = '0') {
         if (!Gdn::session()->isValid()) {
             redirect('/discussions/index', 302);
         }
@@ -216,7 +216,7 @@ class DiscussionsController extends VanillaController {
             }
         }
         if (!$this->Description()) {
-            $this->Description(C('Garden.Description', null));
+            $this->Description(c('Garden.Description', null));
         }
         if ($this->Head) {
             $this->Head->AddRss(url('/discussions/unread/feed.rss', true), $this->Head->title());
@@ -310,7 +310,7 @@ class DiscussionsController extends VanillaController {
      *
      * @param int $Offset Number of discussions to skip.
      */
-    public function Bookmarked($Page = '0') {
+    public function bookmarked($Page = '0') {
         $this->permission('Garden.SignIn.Allow');
         Gdn_Theme::section('DiscussionList');
 
@@ -388,7 +388,7 @@ class DiscussionsController extends VanillaController {
         $this->render();
     }
 
-    public function BookmarkedPopin() {
+    public function bookmarkedPopin() {
         $this->permission('Garden.SignIn.Allow');
 
         $DiscussionModel = new DiscussionModel();
@@ -425,7 +425,7 @@ class DiscussionsController extends VanillaController {
      *
      * @param int $Offset Number of discussions to skip.
      */
-    public function Mine($Page = 'p1') {
+    public function mine($Page = 'p1') {
         $this->permission('Garden.SignIn.Allow');
         Gdn_Theme::section('DiscussionList');
 
@@ -439,7 +439,7 @@ class DiscussionsController extends VanillaController {
         $CountDiscussions = $this->setData('CountDiscussions', $DiscussionModel->getCount($Wheres));
 
         $this->View = 'index';
-        if (C('Vanilla.Discussions.Layout') === 'table') {
+        if (c('Vanilla.Discussions.Layout') === 'table') {
             $this->View = 'table';
         }
 
@@ -483,7 +483,7 @@ class DiscussionsController extends VanillaController {
         $this->render();
     }
 
-    public function UserBookmarkCount($UserID = false) {
+    public function userBookmarkCount($UserID = false) {
         if ($UserID === false) {
             $UserID = Gdn::session()->UserID;
         }
@@ -518,7 +518,7 @@ class DiscussionsController extends VanillaController {
     /**
      * Takes a set of discussion identifiers and returns their comment counts in the same order.
      */
-    public function GetCommentCounts() {
+    public function getCommentCounts() {
         $this->AllowJSONP(true);
 
         $vanilla_identifier = val('vanilla_identifier', $_GET);
@@ -577,7 +577,7 @@ class DiscussionsController extends VanillaController {
     /**
      * Set user preference for sorting discussions.
      */
-    public function Sort($Target = '') {
+    public function sort($Target = '') {
         if (!Gdn::session()->isValid()) {
             throw permissionException();
         }
@@ -614,7 +614,7 @@ class DiscussionsController extends VanillaController {
      *
      * @see PromotedContentModule
      */
-    public function Promoted() {
+    public function promoted() {
         // Create module & set data.
         $PromotedModule = new PromotedContentModule();
         $Status = $PromotedModule->Load(Gdn::request()->get());

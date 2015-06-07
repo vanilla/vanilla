@@ -16,7 +16,7 @@ class DashboardHooks implements Gdn_IPlugin {
     /**
      * Do nothing.
      */
-    public function Setup() {
+    public function setup() {
     }
 
     /**
@@ -24,7 +24,7 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function Base_Render_Before($Sender) {
+    public function base_Render_Before($Sender) {
         $Session = Gdn::session();
 
         // Enable theme previewing
@@ -136,7 +136,7 @@ class DashboardHooks implements Gdn_IPlugin {
     /**
      * @param $Sender
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_GetAppSettingsMenuItems_Handler($Sender) {
         // SideMenuModule menu
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->AddItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
@@ -171,7 +171,7 @@ class DashboardHooks implements Gdn_IPlugin {
         $Menu->addLink('Users', t('Registration'), 'dashboard/settings/registration', 'Garden.Settings.Manage', array('class' => 'nav-registration'));
         $Menu->addLink('Users', t('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage', array('class' => 'nav-authentication'));
 
-        if (C('Garden.Registration.Method') == 'Approval') {
+        if (c('Garden.Registration.Method') == 'Approval') {
             $Menu->addLink('Users', t('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Users.Approve', array('class' => 'nav-applicants'));
         }
 
@@ -216,7 +216,7 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param Gdn_Dispatcher $Sender
      */
-    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+    public function gdn_Dispatcher_AppStartup_Handler($Sender) {
         safeHeader('P3P: CP="CAO PSA OUR"', true);
 
         if ($SSO = Gdn::request()->get('sso')) {
@@ -254,7 +254,7 @@ class DashboardHooks implements Gdn_IPlugin {
      * @param RootController $Sender
      * @param string $Target The url to redirect to after sso.
      */
-    public function RootController_SSO_Create($Sender, $Target = '') {
+    public function rootController_SSO_Create($Sender, $Target = '') {
         if (!$Target) {
             $Target = $Sender->Request->get('redirect');
             if (!$Target) {
@@ -284,7 +284,7 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param SiteNavModule $sender
      */
-    public function SiteNavModule_all_handler($sender) {
+    public function siteNavModule_all_handler($sender) {
         // Add a link to the community home.
         $sender->addLink('main.home', array('text' => t('Community Home'), 'url' => '/', 'icon' => icon('home'), 'sort' => -100));
 
@@ -306,7 +306,7 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param SiteNavModule $sender
      */
-    public function SiteNavModule_default_handler($sender) {
+    public function siteNavModule_default_handler($sender) {
         if (Gdn::session()->isValid()) {
             $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
         }
@@ -339,7 +339,7 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param SiteNavModule $sender
      */
-    public function SiteNavModule_editprofile_handler($sender) {
+    public function siteNavModule_editprofile_handler($sender) {
         $user = Gdn::controller()->data('Profile');
         $user_id = val('UserID', $user);
         $is_me = $user_id == Gdn::session()->UserID;
@@ -365,12 +365,12 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param SiteNavModule $sender
      */
-    public function SiteNavModule_profile_handler($sender) {
+    public function siteNavModule_profile_handler($sender) {
         $user = Gdn::controller()->data('Profile');
         $user_id = val('UserID', $user);
 
         // Show the activity.
-        if (C('Garden.Profile.ShowActivities', true)) {
+        if (c('Garden.Profile.ShowActivities', true)) {
             $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => userUrl($user, '', 'activity'), 'icon' => icon('time')));
         }
 
@@ -380,7 +380,7 @@ class DashboardHooks implements Gdn_IPlugin {
         }
 
         // Show the invitations if we're using the invite registration method.
-        if (strcasecmp(C('Garden.Registration.Method'), 'invitation') === 0) {
+        if (strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0) {
             $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => userUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
         }
 

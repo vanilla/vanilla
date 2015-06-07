@@ -22,7 +22,7 @@ class ConditionModule extends Gdn_Module {
      * @param null $Value
      * @return array|null
      */
-    public function Conditions($Value = null) {
+    public function conditions($Value = null) {
         if (is_array($Value)) {
             $this->_Conditions = $Value;
         } elseif ($this->_Conditions === null) {
@@ -47,7 +47,7 @@ class ConditionModule extends Gdn_Module {
         return $this->_Conditions;
     }
 
-    public function ToString() {
+    public function toString() {
         $Form = $this->_Sender->Form;
         $this->_Sender->addJsFile('condition.js');
 

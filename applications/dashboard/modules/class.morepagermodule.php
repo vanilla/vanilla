@@ -96,14 +96,14 @@ class MorePagerModule extends PagerModule {
      *
      * @return bool
      */
-    function AssetTarget() {
+    function assetTarget() {
         return false;
     }
 
     /**
      * Define all required parameters to create the Pager and PagerDetails.
      */
-    public function Configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = false) {
+    public function configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = false) {
         if ($this->_PropertiesDefined === false || $ForceConfigure === true) {
             $this->Url = $Url;
 
@@ -125,7 +125,7 @@ class MorePagerModule extends PagerModule {
     *
     * @return string Built string.
     */
-    public function Details() {
+    public function details() {
         if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
         }
@@ -146,7 +146,7 @@ class MorePagerModule extends PagerModule {
      *
      * @return bool True if this is the first page.
      */
-    public function FirstPage() {
+    public function firstPage() {
         $Result = $this->Offset == 0;
         return $Result;
     }
@@ -159,7 +159,7 @@ class MorePagerModule extends PagerModule {
      * @param string $Limit
      * @return mixed|string
      */
-    public static function FormatUrl($Url, $Offset, $Limit = '') {
+    public static function formatUrl($Url, $Offset, $Limit = '') {
         // Check for new style page.
         if (strpos($Url, '{Page}') !== false || strpos($Url, '{Offset}') !== false) {
             $Page = PageNumber($Offset, $Limit, true);
@@ -175,7 +175,7 @@ class MorePagerModule extends PagerModule {
      *
      * @return bool True if this is the last page.
      */
-    public function LastPage() {
+    public function lastPage() {
         $Result = $this->Offset + $this->Limit >= $this->TotalRecords;
         return $Result;
     }
@@ -185,7 +185,7 @@ class MorePagerModule extends PagerModule {
      *
      * @param string The type of link to return: more or less
      */
-    public function ToString($Type = 'more') {
+    public function toString($Type = 'more') {
         if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
@@ -246,7 +246,7 @@ class MorePagerModule extends PagerModule {
     /**
      * Are there more pages after the current one?
      */
-    public function HasMorePages() {
+    public function hasMorePages() {
         return $this->TotalRecords > $this->Offset + $this->Limit;
     }
 }

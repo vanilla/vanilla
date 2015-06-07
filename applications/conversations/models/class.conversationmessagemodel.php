@@ -339,7 +339,7 @@ class ConversationMessageModel extends ConversationsModel {
                 );
                 $Story = val('Body', $Fields, '');
 
-                if (C('Conversations.Subjects.Visible')) {
+                if (c('Conversations.Subjects.Visible')) {
                     $Story = concatSep("\n\n", val('Subject', $Conversation, ''), $Story);
                 }
                 $ActivityModel->sendNotification($ActivityID, $Story);

@@ -2,7 +2,7 @@
 /**
  * Get all tutorials, or a specific one.
  */
-function GetTutorials($TutorialCode = '') {
+function getTutorials($TutorialCode = '') {
     // Define all Tutorials
     $Tutorials = array(
         array(

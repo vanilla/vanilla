@@ -18,7 +18,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param DbaController $Sender
      */
-    public function DbaController_CountJobs_Handler($Sender) {
+    public function dbaController_CountJobs_Handler($Sender) {
         $Counts = array(
             'Discussion' => array('CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'),
             'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted')
@@ -43,7 +43,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param array $Options An array of options:
      *  - DeleteMethod: One of delete, wipe, or NULL
      */
-    public function DeleteUserData($UserID, $Options = array(), &$Data = null) {
+    public function deleteUserData($UserID, $Options = array(), &$Data = null) {
         $SQL = Gdn::sql();
 
         // Remove discussion watch records and drafts.
@@ -158,7 +158,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param PermissionModel $Sender Instance of permission model that fired the event
      */
-    public function PermissionModel_DefaultPermissions_Handler($Sender) {
+    public function permissionModel_DefaultPermissions_Handler($Sender) {
         // Guest defaults
         $Sender->AddDefault(
             RoleModel::TYPE_GUEST,
@@ -304,7 +304,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param UserModel $Sender UserModel.
      */
-    public function UserModel_BeforeDeleteUser_Handler($Sender) {
+    public function userModel_BeforeDeleteUser_Handler($Sender) {
         $UserID = val('UserID', $Sender->EventArguments);
         $Options = val('Options', $Sender->EventArguments, array());
         $Options = is_array($Options) ? $Options : array();
@@ -322,7 +322,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param $Sender UserModel.
      * @return bool Whether user has permission.
      */
-    public function UserModel_GetCategoryViewPermission_Create($Sender) {
+    public function userModel_GetCategoryViewPermission_Create($Sender) {
         static $PermissionModel = null;
 
 
@@ -358,7 +358,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function Base_Render_Before($Sender) {
+    public function base_Render_Before($Sender) {
         $Session = Gdn::session();
         if ($Sender->Menu) {
             $Sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, array('Standard' => true));
@@ -373,13 +373,13 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender ProfileController.
      */
-    public function ProfileController_AddProfileTabs_Handler($Sender) {
+    public function profileController_AddProfileTabs_Handler($Sender) {
         if (is_object($Sender->User) && $Sender->User->UserID > 0) {
             $UserID = $Sender->User->UserID;
             // Add the discussion tab
             $DiscussionsLabel = sprite('SpDiscussions').' '.t('Discussions');
             $CommentsLabel = sprite('SpComments').' '.t('Comments');
-            if (C('Vanilla.Profile.ShowCounts', true)) {
+            if (c('Vanilla.Profile.ShowCounts', true)) {
                 $DiscussionsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountDiscussions', $Sender, null), "/profile/count/discussions?userid=$UserID").'</span>';
                 $CommentsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountComments', $Sender, null), "/profile/count/comments?userid=$UserID").'</span>';
             }
@@ -399,7 +399,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender
      */
-    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
+    public function profileController_AfterPreferencesDefined_Handler($Sender) {
         $Sender->Preferences['Notifications']['Email.DiscussionComment'] = t('Notify me when people comment on my discussions.');
         $Sender->Preferences['Notifications']['Email.BookmarkComment'] = t('Notify me when people comment on my bookmarked discussions.');
         $Sender->Preferences['Notifications']['Email.Mention'] = t('Notify me when people mention me.');
@@ -456,7 +456,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender
      */
-    public function ProfileController_CustomNotificationPreferences_Handler($Sender) {
+    public function profileController_CustomNotificationPreferences_Handler($Sender) {
         if (!$Sender->data('NoEmail') && Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             include $Sender->fetchViewLocation('NotificationPreferences', 'Settings', 'Vanilla');
         }
@@ -470,7 +470,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender SearchModel
      */
-    public function SearchModel_Search_Handler($Sender) {
+    public function searchModel_Search_Handler($Sender) {
         $SearchModel = new VanillaSearchModel();
         $SearchModel->Search($Sender);
     }
@@ -483,7 +483,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender SettingsController.
      */
-    public function SettingsController_DashboardData_Handler($Sender) {
+    public function settingsController_DashboardData_Handler($Sender) {
         /*
         $DiscussionModel = new DiscussionModel();
         // Number of Discussions
@@ -510,7 +510,7 @@ class VanillaHooks implements Gdn_IPlugin {
     /**
      * @param SiteLinkMenuModule $sender
      */
-    public function SiteNavModule_default_handler($sender) {
+    public function siteNavModule_default_handler($sender) {
         // Grab the default route so that we don't add a link to it twice.
         $home = trim(val('Destination', Gdn::router()->GetRoute('DefaultController')), '/');
 
@@ -541,7 +541,7 @@ class VanillaHooks implements Gdn_IPlugin {
     /**
      * @param SiteLinkMenuModule $sender
      */
-    public function SiteNavModule_profile_handler($sender) {
+    public function siteNavModule_profile_handler($sender) {
         $user = Gdn::controller()->data('Profile');
 
         if (!$user) {
@@ -567,7 +567,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender ProfileController.
      */
-    public function ProfileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
+    public function profileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
         $Sender->editMode(false);
         $View = $Sender->View;
         // Tell the ProfileController what tab to load
@@ -625,7 +625,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender ProfileController.
      */
-    public function ProfileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
+    public function profileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
         $Sender->editMode(false);
 
         // Tell the ProfileController what tab to load
@@ -684,13 +684,13 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender SettingsController.
      */
-    public function SettingsController_DefineAdminPermissions_Handler($Sender) {
+    public function settingsController_DefineAdminPermissions_Handler($Sender) {
         if (isset($Sender->RequiredAdminPermissions)) {
             $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
         }
     }
 
-    public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
+    public function gdn_Statistics_Tick_Handler($Sender, $Args) {
         $Path = Gdn::request()->Post('Path');
         $Args = Gdn::request()->Post('Args');
         parse_str($Args, $Args);
@@ -741,7 +741,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_GetAppSettingsMenuItems_Handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
         $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));
@@ -756,7 +756,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @package Vanilla
      */
-    public function Setup() {
+    public function setup() {
         $Database = Gdn::database();
         $Config = Gdn::Factory(Gdn::AliasConfig);
         $Drop = false; //Gdn::config('Vanilla.Version') === FALSE ? TRUE : FALSE;

@@ -3,7 +3,7 @@
  * This is a placeholder controller that allows plugins to have methods off of the root of the site.
  *
  * If you want to take advantage of this then do the following:
- *  1. Create a method named <code>public function RootController_MyMethod_Create($Sender, $Args)</code>.
+ *  1. Create a method named <code>public function rootController_MyMethod_Create($Sender, $Args)</code>.
  *  2. Program your method just like any other created controller method.
  *  3. When you browse to <code>/mymethod</code> your method will be called.
  *

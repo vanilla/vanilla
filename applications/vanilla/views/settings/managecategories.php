@@ -23,7 +23,7 @@ $Session = Gdn::session();
         <?php echo t('Categories are used to help organize discussions.', 'Categories are used to help organize discussions. Drag &amp; drop the categories to sort and nest them.'); ?>
     </div>
     <div class="FilterMenu"><?php
-        if (C('Vanilla.Categories.Use')) {
+        if (c('Vanilla.Categories.Use')) {
             echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
             if (checkPermission('Garden.Settings.Manage')) {
                 echo wrap(Anchor(t("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
@@ -33,7 +33,7 @@ $Session = Gdn::session();
         }
         ?></div>
 <?php
-if (C('Vanilla.Categories.Use')) {
+if (c('Vanilla.Categories.Use')) {
     ?>
     <div class="Help Aside">
         <?php

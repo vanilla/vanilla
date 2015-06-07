@@ -39,7 +39,7 @@ class GuestModule extends Gdn_Module {
      *
      * @return string
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
@@ -48,7 +48,7 @@ class GuestModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!Gdn::session()->isValid()) {
             return parent::ToString();
         }

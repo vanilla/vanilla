@@ -19,7 +19,7 @@
     echo wrap($this->Form->textBox('To', array('MultiLine' => true, 'class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
     echo '</div>';
 
-    if (C('Conversations.Subjects.Visible')) {
+    if (c('Conversations.Subjects.Visible')) {
         echo '<div class="P">';
         echo $this->Form->label('Subject', 'Subject');
         echo wrap(

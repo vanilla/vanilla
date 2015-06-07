@@ -90,7 +90,7 @@ class DbaController extends DashboardController {
     /**
      * Fix the category tree after an import that only gives a sort & parent.
      */
-    public function RebuildCategoryTree() {
+    public function rebuildCategoryTree() {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
@@ -111,7 +111,7 @@ class DbaController extends DashboardController {
      * @param $Table
      * @param $Column
      */
-    public function FixUrlCodes($Table, $Column) {
+    public function fixUrlCodes($Table, $Column) {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {

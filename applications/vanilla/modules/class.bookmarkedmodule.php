@@ -28,7 +28,7 @@ class BookmarkedModule extends Gdn_Module {
         $this->Visible = c('Vanilla.Modules.ShowBookmarkedModule', true);
     }
 
-    public function GetData() {
+    public function getData() {
         if (Gdn::session()->isValid()) {
             $BookmarkIDs = Gdn::sql()
                 ->select('DiscussionID')
@@ -56,11 +56,11 @@ class BookmarkedModule extends Gdn_Module {
         }
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (!$this->data('Bookmarks')) {
             $this->GetData();
         }

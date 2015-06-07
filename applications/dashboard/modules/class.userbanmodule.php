@@ -68,7 +68,7 @@ class UserBanModule extends GDN_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             // Only moderators can view the reasons for being banned.
             return '';

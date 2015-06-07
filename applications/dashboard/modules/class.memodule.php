@@ -21,7 +21,7 @@ class MeModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 }

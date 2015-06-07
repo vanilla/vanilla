@@ -17,16 +17,16 @@ class RecentUserModule extends Gdn_Module {
         parent::__construct($Sender);
     }
 
-    public function GetData($Limit = 20) {
+    public function getData($Limit = 20) {
         $UserModel = new UserModel();
         $this->_Sender->RecentUserData = $UserModel->GetActiveUsers($Limit);
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (!c('Garden.Modules.ShowRecentUserModule')) {
             return '';
         }

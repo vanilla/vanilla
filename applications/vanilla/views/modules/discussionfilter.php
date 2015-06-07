@@ -20,12 +20,12 @@ if ($Session->isValid()) {
 }
 
 if (!function_exists('FilterCountString')) {
-    function FilterCountString($Count, $Url = '') {
+    function filterCountString($Count, $Url = '') {
         $Count = CountString($Count, $Url);
         return $Count != '' ? '<span class="Aside">'.$Count.'</span>' : '';
     }
 }
-if (C('Vanilla.Discussions.ShowCounts', true)) {
+if (c('Vanilla.Discussions.ShowCounts', true)) {
     $Bookmarked .= FilterCountString($CountBookmarks, url('/discussions/UserBookmarkCount'));
     $MyDiscussions .= FilterCountString($CountDiscussions);
     $MyDrafts .= FilterCountString($CountDrafts);
@@ -35,8 +35,8 @@ if (C('Vanilla.Discussions.ShowCounts', true)) {
     <ul class="FilterMenu">
         <?php
         $Controller->fireEvent('BeforeDiscussionFilters');
-        //      if (C('Vanilla.Categories.ShowTabs')) {
-        if (C('Vanilla.Categories.Use')) {
+        //      if (c('Vanilla.Categories.ShowTabs')) {
+        if (c('Vanilla.Categories.Use')) {
             $CssClass = 'AllCategories';
             if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {
                 $CssClass .= ' Active';

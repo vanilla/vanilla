@@ -9,7 +9,7 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div id="Frame">
     <div id="Head">
-        <h1><?php echo anchor(C('Garden.Title').' '.Wrap(t('Visit Site')), '/'); ?></h1>
+        <h1><?php echo anchor(c('Garden.Title').' '.Wrap(t('Visit Site')), '/'); ?></h1>
 
         <div class="User">
             <?php

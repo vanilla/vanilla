@@ -99,7 +99,7 @@ class SearchController extends Gdn_Controller {
         // Fix up the summaries.
         $SearchTerms = explode(' ', Gdn_Format::text($Search));
         foreach ($ResultSet as &$Row) {
-            $Row['Summary'] = SearchExcerpt(Gdn_Format::PlainText($Row['Summary'], $Row['Format']), $SearchTerms);
+            $Row['Summary'] = SearchExcerpt(Gdn_Format::plainText($Row['Summary'], $Row['Format']), $SearchTerms);
             $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
             $Row['Format'] = 'Html';
         }

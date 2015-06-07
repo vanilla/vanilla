@@ -105,7 +105,7 @@ class SetupController extends DashboardController {
      * @access public
      * @param string $RedirectUrl Where to send user afterward.
      */
-    private function Configure($RedirectUrl = '') {
+    private function configure($RedirectUrl = '') {
         // Create a model to save configuration settings
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -327,7 +327,7 @@ class SetupController extends DashboardController {
         return $this->Form->errorCount() == 0 ? true : false;
     }
 
-    public function TestUrlRewrites() {
+    public function testUrlRewrites() {
         die('ok');
     }
 }

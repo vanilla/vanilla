@@ -16,7 +16,7 @@ require_once $this->fetchViewLocation('helper_functions');
 </div>
 
 <?php
-if (C('Vanilla.Discussions.Layout') == 'table'):
+if (c('Vanilla.Discussions.Layout') == 'table'):
     if (!function_exists('WriteDiscussionHeading'))
         require_once $this->fetchViewLocation('table_functions');
     ?>

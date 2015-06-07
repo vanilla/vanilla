@@ -19,7 +19,7 @@ class Smf2ImportModel extends Gdn_Model {
     /**
      * Finalize the import.
      */
-    public function AfterImport() {
+    public function afterImport() {
         // Make different sizes of avatars
         $this->ProcessAvatars();
     }
@@ -27,7 +27,7 @@ class Smf2ImportModel extends Gdn_Model {
     /**
      * Create different sizes of user photos.
      */
-    public function ProcessAvatars() {
+    public function processAvatars() {
         $UploadImage = new Gdn_UploadImage();
         $UserData = $this->SQL->select('u.Photo')->from('User u')->get();
         foreach ($UserData->result() as $User) {

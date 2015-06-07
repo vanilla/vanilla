@@ -482,8 +482,8 @@ class ProfileController extends Gdn_Controller {
 
         // if ($this->User->UserID == Gdn::session()->UserID)
         //    return $this->Notifications($Page);
-        // elseif (C('Garden.Profile.ShowActivities', true))
-        if (C('Garden.Profile.ShowActivities', true)) {
+        // elseif (c('Garden.Profile.ShowActivities', true))
+        if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
         } else {
             return Gdn::dispatcher()->dispatch(userUrl($this->User, '', 'discussions'));
@@ -613,7 +613,7 @@ class ProfileController extends Gdn_Controller {
         $this->render();
     }
 
-    public function NotificationsPopin() {
+    public function notificationsPopin() {
         $this->permission('Garden.SignIn.Allow');
 
         $Where = array(
@@ -646,7 +646,7 @@ class ProfileController extends Gdn_Controller {
         // password in Vanilla, they will then be able to log into Vanilla using
         // Vanilla's login form regardless of the state of their membership in the
         // external app.
-        if (C('Garden.Registration.Method') == 'Connect') {
+        if (c('Garden.Registration.Method') == 'Connect') {
             Gdn::dispatcher()->dispatch('DefaultPermission');
             exit();
         }
@@ -863,7 +863,7 @@ class ProfileController extends Gdn_Controller {
         // Define the preferences to be managed
         $Notifications = array();
 
-        if (C('Garden.Profile.ShowActivities', true)) {
+        if (c('Garden.Profile.ShowActivities', true)) {
             $Notifications = array(
                 'Email.WallComment' => t('Notify me when people write on my wall.'),
                 'Email.ActivityComment' => t('Notify me when people reply to my wall comments.'),
@@ -1372,7 +1372,7 @@ class ProfileController extends Gdn_Controller {
             // password in Vanilla, they will then be able to log into Vanilla using
             // Vanilla's login form regardless of the state of their membership in the
             // external app.
-            if (C('Garden.UserAccount.AllowEdit') && c('Garden.Registration.Method') != 'Connect') {
+            if (c('Garden.UserAccount.AllowEdit') && c('Garden.Registration.Method') != 'Connect') {
                 // No password may have been set if they have only signed in with a connect plugin
                 $PasswordLabel = t('Change My Password');
                 if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla") {
@@ -1437,7 +1437,7 @@ class ProfileController extends Gdn_Controller {
             }
 
             // Show activity?
-            if (C('Garden.Profile.ShowActivities', true)) {
+            if (c('Garden.Profile.ShowActivities', true)) {
                 $this->addProfileTab(t('Activity'), $ActivityUrl, 'Activity', sprite('SpActivity').' '.t('Activity'));
             }
 
@@ -1454,7 +1454,7 @@ class ProfileController extends Gdn_Controller {
             }
 
             // Show invitations?
-            if (C('Garden.Registration.Method') == 'Invitation') {
+            if (c('Garden.Registration.Method') == 'Invitation') {
                 $this->addProfileTab(t('Invitations'), 'profile/invitations', 'InvitationsLink', sprite('SpInvitations').' '.t('Invitations'));
             }
 
@@ -1511,7 +1511,7 @@ class ProfileController extends Gdn_Controller {
      * @param bool $CheckPermissions Whether or not to check user permissions.
      * @return bool Always true.
      */
-    public function GetUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = false) {
+    public function getUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = false) {
         if ($this->_UserInfoRetrieved) {
             return;
         }
@@ -1585,7 +1585,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $UserID Unique ID.
      * @return string Relative URL path.
      */
-    public function ProfileUrl($UserReference = null, $UserID = null) {
+    public function profileUrl($UserReference = null, $UserID = null) {
         if (!property_exists($this, 'User')) {
             $this->getUserInfo();
         }
@@ -1605,7 +1605,7 @@ class ProfileController extends Gdn_Controller {
         }
     }
 
-    public function GetProfileUrl($UserReference = null, $UserID = null) {
+    public function getProfileUrl($UserReference = null, $UserID = null) {
         if (!property_exists($this, 'User')) {
             $this->getUserInfo();
         }
@@ -1635,7 +1635,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Controller Controller name. Defaults to Profile.
      * @param string $Application Application name. Defaults to Dashboard.
      */
-    public function SetTabView($CurrentTab, $View = '', $Controller = 'Profile', $Application = 'Dashboard') {
+    public function setTabView($CurrentTab, $View = '', $Controller = 'Profile', $Application = 'Dashboard') {
         $this->BuildProfile();
         if ($View == '') {
             $View = $CurrentTab;
@@ -1656,7 +1656,7 @@ class ProfileController extends Gdn_Controller {
         $this->_CurrentTab = $this->CurrentTab; // Backwards Compat
     }
 
-    public function EditMode($Switch) {
+    public function editMode($Switch) {
 
         $this->EditMode = $Switch;
         if (!$this->EditMode && strpos($this->CssClass, 'EditMode') !== false) {
@@ -1676,7 +1676,7 @@ class ProfileController extends Gdn_Controller {
      * Note: API only
      * @param type $UserID
      */
-    public function Multi($UserID) {
+    public function multi($UserID) {
         $this->permission('Garden.Settings.Manage');
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->deliveryType(DELIVERY_TYPE_DATA);
@@ -1685,7 +1685,7 @@ class ProfileController extends Gdn_Controller {
         unset($this->Data['Counts']);
 
         $UserID = (array)$UserID;
-        $Users = Gdn::userModel()->GetIDs($UserID);
+        $Users = Gdn::userModel()->getIDs($UserID);
 
         $AllowedFields = array('UserID', 'Name', 'Title', 'Location', 'About', 'Email', 'Gender', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Admin', 'Verified', 'Banned', 'Deleted', 'CountDiscussions', 'CountComments', 'CountBookmarks', 'CountBadges', 'Points', 'Punished', 'RankID', 'PhotoUrl', 'Online', 'LastOnlineDate');
         $AllowedFields = array_fill_keys($AllowedFields, null);

@@ -43,7 +43,7 @@ if (!function_exists('WriteComment'))
         }
 
         // Send the user to the discussion in the forum when paging
-        if (C('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
+        if (c('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
             $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
             echo '<div class="PageToForum Foot">';
             echo anchor(t('More Comments'), $DiscussionUrl);

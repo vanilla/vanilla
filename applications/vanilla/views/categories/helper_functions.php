@@ -9,7 +9,7 @@ if (!function_exists('CategoryHeading')):
      * @return string
      * @since 2.1
      */
-    function CategoryHeading() {
+    function categoryHeading() {
         return t('Categories');
     }
 
@@ -21,7 +21,7 @@ if (!function_exists('CategoryPhoto')):
      *
      * @since 2.1
      */
-    function CategoryPhoto($Row) {
+    function categoryPhoto($Row) {
         $PhotoUrl = val('PhotoUrl', $Row);
 
         if ($PhotoUrl) {
@@ -43,7 +43,7 @@ endif;
 
 if (!function_exists('CategoryString')):
 
-    function CategoryString($Rows) {
+    function categoryString($Rows) {
         $Result = '';
         foreach ($Rows as $Row) {
             if ($Result)
@@ -58,7 +58,7 @@ if (!function_exists('GetOptions')):
     /**
      * Render options that the user has for this category.
      */
-    function GetOptions($Category) {
+    function getOptions($Category) {
         if (!Gdn::session()->isValid())
             return;
 
@@ -97,7 +97,7 @@ if (!function_exists('GetOptions')):
 endif;
 
 if (!function_exists('MostRecentString')):
-    function MostRecentString($Row) {
+    function mostRecentString($Row) {
         if (!$Row['LastTitle'])
             return '';
 
@@ -138,7 +138,7 @@ endif;
 
 if (!function_exists('WriteListItem')):
 
-    function WriteListItem($Row, $Depth = 1) {
+    function writeListItem($Row, $Depth = 1) {
         $Children = $Row['Children'];
         $WriteChildren = FALSE;
         if (!empty($Children)) {
@@ -211,7 +211,7 @@ endif;
 
 if (!function_exists('WriteTableHead')):
 
-    function WriteTableHead() {
+    function writeTableHead() {
         ?>
         <tr>
             <td class="CategoryName">
@@ -233,7 +233,7 @@ endif;
 
 if (!function_exists('WriteTableRow')):
 
-    function WriteTableRow($Row, $Depth = 1) {
+    function writeTableRow($Row, $Depth = 1) {
         $Children = $Row['Children'];
         $WriteChildren = FALSE;
         if (!empty($Children)) {
@@ -336,7 +336,7 @@ endif;
 
 if (!function_exists('WriteCategoryList')):
 
-    function WriteCategoryList($Categories, $Depth = 1) {
+    function writeCategoryList($Categories, $Depth = 1) {
         ?>
         <div class="DataListWrap">
             <ul class="DataList CategoryList">
@@ -353,7 +353,7 @@ endif;
 
 if (!function_exists('WriteCategoryTable')):
 
-    function WriteCategoryTable($Categories, $Depth = 1) {
+    function writeCategoryTable($Categories, $Depth = 1) {
         ?>
         <div class="DataTableWrap">
             <table class="DataTable CategoryTable">

@@ -74,7 +74,7 @@ class DiscussionModel extends VanillaModel {
         return $canEdit;
     }
 
-    public function Counts($Column, $From = false, $To = false, $Max = false) {
+    public function counts($Column, $From = false, $To = false, $Max = false) {
         $Result = array('Complete' => true);
         switch ($Column) {
             case 'CountComments':
@@ -144,7 +144,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
      */
-    public function DiscussionSummaryQuery($AdditionalFields = array(), $Join = true) {
+    public function discussionSummaryQuery($AdditionalFields = array(), $Join = true) {
         // Verify permissions (restricting by category if necessary)
         if ($this->Watching) {
             $Perms = CategoryModel::CategoryWatch();
@@ -204,7 +204,7 @@ class DiscussionModel extends VanillaModel {
         $this->fireEvent('AfterDiscussionSummaryQuery');
     }
 
-    public static function DiscussionTypes() {
+    public static function discussionTypes() {
         if (!self::$_DiscussionTypes) {
             $DiscussionTypes = array('Discussion' => array(
                 'Singular' => 'Discussion',
@@ -238,7 +238,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
      * @return Gdn_DataSet SQL result.
      */
-    public function Get($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = null) {
+    public function get($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = null) {
         if ($Limit == '') {
             $Limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
         }
@@ -320,7 +320,7 @@ class DiscussionModel extends VanillaModel {
         // Change discussions returned based on additional criteria
         $this->AddDiscussionColumns($Data);
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Data);
         }
 
@@ -331,7 +331,7 @@ class DiscussionModel extends VanillaModel {
         return $Data;
     }
 
-    public function GetWhere($Where = array(), $Offset = 0, $Limit = false) {
+    public function getWhere($Where = array(), $Offset = 0, $Limit = false) {
         if (!$Limit) {
             $Limit = c('Vanilla.Discussions.PerPage', 30);
         }
@@ -432,7 +432,7 @@ class DiscussionModel extends VanillaModel {
         Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
         CategoryModel::JoinCategories($Data);
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Data);
         }
 
@@ -459,7 +459,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
      * @return Gdn_DataSet SQL result.
      */
-    public function GetUnread($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = null) {
+    public function getUnread($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = null) {
         if ($Limit == '') {
             $Limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
         }
@@ -546,7 +546,7 @@ class DiscussionModel extends VanillaModel {
         Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
         CategoryModel::JoinCategories($Data);
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Data);
         }
 
@@ -565,7 +565,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param object $Data SQL result.
      */
-    public function RemoveAnnouncements($Data) {
+    public function removeAnnouncements($Data) {
         $Result =& $Data->result();
         $Unset = false;
 
@@ -595,7 +595,7 @@ class DiscussionModel extends VanillaModel {
      * @deprecated since version 2.1.26a
      * @param type $Discussions
      */
-    public function AddDenormalizedViews(&$Discussions) {
+    public function addDenormalizedViews(&$Discussions) {
 
         if ($Discussions instanceof Gdn_DataSet) {
             $Result = $Discussions->result();
@@ -628,7 +628,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param object $Data SQL result.
      */
-    public function AddDiscussionColumns($Data) {
+    public function addDiscussionColumns($Data) {
         // Change discussions based on archiving.
         $Result = &$Data->result();
         foreach ($Result as &$Discussion) {
@@ -636,7 +636,7 @@ class DiscussionModel extends VanillaModel {
         }
     }
 
-    public function Calculate(&$Discussion) {
+    public function calculate(&$Discussion) {
         $ArchiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
 
         // Fix up output
@@ -733,7 +733,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param object $Sql Gdn_SQLDriver
      */
-    public function AddArchiveWhere($Sql = null) {
+    public function addArchiveWhere($Sql = null) {
         if (is_null($Sql)) {
             $Sql = $this->SQL;
         }
@@ -757,7 +757,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $Wheres SQL conditions.
      * @return object SQL result.
      */
-    public function GetAnnouncements($Wheres = '') {
+    public function getAnnouncements($Wheres = '') {
         $Session = Gdn::session();
         $Limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
         $Offset = 0;
@@ -825,7 +825,7 @@ class DiscussionModel extends VanillaModel {
         }
 
         // If we allow users to dismiss discussions, skip ones this user dismissed
-        if (C('Vanilla.Discussions.Dismiss', 1) && $UserID) {
+        if (c('Vanilla.Discussions.Dismiss', 1) && $UserID) {
             $this->SQL
                 ->where('coalesce(w.Dismissed, \'0\')', '0', false);
         }
@@ -845,7 +845,7 @@ class DiscussionModel extends VanillaModel {
 
         $this->AddDiscussionColumns($Data);
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Data);
         }
 
@@ -863,7 +863,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $CategoryID Category ID,
      * @return string $Key CacheKey name to be used for cache.
      */
-    public function GetAnnouncementCacheKey($CategoryID = 0) {
+    public function getAnnouncementCacheKey($CategoryID = 0) {
         $Key = 'Announcements';
         if (!is_array($CategoryID) && $CategoryID > 0) {
             $Key .= ':'.$CategoryID;
@@ -880,7 +880,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $DiscussionID Unique ID to find bookmarks for.
      * @return object SQL result.
      */
-    public function GetBookmarkUsers($DiscussionID) {
+    public function getBookmarkUsers($DiscussionID) {
         return $this->SQL
             ->select('UserID')
             ->from('UserDiscussion')
@@ -905,7 +905,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $WatchUserID User to use for read/unread data.
      * @return Gdn_DataSet SQL results.
      */
-    public function GetByUser($UserID, $Limit, $Offset, $LastDiscussionID = false, $WatchUserID = false) {
+    public function getByUser($UserID, $Limit, $Offset, $LastDiscussionID = false, $WatchUserID = false) {
         $Perms = DiscussionModel::CategoryPermissions();
 
         if (is_array($Perms) && empty($Perms)) {
@@ -996,7 +996,7 @@ class DiscussionModel extends VanillaModel {
         Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
         CategoryModel::JoinCategories($Data);
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Data);
         }
 
@@ -1011,7 +1011,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $DiscussionID
      * @return Gdn_DataSet
      */
-    public function GetParticipatedUsers($DiscussionID) {
+    public function getParticipatedUsers($DiscussionID) {
         return $this->SQL
             ->select('UserID')
             ->from('UserDiscussion')
@@ -1029,13 +1029,13 @@ class DiscussionModel extends VanillaModel {
      * @param bool $Escape Prepends category IDs with @
      * @return array Protected local _CategoryPermissions
      */
-    public static function CategoryPermissions($Escape = false) {
+    public static function categoryPermissions($Escape = false) {
         if (is_null(self::$_CategoryPermissions)) {
             $Session = Gdn::session();
 
             if ((is_object($Session->User) && $Session->User->Admin)) {
                 self::$_CategoryPermissions = true;
-            } elseif (C('Garden.Permissions.Disabled.Category')) {
+            } elseif (c('Garden.Permissions.Disabled.Category')) {
                 if ($Session->checkPermission('Vanilla.Discussions.View')) {
                     self::$_CategoryPermissions = true;
                 } else {
@@ -1068,7 +1068,7 @@ class DiscussionModel extends VanillaModel {
         return self::$_CategoryPermissions;
     }
 
-    public function FetchPageInfo($Url, $ThrowError = false) {
+    public function fetchPageInfo($Url, $ThrowError = false) {
         $PageInfo = FetchPageInfo($Url, 3, $ThrowError);
 
         $Title = val('Title', $PageInfo, '');
@@ -1122,7 +1122,7 @@ class DiscussionModel extends VanillaModel {
      * @param bool $ForceNoAnnouncements Not used.
      * @return int Number of discussions.
      */
-    public function GetCount($Wheres = '', $ForceNoAnnouncements = false) {
+    public function getCount($Wheres = '', $ForceNoAnnouncements = false) {
         if (is_array($Wheres) && count($Wheres) == 0) {
             $Wheres = '';
         }
@@ -1209,7 +1209,7 @@ class DiscussionModel extends VanillaModel {
      * @param bool $ForceNoAnnouncements Not used.
      * @return int Number of discussions.
      */
-    public function GetUnreadCount($Wheres = '', $ForceNoAnnouncements = false) {
+    public function getUnreadCount($Wheres = '', $ForceNoAnnouncements = false) {
         if (is_array($Wheres) && count($Wheres) == 0) {
             $Wheres = '';
         }
@@ -1285,7 +1285,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $ForeignID Foreign ID of discussion to get.
      * @return object SQL result.
      */
-    public function GetForeignID($ForeignID, $Type = '') {
+    public function getForeignID($ForeignID, $Type = '') {
         $Hash = ForeignIDHash($ForeignID);
         $Session = Gdn::session();
         $this->fireEvent('BeforeGetForeignID');
@@ -1318,7 +1318,7 @@ class DiscussionModel extends VanillaModel {
             ->get()
             ->firstRow();
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Discussion);
         }
 
@@ -1334,7 +1334,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $DiscussionID Unique ID of discussion to get.
      * @return object SQL result.
      */
-    public function GetID($DiscussionID, $DataSetType = DATASET_TYPE_OBJECT, $Options = array()) {
+    public function getID($DiscussionID, $DataSetType = DATASET_TYPE_OBJECT, $Options = array()) {
         $Session = Gdn::session();
         $this->fireEvent('BeforeGetID');
 
@@ -1364,7 +1364,7 @@ class DiscussionModel extends VanillaModel {
 
         $this->Calculate($Discussion);
 
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Discussion);
         }
 
@@ -1380,7 +1380,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $DiscussionIDs Array of DiscussionIDs to get.
      * @return object SQL result.
      */
-    public function GetIn($DiscussionIDs) {
+    public function getIn($DiscussionIDs) {
         $Session = Gdn::session();
         $this->fireEvent('BeforeGetIn');
         $Result = $this->SQL
@@ -1406,7 +1406,7 @@ class DiscussionModel extends VanillaModel {
             ->get();
 
         // Spliting views off to side table. Aggregate cached keys here.
-        if (C('Vanilla.Views.Denormalize', false)) {
+        if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Result);
         }
 
@@ -1418,16 +1418,16 @@ class DiscussionModel extends VanillaModel {
      *
      * @return string Column name.
      */
-    public static function GetSortField() {
+    public static function getSortField() {
         $SortField = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
-        if (C('Vanilla.Discussions.UserSortField')) {
+        if (c('Vanilla.Discussions.UserSortField')) {
             $SortField = Gdn::session()->GetPreference('Discussions.SortField', $SortField);
         }
 
         return $SortField;
     }
 
-    public static function GetViewsFallback($DiscussionID) {
+    public static function getViewsFallback($DiscussionID) {
 
         // Not found. Check main table.
         $Views = val('CountViews', Gdn::sql()
@@ -1453,7 +1453,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $DiscussionID Unique ID of discussion being affected.
      * @param int $UserID Unique ID of the user being affected.
      */
-    public function DismissAnnouncement($DiscussionID, $UserID) {
+    public function dismissAnnouncement($DiscussionID, $UserID) {
         $Count = $this->SQL
             ->select('UserID')
             ->from('UserDiscussion')
@@ -1501,7 +1501,7 @@ class DiscussionModel extends VanillaModel {
      * @param string $Property
      * @param mixed $Value
      */
-    public function SetField($RowID, $Property, $Value = false) {
+    public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
             $Property = array($Property => $Value);
         }
@@ -1524,7 +1524,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $FormPostValues Data sent from the form model.
      * @return int $DiscussionID Unique ID of the discussion.
      */
-    public function Save($FormPostValues) {
+    public function save($FormPostValues) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -1635,7 +1635,7 @@ class DiscussionModel extends VanillaModel {
                     $Stored = $this->getID($DiscussionID, DATASET_TYPE_OBJECT);
 
                     // Block Format change if we're forcing the formatter.
-                    if (C('Garden.ForceInputFormatter')) {
+                    if (c('Garden.ForceInputFormatter')) {
                         unset($Fields['Format']);
                     }
 
@@ -1668,7 +1668,7 @@ class DiscussionModel extends VanillaModel {
                         $Fields['Format'] = c('Garden.InputFormatter', '');
                     }
 
-                    if (C('Vanilla.QueueNotifications')) {
+                    if (c('Vanilla.QueueNotifications')) {
                         $Fields['Notified'] = ActivityModel::SENT_PENDING;
                     }
 
@@ -1753,7 +1753,7 @@ class DiscussionModel extends VanillaModel {
                     );
 
                     // Allow simple fulltext notifications
-                    if (C('Vanilla.Activity.ShowDiscussionBody', false)) {
+                    if (c('Vanilla.Activity.ShowDiscussionBody', false)) {
                         $Activity['Story'] = $Story;
                     }
 
@@ -1834,7 +1834,7 @@ class DiscussionModel extends VanillaModel {
      * @param type $NotifiedUsers
      * @param ActivityModel $ActivityModel
      */
-    public function NotifyNewDiscussion($Discussion, $ActivityModel, $Activity) {
+    public function notifyNewDiscussion($Discussion, $ActivityModel, $Activity) {
         if (is_numeric($Discussion)) {
             $Discussion = $this->getID($Discussion);
         }
@@ -1912,7 +1912,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param int $CategoryID Unique ID of category we are updating.
      */
-    public function UpdateDiscussionCount($CategoryID, $Discussion = false) {
+    public function updateDiscussionCount($CategoryID, $Discussion = false) {
         $DiscussionID = val('DiscussionID', $Discussion, false);
         if (strcasecmp($CategoryID, 'All') == 0) {
             $Exclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
@@ -1975,7 +1975,7 @@ class DiscussionModel extends VanillaModel {
         }
     }
 
-    public function IncrementNewDiscussion($Discussion) {
+    public function incrementNewDiscussion($Discussion) {
         if (is_numeric($Discussion)) {
             $Discussion = $this->getID($Discussion);
         }
@@ -2006,7 +2006,7 @@ class DiscussionModel extends VanillaModel {
         }
     }
 
-    public function UpdateUserDiscussionCount($UserID, $Inc = false) {
+    public function updateUserDiscussionCount($UserID, $Inc = false) {
         if ($Inc) {
             $User = Gdn::userModel()->getID($UserID);
 
@@ -2042,7 +2042,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $UserID Unique ID of user to update.
      * @return int Total number of bookmarks user has.
      */
-    public function SetUserBookmarkCount($UserID) {
+    public function setUserBookmarkCount($UserID) {
         $Count = $this->UserBookmarkCount($UserID);
         Gdn::userModel()->setField($UserID, 'CountBookmarks', $Count);
 
@@ -2061,7 +2061,7 @@ class DiscussionModel extends VanillaModel {
      * @param mixed $ForceValue If set, overrides toggle behavior with this value.
      * @return mixed Value that was ultimately set for the field.
      */
-    public function SetProperty($DiscussionID, $Property, $ForceValue = null) {
+    public function setProperty($DiscussionID, $Property, $ForceValue = null) {
         if ($ForceValue !== null) {
             $Value = $ForceValue;
         } else {
@@ -2089,7 +2089,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $Score New score for discussion.
      * @return int Total score.
      */
-    public function SetUserScore($DiscussionID, $UserID, $Score) {
+    public function setUserScore($DiscussionID, $UserID, $Score) {
         // Insert or update the UserDiscussion row
         $this->SQL->replace(
             'UserDiscussion',
@@ -2124,7 +2124,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $UserID Unique ID of user whose score we're getting.
      * @return int Total score.
      */
-    public function GetUserScore($DiscussionID, $UserID) {
+    public function getUserScore($DiscussionID, $UserID) {
         $Data = $this->SQL->select('Score')
             ->from('UserDiscussion')
             ->where('DiscussionID', $DiscussionID)
@@ -2143,9 +2143,9 @@ class DiscussionModel extends VanillaModel {
      *
      * @param int $DiscussionID Unique ID of discussion to get +1 view.
      */
-    public function AddView($DiscussionID) {
+    public function addView($DiscussionID) {
         $IncrementBy = 0;
-        if (C('Vanilla.Views.Denormalize', false) &&
+        if (c('Vanilla.Views.Denormalize', false) &&
             Gdn::cache()->activeEnabled() &&
             Gdn::cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL
         ) {
@@ -2185,7 +2185,7 @@ class DiscussionModel extends VanillaModel {
      * @param bool|null $Bookmarked Whether or not to bookmark or unbookmark. Pass null to toggle the bookmark.
      * @return bool The new value of bookmarked.
      */
-    public function Bookmark($DiscussionID, $UserID, $Bookmarked = null) {
+    public function bookmark($DiscussionID, $UserID, $Bookmarked = null) {
         // Get the current user discussion record.
         $UserDiscussion = $this->SQL->getWhere(
             'UserDiscussion',
@@ -2238,7 +2238,7 @@ class DiscussionModel extends VanillaModel {
      * @param object $Discussion Discussion data.
      * @return bool Current state of the bookmark (TRUE for bookmarked, FALSE for unbookmarked).
      */
-    public function BookmarkDiscussion($DiscussionID, $UserID, &$Discussion = null) {
+    public function bookmarkDiscussion($DiscussionID, $UserID, &$Discussion = null) {
         $State = '1';
 
         $DiscussionData = $this->SQL
@@ -2305,7 +2305,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $DiscussionID Unique ID of discussion for which to tally bookmarks.
      * @return int Total number of bookmarks.
      */
-    public function BookmarkCount($DiscussionID) {
+    public function bookmarkCount($DiscussionID) {
         $Data = $this->SQL
             ->select('DiscussionID', 'count', 'Count')
             ->from('UserDiscussion')
@@ -2326,7 +2326,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $UserID Unique ID of user for which to tally bookmarks.
      * @return int Total number of bookmarks.
      */
-    public function UserBookmarkCount($UserID) {
+    public function userBookmarkCount($UserID) {
         $Data = $this->SQL
             ->select('ud.DiscussionID', 'count', 'Count')
             ->from('UserDiscussion ud')
@@ -2350,7 +2350,7 @@ class DiscussionModel extends VanillaModel {
      * @param int $DiscussionID Unique ID of discussion to delete.
      * @return bool Always returns TRUE.
      */
-    public function Delete($DiscussionID, $Options = array()) {
+    public function delete($DiscussionID, $Options = array()) {
         // Retrieve the users who have bookmarked this discussion.
         $BookmarkData = $this->GetBookmarkUsers($DiscussionID);
 
@@ -2425,7 +2425,7 @@ class DiscussionModel extends VanillaModel {
      * @param string Serialized array.
      * @return string Comma-separated tags.
      */
-    protected function FormatTags($Tags) {
+    protected function formatTags($Tags) {
         // Don't bother if there aren't any tags
         if (!$Tags) {
             return '';
@@ -2449,7 +2449,7 @@ class DiscussionModel extends VanillaModel {
     /**
      * Getter/setter for protected $AllowedSortFields array.
      */
-    public static function AllowedSortFields($Allowed = null) {
+    public static function allowedSortFields($Allowed = null) {
         if (is_array($Allowed)) {
             self::$AllowedSortFields = $Allowed;
         }

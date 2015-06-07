@@ -54,7 +54,7 @@ if (!class_exists('MenuModule', false)) {
          * @param string $Attributes
          * @param string $AnchorAttributes
          */
-        public function AddLink($Group, $Text, $Url, $Permission = false, $Attributes = '', $AnchorAttributes = '') {
+        public function addLink($Group, $Text, $Url, $Permission = false, $Attributes = '', $AnchorAttributes = '') {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->Items[$Group] = array();
             }
@@ -70,7 +70,7 @@ if (!class_exists('MenuModule', false)) {
          * @param bool $Permission
          * @param string $Attributes
          */
-        public function AddItem($Group, $Text, $Permission = false, $Attributes = '') {
+        public function addItem($Group, $Text, $Permission = false, $Attributes = '') {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->Items[$Group] = array();
             }
@@ -83,14 +83,14 @@ if (!class_exists('MenuModule', false)) {
          *
          * @return string
          */
-        public function AssetTarget() {
+        public function assetTarget() {
             return 'Menu';
         }
 
         /**
          *
          */
-        public function ClearGroups() {
+        public function clearGroups() {
             $this->Items = array();
         }
 
@@ -99,7 +99,7 @@ if (!class_exists('MenuModule', false)) {
          *
          * @param $Route
          */
-        public function HighlightRoute($Route) {
+        public function highlightRoute($Route) {
             $this->_HighlightRoute = $Route;
         }
 
@@ -109,7 +109,7 @@ if (!class_exists('MenuModule', false)) {
          * @param $Group
          * @param $Text
          */
-        public function RemoveLink($Group, $Text) {
+        public function removeLink($Group, $Text) {
             if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
                 foreach ($this->Items[$Group] as $Index => $GroupArray) {
                     if ($this->Items[$Group][$Index]['Text'] == $Text) {
@@ -124,14 +124,14 @@ if (!class_exists('MenuModule', false)) {
         /**
          * Removes all links from a specific group.
          */
-        public function RemoveLinks($Group) {
+        public function removeLinks($Group) {
             $this->Items[$Group] = array();
         }
 
         /**
          * Removes an entire group of links, and the group itself, from the menu.
          */
-        public function RemoveGroup($Group) {
+        public function removeGroup($Group) {
             if (array_key_exists($Group, $this->Items)) {
                 unset($this->Items[$Group]);
             }
@@ -144,7 +144,7 @@ if (!class_exists('MenuModule', false)) {
          * @return string
          * @throws Exception
          */
-        public function ToString($HighlightRoute = '') {
+        public function toString($HighlightRoute = '') {
             if ($HighlightRoute == '') {
                 $HighlightRoute = $this->_HighlightRoute;
             }

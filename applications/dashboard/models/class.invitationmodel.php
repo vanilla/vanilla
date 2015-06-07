@@ -26,7 +26,7 @@ class InvitationModel extends Gdn_Model {
      * @param $InvitationID
      * @return array|bool|stdClass
      */
-    public function GetByInvitationID($InvitationID) {
+    public function getByInvitationID($InvitationID) {
         $DataSet = $this->SQL->from('Invitation i')
             ->join('User su', 'i.InsertUserID = su.UserID')
             ->join('User au', 'i.AcceptedUserID = au.UserID', 'left')
@@ -52,7 +52,7 @@ class InvitationModel extends Gdn_Model {
      * @return Gdn_DataSet
      * @throws Exception
      */
-    public function GetByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
+    public function getByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
         $this->SQL->select('i.*')
             ->select('u.Name', '', 'AcceptedName')
             ->from('Invitation i')
@@ -78,7 +78,7 @@ class InvitationModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function Save($FormPostValues, $UserModel, $Options = array()) {
+    public function save($FormPostValues, $UserModel, $Options = array()) {
         $Session = Gdn::session();
         $UserID = $Session->UserID;
         $SendEmail = val('SendEmail', $Options, true);
@@ -93,7 +93,7 @@ class InvitationModel extends Gdn_Model {
         // Make sure required db fields are present.
         $this->AddInsertFields($FormPostValues);
         if (!isset($FormPostValues['DateExpires'])) {
-            $Expires = strtotime(C('Garden.Registration.InviteExpiration'));
+            $Expires = strtotime(c('Garden.Registration.InviteExpiration'));
             if ($Expires > time()) {
                 $FormPostValues['DateExpires'] = Gdn_Format::toDateTime($Expires);
             }
@@ -169,7 +169,7 @@ class InvitationModel extends Gdn_Model {
      * @param $InvitationID
      * @throws Exception
      */
-    public function Send($InvitationID) {
+    public function send($InvitationID) {
         $Invitation = $this->GetByInvitationID($InvitationID);
         $Session = Gdn::session();
         if ($Invitation === false) {
@@ -203,7 +203,7 @@ class InvitationModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function Delete($InvitationID) {
+    public function delete($InvitationID) {
         $Session = Gdn::session();
         $UserID = $Session->UserID;
 
@@ -234,7 +234,7 @@ class InvitationModel extends Gdn_Model {
     /**
      * Returns a unique 8 character invitation code.
      */
-    protected function GetInvitationCode() {
+    protected function getInvitationCode() {
         // Generate a new invitation code.
         $Code = BetterRandomString(16, 'Aa0');
 

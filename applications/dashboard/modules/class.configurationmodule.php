@@ -49,7 +49,7 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @return Gdn_Controller
      */
-    public function Controller() {
+    public function controller() {
         return $this->_Sender;
     }
 
@@ -59,7 +59,7 @@ class ConfigurationModule extends Gdn_Module {
      * @param Gdn_Form $NewValue
      * @return Gdn_Form
      */
-    public function Form($NewValue = null) {
+    public function form($NewValue = null) {
         static $Form = null;
 
         if ($NewValue !== null) {
@@ -75,7 +75,7 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @return bool
      */
-    public function HasFiles() {
+    public function hasFiles() {
         static $HasFiles = null;
 
         if ($HasFiles === null) {
@@ -151,7 +151,7 @@ class ConfigurationModule extends Gdn_Module {
      * @param $SchemaRow
      * @return bool|mixed|string
      */
-    public function LabelCode($SchemaRow) {
+    public function labelCode($SchemaRow) {
         if (isset($SchemaRow['LabelCode'])) {
             return $SchemaRow['LabelCode'];
         }
@@ -177,7 +177,7 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @throws Exception
      */
-    public function RenderAll() {
+    public function renderAll() {
         $this->RenderAll = true;
         $Controller = $this->Controller();
         $Controller->ConfigurationModule = $this;
@@ -191,7 +191,7 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @param array $Def A list of fields from the config that this form will use.
      */
-    public function Schema($Def = null) {
+    public function schema($Def = null) {
         if ($Def !== null) {
             $Schema = array();
 

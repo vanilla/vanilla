@@ -18,16 +18,16 @@ class CategoryModeratorsModule extends Gdn_Module {
         $this->ModeratorData = false;
     }
 
-    public function GetData($Category) {
+    public function getData($Category) {
         $this->ModeratorData = array($Category);
         CategoryModel::JoinModerators($this->ModeratorData);
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (is_array($this->ModeratorData)
             && count($this->ModeratorData) > 0
             && is_array($this->ModeratorData[0]->Moderators)

@@ -13,11 +13,11 @@
  */
 class ProfileOptionsModule extends Gdn_Module {
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
-    public function ToString() {
+    public function toString() {
         $Session = Gdn::session();
         $Controller = Gdn::controller();
         $UserID = $Controller->User->UserID;

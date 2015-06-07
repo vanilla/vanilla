@@ -78,7 +78,7 @@ class BanModel extends Gdn_Model {
      * @param array $NewBan Data about the new ban.
      * @param array $OldBan Data about the old ban.
      */
-    public function ApplyBan($NewBan = null, $OldBan = null) {
+    public function applyBan($NewBan = null, $OldBan = null) {
         if (!$NewBan && !$OldBan) {
             return;
         }
@@ -145,7 +145,7 @@ class BanModel extends Gdn_Model {
      *    Valid values for BanType are email, ipaddress or name.
      * @return array
      */
-    public function BanWhere($Ban) {
+    public function banWhere($Ban) {
         $Result = array('u.Admin' => 0, 'u.Deleted' => 0);
         $Ban['BanValue'] = str_replace('*', '%', $Ban['BanValue']);
 
@@ -189,7 +189,7 @@ class BanModel extends Gdn_Model {
      * @param bool $UpdateBlocks
      * @return bool Whether user is banned.
      */
-    public static function CheckUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
+    public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
         $Bans = self::AllBans();
         $Fields = array('Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress');
         $Banned = array();
@@ -237,7 +237,7 @@ class BanModel extends Gdn_Model {
      * @param int $Limit
      * @param bool $ResetData
      */
-    public function Delete($Where = '', $Limit = false, $ResetData = false) {
+    public function delete($Where = '', $Limit = false, $ResetData = false) {
         if (isset($Where['BanID'])) {
             $OldBan = $this->getID($Where['BanID'], DATASET_TYPE_ARRAY);
         }
@@ -249,7 +249,7 @@ class BanModel extends Gdn_Model {
         }
     }
 
-//   public function GetBanUsers($Ban) {
+//   public function getBanUsers($Ban) {
 //      $this->_SetBanWhere($Ban);
 //
 //      $Result = $this->SQL
@@ -321,7 +321,7 @@ class BanModel extends Gdn_Model {
      * @param array $FormPostValues
      * @param array $Settings
      */
-    public function Save($FormPostValues, $Settings = false) {
+    public function save($FormPostValues, $Settings = false) {
         $CurrentBanID = val('BanID', $FormPostValues);
 
         // Get the current ban before saving.
@@ -352,7 +352,7 @@ class BanModel extends Gdn_Model {
      * @param bool $BannedValue Whether user is banned.
      * @param array|false $Ban An array representing the specific auto-ban.
      */
-    public function SaveUser($User, $BannedValue, $Ban = false) {
+    public function saveUser($User, $BannedValue, $Ban = false) {
         $BannedValue = (bool)$BannedValue;
         $Banned = $User['Banned'];
 
@@ -400,7 +400,7 @@ class BanModel extends Gdn_Model {
      * @access public
      * @param array $Data
      */
-    public function SetCounts(&$Data) {
+    public function setCounts(&$Data) {
         $CountUsers = $this->SQL
             ->select('UserID', 'count', 'CountUsers')
             ->from('User u')

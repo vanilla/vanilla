@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteConnection($Connection) {
+function writeConnection($Connection) {
     $c = Gdn::controller();
     $Enabled = val('Enabled', $Connection);
     $SettingsUrl = val('SettingsUrl', $Connection);

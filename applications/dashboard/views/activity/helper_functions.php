@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteActivity($Activity, &$Sender, &$Session) {
+function writeActivity($Activity, &$Sender, &$Session) {
     $Activity = (object)$Activity;
     // If this was a status update or a wall comment, don't bother with activity strings
     $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
@@ -136,7 +136,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
 
 if (!function_exists('WriteActivityComment')):
 
-    function WriteActivityComment($Comment, $Activity) {
+    function writeActivityComment($Comment, $Activity) {
         $Session = Gdn::session();
         $Author = UserBuilder($Comment, 'Insert');
         $PhotoAnchor = userPhoto($Author, 'Photo');
@@ -167,7 +167,7 @@ if (!function_exists('WriteActivityComment')):
 
 endif;
 
-function WriteActivityTabs() {
+function writeActivityTabs() {
     $Sender = Gdn::controller();
     $ModPermission = Gdn::session()->checkPermission('Garden.Moderation.Manage');
     $AdminPermission = Gdn::session()->checkPermission('Garden.Settings.Manage');

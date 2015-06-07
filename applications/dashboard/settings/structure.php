@@ -259,7 +259,7 @@ $Construct->table('UserAuthenticationToken')
     ->set($Explicit, $Drop);
 
 // Fix the sync roles config spelling mistake.
-if (C('Garden.SSO.SynchRoles')) {
+if (c('Garden.SSO.SynchRoles')) {
     saveToConfig(
         array('Garden.SSO.SynchRoles' => '', 'Garden.SSO.SyncRoles' => c('Garden.SSO.SynchRoles')),
         '',

@@ -18,7 +18,7 @@ class SiteTotalsModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
@@ -33,7 +33,7 @@ class SiteTotalsModule extends Gdn_Module {
         $this->setData('Totals', $Result);
     }
 
-    protected function GetCount($Table) {
+    protected function getCount($Table) {
         // Try and get the count from the cache.
         $Key = "$Table.CountRows";
         $Count = Gdn::cache()->get($Key);
@@ -52,7 +52,7 @@ class SiteTotalsModule extends Gdn_Module {
         return $Count;
     }
 
-    public function ToString() {
+    public function toString() {
         $this->_GetData();
         return parent::ToString();
     }

@@ -15,7 +15,7 @@ $MaxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth') + $this->data('Catego
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = count($this->data('Categories'));
 
-//if (C('Vanilla.Categories.ShowTabs')) {
+//if (c('Vanilla.Categories.ShowTabs')) {
 ////   $ViewLocation = Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'vanilla');
 ////   include_once $ViewLocation;
 ////   WriteFilterTabs($this);

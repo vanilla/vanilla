@@ -21,7 +21,7 @@ class vBulletinImportModel extends Gdn_Model {
      *
      * @throws Exception
      */
-    public function AfterImport() {
+    public function afterImport() {
         // Set up the routes to redirect from their older counterparts.
         $Router = Gdn::router();
 
@@ -67,7 +67,7 @@ class vBulletinImportModel extends Gdn_Model {
     /**
      * Create different sizes of user photos.
      */
-    public function ProcessAvatars() {
+    public function processAvatars() {
         $UploadImage = new Gdn_UploadImage();
         $UserData = $this->SQL->select('u.Photo')->from('User u')->where('u.Photo is not null')->get();
 
@@ -114,7 +114,7 @@ class vBulletinImportModel extends Gdn_Model {
     /**
      * Get profile fields imported and add to ProfileFields list.
      */
-    public function ProfileExtenderPrep() {
+    public function profileExtenderPrep() {
         $ProfileKeyData = $this->SQL->select('m.Name')->Distinct()->from('UserMeta m')->like('m.Name', 'Profile_%')->get();
         $ExistingKeys = array_filter((array)explode(',', c('Plugins.ProfileExtender.ProfileFields', '')));
         foreach ($ProfileKeyData->result() as $Key) {

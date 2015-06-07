@@ -610,7 +610,7 @@ class ImportModel extends Gdn_Model {
      *
      * @param $Post
      */
-    public function ToPost(&$Post) {
+    public function toPost(&$Post) {
         $D = $this->Data;
         $Post['Overwrite'] = val('Overwrite', $D, 'Overwrite');
         $Post['Email'] = val('OverwriteEmail', $D, '');
@@ -626,7 +626,7 @@ class ImportModel extends Gdn_Model {
      * @param string $Escape
      * @return array
      */
-    public static function FGetCSV2($fp, $Delim = ',', $Quote = '"', $Escape = "\\") {
+    public static function fGetCSV2($fp, $Delim = ',', $Quote = '"', $Escape = "\\") {
         // Get the full line, considering escaped returns.
         $Line = false;
         do {
@@ -697,7 +697,7 @@ class ImportModel extends Gdn_Model {
      * @return array|mixed|string
      * @throws Gdn_UserException
      */
-    public function GetImportHeader($fpin = null) {
+    public function getImportHeader($fpin = null) {
         $Header = val('Header', $this->Data);
         if ($Header) {
             return $Header;
@@ -738,7 +738,7 @@ class ImportModel extends Gdn_Model {
      * @return mixed|string
      * @throws Gdn_UserException
      */
-    public function GetPasswordHashMethod() {
+    public function getPasswordHashMethod() {
         $HashMethod = val('HashMethod', $this->GetImportHeader());
         if ($HashMethod) {
             return $HashMethod;
@@ -766,7 +766,7 @@ class ImportModel extends Gdn_Model {
      * @param string $Column
      * @return bool
      */
-    public function ImportExists($Table, $Column = '') {
+    public function importExists($Table, $Column = '') {
         if (!array_key_exists('Tables', $this->Data) || !array_key_exists($Table, $this->Data['Tables'])) {
             return false;
         }
@@ -809,7 +809,7 @@ class ImportModel extends Gdn_Model {
      *
      * @return bool
      */
-    public function InsertTables() {
+    public function insertTables() {
         $InsertedCount = 0;
         $Timer = new Gdn_Timer();
         $Timer->start();
@@ -904,7 +904,7 @@ class ImportModel extends Gdn_Model {
      * @param $Str
      * @return string
      */
-    protected static function BackTick($Str) {
+    protected static function backTick($Str) {
         return '`'.str_replace('`', '\`', $Str).'`';
     }
 
@@ -1083,7 +1083,7 @@ class ImportModel extends Gdn_Model {
      *
      * @return bool
      */
-    public function InsertUserTable() {
+    public function insertUserTable() {
         $CurrentUser = $this->SQL->getWhere('User', array('UserID' => Gdn::session()->UserID))->firstRow(DATASET_TYPE_ARRAY);
         $CurrentPassword = $CurrentUser['Password'];
         $CurrentHashMethod = $CurrentUser['HashMethod'];
@@ -1141,7 +1141,7 @@ class ImportModel extends Gdn_Model {
      *
      * @return bool|string
      */
-    public function IsDbSource() {
+    public function isDbSource() {
         return stringBeginsWith($this->ImportPath, 'Db:', true);
     }
 
@@ -1152,7 +1152,7 @@ class ImportModel extends Gdn_Model {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function LoadUserTable() {
+    public function loadUserTable() {
         if (!$this->importExists('User')) {
             throw new Gdn_UserException(t('The user table was not in the import file.'));
         }
@@ -1168,7 +1168,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      */
-    public function LoadState() {
+    public function loadState() {
         $this->CurrentStep = c('Garden.Import.CurrentStep', 0);
         $this->Data = c('Garden.Import.CurrentStepData', array());
         $this->ImportPath = c('Garden.Import.ImportPath', '');
@@ -1180,7 +1180,7 @@ class ImportModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function LoadTables() {
+    public function loadTables() {
         $LoadedCount = 0;
         foreach ($this->Data['Tables'] as $Table => $TableInfo) {
             if (val('Loaded', $TableInfo) || val('Skip', $TableInfo)) {
@@ -1216,7 +1216,7 @@ class ImportModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function LoadTable($Tablename, $Path) {
+    public function loadTable($Tablename, $Path) {
         $Type = $this->LoadTableType();
         $Result = true;
 
@@ -1281,8 +1281,8 @@ class ImportModel extends Gdn_Model {
          ignore 1 lines";
 
         // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
-        $dblink = mysql_connect(C('Database.Host'), c('Database.User'), c('Database.Password'), false, 128);
-        mysql_select_db(C('Database.Name'), $dblink);
+        $dblink = mysql_connect(c('Database.Host'), c('Database.User'), c('Database.Password'), false, 128);
+        mysql_select_db(c('Database.Name'), $dblink);
         $Result = mysql_query($Sql, $dblink);
         if ($Result === false) {
             $Ex = new Exception(mysql_error($dblink));
@@ -1387,7 +1387,7 @@ class ImportModel extends Gdn_Model {
      * @return bool|mixed|string
      * @throws Exception
      */
-    public function LoadTableType($Save = true) {
+    public function loadTableType($Save = true) {
         $Result = val('LoadTableType', $this->Data, false);
 
         if (is_string($Result)) {
@@ -1452,7 +1452,7 @@ class ImportModel extends Gdn_Model {
      *
      * @return bool
      */
-    public function LocalInfileSupported() {
+    public function localInfileSupported() {
         $Sql = "show variables like 'local_infile'";
         $Data = $this->query($Sql)->resultArray();
         if (strcasecmp(GetValueR('0.Value', $Data), 'ON') == 0) {
@@ -1470,7 +1470,7 @@ class ImportModel extends Gdn_Model {
      * @param string $Password
      * @return mixed
      */
-    public function Overwrite($Overwrite = '', $Email = '', $Password = '') {
+    public function overwrite($Overwrite = '', $Email = '', $Password = '') {
         if ($Overwrite == '') {
             return val('Overwrite', $this->Data);
         }
@@ -1494,7 +1494,7 @@ class ImportModel extends Gdn_Model {
      * @param $Line
      * @return array
      */
-    public function ParseInfoLine($Line) {
+    public function parseInfoLine($Line) {
         $Info = explode(',', $Line);
         $Result = array();
         foreach ($Info as $Item) {
@@ -1513,7 +1513,7 @@ class ImportModel extends Gdn_Model {
     /**
      * Process the import tables from the database.
      */
-    public function ProcessImportDb() {
+    public function processImportDb() {
         // Grab a list of all of the tables.
         $TableNames = $this->SQL->FetchTables(':_z%');
         if (count($TableNames) == 0) {
@@ -1544,7 +1544,7 @@ class ImportModel extends Gdn_Model {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function ProcessImportFile() {
+    public function processImportFile() {
         // This one step can take a while so give it more time.
         set_time_limit(60 * 5);
 
@@ -2173,7 +2173,7 @@ class ImportModel extends Gdn_Model {
     /**
      * Verify imported data.
      */
-    public function VerifyImport() {
+    public function verifyImport() {
         // When was the latest discussion posted?
         $LatestDiscussion = $this->SQL->select('DateInserted', 'max', 'LatestDiscussion')->from('Discussion')->get();
         if ($LatestDiscussion->count()) {

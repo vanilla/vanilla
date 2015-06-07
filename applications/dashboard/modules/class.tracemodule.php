@@ -20,11 +20,11 @@ class TraceModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
-    public function ToString() {
+    public function toString() {
         try {
             $Traces = trace();
             if (!$Traces) {

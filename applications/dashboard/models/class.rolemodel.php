@@ -290,7 +290,7 @@ class RoleModel extends Gdn_Model {
     /**
      * Returns a resultset of all roles that have editable permissions.
      *
-     * public function GetEditablePermissions() {
+     * public function getEditablePermissions() {
      * return $this->SQL
      * ->select()
      * ->from('Role')
@@ -305,7 +305,7 @@ class RoleModel extends Gdn_Model {
      *
      * @param int The RoleID to filter to.
      */
-    public function GetByRoleID($RoleID) {
+    public function getByRoleID($RoleID) {
         return $this->getWhere(array('RoleID' => $RoleID))->firstRow();
     }
 
@@ -315,7 +315,7 @@ class RoleModel extends Gdn_Model {
      * @param int The UserID to filter to.
      * @return Gdn_DataSet
      */
-    public function GetByUserID($UserID) {
+    public function getByUserID($UserID) {
         return $this->SQL->select()
             ->from('Role')
             ->join('UserRole', 'Role.RoleID = UserRole.RoleID')
@@ -341,7 +341,7 @@ class RoleModel extends Gdn_Model {
      *
      * @param int The RoleID to filter out.
      */
-    public function GetByNotRoleID($RoleID) {
+    public function getByNotRoleID($RoleID) {
         return $this->getWhere(array('RoleID <>' => $RoleID));
     }
 
@@ -351,7 +351,7 @@ class RoleModel extends Gdn_Model {
      * @param int|array $RoleID One or more role IDs to get the permissions for.
      * @return array Returns an array of permissions.
      */
-    public function GetPermissions($RoleID) {
+    public function getPermissions($RoleID) {
         $PermissionModel = Gdn::permissionModel();
         $roleIDs = (array)$RoleID;
 
@@ -396,7 +396,7 @@ class RoleModel extends Gdn_Model {
      * @return int Returns the number of applicants or 0 if the registration method isn't set to approval.
      */
     public function getApplicantCount($Force = false) {
-        if (C('Garden.Registration.Method') != 'Approval') {
+        if (c('Garden.Registration.Method') != 'Approval') {
             return 0;
         }
 

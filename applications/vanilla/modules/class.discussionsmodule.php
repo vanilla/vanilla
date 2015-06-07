@@ -38,7 +38,7 @@ class DiscussionsModule extends Gdn_Module {
      *
      * @param int|bool $limit Override the number of discussions to display.
      */
-    public function GetData($limit = false) {
+    public function getData($limit = false) {
         if (!$limit) {
             $limit = $this->Limit;
         }
@@ -57,11 +57,11 @@ class DiscussionsModule extends Gdn_Module {
         $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (!$this->data('Discussions')) {
             $this->GetData();
         }

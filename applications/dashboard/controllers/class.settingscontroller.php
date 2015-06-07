@@ -48,7 +48,7 @@ class SettingsController extends DashboardController {
      * @param string $ApplicationName Unique ID of app to be modified.
      * @param string $TransientKey Security token.
      */
-    public function Applications($Filter = '', $ApplicationName = '', $TransientKey = '') {
+    public function applications($Filter = '', $ApplicationName = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
@@ -131,7 +131,7 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Banner() {
+    public function banner() {
         $this->permission('Garden.Community.Manage');
         $this->addSideMenu('dashboard/settings/banner');
         $this->title(t('Banner'));
@@ -284,7 +284,7 @@ class SettingsController extends DashboardController {
      * @param int $Page Page number.
      * @param int $ID Ban ID we're editing or deleting.
      */
-    public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
+    public function bans($Action = '', $Search = '', $Page = '', $ID = '') {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
@@ -340,7 +340,7 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Homepage() {
+    public function homepage() {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
@@ -371,7 +371,7 @@ class SettingsController extends DashboardController {
         $this->render();
     }
 
-    public function Configuration() {
+    public function configuration() {
         $this->permission('Garden.Settings.Manage');
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->deliveryType(DELIVERY_TYPE_DATA);
@@ -409,7 +409,7 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Email() {
+    public function email() {
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/settings/email');
         $this->addJsFile('email.js');
@@ -495,8 +495,8 @@ class SettingsController extends DashboardController {
      * Currently added to the dashboard only. Nothing renders with this method.
      * It is public so it can be added by plugins.
      */
-    public function AddUpdateCheck() {
-        if (C('Garden.NoUpdateCheck')) {
+    public function addUpdateCheck() {
+        if (c('Garden.NoUpdateCheck')) {
             return;
         }
 
@@ -569,7 +569,7 @@ class SettingsController extends DashboardController {
      * @param string $LocaleKey Unique ID of locale to be modified.
      * @param string $TransientKey Security token.
      */
-    public function Locales($Op = null, $LocaleKey = null, $TransientKey = null) {
+    public function locales($Op = null, $LocaleKey = null, $TransientKey = null) {
         $this->permission('Garden.Settings.Manage');
 
         $this->title(t('Locales'));
@@ -579,10 +579,10 @@ class SettingsController extends DashboardController {
         $LocaleModel = new LocaleModel();
 
         // Get the available locale packs.
-        $AvailableLocales = $LocaleModel->AvailableLocalePacks();
+        $AvailableLocales = $LocaleModel->availableLocalePacks();
 
         // Get the enabled locale packs.
-        $EnabledLocales = $LocaleModel->EnabledLocalePacks();
+        $EnabledLocales = $LocaleModel->enabledLocalePacks();
 
         // Check to enable/disable a locale.
         if (($TransientKey && Gdn::session()->validateTransientKey($TransientKey)) || $this->Form->authenticatedPostBack()) {
@@ -609,7 +609,7 @@ class SettingsController extends DashboardController {
                 }
 
                 // Set default locale field if just doing enable/disable
-                $this->Form->setValue('Locale', Gdn_Locale::Canonicalize(C('Garden.Locale', 'en')));
+                $this->Form->setValue('Locale', Gdn_Locale::canonicalize(c('Garden.Locale', 'en')));
             } elseif ($this->Form->authenticatedPostBack()) {
                 // Save the default locale.
                 saveToConfig('Garden.Locale', $this->Form->getFormValue('Locale'));
@@ -622,11 +622,11 @@ class SettingsController extends DashboardController {
                 redirect('/settings/locales');
             }
         } elseif (!$this->Form->isPostBack()) {
-            $this->Form->setValue('Locale', Gdn_Locale::Canonicalize(C('Garden.Locale', 'en')));
+            $this->Form->setValue('Locale', Gdn_Locale::Canonicalize(c('Garden.Locale', 'en')));
         }
 
         // Check for the default locale warning.
-        $DefaultLocale = Gdn_Locale::Canonicalize(C('Garden.Locale'));
+        $DefaultLocale = Gdn_Locale::Canonicalize(c('Garden.Locale'));
         if ($DefaultLocale !== 'en') {
             $LocaleFound = false;
             $MatchingLocales = array();
@@ -661,7 +661,7 @@ class SettingsController extends DashboardController {
      * @param string $PluginName Unique ID of plugin to be modified.
      * @param string $TransientKey Security token.
      */
-    public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
+    public function plugins($Filter = '', $PluginName = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
@@ -723,7 +723,7 @@ class SettingsController extends DashboardController {
      * @access public
      * @param string $RedirectUrl Where to send user after registration.
      */
-    public function Registration($RedirectUrl = '') {
+    public function registration($RedirectUrl = '') {
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/settings/registration');
 
@@ -821,7 +821,7 @@ class SettingsController extends DashboardController {
      * @param array $Array Addon data (e.g. $PluginInfo).
      * @param bool $Filter Whether to exclude hidden addons (defaults to TRUE).
      */
-    public static function SortAddons(&$Array, $Filter = true) {
+    public static function sortAddons(&$Array, $Filter = true) {
         // Make sure every addon has a name.
         foreach ($Array as $Key => $Value) {
             if ($Filter && val('Hidden', $Value)) {
@@ -845,7 +845,7 @@ class SettingsController extends DashboardController {
      * @param array $B Second addon data.
      * @return int Result of strcasecmp.
      */
-    public static function CompareAddonName($A, $B) {
+    public static function compareAddonName($A, $B) {
         return strcasecmp(val('Name', $A), val('Name', $B));
     }
 
@@ -858,7 +858,7 @@ class SettingsController extends DashboardController {
      * @param string $AddonName
      * @param string $TransientKey Security token.
      */
-    public function TestAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
+    public function testAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
         if (!in_array($AddonType, array('Plugin', 'Application', 'Theme', 'Locale'))) {
             $AddonType = 'Plugin';
         }
@@ -900,7 +900,7 @@ class SettingsController extends DashboardController {
      * @param string $Style Unique ID.
      * @todo Why is this in a giant try/catch block?
      */
-    public function ThemeOptions($Style = null) {
+    public function themeOptions($Style = null) {
         $this->permission('Garden.Settings.Manage');
 
         try {
@@ -968,7 +968,7 @@ class SettingsController extends DashboardController {
      * @param string $Style Unique ID.
      * @todo Why is this in a giant try/catch block?
      */
-    public function MobileThemeOptions($Style = null) {
+    public function mobileThemeOptions($Style = null) {
         $this->permission('Garden.Settings.Manage');
 
         try {
@@ -1039,7 +1039,7 @@ class SettingsController extends DashboardController {
      * @param string $ThemeName Unique ID.
      * @param string $TransientKey Security token.
      */
-    public function Themes($ThemeName = '', $TransientKey = '') {
+    public function themes($ThemeName = '', $TransientKey = '') {
         $this->addJsFile('addons.js');
         $this->setData('Title', t('Themes'));
 
@@ -1104,7 +1104,7 @@ class SettingsController extends DashboardController {
      * @param string $ThemeName Unique ID.
      * @param string $TransientKey Security token.
      */
-    public function MobileThemes($ThemeName = '', $TransientKey = '') {
+    public function mobileThemes($ThemeName = '', $TransientKey = '') {
         $IsMobile = true;
 
         $this->addJsFile('addons.js');

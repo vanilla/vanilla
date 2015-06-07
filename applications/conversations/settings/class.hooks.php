@@ -81,7 +81,7 @@ class ConversationsHooks implements Gdn_IPlugin {
 
             if (Gdn::session()->UserID != $Sender->User->UserID) {
                 // Accomodate admin access
-                if (C('Conversations.Moderation.Allow', false) && Gdn::session()->checkPermission('Conversations.Moderation.Manage')) {
+                if (c('Conversations.Moderation.Allow', false) && Gdn::session()->checkPermission('Conversations.Moderation.Manage')) {
                     $CountUnread = $Sender->User->CountUnreadConversations;
                     $InboxLink .= "?userid={$Sender->User->UserID}";
                 } else {

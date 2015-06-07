@@ -4,7 +4,7 @@ $Session = Gdn::session();
 $CancelUrl = $this->data('_CancelUrl');
 if (!$CancelUrl) {
     $CancelUrl = '/discussions';
-    if (C('Vanilla.Categories.Use') && is_object($this->Category))
+    if (c('Vanilla.Categories.Use') && is_object($this->Category))
         $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
 }
 

@@ -26,7 +26,7 @@ class RegardingModel extends Gdn_Model {
      * @param mixed $RegardingID
      * @return array|bool|stdClass
      */
-    public function GetID($RegardingID) {
+    public function getID($RegardingID) {
         $Regarding = $this->getWhere(array('RegardingID' => $RegardingID))->firstRow();
         return $Regarding;
     }
@@ -38,7 +38,7 @@ class RegardingModel extends Gdn_Model {
      * @param string|unknown_type $ForeignID
      * @return array|bool|stdClass
      */
-    public function Get($ForeignType, $ForeignID) {
+    public function get($ForeignType, $ForeignID) {
         return $this->getWhere(array(
             'ForeignType' => $ForeignType,
             'ForeignID' => $ForeignID
@@ -53,7 +53,7 @@ class RegardingModel extends Gdn_Model {
      * @param $ForeignID
      * @return array|bool|stdClass
      */
-    public function GetRelated($Type, $ForeignType, $ForeignID) {
+    public function getRelated($Type, $ForeignType, $ForeignID) {
         return $this->getWhere(array(
             'Type' => $Type,
             'ForeignType' => $ForeignType,
@@ -68,7 +68,7 @@ class RegardingModel extends Gdn_Model {
      * @param array $ForeignIDs
      * @return Gdn_DataSet
      */
-    public function GetAll($ForeignType, $ForeignIDs = array()) {
+    public function getAll($ForeignType, $ForeignIDs = array()) {
         if (count($ForeignIDs) == 0) {
             return new Gdn_DataSet(array());
         }

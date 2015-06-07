@@ -18,7 +18,7 @@ if (!defined('APPLICATION')) {
  * @return string Parsed body.
  */
 if (!function_exists('FormatBody')):
-    function FormatBody($Object) {
+    function formatBody($Object) {
         Gdn::controller()->fireEvent('BeforeCommentBody');
         $Object->FormatBody = Gdn_Format::to($Object->Body, $Object->Format);
         Gdn::controller()->fireEvent('AfterCommentFormat');
@@ -31,7 +31,7 @@ endif;
  * Output link to (un)boomark a discussion.
  */
 if (!function_exists('WriteBookmarkLink')):
-    function WriteBookmarkLink() {
+    function writeBookmarkLink() {
         if (!Gdn::session()->isValid())
             return '';
 
@@ -60,7 +60,7 @@ endif;
  * @param int $CurrentOffet How many comments into the discussion we are (for anchors).
  */
 if (!function_exists('WriteComment')):
-    function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
+    function writeComment($Comment, $Sender, $Session, $CurrentOffset) {
         static $UserPhotoFirst = NULL;
         if ($UserPhotoFirst === null)
             $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
@@ -175,7 +175,7 @@ endif;
  * @return array $Options Each element must include keys 'Label' and 'Url'.
  */
 if (!function_exists('GetDiscussionOptions')):
-    function GetDiscussionOptions($Discussion = null) {
+    function getDiscussionOptions($Discussion = null) {
         $Options = array();
 
         $Sender = Gdn::controller();
@@ -249,7 +249,7 @@ endif;
  * @since 2.1
  */
 if (!function_exists('WriteAdminCheck')):
-    function WriteAdminCheck($Object = null) {
+    function writeAdminCheck($Object = null) {
         if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use'))
             return;
 
@@ -263,7 +263,7 @@ endif;
  * @since 2.1
  */
 if (!function_exists('WriteDiscussionOptions')):
-    function WriteDiscussionOptions($Discussion = null) {
+    function writeDiscussionOptions($Discussion = null) {
         $Options = GetDiscussionOptions($Discussion);
 
         if (empty($Options))
@@ -289,7 +289,7 @@ endif;
  * @return array $Options Each element must include keys 'Label' and 'Url'.
  */
 if (!function_exists('GetCommentOptions')):
-    function GetCommentOptions($Comment) {
+    function getCommentOptions($Comment) {
         $Options = array();
 
         if (!is_numeric(val('CommentID', $Comment)))
@@ -338,7 +338,7 @@ endif;
  * @param DataSet $Comment .
  */
 if (!function_exists('WriteCommentOptions')):
-    function WriteCommentOptions($Comment) {
+    function writeCommentOptions($Comment) {
         $Controller = Gdn::controller();
         $Session = Gdn::session();
 
@@ -356,7 +356,7 @@ if (!function_exists('WriteCommentOptions')):
         endforeach;
         echo '</ul>';
         echo '</span>';
-        if (C('Vanilla.AdminCheckboxes.Use')) {
+        if (c('Vanilla.AdminCheckboxes.Use')) {
             // Only show the checkbox if the user has permission to affect multiple items
             $Discussion = Gdn::controller()->data('Discussion');
             $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
@@ -377,7 +377,7 @@ endif;
  * @since 2.1
  */
 if (!function_exists('WriteCommentForm')):
-    function WriteCommentForm() {
+    function writeCommentForm() {
         $Session = Gdn::session();
         $Controller = Gdn::controller();
 
@@ -399,7 +399,7 @@ if (!function_exists('WriteCommentForm')):
                 ?>
                 <div class="Foot Closed">
                     <div class="Note Closed SignInOrRegister"><?php
-                        $Popup = (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
+                        $Popup = (c('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
                         $ReturnUrl = Gdn::request()->PathAndQuery();
                         echo formatString(
                             t('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'),
@@ -422,9 +422,9 @@ if (!function_exists('WriteCommentForm')):
 endif;
 
 if (!function_exists('WriteCommentFormHeader')):
-    function WriteCommentFormHeader() {
+    function writeCommentFormHeader() {
         $Session = Gdn::session();
-        if (C('Vanilla.Comment.UserPhotoFirst', true)) {
+        if (c('Vanilla.Comment.UserPhotoFirst', true)) {
             echo userPhoto($Session->User);
             echo userAnchor($Session->User, 'Username');
         } else {
@@ -435,7 +435,7 @@ if (!function_exists('WriteCommentFormHeader')):
 endif;
 
 if (!function_exists('WriteEmbedCommentForm')):
-    function WriteEmbedCommentForm() {
+    function writeEmbedCommentForm() {
         $Session = Gdn::session();
         $Controller = Gdn::controller();
         $Discussion = $Controller->data('Discussion');
@@ -493,7 +493,7 @@ if (!function_exists('WriteEmbedCommentForm')):
 endif;
 
 if (!function_exists('IsMeAction')):
-    function IsMeAction($Row) {
+    function isMeAction($Row) {
         if (!c('Garden.Format.MeActions'))
             return;
         $Row = (array)$Row;
@@ -505,7 +505,7 @@ if (!function_exists('IsMeAction')):
 endif;
 
 if (!function_exists('FormatMeAction')):
-    function FormatMeAction($Comment) {
+    function formatMeAction($Comment) {
         if (!IsMeAction($Comment))
             return;
 

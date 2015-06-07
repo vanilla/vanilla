@@ -37,7 +37,7 @@ abstract class VanillaModel extends Gdn_Model {
      * @param string $Type Valid values are 'Comment' or 'Discussion'.
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
-    public function CheckForSpam($Type) {
+    public function checkForSpam($Type) {
         $Session = Gdn::session();
 
         // If spam checking is disabled or user is an admin, skip

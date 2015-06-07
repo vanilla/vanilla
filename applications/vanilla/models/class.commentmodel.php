@@ -52,7 +52,7 @@ class CommentModel extends VanillaModel {
      * @param $Page
      * @param null $Limit
      */
-    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = null) {
+    public function cachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = null) {
         if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc') {
             return;
         }
@@ -102,7 +102,7 @@ class CommentModel extends VanillaModel {
      *
      * @param bool $FireEvent Kludge to fix VanillaCommentReplies plugin.
      */
-    public function CommentQuery($FireEvent = true, $Join = true) {
+    public function commentQuery($FireEvent = true, $Join = true) {
         $this->SQL->select('c.*')
 //         ->select('du.Name', '', 'DeleteName')
 //         ->SelectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
@@ -137,7 +137,7 @@ class CommentModel extends VanillaModel {
      * @param int $Offset Number to skip.
      * @return object SQL results.
      */
-    public function Get($DiscussionID, $Limit, $Offset = 0) {
+    public function get($DiscussionID, $Limit, $Offset = 0) {
         $this->CommentQuery(true, false);
         $this->EventArguments['DiscussionID'] =& $DiscussionID;
         $this->EventArguments['Limit'] =& $Limit;
@@ -199,7 +199,7 @@ class CommentModel extends VanillaModel {
      * @param int $Offset Number to skip.
      * @return object SQL results.
      */
-    public function GetByUser($UserID, $Limit, $Offset = 0) {
+    public function getByUser($UserID, $Limit, $Offset = 0) {
         // Get category permissions
         $Perms = DiscussionModel::CategoryPermissions();
 
@@ -242,7 +242,7 @@ class CommentModel extends VanillaModel {
      * @param int $LastCommentID A hint for quicker paging.
      * @return Gdn_DataSet SQL results.
      */
-    public function GetByUser2($UserID, $Limit, $Offset, $LastCommentID = false) {
+    public function getByUser2($UserID, $Limit, $Offset, $LastCommentID = false) {
         $Perms = DiscussionModel::CategoryPermissions();
 
         if (is_array($Perms) && empty($Perms)) {
@@ -319,7 +319,7 @@ class CommentModel extends VanillaModel {
      * @param mixed Field name(s) to order results by. May be a string or array of strings.
      * @return array $this->_OrderBy (optionally).
      */
-    public function OrderBy($Value = null) {
+    public function orderBy($Value = null) {
         if ($Value === null) {
             return $this->_OrderBy;
         }
@@ -350,7 +350,7 @@ class CommentModel extends VanillaModel {
         }
     }
 
-    public function PageWhere($DiscussionID, $Page, $Limit) {
+    public function pageWhere($DiscussionID, $Page, $Limit) {
         if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc') {
             return false;
         }
@@ -387,7 +387,7 @@ class CommentModel extends VanillaModel {
      * @param int $Score Score being assigned to the comment.
      * @return int New total score for the comment.
      */
-    public function SetUserScore($CommentID, $UserID, $Score) {
+    public function setUserScore($CommentID, $UserID, $Score) {
         // Insert or update the UserComment row
         $this->SQL->replace(
             'UserComment',
@@ -422,7 +422,7 @@ class CommentModel extends VanillaModel {
      * @param int $UserID Unique ID of user who scored the comment.
      * @return int Current score for the comment.
      */
-    public function GetUserScore($CommentID, $UserID) {
+    public function getUserScore($CommentID, $UserID) {
         $Data = $this->SQL->select('Score')
             ->from('UserComment')
             ->where('CommentID', $CommentID)
@@ -444,7 +444,7 @@ class CommentModel extends VanillaModel {
      * @param int $Offset Number to skip.
      * @param int $TotalComments Total in entire discussion (hard limit).
      */
-    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
+    public function setWatch($Discussion, $Limit, $Offset, $TotalComments) {
 
         $NewComments = false;
 
@@ -570,7 +570,7 @@ class CommentModel extends VanillaModel {
      * @param int $DiscussionID Unique ID of discussion we're counting comments from.
      * @return object SQL result.
      */
-    public function GetCount($DiscussionID) {
+    public function getCount($DiscussionID) {
         $this->fireEvent('BeforeGetCount');
 
         if (!empty($this->_Where)) {
@@ -594,7 +594,7 @@ class CommentModel extends VanillaModel {
      * @param array $Where Conditions
      * @return object SQL result.
      */
-    public function GetCountWhere($Where = false) {
+    public function getCountWhere($Where = false) {
         if (is_array($Where)) {
             $this->SQL->where($Where);
         }
@@ -617,7 +617,7 @@ class CommentModel extends VanillaModel {
      * @param array $Options options to pass to the database.
      * @return mixed SQL result in format specified by $ResultType.
      */
-    public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT, $Options = array()) {
+    public function getID($CommentID, $ResultType = DATASET_TYPE_OBJECT, $Options = array()) {
         $this->Options($Options);
 
         $this->CommentQuery(false); // FALSE supresses FireEvent
@@ -641,7 +641,7 @@ class CommentModel extends VanillaModel {
      * @param int $CommentID Unique ID of the comment.
      * @return object SQL result.
      */
-    public function GetIDData($CommentID, $Options = array()) {
+    public function getIDData($CommentID, $Options = array()) {
         $this->fireEvent('BeforeGetIDData');
         $this->CommentQuery(false); // FALSE supresses FireEvent
         $this->Options($Options);
@@ -663,7 +663,7 @@ class CommentModel extends VanillaModel {
      * @param int $LastCommentID Unique ID of the comment.
      * @return object SQL result.
      */
-    public function GetNew($DiscussionID, $LastCommentID) {
+    public function getNew($DiscussionID, $LastCommentID) {
         $this->CommentQuery();
         $this->fireEvent('BeforeGetNew');
         $this->orderBy($this->SQL);
@@ -687,7 +687,7 @@ class CommentModel extends VanillaModel {
      * @param mixed $Comment Unique ID or or a comment object for which the offset is being defined.
      * @return object SQL result.
      */
-    public function GetOffset($Comment) {
+    public function getOffset($Comment) {
         $this->fireEvent('BeforeGetOffset');
 
         if (is_numeric($Comment)) {
@@ -727,7 +727,7 @@ class CommentModel extends VanillaModel {
             ->CountComments;
     }
 
-    public function GetUnreadOffset($DiscussionID, $UserID = null) {
+    public function getUnreadOffset($DiscussionID, $UserID = null) {
         if ($UserID == null) {
             $UserID = Gdn::session()->UserID;
         }
@@ -787,7 +787,7 @@ class CommentModel extends VanillaModel {
      * @param array $FormPostValues Data from the form model.
      * @return int $CommentID
      */
-    public function Save($FormPostValues) {
+    public function save($FormPostValues) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -894,7 +894,7 @@ class CommentModel extends VanillaModel {
      * @param bool $CheckExisting Not used.
      * @param bool $IncUser Whether or not to just increment the user's comment count rather than recalculate it.
      */
-    public function Save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
+    public function save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
         $Session = Gdn::session();
         $UserModel = Gdn::userModel();
 
@@ -980,7 +980,7 @@ class CommentModel extends VanillaModel {
             );
 
             // Allow simple fulltext notifications
-            if (C('Vanilla.Activity.ShowCommentBody', false)) {
+            if (c('Vanilla.Activity.ShowCommentBody', false)) {
                 $Activity['Story'] = val('Body', $Fields);
                 $Activity['Format'] = val('Format', $Fields);
             }
@@ -1075,7 +1075,7 @@ class CommentModel extends VanillaModel {
      * @param array $Discussion
      * @param array $NotifiedUsers
      */
-    public function RecordAdvancedNotications($ActivityModel, $Activity, $Discussion) {
+    public function recordAdvancedNotications($ActivityModel, $Activity, $Discussion) {
         if (is_numeric($Discussion)) {
             $Discussion = $this->getID($Discussion);
         }
@@ -1130,7 +1130,7 @@ class CommentModel extends VanillaModel {
         }
     }
 
-    public function RemovePageCache($DiscussionID, $From = 1) {
+    public function removePageCache($DiscussionID, $From = 1) {
         if (!$this->pageCache) {
             return;
         }
@@ -1158,7 +1158,7 @@ class CommentModel extends VanillaModel {
      *
      * @since 2.3 Added the $Options parameter.
      */
-    public function UpdateCommentCount($Discussion, $Options = array()) {
+    public function updateCommentCount($Discussion, $Options = array()) {
         // Get the discussion.
         if (is_numeric($Discussion)) {
             $this->Options($Options);
@@ -1227,7 +1227,7 @@ class CommentModel extends VanillaModel {
      *
      * @param int $DiscussionID Unique ID of the discussion we are updating.
      */
-    public function UpdateUserCommentCounts($DiscussionID) {
+    public function updateUserCommentCounts($DiscussionID) {
         $Sql = "update ".$this->Database->DatabasePrefix."UserDiscussion ud
          set CountComments = (
             select count(c.CommentID)+1
@@ -1246,7 +1246,7 @@ class CommentModel extends VanillaModel {
      *
      * @param int $UserID Unique ID of the user to be updated.
      */
-    public function UpdateUser($UserID, $Inc = false) {
+    public function updateUser($UserID, $Inc = false) {
         if ($Inc) {
             // Just increment the comment count.
             $this->SQL
@@ -1282,7 +1282,7 @@ class CommentModel extends VanillaModel {
      * @param array $Options Additional options for the delete.
      * @param bool Always returns TRUE.
      */
-    public function Delete($CommentID, $Options = array()) {
+    public function delete($CommentID, $Options = array()) {
         $this->EventArguments['CommentID'] = $CommentID;
 
         $Comment = $this->getID($CommentID, DATASET_TYPE_ARRAY);
@@ -1335,7 +1335,7 @@ class CommentModel extends VanillaModel {
      *
      * @param object $Data SQL result.
      */
-    public function SetCalculatedFields(&$Data) {
+    public function setCalculatedFields(&$Data) {
         $Result = &$Data->result();
         foreach ($Result as &$Comment) {
             $this->Calculate($Comment);
@@ -1350,7 +1350,7 @@ class CommentModel extends VanillaModel {
      *
      * @param object $Data SQL result.
      */
-    public function Calculate($Comment) {
+    public function calculate($Comment) {
 
         // Do nothing yet.
         if ($Attributes = val('Attributes', $Comment)) {
@@ -1361,7 +1361,7 @@ class CommentModel extends VanillaModel {
         $this->fireEvent('SetCalculatedFields');
     }
 
-    public function Where($Value = null) {
+    public function where($Value = null) {
         if ($Value === null) {
             return $this->_Where;
         } elseif (!$Value)

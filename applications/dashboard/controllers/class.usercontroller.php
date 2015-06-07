@@ -132,7 +132,7 @@ class UserController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Add() {
+    public function add() {
         $this->permission('Garden.Users.Add');
 
         // Page setup
@@ -736,7 +736,7 @@ class UserController extends DashboardController {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Available = true;
 
-        if (C('Garden.Registration.EmailUnique', true) && $Email != '') {
+        if (c('Garden.Registration.EmailUnique', true) && $Email != '') {
             $UserModel = Gdn::userModel();
             if ($UserModel->getByEmail($Email)) {
                 $Available = false;
@@ -1091,7 +1091,7 @@ class UserController extends DashboardController {
     public function usernameAvailable($Name = '') {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Available = true;
-        if (C('Garden.Registration.NameUnique', true) && $Name != '') {
+        if (c('Garden.Registration.NameUnique', true) && $Name != '') {
             $UserModel = Gdn::userModel();
             if ($UserModel->getByUsername($Name)) {
                 $Available = false;

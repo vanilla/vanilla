@@ -32,7 +32,7 @@ class SettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Advanced() {
+    public function advanced() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
@@ -151,7 +151,7 @@ class SettingsController extends Gdn_Controller {
      *
      * @param $CurrentUrl Path to current location in dashboard.
      */
-    public function AddSideMenu($CurrentUrl) {
+    public function addSideMenu($CurrentUrl) {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             $SideMenu = new SideMenuModule($this);
@@ -170,7 +170,7 @@ class SettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function FloodControl() {
+    public function floodControl() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
@@ -262,7 +262,7 @@ class SettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function AddCategory() {
+    public function addCategory() {
         // Check permission
         $this->permission('Garden.Community.Manage');
 
@@ -324,7 +324,7 @@ class SettingsController extends Gdn_Controller {
      *
      * @param int $CategoryID Unique ID of the category to be deleted.
      */
-    public function DeleteCategory($CategoryID = false) {
+    public function deleteCategory($CategoryID = false) {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
@@ -416,7 +416,7 @@ class SettingsController extends Gdn_Controller {
      *
      * @param int $CategoryID Unique ID of the category to have its photo deleted.
      */
-    public function DeleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
+    public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
@@ -438,7 +438,7 @@ class SettingsController extends Gdn_Controller {
         }
     }
 
-    protected function SetupDiscussionTypes($Category) {
+    protected function setupDiscussionTypes($Category) {
         $DiscussionTypes = DiscussionModel::DiscussionTypes();
         $this->setData('DiscussionTypes', $DiscussionTypes);
 
@@ -466,7 +466,7 @@ class SettingsController extends Gdn_Controller {
      *
      * @param int $CategoryID Unique ID of the category to be updated.
      */
-    public function EditCategory($CategoryID = '') {
+    public function editCategory($CategoryID = '') {
         // Check permission
         $this->permission('Garden.Community.Manage');
 
@@ -555,7 +555,7 @@ class SettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function ManageCategories() {
+    public function manageCategories() {
         // Check permission
         $this->permission('Garden.Community.Manage');
         $this->addSideMenu('vanilla/settings/managecategories');
@@ -620,7 +620,7 @@ class SettingsController extends Gdn_Controller {
      * @param bool $enabled Whether or not to enable/disable categories.
      * @throws Exception Throws an exception if accessed through an invalid post back.
      */
-    public function EnableCategories($enabled) {
+    public function enableCategories($enabled) {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Form->authenticatedPostBack()) {
@@ -646,7 +646,7 @@ class SettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function SortCategories() {
+    public function sortCategories() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 

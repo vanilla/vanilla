@@ -36,7 +36,7 @@ class RoutesController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Add() {
+    public function add() {
         $this->permission('Garden.Settings.Manage');
         // Use the edit form with no roleid specified.
         $this->View = 'Edit';
@@ -50,7 +50,7 @@ class RoutesController extends DashboardController {
      * @access public
      * @param string $RouteIndex Name of route.
      */
-    public function Edit($RouteIndex = false) {
+    public function edit($RouteIndex = false) {
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/routes');
         $this->Route = Gdn::router()->GetRoute($RouteIndex);
@@ -118,14 +118,14 @@ class RoutesController extends DashboardController {
      * @param mixed $RouteIndex Name of route.
      * @param string $TransientKey Security token.
      */
-    public function Delete($RouteIndex = false, $TransientKey = false) {
+    public function delete($RouteIndex = false, $TransientKey = false) {
         $this->permission('Garden.Settings.Manage');
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $Session = Gdn::session();
 
         // If seeing the form for the first time...
         if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
-            Gdn::router()->DeleteRoute($RouteIndex);
+            Gdn::router()->deleteRoute($RouteIndex);
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {

@@ -26,9 +26,9 @@ class ToggleMenuModule extends Gdn_Module {
      * @param string $Code
      * @param string $Url
      */
-    public function AddLabel($Name, $Code = '', $Url = '') {
+    public function addLabel($Name, $Code = '', $Url = '') {
         if ($Code == '') {
-            $Code = Gdn_Format::url(ucwords(trim(Gdn_Format::PlainText($Name))));
+            $Code = Gdn_Format::url(ucwords(trim(Gdn_Format::plainText($Name))));
         }
 
         $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
@@ -40,7 +40,7 @@ class ToggleMenuModule extends Gdn_Module {
      * @param string $Label
      * @return bool|string
      */
-    public function CurrentLabelCode($Label = '') {
+    public function currentLabelCode($Label = '') {
         if ($Label != '') {
             $this->_CurrentLabelCode = $Label;
         }
@@ -58,7 +58,7 @@ class ToggleMenuModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         $Return = '<ul class="FilterMenu ToggleMenu">';
         foreach ($this->_Labels as $Label) {
             $Url = val('Url', $Label, '');

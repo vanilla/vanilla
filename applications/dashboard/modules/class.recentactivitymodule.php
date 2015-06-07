@@ -19,7 +19,7 @@ class RecentActivityModule extends Gdn_Module {
 
     public $Limit = 5;
 
-    public function GetData($Limit = false) {
+    public function getData($Limit = false) {
         if (!$Limit) {
             $Limit = $this->Limit;
         }
@@ -29,11 +29,11 @@ class RecentActivityModule extends Gdn_Module {
         $this->ActivityData = $Data;
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (!Gdn::session()->checkPermission('Garden.Activity.View')) {
             return '';
         }

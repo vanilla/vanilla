@@ -28,7 +28,7 @@ class AssetModel extends Gdn_Model {
      * @param bool $Folder
      * @param bool $Options
      */
-    public function AddCssFile($Filename, $Folder = false, $Options = false) {
+    public function addCssFile($Filename, $Folder = false, $Options = false) {
         if (is_string($Options)) {
             $Options = array('Css' => $Options);
         }
@@ -42,7 +42,7 @@ class AssetModel extends Gdn_Model {
      * @param $Filename
      * @throws Exception
      */
-    public function ServeCss($ThemeType, $Filename) {
+    public function serveCss($ThemeType, $Filename) {
         // Split the filename into filename and etag.
         if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
             $Basename = $Matches[1];
@@ -159,7 +159,7 @@ class AssetModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function GetCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
+    public function getCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
         $NotFound = array();
 
         // Gather all of the css paths.
@@ -259,7 +259,7 @@ class AssetModel extends Gdn_Model {
      * @param string $ThemeType mobile or desktop
      * @return array|bool
      */
-    public static function CssPath($Filename, $Folder = '', $ThemeType = '') {
+    public static function cssPath($Filename, $Folder = '', $ThemeType = '') {
         if (!$ThemeType) {
             $ThemeType = IsMobile() ? 'mobile' : 'desktop';
         }
@@ -340,7 +340,7 @@ class AssetModel extends Gdn_Model {
     /**
      * Generate an e-tag for the application from the versions of all of its enabled applications/plugins.
      **/
-    public static function ETag() {
+    public static function eTag() {
         $Data = array();
         $Data['vanilla-core-'.APPLICATION_VERSION] = true;
 

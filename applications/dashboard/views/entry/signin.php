@@ -63,7 +63,7 @@ echo '</div>';
         echo $this->Form->button('Sign In', array('class' => 'Button Primary'));
         echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
         ?>
-        <?php if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0): ?>
+        <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>
             <div class="CreateAccount">
                 <?php
                 $Target = $this->target();
@@ -71,7 +71,7 @@ echo '</div>';
                     $Target = '?Target='.urlencode($Target);
                 }
 
-                if (C('Garden.Registration.Method') != 'Invitation') {
+                if (c('Garden.Registration.Method') != 'Invitation') {
                     printf(t("Don't have an account? %s"), anchor(t('Create One.'), '/entry/register'.$Target));
                 }
                 ?>

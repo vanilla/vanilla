@@ -40,7 +40,7 @@ class UpdateModel extends Gdn_Model {
      * @param bool $Fix Whether or not to fix files that have been zipped incorrectly.
      * @return array An array of addon information.
      */
-    public static function AnalyzeAddon($Path, $ThrowError = true) {
+    public static function analyzeAddon($Path, $ThrowError = true) {
         if (!file_exists($Path)) {
             if ($ThrowError) {
                 throw new Exception("$Path not found.", 404);
@@ -603,7 +603,7 @@ class UpdateModel extends Gdn_Model {
      * @param string $Path The path to the index.php file.
      * @return string|false A string containing the version or false if the file could not be parsed.
      */
-    public static function ParseCoreVersion($Path) {
+    public static function parseCoreVersion($Path) {
         $fp = fopen($Path, 'rb');
         $Application = false;
         $Version = false;
@@ -636,7 +636,7 @@ class UpdateModel extends Gdn_Model {
      * @param string $Variable The name of variable containing the information.
      * @return array|false The info array or false if the file could not be parsed.
      */
-    public static function ParseInfoArray($Path, $Variable = false) {
+    public static function parseInfoArray($Path, $Variable = false) {
         $fp = fopen($Path, 'rb');
         $Lines = array();
         $InArray = false;
@@ -718,7 +718,7 @@ class UpdateModel extends Gdn_Model {
         return $Result;
     }
 
-    public function CompareAddons($MyAddons, $LatestAddons, $OnlyUpdates = true) {
+    public function compareAddons($MyAddons, $LatestAddons, $OnlyUpdates = true) {
         $UpdateAddons = false;
 
         // Join the site addons with my addons.
@@ -751,7 +751,7 @@ class UpdateModel extends Gdn_Model {
      * @param bool $Enabled
      * @return array
      */
-    public function GetAddons($Enabled = false) {
+    public function getAddons($Enabled = false) {
         $Addons = array();
 
         // Get the core.
@@ -840,7 +840,7 @@ class UpdateModel extends Gdn_Model {
      * @return array|bool
      * @throws Exception
      */
-    public function GetAddonUpdates($Enabled = false, $OnlyUpdates = true) {
+    public function getAddonUpdates($Enabled = false, $OnlyUpdates = true) {
         // Get the addons on this site.
         $MyAddons = $this->GetAddons($Enabled);
 
@@ -868,7 +868,7 @@ class UpdateModel extends Gdn_Model {
      * @param bool $Drop
      * @throws Exception
      */
-    public function RunStructure($AddonCode = null, $Explicit = false, $Drop = false) {
+    public function runStructure($AddonCode = null, $Explicit = false, $Drop = false) {
         // Get the structure files for all of the enabled applications.
         $ApplicationManager = new Gdn_ApplicationManager();
         $Apps = $ApplicationManager->EnabledApplications();

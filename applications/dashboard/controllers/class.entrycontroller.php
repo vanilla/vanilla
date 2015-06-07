@@ -376,7 +376,7 @@ EOT;
      *
      * @param string $Method Used to register multiple providers on ConnectData event.
      */
-    public function Connect($Method) {
+    public function connect($Method) {
         $this->addJsFile('entry.js');
         $this->View = 'connect';
         $IsPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
@@ -460,7 +460,7 @@ EOT;
                 $RoleIDs = $this->UserModel->newUserRoleIDs();
             }
 
-            if (C('Garden.SSO.SyncRolesBehavior') === 'register') {
+            if (c('Garden.SSO.SyncRolesBehavior') === 'register') {
                 $SaveRoles = false;
             }
 
@@ -474,7 +474,7 @@ EOT;
             // The user is already connected.
             $this->Form->setFormValue('UserID', $UserID);
 
-            if (C('Garden.Registration.ConnectSynchronize', true)) {
+            if (c('Garden.Registration.ConnectSynchronize', true)) {
                 $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
                 $Data = $this->Form->formValues();
 
@@ -532,7 +532,7 @@ EOT;
                         $this->Form->setFormValue('UserID', $UserID);
                         $Data = $this->Form->formValues();
 
-                        if (C('Garden.Registration.ConnectSynchronize', true)) {
+                        if (c('Garden.Registration.ConnectSynchronize', true)) {
                             // Don't overwrite a photo if the user has already uploaded one.
                             $Photo = val('Photo', $Row);
                             if (!val('Photo', $Data) || ($Photo && !stringBeginsWith($Photo, 'http'))) {
@@ -632,7 +632,7 @@ EOT;
                     Gdn::userModel()->fireEvent('AfterSignIn');
 
                     // Send the welcome email.
-                    if (C('Garden.Registration.SendConnectEmail', false)) {
+                    if (c('Garden.Registration.SendConnectEmail', false)) {
                         try {
                             $UserModel->sendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'))));
                         } catch (Exception $Ex) {
@@ -660,7 +660,7 @@ EOT;
                     $ConnectName = $this->Form->getFormValue('ConnectName');
 
                     $User = false;
-                    if (C('Garden.Registration.NameUnique')) {
+                    if (c('Garden.Registration.NameUnique')) {
                         // Check to see if there is already a user with the given name.
                         $User = $UserModel->getWhere(array('Name' => $ConnectName))->firstRow(DATASET_TYPE_ARRAY);
                     }
@@ -844,7 +844,7 @@ EOT;
      * @param array $Arg1
      * @return string Rendered XHTML template.
      */
-    public function SignIn($Method = false, $Arg1 = false) {
+    public function signIn($Method = false, $Arg1 = false) {
         if (!$this->Request->isPostBack()) {
             $this->checkOverride('SignIn', $this->target());
         }
@@ -955,7 +955,7 @@ EOT;
      *
      * @param string $AuthenticationSchemeAlias (default: 'default')
      */
-    public function Handshake($AuthenticationSchemeAlias = 'default') {
+    public function handshake($AuthenticationSchemeAlias = 'default') {
 
         try {
             // Don't show anything if handshaking not turned on by an authenticator
@@ -1259,7 +1259,7 @@ EOT;
      * @access private
      * @since 2.0.0
      */
-    private function RegisterApproval() {
+    private function registerApproval() {
         Gdn::userModel()->addPasswordStrength($this);
 
         // If the form has been posted back...
@@ -1324,7 +1324,7 @@ EOT;
      * @access private
      * @since 2.0.0
      */
-    private function RegisterBasic() {
+    private function registerBasic() {
         Gdn::userModel()->addPasswordStrength($this);
 
         if ($this->Form->isPostBack() === true) {
@@ -1385,7 +1385,7 @@ EOT;
     /**
      * Deprecated since 2.0.18.
      */
-    private function RegisterConnect() {
+    private function registerConnect() {
         throw notFoundException();
     }
 

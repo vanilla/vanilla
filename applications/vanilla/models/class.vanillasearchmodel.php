@@ -25,7 +25,7 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $Value DiscussionModel.
      * @return object DiscussionModel.
      */
-    public function DiscussionModel($Value = false) {
+    public function discussionModel($Value = false) {
         if ($Value !== false) {
             $this->_DiscussionModel = $Value;
         }
@@ -45,7 +45,7 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $SearchModel SearchModel (Dashboard)
      * @return object SQL result.
      */
-    public function DiscussionSql($SearchModel, $AddMatch = true) {
+    public function discussionSql($SearchModel, $AddMatch = true) {
         // Get permission and limit search categories if necessary.
         if ($AddMatch) {
             $Perms = CategoryModel::CategoryWatch();
@@ -89,7 +89,7 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $SearchModel SearchModel (Dashboard)
      * @return object SQL result.
      */
-    public function CommentSql($SearchModel, $AddMatch = true) {
+    public function commentSql($SearchModel, $AddMatch = true) {
         if ($AddMatch) {
             // Get permission and limit search categories if necessary.
             $Perms = CategoryModel::CategoryWatch();
@@ -132,7 +132,7 @@ class VanillaSearchModel extends Gdn_Model {
      *
      * @param object $SearchModel SearchModel (Dashboard)
      */
-    public function Search($SearchModel) {
+    public function search($SearchModel) {
         $SearchModel->AddSearch($this->DiscussionSql($SearchModel));
         $SearchModel->AddSearch($this->CommentSql($SearchModel));
     }

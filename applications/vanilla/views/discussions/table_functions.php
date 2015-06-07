@@ -2,7 +2,7 @@
 
 if (!function_exists('WriteDiscussionHeading')):
 
-    function WriteDiscussionHeading() {
+    function writeDiscussionHeading() {
         ?>
         <tr>
             <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>')); ?>
@@ -31,7 +31,7 @@ if (!function_exists('WriteDiscussionRow')):
     /**
      * Writes a discussion in table row format.
      */
-    function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
+    function writeDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
         if (!property_exists($Sender, 'CanEditDiscussions'))
             $Sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($Discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
 
@@ -154,7 +154,7 @@ endif;
 
 if (!function_exists('WriteDiscussionTable')) :
 
-    function WriteDiscussionTable() {
+    function writeDiscussionTable() {
         $c = Gdn::controller();
         ?>
         <div class="DataTableWrap">

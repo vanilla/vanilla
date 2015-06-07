@@ -64,7 +64,7 @@ if (!class_exists('SideMenuModule', false)) {
          * @param bool $Permission
          * @param array $Attributes
          */
-        public function AddLink($Group, $Text, $Url, $Permission = false, $Attributes = array()) {
+        public function addLink($Group, $Text, $Url, $Permission = false, $Attributes = array()) {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->AddItem($Group, t($Group));
             }
@@ -91,7 +91,7 @@ if (!class_exists('SideMenuModule', false)) {
          * @param bool $Permission
          * @param array $Attributes
          */
-        public function AddItem($Group, $Text, $Permission = false, $Attributes = array()) {
+        public function addItem($Group, $Text, $Permission = false, $Attributes = array()) {
             if (!array_key_exists($Group, $this->Items)) {
                 $Item = array('Group' => $Group, 'Links' => array(), 'Attributes' => array(), '_Sort' => count($this->Items));
             } else {
@@ -116,14 +116,14 @@ if (!class_exists('SideMenuModule', false)) {
          *
          * @return string
          */
-        public function AssetTarget() {
+        public function assetTarget() {
             return 'Menu';
         }
 
         /**
          *
          */
-        public function CheckPermissions() {
+        public function checkPermissions() {
             $Session = Gdn::session();
 
             foreach ($this->Items as $Group => $Item) {
@@ -147,7 +147,7 @@ if (!class_exists('SideMenuModule', false)) {
         /**
          *
          */
-        public function ClearGroups() {
+        public function clearGroups() {
             $this->Items = array();
         }
 
@@ -210,7 +210,7 @@ if (!class_exists('SideMenuModule', false)) {
          *
          * @param $Route
          */
-        public function HighlightRoute($Route) {
+        public function highlightRoute($Route) {
             $this->_HighlightRoute = $Route;
         }
 
@@ -220,7 +220,7 @@ if (!class_exists('SideMenuModule', false)) {
          * @param $Group
          * @param $Text
          */
-        public function RemoveLink($Group, $Text) {
+        public function removeLink($Group, $Text) {
             if (array_key_exists($Group, $this->Items) && isset($this->Items[$Group]['Links'])) {
                 $Links =& $this->Items[$Group]['Links'];
 
@@ -242,14 +242,14 @@ if (!class_exists('SideMenuModule', false)) {
         /**
          * Removes all links from a specific group.
          */
-        public function RemoveLinks($Group) {
+        public function removeLinks($Group) {
             $this->Items[$Group] = array();
         }
 
         /**
          * Removes an entire group of links, and the group itself, from the menu.
          */
-        public function RemoveGroup($Group) {
+        public function removeGroup($Group) {
             if (array_key_exists($Group, $this->Items)) {
                 unset($this->Items[$Group]);
             }
@@ -262,7 +262,7 @@ if (!class_exists('SideMenuModule', false)) {
          * @return string
          * @throws Exception
          */
-        public function ToString($HighlightRoute = '') {
+        public function toString($HighlightRoute = '') {
             Gdn::controller()->EventArguments['SideMenu'] = $this;
             if ($this->EventName) {
                 Gdn::controller()->fireEvent($this->EventName);

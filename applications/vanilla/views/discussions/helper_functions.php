@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('AdminCheck')) {
-    function AdminCheck($Discussion = null, $Wrap = FALSE) {
+    function adminCheck($Discussion = null, $Wrap = FALSE) {
         static $UseAdminChecks = NULL;
         if ($UseAdminChecks === null)
             $UseAdminChecks = c('Vanilla.AdminCheckboxes.Use') && Gdn::session()->checkPermission('Garden.Moderation.Manage');
@@ -48,7 +48,7 @@ EOT;
 }
 
 if (!function_exists('BookmarkButton')) {
-    function BookmarkButton($Discussion) {
+    function bookmarkButton($Discussion) {
         if (!Gdn::session()->isValid())
             return '';
 
@@ -65,7 +65,7 @@ if (!function_exists('BookmarkButton')) {
 
 if (!function_exists('CategoryLink')):
 
-    function CategoryLink($Discussion, $Prefix = ' ') {
+    function categoryLink($Discussion, $Prefix = ' ') {
 //   if (!$Force && Gdn::controller()->data('Category')) {
 //      return;
 //   }
@@ -80,14 +80,14 @@ endif;
 
 if (!function_exists('DiscussionHeading')):
 
-    function DiscussionHeading() {
+    function discussionHeading() {
         return t('Discussion');
     }
 
 endif;
 
 if (!function_exists('WriteDiscussion')):
-    function WriteDiscussion($Discussion, &$Sender, &$Session) {
+    function writeDiscussion($Discussion, &$Sender, &$Session) {
         $CssClass = CssClass($Discussion);
         $DiscussionUrl = $Discussion->Url;
         $Category = CategoryModel::categories($Discussion->CategoryID);
@@ -199,7 +199,7 @@ endif;
 
 if (!function_exists('DiscussionSorter')):
 
-    function WriteDiscussionSorter($Selected = null, $Options = null) {
+    function writeDiscussionSorter($Selected = null, $Options = null) {
         if ($Selected === null) {
             $Selected = Gdn::session()->GetPreference('Discussions.SortField', 'DateLastComment');
         }
@@ -236,7 +236,7 @@ if (!function_exists('DiscussionSorter')):
 endif;
 
 if (!function_exists('WriteMiniPager')):
-    function WriteMiniPager($Discussion) {
+    function writeMiniPager($Discussion) {
         if (!property_exists($Discussion, 'CountPages'))
             return;
 
@@ -260,13 +260,13 @@ if (!function_exists('WriteMiniPager')):
 endif;
 
 if (!function_exists('WritePageLink')):
-    function WritePageLink($Discussion, $PageNumber) {
+    function writePageLink($Discussion, $PageNumber) {
         echo anchor($PageNumber, DiscussionUrl($Discussion, $PageNumber));
     }
 endif;
 
 if (!function_exists('NewComments')):
-    function NewComments($Discussion) {
+    function newComments($Discussion) {
         if (!Gdn::session()->isValid())
             return '';
 
@@ -284,7 +284,7 @@ if (!function_exists('NewComments')):
 endif;
 
 if (!function_exists('Tag')):
-    function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
+    function tag($Discussion, $Column, $Code, $CssClass = FALSE) {
         $Discussion = (object)$Discussion;
 
         if (is_numeric($Discussion->$Column) && !$Discussion->$Column)
@@ -300,7 +300,7 @@ if (!function_exists('Tag')):
 endif;
 
 if (!function_exists('WriteTags')):
-    function WriteTags($Discussion) {
+    function writeTags($Discussion) {
         Gdn::controller()->fireEvent('BeforeDiscussionMeta');
 
         echo Tag($Discussion, 'Announce', 'Announcement');
@@ -311,7 +311,7 @@ if (!function_exists('WriteTags')):
 endif;
 
 if (!function_exists('WriteFilterTabs')):
-    function WriteFilterTabs($Sender) {
+    function writeFilterTabs($Sender) {
         $Session = Gdn::session();
         $Title = property_exists($Sender, 'Category') ? val('Name', $Sender->Category, '') : '';
         if ($Title == '')
@@ -330,7 +330,7 @@ if (!function_exists('WriteFilterTabs')):
             $CountDrafts = $Session->User->CountDrafts;
         }
 
-        if (C('Vanilla.Discussions.ShowCounts', true)) {
+        if (c('Vanilla.Discussions.ShowCounts', true)) {
             $Bookmarked .= CountString($CountBookmarks, url('/discussions/UserBookmarkCount'));
             $MyDiscussions .= CountString($CountDiscussions);
             $MyDrafts .= CountString($CountDrafts);
@@ -354,7 +354,7 @@ if (!function_exists('WriteFilterTabs')):
                 <?php $Sender->fireEvent('AfterAllDiscussionsTab'); ?>
 
                 <?php
-                if (C('Vanilla.Categories.ShowTabs')) {
+                if (c('Vanilla.Categories.ShowTabs')) {
                     $CssClass = '';
                     if (strtolower($Sender->ControllerName) == 'categoriescontroller' && strtolower($Sender->RequestMethod) == 'all') {
                         $CssClass = 'Active';
@@ -387,7 +387,7 @@ if (!function_exists('WriteFilterTabs')):
 endif;
 
 if (!function_exists('OptionsList')):
-    function OptionsList($Discussion) {
+    function optionsList($Discussion) {
         $Sender = Gdn::controller();
         $Session = Gdn::session();
 
@@ -395,7 +395,7 @@ if (!function_exists('OptionsList')):
             $Sender->Options = '';
 
             // Dismiss an announcement
-            if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
+            if (c('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
                 $Sender->Options .= '<li>'.anchor(t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack').'</li>';
 
             // Edit discussion
@@ -451,7 +451,7 @@ if (!function_exists('WriteOptions')):
     /**
      * Render options that the user has for this discussion.
      */
-    function WriteOptions($Discussion) {
+    function writeOptions($Discussion) {
         if (!Gdn::session()->isValid() || !Gdn::controller()->ShowOptions)
             return;
 

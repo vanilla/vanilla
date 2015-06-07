@@ -6,7 +6,7 @@ $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
 $Categories = CategoryModel::MakeTree($this->data('Categories'), $this->data('Category', null));
 
-if (C('Vanilla.Categories.DoHeadings')) {
+if (c('Vanilla.Categories.DoHeadings')) {
     foreach ($Categories as $Category) {
         ?>
         <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>"

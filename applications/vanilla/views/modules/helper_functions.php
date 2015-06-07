@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('WriteModuleDiscussion')):
-    function WriteModuleDiscussion($Discussion, $Px = 'Bookmark') {
+    function writeModuleDiscussion($Discussion, $Px = 'Bookmark') {
         ?>
         <li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
    <span class="Options">
@@ -37,7 +37,7 @@ if (!function_exists('WritePromotedContent')):
      * @param array|object $Content
      * @param PromotedContentModule $Sender
      */
-    function WritePromotedContent($Content, $Sender) {
+    function writePromotedContent($Content, $Sender) {
         static $UserPhotoFirst = NULL;
         if ($UserPhotoFirst === null)
             $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
@@ -154,7 +154,7 @@ if (!function_exists('writePromotedContentRow')):
     function writePromotedContentRow($row, $view) {
         $title = htmlspecialchars(val('Name', $row));
         $url = val('Url', $row);
-        $body = Gdn_Format::PlainText(val('Body', $row), val('Format', $row));
+        $body = Gdn_Format::plainText(val('Body', $row), val('Format', $row));
         $categoryUrl = val('CategoryUrl', $row);
         $categoryName = val('CategoryName', $row);
         $date = val('DateUpdated', $row) ?: val('DateInserted', $row);
@@ -198,7 +198,7 @@ if (!function_exists('writePromotedContentRow')):
         <?php } else { ?>
 
             <li id="Promoted_<?php echo $type.'_'.$id; ?>" class="Item PromotedContent-Item <?php echo $cssClass; ?>">
-                <?php if (C('EnabledPlugins.IndexPhotos')) { ?>
+                <?php if (c('EnabledPlugins.IndexPhotos')) { ?>
                     <a title="<?php echo $username; ?>" href="<?php echo $userUrl; ?>" class="IndexPhoto PhotoWrap">
                         <img src="<?php echo $userPhoto; ?>" alt="<?php echo $username; ?>"
                              class="ProfilePhoto ProfilePhotoMedium">

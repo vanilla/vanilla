@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteConnection($Row) {
+function writeConnection($Row) {
     $c = Gdn::controller();
     $Connected = val('Connected', $Row);
     ?>
@@ -45,7 +45,7 @@ function WriteConnection($Row) {
 }
 
 
-function ConnectButton($Row) {
+function connectButton($Row) {
     $c = Gdn::controller();
 
     $Connected = val('Connected', $Row);

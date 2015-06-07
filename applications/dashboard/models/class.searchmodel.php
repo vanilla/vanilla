@@ -33,7 +33,7 @@ class SearchModel extends Gdn_Model {
      *
      * @param $Sql
      */
-    public function AddSearch($Sql) {
+    public function addSearch($Sql) {
         $this->_SearchSql[] = $Sql;
     }
 
@@ -42,7 +42,7 @@ class SearchModel extends Gdn_Model {
      * @param Gdn_SQLDriver $Sql
      * @param string $Columns a comma seperated list of columns to search on.
      */
-    public function AddMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
+    public function addMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
         if ($this->_SearchMode == 'like') {
             if ($LikeRelavenceColumn) {
                 $Sql->select($LikeRelavenceColumn, '', 'Relavence');
@@ -83,7 +83,7 @@ class SearchModel extends Gdn_Model {
      *
      * @return string
      */
-    public function Parameter() {
+    public function parameter() {
         $Parameter = ':Search'.count($this->_Parameters);
         $this->_Parameters[$Parameter] = '';
         return $Parameter;
@@ -92,7 +92,7 @@ class SearchModel extends Gdn_Model {
     /**
      *
      */
-    public function Reset() {
+    public function reset() {
         $this->_Parameters = array();
         $this->_SearchSql = '';
     }
@@ -106,7 +106,7 @@ class SearchModel extends Gdn_Model {
      * @return array|null
      * @throws Exception
      */
-    public function Search($Search, $Offset = 0, $Limit = 20) {
+    public function search($Search, $Offset = 0, $Limit = 20) {
         // If there are no searches then return an empty array.
         if (trim($Search) == '') {
             return array();
@@ -116,7 +116,7 @@ class SearchModel extends Gdn_Model {
         if ($this->ForceSearchMode) {
             $SearchMode = $this->ForceSearchMode;
         } else {
-            $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
+            $SearchMode = strtolower(c('Garden.Search.Mode', 'matchboolean'));
         }
 
         if ($SearchMode == 'matchboolean') {
@@ -196,7 +196,7 @@ class SearchModel extends Gdn_Model {
      * @param null $Value
      * @return null|string
      */
-    public function SearchMode($Value = null) {
+    public function searchMode($Value = null) {
         if ($Value !== null) {
             $this->_SearchMode = $Value;
         }

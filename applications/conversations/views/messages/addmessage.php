@@ -11,7 +11,7 @@ $this->fireEvent('BeforeMessageForm');
             <div class="Form-Header">
             <span class="Author">
                <?php
-               if (C('Vanilla.Comment.UserPhotoFirst', true)) {
+               if (c('Vanilla.Comment.UserPhotoFirst', true)) {
                    echo userPhoto($Session->User);
                    echo userAnchor($Session->User, 'Username');
                } else {

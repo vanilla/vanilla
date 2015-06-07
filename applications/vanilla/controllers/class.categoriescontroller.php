@@ -37,7 +37,7 @@ class CategoriesController extends VanillaController {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function Archives($Category, $Month, $Page = false) {
+    public function archives($Category, $Month, $Page = false) {
         $Category = CategoryModel::categories($Category);
         if (!$Category) {
             throw notFoundException($Category);
@@ -99,7 +99,7 @@ class CategoriesController extends VanillaController {
     /**
      * "Table" layout for categories. Mimics more traditional forum category layout.
      */
-    public function Table($Category = '') {
+    public function table($Category = '') {
         if ($this->SyndicationMethod == SYNDICATION_NONE) {
             $this->View = 'table';
         } else {
@@ -232,7 +232,7 @@ class CategoriesController extends VanillaController {
             // Get a DiscussionModel
             $DiscussionModel = new DiscussionModel();
             $CategoryIDs = array($CategoryID);
-            if (C('Vanilla.ExpandCategories')) {
+            if (c('Vanilla.ExpandCategories')) {
                 $CategoryIDs = array_merge($CategoryIDs, array_column($this->data('Categories'), 'CategoryID'));
             }
             $Wheres = array('d.CategoryID' => $CategoryIDs);
@@ -324,7 +324,7 @@ class CategoriesController extends VanillaController {
      * @since 2.0.17
      * @access public
      */
-    public function All($Category = '') {
+    public function all($Category = '') {
         // Setup head.
         $this->Menu->highlightRoute('/discussions');
         if (!$this->title()) {
@@ -338,7 +338,7 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section('CategoryList');
 
         if (!$Category) {
-            $this->Description(C('Garden.Description', null));
+            $this->Description(c('Garden.Description', null));
         }
 
         $this->setData('Breadcrumbs', CategoryModel::GetAncestors(val('CategoryID', $this->data('Category'))));
@@ -381,7 +381,7 @@ class CategoriesController extends VanillaController {
      * @since 2.0.0
      * @access public
      */
-    public function Discussions($Category = '') {
+    public function discussions($Category = '') {
         // Setup head
         $this->addJsFile('discussions.js');
         $this->Menu->highlightRoute('/discussions');
@@ -396,7 +396,7 @@ class CategoriesController extends VanillaController {
         }
 
         if (!$Category) {
-            $this->Description(C('Garden.Description', null));
+            $this->Description(c('Garden.Description', null));
         }
 
         Gdn_Theme::section('CategoryDiscussionList');

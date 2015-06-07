@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit;
 
-function PluralCount($Count, $Type) {
+function pluralCount($Count, $Type) {
     $PluralCodes = array('Activity' => '%s Activities');
     $SingleCode = '%s '.Gdn_Form::LabelCode($Type);
     return plural($Count, $SingleCode, val($Type, $PluralCodes, $SingleCode.'s'));
 }
 
-function OtherRecordsMeta($Data) {
+function otherRecordsMeta($Data) {
     if (!val('_Data', $Data)) {
         return '';
     }

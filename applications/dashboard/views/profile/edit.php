@@ -70,7 +70,7 @@
             ?>
         </li>
 
-        <?php if (C('Garden.Profile.Titles', false)): ?>
+        <?php if (c('Garden.Profile.Titles', false)): ?>
             <li class="User-Title">
                 <?php
                 echo $this->Form->label('Title', 'Title');
@@ -79,7 +79,7 @@
             </li>
         <?php endif; ?>
 
-        <?php if (C('Garden.Profile.Locations', false)): ?>
+        <?php if (c('Garden.Profile.Locations', false)): ?>
             <li class="User-Location">
                 <?php
                 echo $this->Form->label('Location', 'Location');

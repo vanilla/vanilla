@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 if (!function_exists('DiscussionSortText')) {
-    function DiscussionSortText($Field) {
+    function discussionSortText($Field) {
         $Text = FALSE;
         switch ($Field) {
             case 'd.DiscussionID' :

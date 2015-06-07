@@ -18,7 +18,7 @@ class SessionController extends DashboardController {
      *
      * Looks for Name and Value POST/GET variables to pass along to Gdn_Session.
      */
-    public function Stash() {
+    public function stash() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $Name = TrueStripSlashes(val('Name', $_POST, ''));

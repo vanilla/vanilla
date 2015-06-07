@@ -31,7 +31,7 @@ class LogController extends DashboardController {
      * @param string $Action Type of action.
      * @param array $LogIDs Numeric IDs of items to confirm.
      */
-    public function Confirm($Action, $LogIDs = '') {
+    public function confirm($Action, $LogIDs = '') {
         $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
 
         $this->Form->InputPrefix = '';
@@ -44,7 +44,7 @@ class LogController extends DashboardController {
         }
 
         // We also want to collect the users from the log.
-        $Logs = $this->LogModel->GetIDs($LogIDArray);
+        $Logs = $this->LogModel->getIDs($LogIDArray);
         $Users = array();
         foreach ($Logs as $Log) {
             $UserID = $Log['RecordUserID'];

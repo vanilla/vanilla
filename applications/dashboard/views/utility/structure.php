@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
-echo Wrap(T($this->Data('Title')), 'h1');
+echo wrap(t($this->data('Title')), 'h1');
 echo '<div class="Wrap">';
-echo $this->Form->Errors();
+echo $this->Form->errors();
 
 if ($this->Data['Status'])
-    echo '<div class="Info">', T($this->Data['Status']), '</div>';
+    echo '<div class="Info">', t($this->Data['Status']), '</div>';
 
 if (array_key_exists('CapturedSql', $this->Data)) {
     $CapturedSql = (array)$this->Data['CapturedSql'];
@@ -12,7 +12,7 @@ if (array_key_exists('CapturedSql', $this->Data)) {
 
     if (count($CapturedSql) > 0) {
         ?>
-        <div class="Info"><?php echo T('The following structure changes are required for your database.'); ?></div>
+        <div class="Info"><?php echo t('The following structure changes are required for your database.'); ?></div>
         <?php
         echo '<pre class="Sql">';
         $First = TRUE;
@@ -30,13 +30,13 @@ if (array_key_exists('CapturedSql', $this->Data)) {
     } else if ($this->Data['CaptureOnly']) {
         ?>
         <div
-            class="Info"><?php echo T('There are no database structure changes required. There may, however, be data changes.'); ?></div>
+            class="Info"><?php echo t('There are no database structure changes required. There may, however, be data changes.'); ?></div>
     <?php
     }
     echo '<div class="Buttons">',
-    Anchor(T('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;')),
+    anchor(t('Run structure & data scripts'), $Url, 'Button', array('style' => 'font-size: 16px;')),
     ' ',
-    Anchor(T('Rescan'), 'dashboard/utility/structure/all', 'Button', array('style' => 'font-size: 16px;')),
+    anchor(t('Rescan'), 'dashboard/utility/structure/all', 'Button', array('style' => 'font-size: 16px;')),
     '</div>';
 }
 echo '</div>';

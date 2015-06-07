@@ -66,7 +66,7 @@ if (!class_exists('SideMenuModule', false)) {
          */
         public function AddLink($Group, $Text, $Url, $Permission = false, $Attributes = array()) {
             if (!array_key_exists($Group, $this->Items)) {
-                $this->AddItem($Group, T($Group));
+                $this->AddItem($Group, t($Group));
             }
             if ($Text === false) {
                 // This link is the group heading.
@@ -124,21 +124,21 @@ if (!class_exists('SideMenuModule', false)) {
          *
          */
         public function CheckPermissions() {
-            $Session = Gdn::Session();
+            $Session = Gdn::session();
 
             foreach ($this->Items as $Group => $Item) {
-                if (GetValue('Permission', $Item) && !$Session->CheckPermission($Item['Permission'], false)) {
+                if (val('Permission', $Item) && !$Session->checkPermission($Item['Permission'], false)) {
                     unset($this->Items[$Group]);
                     continue;
                 }
 
                 foreach ($Item['Links'] as $Key => $Link) {
-                    if (GetValue('Permission', $Link) && !$Session->CheckPermission($Link['Permission'], false)) {
+                    if (val('Permission', $Link) && !$Session->checkPermission($Link['Permission'], false)) {
                         unset($this->Items[$Group]['Links'][$Key]);
                     }
                 }
                 // Remove the item if there are no more links.
-                if (!GetValue('Url', $Item) && !count($this->Items[$Group]['Links'])) {
+                if (!val('Url', $Item) && !count($this->Items[$Group]['Links'])) {
                     unset($this->Items[$Group]);
                 }
             }
@@ -231,7 +231,7 @@ if (!class_exists('SideMenuModule', false)) {
 
 
                 foreach ($Links as $Index => $Link) {
-                    if (GetValue('Text', $Link) == $Text) {
+                    if (val('Text', $Link) == $Text) {
                         unset($this->Items[$Group]['Links'][$Index]);
                         return;
                     }
@@ -263,9 +263,9 @@ if (!class_exists('SideMenuModule', false)) {
          * @throws Exception
          */
         public function ToString($HighlightRoute = '') {
-            Gdn::Controller()->EventArguments['SideMenu'] = $this;
+            Gdn::controller()->EventArguments['SideMenu'] = $this;
             if ($this->EventName) {
-                Gdn::Controller()->FireEvent($this->EventName);
+                Gdn::controller()->fireEvent($this->EventName);
             }
 
 
@@ -275,7 +275,7 @@ if (!class_exists('SideMenuModule', false)) {
             if ($HighlightRoute == '') {
                 $HighlightRoute = Gdn_Url::Request();
             }
-            $HighlightUrl = Url($HighlightRoute);
+            $HighlightUrl = url($HighlightRoute);
 
             // Apply a sort to the items if given.
             if (is_array($this->Sort)) {
@@ -309,15 +309,15 @@ if (!class_exists('SideMenuModule', false)) {
                 uasort($Item['Links'], array($this, '_Compare'));
 
                 // Highlight the group.
-                if (GetValue('Url', $Item) && Url($Item['Url']) == $HighlightUrl) {
-                    $Item['Attributes']['class'] = ConcatSep(' ', GetValue('class', $Item['Attributes']), 'Active');
+                if (val('Url', $Item) && url($Item['Url']) == $HighlightUrl) {
+                    $Item['Attributes']['class'] = ConcatSep(' ', val('class', $Item['Attributes']), 'Active');
                 }
 
                 // Hightlight the correct item in the group.
                 foreach ($Item['Links'] as &$Link) {
-                    if (GetValue('Url', $Link) && Url($Link['Url']) == $HighlightUrl) {
-                        $Link['Attributes']['class'] = ConcatSep(' ', GetValue('class', $Link['Attributes']), 'Active');
-                        $Item['Attributes']['class'] = ConcatSep(' ', GetValue('class', $Item['Attributes']), 'Active');
+                    if (val('Url', $Link) && url($Link['Url']) == $HighlightUrl) {
+                        $Link['Attributes']['class'] = ConcatSep(' ', val('class', $Link['Attributes']), 'Active');
+                        $Item['Attributes']['class'] = ConcatSep(' ', val('class', $Item['Attributes']), 'Active');
                     }
                 }
             }

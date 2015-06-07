@@ -79,18 +79,18 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         if ($ResultString) {
             $Result = json_decode($ResultString, true);
 
-            $IPFrequency = GetValueR('ip.frequency', $Result, 0);
-            $EmailFrequency = GetValueR('email.frequency', $Result, 0);
+            $IPFrequency = valr('ip.frequency', $Result, 0);
+            $EmailFrequency = valr('email.frequency', $Result, 0);
 
             $IsSpam = false;
 
             // Flag registrations as spam above a certain threshold.
-            if ($IPFrequency >= C('Plugins.StopForumSpam.IPThreshold1', 5) || $EmailFrequency >= C('Plugins.StopForumSpam.EmailThreshold1', 20)) {
+            if ($IPFrequency >= c('Plugins.StopForumSpam.IPThreshold1', 5) || $EmailFrequency >= c('Plugins.StopForumSpam.EmailThreshold1', 20)) {
                 $IsSpam = true;
             }
 
             // Don't even log registrations that are above another threahold.
-            if ($IPFrequency >= C('Plugins.StopForumSpam.IPThreshold2', 20) || $EmailFrequency >= C('Plugins.StopForumSpam.EmailThreshold2', 50)) {
+            if ($IPFrequency >= c('Plugins.StopForumSpam.IPThreshold2', 20) || $EmailFrequency >= c('Plugins.StopForumSpam.EmailThreshold2', 50)) {
                 $Options['Log'] = false;
             }
 
@@ -116,26 +116,26 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      */
     public function Structure() {
         // Get a user for operations.
-        $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->Value('UserID');
+        $UserID = Gdn::sql()->getWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->value('UserID');
 
         if (!$UserID) {
-            $UserID = Gdn::SQL()->Insert('User', array(
+            $UserID = Gdn::sql()->insert('User', array(
                 'Name' => 'StopForumSpam',
                 'Password' => RandomString('20'),
                 'HashMethod' => 'Random',
                 'Email' => 'stopforumspam@domain.com',
-                'DateInserted' => Gdn_Format::ToDateTime(),
+                'DateInserted' => Gdn_Format::toDateTime(),
                 'Admin' => '2'
             ));
         }
-        SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => true));
+        saveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => true));
     }
 
     /**
      * @return mixed
      */
     public function UserID() {
-        return C('Plugins.StopForumSpam.UserID', null);
+        return c('Plugins.StopForumSpam.UserID', null);
     }
 
     /**
@@ -155,11 +155,11 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         $Options =& $Args['Options'];
 
         // Detect our favorite bot and short-circuit
-        if ($Reason = GetValue('DiscoveryText', $Data)) {
+        if ($Reason = val('DiscoveryText', $Data)) {
             if (substr($Reason, 0, 1) === '{') {
                 $Sender->EventArguments['IsSpam'] = true;
                 $Data['Log_InsertUserID'] = $this->UserID();
-                $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+                $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
                 return;
             }
         }
@@ -170,7 +170,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
                 $Result = self::Check($Data, $Options);
                 if ($Result) {
                     $Data['Log_InsertUserID'] = $this->UserID();
-                    $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+                    $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
                 }
                 break;
             case 'Comment':

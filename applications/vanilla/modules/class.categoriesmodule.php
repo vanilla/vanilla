@@ -23,7 +23,7 @@ class CategoriesModule extends Gdn_Module {
         parent::__construct($Sender);
         $this->_ApplicationFolder = 'vanilla';
 
-        $this->Visible = C('Vanilla.Categories.Use') && !C('Vanilla.Categories.HideModule');
+        $this->Visible = c('Vanilla.Categories.Use') && !c('Vanilla.Categories.HideModule');
     }
 
     public function AssetTarget() {
@@ -35,12 +35,12 @@ class CategoriesModule extends Gdn_Module {
      */
     protected function GetData() {
         // Allow plugins to set different data.
-        $this->FireEvent('GetData');
+        $this->fireEvent('GetData');
         if ($this->Data) {
             return;
         }
 
-        $Categories = CategoryModel::Categories();
+        $Categories = CategoryModel::categories();
         $Categories2 = $Categories;
 
         // Filter out the categories we aren't watching.
@@ -71,7 +71,7 @@ class CategoriesModule extends Gdn_Module {
             $this->GetData();
         }
 
-        $this->filterDepth($this->Data->Result(), $this->startDepth, $this->endDepth);
+        $this->filterDepth($this->Data->result(), $this->startDepth, $this->endDepth);
 
         return parent::ToString();
     }

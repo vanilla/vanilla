@@ -81,7 +81,7 @@ class ConfigurationModule extends Gdn_Module {
         if ($HasFiles === null) {
             $HasFiles = false;
             foreach ($this->Schema() as $K => $Row) {
-                if (strtolower(GetValue('Control', $Row)) == 'imageupload') {
+                if (strtolower(val('Control', $Row)) == 'imageupload') {
                     $HasFiles = true;
                     break;
                 }
@@ -96,51 +96,51 @@ class ConfigurationModule extends Gdn_Module {
      * @param null $Schema
      * @throws Exception
      */
-    public function Initialize($Schema = null) {
+    public function initialize($Schema = null) {
         if ($Schema !== null) {
             $this->Schema($Schema);
         }
 
         $Form = $this->Form();
 
-        if ($Form->AuthenticatedPostBack()) {
+        if ($Form->authenticatedPostBack()) {
             // Grab the data from the form.
             $Data = array();
-            $Post = $Form->FormValues();
+            $Post = $Form->formValues();
 
             foreach ($this->_Schema as $Row) {
                 $Name = $Row['Name'];
                 $Config = $Row['Config'];
 
                 // For API calls make this a sparse save.
-                if ($this->Controller()->DeliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
+                if ($this->Controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
                     continue;
                 }
 
-                if (strtolower(GetValue('Control', $Row)) == 'imageupload') {
-                    $Form->SaveImage($Name, ArrayTranslate($Row, array('Prefix', 'Size')));
+                if (strtolower(val('Control', $Row)) == 'imageupload') {
+                    $Form->SaveImage($Name, arrayTranslate($Row, array('Prefix', 'Size')));
                 }
 
-                $Value = $Form->GetFormValue($Name);
+                $Value = $Form->getFormValue($Name);
 
-                if ($Value == GetValue('Default', $Value, '')) {
+                if ($Value == val('Default', $Value, '')) {
                     $Value = '';
                 }
 
                 $Data[$Config] = $Value;
-                $this->Controller()->SetData($Name, $Value);
+                $this->Controller()->setData($Name, $Value);
             }
 
             // Save it to the config.
-            SaveToConfig($Data, array('RemoveEmpty' => true));
-            $this->_Sender->InformMessage(T('Saved'));
+            saveToConfig($Data, array('RemoveEmpty' => true));
+            $this->_Sender->informMessage(t('Saved'));
         } else {
             // Load the form data from the config.
             $Data = array();
             foreach ($this->_Schema as $Row) {
-                $Data[$Row['Name']] = C($Row['Config'], GetValue('Default', $Row, ''));
+                $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
             }
-            $Form->SetData($Data);
+            $Form->setData($Data);
             $this->Controller()->Data = $Data;
         }
     }
@@ -182,7 +182,7 @@ class ConfigurationModule extends Gdn_Module {
         $Controller = $this->Controller();
         $Controller->ConfigurationModule = $this;
 
-        $Controller->Render($this->FetchViewLocation());
+        $Controller->render($this->fetchViewLocation());
         $this->RenderAll = false;
     }
 
@@ -209,7 +209,7 @@ class ConfigurationModule extends Gdn_Module {
                 } else {
                     $Row['Name'] = $Key;
                 }
-                TouchValue('Config', $Row, $Row['Name']);
+                touchValue('Config', $Row, $Row['Name']);
                 $Schema[] = $Row;
             }
             $this->_Schema = $Schema;

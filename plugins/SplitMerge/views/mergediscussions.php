@@ -1,17 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
 $Discussions = $this->Data('Discussions');
 if (count($Discussions) < 2) {
-    echo Wrap(T('You have to select at least 2 discussions to merge.'), 'p');
+    echo wrap(T('You have to select at least 2 discussions to merge.'), 'p');
 } else {
-    echo Wrap(T('Choose the main discussion into which all comments will be merged:'), 'p');
+    echo wrap(T('Choose the main discussion into which all comments will be merged:'), 'p');
 
     $DefaultDiscussionID = $Discussions[0]['DiscussionID'];
-    $RadioData = ConsolidateArrayValuesByKey($Discussions, 'DiscussionID', 'Name');
+    $RadioData = consolidateArrayValuesByKey($Discussions, 'DiscussionID', 'Name');
     array_map('htmlspecialchars', $RadioData);
     echo '<ul><li>';
     echo $this->Form->RadioList('MergeDiscussionID', $RadioData, array('ValueField' => 'DiscussionID', 'TextField' => 'Name', 'Default' => $DefaultDiscussionID));
@@ -22,7 +22,7 @@ if (count($Discussions) < 2) {
         '</div>';
 
     echo '<div class="Buttons">'.
-        $this->Form->Button('Merge').
+        $this->Form->button('Merge').
         '</div>';
 }
-echo $this->Form->Close();
+echo $this->Form->close();

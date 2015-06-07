@@ -1,20 +1,20 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <ul>
         <li>
             <?php
-            echo $this->Form->Label('Tag Name', 'FullName');
-            echo $this->Form->TextBox('FullName');
+            echo $this->Form->label('Tag Name', 'FullName');
+            echo $this->Form->textBox('FullName');
             ?>
         </li>
         <li>
             <?php
-            echo $this->Form->Label('Url Slug', 'Name');
-            echo $this->Form->TextBox('Name');
+            echo $this->Form->label('Url Slug', 'Name');
+            echo $this->Form->textBox('Name');
             ?>
         </li>
         <?php if ($this->Data('MergeTagVisible')): ?>
@@ -25,4 +25,4 @@ echo $this->Form->Errors();
             </li>
         <?php endif; ?>
     </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

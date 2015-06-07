@@ -51,7 +51,7 @@ class VanillaSearchModel extends Gdn_Model {
             $Perms = CategoryModel::CategoryWatch();
 
             if ($Perms !== true) {
-                $this->SQL->WhereIn('d.CategoryID', $Perms);
+                $this->SQL->whereIn('d.CategoryID', $Perms);
             }
 
             // Build search part of query.
@@ -60,19 +60,19 @@ class VanillaSearchModel extends Gdn_Model {
 
         // Build base query
         $this->SQL
-            ->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID, d.Score')
-            ->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
-            ->Select('d.DateInserted')
-            ->Select('d.InsertUserID as UserID')
-            ->Select("'Discussion'", '', 'RecordType')
-            ->From('Discussion d');
+            ->select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID, d.Score')
+            ->select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
+            ->select('d.DateInserted')
+            ->select('d.InsertUserID as UserID')
+            ->select("'Discussion'", '', 'RecordType')
+            ->from('Discussion d');
 
         if ($AddMatch) {
             // Execute query.
             $Result = $this->SQL->GetSelect();
 
             // Unset SQL
-            $this->SQL->Reset();
+            $this->SQL->reset();
         } else {
             $Result = $this->SQL;
         }
@@ -94,7 +94,7 @@ class VanillaSearchModel extends Gdn_Model {
             // Get permission and limit search categories if necessary.
             $Perms = CategoryModel::CategoryWatch();
             if ($Perms !== true) {
-                $this->SQL->WhereIn('d.CategoryID', $Perms);
+                $this->SQL->whereIn('d.CategoryID', $Perms);
             }
 
             // Build search part of query
@@ -103,20 +103,20 @@ class VanillaSearchModel extends Gdn_Model {
 
         // Build base query
         $this->SQL
-            ->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID, c.Score')
-            ->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
-            ->Select('c.DateInserted')
-            ->Select('c.InsertUserID as UserID')
-            ->Select("'Comment'", '', 'RecordType')
-            ->From('Comment c')
-            ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID');
+            ->select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID, c.Score')
+            ->select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
+            ->select('c.DateInserted')
+            ->select('c.InsertUserID as UserID')
+            ->select("'Comment'", '', 'RecordType')
+            ->from('Comment c')
+            ->join('Discussion d', 'd.DiscussionID = c.DiscussionID');
 
         if ($AddMatch) {
             // Exectute query
             $Result = $this->SQL->GetSelect();
 
             // Unset SQL
-            $this->SQL->Reset();
+            $this->SQL->reset();
         } else {
             $Result = $this->SQL;
         }

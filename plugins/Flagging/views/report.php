@@ -4,7 +4,7 @@ $Flag = $this->Data['Plugin.Flagging.Data'];
 $Report = $this->Data['Plugin.Flagging.Report'];
 $Reason = $this->Data['Plugin.Flagging.Reason'];
 
-printf(T('%s reported%s <strong>%s</strong>'), Anchor($Flag['UserName'], '/profile/'.$Flag['UserID'].'/'.$Flag['UserName']), ($Flag['Context'] == 'comment') ? T(' a comment in') : null, Anchor($Report['DiscussionName'], $Flag['URL']));
+printf(T('%s reported%s <strong>%s</strong>'), anchor($Flag['UserName'], '/profile/'.$Flag['UserID'].'/'.$Flag['UserName']), ($Flag['Context'] == 'comment') ? T(' a comment in') : null, anchor($Report['DiscussionName'], $Flag['URL']));
 
 ?>
 
@@ -18,4 +18,4 @@ printf(T('%s reported%s <strong>%s</strong>'), Anchor($Flag['UserName'], '/profi
             echo '&#8230;';
 
         ?></blockquote>
-<?php echo Anchor(T('ViewFlagged', 'View &raquo;'), $Flag['URL']); ?>
+<?php echo anchor(T('ViewFlagged', 'View &raquo;'), $Flag['URL']); ?>

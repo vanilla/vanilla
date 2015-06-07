@@ -40,8 +40,8 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      */
     public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
-            if (GetValue('FirstUser', $Args)) {
-                echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+            if (val('FirstUser', $Args)) {
+                echo '<span class="MItem DiscussionAuthor">'.UserAnchor(val('FirstUser', $Args)).'</span>';
             }
         }
     }
@@ -54,8 +54,8 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      */
     public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
         if (!$this->hasLayoutTables() || IsMobile()) {
-            if (GetValue('FirstUser', $Args)) {
-                echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+            if (val('FirstUser', $Args)) {
+                echo '<span class="MItem DiscussionAuthor">'.UserAnchor(val('FirstUser', $Args)).'</span>';
             }
         }
     }
@@ -84,7 +84,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     protected function DisplayPhoto($Sender) {
         // Build user object & output photo
         $FirstUser = UserBuilder($Sender->EventArguments['Discussion'], 'First');
-        echo UserPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
+        echo userPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
     }
 
     /**

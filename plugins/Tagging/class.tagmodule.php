@@ -27,7 +27,7 @@ class TagModule extends Gdn_Module {
         $this->_TagData = false;
         $this->ParentID = null;
         $this->ParentType = 'Global';
-        $this->CategorySearch = C('Plugins.Tagging.CategorySearch', false);
+        $this->CategorySearch = c('Plugins.Tagging.CategorySearch', false);
         parent::__construct($Sender);
     }
 
@@ -56,9 +56,9 @@ class TagModule extends Gdn_Module {
 
         // If no hint was given, determine by environment
         if (is_null($Hint)) {
-            if (Gdn::Controller() instanceof Gdn_Controller) {
-                $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID', null);
-                $CategoryID = Gdn::Controller()->Data('Category.CategoryID', null);
+            if (Gdn::controller() instanceof Gdn_Controller) {
+                $DiscussionID = Gdn::controller()->Data('Discussion.DiscussionID', null);
+                $CategoryID = Gdn::controller()->Data('Category.CategoryID', null);
 
                 if ($DiscussionID) {
                     $Hint = 'Discussion';
@@ -73,14 +73,14 @@ class TagModule extends Gdn_Module {
         switch ($Hint) {
             case 'Discussion':
                 $this->ParentType = 'Discussion';
-                $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID');
+                $DiscussionID = Gdn::controller()->Data('Discussion.DiscussionID');
                 $this->ParentID = $DiscussionID;
                 break;
 
             case 'Category':
                 if ($this->CategorySearch) {
                     $this->ParentType = 'Category';
-                    $CategoryID = Gdn::Controller()->Data('Category.CategoryID');
+                    $CategoryID = Gdn::controller()->Data('Category.CategoryID');
                     $this->ParentID = $CategoryID;
                 }
                 break;
@@ -99,7 +99,7 @@ class TagModule extends Gdn_Module {
      * @throws Exception
      */
     public function GetData() {
-        $TagQuery = Gdn::SQL();
+        $TagQuery = Gdn::sql();
 
         $this->AutoContext();
 
@@ -109,20 +109,20 @@ class TagModule extends Gdn_Module {
                 $Tags = TagModel::instance()->getDiscussionTags($this->ParentID, false);
                 break;
             case 'Category':
-                $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-                    ->Select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
-                    ->Where('td.CategoryID', $this->ParentID)
-                    ->GroupBy('td.TagID')
+                $TagQuery->join('TagDiscussion td', 't.TagID = td.TagID')
+                    ->select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
+                    ->where('td.CategoryID', $this->ParentID)
+                    ->groupBy('td.TagID')
                     ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
                 break;
 
             case 'Global':
                 $TagCacheKey = 'TagModule-Global';
-                $TagQuery->Where('t.CountDiscussions >', 0, false)
+                $TagQuery->where('t.CountDiscussions >', 0, false)
                     ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
 
                 if ($this->CategorySearch) {
-                    $TagQuery->Where('t.CategoryID', '-1');
+                    $TagQuery->where('t.CategoryID', '-1');
                 }
 
                 break;
@@ -132,11 +132,11 @@ class TagModule extends Gdn_Module {
             $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
         } else {
             $this->_TagData = $TagQuery
-                ->Select('t.*')
-                ->From('Tag t')
-                ->OrderBy('t.CountDiscussions', 'desc')
-                ->Limit(25)
-                ->Get();
+                ->select('t.*')
+                ->from('Tag t')
+                ->orderBy('t.CountDiscussions', 'desc')
+                ->limit(25)
+                ->get();
         }
 
         $this->_TagData->DatasetType(DATASET_TYPE_ARRAY);
@@ -161,7 +161,7 @@ class TagModule extends Gdn_Module {
             $this->GetData();
         }
 
-        if ($this->_TagData->NumRows() == 0) {
+        if ($this->_TagData->numRows() == 0) {
             return '';
         }
 
@@ -171,12 +171,12 @@ class TagModule extends Gdn_Module {
         <div class="InlineTags Meta">
             <?php echo T('Tagged'); ?>:
             <ul>
-                <?php foreach ($this->_TagData->ResultArray() as $Tag) :
+                <?php foreach ($this->_TagData->resultArray() as $Tag) :
 ?>
                     <?php if ($Tag['Name'] != '') :
 ?>
                         <li><?php
-                            echo Anchor(
+                            echo anchor(
                                 htmlspecialchars(TagFullName($Tag)),
                                 TagUrl($Tag, '', '/'),
                                 array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
@@ -204,7 +204,7 @@ endforeach; ?>
             $this->GetData();
         }
 
-        if ($this->_TagData->NumRows() == 0) {
+        if ($this->_TagData->numRows() == 0) {
             return '';
         }
 
@@ -219,7 +219,7 @@ endforeach; ?>
                     <?php if ($Tag['Name'] != '') :
 ?>
                         <li><?php
-                            echo Anchor(
+                            echo anchor(
                                 TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
                                 TagUrl($Tag, '', '/'),
                                 array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))

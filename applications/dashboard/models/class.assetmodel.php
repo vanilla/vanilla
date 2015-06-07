@@ -48,14 +48,14 @@ class AssetModel extends Gdn_Model {
             $Basename = $Matches[1];
             $ETag = $Matches[2];
         } else {
-            throw NotFoundException();
+            throw notFoundException();
         }
 
         $Basename = ucfirst($Basename);
 
         $this->EventArguments['Basename'] = $Basename;
         $this->EventArguments['ETag'] = $ETag;
-        $this->FireEvent('BeforeServeCss');
+        $this->fireEvent('BeforeServeCss');
 
         if (function_exists('header_remove')) {
             header_remove('Set-Cookie');
@@ -181,27 +181,27 @@ class AssetModel extends Gdn_Model {
         // Throw an event so that plugins can add their css too.
         $this->EventArguments['ETag'] = $ETag;
         $this->EventArguments['ThemeType'] = $ThemeType;
-        $this->FireEvent($Basename.'Css');
+        $this->fireEvent($Basename.'Css');
 
         // Include theme customizations last so that they override everything else.
         switch ($Basename) {
             case 'Style':
-                $this->AddCssFile('custom.css', false, array('Sort' => 10));
+                $this->addCssFile('custom.css', false, array('Sort' => 10));
 
-                if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-                    $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
+                if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
+                    $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
                     if (is_string($Filenames) && $Filenames != '%s') {
-                        $this->AddCssFile(ChangeBasename('custom.css', $Filenames), false, array('Sort' => 11));
+                        $this->addCssFile(changeBasename('custom.css', $Filenames), false, array('Sort' => 11));
                     }
                 }
 
                 break;
             case 'Admin':
-                $this->AddCssFile('customadmin.css', false, array('Sort' => 10));
+                $this->addCssFile('customadmin.css', false, array('Sort' => 10));
                 break;
         }
 
-        $this->FireEvent('AfterGetCssFiles');
+        $this->fireEvent('AfterGetCssFiles');
 
         // Hunt the css files down.
         $Paths = array();
@@ -331,7 +331,7 @@ class AssetModel extends Gdn_Model {
             }
         }
         if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
-            Trace("Could not find file '$Filename' in folder '$Folder'.");
+            trace("Could not find file '$Filename' in folder '$Folder'.");
         }
 
         return false;
@@ -344,7 +344,7 @@ class AssetModel extends Gdn_Model {
         $Data = array();
         $Data['vanilla-core-'.APPLICATION_VERSION] = true;
 
-        $Plugins = Gdn::PluginManager()->EnabledPlugins();
+        $Plugins = Gdn::pluginManager()->EnabledPlugins();
         foreach ($Plugins as $Info) {
             $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = true;
         }
@@ -362,8 +362,8 @@ class AssetModel extends Gdn_Model {
             $Version = val('Version', $Info, 'v0');
             $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
 
-            if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-                $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
+            if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
+                $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
                 $Data[$Filenames] = true;
             }
         }
@@ -375,12 +375,12 @@ class AssetModel extends Gdn_Model {
             $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
         }
 
-        Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;
+        Gdn::pluginManager()->EventArguments['ETagData'] =& $Data;
 
         $Suffix = '';
-        Gdn::PluginManager()->EventArguments['Suffix'] =& $Suffix;
-        Gdn::PluginManager()->FireAs('AssetModel')->FireEvent('GenerateETag');
-        unset(Gdn::PluginManager()->EventArguments['ETagData']);
+        Gdn::pluginManager()->EventArguments['Suffix'] =& $Suffix;
+        Gdn::pluginManager()->FireAs('AssetModel')->fireEvent('GenerateETag');
+        unset(Gdn::pluginManager()->EventArguments['ETagData']);
 
         ksort($Data);
         $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;

@@ -69,7 +69,7 @@ class ConversationModel extends ConversationsModel {
                 $this->Database->query(DBAModel::getCountSQL('count', 'Conversation', 'ConversationMessage', $Column, 'MessageID'));
                 break;
             case 'CountParticipants':
-                $this->SQL->Update('Conversation c')
+                $this->SQL->update('Conversation c')
                     ->set('c.CountParticipants', '(select count(uc.ConversationID) from GDN_UserConversation uc where uc.ConversationID = c.ConversationID and uc.Deleted = 0)', false, false)
                     ->put();
                 break;
@@ -133,13 +133,13 @@ class ConversationModel extends ConversationsModel {
     }
 
     /**
-     * Get a list of conversaitons for a user's inbox. This is an optimized version of ConversationModel::Get().
+     * Get a list of conversaitons for a user's inbox. This is an optimized version of ConversationModel::get().
      *
      * @param int $UserID
      * @param int $Offset Number to skip.
      * @param int $Limit Maximum to return.
      */
-    public function Get2($UserID, $Offset = 0, $Limit = false) {
+    public function get2($UserID, $Offset = 0, $Limit = false) {
         if (!$Limit) {
             $Limit = c('Conversations.Conversations.PerPage', 30);
         }
@@ -259,7 +259,7 @@ class ConversationModel extends ConversationsModel {
                 ->firstRow(DATASET_TYPE_ARRAY);
 
             // Convert the array.
-            $UserConversation = ArrayTranslate($Data, array('LastMessageID', 'CountReadMessages', 'DateLastViewed', 'Bookmarked'));
+            $UserConversation = arrayTranslate($Data, array('LastMessageID', 'CountReadMessages', 'DateLastViewed', 'Bookmarked'));
             $UserConversation['CountNewMessages'] = $Conversation['CountMessages'] - $Data['CountReadMessages'];
         } else {
             $UserConversation = array('CountNewMessages' => 0, 'CountReadMessages' => $Conversation['CountMessages'], 'DateLastViewed' => $Conversation['DateUpdated']);
@@ -306,7 +306,7 @@ class ConversationModel extends ConversationsModel {
             ->get()->resultArray();
         Gdn::userModel()->joinUsers($Users, array('UserID'));
 
-        $Users = Gdn_DataSet::Index($Users, array('ConversationID'), array('Unique' => false));
+        $Users = Gdn_DataSet::index($Users, array('ConversationID'), array('Unique' => false));
 
 
         foreach ($Data as &$Row) {
@@ -468,7 +468,7 @@ class ConversationModel extends ConversationsModel {
         }
 
         if (C('Garden.ForceInputFormatter')) {
-            $FormPostValues['Format'] = C('Garden.InputFormatter');
+            $FormPostValues['Format'] = c('Garden.InputFormatter');
         }
 
         // Add & apply any extra validation rules:

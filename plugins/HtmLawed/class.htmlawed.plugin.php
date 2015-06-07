@@ -34,7 +34,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
         require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
 
         /** @var bool Whether SafeStyles is enabled. Turning this off is bad mojo. */
-        $this->SafeStyles = C('Garden.Html.SafeStyles');
+        $this->SafeStyles = c('Garden.Html.SafeStyles');
 
         /** @var array HTML elements allowed to have classes in user generated content. */
         $this->ClassedElements = array('a', 'span', 'div', 'p', 'li', 'ul', 'ol', 'dl', 'dd', 'dt', 'i', 'b', 'strong', 'em', 'code', 'blockquote', 'img', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
@@ -134,7 +134,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
      * @return mixed|string
      */
     public function Format($Html) {
-        $Attributes = C('Garden.Html.BlockedAttributes', 'on*');
+        $Attributes = c('Garden.Html.BlockedAttributes', 'on*');
         $Config = array(
             'anti_link_spam' => array('`.`', ''),
             'comment' => 1,

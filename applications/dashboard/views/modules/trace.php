@@ -53,7 +53,7 @@
     <h2>Debug Trace</h2>
     <table>
         <?php
-        foreach ($this->Data('Traces') as $Trace):
+        foreach ($this->data('Traces') as $Trace):
             list($Message, $Type) = $Trace;
 
             $Var = 'Debug';
@@ -81,7 +81,7 @@
                         echo htmlspecialchars($Message->getTraceAsString());
                         echo '</pre>';
                     } else
-                        echo "<pre><b>$Var:</b> ".htmlspecialchars(var_export($Message, TRUE)).'</pre>';
+                        echo "<pre><b>$Var:</b> ".htmlspecialchars(var_export($Message, true)).'</pre>';
                     ?>
                 </td>
             </tr>

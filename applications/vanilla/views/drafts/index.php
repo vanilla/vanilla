@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
-include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
-$Session = Gdn::Session();
+echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
+include($this->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+$Session = Gdn::session();
 $ShowOptions = TRUE;
 $Alt = '';
-$ViewLocation = $this->FetchViewLocation('drafts', 'drafts');
+$ViewLocation = $this->fetchViewLocation('drafts', 'drafts');
 // WriteFilterTabs($this);
 echo Gdn_Theme::Module('DiscussionFilterModule');
-if ($this->DraftData->NumRows() > 0) {
-    echo $this->Pager->ToString('less');
+if ($this->DraftData->numRows() > 0) {
+    echo $this->Pager->toString('less');
     ?>
     <ul class="DataList Drafts">
         <?php
@@ -16,9 +16,9 @@ if ($this->DraftData->NumRows() > 0) {
         ?>
     </ul>
     <?php
-    echo $this->Pager->ToString('more');
+    echo $this->Pager->toString('more');
 } else {
     ?>
-    <div class="Empty"><?php echo T('You do not have any drafts.'); ?></div>
+    <div class="Empty"><?php echo t('You do not have any drafts.'); ?></div>
 <?php
 }

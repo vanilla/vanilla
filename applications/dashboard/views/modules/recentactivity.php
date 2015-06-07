@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="RecentActivity" class="Box">
-    <h4><?php echo GetValue('ActivityModuleTitle', $this, T('Recent Activity')); ?></h4>
+    <h4><?php echo val('ActivityModuleTitle', $this, t('Recent Activity')); ?></h4>
     <ul class="PanelInfo">
         <?php
         $Data = $this->ActivityData;
-        foreach ($Data->Result() as $Activity) {
-            $PhotoAnchor = Anchor(
-                Img($Activity['Photo'], array('class' => 'ProfilePhotoSmall')),
+        foreach ($Data->result() as $Activity) {
+            $PhotoAnchor = anchor(
+                img($Activity['Photo'], array('class' => 'ProfilePhotoSmall')),
                 $Activity['PhotoUrl'], 'Photo');
 
             echo '<li class="Activity '.$Activity['ActivityType'].'">';
@@ -14,9 +14,9 @@
             echo '</li>';
         }
 
-        if ($Data->NumRows() >= $this->Limit) {
+        if ($Data->numRows() >= $this->Limit) {
             ?>
-            <li class="ShowAll"><?php echo Anchor(T('More…'), '/activity'); ?></li>
+            <li class="ShowAll"><?php echo anchor(t('More…'), '/activity'); ?></li>
         <?php
         }
         ?>

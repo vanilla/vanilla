@@ -39,8 +39,8 @@ class CommentModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Comment');
-        $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', false);
-        $this->FireEvent('AfterConstruct');
+        $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
+        $this->fireEvent('AfterConstruct');
     }
 
     /**
@@ -61,7 +61,7 @@ class CommentModel extends VanillaModel {
             return;
         }
 
-        $ConfigLimit = C('Vanilla.Comments.PerPage', 30);
+        $ConfigLimit = c('Vanilla.Comments.PerPage', 30);
 
         if (!$Limit) {
             $Limit = $ConfigLimit;
@@ -80,17 +80,17 @@ class CommentModel extends VanillaModel {
         $New = array(GetValueR('0.DateInserted', $Result));
 
         if (count($Result) >= $Limit) {
-            $New[] = GetValueR(($Limit - 1).'.DateInserted', $Result);
+            $New[] = valr(($Limit - 1).'.DateInserted', $Result);
         }
 
         if ($Curr != $New) {
-            Trace('CommentModel->CachePageWhere()');
+            trace('CommentModel->CachePageWhere()');
 
             $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
-            Gdn::Cache()->Store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
+            Gdn::cache()->store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
 
-            Trace($New, $CacheKey);
-//         Gdn::Controller()->SetData('_PageCacheStore', array($CacheKey, $New));
+            trace($New, $CacheKey);
+//         Gdn::controller()->setData('_PageCacheStore', array($CacheKey, $New));
         }
     }
 
@@ -103,26 +103,26 @@ class CommentModel extends VanillaModel {
      * @param bool $FireEvent Kludge to fix VanillaCommentReplies plugin.
      */
     public function CommentQuery($FireEvent = true, $Join = true) {
-        $this->SQL->Select('c.*')
-//         ->Select('du.Name', '', 'DeleteName')
+        $this->SQL->select('c.*')
+//         ->select('du.Name', '', 'DeleteName')
 //         ->SelectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
-//         ->Join('User du', 'c.DeleteUserID = du.UserID', 'left');
-            ->From('Comment c');
+//         ->join('User du', 'c.DeleteUserID = du.UserID', 'left');
+            ->from('Comment c');
 
         if ($Join) {
             $this->SQL
-                ->Select('iu.Name', '', 'InsertName')
-                ->Select('iu.Photo', '', 'InsertPhoto')
-                ->Select('iu.Email', '', 'InsertEmail')
-                ->Join('User iu', 'c.InsertUserID = iu.UserID', 'left')
-                ->Select('uu.Name', '', 'UpdateName')
-                ->Select('uu.Photo', '', 'UpdatePhoto')
-                ->Select('uu.Email', '', 'UpdateEmail')
-                ->Join('User uu', 'c.UpdateUserID = uu.UserID', 'left');
+                ->select('iu.Name', '', 'InsertName')
+                ->select('iu.Photo', '', 'InsertPhoto')
+                ->select('iu.Email', '', 'InsertEmail')
+                ->join('User iu', 'c.InsertUserID = iu.UserID', 'left')
+                ->select('uu.Name', '', 'UpdateName')
+                ->select('uu.Photo', '', 'UpdatePhoto')
+                ->select('uu.Email', '', 'UpdateEmail')
+                ->join('User uu', 'c.UpdateUserID = uu.UserID', 'left');
         }
 
         if ($FireEvent) {
-            $this->FireEvent('AfterCommentQuery');
+            $this->fireEvent('AfterCommentQuery');
         }
     }
 
@@ -142,48 +142,48 @@ class CommentModel extends VanillaModel {
         $this->EventArguments['DiscussionID'] =& $DiscussionID;
         $this->EventArguments['Limit'] =& $Limit;
         $this->EventArguments['Offset'] =& $Offset;
-        $this->FireEvent('BeforeGet');
+        $this->fireEvent('BeforeGet');
 
         $Page = PageNumber($Offset, $Limit);
         $PageWhere = $this->PageWhere($DiscussionID, $Page, $Limit);
 
         if ($PageWhere) {
             $this->SQL
-                ->Where('c.DiscussionID', $DiscussionID);
+                ->where('c.DiscussionID', $DiscussionID);
 
-            $this->SQL->Where($PageWhere)->Limit($Limit + 10);
-            $this->OrderBy($this->SQL);
+            $this->SQL->where($PageWhere)->limit($Limit + 10);
+            $this->orderBy($this->SQL);
         } else {
             // Do an inner-query to force late-loading of comments.
             $Sql2 = clone $this->SQL;
-            $Sql2->Reset();
-            $Sql2->Select('CommentID')
-                ->From('Comment c')
-                ->Where('c.DiscussionID', $DiscussionID, true, false)
-                ->Limit($Limit, $Offset);
-            $this->OrderBy($Sql2);
+            $Sql2->reset();
+            $Sql2->select('CommentID')
+                ->from('Comment c')
+                ->where('c.DiscussionID', $DiscussionID, true, false)
+                ->limit($Limit, $Offset);
+            $this->orderBy($Sql2);
             $Select = $Sql2->GetSelect();
 
             $Px = $this->SQL->Database->DatabasePrefix;
             $this->SQL->Database->DatabasePrefix = '';
 
-            $this->SQL->Join("($Select) c2", "c.CommentID = c2.CommentID");
+            $this->SQL->join("($Select) c2", "c.CommentID = c2.CommentID");
             $this->SQL->Database->DatabasePrefix = $Px;
 
-//         $this->SQL->Limit($Limit, $Offset);
+//         $this->SQL->limit($Limit, $Offset);
         }
 
-        $this->Where($this->SQL);
+        $this->where($this->SQL);
 
-        $Result = $this->SQL->Get();
+        $Result = $this->SQL->get();
 
-        Gdn::UserModel()->JoinUsers($Result, array('InsertUserID', 'UpdateUserID'));
+        Gdn::userModel()->joinUsers($Result, array('InsertUserID', 'UpdateUserID'));
 
-        $this->SetCalculatedFields($Result);
+        $this->setCalculatedFields($Result);
 
         $this->EventArguments['Comments'] =& $Result;
-        $this->CachePageWhere($Result->Result(), $PageWhere, $DiscussionID, $Page, $Limit);
-        $this->FireEvent('AfterGet');
+        $this->CachePageWhere($Result->result(), $PageWhere, $DiscussionID, $Page, $Limit);
+        $this->fireEvent('AfterGet');
 
         return $Result;
     }
@@ -205,25 +205,25 @@ class CommentModel extends VanillaModel {
 
         // Build main query
         $this->CommentQuery(true, false);
-        $this->FireEvent('BeforeGet');
+        $this->fireEvent('BeforeGet');
         $this->SQL
-            ->Select('d.Name', '', 'DiscussionName')
-            ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-            ->Where('c.InsertUserID', $UserID)
-            ->OrderBy('c.CommentID', 'desc')
-            ->Limit($Limit, $Offset);
+            ->select('d.Name', '', 'DiscussionName')
+            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+            ->where('c.InsertUserID', $UserID)
+            ->orderBy('c.CommentID', 'desc')
+            ->limit($Limit, $Offset);
 
         // Verify permissions (restricting by category if necessary)
         if ($Perms !== true) {
             $this->SQL
-                ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
-                ->WhereIn('d.CategoryID', $Perms);
+                ->join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
+                ->whereIn('d.CategoryID', $Perms);
         }
 
-        //$this->OrderBy($this->SQL);
+        //$this->orderBy($this->SQL);
 
-        $Data = $this->SQL->Get();
-        Gdn::UserModel()->JoinUsers($Data, array('InsertUserID', 'UpdateUserID'));
+        $Data = $this->SQL->get();
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'UpdateUserID'));
 
         return $Data;
 
@@ -252,29 +252,29 @@ class CommentModel extends VanillaModel {
         // The point of this query is to select from one comment table, but filter and sort on another.
         // This puts the paging into an index scan rather than a table scan.
         $this->SQL
-            ->Select('c2.*')
-            ->Select('d.Name', '', 'DiscussionName')
-            ->Select('d.CategoryID')
-            ->From('Comment c')
-            ->Join('Comment c2', 'c.CommentID = c2.CommentID')
-            ->Join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
-            ->Where('c.InsertUserID', $UserID)
-            ->OrderBy('c.CommentID', 'desc');
+            ->select('c2.*')
+            ->select('d.Name', '', 'DiscussionName')
+            ->select('d.CategoryID')
+            ->from('Comment c')
+            ->join('Comment c2', 'c.CommentID = c2.CommentID')
+            ->join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
+            ->where('c.InsertUserID', $UserID)
+            ->orderBy('c.CommentID', 'desc');
 
         if ($LastCommentID) {
             // The last comment id from the last page was given and can be used as a hint to speed up the query.
             $this->SQL
-                ->Where('c.CommentID <', $LastCommentID)
-                ->Limit($Limit);
+                ->where('c.CommentID <', $LastCommentID)
+                ->limit($Limit);
         } else {
-            $this->SQL->Limit($Limit, $Offset);
+            $this->SQL->limit($Limit, $Offset);
         }
 
-        $Data = $this->SQL->Get();
+        $Data = $this->SQL->get();
 
 
-        $Result =& $Data->Result();
-        $this->LastCommentCount = $Data->NumRows();
+        $Result =& $Data->result();
+        $this->LastCommentCount = $Data->numRows();
         if (count($Result) > 0) {
             $this->LastCommentID = $Result[count($Result) - 1]->CommentID;
         } else {
@@ -285,7 +285,7 @@ class CommentModel extends VanillaModel {
         if ($Perms !== true) {
             $Remove = array();
 
-            foreach ($Data->Result() as $Index => $Row) {
+            foreach ($Data->result() as $Index => $Row) {
                 if (!in_array($Row->CategoryID, $Perms)) {
                     $Remove[] = $Index;
                 }
@@ -300,10 +300,10 @@ class CommentModel extends VanillaModel {
             }
         }
 
-        Gdn::UserModel()->JoinUsers($Data, array('InsertUserID', 'UpdateUserID'));
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'UpdateUserID'));
 
         $this->EventArguments['Comments'] =& $Data;
-        $this->FireEvent('AfterGet');
+        $this->fireEvent('AfterGet');
 
         return $Data;
     }
@@ -345,7 +345,7 @@ class CommentModel extends VanillaModel {
         } elseif (is_a($Value, 'Gdn_SQLDriver')) {
             // Set the order of the given sql.
             foreach ($this->_OrderBy as $Parts) {
-                $Value->OrderBy($Parts[0], $Parts[1]);
+                $Value->orderBy($Parts[0], $Parts[1]);
             }
         }
     }
@@ -355,15 +355,15 @@ class CommentModel extends VanillaModel {
             return false;
         }
 
-        if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
+        if ($Limit != c('Vanilla.Comments.PerPage', 30)) {
             return false;
         }
 
         $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
-        $Value = Gdn::Cache()->Get($CacheKey);
-        Trace('CommentModel->PageWhere()');
-        Trace($Value, $CacheKey);
-//      Gdn::Controller()->SetData('_PageCache', array($CacheKey, $Value));
+        $Value = Gdn::cache()->get($CacheKey);
+        trace('CommentModel->PageWhere()');
+        trace($Value, $CacheKey);
+//      Gdn::controller()->setData('_PageCache', array($CacheKey, $Value));
         if ($Value === false) {
             return false;
         } elseif (is_array($Value)) {
@@ -389,25 +389,25 @@ class CommentModel extends VanillaModel {
      */
     public function SetUserScore($CommentID, $UserID, $Score) {
         // Insert or update the UserComment row
-        $this->SQL->Replace(
+        $this->SQL->replace(
             'UserComment',
             array('Score' => $Score),
             array('CommentID' => $CommentID, 'UserID' => $UserID)
         );
 
         // Get the total new score
-        $TotalScore = $this->SQL->Select('Score', 'sum', 'TotalScore')
-            ->From('UserComment')
-            ->Where('CommentID', $CommentID)
-            ->Get()
-            ->FirstRow()
+        $TotalScore = $this->SQL->select('Score', 'sum', 'TotalScore')
+            ->from('UserComment')
+            ->where('CommentID', $CommentID)
+            ->get()
+            ->firstRow()
             ->TotalScore;
 
         // Update the comment's cached version
-        $this->SQL->Update('Comment')
-            ->Set('Score', $TotalScore)
-            ->Where('CommentID', $CommentID)
-            ->Put();
+        $this->SQL->update('Comment')
+            ->set('Score', $TotalScore)
+            ->where('CommentID', $CommentID)
+            ->put();
 
         return $TotalScore;
     }
@@ -423,12 +423,12 @@ class CommentModel extends VanillaModel {
      * @return int Current score for the comment.
      */
     public function GetUserScore($CommentID, $UserID) {
-        $Data = $this->SQL->Select('Score')
-            ->From('UserComment')
-            ->Where('CommentID', $CommentID)
-            ->Where('UserID', $UserID)
-            ->Get()
-            ->FirstRow();
+        $Data = $this->SQL->select('Score')
+            ->from('UserComment')
+            ->where('CommentID', $CommentID)
+            ->where('UserID', $UserID)
+            ->get()
+            ->firstRow();
 
         return $Data ? $Data->Score : 0;
     }
@@ -448,7 +448,7 @@ class CommentModel extends VanillaModel {
 
         $NewComments = false;
 
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
         if ($Session->UserID > 0) {
             // Max comments we could have seen
             $CountWatch = $Limit + $Offset;
@@ -463,7 +463,7 @@ class CommentModel extends VanillaModel {
                 }
 
                 if (isset($Discussion->DateLastViewed)) {
-                    $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
+                    $NewComments |= Gdn_Format::toTimestamp($Discussion->DateLastComment) > Gdn_Format::toTimestamp($Discussion->DateLastViewed);
                 }
 
                 if ($TotalComments > $Discussion->CountCommentWatch) {
@@ -473,11 +473,11 @@ class CommentModel extends VanillaModel {
                 // Update the watch data.
                 if ($NewComments) {
                     // Only update the watch if there are new comments.
-                    $this->SQL->Put(
+                    $this->SQL->put(
                         'UserDiscussion',
                         array(
                             'CountComments' => $CountWatch,
-                            'DateLastViewed' => Gdn_Format::ToDateTime()
+                            'DateLastViewed' => Gdn_Format::toDateTime()
                         ),
                         array(
                             'UserID' => $Session->UserID,
@@ -488,19 +488,19 @@ class CommentModel extends VanillaModel {
 
             } else {
                 // Make sure the discussion isn't archived.
-                $ArchiveDate = C('Vanilla.Archive.Date', false);
-                if (!$ArchiveDate || (Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($ArchiveDate))) {
+                $ArchiveDate = c('Vanilla.Archive.Date', false);
+                if (!$ArchiveDate || (Gdn_Format::toTimestamp($Discussion->DateLastComment) > Gdn_Format::toTimestamp($ArchiveDate))) {
                     $NewComments = true;
 
                     // Insert watch data.
                     $this->SQL->Options('Ignore', true);
-                    $this->SQL->Insert(
+                    $this->SQL->insert(
                         'UserDiscussion',
                         array(
                             'UserID' => $Session->UserID,
                             'DiscussionID' => $Discussion->DiscussionID,
                             'CountComments' => $CountWatch,
-                            'DateLastViewed' => Gdn_Format::ToDateTime()
+                            'DateLastViewed' => Gdn_Format::toDateTime()
                         )
                     );
                 }
@@ -513,18 +513,18 @@ class CommentModel extends VanillaModel {
 
             // If this discussion is in a category that has been marked read,
             // check if reading this thread causes it to be completely read again
-            $CategoryID = GetValue('CategoryID', $Discussion);
+            $CategoryID = val('CategoryID', $Discussion);
             if ($CategoryID) {
-                $Category = CategoryModel::Categories($CategoryID);
+                $Category = CategoryModel::categories($CategoryID);
                 if ($Category) {
-                    $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+                    $DateMarkedRead = val('DateMarkedRead', $Category);
                     if ($DateMarkedRead) {
                         // Fuzzy way of looking back about 2 pages into the past
-                        $LookBackCount = C('Vanilla.Discussions.PerPage', 50) * 2;
+                        $LookBackCount = c('Vanilla.Discussions.PerPage', 50) * 2;
 
                         // Find all discussions with content from after DateMarkedRead
                         $DiscussionModel = new DiscussionModel();
-                        $Discussions = $DiscussionModel->Get(0, 101, array(
+                        $Discussions = $DiscussionModel->get(0, 101, array(
                             'CategoryID' => $CategoryID,
                             'DateLastComment>' => $DateMarkedRead
                         ));
@@ -532,7 +532,7 @@ class CommentModel extends VanillaModel {
 
                         // Abort if we get back as many as we asked for, meaning a
                         // lot has happened.
-                        $NumDiscussions = $Discussions->NumRows();
+                        $NumDiscussions = $Discussions->numRows();
                         if ($NumDiscussions <= $LookBackCount) {
                             // Loop over these and see if any are still unread
                             $MarkAsRead = true;
@@ -547,7 +547,7 @@ class CommentModel extends VanillaModel {
                             // Mark this category read if all the new content is read
                             if ($MarkAsRead) {
                                 $CategoryModel = new CategoryModel();
-                                $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
+                                $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
                                 unset($CategoryModel);
                             }
 
@@ -571,17 +571,17 @@ class CommentModel extends VanillaModel {
      * @return object SQL result.
      */
     public function GetCount($DiscussionID) {
-        $this->FireEvent('BeforeGetCount');
+        $this->fireEvent('BeforeGetCount');
 
         if (!empty($this->_Where)) {
             return false;
         }
 
-        return $this->SQL->Select('CommentID', 'count', 'CountComments')
-            ->From('Comment')
-            ->Where('DiscussionID', $DiscussionID)
-            ->Get()
-            ->FirstRow()
+        return $this->SQL->select('CommentID', 'count', 'CountComments')
+            ->from('Comment')
+            ->where('DiscussionID', $DiscussionID)
+            ->get()
+            ->firstRow()
             ->CountComments;
     }
 
@@ -596,13 +596,13 @@ class CommentModel extends VanillaModel {
      */
     public function GetCountWhere($Where = false) {
         if (is_array($Where)) {
-            $this->SQL->Where($Where);
+            $this->SQL->where($Where);
         }
 
-        return $this->SQL->Select('CommentID', 'count', 'CountComments')
-            ->From('Comment')
-            ->Get()
-            ->FirstRow()
+        return $this->SQL->select('CommentID', 'count', 'CountComments')
+            ->from('Comment')
+            ->get()
+            ->firstRow()
             ->CountComments;
     }
 
@@ -622,9 +622,9 @@ class CommentModel extends VanillaModel {
 
         $this->CommentQuery(false); // FALSE supresses FireEvent
         $Comment = $this->SQL
-            ->Where('c.CommentID', $CommentID)
-            ->Get()
-            ->FirstRow($ResultType);
+            ->where('c.CommentID', $CommentID)
+            ->get()
+            ->firstRow($ResultType);
 
         if ($Comment) {
             $this->Calculate($Comment);
@@ -642,13 +642,13 @@ class CommentModel extends VanillaModel {
      * @return object SQL result.
      */
     public function GetIDData($CommentID, $Options = array()) {
-        $this->FireEvent('BeforeGetIDData');
+        $this->fireEvent('BeforeGetIDData');
         $this->CommentQuery(false); // FALSE supresses FireEvent
         $this->Options($Options);
 
         return $this->SQL
-            ->Where('c.CommentID', $CommentID)
-            ->Get();
+            ->where('c.CommentID', $CommentID)
+            ->get();
     }
 
     /**
@@ -665,14 +665,14 @@ class CommentModel extends VanillaModel {
      */
     public function GetNew($DiscussionID, $LastCommentID) {
         $this->CommentQuery();
-        $this->FireEvent('BeforeGetNew');
-        $this->OrderBy($this->SQL);
+        $this->fireEvent('BeforeGetNew');
+        $this->orderBy($this->SQL);
         $Comments = $this->SQL
-            ->Where('c.DiscussionID', $DiscussionID)
-            ->Where('c.CommentID >', $LastCommentID)
-            ->Get();
+            ->where('c.DiscussionID', $DiscussionID)
+            ->where('c.CommentID >', $LastCommentID)
+            ->get();
 
-        $this->SetCalculatedFields($Comments);
+        $this->setCalculatedFields($Comments);
         return $Comments;
     }
 
@@ -688,18 +688,18 @@ class CommentModel extends VanillaModel {
      * @return object SQL result.
      */
     public function GetOffset($Comment) {
-        $this->FireEvent('BeforeGetOffset');
+        $this->fireEvent('BeforeGetOffset');
 
         if (is_numeric($Comment)) {
-            $Comment = $this->GetID($Comment);
+            $Comment = $this->getID($Comment);
         }
 
         $this->SQL
-            ->Select('c.CommentID', 'count', 'CountComments')
-            ->From('Comment c')
-            ->Where('c.DiscussionID', GetValue('DiscussionID', $Comment));
+            ->select('c.CommentID', 'count', 'CountComments')
+            ->from('Comment c')
+            ->where('c.DiscussionID', val('DiscussionID', $Comment));
 
-        $this->SQL->BeginWhereGroup();
+        $this->SQL->beginWhereGroup();
 
         // Figure out the where clause based on the sort.
         foreach ($this->_OrderBy as $Part) {
@@ -707,36 +707,36 @@ class CommentModel extends VanillaModel {
             list($Expr, $Value) = $this->_WhereFromOrderBy($Part, $Comment, '');
 
             if (!isset($PrevWhere)) {
-                $this->SQL->Where($Expr, $Value);
+                $this->SQL->where($Expr, $Value);
             } else {
-                $this->SQL->OrOp();
-                $this->SQL->BeginWhereGroup();
-                $this->SQL->OrWhere($PrevWhere[0], $PrevWhere[1]);
-                $this->SQL->Where($Expr, $Value);
-                $this->SQL->EndWhereGroup();
+                $this->SQL->orOp();
+                $this->SQL->beginWhereGroup();
+                $this->SQL->orWhere($PrevWhere[0], $PrevWhere[1]);
+                $this->SQL->where($Expr, $Value);
+                $this->SQL->endWhereGroup();
             }
 
             $PrevWhere = $this->_WhereFromOrderBy($Part, $Comment, '==');
         }
 
-        $this->SQL->EndWhereGroup();
+        $this->SQL->endWhereGroup();
 
         return $this->SQL
-            ->Get()
-            ->FirstRow()
+            ->get()
+            ->firstRow()
             ->CountComments;
     }
 
     public function GetUnreadOffset($DiscussionID, $UserID = null) {
         if ($UserID == null) {
-            $UserID = Gdn::Session()->UserID;
+            $UserID = Gdn::session()->UserID;
         }
         if ($UserID == 0) {
             return 0;
         }
 
         // See of the user has read the discussion.
-        $UserDiscussion = $this->SQL->GetWhere('UserDiscussion', array('DiscussionID' => $DiscussionID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
+        $UserDiscussion = $this->SQL->getWhere('UserDiscussion', array('DiscussionID' => $DiscussionID, 'UserID' => $UserID))->firstRow(DATASET_TYPE_ARRAY);
         if (empty($UserDiscussion)) {
             return 0;
         }
@@ -768,7 +768,7 @@ class CommentModel extends VanillaModel {
         } else {
             $Field = $Part[0];
         }
-        $Value = GetValue($Field, $Comment);
+        $Value = val($Field, $Comment);
         if (!$Value) {
             $Value = 0;
         }
@@ -788,29 +788,29 @@ class CommentModel extends VanillaModel {
      * @return int $CommentID
      */
     public function Save($FormPostValues) {
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
 
         // Define the primary key in this model's table.
-        $this->DefineSchema();
+        $this->defineSchema();
 
         // Add & apply any extra validation rules:
-        $this->Validation->ApplyRule('Body', 'Required');
-        $this->Validation->AddRule('MeAction', 'function:ValidateMeAction');
-        $this->Validation->ApplyRule('Body', 'MeAction');
-        $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
+        $this->Validation->applyRule('Body', 'Required');
+        $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
+        $this->Validation->applyRule('Body', 'MeAction');
+        $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
             $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
-            $this->Validation->ApplyRule('Body', 'Length');
+            $this->Validation->applyRule('Body', 'Length');
         }
-        $MinCommentLength = C('Vanilla.Comment.MinLength');
+        $MinCommentLength = c('Vanilla.Comment.MinLength');
         if ($MinCommentLength && is_numeric($MinCommentLength)) {
             $this->Validation->SetSchemaProperty('Body', 'MinLength', $MinCommentLength);
-            $this->Validation->AddRule('MinTextLength', 'function:ValidateMinTextLength');
-            $this->Validation->ApplyRule('Body', 'MinTextLength');
+            $this->Validation->addRule('MinTextLength', 'function:ValidateMinTextLength');
+            $this->Validation->applyRule('Body', 'MinTextLength');
         }
 
         // Validate $CommentID and whether this is an insert
-        $CommentID = ArrayValue('CommentID', $FormPostValues);
+        $CommentID = arrayValue('CommentID', $FormPostValues);
         $CommentID = is_numeric($CommentID) && $CommentID > 0 ? $CommentID : false;
         $Insert = $CommentID === false;
         if ($Insert) {
@@ -822,10 +822,10 @@ class CommentModel extends VanillaModel {
         // Prep and fire event
         $this->EventArguments['FormPostValues'] = &$FormPostValues;
         $this->EventArguments['CommentID'] = $CommentID;
-        $this->FireEvent('BeforeSaveComment');
+        $this->fireEvent('BeforeSaveComment');
 
         // Validate the form posted values
-        if ($this->Validate($FormPostValues, $Insert)) {
+        if ($this->validate($FormPostValues, $Insert)) {
             // If the post is new and it validates, check for spam
             if (!$Insert || !$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
@@ -836,11 +836,11 @@ class CommentModel extends VanillaModel {
                     LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                     // Save the new value.
                     $this->SerializeRow($Fields);
-                    $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
+                    $this->SQL->put($this->Name, $Fields, array('CommentID' => $CommentID));
                 } else {
                     // Make sure that the comments get formatted in the method defined by Garden.
-                    if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter')) {
-                        $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
+                    if (!val('Format', $Fields) || c('Garden.ForceInputFormatter')) {
+                        $Fields['Format'] = Gdn::config('Garden.InputFormatter', '');
                     }
 
                     // Check for spam
@@ -851,31 +851,31 @@ class CommentModel extends VanillaModel {
 
                     // Check for approval
                     $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-                    if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
+                    if ($ApprovalRequired && !val('Verified', Gdn::session()->User)) {
                         $DiscussionModel = new DiscussionModel();
-                        $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Fields));
-                        $Fields['CategoryID'] = GetValue('CategoryID', $Discussion);
-                        LogModel::Insert('Pending', 'Comment', $Fields);
+                        $Discussion = $DiscussionModel->getID(val('DiscussionID', $Fields));
+                        $Fields['CategoryID'] = val('CategoryID', $Discussion);
+                        LogModel::insert('Pending', 'Comment', $Fields);
                         return UNAPPROVED;
                     }
 
                     // Create comment.
                     $this->SerializeRow($Fields);
-                    $CommentID = $this->SQL->Insert($this->Name, $Fields);
+                    $CommentID = $this->SQL->insert($this->Name, $Fields);
                 }
                 if ($CommentID) {
                     $this->EventArguments['CommentID'] = $CommentID;
                     $this->EventArguments['Insert'] = $Insert;
 
                     // IsNewDiscussion is passed when the first comment for new discussions are created.
-                    $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
-                    $this->FireEvent('AfterSaveComment');
+                    $this->EventArguments['IsNewDiscussion'] = val('IsNewDiscussion', $FormPostValues);
+                    $this->fireEvent('AfterSaveComment');
                 }
             }
         }
 
         // Update discussion's comment count
-        $DiscussionID = GetValue('DiscussionID', $FormPostValues);
+        $DiscussionID = val('DiscussionID', $FormPostValues);
         $this->UpdateCommentCount($DiscussionID, array('Slave' => false));
 
         return $CommentID;
@@ -895,21 +895,21 @@ class CommentModel extends VanillaModel {
      * @param bool $IncUser Whether or not to just increment the user's comment count rather than recalculate it.
      */
     public function Save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
-        $Session = Gdn::Session();
-        $UserModel = Gdn::UserModel();
+        $Session = Gdn::session();
+        $UserModel = Gdn::userModel();
 
         // Load comment data
-        $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
+        $Fields = $this->getID($CommentID, DATASET_TYPE_ARRAY);
 
         // Clear any session stashes related to this discussion
         $DiscussionModel = new DiscussionModel();
-        $DiscussionID = GetValue('DiscussionID', $Fields);
-        $Discussion = $DiscussionModel->GetID($DiscussionID);
+        $DiscussionID = val('DiscussionID', $Fields);
+        $Discussion = $DiscussionModel->getID($DiscussionID);
         $Session->Stash('CommentForForeignID_'.GetValue('ForeignID', $Discussion));
 
         // Make a quick check so that only the user making the comment can make the notification.
         // This check may be used in the future so should not be depended on later in the method.
-        if (Gdn::Controller()->DeliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
+        if (Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
             return;
         }
 
@@ -920,33 +920,33 @@ class CommentModel extends VanillaModel {
         $this->UpdateUser($Fields['InsertUserID'], $IncUser && $Insert);
 
         // Mark the user as participated.
-        $this->SQL->Replace(
+        $this->SQL->replace(
             'UserDiscussion',
             array('Participated' => 1),
-            array('DiscussionID' => $DiscussionID, 'UserID' => GetValue('InsertUserID', $Fields))
+            array('DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields))
         );
 
         if ($Insert) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
             if ($Discussion->CategoryID > 0) {
-                $Category = CategoryModel::Categories($Discussion->CategoryID);
+                $Category = CategoryModel::categories($Discussion->CategoryID);
 
                 if ($Category) {
-                    $CountComments = GetValue('CountComments', $Category, 0) + 1;
+                    $CountComments = val('CountComments', $Category, 0) + 1;
 
                     if ($CountComments < self::COMMENT_THRESHOLD_SMALL || ($CountComments < self::COMMENT_THRESHOLD_LARGE && $CountComments % self::COUNT_RECALC_MOD == 0)) {
                         $CountComments = $this->SQL
-                            ->Select('CountComments', 'sum', 'CountComments')
-                            ->From('Discussion')
-                            ->Where('CategoryID', $Discussion->CategoryID)
-                            ->Get()
-                            ->FirstRow()
+                            ->select('CountComments', 'sum', 'CountComments')
+                            ->from('Discussion')
+                            ->where('CategoryID', $Discussion->CategoryID)
+                            ->get()
+                            ->firstRow()
                             ->CountComments;
                     }
                 }
                 $CategoryModel = new CategoryModel();
 
-                $CategoryModel->SetField($Discussion->CategoryID, array(
+                $CategoryModel->setField($Discussion->CategoryID, array(
                     'LastDiscussionID' => $DiscussionID,
                     'LastCommentID' => $CommentID,
                     'CountComments' => $CountComments,
@@ -964,8 +964,8 @@ class CommentModel extends VanillaModel {
 
             // Prepare the notification queue.
             $ActivityModel = new ActivityModel();
-            $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
-            $Category = CategoryModel::Categories($Discussion->CategoryID);
+            $HeadlineFormat = t('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
+            $Category = CategoryModel::categories($Discussion->CategoryID);
             $Activity = array(
                 'ActivityType' => 'Comment',
                 'ActivityUserID' => $Fields['InsertUserID'],
@@ -975,14 +975,14 @@ class CommentModel extends VanillaModel {
                 'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
                 'Data' => array(
                     'Name' => $Discussion->Name,
-                    'Category' => GetValue('Name', $Category),
+                    'Category' => val('Name', $Category),
                 )
             );
 
             // Allow simple fulltext notifications
             if (C('Vanilla.Activity.ShowCommentBody', false)) {
-                $Activity['Story'] = GetValue('Body', $Fields);
-                $Activity['Format'] = GetValue('Format', $Fields);
+                $Activity['Story'] = val('Body', $Fields);
+                $Activity['Format'] = val('Format', $Fields);
             }
 
             // Pass generic activity to events.
@@ -991,7 +991,7 @@ class CommentModel extends VanillaModel {
 
             // Notify users who have bookmarked the discussion.
             $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
-            foreach ($BookmarkData->Result() as $Bookmark) {
+            foreach ($BookmarkData->result() as $Bookmark) {
                 // Check user can still see the discussion.
                 if (!$UserModel->GetCategoryViewPermission($Bookmark->UserID, $Discussion->CategoryID)) {
                     continue;
@@ -1004,7 +1004,7 @@ class CommentModel extends VanillaModel {
 
             // Notify users who have participated in the discussion.
             $ParticipatedData = $DiscussionModel->GetParticipatedUsers($DiscussionID);
-            foreach ($ParticipatedData->Result() as $UserRow) {
+            foreach ($ParticipatedData->result() as $UserRow) {
                 if (!$UserModel->GetCategoryViewPermission($UserRow->UserID, $Discussion->CategoryID)) {
                     continue;
                 }
@@ -1046,7 +1046,7 @@ class CommentModel extends VanillaModel {
                 }
 
                 $HeadlineFormatBak = $Activity['HeadlineFormat'];
-                $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
+                $Activity['HeadlineFormat'] = t('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
                 $Activity['NotifyUserID'] = $User->UserID;
                 $Activity['Data']['Reason'] = 'mention';
                 $ActivityModel->Queue($Activity, 'Mention');
@@ -1060,7 +1060,7 @@ class CommentModel extends VanillaModel {
             $this->EventArguments['NotifiedUsers'] = array_keys(ActivityModel::$Queue);
             $this->EventArguments['MentionedUsers'] = $Usernames;
             $this->EventArguments['ActivityModel'] = $ActivityModel;
-            $this->FireEvent('BeforeNotification');
+            $this->fireEvent('BeforeNotification');
 
             // Send all notifications.
             $ActivityModel->SaveQueue();
@@ -1077,14 +1077,14 @@ class CommentModel extends VanillaModel {
      */
     public function RecordAdvancedNotications($ActivityModel, $Activity, $Discussion) {
         if (is_numeric($Discussion)) {
-            $Discussion = $this->GetID($Discussion);
+            $Discussion = $this->getID($Discussion);
         }
 
-        $CategoryID = GetValue('CategoryID', $Discussion);
+        $CategoryID = val('CategoryID', $Discussion);
 
         // Figure out the category that governs this notification preference.
         $i = 0;
-        $Category = CategoryModel::Categories($CategoryID);
+        $Category = CategoryModel::categories($CategoryID);
         if (!$Category) {
             return;
         }
@@ -1094,13 +1094,13 @@ class CommentModel extends VanillaModel {
                 return;
             }
             $i++;
-            $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+            $Category = CategoryModel::categories($Category['ParentCategoryID']);
         }
 
         // Grab all of the users that need to be notified.
         $Data = $this->SQL
-            ->WhereIn('Name', array('Preferences.Email.NewComment.'.$Category['CategoryID'], 'Preferences.Popup.NewComment.'.$Category['CategoryID']))
-            ->Get('UserMeta')->ResultArray();
+            ->whereIn('Name', array('Preferences.Email.NewComment.'.$Category['CategoryID'], 'Preferences.Popup.NewComment.'.$Category['CategoryID']))
+            ->get('UserMeta')->resultArray();
 
         $NotifyUsers = array();
         foreach ($Data as $Row) {
@@ -1110,7 +1110,7 @@ class CommentModel extends VanillaModel {
 
             $UserID = $Row['UserID'];
             // Check user can still see the discussion.
-            if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID'])) {
+            if (!Gdn::userModel()->GetCategoryViewPermission($UserID, $Category['CategoryID'])) {
                 continue;
             }
 
@@ -1124,8 +1124,8 @@ class CommentModel extends VanillaModel {
 
         foreach ($NotifyUsers as $UserID => $Prefs) {
             $Activity['NotifyUserID'] = $UserID;
-            $Activity['Emailed'] = GetValue('Emailed', $Prefs, false);
-            $Activity['Notified'] = GetValue('Notified', $Prefs, false);
+            $Activity['Emailed'] = val('Emailed', $Prefs, false);
+            $Activity['Notified'] = val('Notified', $Prefs, false);
             $ActivityModel->Queue($Activity);
         }
     }
@@ -1135,13 +1135,13 @@ class CommentModel extends VanillaModel {
             return;
         }
 
-        $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
-        $Limit = C('Vanilla.Comments.PerPage', 30);
+        $CountComments = $this->SQL->getWhere('Discussion', array('DiscussionID' => $DiscussionID))->value('CountComments');
+        $Limit = c('Vanilla.Comments.PerPage', 30);
         $PageCount = PageNumber($CountComments, $Limit) + 1;
 
         for ($Page = $From; $Page <= $PageCount; $Page++) {
             $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
-            Gdn::Cache()->Remove($CacheKey);
+            Gdn::cache()->Remove($CacheKey);
         }
     }
 
@@ -1162,59 +1162,59 @@ class CommentModel extends VanillaModel {
         // Get the discussion.
         if (is_numeric($Discussion)) {
             $this->Options($Options);
-            $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
+            $Discussion = $this->SQL->getWhere('Discussion', array('DiscussionID' => $Discussion))->firstRow(DATASET_TYPE_ARRAY);
         }
         $DiscussionID = $Discussion['DiscussionID'];
 
-        $this->FireEvent('BeforeUpdateCommentCountQuery');
+        $this->fireEvent('BeforeUpdateCommentCountQuery');
 
         $this->Options($Options);
         $Data = $this->SQL
-            ->Select('c.CommentID', 'min', 'FirstCommentID')
-            ->Select('c.CommentID', 'max', 'LastCommentID')
-            ->Select('c.DateInserted', 'max', 'DateLastComment')
-            ->Select('c.CommentID', 'count', 'CountComments')
-            ->From('Comment c')
-            ->Where('c.DiscussionID', $DiscussionID)
-            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            ->select('c.CommentID', 'min', 'FirstCommentID')
+            ->select('c.CommentID', 'max', 'LastCommentID')
+            ->select('c.DateInserted', 'max', 'DateLastComment')
+            ->select('c.CommentID', 'count', 'CountComments')
+            ->from('Comment c')
+            ->where('c.DiscussionID', $DiscussionID)
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $this->EventArguments['Discussion'] =& $Discussion;
         $this->EventArguments['Counts'] =& $Data;
-        $this->FireEvent('BeforeUpdateCommentCount');
+        $this->fireEvent('BeforeUpdateCommentCount');
 
         if ($Discussion) {
             if ($Data) {
-                $this->SQL->Update('Discussion');
+                $this->SQL->update('Discussion');
                 if (!$Discussion['Sink'] && $Data['DateLastComment']) {
-                    $this->SQL->Set('DateLastComment', $Data['DateLastComment']);
+                    $this->SQL->set('DateLastComment', $Data['DateLastComment']);
                 } elseif (!$Data['DateLastComment'])
-                    $this->SQL->Set('DateLastComment', $Discussion['DateInserted']);
+                    $this->SQL->set('DateLastComment', $Discussion['DateInserted']);
 
                 $this->SQL
-                    ->Set('FirstCommentID', $Data['FirstCommentID'])
-                    ->Set('LastCommentID', $Data['LastCommentID'])
-                    ->Set('CountComments', $Data['CountComments'])
-                    ->Where('DiscussionID', $DiscussionID)
-                    ->Put();
+                    ->set('FirstCommentID', $Data['FirstCommentID'])
+                    ->set('LastCommentID', $Data['LastCommentID'])
+                    ->set('CountComments', $Data['CountComments'])
+                    ->where('DiscussionID', $DiscussionID)
+                    ->put();
 
                 // Update the last comment's user ID.
                 $this->SQL
-                    ->Update('Discussion d')
-                    ->Update('Comment c')
-                    ->Set('d.LastCommentUserID', 'c.InsertUserID', false)
-                    ->Where('d.DiscussionID', $DiscussionID)
-                    ->Where('c.CommentID', 'd.LastCommentID', false, false)
-                    ->Put();
+                    ->update('Discussion d')
+                    ->update('Comment c')
+                    ->set('d.LastCommentUserID', 'c.InsertUserID', false)
+                    ->where('d.DiscussionID', $DiscussionID)
+                    ->where('c.CommentID', 'd.LastCommentID', false, false)
+                    ->put();
             } else {
                 // Update the discussion with null counts.
                 $this->SQL
-                    ->Update('Discussion')
-                    ->Set('CountComments', 0)
-                    ->Set('FirstCommentID', null)
-                    ->Set('LastCommentID', null)
-                    ->Set('DateLastComment', 'DateInserted', false, false)
-                    ->Set('LastCommentUserID', null)
-                    ->Where('DiscussionID', $DiscussionID);
+                    ->update('Discussion')
+                    ->set('CountComments', 0)
+                    ->set('FirstCommentID', null)
+                    ->set('LastCommentID', null)
+                    ->set('DateLastComment', 'DateInserted', false, false)
+                    ->set('LastCommentUserID', null)
+                    ->where('DiscussionID', $DiscussionID);
             }
         }
     }
@@ -1235,7 +1235,7 @@ class CommentModel extends VanillaModel {
             where c.DateInserted < ud.DateLastViewed
          )
          where DiscussionID = $DiscussionID";
-        $this->SQL->Query($Sql);
+        $this->SQL->query($Sql);
     }
 
     /**
@@ -1250,22 +1250,22 @@ class CommentModel extends VanillaModel {
         if ($Inc) {
             // Just increment the comment count.
             $this->SQL
-                ->Update('User')
-                ->Set('CountComments', 'CountComments + 1', false)
-                ->Where('UserID', $UserID)
-                ->Put();
+                ->update('User')
+                ->set('CountComments', 'CountComments + 1', false)
+                ->where('UserID', $UserID)
+                ->put();
         } else {
             // Retrieve a comment count
             $CountComments = $this->SQL
-                ->Select('c.CommentID', 'count', 'CountComments')
-                ->From('Comment c')
-                ->Where('c.InsertUserID', $UserID)
-                ->Get()
-                ->FirstRow()
+                ->select('c.CommentID', 'count', 'CountComments')
+                ->from('Comment c')
+                ->where('c.InsertUserID', $UserID)
+                ->get()
+                ->firstRow()
                 ->CountComments;
 
             // Save to the attributes column of the user table for this user.
-            Gdn::UserModel()->SetField($UserID, 'CountComments', $CountComments);
+            Gdn::userModel()->setField($UserID, 'CountComments', $CountComments);
         }
     }
 
@@ -1285,29 +1285,29 @@ class CommentModel extends VanillaModel {
     public function Delete($CommentID, $Options = array()) {
         $this->EventArguments['CommentID'] = $CommentID;
 
-        $Comment = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
+        $Comment = $this->getID($CommentID, DATASET_TYPE_ARRAY);
         if (!$Comment) {
             return false;
         }
-        $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Comment['DiscussionID']))->FirstRow(DATASET_TYPE_ARRAY);
+        $Discussion = $this->SQL->getWhere('Discussion', array('DiscussionID' => $Comment['DiscussionID']))->firstRow(DATASET_TYPE_ARRAY);
 
         // Decrement the UserDiscussion comment count if the user has seen this comment
         $Offset = $this->GetOffset($CommentID);
-        $this->SQL->Update('UserDiscussion')
-            ->Set('CountComments', 'CountComments - 1', false)
-            ->Where('DiscussionID', $Comment['DiscussionID'])
-            ->Where('CountComments >', $Offset)
-            ->Put();
+        $this->SQL->update('UserDiscussion')
+            ->set('CountComments', 'CountComments - 1', false)
+            ->where('DiscussionID', $Comment['DiscussionID'])
+            ->where('CountComments >', $Offset)
+            ->put();
 
         $this->EventArguments['Discussion'] = $Discussion;
-        $this->FireEvent('DeleteComment');
+        $this->fireEvent('DeleteComment');
 
         // Log the deletion.
-        $Log = GetValue('Log', $Options, 'Delete');
-        LogModel::Insert($Log, 'Comment', $Comment, GetValue('LogOptions', $Options, array()));
+        $Log = val('Log', $Options, 'Delete');
+        LogModel::insert($Log, 'Comment', $Comment, val('LogOptions', $Options, array()));
 
         // Delete the comment.
-        $this->SQL->Delete('Comment', array('CommentID' => $CommentID));
+        $this->SQL->delete('Comment', array('CommentID' => $CommentID));
 
         // Update the comment count
         $this->UpdateCommentCount($Discussion, array('Slave' => false));
@@ -1316,7 +1316,7 @@ class CommentModel extends VanillaModel {
         $this->UpdateUser($Comment['InsertUserID']);
 
         // Update the category.
-        $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+        $Category = CategoryModel::categories(val('CategoryID', $Discussion));
         if ($Category && $Category['LastCommentID'] == $CommentID) {
             $CategoryModel = new CategoryModel();
             $CategoryModel->SetRecentPost($Category['CategoryID']);
@@ -1336,7 +1336,7 @@ class CommentModel extends VanillaModel {
      * @param object $Data SQL result.
      */
     public function SetCalculatedFields(&$Data) {
-        $Result = &$Data->Result();
+        $Result = &$Data->result();
         foreach ($Result as &$Comment) {
             $this->Calculate($Comment);
         }
@@ -1353,12 +1353,12 @@ class CommentModel extends VanillaModel {
     public function Calculate($Comment) {
 
         // Do nothing yet.
-        if ($Attributes = GetValue('Attributes', $Comment)) {
-            SetValue('Attributes', $Comment, unserialize($Attributes));
+        if ($Attributes = val('Attributes', $Comment)) {
+            setValue('Attributes', $Comment, unserialize($Attributes));
         }
 
         $this->EventArguments['Comment'] = $Comment;
-        $this->FireEvent('SetCalculatedFields');
+        $this->fireEvent('SetCalculatedFields');
     }
 
     public function Where($Value = null) {
@@ -1368,7 +1368,7 @@ class CommentModel extends VanillaModel {
             $this->_Where = array();
         elseif (is_a($Value, 'Gdn_SQLDriver')) {
             if (!empty($this->_Where)) {
-                $Value->Where($this->_Where);
+                $Value->where($this->_Where);
             }
         } else {
             $this->_Where = $Value;

@@ -153,16 +153,16 @@ if (!class_exists('MenuModule', false)) {
                 $HighlightRoute = Gdn_Url::Request();
             }
 
-            $this->FireEvent('BeforeToString');
+            $this->fireEvent('BeforeToString');
 
             $Username = '';
             $UserID = '';
             $Session_TransientKey = '';
             $Permissions = array();
-            $Session = Gdn::Session();
+            $Session = Gdn::session();
             $HasPermissions = false;
             $Admin = false;
-            if ($Session->IsValid() === true) {
+            if ($Session->isValid() === true) {
                 $UserID = $Session->User->UserID;
                 $Username = $Session->User->Name;
                 $Session_TransientKey = $Session->TransientKey();
@@ -214,19 +214,19 @@ if (!class_exists('MenuModule', false)) {
                                 $Group .= "</li>\r\n";
                             }
 
-                            $Url = ArrayValue('Url', $Link);
+                            $Url = arrayValue('Url', $Link);
                             if (substr($Link['Text'], 0, 1) === '\\') {
                                 $Text = substr($Link['Text'], 1);
                             } else {
                                 $Text = str_replace('{Username}', $Username, $Link['Text']);
                             }
-                            $Attributes = ArrayValue('Attributes', $Link, array());
-                            $AnchorAttributes = ArrayValue('AnchorAttributes', $Link, array());
+                            $Attributes = arrayValue('Attributes', $Link, array());
+                            $AnchorAttributes = arrayValue('AnchorAttributes', $Link, array());
                             if ($Url !== false) {
-                                $Url = Url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
-                                $CurrentLink = $Url == Url($HighlightRoute);
+                                $Url = url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
+                                $CurrentLink = $Url == url($HighlightRoute);
 
-                                $CssClass = ArrayValue('class', $Attributes, '');
+                                $CssClass = arrayValue('class', $Attributes, '');
                                 if ($CurrentLink) {
                                     $Attributes['class'] = $CssClass.' Highlight';
                                 }

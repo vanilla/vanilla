@@ -17,10 +17,10 @@ class DraftsModule extends Gdn_Module {
     public $Form;
 
     public function GetData($Limit = 20, $DiscussionID = '') {
-        $Session = Gdn::Session();
-        if ($Session->IsValid()) {
+        $Session = Gdn::session();
+        if ($Session->isValid()) {
             $DraftModel = new DraftModel();
-            $this->Data = $DraftModel->Get($Session->UserID, 0, $Limit, $DiscussionID);
+            $this->Data = $DraftModel->get($Session->UserID, 0, $Limit, $DiscussionID);
         }
         $this->Form = $this->_Sender->Form;
     }
@@ -30,7 +30,7 @@ class DraftsModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (is_object($this->Data) && $this->Data->NumRows() > 0) {
+        if (is_object($this->Data) && $this->Data->numRows() > 0) {
             return parent::ToString();
         }
 

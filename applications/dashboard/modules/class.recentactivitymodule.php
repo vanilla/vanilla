@@ -25,7 +25,7 @@ class RecentActivityModule extends Gdn_Module {
         }
 
         $ActivityModel = new ActivityModel();
-        $Data = $ActivityModel->GetWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 0, $Limit);
+        $Data = $ActivityModel->getWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 0, $Limit);
         $this->ActivityData = $Data;
     }
 
@@ -34,12 +34,12 @@ class RecentActivityModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!Gdn::Session()->CheckPermission('Garden.Activity.View')) {
+        if (!Gdn::session()->checkPermission('Garden.Activity.View')) {
             return '';
         }
 
-        if (StringIsNullOrEmpty($this->ActivityModuleTitle)) {
-            $this->ActivityModuleTitle = T('Recent Activity');
+        if (stringIsNullOrEmpty($this->ActivityModuleTitle)) {
+            $this->ActivityModuleTitle = t('Recent Activity');
         }
 
         if (!$this->ActivityData) {
@@ -47,7 +47,7 @@ class RecentActivityModule extends Gdn_Module {
         }
 
         $Data = $this->ActivityData;
-        if (is_object($Data) && $Data->NumRows() > 0) {
+        if (is_object($Data) && $Data->numRows() > 0) {
             return parent::ToString();
         }
 

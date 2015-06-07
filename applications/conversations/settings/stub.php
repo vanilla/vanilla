@@ -34,7 +34,7 @@ $ConversationID = $SQL->insert('Conversation', array(
 
 $MessageID = $SQL->insert('ConversationMessage', array(
     'ConversationID' => $ConversationID,
-    'Body' => T('StubConversationBody', $ConversationBody),
+    'Body' => t('StubConversationBody', $ConversationBody),
     'Format' => 'Html',
     'InsertUserID' => $SystemUserID,
     'DateInserted' => $Now

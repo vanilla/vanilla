@@ -31,8 +31,8 @@ class DraftModel extends VanillaModel {
      */
     public function DraftQuery() {
         $this->SQL
-            ->Select('d.*')
-            ->From('Draft d');
+            ->select('d.*')
+            ->from('Draft d');
     }
 
     /**
@@ -58,17 +58,17 @@ class DraftModel extends VanillaModel {
 
         $this->DraftQuery();
         $this->SQL
-            ->Select('d.Name, di.Name', 'coalesce', 'Name')
-            ->Join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
-            ->Where('d.InsertUserID', $UserID)
-            ->OrderBy('d.DateInserted', 'desc')
-            ->Limit($Limit, $Offset);
+            ->select('d.Name, di.Name', 'coalesce', 'Name')
+            ->join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
+            ->where('d.InsertUserID', $UserID)
+            ->orderBy('d.DateInserted', 'desc')
+            ->limit($Limit, $Offset);
 
         if (is_numeric($DiscussionID) && $DiscussionID > 0) {
-            $this->SQL->Where('d.DiscussionID', $DiscussionID);
+            $this->SQL->where('d.DiscussionID', $DiscussionID);
         }
 
-        return $this->SQL->Get();
+        return $this->SQL->get();
     }
 
     /**
@@ -83,9 +83,9 @@ class DraftModel extends VanillaModel {
     public function GetID($DraftID) {
         $this->DraftQuery();
         return $this->SQL
-            ->Where('d.DraftID', $DraftID)
-            ->Get()
-            ->FirstRow();
+            ->where('d.DraftID', $DraftID)
+            ->get()
+            ->firstRow();
     }
 
     /**
@@ -99,11 +99,11 @@ class DraftModel extends VanillaModel {
      */
     public function GetCount($UserID) {
         return $this->SQL
-            ->Select('DraftID', 'count', 'CountDrafts')
-            ->From('Draft')
-            ->Where('InsertUserID', $UserID)
-            ->Get()
-            ->FirstRow()
+            ->select('DraftID', 'count', 'CountDrafts')
+            ->from('Draft')
+            ->where('InsertUserID', $UserID)
+            ->get()
+            ->firstRow()
             ->CountDrafts;
     }
 
@@ -117,21 +117,21 @@ class DraftModel extends VanillaModel {
      * @return int Unique ID of draft.
      */
     public function Save($FormPostValues) {
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
 
         // Define the primary key in this model's table.
-        $this->DefineSchema();
+        $this->defineSchema();
 
         // Add & apply any extra validation rules:
-        $this->Validation->ApplyRule('Body', 'Required');
-        $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
+        $this->Validation->applyRule('Body', 'Required');
+        $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
             $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
-            $this->Validation->ApplyRule('Body', 'Length');
+            $this->Validation->applyRule('Body', 'Length');
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.
-        $DraftID = ArrayValue('DraftID', $FormPostValues, '');
+        $DraftID = arrayValue('DraftID', $FormPostValues, '');
         $Insert = $DraftID == '' ? true : false;
 
         if (!$DraftID) {
@@ -146,11 +146,11 @@ class DraftModel extends VanillaModel {
         if ($Insert) {
             // If no categoryid is defined, grab the first available.
             if (ArrayValue('CategoryID', $FormPostValues) === false) {
-                $FormPostValues['CategoryID'] = $this->SQL->Get('Category', '', '', 1)->FirstRow()->CategoryID;
+                $FormPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
             }
 
         }
-        // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
+        // Add the update fields because this table's default sort is by DateUpdated (see $this->get()).
         $this->AddInsertFields($FormPostValues);
         $this->AddUpdateFields($FormPostValues);
 
@@ -168,7 +168,7 @@ class DraftModel extends VanillaModel {
         }
 
         // Validate the form posted values
-        if ($this->Validate($FormPostValues, $Insert)) {
+        if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
             $DraftID = intval(ArrayValue('DraftID', $Fields, 0));
 
@@ -176,11 +176,11 @@ class DraftModel extends VanillaModel {
             if ($DraftID > 0) {
                 // Update the draft
                 $Fields = RemoveKeyFromArray($Fields, 'DraftID'); // Remove the primary key from the fields for saving
-                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DraftID));
+                $this->SQL->put($this->Name, $Fields, array($this->PrimaryKey => $DraftID));
             } else {
                 // Insert the draft
                 unset($Fields['DraftID']);
-                $DraftID = $this->SQL->Insert($this->Name, $Fields);
+                $DraftID = $this->SQL->insert($this->Name, $Fields);
                 $this->UpdateUser($Session->UserID);
             }
         }
@@ -202,13 +202,13 @@ class DraftModel extends VanillaModel {
     public function Delete($DraftID) {
         // Get some information about this draft
         $DraftUser = $this->SQL
-            ->Select('InsertUserID')
-            ->From('Draft')
-            ->Where('DraftID', $DraftID)
-            ->Get()
-            ->FirstRow();
+            ->select('InsertUserID')
+            ->from('Draft')
+            ->where('DraftID', $DraftID)
+            ->get()
+            ->firstRow();
 
-        $this->SQL->Delete('Draft', array('DraftID' => $DraftID));
+        $this->SQL->delete('Draft', array('DraftID' => $DraftID));
         if (is_object($DraftUser)) {
             $this->UpdateUser($DraftUser->InsertUserID);
         }
@@ -226,9 +226,9 @@ class DraftModel extends VanillaModel {
      */
     public function UpdateUser($UserID) {
         // Retrieve a draft count
-        $CountDrafts = $this->GetCount($UserID);
+        $CountDrafts = $this->getCount($UserID);
 
         // Update CountDrafts column of user table fot this user
-        Gdn::UserModel()->SetField($UserID, 'CountDrafts', $CountDrafts);
+        Gdn::userModel()->setField($UserID, 'CountDrafts', $CountDrafts);
     }
 }

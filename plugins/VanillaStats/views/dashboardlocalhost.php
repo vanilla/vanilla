@@ -4,7 +4,7 @@
     <?php
     echo '<h2>', T('Need More Help?'), '</h2>';
     echo '<ul>';
-    echo '<li>', Anchor(T('Using Vanilla Stats on localhost'), 'http://docs.vanillaforums.com/addons/statistics/'), '</li>';
+    echo '<li>', anchor(T('Using Vanilla Stats on localhost'), 'http://docs.vanillaforums.com/addons/statistics/'), '</li>';
     echo '</ul>';
     ?>
 </div>

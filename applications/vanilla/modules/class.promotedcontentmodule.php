@@ -74,7 +74,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Parameters Use lowercase key names that map to class properties.
      */
     public function Load($Parameters = array()) {
-        $Result = $this->Validate($Parameters);
+        $Result = $this->validate($Parameters);
         if ($Result === true) {
             // Match existing properties to validates parameters.
             foreach ($this->Properties as $Property) {
@@ -116,13 +116,13 @@ class PromotedContentModule extends Gdn_Module {
         $validation->applyRule('selector', 'Required');
         $selectorWhitelist = array('role', 'rank', 'category', 'score', 'promoted');
         if (isset($Parameters['selector']) && !in_array($Parameters['selector'], $selectorWhitelist)) {
-            $validation->AddValidationResult('selector', 'Invalid selector.');
+            $validation->addValidationResult('selector', 'Invalid selector.');
         }
 
         // Validate ContentType.
         $typeWhitelist = array('all', 'discussions', 'comments');
         if (isset($Parameters['contenttype']) && !in_array($Parameters['contenttype'], $typeWhitelist)) {
-            $validation->AddValidationResult('contenttype', 'Invalid contenttype.');
+            $validation->addValidationResult('contenttype', 'Invalid contenttype.');
         }
 
         $result = $validation->validate($Parameters);
@@ -133,12 +133,12 @@ class PromotedContentModule extends Gdn_Module {
      * Get data based on class properties.
      */
     public function GetData() {
-        $this->SetData('Content', false);
+        $this->setData('Content', false);
         $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
         if (method_exists($this, $SelectorMethod)) {
-            $this->SetData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
+            $this->setData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
         } else {
-            $this->FireEvent($SelectorMethod);
+            $this->fireEvent($SelectorMethod);
         }
     }
 
@@ -152,7 +152,7 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $RoleID = $Parameters;
         } else {
-            $RoleID = GetValue('RoleID', $Parameters, null);
+            $RoleID = val('RoleID', $Parameters, null);
         }
 
         // Lookup role name -> roleID
@@ -167,7 +167,7 @@ class PromotedContentModule extends Gdn_Module {
                     continue;
                 } else {
                     $Role = array_shift($Role);
-                    $RoleID[] = GetValue('RoleID', $Role);
+                    $RoleID[] = val('RoleID', $Role);
                 }
             }
         }
@@ -180,37 +180,37 @@ class PromotedContentModule extends Gdn_Module {
         sort($RoleID);
         $RoleIDKey = implode('-', $RoleID);
         $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleIDKey}";
-        $Content = Gdn::Cache()->Get($SelectorRoleCacheKey);
+        $Content = Gdn::cache()->get($SelectorRoleCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get everyone with this Role
-            $UserIDs = Gdn::SQL()->Select('ur.UserID')
-                ->From('UserRole ur')
-                ->Where('ur.RoleID', $RoleID)
-                ->GroupBy('UserID')
-                ->Get()->Result(DATASET_TYPE_ARRAY);
-            $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
+            $UserIDs = Gdn::sql()->select('ur.UserID')
+                ->from('UserRole ur')
+                ->where('ur.RoleID', $RoleID)
+                ->groupBy('UserID')
+                ->get()->result(DATASET_TYPE_ARRAY);
+            $UserIDs = consolidateArrayValuesByKey($UserIDs, 'UserID');
 
             // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
-                $Discussions = Gdn::SQL()->Select('d.*')
-                    ->From('Discussion d')
-                    ->WhereIn('d.InsertUserID', $UserIDs)
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $Discussions = Gdn::sql()->select('d.*')
+                    ->from('Discussion d')
+                    ->whereIn('d.InsertUserID', $UserIDs)
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
             }
 
             // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
-                $Comments = Gdn::SQL()->Select('c.*')
-                    ->From('Comment c')
-                    ->WhereIn('InsertUserID', $UserIDs)
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $Comments = Gdn::sql()->select('c.*')
+                    ->from('Comment c')
+                    ->whereIn('InsertUserID', $UserIDs)
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
 
                 $this->JoinCategory($Comments);
             }
@@ -223,7 +223,7 @@ class PromotedContentModule extends Gdn_Module {
             $this->Prepare($Content);
 
             // Add result to cache
-            Gdn::Cache()->Store($SelectorRoleCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorRoleCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
         }
@@ -248,13 +248,13 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $RankID = $Parameters;
         } else {
-            $RankID = GetValue('RankID', $Parameters, null);
+            $RankID = val('RankID', $Parameters, null);
         }
 
         // Check for Rank passed by name.
         if (!is_numeric($RankID)) {
             $RankModel = new RankModel();
-            $Rank = $RankModel->GetWhere(array('Name' => $RankID))->FirstRow();
+            $Rank = $RankModel->getWhere(array('Name' => $RankID))->firstRow();
             $RankID = val('RankID', $Rank);
         }
 
@@ -265,37 +265,37 @@ class PromotedContentModule extends Gdn_Module {
 
         // Check cache
         $SelectorRankCacheKey = "modules.promotedcontent.rank.{$RankID}";
-        $Content = Gdn::Cache()->Get($SelectorRankCacheKey);
+        $Content = Gdn::cache()->get($SelectorRankCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get everyone with this Role
-            $UserIDs = Gdn::SQL()->Select('u.UserID')
-                ->From('User u')
-                ->Where('u.RankID', $RankID)
-                ->GroupBy('UserID')
-                ->Get()->Result(DATASET_TYPE_ARRAY);
-            $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
+            $UserIDs = Gdn::sql()->select('u.UserID')
+                ->from('User u')
+                ->where('u.RankID', $RankID)
+                ->groupBy('UserID')
+                ->get()->result(DATASET_TYPE_ARRAY);
+            $UserIDs = consolidateArrayValuesByKey($UserIDs, 'UserID');
 
             // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
-                $Discussions = Gdn::SQL()->Select('d.*')
-                    ->From('Discussion d')
-                    ->WhereIn('d.InsertUserID', $UserIDs)
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $Discussions = Gdn::sql()->select('d.*')
+                    ->from('Discussion d')
+                    ->whereIn('d.InsertUserID', $UserIDs)
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
             }
 
             // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
-                $Comments = Gdn::SQL()->Select('c.*')
-                    ->From('Comment c')
-                    ->WhereIn('InsertUserID', $UserIDs)
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $Comments = Gdn::sql()->select('c.*')
+                    ->from('Comment c')
+                    ->whereIn('InsertUserID', $UserIDs)
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
 
                 $this->JoinCategory($Comments);
             }
@@ -308,7 +308,7 @@ class PromotedContentModule extends Gdn_Module {
             $this->Prepare($Content);
 
             // Add result to cache
-            Gdn::Cache()->Store($SelectorRankCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorRankCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
         }
@@ -328,11 +328,11 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $CategoryID = $Parameters;
         } else {
-            $CategoryID = GetValue('CategoryID', $Parameters, null);
+            $CategoryID = val('CategoryID', $Parameters, null);
         }
 
         // Allow category names, and validate category exists.
-        $Category = CategoryModel::Categories($CategoryID);
+        $Category = CategoryModel::categories($CategoryID);
         $CategoryID = val('CategoryID', $Category);
 
         // Disallow invalid or multiple categories.
@@ -342,37 +342,37 @@ class PromotedContentModule extends Gdn_Module {
 
         // Check cache
         $SelectorCategoryCacheKey = "modules.promotedcontent.category.{$CategoryID}";
-        $Content = Gdn::Cache()->Get($SelectorCategoryCacheKey);
+        $Content = Gdn::cache()->get($SelectorCategoryCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
-                $Discussions = Gdn::SQL()->Select('d.*')
-                    ->From('Discussion d')
-                    ->Where('d.CategoryID', $CategoryID)
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $Discussions = Gdn::sql()->select('d.*')
+                    ->from('Discussion d')
+                    ->where('d.CategoryID', $CategoryID)
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
             }
 
             // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
-                $CommentDiscussionIDs = Gdn::SQL()->Select('d.DiscussionID')
-                    ->From('Discussion d')
-                    ->Where('d.CategoryID', $CategoryID)
-                    ->OrderBy('DateLastComment', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $CommentDiscussionIDs = Gdn::sql()->select('d.DiscussionID')
+                    ->from('Discussion d')
+                    ->where('d.CategoryID', $CategoryID)
+                    ->orderBy('DateLastComment', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
                 $CommentDiscussionIDs = array_column($CommentDiscussionIDs, 'DiscussionID');
 
-                $Comments = Gdn::SQL()->Select('c.*')
-                    ->From('Comment c')
-                    ->WhereIn('DiscussionID', $CommentDiscussionIDs)
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit)
-                    ->Get()->Result(DATASET_TYPE_ARRAY);
+                $Comments = Gdn::sql()->select('c.*')
+                    ->from('Comment c')
+                    ->whereIn('DiscussionID', $CommentDiscussionIDs)
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit)
+                    ->get()->result(DATASET_TYPE_ARRAY);
 
                 $this->JoinCategory($Comments);
             }
@@ -385,7 +385,7 @@ class PromotedContentModule extends Gdn_Module {
             $this->Prepare($Content);
 
             // Add result to cache
-            Gdn::Cache()->Store($SelectorCategoryCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorCategoryCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
         }
@@ -405,7 +405,7 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Parameters)) {
             $MinScore = $Parameters;
         } else {
-            $MinScore = GetValue('Score', $Parameters, null);
+            $MinScore = val('Score', $Parameters, null);
         }
 
         if (!is_integer($MinScore)) {
@@ -414,33 +414,33 @@ class PromotedContentModule extends Gdn_Module {
 
         // Check cache
         $SelectorScoreCacheKey = "modules.promotedcontent.score.{$MinScore}";
-        $Content = Gdn::Cache()->Get($SelectorScoreCacheKey);
+        $Content = Gdn::cache()->get($SelectorScoreCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
-                $Discussions = Gdn::SQL()->Select('d.*')
-                    ->From('Discussion d')
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit);
+                $Discussions = Gdn::sql()->select('d.*')
+                    ->from('Discussion d')
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit);
                 if ($MinScore !== false) {
-                    $Discussions->Where('Score >', $MinScore);
+                    $Discussions->where('Score >', $MinScore);
                 }
-                $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
+                $Discussions = $Discussions->get()->result(DATASET_TYPE_ARRAY);
             }
 
             // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
-                $Comments = Gdn::SQL()->Select('c.*')
-                    ->From('Comment c')
-                    ->OrderBy('DateInserted', 'DESC')
-                    ->Limit($this->Limit);
+                $Comments = Gdn::sql()->select('c.*')
+                    ->from('Comment c')
+                    ->orderBy('DateInserted', 'DESC')
+                    ->limit($this->Limit);
                 if ($MinScore !== false) {
-                    $Comments->Where('Score >', $MinScore);
+                    $Comments->where('Score >', $MinScore);
                 }
-                $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
+                $Comments = $Comments->get()->result(DATASET_TYPE_ARRAY);
 
                 $this->JoinCategory($Comments);
             }
@@ -453,7 +453,7 @@ class PromotedContentModule extends Gdn_Module {
             $this->Prepare($Content);
 
             // Add result to cache
-            Gdn::Cache()->Store($SelectorScoreCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorScoreCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
         }
@@ -511,10 +511,10 @@ class PromotedContentModule extends Gdn_Module {
         }
         $DiscussionIDs = array_keys($DiscussionIDs);
 
-        $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->WhereIn('DiscussionID', $DiscussionIDs)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+        $Discussions = Gdn::sql()->select('d.*')
+            ->from('Discussion d')
+            ->whereIn('DiscussionID', $DiscussionIDs)
+            ->get()->result(DATASET_TYPE_ARRAY);
 
         $DiscussionsByID = array();
         foreach ($Discussions as $Discussion) {
@@ -524,7 +524,7 @@ class PromotedContentModule extends Gdn_Module {
 
         foreach ($Comments as &$Comment) {
             $Comment['Discussion'] = $DiscussionsByID[$Comment['DiscussionID']];
-            $Comment['CategoryID'] = GetValueR('Discussion.CategoryID', $Comment);
+            $Comment['CategoryID'] = valr('Discussion.CategoryID', $Comment);
         }
     }
 
@@ -547,7 +547,7 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             foreach ($Section as $Item) {
-                $ItemField = GetValue($Field, $Item);
+                $ItemField = val($Field, $Item);
                 $Interleaved[$ItemField] = array_merge($Item, array('RecordType' => $SectionType));
 
                 ksort($Interleaved);
@@ -567,7 +567,7 @@ class PromotedContentModule extends Gdn_Module {
 
         foreach ($content as &$item) {
             $contentType = val('RecordType', $item);
-            $userID = GetValue('InsertUserID', $item);
+            $userID = val('InsertUserID', $item);
             $itemProperties = array();
             $itemFields = array('DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl',);
 
@@ -576,7 +576,7 @@ class PromotedContentModule extends Gdn_Module {
                     $itemFields = array_merge($itemFields, array('CommentID'));
 
                     // Comment specific
-                    $itemProperties['Name'] = sprintf(T('Re: %s'), GetValueR('Discussion.Name', $item, val('Name', $item)));
+                    $itemProperties['Name'] = sprintf(t('Re: %s'), valr('Discussion.Name', $item, val('Name', $item)));
                     $url = CommentUrl($item);
                     break;
 
@@ -588,7 +588,7 @@ class PromotedContentModule extends Gdn_Module {
 
             $item['Url'] = $url;
             if ($categoryId = val('CategoryID', $item)) {
-                $category = CategoryModel::Categories($categoryId);
+                $category = CategoryModel::categories($categoryId);
                 $item['CategoryName'] = val('Name', $category);
                 $item['CategoryUrl'] = CategoryUrl($category);
             }
@@ -600,15 +600,15 @@ class PromotedContentModule extends Gdn_Module {
             // Attach User
             $userFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
 
-            $user = Gdn::UserModel()->GetID($userID);
+            $user = Gdn::userModel()->getID($userID);
             $roleModel = new RoleModel();
-            $roles = $roleModel->GetByUserID($userID)->ResultArray();
+            $roles = $roleModel->GetByUserID($userID)->resultArray();
             $roleNames = '';
             foreach ($roles as $role) {
                 $roleNames[] = val('Name', $role);
             }
             $userProperties = array(
-                'Url' => Url(UserUrl($user), true),
+                'Url' => url(userUrl($user), true),
                 'PhotoUrl' => UserPhotoUrl($user),
                 'RankName' => val('Name', RankModel::Ranks(val('RankID', $user)), null),
                 'RoleNames' => $roleNames,
@@ -641,13 +641,13 @@ class PromotedContentModule extends Gdn_Module {
      * @return bool
      */
     protected function SecurityFilter($ContentItem) {
-        $CategoryID = GetValue('CategoryID', $ContentItem, null);
+        $CategoryID = val('CategoryID', $ContentItem, null);
         if (is_null($CategoryID) || $CategoryID === false) {
             return false;
         }
 
-        $Category = CategoryModel::Categories($CategoryID);
-        $CanView = GetValue('PermsDiscussionsView', $Category);
+        $Category = CategoryModel::categories($CategoryID);
+        $CanView = val('PermsDiscussionsView', $Category);
         if (!$CanView) {
             return false;
         }
@@ -698,7 +698,7 @@ class PromotedContentModule extends Gdn_Module {
      * @return string
      */
     public function ToString() {
-        if ($this->Data('Content', null) == null) {
+        if ($this->data('Content', null) == null) {
             $this->GetData();
         }
 

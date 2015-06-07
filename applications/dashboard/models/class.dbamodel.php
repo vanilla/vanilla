@@ -26,14 +26,14 @@ class DBAModel extends Gdn_Model {
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function Counts($Table, $Column, $From = false, $To = false) {
-        $Model = $this->CreateModel($Table);
+    public function counts($Table, $Column, $From = false, $To = false) {
+        $Model = $this->createModel($Table);
 
         if (!method_exists($Model, 'Counts')) {
             throw new Gdn_UserException("The $Table model does not support count recalculation.");
         }
 
-        $Result = $Model->Counts($Column, $From, $To);
+        $Result = $Model->counts($Column, $From, $To);
         return $Result;
     }
 
@@ -43,7 +43,7 @@ class DBAModel extends Gdn_Model {
      * @param string $Table
      * @return Gdn_Model
      */
-    public function CreateModel($Table) {
+    public function createModel($Table) {
         $ModelName = $Table.'Model';
         if (class_exists($ModelName)) {
             return new $ModelName();
@@ -64,7 +64,7 @@ class DBAModel extends Gdn_Model {
      * @param string $ChildJoinColumn
      * @return type
      */
-    public static function GetCountSQL(
+    public static function getCountSQL(
         $Aggregate,
         // count, max, min, etc.
         $ParentTable,
@@ -112,7 +112,7 @@ class DBAModel extends Gdn_Model {
 
         if (!empty($Where)) {
             $Wheres = array();
-            $PDO = Gdn::Database()->Connection();
+            $PDO = Gdn::database()->connection();
             foreach ($Where as $Column => $Value) {
                 $Value = $PDO->quote($Value);
                 $Wheres[] = "p.`$Column` = $Value";
@@ -121,7 +121,7 @@ class DBAModel extends Gdn_Model {
             $Result .= "\n where ".implode(" and ", $Wheres);
         }
 
-        $Result = str_replace(':_', Gdn::Database()->DatabasePrefix, $Result);
+        $Result = str_replace(':_', Gdn::database()->DatabasePrefix, $Result);
         return $Result;
     }
 
@@ -132,18 +132,18 @@ class DBAModel extends Gdn_Model {
      * @param array $Column The column to decode.
      * @param int $Limit The number of records to work on.
      */
-    public function HtmlEntityDecode($Table, $Column, $Limit = 100) {
+    public function htmlEntityDecode($Table, $Column, $Limit = 100) {
         // Construct a model to save the results.
-        $Model = $this->CreateModel($Table);
+        $Model = $this->createModel($Table);
 
         // Get the data to decode.
         $Data = $this->SQL
-            ->Select($Model->PrimaryKey)
-            ->Select($Column)
-            ->From($Table)
-            ->Like($Column, '&%;', 'both')
-            ->Limit($Limit)
-            ->Get()->ResultArray();
+            ->select($Model->PrimaryKey)
+            ->select($Column)
+            ->from($Table)
+            ->like($Column, '&%;', 'both')
+            ->limit($Limit)
+            ->get()->resultArray();
 
         $Result = array();
         $Result['Count'] = count($Data);
@@ -159,7 +159,7 @@ class DBAModel extends Gdn_Model {
             $Item = array('From' => $Value, 'To' => $DecodedValue);
 
             if ($Value != $DecodedValue) {
-                $Model->SetField($Row[$Model->PrimaryKey], $Column, $DecodedValue);
+                $Model->setField($Row[$Model->PrimaryKey], $Column, $DecodedValue);
                 $Result['Decoded'] = $Item;
             } else {
                 $Result['NotDecoded'] = $Item;
@@ -177,12 +177,12 @@ class DBAModel extends Gdn_Model {
      * @return bool|Gdn_DataSet|string
      * @throws Exception
      */
-    public function FixInsertUserID($Table) {
+    public function fixInsertUserID($Table) {
         return $this->SQL
-            ->Update($Table)
-            ->Set('InsertUserID', Gdn::UserModel()->GetSystemUserID())
-            ->Where('InsertUserID <', 1)
-            ->Put();
+            ->update($Table)
+            ->set('InsertUserID', Gdn::userModel()->getSystemUserID())
+            ->where('InsertUserID <', 1)
+            ->put();
     }
 
     /**
@@ -190,15 +190,15 @@ class DBAModel extends Gdn_Model {
      *
      * @return array
      */
-    public function FixPermissions() {
-        $Roles = RoleModel::Roles();
+    public function fixPermissions() {
+        $Roles = RoleModel::roles();
         $RoleModel = new RoleModel();
         $PermissionModel = new PermissionModel();
 
         // Find roles missing permission records
         foreach ($Roles as $RoleID => $Role) {
-            $Permissions = $this->SQL->Select('*')->From('Permission p')
-                ->Where('p.RoleID', $RoleID)->Get()->ResultArray();
+            $Permissions = $this->SQL->select('*')->from('Permission p')
+                ->where('p.RoleID', $RoleID)->get()->resultArray();
 
             if (!count($Permissions)) {
                 // Set basic permission record
@@ -214,7 +214,7 @@ class DBAModel extends Gdn_Model {
                     'Garden.Profiles.Edit' => 1,
                     'Conversations.Conversations.Add' => 1
                 );
-                $PermissionModel->Save($DefaultRecord);
+                $PermissionModel->save($DefaultRecord);
 
                 // Set default category permission
                 $DefaultCategory = array(
@@ -226,32 +226,32 @@ class DBAModel extends Gdn_Model {
                     'Vanilla.Discussions.Add' => 1,
                     'Vanilla.Comments.Add' => 1
                 );
-                $PermissionModel->Save($DefaultCategory);
+                $PermissionModel->save($DefaultCategory);
             }
         }
 
         return array('Complete' => true);
     }
 
-    public function FixUrlCodes($Table, $Column) {
-        $Model = $this->CreateModel($Table);
+    public function fixUrlCodes($Table, $Column) {
+        $Model = $this->createModel($Table);
 
         // Get the data to decode.
         $Data = $this->SQL
-            ->Select($Model->PrimaryKey)
-            ->Select($Column)
-            ->From($Table)
-//         ->Like($Column, '&%;', 'both')
-//         ->Limit($Limit)
-            ->Get()->ResultArray();
+            ->select($Model->PrimaryKey)
+            ->select($Column)
+            ->from($Table)
+//         ->like($Column, '&%;', 'both')
+//         ->limit($Limit)
+            ->get()->resultArray();
 
         foreach ($Data as $Row) {
             $Value = $Row[$Column];
-            $Encoded = Gdn_Format::Url($Value);
+            $Encoded = Gdn_Format::url($Value);
 
             if (!$Value || $Value != $Encoded) {
-                $Model->SetField($Row[$Model->PrimaryKey], $Column, $Encoded);
-                Gdn::Controller()->Data['Encoded'][$Row[$Model->PrimaryKey]] = $Encoded;
+                $Model->setField($Row[$Model->PrimaryKey], $Column, $Encoded);
+                Gdn::controller()->Data['Encoded'][$Row[$Model->PrimaryKey]] = $Encoded;
             }
         }
 
@@ -265,18 +265,18 @@ class DBAModel extends Gdn_Model {
      * @return bool|Gdn_DataSet|string
      * @throws Exception
      */
-    public function FixUserRole($RoleID) {
-        $PDO = Gdn::Database()->Connection();
+    public function fixUserRole($RoleID) {
+        $PDO = Gdn::database()->connection();
         $InsertQuery = "
          insert into :_UserRole
 
-         select u.UserID, ".$PDO->Quote($RoleID)." as RoleID
+         select u.UserID, ".$PDO->quote($RoleID)." as RoleID
          from :_User u
             left join :_UserRole ur on u.UserID = ur.UserID
             left join :_Role r on ur.RoleID = r.RoleID
          where r.Name is null";
-        $InsertQuery = str_replace(':_', Gdn::Database()->DatabasePrefix, $InsertQuery);
-        return $this->SQL->Query($InsertQuery);
+        $InsertQuery = str_replace(':_', Gdn::database()->DatabasePrefix, $InsertQuery);
+        return $this->SQL->query($InsertQuery);
     }
 
     /**
@@ -285,9 +285,9 @@ class DBAModel extends Gdn_Model {
      * @param $Table
      * @param $Key
      */
-    public function ResetBatch($Table, $Key) {
+    public function resetBatch($Table, $Key) {
         $Key = "DBA.Range.$Key";
-        Gdn::Set($Key, null);
+        Gdn::set($Key, null);
     }
 
     /**
@@ -299,13 +299,13 @@ class DBAModel extends Gdn_Model {
      * @param bool $Max
      * @return array|mixed
      */
-    public function GetBatch($Table, $Key, $Limit = 10000, $Max = false) {
+    public function getBatch($Table, $Key, $Limit = 10000, $Max = false) {
         $Key = "DBA.Range.$Key";
 
         // See if there is already a range.
-        $Current = @unserialize(Gdn::Get($Key, ''));
+        $Current = @unserialize(Gdn::get($Key, ''));
         if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
-            list($Current['Min'], $Current['Max']) = $this->PrimaryKeyRange($Table);
+            list($Current['Min'], $Current['Max']) = $this->primaryKeyRange($Table);
 
             if ($Max && $Current['Max'] > $Max) {
                 $Current['Max'] = $Max;
@@ -318,7 +318,7 @@ class DBAModel extends Gdn_Model {
             $Current['To'] -= $Limit - 1;
         }
         $Current['From'] = $Current['To'] - $Limit;
-        Gdn::Set($Key, serialize($Current));
+        Gdn::set($Key, serialize($Current));
         $Current['Complete'] = $Current['To'] < $Current['Min'];
 
         $Total = $Current['Max'] - $Current['Min'];
@@ -341,14 +341,14 @@ class DBAModel extends Gdn_Model {
      * @param string $Table The name of the table to look at.
      * @return array An array in the form (min, max).
      */
-    public function PrimaryKeyRange($Table) {
-        $Model = $this->CreateModel($Table);
+    public function primaryKeyRange($Table) {
+        $Model = $this->createModel($Table);
 
         $Data = $this->SQL
-            ->Select($Model->PrimaryKey, 'min', 'MinValue')
-            ->Select($Model->PrimaryKey, 'max', 'MaxValue')
-            ->From($Table)
-            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            ->select($Model->PrimaryKey, 'min', 'MinValue')
+            ->select($Model->PrimaryKey, 'max', 'MaxValue')
+            ->from($Table)
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         if ($Data) {
             return array($Data['MinValue'], $Data['MaxValue']);

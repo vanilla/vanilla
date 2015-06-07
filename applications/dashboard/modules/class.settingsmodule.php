@@ -33,16 +33,16 @@ class SettingsModule extends Gdn_Module {
                 $ApplicationManager = Gdn::Factory('ApplicationManager');
 
                 if ($IsRemovable = !array_key_exists($Name, $ApplicationManager->EnabledApplications())) {
-                    $ApplicationInfo = ArrayValue($Name, $ApplicationManager->AvailableApplications(), array());
-                    $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
+                    $ApplicationInfo = arrayValue($Name, $ApplicationManager->AvailableApplications(), array());
+                    $ApplicationFolder = arrayValue('Folder', $ApplicationInfo, '');
 
                     $IsRemovable = IsWritable(PATH_APPLICATIONS.DS.$ApplicationFolder);
                 }
                 break;
             case self::TYPE_PLUGIN:
-                if ($IsRemovable = !array_key_exists($Name, Gdn::PluginManager()->EnabledPlugins())) {
-                    $PluginInfo = ArrayValue($Name, Gdn::PluginManager()->AvailablePlugins(), false);
-                    $PluginFolder = ArrayValue('Folder', $PluginInfo, false);
+                if ($IsRemovable = !array_key_exists($Name, Gdn::pluginManager()->EnabledPlugins())) {
+                    $PluginInfo = arrayValue($Name, Gdn::pluginManager()->AvailablePlugins(), false);
+                    $PluginFolder = arrayValue('Folder', $PluginInfo, false);
 
                     $IsRemovable = IsWritable(PATH_PLUGINS.DS.$PluginFolder);
                 }

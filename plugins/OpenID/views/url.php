@@ -3,22 +3,22 @@ echo '<div class="Connect">';
 echo '<h1>', $this->Data('Title'), '</h1>';
 $Form = $this->Form; //new Gdn_Form();
 //$Form->Method = 'get';
-echo $Form->Open(array('Action' => Url(Gdn::Request()->Path()), 'Method' => 'get'));
-echo $Form->Errors();
+echo $Form->open(array('Action' => url(Gdn::request()->Path()), 'Method' => 'get'));
+echo $Form->errors();
 ?>
     <div>
         <ul>
             <li>
                 <?php
-                echo $Form->Label('Enter Your OpenID Url', 'Url');
-                echo $Form->TextBox('url');
+                echo $Form->label('Enter Your OpenID Url', 'Url');
+                echo $Form->textBox('url');
                 ?>
             </li>
         </ul>
         <div class="Buttons">
-            <?php echo $Form->Button('Go'); ?>
+            <?php echo $Form->button('Go'); ?>
         </div>
     </div>
 <?php
-echo $Form->Close();
+echo $Form->close();
 echo '</div>';

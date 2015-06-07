@@ -33,7 +33,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      */
     public function Base_Render_Before($Sender) {
-        $Formatter = C('Garden.InputFormatter', 'Html');
+        $Formatter = c('Garden.InputFormatter', 'Html');
         $this->AttachButtonBarResources($Sender, $Formatter);
     }
 
@@ -52,16 +52,16 @@ class ButtonBarPlugin extends Gdn_Plugin {
         if (!in_array($Formatter, $this->Formats)) {
             return;
         }
-        $Sender->AddJsFile('buttonbar.js', 'plugins/ButtonBar');
-        $Sender->AddJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
+        $Sender->addJsFile('buttonbar.js', 'plugins/ButtonBar');
+        $Sender->addJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
 
-        $Sender->AddDefinition('ButtonBarLinkUrl', T('ButtonBar.LinkUrlText', 'Enter your URL:'));
-        $Sender->AddDefinition('ButtonBarImageUrl', T('ButtonBar.ImageUrlText', 'Enter image URL:'));
-        $Sender->AddDefinition('ButtonBarBBCodeHelpText', T('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
-        $Sender->AddDefinition('ButtonBarHtmlHelpText', T('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
-        $Sender->AddDefinition('ButtonBarMarkdownHelpText', T('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarLinkUrl', T('ButtonBar.LinkUrlText', 'Enter your URL:'));
+        $Sender->addDefinition('ButtonBarImageUrl', T('ButtonBar.ImageUrlText', 'Enter image URL:'));
+        $Sender->addDefinition('ButtonBarBBCodeHelpText', T('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarHtmlHelpText', T('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarMarkdownHelpText', T('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
 
-        $Sender->AddDefinition('InputFormat', $Formatter);
+        $Sender->addDefinition('InputFormat', $Formatter);
     }
 
     /**
@@ -71,7 +71,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
      */
     public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
         $Wrap = false;
-        if (Gdn::Controller() instanceof PostController) {
+        if (Gdn::controller() instanceof PostController) {
             $Wrap = true;
         }
         $this->AttachButtonBar($Sender, $Wrap);
@@ -93,15 +93,15 @@ class ButtonBarPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      */
     protected function AttachButtonBar($Sender, $Wrap = false) {
-        $Formatter = C('Garden.InputFormatter', 'Html');
+        $Formatter = c('Garden.InputFormatter', 'Html');
         if (!in_array($Formatter, $this->Formats)) {
             return;
         }
 
-        $View = Gdn::Controller()->FetchView('buttonbar', '', 'plugins/ButtonBar');
+        $View = Gdn::controller()->fetchView('buttonbar', '', 'plugins/ButtonBar');
 
         if ($Wrap) {
-            echo Wrap($View, 'div', array('class' => 'P'));
+            echo wrap($View, 'div', array('class' => 'P'));
         } else {
             echo $View;
         }

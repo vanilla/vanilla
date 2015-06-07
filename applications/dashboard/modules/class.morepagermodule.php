@@ -127,15 +127,15 @@ class MorePagerModule extends PagerModule {
     */
     public function Details() {
         if ($this->_PropertiesDefined === false) {
-            trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
+            trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
         }
 
         $Details = false;
         if ($this->TotalRecords > 0) {
             if ($this->_Totalled === true) {
-                $Details = self::FormatUrl(T('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+                $Details = self::FormatUrl(t('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
             } else {
-                $Details = self::FormatUrl(T('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+                $Details = self::FormatUrl(t('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
             }
         }
         return $Details;
@@ -187,7 +187,7 @@ class MorePagerModule extends PagerModule {
      */
     public function ToString($Type = 'more') {
         if ($this->_PropertiesDefined === false) {
-            trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
+            trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
@@ -206,8 +206,8 @@ class MorePagerModule extends PagerModule {
 
                 $NextOffset = $this->Offset + $this->Limit;
 
-                $Pager .= Anchor(
-                    sprintf(T($this->MoreCode), $ActualRecordsLeft),
+                $Pager .= anchor(
+                    sprintf(t($this->MoreCode), $ActualRecordsLeft),
                     self::FormatUrl($this->Url, $NextOffset, $this->Limit),
                     '',
                     array('rel' => 'nofollow')
@@ -228,8 +228,8 @@ class MorePagerModule extends PagerModule {
                     $PreviousOffset = 0;
                 }
 
-                $Pager .= Anchor(
-                    sprintf(T($this->LessCode), $this->Offset),
+                $Pager .= anchor(
+                    sprintf(t($this->LessCode), $this->Offset),
                     self::FormatUrl($this->Url, $PreviousOffset, $RecordsBefore),
                     '',
                     array('rel' => 'nofollow')

@@ -60,8 +60,8 @@
     </style>
     <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <div class="Info">
         <?php echo T('Facebook Connect allows users to sign in using their Facebook account.', 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>'); ?>
@@ -71,14 +71,14 @@ echo $this->Form->Errors();
             <ul>
                 <li>
                     <?php
-                    echo $this->Form->Label('Application ID', 'ApplicationID');
-                    echo $this->Form->TextBox('ApplicationID');
+                    echo $this->Form->label('Application ID', 'ApplicationID');
+                    echo $this->Form->textBox('ApplicationID');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->Label('Application Secret', 'Secret');
-                    echo $this->Form->TextBox('Secret');
+                    echo $this->Form->label('Application Secret', 'Secret');
+                    echo $this->Form->textBox('Secret');
                     ?>
                 </li>
                 <li>
@@ -107,7 +107,7 @@ echo $this->Form->Errors();
                     ?>
                 </li>
             </ul>
-            <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
+            <?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
         </div>
         <div class="ConfigurationHelp">
             <strong>How to set up Facebook Connect</strong>
@@ -118,7 +118,7 @@ echo $this->Form->Errors();
             <p>
                 When you create the Facebook application, you can choose what to enter in most fields, but make sure you
                 enter the following value in the "Site Url" field:
-                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>"/>
+                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::request()->Domain(), '/').'/'; ?>"/>
             </p>
 
             <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into
@@ -131,4 +131,4 @@ echo $this->Form->Errors();
         </div>
     </div>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();

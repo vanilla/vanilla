@@ -45,12 +45,12 @@ class SearchModel extends Gdn_Model {
     public function AddMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
         if ($this->_SearchMode == 'like') {
             if ($LikeRelavenceColumn) {
-                $Sql->Select($LikeRelavenceColumn, '', 'Relavence');
+                $Sql->select($LikeRelavenceColumn, '', 'Relavence');
             } else {
-                $Sql->Select(1, '', 'Relavence');
+                $Sql->select(1, '', 'Relavence');
             }
 
-            $Sql->BeginWhereGroup();
+            $Sql->beginWhereGroup();
 
             $ColumnsArray = explode(',', $Columns);
 
@@ -60,21 +60,21 @@ class SearchModel extends Gdn_Model {
 
                 $Param = $this->Parameter();
                 if ($First) {
-                    $Sql->Where("$Column like $Param", null, false, false);
+                    $Sql->where("$Column like $Param", null, false, false);
                     $First = false;
                 } else {
-                    $Sql->OrWhere("$Column like $Param", null, false, false);
+                    $Sql->orWhere("$Column like $Param", null, false, false);
                 }
             }
 
-            $Sql->EndWhereGroup();
+            $Sql->endWhereGroup();
         } else {
             $Boolean = $this->_SearchMode == 'boolean' ? ' in boolean mode' : '';
 
             $Param = $this->Parameter();
-            $Sql->Select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
+            $Sql->select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
             $Param = $this->Parameter();
-            $Sql->Where("match($Columns) against ($Param{$Boolean})", null, false, false);
+            $Sql->where("match($Columns) against ($Param{$Boolean})", null, false, false);
         }
     }
 
@@ -129,7 +129,7 @@ class SearchModel extends Gdn_Model {
             $this->_SearchMode = $SearchMode;
         }
 
-        if ($ForceDatabaseEngine = C('Database.ForceStorageEngine')) {
+        if ($ForceDatabaseEngine = c('Database.ForceStorageEngine')) {
             if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0) {
                 $SearchMode = 'like';
             }
@@ -142,7 +142,7 @@ class SearchModel extends Gdn_Model {
         $this->_SearchMode = $SearchMode;
 
         $this->EventArguments['Search'] = $Search;
-        $this->FireEvent('Search');
+        $this->fireEvent('Search');
 
         if (count($this->_SearchSql) == 0) {
             return array();
@@ -150,15 +150,15 @@ class SearchModel extends Gdn_Model {
 
         // Perform the search by unioning all of the sql together.
         $Sql = $this->SQL
-            ->Select()
-            ->From('_TBL_ s')
-            ->OrderBy('s.DateInserted', 'desc')
-            ->Limit($Limit, $Offset)
+            ->select()
+            ->from('_TBL_ s')
+            ->orderBy('s.DateInserted', 'desc')
+            ->limit($Limit, $Offset)
             ->GetSelect();
 
         $Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
 
-        $this->FireEvent('AfterBuildSearchQuery');
+        $this->fireEvent('AfterBuildSearchQuery');
 
         if ($this->_SearchMode == 'like') {
             $Search = '%'.$Search.'%';
@@ -169,19 +169,19 @@ class SearchModel extends Gdn_Model {
         }
 
         $Parameters = $this->_Parameters;
-        $this->Reset();
-        $this->SQL->Reset();
-        $Result = $this->Database->Query($Sql, $Parameters)->ResultArray();
+        $this->reset();
+        $this->SQL->reset();
+        $Result = $this->Database->query($Sql, $Parameters)->resultArray();
 
         foreach ($Result as $Key => $Value) {
             if (isset($Value['Summary'])) {
-                $Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], $Value['Format']));
+                $Value['Summary'] = Condense(Gdn_Format::to($Value['Summary'], $Value['Format']));
                 $Result[$Key] = $Value;
             }
 
             switch ($Value['RecordType']) {
                 case 'Discussion':
-                    $Discussion = ArrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
+                    $Discussion = arrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
                     $Result[$Key]['Url'] = DiscussionUrl($Discussion, 1);
                     break;
             }

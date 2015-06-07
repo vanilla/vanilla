@@ -1,15 +1,15 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="PageBox">
-    <h3><?php echo Anchor(htmlspecialchars($this->Data('PageInfo.Title')), $this->Data('PageInfo.Url')); ?></h3>
+    <h3><?php echo anchor(htmlspecialchars($this->data('PageInfo.Title')), $this->data('PageInfo.Url')); ?></h3>
 
     <div class="Thumbnail">
         <?php
-        foreach ($this->Data('PageInfo.Images') as $Src) {
-            echo Img($Src);
+        foreach ($this->data('PageInfo.Images') as $Src) {
+            echo img($Src);
         }
         ?>
     </div>
     <div class="Description">
-        <?php echo htmlspecialchars($this->Data('PageInfo.Description')); ?>
+        <?php echo htmlspecialchars($this->data('PageInfo.Description')); ?>
     </div>
 </div>

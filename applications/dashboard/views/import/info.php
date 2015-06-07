@@ -1,46 +1,46 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->AddSideMenu();
+$this->addSideMenu();
 ?>
-    <h1><?php echo T('Import'); ?></h1>
+    <h1><?php echo t('Import'); ?></h1>
 <?php
-$CurrentStep = GetValue('CurrentStep', $this->Data, 0);
+$CurrentStep = val('CurrentStep', $this->Data, 0);
 $Complete = FALSE;
 if ($CurrentStep < 1) {
     // The import hasn't started yet.
     echo '<div class="Info">',
-    T('Garden.Import.Info', 'You\'re almost ready to start the import.
+    t('Garden.Import.Info', 'You\'re almost ready to start the import.
 Please review the information below and click <b>Start Import</b> to begin the import.'),
     '</div>';
 } else {
-    $Steps = GetValue('Steps', $this->Data, array());
+    $Steps = val('Steps', $this->Data, array());
     if (count($Steps) > 0 && !array_key_exists($CurrentStep, $Steps)) {
         // The import is complete.
         $Complete = TRUE;
         // The import is complete.
         echo '<div class="Info">',
-        T('Garden.Import.Complete.Description', 'You have successfully completed an import.
+        t('Garden.Import.Complete.Description', 'You have successfully completed an import.
    Click <b>Finished</b> when you are ready.'),
         '</div>';
-        echo Gdn::Slice('/dashboard/role/defaultroleswarning');
+        echo Gdn::slice('/dashboard/role/defaultroleswarning');
     } else {
         // The import is in process.
         echo '<div class="Info">',
-        T('Garden.Import.Continue.Description', 'It appears as though you are in the middle of an import.
+        t('Garden.Import.Continue.Description', 'It appears as though you are in the middle of an import.
    Please choose one of the following options.'),
         '</div>';
     }
 }
 
-include($this->FetchViewLocation('stats', 'import', 'dashboard'));
+include($this->fetchViewLocation('stats', 'import', 'dashboard'));
 
 if ($CurrentStep < 1)
-    echo Anchor(T('Start Import'), 'dashboard/import/go', 'Button'),
+    echo anchor(t('Start Import'), 'dashboard/import/go', 'Button'),
     ' ',
-    Anchor(T('Restart'), 'dashboard/import/restart', 'Button');
+    anchor(t('Restart'), 'dashboard/import/restart', 'Button');
 elseif (!$Complete)
-    echo Anchor(T('Continue Import'), 'dashboard/import/go', 'Button'),
+    echo anchor(t('Continue Import'), 'dashboard/import/go', 'Button'),
     ' ',
-    Anchor(T('Restart'), 'dashboard/import/restart', 'Button');
+    anchor(t('Restart'), 'dashboard/import/restart', 'Button');
 else
-    echo Anchor(T('Finished'), 'dashboard/import/restart', 'Button');
+    echo anchor(t('Finished'), 'dashboard/import/restart', 'Button');
 

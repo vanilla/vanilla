@@ -36,8 +36,8 @@ class UserBanModule extends GDN_Module {
      * @throws Exception
      */
     protected function getData() {
-        $userID = $this->UserID ?: Gdn::Session()->UserID;
-        $user = Gdn::UserModel()->GetID($userID);
+        $userID = $this->UserID ?: Gdn::session()->UserID;
+        $user = Gdn::userModel()->getID($userID);
 
         $banned = val('Banned', $user);
         $bits = BanModel::explodeBans($banned);
@@ -45,10 +45,10 @@ class UserBanModule extends GDN_Module {
 
         foreach ($bits as $bit) {
             if (($bit & $this->ExcludeBans) === 0) {
-                $reasons[$bit] = T("BanReason.$bit");
+                $reasons[$bit] = t("BanReason.$bit");
             }
         }
-        $this->SetData('Reasons', $reasons);
+        $this->setData('Reasons', $reasons);
 
         if (!$this->Summary) {
             if ($this->ExcludeBans) {
@@ -57,10 +57,10 @@ class UserBanModule extends GDN_Module {
                 $summary = "Banned for the following:";
             }
         }
-        $this->SetData('Summary', $this->Summary ?: $summary);
+        $this->setData('Summary', $this->Summary ?: $summary);
 
         $this->EventArguments['User'] = $user;
-        $this->FireEvent('GetData');
+        $this->fireEvent('GetData');
     }
 
     /**
@@ -69,7 +69,7 @@ class UserBanModule extends GDN_Module {
      * @return string
      */
     public function ToString() {
-        if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             // Only moderators can view the reasons for being banned.
             return '';
         }

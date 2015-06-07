@@ -38,11 +38,11 @@ abstract class VanillaModel extends Gdn_Model {
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
     public function CheckForSpam($Type) {
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
 
         // If spam checking is disabled or user is an admin, skip
-        $SpamCheckEnabled = GetValue('SpamCheck', $this, true);
-        if ($SpamCheckEnabled === false || $Session->User->Admin || $Session->CheckPermission('Garden.Moderation.Manage')) {
+        $SpamCheckEnabled = val('SpamCheck', $this, true);
+        if ($SpamCheckEnabled === false || $Session->User->Admin || $Session->checkPermission('Garden.Moderation.Manage')) {
             return false;
         }
 
@@ -53,20 +53,20 @@ abstract class VanillaModel extends Gdn_Model {
             trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
         }
 
-        $CountSpamCheck = $Session->GetAttribute('Count'.$Type.'SpamCheck', 0);
-        $DateSpamCheck = $Session->GetAttribute('Date'.$Type.'SpamCheck', 0);
-        $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);
+        $CountSpamCheck = $Session->getAttribute('Count'.$Type.'SpamCheck', 0);
+        $DateSpamCheck = $Session->getAttribute('Date'.$Type.'SpamCheck', 0);
+        $SecondsSinceSpamCheck = time() - Gdn_Format::toTimestamp($DateSpamCheck);
 
         // Get spam config settings
-        $SpamCount = Gdn::Config('Vanilla.'.$Type.'.SpamCount');
+        $SpamCount = Gdn::config('Vanilla.'.$Type.'.SpamCount');
         if (!is_numeric($SpamCount) || $SpamCount < 1) {
             $SpamCount = 1; // 1 spam minimum
         }
-        $SpamTime = Gdn::Config('Vanilla.'.$Type.'.SpamTime');
+        $SpamTime = Gdn::config('Vanilla.'.$Type.'.SpamTime');
         if (!is_numeric($SpamTime) || $SpamTime < 30) {
             $SpamTime = 30; // 30 second minimum spam span
         }
-        $SpamLock = Gdn::Config('Vanilla.'.$Type.'.SpamLock');
+        $SpamLock = Gdn::config('Vanilla.'.$Type.'.SpamLock');
         if (!is_numeric($SpamLock) || $SpamLock < 60) {
             $SpamLock = 60; // 60 second minimum lockout
         }
@@ -83,10 +83,10 @@ abstract class VanillaModel extends Gdn_Model {
             echo '<div>SpamTime: '.$SpamTime.'</div>';
             */
             $Spam = true;
-            $this->Validation->AddValidationResult(
+            $this->Validation->addValidationResult(
                 'Body',
                 '@'.sprintf(
-                    T('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
+                    t('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
                     $SpamCount,
                     $SpamTime,
                     $SpamLock
@@ -94,19 +94,19 @@ abstract class VanillaModel extends Gdn_Model {
             );
 
             // Update the 'waiting period' every time they try to post again
-            $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
+            $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::toDateTime();
         } else {
             if ($SecondsSinceSpamCheck > $SpamTime) {
                 $Attributes['Count'.$Type.'SpamCheck'] = 1;
-                $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
+                $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::toDateTime();
             } else {
                 $Attributes['Count'.$Type.'SpamCheck'] = $CountSpamCheck + 1;
             }
         }
         // Update the user profile after every comment
-        $UserModel = Gdn::UserModel();
+        $UserModel = Gdn::userModel();
         if ($Session->UserID) {
-            $UserModel->SaveAttribute($Session->UserID, $Attributes);
+            $UserModel->saveAttribute($Session->UserID, $Attributes);
         }
 
         return $Spam;

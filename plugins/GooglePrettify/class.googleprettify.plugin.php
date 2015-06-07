@@ -33,10 +33,10 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * Add Prettify to page text.
      */
     public function AddPretty($Sender) {
-        $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
-        $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
-        if ($Language = C('Plugins.GooglePrettify.Language')) {
-            $Sender->AddJsFile("lang-$Language.js", 'plugins/GooglePrettify', array('_sort' => 102));
+        $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
+        $Sender->addJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
+        if ($Language = c('Plugins.GooglePrettify.Language')) {
+            $Sender->addJsFile("lang-$Language.js", 'plugins/GooglePrettify', array('_sort' => 102));
         }
     }
 
@@ -45,8 +45,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      */
     public function AddTabby($Sender) {
         if (C('Plugins.GooglePrettify.UseTabby', false)) {
-            $Sender->AddJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
-            $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
+            $Sender->addJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
+            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
      $("textarea").livequery(function () {$("textarea").tabby();})
 });');
         }
@@ -62,7 +62,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         if (C('Plugins.GooglePrettify.LineNumbers')) {
             $Class .= ' linenums';
         }
-        if ($Language = C('Plugins.GooglePrettify.Language')) {
+        if ($Language = c('Plugins.GooglePrettify.Language')) {
             $Class .= " lang-$Language";
         }
 
@@ -83,13 +83,13 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     }
 
     public function AssetModel_StyleCss_Handler($Sender) {
-        if (!C('Plugins.GooglePrettify.NoCssFile')) {
+        if (!c('Plugins.GooglePrettify.NoCssFile')) {
             $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
         }
     }
 
     public function AssetModel_GenerateETag_Handler($Sender, $Args) {
-        if (!C('Plugins.GooglePrettify.NoCssFile')) {
+        if (!c('Plugins.GooglePrettify.NoCssFile')) {
             $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = true;
         }
     }

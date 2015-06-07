@@ -38,12 +38,12 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @return string
      */
     protected function _AuthorizeHref($Popup = false) {
-        $Url = Url('/entry/openid', true);
+        $Url = url('/entry/openid', true);
         $UrlParts = explode('?', $Url);
-        parse_str(GetValue(1, $UrlParts, ''), $Query);
+        parse_str(val(1, $UrlParts, ''), $Query);
 
-        $Path = '/'.Gdn::Request()->Path();
-        $Query['Target'] = GetValue('Target', $_GET, $Path ? $Path : '/');
+        $Path = '/'.Gdn::request()->Path();
+        $Query['Target'] = val('Target', $_GET, $Path ? $Path : '/');
 
         if (isset($_GET['Target'])) {
             $Query['Target'] = $_GET['Target'];
@@ -70,7 +70,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
         $OpenID = new LightOpenID();
 
-        if ($url = Gdn::Request()->Get('url')) {
+        if ($url = Gdn::request()->get('url')) {
             if (!filter_var($url, FILTER_VALIDATE_URL)) {
                 throw new Gdn_UserException(sprintf(T('ValidateUrl'), 'OpenID'), 400);
             }
@@ -90,16 +90,16 @@ class OpenIDPlugin extends Gdn_Plugin {
             $OpenID->identity = $url;
         }
 
-        $Url = Url('/entry/connect/openid', true);
+        $Url = url('/entry/connect/openid', true);
         $UrlParts = explode('?', $Url);
-        parse_str(GetValue(1, $UrlParts, ''), $Query);
-        $Query = array_merge($Query, ArrayTranslate($_GET, array('display', 'Target')));
+        parse_str(val(1, $UrlParts, ''), $Query);
+        $Query = array_merge($Query, arrayTranslate($_GET, array('display', 'Target')));
 
         $OpenID->returnUrl = $UrlParts[0].'?'.http_build_query($Query);
         $OpenID->required = array('contact/email', 'namePerson/first', 'namePerson/last', 'pref/language');
 
         $this->EventArguments['OpenID'] = $OpenID;
-        $this->FireEvent('GetOpenID');
+        $this->fireEvent('GetOpenID');
 
         return $OpenID;
     }
@@ -109,7 +109,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      */
 //   public function PluginController_OpenID_Create($Sender) {
 //      $Sender->Permission('Garden.Settings.Manage');
-//		$this->Dispatch($Sender, $Sender->RequestArgs);
+//		$this->dispatch($Sender, $Sender->RequestArgs);
 //   }
 
 //   public function Controller_Toggle($Sender) {
@@ -145,18 +145,18 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function Base_ConnectData_Handler($Sender, $Args) {
-        if (GetValue(0, $Args) != 'openid') {
+        if (val(0, $Args) != 'openid') {
             return;
         }
 
-        $Mode = $Sender->Request->Get('openid_mode');
+        $Mode = $Sender->Request->get('openid_mode');
         if ($Mode != 'id_res') {
             return; // this will error out
         }
         $this->EventArguments = $Args;
 
         // Check session before retrieving
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
         $OpenID = $Session->Stash('OpenID', '', false);
         if (!$OpenID) {
             $OpenID = $this->GetOpenID();
@@ -167,14 +167,14 @@ class OpenIDPlugin extends Gdn_Plugin {
 
             $Form = $Sender->Form; //new Gdn_Form();
             $ID = $OpenID->identity;
-            $Form->SetFormValue('UniqueID', $ID);
-            $Form->SetFormValue('Provider', self::$ProviderKey);
-            $Form->SetFormValue('ProviderName', 'OpenID');
+            $Form->setFormValue('UniqueID', $ID);
+            $Form->setFormValue('Provider', self::$ProviderKey);
+            $Form->setFormValue('ProviderName', 'OpenID');
 
-            $Form->SetFormValue('FullName', trim(val('namePerson/first', $Attr).' '.val('namePerson/last', $Attr)));
+            $Form->setFormValue('FullName', trim(val('namePerson/first', $Attr).' '.val('namePerson/last', $Attr)));
 
-            if ($Email = GetValue('contact/email', $Attr)) {
-                $Form->SetFormValue('Email', $Email);
+            if ($Email = val('contact/email', $Attr)) {
+                $Form->setFormValue('Email', $Email);
             }
 
             $Sender->SetData('Verified', true);
@@ -182,7 +182,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
             $this->EventArguments['OpenID'] = $OpenID;
             $this->EventArguments['Form'] = $Form;
-            $this->FireEvent('AfterConnectData');
+            $this->fireEvent('AfterConnectData');
 
         }
     }
@@ -200,11 +200,11 @@ class OpenIDPlugin extends Gdn_Plugin {
         try {
             $OpenID = $this->GetOpenID();
         } catch (Gdn_UserException $ex) {
-            $Sender->Form->AddError('@'.$ex->getMessage());
+            $Sender->Form->addError('@'.$ex->getMessage());
             $Sender->Render('Url', '', 'plugins/OpenID');
         }
 
-        $Mode = $Sender->Request->Get('openid_mode');
+        $Mode = $Sender->Request->get('openid_mode');
         switch ($Mode) {
             case 'cancel':
                 $Sender->Render('Cancel', '', 'plugins/OpenID');
@@ -224,9 +224,9 @@ class OpenIDPlugin extends Gdn_Plugin {
                 } else {
                     try {
                         $Url = $OpenID->authUrl();
-                        Redirect($Url);
+                        redirect($Url);
                     } catch (Exception $Ex) {
-                        $Sender->Form->AddError($Ex);
+                        $Sender->Form->addError($Ex);
                         $Sender->Render('Url', '', 'plugins/OpenID');
                     }
                 }
@@ -261,7 +261,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function SignInAllowed() {
-        return !C('Plugins.OpenID.DisableSignIn', false);
+        return !c('Plugins.OpenID.DisableSignIn', false);
     }
 
     /**
@@ -312,7 +312,7 @@ class OpenIDPlugin extends Gdn_Plugin {
         // if (!IsMobile())
         // 	return;
 
-        if (!Gdn::Session()->IsValid() && $this->SignInAllowed()) {
+        if (!Gdn::session()->isValid() && $this->SignInAllowed()) {
             echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect OpenIDConnect'));
         }
     }

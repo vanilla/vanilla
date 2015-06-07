@@ -203,14 +203,14 @@ class MessagesController extends ConversationsController {
         $this->title(t('Inbox'));
         Gdn_Theme::section('ConversationList');
 
-        list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
+        list($Offset, $Limit) = offsetLimit($Page, c('Conversations.Conversations.PerPage', 50));
 
         // Calculate offset
         $this->Offset = $Offset;
 
         $UserID = $this->Request->get('userid', Gdn::session()->UserID);
         if ($UserID != Gdn::session()->UserID) {
-            if (!C('Conversations.Moderation.Allow', false)) {
+            if (!c('Conversations.Moderation.Allow', false)) {
                 throw permissionException();
             }
             $this->permission('Conversations.Moderation.Manage');
@@ -220,8 +220,8 @@ class MessagesController extends ConversationsController {
         $this->setData('Conversations', $Conversations->resultArray());
 
         // Get Conversations Count
-        //$CountConversations = $this->ConversationModel->GetCount($UserID);
-        //$this->SetData('CountConversations', $CountConversations);
+        //$CountConversations = $this->ConversationModel->getCount($UserID);
+        //$this->setData('CountConversations', $CountConversations);
 
         // Build the pager
         if (!$this->data('_PagerUrl')) {
@@ -298,7 +298,7 @@ class MessagesController extends ConversationsController {
 
         if (!$InConversation) {
             // Conversation moderation must be enabled and they must have permission
-            if (!C('Conversations.Moderation.Allow', false)) {
+            if (!c('Conversations.Moderation.Allow', false)) {
                 throw permissionException();
             }
             $this->permission('Conversations.Moderation.Manage');
@@ -355,7 +355,7 @@ class MessagesController extends ConversationsController {
 
         $this->title(strip_tags($this->Participants));
 
-        // $CountMessages = $this->ConversationMessageModel->GetCount($ConversationID, $Session->UserID);
+        // $CountMessages = $this->ConversationMessageModel->getCount($ConversationID, $Session->UserID);
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
@@ -390,13 +390,13 @@ class MessagesController extends ConversationsController {
         $this->addModule($InThisConversationModule);
 
         // Doesn't make sense for people who can't even start conversations to be adding people
-        if (CheckPermission('Conversations.Conversations.Add')) {
+        if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('AddPeopleModule');
         }
 
-        $Subject = $this->Data('Conversation.Subject');
+        $Subject = $this->data('Conversation.Subject');
         if (!$Subject) {
-            $Subject = T('Message');
+            $Subject = t('Message');
         }
 
         $this->Data['Breadcrumbs'][] = array(
@@ -420,8 +420,8 @@ class MessagesController extends ConversationsController {
 
         // Check permissions on the recipients.
         $InConversation = false;
-        foreach ($this->RecipientData->Result() as $Recipient) {
-            if ($Recipient->UserID == Gdn::Session()->UserID) {
+        foreach ($this->RecipientData->result() as $Recipient) {
+            if ($Recipient->UserID == Gdn::session()->UserID) {
                 $InConversation = true;
                 break;
             }
@@ -429,7 +429,7 @@ class MessagesController extends ConversationsController {
 
         if (!$InConversation) {
             // Conversation moderation must be enabled and they must have permission
-            if (!C('Conversations.Moderation.Allow', false)) {
+            if (!c('Conversations.Moderation.Allow', false)) {
                 throw permissionException();
             }
             $this->permission('Conversations.Moderation.Manage');
@@ -538,7 +538,7 @@ class MessagesController extends ConversationsController {
      */
 //   public function Bookmarked($Offset = 0, $Limit = '') {
 //      $this->View = 'All';
-//      $this->All($Offset, $Limit, TRUE);
+//      $this->All($Offset, $Limit, true);
 //   }
 
     /**

@@ -49,7 +49,7 @@ class TaggingPlugin extends Gdn_Plugin {
     public function Base_GetAppSettingsMenuItems_Handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
-        $Menu->AddLink('Forum', T('Tagging'), 'settings/tagging', 'Garden.Settings.Manage');
+        $Menu->addLink('Forum', T('Tagging'), 'settings/tagging', 'Garden.Settings.Manage');
     }
 
     /**
@@ -105,7 +105,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $Tags = TagModel::instance()->getDiscussionTags($Sender->Data('Discussion.DiscussionID'), TagModel::IX_EXTENDED);
 
         foreach ($Tags as $Key => $Value) {
-            SetValue($Key, $Sender->Data['Discussion'], $Value);
+            setValue($Key, $Sender->Data['Discussion'], $Value);
         }
     }
 
@@ -125,28 +125,28 @@ class TaggingPlugin extends Gdn_Plugin {
         Gdn_Theme::Section('DiscussionList');
 
         $Args = $Sender->RequestArgs;
-        $Get = array_change_key_case($Sender->Request->Get());
+        $Get = array_change_key_case($Sender->Request->get());
 
-        if ($UseCategories = C('Plugins.Tagging.UseCategories')) {
+        if ($UseCategories = c('Plugins.Tagging.UseCategories')) {
             // The url is in the form /category/tag/p1
-            $CategoryCode = GetValue(0, $Args);
-            $Tag = GetValue(1, $Args);
-            $Page = GetValue(2, $Args);
+            $CategoryCode = val(0, $Args);
+            $Tag = val(1, $Args);
+            $Page = val(2, $Args);
         } else {
             // The url is in the form /tag/p1
             $CategoryCode = '';
-            $Tag = GetValue(0, $Args);
-            $Page = GetValue(1, $Args);
+            $Tag = val(0, $Args);
+            $Page = val(1, $Args);
         }
 
         // Look for explcit values.
-        $CategoryCode = GetValue('category', $Get, $CategoryCode);
-        $Tag = GetValue('tag', $Get, $Tag);
-        $Page = GetValue('page', $Get, $Page);
-        $Category = CategoryModel::Categories($CategoryCode);
+        $CategoryCode = val('category', $Get, $CategoryCode);
+        $Tag = val('tag', $Get, $Tag);
+        $Page = val('page', $Get, $Page);
+        $Category = CategoryModel::categories($CategoryCode);
 
         $Tag = StringEndsWith($Tag, '.rss', true, true);
-        list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
 
         $MultipleTags = strpos($Tag, ',') !== false;
 
@@ -155,15 +155,15 @@ class TaggingPlugin extends Gdn_Plugin {
         $TagModel = TagModel::instance();
         $RecordCount = false;
         if (!$MultipleTags) {
-            $Tags = $TagModel->GetWhere(array('Name' => $Tag))->ResultArray();
+            $Tags = $TagModel->getWhere(array('Name' => $Tag))->resultArray();
 
             if (count($Tags) == 0) {
-                throw NotFoundException('Page');
+                throw notFoundException('Page');
             }
 
             if (count($Tags) > 1) {
                 foreach ($Tags as $TagRow) {
-                    if ($TagRow['CategoryID'] == GetValue('CategoryID', $Category)) {
+                    if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
                         break;
                     }
                 }
@@ -184,15 +184,15 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Title(htmlspecialchars($TagRow['FullName']));
         $UrlTag = rawurlencode($Tag);
         if (urlencode($Tag) == $Tag) {
-            $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));
-            $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, true, false)), '//');
+            $Sender->canonicalUrl(url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));
+            $FeedUrl = url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, true, false)), '//');
         } else {
-            $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true)).'?Tag='.$UrlTag, true));
-            $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true, false), 'feed.rss').'?Tag='.$UrlTag, '//');
+            $Sender->canonicalUrl(url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true)).'?Tag='.$UrlTag, true));
+            $FeedUrl = url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true, false), 'feed.rss').'?Tag='.$UrlTag, '//');
         }
 
         if ($Sender->Head) {
-            $Sender->AddJsFile('discussions.js');
+            $Sender->addJsFile('discussions.js');
             $Sender->Head->AddRss($FeedUrl, $Sender->Head->Title());
         }
 
@@ -201,9 +201,9 @@ class TaggingPlugin extends Gdn_Plugin {
         }
 
         // Add Modules
-        $Sender->AddModule('NewDiscussionModule');
-        $Sender->AddModule('DiscussionFilterModule');
-        $Sender->AddModule('BookmarkedModule');
+        $Sender->addModule('NewDiscussionModule');
+        $Sender->addModule('DiscussionFilterModule');
+        $Sender->addModule('BookmarkedModule');
 
         $Sender->SetData('Category', false, true);
 
@@ -212,35 +212,35 @@ class TaggingPlugin extends Gdn_Plugin {
 
         $DiscussionModel = new DiscussionModel();
 
-        $TagModel->SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
+        $TagModel->SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->get('op', 'or'));
 
-        $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
+        $Sender->DiscussionData = $DiscussionModel->get($Offset, $Limit, array('Announce' => 'all'));
 
         $Sender->SetData('Discussions', $Sender->DiscussionData, true);
-        $Sender->SetJson('Loading', $Offset.' to '.$Limit);
+        $Sender->setJson('Loading', $Offset.' to '.$Limit);
 
         // Build a pager.
         $PagerFactory = new Gdn_PagerFactory();
         $Sender->Pager = $PagerFactory->GetPager('Pager', $Sender);
         $Sender->Pager->ClientID = 'Pager';
-        $Sender->Pager->Configure(
+        $Sender->Pager->configure(
             $Offset,
             $Limit,
             $RecordCount, // record count
             ''
         );
 
-        $Sender->View = C('Vanilla.Discussions.Layout');
+        $Sender->View = c('Vanilla.Discussions.Layout');
 
         /*
         // If these don't equal, then there is a category that should be inserted.
-        if ($UseCategories && $Category && $TagRow['FullName'] != GetValue('Name', $Category)) {
+        if ($UseCategories && $Category && $TagRow['FullName'] != val('Name', $Category)) {
            $Sender->Data['Breadcrumbs'][] = array('Name' => $Category['Name'], 'Url' => TagUrl($TagRow));
         }
         $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
   */
         // Render the controller.
-        $this->View = C('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'index';
+        $this->View = c('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'index';
         $Sender->Render($this->View, 'discussions', 'vanilla');
     }
 
@@ -300,7 +300,7 @@ class TaggingPlugin extends Gdn_Plugin {
             if (count($Breadcrumbs)) {
                 // Rebuild breadcrumbs in discussions when there is a child, as the
                 // parent must come before it.
-                Gdn::Controller()->SetData('Breadcrumbs', $Breadcrumbs);
+                Gdn::controller()->SetData('Breadcrumbs', $Breadcrumbs);
             }
 
         }
@@ -310,17 +310,17 @@ class TaggingPlugin extends Gdn_Plugin {
      * Save tags when saving a discussion.
      */
     public function DiscussionModel_AfterSaveDiscussion_Handler($Sender) {
-        $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
-        $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
-        $CategoryID = GetValueR('Fields.CategoryID', $Sender->EventArguments, 0);
-//      $IsInsert = GetValue('Insert', $Sender->EventArguments);
-        $RawFormTags = GetValue('Tags', $FormPostValues, '');
+        $FormPostValues = val('FormPostValues', $Sender->EventArguments, array());
+        $DiscussionID = val('DiscussionID', $Sender->EventArguments, 0);
+        $CategoryID = valr('Fields.CategoryID', $Sender->EventArguments, 0);
+//      $IsInsert = val('Insert', $Sender->EventArguments);
+        $RawFormTags = val('Tags', $FormPostValues, '');
         $FormTags = TagModel::SplitTags($RawFormTags);
 
         // If we're associating with categories
-        $CategorySearch = C('Plugins.Tagging.CategorySearch', false);
+        $CategorySearch = c('Plugins.Tagging.CategorySearch', false);
         if ($CategorySearch) {
-            $CategoryID = GetValue('CategoryID', $FormPostValues, false);
+            $CategoryID = val('CategoryID', $FormPostValues, false);
         }
 
         // Let plugins add their information getting saved.
@@ -329,7 +329,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $this->EventArguments['Tags'] =& $FormTags;
         $this->EventArguments['Types'] =& $Types;
         $this->EventArguments['CategoryID'] = $CategoryID;
-        $this->FireEvent('SaveDiscussion');
+        $this->fireEvent('SaveDiscussion');
 
         // Save the tags to the db.
         TagModel::instance()->saveDiscussion($DiscussionID, $FormTags, $Types, $CategoryID);
@@ -341,8 +341,8 @@ class TaggingPlugin extends Gdn_Plugin {
      */
 //   public function DiscussionModel_BeforeGet_Handler($Sender) {
 //      if (C('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToDiscussionIDs')) {
-//         $Sender->SQL->WhereIn('d.DiscussionID', $Sender->FilterToDiscussionIDs)
-//            ->Limit(FALSE);
+//         $Sender->SQL->whereIn('d.DiscussionID', $Sender->FilterToDiscussionIDs)
+//            ->limit(FALSE);
 //      }
 //   }
 
@@ -350,18 +350,18 @@ class TaggingPlugin extends Gdn_Plugin {
      * Validate tags when saving a discussion.
      */
     public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
-        $FormPostValues = GetValue('FormPostValues', $Args, array());
-        $TagsString = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
-        $NumTagsMax = C('Plugin.Tagging.Max', 5);
+        $FormPostValues = val('FormPostValues', $Args, array());
+        $TagsString = trim(strtolower(val('Tags', $FormPostValues, '')));
+        $NumTagsMax = c('Plugin.Tagging.Max', 5);
         // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
-        if (StringIsNullOrEmpty($TagsString) && C('Plugins.Tagging.Required')) {
-            $Sender->Validation->AddValidationResult('Tags', 'You must specify at least one tag.');
+        if (stringIsNullOrEmpty($TagsString) && c('Plugins.Tagging.Required')) {
+            $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
             $Tags = TagModel::SplitTags($TagsString);
             if (!TagModel::ValidateTags($Tags)) {
-                $Sender->Validation->AddValidationResult('Tags', '@'.T('ValidateTag', 'Tags cannot contain commas.'));
+                $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
             } elseif (count($Tags) > $NumTagsMax) {
-                $Sender->Validation->AddValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
             } else {
             }
         }
@@ -372,20 +372,20 @@ class TaggingPlugin extends Gdn_Plugin {
         $DiscussionID = $Sender->EventArguments['DiscussionID'];
 
         // Get List of tags to reduce count for
-        $TagDataSet = Gdn::SQL()->Select('TagID')
-            ->From('TagDiscussion')
-            ->Where('DiscussionID', $DiscussionID)
-            ->Get()->ResultArray();
+        $TagDataSet = Gdn::sql()->select('TagID')
+            ->from('TagDiscussion')
+            ->where('DiscussionID', $DiscussionID)
+            ->get()->resultArray();
 
         $RemovedTagIDs = array_column($TagDataSet, 'TagID');
 
         // Check if there are even any tags to delete
         if (count($RemovedTagIDs) > 0) {
             // Step 1: Reduce count
-            Gdn::SQL()->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', false)->WhereIn('TagID', $RemovedTagIDs)->Put();
+            Gdn::sql()->update('Tag')->set('CountDiscussions', 'CountDiscussions - 1', false)->whereIn('TagID', $RemovedTagIDs)->put();
 
             // Step 2: Delete mapping data between discussion and tag (tagdiscussion table)
-            $Sender->SQL->Where('DiscussionID', $DiscussionID)->Delete('TagDiscussion');
+            $Sender->SQL->where('DiscussionID', $DiscussionID)->delete('TagDiscussion');
         }
     }
 
@@ -395,46 +395,46 @@ class TaggingPlugin extends Gdn_Plugin {
     public function PluginController_TagSearch_Create($Sender, $q = '', $id = false, $parent = false, $type = 'default') {
 
         // Allow per-category tags
-        $CategorySearch = C('Plugins.Tagging.CategorySearch', false);
+        $CategorySearch = c('Plugins.Tagging.CategorySearch', false);
         if ($CategorySearch) {
             $CategoryID = GetIncomingValue('CategoryID');
         }
 
         if ($parent && !is_numeric($parent)) {
-            $parent = Gdn::SQL()->GetWhere('Tag', array('Name' => $parent))->Value('TagID', -1);
+            $parent = Gdn::sql()->getWhere('Tag', array('Name' => $parent))->value('TagID', -1);
         }
 
         $Query = $q;
         $Data = array();
-        $Database = Gdn::Database();
+        $Database = Gdn::database();
         if ($Query || $parent || $type !== 'default') {
-            $TagQuery = Gdn::SQL()
-                ->Select('*')
-                ->From('Tag')
-                ->Limit(20);
+            $TagQuery = Gdn::sql()
+                ->select('*')
+                ->from('Tag')
+                ->limit(20);
 
             if ($Query) {
-                $TagQuery->Like('FullName', str_replace(array('%', '_'), array('\%', '_'), $Query), strlen($Query) > 2 ? 'both' : 'right');
+                $TagQuery->like('FullName', str_replace(array('%', '_'), array('\%', '_'), $Query), strlen($Query) > 2 ? 'both' : 'right');
             }
 
             if ($type === 'default') {
                 $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
-                $TagQuery->Where('Type', $defaultTypes); // Other UIs can set a different type
+                $TagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
             } elseif ($type) {
-                $TagQuery->Where('Type', $type);
+                $TagQuery->where('Type', $type);
             }
 
             // Allow per-category tags
             if ($CategorySearch) {
-                $TagQuery->Where('CategoryID', $CategoryID);
+                $TagQuery->where('CategoryID', $CategoryID);
             }
 
             if ($parent) {
-                $TagQuery->Where('ParentTagID', $parent);
+                $TagQuery->where('ParentTagID', $parent);
             }
 
             // Run tag search query
-            $TagData = $TagQuery->Get();
+            $TagData = $TagQuery->get();
 
             foreach ($TagData as $Tag) {
                 $Data[] = array('id' => $id ? $Tag->TagID : $Tag->Name, 'name' => $Tag->FullName);
@@ -458,44 +458,44 @@ class TaggingPlugin extends Gdn_Plugin {
 
         $TagSql = clone Gdn::Sql();
 
-        if ($DateFrom = Gdn::Request()->Get('DateFrom')) {
+        if ($DateFrom = Gdn::request()->get('DateFrom')) {
             // Find the discussion ID of the first discussion created on or after the date from.
-            $DiscussionIDFrom = $TagSql->GetWhere('Discussion', array('DateInserted >= ' => $DateFrom), 'DiscussionID', 'asc', 1)->Value('DiscussionID');
+            $DiscussionIDFrom = $TagSql->getWhere('Discussion', array('DateInserted >= ' => $DateFrom), 'DiscussionID', 'asc', 1)->value('DiscussionID');
             $SortField = 'd.DiscussionID';
         }
 
         $Tags = array_map('trim', explode(',', $Tag));
         $TagIDs = $TagSql
-            ->Select('TagID')
-            ->From('Tag')
-            ->WhereIn('Name', $Tags)
-            ->Get()->ResultArray();
+            ->select('TagID')
+            ->from('Tag')
+            ->whereIn('Name', $Tags)
+            ->get()->resultArray();
 
         $TagIDs = array_column($TagIDs, 'TagID');
 
         if ($Op == 'and' && count($Tags) > 1) {
             $DiscussionIDs = $TagSql
-                ->Select('DiscussionID')
-                ->Select('TagID', 'count', 'CountTags')
-                ->From('TagDiscussion')
-                ->WhereIn('TagID', $TagIDs)
-                ->GroupBy('DiscussionID')
-                ->Having('CountTags >=', count($Tags))
-                ->Limit($Limit, $Offset)
-                ->OrderBy('DiscussionID', 'desc')
-                ->Get()->ResultArray();
+                ->select('DiscussionID')
+                ->select('TagID', 'count', 'CountTags')
+                ->from('TagDiscussion')
+                ->whereIn('TagID', $TagIDs)
+                ->groupBy('DiscussionID')
+                ->having('CountTags >=', count($Tags))
+                ->limit($Limit, $Offset)
+                ->orderBy('DiscussionID', 'desc')
+                ->get()->resultArray();
             $Limit = '';
             $Offset = 0;
 
             $DiscussionIDs = array_column($DiscussionIDs, 'DiscussionID');
 
-            $Sql->WhereIn('d.DiscussionID', $DiscussionIDs);
+            $Sql->whereIn('d.DiscussionID', $DiscussionIDs);
             $SortField = 'd.DiscussionID';
         } else {
             $Sql
-                ->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
-                ->Limit($Limit, $Offset)
-                ->WhereIn('td.TagID', $TagIDs);
+                ->join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
+                ->limit($Limit, $Offset)
+                ->whereIn('td.TagID', $TagIDs);
 
             if ($Op == 'and') {
                 $SortField = 'd.DiscussionID';
@@ -503,7 +503,7 @@ class TaggingPlugin extends Gdn_Plugin {
         }
 
         // Set up the sort field and direction.
-        SaveToConfig(
+        saveToConfig(
             array(
             'Vanilla.Discussions.SortField' => $SortField,
             'Vanilla.Discussions.SortDirection' => $SortDirection),
@@ -520,15 +520,15 @@ class TaggingPlugin extends Gdn_Plugin {
         if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
             // Setup, get most popular tags
             $TagModel = TagModel::instance();
-            $Tags = $TagModel->GetWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
+            $Tags = $TagModel->getWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', c('Plugins.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
             $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
             $Tags = Gdn_DataSet::Index($Tags, 'FullName');
             ksort($Tags);
 
             // The tags must be fetched.
-            if ($Sender->Request->IsPostBack()) {
-                $tag_ids = TagModel::SplitTags($Sender->Form->GetFormValue('Tags'));
-                $tags = TagModel::instance()->GetWhere(array('TagID' => $tag_ids))->ResultArray();
+            if ($Sender->Request->isPostBack()) {
+                $tag_ids = TagModel::SplitTags($Sender->Form->getFormValue('Tags'));
+                $tags = TagModel::instance()->getWhere(array('TagID' => $tag_ids))->resultArray();
                 $tags = array_column($tags, 'TagID', 'FullName');
             } else {
                 // The tags should be set on the data.
@@ -547,15 +547,15 @@ class TaggingPlugin extends Gdn_Plugin {
             echo '<div class="Form-Tags P">';
 
             // Tag text box
-            echo $Sender->Form->Label('Tags', 'Tags');
-            echo $Sender->Form->TextBox('Tags', array('data-tags' => json_encode($tags)));
+            echo $Sender->Form->label('Tags', 'Tags');
+            echo $Sender->Form->textBox('Tags', array('data-tags' => json_encode($tags)));
 
             // Available tags
-            echo Wrap(Anchor(T('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
+            echo wrap(Anchor(T('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
             foreach ($Tags as $Tag) {
-                $TagsHtml .= Anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', array('data-name' => $Tag['Name'], 'data-id' => $Tag['TagID'])).' ';
+                $TagsHtml .= anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', array('data-name' => $Tag['Name'], 'data-id' => $Tag['TagID'])).' ';
             }
-            echo Wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
+            echo wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
 
             echo '</div>';
         }
@@ -567,28 +567,28 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      */
     public function PostController_Render_Before($Sender) {
-        $Sender->AddJsFile('jquery.tokeninput.js');
-        $Sender->AddJsFile('tagging.js', 'plugins/Tagging');
-        $Sender->AddDefinition('PluginsTaggingAdd', Gdn::Session()->CheckPermission('Plugins.Tagging.Add'));
-        $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));
+        $Sender->addJsFile('jquery.tokeninput.js');
+        $Sender->addJsFile('tagging.js', 'plugins/Tagging');
+        $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->CheckPermission('Plugins.Tagging.Add'));
+        $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
 
         // Make sure that detailed tag data is available to the form.
         $TagModel = TagModel::instance();
 
-        $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
+        $DiscussionID = val('DiscussionID', $Sender->Data['Discussion']);
 
         if ($DiscussionID) {
             $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
             $Sender->SetData($Tags);
-        } elseif (!$Sender->Request->IsPostBack() && $tagString = $Sender->Request->Get('tags')) {
+        } elseif (!$Sender->Request->isPostBack() && $tagString = $Sender->Request->get('tags')) {
             $tags = explodeTrim(',', $tagString);
             $types = array_column(TagModel::instance()->defaultTypes(), 'key');
 
             // Look up the tags by name.
-            $tagData = Gdn::SQL()->GetWhere(
+            $tagData = Gdn::sql()->getWhere(
                 'Tag',
                 array('Name' => $tags, 'Type' => $types)
-            )->ResultArray();
+            )->resultArray();
 
             // Add any missing tags.
             $tagNames = array_change_key_case(array_column($tagData, 'Name', 'Name'));
@@ -613,7 +613,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Title('Tagging');
         $Sender->AddSideMenu('settings/tagging');
         $Sender->AddJSFile('tagadmin.js', 'plugins/Tagging');
-        $SQL = Gdn::SQL();
+        $SQL = Gdn::sql();
 
         // Get all tag types
         $TagModel = TagModel::instance();
@@ -622,11 +622,11 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Form->Method = 'get';
         $Sender->Form->InputPrefix = '';
 
-        list($Offset, $Limit) = OffsetLimit($Page, 100);
+        list($Offset, $Limit) = offsetLimit($Page, 100);
         $Sender->SetData('_Limit', $Limit);
 
         if ($Search) {
-            $SQL->Like('FullName', $Search, 'right');
+            $SQL->like('FullName', $Search, 'right');
         }
 
         // This type doesn't actually exist, but it will represent the
@@ -640,9 +640,9 @@ class TaggingPlugin extends Gdn_Plugin {
                 if ($Type === 'null') {
                     $Type = null;
                 }
-                $SQL->Where('Type', $Type);
+                $SQL->where('Type', $Type);
             } elseif ($Type == '') {
-                $SQL->Where('Type', '');
+                $SQL->where('Type', '');
             }
         } else {
             $Type = 'Search Results';
@@ -673,22 +673,22 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->SetData('_CanAddTags', $CanAddTags);
 
         $Data = $SQL
-            ->Select('t.*')
-            ->From('Tag t')
-            ->OrderBy('t.FullName', 'asc')
-            ->OrderBy('t.CountDiscussions', 'desc')
-            ->Limit($Limit, $Offset)
-            ->Get()->ResultArray();
+            ->select('t.*')
+            ->from('Tag t')
+            ->orderBy('t.FullName', 'asc')
+            ->orderBy('t.CountDiscussions', 'desc')
+            ->limit($Limit, $Offset)
+            ->get()->resultArray();
 
         $Sender->SetData('Tags', $Data);
 
         if ($Search) {
-            $SQL->Like('Name', $Search, 'right');
+            $SQL->like('Name', $Search, 'right');
         }
 
         // Make sure search uses its own search type, so results appear
         // in their own tab.
-        $Sender->Form->Action = Url('/settings/tagging/?type='.$TagType);
+        $Sender->Form->Action = url('/settings/tagging/?type='.$TagType);
 
         // Search results pagination will mess up a bit, so don't provide a type
         // in the count.
@@ -700,7 +700,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $RecordCountWhere = array();
         }
 
-        $Sender->SetData('RecordCount', $SQL->GetCount('Tag', $RecordCountWhere));
+        $Sender->SetData('RecordCount', $SQL->getCount('Tag', $RecordCountWhere));
 
         $Sender->Render('tagging', '', 'plugins/Tagging');
     }
@@ -717,37 +717,37 @@ class TaggingPlugin extends Gdn_Plugin {
 
         // Set the model on the form.
         $TagModel = new TagModel;
-        $Sender->Form->SetModel($TagModel);
+        $Sender->Form->setModel($TagModel);
 
         // Add types if allowed to add tags for it, and not '' or 'tags', which
         // are the same.
-        $TagType = Gdn::Request()->Get('type');
+        $TagType = Gdn::request()->get('type');
         if (strtolower($TagType) != 'tags'
             && $TagModel->CanAddTagForType($TagType)
         ) {
-            $Sender->Form->AddHidden('Type', $TagType, true);
+            $Sender->Form->addHidden('Type', $TagType, true);
         }
 
-        if ($Sender->Form->AuthenticatedPostBack()) {
+        if ($Sender->Form->authenticatedPostBack()) {
             // Make sure the tag is valid
-            $TagName = $Sender->Form->GetFormValue('Name');
+            $TagName = $Sender->Form->getFormValue('Name');
             if (!TagModel::ValidateTag($TagName)) {
-                $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
+                $Sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
             }
 
-            $TagType = $Sender->Form->GetFormValue('Type');
+            $TagType = $Sender->Form->getFormValue('Type');
             if (!$TagModel->CanAddTagForType($TagType)) {
-                $Sender->Form->AddError('@'.T('ValidateTagType', 'That type does not accept manually adding new tags.'));
+                $Sender->Form->addError('@'.t('ValidateTagType', 'That type does not accept manually adding new tags.'));
             }
 
             // Make sure that the tag name is not already in use.
-            if ($TagModel->GetWhere(array('Name' => $TagName))->NumRows() > 0) {
-                $Sender->Form->AddError('The specified tag name is already in use.');
+            if ($TagModel->getWhere(array('Name' => $TagName))->numRows() > 0) {
+                $Sender->Form->addError('The specified tag name is already in use.');
             }
 
             $Saved = $Sender->Form->Save();
             if ($Saved) {
-                $Sender->InformMessage(T('Your changes have been saved.'));
+                $Sender->informMessage(T('Your changes have been saved.'));
             }
         }
 
@@ -756,7 +756,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
     public function SettingsController_Tags_Create($Sender) {
         $Sender->Permission('Garden.Settings.Manage');
-        return $this->Dispatch($Sender);
+        return $this->dispatch($Sender);
     }
 
     /**
@@ -767,34 +767,34 @@ class TaggingPlugin extends Gdn_Plugin {
     public function Controller_Edit($Sender) {
         $Sender->AddSideMenu('settings/tagging');
         $Sender->Title(T('Edit Tag'));
-        $TagID = GetValue(1, $Sender->RequestArgs);
+        $TagID = val(1, $Sender->RequestArgs);
 
         // Set the model on the form.
         $TagModel = new TagModel;
-        $Sender->Form->SetModel($TagModel);
-        $Tag = $TagModel->GetID($TagID);
+        $Sender->Form->setModel($TagModel);
+        $Tag = $TagModel->getID($TagID);
         $Sender->Form->SetData($Tag);
 
         // Make sure the form knows which item we are editing.
-        $Sender->Form->AddHidden('TagID', $TagID);
+        $Sender->Form->addHidden('TagID', $TagID);
 
-        if ($Sender->Form->AuthenticatedPostBack()) {
+        if ($Sender->Form->authenticatedPostBack()) {
             // Make sure the tag is valid
-            $TagData = $Sender->Form->GetFormValue('Name');
+            $TagData = $Sender->Form->getFormValue('Name');
             if (!TagModel::ValidateTag($TagData)) {
-                $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
+                $Sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
             }
 
             // Make sure that the tag name is not already in use.
-            if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $TagData))->NumRows() > 0) {
+            if ($TagModel->getWhere(array('TagID <>' => $TagID, 'Name' => $TagData))->numRows() > 0) {
                 $Sender->SetData('MergeTagVisible', true);
-                if (!$Sender->Form->GetFormValue('MergeTag')) {
-                    $Sender->Form->AddError('The specified tag name is already in use.');
+                if (!$Sender->Form->getFormValue('MergeTag')) {
+                    $Sender->Form->addError('The specified tag name is already in use.');
                 }
             }
 
             if ($Sender->Form->Save()) {
-                $Sender->InformMessage(T('Your changes have been saved.'));
+                $Sender->informMessage(T('Your changes have been saved.'));
             }
         }
 
@@ -809,17 +809,17 @@ class TaggingPlugin extends Gdn_Plugin {
     public function Controller_Delete($Sender) {
         $Sender->Permission('Garden.Settings.Manage');
 
-        $TagID = GetValue(1, $Sender->RequestArgs);
+        $TagID = val(1, $Sender->RequestArgs);
         $TagModel = new TagModel();
-        $Tag = $TagModel->GetID($TagID, DATASET_TYPE_ARRAY);
-        if ($Sender->Form->AuthenticatedPostBack()) {
+        $Tag = $TagModel->getID($TagID, DATASET_TYPE_ARRAY);
+        if ($Sender->Form->authenticatedPostBack()) {
             // Delete tag & tag relations.
-            $SQL = Gdn::SQL();
-            $SQL->Delete('TagDiscussion', array('TagID' => $TagID));
-            $SQL->Delete('Tag', array('TagID' => $TagID));
+            $SQL = Gdn::sql();
+            $SQL->delete('TagDiscussion', array('TagID' => $TagID));
+            $SQL->delete('Tag', array('TagID' => $TagID));
 
-            $Sender->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
-            $Sender->JsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
+            $Sender->informMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
+            $Sender->jsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
         }
 
         $Sender->SetData('Title', T('Delete Tag'));
@@ -860,7 +860,7 @@ class TaggingPlugin extends Gdn_Plugin {
      */
     private function AddTagModule($Sender) {
         $TagModule = new TagModule($Sender);
-        $Sender->AddModule($TagModule);
+        $Sender->addModule($TagModule);
     }
 }
 
@@ -868,7 +868,7 @@ if (!function_exists('TagUrl')) :
     function TagUrl($Row, $Page = '', $WithDomain = false) {
         static $UseCategories;
         if (!isset($UseCategories)) {
-            $UseCategories = C('Plugins.Tagging.UseCategories');
+            $UseCategories = c('Plugins.Tagging.UseCategories');
         }
 
         // Add the p before a numeric page.
@@ -883,12 +883,12 @@ if (!function_exists('TagUrl')) :
             $Page = '/'.$Page;
         }
 
-        $Tag = rawurlencode(GetValue('Name', $Row));
+        $Tag = rawurlencode(val('Name', $Row));
 
         if ($UseCategories) {
-            $Category = CategoryModel::Categories($Row['CategoryID']);
+            $Category = CategoryModel::categories($Row['CategoryID']);
             if ($Category && $Category['CategoryID'] > 0) {
-                $Category = rawurlencode(GetValue('UrlCode', $Category, 'x'));
+                $Category = rawurlencode(val('UrlCode', $Category, 'x'));
             } else {
                 $Category = 'x';
             }
@@ -897,15 +897,15 @@ if (!function_exists('TagUrl')) :
             $Result = "/discussions/tagged/$Tag{$Page}";
         }
 
-        return Url($Result, $WithDomain);
+        return url($Result, $WithDomain);
     }
 endif;
 
 if (!function_exists('TagFullName')) :
     function TagFullName($Row) {
-        $Result = GetValue('FullName', $Row);
+        $Result = val('FullName', $Row);
         if (!$Result) {
-            $Result = GetValue('Name', $Row);
+            $Result = val('Name', $Row);
         }
         return $Result;
     }

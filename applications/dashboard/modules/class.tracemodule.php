@@ -11,7 +11,7 @@
 /**
  * Assist with debugging.
  *
- * @see Trace()
+ * @see trace()
  */
 class TraceModule extends Gdn_Module {
 
@@ -26,14 +26,14 @@ class TraceModule extends Gdn_Module {
 
     public function ToString() {
         try {
-            $Traces = Trace();
+            $Traces = trace();
             if (!$Traces) {
                 return '';
             }
 
-            $this->SetData('Traces', $Traces);
+            $this->setData('Traces', $Traces);
 
-            return $this->FetchView();
+            return $this->fetchView();
         } catch (Exception $Ex) {
             return $Ex->getMessage();
         }

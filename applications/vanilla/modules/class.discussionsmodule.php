@@ -30,7 +30,7 @@ class DiscussionsModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
-        $this->FireEvent('Init');
+        $this->fireEvent('Init');
     }
 
     /**
@@ -54,7 +54,7 @@ class DiscussionsModule extends Gdn_Module {
             $discussionModel->Watching = true;
         }
 
-        $this->SetData('Discussions', $discussionModel->Get(0, $limit, $where));
+        $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
     }
 
     public function AssetTarget() {
@@ -62,11 +62,11 @@ class DiscussionsModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!$this->Data('Discussions')) {
+        if (!$this->data('Discussions')) {
             $this->GetData();
         }
 
-        require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
+        require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
 
         return parent::ToString();
     }

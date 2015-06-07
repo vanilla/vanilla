@@ -35,11 +35,11 @@ class UserInfoModule extends Gdn_Module {
     }
 
     public function LoadData() {
-        $UserID = Gdn::Controller()->Data('Profile.UserID', Gdn::Session()->UserID);
-        $this->User = Gdn::UserModel()->GetID($UserID);
-        $this->Roles = Gdn::UserModel()->GetRoles($UserID)->ResultArray();
+        $UserID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
+        $this->User = Gdn::userModel()->getID($UserID);
+        $this->Roles = Gdn::userModel()->GetRoles($UserID)->resultArray();
         // Hide personal info roles
-        if (!CheckPermission('Garden.PersonalInfo.View')) {
+        if (!checkPermission('Garden.PersonalInfo.View')) {
             $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
         }
     }

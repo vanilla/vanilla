@@ -5,7 +5,7 @@ $Fields = $this->Data('ExtendedFields');
 ?>
 
 <h1>Custom Profile Fields</h1>
-<?php echo Wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'Popup SmallButton'), 'div', array('class' => 'Wrap')); ?>
+<?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'Popup SmallButton'), 'div', array('class' => 'Wrap')); ?>
 <table>
     <thead>
     <tr>
@@ -24,12 +24,12 @@ $Fields = $this->Data('ExtendedFields');
         <tr>
             <td><?php echo $Field['Label']; ?></td>
             <td><?php echo $Field['FormType']; ?></td>
-            <td><?php echo (GetValue('Required', $Field, 0)) ? T('Yes') : T('No'); ?></td>
-            <td><?php echo (GetValue('OnRegister', $Field, 0)) ? T('Yes') : T('No'); ?></td>
-            <td><?php echo (GetValue('OnProfile', $Field, 1)) ? T('Yes') : T('No'); ?></td>
-            <!--<td><?php echo (GetValue('OnDiscussion', $Field, 0)) ? T('Yes') : T('No'); ?></td>-->
-            <td><?php echo Anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup SmallButton').
-                    ' '.Anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup SmallButton'); ?></td>
+            <td><?php echo (val('Required', $Field, 0)) ? T('Yes') : T('No'); ?></td>
+            <td><?php echo (val('OnRegister', $Field, 0)) ? T('Yes') : T('No'); ?></td>
+            <td><?php echo (val('OnProfile', $Field, 1)) ? T('Yes') : T('No'); ?></td>
+            <!--<td><?php echo (val('OnDiscussion', $Field, 0)) ? T('Yes') : T('No'); ?></td>-->
+            <td><?php echo anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup SmallButton').
+                    ' '.anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup SmallButton'); ?></td>
         </tr>
     <?php endforeach; ?>
     </tbody>

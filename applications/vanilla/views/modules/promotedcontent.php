@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'modules', 'vanilla');
+require_once Gdn::controller()->fetchViewLocation('helper_functions', 'modules', 'vanilla');
 
 ?>
 <div class="Box BoxPromoted">
-    <?php echo panelHeading(T('Promoted Content')); ?>
+    <?php echo panelHeading(t('Promoted Content')); ?>
     <div class="PanelInfo DataList">
         <?php
-        $Content = $this->Data('Content');
+        $Content = $this->data('Content');
         $ContentItems = sizeof($Content);
 
         if ($Content):

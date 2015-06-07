@@ -14,7 +14,7 @@ $PluginInfo['Debugger'] = array(
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
 );
 
 /**
@@ -49,12 +49,12 @@ class DebuggerPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function Base_AfterBody_Handler($Sender) {
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
         if (!Debug() && !$Session->CheckPermission('Plugins.Debugger.View')) {
             return;
         }
 
-        require $Sender->FetchViewLocation('Debug', '', 'plugins/Debugger');
+        require $Sender->fetchViewLocation('Debug', '', 'plugins/Debugger');
     }
 
     /**
@@ -68,14 +68,14 @@ class DebuggerPlugin extends Gdn_Plugin {
         $Result = '';
         if (is_array($Data)) {
             foreach ($Data as $Key => $Value) {
-                if ($Key === NULL)
+                if ($Key === null)
                     $Key = 'NULL';
                 $Result .= "$Indent<b>$Key</b>: ";
 
-                if ($Value === NULL) {
+                if ($Value === null) {
                     $Result .= "NULL\n";
                 } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
-                    $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
+                    $Result .= htmlspecialchars(var_export($Value, true))."\n";
                 } else {
                     if (is_a($Value, 'Gdn_DataSet'))
                         $Result .= "DataSet";
@@ -100,7 +100,7 @@ class DebuggerPlugin extends Gdn_Plugin {
         } elseif (is_object($Data)) {
             $Result .= $Indent.get_class($Data);
         } else {
-            return trim(var_export($Data, TRUE));
+            return trim(var_export($Data, true));
         }
         return $Result;
     }
@@ -118,13 +118,13 @@ class DebuggerPlugin extends Gdn_Plugin {
      *
      */
     public function Setup() {
-        SaveToConfig('Debug', TRUE);
+        saveToConfig('Debug', true);
     }
 
     /**
      *
      */
     public function OnDisable() {
-        SaveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
+        saveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
     }
 }

@@ -31,30 +31,30 @@ class DashboardController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Initialize() {
+    public function initialize() {
         $this->Head = new HeadModule($this);
-        $this->AddJsFile('jquery.js');
-        $this->AddJsFile('jquery.livequery.js');
-        $this->AddJsFile('jquery.form.js');
-        $this->AddJsFile('jquery.popup.js');
-        $this->AddJsFile('jquery.gardenhandleajaxform.js');
-        $this->AddJsFile('magnific-popup.min.js');
-        $this->AddJsFile('jquery.autosize.min.js');
-        $this->AddJsFile('global.js');
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('magnific-popup.min.js');
+        $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('global.js');
 
         if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
-            $this->AddCssFile('style.css');
-            $this->AddCssFile('vanillicon.css', 'static');
+            $this->addCssFile('style.css');
+            $this->addCssFile('vanillicon.css', 'static');
         } else {
-            if (!C('Garden.Cdns.Disable', false)) {
-                $this->AddCssFile('https://fonts.googleapis.com/css?family=Rokkitt');
+            if (!c('Garden.Cdns.Disable', false)) {
+                $this->addCssFile('https://fonts.googleapis.com/css?family=Rokkitt');
             }
-            $this->AddCssFile('admin.css');
-            $this->AddCssFile('magnific-popup.css');
+            $this->addCssFile('admin.css');
+            $this->addCssFile('magnific-popup.css');
         }
 
         $this->MasterView = 'admin';
-        parent::Initialize();
+        parent::initialize();
     }
 
     /**
@@ -65,7 +65,7 @@ class DashboardController extends Gdn_Controller {
      *
      * @param string $CurrentUrl Used to highlight correct route in menu.
      */
-    public function AddSideMenu($CurrentUrl = false) {
+    public function addSideMenu($CurrentUrl = false) {
         if (!$CurrentUrl) {
             $CurrentUrl = strtolower($this->SelfUrl);
         }
@@ -76,15 +76,15 @@ class DashboardController extends Gdn_Controller {
             $SideMenu = new SideMenuModule($this);
             $SideMenu->EventName = 'GetAppSettingsMenuItems';
             $SideMenu->HtmlId = '';
-            $SideMenu->HighlightRoute($CurrentUrl);
-            $SideMenu->Sort = C('Garden.DashboardMenu.Sort');
+            $SideMenu->highlightRoute($CurrentUrl);
+            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
 
             // Hook for adding to menu
 //         $this->EventArguments['SideMenu'] = &$SideMenu;
-//         $this->FireEvent('GetAppSettingsMenuItems');
+//         $this->fireEvent('GetAppSettingsMenuItems');
 
             // Add the module
-            $this->AddModule($SideMenu, 'Panel');
+            $this->addModule($SideMenu, 'Panel');
         }
     }
 }

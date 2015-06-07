@@ -23,7 +23,7 @@ class UserPhotoModule extends Gdn_Module {
     }
 
     public function ToString() {
-        $this->CanEditPhotos = C('Garden.Profile.EditPhotos');
+        $this->CanEditPhotos = c('Garden.Profile.EditPhotos');
         return parent::ToString();
     }
 }

@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
 function WriteConnection($Connection) {
-    $c = Gdn::Controller();
-    $Enabled = GetValue('Enabled', $Connection);
-    $SettingsUrl = GetValue('SettingsUrl', $Connection);
+    $c = Gdn::controller();
+    $Enabled = val('Enabled', $Connection);
+    $SettingsUrl = val('SettingsUrl', $Connection);
 
     $Css = array();
     $Css[] = $Enabled ? 'Enabled' : 'Disabled';
@@ -12,29 +12,29 @@ function WriteConnection($Connection) {
 
     $Addendums = array();
 
-//   $RequiresRegistration = GetValue('RequiresRegistration', $Connection);
+//   $RequiresRegistration = val('RequiresRegistration', $Connection);
 //   if ($RequiresRegistration)
-//      $Addendums[] = Wrap(T('requires registration'), 'span', array('class' => 'RequiresRegistration'));
+//      $Addendums[] = wrap(t('requires registration'), 'span', array('class' => 'RequiresRegistration'));
 
-    $Configured = GetValue('Configured', $Connection);
+    $Configured = val('Configured', $Connection);
     if (!$Configured)
-        $Addendums[] = Wrap(T('not configured'), 'span', array('class' => 'NotConfigured'));
+        $Addendums[] = wrap(t('not configured'), 'span', array('class' => 'NotConfigured'));
 
-    $Index = GetValue('Index', $Connection, GetValue('ProviderKey', $Connection));
+    $Index = val('Index', $Connection, val('ProviderKey', $Connection));
 
     ?>
     <li id="<?php echo "Provider_$Index"; ?>" class="Item <?php echo $CssClasses; ?>">
         <div class="Connection-Header">
          <span class="IconWrap">
-            <?php echo Img(Asset(GetValue('Icon', $Connection, '/applications/dashboard/design/images/connection-64.png'), '//')); ?>
+            <?php echo img(Asset(val('Icon', $Connection, '/applications/dashboard/design/images/connection-64.png'), '//')); ?>
          </span>
          <span class="Connection-Info">
             <span class="Connection-Name">
                <?php
                if ($Enabled)
-                   echo Anchor(GetValue('Name', $Connection, T('Unknown')), $SettingsUrl);
+                   echo anchor(val('Name', $Connection, t('Unknown')), $SettingsUrl);
                else
-                   echo GetValue('Name', $Connection, T('Unknown'));
+                   echo val('Name', $Connection, t('Unknown'));
                ?>
 
                 <?php if (sizeof($Addendums)): ?>
@@ -44,17 +44,17 @@ function WriteConnection($Connection) {
                 <?php endif; ?>
             </span>
             <span
-                class="Connection-Description"><?php echo GetValue('Description', $Connection, T('Unknown')); ?></span>
+                class="Connection-Description"><?php echo val('Description', $Connection, t('Unknown')); ?></span>
          </span>
          <span class="Connection-Buttons">
             <?php
             if ($Enabled) {
-                echo Anchor(Sprite('SpOptions'), "/social/{$Connection['Index']}", 'Connection-Configure').' ';
+                echo anchor(sprite('SpOptions'), "/social/{$Connection['Index']}", 'Connection-Configure').' ';
                 $SliderState = 'Active';
-                echo Wrap(Anchor(T('Enabled'), "/social/disable/$Index", 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
+                echo wrap(Anchor(t('Enabled'), "/social/disable/$Index", 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
             } else {
                 $SliderState = 'InActive';
-                echo Wrap(Anchor(T('Disabled'), "/social/enable/$Index", 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
+                echo wrap(Anchor(t('Disabled'), "/social/enable/$Index", 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
             }
             ?></span>
         </div>

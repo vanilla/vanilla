@@ -9,8 +9,8 @@ function Capitalize($Word) {
 }
 
 function WriteRangeTab($Range, $Sender) {
-    echo Wrap(
-            Anchor(
+    echo wrap(
+            anchor(
                 Capitalize($Range),
                 'settings?'
                 .http_build_query(array('Range' => $Range))
@@ -24,7 +24,7 @@ function WriteRangeTab($Range, $Sender) {
 <h1>Dashboard</h1>
 <div class="Tabs DateRangeTabs">
     <input type="text" name="DateRange" class="DateRange DateRangeActive"
-           value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')).' - '.Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>"/>
+           value="<?php echo Gdn_Format::date($this->StampStart, T('Date.DefaultFormat')).' - '.Gdn_Format::date($this->StampEnd, T('Date.DefaultFormat')); ?>"/>
     <input type="hidden" name="Range" class="Range" value="<?php echo $this->Range; ?>"/>
     <input type="hidden" name="VanillaID" class="VanillaID" value="<?php echo $VanillaID ?>"/>
     <input type="hidden" name="VanillaVersion" class="VanillaVersion" value="<?php echo $VanillaVersion ?>"/>

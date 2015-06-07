@@ -20,17 +20,17 @@ class InThisDiscussionModule extends Gdn_Module {
     }
 
     public function GetData($DiscussionID, $Limit = 50) {
-        $SQL = Gdn::SQL();
+        $SQL = Gdn::sql();
         $this->_UserData = $SQL
-            ->Select('u.UserID, u.Name, u.Photo')
-            ->Select('c.DateInserted', 'max', 'DateLastActive')
-            ->From('User u')
-            ->Join('Comment c', 'u.UserID = c.InsertUserID')
-            ->Where('c.DiscussionID', $DiscussionID)
-            ->GroupBy('u.UserID, u.Name')
-            ->OrderBy('c.DateInserted', 'desc')
-            ->Limit($Limit)
-            ->Get();
+            ->select('u.UserID, u.Name, u.Photo')
+            ->select('c.DateInserted', 'max', 'DateLastActive')
+            ->from('User u')
+            ->join('Comment c', 'u.UserID = c.InsertUserID')
+            ->where('c.DiscussionID', $DiscussionID)
+            ->groupBy('u.UserID, u.Name')
+            ->orderBy('c.DateInserted', 'desc')
+            ->limit($Limit)
+            ->get();
     }
 
     public function AssetTarget() {
@@ -38,7 +38,7 @@ class InThisDiscussionModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if ($this->_UserData->NumRows() == 0) {
+        if ($this->_UserData->numRows() == 0) {
             return '';
         }
 
@@ -52,10 +52,10 @@ class InThisDiscussionModule extends Gdn_Module {
 ?>
                     <li>
                         <?php
-                        echo Anchor(
-                            Wrap(Wrap(Gdn_Format::Date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
-                            Wrap(Wrap(GetValue('Name', $User), 'span', array('class' => 'Username')), 'span'),
-                            UserUrl($User)
+                        echo anchor(
+                            wrap(Wrap(Gdn_Format::date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
+                            wrap(Wrap(val('Name', $User), 'span', array('class' => 'Username')), 'span'),
+                            userUrl($User)
                         )
                         ?>
                     </li>

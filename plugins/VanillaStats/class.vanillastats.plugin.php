@@ -45,7 +45,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      * Plugin setup.
      */
     public function __construct() {
-        $this->AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
+        $this->AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
         $this->VanillaID = Gdn::InstallationID();
     }
 
@@ -53,10 +53,10 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      * Override the default dashboard page with the new stats one.
      */
     public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
-        $Enabled = C('Garden.Analytics.Enabled', true);
+        $Enabled = c('Garden.Analytics.Enabled', true);
 
-        if ($Enabled && !Gdn::PluginManager()->HasNewMethod('SettingsController', 'Index')) {
-            Gdn::PluginManager()->RegisterNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'Index');
+        if ($Enabled && !Gdn::pluginManager()->HasNewMethod('SettingsController', 'Index')) {
+            Gdn::pluginManager()->RegisterNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'Index');
         }
     }
 
@@ -96,16 +96,16 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      */
     public function StatsDashboard($Sender) {
         $StatsUrl = $this->AnalyticsServer;
-        if (!StringBeginsWith($StatsUrl, 'http:') && !StringBeginsWith($StatsUrl, 'https:')) {
-            $StatsUrl = Gdn::Request()->Scheme()."://{$StatsUrl}";
+        if (!stringBeginsWith($StatsUrl, 'http:') && !stringBeginsWith($StatsUrl, 'https:')) {
+            $StatsUrl = Gdn::request()->Scheme()."://{$StatsUrl}";
         }
 
         // Tell the page where to find the Vanilla Analytics provider
-        $Sender->AddDefinition('VanillaStatsUrl', $StatsUrl);
+        $Sender->addDefinition('VanillaStatsUrl', $StatsUrl);
         $Sender->SetData('VanillaStatsUrl', $StatsUrl);
 
         // Load javascript & css, check permissions, and load side menu for this page.
-        $Sender->AddJsFile('settings.js');
+        $Sender->addJsFile('settings.js');
         $Sender->Title(T('Dashboard'));
         $Sender->RequiredAdminPermissions[] = 'Garden.Settings.View';
         $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
@@ -114,15 +114,15 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
-        $Sender->FireEvent('DefineAdminPermissions');
+        $Sender->fireEvent('DefineAdminPermissions');
         $Sender->Permission($Sender->RequiredAdminPermissions, '', false);
         $Sender->AddSideMenu('dashboard/settings');
 
         if (!Gdn_Statistics::CheckIsEnabled() && Gdn_Statistics::CheckIsLocalhost()) {
             $Sender->Render('dashboardlocalhost', '', 'plugins/VanillaStats');
         } else {
-            $Sender->AddJsFile('vanillastats.js', 'plugins/VanillaStats');
-            $Sender->AddJsFile('picker.js', 'plugins/VanillaStats');
+            $Sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
+            $Sender->addJsFile('picker.js', 'plugins/VanillaStats');
             $Sender->AddCSSFile('picker.css', 'plugins/VanillaStats');
 
             $this->ConfigureRange($Sender);
@@ -144,7 +144,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      */
     public function SettingsController_DashboardSummaries_Create($Sender) {
         // Load javascript & css, check permissions, and load side menu for this page.
-        $Sender->AddJsFile('settings.js');
+        $Sender->addJsFile('settings.js');
         $Sender->Title(T('Dashboard Summaries'));
 
         $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
@@ -153,7 +153,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
         $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
 
-        $Sender->FireEvent('DefineAdminPermissions');
+        $Sender->fireEvent('DefineAdminPermissions');
         $Sender->Permission($Sender->RequiredAdminPermissions, '', false);
         $Sender->AddSideMenu('dashboard/settings');
 
@@ -162,28 +162,28 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         // Load the most active discussions during this date range
         $UserModel = new UserModel();
         $Sender->SetData('DiscussionData', $UserModel->SQL
-            ->Select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID')
-            ->From('Discussion d')
-            ->Where('d.DateLastComment >=', $Sender->DateStart)
-            ->Where('d.DateLastComment <=', $Sender->DateEnd)
-            ->OrderBy('d.CountViews', 'desc')
-            ->OrderBy('d.CountComments', 'desc')
-            ->OrderBy('d.CountBookmarks', 'desc')
-            ->Limit(10, 0)
-            ->Get());
+            ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID')
+            ->from('Discussion d')
+            ->where('d.DateLastComment >=', $Sender->DateStart)
+            ->where('d.DateLastComment <=', $Sender->DateEnd)
+            ->orderBy('d.CountViews', 'desc')
+            ->orderBy('d.CountComments', 'desc')
+            ->orderBy('d.CountBookmarks', 'desc')
+            ->limit(10, 0)
+            ->get());
 
         // Load the most active users during this date range
         $Sender->SetData('UserData', $UserModel->SQL
-            ->Select('u.UserID, u.Name')
-            ->Select('c.CommentID', 'count', 'CountComments')
-            ->From('User u')
-            ->Join('Comment c', 'u.UserID = c.InsertUserID', 'inner')
-            ->GroupBy('u.UserID, u.Name')
-            ->Where('c.DateInserted >=', $Sender->DateStart)
-            ->Where('c.DateInserted <=', $Sender->DateEnd)
-            ->OrderBy('CountComments', 'desc')
-            ->Limit(10, 0)
-            ->Get());
+            ->select('u.UserID, u.Name')
+            ->select('c.CommentID', 'count', 'CountComments')
+            ->from('User u')
+            ->join('Comment c', 'u.UserID = c.InsertUserID', 'inner')
+            ->groupBy('u.UserID, u.Name')
+            ->where('c.DateInserted >=', $Sender->DateStart)
+            ->where('c.DateInserted <=', $Sender->DateEnd)
+            ->orderBy('CountComments', 'desc')
+            ->limit(10, 0)
+            ->get());
 
         // Render the custom dashboard view
         $Sender->Render('dashboardsummaries', '', 'plugins/VanillaStats');
@@ -212,8 +212,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         // Validate that any values coming from the url or form are valid
         $Sender->DateRange = GetIncomingValue('DateRange');
         $DateRangeParts = explode('-', $Sender->DateRange);
-        $Sender->StampStart = strtotime(GetValue(0, $DateRangeParts));
-        $Sender->StampEnd = strtotime(GetValue(1, $DateRangeParts));
+        $Sender->StampStart = strtotime(val(0, $DateRangeParts));
+        $Sender->StampEnd = strtotime(val(1, $DateRangeParts));
         if (!$Sender->StampEnd) {
             $Sender->StampEnd = strtotime('yesterday');
         }
@@ -235,19 +235,19 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->DateRange = $Sender->DateStart.' - '.$Sender->DateEnd;
 
         // Define the range boundaries.
-        $Database = Gdn::Database();
+        $Database = Gdn::database();
 
         // We use the User table as the boundary start b/c users are always inserted before discussions or comments.
         // We have to put a little kludge in here b/c an older version of Vanilla hard-inserted the admin user with an insert date of Sept 16, 1975.
-        $Data = $Database->SQL()
-            ->Select('DateInserted')
-            ->From('User')
-            ->Where('DateInserted >', '1975-09-17')
-            ->OrderBy('DateInserted', 'asc')
-            ->Limit(1)
-            ->Get()->FirstRow();
+        $Data = $Database->sql()
+            ->select('DateInserted')
+            ->from('User')
+            ->where('DateInserted >', '1975-09-17')
+            ->orderBy('DateInserted', 'asc')
+            ->limit(1)
+            ->get()->firstRow();
 
-        $Sender->BoundaryStart = Gdn_Format::Date($Data ? $Data->DateInserted : $Sender->DateStart, '%Y-%m-%d');
-        $Sender->BoundaryEnd = Gdn_Format::Date($Sender->DateEnd, '%Y-%m-%d');
+        $Sender->BoundaryStart = Gdn_Format::date($Data ? $Data->DateInserted : $Sender->DateStart, '%Y-%m-%d');
+        $Sender->BoundaryEnd = Gdn_Format::date($Sender->DateEnd, '%Y-%m-%d');
     }
 }

@@ -35,6 +35,6 @@ class MessageModule extends Gdn_Module {
      * @return mixed|string
      */
     public function AssetTarget() {
-        return $this->_Message == false ? 'Content' : GetValue('AssetTarget', $this->_Message);
+        return $this->_Message == false ? 'Content' : val('AssetTarget', $this->_Message);
     }
 }

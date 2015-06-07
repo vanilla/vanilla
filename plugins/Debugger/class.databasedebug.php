@@ -98,9 +98,9 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         $Trace = debug_backtrace();
         $Method = '';
         foreach ($Trace as $Info) {
-            $Class = GetValue('class', $Info, '');
+            $Class = val('class', $Info, '');
             if ($Class === '' || StringEndsWith($Class, 'Model', true) || StringEndsWith($Class, 'Plugin', true)) {
-                $Type = ArrayValue('type', $Info, '');
+                $Type = arrayValue('type', $Info, '');
 
                 $Method = $Class.$Type.$Info['function'].'('.self::FormatArgs($Info['args']).')';
                 break;
@@ -117,7 +117,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 
             $AllSet = true;
             foreach ($CacheKeys as $CacheKey) {
-                $Value = Gdn::Cache()->Get($CacheKey);
+                $Value = Gdn::cache()->get($CacheKey);
                 $CacheValue = $Value !== Gdn_Cache::CACHEOP_FAILURE;
                 $AllSet &= $CacheValue;
                 $Cache[$CacheKey] = $CacheValue;
@@ -136,7 +136,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         $TimeEnd = Now();
         $this->_ExecutionTime += ($TimeEnd - $TimeStart);
 
-        if ($SaveQuery && !StringBeginsWith($Sql, 'set names')) {
+        if ($SaveQuery && !stringBeginsWith($Sql, 'set names')) {
             $Query['Time'] = ($TimeEnd - $TimeStart);
             $this->_Queries[] = $Query;
         }

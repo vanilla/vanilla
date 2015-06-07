@@ -13,15 +13,15 @@ $CanAddTags = $this->Data('_CanAddTags');
         <?php echo T('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'); ?>
     </div>
 
-<?php echo $this->Form->Open(); ?>
+<?php echo $this->Form->open(); ?>
     <div class="Wrap">
         <?php
-        echo $this->Form->Errors();
+        echo $this->Form->errors();
 
         echo '<p>', T('Search for a tag.', 'Search for all or part of a tag.'), '</p>';
 
-        echo $this->Form->TextBox('Search');
-        echo ' '.$this->Form->Button(T('Go'));
+        echo $this->Form->textBox('Search');
+        echo ' '.$this->Form->button(T('Go'));
         //printf(T('%s tag(s) found.'), $this->Data('RecordCount'));
         ?>
     </div>
@@ -60,7 +60,7 @@ $CanAddTags = $this->Data('_CanAddTags');
                 $CurrentTab = 'current-tab';
             }
 
-            $TabUrl = Url('/settings/tagging/?type='.strtolower($TagMeta['key']));
+            $TabUrl = url('/settings/tagging/?type='.strtolower($TagMeta['key']));
 
             ?>
 
@@ -77,7 +77,7 @@ $CanAddTags = $this->Data('_CanAddTags');
 
     <div class="Tags">
         <?php
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
         $TagCount = $this->Data('RecordCount');
         if ($TagCount == 0) {
             echo T("There are no tags in the system yet.");
@@ -88,7 +88,7 @@ $CanAddTags = $this->Data('_CanAddTags');
                 $Title = '';
                 $Special = FALSE;
 
-                if (GetValue('Type', $Tag)) {
+                if (val('Type', $Tag)) {
                     $Special = TRUE;
                     $CssClass .= " Tag-Special Tag-{$Tag['Type']}";
                     $Title = T('This is a special tag.');
@@ -103,13 +103,13 @@ $CanAddTags = $this->Data('_CanAddTags');
                     if ($Special) {
                         echo htmlspecialchars($DisplayName).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count'));
                     } else {
-                        echo Anchor(
+                        echo anchor(
                             htmlspecialchars($DisplayName).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count')),
                             "/settings/tags/edit/{$Tag['TagID']}",
                             'TagName Tag_'.str_replace(' ', '_', $Tag['Name'])
                         );
 
-                        echo ' '.Anchor('×', "/settings/tags/delete/{$Tag['TagID']}", 'Delete Popup');
+                        echo ' '.anchor('×', "/settings/tags/delete/{$Tag['TagID']}", 'Delete Popup');
                     }
                     ?>
                 </div>
@@ -123,7 +123,7 @@ $CanAddTags = $this->Data('_CanAddTags');
 
             <?php
             if ($CanAddTags) {
-                echo ' '.Anchor('Add Tag', '/settings/tags/add?type='.$TagType, 'Popup Button');
+                echo ' '.anchor('Add Tag', '/settings/tags/add?type='.$TagType, 'Popup Button');
             }
             ?>
 
@@ -132,6 +132,6 @@ $CanAddTags = $this->Data('_CanAddTags');
     </div>
 <?php
 
-PagerModule::Write();
+PagerModule::write();
 
-echo $this->Form->Close();
+echo $this->Form->close();

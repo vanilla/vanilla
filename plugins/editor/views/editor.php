@@ -19,7 +19,7 @@ foreach ($this->Data('_EditorToolbar') as $button) {
 
    // If the type is not an array, it's a regular button (type==button)
    if (!is_array($button['type'])) {
-      $html_toolbar .= Wrap('', 'span', $button['attr']);
+      $html_toolbar .= wrap('', 'span', $button['attr']);
    } else {
       // Else this button has dropdown options, so generate them
       $html_button_dropdown_options = '';
@@ -40,48 +40,48 @@ foreach ($this->Data('_EditorToolbar') as $button) {
 
          // Concatenate child elements
          if (isset($button_option['attr'])) {
-            $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
+            $html_button_dropdown_options .= wrap($action_text, $html_tag, $button_option['attr']);
          }
       }
 
       switch ($button['action']) {
 
          case 'link':
-            $html_toolbar .= Wrap(
-               Wrap($html_arrow_down, 'span', $button['attr']).''.
+            $html_toolbar .= wrap(
+               wrap($html_arrow_down, 'span', $button['attr']).''.
                '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                      <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                       <div class="MenuButtons">
-                      <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="'.T('OK').'"/>
-                      <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="'.T('Cancel').'"/>
+                      <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="'.t('OK').'"/>
+                      <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="'.t('Cancel').'"/>
                       </div>
                    </div>'
                , 'div', array('class' => 'editor-dropdown editor-dropdown-link'));
             break;
 
          case 'image':
-            $html_toolbar .= Wrap(
-               Wrap($html_arrow_down, 'span', $button['attr']).''.
+            $html_toolbar .= wrap(
+               wrap($html_arrow_down, 'span', $button['attr']).''.
                '<div class="editor-insert-dialog Flyout MenuItems editor-file-image editor-insert-image" data-wysihtml5-dialog="insertImage">
-                      <div class="drop-section image-input" title="'.T('Paste the URL of an image to quickly embed it.').'">
-                        <input class="InputBox editor-input-image" placeholder="'.T('Image URL').'" />
+                      <div class="drop-section image-input" title="'.t('Paste the URL of an image to quickly embed it.').'">
+                        <input class="InputBox editor-input-image" placeholder="'.t('Image URL').'" />
                      </div>
                   </div>'
                , 'div', array('class' => 'editor-dropdown editor-dropdown-image'));
             break;
 
          case 'upload':
-            $html_toolbar .= Wrap(
-               Wrap($html_arrow_down, 'span', $button['attr']).''.
+            $html_toolbar .= wrap(
+               wrap($html_arrow_down, 'span', $button['attr']).''.
                '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
                      <div id="drop-cue-dropdown" class="drop-section file-drop">
-                        '.T('Drop image/file').'
+                        '.t('Drop image/file').'
                      </div>
                      <div class="drop-section file-input">
-                        <span class="file-or">'.T('or').'</span> <input type="file" name="'.$editor_file_input_name.'[]" multiple />
+                        <span class="file-or">'.t('or').'</span> <input type="file" name="'.$editor_file_input_name.'[]" multiple />
                      </div>
-                     <div class="drop-section image-input" title="'.T('Paste the URL of an image to quickly embed it.').'">
-                        <input class="InputBox editor-input-image" placeholder="'.T('Image URL').'" />
+                     <div class="drop-section image-input" title="'.t('Paste the URL of an image to quickly embed it.').'">
+                        <input class="InputBox editor-input-image" placeholder="'.t('Image URL').'" />
                      </div>
                   </div>'
                , 'div', array('class' => 'editor-dropdown editor-dropdown-upload'));
@@ -94,7 +94,7 @@ foreach ($this->Data('_EditorToolbar') as $button) {
             $textColorOptions = '';
             if (isset($colorType['text'])) {
                foreach ($colorType['text'] as $textColor) {
-                  $textColorOptions .= Wrap('', $textColor['html_tag'], $textColor['attr']);
+                  $textColorOptions .= wrap('', $textColor['html_tag'], $textColor['attr']);
                }
 
                if ($textColorOptions) {
@@ -105,7 +105,7 @@ foreach ($this->Data('_EditorToolbar') as $button) {
             $highlightColorOptions = '';
             if (isset($colorType['highlight'])) {
                foreach ($colorType['highlight'] as $highlightColor) {
-                  $highlightColorOptions .= Wrap('', $highlightColor['html_tag'], $highlightColor['attr']);
+                  $highlightColorOptions .= wrap('', $highlightColor['html_tag'], $highlightColor['attr']);
                }
 
                if ($highlightColorOptions) {
@@ -119,18 +119,18 @@ foreach ($this->Data('_EditorToolbar') as $button) {
 
             $colorOptions = $textColorOptions.$highlightColorOptions;
 
-            $html_toolbar .= Wrap(
-               Wrap($html_arrow_down, 'span', $button['attr']).''.
-               Wrap($colorOptions, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
+            $html_toolbar .= wrap(
+               wrap($html_arrow_down, 'span', $button['attr']).''.
+               wrap($colorOptions, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
                , 'div', array('class' => "editor-dropdown editor-dropdown-color $cssHasHighlight")
             );
             break;
 
          // All other dropdowns (color, format, emoji)
          default:
-            $html_toolbar .= Wrap(
-               Wrap($html_arrow_down, 'span', $button['attr']).''.
-               Wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
+            $html_toolbar .= wrap(
+               wrap($html_arrow_down, 'span', $button['attr']).''.
+               wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
                , 'div', array('class' => 'editor-dropdown editor-dropdown-default editor-action-'.$button['action']));
             break;
       }
@@ -144,7 +144,7 @@ $html_toolbar .= '<div class="editor-upload-progress"></div>';
 
 // Add drop message when dragging over dropzone. Only display when
 // dragging over element.
-$html_toolbar .= '<div class="editor-upload-attention">'.T('Drop image/file').'</div>';
+$html_toolbar .= '<div class="editor-upload-attention">'.t('Drop image/file').'</div>';
 
 // Generate output for view
 echo $html_toolbar;

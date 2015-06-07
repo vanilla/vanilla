@@ -41,7 +41,7 @@ class ConversationsController extends Gdn_Controller {
     public function initialize() {
         // You've got to be signed in to send private messages.
         if (!Gdn::session()->isValid()) {
-            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
+            redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {

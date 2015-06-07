@@ -6,16 +6,16 @@
 <div class="FilterMenu">
     <?php
     $FormAction = $this->Plugin->AutoTogglePath();
-    echo $this->Form->Open(array(
-        'action' => Url($FormAction),
+    echo $this->Form->open(array(
+        'action' => url($FormAction),
         'jsaction' => $FormAction
     ));
-    echo $this->Form->Errors();
+    echo $this->Form->errors();
 
     $PluginName = $this->Plugin->GetPluginKey('Name');
     $ButtonName = T($this->Plugin->IsEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
 
-    echo $this->Form->Close($ButtonName, '', array(
+    echo $this->Form->close($ButtonName, '', array(
         'class' => 'SliceSubmit SliceForm SmallButton'
     ));
     ?>

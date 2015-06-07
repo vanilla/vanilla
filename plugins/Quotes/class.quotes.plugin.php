@@ -54,7 +54,7 @@ class QuotesPlugin extends Gdn_Plugin {
         }
 
         // Whether to handle drawing quotes or leave it up to some other plugin
-        $this->HandleRenderQuotes = C('Plugins.Quotes.RenderQuotes', true);
+        $this->HandleRenderQuotes = c('Plugins.Quotes.RenderQuotes', true);
     }
 
     /**
@@ -63,17 +63,17 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-        if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+        if (!Gdn::session()->CheckPermission('Garden.SignIn.Allow')) {
             return;
         }
 
         $SideMenu = $Sender->EventArguments['SideMenu'];
-        $ViewingUserID = Gdn::Session()->UserID;
+        $ViewingUserID = Gdn::session()->UserID;
 
         if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup'));
         } else {
-            $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), userUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
         }
     }
 
@@ -95,13 +95,13 @@ class QuotesPlugin extends Gdn_Plugin {
 
         list($UserReference, $Username) = $Args;
 
-        $Sender->GetUserInfo($UserReference, $Username);
+        $Sender->getUserInfo($UserReference, $Username);
         $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
 
-        $UserID = Gdn::Session()->UserID;
+        $UserID = Gdn::session()->UserID;
         $ViewingUserID = $UserID;
 
         if ($Sender->User->UserID != $ViewingUserID) {
@@ -112,24 +112,24 @@ class QuotesPlugin extends Gdn_Plugin {
             $Sender->SetData('ForceEditing', false);
         }
 
-        $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
-        $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
+        $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
+        $Sender->Form->setValue('QuoteFolding', $QuoteFolding);
 
         $Sender->SetData('QuoteFoldingOptions', array(
             'None' => T("Don't fold quotes"),
-            '1' => Plural(1, '%s level deep', '%s levels deep'),
-            '2' => Plural(2, '%s level deep', '%s levels deep'),
-            '3' => Plural(3, '%s level deep', '%s levels deep'),
-            '4' => Plural(4, '%s level deep', '%s levels deep'),
-            '5' => Plural(5, '%s level deep', '%s levels deep')
+            '1' => plural(1, '%s level deep', '%s levels deep'),
+            '2' => plural(2, '%s level deep', '%s levels deep'),
+            '3' => plural(3, '%s level deep', '%s levels deep'),
+            '4' => plural(4, '%s level deep', '%s levels deep'),
+            '5' => plural(5, '%s level deep', '%s levels deep')
         ));
 
         // Form submission handling.
-        if ($Sender->Form->AuthenticatedPostBack()) {
+        if ($Sender->Form->authenticatedPostBack()) {
             $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
             if ($NewFoldingLevel != $QuoteFolding) {
-                Gdn::UserModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
-                $Sender->InformMessage(T("Your changes have been saved."));
+                Gdn::userModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
+                $Sender->informMessage(T("Your changes have been saved."));
             }
         }
 
@@ -142,17 +142,17 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-        if (!Gdn::Session()->IsValid()) {
+        if (!Gdn::session()->isValid()) {
             return;
         }
 
-        $UserPrefs = Gdn_Format::Unserialize(Gdn::Session()->User->Preferences);
+        $UserPrefs = Gdn_Format::Unserialize(Gdn::session()->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
 
-        $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
-        $Sender->AddDefinition('QuotesFolding', $QuoteFolding);
+        $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
+        $Sender->addDefinition('QuotesFolding', $QuoteFolding);
     }
 
     /**
@@ -162,7 +162,7 @@ class QuotesPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function PluginController_Quotes_Create($Sender) {
-        $this->Dispatch($Sender, $Sender->RequestArgs);
+        $this->dispatch($Sender, $Sender->RequestArgs);
     }
 
     /**
@@ -182,11 +182,11 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param bool $Format
      */
     public function DiscussionController_GetQuote_Create($Sender, $Selector, $Format = false) {
-        $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
 
         if (!$Format) {
-            $Format = C('Garden.InputFormatter');
+            $Format = c('Garden.InputFormatter');
         }
 
         $QuoteData = array(
@@ -197,7 +197,7 @@ class QuotesPlugin extends Gdn_Plugin {
         list($Type, $ID) = explode('_', $Selector);
         $this->FormatQuote($Type, $ID, $QuoteData, $Format);
 
-        $Sender->SetJson('Quote', $QuoteData);
+        $Sender->setJson('Quote', $QuoteData);
         $Sender->Render('GetQuote', '', 'plugins/Quotes');
     }
 
@@ -226,7 +226,7 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     protected function PrepareController($Sender) {
         //if (!$this->HandleRenderQuotes) return;
-        $Sender->AddJsFile('quotes.js', 'plugins/Quotes');
+        $Sender->addJsFile('quotes.js', 'plugins/Quotes');
     }
 
     /**
@@ -241,7 +241,7 @@ class QuotesPlugin extends Gdn_Plugin {
      * Output Quote link.
      */
     protected function AddQuoteButton($Sender, $Args) {
-        if (!Gdn::Session()->UserID) {
+        if (!Gdn::session()->UserID) {
             return;
         }
 
@@ -255,7 +255,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        echo Anchor(Sprite('ReactQuote', 'ReactSprite').' '.T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
+        echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender) {
@@ -287,7 +287,7 @@ class QuotesPlugin extends Gdn_Plugin {
         static $ValidateUsernameRegex = null;
 
         if (is_null($ValidateUsernameRegex)) {
-            $ValidateUsernameRegex = sprintf("[%s]+", C('Garden.User.ValidationRegex', "\d\w_ "));
+            $ValidateUsernameRegex = sprintf("[%s]+", c('Garden.User.ValidationRegex', "\d\w_ "));
         }
 
         if (isset($Sender->EventArguments['Comment'])) {
@@ -333,7 +333,7 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     protected function QuoteAuthorCallback($Matches) {
         $Attribution = T('%s said:');
-        $Link = Anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
+        $Link = anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
         $Attribution = sprintf($Attribution, $Link);
         return <<<BLOCKQUOTE
       <blockquote class="UserQuote"><div class="QuoteAuthor">{$Attribution}</div><div class="QuoteText"><p>
@@ -372,7 +372,7 @@ BLOCKQUOTE;
             );
             $this->FormatQuote($Type, $ID, $QuoteData);
             if ($QuoteData['status'] == 'success') {
-                $Sender->Form->SetValue('Body', "{$QuoteData['body']}\n");
+                $Sender->Form->setValue('Body', "{$QuoteData['body']}\n");
             }
         }
     }
@@ -391,7 +391,7 @@ BLOCKQUOTE;
         Emoji::instance()->enabled = false;
 
         if (!$Format) {
-            $Format = C('Garden.InputFormatter');
+            $Format = c('Garden.InputFormatter');
         }
 
         $Type = strtolower($Type);
@@ -411,7 +411,7 @@ BLOCKQUOTE;
 
         //$QuoteData = array();
         if ($Model) {
-            $Data = $Model->GetID($ID);
+            $Data = $Model->getID($ID);
             $NewFormat = $Format;
             if ($NewFormat == 'Wysiwyg') {
                 $NewFormat = 'Html';
@@ -425,17 +425,17 @@ BLOCKQUOTE;
             $NewBody = $Data->Body;
             if ($QuoteFormat != $NewFormat) {
                 if (in_array($NewFormat, array('Html', 'Wysiwyg'))) {
-                    $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
+                    $NewBody = Gdn_Format::to($NewBody, $QuoteFormat);
                 } elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode') {
-                    $NewBody = Gdn_Format::Text($NewBody, false);
+                    $NewBody = Gdn_Format::text($NewBody, false);
                 } elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode') {
-                    $NewBody = Gdn_Format::Text($NewBody, false);
+                    $NewBody = Gdn_Format::text($NewBody, false);
                 } else {
                     $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
                 }
 
                 if (!in_array($NewFormat, array('Html', 'Wysiwyg'))) {
-                    Gdn::Controller()->InformMessage(sprintf(
+                    Gdn::controller()->informMessage(sprintf(
                         T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
                         htmlspecialchars($QuoteFormat),
                         htmlspecialchars($NewFormat)
@@ -481,7 +481,7 @@ BQ;
 
                     break;
                 case 'Wysiwyg':
-                    $Attribution = sprintf(T('%s said:'), UserAnchor($Data, null, array('Px' => 'Insert')));
+                    $Attribution = sprintf(T('%s said:'), userAnchor($Data, null, array('Px' => 'Insert')));
                     $QuoteBody = $Data->Body;
 
                     // TODO: Strip inner quotes...

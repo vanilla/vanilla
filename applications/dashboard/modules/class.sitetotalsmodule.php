@@ -23,32 +23,32 @@ class SiteTotalsModule extends Gdn_Module {
     }
 
     protected function _GetData() {
-        $Px = Gdn::Database()->DatabasePrefix;
+        $Px = Gdn::database()->DatabasePrefix;
         $Sql = "show table status where Name in ('{$Px}User', '{$Px}Discussion', '{$Px}Comment')";
 
         $Result = array('User' => 0, 'Discussion' => 0, 'Comment' => 0);
         foreach ($Result as $Name => $Value) {
-            $Result[$Name] = $this->GetCount($Name);
+            $Result[$Name] = $this->getCount($Name);
         }
-        $this->SetData('Totals', $Result);
+        $this->setData('Totals', $Result);
     }
 
     protected function GetCount($Table) {
         // Try and get the count from the cache.
         $Key = "$Table.CountRows";
-        $Count = Gdn::Cache()->Get($Key);
+        $Count = Gdn::cache()->get($Key);
         if ($Count !== Gdn_Cache::CACHEOP_FAILURE) {
             return $Count;
         }
 
         // The count wasn't in the cache so grab it from the table.
-        $Count = Gdn::SQL()
-            ->Select($Table.'ID', 'count', 'CountRows')
-            ->From($Table)
-            ->Get()->Value('CountRows');
+        $Count = Gdn::sql()
+            ->select($Table.'ID', 'count', 'CountRows')
+            ->from($Table)
+            ->get()->value('CountRows');
 
         // Save the value to the cache.
-        Gdn::Cache()->Store($Key, $Count, array(Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)));
+        Gdn::cache()->store($Key, $Count, array(Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)));
         return $Count;
     }
 

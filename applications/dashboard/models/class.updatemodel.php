@@ -116,17 +116,17 @@ class UpdateModel extends Gdn_Model {
                 // Validate the addon.
                 $Name = $Entry['Name'];
                 $Valid = true;
-                if (!GetValue('Name', $Info)) {
+                if (!val('Name', $Info)) {
                     $Info['Name'] = $Key;
                 }
 
-                if (!GetValue('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
+                if (!val('Description', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
                     $Valid = false;
                 }
 
-                if (!GetValue('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Version'));
+                if (!val('Version', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
                     $Valid = false;
                 }
 
@@ -165,7 +165,7 @@ class UpdateModel extends Gdn_Model {
 
         // Add the addon requirements.
         if ($Addon) {
-            $Requirements = ArrayTranslate($Addon, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
+            $Requirements = arrayTranslate($Addon, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
             foreach ($Requirements as $Type => $Items) {
                 if (!is_array($Items)) {
                     unset($Requirements[$Type]);
@@ -176,7 +176,7 @@ class UpdateModel extends Gdn_Model {
             $Addon['Checked'] = true;
             $Addon['Path'] = $Path;
             $UploadsPath = PATH_UPLOADS.'/';
-            if (StringBeginsWith($Addon['Path'], $UploadsPath)) {
+            if (stringBeginsWith($Addon['Path'], $UploadsPath)) {
                 $Addon['File'] = substr($Addon['Path'], strlen($UploadsPath));
             }
 
@@ -235,13 +235,13 @@ class UpdateModel extends Gdn_Model {
                     $NewRoot = $Root;
                 }
 
-                if (!GetValue('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
+                if (!val('Description', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
                     $Valid = false;
                 }
 
-                if (!GetValue('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Version'));
+                if (!val('Version', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
                     $Valid = false;
                 }
 
@@ -250,7 +250,7 @@ class UpdateModel extends Gdn_Model {
                     $Addon = array(
                         'AddonKey' => $Key,
                         'AddonTypeID' => self::ADDON_TYPE_PLUGIN,
-                        'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
+                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
                         'Path' => $Path);
@@ -291,13 +291,13 @@ class UpdateModel extends Gdn_Model {
                     $NewRoot = $Root;
                 }
 
-                if (!GetValue('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
+                if (!val('Description', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
                     $Valid = false;
                 }
 
-                if (!GetValue('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Version'));
+                if (!val('Version', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
                     $Valid = false;
                 }
 
@@ -306,7 +306,7 @@ class UpdateModel extends Gdn_Model {
                     $Addon = array(
                         'AddonKey' => $Key,
                         'AddonTypeID' => self::ADDON_TYPE_APPLICATION,
-                        'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
+                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
                         'Path' => $Path);
@@ -343,13 +343,13 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
-                if (!GetValue('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
+                if (!val('Description', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
                     $Valid = false;
                 }
 
-                if (!GetValue('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Version'));
+                if (!val('Version', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
                     $Valid = false;
                 }
 
@@ -358,7 +358,7 @@ class UpdateModel extends Gdn_Model {
                     $Addon = array(
                         'AddonKey' => $Key,
                         'AddonTypeID' => self::ADDON_TYPE_THEME,
-                        'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
+                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
                         'Path' => $Path);
@@ -393,21 +393,21 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
-                if (!GetValue('Locale', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Locale'));
+                if (!val('Locale', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Locale'));
                     $Valud = false;
                 } elseif (strcasecmp($Info['Locale'], $Key) == 0) {
-                    $Result[] = $Name.': '.T('The locale\'s key cannot be the same as the name of the locale.');
+                    $Result[] = $Name.': '.t('The locale\'s key cannot be the same as the name of the locale.');
                     $Valid = false;
                 }
 
-                if (!GetValue('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
+                if (!val('Description', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
                     $Valid = false;
                 }
 
-                if (!GetValue('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Version'));
+                if (!val('Version', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
                     $Valid = false;
                 }
 
@@ -416,7 +416,7 @@ class UpdateModel extends Gdn_Model {
                     $Addon = array(
                         'AddonKey' => $Key,
                         'AddonTypeID' => self::ADDON_TYPE_LOCALE,
-                        'Name' => GetValue('Name', $Info) ? $Info['Name'] : $Key,
+                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
                         'Path' => $Path);
@@ -458,7 +458,7 @@ class UpdateModel extends Gdn_Model {
 
         if ($Addon) {
             // Add the requirements.
-            $Requirements = ArrayTranslate($Info, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
+            $Requirements = arrayTranslate($Info, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
             foreach ($Requirements as $Type => $Items) {
                 if (!is_array($Items)) {
                     unset($Requirements[$Type]);
@@ -470,7 +470,7 @@ class UpdateModel extends Gdn_Model {
 
 
             $UploadsPath = PATH_ROOT.'/uploads/';
-            if (StringBeginsWith($Addon['Path'], $UploadsPath)) {
+            if (stringBeginsWith($Addon['Path'], $UploadsPath)) {
                 $Addon['File'] = substr($Addon['Path'], strlen($UploadsPath));
             }
             if ($Fix) {
@@ -560,7 +560,7 @@ class UpdateModel extends Gdn_Model {
                     ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
                     ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
 
-                throw new Exception(T('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
             }
             return false;
         }
@@ -692,7 +692,7 @@ class UpdateModel extends Gdn_Model {
                 $Quote = $Line[0];
                 $Value = trim($Line, $Quote);
                 $Value = str_replace('\\'.$Quote, $Quote, $Value);
-            } elseif (StringBeginsWith($Line, 'array(') && substr($Line, -1) == ')') {
+            } elseif (stringBeginsWith($Line, 'array(') && substr($Line, -1) == ')') {
                 // Parse the line's array.
                 $Line = substr($Line, 6, strlen($Line) - 7);
                 $Items = explode(',', $Line);
@@ -723,16 +723,16 @@ class UpdateModel extends Gdn_Model {
 
         // Join the site addons with my addons.
         foreach ($LatestAddons as $Addon) {
-            $Key = GetValue('AddonKey', $Addon);
-            $Type = GetValue('Type', $Addon);
+            $Key = val('AddonKey', $Addon);
+            $Type = val('Type', $Addon);
             $Slug = strtolower($Key).'-'.strtolower($Type);
-            $Version = GetValue('Version', $Addon);
-            $FileUrl = GetValue('Url', $Addon);
+            $Version = val('Version', $Addon);
+            $FileUrl = val('Url', $Addon);
 
             if (isset($MyAddons[$Slug])) {
                 $MyAddon = $MyAddons[$Slug];
 
-                if (version_compare($Version, GetValue('Version', $MyAddon, '999'), '>')) {
+                if (version_compare($Version, val('Version', $MyAddon, '999'), '>')) {
                     $MyAddon['NewVersion'] = $Version;
                     $MyAddon['NewDownloadUrl'] = $FileUrl;
                     $UpdateAddons[$Slug] = $MyAddon;
@@ -771,12 +771,12 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'application', 'Version' => GetValue('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, strtolower($Key)));
+            $Addon = array('AddonKey' => $Key, 'AddonType' => 'application', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, strtolower($Key)));
             self::_AddAddon($Addon, $Addons);
         }
 
         // Get a list of all of the plugins.
-        $PluginManager = Gdn::PluginManager();
+        $PluginManager = Gdn::pluginManager();
         if ($Enabled) {
             $Plugins = $PluginManager->EnabledPlugins();
         } else {
@@ -789,7 +789,7 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'plugin', 'Version' => GetValue('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, $Key));
+            $Addon = array('AddonKey' => $Key, 'AddonType' => 'plugin', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, $Key));
             self::_AddAddon($Addon, $Addons);
         }
 
@@ -807,7 +807,7 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'theme', 'Version' => GetValue('Version', $Info, '0.0'), 'Folder' => '/themes/'.GetValue('Folder', $Info, $Key));
+            $Addon = array('AddonKey' => $Key, 'AddonType' => 'theme', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/themes/'.GetValue('Folder', $Info, $Key));
             self::_AddAddon($Addon, $Addons);
         }
 
@@ -825,7 +825,7 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'locale', 'Version' => GetValue('Version', $Info, '0.0'), 'Folder' => '/locales/'.GetValue('Folder', $Info, $Key));
+            $Addon = array('AddonKey' => $Key, 'AddonType' => 'locale', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/locales/'.GetValue('Folder', $Info, $Key));
             self::_AddAddon($Addon, $Addons);
         }
 
@@ -854,7 +854,7 @@ class UpdateModel extends Gdn_Model {
         $UpdateAddons = array();
 
         if ($SiteAddons) {
-            $SiteAddons = GetValue('Addons', json_decode($SiteAddons, true));
+            $SiteAddons = val('Addons', json_decode($SiteAddons, true));
             $UpdateAddons = $this->CompareAddons($MyAddons, $SiteAddons);
         }
         return $UpdateAddons;
@@ -872,7 +872,7 @@ class UpdateModel extends Gdn_Model {
         // Get the structure files for all of the enabled applications.
         $ApplicationManager = new Gdn_ApplicationManager();
         $Apps = $ApplicationManager->EnabledApplications();
-        $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
+        $AppNames = consolidateArrayValuesByKey($Apps, 'Folder');
         $Paths = array();
         foreach ($Apps as $Key => $AppInfo) {
             $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
@@ -884,16 +884,16 @@ class UpdateModel extends Gdn_Model {
         }
 
         // Execute the structures.
-        $Database = Gdn::Database();
-        $SQL = Gdn::SQL();
-        $Structure = Gdn::Structure();
+        $Database = Gdn::database();
+        $SQL = Gdn::sql();
+        $Structure = Gdn::structure();
 
         foreach ($Paths as $Path) {
             include $Path;
         }
 
         // Execute the structures for all of the plugins.
-        $PluginManager = Gdn::PluginManager();
+        $PluginManager = Gdn::pluginManager();
 
         $Registered = $PluginManager->RegisteredPlugins();
 
@@ -905,7 +905,7 @@ class UpdateModel extends Gdn_Model {
             try {
                 $Plugin = $PluginManager->GetPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
                 if (method_exists($Plugin, 'Structure')) {
-                    Trace("{$ClassName}->Structure()");
+                    trace("{$ClassName}->Structure()");
                     $Plugin->Structure();
                 }
             } catch (Exception $Ex) {

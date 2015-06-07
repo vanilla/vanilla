@@ -153,7 +153,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      */
     public function Emoji_Init_Handler($sender, $args) {
         // Get the currently selected emoji set & switch to it.
-        $emojiSetKey = C('Garden.EmojiSet');
+        $emojiSetKey = c('Garden.EmojiSet');
         if (!$emojiSetKey || !array_key_exists($emojiSetKey, $this->getEmojiSets())) {
             return;
         }
@@ -174,7 +174,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
 
-            $icon = (isset($manifest['icon'])) ? Img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
+            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
             $items[$key] = '@'.$icon.
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.

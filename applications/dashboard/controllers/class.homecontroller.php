@@ -19,17 +19,17 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Initialize() {
+    public function initialize() {
         $this->Head = new HeadModule($this);
-        $this->AddJsFile('jquery.js');
-        $this->AddJsFile('jquery.livequery.js');
-        $this->AddJsFile('jquery.form.js');
-        $this->AddJsFile('jquery.popup.js');
-        $this->AddJsFile('jquery.gardenhandleajaxform.js');
-        $this->AddJsFile('global.js');
-        $this->AddCssFile('admin.css');
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('global.js');
+        $this->addCssFile('admin.css');
         $this->MasterView = 'empty';
-        parent::Initialize();
+        parent::initialize();
     }
 
     /**
@@ -38,29 +38,29 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Index() {
+    public function index() {
         $this->View = 'FileNotFound';
-        $this->FileNotFound();
+        $this->fileNotFound();
     }
 
     /**
      * Display error page.
      */
-    public function Error() {
-        $this->RemoveCssFile('admin.css');
-        $this->AddCssFile('style.css');
-        $this->AddCssFile('vanillicon.css', 'static');
+    public function error() {
+        $this->removeCssFile('admin.css');
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
         $this->MasterView = 'default';
 
         $this->CssClass = 'SplashMessage NoPanel';
 
-        $this->SetData('_NoMessages', true);
+        $this->setData('_NoMessages', true);
 
-        $Code = $this->Data('Code', 400);
+        $Code = $this->data('Code', 400);
         safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
-        Gdn_Theme::Section('Error');
+        Gdn_Theme::section('Error');
 
-        $this->Render();
+        $this->render();
     }
 
     /**
@@ -70,25 +70,25 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function FileNotFound() {
-        $this->RemoveCssFile('admin.css');
-        $this->AddCssFile('style.css');
-        $this->AddCssFile('vanillicon.css', 'static');
+    public function fileNotFound() {
+        $this->removeCssFile('admin.css');
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
 
         $this->MasterView = 'default';
 
         $this->CssClass = 'SplashMessage NoPanel';
 
-        if ($this->Data('ViewPaths')) {
-            Trace($this->Data('ViewPaths'), 'View Paths');
+        if ($this->data('ViewPaths')) {
+            trace($this->data('ViewPaths'), 'View Paths');
         }
 
-        $this->SetData('_NoMessages', true);
-        Gdn_Theme::Section('Error');
+        $this->setData('_NoMessages', true);
+        Gdn_Theme::section('Error');
 
-        if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+        if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             safeHeader("HTTP/1.0 404", true, 404);
-            $this->Render();
+            $this->render();
         } else {
             $this->RenderException(NotFoundException());
         }
@@ -100,10 +100,10 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function UpdateMode() {
+    public function updateMode() {
         safeHeader("HTTP/1.0 503", true, 503);
-        $this->SetData('UpdateMode', true);
-        $this->Render();
+        $this->setData('UpdateMode', true);
+        $this->render();
     }
 
     /**
@@ -112,10 +112,10 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Deleted() {
+    public function deleted() {
         safeHeader("HTTP/1.0 410", true, 410);
-        Gdn_Theme::Section('Error');
-        $this->Render();
+        Gdn_Theme::section('Error');
+        $this->render();
     }
 
     /**
@@ -124,8 +124,8 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function TermsOfService() {
-        $this->Render();
+    public function termsOfService() {
+        $this->render();
     }
 
     /**
@@ -134,8 +134,8 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function PrivacyPolicy() {
-        $this->Render();
+    public function privacyPolicy() {
+        $this->render();
     }
 
     /**
@@ -144,14 +144,14 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Permission() {
-        Gdn_Theme::Section('Error');
+    public function permission() {
+        Gdn_Theme::section('Error');
 
-        if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+        if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             safeHeader("HTTP/1.0 401", true, 401);
-            $this->Render();
+            $this->render();
         } else {
-            $this->RenderException(PermissionException());
+            $this->RenderException(permissionException());
         }
     }
 }

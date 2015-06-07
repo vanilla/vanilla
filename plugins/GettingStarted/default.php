@@ -38,7 +38,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
         }
 
         // Save the action if editing registration settings
-        if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->AuthenticatedPostBack() === true) {
+        if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->authenticatedPostBack() === true) {
             $this->SaveStep('Plugins.GettingStarted.Registration');
         }
 
@@ -56,34 +56,34 @@ class GettingStartedPlugin extends Gdn_Plugin {
         if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
             $Sender->AddCssFile('getting-started.css', 'plugins/GettingStarted');
 
-            $Session = Gdn::Session();
+            $Session = Gdn::session();
             $WelcomeMessage = '<div class="GettingStarted">'
-                .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
-                ."<h1>".T("Here's how to get started:")."</h1>"
+                .anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
+                ."<h1>".t("Here's how to get started:")."</h1>"
                 .'<ul>
       <li class="One'.(C('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">
-	 <strong>'.Anchor(T('Welcome to your Dashboard'), 'settings').'</strong>
-         <p>'.T('This is the administrative dashboard for your new community. Check out the configuration options to the left: from here you can configure how your community works. <b>Only users in the "Administrator" role can see this part of your community.</b>').'</p>
+	 <strong>'.anchor(T('Welcome to your Dashboard'), 'settings').'</strong>
+         <p>'.t('This is the administrative dashboard for your new community. Check out the configuration options to the left: from here you can configure how your community works. <b>Only users in the "Administrator" role can see this part of your community.</b>').'</p>
       </li>
       <li class="Two'.(C('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">
-	 <strong>'.Anchor(T("Where is your Community Forum?"), '/').'</strong>
-         <p>'.T('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').Anchor(T('clicking here'), '/').T('. The community forum is what all of your users &amp; customers will see when they visit ').Anchor(Gdn::Request()->Url('/', true), Gdn::Request()->Url('/', true)).'.</p>
+	 <strong>'.anchor(T("Where is your Community Forum?"), '/').'</strong>
+         <p>'.t('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').anchor(T('clicking here'), '/').t('. The community forum is what all of your users &amp; customers will see when they visit ').anchor(Gdn::request()->Url('/', true), Gdn::request()->Url('/', true)).'.</p>
       </li>
       <li class="Three'.(C('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
-         <p>'.T('Discussion categories are used to help your users organize their discussions in a way that is meaningful for your community.').'</p>
+         <strong>'.anchor(T('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
+         <p>'.t('Discussion categories are used to help your users organize their discussions in a way that is meaningful for your community.').'</p>
       </li>
       <li class="Four'.(C('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Customize your Public Profile'), 'profile').'</strong>
-         <p>'.T('Everyone who signs up for your community gets a public profile page where they can upload a picture of themselves, manage their profile settings, and track cool things going on in the community. You should ').Anchor(T('customize your profile now'), 'profile').'.</p>
+         <strong>'.anchor(T('Customize your Public Profile'), 'profile').'</strong>
+         <p>'.t('Everyone who signs up for your community gets a public profile page where they can upload a picture of themselves, manage their profile settings, and track cool things going on in the community. You should ').anchor(T('customize your profile now'), 'profile').'.</p>
       </li>
       <li class="Five'.(C('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Start your First Discussion'), 'post/discussion').'</strong>
-	 <p>'.T('Get the ball rolling in your community by ').Anchor(T('starting your first discussion'), 'post/discussion').T(' now.').'</p>
+         <strong>'.anchor(T('Start your First Discussion'), 'post/discussion').'</strong>
+	 <p>'.t('Get the ball rolling in your community by ').anchor(T('starting your first discussion'), 'post/discussion').t(' now.').'</p>
       </li>
       <li class="Six'.(C('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Manage your Plugins'), 'settings/plugins').'</strong>
-         <p>'.T('Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.').'</p>
+         <strong>'.anchor(T('Manage your Plugins'), 'settings/plugins').'</strong>
+         <p>'.t('Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.').'</p>
       </li>
    </ul>
 </div>';
@@ -94,37 +94,37 @@ class GettingStartedPlugin extends Gdn_Plugin {
     // Record when the various actions are taken
     // 1. If the user edits the registration settings
     public function SaveStep($Step) {
-        if (Gdn::Config($Step, '') != '1') {
-            SaveToConfig($Step, '1');
+        if (Gdn::config($Step, '') != '1') {
+            saveToConfig($Step, '1');
         }
 
         // If all of the steps are now completed, disable this plugin
-        if (Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
-            && Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1'
-            && Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1'
-            && Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1'
-            && Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1'
+        if (Gdn::config('Plugins.GettingStarted.Registration', '0') == '1'
+            && Gdn::config('Plugins.GettingStarted.Plugins', '0') == '1'
+            && Gdn::config('Plugins.GettingStarted.Categories', '0') == '1'
+            && Gdn::config('Plugins.GettingStarted.Profile', '0') == '1'
+            && Gdn::config('Plugins.GettingStarted.Discussion', '0') == '1'
         ) {
-            Gdn::PluginManager()->DisablePlugin('GettingStarted');
+            Gdn::pluginManager()->DisablePlugin('GettingStarted');
         }
     }
 
     // If the user posts back any forms to their profile, they've completed step 4: profile customization
     public function ProfileController_Render_Before($Sender) {
-        if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === true) {
+        if (property_exists($Sender, 'Form') && $Sender->Form->authenticatedPostBack() === true) {
             $this->SaveStep('Plugins.GettingStarted.Profile');
         }
     }
 
     // If the user starts a discussion, they've completed step 5: profile customization
     public function PostController_Render_Before($Sender) {
-        if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === true) {
+        if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->authenticatedPostBack() === true) {
             $this->SaveStep('Plugins.GettingStarted.Discussion');
         }
     }
 
     public function PluginController_DismissGettingStarted_Create($Sender) {
-        Gdn::PluginManager()->DisablePlugin('GettingStarted');
+        Gdn::pluginManager()->DisablePlugin('GettingStarted');
         echo 'TRUE';
     }
 

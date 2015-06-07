@@ -1,22 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 $this->EventArguments['FormCssClass'] = 'MessageForm CommentForm';
-$this->FireEvent('BeforeMessageForm');
+$this->fireEvent('BeforeMessageForm');
 ?>
 <div id="MessageForm" class="<?php echo $this->EventArguments['FormCssClass']; ?>">
-    <h2 class="H"><?php echo T("Add a Message"); ?></h2>
+    <h2 class="H"><?php echo t("Add a Message"); ?></h2>
 
     <div class="MessageFormWrap">
         <div class="Form-HeaderWrap">
             <div class="Form-Header">
             <span class="Author">
                <?php
-               if (C('Vanilla.Comment.UserPhotoFirst', TRUE)) {
-                   echo UserPhoto($Session->User);
-                   echo UserAnchor($Session->User, 'Username');
+               if (C('Vanilla.Comment.UserPhotoFirst', true)) {
+                   echo userPhoto($Session->User);
+                   echo userAnchor($Session->User, 'Username');
                } else {
-                   echo UserAnchor($Session->User, 'Username');
-                   echo UserPhoto($Session->User);
+                   echo userAnchor($Session->User, 'Username');
+                   echo userPhoto($Session->User);
                }
                ?>
             </span>
@@ -26,14 +26,14 @@ $this->FireEvent('BeforeMessageForm');
             <div class="Form-Body">
                 <div class="FormWrapper FormWrapper-Condensed">
                     <?php
-                    echo $this->Form->Open(array('id' => 'Form_ConversationMessage', 'action' => Url('/messages/addmessage/')));
-                    echo $this->Form->Errors();
-                    //               echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
-                    echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage', 'FileUpload' => true));
+                    echo $this->Form->open(array('id' => 'Form_ConversationMessage', 'action' => url('/messages/addmessage/')));
+                    echo $this->Form->errors();
+                    //               echo wrap($this->Form->textBox('Body', array('MultiLine' => true, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
+                    echo $this->Form->bodyBox('Body', array('Table' => 'ConversationMessage', 'FileUpload' => true));
                     echo '<div class="Buttons">',
-                    $this->Form->Button('Send Message', array('class' => 'Button Primary')),
+                    $this->Form->button('Send Message', array('class' => 'Button Primary')),
                     '</div>';
-                    echo $this->Form->Close();
+                    echo $this->Form->close();
                     ?>
                 </div>
             </div>

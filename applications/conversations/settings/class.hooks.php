@@ -105,7 +105,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function profileController_beforeProfileOptions_handler($Sender, $Args) {
         if (!$Sender->EditMode && Gdn::session()->isValid() && Gdn::session()->UserID != $Sender->User->UserID) {
             $Sender->EventArguments['MemberOptions'][] = array(
-                'Text' => Sprite('SpMessage').' '.T('Message'),
+                'Text' => sprite('SpMessage').' '.t('Message'),
                 'Url' => '/messages/add/'.$Sender->User->Name,
                 'CssClass' => 'MessageUser'
             );
@@ -162,7 +162,7 @@ class ConversationsHooks implements Gdn_IPlugin {
         );
         $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
-            array( 'Conversations.Conversations.Add' => 1)
+            array('Conversations.Conversations.Add' => 1)
         );
         $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
@@ -180,23 +180,23 @@ class ConversationsHooks implements Gdn_IPlugin {
         /*
         $ConversationModel = new ConversationModel();
         // Number of Conversations
-        $CountConversations = $ConversationModel->GetCountWhere();
-        $Sender->AddDefinition('CountConversations', $CountConversations);
+        $CountConversations = $ConversationModel->getCountWhere();
+        $Sender->addDefinition('CountConversations', $CountConversations);
         $Sender->BuzzData[T('Conversations')] = number_format($CountConversations);
         // Number of New Conversations in the last day
-        $Sender->BuzzData[T('New conversations in the last day')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day')))));
+        $Sender->BuzzData[T('New conversations in the last day')] = number_format($ConversationModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 day')))));
         // Number of New Conversations in the last week
-        $Sender->BuzzData[T('New conversations in the last week')] = number_format($ConversationModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
+        $Sender->BuzzData[T('New conversations in the last week')] = number_format($ConversationModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 week')))));
 
         $ConversationMessageModel = new ConversationMessageModel();
         // Number of Messages
-        $CountMessages = $ConversationMessageModel->GetCountWhere();
-        $Sender->AddDefinition('CountConversationMessages', $CountMessages);
+        $CountMessages = $ConversationMessageModel->getCountWhere();
+        $Sender->addDefinition('CountConversationMessages', $CountMessages);
         $Sender->BuzzData[T('Conversation Messages')] = number_format($CountMessages);
         // Number of New Messages in the last day
-        $Sender->BuzzData[T('New messages in the last day')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day')))));
+        $Sender->BuzzData[T('New messages in the last day')] = number_format($ConversationMessageModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 day')))));
         // Number of New Messages in the last week
-        $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
+        $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 week')))));
         */
     //}
 

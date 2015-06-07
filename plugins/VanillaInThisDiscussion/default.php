@@ -50,13 +50,13 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
 
     public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
         // Handle limit
-        $Limit = C('Plugins.VanillaInThisDiscussion.Limit', 20);
+        $Limit = c('Plugins.VanillaInThisDiscussion.Limit', 20);
 
         // Render
         include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
         $InThisDiscussionModule = new InThisDiscussionModule($Sender);
         $InThisDiscussionModule->GetData($Sender->Data('Discussion.DiscussionID'), $Limit);
-        $Sender->AddModule($InThisDiscussionModule);
+        $Sender->addModule($InThisDiscussionModule);
 
     }
 

@@ -58,8 +58,8 @@ class AddPeopleModule extends Gdn_Module {
                 }
             }
             $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
-            // if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
-            //    Redirect('/messages/'.$this->Conversation->ConversationID);
+            // if ($Sender->deliveryType() == DELIVERY_TYPE_ALL)
+            //    redirect('/messages/'.$this->Conversation->ConversationID);
 
             $Sender->informMessage(t('Your changes were saved.'));
             $Sender->RedirectUrl = url('/messages/'.$this->Conversation->ConversationID);

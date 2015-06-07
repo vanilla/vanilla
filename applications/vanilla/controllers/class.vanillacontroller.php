@@ -21,25 +21,25 @@ class VanillaController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Initialize() {
+    public function initialize() {
         // Set up head
         $this->Head = new HeadModule($this);
-        $this->AddJsFile('jquery.js');
-        $this->AddJsFile('jquery-ui.js');
-        $this->AddJsFile('jquery.livequery.js');
-        $this->AddJsFile('jquery.form.js');
-        $this->AddJsFile('jquery.popup.js');
-        $this->AddJsFile('jquery.gardenhandleajaxform.js');
-        $this->AddJsFile('jquery.atwho.js');
-        $this->AddJsFile('global.js');
-        $this->AddCssFile('style.css');
-        $this->AddCssFile('vanillicon.css', 'static');
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('jquery.atwho.js');
+        $this->addJsFile('global.js');
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
 
         // Add modules
-//      $this->AddModule('MeModule');
-        $this->AddModule('GuestModule');
-        $this->AddModule('SignedInModule');
+//      $this->addModule('MeModule');
+        $this->addModule('GuestModule');
+        $this->addModule('SignedInModule');
 
-        parent::Initialize();
+        parent::initialize();
     }
 }

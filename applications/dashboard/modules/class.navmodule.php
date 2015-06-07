@@ -210,12 +210,12 @@ class NavModule extends Gdn_Module {
 
         if ($badge) {
             if (is_numeric($badge)) {
-                $badge = Wrap(number_format($badge), 'span', array('class' => 'Count'));
+                $badge = wrap(number_format($badge), 'span', array('class' => 'Count'));
             }
             $text = '<span class="Aside">'.$badge.'</span> '.$text;
         }
 
-        echo Anchor($text, $href, $class, $link, true)."\n";
+        echo anchor($text, $href, $class, $link, true)."\n";
     }
 
     /**

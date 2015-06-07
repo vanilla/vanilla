@@ -1,28 +1,28 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <ul>
         <li>
             <?php
-            echo $this->Form->Label('Type', 'FormType');
+            echo $this->Form->label('Type', 'FormType');
             echo $this->Form->Dropdown('FormType', $this->Data('FormTypes'));
             ?>
         </li>
         <li class="Label<?php if ($this->Form->GetValue('FormType') == 'DateOfBirth') echo ' Hidden'; ?>">
             <?php
-            echo $this->Form->Label('Label', 'Label');
-            echo $this->Form->TextBox('Label');
+            echo $this->Form->label('Label', 'Label');
+            echo $this->Form->textBox('Label');
             ?>
         </li>
         <li class="Options<?php if ($this->Form->GetValue('FormType') != 'Dropdown') echo ' Hidden'; ?>">
             <?php
 
-            echo $this->Form->Label('Options', 'Options');
-            echo Wrap(T('One option per line'), 'p');
-            echo $this->Form->TextBox('Options', array('MultiLine' => TRUE));
+            echo $this->Form->label('Options', 'Options');
+            echo wrap(T('One option per line'), 'p');
+            echo $this->Form->textBox('Options', array('MultiLine' => TRUE));
             ?>
         </li>
         <li>
@@ -81,4 +81,4 @@ echo $this->Form->Errors();
             }
         }
     </script>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

@@ -31,7 +31,7 @@ class GuestModule extends Gdn_Module {
         }
         parent::__construct($Sender, $ApplicationFolder);
 
-        $this->Visible = C('Garden.Modules.ShowGuestModule');
+        $this->Visible = c('Garden.Modules.ShowGuestModule');
     }
 
     /**
@@ -49,7 +49,7 @@ class GuestModule extends Gdn_Module {
      * @return string
      */
     public function ToString() {
-        if (!Gdn::Session()->IsValid()) {
+        if (!Gdn::session()->isValid()) {
             return parent::ToString();
         }
 

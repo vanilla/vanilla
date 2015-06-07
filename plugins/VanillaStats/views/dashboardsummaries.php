@@ -12,7 +12,7 @@
         <tbody>
         <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
             <tr>
-                <th><?php echo Anchor(htmlspecialchars($Discussion->Name), DiscussionUrl($Discussion)); ?></th>
+                <th><?php echo anchor(htmlspecialchars($Discussion->Name), DiscussionUrl($Discussion)); ?></th>
                 <td><?php echo number_format($Discussion->CountComments); ?></td>
                 <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
                 <td><?php echo number_format($Discussion->CountViews); ?></td>
@@ -34,7 +34,7 @@
         <tbody>
         <?php foreach ($this->Data['UserData'] as $User) { ?>
             <tr>
-                <th><?php echo Anchor($User->Name, 'profile/'.$User->UserID.'/'.Gdn_Format::Url($User->Name)); ?></th>
+                <th><?php echo anchor($User->Name, 'profile/'.$User->UserID.'/'.Gdn_Format::url($User->Name)); ?></th>
                 <td><?php echo number_format($User->CountComments); ?></td>
                 <!-- <td><?php // echo number_format($Discussion->CountViews); ?></td> -->
             </tr>

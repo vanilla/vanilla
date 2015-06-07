@@ -15,14 +15,14 @@ if (!function_exists('WriteAttachment')) {
 
         $customMethod = AttachmentModel::GetWriteAttachmentMethodName($Attachment['Type']);
         if (function_exists($customMethod)) {
-            if (GetValue('Error', $Attachment)) {
+            if (val('Error', $Attachment)) {
                 WriteErrorAttachment($Attachment);
                 return;
             }
             $customMethod($Attachment);
         } else {
-            Trace($customMethod, 'Write Attachment method not found');
-            Trace($Attachment, 'Attachment');
+            trace($customMethod, 'Write Attachment method not found');
+            trace($Attachment, 'Attachment');
         }
         return;
     }
@@ -110,12 +110,12 @@ if (!function_exists('WriteGenericAttachment')) {
      * @return string
      */
     function WriteGenericAttachment($Attachment) {
-        $Type = GetValue('Type', $Attachment);
-        $Icon = GetValue('Icon', $Attachment, 'sign-blank');
-        $Title = GetValue('Title', $Attachment);
-        $Meta = GetValue('Meta', $Attachment);
-        $Body = GetValue('Body', $Attachment);
-        $Fields = GetValue('Fields', $Attachment);
+        $Type = val('Type', $Attachment);
+        $Icon = val('Icon', $Attachment, 'sign-blank');
+        $Title = val('Title', $Attachment);
+        $Meta = val('Meta', $Attachment);
+        $Body = val('Body', $Attachment);
+        $Fields = val('Fields', $Attachment);
 
         ?>
         <div class="item-attachment">
@@ -155,7 +155,7 @@ if (!function_exists('WriteGenericAttachment')) {
                                 <?php if ($Fields): ?>
                                     <dl class="dl-columns">
                                         <?php foreach ($Fields as $Title => $Field): ?>
-                                            <dt><?php echo T($Title); ?></dt>
+                                            <dt><?php echo t($Title); ?></dt>
                                             <dd><?php echo Gdn_Format::Html($Field); ?></dd>
                                         <?php endforeach; ?>
                                     </dl>

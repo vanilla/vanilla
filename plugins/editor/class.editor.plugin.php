@@ -77,21 +77,21 @@ class EditorPlugin extends Gdn_Plugin {
         $this->mediaCache = null;
         $this->mediaCacheExpire = 60 * 60 * 6;
         $this->AssetPath = Asset('/plugins/editor');
-        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
-        $this->ForceWysiwyg = C('Plugins.editor.ForceWysiwyg', false);
+        $this->pluginInfo = Gdn::pluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
+        $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
 
        // Check upload permissions
-        $this->canUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', false);
+        $this->canUpload = Gdn::session()->CheckPermission('Plugins.Attachments.Upload.Allow', false);
 
         if ($this->canUpload) {
-            $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
-            if (!GetValue('AllowFileUploads', $PermissionCategory, true)) {
+            $PermissionCategory = CategoryModel::PermissionCategory(Gdn::controller()->Data('Category'));
+            if (!val('AllowFileUploads', $PermissionCategory, true)) {
                 $this->canUpload = false;
             }
         }
 
        // Check against config, too
-        if (!C('Garden.AllowFileUploads', false)) {
+        if (!c('Garden.AllowFileUploads', false)) {
             $this->canUpload = false;
         }
     }
@@ -371,7 +371,7 @@ class EditorPlugin extends Gdn_Plugin {
         $this->EventArguments['colors'] =& $fontColorList;
         $this->EventArguments['format'] =& $fontFormatOptions;
         $this->EventArguments['font'] =& $fontFamilyOptions;
-        $this->FireEvent('toolbarConfig');
+        $this->fireEvent('toolbarConfig');
 
        // Order the specified dropdowns.
         $this->sortWeightedOptions($fontFormatOptions);
@@ -598,7 +598,7 @@ class EditorPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $c = Gdn::Controller();
+        $c = Gdn::controller();
 
        // If user wants to modify styling of Wysiwyg content in editor,
        // they can override the styles with this file.
@@ -608,39 +608,39 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
        // Load JavaScript used by every editor view.
-        $c->AddJsFile('editor.js', 'plugins/editor');
+        $c->addJsFile('editor.js', 'plugins/editor');
 
        // Fileuploads
-        $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
-        $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
-        $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
+        $c->addJsFile('jquery.ui.widget.js', 'plugins/editor');
+        $c->addJsFile('jquery.iframe-transport.js', 'plugins/editor');
+        $c->addJsFile('jquery.fileupload.js', 'plugins/editor');
 
        // Set definitions for JavaScript to read
-        $c->AddDefinition('editorVersion', $this->pluginInfo['Version']);
-        $c->AddDefinition('editorInputFormat', $this->Format);
-        $c->AddDefinition('editorPluginAssets', $this->AssetPath);
-        $c->AddDefinition('wysiwygHelpText', T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
-        $c->AddDefinition('bbcodeHelpText', T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
-        $c->AddDefinition('htmlHelpText', T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
-        $c->AddDefinition('markdownHelpText', T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
-        $c->AddDefinition('textHelpText', T('editor.TextHelpText', 'You are using plain text in your post.'));
-        $c->AddDefinition('editorWysiwygCSS', $CssPath);
+        $c->addDefinition('editorVersion', $this->pluginInfo['Version']);
+        $c->addDefinition('editorInputFormat', $this->Format);
+        $c->addDefinition('editorPluginAssets', $this->AssetPath);
+        $c->addDefinition('wysiwygHelpText', T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
+        $c->addDefinition('bbcodeHelpText', T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
+        $c->addDefinition('htmlHelpText', T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
+        $c->addDefinition('markdownHelpText', T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
+        $c->addDefinition('textHelpText', T('editor.TextHelpText', 'You are using plain text in your post.'));
+        $c->addDefinition('editorWysiwygCSS', $CssPath);
 
        // Set variables for file uploads
         $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
         $FileMaxSize = Gdn_Upload::UnformatFileSize(ini_get('upload_max_filesize'));
         $ConfigMaxSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1MB'));
         $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
-        $c->AddDefinition('maxUploadSize', $MaxSize);
+        $c->addDefinition('maxUploadSize', $MaxSize);
        // Set file input name
-        $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
+        $c->addDefinition('editorFileInputName', $this->editorFileInputName);
         $Sender->SetData('_editorFileInputName', $this->editorFileInputName);
        // Save allowed file types
-        $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
+        $c->addDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
        // Get max file uploads, to be used for max drops at once.
-        $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
+        $c->addDefinition('maxFileUploads', ini_get('max_file_uploads'));
        // Set canUpload definition here, but not Data (set in BeforeBodyBox) because it overwrites.
-        $c->AddDefinition('canUpload', $this->canUpload);
+        $c->addDefinition('canUpload', $this->canUpload);
     }
 
    /**
@@ -664,8 +664,8 @@ class EditorPlugin extends Gdn_Plugin {
 
        // Make sure we have some sort of format.
         if (!$this->Format) {
-            $this->Format = C('Garden.InputFormatter', 'Html');
-            $Sender->SetValue('Format', $this->Format);
+            $this->Format = c('Garden.InputFormatter', 'Html');
+            $Sender->setValue('Format', $this->Format);
         }
 
        // If force Wysiwyg enabled in settings
@@ -673,15 +673,15 @@ class EditorPlugin extends Gdn_Plugin {
          //&& strcasecmp($this->Format, 'wysiwyg') != 0
          && $this->ForceWysiwyg == true
         ) {
-            $wysiwygBody = Gdn_Format::To($Sender->GetValue('Body'), $this->Format);
-            $Sender->SetValue('Body', $wysiwygBody);
+            $wysiwygBody = Gdn_Format::to($Sender->GetValue('Body'), $this->Format);
+            $Sender->setValue('Body', $wysiwygBody);
 
             $this->Format = 'Wysiwyg';
-            $Sender->SetValue('Format', $this->Format);
+            $Sender->setValue('Format', $this->Format);
         }
 
         if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {
-            $c = Gdn::Controller();
+            $c = Gdn::controller();
 
            // Set minor data for view
             $c->SetData('_EditorInputFormat', $this->Format);
@@ -693,19 +693,19 @@ class EditorPlugin extends Gdn_Plugin {
             if (!isset($c->Data['_EditorToolbar'])) {
                 $editorToolbar = $this->getEditorToolbar($attributes);
                 $this->EventArguments['EditorToolbar'] =& $editorToolbar;
-                $this->FireEvent('InitEditorToolbar');
+                $this->fireEvent('InitEditorToolbar');
 
                // Set data for view
                 $c->SetData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->AddDefinition('canUpload', $this->canUpload);
+            $c->addDefinition('canUpload', $this->canUpload);
             $c->SetData('_canUpload', $this->canUpload);
 
            // Determine which controller (post or discussion) is invoking this.
            // At the moment they're both the same, but in future you may want
            // to know this information to modify it accordingly.
-            $View = $c->FetchView('editor', '', 'plugins/editor');
+            $View = $c->fetchView('editor', '', 'plugins/editor');
 
             $Args['BodyBox'] .= $View;
         }
@@ -725,7 +725,7 @@ class EditorPlugin extends Gdn_Plugin {
 
        // Grab raw upload data ($_FILES), essentially. It's only needed
        // because the methods on the Upload class do not expose all variables.
-        $fileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, false);
+        $fileData = Gdn::request()->GetValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, false);
 
         $discussionID = ($Sender->Request->Post('DiscussionID'))
          ? $Sender->Request->Post('DiscussionID')
@@ -812,7 +812,7 @@ class EditorPlugin extends Gdn_Plugin {
             'ImageHeight' => $imageHeight,
             'ThumbWidth' => $thumbWidth,
             'ThumbHeight' => $thumbHeight,
-            'InsertUserID' => Gdn::Session()->UserID,
+            'InsertUserID' => Gdn::session()->UserID,
             'DateInserted' => date('Y-m-d H:i:s'),
             'StorageMethod' => 'local',
             'Path' => $filePathParsed['SaveName'],
@@ -826,11 +826,11 @@ class EditorPlugin extends Gdn_Plugin {
            // Clear Media cache for discussion, if any.
            /*if ($discussionID) {
             $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
-            Gdn::Cache()->Remove($cacheKey);
+            Gdn::cache()->Remove($cacheKey);
            }*/
 
             if ($generate_thumbnail) {
-                $thumbUrl = Url('/utility/mediathumbnail/'.$MediaID, true);
+                $thumbUrl = url('/utility/mediathumbnail/'.$MediaID, true);
             }
 
             $payload = array(
@@ -875,7 +875,7 @@ class EditorPlugin extends Gdn_Plugin {
        // Save data to database using model with media table
         $Model = new Gdn_Model('Media');
 
-        $Media = $Model->GetID($FileID);
+        $Media = $Model->getID($FileID);
         if ($Media) {
             $Media->ForeignID = $ForeignID;
             $Media->ForeignTable = $ForeignType;
@@ -903,15 +903,15 @@ class EditorPlugin extends Gdn_Plugin {
 
        // Save data to database using model with media table
         $Model = new Gdn_Model('Media');
-        $Media = (array)$Model->GetID($MediaID);
+        $Media = (array)$Model->getID($MediaID);
 
-        $IsOwner = (!empty($Media['InsertUserID']) && Gdn::Session()->UserID == $Media['InsertUserID']);
+        $IsOwner = (!empty($Media['InsertUserID']) && Gdn::session()->UserID == $Media['InsertUserID']);
        // @todo Per-category edit permission would be better, but this global is far simpler to check here.
        // However, this currently matches the permission check in views/attachments.php so keep that in sync.
-        $CanDelete = ($IsOwner || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'));
+        $CanDelete = ($IsOwner || Gdn::session()->CheckPermission('Garden.Moderation.Manage'));
         if ($Media && $CanDelete) {
             try {
-                if ($Model->Delete($MediaID)) {
+                if ($Model->delete($MediaID)) {
                    // unlink the images.
                     $path = PATH_UPLOADS.'/'.$Media['Path'];
                     $thumbPath = PATH_UPLOADS.'/'.$Media['ThumbPath'];
@@ -930,14 +930,14 @@ class EditorPlugin extends Gdn_Plugin {
                     $discussionID = $Media['ForeignID'];
                    } elseif ($Media['ForeignTable'] == 'comment') {
                     $commentModel = new CommentModel();
-                    $commentRow = $commentModel->GetID($Media['ForeignID'], DATASET_TYPE_ARRAY);
+                    $commentRow = $commentModel->getID($Media['ForeignID'], DATASET_TYPE_ARRAY);
                     if ($commentRow) {
                      $discussionID = $commentRow['DiscussionID'];
                     }
                    }
                    if ($discussionID) {
                     $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
-                    Gdn::Cache()->Remove($cacheKey);
+                    Gdn::cache()->Remove($cacheKey);
                    }*/
                 }
             } catch (Exception $e) {
@@ -958,7 +958,7 @@ class EditorPlugin extends Gdn_Plugin {
     public function saveUploads($id, $type) {
 
        // Array of Media IDs, as input is MediaIDs[]
-        $mediaIds = (array)Gdn::Request()->GetValue('MediaIDs');
+        $mediaIds = (array)Gdn::request()->GetValue('MediaIDs');
 
         if (count($mediaIds)) {
             foreach ($mediaIds as $mediaId) {
@@ -967,7 +967,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
        // Array of Media IDs to remove, if any.
-        $removeMediaIds = (array)Gdn::Request()->GetValue('RemoveMediaIDs');
+        $removeMediaIds = (array)Gdn::request()->GetValue('RemoveMediaIDs');
        // Clean it if it's empty.
         $removeMediaIds = array_filter($removeMediaIds);
 
@@ -1070,7 +1070,7 @@ class EditorPlugin extends Gdn_Plugin {
     protected function AttachUploadsToComment($Sender, $Type = 'comment', $row = null) {
 
         $param = ucfirst($Type).'ID';
-        $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
+        $foreignId = val($param, val(ucfirst($Type), $Sender->EventArguments));
 
        // Get all media for the page.
         $mediaList = $this->MediaCache($Sender);
@@ -1088,9 +1088,9 @@ class EditorPlugin extends Gdn_Plugin {
 
             if (count($attachments)) {
                // Loop through the attachments and add a flag if they are found in the source or not.
-                $body = Gdn_Format::To(val('Body', $row), val('Format', $row));
+                $body = Gdn_Format::to(val('Body', $row), val('Format', $row));
                 foreach ($attachments as &$attachment) {
-                    $src = Gdn_Upload::Url($attachment['Path']);
+                    $src = Gdn_Upload::url($attachment['Path']);
                     $src = preg_replace('`^https?:?`i', '', $src);
                     $src = preg_quote($src);
 
@@ -1102,7 +1102,7 @@ class EditorPlugin extends Gdn_Plugin {
 
                 $Sender->SetData('_attachments', $attachments);
                 $Sender->SetData('_editorkey', strtolower($param.$foreignId));
-                echo $Sender->FetchView($this->GetView('attachments.php'));
+                echo $Sender->fetchView($this->GetView('attachments.php'));
             }
         }
     }
@@ -1119,9 +1119,9 @@ class EditorPlugin extends Gdn_Plugin {
             'ConversationID' => $id
             );
 
-            $Conversations = $ConversationMessageModel->GetWhere(
+            $Conversations = $ConversationMessageModel->getWhere(
                 $sqlWhere
-            )->ResultArray();
+            )->resultArray();
         }
 
         $MessageIDList = array();
@@ -1170,11 +1170,11 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         if (is_null($DiscussionID) && !empty($Comments)) {
-            $DiscussionID = $Comments->FirstRow()->DiscussionID;
+            $DiscussionID = $Comments->firstRow()->DiscussionID;
         }
 
         if ($DiscussionID) {
-            if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
+            if ($Comments instanceof Gdn_DataSet && $Comments->numRows()) {
                 $Comments->DataSeek(-1);
                 while ($Comment = $Comments->NextRow()) {
                     $CommentIDList[] = $Comment->CommentID;
@@ -1234,7 +1234,7 @@ class EditorPlugin extends Gdn_Plugin {
         $mediaDataComment = array();
 
        /*$cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
-       $cacheResponse = Gdn::Cache()->Get($cacheKey);
+       $cacheResponse = Gdn::cache()->get($cacheKey);
        if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {*/
         $mediaModel = new Gdn_Model('Media');
 
@@ -1246,9 +1246,9 @@ class EditorPlugin extends Gdn_Plugin {
                 'ForeignID' => $discussionID
                 );
 
-                $mediaDataDiscussion = $mediaModel->GetWhere(
+                $mediaDataDiscussion = $mediaModel->getWhere(
                     $sqlWhere
-                )->ResultArray();
+                )->resultArray();
             }
         }
 
@@ -1266,14 +1266,14 @@ class EditorPlugin extends Gdn_Plugin {
             'ForeignID' => $commentIDList
             );
 
-            $mediaDataComment = $mediaModel->GetWhere(
+            $mediaDataComment = $mediaModel->getWhere(
                 $sqlWhere
-            )->ResultArray();
+            )->resultArray();
         }
 
         $mediaData = array_merge($mediaDataDiscussion, $mediaDataComment);
        /*
-         Gdn::Cache()->Store($cacheKey, $mediaData, array(
+         Gdn::cache()->store($cacheKey, $mediaData, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->mediaCacheExpire
          ));
        } else {
@@ -1284,7 +1284,7 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     public function PostController_DiscussionFormOptions_Handler($Sender, $Args) {
-        if (!is_null($Discussion = GetValue('Discussion', $Sender, null))) {
+        if (!is_null($Discussion = val('Discussion', $Sender, null))) {
             $Sender->EventArguments['Type'] = 'Discussion';
             $Sender->EventArguments['Discussion'] = $Discussion;
             $this->AttachUploadsToComment($Sender, 'discussion');
@@ -1408,12 +1408,12 @@ class EditorPlugin extends Gdn_Plugin {
         $Cf->Initialize(array(
          'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats),
          'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'),
-         'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => C('Garden.MobileInputFormatter'))
+         'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => c('Garden.MobileInputFormatter'))
         ));
 
        // Add some JS and CSS to blur out option when Wysiwyg not chosen.
-        $c = Gdn::Controller();
-        $c->AddJsFile('settings.js', 'plugins/editor');
+        $c = Gdn::controller();
+        $c->addJsFile('settings.js', 'plugins/editor');
         $Sender->AddCssFile('settings.css', 'plugins/editor');
 
         $Sender->AddSideMenu();
@@ -1427,7 +1427,7 @@ class EditorPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Appearance', T('Appearance'));
-      $Menu->AddLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
+      $Menu->addLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
    }
    */
 
@@ -1446,7 +1446,7 @@ class EditorPlugin extends Gdn_Plugin {
         );
 
         foreach ($pluginEditors as $pluginName) {
-            Gdn::PluginManager()->DisablePlugin($pluginName);
+            Gdn::pluginManager()->DisablePlugin($pluginName);
         }
 
         TouchConfig(array(
@@ -1461,11 +1461,11 @@ class EditorPlugin extends Gdn_Plugin {
        // Set to false by default, so change in config if uploads allowed.
         TouchConfig('Garden.AllowFileUploads', true);
 
-        $Structure = Gdn::Structure();
+        $Structure = Gdn::structure();
         $Structure
-         ->Table('Category')
-         ->Column('AllowFileUploads', 'tinyint(1)', '1')
-         ->Set();
+         ->table('Category')
+         ->column('AllowFileUploads', 'tinyint(1)', '1')
+         ->set();
     }
 
     public function OnDisable() {
@@ -1485,16 +1485,16 @@ class EditorPlugin extends Gdn_Plugin {
         require 'generate_thumbnail.php';
 
         $model = new Gdn_Model('Media');
-        $media = $model->GetID($media_id, DATASET_TYPE_ARRAY);
+        $media = $model->getID($media_id, DATASET_TYPE_ARRAY);
 
         if (!$media) {
-            throw NotFoundException('File');
+            throw notFoundException('File');
         }
 
        // Get actual path to the file.
         $local_path = Gdn_Upload::CopyLocal($media['Path']);
         if (!file_exists($local_path)) {
-            throw NotFoundException('File');
+            throw notFoundException('File');
         }
 
         $file_extension = pathinfo($local_path, PATHINFO_EXTENSION);
@@ -1508,7 +1508,7 @@ class EditorPlugin extends Gdn_Plugin {
        // Create thumbnail, and grab debug data from whole process.
         $thumb_payload = generate_thumbnail($local_path, $thumb_destination_path, array(
          // Give preference to height for thumbnail, so height controls.
-         'height' => C('Plugins.FileUpload.ThumbnailHeight', 128)
+         'height' => c('Plugins.FileUpload.ThumbnailHeight', 128)
         ));
 
         if ($thumb_payload['success'] === true) {
@@ -1555,7 +1555,7 @@ class EditorPlugin extends Gdn_Plugin {
             $url = Asset('/plugins/FileUpload/images/file.png');
         }
 
-        Redirect($url, 301);
+        redirect($url, 301);
     }
 
    // Copy the Spoilers plugin functionality into the editor so that plugin

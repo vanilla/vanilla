@@ -279,7 +279,7 @@ class ConversationMessageModel extends ConversationsModel {
             // Collapse for call to UpdateUserCache and ActivityModel.
             $InsertUserFound = false;
             foreach ($UserData as $UpdateUser) {
-                $LastMessageID = GetValue('LastMessageID', $UpdateUser);
+                $LastMessageID = val('LastMessageID', $UpdateUser);
                 $UserID = val('UserID', $UpdateUser);
                 $Deleted = val('Deleted', $UpdateUser);
 
@@ -320,7 +320,7 @@ class ConversationMessageModel extends ConversationsModel {
                 $ConversationModel->updateUserUnreadCount($UpdateCountUserIDs, true);
             }
 
-            $this->FireEvent('AfterAdd');
+            $this->fireEvent('AfterAdd');
 
             $ActivityModel = new ActivityModel();
             foreach ($NotifyUserIDs as $NotifyUserID) {

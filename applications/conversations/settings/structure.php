@@ -24,7 +24,7 @@ $Px = $Database->DatabasePrefix;
 // ppl. This table keeps track of the unique id of the conversation, the person
 // who started the conversation (and when), and the last person to contribute to
 // the conversation (and when).
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
+// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->table('Conversation');
 
 $UpdateCountMessages = $Construct->tableExists() && !$Construct->columnExists('CountMessages');

@@ -11,11 +11,11 @@ $editorkey = $this->Data('_editorkey');
 
       <?php
 
-      $isOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == $attachment['InsertUserID']));
+      $isOwner = (Gdn::session()->isValid() && (Gdn::session()->UserID == $attachment['InsertUserID']));
       $viewerCssClass = ($isOwner)
          ? 'file-owner'
          : 'file-readonly';
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+      if (Gdn::session()->CheckPermission('Garden.Moderation.Manage')) {
          $viewerCssClass = 'file-owner';
       }
       if (val('InBody', $attachment)) {

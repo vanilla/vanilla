@@ -25,33 +25,33 @@ class BookmarkedModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
-        $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', true);
+        $this->Visible = c('Vanilla.Modules.ShowBookmarkedModule', true);
     }
 
     public function GetData() {
-        if (Gdn::Session()->IsValid()) {
-            $BookmarkIDs = Gdn::SQL()
-                ->Select('DiscussionID')
-                ->From('UserDiscussion')
-                ->Where('UserID', Gdn::Session()->UserID)
-                ->Where('Bookmarked', 1)
-                ->Get()->ResultArray();
-            $BookmarkIDs = ConsolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
+        if (Gdn::session()->isValid()) {
+            $BookmarkIDs = Gdn::sql()
+                ->select('DiscussionID')
+                ->from('UserDiscussion')
+                ->where('UserID', Gdn::session()->UserID)
+                ->where('Bookmarked', 1)
+                ->get()->resultArray();
+            $BookmarkIDs = consolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
 
             if (count($BookmarkIDs)) {
                 $DiscussionModel = new DiscussionModel();
                 DiscussionModel::CategoryPermissions();
 
-                $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
+                $DiscussionModel->SQL->whereIn('d.DiscussionID', $BookmarkIDs);
 
-                $Bookmarks = $DiscussionModel->Get(
+                $Bookmarks = $DiscussionModel->get(
                     0,
                     $this->Limit,
                     array('w.Bookmarked' => '1')
                 );
-                $this->SetData('Bookmarks', $Bookmarks);
+                $this->setData('Bookmarks', $Bookmarks);
             } else {
-                $this->SetData('Bookmarks', new Gdn_DataSet());
+                $this->setData('Bookmarks', new Gdn_DataSet());
             }
         }
     }
@@ -61,13 +61,13 @@ class BookmarkedModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!$this->Data('Bookmarks')) {
+        if (!$this->data('Bookmarks')) {
             $this->GetData();
         }
 
-        $Bookmarks = $this->Data('Bookmarks');
+        $Bookmarks = $this->data('Bookmarks');
 
-        if (is_object($Bookmarks) && ($Bookmarks->NumRows() > 0 || $this->Help)) {
+        if (is_object($Bookmarks) && ($Bookmarks->numRows() > 0 || $this->Help)) {
             return parent::ToString();
         }
 

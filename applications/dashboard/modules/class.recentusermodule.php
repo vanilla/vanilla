@@ -27,12 +27,12 @@ class RecentUserModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (!C('Garden.Modules.ShowRecentUserModule')) {
+        if (!c('Garden.Modules.ShowRecentUserModule')) {
             return '';
         }
 
         $Data = $this->_Sender->RecentUserData;
-        if ($Data !== false && $Data->NumRows() > 0) {
+        if ($Data !== false && $Data->numRows() > 0) {
             return parent::ToString();
         }
 

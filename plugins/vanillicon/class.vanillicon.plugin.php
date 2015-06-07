@@ -96,17 +96,17 @@ if (!function_exists('UserPhotoDefaultUrl')) {
     function UserPhotoDefaultUrl($user, $options = array()) {
         static $iconSize = null, $type = null;
         if ($iconSize === null) {
-            $thumbSize = C('Garden.Thumbnail.Size');
+            $thumbSize = c('Garden.Thumbnail.Size');
             $iconSize = $thumbSize <= 50 ? 50 : 100;
         }
         if ($type === null) {
-            $type = C('Plugins.Vanillicon.Type');
+            $type = c('Plugins.Vanillicon.Type');
         }
         $size = val('Size', $options, $iconSize);
 
         $email = val('Email', $user);
         if (!$email) {
-            $email = GetValue('UserID', $user, 100);
+            $email = val('UserID', $user, 100);
         }
         $hash = md5($email);
         $px = substr($hash, 0, 1);

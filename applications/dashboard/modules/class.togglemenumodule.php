@@ -28,7 +28,7 @@ class ToggleMenuModule extends Gdn_Module {
      */
     public function AddLabel($Name, $Code = '', $Url = '') {
         if ($Code == '') {
-            $Code = Gdn_Format::Url(ucwords(trim(Gdn_Format::PlainText($Name))));
+            $Code = Gdn_Format::url(ucwords(trim(Gdn_Format::PlainText($Name))));
         }
 
         $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
@@ -61,13 +61,13 @@ class ToggleMenuModule extends Gdn_Module {
     public function ToString() {
         $Return = '<ul class="FilterMenu ToggleMenu">';
         foreach ($this->_Labels as $Label) {
-            $Url = GetValue('Url', $Label, '');
+            $Url = val('Url', $Label, '');
             if ($Url == '') {
                 $Url = '#';
             }
 
-            $Name = GetValue('Name', $Label, '');
-            $Code = GetValue('Code', $Label, '');
+            $Name = val('Name', $Label, '');
+            $Code = val('Code', $Label, '');
             $Active = strcasecmp($Code, $this->CurrentLabelCode()) == 0;
             $CssClass = 'Handle-'.$Code;
             $AnchorClass = '';
@@ -77,7 +77,7 @@ class ToggleMenuModule extends Gdn_Module {
             }
 
             $Return .= '<li class="'.$CssClass.'">';
-            $Return .= Anchor($Name, $Url, $AnchorClass);
+            $Return .= anchor($Name, $Url, $AnchorClass);
             $Return .= '</li>';
         }
         $Return .= '</ul>';

@@ -6,7 +6,7 @@
  * For example, to create a page at http://localhost/garden/plugin/mynewmethod
  * your plugin should have a method called:
  *  public function PluginController_MyNewMethod_Create($Sender) {
- *     $Sender->Render('/path/to/some/view.php');
+ *     $Sender->render('/path/to/some/view.php');
  *  }
  *
  * @copyright 2009-2015 Vanilla Forums Inc.

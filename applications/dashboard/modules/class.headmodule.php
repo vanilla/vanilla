@@ -78,7 +78,7 @@ if (!class_exists('HeadModule', false)) {
                 }
             }
 
-            $this->AddTag('link', $Properties);
+            $this->addTag('link', $Properties);
         }
 
         /**
@@ -88,10 +88,10 @@ if (!class_exists('HeadModule', false)) {
          * @param $Title
          */
         public function AddRss($HRef, $Title) {
-            $this->AddTag('link', array(
+            $this->addTag('link', array(
                 'rel' => 'alternate',
                 'type' => 'application/rss+xml',
-                'title' => Gdn_Format::Text($Title),
+                'title' => Gdn_Format::text($Title),
                 'href' => Asset($HRef)
             ));
         }
@@ -144,7 +144,7 @@ if (!class_exists('HeadModule', false)) {
 
             $Attributes = array();
             if ($Src) {
-                $Attributes['src'] = Asset($Src, false, GetValue('version', $Options));
+                $Attributes['src'] = Asset($Src, false, val('version', $Options));
             }
             $Attributes['type'] = $Type;
             if (isset($Options['defer'])) {
@@ -155,7 +155,7 @@ if (!class_exists('HeadModule', false)) {
                 $Attributes['_'.strtolower($Key)] = $Value;
             }
 
-            $this->AddTag('script', $Attributes);
+            $this->addTag('script', $Attributes);
         }
 
         /**
@@ -260,7 +260,7 @@ if (!class_exists('HeadModule', false)) {
         public function SetFavIcon($HRef) {
             if (!$this->_FavIconSet) {
                 $this->_FavIconSet = true;
-                $this->AddTag(
+                $this->addTag(
                     'link',
                     array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
                     null,
@@ -292,18 +292,18 @@ if (!class_exists('HeadModule', false)) {
             if ($Title != '') {
                 // Apply $Title to $this->_Title and return it;
                 $this->_Title = $Title;
-                $this->_Sender->Title($Title);
+                $this->_Sender->title($Title);
                 return $Title;
             } elseif ($this->_Title != '') {
                 // Return $this->_Title if set;
                 return $this->_Title;
             } elseif ($NoSubTitle) {
-                return GetValueR('Data.Title', $this->_Sender, '');
+                return valr('Data.Title', $this->_Sender, '');
             } else {
-                $Subtitle = GetValueR('Data._Subtitle', $this->_Sender, C('Garden.Title'));
+                $Subtitle = valr('Data._Subtitle', $this->_Sender, c('Garden.Title'));
 
                 // Default Return title from controller's Data.Title + banner title;
-                return ConcatSep(' - ', GetValueR('Data.Title', $this->_Sender, ''), $Subtitle);
+                return ConcatSep(' - ', valr('Data.Title', $this->_Sender, ''), $Subtitle);
             }
         }
 
@@ -323,8 +323,8 @@ if (!class_exists('HeadModule', false)) {
             }
             $Cmp = strcasecmp($A[self::TAG_KEY], $B[self::TAG_KEY]);
             if ($Cmp == 0) {
-                $SortA = GetValue(self::SORT_KEY, $A, 0);
-                $SortB = GetValue(self::SORT_KEY, $B, 0);
+                $SortA = val(self::SORT_KEY, $A, 0);
+                $SortB = val(self::SORT_KEY, $B, 0);
                 if ($SortA < $SortB) {
                     $Cmp = -1;
                 } elseif ($SortA > $SortB)
@@ -339,62 +339,62 @@ if (!class_exists('HeadModule', false)) {
          */
         public function ToString() {
             // Add the canonical Url if necessary.
-            if (method_exists($this->_Sender, 'CanonicalUrl') && !C('Garden.Modules.NoCanonicalUrl', false)) {
-                $CanonicalUrl = $this->_Sender->CanonicalUrl();
+            if (method_exists($this->_Sender, 'CanonicalUrl') && !c('Garden.Modules.NoCanonicalUrl', false)) {
+                $CanonicalUrl = $this->_Sender->canonicalUrl();
 
-                if (!IsUrl($CanonicalUrl)) {
-                    $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
+                if (!isUrl($CanonicalUrl)) {
+                    $CanonicalUrl = Gdn::router()->ReverseRoute($CanonicalUrl);
                 }
 
-                $this->_Sender->CanonicalUrl($CanonicalUrl);
-//            $CurrentUrl = Url('', TRUE);
+                $this->_Sender->canonicalUrl($CanonicalUrl);
+//            $CurrentUrl = url('', true);
 //            if ($CurrentUrl != $CanonicalUrl) {
-                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
+                $this->addTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
 //            }
             }
 
             // Include facebook open-graph meta information.
-            if ($FbAppID = C('Plugins.Facebook.ApplicationID')) {
-                $this->AddTag('meta', array('property' => 'fb:app_id', 'content' => $FbAppID));
+            if ($FbAppID = c('Plugins.Facebook.ApplicationID')) {
+                $this->addTag('meta', array('property' => 'fb:app_id', 'content' => $FbAppID));
             }
 
-            $SiteName = C('Garden.Title', '');
+            $SiteName = c('Garden.Title', '');
             if ($SiteName != '') {
-                $this->AddTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
+                $this->addTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
             }
 
-            $Title = Gdn_Format::Text($this->Title('', true));
+            $Title = Gdn_Format::text($this->title('', true));
             if ($Title != '') {
-                $this->AddTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
+                $this->addTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
             }
 
             if (isset($CanonicalUrl)) {
-                $this->AddTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
+                $this->addTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
             }
 
             if ($Description = $this->_Sender->Description()) {
-                $this->AddTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
+                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
             }
 
             // Default to the site logo if there were no images provided by the controller.
             if (count($this->_Sender->Image()) == 0) {
-                $Logo = C('Garden.ShareImage', C('Garden.Logo', ''));
+                $Logo = c('Garden.ShareImage', c('Garden.Logo', ''));
                 if ($Logo != '') {
                     // Fix the logo path.
-                    if (StringBeginsWith($Logo, 'uploads/')) {
+                    if (stringBeginsWith($Logo, 'uploads/')) {
                         $Logo = substr($Logo, strlen('uploads/'));
                     }
 
-                    $Logo = Gdn_Upload::Url($Logo);
-                    $this->AddTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
+                    $Logo = Gdn_Upload::url($Logo);
+                    $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
                 }
             } else {
                 foreach ($this->_Sender->Image() as $Img) {
-                    $this->AddTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
+                    $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
                 }
             }
 
-            $this->FireEvent('BeforeToString');
+            $this->fireEvent('BeforeToString');
 
             $Tags = $this->_Tags;
 
@@ -404,7 +404,7 @@ if (!class_exists('HeadModule', false)) {
             $Tags2 = $this->_Tags;
 
             // Start with the title.
-            $Head = '<title>'.Gdn_Format::Text($this->Title())."</title>\n";
+            $Head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
 
             $TagStrings = array();
             // Loop through each tag.
@@ -412,9 +412,9 @@ if (!class_exists('HeadModule', false)) {
                 $Tag = $Attributes[self::TAG_KEY];
 
                 // Inline the content of the tag, if necessary.
-                if (GetValue('_hint', $Attributes) == 'inline') {
-                    $Path = GetValue('_path', $Attributes);
-                    if (!StringBeginsWith($Path, 'http')) {
+                if (val('_hint', $Attributes) == 'inline') {
+                    $Path = val('_path', $Attributes);
+                    if (!stringBeginsWith($Path, 'http')) {
                         $Attributes[self::CONTENT_KEY] = file_get_contents($Path);
 
                         if (isset($Attributes['src'])) {

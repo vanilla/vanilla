@@ -52,7 +52,7 @@ require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
 
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
-Gdn_Autoloader::start();
+Gdn_Autoloader::Start();
 
 // Guard against broken cache files
 if (!class_exists('Gdn')) {
@@ -86,7 +86,7 @@ if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
 
 Gdn::Config()->Caching(TRUE);
 
-debug(C('Debug', FALSE));
+Debug(C('Debug', FALSE));
 
 // Default request object
 Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', NULL, Gdn::FactoryRealSingleton, 'Create');
@@ -101,7 +101,7 @@ Gdn::Request()->FromEnvironment();
 
 // ApplicationManager
 Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_APPLICATION);
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
 
 // ThemeManager
 Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
@@ -139,10 +139,10 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
 }
 
 if (C('Debug')) {
-    debug(TRUE);
+    Debug(TRUE);
 }
 
-Gdn_Cache::trace(debug());
+Gdn_Cache::Trace(Debug());
 
 /**
  * Factory Services
@@ -213,11 +213,11 @@ unset($Hooks_Path);
 
 // Themes startup
 Gdn::ThemeManager()->Start();
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_THEME);
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
 
 // Plugins startup
 Gdn::PluginManager()->Start();
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 /**
  * Locales

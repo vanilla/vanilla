@@ -64,7 +64,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <div class="Info">
-        <?php echo T('Facebook Connect allows users to sign in using their Facebook account.', 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>'); ?>
+        <?php echo t('Facebook Connect allows users to sign in using their Facebook account.', 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>'); ?>
     </div>
     <div class="Configuration">
         <div class="ConfigurationForm">

@@ -16,7 +16,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * No setup required.
      */
-    public function Setup() {
+    public function setup() {
     }
 
     /**

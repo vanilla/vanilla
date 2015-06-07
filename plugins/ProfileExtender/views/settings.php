@@ -24,10 +24,10 @@ $Fields = $this->data('ExtendedFields');
         <tr>
             <td><?php echo $Field['Label']; ?></td>
             <td><?php echo $Field['FormType']; ?></td>
-            <td><?php echo (val('Required', $Field, 0)) ? T('Yes') : T('No'); ?></td>
-            <td><?php echo (val('OnRegister', $Field, 0)) ? T('Yes') : T('No'); ?></td>
-            <td><?php echo (val('OnProfile', $Field, 1)) ? T('Yes') : T('No'); ?></td>
-            <!--<td><?php echo (val('OnDiscussion', $Field, 0)) ? T('Yes') : T('No'); ?></td>-->
+            <td><?php echo (val('Required', $Field, 0)) ? t('Yes') : t('No'); ?></td>
+            <td><?php echo (val('OnRegister', $Field, 0)) ? t('Yes') : t('No'); ?></td>
+            <td><?php echo (val('OnProfile', $Field, 1)) ? t('Yes') : t('No'); ?></td>
+            <!--<td><?php echo (val('OnDiscussion', $Field, 0)) ? t('Yes') : t('No'); ?></td>-->
             <td><?php echo anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup SmallButton').
                     ' '.anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup SmallButton'); ?></td>
         </tr>

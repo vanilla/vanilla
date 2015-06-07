@@ -5,7 +5,7 @@ $ElementID = $this->Data['Plugin.Flagging.Data']['ElementID'];
 $URL = $this->Data['Plugin.Flagging.Data']['URL'];
 $Title = sprintf("Flag this %s", ucfirst($this->Data['Plugin.Flagging.Data']['Context']));
 ?>
-    <h2><?php echo T($Title); ?></h2>
+    <h2><?php echo t($Title); ?></h2>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -13,10 +13,10 @@ echo $this->Form->errors();
     <ul>
         <li>
             <div class="Warning">
-                <?php echo T('FlagForReview', "You are about to flag this for moderator review. If you're sure you want to do this,
+                <?php echo t('FlagForReview', "You are about to flag this for moderator review. If you're sure you want to do this,
          please enter a brief reason below, then press 'Flag this!'."); ?>
             </div>
-            <?php echo T('FlagLinkContent', 'Link to content:').' '.anchor(T('FlagLinkFormat', "{$UcContext} #{$ElementID}"), $URL); ?> &ndash;
+            <?php echo t('FlagLinkContent', 'Link to content:').' '.anchor(t('FlagLinkFormat', "{$UcContext} #{$ElementID}"), $URL); ?> &ndash;
             <?php echo $this->Data['Plugin.Flagging.Data']['ElementAuthor']; ?>
         </li>
         <li>

@@ -12,14 +12,27 @@
  */
 class InThisDiscussionModule extends Gdn_Module {
 
+    /** @var array */
     protected $_UserData;
 
+    /**
+     *
+     *
+     * @param string $Sender
+     */
     public function __construct($Sender = '') {
         $this->_UserData = false;
         parent::__construct($Sender);
     }
 
-    public function GetData($DiscussionID, $Limit = 50) {
+    /**
+     *
+     *
+     * @param $DiscussionID
+     * @param int $Limit
+     * @throws Exception
+     */
+    public function getData($DiscussionID, $Limit = 50) {
         $SQL = Gdn::sql();
         $this->_UserData = $SQL
             ->select('u.UserID, u.Name, u.Photo')
@@ -33,11 +46,21 @@ class InThisDiscussionModule extends Gdn_Module {
             ->get();
     }
 
-    public function AssetTarget() {
+    /**
+     * Default render location.
+     *
+     * @return string
+     */
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    /**
+     * Build HTML.
+     *
+     * @return string HTML.
+     */
+    public function toString() {
         if ($this->_UserData->numRows() == 0) {
             return '';
         }
@@ -46,15 +69,15 @@ class InThisDiscussionModule extends Gdn_Module {
         ob_start();
         ?>
         <div class="Box">
-            <?php echo panelHeading(T('In this Discussion')); ?>
+            <?php echo panelHeading(t('In this Discussion')); ?>
             <ul class="PanelInfo">
                 <?php foreach ($this->_UserData->Result() as $User) :
 ?>
                     <li>
                         <?php
                         echo anchor(
-                            wrap(Wrap(Gdn_Format::date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
-                            wrap(Wrap(val('Name', $User), 'span', array('class' => 'Username')), 'span'),
+                            wrap(wrap(Gdn_Format::date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
+                            wrap(wrap(val('Name', $User), 'span', array('class' => 'Username')), 'span'),
                             userUrl($User)
                         )
                         ?>

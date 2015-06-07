@@ -39,7 +39,7 @@ class TagModule extends Gdn_Module {
      */
     public function __set($Name, $Value) {
         if ($Name == 'Context') {
-            $this->AutoContext($Value);
+            $this->autoContext($Value);
         }
     }
 
@@ -48,7 +48,7 @@ class TagModule extends Gdn_Module {
      *
      * @param null $Hint
      */
-    protected function AutoContext($Hint = null) {
+    protected function autoContext($Hint = null) {
         // If we're already configured, don't auto configure
         if (!is_null($this->ParentID) && is_null($Hint)) {
             return;
@@ -98,10 +98,10 @@ class TagModule extends Gdn_Module {
      *
      * @throws Exception
      */
-    public function GetData() {
+    public function getData() {
         $TagQuery = Gdn::sql();
 
-        $this->AutoContext();
+        $this->autoContext();
 
         $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
         switch ($this->ParentType) {
@@ -113,13 +113,13 @@ class TagModule extends Gdn_Module {
                     ->select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
                     ->where('td.CategoryID', $this->ParentID)
                     ->groupBy('td.TagID')
-                    ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+                    ->cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
                 break;
 
             case 'Global':
                 $TagCacheKey = 'TagModule-Global';
                 $TagQuery->where('t.CountDiscussions >', 0, false)
-                    ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+                    ->cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
 
                 if ($this->CategorySearch) {
                     $TagQuery->where('t.CategoryID', '-1');
@@ -139,7 +139,7 @@ class TagModule extends Gdn_Module {
                 ->get();
         }
 
-        $this->_TagData->DatasetType(DATASET_TYPE_ARRAY);
+        $this->_TagData->datasetType(DATASET_TYPE_ARRAY);
     }
 
     /**
@@ -147,7 +147,7 @@ class TagModule extends Gdn_Module {
      *
      * @return string
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
@@ -156,9 +156,9 @@ class TagModule extends Gdn_Module {
      *
      * @return string
      */
-    public function InlineDisplay() {
+    public function inlineDisplay() {
         if (!$this->_TagData) {
-            $this->GetData();
+            $this->getData();
         }
 
         if ($this->_TagData->numRows() == 0) {
@@ -169,7 +169,7 @@ class TagModule extends Gdn_Module {
         ob_start();
         ?>
         <div class="InlineTags Meta">
-            <?php echo T('Tagged'); ?>:
+            <?php echo t('Tagged'); ?>:
             <ul>
                 <?php foreach ($this->_TagData->resultArray() as $Tag) :
 ?>
@@ -199,9 +199,9 @@ endforeach; ?>
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!$this->_TagData) {
-            $this->GetData();
+            $this->getData();
         }
 
         if ($this->_TagData->numRows() == 0) {
@@ -212,9 +212,9 @@ endforeach; ?>
         ob_start();
         ?>
         <div class="Box Tags">
-            <?php echo panelHeading(T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
+            <?php echo panelHeading(t($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
             <ul class="TagCloud">
-                <?php foreach ($this->_TagData->Result() as $Tag) :
+                <?php foreach ($this->_TagData->result() as $Tag) :
 ?>
                     <?php if ($Tag['Name'] != '') :
 ?>

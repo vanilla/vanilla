@@ -28,7 +28,7 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function RoleController_AfterRolesInfo_handler($Sender) {
+    public function roleController_afterRolesInfo_handler($Sender) {
         if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
@@ -38,10 +38,10 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         $Style = array('style' => 'background: #ff0; padding: 2px 4px; margin: 0 10px 2px 0; display: inline-block;');
         if ($Private) {
             echo wrap('Your community is currently <strong>PRIVATE</strong>.', 'span', $Style);
-            echo wrap(Anchor('Switch to PUBLIC', 'settings/privatecommunity/on/'.Gdn::session()->TransientKey(), 'SmallButton').'(Everyone will see inside your community)', 'div');
+            echo wrap(anchor('Switch to PUBLIC', 'settings/privatecommunity/on/'.Gdn::session()->transientKey(), 'SmallButton').'(Everyone will see inside your community)', 'div');
         } else {
             echo wrap('Your community is currently <strong>PUBLIC</strong>.', 'span', $Style);
-            echo wrap(Anchor('Switch to PRIVATE', 'settings/privatecommunity/off/'.Gdn::session()->TransientKey(), 'SmallButton').'(Only members will see inside your community)', 'div');
+            echo wrap(anchor('Switch to PRIVATE', 'settings/privatecommunity/off/'.Gdn::session()->transientKey(), 'SmallButton').'(Only members will see inside your community)', 'div');
         }
         echo '</div>';
     }
@@ -51,7 +51,7 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function SettingsController_PrivateCommunity_Create($Sender) {
+    public function settingsController_privateCommunity_create($Sender) {
         $Session = Gdn::session();
         $Switch = val(0, $Sender->RequestArgs);
         $TransientKey = val(1, $Sender->RequestArgs);
@@ -67,6 +67,6 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
     /**
      * No setup.
      */
-    public function Setup() {
+    public function setup() {
     }
 }

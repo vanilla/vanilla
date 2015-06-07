@@ -42,8 +42,8 @@ $editorkey = $this->data('_editorkey');
                target="_blank"><?php echo htmlspecialchars($attachment['Name']); ?></a>
             <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
          </div>
-         <span class="editor-file-remove" title="<?php echo T('Remove'); ?>"></span>
-         <span class="editor-file-reattach" title="<?php echo T('Click to re-attach'); ?>"></span>
+         <span class="editor-file-remove" title="<?php echo t('Remove'); ?>"></span>
+         <span class="editor-file-reattach" title="<?php echo t('Click to re-attach'); ?>"></span>
       </div>
 
    <?php endforeach; ?>

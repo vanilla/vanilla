@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
 /**
  * InThisDiscussion plugin.
  *
@@ -14,12 +12,9 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
     'Name' => 'In This Discussion',
     'Description' => "Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.",
     'Version' => '1',
-    'Requires' => false, // This would normally be an array of plugin names/versions that this plugin requires
-    'HasLocale' => false,
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
-    'RegisterPermissions' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'SettingsUrl' => '/settings/inthisdiscussion'
 );
@@ -29,38 +24,49 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
  */
 class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
 
-    // Setup settings page
-    public function SettingsController_InThisDiscussion_Create($Sender) {
+    /**
+     * Setup settings page.
+     *
+     * @param $Sender
+     */
+    public function settingsController_inThisDiscussion_create($Sender) {
         $Sender->permission('Garden.Settings.Manage');
-        $Sender->setData('Title', T('In This Discussion Settings'));
+        $Sender->setData('Title', t('In This Discussion Settings'));
         $Sender->addSideMenu('dashboard/settings/plugins');
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(
             'Plugins.VanillaInThisDiscussion.Limit' => array(
-                'Description' => T('User Limit'),
+                'Description' => t('User Limit'),
                 'Default' => 20,
-                'LabelCode' => T('Enter a limit for the number of users displayed')
+                'LabelCode' => t('Enter a limit for the number of users displayed')
             )
         ));
-
 
         $Conf->renderAll();
     }
 
-    public function DiscussionController_BeforeDiscussionRender_handler($Sender) {
+    /**
+     *
+     *
+     * @param $Sender
+     */
+    public function discussionController_beforeDiscussionRender_handler($Sender) {
         // Handle limit
         $Limit = c('Plugins.VanillaInThisDiscussion.Limit', 20);
 
         // Render
         include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
         $InThisDiscussionModule = new InThisDiscussionModule($Sender);
-        $InThisDiscussionModule->GetData($Sender->data('Discussion.DiscussionID'), $Limit);
+        $InThisDiscussionModule->getData($Sender->data('Discussion.DiscussionID'), $Limit);
         $Sender->addModule($InThisDiscussionModule);
 
     }
 
-    public function Setup() {
+    /**
+     *
+     */
+    public function setup() {
         // No setup required
     }
 }

@@ -55,11 +55,11 @@ class ButtonBarPlugin extends Gdn_Plugin {
         $Sender->addJsFile('buttonbar.js', 'plugins/ButtonBar');
         $Sender->addJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
 
-        $Sender->addDefinition('ButtonBarLinkUrl', T('ButtonBar.LinkUrlText', 'Enter your URL:'));
-        $Sender->addDefinition('ButtonBarImageUrl', T('ButtonBar.ImageUrlText', 'Enter image URL:'));
-        $Sender->addDefinition('ButtonBarBBCodeHelpText', T('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
-        $Sender->addDefinition('ButtonBarHtmlHelpText', T('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
-        $Sender->addDefinition('ButtonBarMarkdownHelpText', T('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarLinkUrl', t('ButtonBar.LinkUrlText', 'Enter your URL:'));
+        $Sender->addDefinition('ButtonBarImageUrl', t('ButtonBar.ImageUrlText', 'Enter image URL:'));
+        $Sender->addDefinition('ButtonBarBBCodeHelpText', t('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarHtmlHelpText', t('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarMarkdownHelpText', t('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
 
         $Sender->addDefinition('InputFormat', $Formatter);
     }
@@ -76,10 +76,10 @@ class ButtonBarPlugin extends Gdn_Plugin {
         }
         $this->attachButtonBar($Sender, $Wrap);
     }
-//   public function DiscussionController_BeforeBodyField_handler($Sender) {
+//   public function discussionController_BeforeBodyField_handler($Sender) {
 //      $this->AttachButtonBar($Sender);
 //   }
-//   public function PostController_BeforeBodyField_handler($Sender) {
+//   public function postController_BeforeBodyField_handler($Sender) {
 //      $this->AttachButtonBar($Sender);
 //   }
 

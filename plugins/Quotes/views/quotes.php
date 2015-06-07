@@ -7,7 +7,7 @@ echo $this->Form->errors();
     <ul>
         <?php if ($this->data('ForceEditing') && $this->data('ForceEditing') != FALSE) { ?>
             <div
-                class="Warning"><?php echo sprintf(T("You are editing %s's quote settings"), $this->data('ForceEditing')); ?></div>
+                class="Warning"><?php echo sprintf(t("You are editing %s's quote settings"), $this->data('ForceEditing')); ?></div>
         <?php } ?>
         <li>
             <?php

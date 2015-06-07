@@ -32,7 +32,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     /**
      * Add Prettify to page text.
      */
-    public function AddPretty($Sender) {
+    public function addPretty($Sender) {
         $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
         $Sender->addJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
         if ($Language = c('Plugins.GooglePrettify.Language')) {
@@ -43,8 +43,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     /**
      * Add Tabby to a page's text areas.
      */
-    public function AddTabby($Sender) {
-        if (C('Plugins.GooglePrettify.UseTabby', false)) {
+    public function addTabby($Sender) {
+        if (c('Plugins.GooglePrettify.UseTabby', false)) {
             $Sender->addJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
             $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
      $("textarea").livequery(function () {$("textarea").tabby();})
@@ -57,9 +57,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public function GetJs() {
+    public function getJs() {
         $Class = '';
-        if (C('Plugins.GooglePrettify.LineNumbers')) {
+        if (c('Plugins.GooglePrettify.LineNumbers')) {
             $Class .= ' linenums';
         }
         if ($Language = c('Plugins.GooglePrettify.Language')) {
@@ -88,7 +88,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         }
     }
 
-    public function AssetModel_GenerateETag_handler($Sender, $Args) {
+    public function assetModel_generateETag_handler($Sender, $Args) {
         if (!c('Plugins.GooglePrettify.NoCssFile')) {
             $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = true;
         }
@@ -99,9 +99,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $Sender
      */
-    public function DiscussionController_Render_Before($Sender) {
-        $this->AddPretty($Sender);
-        $this->AddTabby($Sender);
+    public function discussionController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
     }
 
     /**
@@ -109,9 +109,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      *
      * @param PostController $Sender
      */
-    public function PostController_Render_Before($Sender) {
-        $this->AddPretty($Sender);
-        $this->AddTabby($Sender);
+    public function postController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
     }
 
     /**
@@ -120,9 +120,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * @param unknown_type $Sender
      * @param unknown_type $Args
      */
-    public function SettingsController_GooglePrettify_Create($Sender, $Args) {
+    public function settingsController_googlePrettify_create($Sender, $Args) {
         $Cf = new ConfigurationModule($Sender);
-        $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', true);
+        $CssUrl = asset('/plugins/GooglePrettify/design/prettify.css', true);
 
         $Languages = array(
             'apollo' => 'apollo',
@@ -154,7 +154,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         ));
 
         $Sender->addSideMenu();
-        $Sender->setData('Title', T('Syntax Prettifier Settings'));
+        $Sender->setData('Title', t('Syntax Prettifier Settings'));
         $Cf->renderAll();
     }
 }

@@ -31,7 +31,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Options
      * @return bool
      */
-    public static function Check(&$Data, &$Options) {
+    public static function check(&$Data, &$Options) {
         // Make the request.
         $Get = array();
 
@@ -44,7 +44,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
                          '10.0.0.0/8',
                          '172.16.0.0/12',
                          '192.168.0.0/16') as $LocalCIDR) {
-                if (Gdn_Statistics::CIDRCheck($Data['IPAddress'], $LocalCIDR)) {
+                if (Gdn_Statistics::cidrCheck($Data['IPAddress'], $LocalCIDR)) {
                     $AddIP = false;
                     break;
                 }
@@ -107,21 +107,21 @@ class StopForumSpamPlugin extends Gdn_Plugin {
     /**
      *
      */
-    public function Setup() {
-        $this->Structure();
+    public function setup() {
+        $this->structure();
     }
 
     /**
      *
      */
-    public function Structure() {
+    public function structure() {
         // Get a user for operations.
         $UserID = Gdn::sql()->getWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->value('UserID');
 
         if (!$UserID) {
             $UserID = Gdn::sql()->insert('User', array(
                 'Name' => 'StopForumSpam',
-                'Password' => RandomString('20'),
+                'Password' => randomString('20'),
                 'HashMethod' => 'Random',
                 'Email' => 'stopforumspam@domain.com',
                 'DateInserted' => Gdn_Format::toDateTime(),
@@ -132,9 +132,11 @@ class StopForumSpamPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
+     *
      * @return mixed
      */
-    public function UserID() {
+    public function userID() {
         return c('Plugins.StopForumSpam.UserID', null);
     }
 
@@ -144,7 +146,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function base_CheckSpam_handler($Sender, $Args) {
+    public function base_checkSpam_handler($Sender, $Args) {
         // Don't check for spam if another plugin has already determined it is.
         if ($Sender->EventArguments['IsSpam']) {
             return;
@@ -158,7 +160,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         if ($Reason = val('DiscoveryText', $Data)) {
             if (substr($Reason, 0, 1) === '{') {
                 $Sender->EventArguments['IsSpam'] = true;
-                $Data['Log_InsertUserID'] = $this->UserID();
+                $Data['Log_InsertUserID'] = $this->userID();
                 $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
                 return;
             }
@@ -167,9 +169,9 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         $Result = false;
         switch ($RecordType) {
             case 'Registration':
-                $Result = self::Check($Data, $Options);
+                $Result = self::check($Data, $Options);
                 if ($Result) {
-                    $Data['Log_InsertUserID'] = $this->UserID();
+                    $Data['Log_InsertUserID'] = $this->userID();
                     $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
                 }
                 break;
@@ -188,7 +190,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param array $Args
      */
-    public function SettingsController_StopForumSpam_Create($Sender, $Args = array()) {
+    public function settingsController_stopForumSpam_create($Sender, $Args = array()) {
         $Sender->permission('Garden.Settings.Manage');
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(
@@ -199,7 +201,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         ));
 
         $Sender->addSideMenu('dashboard/settings/plugins');
-        $Sender->setData('Title', T('Stop Forum Spam Settings'));
+        $Sender->setData('Title', t('Stop Forum Spam Settings'));
         $Sender->ConfigurationModule = $Conf;
         $Conf->renderAll();
     }

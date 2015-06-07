@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo T($this->Data['Title']); ?></h1>
+<h1><?php echo t($this->Data['Title']); ?></h1>
 <div class="Info">
-    <?php echo T('FlaggedContent', 'The following content has been flagged by users for moderator review.'); ?>
+    <?php echo t('FlaggedContent', 'The following content has been flagged by users for moderator review.'); ?>
 </div>
 
 <?php
@@ -10,9 +10,9 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-<h3><?php echo T('Flagging Settings'); ?></h3>
+<h3><?php echo t('Flagging Settings'); ?></h3>
 <ul>
-    <li><?php echo $this->Form->checkBox('Plugins.Flagging.UseDiscussions', T('Create Discussions')); ?></li>
+    <li><?php echo $this->Form->checkBox('Plugins.Flagging.UseDiscussions', t('Create Discussions')); ?></li>
     <li>
         <?php
         echo $this->Form->label('Category to Use', 'Plugins.Flagging.CategoryID');
@@ -28,10 +28,10 @@ echo "<h3>".t('Flagged Items')."</h3>\n";
 echo '<div class="FlaggedContent">';
 $NumFlaggedItems = count($this->FlaggedItems);
 if (!$NumFlaggedItems) {
-    echo T('FlagQueueEmpty', "There are no items awaiting moderation at this time.");
+    echo t('FlagQueueEmpty', "There are no items awaiting moderation at this time.");
 } else {
     echo sprintf(
-        T('Flagging queue counter', '%s in queue.'),
+        t('Flagging queue counter', '%s in queue.'),
         plural($NumFlaggedItems, '%s post', '%s posts')
     );
     foreach ($this->FlaggedItems as $URL => $FlaggedList) {
@@ -51,12 +51,12 @@ if (!$NumFlaggedItems) {
                         <div class="FlaggedItemInfo">
                             <?php
                             if ($NumComplaintsInThread > 1)
-                                $OtherString = T(' and').' '.($NumComplaintsInThread - 1).' '.t(Plural($NumComplaintsInThread - 1, 'other', 'others'));
+                                $OtherString = t(' and').' '.($NumComplaintsInThread - 1).' '.t(Plural($NumComplaintsInThread - 1, 'other', 'others'));
                             else
                                 $OtherString = '';
                             ?>
-                            <span><?php echo T('FlaggedBy', "Reported by:"); ?> </span>
-                            <span><?php printf(T('<strong>%s</strong>%s on %s'), anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}"), $OtherString, $Flag['DateInserted']); ?></span>
+                            <span><?php echo t('FlaggedBy', "Reported by:"); ?> </span>
+                            <span><?php printf(t('<strong>%s</strong>%s on %s'), anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}"), $OtherString, $Flag['DateInserted']); ?></span>
                         </div>
                         <div class="FlaggedItemComment">"<?php echo Gdn_Format::text($Flag['Comment']); ?>"</div>
                         <div class="FlaggedActions">
@@ -79,7 +79,7 @@ if (!$NumFlaggedItems) {
                     ?>
                     <div class="FlaggedOtherCell">
                         <div
-                            class="FlaggedItemInfo"><?php echo T('On').' '.$Flag['DateInserted'].', <strong>'.anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}").'</strong> '.t('said:'); ?></div>
+                            class="FlaggedItemInfo"><?php echo t('On').' '.$Flag['DateInserted'].', <strong>'.anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}").'</strong> '.t('said:'); ?></div>
                         <div class="FlaggedItemComment">"<?php echo Gdn_Format::text($Flag['Comment']); ?>"</div>
                     </div>
                 <?php

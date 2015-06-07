@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T($this->Data['Title'].' Settings'); ?></h1>
+<h1><?php echo t($this->Data['Title'].' Settings'); ?></h1>
 <div class="Info">
-    <?php echo T($this->Data['Description']); ?>
+    <?php echo t($this->Data['Description']); ?>
 </div>
 <div class="FilterMenu">
     <?php
@@ -13,7 +13,7 @@
     echo $this->Form->errors();
 
     $PluginName = $this->Plugin->GetPluginKey('Name');
-    $ButtonName = T($this->Plugin->IsEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
+    $ButtonName = t($this->Plugin->IsEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
 
     echo $this->Form->close($ButtonName, '', array(
         'class' => 'SliceSubmit SliceForm SmallButton'

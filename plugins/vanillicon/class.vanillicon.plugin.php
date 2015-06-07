@@ -12,7 +12,7 @@
 $PluginInfo['vanillicon'] = array(
    'Name' => 'Vanillicon',
    'Description' => "Provides fun default user icons from vanillicon.com.",
-   'Version' => '2.0.0-beta',
+   'Version' => '2.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -47,9 +47,9 @@ class VanilliconPlugin extends Gdn_Plugin {
     * @param ProfileController $Sender
     * @param array $Args
     */
-    public function ProfileController_AfterAddSideMenu_handler($Sender, $Args) {
+    public function profileController_afterAddSideMenu_handler($Sender, $Args) {
         if (!$Sender->User->Photo) {
-            $Sender->User->Photo = UserPhotoDefaultUrl($Sender->User, array('Size' => 200));
+            $Sender->User->Photo = userPhotoDefaultUrl($Sender->User, array('Size' => 200));
         }
     }
 
@@ -58,7 +58,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $sender
     */
-    public function SettingsController_Vanillicon_Create($sender) {
+    public function settingsController_vanillicon_create($sender) {
         $sender->permission('Garden.Settings.Manage');
         $cf = new ConfigurationModule($sender);
 
@@ -79,7 +79,7 @@ class VanilliconPlugin extends Gdn_Plugin {
         ));
 
         $sender->addSideMenu();
-        $sender->setData('Title', sprintf(T('%s Settings'), 'Vanillicon'));
+        $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
         $cf->renderAll();
     }
 }
@@ -93,7 +93,7 @@ if (!function_exists('UserPhotoDefaultUrl')) {
     * - Size: The size of the photo.
     * @return string Returns the vanillicon url for the user.
     */
-    function UserPhotoDefaultUrl($user, $options = array()) {
+    function userPhotoDefaultUrl($user, $options = array()) {
         static $iconSize = null, $type = null;
         if ($iconSize === null) {
             $thumbSize = c('Garden.Thumbnail.Size');

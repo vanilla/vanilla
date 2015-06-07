@@ -275,7 +275,7 @@ class FacebookPlugin extends Gdn_Plugin {
             $CssClass = 'ReactButton PopupWindow';
         }
 
-        echo ' '.anchor(sprite('ReactFacebook', 'Sprite ReactSprite', T('Share on Facebook')), url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", true), $CssClass).' ';
+        echo ' '.anchor(sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')), url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", true), $CssClass).' ';
     }
 
     /**
@@ -367,7 +367,7 @@ class FacebookPlugin extends Gdn_Plugin {
                 $Get = array(
                     'app_id' => c('Plugins.Facebook.ApplicationID'),
                     'link' => $Row['ShareUrl'],
-                    'name' => Gdn_Format::PlainText($Row['Name'], 'Text'),
+                    'name' => Gdn_Format::plainText($Row['Name'], 'Text'),
                     'description' => $Message,
                     'redirect_uri' => url('/post/shared/facebook', true)
                 );
@@ -388,11 +388,11 @@ class FacebookPlugin extends Gdn_Plugin {
      * @param type $Username
      * @param type $Code
      */
-    public function ProfileController_FacebookConnect_Create($Sender, $UserReference, $Username, $Code = false) {
+    public function profileController_FacebookConnect_create($Sender, $UserReference, $Username, $Code = false) {
         $Sender->permission('Garden.SignIn.Allow');
 
         $Sender->getUserInfo($UserReference, $Username, '', true);
-        $Sender->_setBreadcrumbs(T('Connections'), '/profile/connections');
+        $Sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
 
         // Get the access token.
         $AccessToken = $this->getAccessToken($Code, self::profileConnecUrl());
@@ -489,7 +489,7 @@ class FacebookPlugin extends Gdn_Plugin {
             $Query = 'display='.urlencode($Sender->Request->get('display'));
         }
 
-        $RedirectUri = ConcatSep('&', $this->redirectUri(), $Query);
+        $RedirectUri = concatSep('&', $this->redirectUri(), $Query);
 
         $AccessToken = $Sender->Form->getFormValue('AccessToken');
 
@@ -510,7 +510,7 @@ class FacebookPlugin extends Gdn_Plugin {
             if (!isset($NewToken)) {
                 // There was an error getting the profile, which probably means the saved access token is no longer valid. Try and reauthorize.
                 if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect($this->AuthorizeUri());
+                    redirect($this->authorizeUri());
                 } else {
                     $Sender->setHeader('Content-type', 'application/json');
                     $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
@@ -531,7 +531,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $Form->setFormValue('Photo', "//graph.facebook.com/{$ID}/picture?type=large");
         $Form->addHidden('AccessToken', $AccessToken);
 
-        if (C('Plugins.Facebook.UseFacebookNames')) {
+        if (c('Plugins.Facebook.UseFacebookNames')) {
             $Form->setFormValue('Name', val('name', $Profile));
             saveToConfig(array(
                 'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
@@ -560,7 +560,7 @@ class FacebookPlugin extends Gdn_Plugin {
      * @return mixed
      * @throws Gdn_UserException
      */
-    protected function GetAccessToken($Code, $RedirectUri, $ThrowError = true) {
+    protected function getAccessToken($Code, $RedirectUri, $ThrowError = true) {
         $Get = array(
             'client_id' => c('Plugins.Facebook.ApplicationID'),
             'client_secret' => c('Plugins.Facebook.Secret'),
@@ -598,7 +598,7 @@ class FacebookPlugin extends Gdn_Plugin {
      * @param $AccessToken
      * @return mixed
      */
-    public function GetProfile($AccessToken) {
+    public function getProfile($AccessToken) {
         $Url = "https://graph.facebook.com/me?access_token=$AccessToken";
 //      $C = curl_init();
 //      curl_setopt($C, CURLOPT_RETURNTRANSFER, true);

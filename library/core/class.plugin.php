@@ -140,7 +140,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     /**
      * Implementaion of Gdn_IPlugin::Setup().
      */
-    public function Setup() {
+    public function setup() {
         // Do nothing...
     }
 

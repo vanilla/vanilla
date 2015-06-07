@@ -512,7 +512,7 @@ class Gdn_Database {
      *
      * @return Gdn_DatabaseStructure The database structure class for this database.
      */
-    public function Structure() {
+    public function structure() {
         if (is_null($this->_Structure)) {
             $Name = $this->Engine.'Structure';
             $this->_Structure = Gdn::Factory($Name, $this);

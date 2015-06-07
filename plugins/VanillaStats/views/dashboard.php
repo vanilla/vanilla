@@ -24,7 +24,7 @@ function WriteRangeTab($Range, $Sender) {
 <h1>Dashboard</h1>
 <div class="Tabs DateRangeTabs">
     <input type="text" name="DateRange" class="DateRange DateRangeActive"
-           value="<?php echo Gdn_Format::date($this->StampStart, T('Date.DefaultFormat')).' - '.Gdn_Format::date($this->StampEnd, T('Date.DefaultFormat')); ?>"/>
+           value="<?php echo Gdn_Format::date($this->StampStart, t('Date.DefaultFormat')).' - '.Gdn_Format::date($this->StampEnd, t('Date.DefaultFormat')); ?>"/>
     <input type="hidden" name="Range" class="Range" value="<?php echo $this->Range; ?>"/>
     <input type="hidden" name="VanillaID" class="VanillaID" value="<?php echo $VanillaID ?>"/>
     <input type="hidden" name="VanillaVersion" class="VanillaVersion" value="<?php echo $VanillaVersion ?>"/>
@@ -57,12 +57,12 @@ function WriteRangeTab($Range, $Sender) {
     });
 </script>
 <div class="Column Column1 ReleasesColumn">
-    <h1><?php echo T('Updates'); ?></h1>
+    <h1><?php echo t('Updates'); ?></h1>
 
     <div class="List"></div>
 </div>
 <div class="Column Column2 NewsColumn">
-    <h1><?php echo T('Recent News'); ?></h1>
+    <h1><?php echo t('Recent News'); ?></h1>
 
     <div class="List"></div>
 </div>

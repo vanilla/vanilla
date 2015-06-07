@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <description><?php echo Gdn_Format::text($this->Head->Title()); ?></description>
+    <description><?php echo Gdn_Format::text($this->Head->title()); ?></description>
     <language><?php echo Gdn::config('Garden.Locale', 'en-US'); ?></language>
     <atom:link href="<?php echo url('discussions/tagged'.urlencode($this->data('Tag')).'/feed.rss'); ?>" rel="self"
                type="application/rss+xml"/>

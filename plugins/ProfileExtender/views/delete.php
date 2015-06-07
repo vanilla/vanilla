@@ -5,7 +5,7 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 
-echo wrap(FormatString(T("ConfirmDeleteProfileField",
+echo wrap(FormatString(t("ConfirmDeleteProfileField",
     "You are about to delete the profile field &ldquo;{Field.Label}&rdquo; from all users."), $this->Data), 'p');
 
 echo '<div class="Buttons Buttons-Confirm">';

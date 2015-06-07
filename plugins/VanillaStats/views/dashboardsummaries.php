@@ -3,10 +3,10 @@
     <table>
         <thead>
         <tr>
-            <th><?php echo T('Popular Discussions'); ?></th>
-            <td><?php echo T('Comments'); ?></td>
-            <td><?php echo T('Follows'); ?></td>
-            <td><?php echo T('Views'); ?></td>
+            <th><?php echo t('Popular Discussions'); ?></th>
+            <td><?php echo t('Comments'); ?></td>
+            <td><?php echo t('Follows'); ?></td>
+            <td><?php echo t('Views'); ?></td>
         </tr>
         </thead>
         <tbody>
@@ -25,10 +25,10 @@
     <table>
         <thead>
         <tr>
-            <th><?php echo T('Active Users'); ?></th>
-            <!-- <td><?php echo T('Discussions'); ?></td> -->
-            <td><?php echo T('Comments'); ?></td>
-            <!-- <td><?php echo T('PageViews'); ?></td> -->
+            <th><?php echo t('Active Users'); ?></th>
+            <!-- <td><?php echo t('Discussions'); ?></td> -->
+            <td><?php echo t('Comments'); ?></td>
+            <!-- <td><?php echo t('PageViews'); ?></td> -->
         </tr>
         </thead>
         <tbody>

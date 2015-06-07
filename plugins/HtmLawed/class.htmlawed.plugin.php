@@ -133,7 +133,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
      * @param $Html
      * @return mixed|string
      */
-    public function Format($Html) {
+    public function format($Html) {
         $Attributes = c('Garden.Html.BlockedAttributes', 'on*');
         $Config = array(
             'anti_link_spam' => array('`.`', ''),
@@ -151,7 +151,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
         );
 
         // Turn embedded videos into simple links (legacy workaround)
-        $Html = Gdn_Format::UnembedContent($Html);
+        $Html = Gdn_Format::unembedContent($Html);
 
         // We check the flag within Gdn_Format to see
         // if htmLawed should place rel="nofollow" links
@@ -211,7 +211,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
     /**
      * No setup.
      */
-    public function Setup() {
+    public function setup() {
     }
 }
 
@@ -222,7 +222,7 @@ if (!function_exists('FormatRssCustom')) :
      * @param $Html
      * @return mixed|string
      */
-    function FormatRssHtmlCustom($Html) {
+    function formatRssHtmlCustom($Html) {
         require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
 
         $Config = array(
@@ -253,7 +253,7 @@ endif;
  * @param int $Attributes
  * @return string
  */
-function HTMLawedHookTag($Element, $Attributes = 0) {
+function htmlawedHookTag($Element, $Attributes = 0) {
     // If second argument is not received, it means a closing tag is being handled
     if ($Attributes === 0) {
         return "</$Element>";

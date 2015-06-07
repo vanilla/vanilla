@@ -8,9 +8,9 @@ $CanAddTags = $this->data('_CanAddTags');
 
 ?>
 
-    <h1><?php echo T($this->Data['Title']); ?></h1>
+    <h1><?php echo t($this->Data['Title']); ?></h1>
     <div class="Info">
-        <?php echo T('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'); ?>
+        <?php echo t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'); ?>
     </div>
 
 <?php echo $this->Form->open(); ?>
@@ -18,18 +18,18 @@ $CanAddTags = $this->data('_CanAddTags');
         <?php
         echo $this->Form->errors();
 
-        echo '<p>', T('Search for a tag.', 'Search for all or part of a tag.'), '</p>';
+        echo '<p>', t('Search for a tag.', 'Search for all or part of a tag.'), '</p>';
 
         echo $this->Form->textBox('Search');
-        echo ' '.$this->Form->button(T('Go'));
-        //printf(T('%s tag(s) found.'), $this->data('RecordCount'));
+        echo ' '.$this->Form->button(t('Go'));
+        //printf(t('%s tag(s) found.'), $this->data('RecordCount'));
         ?>
     </div>
     <div class="Wrap">
         <?php
-        echo T('Click a tag name to edit. Click x to remove.');
+        echo t('Click a tag name to edit. Click x to remove.');
         echo ' ';
-        echo T("Red tags are special and can't be removed.");
+        echo t("Red tags are special and can't be removed.");
         ?>
     </div>
 
@@ -80,7 +80,7 @@ $CanAddTags = $this->data('_CanAddTags');
         $Session = Gdn::session();
         $TagCount = $this->data('RecordCount');
         if ($TagCount == 0) {
-            echo T("There are no tags in the system yet.");
+            echo t("There are no tags in the system yet.");
         } else {
             $Tags = $this->data('Tags');
             foreach ($Tags as $Tag) {
@@ -91,7 +91,7 @@ $CanAddTags = $this->data('_CanAddTags');
                 if (val('Type', $Tag)) {
                     $Special = TRUE;
                     $CssClass .= " Tag-Special Tag-{$Tag['Type']}";
-                    $Title = T('This is a special tag.');
+                    $Title = t('This is a special tag.');
                 }
 
                 ?>

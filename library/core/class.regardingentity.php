@@ -437,7 +437,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
     /**
      * No setup.
      */
-    public function Setup() {
+    public function setup() {
     }
 
 }

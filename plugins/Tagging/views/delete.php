@@ -6,7 +6,7 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 
-echo '<div class="P">'.sprintf(T('Are you sure you want to delete this %s?'), T('tag')).'</div>';
+echo '<div class="P">'.sprintf(t('Are you sure you want to delete this %s?'), t('tag')).'</div>';
 
 echo '<div class="Buttons Buttons-Confirm">';
 echo $this->Form->button('OK', array('class' => 'Button Primary'));

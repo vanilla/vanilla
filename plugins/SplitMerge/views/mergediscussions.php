@@ -6,9 +6,9 @@ echo $this->Form->errors();
 
 $Discussions = $this->data('Discussions');
 if (count($Discussions) < 2) {
-    echo wrap(T('You have to select at least 2 discussions to merge.'), 'p');
+    echo wrap(t('You have to select at least 2 discussions to merge.'), 'p');
 } else {
-    echo wrap(T('Choose the main discussion into which all comments will be merged:'), 'p');
+    echo wrap(t('Choose the main discussion into which all comments will be merged:'), 'p');
 
     $DefaultDiscussionID = $Discussions[0]['DiscussionID'];
     $RadioData = consolidateArrayValuesByKey($Discussions, 'DiscussionID', 'Name');

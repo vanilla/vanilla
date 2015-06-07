@@ -280,14 +280,14 @@ class EditorPlugin extends Gdn_Plugin {
        // Stuff like 'heading1' is the editor-action.
         $fontFormatOptions = array(
          'heading1' => array(
-            'text' => sprintf(T('Heading %s'), 1),
+            'text' => sprintf(t('Heading %s'), 1),
             'command' => 'formatBlock',
             'value' => 'h1',
             'class' => 'post-font-size-h1',
             'sort' => 100
          ),
          'heading2' => array(
-            'text' => sprintf(T('Heading %s'), 2),
+            'text' => sprintf(t('Heading %s'), 2),
             'command' => 'formatBlock',
             'value' => 'h2',
             'class' => 'post-font-size-h2',
@@ -302,21 +302,21 @@ class EditorPlugin extends Gdn_Plugin {
             'sort' => 98
          ),
          'blockquote' => array(
-            'text' => T('Quote'),
+            'text' => t('Quote'),
             'command' => 'blockquote',
             'value' => 'blockquote',
             'class' => '',
             'sort' => 10
          ),
          'code' => array(
-            'text' => T('Source Code', 'Code'),
+            'text' => t('Source Code', 'Code'),
             'command' => 'code',
             'value' => 'code',
             'class' => '',
             'sort' => 9
          ),
          'spoiler' => array(
-            'text' => T('Spoiler'),
+            'text' => t('Spoiler'),
             'command' => 'spoiler',
             'value' => 'spoiler',
             'class' => '',
@@ -385,7 +385,7 @@ class EditorPlugin extends Gdn_Plugin {
         foreach ($fontColorList as $fontColor) {
            // Fore color
             $editorDataAttr = '{"action":"color","value":"'.$fontColor.'"}';
-            $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action' => 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => T($fontColor),*/
+            $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action' => 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => t($fontColor),*/
             'data-editor' => $editorDataAttr));
 
            // Highlight color
@@ -393,7 +393,7 @@ class EditorPlugin extends Gdn_Plugin {
                 $fontColor = 'white';
             }
             $editorDataAttrHighlight = '{"action":"highlightcolor","value":"'.$fontColor.'"}';
-            $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action' => 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => T($fontColor),*/
+            $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action' => 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => t($fontColor),*/
             'data-editor' => $editorDataAttrHighlight));
         }
 
@@ -490,40 +490,40 @@ class EditorPlugin extends Gdn_Plugin {
        * TODO this is ugly. Pop everything into array, and build this in a loop.
        */
 
-        $editorToolbarAll['bold'] = array('edit' => 'basic', 'action' => 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
-        $editorToolbarAll['italic'] = array('edit' => 'basic', 'action' => 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
-        $editorToolbarAll['strike'] = array('edit' => 'basic', 'action' => 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strikethrough'), 'data-editor' => '{"action":"strike","value":""}'));
+        $editorToolbarAll['bold'] = array('edit' => 'basic', 'action' => 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => t('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
+        $editorToolbarAll['italic'] = array('edit' => 'basic', 'action' => 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => t('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
+        $editorToolbarAll['strike'] = array('edit' => 'basic', 'action' => 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => t('Strikethrough'), 'data-editor' => '{"action":"strike","value":""}'));
 
         $editorToolbarAll['color'] = array('edit' => 'basic', 'action' => 'color', 'type' =>
          $toolbarColorGroups,
-         'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
+         'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => t('Color'), 'data-editor' => '{"action":"color","value":""}'));
 
-        $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action' => 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => T('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
-        $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action' => 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
-        $editorToolbarAll['indent'] = array('edit' => 'format', 'action' => 'indent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'indent', 'title' => T('Indent'), 'data-editor' => '{"action":"indent","value":""}'));
-        $editorToolbarAll['outdent'] = array('edit' => 'format', 'action' => 'outdent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'outdent', 'title' => T('Outdent'), 'data-editor' => '{"action":"outdent","value":""}'));
+        $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action' => 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => t('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
+        $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action' => 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => t('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
+        $editorToolbarAll['indent'] = array('edit' => 'format', 'action' => 'indent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'indent', 'title' => t('Indent'), 'data-editor' => '{"action":"indent","value":""}'));
+        $editorToolbarAll['outdent'] = array('edit' => 'format', 'action' => 'outdent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'outdent', 'title' => t('Outdent'), 'data-editor' => '{"action":"outdent","value":""}'));
 
         $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers editor-optional-button'));
         $editorToolbarAll['format'] = array('edit' => 'format', 'action' => 'headers', 'type' =>
          $toolbarFormatOptions,
-         'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => T('Format'), 'data-editor' => '{"action":"format","value":""}'));
+         'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => t('Format'), 'data-editor' => '{"action":"format","value":""}'));
 
         $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media editor-optional-button'));
-        $editorToolbarAll['emoji'] = array('edit' => 'media', 'action' => 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
-        $editorToolbarAll['links'] = array('edit' => 'media', 'action' => 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link editor-optional-button', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
-        $editorToolbarAll['images'] = array('edit' => 'media', 'action' => 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
+        $editorToolbarAll['emoji'] = array('edit' => 'media', 'action' => 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => t('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
+        $editorToolbarAll['links'] = array('edit' => 'media', 'action' => 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link editor-optional-button', 'data-wysihtml5-command' => 'createLink', 'title' => t('Url'), 'data-editor' => '{"action":"url","value":""}'));
+        $editorToolbarAll['images'] = array('edit' => 'media', 'action' => 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => t('Image'), 'data-editor' => '{"action":"image","value":""}'));
 
-        $editorToolbarAll['uploads'] = array('edit' => 'media', 'action' => 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-file editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach image/file'), 'data-editor' => '{"action":"upload","value":""}'));
+        $editorToolbarAll['uploads'] = array('edit' => 'media', 'action' => 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-file editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => t('Attach image/file'), 'data-editor' => '{"action":"upload","value":""}'));
 
         $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align editor-optional-button'));
-        $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action' => 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyLeft', 'title' => T('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
-        $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action' => 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyCenter', 'title' => T('Align center'), 'data-editor' => '{"action":"aligncenter","value":""}'));
-        $editorToolbarAll['alignright'] = array('edit' => 'format', 'action' => 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyRight', 'title' => T('Align right'), 'data-editor' => '{"action":"alignright","value":""}'));
+        $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action' => 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyLeft', 'title' => t('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
+        $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action' => 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyCenter', 'title' => t('Align center'), 'data-editor' => '{"action":"aligncenter","value":""}'));
+        $editorToolbarAll['alignright'] = array('edit' => 'format', 'action' => 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyRight', 'title' => t('Align right'), 'data-editor' => '{"action":"alignright","value":""}'));
 
         $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches editor-optional-button'));
-        $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action' => 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-action' => 'change_view', 'title' => T('Toggle HTML view'), 'data-editor' => '{"action":"togglehtml","value":""}'));
-        $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action' => 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close editor-optional-button', 'title' => T('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}'));
-        $editorToolbarAll['lights'] = array('edit' => 'switches', 'action' => 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close editor-optional-button', 'title' => T('Toggle lights'), 'data-editor' => '{"action":"lights","value":""}'));
+        $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action' => 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-action' => 'change_view', 'title' => t('Toggle HTML view'), 'data-editor' => '{"action":"togglehtml","value":""}'));
+        $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action' => 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}'));
+        $editorToolbarAll['lights'] = array('edit' => 'switches', 'action' => 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle lights'), 'data-editor' => '{"action":"lights","value":""}'));
 
        // Filter out disallowed editor actions
         foreach ($allowedEditorActions as $editorAction => $allowed) {
@@ -619,11 +619,11 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('editorVersion', $this->pluginInfo['Version']);
         $c->addDefinition('editorInputFormat', $this->Format);
         $c->addDefinition('editorPluginAssets', $this->AssetPath);
-        $c->addDefinition('wysiwygHelpText', T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
-        $c->addDefinition('bbcodeHelpText', T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
-        $c->addDefinition('htmlHelpText', T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
-        $c->addDefinition('markdownHelpText', T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
-        $c->addDefinition('textHelpText', T('editor.TextHelpText', 'You are using plain text in your post.'));
+        $c->addDefinition('wysiwygHelpText', t('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
+        $c->addDefinition('bbcodeHelpText', t('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
+        $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
+        $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
+        $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
 
        // Set variables for file uploads
@@ -669,7 +669,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
        // If force Wysiwyg enabled in settings
-        if (C('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg'
+        if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg'
          //&& strcasecmp($this->Format, 'wysiwyg') != 0
          && $this->ForceWysiwyg == true
         ) {
@@ -1429,7 +1429,7 @@ class EditorPlugin extends Gdn_Plugin {
    /*
    public function base_GetAppSettingsMenuItems_handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Appearance', T('Appearance'));
+      $Menu->AddItem('Appearance', t('Appearance'));
       $Menu->addLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
    }
    */

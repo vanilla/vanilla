@@ -21,7 +21,7 @@ echo $this->Form->errors();
             <?php
 
             echo $this->Form->label('Options', 'Options');
-            echo wrap(T('One option per line'), 'p');
+            echo wrap(t('One option per line'), 'p');
             echo $this->Form->textBox('Options', array('MultiLine' => TRUE));
             ?>
         </li>

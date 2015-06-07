@@ -3,36 +3,36 @@ $Advanced = TRUE;
 ?>
     <div class="Help Aside">
         <?php
-        echo Wrap(T('Need More Help?'), 'h2');
+        echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
-        echo Wrap(Anchor(T("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
-        echo Wrap(Anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
+        echo wrap(Anchor(t("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
+        echo wrap(Anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
         echo '</ul>';
         ?>
     </div>
-    <h1><?php echo T('Manage Roles & Permissions'); ?></h1>
+    <h1><?php echo t('Manage Roles & Permissions'); ?></h1>
 <?php
-echo $this->Form->Open();
+echo $this->Form->open();
 $this->DefaultRolesWarning();
 ?>
     <div class="Info"><?php
-        echo T('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
-        $this->FireEvent('AfterRolesInfo');
+        echo t('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
+        $this->fireEvent('AfterRolesInfo');
         ?></div>
 <?php if ($Advanced) { ?>
-    <div class="FilterMenu"><?php echo Anchor(T('Add Role'), 'dashboard/role/add', 'SmallButton'); ?></div>
+    <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'SmallButton'); ?></div>
 <?php } ?>
     <table border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable" id="RoleTable">
         <thead>
         <tr id="0">
-            <th><?php echo T('Role'); ?></th>
-            <th class="Alt"><?php echo T('Description'); ?></th>
+            <th><?php echo t('Role'); ?></th>
+            <th class="Alt"><?php echo t('Description'); ?></th>
         </tr>
         </thead>
         <tbody>
         <?php
         $Alt = FALSE;
-        foreach ($this->Data('Roles') as $Role) {
+        foreach ($this->data('Roles') as $Role) {
             $Alt = $Alt ? FALSE : TRUE;
             ?>
             <tr id="<?php echo $Role['RoleID']; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
@@ -41,9 +41,9 @@ $this->DefaultRolesWarning();
                     <?php if ($Advanced && $Role['CanModify']) { ?>
                         <div>
                             <?php
-                            echo Anchor(T('Edit'), "/role/edit/{$Role['RoleID']}", 'SmallButton');
+                            echo anchor(t('Edit'), "/role/edit/{$Role['RoleID']}", 'SmallButton');
                             if ($Role['Deletable'])
-                                echo Anchor(T('Delete'), "/role/delete/{$Role['RoleID']}", 'Popup SmallButton');
+                                echo anchor(t('Delete'), "/role/delete/{$Role['RoleID']}", 'Popup SmallButton');
                             ?>
                         </div>
                     <?php } ?>
@@ -54,8 +54,8 @@ $this->DefaultRolesWarning();
 
                     if (val('Type', $Role)) {
                         echo '<div class="Meta-Container"><span class="Meta-Label">'.
-                            T('default type', 'default').': '.
-                            T(val('Type', $Role)).
+                            t('default type', 'default').': '.
+                            t(val('Type', $Role)).
                             '</span></div>';
                     }
                     ?>
@@ -65,4 +65,4 @@ $this->DefaultRolesWarning();
         </tbody>
     </table>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();

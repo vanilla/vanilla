@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * GooglePrettify Plugin.
  *
@@ -13,7 +13,7 @@ $PluginInfo['GooglePrettify'] = array(
     'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
     'Version' => '1.2',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -32,21 +32,21 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     /**
      * Add Prettify to page text.
      */
-    public function AddPretty($Sender) {
-        $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
-        $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
-        if ($Language = C('Plugins.GooglePrettify.Language')) {
-            $Sender->AddJsFile("lang-$Language.js", 'plugins/GooglePrettify', array('_sort' => 102));
+    public function addPretty($Sender) {
+        $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
+        $Sender->addJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
+        if ($Language = c('Plugins.GooglePrettify.Language')) {
+            $Sender->addJsFile("lang-$Language.js", 'plugins/GooglePrettify', array('_sort' => 102));
         }
     }
 
     /**
      * Add Tabby to a page's text areas.
      */
-    public function AddTabby($Sender) {
-        if (C('Plugins.GooglePrettify.UseTabby', FALSE)) {
-            $Sender->AddJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
-            $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
+    public function addTabby($Sender) {
+        if (c('Plugins.GooglePrettify.UseTabby', false)) {
+            $Sender->addJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
+            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
      $("textarea").livequery(function () {$("textarea").tabby();})
 });');
         }
@@ -57,11 +57,12 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public function GetJs() {
+    public function getJs() {
         $Class = '';
-        if (C('Plugins.GooglePrettify.LineNumbers'))
+        if (c('Plugins.GooglePrettify.LineNumbers')) {
             $Class .= ' linenums';
-        if ($Language = C('Plugins.GooglePrettify.Language')) {
+        }
+        if ($Language = c('Plugins.GooglePrettify.Language')) {
             $Class .= " lang-$Language";
         }
 
@@ -81,14 +82,16 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         return $Result;
     }
 
-    public function AssetModel_StyleCss_Handler($Sender) {
-        if (!C('Plugins.GooglePrettify.NoCssFile'))
-            $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
+    public function assetModel_styleCss_handler($Sender) {
+        if (!c('Plugins.GooglePrettify.NoCssFile')) {
+            $Sender->addCssFile('prettify.css', 'plugins/GooglePrettify');
+        }
     }
 
-    public function AssetModel_GenerateETag_Handler($Sender, $Args) {
-        if (!C('Plugins.GooglePrettify.NoCssFile'))
-            $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = TRUE;
+    public function assetModel_generateETag_handler($Sender, $Args) {
+        if (!c('Plugins.GooglePrettify.NoCssFile')) {
+            $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = true;
+        }
     }
 
     /**
@@ -96,9 +99,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $Sender
      */
-    public function DiscussionController_Render_Before($Sender) {
-        $this->AddPretty($Sender);
-        $this->AddTabby($Sender);
+    public function discussionController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
     }
 
     /**
@@ -106,9 +109,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      *
      * @param PostController $Sender
      */
-    public function PostController_Render_Before($Sender) {
-        $this->AddPretty($Sender);
-        $this->AddTabby($Sender);
+    public function postController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
     }
 
     /**
@@ -117,9 +120,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * @param unknown_type $Sender
      * @param unknown_type $Args
      */
-    public function SettingsController_GooglePrettify_Create($Sender, $Args) {
+    public function settingsController_googlePrettify_create($Sender, $Args) {
         $Cf = new ConfigurationModule($Sender);
-        $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', TRUE);
+        $CssUrl = asset('/plugins/GooglePrettify/design/prettify.css', true);
 
         $Languages = array(
             'apollo' => 'apollo',
@@ -142,16 +145,16 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
             'yaml' => 'yaml'
         );
 
-        $Cf->Initialize(array(
-            'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => FALSE),
-            'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => FALSE),
-            'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => FALSE),
-            'Plugins.GooglePrettify.Language' => array('Control' => 'DropDown', 'Items' => $Languages, 'Options' => array('IncludeNull' => TRUE),
+        $Cf->initialize(array(
+            'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => false),
+            'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => false),
+            'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => false),
+            'Plugins.GooglePrettify.Language' => array('Control' => 'DropDown', 'Items' => $Languages, 'Options' => array('IncludeNull' => true),
                 'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
         ));
 
-        $Sender->AddSideMenu();
-        $Sender->SetData('Title', T('Syntax Prettifier Settings'));
-        $Cf->RenderAll();
+        $Sender->addSideMenu();
+        $Sender->setData('Title', t('Syntax Prettifier Settings'));
+        $Cf->renderAll();
     }
 }

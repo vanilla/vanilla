@@ -34,8 +34,9 @@ class SiteNavModule extends NavModule {
         }
 
         // If a section wasn't found then add the default nav.
-        if (!$section_found)
+        if (!$section_found) {
             $this->fireEvent('default');
+        }
 
         // Fire an event for everything.
         $this->fireEvent('all');

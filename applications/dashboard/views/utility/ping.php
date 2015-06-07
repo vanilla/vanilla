@@ -2,8 +2,8 @@
 
 <div class="SplashInfo">
     <?php
-    if ($this->Data('valid')) {
-        echo '<h1>', T('Pong'), '</h1>';
+    if ($this->data('valid')) {
+        echo '<h1>', t('Pong'), '</h1>';
     }
     ?>
 </div>

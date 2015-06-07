@@ -4,32 +4,32 @@
             <?php
             echo $this->Participants;
 
-            if ($this->Data('Conversation.Subject')) {
+            if ($this->data('Conversation.Subject')) {
                 echo
                     Bullet(' ').
-                    '<span class="Gloss">'.htmlspecialchars($this->Data('Conversation.Subject')).'</span>';
+                    '<span class="Gloss">'.htmlspecialchars($this->data('Conversation.Subject')).'</span>';
             }
             ?>
         </h1>
         <?php
 
-        if ($this->Data('Conversation.Type')) {
-            $this->FireEvent('Conversation'.str_replace('_', '', $this->Data('Conversation.Type')));
+        if ($this->data('Conversation.Type')) {
+            $this->fireEvent('Conversation'.str_replace('_', '', $this->data('Conversation.Type')));
         }
 
-        if ($this->Data('_HasDeletedUsers')) {
-            echo '<div class="Info">', T('One or more users have left this conversation.', 'One or more users have left this conversation. They won\'t receive any more messages unless you add them back in to the conversation.'), '</div>';
+        if ($this->data('_HasDeletedUsers')) {
+            echo '<div class="Info">', t('One or more users have left this conversation.', 'One or more users have left this conversation. They won\'t receive any more messages unless you add them back in to the conversation.'), '</div>';
         }
-        $this->FireEvent('BeforeConversation');
-        echo $this->Pager->ToString('less');
+        $this->fireEvent('BeforeConversation');
+        echo $this->Pager->toString('less');
         ?>
         <ul class="DataList MessageList Conversation">
             <?php
-            $MessagesViewLocation = $this->FetchViewLocation('messages');
+            $MessagesViewLocation = $this->fetchViewLocation('messages');
             include($MessagesViewLocation);
             ?>
         </ul>
     </div>
 <?php
-echo $this->Pager->ToString();
-echo Gdn::Controller()->FetchView('addmessage');
+echo $this->Pager->toString();
+echo Gdn::controller()->fetchView('addmessage');

@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * HtmLawed Plugin.
  *
@@ -10,14 +10,14 @@
 $PluginInfo['HtmLawed'] = array(
     'Description' => 'Adapts HtmLawed to work with Vanilla.',
     'Version' => '1.1',
-    'RequiredApplications' => NULL,
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
+    'RequiredApplications' => null,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-    'Hidden' => TRUE
+    'Hidden' => true
 );
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLawedPlugin', __FILE__, Gdn::FactorySingleton);
@@ -34,7 +34,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
         require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
 
         /** @var bool Whether SafeStyles is enabled. Turning this off is bad mojo. */
-        $this->SafeStyles = C('Garden.Html.SafeStyles');
+        $this->SafeStyles = c('Garden.Html.SafeStyles');
 
         /** @var array HTML elements allowed to have classes in user generated content. */
         $this->ClassedElements = array('a', 'span', 'div', 'p', 'li', 'ul', 'ol', 'dl', 'dd', 'dt', 'i', 'b', 'strong', 'em', 'code', 'blockquote', 'img', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
@@ -125,7 +125,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
     }
 
     /** @var bool  */
-    public $SafeStyles = TRUE;
+    public $SafeStyles = true;
 
     /**
      *
@@ -133,8 +133,8 @@ class HTMLawedPlugin extends Gdn_Plugin {
      * @param $Html
      * @return mixed|string
      */
-    public function Format($Html) {
-        $Attributes = C('Garden.Html.BlockedAttributes', 'on*');
+    public function format($Html) {
+        $Attributes = c('Garden.Html.BlockedAttributes', 'on*');
         $Config = array(
             'anti_link_spam' => array('`.`', ''),
             'comment' => 1,
@@ -151,7 +151,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
         );
 
         // Turn embedded videos into simple links (legacy workaround)
-        $Html = Gdn_Format::UnembedContent($Html);
+        $Html = Gdn_Format::unembedContent($Html);
 
         // We check the flag within Gdn_Format to see
         // if htmLawed should place rel="nofollow" links
@@ -211,18 +211,18 @@ class HTMLawedPlugin extends Gdn_Plugin {
     /**
      * No setup.
      */
-    public function Setup() {
+    public function setup() {
     }
 }
 
-if (!function_exists('FormatRssCustom')):
+if (!function_exists('FormatRssCustom')) :
     /**
      *
      *
      * @param $Html
      * @return mixed|string
      */
-    function FormatRssHtmlCustom($Html) {
+    function formatRssHtmlCustom($Html) {
         require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
 
         $Config = array(
@@ -253,7 +253,7 @@ endif;
  * @param int $Attributes
  * @return string
  */
-function HTMLawedHookTag($Element, $Attributes = 0) {
+function htmlawedHookTag($Element, $Attributes = 0) {
     // If second argument is not received, it means a closing tag is being handled
     if ($Attributes === 0) {
         return "</$Element>";
@@ -262,8 +262,9 @@ function HTMLawedHookTag($Element, $Attributes = 0) {
     $Attribs = '';
     foreach ($Attributes as $Key => $Value) {
         if (strcasecmp($Key, 'style') == 0) {
-            if (strpos($Value, 'position') !== FALSE || strpos($Value, 'z-index') !== FALSE || strpos($Value, 'opacity') !== FALSE)
+            if (strpos($Value, 'position') !== false || strpos($Value, 'z-index') !== false || strpos($Value, 'opacity') !== false) {
                 continue;
+            }
         }
 
         $Attribs .= " {$Key}=\"{$Value}\"";

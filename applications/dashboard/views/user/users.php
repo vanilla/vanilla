@@ -1,32 +1,32 @@
 <?php if (!defined('APPLICATION')) exit();
 $Alt = FALSE;
-$Session = Gdn::Session();
-$EditUser = $Session->CheckPermission('Garden.Users.Edit');
-$DeleteUser = $Session->CheckPermission('Garden.Users.Delete');
-$ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
-foreach ($this->UserData->Result() as $User) {
+$Session = Gdn::session();
+$EditUser = $Session->checkPermission('Garden.Users.Edit');
+$DeleteUser = $Session->checkPermission('Garden.Users.Delete');
+$ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
+foreach ($this->UserData->result() as $User) {
     $Alt = $Alt ? FALSE : TRUE;
     ?>
     <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>
         data-userid="<?php echo $User->UserID ?>">
         <!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
         <td><strong><?php
-                echo UserAnchor($User, 'Username');
+                echo userAnchor($User, 'Username');
                 ?></strong></td>
         <?php if ($ViewPersonalInfo) : ?>
             <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
         <?php endif; ?>
         <td style="max-width: 200px;">
             <?php
-            $Roles = GetValue('Roles', $User, array());
+            $Roles = val('Roles', $User, array());
             $RolesString = '';
 
             if ($User->Banned && !in_array('Banned', $Roles)) {
-                $RolesString = T('Banned');
+                $RolesString = t('Banned');
             }
 
             if ($User->Admin > 1) {
-                $RolesString = ConcatSep(', ', $RolesString, T('System'));
+                $RolesString = ConcatSep(', ', $RolesString, t('System'));
             }
 
             foreach ($Roles as $RoleID => $RoleName) {
@@ -36,25 +36,25 @@ foreach ($this->UserData->Result() as $User) {
             echo $RolesString;
             ?>
         </td>
-        <td class="Alt"><?php echo Gdn_Format::Date($User->DateFirstVisit, 'html'); ?></td>
-        <td><?php echo Gdn_Format::Date($User->DateLastActive, 'html'); ?></td>
+        <td class="Alt"><?php echo Gdn_Format::date($User->DateFirstVisit, 'html'); ?></td>
+        <td><?php echo Gdn_Format::date($User->DateLastActive, 'html'); ?></td>
         <?php if ($ViewPersonalInfo) : ?>
             <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
         <?php endif; ?>
         <?php
         $this->EventArguments['User'] = $User;
-        $this->FireEvent('UserCell');
+        $this->fireEvent('UserCell');
         ?>
         <?php if ($EditUser || $DeleteUser) { ?>
             <td><?php
                 if ($EditUser)
-                    echo Anchor(T('Edit'), '/user/edit/'.$User->UserID, 'Popup SmallButton');
+                    echo anchor(t('Edit'), '/user/edit/'.$User->UserID, 'Popup SmallButton');
 
                 if ($DeleteUser && $User->UserID != $Session->User->UserID)
-                    echo Anchor(T('Delete'), '/user/delete/'.$User->UserID, 'SmallButton');
+                    echo anchor(t('Delete'), '/user/delete/'.$User->UserID, 'SmallButton');
 
                 $this->EventArguments['User'] = $User;
-                $this->FireEvent('UserListOptions');
+                $this->fireEvent('UserListOptions');
                 ?></td>
         <?php } ?>
     </tr>

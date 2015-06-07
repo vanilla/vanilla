@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$VanillaID = $this->Data('VanillaID');
-$VanillaVersion = $this->Data('VanillaVersion');
-$SecurityToken = $this->Data('SecurityToken');
+$VanillaID = $this->data('VanillaID');
+$VanillaVersion = $this->data('VanillaVersion');
+$SecurityToken = $this->data('SecurityToken');
 
 function Capitalize($Word) {
     return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
 }
 
 function WriteRangeTab($Range, $Sender) {
-    echo Wrap(
-            Anchor(
+    echo wrap(
+            anchor(
                 Capitalize($Range),
                 'settings?'
                 .http_build_query(array('Range' => $Range))
@@ -24,7 +24,7 @@ function WriteRangeTab($Range, $Sender) {
 <h1>Dashboard</h1>
 <div class="Tabs DateRangeTabs">
     <input type="text" name="DateRange" class="DateRange DateRangeActive"
-           value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')).' - '.Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>"/>
+           value="<?php echo Gdn_Format::date($this->StampStart, t('Date.DefaultFormat')).' - '.Gdn_Format::date($this->StampEnd, t('Date.DefaultFormat')); ?>"/>
     <input type="hidden" name="Range" class="Range" value="<?php echo $this->Range; ?>"/>
     <input type="hidden" name="VanillaID" class="VanillaID" value="<?php echo $VanillaID ?>"/>
     <input type="hidden" name="VanillaVersion" class="VanillaVersion" value="<?php echo $VanillaVersion ?>"/>
@@ -39,7 +39,7 @@ function WriteRangeTab($Range, $Sender) {
 </div>
 <div class="Picker"></div>
 <script type="text/javascript"
-        src="<?php echo $this->Data('VanillaStatsUrl'); ?>/applications/vanillastats/js/remote.js"></script>
+        src="<?php echo $this->data('VanillaStatsUrl'); ?>/applications/vanillastats/js/remote.js"></script>
 <div class="DashboardSummaries">
     <div class="Loading"></div>
 </div>
@@ -57,12 +57,12 @@ function WriteRangeTab($Range, $Sender) {
     });
 </script>
 <div class="Column Column1 ReleasesColumn">
-    <h1><?php echo T('Updates'); ?></h1>
+    <h1><?php echo t('Updates'); ?></h1>
 
     <div class="List"></div>
 </div>
 <div class="Column Column2 NewsColumn">
-    <h1><?php echo T('Recent News'); ?></h1>
+    <h1><?php echo t('Recent News'); ?></h1>
 
     <div class="List"></div>
 </div>

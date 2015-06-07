@@ -1,28 +1,28 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <div class="Help Aside">
         <?php
-        echo Wrap(T('Need More Help?'), 'h2');
+        echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
-        echo Wrap(Anchor(T("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
+        echo wrap(Anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
         echo '</ul>';
         ?>
     </div>
-    <h1><?php echo T('User Registration Settings'); ?></h1>
+    <h1><?php echo t('User Registration Settings'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
-echo Gdn::Slice('/dashboard/role/defaultroleswarning');
+echo Gdn::slice('/dashboard/role/defaultroleswarning');
 
 ?>
     <ul>
         <li id="RegistrationMethods">
-            <div class="Info"><?php echo T('Change the way that new users register with the site.'); ?></div>
+            <div class="Info"><?php echo t('Change the way that new users register with the site.'); ?></div>
             <table class="Label AltColumns">
                 <thead>
                 <tr>
-                    <th><?php echo T('Method'); ?></th>
-                    <th class="Alt"><?php echo T('Description'); ?></th>
+                    <th><?php echo t('Method'); ?></th>
+                    <th class="Alt"><?php echo t('Description'); ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -47,7 +47,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
 
                             echo $this->Form->Radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
                             ?></th>
-                        <td class="Alt"><?php echo T($Description); ?></td>
+                        <td class="Alt"><?php echo t($Description); ?></td>
                     </tr>
                 <?php
                 }
@@ -57,56 +57,56 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
         </li>
         <li id="CaptchaSettings">
             <div
-                class="Info"><?php echo T('Captcha Explanation', 'The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.', '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
+                class="Info"><?php echo t('Captcha Explanation', 'The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.', '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
             <table class="Label AltColumns">
                 <thead>
                 <tr>
-                    <th><?php echo T('Key Type'); ?></th>
-                    <th class="Alt"><?php echo T('Key Value'); ?></th>
+                    <th><?php echo t('Key Type'); ?></th>
+                    <th class="Alt"><?php echo t('Key Value'); ?></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr class="Alt">
-                    <th><?php echo T('Public Key'); ?></th>
-                    <td class="Alt"><?php echo $this->Form->TextBox('Garden.Registration.CaptchaPublicKey'); ?></td>
+                    <th><?php echo t('Public Key'); ?></th>
+                    <td class="Alt"><?php echo $this->Form->textBox('Garden.Registration.CaptchaPublicKey'); ?></td>
                 </tr>
                 <tr>
-                    <th><?php echo T('Private Key'); ?></th>
-                    <td class="Alt"><?php echo $this->Form->TextBox('Garden.Registration.CaptchaPrivateKey'); ?></td>
+                    <th><?php echo t('Private Key'); ?></th>
+                    <td class="Alt"><?php echo $this->Form->textBox('Garden.Registration.CaptchaPrivateKey'); ?></td>
                 </tr>
                 </tbody>
             </table>
         </li>
         <li id="InvitationExpiration">
             <?php
-            echo $this->Form->Label('Invitations will expire', 'Garden.Registration.InviteExpiration');
+            echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration');
             echo $this->Form->DropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, array('value' => $this->InviteExpiration));
             ?>
         </li>
         <li id="InvitationSettings">
             <div class="Info">
                 <?php
-                echo sprintf(T('Invitations can be sent from users\' profile pages.',
+                echo sprintf(t('Invitations can be sent from users\' profile pages.',
                     'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.'),
-                    Url('/dashboard/profile/invitations')),
+                    url('/dashboard/profile/invitations')),
                 '<br /><br />';
 
-                echo T('Choose who can send out invitations to new members:');
+                echo t('Choose who can send out invitations to new members:');
                 ?>
             </div>
             <table class="Label AltColumns">
                 <thead>
                 <tr>
-                    <th><?php echo T('Role'); ?></th>
-                    <th class="Alt"><?php echo T('Invitations per month'); ?></th>
+                    <th><?php echo t('Role'); ?></th>
+                    <th class="Alt"><?php echo t('Invitations per month'); ?></th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
                 $i = 0;
-                $Count = $this->RoleData->NumRows();
+                $Count = $this->RoleData->numRows();
                 $Alt = FALSE;
-                foreach ($this->RoleData->Result() as $Role) {
+                foreach ($this->RoleData->result() as $Role) {
                     $Alt = $Alt ? FALSE : TRUE;
                     $CssClass = $Alt ? 'Alt' : '';
                     ++$i;
@@ -114,7 +114,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                         $CssClass .= ' Last';
 
                     $CssClass = trim($CssClass);
-                    $CurrentValue = ArrayValue($Role['RoleID'], $this->ExistingRoleInvitations, FALSE);
+                    $CurrentValue = arrayValue($Role['RoleID'], $this->ExistingRoleInvitations, false);
                     ?>
                     <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                         <th><?php echo $Role['Name']; ?></th>
@@ -134,15 +134,15 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
         <li>
             <div class="Info">
                 <?php
-                if (UserModel::NoEmail()) {
+                if (UserModel::noEmail()) {
                     echo '<div class="Warning">',
-                    T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
+                    t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
                     '</div>';
                 }
 
-                echo $this->Form->CheckBox('Garden.Registration.ConfirmEmail', '@'.T('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
+                echo $this->Form->CheckBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
                 ?>
             </div>
         </li>
     </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

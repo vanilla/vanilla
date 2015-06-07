@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once $this->FetchViewLocation('helper_functions');
-function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
+require_once $this->fetchViewLocation('helper_functions');
+function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
     $Tutorial = GetTutorials($TutorialCode);
     if (!$Tutorial)
         return '';
 
     $Thumbnail = $ThumbnailSize == 'medium' ? $Tutorial['Thumbnail'] : $Tutorial['LargeThumbnail'];
-    return Anchor(
+    return anchor(
         '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" title="'.$Tutorial['Name'].'" />'
-        .($WriteTitle ? Wrap($Tutorial['Name']) : ''),
+        .($WriteTitle ? wrap($Tutorial['Name']) : ''),
         'settings/tutorials/'.$Tutorial['Code']
     );
 }
@@ -181,28 +181,28 @@ function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
             margin: 0;
         }
     </style>
-    <h1><?php echo T('Getting Started with Vanilla'); ?></h1>
+    <h1><?php echo t('Getting Started with Vanilla'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <div class="Info">
         <div class="Welcome">
-            <h2><?php echo T('Getting Started with Vanilla'); ?></h2>
+            <h2><?php echo t('Getting Started with Vanilla'); ?></h2>
 
-            <p><strong><?php echo T('Kick-start your community and increase user engagement.'); ?></strong></p>
+            <p><strong><?php echo t('Kick-start your community and increase user engagement.'); ?></strong></p>
 
-            <p><?php echo T("Check out these tutorials to get started using Vanilla", "Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?></p>
+            <p><?php echo t("Check out these tutorials to get started using Vanilla", "Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?></p>
 
-            <p><?php echo Anchor(T("Check out the full list of video tutorials here."), 'settings/tutorials'); ?></p>
+            <p><?php echo anchor(t("Check out the full list of video tutorials here."), 'settings/tutorials'); ?></p>
 
             <div class="Video"><?php echo TutLink('introduction', FALSE, 'large'); ?></div>
         </div>
         <div class="Step">
             <div class="NumberPoint">1</div>
-            <h2><?php echo T('The Basics'); ?></h2>
+            <h2><?php echo t('The Basics'); ?></h2>
 
-            <p><?php echo T('Learn how to use the basic functionality of your forum.'); ?></p>
+            <p><?php echo t('Learn how to use the basic functionality of your forum.'); ?></p>
 
             <div class="Videos">
                 <?php
@@ -214,9 +214,9 @@ echo $this->Form->Errors();
         </div>
         <div class="Step">
             <div class="NumberPoint">2</div>
-            <h2><?php echo T("Appearance"); ?></h2>
+            <h2><?php echo t("Appearance"); ?></h2>
 
-            <p><?php echo T("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></p>
+            <p><?php echo t("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></p>
 
             <div class="Videos">
                 <?php echo TutLink('appearance'); ?>
@@ -224,9 +224,9 @@ echo $this->Form->Errors();
         </div>
         <div class="Step">
             <div class="NumberPoint">3</div>
-            <h2><?php echo T('Organize'); ?></h2>
+            <h2><?php echo t('Organize'); ?></h2>
 
-            <p><?php echo T('Create & organize discussion categories and manage your users.'); ?></p>
+            <p><?php echo t('Create & organize discussion categories and manage your users.'); ?></p>
 
             <div class="Videos">
                 <?php
@@ -239,19 +239,19 @@ echo $this->Form->Errors();
         </div>
         <div class="Step">
             <div class="NumberPoint">4</div>
-            <h2><?php echo T('Encourage your friends to join your new community!'); ?></h2>
+            <h2><?php echo t('Encourage your friends to join your new community!'); ?></h2>
 
             <div class="TextBoxWrapper">
                 <?php
-                $Attribs = array('Multiline' => TRUE, 'class' => 'Message');
-                if (!$this->Form->AuthenticatedPostBack())
-                    $Attribs['value'] = T('InvitationMessage', "Hi Pal!
+                $Attribs = array('Multiline' => true, 'class' => 'Message');
+                if (!$this->Form->authenticatedPostBack())
+                    $Attribs['value'] = t('InvitationMessage', "Hi Pal!
 
 Check out the new community forum I've just set up. It's a great place for us to chat with each other online.
 
 Follow the link below to log in.");
-                echo $this->Form->TextBox('InvitationMessage', $Attribs);
-                echo $this->Form->TextBox('Recipients', array('class' => 'RecipientBox'));
+                echo $this->Form->textBox('InvitationMessage', $Attribs);
+                echo $this->Form->textBox('Recipients', array('class' => 'RecipientBox'));
                 ?>
             </div>
             <script type="text/javascript">
@@ -269,7 +269,7 @@ Follow the link below to log in.");
                     });
                 });
             </script>
-            <?php echo $this->Form->Button(T('Send Invitations!')); ?>
+            <?php echo $this->Form->button(t('Send Invitations!')); ?>
         </div>
     </div>
-<?php echo $this->Form->Close(); ?>
+<?php echo $this->Form->close(); ?>

@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-if ($this->Data('_CssClass')) {
-    if ($this->Data('_Value')) {
-        echo ' <span class="'.$this->Data('_CssClass').'">'.$this->Data('_Value').'</span>';
+if ($this->data('_CssClass')) {
+    if ($this->data('_Value')) {
+        echo ' <span class="'.$this->data('_CssClass').'">'.$this->data('_Value').'</span>';
     }
 } else {
-    echo $this->Data('_Value');
+    echo $this->data('_Value');
 }

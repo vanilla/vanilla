@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * InThisDiscussion module.
  *
@@ -12,52 +12,78 @@
  */
 class InThisDiscussionModule extends Gdn_Module {
 
+    /** @var array */
     protected $_UserData;
 
+    /**
+     *
+     *
+     * @param string $Sender
+     */
     public function __construct($Sender = '') {
-        $this->_UserData = FALSE;
+        $this->_UserData = false;
         parent::__construct($Sender);
     }
 
-    public function GetData($DiscussionID, $Limit = 50) {
-        $SQL = Gdn::SQL();
+    /**
+     *
+     *
+     * @param $DiscussionID
+     * @param int $Limit
+     * @throws Exception
+     */
+    public function getData($DiscussionID, $Limit = 50) {
+        $SQL = Gdn::sql();
         $this->_UserData = $SQL
-            ->Select('u.UserID, u.Name, u.Photo')
-            ->Select('c.DateInserted', 'max', 'DateLastActive')
-            ->From('User u')
-            ->Join('Comment c', 'u.UserID = c.InsertUserID')
-            ->Where('c.DiscussionID', $DiscussionID)
-            ->GroupBy('u.UserID, u.Name')
-            ->OrderBy('c.DateInserted', 'desc')
-            ->Limit($Limit)
-            ->Get();
+            ->select('u.UserID, u.Name, u.Photo')
+            ->select('c.DateInserted', 'max', 'DateLastActive')
+            ->from('User u')
+            ->join('Comment c', 'u.UserID = c.InsertUserID')
+            ->where('c.DiscussionID', $DiscussionID)
+            ->groupBy('u.UserID, u.Name')
+            ->orderBy('c.DateInserted', 'desc')
+            ->limit($Limit)
+            ->get();
     }
 
-    public function AssetTarget() {
+    /**
+     * Default render location.
+     *
+     * @return string
+     */
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
-        if ($this->_UserData->NumRows() == 0)
+    /**
+     * Build HTML.
+     *
+     * @return string HTML.
+     */
+    public function toString() {
+        if ($this->_UserData->numRows() == 0) {
             return '';
+        }
 
         $String = '';
         ob_start();
         ?>
         <div class="Box">
-            <?php echo panelHeading(T('In this Discussion')); ?>
+            <?php echo panelHeading(t('In this Discussion')); ?>
             <ul class="PanelInfo">
-                <?php foreach ($this->_UserData->Result() as $User): ?>
+                <?php foreach ($this->_UserData->Result() as $User) :
+?>
                     <li>
                         <?php
-                        echo Anchor(
-                            Wrap(Wrap(Gdn_Format::Date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
-                            Wrap(Wrap(GetValue('Name', $User), 'span', array('class' => 'Username')), 'span'),
-                            UserUrl($User)
+                        echo anchor(
+                            wrap(wrap(Gdn_Format::date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
+                            wrap(wrap(val('Name', $User), 'span', array('class' => 'Username')), 'span'),
+                            userUrl($User)
                         )
                         ?>
                     </li>
-                <?php endforeach; ?>
+                <?php
+endforeach; ?>
             </ul>
         </div>
         <?php

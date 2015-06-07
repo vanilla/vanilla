@@ -1,21 +1,21 @@
 <?php if (!defined('APPLICATION')) exit();
-$ShowAllCategoriesPref = Gdn::Session()->GetPreference('ShowAllCategories');
-$Url = Gdn::Request()->Path();
+$ShowAllCategoriesPref = Gdn::session()->GetPreference('ShowAllCategories');
+$Url = Gdn::request()->Path();
 ?>
 
 <div class="CategoryFilter">
-    <div class="CategoryFilterTitle"><?php echo T('Category Filter'); ?></div>
+    <div class="CategoryFilterTitle"><?php echo t('Category Filter'); ?></div>
     <div class="CategoryFilterOptions">
-        <?php echo Wrap(T('Viewing'), 'span').': '; ?>
+        <?php echo wrap(t('Viewing'), 'span').': '; ?>
         <?php
         if ($ShowAllCategoriesPref):
-            echo Wrap(T('all categories'), 'span', array('class' => 'CurrentFilter'));
+            echo wrap(t('all categories'), 'span', array('class' => 'CurrentFilter'));
             echo ' | ';
-            echo Wrap(Anchor(T('followed categories'), $Url.'?ShowAllCategories=false'), 'span');
+            echo wrap(Anchor(t('followed categories'), $Url.'?ShowAllCategories=false'), 'span');
         else:
-            echo Wrap(Anchor(T('all categories'), $Url.'?ShowAllCategories=true'), 'span');
+            echo wrap(Anchor(t('all categories'), $Url.'?ShowAllCategories=true'), 'span');
             echo ' | ';
-            echo Wrap(T('followed categories'), 'span', array('class' => 'CurrentFilter'));
+            echo wrap(t('followed categories'), 'span', array('class' => 'CurrentFilter'));
         endif;
         ?>
     </div>

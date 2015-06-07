@@ -13,7 +13,7 @@
  */
 class SignedInModule extends Gdn_Module {
 
-    public function AssetTarget() {
+    public function assetTarget() {
         $this->_ApplicationFolder = 'dashboard';
         return 'Panel';
     }

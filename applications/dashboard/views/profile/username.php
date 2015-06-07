@@ -6,6 +6,6 @@
     if ($this->User->Title)
         echo Gdn_Theme::BulletItem('Title');
     echo ' '.Bullet().' '.Wrap(htmlspecialchars($this->User->Title), 'span', array('class' => 'User-Title'));
-    $this->FireEvent('UsernameMeta');
+    $this->fireEvent('UsernameMeta');
     echo '</span>';
     ?></h1>

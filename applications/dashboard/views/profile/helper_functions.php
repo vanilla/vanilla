@@ -6,23 +6,23 @@ if (!function_exists('UserVerified')):
      * @param array|object $User
      * @return string
      */
-    function UserVerified($User) {
-        $UserID = GetValue('UserID', $User);
+    function userVerified($User) {
+        $UserID = val('UserID', $User);
 
-        if (GetValue('Verified', $User)) {
-            $Label = T('Verified');
-            $Title = T('Verified Description', 'Verified users bypass spam and pre-moderation filters.');
+        if (val('Verified', $User)) {
+            $Label = t('Verified');
+            $Title = t('Verified Description', 'Verified users bypass spam and pre-moderation filters.');
             $Url = "/user/verify.json?userid=$UserID&verified=0";
         } else {
-            $Label = T('Not Verified');
-            $Title = T('Not Verified Description', 'Unverified users are passed through spam and pre-moderation filters.');
+            $Label = t('Not Verified');
+            $Title = t('Not Verified Description', 'Unverified users are passed through spam and pre-moderation filters.');
             $Url = "/user/verify.json?userid=$UserID&verified=1";
         }
 
-        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-            return Anchor($Label, $Url, array('title' => $Title, 'class' => 'User-Verified Hijack'));
+        if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            return anchor($Label, $Url, array('title' => $Title, 'class' => 'User-Verified Hijack'));
         } else {
-            return Wrap($Label, 'span', array('title' => $Title, 'class' => 'User-Verified'));
+            return wrap($Label, 'span', array('title' => $Title, 'class' => 'User-Verified'));
         }
     }
 

@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<?php if (!count($this->Data('SearchResults')) && $this->Data('SearchTerm'))
-    echo '<p class="NoResults">', sprintf(T('No results for %s.', 'No results for <b>%s</b>.'), $this->Data('SearchTerm')), '</p>';
+<?php if (!count($this->data('SearchResults')) && $this->data('SearchTerm'))
+    echo '<p class="NoResults">', sprintf(t('No results for %s.', 'No results for <b>%s</b>.'), $this->data('SearchTerm')), '</p>';
 ?>
-    <ol id="search-results" class="DataList DataList-Search" start="<?php echo $this->Data('From'); ?>">
-        <?php foreach ($this->Data('SearchResults') as $Row): ?>
+    <ol id="search-results" class="DataList DataList-Search" start="<?php echo $this->data('From'); ?>">
+        <?php foreach ($this->data('SearchResults') as $Row): ?>
             <li class="Item Item-Search">
-                <h3><?php echo Anchor(htmlspecialchars($Row['Title']), $Row['Url']); ?></h3>
+                <h3><?php echo anchor(htmlspecialchars($Row['Title']), $Row['Url']); ?></h3>
 
                 <div class="Item-Body Media">
                     <?php
-                    $Photo = UserPhoto($Row, array('LinkClass' => 'Img'));
+                    $Photo = userPhoto($Row, array('LinkClass' => 'Img'));
                     if ($Photo) {
                         echo $Photo;
                     }
@@ -19,18 +19,18 @@
                         <div class="Meta">
                             <?php
                             echo ' <span class="MItem-Author">'.
-                                sprintf(T('by %s'), UserAnchor($Row)).
+                                sprintf(t('by %s'), userAnchor($Row)).
                                 '</span>';
 
                             echo Bullet(' ');
                             echo ' <span clsss="MItem-DateInserted">'.
-                                Gdn_Format::Date($Row['DateInserted'], 'html').
+                                Gdn_Format::date($Row['DateInserted'], 'html').
                                 '</span> ';
 
 
                             if (isset($Row['Breadcrumbs'])) {
                                 echo Bullet(' ');
-                                echo ' <span class="MItem-Location">'.Gdn_Theme::Breadcrumbs($Row['Breadcrumbs'], FALSE).'</span> ';
+                                echo ' <span class="MItem-Location">'.Gdn_Theme::Breadcrumbs($Row['Breadcrumbs'], false).'</span> ';
                             }
 
                             if (isset($Row['Notes'])) {
@@ -42,7 +42,7 @@
                             <?php echo $Row['Summary']; ?>
                         </div>
                         <?php
-                        $Count = GetValue('Count', $Row);
+                        $Count = val('Count', $Row);
                         //            $i = 0;
                         //            if (isset($Row['Children'])) {
                         //               echo '<ul>';
@@ -55,7 +55,7 @@
                         //                  $Count--;
                         //
                         //                  echo "\n<li>".
-                        //                     Anchor($child['Summary'], $child['Url']);
+                        //                     anchor($child['Summary'], $child['Url']);
                         //                     '</li>';
                         //
                         //                  if ($i >= 3)
@@ -65,8 +65,8 @@
                         //            }
 
                         if (($Count) > 1) {
-                            $url = $this->Data('SearchUrl').'&discussionid='.urlencode($Row['DiscussionID']).'#search-results';
-                            echo '<div>'.Anchor(Plural($Count, '%s result', '%s results'), $url).'</div>';
+                            $url = $this->data('SearchUrl').'&discussionid='.urlencode($Row['DiscussionID']).'#search-results';
+                            echo '<div>'.anchor(Plural($Count, '%s result', '%s results'), $url).'</div>';
                         }
                         ?>
                     </div>
@@ -78,10 +78,10 @@
 <?php
 echo '<div class="PageControls Bottom">';
 
-$RecordCount = $this->Data('RecordCount');
+$RecordCount = $this->data('RecordCount');
 if ($RecordCount)
-    echo '<span class="Gloss">'.Plural($RecordCount, '%s result', '%s results').'</span>';
+    echo '<span class="Gloss">'.plural($RecordCount, '%s result', '%s results').'</span>';
 
-PagerModule::Write(array('Wrapper' => '<div %1$s>%2$s</div>'));
+PagerModule::write(array('Wrapper' => '<div %1$s>%2$s</div>'));
 
 echo '</div>';

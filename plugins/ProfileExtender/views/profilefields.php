@@ -13,7 +13,7 @@ if (is_array($this->ProfileFields)) {
         if ($Field['FormType'] == 'CheckBox') {
             continue;
         } else {
-            echo Wrap($Sender->Form->Label($Field['Label'], $Name).
+            echo wrap($Sender->Form->label($Field['Label'], $Name).
                 $Sender->Form->{$Field['FormType']}($Name, $Options), 'li');
         }
     }

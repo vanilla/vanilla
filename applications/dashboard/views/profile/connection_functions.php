@@ -1,24 +1,24 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteConnection($Row) {
-    $c = Gdn::Controller();
-    $Connected = GetValue('Connected', $Row);
+function writeConnection($Row) {
+    $c = Gdn::controller();
+    $Connected = val('Connected', $Row);
     ?>
     <li id="<?php echo "Provider_{$Row['ProviderKey']}"; ?>" class="Item">
         <div class="Connection-Header">
          <span class="IconWrap">
             <?php
-            echo Img(GetValue('Icon', $Row, Asset('/applications/dashboard/design/images/connection-64.png')));
+            echo img(val('Icon', $Row, Asset('/applications/dashboard/design/images/connection-64.png')));
             ?>
          </span>
          <span class="Connection-Name">
             <?php
-            echo GetValue('Name', $Row, T('Unknown'));
+            echo val('Name', $Row, t('Unknown'));
 
             if ($Connected) {
                 echo ' <span class="Gloss Connected">';
 
-                if ($Photo = GetValueR('Profile.Photo', $Row)) {
+                if ($Photo = valr('Profile.Photo', $Row)) {
                     echo ' '.Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall'));
                 }
 
@@ -36,7 +36,7 @@ function WriteConnection($Row) {
          <?php
 
         //         if (Debug()) {
-        //            decho(GetValue($Row['ProviderKey'], $c->User->Attributes), 'Attributes');
+        //            decho(val($Row['ProviderKey'], $c->User->Attributes), 'Attributes');
         //         }
         ?>
       </div>-->
@@ -45,19 +45,19 @@ function WriteConnection($Row) {
 }
 
 
-function ConnectButton($Row) {
-    $c = Gdn::Controller();
+function connectButton($Row) {
+    $c = Gdn::controller();
 
-    $Connected = GetValue('Connected', $Row);
+    $Connected = val('Connected', $Row);
     $CssClass = $Connected ? 'Active' : 'InActive';
-    $ConnectUrl = GetValue('ConnectUrl', $Row);
-    $DisconnectUrl = UserUrl($c->User, '', 'Disconnect', array('provider' => $Row['ProviderKey']));
+    $ConnectUrl = val('ConnectUrl', $Row);
+    $DisconnectUrl = userUrl($c->User, '', 'Disconnect', array('provider' => $Row['ProviderKey']));
 
     $Result = '<span class="ActivateSlider ActivateSlider-'.$CssClass.'">';
     if ($Connected) {
-        $Result .= Anchor(T('Connected'), $DisconnectUrl, 'Button Primary Hijack');
+        $Result .= anchor(t('Connected'), $DisconnectUrl, 'Button Primary Hijack');
     } else {
-        $Result .= Anchor(T('Connect'), $ConnectUrl, 'Button', array('target' => '_top'));
+        $Result .= anchor(t('Connect'), $ConnectUrl, 'Button', array('target' => '_top'));
     }
     $Result .= '</span>';
 

@@ -1,36 +1,36 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
-$CountAllowed = GetValue('CountAllowed', $this->Data, 0);
-$CountNotAllowed = GetValue('CountNotAllowed', $this->Data, 0);
-$CountCheckedDiscussions = GetValue('CountCheckedDiscussions', $this->Data, 0);
+$CountAllowed = val('CountAllowed', $this->Data, 0);
+$CountNotAllowed = val('CountNotAllowed', $this->Data, 0);
+$CountCheckedDiscussions = val('CountCheckedDiscussions', $this->Data, 0);
 
 if ($CountNotAllowed > 0) {
-    echo Wrap(sprintf(
-        T('NoPermissionToDeleteDiscussions', 'You do not have permission to delete %1$s of the selected discussions.'),
+    echo wrap(sprintf(
+        t('NoPermissionToDeleteDiscussions', 'You do not have permission to delete %1$s of the selected discussions.'),
         $CountNotAllowed
     ), 'p');
 
-    echo Wrap(sprintf(
-        T('AboutToDeleteSelectedDiscussions', 'You are about to delete %1$s of the %2$s selected discussions.'),
+    echo wrap(sprintf(
+        t('AboutToDeleteSelectedDiscussions', 'You are about to delete %1$s of the %2$s selected discussions.'),
         $CountAllowed,
         $CountCheckedDiscussions
     ), 'p');
 } else {
-    echo Wrap(sprintf(
-        T('AboutToDelete', 'You are about to delete %s.'),
-        Plural($CountAllowed, '%s discussion', '%s discussions')
+    echo wrap(sprintf(
+        t('AboutToDelete', 'You are about to delete %s.'),
+        plural($CountAllowed, '%s discussion', '%s discussions')
     ), 'p');
 }
 
-echo '<p><strong>'.T('Are you sure you wish to continue?').'</strong></p>';
+echo '<p><strong>'.t('Are you sure you wish to continue?').'</strong></p>';
 
 echo '<div class="Buttons Buttons-Confirm">',
-$this->Form->Button('OK', array('class' => 'Button Primary')),
-$this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+$this->Form->button('OK', array('class' => 'Button Primary')),
+$this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
 '</div>';
 
-echo $this->Form->Close();
+echo $this->Form->close();

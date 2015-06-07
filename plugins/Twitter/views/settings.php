@@ -51,46 +51,46 @@
             padding: 4px 3px;
         }
     </style>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <div class="Info">
-        <?php echo T('Twitter Connect allows users to sign in using their Twitter account.', 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>'); ?>
+        <?php echo t('Twitter Connect allows users to sign in using their Twitter account.', 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>'); ?>
     </div>
     <div class="Configuration">
         <div class="ConfigurationForm">
             <ul>
                 <li>
                     <?php
-                    echo $this->Form->Label('Consumer Key', 'ConsumerKey');
-                    echo $this->Form->TextBox('ConsumerKey');
+                    echo $this->Form->label('Consumer Key', 'ConsumerKey');
+                    echo $this->Form->textBox('ConsumerKey');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->Label('Consumer Secret', 'Secret');
-                    echo $this->Form->TextBox('Secret');
+                    echo $this->Form->label('Consumer Secret', 'Secret');
+                    echo $this->Form->textBox('Secret');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSignIn', 'Enable Social Sign In');
+                    echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
+                    echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSharing', 'Enable automatic Social Share.');
+                    echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
                     ?>
                 </li>
             </ul>
-            <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
+            <?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
         </div>
         <div class="ConfigurationHelp">
             <p><strong>How to set up Twitter Connect</strong></p>
@@ -106,8 +106,8 @@ echo $this->Form->Errors();
                     click Save.
                 </li>
             </ol>
-            <p><?php echo Anchor(Img('/plugins/Twitter/design/help-consumervalues-sm.png', array('style' => 'max-width: 763px;')), '/plugins/Twitter/design/help-consumervalues.png', array('target' => '_blank')); ?></p>
+            <p><?php echo anchor(Img('/plugins/Twitter/design/help-consumervalues-sm.png', array('style' => 'max-width: 763px;')), '/plugins/Twitter/design/help-consumervalues.png', array('target' => '_blank')); ?></p>
         </div>
     </div>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();

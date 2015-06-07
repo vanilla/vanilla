@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * Quotes Plugin.
  *
@@ -13,12 +13,9 @@ $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
     'Version' => '1.6.10',
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => TRUE,
-    'RegisterPermissions' => FALSE,
+    'HasLocale' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -39,7 +36,7 @@ $PluginInfo['Quotes'] = array(
 class QuotesPlugin extends Gdn_Plugin {
 
     /** @var bool */
-    public $HandleRenderQuotes = TRUE;
+    public $HandleRenderQuotes = true;
 
     /**
      *
@@ -54,7 +51,7 @@ class QuotesPlugin extends Gdn_Plugin {
         }
 
         // Whether to handle drawing quotes or leave it up to some other plugin
-        $this->HandleRenderQuotes = C('Plugins.Quotes.RenderQuotes', TRUE);
+        $this->HandleRenderQuotes = c('Plugins.Quotes.RenderQuotes', true);
     }
 
     /**
@@ -62,18 +59,18 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-        if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+    public function profileController_afterAddSideMenu_handler($Sender) {
+        if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
             return;
         }
 
         $SideMenu = $Sender->EventArguments['SideMenu'];
-        $ViewingUserID = Gdn::Session()->UserID;
+        $ViewingUserID = Gdn::session()->UserID;
 
         if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup'));
         } else {
-            $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), userUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
         }
     }
 
@@ -82,9 +79,9 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function ProfileController_Quotes_Create($Sender) {
-        $Sender->Permission('Garden.SignIn.Allow');
-        $Sender->Title(T("Quotes Settings"));
+    public function profileController_quotes_create($Sender) {
+        $Sender->permission('Garden.SignIn.Allow');
+        $Sender->title(t("Quotes Settings"));
 
         $Args = $Sender->RequestArgs;
         if (sizeof($Args) < 2) {
@@ -95,45 +92,45 @@ class QuotesPlugin extends Gdn_Plugin {
 
         list($UserReference, $Username) = $Args;
 
-        $Sender->GetUserInfo($UserReference, $Username);
-        $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
+        $Sender->getUserInfo($UserReference, $Username);
+        $UserPrefs = Gdn_Format::unserialize($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
 
-        $UserID = Gdn::Session()->UserID;
+        $UserID = Gdn::session()->UserID;
         $ViewingUserID = $UserID;
 
         if ($Sender->User->UserID != $ViewingUserID) {
-            $Sender->Permission('Garden.Users.Edit');
+            $Sender->permission('Garden.Users.Edit');
             $UserID = $Sender->User->UserID;
-            $Sender->SetData('ForceEditing', $Sender->User->Name);
+            $Sender->setData('ForceEditing', $Sender->User->Name);
         } else {
-            $Sender->SetData('ForceEditing', FALSE);
+            $Sender->setData('ForceEditing', false);
         }
 
-        $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
-        $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
+        $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
+        $Sender->Form->setValue('QuoteFolding', $QuoteFolding);
 
-        $Sender->SetData('QuoteFoldingOptions', array(
-            'None' => T("Don't fold quotes"),
-            '1' => Plural(1, '%s level deep', '%s levels deep'),
-            '2' => Plural(2, '%s level deep', '%s levels deep'),
-            '3' => Plural(3, '%s level deep', '%s levels deep'),
-            '4' => Plural(4, '%s level deep', '%s levels deep'),
-            '5' => Plural(5, '%s level deep', '%s levels deep')
+        $Sender->setData('QuoteFoldingOptions', array(
+            'None' => t("Don't fold quotes"),
+            '1' => plural(1, '%s level deep', '%s levels deep'),
+            '2' => plural(2, '%s level deep', '%s levels deep'),
+            '3' => plural(3, '%s level deep', '%s levels deep'),
+            '4' => plural(4, '%s level deep', '%s levels deep'),
+            '5' => plural(5, '%s level deep', '%s levels deep')
         ));
 
         // Form submission handling.
-        if ($Sender->Form->AuthenticatedPostBack()) {
-            $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
+        if ($Sender->Form->authenticatedPostBack()) {
+            $NewFoldingLevel = $Sender->Form->getValue('QuoteFolding', '1');
             if ($NewFoldingLevel != $QuoteFolding) {
-                Gdn::UserModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
-                $Sender->InformMessage(T("Your changes have been saved."));
+                Gdn::userModel()->savePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
+                $Sender->informMessage(t("Your changes have been saved."));
             }
         }
 
-        $Sender->Render('quotes', '', 'plugins/Quotes');
+        $Sender->render('quotes', '', 'plugins/Quotes');
     }
 
     /**
@@ -141,18 +138,18 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-        if (!Gdn::Session()->IsValid()) {
+    public function discussionController_beforeDiscussionRender_handler($Sender) {
+        if (!Gdn::session()->isValid()) {
             return;
         }
 
-        $UserPrefs = Gdn_Format::Unserialize(Gdn::Session()->User->Preferences);
+        $UserPrefs = Gdn_Format::unserialize(Gdn::session()->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
 
-        $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
-        $Sender->AddDefinition('QuotesFolding', $QuoteFolding);
+        $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
+        $Sender->addDefinition('QuotesFolding', $QuoteFolding);
     }
 
     /**
@@ -161,8 +158,8 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Sender
      * @throws Exception
      */
-    public function PluginController_Quotes_Create($Sender) {
-        $this->Dispatch($Sender, $Sender->RequestArgs);
+    public function pluginController_quotes_create($Sender) {
+        $this->dispatch($Sender, $Sender->RequestArgs);
     }
 
     /**
@@ -170,8 +167,8 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Controller_Getquote($Sender) {
-        $this->DiscussionController_GetQuote_Create($Sender);
+    public function controller_getquote($Sender) {
+        $this->discussionController_getQuote_create($Sender);
     }
 
     /**
@@ -181,12 +178,13 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Selector
      * @param bool $Format
      */
-    public function DiscussionController_GetQuote_Create($Sender, $Selector, $Format = FALSE) {
-        $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+    public function discussionController_getQuote_create($Sender, $Selector, $Format = false) {
+        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
 
-        if (!$Format)
-            $Format = C('Garden.InputFormatter');
+        if (!$Format) {
+            $Format = c('Garden.InputFormatter');
+        }
 
         $QuoteData = array(
             'status' => 'failed'
@@ -194,10 +192,10 @@ class QuotesPlugin extends Gdn_Plugin {
 
         $QuoteData['selector'] = $Selector;
         list($Type, $ID) = explode('_', $Selector);
-        $this->FormatQuote($Type, $ID, $QuoteData, $Format);
+        $this->formatQuote($Type, $ID, $QuoteData, $Format);
 
-        $Sender->SetJson('Quote', $QuoteData);
-        $Sender->Render('GetQuote', '', 'plugins/Quotes');
+        $Sender->setJson('Quote', $QuoteData);
+        $Sender->render('GetQuote', '', 'plugins/Quotes');
     }
 
     /**
@@ -205,8 +203,8 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function DiscussionController_Render_Before($Sender) {
-        $this->PrepareController($Sender);
+    public function discussionController_render_before($Sender) {
+        $this->prepareController($Sender);
     }
 
     /**
@@ -214,8 +212,8 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function PostController_Render_Before($Sender) {
-        $this->PrepareController($Sender);
+    public function postController_render_before($Sender) {
+        $this->prepareController($Sender);
     }
 
     /**
@@ -225,52 +223,52 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     protected function PrepareController($Sender) {
         //if (!$this->HandleRenderQuotes) return;
-        $Sender->AddJsFile('quotes.js', 'plugins/Quotes');
+        $Sender->addJsFile('quotes.js', 'plugins/Quotes');
     }
 
     /**
      * Add 'Quote' option to Discussion.
      */
-    public function Base_AfterFlag_Handler($Sender, $Args) {
+    public function base_AfterFlag_handler($Sender, $Args) {
         echo Gdn_Theme::BulletItem('Flags');
-        $this->AddQuoteButton($Sender, $Args);
+        $this->addQuoteButton($Sender, $Args);
     }
 
     /**
      * Output Quote link.
      */
-    protected function AddQuoteButton($Sender, $Args) {
-        if (!Gdn::Session()->UserID) {
+    protected function addQuoteButton($Sender, $Args) {
+        if (!Gdn::session()->UserID) {
             return;
         }
 
         if (isset($Args['Comment'])) {
             $Object = $Args['Comment'];
             $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
-        } else if (isset($Args['Discussion'])) {
+        } elseif (isset($Args['Discussion'])) {
             $Object = $Args['Discussion'];
             $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
         } else {
             return;
         }
 
-        echo Anchor(Sprite('ReactQuote', 'ReactSprite').' '.T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", TRUE), 'ReactButton Quote Visible').' ';
+        echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 
-    public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender) {
+    public function discussionController_beforeDiscussionDisplay_handler($Sender) {
         $this->RenderQuotes($Sender);
     }
 
-    public function PostController_BeforeDiscussionDisplay_Handler($Sender) {
-        $this->RenderQuotes($Sender);
+    public function postController_beforeDiscussionDisplay_handler($Sender) {
+        $this->renderQuotes($Sender);
     }
 
-    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
-        $this->RenderQuotes($Sender);
+    public function discussionController_beforeCommentDisplay_handler($Sender) {
+        $this->renderQuotes($Sender);
     }
 
-    public function PostController_BeforeCommentDisplay_Handler($Sender) {
-        $this->RenderQuotes($Sender);
+    public function postController_beforeCommentDisplay_handler($Sender) {
+        $this->renderQuotes($Sender);
     }
 
     /**
@@ -278,15 +276,15 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    protected function RenderQuotes($Sender) {
+    protected function renderQuotes($Sender) {
         if (!$this->HandleRenderQuotes) {
             return;
         }
 
-        static $ValidateUsernameRegex = NULL;
+        static $ValidateUsernameRegex = null;
 
         if (is_null($ValidateUsernameRegex)) {
-            $ValidateUsernameRegex = sprintf("[%s]+", C('Garden.User.ValidationRegex', "\d\w_ "));
+            $ValidateUsernameRegex = sprintf("[%s]+", c('Garden.User.ValidationRegex', "\d\w_ "));
         }
 
         if (isset($Sender->EventArguments['Comment'])) {
@@ -330,9 +328,9 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param $Matches
      * @return string
      */
-    protected function QuoteAuthorCallback($Matches) {
-        $Attribution = T('%s said:');
-        $Link = Anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
+    protected function quoteAuthorCallback($Matches) {
+        $Attribution = t('%s said:');
+        $Link = anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
         $Attribution = sprintf($Attribution, $Link);
         return <<<BLOCKQUOTE
       <blockquote class="UserQuote"><div class="QuoteAuthor">{$Attribution}</div><div class="QuoteText"><p>
@@ -344,14 +342,14 @@ BLOCKQUOTE;
      *
      * @param $Sender
      */
-    public function PostController_Quote_Create($Sender) {
+    public function postController_quote_create($Sender) {
         if (sizeof($Sender->RequestArgs) < 2) {
             return;
         }
         $Selector = $Sender->RequestArgs[1];
-        $Sender->SetData('Plugin.Quotes.QuoteSource', $Selector);
+        $Sender->setData('Plugin.Quotes.QuoteSource', $Selector);
         $Sender->View = 'comment';
-        return $Sender->Comment();
+        return $Sender->comment();
     }
 
     /**
@@ -359,7 +357,7 @@ BLOCKQUOTE;
      *
      * @param $Sender
      */
-    public function PostController_BeforeCommentRender_Handler($Sender) {
+    public function postController_BeforeCommentRender_handler($Sender) {
         if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
             if (sizeof($Sender->RequestArgs) < 2) {
                 return;
@@ -369,9 +367,9 @@ BLOCKQUOTE;
             $QuoteData = array(
                 'status' => 'failed'
             );
-            $this->FormatQuote($Type, $ID, $QuoteData);
+            $this->formatQuote($Type, $ID, $QuoteData);
             if ($QuoteData['status'] == 'success') {
-                $Sender->Form->SetValue('Body', "{$QuoteData['body']}\n");
+                $Sender->Form->setValue('Body', "{$QuoteData['body']}\n");
             }
         }
     }
@@ -384,17 +382,17 @@ BLOCKQUOTE;
      * @param $QuoteData
      * @param bool $Format
      */
-    protected function FormatQuote($Type, $ID, &$QuoteData, $Format = FALSE) {
+    protected function formatQuote($Type, $ID, &$QuoteData, $Format = false) {
         // Temporarily disable Emoji parsing (prevent double-parsing to HTML)
         $emojiEnabled = Emoji::instance()->enabled;
         Emoji::instance()->enabled = false;
 
         if (!$Format) {
-            $Format = C('Garden.InputFormatter');
+            $Format = c('Garden.InputFormatter');
         }
 
         $Type = strtolower($Type);
-        $Model = FALSE;
+        $Model = false;
         switch ($Type) {
             case 'comment':
                 $Model = new CommentModel();
@@ -410,7 +408,7 @@ BLOCKQUOTE;
 
         //$QuoteData = array();
         if ($Model) {
-            $Data = $Model->GetID($ID);
+            $Data = $Model->getID($ID);
             $NewFormat = $Format;
             if ($NewFormat == 'Wysiwyg') {
                 $NewFormat = 'Html';
@@ -424,18 +422,18 @@ BLOCKQUOTE;
             $NewBody = $Data->Body;
             if ($QuoteFormat != $NewFormat) {
                 if (in_array($NewFormat, array('Html', 'Wysiwyg'))) {
-                    $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
+                    $NewBody = Gdn_Format::to($NewBody, $QuoteFormat);
                 } elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode') {
-                    $NewBody = Gdn_Format::Text($NewBody, false);
+                    $NewBody = Gdn_Format::text($NewBody, false);
                 } elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode') {
-                    $NewBody = Gdn_Format::Text($NewBody, false);
+                    $NewBody = Gdn_Format::text($NewBody, false);
                 } else {
-                    $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
+                    $NewBody = Gdn_Format::plainText($NewBody, $QuoteFormat);
                 }
 
                 if (!in_array($NewFormat, array('Html', 'Wysiwyg'))) {
-                    Gdn::Controller()->InformMessage(sprintf(
-                        T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
+                    Gdn::controller()->informMessage(sprintf(
+                        t('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
                         htmlspecialchars($QuoteFormat),
                         htmlspecialchars($NewFormat)
                     ));
@@ -451,8 +449,9 @@ BLOCKQUOTE;
 
                 case 'BBCode':
                     $Author = htmlspecialchars($Data->InsertName);
-                    if ($ID)
+                    if ($ID) {
                         $IDString = ';'.htmlspecialchars($ID);
+                    }
 
                     $QuoteBody = $Data->Body;
 
@@ -471,15 +470,15 @@ BQ;
                     $QuoteBody = $Data->Body;
 
                     // Strip inner quotes and mentions...
-                    $QuoteBody = self::_StripMarkdownQuotes($QuoteBody);
-                    $QuoteBody = self::_StripMentions($QuoteBody);
+                    $QuoteBody = self::_stripMarkdownQuotes($QuoteBody);
+                    $QuoteBody = self::_stripMentions($QuoteBody);
 
-                    $Quote = '> '.sprintf(T('%s said:'), '@'.$Data->InsertName)."\n".
+                    $Quote = '> '.sprintf(t('%s said:'), '@'.$Data->InsertName)."\n".
                         '> '.str_replace("\n", "\n> ", $QuoteBody)."\n";
 
                     break;
                 case 'Wysiwyg':
-                    $Attribution = sprintf(T('%s said:'), UserAnchor($Data, NULL, array('Px' => 'Insert')));
+                    $Attribution = sprintf(t('%s said:'), userAnchor($Data, null, array('Px' => 'Insert')));
                     $QuoteBody = $Data->Body;
 
                     // TODO: Strip inner quotes...
@@ -514,7 +513,7 @@ BLOCKQUOTE;
     /**
      * No setup.
      */
-    public function Setup() {
+    public function setup() {
     }
 
     /**
@@ -523,7 +522,7 @@ BLOCKQUOTE;
      * @param $Text
      * @return mixed
      */
-    protected static function _StripMarkdownQuotes($Text) {
+    protected static function _stripMarkdownQuotes($Text) {
         $Text = preg_replace('/
               (                                # Wrap whole match in $1
                 (?>
@@ -544,9 +543,11 @@ BLOCKQUOTE;
      * @param $Text
      * @return mixed
      */
-    protected static function _StripMentions($Text) {
+    protected static function _stripMentions($Text) {
         $Text = preg_replace(
-            '/(^|[\s,\.>])@(\w{1,50})\b/i', '$1$2', $Text
+            '/(^|[\s,\.>])@(\w{1,50})\b/i',
+            '$1$2',
+            $Text
         );
 
         return $Text;

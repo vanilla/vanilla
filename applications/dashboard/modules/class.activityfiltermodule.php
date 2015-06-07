@@ -18,7 +18,7 @@ class ActivityFilterModule extends Gdn_Module {
      *
      * @return string
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
@@ -27,7 +27,7 @@ class ActivityFilterModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         return parent::ToString();
     }
 }

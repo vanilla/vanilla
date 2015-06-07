@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'modules', 'vanilla');
+require_once Gdn::controller()->fetchViewLocation('helper_functions', 'modules', 'vanilla');
 
 ?>
-    <h1 class="H"><?php echo $this->Data('Title'); ?></h1>
+    <h1 class="H"><?php echo $this->data('Title'); ?></h1>
 <?php
 
-if ($data = $this->Data('Content')) {
-    if ($view = $this->Data('View') == 'table') {
+if ($data = $this->data('Content')) {
+    if ($view = $this->data('View') == 'table') {
         writePromotedContentTable($data);
     } else {
         writePromotedContentList($data);
     }
 } else {
-    echo $this->Data('EmptyMessage');
+    echo $this->data('EmptyMessage');
 }

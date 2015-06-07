@@ -11,18 +11,18 @@ if (!function_exists('WriteAttachment')) {
      * @param array $Attachment Attachment
      * @return string
      */
-    function WriteAttachment($Attachment) {
+    function writeAttachment($Attachment) {
 
         $customMethod = AttachmentModel::GetWriteAttachmentMethodName($Attachment['Type']);
         if (function_exists($customMethod)) {
-            if (GetValue('Error', $Attachment)) {
+            if (val('Error', $Attachment)) {
                 WriteErrorAttachment($Attachment);
                 return;
             }
             $customMethod($Attachment);
         } else {
-            Trace($customMethod, 'Write Attachment method not found');
-            Trace($Attachment, 'Attachment');
+            trace($customMethod, 'Write Attachment method not found');
+            trace($Attachment, 'Attachment');
         }
         return;
     }
@@ -30,7 +30,7 @@ if (!function_exists('WriteAttachment')) {
 }
 
 if (!function_exists('WriteAttachments')) {
-    function WriteAttachments($Attachments) {
+    function writeAttachments($Attachments) {
         foreach ($Attachments as $Attachment) {
             ?>
             <div class="item-attachments">
@@ -42,7 +42,7 @@ if (!function_exists('WriteAttachments')) {
 }
 
 if (!function_exists('WriteSkeletonAttachment')) {
-    function WriteSkeletonAttachment($Attachment) {
+    function writeSkeletonAttachment($Attachment) {
         ?>
         <div class="item-attachment">
             <div class="alert">
@@ -93,7 +93,7 @@ if (!function_exists('WriteErrorAttachment')) {
      * @param array $Attachment
      * @return string
      */
-    function WriteErrorAttachment($Attachment) {
+    function writeErrorAttachment($Attachment) {
         WriteGenericAttachment(array(
             'Type' => 'Warning',
             'Icon' => 'warning-sign',
@@ -109,13 +109,13 @@ if (!function_exists('WriteGenericAttachment')) {
      * @param array $Attachment
      * @return string
      */
-    function WriteGenericAttachment($Attachment) {
-        $Type = GetValue('Type', $Attachment);
-        $Icon = GetValue('Icon', $Attachment, 'sign-blank');
-        $Title = GetValue('Title', $Attachment);
-        $Meta = GetValue('Meta', $Attachment);
-        $Body = GetValue('Body', $Attachment);
-        $Fields = GetValue('Fields', $Attachment);
+    function writeGenericAttachment($Attachment) {
+        $Type = val('Type', $Attachment);
+        $Icon = val('Icon', $Attachment, 'sign-blank');
+        $Title = val('Title', $Attachment);
+        $Meta = val('Meta', $Attachment);
+        $Body = val('Body', $Attachment);
+        $Fields = val('Fields', $Attachment);
 
         ?>
         <div class="item-attachment">
@@ -155,7 +155,7 @@ if (!function_exists('WriteGenericAttachment')) {
                                 <?php if ($Fields): ?>
                                     <dl class="dl-columns">
                                         <?php foreach ($Fields as $Title => $Field): ?>
-                                            <dt><?php echo T($Title); ?></dt>
+                                            <dt><?php echo t($Title); ?></dt>
                                             <dd><?php echo Gdn_Format::Html($Field); ?></dd>
                                         <?php endforeach; ?>
                                     </dl>

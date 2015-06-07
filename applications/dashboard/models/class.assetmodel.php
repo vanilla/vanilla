@@ -28,7 +28,7 @@ class AssetModel extends Gdn_Model {
      * @param bool $Folder
      * @param bool $Options
      */
-    public function AddCssFile($Filename, $Folder = false, $Options = false) {
+    public function addCssFile($Filename, $Folder = false, $Options = false) {
         if (is_string($Options)) {
             $Options = array('Css' => $Options);
         }
@@ -42,20 +42,20 @@ class AssetModel extends Gdn_Model {
      * @param $Filename
      * @throws Exception
      */
-    public function ServeCss($ThemeType, $Filename) {
+    public function serveCss($ThemeType, $Filename) {
         // Split the filename into filename and etag.
         if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
             $Basename = $Matches[1];
             $ETag = $Matches[2];
         } else {
-            throw NotFoundException();
+            throw notFoundException();
         }
 
         $Basename = ucfirst($Basename);
 
         $this->EventArguments['Basename'] = $Basename;
         $this->EventArguments['ETag'] = $ETag;
-        $this->FireEvent('BeforeServeCss');
+        $this->fireEvent('BeforeServeCss');
 
         if (function_exists('header_remove')) {
             header_remove('Set-Cookie');
@@ -63,7 +63,7 @@ class AssetModel extends Gdn_Model {
 
         safeHeader("Content-Type: text/css");
         if (!in_array($Basename, array('Style', 'Admin'))) {
-            safeHeader("HTTP/1.0 404", TRUE, 404);
+            safeHeader("HTTP/1.0 404", true, 404);
 
             echo "/* Could not find $Basename/$ETag */";
             die();
@@ -76,7 +76,7 @@ class AssetModel extends Gdn_Model {
         $RequestETags = explode(',', $RequestETags);
         foreach ($RequestETags as $RequestETag) {
             if ($RequestETag == $ETag) {
-                safeHeader("HTTP/1.0 304", TRUE, 304);
+                safeHeader("HTTP/1.0 304", true, 304);
                 die();
             }
         }
@@ -131,10 +131,10 @@ class AssetModel extends Gdn_Model {
             }
 
             $Css = Minify_CSS::minify($Css, array(
-                'preserveComments' => TRUE,
+                'preserveComments' => true,
                 'prependRelativePath' => $this->UrlPrefix.Asset(dirname($UrlPath).'/'),
                 'currentDir' => dirname($Path),
-                'minify' => TRUE
+                'minify' => true
             ));
             echo $Css;
 
@@ -144,7 +144,7 @@ class AssetModel extends Gdn_Model {
         // Create a cached copy of the file.
         $Css = ob_get_flush();
         if (!file_exists(dirname($CachePath))) {
-            mkdir(dirname($CachePath), 0775, TRUE);
+            mkdir(dirname($CachePath), 0775, true);
         }
         file_put_contents($CachePath, $Css);
     }
@@ -159,7 +159,7 @@ class AssetModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function GetCssFiles($ThemeType, $Basename, $ETag, &$NotFound = NULL) {
+    public function getCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
         $NotFound = array();
 
         // Gather all of the css paths.
@@ -181,27 +181,27 @@ class AssetModel extends Gdn_Model {
         // Throw an event so that plugins can add their css too.
         $this->EventArguments['ETag'] = $ETag;
         $this->EventArguments['ThemeType'] = $ThemeType;
-        $this->FireEvent($Basename.'Css');
+        $this->fireEvent($Basename.'Css');
 
         // Include theme customizations last so that they override everything else.
         switch ($Basename) {
             case 'Style':
-                $this->AddCssFile('custom.css', false, array('Sort' => 10));
+                $this->addCssFile('custom.css', false, array('Sort' => 10));
 
-                if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-                    $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
+                if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
+                    $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
                     if (is_string($Filenames) && $Filenames != '%s') {
-                        $this->AddCssFile(ChangeBasename('custom.css', $Filenames), false, array('Sort' => 11));
+                        $this->addCssFile(changeBasename('custom.css', $Filenames), false, array('Sort' => 11));
                     }
                 }
 
                 break;
             case 'Admin':
-                $this->AddCssFile('customadmin.css', false, array('Sort' => 10));
+                $this->addCssFile('customadmin.css', false, array('Sort' => 10));
                 break;
         }
 
-        $this->FireEvent('AfterGetCssFiles');
+        $this->fireEvent('AfterGetCssFiles');
 
         // Hunt the css files down.
         $Paths = array();
@@ -212,12 +212,10 @@ class AssetModel extends Gdn_Model {
             $Css = val('Css', $Options);
 
             if ($Css) {
-
                 // Add some literal Css.
                 $Paths[] = array(false, $Folder, $Options);
 
             } else {
-
                 list($Path, $UrlPath) = self::CssPath($Filename, $Folder, $ThemeType);
                 if ($Path) {
                     $Paths[] = array($Path, $UrlPath, $Options);
@@ -261,7 +259,7 @@ class AssetModel extends Gdn_Model {
      * @param string $ThemeType mobile or desktop
      * @return array|bool
      */
-    public static function CssPath($Filename, $Folder = '', $ThemeType = '') {
+    public static function cssPath($Filename, $Folder = '', $ThemeType = '') {
         if (!$ThemeType) {
             $ThemeType = IsMobile() ? 'mobile' : 'desktop';
         }
@@ -301,7 +299,7 @@ class AssetModel extends Gdn_Model {
                 $Paths[] = array(PATH_ROOT.$Path, $Path);
 
                 // A plugin-relative path was given
-            } else if (stringBeginsWith($Folder, 'plugins/')) {
+            } elseif (stringBeginsWith($Folder, 'plugins/')) {
                 $Folder = substr($Folder, strlen('plugins/'));
                 $Path = "/{$Folder}/design/{$Filename}";
                 $Paths[] = array(PATH_PLUGINS.$Path, "/plugins$Path");
@@ -333,7 +331,7 @@ class AssetModel extends Gdn_Model {
             }
         }
         if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
-            Trace("Could not find file '$Filename' in folder '$Folder'.");
+            trace("Could not find file '$Filename' in folder '$Folder'.");
         }
 
         return false;
@@ -342,31 +340,31 @@ class AssetModel extends Gdn_Model {
     /**
      * Generate an e-tag for the application from the versions of all of its enabled applications/plugins.
      **/
-    public static function ETag() {
+    public static function eTag() {
         $Data = array();
-        $Data['vanilla-core-'.APPLICATION_VERSION] = TRUE;
+        $Data['vanilla-core-'.APPLICATION_VERSION] = true;
 
-        $Plugins = Gdn::PluginManager()->EnabledPlugins();
+        $Plugins = Gdn::pluginManager()->EnabledPlugins();
         foreach ($Plugins as $Info) {
-            $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = true;
         }
 //      echo(Gdn_Upload::FormatFileSize(strlen(serialize($Plugins))));
 //      decho($Plugins);
 
         $Applications = Gdn::ApplicationManager()->EnabledApplications();
         foreach ($Applications as $Info) {
-            $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = true;
         }
 
         // Add the desktop theme version.
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->DesktopTheme());
         if (!empty($Info)) {
             $Version = val('Version', $Info, 'v0');
-            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
 
-            if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-                $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
-                $Data[$Filenames] = TRUE;
+            if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
+                $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
+                $Data[$Filenames] = true;
             }
         }
 
@@ -374,15 +372,15 @@ class AssetModel extends Gdn_Model {
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->MobileTheme());
         if (!empty($Info)) {
             $Version = val('Version', $Info, 'v0');
-            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = TRUE;
+            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
         }
 
-        Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;
+        Gdn::pluginManager()->EventArguments['ETagData'] =& $Data;
 
         $Suffix = '';
-        Gdn::PluginManager()->EventArguments['Suffix'] =& $Suffix;
-        Gdn::PluginManager()->FireAs('AssetModel')->FireEvent('GenerateETag');
-        unset(Gdn::PluginManager()->EventArguments['ETagData']);
+        Gdn::pluginManager()->EventArguments['Suffix'] =& $Suffix;
+        Gdn::pluginManager()->FireAs('AssetModel')->fireEvent('GenerateETag');
+        unset(Gdn::pluginManager()->EventArguments['ETagData']);
 
         ksort($Data);
         $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;

@@ -1,96 +1,96 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="FormTitleWrapper">
-    <h1 class="H"><?php echo $this->Data('Title'); ?></h1>
+    <h1 class="H"><?php echo $this->data('Title'); ?></h1>
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->open();
+    echo $this->Form->errors();
     ?>
     <ul>
         <li class="User-Name">
             <?php
-            echo $this->Form->Label('Username', 'Name');
+            echo $this->Form->label('Username', 'Name');
             $Attributes = array();
 
-            if (!$this->Data('_CanEditUsername')) {
+            if (!$this->data('_CanEditUsername')) {
                 $Attributes['disabled'] = 'disabled';
             }
-            echo $this->Form->TextBox('Name', $Attributes);
+            echo $this->Form->textBox('Name', $Attributes);
             ?>
         </li>
 
-        <?php if ($this->Data('_CanViewPersonalInfo')) : ?>
+        <?php if ($this->data('_CanViewPersonalInfo')) : ?>
             <li class="User-Email">
                 <?php
-                echo $this->Form->Label('Email', 'Email');
+                echo $this->Form->label('Email', 'Email');
 
-                if (!$this->Data('_CanEditEmail') && UserModel::NoEmail()) {
+                if (!$this->data('_CanEditEmail') && UserModel::noEmail()) {
 
                     echo '<div class="Gloss">',
-                    T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
+                    t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
                     '</div>';
 
                 } else {
 
                     $EmailAttributes = array();
-                    if (!$this->Data('_CanEditEmail')) {
+                    if (!$this->data('_CanEditEmail')) {
                         $EmailAttributes['disabled'] = 'disabled';
                     }
 
                     // Email confirmation
-                    if (!$this->Data('_EmailConfirmed'))
+                    if (!$this->data('_EmailConfirmed'))
                         $EmailAttributes['class'] = 'InputBox Unconfirmed';
 
-                    echo $this->Form->TextBox('Email', $EmailAttributes);
+                    echo $this->Form->textBox('Email', $EmailAttributes);
 
                 }
                 ?>
             </li>
         <?php endif; ?>
 
-        <?php if ($this->Data('_CanEditEmail')): ?>
+        <?php if ($this->data('_CanEditEmail')): ?>
             <li class="User-ShowEmail">
                 <?php
-                echo $this->Form->CheckBox('ShowEmail', T('Allow other members to see your email?'), array('value' => '1'));
+                echo $this->Form->CheckBox('ShowEmail', t('Allow other members to see your email?'), array('value' => '1'));
                 ?>
             </li>
         <?php endif ?>
 
-        <?php if ($this->Data('_CanConfirmEmail')): ?>
+        <?php if ($this->data('_CanConfirmEmail')): ?>
             <li class="User-ConfirmEmail">
                 <?php
-                echo $this->Form->CheckBox('ConfirmEmail', T("Confirmed email address"), array('value' => '1'));
+                echo $this->Form->CheckBox('ConfirmEmail', t("Confirmed email address"), array('value' => '1'));
                 ?>
             </li>
         <?php endif ?>
 
         <li class="Gender User-Gender">
             <?php
-            echo $this->Form->Label('Gender', 'Gender');
+            echo $this->Form->label('Gender', 'Gender');
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
             ?>
         </li>
 
-        <?php if (C('Garden.Profile.Titles', FALSE)): ?>
+        <?php if (c('Garden.Profile.Titles', false)): ?>
             <li class="User-Title">
                 <?php
-                echo $this->Form->Label('Title', 'Title');
-                echo $this->Form->TextBox('Title');
+                echo $this->Form->label('Title', 'Title');
+                echo $this->Form->textBox('Title');
                 ?>
             </li>
         <?php endif; ?>
 
-        <?php if (C('Garden.Profile.Locations', FALSE)): ?>
+        <?php if (c('Garden.Profile.Locations', false)): ?>
             <li class="User-Location">
                 <?php
-                echo $this->Form->Label('Location', 'Location');
-                echo $this->Form->TextBox('Location');
+                echo $this->Form->label('Location', 'Location');
+                echo $this->Form->textBox('Location');
                 ?>
             </li>
         <?php endif; ?>
 
         <?php
-        $this->FireEvent('EditMyAccountAfter');
+        $this->fireEvent('EditMyAccountAfter');
         ?>
     </ul>
-    <?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary')); ?>
+    <?php echo $this->Form->close('Save', '', array('class' => 'Button Primary')); ?>
 </div>

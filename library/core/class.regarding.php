@@ -258,7 +258,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     /**
      * Do nothing.
      */
-    public function setup() {
+    public function Setup() {
     }
 
 }

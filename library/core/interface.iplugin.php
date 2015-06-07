@@ -28,7 +28,7 @@ interface Gdn_IPlugin {
      *
      * @return boolean
      */
-    public function setup();
+    public function Setup();
 
     /**
      * These methods are invoked if present, but are not required and will be silently ignored

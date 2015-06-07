@@ -510,7 +510,7 @@ class Gdn {
      *
      * @return Gdn_DatabaseStructure
      */
-    public static function structure() {
+    public static function Structure() {
         $Database = self::Database();
         $Result = $Database->Structure();
         return $Result;

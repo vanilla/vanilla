@@ -497,7 +497,7 @@ if (!function_exists('c')) {
      * @see Gdn::Config()
      */
     function c($Name = false, $Default = false) {
-        return Gdn::Config($Name, $Default);
+        return Gdn::config($Name, $Default);
     }
 }
 
@@ -512,7 +512,7 @@ if (!function_exists('config')) {
      * @see Gdn::Config()
      */
     function config($Name = false, $Default = false) {
-        return Gdn::Config($Name, $Default);
+        return Gdn::config($Name, $Default);
     }
 }
 

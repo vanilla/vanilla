@@ -213,7 +213,7 @@ class Gdn {
             return;
         }
 
-        self::Factory()->install($Alias, $ClassName, $Path, $FactoryType, $Data);
+        self::factory()->install($Alias, $ClassName, $Path, $FactoryType, $Data);
 
         // Cache some of the more commonly used factory objects as properties.
         switch ($Alias) {

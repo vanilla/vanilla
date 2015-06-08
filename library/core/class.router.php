@@ -223,7 +223,7 @@ class Gdn_Router extends Gdn_Pluggable {
     private function _loadRoutes() {
         $Routes = Gdn::config('Routes', array());
         $this->EventArguments['Routes'] = &$Routes;
-        $this->FireEvent("BeforeLoadRoutes");
+        $this->fireEvent("BeforeLoadRoutes");
         foreach ($Routes as $Key => $Destination) {
             $Route = $this->_decodeRouteKey($Key);
             $RouteData = $this->_parseRoute($Destination);

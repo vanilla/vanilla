@@ -42,7 +42,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
 
     /**
      * @var Gdn_ConfigurationSource Dynamic (writable) config source.
-     * This is the configuration source that is written to when saves or removes are occuring.
+     * This is the configuration source that is written to when saves or removes are occurring.
      */
     protected $dynamic = null;
 
@@ -162,7 +162,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $Keys = explode('.', $Name);
         // If splitting is off, HANDLE IT
         if (!$this->splitting) {
-            $FirstKey = GetValue(0, $Keys);
+            $FirstKey = val(0, $Keys);
             if ($FirstKey == $this->defaultGroup) {
                 $Keys = array(array_shift($Keys), implode('.', $Keys));
             } else {
@@ -212,12 +212,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
             'FormatStyle' => 'Array'
         );
         $Options = array_merge($Defaults, $Options);
-        $VariableName = GetValue('VariableName', $Options);
-        $WrapPHP = GetValue('WrapPHP', $Options, true);
-        $SafePHP = GetValue('SafePHP', $Options, true);
-        $ByLine = GetValue('ByLine', $Options, false);
-        $Headings = GetValue('Headings', $Options, true);
-        $FormatStyle = GetValue('FormatStyle', $Options);
+        $VariableName = val('VariableName', $Options);
+        $WrapPHP = val('WrapPHP', $Options, true);
+        $SafePHP = val('SafePHP', $Options, true);
+        $ByLine = val('ByLine', $Options, false);
+        $Headings = val('Headings', $Options, true);
+        $FormatStyle = val('FormatStyle', $Options);
         $Formatter = "Format{$FormatStyle}Assignment";
 
         $FirstLine = '';
@@ -276,7 +276,6 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @return mixed The configuration value.
      */
     public function get($Name, $DefaultValue = false) {
-
         // Shortcut, get the whole config
         if ($Name == '.') {
             return $this->Data;
@@ -324,7 +323,6 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $SourceTag = "{$Type}:{$Identifier}";
         if (!array_key_exists($SourceTag, $this->sources)) {
             return false;
-            return false;
         }
 
         return $this->sources[$SourceTag];
@@ -360,7 +358,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $Keys = explode('.', $Name);
             // If splitting is off, HANDLE IT
             if (!$this->splitting) {
-                $FirstKey = GetValue(0, $Keys);
+                $FirstKey = val(0, $Keys);
                 if ($FirstKey == $this->defaultGroup) {
                     $Keys = array(array_shift($Keys), implode('.', $Keys));
                 } else {
@@ -753,8 +751,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
 
         // Infrastructure deployment. Use old method.
         $TmpFile = tempnam(PATH_CONF, 'config');
-        $Result = FALSE;
-        if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
+        $Result = false;
+        if (file_put_contents($TmpFile, $FileContents) !== false) {
             chmod($TmpFile, 0664);
             $Result = rename($TmpFile, $File);
         }
@@ -990,7 +988,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
             if (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
                 $UseCache = true;
-                $CachedConfigData = Gdn::Cache()->Get($FileKey, array(
+                $CachedConfigData = Gdn::cache()->get($FileKey, array(
                     Gdn_Cache::FEATURE_NOPREFIX => true
                 ));
                 $LoadedFromCache = ($CachedConfigData !== Gdn_Cache::CACHEOP_FAILURE);

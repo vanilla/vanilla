@@ -367,7 +367,7 @@ class Gdn_Format {
         }
 
         if ($Format == 'html') {
-            $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
+            $Result = wrap($Result, 'span', array('title' => number_format($Number)));
         }
 
         return $Result;

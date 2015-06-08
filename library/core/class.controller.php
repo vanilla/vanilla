@@ -1259,7 +1259,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Or as a boolean if necessary
             $View = true;
             if (property_exists($this, 'Form') && is_object($this->Form)) {
-                $View = $this->Form->grrorCount() > 0 ? false : true;
+                $View = $this->Form->errorCount() > 0 ? false : true;
             }
         }
 

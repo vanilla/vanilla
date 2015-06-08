@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$AllowEmbed = C('Garden.Embed.Allow');
+$AllowEmbed = c('Garden.Embed.Allow');
 ?>
 <style type="text/css">
     .Info form ul {
@@ -21,23 +21,23 @@ $AllowEmbed = C('Garden.Embed.Allow');
         margin-bottom: 20px;
     }
 </style>
-<h1><?php echo T('Advanced Embed Settings'); ?></h1>
+<h1><?php echo t('Advanced Embed Settings'); ?></h1>
 <div class="Info">
     <?php
     echo 'The following settings apply to all types of embedded forum content: ';
-    echo Anchor('blog comments', 'embed/comments');
+    echo anchor('blog comments', 'embed/comments');
     echo ', and ';
-    echo Anchor('forum embedding', 'embed/forum');
+    echo anchor('forum embedding', 'embed/forum');
     echo '.';
     if (!$AllowEmbed) {
-        echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently DISABLED.').'</span>', 'p');
-        echo Anchor('Enable Embedding', 'embed/advanced/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
+        echo wrap('<span style="background: #ff0;">'.t('Embedding is currently DISABLED.').'</span>', 'p');
+        echo anchor('Enable Embedding', 'embed/advanced/enable/'.Gdn::session()->TransientKey(), 'SmallButton');
     } else {
-    echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently ENABLED.').'</span>', 'p');
-    echo Anchor('Disable Embedding', 'embed/advanced/disable/'.Gdn::Session()->TransientKey(), 'SmallButton');
+    echo wrap('<span style="background: #ff0;">'.t('Embedding is currently ENABLED.').'</span>', 'p');
+    echo anchor('Disable Embedding', 'embed/advanced/disable/'.Gdn::session()->TransientKey(), 'SmallButton');
     ?>
 </div>
-<h1><?php echo T('Settings'); ?></h1>
+<h1><?php echo t('Settings'); ?></h1>
 <div class="Info">
     <h2>Trusted Domains</h2>
 
@@ -55,16 +55,16 @@ $AllowEmbed = C('Garden.Embed.Allow');
         </small>
     </p>
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
-    echo Wrap($this->Form->TextBox('Garden.TrustedDomains', array('MultiLine' => TRUE)), 'p');
+    echo $this->Form->open();
+    echo $this->Form->errors();
+    echo wrap($this->Form->textBox('Garden.TrustedDomains', array('MultiLine' => TRUE)), 'p');
     ?>
 
     <h2>Forum Embed Settings</h2>
 
     <p>The url where the forum is embedded:</p>
 
-    <p><?php echo $this->Form->TextBox('Garden.Embed.RemoteUrl'); ?> <em>Example: http://yourdomain.com/forum/</em></p>
+    <p><?php echo $this->Form->textBox('Garden.Embed.RemoteUrl'); ?> <em>Example: http://yourdomain.com/forum/</em></p>
 
     <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></p>
 
@@ -77,7 +77,7 @@ $AllowEmbed = C('Garden.Embed.Allow');
     </p>
     <p><?php echo $this->Form->CheckBox('Garden.SignIn.Popup', "Use popups for sign in pages."); ?></p>
     <?php
-    echo $this->Form->Close('Save', '', array('style' => 'margin: 0;'));
+    echo $this->Form->close('Save', '', array('style' => 'margin: 0;'));
     }
     ?>
 </div>

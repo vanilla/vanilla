@@ -19,9 +19,9 @@ class Vanilla1ImportModel extends Gdn_Model {
     /**
      * Custom finalization.
      */
-    public function AfterImport() {
+    public function afterImport() {
         // Set up the routes to redirect from their older counterparts.
-        $Router = Gdn::Router();
+        $Router = Gdn::router();
         $Router->SetRoute('\?CategoryID=(\d+)(?:&page=(\d+))?', 'categories/$1/p$2', 'Permanent');
         $Router->SetRoute('\?page=(\d+)', 'discussions/p$1', 'Permanent');
         $Router->SetRoute('comments\.php\?DiscussionID=(\d+)', 'discussion/$1/x', 'Permanent');

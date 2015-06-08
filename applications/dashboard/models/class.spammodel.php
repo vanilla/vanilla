@@ -17,7 +17,7 @@ class SpamModel extends Gdn_Pluggable {
     protected static $_Instance;
 
     /** @var bool */
-    public static $Disabled = FALSE;
+    public static $Disabled = false;
 
     /**
      *
@@ -25,8 +25,9 @@ class SpamModel extends Gdn_Pluggable {
      * @return SpamModel
      */
     protected static function _Instance() {
-        if (!self::$_Instance)
+        if (!self::$_Instance) {
             self::$_Instance = new SpamModel();
+        }
 
         return self::$_Instance;
     }
@@ -37,7 +38,7 @@ class SpamModel extends Gdn_Pluggable {
      * @param bool|null $value
      * @return bool
      */
-    public static function Disabled($value = null) {
+    public static function disabled($value = null) {
         if ($value !== null) {
             self::$Disabled = $value;
         }
@@ -54,26 +55,27 @@ class SpamModel extends Gdn_Pluggable {
      * @param array $Options Options for fine-tuning this method call.
      *  - Log: Log the record if it is found to be spam.
      */
-    public static function IsSpam($RecordType, $Data, $Options = array()) {
-        if (self::$Disabled)
-            return FALSE;
+    public static function isSpam($RecordType, $Data, $Options = array()) {
+        if (self::$Disabled) {
+            return false;
+        }
 
         // Set some information about the user in the data.
         if ($RecordType == 'Registration') {
-            TouchValue('Username', $Data, $Data['Name']);
+            touchValue('Username', $Data, $Data['Name']);
         } else {
-            TouchValue('InsertUserID', $Data, Gdn::Session()->UserID);
+            touchValue('InsertUserID', $Data, Gdn::session()->UserID);
 
-            $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Data), DATASET_TYPE_ARRAY);
+            $User = Gdn::userModel()->getID(val('InsertUserID', $Data), DATASET_TYPE_ARRAY);
 
             if ($User) {
-                if (GetValue('Verified', $User)) {
+                if (val('Verified', $User)) {
                     // The user has been verified and isn't a spammer.
-                    return FALSE;
+                    return false;
                 }
-                TouchValue('Username', $Data, $User['Name']);
-                TouchValue('Email', $Data, $User['Email']);
-                TouchValue('IPAddress', $Data, $User['LastIPAddress']);
+                touchValue('Username', $Data, $User['Name']);
+                touchValue('Email', $Data, $User['Email']);
+                touchValue('IPAddress', $Data, $User['LastIPAddress']);
             }
         }
 
@@ -81,20 +83,20 @@ class SpamModel extends Gdn_Pluggable {
             $Data['Body'] = $Data['Story'];
         }
 
-        TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
+        touchValue('IPAddress', $Data, Gdn::request()->ipAddress());
 
         $Sp = self::_Instance();
 
         $Sp->EventArguments['RecordType'] = $RecordType;
         $Sp->EventArguments['Data'] =& $Data;
         $Sp->EventArguments['Options'] =& $Options;
-        $Sp->EventArguments['IsSpam'] = FALSE;
+        $Sp->EventArguments['IsSpam'] = false;
 
-        $Sp->FireEvent('CheckSpam');
+        $Sp->fireEvent('CheckSpam');
         $Spam = $Sp->EventArguments['IsSpam'];
 
         // Log the spam entry.
-        if ($Spam && GetValue('Log', $Options, TRUE)) {
+        if ($Spam && val('Log', $Options, true)) {
             $LogOptions = array();
             switch ($RecordType) {
                 case 'Registration':
@@ -108,7 +110,7 @@ class SpamModel extends Gdn_Pluggable {
                     break;
             }
 
-            LogModel::Insert('Spam', $RecordType, $Data, $LogOptions);
+            LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
         }
 
         return $Spam;

@@ -1,7 +1,7 @@
 <?php
 
 // Grab data
-$child_tags = $this->Data('ChildTags');
+$child_tags = $this->data('ChildTags');
 
 // Build HTML list.
 $html_li_build = '';

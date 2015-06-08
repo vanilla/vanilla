@@ -1,18 +1,18 @@
 <?php
 
-$Category = $this->Data('Category');
+$Category = $this->data('Category');
 if (!$Category)
     return;
 
-$SubCategories = CategoryModel::MakeTree(CategoryModel::Categories(), $Category);
+$SubCategories = CategoryModel::MakeTree(CategoryModel::categories(), $Category);
 
 if (!$SubCategories)
     return;
 
-require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla');
+require_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 ?>
-<h2 class="ChildCategories-Title Hidden"><?php echo T('Child Categories'); ?></h2>
+<h2 class="ChildCategories-Title Hidden"><?php echo t('Child Categories'); ?></h2>
 <ul class="DataList ChildCategoryList">
     <?php
     foreach ($SubCategories as $Row):
@@ -24,9 +24,9 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
         <li id="Category_<?php echo $Row['CategoryID']; ?>" class="Item Category">
             <div class="ItemContent Category">
                 <h3 class="CategoryName TitleWrap"><?php
-                    echo Anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
-                    Gdn::Controller()->EventArguments['Category'] = $Row;
-                    Gdn::Controller()->FireEvent('AfterCategoryTitle');
+                    echo anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
+                    Gdn::controller()->EventArguments['Category'] = $Row;
+                    Gdn::controller()->fireEvent('AfterCategoryTitle');
                     ?></h3>
 
                 <?php if ($Row['Description']): ?>
@@ -37,7 +37,7 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
 
                 <div class="Meta Hidden">
                <span class="MItem MItem-Count DiscussionCount"><?php
-                   echo Plural(
+                   echo plural(
                        $Row['CountDiscussions'],
                        '%s discussion',
                        '%s discussions',
@@ -45,7 +45,7 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
                    ?></span>
 
                <span class="MItem MItem-Count CommentCount"><?php
-                   echo Plural(
+                   echo plural(
                        $Row['CountComments'],
                        '%s comment',
                        '%s comments',

@@ -7,7 +7,7 @@ foreach ($this->Items as $Item) {
     echo '<div class="Box Group '.GetValue('class', $Item['Attributes']).'">';
     if ($Item['Text'] != '')
         echo "\n", '<h4>',
-        isset($Item['Url']) ? Anchor($Item['Text'], $Item['Url']) : $Item['Text'],
+        isset($Item['Url']) ? anchor($Item['Text'], $Item['Url']) : $Item['Text'],
         '</h4>';
 
     if (count($Item['Links'])) {
@@ -16,7 +16,7 @@ foreach ($this->Items as $Item) {
         // Loop through all the links in the group.
         foreach ($Item['Links'] as $Link) {
             echo "\n  <li".Attribute($Link['Attributes']).">",
-            Anchor($Link['Text'], $Link['Url']),
+            anchor($Link['Text'], $Link['Url']),
             '</li>';
         }
 

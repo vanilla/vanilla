@@ -16,7 +16,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * No setup required.
      */
-    public function Setup() {
+    public function setup() {
     }
 
     /**
@@ -25,9 +25,9 @@ class MobileThemeHooks implements Gdn_IPlugin {
     public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
         // Remove plugins so they don't mess up layout or functionality.
         if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
-            Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
+            Gdn::pluginManager()->RemoveMobileUnfriendlyPlugins();
         }
-        SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
+        saveToConfig('Garden.Format.EmbedSize', '240x135', false);
     }
 
     /**
@@ -35,7 +35,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
      */
     public function Base_Render_Before($Sender) {
         if (IsMobile() && is_object($Sender->Head)) {
-            $Sender->Head->AddTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
+            $Sender->Head->addTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
             $Sender->Head->AddString('
 <script type="text/javascript">
    // If not looking for a specific comment, hide the address bar in iphone
@@ -53,8 +53,8 @@ class MobileThemeHooks implements Gdn_IPlugin {
      * Add button, remove options, increase click area on discussions list.
      */
     public function CategoriesController_Render_Before($Sender) {
-        $Sender->ShowOptions = FALSE;
-        SaveToConfig('Vanilla.AdminCheckboxes.Use', FALSE, FALSE);
+        $Sender->ShowOptions = false;
+        saveToConfig('Vanilla.AdminCheckboxes.Use', false, false);
         $this->AddButton($Sender, 'Discussion');
         $this->DiscussionsClickable($Sender);
     }
@@ -63,8 +63,8 @@ class MobileThemeHooks implements Gdn_IPlugin {
      * Add button, remove options, increase click area on discussions list.
      */
     public function DiscussionsController_Render_Before($Sender) {
-        $Sender->ShowOptions = FALSE;
-        SaveToConfig('Vanilla.AdminCheckboxes.Use', FALSE, FALSE);
+        $Sender->ShowOptions = false;
+        saveToConfig('Vanilla.AdminCheckboxes.Use', false, false);
         $this->AddButton($Sender, 'Discussion');
         $this->DiscussionsClickable($Sender);
     }
@@ -102,10 +102,10 @@ class MobileThemeHooks implements Gdn_IPlugin {
      */
     private function AddButton($Sender, $ButtonType) {
         if (is_object($Sender->Menu)) {
-            if ($ButtonType == 'Discussion')
-                $Sender->Menu->AddLink('NewDiscussion', Img('themes/mobile/design/images/new.png', array('alt' => T('New Discussion'))), '/post/discussion'.(array_key_exists('CategoryID', $Sender->Data) ? '/'.$Sender->Data['CategoryID'] : ''), array('Garden.SignIn.Allow'), array('class' => 'NewDiscussion'));
-            elseif ($ButtonType == 'Conversation')
-                $Sender->Menu->AddLink('NewConversation', Img('themes/mobile/design/images/new.png', array('alt' => T('New Conversation'))), '/messages/add', '', array('class' => 'NewConversation'));
+            if ($ButtonType == 'Discussion') {
+                $Sender->Menu->addLink('NewDiscussion', img('themes/mobile/design/images/new.png', array('alt' => T('New Discussion'))), '/post/discussion'.(array_key_exists('CategoryID', $Sender->Data) ? '/'.$Sender->Data['CategoryID'] : ''), array('Garden.SignIn.Allow'), array('class' => 'NewDiscussion'));
+            } elseif ($ButtonType == 'Conversation')
+                $Sender->Menu->addLink('NewConversation', img('themes/mobile/design/images/new.png', array('alt' => T('New Conversation'))), '/messages/add', '', array('class' => 'NewConversation'));
         }
     }
 
@@ -133,6 +133,6 @@ class MobileThemeHooks implements Gdn_IPlugin {
      */
     public function ProfileController_BeforeUserInfo_Handler($Sender) {
         $UserPhoto = new UserPhotoModule();
-        echo $UserPhoto->ToString();
+        echo $UserPhoto->toString();
     }
 }

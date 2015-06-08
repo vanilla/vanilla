@@ -1,15 +1,15 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
     <div
-        class="Info"><?php echo T('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.'); ?></div>
+        class="Info"><?php echo t('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.'); ?></div>
 <?php
-echo '<noscript><div class="Errors"><ul><li>', T('This page requires Javascript.'), '</li></ul></div></noscript>';
-echo $this->Form->Open();
+echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
+echo $this->Form->open();
 ?>
     <div class="Info">
         <?php
-        echo Anchor(T('Restore'), '#', array('class' => 'RestoreButton SmallButton'));
-        echo Anchor(T('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
+        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton SmallButton'));
+        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
         ?>
     </div>
 <?php
@@ -20,12 +20,12 @@ echo '</div id="LogTable">';
 ?>
     <div class="Info">
         <?php
-        echo Anchor(T('Restore'), '#', array('class' => 'RestoreButton SmallButton'));
-        echo Anchor(T('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
+        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton SmallButton'));
+        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
         ?>
     </div>
 <?php
 
-$this->AddDefinition('ExpandText', T('(more)'));
-$this->AddDefinition('CollapseText', T('(less)'));
-echo $this->Form->Close();
+$this->addDefinition('ExpandText', t('(more)'));
+$this->addDefinition('CollapseText', t('(less)'));
+echo $this->Form->close();

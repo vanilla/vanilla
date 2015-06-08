@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 
 echo '<div class="DataListWrap">';
-echo '<h2 class="H">'.T('Notifications').'</h2>';
+echo '<h2 class="H">'.t('Notifications').'</h2>';
 
-if (count($this->Data('Activities'))) {
+if (count($this->data('Activities'))) {
     echo '<ul class="DataList Activities Notifications">';
-    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
+    include($this->fetchViewLocation('activities', 'activity', 'dashboard'));
     echo '</ul>';
-    echo PagerModule::Write(array('CurrentRecords' => count($this->Data('Activities'))));
+    echo PagerModule::write(array('CurrentRecords' => count($this->data('Activities'))));
 } else {
     ?>
-    <div class="Empty"><?php echo T('You do not have any notifications yet.'); ?></div>
+    <div class="Empty"><?php echo t('You do not have any notifications yet.'); ?></div>
 <?php
 }
 echo '</div>';

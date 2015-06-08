@@ -13,11 +13,11 @@
  */
 class ProfileFilterModule extends Gdn_Module {
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         return parent::ToString();
     }
 }

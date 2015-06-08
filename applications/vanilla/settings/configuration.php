@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Vanilla default configuration options.
  *
@@ -27,7 +29,7 @@ $Configuration['Vanilla']['Comments']['PerPage'] = '30';
 $Configuration['Vanilla']['Discussions']['PerCategory'] = '5';
 $Configuration['Vanilla']['Discussions']['PerPage'] = '30';
 $Configuration['Vanilla']['Discussions']['Home'] = 'discussions';
-$Configuration['Vanilla']['Categories']['Use'] = TRUE;
+$Configuration['Vanilla']['Categories']['Use'] = true;
 // Categories can be infinitely nested, but this doesn't look great when
 // displaying them to users. Use the MaxDisplayDepth settings to control how
 // deep they should be displayed to the users on the category listing. The final
@@ -42,11 +44,11 @@ $Configuration['Vanilla']['Categories']['MaxModuleDisplayDepth'] = 0;
 $Configuration['Vanilla']['Categories']['DoHeadings'] = 0;
 
 // Should users be automatically pushed to the last comment they read in a discussion?
-$Configuration['Vanilla']['Comments']['AutoOffset'] = TRUE;
-$Configuration['Vanilla']['Comment']['ReplaceNewlines'] = TRUE;
+$Configuration['Vanilla']['Comments']['AutoOffset'] = true;
+$Configuration['Vanilla']['Comment']['ReplaceNewlines'] = true;
 
 // Module visibility
-$Configuration['Vanilla']['Modules']['ShowBookmarkedModule'] = FALSE;
+$Configuration['Vanilla']['Modules']['ShowBookmarkedModule'] = false;
 
 // Allow users to delete their own comments if are still allowed to edit (per timeout).
-$Configuration['Vanilla']['Comments']['AllowSelfDelete'] = FALSE;
+$Configuration['Vanilla']['Comments']['AllowSelfDelete'] = false;

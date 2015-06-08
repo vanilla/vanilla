@@ -44,22 +44,22 @@ class SearchController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function Initialize() {
+    public function initialize() {
         $this->Head = new HeadModule($this);
-        $this->AddJsFile('jquery.js');
-        $this->AddJsFile('jquery.livequery.js');
-        $this->AddJsFile('jquery.form.js');
-        $this->AddJsFile('jquery.popup.js');
-        $this->AddJsFile('jquery.gardenhandleajaxform.js');
-        $this->AddJsFile('jquery.expander.js');
-        $this->AddJsFile('global.js');
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('jquery.expander.js');
+        $this->addJsFile('global.js');
 
-        $this->AddCssFile('style.css');
-        $this->AddCssFile('vanillicon.css', 'static');
-        $this->AddCssFile('menu.css');
-        $this->AddModule('GuestModule');
-        parent::Initialize();
-        $this->SetData('Breadcrumbs', array(array('Name' => T('Search'), 'Url' => '/search')));
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
+        $this->addCssFile('menu.css');
+        $this->addModule('GuestModule');
+        parent::initialize();
+        $this->setData('Breadcrumbs', array(array('Name' => t('Search'), 'Url' => '/search')));
     }
 
     /**
@@ -69,48 +69,51 @@ class SearchController extends Gdn_Controller {
      * @access public
      * @param int $Page Page number.
      */
-    public function Index($Page = '') {
-        $this->AddJsFile('search.js');
-        $this->Title(T('Search'));
+    public function index($Page = '') {
+        $this->addJsFile('search.js');
+        $this->title(t('Search'));
 
-        SaveToConfig('Garden.Format.EmbedSize', '160x90', FALSE);
-        Gdn_Theme::Section('SearchResults');
+        saveToConfig('Garden.Format.EmbedSize', '160x90', false);
+        Gdn_Theme::section('SearchResults');
 
-        list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
-        $this->SetData('_Limit', $Limit);
+        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Search.PerPage', 20));
+        $this->setData('_Limit', $Limit);
 
-        $Search = $this->Form->GetFormValue('Search');
-        $Mode = $this->Form->GetFormValue('Mode');
-        if ($Mode)
+        $Search = $this->Form->getFormValue('Search');
+        $Mode = $this->Form->getFormValue('Mode');
+        if ($Mode) {
             $this->SearchModel->ForceSearchMode = $Mode;
+        }
         try {
             $ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
         } catch (Gdn_UserException $Ex) {
-            $this->Form->AddError($Ex);
+            $this->Form->addError($Ex);
             $ResultSet = array();
         } catch (Exception $Ex) {
             LogException($Ex);
-            $this->Form->AddError($Ex);
+            $this->Form->addError($Ex);
             $ResultSet = array();
         }
-        Gdn::UserModel()->JoinUsers($ResultSet, array('UserID'));
+        Gdn::userModel()->joinUsers($ResultSet, array('UserID'));
 
         // Fix up the summaries.
-        $SearchTerms = explode(' ', Gdn_Format::Text($Search));
+        $SearchTerms = explode(' ', Gdn_Format::text($Search));
         foreach ($ResultSet as &$Row) {
-            $Row['Summary'] = SearchExcerpt(Gdn_Format::PlainText($Row['Summary'], $Row['Format']), $SearchTerms);
+            $Row['Summary'] = SearchExcerpt(Gdn_Format::plainText($Row['Summary'], $Row['Format']), $SearchTerms);
             $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
             $Row['Format'] = 'Html';
         }
 
-        $this->SetData('SearchResults', $ResultSet, TRUE);
-        $this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
-        if ($ResultSet)
+        $this->setData('SearchResults', $ResultSet, true);
+        $this->setData('SearchTerm', Gdn_Format::text($Search), true);
+        if ($ResultSet) {
             $NumResults = count($ResultSet);
-        else
+        } else {
             $NumResults = 0;
-        if ($NumResults == $Offset + $Limit)
+        }
+        if ($NumResults == $Offset + $Limit) {
             $NumResults++;
+        }
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
@@ -118,21 +121,21 @@ class SearchController extends Gdn_Controller {
         $this->Pager->MoreCode = 'More Results';
         $this->Pager->LessCode = 'Previous Results';
         $this->Pager->ClientID = 'Pager';
-        $this->Pager->Configure(
+        $this->Pager->configure(
             $Offset,
             $Limit,
             $NumResults,
-            'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::Url($Search)
+            'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::url($Search)
         );
 
 //		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-//         $this->SetJson('LessRow', $this->Pager->ToString('less'));
-//         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+//         $this->setJson('LessRow', $this->Pager->toString('less'));
+//         $this->setJson('MoreRow', $this->Pager->toString('more'));
 //         $this->View = 'results';
 //      }
 
-        $this->CanonicalUrl(Url('search', TRUE));
+        $this->canonicalUrl(url('search', true));
 
-        $this->Render();
+        $this->render();
     }
 }

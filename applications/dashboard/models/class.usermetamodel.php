@@ -22,8 +22,8 @@ class UserMetaModel extends Gdn_Model {
     public function __construct() {
         self::$MemoryCache = array();
         parent::__construct('UserMeta');
-        $this->SQL = clone Gdn::SQL();
-        $this->SQL->Reset();
+        $this->SQL = clone Gdn::sql();
+        $this->SQL->reset();
     }
 
     /**
@@ -45,8 +45,8 @@ class UserMetaModel extends Gdn_Model {
      * @param $Default optional default return value if key is not found
      * @return array results or $Default
      */
-    public function GetUserMeta($UserID, $Key = NULL, $Default = NULL) {
-        if (Gdn::Cache()->ActiveEnabled()) {
+    public function getUserMeta($UserID, $Key = null, $Default = null) {
+        if (Gdn::cache()->activeEnabled()) {
             if (is_array($UserID)) {
                 $Result = array();
                 foreach ($UserID as $ID) {
@@ -58,19 +58,20 @@ class UserMetaModel extends Gdn_Model {
 
             // Try and grab the user meta from the cache.
             $CacheKey = 'UserMeta_'.$UserID;
-            $UserMeta = Gdn::Cache()->Get($CacheKey);
+            $UserMeta = Gdn::cache()->get($CacheKey);
 
             if ($UserMeta === Gdn_Cache::CACHEOP_FAILURE) {
-                $UserMeta = $this->GetWhere(array('UserID' => $UserID), 'Name')->ResultArray();
-                $UserMeta = ConsolidateArrayValuesByKey($UserMeta, 'Name', 'Value');
-                Gdn::Cache()->Store($CacheKey, $UserMeta);
+                $UserMeta = $this->getWhere(array('UserID' => $UserID), 'Name')->resultArray();
+                $UserMeta = consolidateArrayValuesByKey($UserMeta, 'Name', 'Value');
+                Gdn::cache()->store($CacheKey, $UserMeta);
             }
 
-            if ($Key === NULL)
+            if ($Key === null) {
                 return $UserMeta;
+            }
 
-            if (strpos($Key, '%') === FALSE) {
-                $Result = GetValue($Key, $UserMeta, $Default);
+            if (strpos($Key, '%') === false) {
+                $Result = val($Key, $UserMeta, $Default);
                 return array($Key => $Result);
             }
 
@@ -78,38 +79,43 @@ class UserMetaModel extends Gdn_Model {
 
             $Result = array();
             foreach ($UserMeta as $Name => $Value) {
-                if (preg_match($Regex, $Name))
+                if (preg_match($Regex, $Name)) {
                     $Result[$Name] = $Value;
+                }
             }
             return $Result;
         }
 
-        $Sql = clone Gdn::SQL();
-        $Sql->Reset();
+        $Sql = clone Gdn::sql();
+        $Sql->reset();
         $UserMetaQuery = $Sql
-            ->Select('*')
-            ->From('UserMeta u');
+            ->select('*')
+            ->from('UserMeta u');
 
-        if (is_array($UserID))
-            $UserMetaQuery->WhereIn('u.UserID', $UserID);
-        else
-            $UserMetaQuery->Where('u.UserID', $UserID);
+        if (is_array($UserID)) {
+            $UserMetaQuery->whereIn('u.UserID', $UserID);
+        } else {
+            $UserMetaQuery->where('u.UserID', $UserID);
+        }
 
-        if (stristr($Key, '%'))
-            $UserMetaQuery->Where('u.Name like', $Key);
-        else
-            $UserMetaQuery->Where('u.Name', $Key);
+        if (stristr($Key, '%')) {
+            $UserMetaQuery->where('u.Name like', $Key);
+        } else {
+            $UserMetaQuery->where('u.Name', $Key);
+        }
 
-        $UserMetaData = $UserMetaQuery->Get();
+        $UserMetaData = $UserMetaQuery->get();
 
         $UserMeta = array();
-        if ($UserMetaData->NumRows()) {
+        if ($UserMetaData->numRows()) {
             if (is_array($UserID)) {
-                while ($MetaRow = $UserMetaData->NextRow())
+                while ($MetaRow = $UserMetaData->NextRow()) {
                     $UserMeta[$MetaRow->UserID][$MetaRow->Name] = $MetaRow->Value;
+                }
             } else {
-                while ($MetaRow = $UserMetaData->NextRow())
+                while ($MetaRow = $UserMetaData->NextRow()) {
                     $UserMeta[$MetaRow->Name] = $MetaRow->Value;
+                }
             }
         } else {
             self::$MemoryCache[$Key] = $Default;
@@ -130,15 +136,15 @@ class UserMetaModel extends Gdn_Model {
      * ++ Before any queries are run, $Key is converted to its fully qualified format (Plugin.<PluginName> prepended)
      * ++ to prevent collisions in the meta table when multiple plugins have similar key names.
      *
-     * If $Value == NULL, the matching row(s) are deleted instead of updated.
+     * If $Value == null, the matching row(s) are deleted instead of updated.
      *
      * @param $UserID int UserID or array of UserIDs
      * @param $Key string relative user key
      * @param $Value mixed optional value to set, null to delete
      * @return void
      */
-    public function SetUserMeta($UserID, $Key, $Value = NULL) {
-        if (Gdn::Cache()->ActiveEnabled()) {
+    public function setUserMeta($UserID, $Key, $Value = null) {
+        if (Gdn::cache()->activeEnabled()) {
             if (is_array($UserID)) {
                 foreach ($UserID as $ID) {
                     $this->SetUserMeta($ID, $Key, $Value);
@@ -148,40 +154,43 @@ class UserMetaModel extends Gdn_Model {
 
             $UserMeta = $this->GetUserMeta($UserID);
             if (!stristr($Key, '%')) {
-                if ($Value === NULL)
+                if ($Value === null) {
                     unset($UserMeta[$Key]);
-                else
+                } else {
                     $UserMeta[$Key] = $Value;
+                }
             } else {
                 $MatchKey = str_replace('%', '*', $Key);
                 foreach ($UserMeta as $UserMetaKey => $UserMetaValue) {
                     if (fnmatch($MatchKey, $UserMetaKey)) {
-                        if ($Value === NULL)
+                        if ($Value === null) {
                             unset($UserMeta[$UserMetaKey]);
-                        else
+                        } else {
                             $UserMeta[$UserMetaKey] = $Value;
+                        }
                     }
                 }
             }
 
             $CacheKey = 'UserMeta_'.$UserID;
-            Gdn::Cache()->Store($CacheKey, $UserMeta);
+            Gdn::cache()->store($CacheKey, $UserMeta);
 
             // Update the DB.
-            $this->SQL->Reset();
-            if ($Value === NULL) {
-                $Q = $this->SQL->Where('UserID', $UserID);
-                if (stristr($Key, '%'))
-                    $Q->Like('Name', $Key);
-                else
-                    $Q->Where('Name', $Key);
+            $this->SQL->reset();
+            if ($Value === null) {
+                $Q = $this->SQL->where('UserID', $UserID);
+                if (stristr($Key, '%')) {
+                    $Q->like('Name', $Key);
+                } else {
+                    $Q->where('Name', $Key);
+                }
 
-                $Q->Delete('UserMeta');
+                $Q->delete('UserMeta');
             } else {
                 $Px = $this->SQL->Database->DatabasePrefix;
                 $Sql = "insert {$Px}UserMeta (UserID, Name, Value) values(:UserID, :Name, :Value) on duplicate key update Value = :Value1";
                 $Params = array(':UserID' => $UserID, ':Name' => $Key, ':Value' => $Value, ':Value1' => $Value);
-                $this->Database->Query($Sql, $Params);
+                $this->Database->query($Sql, $Params);
             }
 
             return;
@@ -189,41 +198,43 @@ class UserMetaModel extends Gdn_Model {
 
 
         if (is_null($Value)) {  // Delete
-            $UserMetaQuery = Gdn::SQL();
+            $UserMetaQuery = Gdn::sql();
 
-            if (is_array($UserID))
-                $UserMetaQuery->WhereIn('UserID', $UserID);
-            else
-                $UserMetaQuery->Where('UserID', $UserID);
+            if (is_array($UserID)) {
+                $UserMetaQuery->whereIn('UserID', $UserID);
+            } else {
+                $UserMetaQuery->where('UserID', $UserID);
+            }
 
-            if (stristr($Key, '%'))
-                $UserMetaQuery->Like('Name', $Key);
-            else
-                $UserMetaQuery->Where('Name', $Key);
+            if (stristr($Key, '%')) {
+                $UserMetaQuery->like('Name', $Key);
+            } else {
+                $UserMetaQuery->where('Name', $Key);
+            }
 
-            $UserMetaQuery->Delete('UserMeta');
+            $UserMetaQuery->delete('UserMeta');
         } else {                // Set
-            if (!is_array($UserID))
+            if (!is_array($UserID)) {
                 $UserID = array($UserID);
+            }
 
             foreach ($UserID as $UID) {
                 try {
-                    Gdn::SQL()->Insert('UserMeta', array(
+                    Gdn::sql()->insert('UserMeta', array(
                         'UserID' => $UID,
                         'Name' => $Key,
                         'Value' => $Value
                     ));
                 } catch (Exception $e) {
-                    Gdn::SQL()->Update('UserMeta', array(
+                    Gdn::sql()->update('UserMeta', array(
                         'Value' => $Value
                     ), array(
                         'UserID' => $UID,
                         'Name' => $Key
-                    ))->Put();
+                    ))->put();
                 }
             }
         }
         return;
     }
-
 }

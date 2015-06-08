@@ -7,20 +7,20 @@
     });
 </script>
 
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="Wrap">
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->open();
+    echo $this->Form->errors();
     ?>
 
     <div class="DismissMessage WarningMessage">
         <?php
-        echo FormatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
+        echo formatString(t('You are about to ban {User.UserID,user}.'), $this->Data);
         ?>
     </div>
 
-    <div class="P"><b><?php echo T('Why are you Banning this user?') ?></b></div>
+    <div class="P"><b><?php echo t('Why are you Banning this user?') ?></b></div>
 
     <?php
 
@@ -29,18 +29,18 @@
     echo '<div class="P">',
     $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
     '<div class="TextBoxWrapper">',
-    $this->Form->TextBox('ReasonText', array('MultiLine' => TRUE)),
+    $this->Form->textBox('ReasonText', array('MultiLine' => TRUE)),
     '</div>',
     '</div>';
 
-    if ($this->Data('_MayDeleteContent'))
-        echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
+    if ($this->data('_MayDeleteContent'))
+        echo '<div class="P">', $this->Form->CheckBox('DeleteContent', t("Also delete this user's content.")), '</div>';
 
     ?>
 
 
     <?php
-    echo '<div class="Buttons P">', $this->Form->Button(T('Ban.Action', 'Ban')), '</div>';
-    echo $this->Form->Close();
+    echo '<div class="Buttons P">', $this->Form->button(t('Ban.Action', 'Ban')), '</div>';
+    echo $this->Form->close();
     ?>
 </div>

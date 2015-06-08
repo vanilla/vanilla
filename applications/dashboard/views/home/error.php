@@ -1,19 +1,19 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="SplashInfo">
     <div class="Center">
-        <h1><?php echo $this->Data('Title', T('Whoops!')); ?></h1>
+        <h1><?php echo $this->data('Title', t('Whoops!')); ?></h1>
 
         <div id="Message">
             <?php
-            echo Gdn_Format::Markdown($this->Data('Exception', 'No error message supplied.'));
+            echo Gdn_Format::Markdown($this->data('Exception', 'No error message supplied.'));
             ?>
         </div>
     </div>
-    <?php if (Debug() && $this->Data('Trace')): ?>
+    <?php if (Debug() && $this->data('Trace')): ?>
         <h2>Error</h2>
-        <?php echo $this->Data('Code').' '.htmlspecialchars(Gdn_Controller::GetStatusMessage($this->Data('Code'))); ?>
+        <?php echo $this->data('Code').' '.htmlspecialchars(Gdn_Controller::GetStatusMessage($this->data('Code'))); ?>
         <h2>Trace</h2>
-        <pre stye="text-align"><?php echo htmlspecialchars($this->Data('Trace')); ?></pre>
+        <pre stye="text-align"><?php echo htmlspecialchars($this->data('Trace')); ?></pre>
     <?php endif; ?>
-    <!-- Code: <?php $this->Data('Code', 400); ?> -->
+    <!-- Code: <?php $this->data('Code', 400); ?> -->
 </div>

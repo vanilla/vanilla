@@ -67,7 +67,7 @@
             echo "</div>\n";
         }
         // Dump queries if present.
-        $Database = Gdn::Database();
+        $Database = Gdn::database();
         if (!is_null($Database) && method_exists($Database, 'Queries')) {
             $Queries = $Database->Queries();
             $QueryTimes = $Database->QueryTimes();
@@ -101,7 +101,7 @@
                 // Don't echo the configuration array as it contains sensitive information
                 if (!in_array($Key, array('Config', 'Configuration'))) {
                     echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'><strong>['.$Key.']</strong> ';
-                    echo htmlentities(var_export($Value, TRUE), ENT_COMPAT, 'UTF-8');
+                    echo htmlentities(var_export($Value, true), ENT_COMPAT, 'UTF-8');
                     echo "</pre>\r\n";
                     $Odd = $Odd == TRUE ? FALSE : TRUE;
                 }

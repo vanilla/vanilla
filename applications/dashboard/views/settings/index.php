@@ -2,13 +2,13 @@
 $this->RenderAsset('Messages');
 ?>
 <div class="Column Column2">
-    <h1><?php echo T('Recently Active Users'); ?></h1>
+    <h1><?php echo t('Recently Active Users'); ?></h1>
     <table id="RecentUsers" border="0" cellpadding="0" cellspacing="0" class="AltColumns">
         <!--
       <thead>
          <tr>
-            <th><?php echo T('User'); ?></th>
-            <th class="Alt"><?php echo T('Last Active'); ?></th>
+            <th><?php echo t('User'); ?></th>
+            <th class="Alt"><?php echo t('Last Active'); ?></th>
          </tr>
       </thead>
       -->
@@ -23,10 +23,10 @@ $this->RenderAsset('Messages');
             ?>>
                 <th><?php
                     $PhotoUser = UserBuilder($User);
-                    echo UserPhoto($PhotoUser);
-                    echo UserAnchor($User);
+                    echo userPhoto($PhotoUser);
+                    echo userAnchor($User);
                     ?></th>
-                <td class="Alt"><?php echo Gdn_Format::Date($User->DateLastActive, 'html'); ?></td>
+                <td class="Alt"><?php echo Gdn_Format::date($User->DateLastActive, 'html'); ?></td>
             </tr>
         <?php
         }
@@ -35,12 +35,12 @@ $this->RenderAsset('Messages');
     </table>
 </div>
 <div class="Column Column1 ReleasesColumn">
-    <h1><?php echo T('Updates'); ?></h1>
+    <h1><?php echo t('Updates'); ?></h1>
 
     <div class="List"></div>
 </div>
 <div class="Column Column2 NewsColumn">
-    <h1><?php echo T('Recent News'); ?></h1>
+    <h1><?php echo t('Recent News'); ?></h1>
 
     <div class="List"></div>
 </div>

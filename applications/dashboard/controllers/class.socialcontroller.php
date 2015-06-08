@@ -19,30 +19,30 @@ class SocialController extends DashboardController {
     /**
      * Runs before every call to this controller.
      */
-    public function Initialize() {
-        parent::Initialize();
-        Gdn_Theme::Section('Dashboard');
+    public function initialize() {
+        parent::initialize();
+        Gdn_Theme::section('Dashboard');
     }
 
     /**
      * Default method.
      */
-    public function Index() {
-        Redirect('social/manage');
+    public function index() {
+        redirect('social/manage');
     }
 
     /**
      * Settings page.
      */
-    public function Manage() {
-        $this->Permission('Garden.Settings.Manage');
-        $this->Title("Social Integration");
-        $this->AddSideMenu('dashboard/social');
+    public function manage() {
+        $this->permission('Garden.Settings.Manage');
+        $this->title("Social Integration");
+        $this->addSideMenu('dashboard/social');
 
         $Connections = $this->GetConnections();
-        $this->SetData('Connections', $Connections);
+        $this->setData('Connections', $Connections);
 
-        $this->Render();
+        $this->render();
     }
 
     /**
@@ -51,27 +51,32 @@ class SocialController extends DashboardController {
      * @return array|mixed
      * @throws Exception
      */
-    protected function GetConnections() {
-        $this->FireEvent('GetConnections');
-        $Connections = $this->Data('Connections', array());
-        if (!is_array($Connections)) $Connections = array();
+    protected function getConnections() {
+        $this->fireEvent('GetConnections');
+        $Connections = $this->data('Connections', array());
+        if (!is_array($Connections)) {
+            $Connections = array();
+        }
 
-        foreach (Gdn::PluginManager()->AvailablePlugins() as $PluginKey => $PluginInfo) {
-            if (!array_key_exists('SocialConnect', $PluginInfo)) continue;
+        foreach (Gdn::pluginManager()->AvailablePlugins() as $PluginKey => $PluginInfo) {
+            if (!array_key_exists('SocialConnect', $PluginInfo)) {
+                continue;
+            }
 
-            if (!array_key_exists($PluginKey, $Connections))
+            if (!array_key_exists($PluginKey, $Connections)) {
                 $Connections[$PluginKey] = array();
+            }
 
             $ConnectionName = $PluginInfo['Index'];
 
-            if (Gdn::PluginManager()->CheckPlugin($PluginKey)) {
-                $Configured = Gdn::PluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
+            if (Gdn::pluginManager()->CheckPlugin($PluginKey)) {
+                $Configured = Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
             } else {
-                $Configured = NULL;
+                $Configured = null;
             }
 
             $Connections[$PluginKey] = array_merge($Connections[$PluginKey], $PluginInfo, array(
-                'Enabled' => Gdn::PluginManager()->CheckPlugin($PluginKey),
+                'Enabled' => Gdn::pluginManager()->CheckPlugin($PluginKey),
                 'Configured' => $Configured
             ), array(
                 'Icon' => sprintf("/plugins/%s/icon.png", $PluginInfo['Folder'])
@@ -87,30 +92,30 @@ class SocialController extends DashboardController {
      * @param $Plugin
      * @throws Exception
      */
-    public function Disable($Plugin) {
-        $this->Permission('Garden.Settings.Manage');
+    public function disable($Plugin) {
+        $this->permission('Garden.Settings.Manage');
         $Connections = $this->GetConnections();
         unset($this->Data['Connections']);
 
         if (!array_key_exists($Plugin, $Connections)) {
-            throw NotFoundException('SocialConnect Plugin');
+            throw notFoundException('SocialConnect Plugin');
         }
 
-        Gdn::PluginManager()->DisablePlugin($Plugin);
+        Gdn::pluginManager()->DisablePlugin($Plugin);
 
         $Connections = $this->GetConnections();
-        $Connection = GetValue($Plugin, $Connections);
+        $Connection = val($Plugin, $Connections);
 
-        require_once($this->FetchViewLocation('connection_functions'));
+        require_once($this->fetchViewLocation('connection_functions'));
         ob_start();
         WriteConnection($Connection);
         $Row = ob_get_clean();
 
-        $this->JsonTarget("#Provider_{$Connection['Index']}", $Row);
-        $this->InformMessage(T("Plugin disabled."));
+        $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
+        $this->informMessage(t("Plugin disabled."));
 
         unset($this->Data['Connections']);
-        $this->Render('blank', 'utility');
+        $this->render('blank', 'utility');
     }
 
     /**
@@ -120,29 +125,28 @@ class SocialController extends DashboardController {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function Enable($Plugin) {
-        $this->Permission('Garden.Settings.Manage');
+    public function enable($Plugin) {
+        $this->permission('Garden.Settings.Manage');
         $Connections = $this->GetConnections();
 
         if (!array_key_exists($Plugin, $Connections)) {
-            throw NotFoundException('SocialConnect Plugin');
+            throw notFoundException('SocialConnect Plugin');
         }
 
-        Gdn::PluginManager()->EnablePlugin($Plugin, NULL);
+        Gdn::pluginManager()->EnablePlugin($Plugin, null);
 
         $Connections = $this->GetConnections();
-        $Connection = GetValue($Plugin, $Connections);
+        $Connection = val($Plugin, $Connections);
 
-        require_once($this->FetchViewLocation('connection_functions'));
+        require_once($this->fetchViewLocation('connection_functions'));
         ob_start();
         WriteConnection($Connection);
         $Row = ob_get_clean();
 
-        $this->JsonTarget("#Provider_{$Connection['Index']}", $Row);
-        $this->InformMessage(T("Plugin enabled."));
+        $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
+        $this->informMessage(t("Plugin enabled."));
 
         unset($this->Data['Connections']);
-        $this->Render('blank', 'utility');
+        $this->render('blank', 'utility');
     }
-
 }

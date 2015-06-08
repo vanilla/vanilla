@@ -19,9 +19,9 @@ class StatisticsController extends DashboardController {
     /**
      * Output available info.
      */
-    public function Info() {
-        $this->SetData('FirstDate', Gdn::Statistics()->FirstDate());
-        $this->Render();
+    public function info() {
+        $this->setData('FirstDate', Gdn::statistics()->firstDate());
+        $this->render();
     }
 
     /**
@@ -30,11 +30,12 @@ class StatisticsController extends DashboardController {
      * @since 2.0.17
      * @access public
      */
-    public function Initialize() {
-        parent::Initialize();
-        Gdn_Theme::Section('Dashboard');
-        if ($this->Menu)
-            $this->Menu->HighlightRoute('/dashboard/settings');
+    public function initialize() {
+        parent::initialize();
+        Gdn_Theme::section('Dashboard');
+        if ($this->Menu) {
+            $this->Menu->highlightRoute('/dashboard/settings');
+        }
     }
 
     /**
@@ -43,61 +44,63 @@ class StatisticsController extends DashboardController {
      * @since 2.0.17
      * @access public
      */
-    public function Index() {
-        $this->Permission('Garden.Settings.Manage');
-        $this->AddSideMenu('dashboard/statistics');
-        //$this->AddJsFile('statistics.js');
-        $this->Title(T('Vanilla Statistics'));
-        $this->EnableSlicing($this);
+    public function index() {
+        $this->permission('Garden.Settings.Manage');
+        $this->addSideMenu('dashboard/statistics');
+        //$this->addJsFile('statistics.js');
+        $this->title(t('Vanilla Statistics'));
+        $this->enableSlicing($this);
 
-        if ($this->Form->IsPostBack()) {
-            $Flow = TRUE;
+        if ($this->Form->isPostBack()) {
+            $Flow = true;
 
-            if ($Flow && $this->Form->GetFormValue('Reregister')) {
-                Gdn::Statistics()->Register();
+            if ($Flow && $this->Form->getFormValue('Reregister')) {
+                Gdn::Statistics()->register();
             }
 
-            if ($Flow && $this->Form->GetFormValue('Save')) {
-                Gdn::InstallationID($this->Form->GetFormValue('InstallationID'));
-                Gdn::InstallationSecret($this->Form->GetFormValue('InstallationSecret'));
-                $this->InformMessage(T("Your settings have been saved."));
+            if ($Flow && $this->Form->getFormValue('Save')) {
+                Gdn::installationID($this->Form->getFormValue('InstallationID'));
+                Gdn::installationSecret($this->Form->getFormValue('InstallationSecret'));
+                $this->informMessage(t("Your settings have been saved."));
             }
 
-            if ($Flow && $this->Form->GetFormValue('AllowLocal')) {
-                SaveToConfig('Garden.Analytics.AllowLocal', TRUE);
+            if ($Flow && $this->Form->getFormValue('AllowLocal')) {
+                saveToConfig('Garden.Analytics.AllowLocal', true);
             }
 
-            if ($Flow && $this->Form->GetFormValue('Allow')) {
-                SaveToConfig('Garden.Analytics.Enabled', TRUE);
+            if ($Flow && $this->Form->getFormValue('Allow')) {
+                saveToConfig('Garden.Analytics.Enabled', true);
             }
 
-            if ($Flow && $this->Form->GetFormValue('ClearCredentials')) {
-                Gdn::InstallationID(FALSE);
-                Gdn::InstallationSecret(FALSE);
-                Gdn::Statistics()->Tick();
-                $Flow = FALSE;
+            if ($Flow && $this->Form->getFormValue('ClearCredentials')) {
+                Gdn::installationID(false);
+                Gdn::installationSecret(false);
+                Gdn::statistics()->Tick();
+                $Flow = false;
             }
         } else {
-            $this->Form->SetValue('InstallationID', Gdn::InstallationID());
-            $this->Form->SetValue('InstallationSecret', Gdn::InstallationSecret());
+            $this->Form->setValue('InstallationID', Gdn::installationID());
+            $this->Form->setValue('InstallationSecret', Gdn::installationSecret());
         }
 
-        $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();
+        $AnalyticsEnabled = Gdn_Statistics::checkIsEnabled();
         if ($AnalyticsEnabled) {
-            $ConfFile = Gdn::Config()->DefaultPath();
-            $this->SetData('ConfWritable', $ConfWritable = is_writable($ConfFile));
-            if (!$ConfWritable)
-                $AnalyticsEnabled = FALSE;
+            $ConfFile = Gdn::config()->defaultPath();
+            $this->setData('ConfWritable', $ConfWritable = is_writable($ConfFile));
+            if (!$ConfWritable) {
+                $AnalyticsEnabled = false;
+            }
         }
 
-        $this->SetData('AnalyticsEnabled', $AnalyticsEnabled);
+        $this->setData('AnalyticsEnabled', $AnalyticsEnabled);
 
-        $NotifyMessage = Gdn::Get('Garden.Analytics.Notify', FALSE);
-        $this->SetData('NotifyMessage', $NotifyMessage);
-        if ($NotifyMessage !== FALSE)
-            Gdn::Set('Garden.Analytics.Notify', NULL);
+        $NotifyMessage = Gdn::get('Garden.Analytics.Notify', false);
+        $this->setData('NotifyMessage', $NotifyMessage);
+        if ($NotifyMessage !== false) {
+            Gdn::set('Garden.Analytics.Notify', null);
+        }
 
-        $this->Render();
+        $this->render();
     }
 
     /**
@@ -106,10 +109,9 @@ class StatisticsController extends DashboardController {
      * @since 2.0.17
      * @access public
      */
-    public function Verify() {
-        $CredentialsValid = Gdn::Statistics()->ValidateCredentials();
-        $this->SetData('StatisticsVerified', $CredentialsValid);
-        $this->Render();
+    public function verify() {
+        $CredentialsValid = Gdn::statistics()->validateCredentials();
+        $this->setData('StatisticsVerified', $CredentialsValid);
+        $this->render();
     }
-
 }

@@ -4,19 +4,19 @@
     <?php
     // Add the canonical Url.
     if (method_exists($Sender, 'CanonicalUrl')) {
-        $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl(), ENT_COMPAT, C('Garden.Charset', 'UTF-8'));
+        $CanonicalUrl = htmlspecialchars($Sender->canonicalUrl(), ENT_COMPAT, c('Garden.Charset', 'UTF-8'));
 
-        echo '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\" accesskey=\"r\">$CanonicalUrl</a></div>";
+        echo '<div class="CanonicalUrl"><b>'.t('Canonical Url')."</b>: <a href=\"$CanonicalUrl\" accesskey=\"r\">$CanonicalUrl</a></div>";
     }
     ?>
 
     <?php
     // Add some cache info.
-    if (Gdn::Cache()->ActiveEnabled()) {
+    if (Gdn::cache()->activeEnabled()) {
         echo '<h3>Cache Information</h3>';
         echo '<pre>';
-        echo '<b>Cache Revision</b>: '.Gdn::Cache()->GetRevision()."\n";
-        echo '<b>Permissions Revision</b>: '.Gdn::UserModel()->GetPermissionsIncrement()."\n";
+        echo '<b>Cache Revision</b>: '.Gdn::cache()->GetRevision()."\n";
+        echo '<b>Permissions Revision</b>: '.Gdn::userModel()->GetPermissionsIncrement()."\n";
 
         if (property_exists('Gdn_Cache', 'GetCount')) {
             echo '<b>Cache Gets</b>: '.sprintf('%s in %ss', Gdn_Cache::$GetCount, Gdn_Cache::$GetTime);
@@ -69,8 +69,8 @@
 
     <?php
     // Add the queries.
-    $Database = Gdn::Database();
-    $SQL = $Database->SQL();
+    $Database = Gdn::database();
+    $SQL = $Database->sql();
 
     if (!is_null($Database)) {
         $String = '';
@@ -87,7 +87,7 @@
             $String .= $QueryInfo['Method']
                 .' <small>'.$QueryInfo['connection'].'</small>'
                 .' <small>'.@number_format($QueryInfo['Time'], 6).'s</small> '
-                .(isset($QueryInfo['Cache']) ? '<div><b>Cache:</b> '.var_export($QueryInfo['Cache'], TRUE).'</div>' : '')
+                .(isset($QueryInfo['Cache']) ? '<div><b>Cache:</b> '.var_export($QueryInfo['Cache'], true).'</div>' : '')
                 .'<pre>'.htmlspecialchars($Query).';</pre>';
         }
         echo $String;
@@ -100,7 +100,7 @@
     <h3>Controller Data</h3>
 <pre>
 <?php
-echo DebuggerPlugin::FormatData(Gdn::Controller()->Data);
+echo DebuggerPlugin::FormatData(Gdn::controller()->Data);
 ?>
 </pre>
 

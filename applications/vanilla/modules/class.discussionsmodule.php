@@ -30,7 +30,7 @@ class DiscussionsModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
-        $this->FireEvent('Init');
+        $this->fireEvent('Init');
     }
 
     /**
@@ -38,7 +38,7 @@ class DiscussionsModule extends Gdn_Module {
      *
      * @param int|bool $limit Override the number of discussions to display.
      */
-    public function GetData($limit = FALSE) {
+    public function getData($limit = false) {
         if (!$limit) {
             $limit = $this->Limit;
         }
@@ -51,22 +51,22 @@ class DiscussionsModule extends Gdn_Module {
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
-            $discussionModel->Watching = TRUE;
+            $discussionModel->Watching = true;
         }
 
-        $this->SetData('Discussions', $discussionModel->Get(0, $limit, $where));
+        $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
-        if (!$this->Data('Discussions')) {
+    public function toString() {
+        if (!$this->data('Discussions')) {
             $this->GetData();
         }
 
-        require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
+        require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
 
         return parent::ToString();
     }

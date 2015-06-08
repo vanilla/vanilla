@@ -18,12 +18,12 @@ class UserPhotoModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
-        $this->CanEditPhotos = C('Garden.Profile.EditPhotos');
+    public function toString() {
+        $this->CanEditPhotos = c('Garden.Profile.EditPhotos');
         return parent::ToString();
     }
 }

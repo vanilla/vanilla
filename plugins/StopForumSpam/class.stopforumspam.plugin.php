@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * StopForumSpam plugin.
  *
@@ -31,27 +31,27 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Options
      * @return bool
      */
-    public static function Check(&$Data, &$Options) {
+    public static function check(&$Data, &$Options) {
         // Make the request.
         $Get = array();
 
 
         if (isset($Data['IPAddress'])) {
-            $AddIP = TRUE;
+            $AddIP = true;
             // Don't check against the localhost.
             foreach (array(
                          '127.0.0.1/0',
                          '10.0.0.0/8',
                          '172.16.0.0/12',
                          '192.168.0.0/16') as $LocalCIDR) {
-
-                if (Gdn_Statistics::CIDRCheck($Data['IPAddress'], $LocalCIDR)) {
-                    $AddIP = FALSE;
+                if (Gdn_Statistics::cidrCheck($Data['IPAddress'], $LocalCIDR)) {
+                    $AddIP = false;
                     break;
                 }
             }
-            if ($AddIP)
+            if ($AddIP) {
                 $Get['ip'] = $Data['IPAddress'];
+            }
         }
         if (isset($Data['Username'])) {
             $Get['username'] = $Data['Username'];
@@ -60,8 +60,9 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             $Get['email'] = $Data['Email'];
         }
 
-        if (empty($Get))
-            return FALSE;
+        if (empty($Get)) {
+            return false;
+        }
 
         $Get['f'] = 'json';
 
@@ -76,21 +77,21 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         curl_close($Curl);
 
         if ($ResultString) {
-            $Result = json_decode($ResultString, TRUE);
+            $Result = json_decode($ResultString, true);
 
-            $IPFrequency = GetValueR('ip.frequency', $Result, 0);
-            $EmailFrequency = GetValueR('email.frequency', $Result, 0);
+            $IPFrequency = valr('ip.frequency', $Result, 0);
+            $EmailFrequency = valr('email.frequency', $Result, 0);
 
-            $IsSpam = FALSE;
+            $IsSpam = false;
 
             // Flag registrations as spam above a certain threshold.
-            if ($IPFrequency >= C('Plugins.StopForumSpam.IPThreshold1', 5) || $EmailFrequency >= C('Plugins.StopForumSpam.EmailThreshold1', 20)) {
-                $IsSpam = TRUE;
+            if ($IPFrequency >= c('Plugins.StopForumSpam.IPThreshold1', 5) || $EmailFrequency >= c('Plugins.StopForumSpam.EmailThreshold1', 20)) {
+                $IsSpam = true;
             }
 
             // Don't even log registrations that are above another threahold.
-            if ($IPFrequency >= C('Plugins.StopForumSpam.IPThreshold2', 20) || $EmailFrequency >= C('Plugins.StopForumSpam.EmailThreshold2', 50)) {
-                $Options['Log'] = FALSE;
+            if ($IPFrequency >= c('Plugins.StopForumSpam.IPThreshold2', 20) || $EmailFrequency >= c('Plugins.StopForumSpam.EmailThreshold2', 50)) {
+                $Options['Log'] = false;
             }
 
             if ($Result) {
@@ -100,41 +101,43 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             return $IsSpam;
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
      *
      */
-    public function Setup() {
-        $this->Structure();
+    public function setup() {
+        $this->structure();
     }
 
     /**
      *
      */
-    public function Structure() {
+    public function structure() {
         // Get a user for operations.
-        $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->Value('UserID');
+        $UserID = Gdn::sql()->getWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->value('UserID');
 
         if (!$UserID) {
-            $UserID = Gdn::SQL()->Insert('User', array(
+            $UserID = Gdn::sql()->insert('User', array(
                 'Name' => 'StopForumSpam',
-                'Password' => RandomString('20'),
+                'Password' => randomString('20'),
                 'HashMethod' => 'Random',
                 'Email' => 'stopforumspam@domain.com',
-                'DateInserted' => Gdn_Format::ToDateTime(),
+                'DateInserted' => Gdn_Format::toDateTime(),
                 'Admin' => '2'
             ));
         }
-        SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => TRUE));
+        saveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => true));
     }
 
     /**
+     *
+     *
      * @return mixed
      */
-    public function UserID() {
-        return C('Plugins.StopForumSpam.UserID', NULL);
+    public function userID() {
+        return c('Plugins.StopForumSpam.UserID', null);
     }
 
     /**
@@ -143,32 +146,33 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function Base_CheckSpam_Handler($Sender, $Args) {
+    public function base_checkSpam_handler($Sender, $Args) {
         // Don't check for spam if another plugin has already determined it is.
-        if ($Sender->EventArguments['IsSpam'])
+        if ($Sender->EventArguments['IsSpam']) {
             return;
+        }
 
         $RecordType = $Args['RecordType'];
         $Data =& $Args['Data'];
         $Options =& $Args['Options'];
 
         // Detect our favorite bot and short-circuit
-        if ($Reason = GetValue('DiscoveryText', $Data)) {
+        if ($Reason = val('DiscoveryText', $Data)) {
             if (substr($Reason, 0, 1) === '{') {
-                $Sender->EventArguments['IsSpam'] = TRUE;
-                $Data['Log_InsertUserID'] = $this->UserID();
-                $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+                $Sender->EventArguments['IsSpam'] = true;
+                $Data['Log_InsertUserID'] = $this->userID();
+                $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
                 return;
             }
         }
 
-        $Result = FALSE;
+        $Result = false;
         switch ($RecordType) {
             case 'Registration':
-                $Result = self::Check($Data, $Options);
+                $Result = self::check($Data, $Options);
                 if ($Result) {
-                    $Data['Log_InsertUserID'] = $this->UserID();
-                    $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+                    $Data['Log_InsertUserID'] = $this->userID();
+                    $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
                 }
                 break;
             case 'Comment':
@@ -186,19 +190,19 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param array $Args
      */
-    public function SettingsController_StopForumSpam_Create($Sender, $Args = array()) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function settingsController_stopForumSpam_create($Sender, $Args = array()) {
+        $Sender->permission('Garden.Settings.Manage');
         $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
+        $Conf->initialize(array(
             'Plugins.StopForumSpam.IPThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'IP addresses reported this many times will be flagged as spam.'),
             'Plugins.StopForumSpam.EmailThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'Email addresses reported this many times will be flagged as spam.'),
             'Plugins.StopForumSpam.IPThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'IP addresses reported this many times will be completely rejected.'),
             'Plugins.StopForumSpam.EmailThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 50, 'Description' => 'Email addresses reported this many times will be completely rejected.'),
         ));
 
-        $Sender->AddSideMenu('dashboard/settings/plugins');
-        $Sender->SetData('Title', T('Stop Forum Spam Settings'));
+        $Sender->addSideMenu('dashboard/settings/plugins');
+        $Sender->setData('Title', t('Stop Forum Spam Settings'));
         $Sender->ConfigurationModule = $Conf;
-        $Conf->RenderAll();
+        $Conf->renderAll();
     }
 }

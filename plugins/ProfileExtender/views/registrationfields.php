@@ -7,9 +7,9 @@ if (is_array($Sender->RegistrationFields)) {
             $Options = array_combine($Field['Options'], $Field['Options']);
 
         if ($Field['FormType'] == 'CheckBox') {
-            echo Wrap($Sender->Form->{$Field['FormType']}($Name, $Field['Label']), 'li');
+            echo wrap($Sender->Form->{$Field['FormType']}($Name, $Field['Label']), 'li');
         } else {
-            echo Wrap($Sender->Form->Label($Field['Label'], $Name).
+            echo wrap($Sender->Form->label($Field['Label'], $Name).
                 $Sender->Form->{$Field['FormType']}($Name, $Options), 'li');
         }
     }

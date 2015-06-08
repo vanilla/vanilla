@@ -38,7 +38,7 @@ class MessagesController extends ConversationsController {
         $this->Menu->highlightRoute('/messages/inbox');
         $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
 //      $this->addModule('MeModule');
-        $this-addModule('SignedInModule');
+        $this->addModule('SignedInModule');
 
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');

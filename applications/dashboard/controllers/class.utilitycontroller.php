@@ -442,6 +442,11 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function ping() {
         $start = microtime(true);
 
@@ -518,6 +523,11 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     public function setHourOffset() {
         $Form = new Gdn_Form();
 

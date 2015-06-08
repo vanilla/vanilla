@@ -57,7 +57,7 @@ class Gdn_ConfigurationModel {
      *
      * @param mixed $FieldName The name of the field (or array of field names) to ensure.
      */
-    public function detField($FieldName) {
+    public function setField($FieldName) {
         $Config = Gdn::factory(Gdn::AliasConfig);
         if (is_array($FieldName) === false) {
             $FieldName = array($FieldName);

@@ -503,9 +503,9 @@ class Gdn {
      * @return Gdn_SQLDriver
      * @see Gdn_Database::SQL()
      */
-    public static function SQL() {
+    public static function sql() {
         $Database = self::database();
-        $Result = $Database->SQL();
+        $Result = $Database->sql();
         return $Result;
     }
 

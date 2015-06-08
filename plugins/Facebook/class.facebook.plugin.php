@@ -354,7 +354,7 @@ class FacebookPlugin extends Gdn_Plugin {
             throw permissionException();
         }
 
-        $Row = retRecord($RecordType, $ID, true);
+        $Row = getRecord($RecordType, $ID, true);
         if ($Row) {
             $Message = sliceParagraph(Gdn_Format::plainText($Row['Body'], $Row['Format']), 160);
 

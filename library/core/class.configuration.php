@@ -518,7 +518,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $this->sources[$SourceTag] = $ConfigurationSource;
 
         if ($Dynamic) {
-            $this->cynamic = $ConfigurationSource;
+            $this->dynamic = $ConfigurationSource;
         }
 
         if (!$UseSplitting) {

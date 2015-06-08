@@ -758,7 +758,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function setup() {
         $Database = Gdn::database();
-        $Config = Gdn::Factory(Gdn::AliasConfig);
+        $Config = Gdn::factory(Gdn::AliasConfig);
         $Drop = false; //Gdn::config('Vanilla.Version') === FALSE ? TRUE : FALSE;
         $Explicit = true;
 

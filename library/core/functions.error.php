@@ -103,7 +103,7 @@ function Gdn_ExceptionHandler($Exception) {
             }
 
             if (class_exists('Gdn_Controller', false)) {
-                $msg = Gdn_Controller::GetStatusMessage($Code);
+                $msg = Gdn_Controller::getStatusMessage($Code);
             } else {
                 $msg = 'Error';
             }
@@ -166,9 +166,9 @@ function Gdn_ExceptionHandler($Exception) {
 
         // Try and rollback a database transaction.
         if (class_exists('Gdn', false)) {
-            $Database = Gdn::Database();
+            $Database = Gdn::database();
             if (is_object($Database)) {
-                $Database->RollbackTransaction();
+                $Database->rollbackTransaction();
             }
         }
 
@@ -374,7 +374,7 @@ if (!function_exists('ErrorMessage')) {
      * @param string The name of the method that encountered the error.
      * @param string Any additional information that could be useful to debuggers.
      */
-    function ErrorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
+    function errorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
         return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
     }
 }
@@ -385,11 +385,11 @@ if (!function_exists('LogException')) {
      *
      * @param Exception $Ex
      */
-    function LogException($Ex) {
+    function logException($Ex) {
         if (!class_exists('Gdn', false)) {
             return;
         }
-        if (!Gdn::Config('Garden.Errors.LogEnabled', false)) {
+        if (!Gdn::config('Garden.Errors.LogEnabled', false)) {
             return;
         }
 
@@ -398,17 +398,17 @@ if (!function_exists('LogException')) {
         }
 
         try {
-            $Px = Gdn::Request()->Host().' Garden ';
+            $Px = Gdn::request()->host().' Garden ';
         } catch (Exception $Ex) {
             $Px = 'Garden ';
         }
 
-        $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
+        $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
         if (!$ErrorLogFile) {
             $Type = 0;
         } else {
             $Type = 3;
-            $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
+            $Date = date(Gdn::config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
             $Px = "$Date $Px";
         }
 
@@ -434,7 +434,7 @@ if (!function_exists('LogMessage')) {
      * @param string The error message.
      * @param string Any additional information that could be useful to debuggers.
      */
-    function LogMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
+    function logMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
         // Figure out where to save the log
         if (class_exists('Gdn', false)) {
             $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', false);
@@ -448,11 +448,11 @@ if (!function_exists('LogMessage')) {
                 }
 
                 // Fail silently (there could be permission issues on badly set up servers).
-                $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
+                $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
                 if ($ErrorLogFile == '') {
                     @error_log($Log);
                 } else {
-                    $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
+                    $Date = date(Gdn::config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
                     $Log = "$Date: $Log\n";
                     @error_log($Log, 3, $ErrorLogFile);
                 }
@@ -468,7 +468,7 @@ if (!function_exists('Boop')) {
      * @param mixed $Message The object or string to log to the screen
      * @param optional $Arguments A list of arguments to log to the screen as if from a function call
      */
-    function Boop($Message, $Arguments = array(), $Vardump = false) {
+    function boop($Message, $Arguments = array(), $Vardump = false) {
         if (!defined('BOOP') || !BOOP) {
             return;
         }
@@ -498,19 +498,19 @@ if (!function_exists('CleanErrorArguments')) {
      * @param $Var
      * @param array $BlackList
      */
-    function CleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
+    function cleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
         if (is_array($Var)) {
             foreach ($Var as $Key => $Value) {
                 if (in_array(strtolower($Key), $BlackList)) {
                     $Var[$Key] = 'SECURITY';
                 } else {
                     if (is_object($Value)) {
-                        $Value = Gdn_Format::ObjectAsArray($Value);
+                        $Value = Gdn_Format::objectAsArray($Value);
                         $Var[$Key] = $Value;
                     }
 
                     if (is_array($Value)) {
-                        CleanErrorArguments($Var[$Key], $BlackList);
+                        cleanErrorArguments($Var[$Key], $BlackList);
                     }
                 }
             }
@@ -530,10 +530,10 @@ set_exception_handler('Gdn_ExceptionHandler');
  * @param string $Code The translation code of the type of object that wasn't found.
  * @return Exception
  */
-function NotFoundException($RecordType = 'Page') {
-    Gdn::Dispatcher()
-        ->PassData('RecordType', $RecordType)
-        ->PassData('Description', sprintf(T('The %s you were looking for could not be found.'), strtolower($RecordType)));
+function notFoundException($RecordType = 'Page') {
+    Gdn::dispatcher()
+        ->passData('RecordType', $RecordType)
+        ->passData('Description', sprintf(T('The %s you were looking for could not be found.'), strtolower($RecordType)));
     return new Gdn_UserException(sprintf(T('%s not found.'), T($RecordType)), 404);
 }
 
@@ -543,17 +543,17 @@ function NotFoundException($RecordType = 'Page') {
  * @param string|null $Permission The name of the permission that was required.
  * @return Exception
  */
-function PermissionException($Permission = null) {
+function permissionException($Permission = null) {
     if (!$Permission) {
-        $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
+        $Message = t('PermissionErrorMessage', "You don't have permission to do that.");
     } elseif ($Permission == 'Banned')
-        $Message = T("You've been banned.");
-    elseif (StringBeginsWith($Permission, '@'))
-        $Message = StringBeginsWith($Permission, '@', true, true);
+        $Message = t("You've been banned.");
+    elseif (stringBeginsWith($Permission, '@'))
+        $Message = stringBeginsWith($Permission, '@', true, true);
     else {
-        $Message = T(
+        $Message = t(
             "PermissionRequired.$Permission",
-            sprintf(T('You need the %s permission to do that.'), $Permission)
+            sprintf(t('You need the %s permission to do that.'), $Permission)
         );
     }
     return new Gdn_UserException($Message, 403);
@@ -565,13 +565,13 @@ function PermissionException($Permission = null) {
  * @param string|null $Permission The name of the permission that was required.
  * @return Exception
  */
-function ForbiddenException($Resource = null) {
+function forbiddenException($Resource = null) {
     if (!$Resource) {
-        $Message = T('ForbiddenErrorMessage', "You are not allowed to do that.");
-    } elseif (StringBeginsWith($Resource, '@'))
-        $Message = StringBeginsWith($Resource, '@', true, true);
+        $Message = t('ForbiddenErrorMessage', "You are not allowed to do that.");
+    } elseif (stringBeginsWith($Resource, '@'))
+        $Message = stringBeginsWith($Resource, '@', true, true);
     else {
-        $Message = sprintf(T('You are not allowed to %s.'), $Resource);
+        $Message = sprintf(t('You are not allowed to %s.'), $Resource);
     }
     return new Gdn_UserException($Message, 403);
 }

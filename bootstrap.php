@@ -52,7 +52,7 @@ require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
 
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
-Gdn_Autoloader::Start();
+Gdn_Autoloader::start();
 
 // Guard against broken cache files
 if (!class_exists('Gdn')) {
@@ -62,16 +62,16 @@ if (!class_exists('Gdn')) {
 }
 
 // Cache Layer
-Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');
+Gdn::factoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');
 
 // Install the configuration handler
-Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
+Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 
 // Load default baseline Garden configurations
-Gdn::config()->Load(PATH_CONF.'/config-defaults.php');
+Gdn::config()->load(PATH_CONF.'/config-defaults.php');
 
 // Load installation-specific configuration so that we know what apps are enabled
-Gdn::config()->Load(Gdn::config()->DefaultPath(), 'Configuration', true);
+Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
 
 /**
  * Bootstrap Early
@@ -84,13 +84,13 @@ if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
     require_once(PATH_CONF.'/bootstrap.early.php');
 }
 
-Gdn::config()->Caching(TRUE);
+Gdn::config()->caching(true);
 
 Debug(C('Debug', false));
 
 // Default request object
-Gdn::FactoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
-Gdn::request()->FromEnvironment();
+Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
+Gdn::request()->fromEnvironment();
 
 /**
  * Extension Managers
@@ -100,14 +100,14 @@ Gdn::request()->FromEnvironment();
  */
 
 // ApplicationManager
-Gdn::FactoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_APPLICATION);
+Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
+Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_APPLICATION);
 
 // ThemeManager
-Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
+Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 
 // PluginManager
-Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
+Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
 // Load the configurations for enabled Applications
 foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
@@ -120,13 +120,13 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
  * If Garden is not yet installed, force the request to /dashboard/setup and
  * begin installation.
  */
-if (Gdn::config('Garden.Installed', false) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
+if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
     safeHeader('Location: '.Gdn::request()->Url('dashboard/setup', true));
     exit();
 }
 
 // Re-apply loaded user settings
-Gdn::config()->OverlayDynamic();
+Gdn::config()->overlayDynamic();
 
 /**
  * Bootstrap Late
@@ -139,10 +139,10 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
 }
 
 if (C('Debug')) {
-    Debug(TRUE);
+    debug(true);
 }
 
-Gdn_Cache::Trace(Debug());
+Gdn_Cache::trace(debug());
 
 /**
  * Factory Services
@@ -152,39 +152,39 @@ Gdn_Cache::Trace(Debug());
  */
 
 // Default database.
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_Database', null, Gdn::FactorySingleton, array('Database'));
+Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_Database', null, Gdn::FactorySingleton, array('Database'));
 // Database drivers.
-Gdn::FactoryInstall('MySQLDriver', 'Gdn_MySQLDriver', null, Gdn::FactoryInstance);
-Gdn::FactoryInstall('MySQLStructure', 'Gdn_MySQLStructure', null, Gdn::FactoryInstance);
+Gdn::factoryInstall('MySQLDriver', 'Gdn_MySQLDriver', null, Gdn::FactoryInstance);
+Gdn::factoryInstall('MySQLStructure', 'Gdn_MySQLStructure', null, Gdn::FactoryInstance);
 // Form class
-Gdn::FactoryInstall('Form', 'Gdn_Form', null, Gdn::FactoryInstance);
+Gdn::factoryInstall('Form', 'Gdn_Form', null, Gdn::FactoryInstance);
 
 // Identity, Authenticator & Session.
-Gdn::FactoryInstall('Identity', 'Gdn_CookieIdentity');
-Gdn::FactoryInstall(Gdn::AliasSession, 'Gdn_Session');
-Gdn::FactoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
+Gdn::factoryInstall('Identity', 'Gdn_CookieIdentity');
+Gdn::factoryInstall(Gdn::AliasSession, 'Gdn_Session');
+Gdn::factoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
 
 // Dispatcher.
-Gdn::FactoryInstall(Gdn::AliasRouter, 'Gdn_Router');
-Gdn::FactoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
+Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
+Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
 
 // Smarty Templating Engine
-Gdn::FactoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
-Gdn::FactoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
+Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
+Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 
 // Slice handler
-Gdn::FactoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
+Gdn::factoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
 
 // Remote Statistics
-Gdn::FactoryInstall('Statistics', 'Gdn_Statistics', null, Gdn::FactorySingleton);
-Gdn::Statistics();
+Gdn::factoryInstall('Statistics', 'Gdn_Statistics', null, Gdn::FactorySingleton);
+Gdn::statistics();
 
 // Regarding
-Gdn::FactoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
-Gdn::Regarding();
+Gdn::factoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
+Gdn::regarding();
 
 // Other objects.
-Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
+Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
 
 /**
  * Extension Startup
@@ -194,7 +194,7 @@ Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
  */
 
 // Applications startup
-foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
+foreach (Gdn::applicationManager()->enabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
     // Include the application's bootstrap.
     $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
     if (file_exists($Gdn_Path)) {
@@ -212,12 +212,12 @@ unset($Gdn_Path);
 unset($Hooks_Path);
 
 // Themes startup
-Gdn::ThemeManager()->start();
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_THEME);
+Gdn::themeManager()->start();
+Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_THEME);
 
 // Plugins startup
 Gdn::pluginManager()->start();
-Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
+Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 /**
  * Locales
@@ -227,14 +227,14 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
  */
 
 // Load the Garden locale system
-$Gdn_Locale = new Gdn_Locale(C('Garden.Locale', 'en'), Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::pluginManager()->EnabledPluginFolders());
-Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $Gdn_Locale);
+$Gdn_Locale = new Gdn_Locale(C('Garden.Locale', 'en'), Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
+Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $Gdn_Locale);
 unset($Gdn_Locale);
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 
 // Start Authenticators
-Gdn::Authenticator()->StartAuthenticator();
+Gdn::authenticator()->startAuthenticator();
 
 /**
  * Bootstrap After

@@ -52,6 +52,7 @@ define('SYNDICATION_NONE', 'NONE');
 define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
+// Debug error types.
 define('TRACE_INFO', 'Info');
 define('TRACE_ERROR', 'Error');
 define('TRACE_WARNING', 'Warning');
@@ -67,4 +68,12 @@ if (!defined('E_USER_DEPRECATED')) {
 define('SPAM', 'SPAM');
 define('UNAPPROVED', 'UNAPPROVED');
 
+// Numeric keys for Vanilla's addon types.
+define('ADDON_TYPE_PLUGIN', 1);
+define('ADDON_TYPE_THEME', 2);
+define('ADDON_TYPE_LOCALE', 4);
+define('ADDON_TYPE_APPLICATION', 5);
+define('ADDON_TYPE_CORE', 10);
+
+// Signal we did all this ^.
 define('VANILLA_CONSTANTS', TRUE);

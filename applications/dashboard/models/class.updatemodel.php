@@ -13,12 +13,6 @@
  */
 class UpdateModel extends Gdn_Model {
 
-    const ADDON_TYPE_PLUGIN = 1;
-    const ADDON_TYPE_THEME = 2;
-    const ADDON_TYPE_LOCALE = 4;
-    const ADDON_TYPE_APPLICATION = 5;
-    const ADDON_TYPE_CORE = 10;
-
     /** @var string URL to the addons site. */
     public $AddonSiteUrl = 'http://vanilla.local';
 
@@ -80,7 +74,7 @@ class UpdateModel extends Gdn_Model {
                 // The application was confirmed.
                 $Addon = array(
                     'AddonKey' => 'vanilla',
-                    'AddonTypeID' => self::ADDON_TYPE_CORE,
+                    'AddonTypeID' => ADDON_TYPE_CORE,
                     'Name' => 'Vanilla',
                     'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
                     'Version' => $Version,
@@ -96,7 +90,7 @@ class UpdateModel extends Gdn_Model {
 
                 $Addon = array(
                     'AddonKey' => 'porter',
-                    'AddonTypeID' => self::ADDON_TYPE_CORE,
+                    'AddonTypeID' => ADDON_TYPE_CORE,
                     'Name' => 'Vanilla Porter',
                     'Description' => 'Drop this script in your existing site and navigate to it in your web browser to export your existing forum data to the Vanilla 2 import format.',
                     'Version' => $Version,
@@ -143,16 +137,16 @@ class UpdateModel extends Gdn_Model {
                 $Addon = array_merge(array('AddonKey' => $Key, 'AddonTypeID' => ''), $Info);
                 switch ($Variable) {
                     case 'ApplicationInfo':
-                        $Addon['AddonTypeID'] = self::ADDON_TYPE_APPLICATION;
+                        $Addon['AddonTypeID'] = ADDON_TYPE_APPLICATION;
                         break;
                     case 'LocaleInfo':
-                        $Addon['AddonTypeID'] = self::ADDON_TYPE_LOCALE;
+                        $Addon['AddonTypeID'] = ADDON_TYPE_LOCALE;
                         break;
                     case 'PluginInfo':
-                        $Addon['AddonTypeID'] = self::ADDON_TYPE_PLUGIN;
+                        $Addon['AddonTypeID'] = ADDON_TYPE_PLUGIN;
                         break;
                     case 'ThemeInfo':
-                        $Addon['AddonTypeID'] = self::ADDON_TYPE_THEME;
+                        $Addon['AddonTypeID'] = ADDON_TYPE_THEME;
                         break;
                 }
             }
@@ -249,7 +243,7 @@ class UpdateModel extends Gdn_Model {
                     // The plugin was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => self::ADDON_TYPE_PLUGIN,
+                        'AddonTypeID' => ADDON_TYPE_PLUGIN,
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -305,7 +299,7 @@ class UpdateModel extends Gdn_Model {
                     // The application was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => self::ADDON_TYPE_APPLICATION,
+                        'AddonTypeID' => ADDON_TYPE_APPLICATION,
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -357,7 +351,7 @@ class UpdateModel extends Gdn_Model {
                     // The application was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => self::ADDON_TYPE_THEME,
+                        'AddonTypeID' => ADDON_TYPE_THEME,
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -415,7 +409,7 @@ class UpdateModel extends Gdn_Model {
                     // The locale pack was confirmed.
                     $Addon = array(
                         'AddonKey' => $Key,
-                        'AddonTypeID' => self::ADDON_TYPE_LOCALE,
+                        'AddonTypeID' => ADDON_TYPE_LOCALE,
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
@@ -445,7 +439,7 @@ class UpdateModel extends Gdn_Model {
                 // The application was confirmed.
                 $Addon = array(
                     'AddonKey' => 'vanilla',
-                    'AddonTypeID' => self::ADDON_TYPE_CORE,
+                    'AddonTypeID' => ADDON_TYPE_CORE,
                     'Name' => 'Vanilla',
                     'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
                     'Version' => $Version,

@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
         return false;
     });
 
-    function CarryOn(json) {
+    function carryOn(json) {
         $('#Content').html(json.Data);
         if (json.NextUrl != null && json.NextUrl != 'Finished')
             $.ajax({

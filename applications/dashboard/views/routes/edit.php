@@ -1,37 +1,37 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php
         if ($this->Route !== FALSE)
-            echo T('Edit Route');
+            echo t('Edit Route');
         else
-            echo T('Add Route');
+            echo t('Add Route');
         ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <ul>
         <li>
             <?php
-            echo $this->Form->Label('Route Expression', 'Route');
+            echo $this->Form->label('Route Expression', 'Route');
             $Attributes = array('class' => 'InputBox WideInput');
             if ($this->Route['Reserved']) {
                 //$Attributes['value'] = $this->Route;
                 $Attributes['disabled'] = 'disabled';
             }
-            echo $this->Form->TextBox('Route', $Attributes);
+            echo $this->Form->textBox('Route', $Attributes);
             ?>
         </li>
         <li>
             <?php
-            echo $this->Form->Label('Target', 'Target');
-            echo $this->Form->TextBox('Target', array('class' => 'InputBox WideInput'));
+            echo $this->Form->label('Target', 'Target');
+            echo $this->Form->textBox('Target', array('class' => 'InputBox WideInput'));
             ?>
         </li>
         <li>
             <?php
-            echo $this->Form->Label('Type', 'Route Type');
-            echo $this->Form->DropDown('Type', Gdn::Router()->GetRouteTypes());
+            echo $this->Form->label('Type', 'Route Type');
+            echo $this->Form->DropDown('Type', Gdn::router()->GetRouteTypes());
             ?>
         </li>
     </ul>
-<?php echo $this->Form->Close('Save'); ?>
+<?php echo $this->Form->close('Save'); ?>

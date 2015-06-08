@@ -1,20 +1,20 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 
-<?php if ($this->Data('ThemeInfo.Options.Description')) {
+<?php if ($this->data('ThemeInfo.Options.Description')) {
     echo '<div class="Info">',
-    $this->Data('ThemeInfo.Options.Description'),
+    $this->data('ThemeInfo.Options.Description'),
     '</div>';
 }
 ?>
 
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
-<?php if (is_array($this->Data('ThemeInfo.Options.Styles'))): ?>
-    <h3><?php echo T('Styles'); ?></h3>
+<?php if (is_array($this->data('ThemeInfo.Options.Styles'))): ?>
+    <h3><?php echo t('Styles'); ?></h3>
     <table class="SelectionGrid ThemeStyles">
         <tbody>
         <?php
@@ -23,30 +23,30 @@ echo $this->Form->Errors();
         $Col = 0;
         $Classes = array('FirstCol', 'MiddleCol', 'LastCol');
 
-        foreach ($this->Data('ThemeInfo.Options.Styles') as $Key => $Options) {
-            $Basename = GetValue('Basename', $Options, '%s');
+        foreach ($this->data('ThemeInfo.Options.Styles') as $Key => $Options) {
+            $Basename = val('Basename', $Options, '%s');
 
             if ($Col == 0)
                 echo '<tr>';
 
             $Active = '';
-            if ($this->Data('ThemeOptions.Styles.Key') == $Key || (!$this->Data('ThemeOptions.Styles.Key') && $Basename == '%s'))
+            if ($this->data('ThemeOptions.Styles.Key') == $Key || (!$this->data('ThemeOptions.Styles.Key') && $Basename == '%s'))
                 $Active = ' Active';
 
             $KeyID = str_replace(' ', '_', $Key);
             echo "<td id=\"{$KeyID}_td\" class=\"{$Classes[$Col]}$Active\">";
-            echo '<h4>', T($Key), '</h4>';
+            echo '<h4>', t($Key), '</h4>';
 
             // Look for a screenshot for for the style.
-            $Screenshot = SafeGlob(PATH_THEMES.DS.$this->Data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), array('gif', 'jpg', 'png'));
+            $Screenshot = SafeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), array('gif', 'jpg', 'png'));
             if (is_array($Screenshot) && count($Screenshot) > 0) {
                 $Screenshot = basename($Screenshot[0]);
-                echo Img('/themes/'.$this->Data('ThemeFolder').'/design/'.$Screenshot, array('alt' => T($Key), 'width' => '160'));
+                echo img('/themes/'.$this->data('ThemeFolder').'/design/'.$Screenshot, array('alt' => t($Key), 'width' => '160'));
             }
 
             $Disabled = $Active ? ' Disabled' : '';
             echo '<div class="Buttons">',
-            Anchor(T('Select'), '?style='.urlencode($Key), 'SmallButton SelectThemeStyle'.$Disabled, array('Key' => $Key)),
+            anchor(t('Select'), '?style='.urlencode($Key), 'SmallButton SelectThemeStyle'.$Disabled, array('Key' => $Key)),
             '</div>';
 
             if (isset($Options['Description'])) {
@@ -70,28 +70,28 @@ echo $this->Form->Errors();
 
 <?php endif; ?>
 
-<?php if (is_array($this->Data('ThemeInfo.Options.Text'))): ?>
-    <h3><?php echo T('Text'); ?></h3>
+<?php if (is_array($this->data('ThemeInfo.Options.Text'))): ?>
+    <h3><?php echo t('Text'); ?></h3>
     <div class="Info">
-        <?php echo T('This theme has customizable text.', 'This theme has text that you can customize.'); ?>
+        <?php echo t('This theme has customizable text.', 'This theme has text that you can customize.'); ?>
     </div>
 
     <ul>
-        <?php foreach ($this->Data('ThemeInfo.Options.Text') as $Code => $Options) {
+        <?php foreach ($this->data('ThemeInfo.Options.Text') as $Code => $Options) {
 
             echo '<li>',
-            $this->Form->Label('@'.$Code, 'Text_'.$Code);
+            $this->Form->label('@'.$Code, 'Text_'.$Code);
 
             if (isset($Options['Description']))
                 echo '<div class="Info2">', $Options['Description'], '</div>';
 
-            switch (strtolower(GetValue('Type', $Options, 'textarea'))) {
+            switch (strtolower(val('Type', $Options, 'textarea'))) {
                 case 'textbox':
-                    echo $this->Form->TextBox($this->Form->EscapeString('Text_'.$Code));
+                    echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code));
                     break;
                 case 'textarea':
                 default:
-                    echo $this->Form->TextBox($this->Form->EscapeString('Text_'.$Code), array('MultiLine' => TRUE));
+                    echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code), array('MultiLine' => TRUE));
                     break;
             }
 
@@ -102,9 +102,9 @@ echo $this->Form->Errors();
         ?>
     </ul>
     <?php
-    echo $this->Form->Button('Save');
+    echo $this->Form->button('Save');
 endif;
 ?>
 
 <?php
-echo '<br />'.$this->Form->Close();
+echo '<br />'.$this->Form->close();

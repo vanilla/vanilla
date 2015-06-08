@@ -67,10 +67,11 @@ class NavModule extends Gdn_Module {
      * @param array $item The item to add.
      */
     protected function addItem($type, $key, $item) {
-        if (!is_array($key))
+        if (!is_array($key)) {
             $key = explode('.', $key);
-        else
+        } else {
             $key = array_values($key);
+        }
 
         $item = (array)$item;
 
@@ -84,8 +85,9 @@ class NavModule extends Gdn_Module {
                 // Add the item here.
                 if (array_key_exists($key_part, $items)) {
                     // The item is already here so merge this one on top of it.
-                    if ($items[$key_part]['type'] !== $type)
+                    if ($items[$key_part]['type'] !== $type) {
                         throw new \Exception("$key of type $type does not match exsisting type {$items[$key_part]['type']}.", 500);
+                    }
 
                     $items[$key_part] = array_merge($items[$key_part], $item);
                 } else {
@@ -168,8 +170,9 @@ class NavModule extends Gdn_Module {
 
         foreach ($items as $key => $item) {
             $visible = $this->itemVisible($key, $item);
-            if (!$visible)
+            if (!$visible) {
                 continue;
+            }
 
             switch ($item['type']) {
                 case 'link':
@@ -201,17 +204,18 @@ class NavModule extends Gdn_Module {
         $class = 'nav-link '.$this->getCssClass($key, $link);
         unset($link['url'], $link['text'], $link['class'], $link['icon'], $link['badge']);
 
-        if ($icon)
+        if ($icon) {
             $text = $icon.' <span class="text">'.$text.'</span>';
+        }
 
         if ($badge) {
             if (is_numeric($badge)) {
-                $badge = Wrap(number_format($badge), 'span', array('class' => 'Count'));
+                $badge = wrap(number_format($badge), 'span', array('class' => 'Count'));
             }
             $text = '<span class="Aside">'.$badge.'</span> '.$text;
         }
 
-        echo Anchor($text, $href, $class, $link, true)."\n";
+        echo anchor($text, $href, $class, $link, true)."\n";
     }
 
     /**
@@ -229,8 +233,9 @@ class NavModule extends Gdn_Module {
         unset($group['text'], $group['items']);
 
         // Don't render an empty group.
-        if (empty($items))
+        if (empty($items)) {
             return;
+        }
 
         echo '<div '.attribute($group).">\n";
 
@@ -265,12 +270,13 @@ class NavModule extends Gdn_Module {
             $sort_a = NavModule::sortItemsOrder($a, $items);
             $sort_b = NavModule::sortItemsOrder($b, $items);
 
-            if ($sort_a > $sort_b)
+            if ($sort_a > $sort_b) {
                 return 1;
-            elseif ($sort_a < $sort_b)
+            } elseif ($sort_a < $sort_b)
                 return -1;
-            else
+            else {
                 return 0;
+            }
         });
     }
 
@@ -327,7 +333,7 @@ class NavModule extends Gdn_Module {
     }
 }
 
-if (!function_exists('icon')):
+if (!function_exists('icon')) :
     /**
      * Return icon HTML.
      *

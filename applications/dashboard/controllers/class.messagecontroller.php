@@ -22,8 +22,8 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Add() {
-        $this->Permission('Garden.Community.Manage');
+    public function add() {
+        $this->permission('Garden.Community.Manage');
         // Use the edit form with no MessageID specified.
         $this->View = 'Edit';
         $this->Edit();
@@ -35,21 +35,22 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Delete($MessageID = '', $TransientKey = FALSE) {
-        $this->Permission('Garden.Community.Manage');
-        $this->DeliveryType(DELIVERY_TYPE_BOOL);
-        $Session = Gdn::Session();
+    public function delete($MessageID = '', $TransientKey = false) {
+        $this->permission('Garden.Community.Manage');
+        $this->deliveryType(DELIVERY_TYPE_BOOL);
+        $Session = Gdn::session();
 
-        if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
-            $Message = $this->MessageModel->Delete(array('MessageID' => $MessageID));
+        if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
+            $Message = $this->MessageModel->delete(array('MessageID' => $MessageID));
             // Reset the message cache
             $this->MessageModel->SetMessageCache();
         }
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-            Redirect('dashboard/message');
+        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
+            redirect('dashboard/message');
+        }
 
-        $this->Render();
+        $this->render();
     }
 
     /**
@@ -58,19 +59,20 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Dismiss($MessageID = '', $TransientKey = FALSE) {
-        $Session = Gdn::Session();
+    public function dismiss($MessageID = '', $TransientKey = false) {
+        $Session = Gdn::session();
 
-        if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
-            $Prefs = $Session->GetPreference('DismissedMessages', array());
+        if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
+            $Prefs = $Session->getPreference('DismissedMessages', array());
             $Prefs[] = $MessageID;
-            $Session->SetPreference('DismissedMessages', $Prefs);
+            $Session->setPreference('DismissedMessages', $Prefs);
         }
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-            Redirect(GetIncomingValue('Target', '/discussions'));
+        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
+            redirect(getIncomingValue('Target', '/discussions'));
+        }
 
-        $this->Render();
+        $this->render();
     }
 
     /**
@@ -79,50 +81,52 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Edit($MessageID = '') {
-        $this->AddJsFile('jquery.autosize.min.js');
-        $this->AddJsFile('messages.js');
+    public function edit($MessageID = '') {
+        $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('messages.js');
 
-        $this->Permission('Garden.Community.Manage');
-        $this->AddSideMenu('dashboard/message');
+        $this->permission('Garden.Community.Manage');
+        $this->addSideMenu('dashboard/message');
 
         // Generate some Controller & Asset data arrays
-        $this->SetData('Locations', $this->_GetLocationData());
-        $this->AssetData = $this->_GetAssetData();
+        $this->setData('Locations', $this->_getLocationData());
+        $this->AssetData = $this->_getAssetData();
 
         // Set the model on the form.
-        $this->Form->SetModel($this->MessageModel);
-        $this->Message = $this->MessageModel->GetID($MessageID);
-        $this->Message = $this->MessageModel->DefineLocation($this->Message);
+        $this->Form->setModel($this->MessageModel);
+        $this->Message = $this->MessageModel->getID($MessageID);
+        $this->Message = $this->MessageModel->defineLocation($this->Message);
 
         // Make sure the form knows which item we are editing.
-        if (is_numeric($MessageID) && $MessageID > 0)
-            $this->Form->AddHidden('MessageID', $MessageID);
+        if (is_numeric($MessageID) && $MessageID > 0) {
+            $this->Form->addHidden('MessageID', $MessageID);
+        }
 
-        $CategoriesData = CategoryModel::Categories();
+        $CategoriesData = CategoryModel::categories();
         $Categories = array();
         foreach ($CategoriesData as $Row) {
-            if ($Row['CategoryID'] < 0)
+            if ($Row['CategoryID'] < 0) {
                 continue;
+            }
 
             $Categories[$Row['CategoryID']] = str_repeat('&nbsp;&nbsp;&nbsp;', max(0, $Row['Depth'] - 1)).$Row['Name'];
         }
-        $this->SetData('Categories', $Categories);
+        $this->setData('Categories', $Categories);
 
         // If seeing the form for the first time...
-        if (!$this->Form->AuthenticatedPostBack()) {
-            $this->Form->SetData($this->Message);
+        if (!$this->Form->authenticatedPostBack()) {
+            $this->Form->setData($this->Message);
         } else {
-            if ($MessageID = $this->Form->Save()) {
+            if ($MessageID = $this->Form->save()) {
                 // Reset the message cache
-                $this->MessageModel->SetMessageCache();
+                $this->MessageModel->setMessageCache();
 
                 // Redirect
-                $this->InformMessage(T('Your changes have been saved.'));
-                //$this->RedirectUrl = Url('dashboard/message');
+                $this->informMessage(t('Your changes have been saved.'));
+                //$this->RedirectUrl = url('dashboard/message');
             }
         }
-        $this->Render();
+        $this->render();
     }
 
     /**
@@ -131,18 +135,18 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Index() {
-        $this->Permission('Garden.Community.Manage');
-        $this->AddSideMenu('dashboard/message');
-        $this->AddJsFile('jquery.autosize.min.js');
-        $this->AddJsFile('jquery.tablednd.js');
-        $this->AddJsFile('jquery-ui.js');
-        $this->AddJsFile('messages.js');
-        $this->Title(T('Messages'));
+    public function index() {
+        $this->permission('Garden.Community.Manage');
+        $this->addSideMenu('dashboard/message');
+        $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('jquery.tablednd.js');
+        $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('messages.js');
+        $this->title(t('Messages'));
 
         // Load all messages from the db
-        $this->MessageData = $this->MessageModel->Get('Sort');
-        $this->Render();
+        $this->MessageData = $this->MessageModel->get('Sort');
+        $this->render();
     }
 
     /**
@@ -151,11 +155,12 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function Initialize() {
-        parent::Initialize();
-        Gdn_Theme::Section('Dashboard');
-        if ($this->Menu)
-            $this->Menu->HighlightRoute('/dashboard/settings');
+    public function initialize() {
+        parent::initialize();
+        Gdn_Theme::section('Dashboard');
+        if ($this->Menu) {
+            $this->Menu->highlightRoute('/dashboard/settings');
+        }
     }
 
     /**
@@ -164,12 +169,12 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access protected
      */
-    protected function _GetAssetData() {
+    protected function _getAssetData() {
         $AssetData = array();
-        $AssetData['Content'] = T('Above Main Content');
-        $AssetData['Panel'] = T('Below Sidebar');
+        $AssetData['Content'] = t('Above Main Content');
+        $AssetData['Panel'] = t('Below Sidebar');
         $this->EventArguments['AssetData'] = &$AssetData;
-        $this->FireEvent('AfterGetAssetData');
+        $this->fireEvent('AfterGetAssetData');
         return $AssetData;
     }
 
@@ -179,22 +184,22 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access protected
      */
-    protected function _GetLocationData() {
+    protected function _getLocationData() {
         $ControllerData = array();
-        $ControllerData['[Base]'] = T('All Pages');
-        $ControllerData['[NonAdmin]'] = T('All Forum Pages');
+        $ControllerData['[Base]'] = t('All Pages');
+        $ControllerData['[NonAdmin]'] = t('All Forum Pages');
         // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
         // $ControllerData['[Admin]'] = 'All Dashboard Pages';
-        $ControllerData['Dashboard/Profile/Index'] = T('Profile Page');
-        $ControllerData['Vanilla/Discussions/Index'] = T('Discussions Page');
-        $ControllerData['Vanilla/Discussion/Index'] = T('Comments Page');
-        $ControllerData['Vanilla/Post/Discussion'] = T('New Discussion Form');
-        $ControllerData['Dashboard/Entry/SignIn'] = T('Sign In');
-        $ControllerData['Dashboard/Entry/Register'] = T('Registration');
+        $ControllerData['Dashboard/Profile/Index'] = t('Profile Page');
+        $ControllerData['Vanilla/Discussions/Index'] = t('Discussions Page');
+        $ControllerData['Vanilla/Discussion/Index'] = t('Comments Page');
+        $ControllerData['Vanilla/Post/Discussion'] = t('New Discussion Form');
+        $ControllerData['Dashboard/Entry/SignIn'] = t('Sign In');
+        $ControllerData['Dashboard/Entry/Register'] = t('Registration');
         // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
         // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
         $this->EventArguments['ControllerData'] = &$ControllerData;
-        $this->FireEvent('AfterGetLocationData');
+        $this->fireEvent('AfterGetLocationData');
         return $ControllerData;
     }
 }

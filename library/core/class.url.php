@@ -21,13 +21,14 @@ class Gdn_Url {
      * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
      * @return string
      */
-    public static function WebRoot($WithDomain = FALSE) {
-        $WebRoot = Gdn::Request()->WebRoot();
+    public static function webRoot($WithDomain = false) {
+        $WebRoot = Gdn::request()->webRoot();
 
-        if ($WithDomain)
-            $Result = Gdn::Request()->Domain().'/'.$WebRoot;
-        else
+        if ($WithDomain) {
+            $Result = Gdn::request()->domain().'/'.$WebRoot;
+        } else {
             $Result = $WebRoot;
+        }
 
         return $Result;
     }
@@ -38,9 +39,9 @@ class Gdn_Url {
      *
      * @return string
      */
-    public static function Domain() {
+    public static function domain() {
         // Attempt to get the domain from the configuration array
-        return Gdn::Request()->Domain();
+        return Gdn::request()->domain();
     }
 
     /**
@@ -49,8 +50,8 @@ class Gdn_Url {
      *
      * @return string
      */
-    public static function Host() {
-        return Gdn::Request()->RequestHost();
+    public static function host() {
+        return Gdn::request()->requestHost();
     }
 
     /**
@@ -59,8 +60,8 @@ class Gdn_Url {
      *
      * @return string
      */
-    public static function QueryString() {
-        return http_build_query(Gdn::Request()->GetRequestArguments(Gdn_Request::INPUT_GET));
+    public static function queryString() {
+        return http_build_query(Gdn::request()->getRequestArguments(Gdn_Request::INPUT_GET));
     }
 
     /**
@@ -72,10 +73,11 @@ class Gdn_Url {
      * @param boolean $RemoveSyndication
      * @return string
      */
-    public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
-        $Result = Gdn::Request()->Path();
-        if ($WithWebRoot)
-            $Result = self::WebRoot($WithDomain).'/'.$Result;
+    public static function request($WithWebRoot = false, $WithDomain = false, $RemoveSyndication = false) {
+        $Result = Gdn::request()->path();
+        if ($WithWebRoot) {
+            $Result = self::webRoot($WithDomain).'/'.$Result;
+        }
         return $Result;
     }
 }

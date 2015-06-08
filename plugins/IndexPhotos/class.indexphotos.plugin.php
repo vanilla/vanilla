@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * IndexPhotos Plugin.
  *
@@ -12,8 +12,8 @@ $PluginInfo['IndexPhotos'] = array(
     'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed. Note that this plugin will not have any affect when table layouts are enabled.",
     'Version' => '1.2.2',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'RegisterPermissions' => FALSE,
-    'MobileFriendly' => TRUE,
+    'RegisterPermissions' => false,
+    'MobileFriendly' => true,
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'
@@ -29,19 +29,20 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function AssetModel_StyleCss_Handler($Sender) {
+    public function assetModel_styleCss_handler($Sender) {
         if (!$this->hasLayoutTables() || IsMobile()) {
-            $Sender->AddCssFile('indexphotos.css', 'plugins/IndexPhotos');
+            $Sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
         }
     }
 
     /**
      * Add OP name to start of discussion meta.
      */
-    public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
-        if (!$this->hasLayoutTables() || IsMobile()) {
-            if (GetValue('FirstUser', $Args))
-                echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+    public function discussionsController_afterDiscussionLabels_handler($Sender, $Args) {
+        if (!$this->hasLayoutTables() || isMobile()) {
+            if (val('FirstUser', $Args)) {
+                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $Args)).'</span>';
+            }
         }
     }
 
@@ -51,38 +52,39 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
-        if (!$this->hasLayoutTables() || IsMobile()) {
-            if (GetValue('FirstUser', $Args))
-                echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+    public function categoriesController_afterDiscussionLabels_handler($Sender, $Args) {
+        if (!$this->hasLayoutTables() || isMobile()) {
+            if (val('FirstUser', $Args)) {
+                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $Args)).'</span>';
+            }
         }
     }
 
     /**
      * Trigger on All Discussions.
      */
-    public function DiscussionsController_BeforeDiscussionContent_Handler($Sender) {
-        if (!$this->hasLayoutTables() || IsMobile()) {
-            $this->DisplayPhoto($Sender);
+    public function discussionsController_beforeDiscussionContent_handler($Sender) {
+        if (!$this->hasLayoutTables() || isMobile()) {
+            $this->displayPhoto($Sender);
         }
     }
 
     /**
      * Trigger on Categories.
      */
-    public function CategoriesController_BeforeDiscussionContent_Handler($Sender) {
+    public function categoriesController_beforeDiscussionContent_handler($Sender) {
         if (!$this->hasLayoutTables()) {
-            $this->DisplayPhoto($Sender);
+            $this->displayPhoto($Sender);
         }
     }
 
     /**
      * Display user photo for first user in each discussion.
      */
-    protected function DisplayPhoto($Sender) {
+    protected function displayPhoto($Sender) {
         // Build user object & output photo
-        $FirstUser = UserBuilder($Sender->EventArguments['Discussion'], 'First');
-        echo UserPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
+        $FirstUser = userBuilder($Sender->EventArguments['Discussion'], 'First');
+        echo userPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
     }
 
     /**
@@ -91,6 +93,6 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @return bool If forum is using table layout, returns true
      */
     public function hasLayoutTables() {
-        return (C('Vanilla.Discussions.Layout') == 'table');
+        return (c('Vanilla.Discussions.Layout') == 'table');
     }
 }

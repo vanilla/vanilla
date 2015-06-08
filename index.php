@@ -29,12 +29,12 @@ require_once(PATH_ROOT.'/bootstrap.php');
 
 // Create and configure the dispatcher.
 
-$Dispatcher = Gdn::Dispatcher();
+$Dispatcher = Gdn::dispatcher();
 
 $EnabledApplications = Gdn::ApplicationManager()->EnabledApplicationFolders();
 $Dispatcher->EnabledApplicationFolders($EnabledApplications);
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
 // Process the request.
-$Dispatcher->Start();
-$Dispatcher->Dispatch();
+$Dispatcher->start();
+$Dispatcher->dispatch();

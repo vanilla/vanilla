@@ -1,7 +1,7 @@
 <?php
 
-$attachments = $this->Data('_attachments');
-$editorkey = $this->Data('_editorkey');
+$attachments = $this->data('_attachments');
+$editorkey = $this->data('_editorkey');
 
 ?>
 
@@ -11,11 +11,11 @@ $editorkey = $this->Data('_editorkey');
 
       <?php
 
-      $isOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == $attachment['InsertUserID']));
+      $isOwner = (Gdn::session()->isValid() && (Gdn::session()->UserID == $attachment['InsertUserID']));
       $viewerCssClass = ($isOwner)
          ? 'file-owner'
          : 'file-readonly';
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+      if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
          $viewerCssClass = 'file-owner';
       }
       if (val('InBody', $attachment)) {
@@ -42,8 +42,8 @@ $editorkey = $this->Data('_editorkey');
                target="_blank"><?php echo htmlspecialchars($attachment['Name']); ?></a>
             <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
          </div>
-         <span class="editor-file-remove" title="<?php echo T('Remove'); ?>"></span>
-         <span class="editor-file-reattach" title="<?php echo T('Click to re-attach'); ?>"></span>
+         <span class="editor-file-remove" title="<?php echo t('Remove'); ?>"></span>
+         <span class="editor-file-reattach" title="<?php echo t('Click to re-attach'); ?>"></span>
       </div>
 
    <?php endforeach; ?>

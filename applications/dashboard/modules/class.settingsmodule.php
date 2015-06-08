@@ -26,34 +26,33 @@ class SettingsModule extends Gdn_Module {
      * @param string $Name
      * @return boolean
      */
-    public static function IsRemovable($Type, $Name) {
+    public static function isRemovable($Type, $Name) {
 
         switch ($Type) {
             case self::TYPE_APPLICATION:
                 $ApplicationManager = Gdn::Factory('ApplicationManager');
 
                 if ($IsRemovable = !array_key_exists($Name, $ApplicationManager->EnabledApplications())) {
-                    $ApplicationInfo = ArrayValue($Name, $ApplicationManager->AvailableApplications(), array());
-                    $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
+                    $ApplicationInfo = arrayValue($Name, $ApplicationManager->AvailableApplications(), array());
+                    $ApplicationFolder = arrayValue('Folder', $ApplicationInfo, '');
 
                     $IsRemovable = IsWritable(PATH_APPLICATIONS.DS.$ApplicationFolder);
                 }
                 break;
             case self::TYPE_PLUGIN:
-                if ($IsRemovable = !array_key_exists($Name, Gdn::PluginManager()->EnabledPlugins())) {
-                    $PluginInfo = ArrayValue($Name, Gdn::PluginManager()->AvailablePlugins(), FALSE);
-                    $PluginFolder = ArrayValue('Folder', $PluginInfo, FALSE);
+                if ($IsRemovable = !array_key_exists($Name, Gdn::pluginManager()->EnabledPlugins())) {
+                    $PluginInfo = arrayValue($Name, Gdn::pluginManager()->AvailablePlugins(), false);
+                    $PluginFolder = arrayValue('Folder', $PluginInfo, false);
 
                     $IsRemovable = IsWritable(PATH_PLUGINS.DS.$PluginFolder);
                 }
                 break;
             case self::TYPE_THEME:
                 // TODO
-                $IsRemovable = FALSE;
+                $IsRemovable = false;
                 break;
         }
 
         return $IsRemovable;
     }
-
 }

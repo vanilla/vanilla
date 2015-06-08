@@ -16,29 +16,32 @@ class CategoryFollowToggleModule extends Gdn_Module {
     /**
      * Set the preference in the user's session.
      */
-    public function SetToggle() {
-        $Session = Gdn::Session();
-        if (!$Session->IsValid())
+    public function setToggle() {
+        $Session = Gdn::session();
+        if (!$Session->isValid()) {
             return;
+        }
 
         $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
         if ($ShowAllCategories != '') {
-            $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
+            $ShowAllCategories = $ShowAllCategories == 'true' ? true : false;
             $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
-            if ($ShowAllCategories != $ShowAllCategoriesPref)
-                $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+            if ($ShowAllCategories != $ShowAllCategoriesPref) {
+                $Session->setPreference('ShowAllCategories', $ShowAllCategories);
+            }
 
-            Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
+            redirect('/'.ltrim(Gdn::request()->Path(), '/'));
         }
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
-        if (Gdn::Session()->IsValid())
+    public function toString() {
+        if (Gdn::session()->isValid()) {
             return parent::ToString();
+        }
 
         return '';
     }

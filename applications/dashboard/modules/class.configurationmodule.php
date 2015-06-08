@@ -21,24 +21,25 @@
 class ConfigurationModule extends Gdn_Module {
 
     /** @var bool Whether or not the view is rendering the entire page. */
-    public $RenderAll = FALSE;
+    public $RenderAll = false;
 
     /** @var array A definition of the data that this will manage. */
     protected $_Schema;
 
     /** @var ConfigurationModule */
-    public $ConfigurationModule = NULL;
+    public $ConfigurationModule = null;
 
     /**
      *
      *
      * @param Gdn_Controller $Controller The controller using this model.
      */
-    public function __construct($Sender = NULL) {
+    public function __construct($Sender = null) {
         parent::__construct($Sender);
 
-        if (property_exists($Sender, 'Form'))
+        if (property_exists($Sender, 'Form')) {
             $this->Form($Sender->Form);
+        }
 
         $this->ConfigurationModule = $this;
     }
@@ -48,7 +49,7 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @return Gdn_Controller
      */
-    public function Controller() {
+    public function controller() {
         return $this->_Sender;
     }
 
@@ -58,12 +59,12 @@ class ConfigurationModule extends Gdn_Module {
      * @param Gdn_Form $NewValue
      * @return Gdn_Form
      */
-    public function Form($NewValue = NULL) {
-        static $Form = NULL;
+    public function form($NewValue = null) {
+        static $Form = null;
 
-        if ($NewValue !== NULL)
+        if ($NewValue !== null) {
             $Form = $NewValue;
-        elseif ($Form === NULL)
+        } elseif ($Form === null)
             $Form = new Gdn_Form();
 
         return $Form;
@@ -74,14 +75,14 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @return bool
      */
-    public function HasFiles() {
-        static $HasFiles = NULL;
+    public function hasFiles() {
+        static $HasFiles = null;
 
-        if ($HasFiles === NULL) {
-            $HasFiles = FALSE;
+        if ($HasFiles === null) {
+            $HasFiles = false;
             foreach ($this->Schema() as $K => $Row) {
-                if (strtolower(GetValue('Control', $Row)) == 'imageupload') {
-                    $HasFiles = TRUE;
+                if (strtolower(val('Control', $Row)) == 'imageupload') {
+                    $HasFiles = true;
                     break;
                 }
             }
@@ -95,50 +96,51 @@ class ConfigurationModule extends Gdn_Module {
      * @param null $Schema
      * @throws Exception
      */
-    public function Initialize($Schema = NULL) {
-        if ($Schema !== NULL)
+    public function initialize($Schema = null) {
+        if ($Schema !== null) {
             $this->Schema($Schema);
+        }
 
         $Form = $this->Form();
 
-        if ($Form->AuthenticatedPostBack()) {
+        if ($Form->authenticatedPostBack()) {
             // Grab the data from the form.
             $Data = array();
-            $Post = $Form->FormValues();
+            $Post = $Form->formValues();
 
             foreach ($this->_Schema as $Row) {
                 $Name = $Row['Name'];
                 $Config = $Row['Config'];
 
                 // For API calls make this a sparse save.
-                if ($this->Controller()->DeliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
+                if ($this->Controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
                     continue;
                 }
 
-                if (strtolower(GetValue('Control', $Row)) == 'imageupload') {
-                    $Form->SaveImage($Name, ArrayTranslate($Row, array('Prefix', 'Size')));
+                if (strtolower(val('Control', $Row)) == 'imageupload') {
+                    $Form->SaveImage($Name, arrayTranslate($Row, array('Prefix', 'Size')));
                 }
 
-                $Value = $Form->GetFormValue($Name);
+                $Value = $Form->getFormValue($Name);
 
-                if ($Value == GetValue('Default', $Value, '')) {
+                if ($Value == val('Default', $Value, '')) {
                     $Value = '';
                 }
 
                 $Data[$Config] = $Value;
-                $this->Controller()->SetData($Name, $Value);
+                $this->Controller()->setData($Name, $Value);
             }
 
             // Save it to the config.
-            SaveToConfig($Data, array('RemoveEmpty' => TRUE));
-            $this->_Sender->InformMessage(T('Saved'));
+            saveToConfig($Data, array('RemoveEmpty' => true));
+            $this->_Sender->informMessage(t('Saved'));
         } else {
             // Load the form data from the config.
             $Data = array();
             foreach ($this->_Schema as $Row) {
-                $Data[$Row['Name']] = C($Row['Config'], GetValue('Default', $Row, ''));
+                $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
             }
-            $Form->SetData($Data);
+            $Form->setData($Data);
             $this->Controller()->Data = $Data;
         }
     }
@@ -149,11 +151,12 @@ class ConfigurationModule extends Gdn_Module {
      * @param $SchemaRow
      * @return bool|mixed|string
      */
-    public function LabelCode($SchemaRow) {
-        if (isset($SchemaRow['LabelCode']))
+    public function labelCode($SchemaRow) {
+        if (isset($SchemaRow['LabelCode'])) {
             return $SchemaRow['LabelCode'];
+        }
 
-        if (strpos($SchemaRow['Name'], '.') !== FALSE) {
+        if (strpos($SchemaRow['Name'], '.') !== false) {
             $LabelCode = trim(strrchr($SchemaRow['Name'], '.'), '.');
         } else {
             $LabelCode = $SchemaRow['Name'];
@@ -164,7 +167,7 @@ class ConfigurationModule extends Gdn_Module {
         $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
         $LabelCode = trim($LabelCode);
 
-        $LabelCode = StringEndsWith($LabelCode, " ID", TRUE, TRUE);
+        $LabelCode = StringEndsWith($LabelCode, " ID", true, true);
 
         return $LabelCode;
     }
@@ -174,13 +177,13 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @throws Exception
      */
-    public function RenderAll() {
-        $this->RenderAll = TRUE;
+    public function renderAll() {
+        $this->RenderAll = true;
         $Controller = $this->Controller();
         $Controller->ConfigurationModule = $this;
 
-        $Controller->Render($this->FetchViewLocation());
-        $this->RenderAll = FALSE;
+        $Controller->render($this->fetchViewLocation());
+        $this->RenderAll = false;
     }
 
     /**
@@ -188,8 +191,8 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @param array $Def A list of fields from the config that this form will use.
      */
-    public function Schema($Def = NULL) {
-        if ($Def !== NULL) {
+    public function schema($Def = null) {
+        if ($Def !== null) {
             $Schema = array();
 
             foreach ($Def as $Key => $Value) {
@@ -206,7 +209,7 @@ class ConfigurationModule extends Gdn_Module {
                 } else {
                     $Row['Name'] = $Key;
                 }
-                TouchValue('Config', $Row, $Row['Name']);
+                touchValue('Config', $Row, $Row['Name']);
                 $Schema[] = $Row;
             }
             $this->_Schema = $Schema;

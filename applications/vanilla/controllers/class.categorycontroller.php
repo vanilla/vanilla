@@ -16,29 +16,31 @@ class CategoryController extends VanillaController {
     /** @var Gdn_CategoryModel */
     public $CategoryModel;
 
-    public function  __construct() {
+    public function __construct() {
         parent::__construct();
         $this->CategoryModel = new CategoryModel();
     }
 
-    public function Follow($CategoryID, $Value, $TKey) {
-        if (Gdn::Session()->ValidateTransientKey($TKey)) {
+    public function follow($CategoryID, $Value, $TKey) {
+        if (Gdn::session()->validateTransientKey($TKey)) {
             $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => !(bool)$Value));
         }
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-            Redirect('/categories');
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect('/categories');
+        }
 
-        $this->Render();
+        $this->render();
     }
 
-    public function MarkRead($CategoryID, $TKey) {
-        if (Gdn::Session()->ValidateTransientKey($TKey)) {
-            $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
+    public function markRead($CategoryID, $TKey) {
+        if (Gdn::session()->validateTransientKey($TKey)) {
+            $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
         }
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-            Redirect('/categories');
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect('/categories');
+        }
 
-        $this->Render();
+        $this->render();
     }
 }

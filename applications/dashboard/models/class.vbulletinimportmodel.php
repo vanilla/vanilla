@@ -21,9 +21,9 @@ class vBulletinImportModel extends Gdn_Model {
      *
      * @throws Exception
      */
-    public function AfterImport() {
+    public function afterImport() {
         // Set up the routes to redirect from their older counterparts.
-        $Router = Gdn::Router();
+        $Router = Gdn::router();
 
         // Categories
         $Router->SetRoute('forumdisplay\.php\?f=(\d+)', 'categories/$1', 'Permanent');
@@ -53,38 +53,39 @@ class vBulletinImportModel extends Gdn_Model {
         $this->ProfileExtenderPrep();
 
         // Set guests to System user to prevent security issues
-        $SystemUserID = Gdn::UserModel()->GetSystemUserID();
-        $this->SQL->Update('Discussion')
-            ->Set('InsertUserID', $SystemUserID)
-            ->Where('InsertUserID', 0)
-            ->Put();
-        $this->SQL->Update('Comment')
-            ->Set('InsertUserID', $SystemUserID)
-            ->Where('InsertUserID', 0)
-            ->Put();
+        $SystemUserID = Gdn::userModel()->GetSystemUserID();
+        $this->SQL->update('Discussion')
+            ->set('InsertUserID', $SystemUserID)
+            ->where('InsertUserID', 0)
+            ->put();
+        $this->SQL->update('Comment')
+            ->set('InsertUserID', $SystemUserID)
+            ->where('InsertUserID', 0)
+            ->put();
     }
 
     /**
      * Create different sizes of user photos.
      */
-    public function ProcessAvatars() {
+    public function processAvatars() {
         $UploadImage = new Gdn_UploadImage();
-        $UserData = $this->SQL->Select('u.Photo')->From('User u')->Where('u.Photo is not null')->Get();
+        $UserData = $this->SQL->select('u.Photo')->from('User u')->where('u.Photo is not null')->get();
 
         // Make sure the avatars folder exists.
-        if (!file_exists(PATH_UPLOADS.'/userpics'))
+        if (!file_exists(PATH_UPLOADS.'/userpics')) {
             mkdir(PATH_UPLOADS.'/userpics');
+        }
 
         // Get sizes
-        $ProfileHeight = C('Garden.Profile.MaxHeight', 1000);
-        $ProfileWidth = C('Garden.Profile.MaxWidth', 250);
-        $ThumbSize = C('Garden.Thumbnail.Size', 40);
+        $ProfileHeight = c('Garden.Profile.MaxHeight', 1000);
+        $ProfileWidth = c('Garden.Profile.MaxWidth', 250);
+        $ThumbSize = c('Garden.Thumbnail.Size', 40);
 
         // Temporarily set maximum quality
-        SaveToConfig('Garden.UploadImage.Quality', 100, FALSE);
+        saveToConfig('Garden.UploadImage.Quality', 100, false);
 
         // Create profile and thumbnail sizes
-        foreach ($UserData->Result() as $User) {
+        foreach ($UserData->result() as $User) {
             try {
                 $Image = PATH_ROOT.DS.'uploads'.DS.GetValue('Photo', $User);
                 $ImageBaseName = pathinfo($Image, PATHINFO_BASENAME);
@@ -103,7 +104,7 @@ class vBulletinImportModel extends Gdn_Model {
                     PATH_UPLOADS.'/userpics/n'.$ImageBaseName,
                     $ThumbSize,
                     $ThumbSize,
-                    TRUE
+                    true
                 );
             } catch (Exception $ex) {
             }
@@ -113,16 +114,17 @@ class vBulletinImportModel extends Gdn_Model {
     /**
      * Get profile fields imported and add to ProfileFields list.
      */
-    public function ProfileExtenderPrep() {
-        $ProfileKeyData = $this->SQL->Select('m.Name')->Distinct()->From('UserMeta m')->Like('m.Name', 'Profile_%')->Get();
-        $ExistingKeys = array_filter((array)explode(',', C('Plugins.ProfileExtender.ProfileFields', '')));
-        foreach ($ProfileKeyData->Result() as $Key) {
+    public function profileExtenderPrep() {
+        $ProfileKeyData = $this->SQL->select('m.Name')->Distinct()->from('UserMeta m')->like('m.Name', 'Profile_%')->get();
+        $ExistingKeys = array_filter((array)explode(',', c('Plugins.ProfileExtender.ProfileFields', '')));
+        foreach ($ProfileKeyData->result() as $Key) {
             $Name = str_replace('Profile.', '', $Key->Name);
             if (!in_array($Name, $ExistingKeys)) {
                 $ExistingKeys[] = $Name;
             }
         }
-        if (count($ExistingKeys))
-            SaveToConfig('Plugins.ProfileExtender.ProfileFields', implode(',', $ExistingKeys));
+        if (count($ExistingKeys)) {
+            saveToConfig('Plugins.ProfileExtender.ProfileFields', implode(',', $ExistingKeys));
+        }
     }
 }

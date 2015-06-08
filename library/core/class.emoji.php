@@ -242,7 +242,7 @@ class Emoji {
             $this->enabled = false;
         }
 
-        Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
+        Gdn::pluginManager()->callEventHandlers($this, 'Emoji', 'Init', 'Handler');
 
         // Add emoji to definition list for whole site. This used to be in the
         // advanced editor plugin, but since moving atmentions to core, had to
@@ -252,7 +252,7 @@ class Emoji {
         // does not instantiate this class anywhere, so there will not be any
         // suggestions for emoji yet, but keep here for whenever Advanced Editor
         // is running.
-        $c = Gdn::Controller();
+        $c = Gdn::controller();
         if ($c && $this->enabled) {
             $emojis = $this->getEmoji();
             $emojiAssetPath = $this->getAssetPath();
@@ -271,7 +271,7 @@ class Emoji {
                 'emoji' => $this->getEmoji()
             );
 
-            $c->AddDefinition('emoji', $emoji);
+            $c->addDefinition('emoji', $emoji);
         }
     }
 
@@ -282,7 +282,7 @@ class Emoji {
      * @return string
      */
     public function buildEmojiPath($emojiName) {
-        Deprecated('buildEmojiPath', 'getEmojiPath');
+        deprecated('buildEmojiPath', 'getEmojiPath');
         return $this->getEmojiPath($emojiName);
     }
 
@@ -376,7 +376,7 @@ class Emoji {
      * @return array List of Emojis that will appear in the editor.
      */
     public function getEmojiEditorList() {
-        Deprecated('getEmojiEditorList', 'getEditorList');
+        deprecated('getEmojiEditorList', 'getEditorList');
         return $this->getEditorList();
     }
 
@@ -420,7 +420,7 @@ class Emoji {
      * @param array $value The new editor list.
      */
     public function setEmojiEditorList($value) {
-        Deprecated('setEmojiEditorList', 'setEditorList');
+        deprecated('setEmojiEditorList', 'setEditorList');
         return $this->setEditorList($value);
     }
 
@@ -476,11 +476,11 @@ class Emoji {
      * @return string The html that represents the emoji.
      */
     public function img($emoji_path, $emoji_name) {
-        $dir = Asset(dirname($emoji_path));
+        $dir = asset(dirname($emoji_path));
         $filename = basename($emoji_path);
         $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
         $basename = basename($filename, $ext);
-        $src = Asset($emoji_path);
+        $src = asset($emoji_path);
 
         $img = str_replace(
             array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
@@ -532,7 +532,7 @@ class Emoji {
     public function setFromManifest($manifest, $assetPath = '') {
         // Set the default asset root.
         if ($assetPath) {
-            $this->setAssetPath(StringBeginsWith($assetPath, PATH_ROOT, true, true));
+            $this->setAssetPath(stringBeginsWith($assetPath, PATH_ROOT, true, true));
         }
 
         // Set the emoji settings from the manifest.
@@ -599,7 +599,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $Text = Gdn_Format::ReplaceButProtectCodeBlocks("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function ($m) use ($emoji) {
+        $Text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {
@@ -607,7 +607,7 @@ class Emoji {
             } else {
                 return $m[0];
             }
-        }, $Text, TRUE);
+        }, $Text, true);
 
         return substr($Text, 1, -1);
     }

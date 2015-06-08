@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 ?>
     <style>
         .CategoryPhoto {
@@ -11,70 +11,70 @@ $Session = Gdn::Session();
     </style>
     <div class="Help Aside">
         <?php
-        echo Wrap(T('Need More Help?'), 'h2');
+        echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
-        echo Wrap(Anchor(T("Video tutorial on managing categories"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
-        echo Wrap(Anchor(T('Managing Categories'), 'http://docs.vanillaforums.com/features/categories/'), 'li');
+        echo wrap(Anchor(t("Video tutorial on managing categories"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
+        echo wrap(Anchor(t('Managing Categories'), 'http://docs.vanillaforums.com/features/categories/'), 'li');
         echo '</ul>';
         ?>
     </div>
-    <h1><?php echo T('Manage Categories'); ?></h1>
+    <h1><?php echo t('Manage Categories'); ?></h1>
     <div class="Info">
-        <?php echo T('Categories are used to help organize discussions.', 'Categories are used to help organize discussions. Drag &amp; drop the categories to sort and nest them.'); ?>
+        <?php echo t('Categories are used to help organize discussions.', 'Categories are used to help organize discussions. Drag &amp; drop the categories to sort and nest them.'); ?>
     </div>
     <div class="FilterMenu"><?php
-        if (C('Vanilla.Categories.Use')) {
-            echo Anchor(T('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
-            if (CheckPermission('Garden.Settings.Manage')) {
-                echo Wrap(Anchor(T("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
+        if (c('Vanilla.Categories.Use')) {
+            echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
+            if (checkPermission('Garden.Settings.Manage')) {
+                echo wrap(Anchor(t("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
             }
-        } elseif (CheckPermission('Garden.Settings.Manage')) {
-            echo Anchor(T('Use Categories'), 'vanilla/settings/enablecategories?enabled=1'.Gdn::Session()->TransientKey(), 'SmallButton Hijack');
+        } elseif (checkPermission('Garden.Settings.Manage')) {
+            echo anchor(t('Use Categories'), 'vanilla/settings/enablecategories?enabled=1'.Gdn::session()->TransientKey(), 'SmallButton Hijack');
         }
         ?></div>
 <?php
-if (C('Vanilla.Categories.Use')) {
+if (c('Vanilla.Categories.Use')) {
     ?>
     <div class="Help Aside">
         <?php
-        echo '<h2>', T('Did You Know?'), '</h2>';
+        echo '<h2>', t('Did You Know?'), '</h2>';
         echo '<ul>';
-        echo '<li>', sprintf(T('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), Url('/dashboard/settings/homepage')), '</li>';
-        echo '<li>', sprintf(T('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), Url('/categories')), '</li>';
-        echo '<li>', T('Drag and drop the categories below to sort and nest them.'), '</li>';
+        echo '<li>', sprintf(t('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), url('/dashboard/settings/homepage')), '</li>';
+        echo '<li>', sprintf(t('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), url('/categories')), '</li>';
+        echo '<li>', t('Drag and drop the categories below to sort and nest them.'), '</li>';
         echo '</ul>';
         ?>
     </div>
     <h1><?php
-        echo T('Category Page Layout');
+        echo t('Category Page Layout');
         echo ' ';
-        echo Anchor(T('View Page'), 'categories');
+        echo anchor(t('View Page'), 'categories');
         ?></h1>
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->open();
+    echo $this->Form->errors();
     echo '<div class="Info">'
-        .T('Configure how nested categories are displayed to users.')
+        .t('Configure how nested categories are displayed to users.')
         .Wrap(sprintf(
-            T('Vanilla.Categories.MaxDisplayDepth', 'Place nested categories in a comma-delimited list when they are %1$s'),
-            $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', GetValue('MaxDepthData', $this->Data))
+            t('Vanilla.Categories.MaxDisplayDepth', 'Place nested categories in a comma-delimited list when they are %1$s'),
+            $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', val('MaxDepthData', $this->Data))
         ), 'div')
         .Wrap($this->Form->CheckBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
         .Wrap($this->Form->CheckBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
         .'</div>'
         .'<div class="Buttons Wrap">'
-        .$this->Form->Button('Save')
+        .$this->Form->button('Save')
         .'</div>'
-        .$this->Form->Close();
+        .$this->Form->close();
 
-    echo Wrap(T('Organize Categories'), 'h1')
+    echo wrap(t('Organize Categories'), 'h1')
         .'<ol class="Sortable">';
     $Right = array(); // Start with an empty $Right stack
     $LastRight = 0;
     $OpenCount = 0;
     $Loop = 0;
-    $CanDelete = CheckPermission('Garden.Settings.Manage');
-    foreach ($this->CategoryData->Result() as $Category) {
+    $CanDelete = checkPermission('Garden.Settings.Manage');
+    foreach ($this->CategoryData->result() as $Category) {
         if ($Category->CategoryID > 0) {
             // Only check stack if there is one
             $CountRight = count($Right);
@@ -103,29 +103,29 @@ if (C('Vanilla.Categories.Use')) {
             }
 
             echo "\n".'<li id="list_'.$Category->CategoryID.'">';
-            // DEBUG: echo Wrap($Category->Name.' [countright: '.$CountRight.' lastcount: '.$LastRight.' opencount: '.$OpenCount.']', 'div');
+            // DEBUG: echo wrap($Category->Name.' [countright: '.$CountRight.' lastcount: '.$LastRight.' opencount: '.$OpenCount.']', 'div');
             $CategoryUrl = CategoryUrl($Category);
 
             if ($Category->Photo) {
-                $Photo = Img(Gdn_Upload::Url($Category->Photo), array('class' => 'CategoryPhoto'));
+                $Photo = img(Gdn_Upload::url($Category->Photo), array('class' => 'CategoryPhoto'));
             } else {
                 $Photo = '';
             }
 
-            echo Wrap(
+            echo wrap(
                 '<table'.($OpenCount > 0 ? ' class="Indented"' : '').'>
                <tr>
                   <td>
                      '.$Photo.'
                      <strong>'.htmlspecialchars($Category->Name).'</strong>
-                     '.Anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
+                     '.anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'
                      './*Wrap("ID: {$Category->CategoryID}, PermID: {$Category->PermissionCategoryID}", 'div').*/
                 '
                   </td>
                   <td class="Buttons">'
-                .Anchor(T('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
-                .($CanDelete ? Anchor(T('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
+                .anchor(t('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
+                .($CanDelete ? anchor(t('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
                 .'</td>
                </tr>
             </table>'

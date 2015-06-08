@@ -3,36 +3,36 @@
  * "Table" layout for discussions. Mimics more traditional forum discussion layout.
  */
 
-$Session = Gdn::Session();
-include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
-include_once $this->FetchViewLocation('table_functions', 'discussions', 'vanilla');
+$Session = Gdn::session();
+include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+include_once $this->fetchViewLocation('table_functions', 'discussions', 'vanilla');
 
 /**
  * Render the page.
  */
 
-$PagerOptions = array('Wrapper' => '<div %1$s>%2$s</div>', 'RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
-if ($this->Data('_PagerUrl')) {
-    $PagerOptions['Url'] = $this->Data('_PagerUrl');
+$PagerOptions = array('Wrapper' => '<div %1$s>%2$s</div>', 'RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows());
+if ($this->data('_PagerUrl')) {
+    $PagerOptions['Url'] = $this->data('_PagerUrl');
 }
 
-echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 
-if ($Description = $this->Data('_Description')) {
+if ($Description = $this->data('_Description')) {
     echo '<div class="P PageDescription">';
-    echo $this->Data('_Description', '&#160;');
+    echo $this->data('_Description', '&#160;');
     echo '</div>';
 }
-$this->FireEvent('AfterDescription');
+$this->fireEvent('AfterDescription');
 
-include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
+include $this->fetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
 echo '<div class="PageControls Top">';
-PagerModule::Write($PagerOptions);
-echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+PagerModule::write($PagerOptions);
+echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
 echo '</div>';
 
-if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
+if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
     ?>
     <div class="DataTableWrap">
         <table class="DataTable DiscussionsTable">
@@ -45,14 +45,14 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
             <?php
             $Alt = '';
             if (property_exists($this, 'AnnounceData') && is_object($this->AnnounceData)) {
-                foreach ($this->AnnounceData->Result() as $Discussion) {
+                foreach ($this->AnnounceData->result() as $Discussion) {
                     $Alt = $Alt == ' Alt' ? '' : ' Alt';
                     WriteDiscussionRow($Discussion, $this, $Session, $Alt);
                 }
             }
 
             $Alt = '';
-            foreach ($this->DiscussionData->Result() as $Discussion) {
+            foreach ($this->DiscussionData->result() as $Discussion) {
                 $Alt = $Alt == ' Alt' ? '' : ' Alt';
                 WriteDiscussionRow($Discussion, $this, $Session, $Alt);
             }
@@ -63,12 +63,12 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
     <?php
 
     echo '<div class="PageControls Bottom">';
-    PagerModule::Write($PagerOptions);
-    echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+    PagerModule::write($PagerOptions);
+    echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
     echo '</div>';
 
 } else {
     ?>
-    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>
+    <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
 <?php
 }

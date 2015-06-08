@@ -1,19 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 ?>
-<h1><?php echo T('Manage Routes'); ?></h1>
+<h1><?php echo t('Manage Routes'); ?></h1>
 <div class="Info"><?php
-    echo T('Routes can be used to redirect users to various parts of your site depending on the url.'),
+    echo t('Routes can be used to redirect users to various parts of your site depending on the url.'),
     ' ',
-    Anchor(T('Get more information on creating custom routes'), 'http://vanillaforums.org/page/routes');
+    anchor(t('Get more information on creating custom routes'), 'http://vanillaforums.org/page/routes');
     ?></div>
-<div class="FilterMenu"><?php echo Anchor(T('Add Route'), 'dashboard/routes/add', 'AddRoute SmallButton'); ?></div>
+<div class="FilterMenu"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'AddRoute SmallButton'); ?></div>
 <table class="AltColumns" id="RouteTable">
     <thead>
     <tr>
-        <th><?php echo T('Route'); ?></th>
-        <th class="Alt"><?php echo T('Target'); ?></th>
-        <th class="Alt"><?php echo T('Type'); ?></th>
+        <th><?php echo t('Route'); ?></th>
+        <th class="Alt"><?php echo t('Target'); ?></th>
+        <th class="Alt"><?php echo t('Type'); ?></th>
     </tr>
     </thead>
     <tbody>
@@ -24,7 +24,7 @@ $Session = Gdn::Session();
         $Alt = !$Alt;
 
         $Target = $RouteData['Destination'];
-        $RouteType = T(Gdn::Router()->RouteTypes[$RouteData['Type']]);
+        $RouteType = t(Gdn::router()->RouteTypes[$RouteData['Type']]);
         $Reserved = $RouteData['Reserved'];
         ?>
         <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
@@ -33,9 +33,9 @@ $Session = Gdn::Session();
 
                 <div>
                     <?php
-                    echo Anchor(T('Edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute SmallButton');
+                    echo anchor(t('Edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute SmallButton');
                     if (!$Reserved)
-                        echo Anchor(T('Delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'DeleteRoute SmallButton');
+                        echo anchor(t('Delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'DeleteRoute SmallButton');
 
                     ?>
                 </div>

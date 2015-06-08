@@ -68,7 +68,7 @@ class LightOpenID {
     );
 
     function __construct() {
-        $this->trustRoot = Gdn::Request()->Scheme().'://'.Gdn::Request()->Host();
+        $this->trustRoot = Gdn::request()->Scheme().'://'.Gdn::request()->Host();
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
         $this->returnUrl = $this->trustRoot.$uri;
 
@@ -331,7 +331,9 @@ class LightOpenID {
      * @throws ErrorException
      */
     function discover($url) {
-        if (!$url) throw new ErrorException('No identity supplied.');
+        if (!$url) {
+            throw new ErrorException('No identity supplied.');
+        }
         # Use xri.net proxy to resolve i-name identities
         if (!preg_match('#^https?:#', $url)) {
             $url = "https://xri.net/$url";
@@ -374,7 +376,9 @@ class LightOpenID {
                         # OpenID 2
                         $ns = preg_quote('http://specs.openid.net/auth/2.0/');
                         if (preg_match('#<Type>\s*'.$ns.'(server|signon)\s*</Type>#s', $content, $type)) {
-                            if ($type[1] == 'server') $this->identifier_select = true;
+                            if ($type[1] == 'server') {
+                                $this->identifier_select = true;
+                            }
 
                             preg_match('#<URI.*?>(.*)</URI>#', $content, $server);
                             preg_match('#<(Local|Canonical)ID>(.*)</\1ID>#', $content, $delegate);
@@ -387,7 +391,9 @@ class LightOpenID {
                                 || strpos($content, '<Type>http://openid.net/extensions/sreg/1.1</Type>');
 
                             $server = $server[1];
-                            if (isset($delegate[2])) $this->identity = trim($delegate[2]);
+                            if (isset($delegate[2])) {
+                                $this->identity = trim($delegate[2]);
+                            }
                             $this->version = 2;
 
                             $this->server = $server;
@@ -397,7 +403,6 @@ class LightOpenID {
                         # OpenID 1.1
                         $ns = preg_quote('http://openid.net/signon/1.1');
                         if (preg_match('#<Type>\s*'.$ns.'\s*</Type>#s', $content)) {
-
                             preg_match('#<URI.*?>(.*)</URI>#', $content, $server);
                             preg_match('#<.*?Delegate>(.*)</.*?Delegate>#', $content, $delegate);
                             if (empty($server)) {
@@ -408,7 +413,9 @@ class LightOpenID {
                                 || strpos($content, '<Type>http://openid.net/extensions/sreg/1.1</Type>');
 
                             $server = $server[1];
-                            if (isset($delegate[1])) $this->identity = $delegate[1];
+                            if (isset($delegate[1])) {
+                                $this->identity = $delegate[1];
+                            }
                             $this->version = 1;
 
                             $this->server = $server;
@@ -422,7 +429,9 @@ class LightOpenID {
                     $content = null;
                     break;
                 }
-                if ($next) continue;
+                if ($next) {
+                    continue;
+                }
 
                 # There are no relevant information in headers, so we search the body.
                 $content = $this->request($url, 'GET');
@@ -433,7 +442,9 @@ class LightOpenID {
                 }
             }
 
-            if (!$content) $content = $this->request($url, 'GET');
+            if (!$content) {
+                $content = $this->request($url, 'GET');
+            }
 
             # At this point, the YADIS Discovery has failed, so we'll switch
             # to openid2 HTML discovery, then fallback to openid 1.1 discovery.
@@ -472,7 +483,9 @@ class LightOpenID {
         if ($this->required) {
             $params['openid.sreg.required'] = array();
             foreach ($this->required as $required) {
-                if (!isset(self::$ax_to_sreg[$required])) continue;
+                if (!isset(self::$ax_to_sreg[$required])) {
+                    continue;
+                }
                 $params['openid.sreg.required'][] = self::$ax_to_sreg[$required];
             }
             $params['openid.sreg.required'] = implode(',', $params['openid.sreg.required']);
@@ -481,7 +494,9 @@ class LightOpenID {
         if ($this->optional) {
             $params['openid.sreg.optional'] = array();
             foreach ($this->optional as $optional) {
-                if (!isset(self::$ax_to_sreg[$optional])) continue;
+                if (!isset(self::$ax_to_sreg[$optional])) {
+                    continue;
+                }
                 $params['openid.sreg.optional'][] = self::$ax_to_sreg[$optional];
             }
             $params['openid.sreg.optional'] = implode(',', $params['openid.sreg.optional']);
@@ -500,9 +515,13 @@ class LightOpenID {
             $optional = array();
             foreach (array('required', 'optional') as $type) {
                 foreach ($this->$type as $alias => $field) {
-                    if (is_int($alias)) $alias = strtr($field, '/', '_');
+                    if (is_int($alias)) {
+                        $alias = strtr($field, '/', '_');
+                    }
                     $this->aliases[$alias] = 'http://axschema.org/'.$field;
-                    if (empty($counts[$alias])) $counts[$alias] = 0;
+                    if (empty($counts[$alias])) {
+                        $counts[$alias] = 0;
+                    }
                     $counts[$alias] += 1;
                     ${$type}[] = $alias;
                 }
@@ -511,7 +530,9 @@ class LightOpenID {
                 $params['openid.ax.type.'.$alias] = $ns;
             }
             foreach ($counts as $alias => $count) {
-                if ($count == 1) continue;
+                if ($count == 1) {
+                    continue;
+                }
                 $params['openid.ax.count.'.$alias] = $count;
             }
 
@@ -543,8 +564,7 @@ class LightOpenID {
                 'openid.trust_root' => $this->trustRoot,
             ) + $this->sregParams();
 
-        return $this->build_url(parse_url($this->server)
-            , array('query' => http_build_query($params, '', '&')));
+        return $this->build_url(parse_url($this->server), array('query' => http_build_query($params, '', '&')));
     }
 
     protected function authUrl_v2($identifier_select) {
@@ -574,8 +594,7 @@ class LightOpenID {
             $params['openid.claimed_id'] = $this->claimed_id;
         }
 
-        return $this->build_url(parse_url($this->server)
-            , array('query' => http_build_query($params, '', '&')));
+        return $this->build_url(parse_url($this->server), array('query' => http_build_query($params, '', '&')));
     }
 
     /**
@@ -585,7 +604,9 @@ class LightOpenID {
      * @throws ErrorException
      */
     function authUrl($identifier_select = null) {
-        if (!$this->server) $this->discover($this->identity);
+        if (!$this->server) {
+            $this->discover($this->identity);
+        }
 
         if ($this->version == 2) {
             if ($identifier_select === null) {
@@ -687,8 +708,10 @@ class LightOpenID {
                 # to check, than cause an E_NOTICE.
                 continue;
             }
-            $key = substr($this->data['openid_'.$alias.'_type_'.$key],
-                strlen('http://axschema.org/'));
+            $key = substr(
+                $this->data['openid_'.$alias.'_type_'.$key],
+                strlen('http://axschema.org/')
+            );
             $attributes[$key] = $value;
         }
         return $attributes;

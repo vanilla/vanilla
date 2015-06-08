@@ -22,24 +22,25 @@ class DiscussionSorterModule extends Gdn_Module {
     public function __construct($Sender) {
         parent::__construct($Sender, 'Vanilla');
 
-        $this->Visible = C('Vanilla.Discussions.UserSortField');
+        $this->Visible = c('Vanilla.Discussions.UserSortField');
 
         // Default options
         $this->SortOptions = array(
-            'd.DateLastComment' => T('SortOptionLastComment', 'by Last Comment'),
-            'd.DateInserted' => T('SortOptionStartDate', 'by Start Date')
+            'd.DateLastComment' => t('SortOptionLastComment', 'by Last Comment'),
+            'd.DateInserted' => t('SortOptionStartDate', 'by Start Date')
         );
 
         // Get sort option selected
-        $this->SortFieldSelected = Gdn::Session()->GetPreference('Discussions.SortField', 'd.DateLastComment');
+        $this->SortFieldSelected = Gdn::session()->GetPreference('Discussions.SortField', 'd.DateLastComment');
     }
 
-    public function AssetTarget() {
-        return FALSE;
+    public function assetTarget() {
+        return false;
     }
 
-    public function ToString() {
-        if (Gdn::Session()->IsValid())
+    public function toString() {
+        if (Gdn::session()->isValid()) {
             return parent::ToString();
+        }
     }
 }

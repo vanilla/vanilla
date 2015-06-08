@@ -1,26 +1,26 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->AddSideMenu();
+$this->addSideMenu();
 ?>
     <style> .Complete {
             text-decoration: line-through;
         }</style>
-    <h1><?php echo T('Import'); ?></h1>
+    <h1><?php echo t('Import'); ?></h1>
 <?php
-echo $this->Form->Errors();
+echo $this->Form->errors();
 
-$CurrentStep = GetValue('CurrentStep', $this->Data, 0);
-$Steps = GetValue('Steps', $this->Data, array());
+$CurrentStep = val('CurrentStep', $this->Data, 0);
+$Steps = val('Steps', $this->Data, array());
 $Complete = FALSE;
 
 if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
     $Complete = TRUE;
     echo '<div class="Info">',
-    sprintf(T('Garden.Import.Complete.Description', 'You have successfully completed an import.
+    sprintf(t('Garden.Import.Complete.Description', 'You have successfully completed an import.
    Remember to visit <a href="%s">Dashboard &gt; Roles & Permissions</a> to set up your role permissions.
-   Click <b>Finished</b> when you are ready.'), Url('/dashboard/role')),
+   Click <b>Finished</b> when you are ready.'), url('/dashboard/role')),
     '</div>';
 
-    echo Gdn::Slice('/dashboard/role/defaultroleswarning');
+    echo Gdn::slice('/dashboard/role/defaultroleswarning');
 }
 ?>
     <div class="Info">
@@ -28,17 +28,17 @@ if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
             <?php
             foreach ($Steps as $Number => $Name) {
                 echo '<li ', ($CurrentStep > $Number ? 'class="Complete"' : ''), '>',
-                T('Garden.Import.Steps.'.$Name, _SpacifyCamelCase($Name));
+                t('Garden.Import.Steps.'.$Name, _SpacifyCamelCase($Name));
 
                 if ($Number == $CurrentStep) {
-                    $Message = GetValue('CurrentStepMessage', $this->Data);
+                    $Message = val('CurrentStepMessage', $this->Data);
                     echo '<div><span class="Progress">&#160;</span>';
                     if ($Message)
-                        echo ' ', Wrap($Message, 'span');
+                        echo ' ', wrap($Message, 'span');
                     echo '</div>';
                     $ErrorType = $this->Data['ErrorType'];
                     if ($ErrorType) {
-                        $ViewLocation = $this->FetchViewLocation(strtolower($ErrorType), 'import', 'dashboard');
+                        $ViewLocation = $this->fetchViewLocation(strtolower($ErrorType), 'import', 'dashboard');
                         if (file_exists($ViewLocation))
                             include($ViewLocation);
                     }
@@ -67,10 +67,10 @@ if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
 <?php
 
 if ($Complete) {
-    include($this->FetchViewLocation('stats', 'import', 'dashboard'));
-    echo Anchor(T('Finished'), 'dashboard/import/restart', 'Button');
+    include($this->fetchViewLocation('stats', 'import', 'dashboard'));
+    echo anchor(t('Finished'), 'dashboard/import/restart', 'Button');
 } else {
     echo '<noscript><div>',
-    Anchor(T('Continue'), strtolower($this->Application).'/import/go', 'Button'),
+    anchor(t('Continue'), strtolower($this->Application).'/import/go', 'Button'),
     '</div></noscript>';
 }

@@ -1,12 +1,12 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-   <title><?php echo $this->Head->Title(); ?></title>
-   <link href="<?php echo Url('', TRUE, TRUE); ?>"/>
+   <title><?php echo $this->Head->title(); ?></title>
+   <link href="<?php echo url('', TRUE, true); ?>"/>
    <updated><?php echo date(DATE_ATOM); ?></updated>
-   
+
    <?php
       $this->RenderAsset('AtomHead');
-      
+
       /* Sample Atom Content:
       <entry>
          <title>Atom-Powered Robots Run Amok</title>

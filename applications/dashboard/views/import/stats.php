@@ -2,12 +2,12 @@
 <table class="AltColumns">
     <?php
     $Header = array();
-    $ImportPaths = $this->Data('ImportPaths');
+    $ImportPaths = $this->data('ImportPaths');
     if (is_array($ImportPaths))
-        $Filename = GetValue($this->Data('ImportPath'), $ImportPaths);
+        $Filename = val($this->data('ImportPath'), $ImportPaths);
     else
         $Filename = '';
-    //$Filename = GetValue('OriginalFilename', $this->Data);
+    //$Filename = val('OriginalFilename', $this->Data);
     if ($Filename)
         $Header[T('Source')] = $Filename;
 
@@ -18,16 +18,16 @@
         switch ($Name) {
             case 'Orphaned Comments':
             case 'Orphaned Discussions':
-                $Value .= ' '.Anchor(
-                        T('Click here to fix.'),
-                        Gdn::Request()->Url('dba/fixinsertuserid')
+                $Value .= ' '.anchor(
+                        t('Click here to fix.'),
+                        Gdn::request()->Url('dba/fixinsertuserid')
                     );
                 break;
             default:
                 $Name = htmlspecialchars($Name);
                 $Value = htmlspecialchars($Value);
 
-                if (substr_compare('Time', $Name, 0, 4, TRUE) == 0) {
+                if (substr_compare('Time', $Name, 0, 4, true) == 0) {
                     $Value = Gdn_Timer::FormatElapsed($Value);
                 }
         }
@@ -35,8 +35,8 @@
         echo "<tr><th>$Name</th><td class=\"Alt\">$Value</td></tr>\n";
     }
 
-    if ($this->Data('GenerateSQL')) {
-        echo "<tr><th>".T('Special')."</th><td class=\"Alt\">".T('Generate import SQL only')."</td></tr>\n";
+    if ($this->data('GenerateSQL')) {
+        echo "<tr><th>".t('Special')."</th><td class=\"Alt\">".t('Generate import SQL only')."</td></tr>\n";
     }
     ?>
 </table>

@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once $this->FetchViewLocation('helper_functions');
+require_once $this->fetchViewLocation('helper_functions');
 $Tutorials = GetTutorials();
 
 // Figure out the current video
-$CurrentTutorialCode = $this->Data('CurrentTutorial');
-$Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
+$CurrentTutorialCode = $this->data('CurrentTutorial');
+$Keys = consolidateArrayValuesByKey($Tutorials, 'Code');
 $Index = array_search($CurrentTutorialCode, $Keys);
 if (!$Index)
     $Index = 0;
 
-$CurrentTutorial = GetValue($Index, $Tutorials);
-$CurrentTutorialCode = GetValue('Code', $CurrentTutorial, '');
+$CurrentTutorial = val($Index, $Tutorials);
+$CurrentTutorialCode = val('Code', $CurrentTutorial, '');
 ?>
 <style type="text/css">
     div.Tutorials {
@@ -69,7 +69,7 @@ $CurrentTutorialCode = GetValue('Code', $CurrentTutorial, '');
         border: 6px solid #ddd;
     }
 </style>
-<h1><?php echo T('Help &amp; Tutorials'); ?></h1>
+<h1><?php echo t('Help &amp; Tutorials'); ?></h1>
 <div class="Tutorials">
     <div class="Video">
         <iframe wmode="transparent"
@@ -78,16 +78,16 @@ $CurrentTutorialCode = GetValue('Code', $CurrentTutorial, '');
     </div>
     <div class="VideoInfo">
         <?php
-        echo Wrap($CurrentTutorial['Name'], 'strong');
-        echo Wrap($CurrentTutorial['Description'], 'em');
-        // echo '<input type="text" value="'.Url('/settings/tutorials/'.$Tutorial['Code'], TRUE).'" />';
+        echo wrap($CurrentTutorial['Name'], 'strong');
+        echo wrap($CurrentTutorial['Description'], 'em');
+        // echo '<input type="text" value="'.Url('/settings/tutorials/'.$Tutorial['Code'], true).'" />';
         ?>
     </div>
     <div class="Videos">
-        <h2><?php echo T('Other Tutorials'); ?></h2>
+        <h2><?php echo t('Other Tutorials'); ?></h2>
         <?php
         foreach ($Tutorials as $Tutorial) {
-            echo Anchor(
+            echo anchor(
                 '<img src="'.$Tutorial['Thumbnail'].'" alt="'.$Tutorial['Name'].'" />'
                 .Wrap($Tutorial['Name'], 'span'),
                 'settings/tutorials/'.$Tutorial['Code'],

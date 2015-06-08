@@ -28,11 +28,12 @@ class Gdn_Timer {
      *
      * @return mixed
      */
-    public function ElapsedTime() {
-        if (is_null($this->FinishTime))
-            $Result = microtime(TRUE) - $this->StartTime;
-        else
+    public function elapsedTime() {
+        if (is_null($this->FinishTime)) {
+            $Result = microtime(true) - $this->StartTime;
+        } else {
             $Result = $this->FinishTime - $this->StartTime;
+        }
         return $Result;
     }
 
@@ -41,10 +42,11 @@ class Gdn_Timer {
      *
      * @param string $Message
      */
-    public function Finish($Message = '') {
-        $this->FinishTime = microtime(TRUE);
-        if ($Message)
-            $this->Write($Message, $this->FinishTime, $this->StartTime);
+    public function finish($Message = '') {
+        $this->FinishTime = microtime(true);
+        if ($Message) {
+            $this->write($Message, $this->FinishTime, $this->StartTime);
+        }
     }
 
     /**
@@ -53,7 +55,7 @@ class Gdn_Timer {
      * @param $Span
      * @return string
      */
-    public static function FormatElapsed($Span) {
+    public static function formatElapsed($Span) {
         $m = floor($Span / 60);
         $s = $Span - $m * 60;
         return sprintf('%d:%05.2f', $m, $s);
@@ -64,13 +66,14 @@ class Gdn_Timer {
      *
      * @param string $Message
      */
-    public function Start($Message = '') {
-        $this->StartTime = microtime(TRUE);
+    public function start($Message = '') {
+        $this->StartTime = microtime(true);
         $this->SplitTime = $this->StartTime;
-        $this->FinishTime = NULL;
+        $this->FinishTime = null;
 
-        if ($Message)
-            $this->Write($Message, $this->StartTime);
+        if ($Message) {
+            $this->write($Message, $this->StartTime);
+        }
     }
 
     /**
@@ -78,11 +81,12 @@ class Gdn_Timer {
      *
      * @param string $Message
      */
-    public function Split($Message = '') {
+    public function split($Message = '') {
         $PrevSplit = $this->SplitTime;
-        $this->SplitTime = microtime(TRUE);
-        if ($Message) ;
-        $this->Write($Message, $this->SplitTime, $PrevSplit);
+        $this->SplitTime = microtime(true);
+        if ($Message) {
+        }
+        $this->write($Message, $this->SplitTime, $PrevSplit);
     }
 
     /**
@@ -92,12 +96,14 @@ class Gdn_Timer {
      * @param null $Time
      * @param null $PrevTime
      */
-    public function Write($Message, $Time = NULL, $PrevTime = NULL) {
-        if ($Message)
+    public function write($Message, $Time = null, $PrevTime = null) {
+        if ($Message) {
             echo $Message;
+        }
         if (!is_null($Time)) {
-            if ($Message)
+            if ($Message) {
                 echo ': ';
+            }
             echo date('Y-m-d H:i:s', $Time);
             if (!is_null($PrevTime)) {
                 $Span = $Time - $PrevTime;
@@ -108,5 +114,4 @@ class Gdn_Timer {
         }
         echo "\n";
     }
-
 }

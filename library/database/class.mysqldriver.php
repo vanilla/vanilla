@@ -23,10 +23,12 @@
 class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
     /**
+     *
+     *
      * @param $String
      * @return string
      */
-    public function Backtick($String) {
+    public function backtick($String) {
         return '`'.trim($String, '`').'`';
     }
 
@@ -36,12 +38,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string|array $String The string (or array of strings) of SQL to be escaped.
      * @param boolean $FirstWordOnly Should the function only escape the first word?\
      */
-    public function EscapeSql($String, $FirstWordOnly = FALSE) {
+    public function escapeSql($String, $FirstWordOnly = false) {
         if (is_array($String)) {
             $EscapedArray = array();
 
             foreach ($String as $k => $v) {
-                $EscapedArray[$this->EscapeSql($k)] = $this->EscapeSql($v, $FirstWordOnly);
+                $EscapedArray[$this->escapeSql($k)] = $this->escapeSql($v, $FirstWordOnly);
             }
 
             return $EscapedArray;
@@ -50,21 +52,21 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
         // This function may get "item1 item2" as a string, and so
         // we may need "`item1` `item2`" and not "`item1 item2`"
-        if (ctype_alnum($String) === FALSE) {
-            if (strpos($String, '.') !== FALSE) {
+        if (ctype_alnum($String) === false) {
+            if (strpos($String, '.') !== false) {
                 $MungedAliases = implode('.', array_keys($this->_AliasMap)).'.';
                 $TableName = substr($String, 0, strpos($String, '.') + 1);
                 //echo '<div>STRING: '.$String.'</div>';
                 //echo '<div>TABLENAME: '.$TableName.'</div>';
                 //echo '<div>ALIASES: '.$MungedAliases.'</div>';
                 // If the "TableName" isn't found in the alias list and it is a valid table name, apply the database prefix to it
-                $String = (strpos($MungedAliases, $TableName) !== FALSE || strpos($TableName, "'") !== FALSE) ? $String : $this->Database->DatabasePrefix.$String;
+                $String = (strpos($MungedAliases, $TableName) !== false || strpos($TableName, "'") !== false) ? $String : $this->Database->DatabasePrefix.$String;
                 //echo '<div>RESULT: '.$String.'</div>';
 
             }
 
             // This function may get "field >= 1", and need it to return "`field` >= 1"
-            $LeftBound = ($FirstWordOnly === TRUE) ? '' : '|\s|\(';
+            $LeftBound = ($FirstWordOnly === true) ? '' : '|\s|\(';
 
             $String = preg_replace('/(^'.$LeftBound.')([\w-]+?)(\s|\)|$)/iS', '$1`$2`$3', $String);
             //echo '<div>STRING: '.$String.'</div>';
@@ -76,8 +78,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
         $Exceptions = array('as', '/', '-', '%', '+', '*');
 
         foreach ($Exceptions as $Exception) {
-            if (stristr($String, " `{$Exception}` ") !== FALSE)
+            if (stristr($String, " `{$Exception}` ") !== false) {
                 $String = preg_replace('/ `('.preg_quote($Exception).')` /i', ' $1 ', $String);
+            }
         }
         return $String;
     }
@@ -88,7 +91,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $RefExpr
      * @return string
      */
-    public function EscapeIdentifier($RefExpr) {
+    public function escapeIdentifier($RefExpr) {
         // The MySql back tick syntax is the default escape sequence so nothing needs to be done.
         return $RefExpr;
     }
@@ -98,11 +101,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *
      * @param string $Table The name of the table to fetch column data from.
      */
-    public function FetchColumnSql($Table) {
-        if ($Table[0] != '`' && !StringBeginsWith($Table, $this->Database->DatabasePrefix))
+    public function fetchColumnSql($Table) {
+        if ($Table[0] != '`' && !StringBeginsWith($Table, $this->Database->DatabasePrefix)) {
             $Table = $this->Database->DatabasePrefix.$Table;
+        }
 
-        return "show columns from ".$this->FormatTableName($Table);
+        return "show columns from ".$this->formatTableName($Table);
     }
 
     /**
@@ -112,13 +116,13 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *  - <b>FALSE</b>: All tables will be fetched. Default.
      *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
      */
-    public function FetchTableSql($LimitToPrefix = FALSE) {
+    public function fetchTableSql($LimitToPrefix = false) {
         $Sql = "show tables";
 
-        if (is_bool($LimitToPrefix) && $LimitToPrefix && $this->Database->DatabasePrefix != '')
-            $Sql .= " like ".$this->Database->Connection()->quote($this->Database->DatabasePrefix.'%');
-        elseif (is_string($LimitToPrefix) && $LimitToPrefix)
-            $Sql .= " like ".$this->Database->Connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
+        if (is_bool($LimitToPrefix) && $LimitToPrefix && $this->Database->DatabasePrefix != '') {
+            $Sql .= " like ".$this->Database->connection()->quote($this->Database->DatabasePrefix.'%');
+        } elseif (is_string($LimitToPrefix) && $LimitToPrefix)
+            $Sql .= " like ".$this->Database->connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
 
         return $Sql;
         echo "<pre>$Sql</pre>";
@@ -131,37 +135,40 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *
      * @param string $Table The name of the table to get schema data for.
      */
-    public function FetchTableSchema($Table) {
+    public function fetchTableSchema($Table) {
         // Format the table name.
-        $Table = $this->EscapeSql($this->Database->DatabasePrefix.$Table);
-        $DataSet = $this->Query($this->FetchColumnSql($Table));
+        $Table = $this->escapeSql($this->Database->DatabasePrefix.$Table);
+        $DataSet = $this->query($this->fetchColumnSql($Table));
         $Schema = array();
-        foreach ($DataSet->Result() as $Field) {
+
+        foreach ($DataSet->result() as $Field) {
             $Type = $Field->Type;
-            $Unsigned = stripos($Type, 'unsigned') !== FALSE;
+            $Unsigned = stripos($Type, 'unsigned') !== false;
             $Length = '';
             $Precision = '';
             $Parentheses = strpos($Type, '(');
             $Enum = '';
 
-            if ($Parentheses !== FALSE) {
+            if ($Parentheses !== false) {
                 $LengthParts = explode(',', substr($Type, $Parentheses + 1, -1));
                 $Type = substr($Type, 0, $Parentheses);
 
                 if (strcasecmp($Type, 'enum') == 0) {
                     $Enum = array();
-                    foreach ($LengthParts as $Value)
+                    foreach ($LengthParts as $Value) {
                         $Enum[] = trim($Value, "'");
+                    }
                 } else {
                     $Length = trim($LengthParts[0]);
-                    if (count($LengthParts) > 1)
+                    if (count($LengthParts) > 1) {
                         $Precision = trim($LengthParts[1]);
+                    }
                 }
             }
 
             $Object = new stdClass();
             $Object->Name = $Field->Field;
-            $Object->PrimaryKey = ($Field->Key == 'PRI' ? TRUE : FALSE);
+            $Object->PrimaryKey = ($Field->Key == 'PRI' ? true : false);
             $Object->Type = $Type;
             //$Object->Type2 = $Field->Type;
             $Object->Unsigned = $Unsigned;
@@ -170,8 +177,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $Object->Length = $Length;
             $Object->Precision = $Precision;
             $Object->Enum = $Enum;
-            $Object->KeyType = NULL; // give placeholder so it can be defined again.
-            $Object->AutoIncrement = strpos($Field->Extra, 'auto_increment') === FALSE ? FALSE : TRUE;
+            $Object->KeyType = null; // give placeholder so it can be defined again.
+            $Object->AutoIncrement = strpos($Field->Extra, 'auto_increment') === false ? false : true;
             $Schema[$Field->Field] = $Object;
         }
 
@@ -179,10 +186,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     }
 
     /**
-     * Returns a string of SQL that retrieves the database engine version in the
-     * fieldname "version".
+     * Returns a string of SQL that retrieves the database engine version in the fieldname "version".
      */
-    public function FetchVersionSql() {
+    public function fetchVersionSql() {
         return "select version() as Version";
     }
 
@@ -192,14 +198,15 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *
      * @param string $Table The name of the table name to format.
      */
-    public function FormatTableName($Table) {
+    public function formatTableName($Table) {
 
-        if (strpos($Table, '.') !== FALSE) {
+        if (strpos($Table, '.') !== false) {
             if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Table, $Matches)) {
                 $DatabaseTable = '`'.str_replace('.', '`.`', $Matches[1]).'`';
                 $Table = str_replace($Matches[1], $DatabaseTable, $Table);
-            } else
+            } else {
                 $Table = '`'.str_replace('.', '`.`', $Table).'`';
+            }
         }
         return $Table;
     }
@@ -211,7 +218,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $TableName The name of the table to delete from.
      * @param array $Wheres An array of where conditions.
      */
-    public function GetDelete($TableName, $Wheres = array()) {
+    public function getDelete($TableName, $Wheres = array()) {
         $Conditions = '';
         $Joins = '';
         $DeleteFrom = '';
@@ -224,10 +231,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $DeleteFroms = array();
             foreach ($this->_Froms as $From) {
                 $Parts = preg_split('`\s`', trim($From));
-                if (count($Parts) > 1)
+                if (count($Parts) > 1) {
                     $DeleteFroms[] = $Parts[1].'.*';
-                else
+                } else {
                     $DeleteFroms[] = $Parts[0].'.*';
+                }
             }
             $DeleteFrom = implode(', ', $DeleteFroms);
         }
@@ -237,7 +245,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $Conditions .= implode("\n", $Wheres);
 
             // Close any where groups that were left open.
-            $this->_EndQuery();
+            $this->_endQuery();
 
         }
 
@@ -253,16 +261,18 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * $Select.
      * @param string $Select A select query that will fill the FieldNames specified in $Data.
      */
-    public function GetInsert($Table, $Data, $Select = '') {
-        if (!is_array($Data))
+    public function getInsert($Table, $Data, $Select = '') {
+        if (!is_array($Data)) {
             trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
+        }
 
-        if ($this->Options('Replace'))
+        if ($this->options('Replace')) {
             $Sql = 'replace ';
-        else
-            $Sql = 'insert '.($this->Options('Ignore') ? 'ignore ' : '');
+        } else {
+            $Sql = 'insert '.($this->options('Ignore') ? 'ignore ' : '');
+        }
 
-        $Sql .= $this->FormatTableName($Table).' ';
+        $Sql .= $this->formatTableName($Table).' ';
         if ($Select != '') {
             $Sql .= "\n(".implode(', ', $Data).') '
                 ."\n".$Select;
@@ -276,8 +286,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
                 // Append each insert statement.
                 for ($i = 0; $i < count($Data); $i++) {
-                    if ($i > 0)
+                    if ($i > 0) {
                         $Sql .= ', ';
+                    }
                     $Sql .= "\n('".implode('\', \'', array_values($Data[$i])).'\')';
                 }
             } else {
@@ -297,31 +308,30 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param int $Limit The number of records to limit the query to.
      * @param int $Offset The number of records to offset the query from.
      */
-    public function GetLimit($Query, $Limit, $Offset) {
+    public function getLimit($Query, $Limit, $Offset) {
         $Offset = $Offset == 0 ? '' : $Offset.', ';
         return $Query."limit ".$Offset.$Limit;
     }
 
     /**
-     * Returns an update statement for the specified table with the provided
-     * $Data.
+     * Returns an update statement for the specified table with the provided $Data.
      *
      * @param array $Tables The name of the table to updated data in.
-     * @param array $Data An associative array of FieldName => Value pairs that should be inserted
-     * $Table.
+     * @param array $Data An associative array of FieldName => Value pairs that should be inserted $Table.
      * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
      * to the where portion of the update statement.
      */
-    public function GetUpdate($Tables, $Data, $Where) {
-        if (!is_array($Data))
-            trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
+    public function getUpdate($Tables, $Data, $Where) {
+        if (!is_array($Data)) {
+            trigger_error(errorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
+        }
 
         $Sets = array();
         foreach ($Data as $Field => $Value) {
             $Sets[] = $Field." = ".$Value;
         }
 
-        $sql = 'update '.($this->Options('Ignore') ? 'ignore ' : '').$this->_FromTables($Tables);
+        $sql = 'update '.($this->options('Ignore') ? 'ignore ' : '').$this->_fromTables($Tables);
 
         if (count($this->_Joins) > 0) {
             $sql .= "\n";
@@ -340,7 +350,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 $sql .= ')';
             }
             $this->_OpenWhereGroupCount = 0;
-        } else if (is_string($Where) && !StringIsNullOrEmpty($Where)) {
+        } elseif (is_string($Where) && !stringIsNullOrEmpty($Where)) {
             $sql .= ' where '.$Where;
         }
         return $sql;
@@ -351,8 +361,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *
      * @param string The name of the table to updated data in.
      */
-    public function GetTruncate($Table) {
-        return 'truncate '.$this->FormatTableName($Table);
+    public function getTruncate($Table) {
+        return 'truncate '.$this->formatTableName($Table);
     }
 
     /**
@@ -364,13 +374,14 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * array('null' => 1, '' => 0) results in "when null then 1 else 0".
      * @param string $Alias The alias to give a column name.
      */
-    public function SelectCase($Field, $Options, $Alias) {
+    public function selectCase($Field, $Options, $Alias) {
         $CaseOptions = '';
         foreach ($Options as $Key => $Val) {
-            if ($Key == '')
+            if ($Key == '') {
                 $CaseOptions .= ' else '.$Val;
-            else
+            } else {
                 $CaseOptions .= ' when '.$Key.' then '.$Val;
+            }
         }
         $this->_Selects[] = array('Field' => $Field, 'Function' => '', 'Alias' => $Alias, 'CaseOptions' => $CaseOptions);
         return $this;
@@ -382,15 +393,14 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $Encoding
      * @todo $Encoding needs a description.
      */
-    public function SetEncoding($Encoding) {
-        if ($Encoding != '' && $Encoding !== FALSE) {
+    public function setEncoding($Encoding) {
+        if ($Encoding != '' && $Encoding !== false) {
             // Make sure to pass through any named parameters from queries defined before the connection was opened.
             $SavedNamedParameters = $this->_NamedParameters;
             $this->_NamedParameters = array();
             $this->_NamedParameters[':encoding'] = $Encoding;
-            $this->Query('set names :encoding');
+            $this->query('set names :encoding');
             $this->_NamedParameters = $SavedNamedParameters;
         }
     }
-
 }

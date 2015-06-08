@@ -44,21 +44,21 @@
     }
 </style>
 
-<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H"><?php echo $this->data('Title'); ?></h2>
 
 <div class="Hero">
-    <h3><?php echo T("What's This?"); ?></h3>
+    <h3><?php echo t("What's This?"); ?></h3>
 
     <p>
         <?php
-        echo Gdn_Format::Markdown(T('Connect your profile to social networks.', "Connect your profile to social networks to be notified of activity here and share your activity with your friends and followers."));
+        echo Gdn_Format::Markdown(t('Connect your profile to social networks.', "Connect your profile to social networks to be notified of activity here and share your activity with your friends and followers."));
         ?>
     </p>
 </div>
 
 <ul class="DataList DataList-Connections">
     <?php
-    foreach ($this->Data('Connections') as $Key => $Row) {
+    foreach ($this->data('Connections') as $Key => $Row) {
         WriteConnection($Row);
     }
     ?>

@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 if (!function_exists('DiscussionSortText')) {
-    function DiscussionSortText($Field) {
+    function discussionSortText($Field) {
         $Text = FALSE;
         switch ($Field) {
             case 'd.DiscussionID' :
-                $Text = T('SortDiscussionsByID', 'ID number (like support tickets)');
+                $Text = t('SortDiscussionsByID', 'ID number (like support tickets)');
                 break;
             case 'd.DateLastComment' :
-                $Text = T('SortDiscussionsByLastComment', 'Most recent comment (like a forum)');
+                $Text = t('SortDiscussionsByLastComment', 'Most recent comment (like a forum)');
                 break;
             case 'd.DateInserted' :
-                $Text = T('SortDiscussionsByDateInserted', 'Start time (like a blog)');
+                $Text = t('SortDiscussionsByDateInserted', 'Start time (like a blog)');
                 break;
         }
         return ($Text) ? $Text : $Field;
@@ -19,29 +19,29 @@ if (!function_exists('DiscussionSortText')) {
 ?>
     <div class="Help Aside">
         <?php
-        echo Wrap(T('Need More Help?'), 'h2');
+        echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
-        echo Wrap(Anchor(T("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
+        echo wrap(Anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
         echo '</ul>';
         ?>
     </div>
-    <h1><?php echo T('Advanced'); ?></h1>
+    <h1><?php echo t('Advanced'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <ul>
         <li>
             <?php
             $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
             $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
-            echo $this->Form->Label('Discussions per Page', 'Vanilla.Discussions.PerPage');
+            echo $this->Form->label('Discussions per Page', 'Vanilla.Discussions.PerPage');
             echo $this->Form->DropDown('Vanilla.Discussions.PerPage', $Options, $Fields);
             ?>
         </li>
         <li>
             <?php
-            echo $this->Form->Label('Comments per Page', 'Vanilla.Comments.PerPage');
+            echo $this->Form->label('Comments per Page', 'Vanilla.Comments.PerPage');
             echo $this->Form->DropDown('Vanilla.Comments.PerPage', $Options, $Fields);
             ?>
         </li>
@@ -52,47 +52,47 @@ echo $this->Form->Errors();
             foreach ($AllowedSortFields as $Field) {
                 $SortFields[$Field] = DiscussionSortText($Field);
             }
-            echo $this->Form->Label('Sort discussions by', 'Vanilla.Discussions.SortField');
+            echo $this->Form->label('Sort discussions by', 'Vanilla.Discussions.SortField');
             echo $this->Form->DropDown('Vanilla.Discussions.SortField', $SortFields, $Fields);
             ?>
         </li>
         <li>
             <?php
-            $Options = array('0' => T('Authors may never edit'),
-                '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')),
-                '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')),
-                '3600' => sprintf(T('Authors may edit for %s'), T('1 hour')),
-                '14400' => sprintf(T('Authors may edit for %s'), T('4 hours')),
-                '86400' => sprintf(T('Authors may edit for %s'), T('1 day')),
-                '604800' => sprintf(T('Authors may edit for %s'), T('1 week')),
-                '2592000' => sprintf(T('Authors may edit for %s'), T('1 month')),
-                '-1' => T('Authors may always edit'));
+            $Options = array('0' => t('Authors may never edit'),
+                '350' => sprintf(t('Authors may edit for %s'), t('5 minutes')),
+                '900' => sprintf(t('Authors may edit for %s'), t('15 minutes')),
+                '3600' => sprintf(t('Authors may edit for %s'), t('1 hour')),
+                '14400' => sprintf(t('Authors may edit for %s'), t('4 hours')),
+                '86400' => sprintf(t('Authors may edit for %s'), t('1 day')),
+                '604800' => sprintf(t('Authors may edit for %s'), t('1 week')),
+                '2592000' => sprintf(t('Authors may edit for %s'), t('1 month')),
+                '-1' => t('Authors may always edit'));
             $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
-            echo $this->Form->Label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
+            echo $this->Form->label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
             echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
-            echo Wrap(T('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'Info'));
+            echo wrap(t('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'Info'));
             ?>
         </li>
         <!--   <li>
       <?php
-        $Options2 = array('0' => T('Never - Users Must Refresh Page'),
-            '5' => T('Every 5 seconds'),
-            '10' => T('Every 10 seconds'),
-            '30' => T('Every 30 seconds'),
-            '60' => T('Every 1 minute'),
-            '300' => T('Every 5 minutes'));
-        echo $this->Form->Label('Auto-Fetch New Comments', 'Vanilla.Comments.AutoRefresh');
+        $Options2 = array('0' => t('Never - Users Must Refresh Page'),
+            '5' => t('Every 5 seconds'),
+            '10' => t('Every 10 seconds'),
+            '30' => t('Every 30 seconds'),
+            '60' => t('Every 1 minute'),
+            '300' => t('Every 5 minutes'));
+        echo $this->Form->label('Auto-Fetch New Comments', 'Vanilla.Comments.AutoRefresh');
         echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
         ?>
    </li>-->
         <li>
             <?php
-            echo $this->Form->Label('Archive Discussions', 'Vanilla.Archive.Date');
+            echo $this->Form->label('Archive Discussions', 'Vanilla.Archive.Date');
             echo '<div class="Info">',
-            T('Vanilla.Archive.Description', 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.'),
+            t('Vanilla.Archive.Description', 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.'),
             '</div>';
             echo $this->Form->Calendar('Vanilla.Archive.Date');
-            echo ' '.T('(YYYY-mm-dd)');
+            echo ' '.t('(YYYY-mm-dd)');
             ?>
         </li>
         <li>
@@ -109,19 +109,19 @@ echo $this->Form->Errors();
     <ul>
         <li>
             <div
-                class="Info"><?php echo T("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
+                class="Info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
             <?php
-            echo $this->Form->Label('Max Comment Length', 'Vanilla.Comment.MaxLength');
-            echo $this->Form->TextBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput'));
+            echo $this->Form->label('Max Comment Length', 'Vanilla.Comment.MaxLength');
+            echo $this->Form->textBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput'));
             ?>
         </li>
         <li>
             <div
-                class="Info"><?php echo T("You can specify a minimum comment length to discourage short comments."); ?></div>
+                class="Info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
             <?php
-            echo $this->Form->Label('Min Comment Length', 'Vanilla.Comment.MinLength');
-            echo $this->Form->TextBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput'));
+            echo $this->Form->label('Min Comment Length', 'Vanilla.Comment.MinLength');
+            echo $this->Form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput'));
             ?>
         </li>
     </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

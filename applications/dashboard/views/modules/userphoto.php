@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
-$User = GetValue('User', Gdn::Controller());
-if (!$User && Gdn::Session()->IsValid()) {
-    $User = Gdn::Session()->User;
+$User = val('User', Gdn::controller());
+if (!$User && Gdn::session()->isValid()) {
+    $User = Gdn::session()->User;
 }
 
 if (!$User)
@@ -10,28 +10,28 @@ if (!$User)
 $Photo = $User->Photo;
 
 if ($User->Banned) {
-    $BannedPhoto = C('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
+    $BannedPhoto = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
     if ($BannedPhoto)
-        $Photo = Gdn_Upload::Url($BannedPhoto);
+        $Photo = Gdn_Upload::url($BannedPhoto);
 }
 
 if ($Photo) {
     ?>
-    <div class="Photo PhotoWrap PhotoWrapLarge <?php echo GetValue('_CssClass', $User); ?>">
+    <div class="Photo PhotoWrap PhotoWrapLarge <?php echo val('_CssClass', $User); ?>">
         <?php
         if (IsUrl($Photo))
-            $Img = Img($Photo, array('class' => 'ProfilePhotoLarge'));
+            $Img = img($Photo, array('class' => 'ProfilePhotoLarge'));
         else
-            $Img = Img(Gdn_Upload::Url(ChangeBasename($Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
+            $Img = img(Gdn_Upload::url(changeBasename($Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
 
-        if (!$User->Banned && C('Garden.Profile.EditPhotos', TRUE) && (Gdn::Session()->UserID == $User->UserID || Gdn::Session()->CheckPermission('Garden.Users.Edit')))
-            echo Anchor(Wrap(T('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture');
+        if (!$User->Banned && c('Garden.Profile.EditPhotos', true) && (Gdn::session()->UserID == $User->UserID || Gdn::session()->checkPermission('Garden.Users.Edit')))
+            echo anchor(Wrap(t('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture');
 
         echo $Img;
         ?>
     </div>
-<?php } else if ($User->UserID == Gdn::Session()->UserID || Gdn::Session()->CheckPermission('Garden.Users.Edit')) { ?>
+<?php } else if ($User->UserID == Gdn::session()->UserID || Gdn::session()->checkPermission('Garden.Users.Edit')) { ?>
     <div
-        class="Photo"><?php echo Anchor(T('Add a Profile Picture'), '/profile/picture?userid='.$User->UserID, 'AddPicture BigButton'); ?></div>
+        class="Photo"><?php echo anchor(t('Add a Profile Picture'), '/profile/picture?userid='.$User->UserID, 'AddPicture BigButton'); ?></div>
 <?php
 }

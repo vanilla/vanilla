@@ -1403,7 +1403,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                 ));
 
                 if ($FileContents === false) {
-                    trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
+                    trigger_error(errorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
                 }
 
                 // Save to cache if we're into that sort of thing

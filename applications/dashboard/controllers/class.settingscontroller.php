@@ -799,7 +799,7 @@ class SettingsController extends DashboardController {
             // Define the Garden.Registration.RoleInvitations setting based on the postback values
             $InvitationRoleIDs = $this->Form->getValue('InvitationRoleID');
             $InvitationCounts = $this->Form->getValue('InvitationCount');
-            $this->ExistingRoleInvitations = ArrayCombine($InvitationRoleIDs, $InvitationCounts);
+            $this->ExistingRoleInvitations = arrayCombine($InvitationRoleIDs, $InvitationCounts);
             $ConfigurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
             // Event hook

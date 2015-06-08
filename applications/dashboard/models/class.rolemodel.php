@@ -56,7 +56,7 @@ class RoleModel extends Gdn_Model {
      */
     public function clearCache() {
         $Key = 'Roles';
-        Gdn::cache()->Remove($Key);
+        Gdn::cache()->remove($Key);
     }
 
     /**
@@ -98,7 +98,7 @@ class RoleModel extends Gdn_Model {
      */
     public static function filterPersonalInfo($Role) {
         if (is_string($Role)) {
-            $Role = array_shift(self::GetByName($Role));
+            $Role = array_shift(self::getByName($Role));
         }
 
         return (val('PersonalInfo', $Role)) ? false : true;

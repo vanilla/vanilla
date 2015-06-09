@@ -1482,7 +1482,7 @@ class ProfileController extends Gdn_Controller {
         // Get the user.
         $User = $UserModel->getID($UserID, DATASET_TYPE_ARRAY);
         if (!$User) {
-            throw new Exception(t('User not found.'), 404);
+            throw notFoundException('User');
         }
 
         $PhotoUrl = $User['Photo'];

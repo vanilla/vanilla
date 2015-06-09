@@ -86,7 +86,7 @@ class MessageModel extends Gdn_Model {
      * @param bool $IncludeSubcategories
      * @return bool
      */
-    protected function inCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
+    protected static function inCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
         if (!$HaystackCategoryID) {
             return true;
         }
@@ -152,7 +152,7 @@ class MessageModel extends Gdn_Model {
                 } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
                     $Visible = true;
 
-                if ($Visible && !$this->inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message))) {
+                if ($Visible && !self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message))) {
                     $Visible = false;
                 }
 
@@ -181,7 +181,7 @@ class MessageModel extends Gdn_Model {
             ->get()->resultArray();
 
         $Result = array_filter($Result, function ($Message) use ($CategoryID) {
-            return $this->inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+            return MessageModel::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
         });
 
         return $Result;

@@ -1553,7 +1553,21 @@ class Gdn_Controller extends Gdn_Pluggable {
     public function renderException($Ex) {
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             try {
+                // Pick our route.
+                switch ($Ex->getCode()) {
+                    case 401:
+                        $route = 'DefaultPermission';
+                        break;
+                    case 404:
+                        $route = 'Default404';
+                        break;
+                    default:
+                        $route = '/home/error';
+                }
+
+                // Redispatch to our error handler.
                 if (is_a($Ex, 'Gdn_UserException')) {
+                    // UserExceptions provide more info.
                     Gdn::dispatcher()
                         ->passData('Code', $Ex->getCode())
                         ->passData('Exception', $Ex->getMessage())
@@ -1561,27 +1575,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                         ->passData('Trace', $Ex->getTraceAsString())
                         ->passData('Url', url())
                         ->passData('Breadcrumbs', $this->Data('Breadcrumbs', array()))
-                        ->dispatch('/home/error');
+                        ->dispatch($route);
+                } elseif (in_array($Ex->getCode(), array(401, 404))) {
+                    // Default forbidden & not found codes.
+                    Gdn::dispatcher()
+                        ->passData('Message', $Ex->getMessage())
+                        ->passData('Url', url())
+                        ->dispatch($route);
                 } else {
-                    switch ($Ex->getCode()) {
-                        case 401:
-                            Gdn::dispatcher()
-                                ->passData('Message', $Ex->getMessage())
-                                ->passData('Url', url())
-                                ->dispatch('DefaultPermission');
-                            break;
-                        case 404:
-                            Gdn::dispatcher()
-                                ->passData('Message', $Ex->getMessage())
-                                ->passData('Url', url())
-                                ->dispatch('Default404');
-                            break;
-                        default:
-                            Gdn_ExceptionHandler($Ex);
-                    }
+                    // I dunno! Barf.
+                    Gdn_ExceptionHandler($Ex);
                 }
-
-
             } catch (Exception $Ex2) {
                 Gdn_ExceptionHandler($Ex);
             }

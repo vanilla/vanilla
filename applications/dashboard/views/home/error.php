@@ -5,13 +5,13 @@
 
         <div id="Message">
             <?php
-            echo Gdn_Format::Markdown($this->data('Exception', 'No error message supplied.'));
+            echo Gdn_Format::markdown($this->data('Exception', 'No error message supplied.'));
             ?>
         </div>
     </div>
-    <?php if (Debug() && $this->data('Trace')): ?>
+    <?php if (debug() && $this->data('Trace')): ?>
         <h2>Error</h2>
-        <?php echo $this->data('Code').' '.htmlspecialchars(Gdn_Controller::GetStatusMessage($this->data('Code'))); ?>
+        <?php echo $this->data('Code').' '.htmlspecialchars(Gdn_Controller::getStatusMessage($this->data('Code'))); ?>
         <h2>Trace</h2>
         <pre stye="text-align"><?php echo htmlspecialchars($this->data('Trace')); ?></pre>
     <?php endif; ?>

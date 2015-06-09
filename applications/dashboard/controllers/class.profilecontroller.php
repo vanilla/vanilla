@@ -1526,14 +1526,14 @@ class ProfileController extends Gdn_Controller {
         $this->Roles = array();
         if ($UserReference == '') {
             if ($Username) {
-                $this->User = $this->UserModel->GetByUsername($Username);
+                $this->User = $this->UserModel->getByUsername($Username);
             } else {
                 $this->User = $this->UserModel->getID(Gdn::session()->UserID);
             }
         } elseif (is_numeric($UserReference) && $Username != '') {
             $this->User = $this->UserModel->getID($UserReference);
         } else {
-            $this->User = $this->UserModel->GetByUsername($UserReference);
+            $this->User = $this->UserModel->getByUsername($UserReference);
         }
 
         $this->fireEvent('UserLoaded');
@@ -1543,7 +1543,7 @@ class ProfileController extends Gdn_Controller {
         } elseif ($this->User->Deleted == 1) {
             redirect('dashboard/home/deleted');
         } else {
-            $this->RoleData = $this->UserModel->GetRoles($this->User->UserID);
+            $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {
                 $this->Roles = array_column($this->RoleData->resultArray(), 'Name');
             }
@@ -1602,6 +1602,14 @@ class ProfileController extends Gdn_Controller {
         }
     }
 
+    /**
+     *
+     *
+     * @param string|int|null $UserReference
+     * @param int|null $UserID
+     * @return string
+     * @throws Exception
+     */
     public function getProfileUrl($UserReference = null, $UserID = null) {
         if (!property_exists($this, 'User')) {
             $this->getUserInfo();
@@ -1633,7 +1641,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Application Application name. Defaults to Dashboard.
      */
     public function setTabView($CurrentTab, $View = '', $Controller = 'Profile', $Application = 'Dashboard') {
-        $this->BuildProfile();
+        $this->buildProfile();
         if ($View == '') {
             $View = $CurrentTab;
         }

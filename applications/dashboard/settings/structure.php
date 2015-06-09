@@ -27,6 +27,7 @@ $Px = $Database->DatabasePrefix;
 $Construct->table('Role');
 
 $RoleTableExists = $Construct->tableExists();
+$RoleTypeExists = $Construct->columnExists('Type');
 
 $Construct
     ->primaryKey('RoleID')
@@ -153,7 +154,7 @@ $Construct
     ->set($Explicit, $Drop);
 
 // Fix old default roles that were stored in the config and user-role table.
-if ($RoleTableExists && $UserRoleExists) {
+if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
     if ($v = c('Garden.Registration.ApplicantRoleID')) {
         $SQL->update('Role')

@@ -607,10 +607,15 @@ class PromotedContentModule extends Gdn_Module {
             foreach ($roles as $role) {
                 $roleNames[] = val('Name', $role);
             }
+            // check
+            $rankName = null;
+            if (class_exists('RankModel')) {
+                $rankName = val('Name', RankModel::Ranks(val('RankID', $user)), null);
+            }
             $userProperties = array(
                 'Url' => url(userUrl($user), true),
                 'PhotoUrl' => UserPhotoUrl($user),
-                'RankName' => val('Name', RankModel::Ranks(val('RankID', $user)), null),
+                'RankName' => $rankName,
                 'RoleNames' => $roleNames,
                 'CssClass' => val('_CssClass', $user)
             );

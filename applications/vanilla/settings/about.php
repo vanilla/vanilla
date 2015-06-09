@@ -13,5 +13,5 @@ $ApplicationInfo['Vanilla'] = array(
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
     'License' => 'GPL v2',
-    'Hidden' => TRUE
+    'Hidden' => true
 );

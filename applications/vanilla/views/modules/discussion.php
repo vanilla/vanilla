@@ -6,8 +6,8 @@ if (!isset($this->Prefix)) {
 
 if (!function_exists('WriteModuleDiscussion')) {
     $DiscussionsModule = new DiscussionsModule();
-    require_once $DiscussionsModule->FetchViewLocation('helper_functions');
-    require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
+    require_once $DiscussionsModule->fetchViewLocation('helper_functions');
+    require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
 }
 
 WriteModuleDiscussion($Discussion, $this->Prefix);

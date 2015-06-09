@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php
 /**
  * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -129,16 +129,17 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                     'icon' => 'icon.png'
 
                 ),
-                '/resources/emoji');
+                '/resources/emoji'
+            );
 
-            $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter");
-            $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
-            $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
-            $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
+                $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter");
+                $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
+                $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
+                $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
 
-            $this->fireEvent('Init');
+                $this->fireEvent('Init');
 
-            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
+                $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
         }
 
         return $this->emojiSets;
@@ -150,9 +151,9 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param Emoji $sender
      * @param array $args
      */
-    public function Emoji_Init_Handler($sender, $args) {
+    public function emoji_init_handler($sender, $args) {
         // Get the currently selected emoji set & switch to it.
-        $emojiSetKey = C('Garden.EmojiSet');
+        $emojiSetKey = c('Garden.EmojiSet');
         if (!$emojiSetKey || !array_key_exists($emojiSetKey, $this->getEmojiSets())) {
             return;
         }
@@ -165,23 +166,22 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      * @param array $args
      */
-    public function SettingsController_EmojiExtender_Create($sender, $args) {
+    public function settingsController_emojiExtender_create($sender, $args) {
         $cf = new ConfigurationModule($sender);
-
         $items = array();
 
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
 
-            $icon = (isset($manifest['icon'])) ? Img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
+            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
             $items[$key] = '@'.$icon.
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
-                (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
-                (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::Wysiwyg($manifest['description']).'</p>').
+                (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(t('by %s'), $manifest['author']).'</div>').
+                (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::wysiwyg($manifest['description']).'</p>').
                 '</div>';
         }
-        $cf->Initialize(array(
+        $cf->initialize(array(
             'Garden.EmojiSet' => array(
                 'LabelCode' => 'Emoji Set',
                 'Control' => 'radiolist',
@@ -193,10 +193,9 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
 
-        $sender->AddCssFile('settings.css', 'plugins/EmojiExtender');
-        $sender->AddSideMenu();
-        $sender->SetData('Title', sprintf(T('%s Settings'), 'Emoji'));
-        $cf->RenderAll();
+        $sender->addCssFile('settings.css', 'plugins/EmojiExtender');
+        $sender->addSideMenu();
+        $sender->setData('Title', sprintf(t('%s Settings'), 'Emoji'));
+        $cf->renderAll();
     }
-
 }

@@ -43,24 +43,25 @@ class AuthenticationController extends DashboardController {
      * @since 2.0.3
      * @access public
      */
-    public function Initialize() {
-        parent::Initialize();
-        Gdn_Theme::Section('Dashboard');
-        if ($this->Menu)
-            $this->Menu->HighlightRoute('/dashboard/authentication');
+    public function initialize() {
+        parent::initialize();
+        Gdn_Theme::section('Dashboard');
+        if ($this->Menu) {
+            $this->Menu->highlightRoute('/dashboard/authentication');
+        }
 
-        $this->EnableSlicing($this);
+        $this->enableSlicing($this);
 
-        $Authenticators = Gdn::Authenticator()->GetAvailable();
+        $Authenticators = Gdn::authenticator()->GetAvailable();
         $this->ChooserList = array();
         $this->ConfigureList = array();
         foreach ($Authenticators as $AuthAlias => $AuthConfig) {
             $this->ChooserList[$AuthAlias] = $AuthConfig['Name'];
-            $Authenticator = Gdn::Authenticator()->AuthenticateWith($AuthAlias);
-            $ConfigURL = (is_a($Authenticator, "Gdn_Authenticator") && method_exists($Authenticator, 'AuthenticatorConfiguration')) ? $Authenticator->AuthenticatorConfiguration($this) : FALSE;
+            $Authenticator = Gdn::authenticator()->authenticateWith($AuthAlias);
+            $ConfigURL = (is_a($Authenticator, "Gdn_Authenticator") && method_exists($Authenticator, 'AuthenticatorConfiguration')) ? $Authenticator->AuthenticatorConfiguration($this) : false;
             $this->ConfigureList[$AuthAlias] = $ConfigURL;
         }
-        $this->CurrentAuthenticationAlias = Gdn::Authenticator()->AuthenticateWith('default')->GetAuthenticationSchemeAlias();
+        $this->CurrentAuthenticationAlias = Gdn::authenticator()->authenticateWith('default')->getAuthenticationSchemeAlias();
     }
 
     /**
@@ -71,9 +72,9 @@ class AuthenticationController extends DashboardController {
      *
      * @param string $AuthenticationSchemeAlias
      */
-    public function Index($AuthenticationSchemeAlias = NULL) {
+    public function index($AuthenticationSchemeAlias = null) {
         $this->View = 'choose';
-        $this->Choose($AuthenticationSchemeAlias);
+        $this->choose($AuthenticationSchemeAlias);
     }
 
     /**
@@ -84,38 +85,39 @@ class AuthenticationController extends DashboardController {
      *
      * @param string $AuthenticationSchemeAlias
      */
-    public function Choose($AuthenticationSchemeAlias = NULL) {
-        $this->Permission('Garden.Settings.Manage');
-        $this->AddSideMenu('dashboard/authentication');
-        $this->Title(T('Authentication'));
-        $this->AddCssFile('authentication.css');
+    public function choose($AuthenticationSchemeAlias = null) {
+        $this->permission('Garden.Settings.Manage');
+        $this->addSideMenu('dashboard/authentication');
+        $this->title(t('Authentication'));
+        $this->addCssFile('authentication.css');
 
-        $PreFocusAuthenticationScheme = NULL;
-        if (!is_null($AuthenticationSchemeAlias))
+        $PreFocusAuthenticationScheme = null;
+        if (!is_null($AuthenticationSchemeAlias)) {
             $PreFocusAuthenticationScheme = $AuthenticationSchemeAlias;
+        }
 
-        if ($this->Form->AuthenticatedPostback()) {
-            $NewAuthSchemeAlias = $this->Form->GetValue('Garden.Authentication.Chooser');
-            $AuthenticatorInfo = Gdn::Authenticator()->GetAuthenticatorInfo($NewAuthSchemeAlias);
-            if ($AuthenticatorInfo !== FALSE) {
-                $CurrentAuthenticatorAlias = Gdn::Authenticator()->AuthenticateWith('default')->GetAuthenticationSchemeAlias();
+        if ($this->Form->authenticatedPostback()) {
+            $NewAuthSchemeAlias = $this->Form->getValue('Garden.Authentication.Chooser');
+            $AuthenticatorInfo = Gdn::authenticator()->getAuthenticatorInfo($NewAuthSchemeAlias);
+            if ($AuthenticatorInfo !== false) {
+                $CurrentAuthenticatorAlias = Gdn::authenticator()->AuthenticateWith('default')->getAuthenticationSchemeAlias();
 
                 // Disable current
                 $AuthenticatorDisableEvent = "DisableAuthenticator".ucfirst($CurrentAuthenticatorAlias);
-                $this->FireEvent($AuthenticatorDisableEvent);
+                $this->fireEvent($AuthenticatorDisableEvent);
 
                 // Enable new
                 $AuthenticatorEnableEvent = "EnableAuthenticator".ucfirst($NewAuthSchemeAlias);
-                $this->FireEvent($AuthenticatorEnableEvent);
+                $this->fireEvent($AuthenticatorEnableEvent);
 
                 $PreFocusAuthenticationScheme = $NewAuthSchemeAlias;
-                $this->CurrentAuthenticationAlias = Gdn::Authenticator()->AuthenticateWith('default')->GetAuthenticationSchemeAlias();
+                $this->CurrentAuthenticationAlias = Gdn::authenticator()->authenticateWith('default')->getAuthenticationSchemeAlias();
             }
         }
 
-        $this->SetData('AuthenticationConfigureList', $this->ConfigureList);
-        $this->SetData('PreFocusAuthenticationScheme', $PreFocusAuthenticationScheme);
-        $this->Render();
+        $this->setData('AuthenticationConfigureList', $this->ConfigureList);
+        $this->setData('PreFocusAuthenticationScheme', $PreFocusAuthenticationScheme);
+        $this->render();
     }
 
     /**
@@ -126,22 +128,22 @@ class AuthenticationController extends DashboardController {
      *
      * @param string $AuthenticationSchemeAlias
      */
-    public function Configure($AuthenticationSchemeAlias = NULL) {
-        $Message = T("Please choose an authenticator to configure.");
+    public function configure($AuthenticationSchemeAlias = null) {
+        $Message = t("Please choose an authenticator to configure.");
         if (!is_null($AuthenticationSchemeAlias)) {
-            $AuthenticatorInfo = Gdn::Authenticator()->GetAuthenticatorInfo($AuthenticationSchemeAlias);
-            if ($AuthenticatorInfo !== FALSE) {
+            $AuthenticatorInfo = Gdn::authenticator()->getAuthenticatorInfo($AuthenticationSchemeAlias);
+            if ($AuthenticatorInfo !== false) {
                 $this->AuthenticatorChoice = $AuthenticationSchemeAlias;
-                if (array_key_exists($AuthenticationSchemeAlias, $this->ConfigureList) && $this->ConfigureList[$AuthenticationSchemeAlias] !== FALSE) {
-                    echo Gdn::Slice($this->ConfigureList[$AuthenticationSchemeAlias]);
+                if (array_key_exists($AuthenticationSchemeAlias, $this->ConfigureList) && $this->ConfigureList[$AuthenticationSchemeAlias] !== false) {
+                    echo Gdn::slice($this->ConfigureList[$AuthenticationSchemeAlias]);
                     return;
-                } else
-                    $Message = sprintf(T("The %s Authenticator does not have any custom configuration options."), $AuthenticatorInfo['Name']);
+                } else {
+                    $Message = sprintf(t("The %s Authenticator does not have any custom configuration options."), $AuthenticatorInfo['Name']);
+                }
             }
         }
 
-        $this->SetData('ConfigureMessage', $Message);
-        $this->Render();
+        $this->setData('ConfigureMessage', $Message);
+        $this->render();
     }
-
 }

@@ -9,42 +9,60 @@
  * Class Gdn_DatabaseDebug
  */
 class Gdn_DatabaseDebug extends Gdn_Database {
-    /// PROPERTIES ///
 
+    /** @var int  */
     protected $_ExecutionTime = 0;
 
+    /** @var array  */
     protected $_Queries = array();
 
-    /// METHODS ///
-
-    public function ExecutionTime() {
+    /**
+     *
+     *
+     * @return int
+     */
+    public function executionTime() {
         return $this->_ExecutionTime;
     }
 
-    private static function FormatArgs($Args) {
-        if (!is_array($Args))
+    /**
+     *
+     *
+     * @param $Args
+     * @return string
+     */
+    private static function formatArgs($Args) {
+        if (!is_array($Args)) {
             return '';
+        }
 
         $Result = '';
-
         foreach ($Args as $i => $Expr) {
-            if (strlen($Result) > 0)
+            if (strlen($Result) > 0) {
                 $Result .= ', ';
-            $Result .= self::FormatExpr($Expr);
+            }
+            $Result .= self::formatExpr($Expr);
         }
         return $Result;
     }
 
-    private static function FormatExpr($Expr) {
+    /**
+     *
+     *
+     * @param $Expr
+     * @return string
+     */
+    private static function formatExpr($Expr) {
         if (is_array($Expr)) {
             if (count($Expr) > 3) {
                 $Result = count($Expr);
             } else {
                 $Result = '';
                 foreach ($Expr as $Key => $Value) {
-                    if (strlen($Result) > 0)
+                    if (strlen($Result) > 0) {
                         $Result .= ', ';
-                    $Result .= '\''.str_replace('\'', '\\\'', $Key).'\' => '.self::FormatExpr($Value);
+                    }
+                    $Result .= '\''.str_replace('\'', '\\\'', $Key).'\' => '.self::formatExpr($Value);
                 }
             }
             return 'array('.$Result.')';
@@ -59,19 +77,32 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         }
     }
 
-    public function Queries() {
+    /**
+     *
+     *
+     * @return array
+     */
+    public function queries() {
         return $this->_Queries;
     }
 
-    public function Query($Sql, $InputParameters = NULL, $Options = array()) {
+    /**
+     *
+     *
+     * @param string $Sql
+     * @param null $InputParameters
+     * @param array $Options
+     * @return Gdn_DataSet|object|string
+     */
+    public function query($Sql, $InputParameters = null, $Options = array()) {
         $Trace = debug_backtrace();
         $Method = '';
         foreach ($Trace as $Info) {
-            $Class = GetValue('class', $Info, '');
-            if ($Class === '' || StringEndsWith($Class, 'Model', TRUE) || StringEndsWith($Class, 'Plugin', TRUE)) {
-                $Type = ArrayValue('type', $Info, '');
+            $Class = val('class', $Info, '');
+            if ($Class === '' || stringEndsWith($Class, 'Model', true) || stringEndsWith($Class, 'Plugin', true)) {
+                $Type = arrayValue('type', $Info, '');
 
-                $Method = $Class.$Type.$Info['function'].'('.self::FormatArgs($Info['args']).')';
+                $Method = $Class.$Type.$Info['function'].'('.self::formatArgs($Info['args']).')';
                 break;
             }
         }
@@ -79,14 +110,14 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         // Save the query for debugging
         // echo '<br />adding to queries: '.$Sql;
         $Query = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
-        $SaveQuery = TRUE;
+        $SaveQuery = true;
         if (isset($Options['Cache'])) {
             $CacheKeys = (array)$Options['Cache'];
             $Cache = array();
 
-            $AllSet = TRUE;
+            $AllSet = true;
             foreach ($CacheKeys as $CacheKey) {
-                $Value = Gdn::Cache()->Get($CacheKey);
+                $Value = Gdn::cache()->get($CacheKey);
                 $CacheValue = $Value !== Gdn_Cache::CACHEOP_FAILURE;
                 $AllSet &= $CacheValue;
                 $Cache[$CacheKey] = $CacheValue;
@@ -96,16 +127,16 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         }
 
         // Start the Query Timer
-        $TimeStart = Now();
+        $TimeStart = now();
 
-        $Result = parent::Query($Sql, $InputParameters, $Options);
+        $Result = parent::query($Sql, $InputParameters, $Options);
         $Query = array_merge($this->LastInfo, $Query);
 
         // Aggregate the query times
-        $TimeEnd = Now();
+        $TimeEnd = now();
         $this->_ExecutionTime += ($TimeEnd - $TimeStart);
 
-        if ($SaveQuery && !StringBeginsWith($Sql, 'set names')) {
+        if ($SaveQuery && !stringBeginsWith($Sql, 'set names')) {
             $Query['Time'] = ($TimeEnd - $TimeStart);
             $this->_Queries[] = $Query;
         }
@@ -113,7 +144,12 @@ class Gdn_DatabaseDebug extends Gdn_Database {
         return $Result;
     }
 
-    public function QueryTimes() {
+    /**
+     *
+     *
+     * @return array
+     */
+    public function queryTimes() {
         return array();
     }
 }

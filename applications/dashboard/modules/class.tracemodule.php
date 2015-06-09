@@ -11,7 +11,7 @@
 /**
  * Assist with debugging.
  *
- * @see Trace()
+ * @see trace()
  */
 class TraceModule extends Gdn_Module {
 
@@ -20,19 +20,20 @@ class TraceModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
-    public function ToString() {
+    public function toString() {
         try {
-            $Traces = Trace();
-            if (!$Traces)
+            $Traces = trace();
+            if (!$Traces) {
                 return '';
+            }
 
-            $this->SetData('Traces', $Traces);
+            $this->setData('Traces', $Traces);
 
-            return $this->FetchView();
+            return $this->fetchView();
         } catch (Exception $Ex) {
             return $Ex->getMessage();
         }

@@ -58,56 +58,56 @@
             width: 280px;
         }
     </style>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <div class="Info">
-        <?php echo T('Facebook Connect allows users to sign in using their Facebook account.', 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>'); ?>
+        <?php echo t('Facebook Connect allows users to sign in using their Facebook account.', 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>'); ?>
     </div>
     <div class="Configuration">
         <div class="ConfigurationForm">
             <ul>
                 <li>
                     <?php
-                    echo $this->Form->Label('Application ID', 'ApplicationID');
-                    echo $this->Form->TextBox('ApplicationID');
+                    echo $this->Form->label('Application ID', 'ApplicationID');
+                    echo $this->Form->textBox('ApplicationID');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->Label('Application Secret', 'Secret');
-                    echo $this->Form->TextBox('Secret');
+                    echo $this->Form->label('Application Secret', 'Secret');
+                    echo $this->Form->textBox('Secret');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('UseFacebookNames', 'Use Facebook names for usernames.');
+                    echo $this->Form->checkBox('UseFacebookNames', 'Use Facebook names for usernames.');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SendConnectEmail', 'Send users a welcome email.');
+                    echo $this->Form->checkBox('SendConnectEmail', 'Send users a welcome email.');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSignIn', 'Enable Social Sign In');
+                    echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
+                    echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
                     ?>
                 </li>
                 <li>
                     <?php
-                    echo $this->Form->CheckBox('SocialSharing', 'Enable automatic Social Share.');
+                    echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
                     ?>
                 </li>
             </ul>
-            <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
+            <?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
         </div>
         <div class="ConfigurationHelp">
             <strong>How to set up Facebook Connect</strong>
@@ -118,7 +118,7 @@ echo $this->Form->Errors();
             <p>
                 When you create the Facebook application, you can choose what to enter in most fields, but make sure you
                 enter the following value in the "Site Url" field:
-                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>"/>
+                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::request()->domain(), '/').'/'; ?>"/>
             </p>
 
             <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into
@@ -131,4 +131,4 @@ echo $this->Form->Errors();
         </div>
     </div>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();

@@ -20,7 +20,7 @@ class AddPeopleModule extends Gdn_Module {
     public $Form;
 
     /** @var bool Whether user is allowed to use this form. */
-    public $AddUserAllowed = TRUE;
+    public $AddUserAllowed = true;
 
     /**
      *
@@ -29,38 +29,40 @@ class AddPeopleModule extends Gdn_Module {
      * @throws Exception
      */
     public function __construct($Sender = '') {
-        $Session = Gdn::Session();
-        if (property_exists($Sender, 'Conversation'))
+        $Session = Gdn::session();
+        if (property_exists($Sender, 'Conversation')) {
             $this->Conversation = $Sender->Conversation;
+        }
 
         // Allowed to use this module?
-        $this->AddUserAllowed = $Sender->ConversationModel->AddUserAllowed($this->Conversation->ConversationID);
+        $this->AddUserAllowed = $Sender->ConversationModel->addUserAllowed($this->Conversation->ConversationID);
 
-        $this->Form = Gdn::Factory('Form', 'AddPeople');
+        $this->Form = Gdn::factory('Form', 'AddPeople');
         // $this->Form->Action = $Sender->SelfUrl;
         // If the form was posted back, check for people to add to the conversation
-        if ($this->Form->AuthenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack()) {
             // Defer exceptions until they try to use the form so we don't fill our logs
-            if (!$this->AddUserAllowed || !CheckPermission('Conversations.Conversations.Add')) {
-                throw PermissionException();
+            if (!$this->AddUserAllowed || !checkPermission('Conversations.Conversations.Add')) {
+                throw permissionException();
             }
 
             $NewRecipientUserIDs = array();
-            $NewRecipients = explode(',', $this->Form->GetFormValue('AddPeople', ''));
-            $UserModel = Gdn::Factory("UserModel");
+            $NewRecipients = explode(',', $this->Form->getFormValue('AddPeople', ''));
+            $UserModel = Gdn::factory("UserModel");
             foreach ($NewRecipients as $Name) {
                 if (trim($Name) != '') {
-                    $User = $UserModel->GetByUsername(trim($Name));
-                    if (is_object($User))
+                    $User = $UserModel->getByUsername(trim($Name));
+                    if (is_object($User)) {
                         $NewRecipientUserIDs[] = $User->UserID;
+                    }
                 }
             }
-            $Sender->ConversationModel->AddUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
-            // if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
-            //    Redirect('/messages/'.$this->Conversation->ConversationID);
+            $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
+            // if ($Sender->deliveryType() == DELIVERY_TYPE_ALL)
+            //    redirect('/messages/'.$this->Conversation->ConversationID);
 
-            $Sender->InformMessage(T('Your changes were saved.'));
-            $Sender->RedirectUrl = Url('/messages/'.$this->Conversation->ConversationID);
+            $Sender->informMessage(t('Your changes were saved.'));
+            $Sender->RedirectUrl = url('/messages/'.$this->Conversation->ConversationID);
         }
         $this->_ApplicationFolder = $Sender->Application;
         $this->_ThemeFolder = $Sender->Theme;
@@ -71,7 +73,7 @@ class AddPeopleModule extends Gdn_Module {
      *
      * @return string
      */
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
@@ -80,13 +82,13 @@ class AddPeopleModule extends Gdn_Module {
      *
      * @return string Rendered HTML.
      */
-    public function ToString() {
+    public function toString() {
         // Simplify our permission logic
         $ConversationExists = (is_object($this->Conversation) && $this->Conversation->ConversationID > 0);
-        $CanAddUsers = ($this->AddUserAllowed && CheckPermission('Conversations.Conversations.Add'));
+        $CanAddUsers = ($this->AddUserAllowed && checkPermission('Conversations.Conversations.Add'));
 
         if ($ConversationExists && $CanAddUsers) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

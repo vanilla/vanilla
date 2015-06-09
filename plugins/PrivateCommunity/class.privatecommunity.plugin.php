@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * PrivateCommunity Plugin.
  *
@@ -28,19 +28,20 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function RoleController_AfterRolesInfo_Handler($Sender) {
-        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+    public function roleController_afterRolesInfo_handler($Sender) {
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
+        }
 
-        $Private = C('Garden.PrivateCommunity');
+        $Private = c('Garden.PrivateCommunity');
         echo '<div style="padding: 10px 0;">';
         $Style = array('style' => 'background: #ff0; padding: 2px 4px; margin: 0 10px 2px 0; display: inline-block;');
         if ($Private) {
-            echo Wrap('Your community is currently <strong>PRIVATE</strong>.', 'span', $Style);
-            echo Wrap(Anchor('Switch to PUBLIC', 'settings/privatecommunity/on/'.Gdn::Session()->TransientKey(), 'SmallButton').'(Everyone will see inside your community)', 'div');
+            echo wrap('Your community is currently <strong>PRIVATE</strong>.', 'span', $Style);
+            echo wrap(anchor('Switch to PUBLIC', 'settings/privatecommunity/on/'.Gdn::session()->transientKey(), 'SmallButton').'(Everyone will see inside your community)', 'div');
         } else {
-            echo Wrap('Your community is currently <strong>PUBLIC</strong>.', 'span', $Style);
-            echo Wrap(Anchor('Switch to PRIVATE', 'settings/privatecommunity/off/'.Gdn::Session()->TransientKey(), 'SmallButton').'(Only members will see inside your community)', 'div');
+            echo wrap('Your community is currently <strong>PUBLIC</strong>.', 'span', $Style);
+            echo wrap(anchor('Switch to PRIVATE', 'settings/privatecommunity/off/'.Gdn::session()->transientKey(), 'SmallButton').'(Only members will see inside your community)', 'div');
         }
         echo '</div>';
     }
@@ -50,23 +51,22 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function SettingsController_PrivateCommunity_Create($Sender) {
-        $Session = Gdn::Session();
-        $Switch = GetValue(0, $Sender->RequestArgs);
-        $TransientKey = GetValue(1, $Sender->RequestArgs);
-        if (
-            in_array($Switch, array('on', 'off'))
-            && $Session->ValidateTransientKey($TransientKey)
-            && $Session->CheckPermission('Garden.Settings.Manage')
+    public function settingsController_privateCommunity_create($Sender) {
+        $Session = Gdn::session();
+        $Switch = val(0, $Sender->RequestArgs);
+        $TransientKey = val(1, $Sender->RequestArgs);
+        if (in_array($Switch, array('on', 'off'))
+            && $Session->validateTransientKey($TransientKey)
+            && $Session->checkPermission('Garden.Settings.Manage')
         ) {
-            SaveToConfig('Garden.PrivateCommunity', $Switch == 'on' ? FALSE : TRUE);
+            saveToConfig('Garden.PrivateCommunity', $Switch == 'on' ? false : true);
         }
-        Redirect('dashboard/role');
+        redirect('dashboard/role');
     }
 
     /**
      * No setup.
      */
-    public function Setup() {
+    public function setup() {
     }
 }

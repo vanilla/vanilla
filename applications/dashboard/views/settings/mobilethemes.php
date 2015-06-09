@@ -1,72 +1,72 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
-$AddonUrl = Gdn::Config('Garden.AddonUrl');
+$Session = Gdn::session();
+$AddonUrl = Gdn::config('Garden.AddonUrl');
 ?>
 
 <h1>
-    <?php echo T('Manage Mobile Themes'); ?>
+    <?php echo t('Manage Mobile Themes'); ?>
 </h1>
 
 <div class="Info">
-    <p class="P"><?php echo T('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
+    <p class="P"><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
 
-    <p class="P"><?php echo T('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
+    <p class="P"><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
 </div>
 
 <h3>Available Mobile Themes</h3>
 
-<?php echo $this->Form->Errors(); ?>
+<?php echo $this->Form->errors(); ?>
 
 <div class="Messages Errors TestAddonErrors Hidden">
     <ul>
-        <li><?php echo T('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
+        <li><?php echo t('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
     </ul>
 </div>
 
-<?php if (count($this->Data('AvailableThemes', array()))): ?>
+<?php if (count($this->data('AvailableThemes', array()))): ?>
 
     <table class="browser-mobile-themes SelectionGrid Themes">
         <tbody>
 
         <?php
         // Get currently enabled theme data.
-        $EnabledThemeInfo = $this->Data('EnabledThemeInfo');
-        $EnabledVersion = $this->Data('EnabledTheme.Version');
-        $EnabledThemeUrl = $this->Data('EnabledTheme.Url');
-        $EnabledAuthor = $this->Data('EnabledTheme.Author');
-        $EnabledAuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
-        $EnabledNewVersion = $this->Data('EnabledTheme.NewVersion');
+        $EnabledThemeInfo = $this->data('EnabledThemeInfo');
+        $EnabledVersion = $this->data('EnabledTheme.Version');
+        $EnabledThemeUrl = $this->data('EnabledTheme.Url');
+        $EnabledAuthor = $this->data('EnabledTheme.Author');
+        $EnabledAuthorUrl = $this->data('EnabledTheme.AuthorUrl');
+        $EnabledNewVersion = $this->data('EnabledTheme.NewVersion');
         $EnabledUpgrade = $EnabledNewVersion != '' && version_compare($EnabledNewVersion, $EnabledVersion, '>');
-        $EnabledPreviewUrl = $this->Data('EnabledTheme.MobileScreenshotUrl', FALSE);
-        $EnabledThemeName = $this->Data('EnabledThemeName');
+        $EnabledPreviewUrl = $this->data('EnabledTheme.MobileScreenshotUrl', false);
+        $EnabledThemeName = $this->data('EnabledThemeName');
 
-        if ($this->Data('EnabledTheme.Options')) {
-            $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'), Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
+        if ($this->data('EnabledTheme.Options')) {
+            $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'), anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
         }
 
         $Cols = 3;
         $Col = 0;
-        foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo):
+        foreach ($this->data('AvailableThemes') as $ThemeName => $ThemeInfo):
 
-            $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
-            $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
-            $Active = $ThemeFolder == $this->Data('EnabledThemeFolder');
-            $Version = GetValue('Version', $ThemeInfo, '');
-            $ThemeUrl = GetValue('Url', $ThemeInfo, '');
-            $Author = GetValue('Author', $ThemeInfo, '');
-            $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
-            $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
+            $ScreenName = val('Name', $ThemeInfo, $ThemeName);
+            $ThemeFolder = val('Folder', $ThemeInfo, '');
+            $Active = $ThemeFolder == $this->data('EnabledThemeFolder');
+            $Version = val('Version', $ThemeInfo, '');
+            $ThemeUrl = val('Url', $ThemeInfo, '');
+            $Author = val('Author', $ThemeInfo, '');
+            $AuthorUrl = val('AuthorUrl', $ThemeInfo, '');
+            $NewVersion = val('NewVersion', $ThemeInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-            $PreviewUrl = GetValue('MobileScreenshotUrl', $ThemeInfo, FALSE);
-            $Description = GetValue('Description', $ThemeInfo);
-            $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
+            $PreviewUrl = val('MobileScreenshotUrl', $ThemeInfo, false);
+            $Description = val('Description', $ThemeInfo);
+            $RequiredApplications = val('RequiredApplications', $ThemeInfo, false);
 
             $ClassCurrentTheme = ($EnabledThemeInfo['Index'] == $ThemeInfo['Index'])
                 ? 'current-theme'
                 : '';
 
             $PreviewImageHtml = ($PreviewUrl !== FALSE)
-                ? Anchor(Img($PreviewUrl, array('alt' => $ScreenName)), $PreviewUrl, '', array('class' => 'theme-image mfp-image'))
+                ? anchor(Img($PreviewUrl, array('alt' => $ScreenName)), $PreviewUrl, '', array('class' => 'theme-image mfp-image'))
                 : '<div class="theme-image"></div>';
 
             $DescriptionHtml = ($Description)
@@ -88,7 +88,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
             <td class="themeblock <?php echo $ClassCurrentTheme; ?> <?php echo $ColClass; ?>">
                 <h4>
-                    <?php echo ($ThemeUrl != '') ? Anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
+                    <?php echo ($ThemeUrl != '') ? anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
                 </h4>
 
                 <!--<div class="author-name">
@@ -102,10 +102,10 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                     <div class="Buttons">
                         <div class="theme-buttons">
                             <?php
-                            echo Anchor(T('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                            //echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
+                            echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
+                            //echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
                             $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                            $this->FireEvent('AfterThemeButtons');
+                            $this->fireEvent('AfterThemeButtons');
                             ?>
                         </div>
 
@@ -121,9 +121,9 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
 
                 <?php
-                if ($this->Data('EnabledTheme.Options')) {
-                    $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
-                        Anchor(T('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
+                if ($this->data('EnabledTheme.Options')) {
+                    $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
+                        anchor(t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
 
                     echo '<div class="Options">',
                     $OptionsDescription,
@@ -134,7 +134,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                 <?php if (is_array($RequiredApplications)): ?>
 
                     <dl>
-                        <dt><?php echo T('Requires'); ?></dt>
+                        <dt><?php echo t('Requires'); ?></dt>
                         <dd>
 
                             <?php
@@ -143,7 +143,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                                 if ($i > 0) {
                                     echo ', ';
                                 }
-                                printf(T('%1$s %2$s'), $RequiredApplication, $VersionInfo);
+                                printf(t('%1$s %2$s'), $RequiredApplication, $VersionInfo);
                                 ++$i;
                             }
                             ?>

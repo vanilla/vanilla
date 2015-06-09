@@ -13,13 +13,13 @@
  */
 class ProfileOptionsModule extends Gdn_Module {
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
-    public function ToString() {
-        $Session = Gdn::Session();
-        $Controller = Gdn::Controller();
+    public function toString() {
+        $Session = Gdn::session();
+        $Controller = Gdn::controller();
         $UserID = $Controller->User->UserID;
         $MemberOptions = array();
         $ProfileOptions = array();
@@ -27,29 +27,30 @@ class ProfileOptionsModule extends Gdn_Module {
         $Controller->EventArguments['ProfileOptions'] = &$ProfileOptions;
         $Controller->EventArguments['MemberOptions'] = &$MemberOptions;
         if ($Controller->EditMode) {
-            return '<div class="ProfileOptions">'.Anchor(T('Back to Profile'), UserUrl($Controller->User), array('class' => 'ProfileButtons')).'</div>';
-//         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
+            return '<div class="ProfileOptions">'.anchor(t('Back to Profile'), userUrl($Controller->User), array('class' => 'ProfileButtons')).'</div>';
+//         $ProfileOptions[] = array('Text' => t('Back to Profile'), 'Url' => userUrl($Controller->User), 'CssClass' => 'BackToProfile');
         } else {
             // Profile Editing
             if (hasEditProfile($Controller->User->UserID)) {
-                $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
-            } elseif ($Session->IsValid() && $UserID == $Session->UserID) {
-                $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Preferences'), 'Url' => UserUrl($Controller->User, '', 'preferences'));
+                $ProfileOptions[] = array('Text' => sprite('SpEditProfile').' '.t('Edit Profile'), 'Url' => userUrl($Controller->User, '', 'edit'));
+            } elseif ($Session->isValid() && $UserID == $Session->UserID) {
+                $ProfileOptions[] = array('Text' => sprite('SpEditProfile').' '.t('Preferences'), 'Url' => userUrl($Controller->User, '', 'preferences'));
             }
 
             // Ban/Unban
-            $MayBan = CheckPermission('Garden.Moderation.Manage') || CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Users.Ban');
+            $MayBan = checkPermission('Garden.Moderation.Manage') || checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Users.Ban');
             if ($MayBan && $UserID != $Session->UserID) {
                 if (BanModel::isBanned($Controller->User->Banned, BanModel::BAN_MANUAL)) {
-                    $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
+                    $ProfileOptions[] = array('Text' => sprite('SpBan').' '.t('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
                 } elseif (!$Controller->User->Admin) {
-                    $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
+                    $ProfileOptions[] = array('Text' => sprite('SpBan').' '.t('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
                 }
             }
 
             // Delete content.
-            if (CheckPermission('Garden.Moderation.Manage'))
-                $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            if (checkPermission('Garden.Moderation.Manage')) {
+                $ProfileOptions[] = array('Text' => sprite('SpDelete').' '.t('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            }
         }
         return parent::ToString();
     }

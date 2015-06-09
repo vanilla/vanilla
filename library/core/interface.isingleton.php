@@ -13,10 +13,11 @@
  */
 interface ISingleton {
     /**
-     * Returns the internal pointer to the in-memory singleton of the class.
+     * Return the internal pointer to the in-memory singleton of the class.
+     *
      * Instantiates the class if it has not yet been created.
      *
      * @return object
      */
-    public static function GetInstance();
+    public static function getInstance();
 }

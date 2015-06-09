@@ -52,8 +52,7 @@ class BaseLogger implements LoggerInterface {
     }
 
     /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
+     * Runtime errors that do not require immediate action but should typically be logged and monitored.
      *
      * @param string $message
      * @param array $context
@@ -121,8 +120,8 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function log($level, $message, array $context = array()) {
-        Trace(FormatString($message, $context), 'FormattedMessage');
-        Trace($context, 'context');
+        trace(formatString($message, $context), 'FormattedMessage');
+        trace($context, 'context');
 
     }
 }

@@ -1,58 +1,58 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->EmbedType = GetValue('0', $this->RequestArgs, 'wordpress');
-$AllowEmbed = C('Garden.Embed.Allow');
+$this->EmbedType = val('0', $this->RequestArgs, 'wordpress');
+$AllowEmbed = c('Garden.Embed.Allow');
 ?>
 <div class="Help Aside">
     <?php
-    echo '<h2>', T('Need More Help?'), '</h2>';
+    echo '<h2>', t('Need More Help?'), '</h2>';
     echo '<ul>';
-    echo Wrap(Anchor(T("Embedding Documentation"), 'http://docs.vanillaforums.com/features/embedding/'), 'li');
+    echo wrap(Anchor(t("Embedding Documentation"), 'http://docs.vanillaforums.com/features/embedding/'), 'li');
     echo '</ul>';
     ?>
 </div>
-<h1><?php echo T('Blog Comments'); ?></h1>
+<h1><?php echo t('Blog Comments'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 <div class="Info">
     <?php
-    echo T('AboutCommentEmbedding', "Vanilla can be used as a drop-in replacement for your blog's native commenting system. As a matter of fact, it can be used to add comments to any page on the web.");
+    echo t('AboutCommentEmbedding', "Vanilla can be used as a drop-in replacement for your blog's native commenting system. As a matter of fact, it can be used to add comments to any page on the web.");
     if (!$AllowEmbed) {
-        echo T('Enable embedding to use blog comments.', 'In order for this to work, you will need to enable embedding.');
-        echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently DISABLED.').'</span>', 'p');
-        echo Anchor('Enable Embedding', 'embed/comments/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
+        echo t('Enable embedding to use blog comments.', 'In order for this to work, you will need to enable embedding.');
+        echo wrap('<span style="background: #ff0;">'.t('Embedding is currently DISABLED.').'</span>', 'p');
+        echo anchor('Enable Embedding', 'embed/comments/enable/'.Gdn::session()->TransientKey(), 'SmallButton');
     } else {
-    echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently ENABLED.').'</span>', 'p');
-    echo Anchor('Disable Embedding', 'embed/comments/disable/'.Gdn::Session()->TransientKey(), 'SmallButton');
-    echo Wrap(T("Use the plugin for WordPress or our universal code for any other platform", "Use the WordPress plugin to set up Vanilla Comments on your blog, or use the universal code to set up Vanilla Comments on any other platform."), 'p');
+    echo wrap('<span style="background: #ff0;">'.t('Embedding is currently ENABLED.').'</span>', 'p');
+    echo anchor('Disable Embedding', 'embed/comments/disable/'.Gdn::session()->TransientKey(), 'SmallButton');
+    echo wrap(t("Use the plugin for WordPress or our universal code for any other platform", "Use the WordPress plugin to set up Vanilla Comments on your blog, or use the universal code to set up Vanilla Comments on any other platform."), 'p');
     ?>
 </div>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();
 ?>
     <div class="Tabs FilterTabs">
         <ul>
-            <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('WordPress Plugin'), 'embed/comments/wordpress'); ?></li>
-            <li<?php echo $this->EmbedType == 'universal' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Universal Code'), 'embed/comments/universal'); ?></li>
-            <li<?php echo $this->EmbedType == 'settings' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Comment Settings'), 'embed/comments/settings'); ?></li>
-            <li<?php echo $this->EmbedType == 'advanced' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Advanced Settings'), 'embed/advanced'); ?></li>
+            <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo anchor(t('WordPress Plugin'), 'embed/comments/wordpress'); ?></li>
+            <li<?php echo $this->EmbedType == 'universal' ? ' class="Active"' : ''; ?>><?php echo anchor(t('Universal Code'), 'embed/comments/universal'); ?></li>
+            <li<?php echo $this->EmbedType == 'settings' ? ' class="Active"' : ''; ?>><?php echo anchor(t('Comment Settings'), 'embed/comments/settings'); ?></li>
+            <li<?php echo $this->EmbedType == 'advanced' ? ' class="Active"' : ''; ?>><?php echo anchor(t('Advanced Settings'), 'embed/advanced'); ?></li>
         </ul>
     </div>
 <?php if ($this->EmbedType == 'wordpress') { ?>
-    <h1><?php echo T('Ready-made Vanilla Comments Plugin for WordPress'); ?></h1>
+    <h1><?php echo t('Ready-made Vanilla Comments Plugin for WordPress'); ?></h1>
     <div class="Info">
         <h2>Using WordPress?</h2>
 
         <p>If you want to use Vanilla Comments instead of your native WordPress comments, grab our ready-made plugin
             from WordPress.org for easy integration.</p>
     </div>
-    <?php echo Anchor('Get The Vanilla Forums Plugin from WordPress.org Now', 'http://wordpress.org/extend/plugins/vanilla-forums/', 'Button'); ?>
+    <?php echo anchor('Get The Vanilla Forums Plugin from WordPress.org Now', 'http://wordpress.org/extend/plugins/vanilla-forums/', 'Button'); ?>
     <div class="Info">
         <h2>Not Using WordPress?</h2>
 
         <p>If you are not using WordPress, you
-            can <?php echo Anchor('use the universal code', 'embed/comments/universal'); ?> for embedding Vanilla
+            can <?php echo anchor('use the universal code', 'embed/comments/universal'); ?> for embedding Vanilla
             Comments.</p>
     </div>
 <?php } else if ($this->EmbedType == 'settings') { ?>
@@ -62,17 +62,17 @@ echo $this->Form->Close();
             max-width: 500px;
         }
     </style>
-    <h1><?php echo T('Comment Settings'); ?></h1>
+    <h1><?php echo t('Comment Settings'); ?></h1>
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->open();
+    echo $this->Form->errors();
     ?>
     <ul>
         <li>
             <?php
             $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
             $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
-            echo $this->Form->Label('Comments per Page', 'Garden.Embed.CommentsPerPage');
+            echo $this->Form->label('Comments per Page', 'Garden.Embed.CommentsPerPage');
             echo $this->Form->DropDown('Garden.Embed.CommentsPerPage', $Options, $Fields);
             ?>
         </li>
@@ -80,7 +80,7 @@ echo $this->Form->Close();
             <?php
             $Options = array('desc' => 'Most recent first / comment form at top of list', 'asc' => 'Most recent last / comment form at bottom of list');
             $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
-            echo $this->Form->Label('Sort blog comments in the following order:', 'Garden.Embed.SortComments');
+            echo $this->Form->label('Sort blog comments in the following order:', 'Garden.Embed.SortComments');
             echo $this->Form->DropDown('Garden.Embed.SortComments', $Options, $Fields);
             ?>
         </li>
@@ -96,7 +96,7 @@ echo $this->Form->Close();
         </li>
     </ul>
     <?php
-    echo $this->Form->Close('Save');
+    echo $this->Form->close('Save');
 
 } else {
     ?>
@@ -129,7 +129,7 @@ echo $this->Form->Close();
             border-bottom: 0;
         }
     </style>
-    <h1><?php echo T('Use Vanilla as a commenting system in your site'); ?></h1>
+    <h1><?php echo t('Use Vanilla as a commenting system in your site'); ?></h1>
     <div class="Info">
         <p>You can use Vanilla as a commenting system for your website, and all
             contributed comments will also be present in your discussion forum. Vanilla
@@ -142,7 +142,7 @@ echo $this->Form->Close();
         <div class="CopyBox">&lt;div id="vanilla-comments">&lt;/div>
             &lt;script type="text/javascript">
             <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
-                var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // The full http url & path to your vanilla
+                var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla
                 forum
                 var vanilla_identifier = 'your-content-identifier'; // Your unique identifier for the content being
                 commented on</strong>
@@ -179,7 +179,7 @@ echo $this->Form->Close();
 
         <div class="CopyBox">&lt;script type="text/javascript">
             <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
-                var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // The full http url & path to your vanilla
+                var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla
                 forum</strong>
 
             /*** Optional Settings: customize the format of the comment counts. Html is allowed. */

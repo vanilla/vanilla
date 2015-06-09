@@ -14,19 +14,20 @@
 interface Gdn_IIdentity {
 
     /**
-     * Returns the unique id assigned to the user in the database (retrieved
-     * from the session cookie if the cookie authenticates) or FALSE if not
-     * found or authentication fails.
+     * Return the unique id assigned to a user in the database.
+     *
+     * This is retrieved from the session cookie if the cookie authenticates) or false if not found or authentication
+     * fails.
      *
      * @return int
      */
-    public function GetIdentity();
+    public function getIdentity();
 
     /**
      * Generates the user's session cookie.
      *
-     * @param int $UserID The unique id assigned to the user in the database.
-     * @param boolean $Persist Should the user's session remain persistent across visits?
+     * @param int $userID The unique id assigned to the user in the database.
+     * @param boolean $persist Should the user's session remain persistent across visits?
      */
-    public function SetIdentity($UserID, $Persist = FALSE);
+    public function setIdentity($userID, $persist = false);
 }

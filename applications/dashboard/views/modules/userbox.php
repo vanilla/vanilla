@@ -1,15 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
-$User = GetValue('User', $this->_Sender);
+$User = val('User', $this->_Sender);
 if ($User):
     echo '<div class="UserBox">';
-    echo UserPhoto($User);
+    echo userPhoto($User);
     echo '<div class="WhoIs">';
-    echo UserAnchor($User, 'Username');
+    echo userAnchor($User, 'Username');
     echo '<div class="Email">';
 
     // Only show the email address if allowed.
-    if (GetValue('UserID', $User) == Gdn::Session()->UserID || Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'))
-        echo GetValue('Email', $User, '');
+    if (val('UserID', $User) == Gdn::session()->UserID || Gdn::session()->checkPermission('Garden.PersonalInfo.View'))
+        echo val('Email', $User, '');
     else
         echo '&nbsp;';
 

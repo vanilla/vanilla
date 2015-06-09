@@ -17,11 +17,11 @@ class DiscussionFilterModule extends Gdn_Module {
         parent::__construct($Sender, 'Vanilla');
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         return parent::ToString();
     }
 }

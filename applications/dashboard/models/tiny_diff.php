@@ -75,8 +75,9 @@ class Tiny_diff {
         $diff = $this->diff(explode(PHP_EOL, $old), explode(PHP_EOL, $new));
         $result = '';
 
-        if ($mode == 'raw')
+        if ($mode == 'raw') {
             return $diff;
+        }
 
         foreach ($diff as $line) {
             if (is_array($line)) {

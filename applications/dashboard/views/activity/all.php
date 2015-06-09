@@ -1,37 +1,37 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <div class="ActivityFormWrap">
-    <h1 class="H"><?php echo $this->Data('Title'); ?></h1>
+    <h1 class="H"><?php echo $this->data('Title'); ?></h1>
 <?php
-include_once $this->FetchViewLocation('helper_functions');
+include_once $this->fetchViewLocation('helper_functions');
 
-$this->FireEvent('BeforeStatusForm');
-$Session = Gdn::Session();
-if ($Session->CheckPermission('Garden.Profiles.Edit')) {
+$this->fireEvent('BeforeStatusForm');
+$Session = Gdn::session();
+if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
-    echo $this->Form->Open(array('action' => Url('/activity/post/'.$this->Data('Filter')), 'class' => 'Activity'));
-    echo $this->Form->Errors();
-    echo $this->Form->TextBox('Comment', array('MultiLine' => TRUE, 'Wrap' => TRUE));
+    echo $this->Form->open(array('action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity'));
+    echo $this->Form->errors();
+    echo $this->Form->textBox('Comment', array('MultiLine' => true, 'Wrap' => TRUE));
 
     echo '<div class="Buttons">';
-    echo $this->Form->Button('Share', array('class' => 'Button Primary'));
+    echo $this->Form->button('Share', array('class' => 'Button Primary'));
     echo '</div>';
 
-    echo $this->Form->Close();
+    echo $this->Form->close();
     echo '</div>';
 }
 echo '</div>';
 echo '<ul class="DataList Activities">';
 
-$Activities = $this->Data('Activities', array());
+$Activities = $this->data('Activities', array());
 if (count($Activities) > 0) {
-    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
+    include($this->fetchViewLocation('activities', 'activity', 'dashboard'));
 } else {
     ?>
-<li><div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div></li>
+<li><div class="Empty"><?php echo t('Not much happening here, yet.'); ?></div></li>
    <?php
 }
 
 echo '</ul>';
 
 if (count($Activities) > 0)
-    PagerModule::Write(array('CurrentRecords' => count($Activities)));
+    PagerModule::write(array('CurrentRecords' => count($Activities)));

@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 
 if (!property_exists($this, 'ProfileUserID'))
     $this->ProfileUserID = '';
 
 if (!function_exists('WriteActivityComment'))
-    include($this->FetchViewLocation('helper_functions', 'activity'));
+    include($this->fetchViewLocation('helper_functions', 'activity'));
 
-if ($this->Data('Comment'))
-    WriteActivityComment($this->Data('Comment'), $this, $Session);
+if ($this->data('Comment'))
+    WriteActivityComment($this->data('Comment'), $this, $Session);

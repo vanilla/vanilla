@@ -16,28 +16,28 @@ interface Gdn_IModule {
     /**
      * Returns the name of the asset where this component should be rendered.
      */
-    public function AssetTarget();
+    public function assetTarget();
 
     /**
      * Returns the xhtml for this module as a fully parsed and rendered string.
      */
-    public function FetchView();
+    public function fetchView();
 
     /**
      * Returns the location of the view for this module in the filesystem.
      *
-     * @param string $View
-     * @param string $ApplicationFolder
+     * @param string $View The name of the view to lookup.
+     * @param string $ApplicationFolder The name of the application folder that contains the view.
      */
-    public function FetchViewLocation($View = '', $ApplicationFolder = '');
+    public function fetchViewLocation($View = '', $ApplicationFolder = '');
 
     /**
      * Returns the name of the module.
      */
-    public function Name();
+    public function name();
 
     /**
      * Renders the module.
      */
-    public function Render();
+    public function render();
 }

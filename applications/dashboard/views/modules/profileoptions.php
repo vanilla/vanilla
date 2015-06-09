@@ -3,13 +3,13 @@
 ?>
 <div class="ProfileOptions">
     <?php
-    $Controller = Gdn::Controller();
-    $Controller->FireEvent('BeforeProfileOptions');
+    $Controller = Gdn::controller();
+    $Controller->fireEvent('BeforeProfileOptions');
     echo ButtonGroup($Controller->EventArguments['MemberOptions'], 'NavButton MemberButtons');
     echo ' ';
     echo ButtonDropDown($Controller->EventArguments['ProfileOptions'],
         'NavButton ProfileButtons Button-EditProfile',
-        Sprite('SpEditProfile', 'Sprite16').' <span class="Hidden">'.T('Edit Profile').'</span>'
+        sprite('SpEditProfile', 'Sprite16').' <span class="Hidden">'.t('Edit Profile').'</span>'
     );
     ?>
 </div>

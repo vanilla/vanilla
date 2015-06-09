@@ -3,15 +3,15 @@
         <?php
         $Form = $this->Form;
         $Form->InputPrefix = '';
-        echo $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
+        echo $Form->open(array('action' => url('/search'), 'method' => 'get')),
         '<div class="SiteSearch InputAndButton">',
-        $Form->TextBox('Search'),
-        $Form->Button('Search', array('Name' => '')),
+        $Form->textBox('Search'),
+        $Form->button('Search', array('Name' => '')),
         '</div>',
-        $Form->Errors(),
-        $Form->Close();
+        $Form->errors(),
+        $Form->close();
         ?>
     </div>
 <?php
-$ViewLocation = $this->FetchViewLocation('results');
+$ViewLocation = $this->fetchViewLocation('results');
 include($ViewLocation);

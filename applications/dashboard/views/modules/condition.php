@@ -6,13 +6,13 @@ function _DN($Current, $Type) {
     return '';
 }
 
-function WriteConditionEdit($Condition, $Sender) {
+function writeConditionEdit($Condition, $Sender) {
     $Px = $Sender->Prefix;
     $Form = new Gdn_Form();
 
-    $Type = GetValue(0, $Condition, '');
-    $Field = GetValue(1, $Condition, '');
-    $Expr = GetValue(2, $Condition, '');
+    $Type = val(0, $Condition, '');
+    $Field = val(1, $Condition, '');
+    $Expr = val(2, $Condition, '');
 
     echo '<tr>';
 
@@ -35,7 +35,7 @@ function WriteConditionEdit($Condition, $Sender) {
 
     // Textbox field.
     echo '<div class="Cond_request"'._DN($Type, Gdn_Condition::REQUEST).'>',
-    $Form->TextBox($Px.'Field[]', array('Value' => $Type == Gdn_Condition::REQUEST ? $Field : ''));
+    $Form->textBox($Px.'Field[]', array('Value' => $Type == Gdn_Condition::REQUEST ? $Field : ''));
     '</div>';
 
     echo '</td>';
@@ -43,14 +43,14 @@ function WriteConditionEdit($Condition, $Sender) {
     // Expression.
     echo '<td>',
         '<div class="Cond_request"'._DN($Type, Gdn_Condition::REQUEST).'>',
-    $Form->TextBox($Px.'Expr[]', array('Value' => $Type == Gdn_Condition::REQUEST ? $Expr : '')),
+    $Form->textBox($Px.'Expr[]', array('Value' => $Type == Gdn_Condition::REQUEST ? $Expr : '')),
     '</div>',
     '</td>';
 
     // Buttons.
     echo '<td align="right">',
     '<a href="#" class="DeleteCondition">',
-    T('Delete'),
+    t('Delete'),
     '</a></td>';
 
     echo '</tr>';
@@ -61,9 +61,9 @@ function WriteConditionEdit($Condition, $Sender) {
     <table class="ConditionEdit">
         <thead>
         <tr>
-            <th width="30%"><?php echo T('Condition Type', 'Type'); ?></th>
-            <th width="30%"><?php echo T('Condition Field', 'Field'); ?></th>
-            <th width="30%"><?php echo T('Condition Expression', 'Value'); ?></th>
+            <th width="30%"><?php echo t('Condition Type', 'Type'); ?></th>
+            <th width="30%"><?php echo t('Condition Field', 'Field'); ?></th>
+            <th width="30%"><?php echo t('Condition Expression', 'Value'); ?></th>
             <th>&#160;</th>
         </tr>
         </thead>
@@ -85,6 +85,6 @@ function WriteConditionEdit($Condition, $Sender) {
         ?>
     </table>
     <div style="text-align: right; margin-top: 10px;">
-        <a class="AddCondition Button"><?php echo sprintf(T('Add %s'), T('Condition')); ?></a>
+        <a class="AddCondition Button"><?php echo sprintf(t('Add %s'), t('Condition')); ?></a>
     </div>
 </div>

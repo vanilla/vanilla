@@ -2,7 +2,7 @@
 /**
  * Get all tutorials, or a specific one.
  */
-function GetTutorials($TutorialCode = '') {
+function getTutorials($TutorialCode = '') {
     // Define all Tutorials
     $Tutorials = array(
         array(
@@ -70,14 +70,14 @@ function GetTutorials($TutorialCode = '') {
     }
 
     if ($TutorialCode != '') {
-        $Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
+        $Keys = consolidateArrayValuesByKey($Tutorials, 'Code');
         $Index = array_search($TutorialCode, $Keys);
         if ($Index === FALSE)
             return FALSE; // Not found!
 
         // Found it, so define it's thumbnail location
-        $Tutorial = GetValue($Index, $Tutorials);
-        $VideoID = GetValue('VideoID', $Tutorial);
+        $Tutorial = val($Index, $Tutorials);
+        $VideoID = val('VideoID', $Tutorial);
         try {
             $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
 

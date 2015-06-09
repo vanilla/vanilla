@@ -7,13 +7,13 @@
 if (!defined('APPLICATION')) {
     exit();
 }
-$UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
+$UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
-$Discussion = $this->Data('Discussion');
-$Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
+$Discussion = $this->data('Discussion');
+$Author = Gdn::userModel()->getID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
 // Prep event args.
-$CssClass = CssClass($Discussion, FALSE);
+$CssClass = CssClass($Discussion, false);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
 $this->EventArguments['CssClass'] = &$CssClass;
@@ -23,7 +23,7 @@ $this->EventArguments['Object'] = &$Discussion;
 $this->EventArguments['Type'] = 'Discussion';
 
 // Discussion template event
-$this->FireEvent('BeforeDiscussionDisplay');
+$this->fireEvent('BeforeDiscussionDisplay');
 ?>
 <div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
     <div class="Discussion">
@@ -32,27 +32,27 @@ $this->FireEvent('BeforeDiscussionDisplay');
             <span class="Author">
                <?php
                if ($UserPhotoFirst) {
-                   echo UserPhoto($Author);
-                   echo UserAnchor($Author, 'Username');
+                   echo userPhoto($Author);
+                   echo userAnchor($Author, 'Username');
                } else {
-                   echo UserAnchor($Author, 'Username');
-                   echo UserPhoto($Author);
+                   echo userAnchor($Author, 'Username');
+                   echo userPhoto($Author);
                }
                echo FormatMeAction($Discussion);
                ?>
             </span>
             <span class="AuthorInfo">
                <?php
-               echo WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-               echo WrapIf(htmlspecialchars(GetValue('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
-               $this->FireEvent('AuthorInfo');
+               echo WrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+               echo WrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+               $this->fireEvent('AuthorInfo');
                ?>
             </span>
             </div>
             <div class="Meta DiscussionMeta">
             <span class="MItem DateCreated">
                <?php
-               echo Anchor(Gdn_Format::Date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
+               echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
                ?>
             </span>
                 <?php
@@ -60,22 +60,22 @@ $this->FireEvent('BeforeDiscussionDisplay');
                 ?>
                 <?php
                 // Include source if one was set
-                if ($Source = GetValue('Source', $Discussion))
-                    echo ' '.Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem MItem-Source')).' ';
+                if ($Source = val('Source', $Discussion))
+                    echo ' '.Wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem MItem-Source')).' ';
 
                 // Category
-                if (C('Vanilla.Categories.Use')) {
+                if (c('Vanilla.Categories.Use')) {
                     echo ' <span class="MItem Category">';
-                    echo ' '.T('in').' ';
-                    echo Anchor(htmlspecialchars($this->Data('Discussion.Category')), CategoryUrl($this->Data('Discussion.CategoryUrlCode')));
+                    echo ' '.t('in').' ';
+                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), CategoryUrl($this->data('Discussion.CategoryUrlCode')));
                     echo '</span> ';
                 }
-                $this->FireEvent('DiscussionInfo');
-                $this->FireEvent('AfterDiscussionMeta'); // DEPRECATED
+                $this->fireEvent('DiscussionInfo');
+                $this->fireEvent('AfterDiscussionMeta'); // DEPRECATED
                 ?>
             </div>
         </div>
-        <?php $this->FireEvent('BeforeDiscussionBody'); ?>
+        <?php $this->fireEvent('BeforeDiscussionBody'); ?>
         <div class="Item-BodyWrap">
             <div class="Item-Body">
                 <div class="Message">
@@ -84,9 +84,9 @@ $this->FireEvent('BeforeDiscussionDisplay');
                     ?>
                 </div>
                 <?php
-                $this->FireEvent('AfterDiscussionBody');
+                $this->fireEvent('AfterDiscussionBody');
                 WriteReactions($Discussion);
-                if (GetValue('Attachments', $Discussion)) {
+                if (val('Attachments', $Discussion)) {
                     WriteAttachments($Discussion->Attachments);
                 }
                 ?>

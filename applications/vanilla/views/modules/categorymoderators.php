@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box Moderators">
-    <?php echo panelHeading(T('Moderators')); ?>
+    <?php echo panelHeading(t('Moderators')); ?>
     <ul class="PanelInfo">
         <?php
         foreach ($this->ModeratorData[0]->Moderators as $Mod) {

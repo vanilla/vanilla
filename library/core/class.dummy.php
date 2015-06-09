@@ -42,7 +42,7 @@ class Gdn_Dummy {
      * @static
      * @return Dummy The singleton instance of this class.
      */
-    public static function GetInstance() {
+    public static function getInstance() {
         if (!isset(self::$_Instance)) {
             self::$_Instance = new Gdn_Dummy();
         }

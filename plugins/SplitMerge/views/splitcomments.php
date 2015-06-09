@@ -1,28 +1,28 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
-$CountCheckedComments = GetValue('CountCheckedComments', $this->Data, 0);
+$CountCheckedComments = val('CountCheckedComments', $this->Data, 0);
 
-echo Wrap(sprintf(
-    T('Split %s to new discussion', 'You have chosen to split %s into a new discussion.'),
-    Plural($CountCheckedComments, '%s comment', '%s comments')
+echo wrap(sprintf(
+    t('Split %s to new discussion', 'You have chosen to split %s into a new discussion.'),
+    plural($CountCheckedComments, '%s comment', '%s comments')
 ), 'p');
 ?>
     <ul>
         <li>
             <?php
-            echo $this->Form->Label('New Discussion Topic', 'Name');
-            echo $this->Form->TextBox('Name');
+            echo $this->Form->label('New Discussion Topic', 'Name');
+            echo $this->Form->textBox('Name');
             ?>
         </li>
         <?php if ($this->ShowCategorySelector === TRUE) { ?>
             <li>
                 <?php
                 echo '<p><div class="Category">';
-                echo $this->Form->Label('Category', 'CategoryID'), ' ';
+                echo $this->Form->label('Category', 'CategoryID'), ' ';
                 echo $this->Form->CategoryDropDown();
                 echo '</div></p>';
                 ?>
@@ -30,4 +30,4 @@ echo Wrap(sprintf(
         <?php } ?>
     </ul>
 <?php
-echo $this->Form->Close('Create New Discussion');
+echo $this->Form->close('Create New Discussion');

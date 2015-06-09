@@ -480,9 +480,6 @@ class ProfileController extends Gdn_Controller {
             $this->Head->addTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
         }
 
-        // if ($this->User->UserID == Gdn::session()->UserID)
-        //    return $this->Notifications($Page);
-        // elseif (c('Garden.Profile.ShowActivities', true))
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
         } else {
@@ -1476,7 +1473,7 @@ class ProfileController extends Gdn_Controller {
             $UserID = Gdn::session()->UserID;
         }
 
-        if (($UserID != Gdn::session()->UserID || !Gdn::session()->UserID) && !Gdn::session()->checkPermission('Garden.Users.Edit')) {
+        if (($UserID != Gdn::session()->UserID || !Gdn::session()->UserID) && !checkPermission('Garden.Users.Edit')) {
             throw new Exception(t('You do not have permission to view other profiles.'), 401);
         }
 
@@ -1490,7 +1487,7 @@ class ProfileController extends Gdn_Controller {
 
         $PhotoUrl = $User['Photo'];
         if ($PhotoUrl && strpos($PhotoUrl, '//') == false) {
-            $PhotoUrl = url('/uploads/'.ChangeBasename($PhotoUrl, 'n%s'), true);
+            $PhotoUrl = url('/uploads/'.changeBasename($PhotoUrl, 'n%s'), true);
         }
         $User['Photo'] = $PhotoUrl;
 

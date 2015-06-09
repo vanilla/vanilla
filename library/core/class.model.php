@@ -187,7 +187,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->defineSchema();
 
         // See if a primary key value was posted and decide how to save
-        $PrimaryKeyVal = GetValue($this->PrimaryKey, $FormPostValues, false);
+        $PrimaryKeyVal = val($this->PrimaryKey, $FormPostValues, false);
         $Insert = $PrimaryKeyVal == false ? true : false;
         if ($Insert) {
             $this->addInsertFields($FormPostValues);
@@ -198,7 +198,7 @@ class Gdn_Model extends Gdn_Pluggable {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert) === true) {
             $Fields = $this->Validation->validationFields();
-            $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to insert or update the primary key
+            $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to insert or update the primary key
             if ($Insert === false) {
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {

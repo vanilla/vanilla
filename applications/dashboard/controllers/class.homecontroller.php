@@ -154,4 +154,14 @@ class HomeController extends Gdn_Controller {
             $this->RenderException(permissionException());
         }
     }
+
+    /**
+     * Provide a safe landing page for external redirects.
+     *
+     * @since 2.2
+     * @access public
+     */
+     public function leaving() {
+        $this->render();
+     }
 }

@@ -643,7 +643,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (defined('DELIVERY_TYPE_'.$Default)) {
                 $this->_DeliveryType = $Default;
             } else {
-                throw new Exception(sprintf(t('Attempted to set invalid DeliveryType value (%s).'), $Default));
+                // Throwing an exception this early pukes a stack trace.
+                // A better solution is to fall back to our default and ignore the stupid.
+                $this->_DeliveryType = DELIVERY_TYPE_ALL;
             }
         }
 

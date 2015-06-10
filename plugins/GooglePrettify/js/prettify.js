@@ -76,7 +76,7 @@
             return RegExp(n.join("|"), j ? "gi" : "g")
         }
 
-        function t(a, d) {
+        function T(a, d) {
             function g(a) {
                 var c = a.nodeType;
                 if (c == 1) {
@@ -226,7 +226,7 @@
         function K(a) {
             var d = a.h;
             try {
-                var g = t(a.c, a.i), b = g.a;
+                var g = T(a.c, a.i), b = g.a;
                 a.a = b;
                 a.d = g.d;
                 a.e = 0;
@@ -283,11 +283,11 @@
                 regexLiterals: !0
             }), F = {};
         p(X, ["default-code"]);
-        p(c([], [["pln", /^[^<?]+/], ["dec", /^<!\w[^>]*(?:>|$)/], ["com", /^<\!--[\S\s]*?(?:--\>|$)/], ["lang-", /^<\?([\S\s]+?)(?:\?>|$)/], ["lang-", /^<%([\S\s]+?)(?:%>|$)/], ["pun", /^(?:<[%?]|[%?]>)/], ["lang-",
+        p(C([], [["pln", /^[^<?]+/], ["dec", /^<!\w[^>]*(?:>|$)/], ["com", /^<\!--[\S\s]*?(?:--\>|$)/], ["lang-", /^<\?([\S\s]+?)(?:\?>|$)/], ["lang-", /^<%([\S\s]+?)(?:%>|$)/], ["pun", /^(?:<[%?]|[%?]>)/], ["lang-",
             /^<xmp\b[^>]*>([\S\s]+?)<\/xmp\b[^>]*>/i], ["lang-js", /^<script\b[^>]*>([\S\s]*?)(<\/script\b[^>]*>)/i], ["lang-css", /^<style\b[^>]*>([\S\s]*?)(<\/style\b[^>]*>)/i], ["lang-in.tag", /^(<\/?[a-z][^<>]*>)/i]]), ["default-markup", "htm", "html", "mxml", "xhtml", "xml", "xsl"]);
-        p(c([["pln", /^\s+/, q, " \t\r\n"], ["atv", /^(?:"[^"]*"?|'[^']*'?)/, q, "\"'"]], [["tag", /^^<\/?[a-z](?:[\w-.:]*\w)?|\/?>$/i], ["atn", /^(?!style[\s=]|on)[a-z](?:[\w:-]*\w)?/i], ["lang-uq.val", /^=\s*([^\s"'>]*(?:[^\s"'/>]|\/(?=\s)))/], ["pun", /^[/<->]+/],
+        p(C([["pln", /^\s+/, q, " \t\r\n"], ["atv", /^(?:"[^"]*"?|'[^']*'?)/, q, "\"'"]], [["tag", /^^<\/?[a-z](?:[\w-.:]*\w)?|\/?>$/i], ["atn", /^(?!style[\s=]|on)[a-z](?:[\w:-]*\w)?/i], ["lang-uq.val", /^=\s*([^\s"'>]*(?:[^\s"'/>]|\/(?=\s)))/], ["pun", /^[/<->]+/],
             ["lang-js", /^on\w+\s*=\s*"([^"]+)"/i], ["lang-js", /^on\w+\s*=\s*'([^']+)'/i], ["lang-js", /^on\w+\s*=\s*([^\s"'>]+)/i], ["lang-css", /^style\s*=\s*"([^"]+)"/i], ["lang-css", /^style\s*=\s*'([^']+)'/i], ["lang-css", /^style\s*=\s*([^\s"'>]+)/i]]), ["in.tag"]);
-        p(c([], [["atv", /^[\S\s]+/]]), ["uq.val"]);
+        p(C([], [["atv", /^[\S\s]+/]]), ["uq.val"]);
         p(v({keywords: M, hashComments: !0, cStyleComments: !0, types: R}), ["c", "cc", "cpp", "cxx", "cyc", "m"]);
         p(v({keywords: "null,true,false"}), ["json"]);
         p(v({keywords: O, hashComments: !0, cStyleComments: !0, verbatimStrings: !0, types: R}),
@@ -315,7 +315,7 @@
             regexLiterals: !0
         }), ["coffee"]);
         p(v({keywords: W, cStyleComments: !0, multilineStrings: !0}), ["rc", "rs", "rust"]);
-        p(c([], [["str", /^[\S\s]+/]]), ["regex"]);
+        p(C([], [["str", /^[\S\s]+/]]), ["regex"]);
         var Y = D.PR = {
             createSimpleLexer: C,
             registerLangHandler: p,

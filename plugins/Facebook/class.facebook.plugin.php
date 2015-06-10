@@ -317,7 +317,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".Wrap($this->_hetButton(), 'li', array('class' => 'Connect FacebookConnect'));
+            echo "\n".Wrap($this->_getButton(), 'li', array('class' => 'Connect FacebookConnect'));
         }
     }
 

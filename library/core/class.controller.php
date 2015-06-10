@@ -642,8 +642,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Use constants' name pattern instead of a strict whitelist for forwards-compatibility.
             if (defined('DELIVERY_TYPE_'.$Default)) {
                 $this->_DeliveryType = $Default;
-            } else {
-                throw new Exception(sprintf(t('Attempted to set invalid DeliveryType value (%s).'), $Default));
             }
         }
 

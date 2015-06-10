@@ -27,7 +27,7 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Delete a message.
      *
      * @param string $Where
      * @param bool $Limit
@@ -41,7 +41,8 @@ class MessageModel extends Gdn_Model {
     /**
      * Returns a single message object for the specified id or FALSE if not found.
      *
-     * @param int The MessageID to filter to.
+     * @param int $MessageID The MessageID to filter to.
+     * @return array Requested message.
      */
     public function getID($MessageID) {
         if (Gdn::cache()->activeEnabled()) {
@@ -54,8 +55,8 @@ class MessageModel extends Gdn_Model {
     /**
      * Build the Message's Location property and add it.
      *
-     * @param mixed $Message Array or object.
-     * @return mixed Array or object given with Location property/key added.
+     * @param array|object $Message Message data.
+     * @return array|object Message data with Location property/key added.
      */
     public function defineLocation($Message) {
         $Controller = val('Controller', $Message);
@@ -78,14 +79,14 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
+     * Whether we are in (or optionally below) a category.
      *
-     *
-     * @param $NeedleCategoryID
-     * @param $HaystackCategoryID
+     * @param int $NeedleCategoryID
+     * @param int $HaystackCategoryID
      * @param bool $IncludeSubcategories
      * @return bool
      */
-    protected function inCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
+    protected static function inCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
         if (!$HaystackCategoryID) {
             return true;
         }
@@ -113,7 +114,7 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Get what messages are active for a template location.
      *
      * @param $Location
      * @param array $Exceptions
@@ -151,7 +152,7 @@ class MessageModel extends Gdn_Model {
                 } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
                     $Visible = true;
 
-                if ($Visible && !$this->inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message))) {
+                if ($Visible && !self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message))) {
                     $Visible = false;
                 }
 
@@ -180,7 +181,7 @@ class MessageModel extends Gdn_Model {
             ->get()->resultArray();
 
         $Result = array_filter($Result, function ($Message) use ($CategoryID) {
-            return $this->inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+            return MessageModel::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
         });
 
         return $Result;
@@ -188,6 +189,8 @@ class MessageModel extends Gdn_Model {
 
     /**
      * Returns a distinct array of controllers that have enabled messages.
+     *
+     * @return array Locations with enabled messages.
      */
     public function getEnabledLocations() {
         $Data = $this->SQL
@@ -216,21 +219,21 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
+     * Get all messages or one message.
      *
-     *
-     * @param bool $ID
-     * @return array|mixed|null|type|void
+     * @param int|bool $ID ID of message to get.
+     * @return array|null
      */
     public static function messages($ID = false) {
         if ($ID === null) {
-            Gdn::cache()->Remove('Messages');
+            Gdn::cache()->remove('Messages');
             return;
         }
 
         $Messages = Gdn::cache()->get('Messages');
         if ($Messages === Gdn_Cache::CACHEOP_FAILURE) {
             $Messages = Gdn::sql()->get('Message', 'Sort')->resultArray();
-            $Messages = Gdn_DataSet::Index($Messages, array('MessageID'));
+            $Messages = Gdn_DataSet::index($Messages, array('MessageID'));
             Gdn::cache()->store('Messages', $Messages);
         }
         if ($ID === false) {
@@ -241,11 +244,11 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
+     * Save a message.
      *
-     *
-     * @param array $FormPostValues
+     * @param array $FormPostValues Message data.
      * @param bool $Settings
-     * @return unknown
+     * @return int The MessageID.
      */
     public function save($FormPostValues, $Settings = false) {
         // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
@@ -269,7 +272,7 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Save our current message locations in the config.
      */
     public function setMessageCache() {
         // Retrieve an array of all controllers that have enabled messages associated

@@ -22,7 +22,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * Remove plugins that are not mobile friendly!
      */
-    public function gdn_dispatcher_afterAnalyzeRequest_Handler($Sender) {
+    public function gdn_dispatcher_afterAnalyzeRequest_handler($Sender) {
         // Remove plugins so they don't mess up layout or functionality.
         $inPublicDashboard = ($Sender->application() == 'dashboard' && in_array($Sender->controller(), array('Activity', 'Profile', 'Search')));
         if (in_array($Sender->application(), array('vanilla', 'conversations')) || $inPublicDashboard) {

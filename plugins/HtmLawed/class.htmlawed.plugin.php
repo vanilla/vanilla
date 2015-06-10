@@ -9,18 +9,14 @@
 
 $PluginInfo['HtmLawed'] = array(
     'Description' => 'Adapts HtmLawed to work with Vanilla.',
-    'Version' => '1.1',
-    'RequiredApplications' => null,
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
+    'Version' => '1.1.1',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
     'Hidden' => true
 );
 
-Gdn::FactoryInstall('HtmlFormatter', 'HTMLawedPlugin', __FILE__, Gdn::FactorySingleton);
+Gdn::factoryInstall('HtmlFormatter', 'HTMLawedPlugin', __FILE__, Gdn::FactorySingleton);
 
 /**
  * Class HTMLawedPlugin

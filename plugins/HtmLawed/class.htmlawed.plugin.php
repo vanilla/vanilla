@@ -10,11 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 $PluginInfo['HtmLawed'] = array(
    'Description' => 'Adapts HtmLawed to work with Vanilla.',
-   'Version' => '1.0.1',
-   'RequiredApplications' => NULL,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
+   'Version' => '1.0.2',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com/profile/todd',

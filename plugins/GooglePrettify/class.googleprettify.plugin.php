@@ -11,7 +11,7 @@
 $PluginInfo['GooglePrettify'] = array(
     'Name' => 'Syntax Prettifier',
     'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
-    'Version' => '1.2',
+    'Version' => '1.2.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',

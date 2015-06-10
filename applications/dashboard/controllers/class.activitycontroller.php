@@ -225,7 +225,7 @@ class ActivityController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function domment() {
+    public function comment() {
         $this->permission('Garden.Profiles.Edit');
 
         $Session = Gdn::session();
@@ -278,6 +278,12 @@ class ActivityController extends Gdn_Controller {
         $this->render();
     }
 
+    /**
+     *
+     * 
+     * @param bool $Notify
+     * @param bool $UserID
+     */
     public function post($Notify = false, $UserID = false) {
         if (is_numeric($Notify)) {
             $UserID = $Notify;

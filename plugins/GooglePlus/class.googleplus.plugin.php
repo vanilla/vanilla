@@ -132,7 +132,17 @@ class GooglePlusPlugin extends Gdn_Plugin {
      */
     public function isConfigured() {
         $Result = c('Plugins.GooglePlus.ClientID') && c('Plugins.GooglePlus.Secret');
+        if(!$Result) {
+            return $Result;
+        }
         return $Result;
+        $Url = $this->authorizeUri();
+        $Ping = $this->curl($Url, 'GET', true);
+        if($Ping === 302) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -171,7 +181,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @return mixed
      * @throws Gdn_UserException
      */
-    public static function curl($Url, $Method = 'GET', $Data = array()) {
+    public static function curl($Url, $Method = 'GET', $Ping = fals) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -198,9 +208,13 @@ class GooglePlusPlugin extends Gdn_Plugin {
         }
 
         if ($HttpCode != 200) {
-            $Error = val('error', $Result, $Response);
+            if(!$Ping) {
+                $Error = val('error', $Result, $Response);
 
-            throw new Gdn_UserException($Error, $HttpCode);
+                throw new Gdn_UserException($Error, $HttpCode);
+            } else {
+                return $HttpCode;
+            }
         }
 
         return $Result;

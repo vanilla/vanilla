@@ -429,7 +429,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      */
-    public function celeteFiles() {
+    public function deleteFiles() {
         if (stringBeginsWith($this->ImportPath, 'Db:', true)) {
             return;
         }
@@ -455,7 +455,7 @@ class ImportModel extends Gdn_Model {
     /**
      * Remove the data from the appropriate tables when we are overwriting the forum.
      */
-    public function celeteOverwriteTables() {
+    public function deleteOverwriteTables() {
         $Tables = array('Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
             'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Rank', 'Poll', 'PollOption', 'PollVote', 'Role', 'UserAuthentication',
             'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');

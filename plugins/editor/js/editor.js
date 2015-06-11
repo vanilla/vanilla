@@ -1205,13 +1205,22 @@
                                     ? 400
                                     : payload.original_height;
 
+                                var payloadHeight = payload.original_height;
+                                var payloadWidth = payload.original_width;
+                                var editorWidth = $(editor.textarea.element).width();
+
+                                // Image max-width is 100%. Change the height to refect scaling down the width.
+                                if (editorWidth < payloadWidth) {
+                                    payloadHeight = (editorWidth * payload.original_height) / payload.original_width;
+                                }
+
                                 var imgTag = buildImgTag(payload.original_url, format);
 
                                 if (handleIframe) {
                                     editor.focus();
                                     editor.composer.commands.exec("insertImage", {src: payload.original_url, alt: ''});
                                     //editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-                                    wysiInsertAdjustHeight(editor, payload.original_height);
+                                    wysiInsertAdjustHeight(editor, payloadHeight);
                                 } else {
                                     try {
                                         // i don't know why adding [0] to this when iframe

@@ -377,6 +377,9 @@ pre.CodeBlock {
   padding: inherit;
   font: inherit;
   outline: none;
+  img {
+    max-width: 100%;
+  }
 }
 
 /**

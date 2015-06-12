@@ -216,8 +216,12 @@ class MessagesController extends ConversationsController {
             $this->permission('Conversations.Moderation.Manage');
         }
 
-        $Conversations = $this->ConversationModel->get2($UserID, $Offset, $Limit);
-        $this->setData('Conversations', $Conversations->resultArray());
+        $conversations = $this->ConversationModel->get2($UserID, $Offset, $Limit)->resultArray();
+
+        $this->EventArguments['Conversations'] = &$conversations;
+        $this->fireEvent('beforeMessagesAll');
+
+        $this->setData('Conversations', $conversations);
 
         // Get Conversations Count
         //$CountConversations = $this->ConversationModel->getCount($UserID);
@@ -229,7 +233,7 @@ class MessagesController extends ConversationsController {
         }
         $this->setData('_Page', $Page);
         $this->setData('_Limit', $Limit);
-        $this->setData('_CurrentRecords', count($Conversations->resultArray()));
+        $this->setData('_CurrentRecords', count($conversations));
 
         // Deliver json data if necessary
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
@@ -483,6 +487,9 @@ class MessagesController extends ConversationsController {
 
         // Last message user data
         Gdn::userModel()->joinUsers($Conversations, array('LastInsertUserID'));
+
+        $this->EventArguments['Conversations'] = &$Conversations;
+        $this->fireEvent('beforeMessagesPopin');
 
         // Join in the participants.
         $this->setData('Conversations', $Conversations);

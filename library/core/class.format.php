@@ -37,6 +37,9 @@ class Gdn_Format {
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
     );
 
+    /** @var array Different top-level spoiler css classes in Vanilla */
+    protected static $spoilerClasses = array('Spoiler', 'UserSpoiler');
+
     /**
      * The ActivityType table has some special sprintf search/replace values in the
      * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -955,6 +958,35 @@ class Gdn_Format {
     }
 
     /**
+     * Checks to see if $html has a spoiler element and replaces the element.
+     *
+     * @param string $html A html-formatted string
+     * @return string
+     */
+    protected static function replaceSpoilers($html) {
+        // Check if $html contains spoiler classes before we do the heavy lifting.
+        $found = false;
+        foreach(Gdn_Format::$spoilerClasses as $spoiler) {
+            if (strpos($html, $spoiler)) {
+                $found = true;
+            }
+        }
+        if (!$found) {
+            return $html;
+        }
+
+        // Transform $html into a dom object and replace the spoiler block.
+        if (!defined('HDOM_TYPE_ELEMENT')) {
+            require_once(PATH_LIBRARY . '/vendors/simplehtmldom/simple_html_dom.php');
+        }
+        $html = str_get_html($html);
+        foreach (Gdn_Format::$spoilerClasses as $spoiler) {
+            $html->find('.' . $spoiler, 0)->outertext = t('Spoiler Replacement', t('Spoiler'));
+        }
+        return $html;
+    }
+
+    /**
      * Format a string as plain text.
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
@@ -963,6 +995,7 @@ class Gdn_Format {
      */
     public static function plainText($Body, $Format = 'Html') {
         $Result = Gdn_Format::to($Body, $Format);
+        $Result = Gdn_Format::replaceSpoilers($Result);
 
         if ($Format != 'Text') {
             // Remove returns and then replace html return tags with returns.

@@ -3,7 +3,7 @@
         <?php
         echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
+        echo wrap(anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
         echo '</ul>';
         ?>
     </div>
@@ -29,9 +29,9 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 <?php
                 $Count = count($this->RegistrationMethods);
                 $i = 0;
-                $Alt = FALSE;
+                $Alt = false;
                 foreach ($this->RegistrationMethods as $Method => $Description) {
-                    $Alt = $Alt ? FALSE : TRUE;
+                    $Alt = $Alt ? false : true;
                     $CssClass = $Alt ? 'Alt' : '';
                     ++$i;
                     if ($Count == $i)
@@ -45,7 +45,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                             if ($MethodName == 'Captcha')
                                 $MethodName = 'Basic';
 
-                            echo $this->Form->Radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
+                            echo $this->Form->radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
                             ?></th>
                         <td class="Alt"><?php echo t($Description); ?></td>
                     </tr>
@@ -80,7 +80,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
         <li id="InvitationExpiration">
             <?php
             echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration');
-            echo $this->Form->DropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, array('value' => $this->InviteExpiration));
+            echo $this->Form->dropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, array('value' => $this->InviteExpiration));
             ?>
         </li>
         <li id="InvitationSettings">
@@ -105,9 +105,9 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 <?php
                 $i = 0;
                 $Count = $this->RoleData->numRows();
-                $Alt = FALSE;
+                $Alt = false;
                 foreach ($this->RoleData->result() as $Role) {
-                    $Alt = $Alt ? FALSE : TRUE;
+                    $Alt = $Alt ? false : true;
                     $CssClass = $Alt ? 'Alt' : '';
                     ++$i;
                     if ($Count == $i)
@@ -140,7 +140,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                     '</div>';
                 }
 
-                echo $this->Form->CheckBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
+                echo $this->Form->checkBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
                 ?>
             </div>
         </li>

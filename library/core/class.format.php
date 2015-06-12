@@ -964,24 +964,15 @@ class Gdn_Format {
      * @return string
      */
     protected static function replaceSpoilers($html) {
-        // Check if $html contains spoiler classes before we do the heavy lifting.
-        $found = false;
-        foreach(Gdn_Format::$spoilerClasses as $spoiler) {
-            if (strpos($html, $spoiler)) {
-                $found = true;
+        if (preg_match('/class="(User)?Spoiler"/i', $html)) {
+            // Transform $html into a dom object and replace the spoiler block.
+            if (!defined('HDOM_TYPE_ELEMENT')) {
+                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
-        }
-        if (!$found) {
-            return $html;
-        }
-
-        // Transform $html into a dom object and replace the spoiler block.
-        if (!defined('HDOM_TYPE_ELEMENT')) {
-            require_once(PATH_LIBRARY . '/vendors/simplehtmldom/simple_html_dom.php');
-        }
-        $html = str_get_html($html);
-        foreach (Gdn_Format::$spoilerClasses as $spoiler) {
-            $html->find('.' . $spoiler, 0)->outertext = t('Spoiler Replacement', t('Spoiler'));
+            $html = str_get_html($html);
+            foreach (Gdn_Format::$spoilerClasses as $spoiler) {
+                $html->find('.'.$spoiler, 0)->outertext = t('(Spoiler)');
+            }
         }
         return $html;
     }

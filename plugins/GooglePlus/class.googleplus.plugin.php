@@ -198,9 +198,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
         }
 
         if ($HttpCode != 200) {
-                $Error = val('error', $Result, $Response);
+            $Error = val('error', $Result, $Response);
 
-                throw new Gdn_UserException($Error, $HttpCode);
+            throw new Gdn_UserException($Error, $HttpCode);
         }
 
         return $Result;

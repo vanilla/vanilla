@@ -346,6 +346,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param $Args
      */
     public function base_beforeSignInButton_handler($Sender, $Args) {
+        if (!$this->isConfigured()) {
+            return;
+        }
         if (!$this->isDefault()) {
             echo ' '.$this->signInButton('icon').' ';
         }

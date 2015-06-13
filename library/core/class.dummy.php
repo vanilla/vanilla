@@ -22,7 +22,7 @@ class Gdn_Dummy {
     }
 
     public static function __callStatic($Name, $Arguments) {
-        return Gdn_Dummy::getInstance();
+        return self::getInstance();
     }
 
     public function __get($Name) {

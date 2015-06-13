@@ -309,7 +309,7 @@ class TaggingPlugin extends Gdn_Plugin {
     /**
      * Save tags when saving a discussion.
      */
-    public function aiscussionModel_afterSaveDiscussion_handler($Sender) {
+    public function discussionModel_afterSaveDiscussion_handler($Sender) {
         $FormPostValues = val('FormPostValues', $Sender->EventArguments, array());
         $DiscussionID = val('DiscussionID', $Sender->EventArguments, 0);
         $CategoryID = valr('Fields.CategoryID', $Sender->EventArguments, 0);

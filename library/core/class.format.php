@@ -955,6 +955,25 @@ class Gdn_Format {
     }
 
     /**
+     * Check to see if a string has spoilers and replace them with an innocuous string.
+     *
+     * @param string $html An HTML-formatted string.
+     * @param string $replaceWith The translation code to replace spoilers with.
+     * @return string Returns the html with spoilers removed.
+     */
+    protected static function replaceSpoilers($html, $replaceWith = '(Spoiler)') {
+        if (preg_match('/class="(User)?Spoiler"/i', $html)) {
+            // Transform $html into a dom object and replace the spoiler block.
+            if (!function_exists('str_get_html')) {
+                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
+            }
+            $html = str_get_html($html);
+            $html->find('.Spoiler,.UserSpoiler', 0)->outertext = t($replaceWith);
+        }
+        return $html;
+    }
+
+    /**
      * Format a string as plain text.
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
@@ -963,6 +982,7 @@ class Gdn_Format {
      */
     public static function plainText($Body, $Format = 'Html') {
         $Result = Gdn_Format::to($Body, $Format);
+        $Result = Gdn_Format::replaceSpoilers($Result);
 
         if ($Format != 'Text') {
             // Remove returns and then replace html return tags with returns.

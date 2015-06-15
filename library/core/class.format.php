@@ -37,9 +37,6 @@ class Gdn_Format {
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
     );
 
-    /** @var array Different top-level spoiler css classes in Vanilla */
-    protected static $spoilerClasses = array('Spoiler', 'UserSpoiler');
-
     /**
      * The ActivityType table has some special sprintf search/replace values in the
      * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -958,21 +955,20 @@ class Gdn_Format {
     }
 
     /**
-     * Checks to see if $html has a spoiler element and replaces the element.
+     * Check to see if a string has spoilers and replace them with an innocuous string.
      *
-     * @param string $html A html-formatted string
-     * @return string
+     * @param string $html An HTML-formatted string.
+     * @param string $replaceWith The translation code to replace spoilers with.
+     * @return string Returns the html with spoilers removed.
      */
-    protected static function replaceSpoilers($html) {
+    protected static function replaceSpoilers($html, $replaceWith = '(Spoiler)') {
         if (preg_match('/class="(User)?Spoiler"/i', $html)) {
             // Transform $html into a dom object and replace the spoiler block.
-            if (!defined('HDOM_TYPE_ELEMENT')) {
+            if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
             $html = str_get_html($html);
-            foreach (Gdn_Format::$spoilerClasses as $spoiler) {
-                $html->find('.'.$spoiler, 0)->outertext = t('(Spoiler)');
-            }
+            $html->find('.Spoiler,.UserSpoiler', 0)->outertext = t($replaceWith);
         }
         return $html;
     }

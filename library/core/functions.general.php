@@ -943,15 +943,17 @@ if (!function_exists('externalUrl')) {
      * @return string Returns the external URL.
      */
     function externalUrl($path) {
-        $Format = C('Garden.ExternalUrlFormat');
+        $urlFormat = C('Garden.ExternalUrlFormat');
 
-        if ($Format && !StringBeginsWith($path, 'http')) {
-            $Result = sprintf($Format, ltrim($path, '/'));
+        if ($urlFormat && !isUrl($path)) {
+            $result = sprintf($urlFormat, ltrim($path, '/'));
+        } elseif (stringBeginsWith($path, '//')) {
+            $result = Gdn::request()->scheme().':'.$path;
         } else {
-            $Result = Url($path, true);
+            $result = Url($path, true);
         }
 
-        return $Result;
+        return $result;
     }
 }
 

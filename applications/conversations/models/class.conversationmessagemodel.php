@@ -322,28 +322,30 @@ class ConversationMessageModel extends ConversationsModel {
 
             $this->fireEvent('AfterAdd');
 
-            $ActivityModel = new ActivityModel();
-            foreach ($NotifyUserIDs as $NotifyUserID) {
-                if ($Session->UserID == $NotifyUserID) {
+            $activityModel = new ActivityModel();
+            foreach ($NotifyUserIDs as $notifyUserID) {
+                if ($Session->UserID == $notifyUserID) {
                     continue; // don't notify self.
                 }
                 // Notify the users of the new message.
-                $ActivityID = $ActivityModel->add(
-                    $Session->UserID,
-                    'ConversationMessage',
-                    '',
-                    $NotifyUserID,
-                    '',
-                    "/messages/{$ConversationID}#{$MessageID}",
-                    false
+                $activity = array(
+                    'ActivityType' => 'ConversationMessage',
+                    'ActivityUserID' => val('InsertUserID', $Fields),
+                    'NotifyUserID' => $notifyUserID,
+                    'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,user} sent you a <a href="{Url,html}">message</a>'),
+                    'RecordType' => 'Conversation',
+                    'RecordID' => $ConversationID,
+                    'Story' => val('Body', $Fields, ''),
+                    'Format' => val('Format', $Fields, c('Garden.InputFormatter')),
+                    'Route' => "/messages/{$ConversationID}#{$MessageID}",
                 );
-                $Story = val('Body', $Fields, '');
 
-                if (c('Conversations.Subjects.Visible')) {
-                    $Story = concatSep("\n\n", val('Subject', $Conversation, ''), $Story);
+                if (c('Conversations.Subjects.Visible') && val('Subject', $Conversation, '')) {
+                    $activity['HeadlineFormat'] = val('Subject', $Conversation, '');
                 }
-                $ActivityModel->sendNotification($ActivityID, $Story);
+                $activityModel->queue($activity, 'ConversationMessage');
             }
+            $activityModel->saveQueue();
         }
         return $MessageID;
     }

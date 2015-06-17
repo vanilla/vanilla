@@ -121,7 +121,6 @@ class DropdownModule extends SortableModule {
      */
     public function __construct($triggerId, $triggerText = '', $dropdownCssClass = '', $listCssClass = '', $useCssPrefix = true) {
         parent::__construct('dropdown', true, $useCssPrefix);
-
         $this->triggerId = $triggerId;
         $this->trigger['triggerText'] = $triggerText;
         $this->dropdownCssClass = $dropdownCssClass;
@@ -141,6 +140,7 @@ class DropdownModule extends SortableModule {
      * @param string $type One of the triggerTypes - currently supports 'anchor' or 'button'.
      * @param string $class CSS class for the trigger.
      * @param string $icon Icon for the trigger.
+     * @return object $this The calling DropdownModule object.
      */
     public function setTrigger($text = '', $type = 'button', $class = 'btn-default', $icon = 'caret-down') {
         $this->trigger['triggerText'] = $text;
@@ -159,6 +159,7 @@ class DropdownModule extends SortableModule {
      * The default view requires these assets in order to render properly.
      *
      * @param $controller Controller object rendering the dropdown menu.
+     * @return object $this The calling DropdownModule object.
      */
     public function addBootstrapAssets($controller) {
         $controller->AddCssFile('dropdowns.css', 'dashboard');
@@ -167,5 +168,6 @@ class DropdownModule extends SortableModule {
         $controller->AddCssFile('type.css', 'dashboard');
 
         $controller->AddJsFile('dropdown.js', 'dashboard');
+        return $this;
     }
 }

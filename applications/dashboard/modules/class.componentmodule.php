@@ -23,7 +23,7 @@ abstract class ComponentModule extends Gdn_Module {
     private $renderAs = '';
 
     /**
-     * The constructor method should be called by all extending classes' constructors.
+     * Constructor. Should be called by all extending classes' constructors.
      * The view should be the default php view for any extending class.
      *
      * @param string $view The filename of the view to render, excluding the extension.
@@ -40,7 +40,7 @@ abstract class ComponentModule extends Gdn_Module {
      * @return string Badge HTML string.
      */
     public function badge($badge) {
-        return '<span class="badge">'.$badge.'</span>';
+        return ' <span class="badge">'.$badge.'</span> ';
     }
 
     /**
@@ -48,11 +48,11 @@ abstract class ComponentModule extends Gdn_Module {
      * A popin contains data that is injected after the page loads.
      * A badge generally designates a count, and displays with a contrasting background.
      *
-     * @param string $rel Callback endpoint for a popin.
+     * @param string $rel Endpoint for a popin.
      * @return string Popin HTML string.
      */
     public function popin($rel) {
-        return '<span class="badge Popin js-popin" rel="'.$rel.'"></span>';
+        return ' <span class="badge Popin js-popin" rel="'.$rel.'"></span> ';
     }
 
     /**
@@ -64,7 +64,7 @@ abstract class ComponentModule extends Gdn_Module {
      */
     public function icon($icon) {
         $icon = strtolower($icon);
-        return '<span class="icon icon-'.$icon.'"></span>';
+        return ' <span class="icon icon-'.$icon.'"></span> ';
     }
 
     /**

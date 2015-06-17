@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * A module for a sortable list.
+ * A component for a sortable list.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -11,24 +11,55 @@
 
 abstract class SortableModule extends ComponentModule {
 
+    /**
+     * @var array List of items to sort.
+     */
     public $items = array();
 
-    protected $keyNumber = 1;
+    /**
+     * @var int Index number to start the item* key-generation with.
+     */
+    private $keyNumber = 1;
 
-    public $useCssPrefix;
+    /**
+     * @var bool Whether to use CSS prefixes on the generated CSS classes for the items.
+     */
+    public $useCssPrefix = false;
 
-    public $headerCssClassPrefix;
-    public $linkCssClassPrefix;
-    public $dividerCssClassPrefix;
+    /**
+     * @var string CSS prefix for a header item.
+     */
+    public $headerCssClassPrefix = 'header';
 
+    /**
+     * @var string CSS prefix for a link item.
+     */
+    public $linkCssClassPrefix = 'link';
+
+    /**
+     * @var string CSS prefix for a divider item.
+     */
+    public $dividerCssClassPrefix = 'divider';
+
+    /**
+     * @var bool Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
+     */
     private $flatten;
-    private $isRendered = false;
 
-    /// Methods ///
+    /**
+     * @var bool Whether we have run the prepare method yet.
+     */
+    private $isPrepared = false;
 
+    /**
+     * Constructor. Should be called by all extending classes' constructors.
+     *
+     * @param string $view The filename of the view to render, excluding the extension.
+     * @param bool $flatten Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
+     * @param bool $useCssPrefix Whether to use CSS prefixes on the generated CSS classes for the items.
+     */
     public function __construct($view, $flatten, $useCssPrefix = false) {
         parent::__construct($view);
-//        $this->_ApplicationFolder = 'dashboard';
         $this->flatten = $flatten;
         $this->useCssPrefix = $useCssPrefix;
     }
@@ -36,10 +67,14 @@ abstract class SortableModule extends ComponentModule {
     /**
      * Add a divider to the items array.
      *
-     * @param string $key The key of the divider.
-     * @param array $options Options for the divider.
+     * @param bool $isAllowed Whether to actually add the item.
+     * @param string $key The item's key (for sorting and CSS targeting).
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param string $cssClass The divider's CSS class.
+     * @return object $this The calling object.
+     * @throws Exception
      */
-    public function addDivider($isAllowed = true, $key = '',  $sort = false, $cssClass = '') {
+    public function addDivider($isAllowed = true, $key = '',  $sort = array(), $cssClass = '') {
         if (!$isAllowed) {
             return $this;
         }
@@ -59,17 +94,18 @@ abstract class SortableModule extends ComponentModule {
     /**
      * Add a group to the items array.
      *
-     * @param array $group The group with the following key(s):
-     * - **text**: The text of the group heading.
-     * - **icon**: The icon class to appear by header.
-     * - **badge**: The header badge such as a count or alert.
-     * - **sort**: Specify a custom sort order for the item.
-     *    This can be either a number or an array in the form ('before|after', 'key').
-     * - **key**: Group key.
-     * - **class**: Header CSS class.
+     * @param string $text The display text for the group header.
+     * @param bool $isAllowed Whether to actually add the item.
+     * @param string $key The item's key (for sorting and CSS targeting).
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param string $icon Name of the icon for the item, excluding the 'icon-' prefix.
+     * @param string $badge Info to put into a badge, usually a number.
+     * @param string $popinRel Endpoint for a popin.
+     * @param string $cssClass The group header's CSS class.
+     * @return object $this The calling object.
+     * @throws Exception
      */
-
-    public function addGroup($text = '', $isAllowed = true, $key = '',  $sort = false, $icon = '', $badge = '', $popinRel = '', $cssClass = '') {
+    public function addGroup($text = '', $isAllowed = true, $key = '',  $sort = array(), $icon = '', $badge = '', $popinRel = '', $cssClass = '') {
         if (!$isAllowed) {
             return $this;
         }
@@ -92,21 +128,22 @@ abstract class SortableModule extends ComponentModule {
     }
 
     /**
-     * Add a link to the menu.
+     * Add a link to the items array.
      *
-     * @param string|array $key The key of the link. You can nest links in a group by using dot syntax to specify its key.
-     * @param array $link The link with the following keys:
-     * - **url**: The url of the link.
-     * - **text**: The text of the link.
-     * - **icon**: The icon class to appear by link.
-     * - **badge**: The link contain a badge. such as a count or alert.
-     * - **sort**: Specify a custom sort order for the item.
-     *    This can be either a number or an array in the form ('before|after', 'key').
-     * - **disabled**: Set to true to add disabled style to link.
-     * - **key**: Item key.
-     * - **class**: CSS class.
+     * @param string $text The display text for the link.
+     * @param string $url The destination url for the link.
+     * @param bool $isAllowed Whether to actually add the item.
+     * @param string $key The item's key (for sorting and CSS targeting).
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param string $icon Name of the icon for the item, excluding the 'icon-' prefix.
+     * @param string $badge Info to put into a badge, usually a number.
+     * @param string $popinRel Endpoint for a popin.
+     * @param bool $disabled Whether to disable the link.
+     * @param string $cssClass The link's CSS class.
+     * @return object $this The calling object.
+     * @throws Exception
      */
-    public function addLink($text, $url, $isAllowed = true, $key = false, $sort = false, $icon = '', $badge = '', $popinRel = '', $disabled = false, $cssClass = '') {
+    public function addLink($text, $url, $isAllowed = true, $key = '', $sort = array(), $icon = '', $badge = '', $popinRel = '', $disabled = false, $cssClass = '') {
         if (!$isAllowed) {
             return $this;
         }
@@ -138,24 +175,20 @@ abstract class SortableModule extends ComponentModule {
         return $this;
     }
 
-
+    /**
+     * Checks whether the items array is empty.
+     *
+     * @return bool Whether the items array is empty.
+     */
     public function hasItems() {
         return (!empty($this->items));
     }
 
-
     /**
-     * Add a list of links to the menu.
+     * Generate a key for an item if one does not exist, and add the property to the item.
      *
-     * @param array $links List of links
+     * @param array $item The item to generate and add a key for.
      */
-    public function addLinks($links) {
-        foreach($links as $link) {
-            $this->addLinkArray($link);
-        }
-        return $this;
-    }
-
     public function addKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
@@ -166,9 +199,9 @@ abstract class SortableModule extends ComponentModule {
     /**
      * Add an item to the items array.
      *
-     * @param string $type The type of item (link, group, or divider).
-     * @param string $key The item key. Dot syntax is allowed to nest items into groups.
-     * @param array $item The item to add.
+     * @param string $type The type of the item: link, group or divider.
+     * @param array $item The item to add to the array.
+     * @throws Exception
      */
     protected function addItem($type, $item) {
         $this->addKey($item);
@@ -226,12 +259,12 @@ abstract class SortableModule extends ComponentModule {
     }
 
     /**
-     * Adds CSS class[es] to an item, based on 'class' property of an item
-     * and also the 'key' property of an item. Prepends prefix to class names.
+     * Builds a CSS class for an item, based on the 'key' property of the item.
+     * Optionally prepends a prefix to generated class names.
      *
-     * @param string $prefix Prefix to add to class name.
-     * @param array $item Item to add CSS class to.
-     * @return string
+     * @param string $prefix The optional prefix to add to class name.
+     * @param array $item The item to generate CSS class for.
+     * @return string The generated CSS class.
      */
     protected function buildCssClass($prefix, $item) {
         $result = '';
@@ -249,27 +282,30 @@ abstract class SortableModule extends ComponentModule {
                 $result .= $prefix.str_replace('.', '-', val('key', $item));
             }
         }
-
         return trim($result);
     }
 
+    /**
+     * Checks whether the current request url matches an item's link url.
+     *
+     * @param array $item The item to check.
+     * @return bool Whether the current request url matches an item's link url.
+     */
     public function isActive($item) {
-        $HighlightRoute = Gdn_Url::Request();
-        $HighlightUrl = Url($HighlightRoute);
-
-        // Highlight the group.
-        return (val('url', $item) && val('url', $item) == $HighlightUrl);
+        $highlightRoute = Gdn_Url::request();
+        $highlightUrl = Url($highlightRoute);
+        return (val('linkUrl', $item) && Url(val('linkUrl', $item)) == $highlightUrl);
     }
 
     /**
-     * Sort the items in a given dataset (array).
+     * Recursive function to sort the items in a given array.
      *
-     * @param array $items
+     * @param array $items The items to sort.
      */
-    public static function sortItems(&$items) {
+    public function sortItems(&$items) {
         uasort($items, function($a, $b) use ($items) {
-            $sort_a = NavModule::sortItemsOrder($a, $items);
-            $sort_b = NavModule::sortItemsOrder($b, $items);
+            $sort_a = self::sortItemsOrder($a, $items);
+            $sort_b = self::sortItemsOrder($b, $items);
 
             if ($sort_a > $sort_b)
                 return 1;
@@ -289,10 +325,10 @@ abstract class SortableModule extends ComponentModule {
      *
      * @param array $item The item to get the sort order from.
      * @param array $items The entire list of items.
-     * @param int $depth The current recursive depth used to prevent inifinite recursion.
+     * @param int $depth The current recursive depth used to prevent infinite recursion.
      * @return number
      */
-    public static function sortItemsOrder($item, $items, $depth = 0) {
+    public function sortItemsOrder($item, $items, $depth = 0) {
         $default_sort = val('_sort', $item, 100);
 
         // Check to see if a custom sort has been specified.
@@ -307,10 +343,10 @@ abstract class SortableModule extends ComponentModule {
                 if (array_key_exists($key, $items)) {
                     switch ($op) {
                         case 'after':
-                            return NavModule::sortItemsOrder($items[$key], $items, $depth + 1) + 1000;
+                            return self::sortItemsOrder($items[$key], $items, $depth + 1) + 1000;
                         case 'before':
                         default:
-                            return NavModule::sortItemsOrder($items[$key], $items, $depth + 1) - 1000;
+                            return self::sortItemsOrder($items[$key], $items, $depth + 1) - 1000;
                     }
                 }
             }
@@ -318,37 +354,49 @@ abstract class SortableModule extends ComponentModule {
         return $default_sort * 10000 + $default_sort;
     }
 
+    /**
+     * Prepares the items array for output by sorting, optionally flattening,
+     * and making the index values of the items array numeric.
+     *
+     * @return bool Whether to render the component.
+     */
     public function prepare() {
-        if ($this->isRendered) {
+        if ($this->isPrepared) {
             return;
         }
-        $this->isRendered = true;
+        $this->isPrepared = true;
         $this->sortItems($this->items);
         if ($this->flatten) {
             $this->items = $this->flattenArray($this->items);
         }
         else {
-            $this->items = $this->numericItemKeys($this->items);
+            $this->items = $this->resetArrayIndices($this->items);
         }
-
         return !empty($this->items);
     }
 
-    public function numericItemKeys($items) {
-        foreach ($items as $key => &$item) {
-            unset($item['_sort'], $item['key']);
+    /**
+     * Recursive function that resets the indices of the items array to
+     * be numeric. Necessary for mustache logic.
+     *
+     * @param array $items The items array to reset indices on.
+     * @return array The updated items array.
+     */
+    public function resetArrayIndices($items) {
+        foreach ($items as $index => &$item) {
+            unset($item['_sort'], $item['key']); //remove data we don't need anymore
 
-            // remove empty groups
+            // Remove empty groups.
             if (val('type', $item) == 'group' && !val('items', $item)) {
-                unset($items[$key]);
+                unset($items[$index]);
             }
-
             if (val('items', $item)) {
-                $item['items'] = $this->numericItemKeys($item['items']);
+                $item['items'] = $this->resetArrayIndices($item['items']);
                 //for mustache logic
                 $item['hasChildren'] = true;
             }
             else {
+                //for mustache logic
                 $item['hasChildren'] = false;
             }
         }
@@ -356,10 +404,11 @@ abstract class SortableModule extends ComponentModule {
     }
 
     /**
-     * Creates flattened array of menu items.
+     * Creates a flattened array of menu items.
+     * Useful for lists like dropdown menu, where nesting lists is not necessary.
      *
-     * @param array $items
-     * @return array
+     * @param array $items The item list to flatten.
+     * @return array The flattened items list.
      */
     public function flattenArray($items) {
         $newitems = array();

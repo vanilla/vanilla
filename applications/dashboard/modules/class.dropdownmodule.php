@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * A module for a dropdown.
+ * A dropdown menu component.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -10,7 +10,7 @@
  */
 
 /**
- * A flawlessly configurable module for a dropdown menu.
+ * A flawlessly configurable dropdown menu component.
  *
  * The module includes a dropdown trigger and menu items. Menu items can be
  *
@@ -32,7 +32,6 @@
  *
  *  $dropdown = new DropdownModule('my-dropdown', 'Trigger Name');
  *  $dropdown->addBootstrapAssets($this);
- *  $dropdown->setView('dropdown-legacy');
  *  $dropdown->setTrigger('A New Name', 'button', 'btn-default', 'caret-down')
  *  ->addLink('Link 1', '#') // automatically creates key: item1
  *  ->addDivider() // automatically creates key: item2
@@ -66,22 +65,28 @@
  *  Link 6
  *  Link 7
  *
- * The view is currently a mustache template, which requires the Mustache rendering plugin to be enabled.
  *
  */
 class DropdownModule extends SortableModule {
 
     /**
-     * @var string The id of the trigger.
+     * @var string The id value of the trigger.
      */
     public $triggerId;
 
-
     /**
-     * @var array Collection of trigger attributes.
+     * @var array Collection of attributes for the dropdown menu trigger.
+     * - **type**: string - One of the $triggerTypes.
+     * - **isButton**: bool - Helper flag for Mustache template rendering.
+     * - **isAnchor**: bool - Helper flag for Mustache template rendering.
+     * - **triggerText**: string - Text on the trigger.
+     * - **triggerCssClass**: string - CSS class for the trigger.
+     * - **triggerIcon**: string - Icon for the trigger.
      */
     public $trigger = array('type' => 'button',
                             'isButton' => true,
+                            'isAnchor' => false,
+                            'triggerText' => '',
                             'triggerCssClass' => 'btn-default',
                             'triggerIcon' => 'caret-down');
 
@@ -91,31 +96,40 @@ class DropdownModule extends SortableModule {
     private $triggerTypes = array('button', 'anchor');
 
     /**
-     * @var string The css class of the menulist <ul> block, if any.
-     * Bootstrap supports 'dropdown-menu-right' to align the dropdown box to the right of its container
+     * @var string A potential CSS class of the dropdown menu wrapper container.
      */
-    public $listCssClass = '';
-
     public $dropdownCssClass;
 
     /**
-     * @var string The top level html wrapper element
+     * @var string A potential CSS class of the list <ul> block.
+     */
+    public $listCssClass = ''; // Twitter Bootstrap supports 'dropdown-menu-right' to align the dropdown box to the right of its container.
+
+    /**
+     * @var string The dropdown menu wrapper container element tag.
      */
     public $tag = 'div';
 
-    /// Methods ///
-
-    public function __construct($triggerId, $triggerText = '', $class = '', $listCssClass = '', $useCssPrefix = false) {
+    /**
+     * Constructor.
+     *
+     * @param string $triggerId The id value of the trigger.
+     * @param string $triggerText Text on the trigger.
+     * @param string $dropdownCssClass A potential CSS class of the dropdown menu wrapper container.
+     * @param string $listCssClass A potential CSS class of the list <ul> block.
+     * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
+     */
+    public function __construct($triggerId, $triggerText = '', $dropdownCssClass = '', $listCssClass = '', $useCssPrefix = true) {
         parent::__construct('dropdown', true, $useCssPrefix);
 
-        $this->trigger['triggerText'] = $triggerText;
-        $this->listCssClass = trim($listCssClass);
         $this->triggerId = $triggerId;
-        $this->dropdownCssClass = $class;
+        $this->trigger['triggerText'] = $triggerText;
+        $this->dropdownCssClass = $dropdownCssClass;
+        $this->listCssClass = trim($listCssClass);
 
         if ($useCssPrefix) {
             $this->headerCssClassPrefix = 'dropdown-header';
-            $this->linkCssClassPrefix = 'dropdown-link';
+            $this->linkCssClassPrefix = 'dropdown-menu-link';
             $this->dividerCssClassPrefix = 'divider';
         }
     }
@@ -123,12 +137,12 @@ class DropdownModule extends SortableModule {
     /**
      * Configure the trigger.
      *
-     * @param string $text Text on the button or anchor.
-     * @param string $type Trigger type - currently supports 'anchor' or 'button'.
-     * @param string $class CSS class on button or anchor tag.
-     * @param string $icon Icon span CSS class.
+     * @param string $text Text on the trigger.
+     * @param string $type One of the triggerTypes - currently supports 'anchor' or 'button'.
+     * @param string $class CSS class for the trigger.
+     * @param string $icon Icon for the trigger.
      */
-    public function setTrigger($text, $type = 'button', $class = 'btn-default', $icon = 'caret-down') {
+    public function setTrigger($text = '', $type = 'button', $class = 'btn-default', $icon = 'caret-down') {
         $this->trigger['triggerText'] = $text;
         $this->trigger['type'] = in_array($type, $this->triggerTypes) ? $type : 'button';
         $this->trigger['triggerIcon'] = $icon;
@@ -140,6 +154,12 @@ class DropdownModule extends SortableModule {
         return $this;
     }
 
+    /**
+     * Adds necessary Twitter Bootstrap assets for the dropdown menu to render.
+     * The default view requires these assets in order to render properly.
+     *
+     * @param $controller Controller object rendering the dropdown menu.
+     */
     public function addBootstrapAssets($controller) {
         $controller->AddCssFile('dropdowns.css', 'dashboard');
         $controller->AddCssFile('buttons.css', 'dashboard');

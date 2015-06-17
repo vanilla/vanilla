@@ -304,8 +304,8 @@ abstract class SortableModule extends ComponentModule {
      */
     public function sortItems(&$items) {
         uasort($items, function($a, $b) use ($items) {
-            $sort_a = self::sortItemsOrder($a, $items);
-            $sort_b = self::sortItemsOrder($b, $items);
+            $sort_a = $this->sortItemsOrder($a, $items);
+            $sort_b = $this->sortItemsOrder($b, $items);
 
             if ($sort_a > $sort_b)
                 return 1;
@@ -343,10 +343,10 @@ abstract class SortableModule extends ComponentModule {
                 if (array_key_exists($key, $items)) {
                     switch ($op) {
                         case 'after':
-                            return self::sortItemsOrder($items[$key], $items, $depth + 1) + 1000;
+                            return $this->sortItemsOrder($items[$key], $items, $depth + 1) + 1000;
                         case 'before':
                         default:
-                            return self::sortItemsOrder($items[$key], $items, $depth + 1) - 1000;
+                            return $this->sortItemsOrder($items[$key], $items, $depth + 1) - 1000;
                     }
                 }
             }

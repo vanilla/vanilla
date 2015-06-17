@@ -8,7 +8,7 @@
 // Define the plugin:
 $PluginInfo['Debugger'] = array(
     'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
-    'Version' => '1.1',
+    'Version' => '1.1.1',
     'RegisterPermissions' => array('Plugins.Debugger.View', 'Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
     'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
     'Author' => "Mark O'Sullivan",
@@ -27,10 +27,6 @@ class DebuggerPlugin extends Gdn_Plugin {
      */
     public function __construct() {
         parent::__construct();
-        $tmp = Gdn::factoryOverwrite(TRUE);
-        Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
-        Gdn::factoryOverwrite($tmp);
-        unset($tmp);
     }
 
     /**
@@ -55,6 +51,20 @@ class DebuggerPlugin extends Gdn_Plugin {
         }
 
         require $Sender->fetchViewLocation('Debug', '', 'plugins/Debugger');
+    }
+
+    /**
+     * Register the debug database that captures the queries.
+     *
+     * This event happens as early as possible so that all queries can be captured.
+     *
+     * @param Gdn_PluginManager $sender The {@link Gdn_PluginManager} firing the event.
+     */
+    public function gdn_pluginManager_afterStart_handler($sender) {
+        $tmp = Gdn::factoryOverwrite(true);
+        Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryOverwrite($tmp);
+        unset($tmp);
     }
 
     /**

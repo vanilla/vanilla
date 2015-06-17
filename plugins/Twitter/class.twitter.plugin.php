@@ -11,7 +11,7 @@
 $PluginInfo['Twitter'] = array(
     'Name' => 'Twitter Social Connect',
     'Description' => 'Users may sign into your site using their Twitter account.',
-    'Version' => '1.1.9',
+    'Version' => '1.1.10',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
     'SettingsUrl' => '/dashboard/social/twitter',
@@ -223,7 +223,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Args
      * @throws Gdn_UserException
      */
-    public function siscussionModel_afterSaveDiscussion_handler($Sender, $Args) {
+    public function discussionModel_afterSaveDiscussion_handler($Sender, $Args) {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }

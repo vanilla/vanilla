@@ -1,0 +1,43 @@
+<{{tag}} class="dropdown {{dropdownCssClass}}">
+  {{#trigger}}
+    {{#isButton}}
+      <button id="{{triggerId}}" class="btn dropdown-toggle {{triggerCssClass}}" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+         {{triggerText}}
+         {{#triggerIcon}}
+             <span class="icon icon-{{triggerIcon}}"></span>
+         {{/triggerIcon}}
+      </button>
+    {{/isButton}}
+    {{#isAnchor}}
+      <a id="{{triggerId}}" class="{{triggerCssClass}}" data-target="#" href="/" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+         {{triggerText}}
+         {{#triggerIcon}}
+             <span class="icon icon-{{triggerIcon}}"></span>
+         {{/triggerIcon}}
+      </a>
+    {{/isAnchor}}
+  {{/trigger}}
+   <ul class="dropdown-menu {{listCssClass}}" role="menu" aria-labelledby="{{triggerId}}">
+      {{#items}}
+         {{#isGroup}}
+             <li role="presentation" class="dropdown-header {{headerCssClass}}">
+               {{#headerIcon}}
+                   <span class="icon icon-{{headerIcon}}"></span>
+               {{/headerIcon}}
+               {{headerText}}
+               {{#headerBadge}}
+                   <span class="badge">{{headerBadge}}</span>
+               {{/headerBadge}}
+             </li>
+         {{/isGroup}}
+         {{#isLink}}
+             <li role="presentation" {{#listItemCssClass}}class="{{listItemCssClass}}"{{/listItemCssClass}}>
+               <a role="menuitem" class="dropdown-menu-link {{linkCssClass}}" tabindex="-1" href="{{linkUrl}}">{{#linkIcon}}<span class="icon icon-{{linkIcon}}"></span>{{/linkIcon}}{{linkText}}{{#linkBadge}}<span class="badge">{{linkBadge}}</span>{{/linkBadge}}</a>
+             </li>
+         {{/isLink}}
+         {{#isDivider}}
+             <li role="presentation" class="divider {{dividerCssClass}}"></li>
+         {{/isDivider}}
+      {{/items}}
+   </ul>
+</{{tag}}>

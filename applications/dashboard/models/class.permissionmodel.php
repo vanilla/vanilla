@@ -70,6 +70,32 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * Add the permissions from one permission array to another.
+     *
+     * @param array $perms1 The permissions to be added to.
+     * @param array $perms2 The permissions to add.
+     * @return array Returns an array with all of the permissions in both permissions arrays.
+     */
+    public static function addPermissions($perms1, $perms2) {
+        // Union the global permissions.
+        $result = array_unique(array_merge(array_filter($perms1, 'is_string'), array_filter($perms2, 'is_string')));
+
+        // Union the junction permissions.
+        $junctions1 = array_filter($perms1, 'is_array');
+        $junctions2 = array_filter($perms2, 'is_array');
+        foreach ($junctions2 as $key => $ids) {
+            if (empty($junctions1[$key])) {
+                $junctions1[$key] = $ids;
+            } else {
+                $junctions1[$key] = array_unique(array_merge($junctions1[$key], $ids));
+            }
+        }
+
+        $result = array_merge($result, $junctions1);
+        return $result;
+    }
+
+    /**
      * Populate a list of default permissions, per type.
      *
      * @param bool $ResetDefaults If we already have defaults, should they be discarded?
@@ -654,6 +680,40 @@ class PermissionModel extends Gdn_Model {
         $Result = array_merge($Result, $JunctionPermissions);
 
         return $Result;
+    }
+
+    /**
+     * Get the permissions for one or more roles.
+     *
+     * @param int $roleID The role to get the permissions for.
+     * @return array Returns a permission array suitable for use in a session.
+     */
+    public function getPermissionsByRole($roleID) {
+        $inc = Gdn::userModel()->getPermissionsIncrement();
+        $key = "perms:$inc:role:$roleID";
+
+        $permissions = Gdn::cache()->get($key);
+        if ($permissions === Gdn_Cache::CACHEOP_FAILURE) {
+            $sql = clone $this->SQL;
+            $sql->reset();
+
+            // Select all of the permission columns.
+            $PermissionColumns = $this->PermissionColumns();
+            foreach ($PermissionColumns as $ColumnName => $Value) {
+                $sql->select('p.`'.$ColumnName.'`', 'MAX');
+            }
+
+            $sql->from('Permission p')
+                ->where('p.RoleID', $roleID)
+                ->select(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'))
+                ->groupBy(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'));
+
+            $permissions = $sql->get()->resultArray();
+            $permissions = UserModel::compilePermissions($permissions);
+            Gdn::cache()->store($key, $permissions);
+        }
+
+        return $permissions;
     }
 
     /**

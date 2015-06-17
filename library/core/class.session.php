@@ -45,6 +45,16 @@ class Gdn_Session {
         $this->_TransientKey = false;
     }
 
+
+    /**
+     * Add the permissions from a permissions array to this session's permissions.
+     *
+     * @param array $perms The permissions to add.
+     */
+    public function addPermissions($perms) {
+        $this->_Permissions = PermissionModel::addPermissions($this->_Permissions, $perms);
+    }
+
     /**
      * Checks the currently authenticated user's permissions for the specified
      * permission. Returns a boolean value indicating if the action is

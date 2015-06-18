@@ -647,7 +647,7 @@ class UserModel extends Gdn_Model {
      */
     public function synchUser($CurrentUser, $NewUser, $Force = false) {
         deprecated('UserModel::synchUser', 'UserModel::syncUser');
-        $this->syncUser($CurrentUser, $NewUser, $Force);
+        return $this->syncUser($CurrentUser, $NewUser, $Force);
     }
 
     /**

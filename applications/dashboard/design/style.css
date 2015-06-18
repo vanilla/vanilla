@@ -2444,13 +2444,6 @@ mark {
     max-width: 100%;
 }
 
-.Message .ImageResized {
-    font-size: 11px;
-    font-weight: normal;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
 /* =============================================================== Categories */
 .ChildCategories {
     border-top: 1px dotted #ddd;
@@ -5446,10 +5439,6 @@ input + .ReactSprite {
 .Video.YouTube .VideoPreview img {
     max-width: 100%;
     height: auto !important;
-}
-
-.Video.YouTube .VideoPreview .ImageResized {
-    display: none;
 }
 
 /* For vimeo/other embeds */

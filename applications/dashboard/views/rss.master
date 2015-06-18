@@ -22,5 +22,6 @@
          */
          $this->RenderAsset('Content');
       ?>
+   <language><?php echo Gdn::Locale()->Locale; ?></language>
    </channel>
 </rss>

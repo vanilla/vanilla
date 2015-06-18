@@ -64,7 +64,7 @@ class DiscussionController extends VanillaController {
         }
 
         if (!is_object($this->Discussion)) {
-            throw new Exception(sprintf(t('%s Not Found'), t('Discussion')), 404);
+            throw notFoundException('Discussion');
         }
 
         // Define the query offset & limit.

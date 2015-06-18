@@ -585,7 +585,7 @@ if (!function_exists('changeBasename')) {
 // Smarty
 if (!function_exists('checkPermission')) {
     function checkPermission($PermissionName, $Type = '') {
-        $Result = Gdn::Session()->CheckPermission($PermissionName, false, $Type ? 'Category' : '', $Type);
+        $Result = Gdn::session()->checkPermission($PermissionName, false, $Type ? 'Category' : '', $Type);
         return $Result;
     }
 }
@@ -593,8 +593,8 @@ if (!function_exists('checkPermission')) {
 // Negative permission check
 if (!function_exists('checkRestriction')) {
     function checkRestriction($PermissionName) {
-        $Result = Gdn::Session()->CheckPermission($PermissionName);
-        $Unrestricted = Gdn::Session()->CheckPermission('Garden.Admin.Only');
+        $Result = Gdn::session()->checkPermission($PermissionName);
+        $Unrestricted = Gdn::session()->checkPermission('Garden.Admin.Only');
         return $Result && !$Unrestricted;
     }
 }
@@ -602,7 +602,7 @@ if (!function_exists('checkRestriction')) {
 // Smarty sux
 if (!function_exists('multiCheckPermission')) {
     function multiCheckPermission($PermissionName) {
-        $Result = Gdn::Session()->CheckPermission($PermissionName, false);
+        $Result = Gdn::session()->checkPermission($PermissionName, false);
         return $Result;
     }
 }

@@ -16,8 +16,6 @@
  * This is a static class that hooks into the SPL autoloader.
  */
 class Gdn_Autoloader {
-
-    const CONTEXT_CORE = 'core';
     const CONTEXT_APPLICATION = 'application';
     const CONTEXT_PLUGIN = 'plugin';
     const CONTEXT_LOCALE = 'locale';
@@ -572,7 +570,6 @@ class Gdn_Autoloader {
     public static function start() {
 
         self::$prefixes = array(
-            self::CONTEXT_CORE => 'c',
             self::CONTEXT_APPLICATION => 'a',
             self::CONTEXT_PLUGIN => 'p',
             self::CONTEXT_THEME => 't'
@@ -589,11 +586,6 @@ class Gdn_Autoloader {
 
         // Register autoloader with the SPL
         spl_autoload_register(array('Gdn_Autoloader', 'lookup'));
-
-        // Configure library/core and library/database
-        self::registerMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/core');
-        self::registerMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/database');
-        self::registerMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/vendors');
 
         // Register shutdown function to auto save changed cache files
         register_shutdown_function(array('Gdn_Autoloader', 'shutdown'));

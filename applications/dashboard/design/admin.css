@@ -2461,6 +2461,10 @@ ol.Sortable {
     display: block;
 }
 
+.FeedItem h2 {
+    margin-bottom: 0;
+}
+
 .Selected {
     background: #FFFF99 !Important;
 }

@@ -319,7 +319,7 @@ class Gdn_Autoloader {
      * @param type $MapRootLocation
      * @return Gdn_Autoloader_Map
      */
-   public static function getMap($MapType, $ContextType, $Extension = self::CONTEXT_PLUGIN, $MapRootLocation = PATH_CACHE) {
+    public static function getMap($MapType, $ContextType, $Extension = self::CONTEXT_PLUGIN, $MapRootLocation = PATH_CACHE) {
         $MapHash = self::makeMapHash($MapType, $ContextType, $Extension, $MapRootLocation);
         return self::map($MapHash);
     }
@@ -534,7 +534,7 @@ class Gdn_Autoloader {
      * @param $ContextType
      * @param string $Extension
      */
-   public static function forceIndex($MapType, $ContextType, $Extension = self::CONTEXT_PLUGIN) {
+    public static function forceIndex($MapType, $ContextType, $Extension = self::CONTEXT_PLUGIN) {
         $Map = self::getMap($MapType, $ContextType, $Extension);
         $Map->index();
     }

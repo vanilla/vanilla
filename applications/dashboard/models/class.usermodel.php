@@ -643,6 +643,20 @@ class UserModel extends Gdn_Model {
      * @param array $NewUser Data to overwrite user with.
      * @param bool $Force
      * @since 2.1
+     * @deprecated since 2.2.
+     */
+    public function synchUser($CurrentUser, $NewUser, $Force = false) {
+        deprecated('UserModel::synchUser', 'UserModel::syncUser');
+        $this->syncUser($CurrentUser, $NewUser, $Force);
+    }
+
+    /**
+     * Sync user data.
+     *
+     * @param array|int $CurrentUser
+     * @param array $NewUser Data to overwrite user with.
+     * @param bool $Force
+     * @since 2.1
      */
     public function syncUser($CurrentUser, $NewUser, $Force = false) {
         // Don't synchronize the user if we are configured not to.

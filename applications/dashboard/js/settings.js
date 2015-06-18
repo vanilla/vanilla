@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
     };
 
     lists.addClass('Loading');
-    var newsUrl = gdn.definition("DashboardNewsFeed", "/dashboard/utility/getfeed/news/5/extended");
+    var newsUrl = gdn.definition("DashboardNewsFeed", "/dashboard/utility/getfeed/news/5/normal");
     var releasesUrl = gdn.definition("DashboardReleasesFeed", "/dashboard/utility/getfeed/releases/2/extended");
     if (newsUrl) {
         loadFeed(newsColumn, newsUrl);

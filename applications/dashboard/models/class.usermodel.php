@@ -566,7 +566,7 @@ class UserModel extends Gdn_Model {
      * @param bool $ThrowError
      * @return int|void
      */
-    public function sSO($String, $ThrowError = false) {
+    public function sso($String, $ThrowError = false) {
         if (!$String) {
             return;
         }
@@ -598,7 +598,7 @@ class UserModel extends Gdn_Model {
             return;
         }
 
-        $Provider = Gdn_AuthenticationProviderModel::GetProviderByKey($ClientID);
+        $Provider = Gdn_AuthenticationProviderModel::getProviderByKey($ClientID);
 
         if (!$Provider) {
             trace("Unknown SSO Provider: $ClientID", TRACE_ERROR);
@@ -626,23 +626,25 @@ class UserModel extends Gdn_Model {
             'name' => 'Name',
             'email' => 'Email',
             'photourl' => 'Photo',
+            'roles' => 'Roles',
             'uniqueid' => null,
             'client_id' => null), true);
 
         trace($User, 'SSO User');
 
-        $UserID = Gdn::userModel()->Connect($UniqueID, $ClientID, $User);
+        $UserID = Gdn::userModel()->connect($UniqueID, $ClientID, $User);
         return $UserID;
     }
 
     /**
+     * Sync user data.
      *
-     *
-     * @param array $CurrentUser
-     * @param array $NewUser
+     * @param array|int $CurrentUser
+     * @param array $NewUser Data to overwrite user with.
+     * @param bool $Force
      * @since 2.1
      */
-    public function synchUser($CurrentUser, $NewUser, $Force = false) {
+    public function syncUser($CurrentUser, $NewUser, $Force = false) {
         // Don't synchronize the user if we are configured not to.
         if (!$Force && !c('Garden.Registration.ConnectSynchronize', true)) {
             return;
@@ -730,7 +732,7 @@ class UserModel extends Gdn_Model {
 
         if ($UserID) {
             // Save the user.
-            $this->synchUser($UserID, $UserData);
+            $this->syncUser($UserID, $UserData);
             return $UserID;
         } else {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
@@ -742,7 +744,7 @@ class UserModel extends Gdn_Model {
                 if ($User) {
                     $User = (array)$User;
                     // Save the user.
-                    $this->synchUser($User, $UserData);
+                    $this->syncUser($User, $UserData);
                     $UserID = $User['UserID'];
                 }
             }

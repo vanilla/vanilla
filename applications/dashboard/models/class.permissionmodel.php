@@ -698,9 +698,9 @@ class PermissionModel extends Gdn_Model {
             $sql->reset();
 
             // Select all of the permission columns.
-            $PermissionColumns = $this->PermissionColumns();
-            foreach ($PermissionColumns as $ColumnName => $Value) {
-                $sql->select('p.`'.$ColumnName.'`', 'MAX');
+            $permissionColumns = $this->permissionColumns();
+            foreach ($permissionColumns as $columnName => $value) {
+                $sql->select('p.`'.$columnName.'`', 'MAX');
             }
 
             $sql->from('Permission p')

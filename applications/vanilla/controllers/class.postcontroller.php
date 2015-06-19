@@ -704,7 +704,7 @@ class PostController extends VanillaController {
                             // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                             $OrderBy = valr('0.0', $this->CommentModel->orderBy());
 //                     $Redirect = !in_array($OrderBy, array('c.DateInserted', 'c.CommentID'));
-//							$DisplayNewCommentOnly = $this->Form->getFormValue('DisplayNewCommentOnly');
+//                          $DisplayNewCommentOnly = $this->Form->getFormValue('DisplayNewCommentOnly');
 
 //                     if (!$Redirect) {
 //                        // Otherwise load all new comments that the user hasn't seen yet
@@ -726,7 +726,7 @@ class PostController extends VanillaController {
 //                        $this->RedirectUrl = Gdn::request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", true);
 //                     } else {
 //                        // Make sure to load all new comments since the page was last loaded by this user
-//								if ($DisplayNewCommentOnly)
+//                              if ($DisplayNewCommentOnly)
                             $this->Offset = $this->CommentModel->GetOffset($CommentID);
                             $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => false));
                             $this->setData('Comments', $Comments);

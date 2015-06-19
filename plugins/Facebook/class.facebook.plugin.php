@@ -763,7 +763,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
 
 //   public function OnDisable() {
-//		$this->_Disable();
+//      $this->_Disable();
 //   }
 
 //   protected function _CreateProviderModel() {
@@ -801,9 +801,9 @@ class FacebookPlugin extends Gdn_Plugin {
 //
 //   private function _Disable() {
 //      RemoveFromConfig('Plugins.VanillaConnect.Enabled');
-//		RemoveFromConfig('Garden.SignIn.Popup');
-//		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
-//		RemoveFromConfig('Garden.Authenticators.handshake.Name');
+//      RemoveFromConfig('Garden.SignIn.Popup');
+//      RemoveFromConfig('Garden.Authenticator.DefaultScheme');
+//      RemoveFromConfig('Garden.Authenticators.handshake.Name');
 //      RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
 //      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 //   }
@@ -812,9 +812,9 @@ class FacebookPlugin extends Gdn_Plugin {
 //      $this->_Enable();
 //   }
 //
-//	private function _Enable($FullEnable = TRUE) {
-//		saveToConfig('Garden.SignIn.Popup', false);
-//		saveToConfig('Garden.Authenticators.handshake.Name', 'VanillaConnect');
+//  private function _Enable($FullEnable = TRUE) {
+//      saveToConfig('Garden.SignIn.Popup', false);
+//      saveToConfig('Garden.Authenticators.handshake.Name', 'VanillaConnect');
 //      saveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
 //      saveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
 //
@@ -833,5 +833,5 @@ class FacebookPlugin extends Gdn_Plugin {
 //
 //      if (!$Provider)
 //         $this->_CreateProviderModel();
-//	}
+//  }
 }

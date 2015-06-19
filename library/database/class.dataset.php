@@ -192,10 +192,10 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
 
         $Result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
 
-//		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+//      $this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
 //      while($Row = $this->_PDOStatement->fetch()) {
-//			$Result[] = $Row;
-//		}
+//          $Result[] = $Row;
+//      }
 
         $this->freePDOStatement(true);
         $this->_Result = $Result;

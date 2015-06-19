@@ -340,7 +340,7 @@ $PermissionModel->undefine(array(
 //$PhotoTableExists = $Construct->TableExists('Photo');
 //
 //$Construct
-//	->PrimaryKey('PhotoID')
+//  ->PrimaryKey('PhotoID')
 //   ->column('Name', 'varchar(255)')
 //   ->column('InsertUserID', 'int', TRUE, 'key')
 //   ->column('DateInserted', 'datetime')

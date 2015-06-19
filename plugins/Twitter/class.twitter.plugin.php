@@ -176,7 +176,7 @@ class TwitterPlugin extends Gdn_Plugin {
         }
 
         // if (!IsMobile())
-        // 	return;
+        //  return;
 
         if (!Gdn::session()->isValid()) {
             echo "\n".Wrap($this->_getButton(), 'li', array('class' => 'Connect TwitterConnect'));

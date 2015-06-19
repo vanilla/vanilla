@@ -10,11 +10,11 @@ $Redirects = array(
     'user' => 'dashboard/profile/%d/x'
 );
 
-$Type = NULL;
+$Type = null;
 $Index = 0;
-if (array_key_exists('p', $_GET) && $Index = $_GET['p'])
+if (array_key_exists('p', $_GET) && $Index = $_GET['p']) {
     $Type = 'post';
-elseif (array_key_exists('t', $_GET) && $Index = $_GET['t'])
+} elseif (array_key_exists('t', $_GET) && $Index = $_GET['t'])
     $Type = 'thread';
 elseif (array_key_exists('f', $_GET) && $Index = $_GET['f'])
     $Type = 'category';
@@ -46,11 +46,11 @@ switch ($Type) {
 }
 
 if (!is_null($Type)) {
-    header("Location: {$Redirect}", TRUE, 301);
+    header("Location: {$Redirect}", true, 301);
     exit();
 }
 
-header("Location: index.php", TRUE, 301);
+header("Location: index.php", true, 301);
 exit();
 
 //$t = $_GET['t'];

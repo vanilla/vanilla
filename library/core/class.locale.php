@@ -444,7 +444,7 @@ class Gdn_Locale extends Gdn_Pluggable {
             return false;
         } else {
             return $this->Locale;
-    }
+        }
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Vanilla's default locale.
  *
@@ -16,4 +18,3 @@ $Definition['CategoryID'] = 'Category';
 
 // Deprecated Translations
 $Definition['Start a New Discussion'] = 'New Discussion';
-

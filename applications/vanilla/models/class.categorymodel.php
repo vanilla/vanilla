@@ -1675,7 +1675,7 @@ class CategoryModel extends Gdn_Model {
             $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
         }
 
-        //	Prep and fire event.
+        //  Prep and fire event.
         $this->EventArguments['FormPostValues'] = &$FormPostValues;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('BeforeSaveCategory');

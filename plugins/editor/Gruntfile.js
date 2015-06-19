@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     // Load all Grunt tasks matching the `grunt-*` pattern
     require('load-grunt-tasks')(grunt);
 

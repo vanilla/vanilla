@@ -280,7 +280,7 @@ class ActivityController extends Gdn_Controller {
 
     /**
      *
-     * 
+     *
      * @param bool $Notify
      * @param bool $UserID
      */

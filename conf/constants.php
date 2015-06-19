@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Framework constants.
  *
@@ -76,4 +78,4 @@ define('ADDON_TYPE_APPLICATION', 5);
 define('ADDON_TYPE_CORE', 10);
 
 // Signal we did all this ^.
-define('VANILLA_CONSTANTS', TRUE);
+define('VANILLA_CONSTANTS', true);

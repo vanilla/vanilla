@@ -551,8 +551,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     // The existing & new column types do not match, so modify the column.
                     $ChangeSql = $Comment.'change `'.$ColumnName.'` '.$this->_defineColumn(val($ColumnName, $this->_Columns));
                     $AlterSql[] = $ChangeSql;
-//					if (!$this->Query($AlterSqlPrefix.$ChangeSql))
-//						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
+//                  if (!$this->Query($AlterSqlPrefix.$ChangeSql))
+//                      throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
 //                     $ColumnName,
 //                     $this->_DatabasePrefix.$this->_TableName));
 

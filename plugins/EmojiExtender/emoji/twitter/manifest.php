@@ -72,7 +72,7 @@
             'worried' => 'worried.png',
             'yum' => 'yum.png',
         ),
-    'aliases' =>
+        'aliases' =>
         array(
             ':)' => 'smile',
             ':D' => 'grin',
@@ -94,7 +94,7 @@
             '>_<' => 'rage',
             ':3' => 'blush',
         ),
-    'editor' =>
+        'editor' =>
         array(
             ':)' => 'smile',
             ':D' => 'smiley',
@@ -109,7 +109,7 @@
             ':3' => 'blush',
             '<3' => 'heart',
         ),
-    'archive' =>
+        'archive' =>
         array(
             'broken_heart' => 'heartbreak.png',
             'dizzy_face' => 'dizzy.png',
@@ -124,17 +124,17 @@
             'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
             'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
         ),
-    'minSize' =>
+        'minSize' =>
         array(
             'w' => 36,
             'h' => 36,
         ),
-    'maxSize' =>
+        'maxSize' =>
         array(
             'w' => 40,
             'h' => 40,
         ),
-    'sizes' =>
+        'sizes' =>
         array(
             0 => 1,
         ),

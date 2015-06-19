@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Conversations default locale.
  *
@@ -15,4 +17,3 @@ $Definition['RecipientUserID'] = 'recipient';
 $Definition['Start a New Conversation'] = 'New Message';
 $Definition['New Conversation'] = 'New Message';
 $Definition['Start Conversation'] = 'Post Message';
-

@@ -78,8 +78,9 @@ class DebuggerPlugin extends Gdn_Plugin {
         $Result = '';
         if (is_array($Data)) {
             foreach ($Data as $Key => $Value) {
-                if ($Key === null)
+                if ($Key === null) {
                     $Key = 'NULL';
+                }
                 $Result .= "$Indent<b>$Key</b>: ";
 
                 if ($Value === null) {
@@ -87,8 +88,9 @@ class DebuggerPlugin extends Gdn_Plugin {
                 } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
                     $Result .= htmlspecialchars(var_export($Value, true))."\n";
                 } else {
-                    if (is_a($Value, 'Gdn_DataSet'))
+                    if (is_a($Value, 'Gdn_DataSet')) {
                         $Result .= "DataSet";
+                    }
 
                     $Result .=
                         "\n"
@@ -97,8 +99,9 @@ class DebuggerPlugin extends Gdn_Plugin {
             }
         } elseif (is_a($Data, 'Gdn_DataSet')) {
             $Data = $Data->result();
-            if (count($Data) == 0)
+            if (count($Data) == 0) {
                 return $Result.'EMPTY<br />';
+            }
 
             $Fields = array_keys((array)reset($Data));
             $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
@@ -135,6 +138,6 @@ class DebuggerPlugin extends Gdn_Plugin {
      *
      */
     public function onDisable() {
-        saveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
+        saveToConfig('Debug', false, array('RemoveEmpty' => true));
     }
 }

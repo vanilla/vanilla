@@ -480,13 +480,13 @@ class PagerModule extends Gdn_Module {
         $WriteCount++;
 
 //      list($Offset, $Limit) = offsetLimit(GetValue, 20);
-//		$Pager->configure(
-//			$Offset,
-//			$Limit,
-//			$TotalAddons,
-//			"/settings/addons/$Section?Page={Page}"
-//		);
-//		$Sender->setData('_Pager', $Pager);
+//      $Pager->configure(
+//          $Offset,
+//          $Limit,
+//          $TotalAddons,
+//          "/settings/addons/$Section?Page={Page}"
+//      );
+//      $Sender->setData('_Pager', $Pager);
     }
 
     /**

@@ -1341,7 +1341,7 @@ EOT;
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
-	 <iframe width="640" height="360" src="http://hitbox.tv/#!/embed/{$Matches[2]}" frameborder="0" allowfullscreen></iframe>
+     <iframe width="640" height="360" src="http://hitbox.tv/#!/embed/{$Matches[2]}" frameborder="0" allowfullscreen></iframe>
 <a href="http://www.hitbox.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.hitbox.tv</a>
 EOT;
 

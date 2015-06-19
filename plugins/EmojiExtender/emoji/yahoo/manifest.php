@@ -100,7 +100,7 @@
             'worried' => 'worried.gif',
             'yin_yang' => 'yin_yang.gif',
         ),
-    'aliases' =>
+        'aliases' =>
         array(
             ':)' => 'smile',
             ':D' => 'grin',
@@ -121,7 +121,7 @@
             '>_<' => 'rage',
             ':3' => 'blush',
         ),
-    'editor' =>
+        'editor' =>
         array(
             ':)' => 'smile',
             ':D' => 'smiley',
@@ -132,7 +132,7 @@
             'B)' => 'sunglasses',
             ':#' => 'grin',
         ),
-    'archive' =>
+        'archive' =>
         array(
             'broken_heart' => 'heartbreak.gif',
             'dizzy_face' => 'dizzy.gif',
@@ -143,17 +143,17 @@
             'stuck_out_tongue' => 'tongue.gif',
             'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.gif',
         ),
-    'minSize' =>
+        'minSize' =>
         array(
             'w' => 17,
             'h' => 18,
         ),
-    'maxSize' =>
+        'maxSize' =>
         array(
             'w' => 52,
             'h' => 22,
         ),
-    'sizes' =>
+        'sizes' =>
         array(
             0 => 1,
         ),

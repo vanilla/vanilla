@@ -1602,7 +1602,7 @@ class DiscussionModel extends VanillaModel {
             $FormPostValues['Sink'] = 0;
         }
 
-        //	Prep and fire event
+        //  Prep and fire event
         $this->EventArguments['FormPostValues'] = &$FormPostValues;
         $this->EventArguments['DiscussionID'] = $DiscussionID;
         $this->fireEvent('BeforeSaveDiscussion');

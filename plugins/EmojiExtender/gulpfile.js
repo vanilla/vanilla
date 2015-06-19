@@ -4,7 +4,7 @@ var gulp = require('gulp')
 // Load all Gulp tasks matching the `gulp-*` pattern
     , $ = require('gulp-load-plugins')();
 
-gulp.task('styles', function() {
+gulp.task('styles', function () {
     return gulp.src('scss/*.scss')
         .pipe($.plumber())
         .pipe($.sass({
@@ -17,7 +17,7 @@ gulp.task('styles', function() {
         .pipe($.size({showFiles: true}));
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', function () {
     var dependencies = require('wiredep')()
         , source = $.filter('js/src/**/*.js');
 
@@ -34,7 +34,7 @@ gulp.task('scripts', function() {
         .pipe($.size({showFiles: true}));
 });
 
-gulp.task('images', function() {
+gulp.task('images', function () {
     return gulp.src('design/images/**/*')
         .pipe($.cache($.imagemin({
             optimizationLevel: 3,
@@ -45,7 +45,7 @@ gulp.task('images', function() {
         .pipe($.size({showFiles: true}));
 });
 
-gulp.task('fonts', function() {
+gulp.task('fonts', function () {
     return $.bowerFiles()
         .pipe($.filter('**/*.{eot,svg,ttf,woff}'))
         .pipe($.flatten())
@@ -53,7 +53,7 @@ gulp.task('fonts', function() {
         .pipe($.size({showFiles: true}));
 });
 
-gulp.task('wiredep', function() {
+gulp.task('wiredep', function () {
     var wiredep = require('wiredep').stream;
 
     return gulp.src('scss/**/*.scss')
@@ -61,11 +61,11 @@ gulp.task('wiredep', function() {
         .pipe(gulp.dest('scss'));
 });
 
-gulp.task('default', ['wiredep'], function() {
+gulp.task('default', ['wiredep'], function () {
     gulp.start('styles', 'scripts', 'images', 'fonts');
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', function () {
     var server = $.livereload();
 
     gulp.watch([
@@ -73,7 +73,7 @@ gulp.task('watch', function() {
         , 'design/images/**/*'
         , 'js/*.js'
         , 'views/**/*.tpl'
-    ], function(file) {
+    ], function (file) {
         return server.changed(file.path);
     });
 

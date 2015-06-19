@@ -128,7 +128,7 @@ class SearchController extends Gdn_Controller {
             'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::url($Search)
         );
 
-//		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+//      if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
 //         $this->setJson('LessRow', $this->Pager->toString('less'));
 //         $this->setJson('MoreRow', $this->Pager->toString('more'));
 //         $this->View = 'results';

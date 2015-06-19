@@ -98,10 +98,10 @@ class ImportController extends DashboardController {
             }
 
             /*elseif(is_array($Result)) {
-				saveToConfig(array(
-					'Garden.Import.CurrentStep' => $CurrentStep,
-					'Garden.Import.CurrentStepData' => arrayValue('Data', $Result)));
-				$this->setData('CurrentStepMessage', arrayValue('Message', $Result));
+                saveToConfig(array(
+                    'Garden.Import.CurrentStep' => $CurrentStep,
+                    'Garden.Import.CurrentStepData' => arrayValue('Data', $Result)));
+                $this->setData('CurrentStepMessage', arrayValue('Message', $Result));
 			}*/
         }
         $Imp->saveState();

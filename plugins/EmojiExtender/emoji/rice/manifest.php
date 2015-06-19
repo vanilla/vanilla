@@ -40,7 +40,7 @@
             'wink' => 'wink.png',
             'yum' => 'yum.png',
         ),
-    'aliases' =>
+        'aliases' =>
         array(
             ':)' => 'smile',
             ':(' => 'frown',
@@ -55,7 +55,7 @@
             '>_<' => 'rage',
             ':3' => 'blush',
         ),
-    'editor' =>
+        'editor' =>
         array(
             ':)' => 'smile',
             ':(' => 'frown',
@@ -66,7 +66,7 @@
             '8-)' => 'glasses',
             '>_<' => 'rage',
         ),
-    'archive' =>
+        'archive' =>
         array(
             'dizzy_face' => 'dizzy.png',
             'heart_eyes' => 'love.png',
@@ -74,17 +74,17 @@
             'smiling_imp' => 'naughty.png',
             'stuck_out_tongue' => 'tongue.png',
         ),
-    'minSize' =>
+        'minSize' =>
         array(
             'w' => 18,
             'h' => 18,
         ),
-    'maxSize' =>
+        'maxSize' =>
         array(
             'w' => 30,
             'h' => 19,
         ),
-    'sizes' =>
+        'sizes' =>
         array(
             0 => 1,
             1 => 2,

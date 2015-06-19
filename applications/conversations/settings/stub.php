@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) { exit(); }
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Conversations stub content for a new site.
  *
@@ -13,17 +15,16 @@
 // Only do this once, ever.
 if (!$Drop) {
     return;
+
 }
 
 $SQL = Gdn::database()->sql();
-
 // Prep default content
 $ConversationBody = "Pssst. Hey. A conversation is a private chat between two or more members. No one can see it except the members added. You can delete this one since I&rsquo;m just a bot and know better than to talk back.";
 $SystemUserID = Gdn::userModel()->getSystemUserID();
 $TargetUserID = Gdn::session()->UserID;
 $Now = Gdn_Format::toDateTime();
 $Contributors = Gdn_Format::serialize(array($SystemUserID, $TargetUserID));
-
 // Insert stub conversation
 $ConversationID = $SQL->insert('Conversation', array(
     'InsertUserID' => $SystemUserID,
@@ -31,7 +32,6 @@ $ConversationID = $SQL->insert('Conversation', array(
     'Contributors' => $Contributors,
     'CountMessages' => 1
 ));
-
 $MessageID = $SQL->insert('ConversationMessage', array(
     'ConversationID' => $ConversationID,
     'Body' => t('StubConversationBody', $ConversationBody),
@@ -39,12 +39,10 @@ $MessageID = $SQL->insert('ConversationMessage', array(
     'InsertUserID' => $SystemUserID,
     'DateInserted' => $Now
 ));
-
 $SQL->update('Conversation')
     ->set('LastMessageID', $MessageID)
     ->where('ConversationID', $ConversationID)
     ->put();
-
 $SQL->insert('UserConversation', array(
     'ConversationID' => $ConversationID,
     'UserID' => $TargetUserID,

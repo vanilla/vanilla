@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) { exit(); }
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Conversations database structure.
  *
@@ -10,28 +12,26 @@
 
 if (!isset($Drop)) {
     $Drop = false;
+
 }
 
 if (!isset($Explicit)) {
     $Explicit = true;
+
 }
 
 $SQL = $Database->sql();
 $Construct = $Database->structure();
 $Px = $Database->DatabasePrefix;
-
 // Contains all conversations. A conversation takes place between X number of
 // ppl. This table keeps track of the unique id of the conversation, the person
 // who started the conversation (and when), and the last person to contribute to
 // the conversation (and when).
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->table('Conversation');
-
 $UpdateCountMessages = $Construct->tableExists() && !$Construct->columnExists('CountMessages');
 $UpdateLastMessageID = $Construct->tableExists() && !$Construct->columnExists('LastMessageID');
 $CountParticipantsExists = $Construct->columnExists('CountParticipants');
-
-
 $Construct
     ->primaryKey('ConversationID')
     ->column('Type', 'varchar(10)', true, 'index')
@@ -50,16 +50,13 @@ $Construct
     ->column('LastMessageID', 'int', null)
     ->column('RegardingID', 'int(11)', true, 'index')
     ->set($Explicit, $Drop);
-
 // Contains the user/conversation relationship. Keeps track of all users who are
 // taking part in the conversation. It also keeps DateCleared, which is a
 // per-user date relating to when each users last cleared the conversation history.
 $Construct->table('UserConversation');
-
 $UserConversationExists = $Construct->tableExists();
 $UpdateCountReadMessages = $Construct->tableExists() && !$Construct->columnExists('CountReadMessages');
 $DateConversationUpdatedExists = $Construct->columnExists('DateConversationUpdated');
-
 $Construct
     ->column('UserID', 'int', false, array('primary', 'index.Inbox'))
     ->column('ConversationID', 'int', false, array('primary', 'key'))
@@ -71,18 +68,19 @@ $Construct
     ->column('Deleted', 'tinyint(1)', '0', 'index.Inbox') // User deleted this conversation
     ->column('DateConversationUpdated', 'datetime', true, 'index.Inbox') // For speeding up queries.
     ->set($Explicit, $Drop);
-
 if (!$DateConversationUpdatedExists) {
     $SQL->update('UserConversation uc')
         ->join('Conversation c', 'uc.ConversationID = c.ConversationID')
         ->set('DateConversationUpdated', 'c.DateUpdated', false)
         ->put();
+
 }
 
 if (!$CountParticipantsExists && $UserConversationExists) {
     $SQL->update('Conversation c')
         ->set('c.CountParticipants', '(select count(uc.ConversationID) from GDN_UserConversation uc where uc.ConversationID = c.ConversationID and uc.Deleted = 0)', false, false)
         ->put();
+
 }
 
 // Contains messages for each conversation, as well as who inserted the message
@@ -96,24 +94,23 @@ $Construct->table('ConversationMessage')
     ->column('DateInserted', 'datetime', false)
     ->column('InsertIPAddress', 'varchar(15)', true)
     ->set($Explicit, $Drop);
-
 if ($UpdateCountMessages) {
-    // Calculate the count column.
     $UpSql = "update {$Px}Conversation c
 set CountMessages = (
    select count(MessageID)
    from {$Px}ConversationMessage m
    where c.ConversationID = m.ConversationID)";
     $Construct->query($UpSql);
+
 }
 if ($UpdateLastMessageID) {
-    // Calculate the count column.
     $UpSql = "update {$Px}Conversation c
 set LastMessageID = (
    select max(MessageID)
    from {$Px}ConversationMessage m
    where c.ConversationID = m.ConversationID)";
     $Construct->query($UpSql);
+
 }
 
 if ($UpdateCountReadMessages) {
@@ -123,15 +120,14 @@ set CountReadMessages = (
   from {$Px}ConversationMessage cm
   where cm.ConversationID = uc.ConversationID
     and cm.MessageID <= uc.LastMessageID)";
-
     $Construct->query($UpSql);
+
 }
 
 // Add extra columns to user table for tracking discussions, comments & replies
 $Construct->table('User')
     ->column('CountUnreadConversations', 'int', null)
     ->set(false, false);
-
 // Insert some activity types
 ///  %1 = ActivityName
 ///  %2 = ActivityName Possessive
@@ -153,6 +149,7 @@ if ($SQL->getWhere('ActivityType', array('Name' => 'ConversationMessage'))->numR
         'Notify' => '1',
         'Public' => '0'
     ));
+
 }
 
 // X added Y to a conversation
@@ -166,6 +163,7 @@ if ($SQL->getWhere('ActivityType', array('Name' => 'AddedToConversation'))->numR
         'Notify' => '1',
         'Public' => '0'
     ));
+
 }
 
 $PermissionModel = Gdn::permissionModel();

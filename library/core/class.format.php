@@ -1476,7 +1476,7 @@ EOT;
                 // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
                 $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
-                    '/(^|[\s,\.>\)])@('.$Pattern.'{1,64})\b/i', //{3,20}
+                    '/(^|[\s,\.>\(])@('.$Pattern.'{1,64})\b/i', //{3,20}
                     '\1'.anchor('@$2', $urlFormat),
                     $Mixed
                 );

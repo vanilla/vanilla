@@ -148,5 +148,5 @@ $Configuration['Modules']['Conversations']['Content'] = array('MessageModule', '
 $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['DefaultForumRoot'] = 'discussions';
 $Configuration['Routes']['Default404'] = array('dashboard/home/filenotfound', 'NotFound');
-$Configuration['Routes']['DefaultPermission'] = array('dashboard/home/permission', 'NotAuthorized');
+$Configuration['Routes']['DefaultPermission'] = array('dashboard/home/unauthorized', 'NotAuthorized');
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';

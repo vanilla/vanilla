@@ -668,7 +668,7 @@ class UserModel extends Gdn_Model {
             $CurrentUser = $this->getID($CurrentUser, DATASET_TYPE_ARRAY);
         }
 
-        // Don't synch the user photo if they've uploaded one already.
+        // Don't sync the user photo if they've uploaded one already.
         $Photo = val('Photo', $NewUser);
         $CurrentPhoto = val('Photo', $CurrentUser);
         if (false
@@ -682,25 +682,10 @@ class UserModel extends Gdn_Model {
             trace('Not setting photo.');
         }
 
-        if (c('Garden.SSO.SyncRoles')) {
+        if (c('Garden.SSO.SyncRoles') && c('Garden.SSO.SyncRolesBehavior') !== 'register') {
             // Translate the role names to IDs.
             $Roles = val('Roles', $NewUser, '');
-            if (is_string($Roles)) {
-                $Roles = explode(',', $Roles);
-            } elseif (!is_array($Roles)) {
-                $Roles = array();
-            }
-            $Roles = array_map('trim', $Roles);
-            $Roles = array_map('strtolower', $Roles);
-
-            $AllRoles = RoleModel::roles();
-            $RoleIDs = array();
-            foreach ($AllRoles as $RoleID => $Role) {
-                $Name = strtolower($Role['Name']);
-                if (in_array($Name, $Roles) || in_array($RoleID, $Roles)) {
-                    $RoleIDs[] = $RoleID;
-                }
-            }
+            $RoleIDs = $this->lookupRoleIDs($Roles);
             if (empty($RoleIDs)) {
                 $RoleIDs = $this->newUserRoleIDs();
             }
@@ -730,6 +715,12 @@ class UserModel extends Gdn_Model {
      */
     public function connect($UniqueID, $ProviderKey, $UserData, $Options = array()) {
         trace('UserModel->Connect()');
+        $provider = Gdn_AuthenticationProviderModel::getProviderByKey($ProviderKey);
+
+        // Trusted providers can sync roles.
+        if (val('Trusted', $provider) && (!empty($UserData['Roles']) || !empty($UserData['Roles']))) {
+            saveToConfig('Garden.SSO.SyncRoles', true, false);
+        }
 
         $UserID = false;
         if (!isset($UserData['UserID'])) {
@@ -765,14 +756,18 @@ class UserModel extends Gdn_Model {
 
             if (!$UserID) {
                 // Create a new user.
-//            $UserID = $this->InsertForBasic($UserData, FALSE, array('ValidateEmail' => false, 'NoConfirmEmail' => TRUE));
                 $UserData['Password'] = md5(microtime());
                 $UserData['HashMethod'] = 'Random';
 
                 touchValue('CheckCaptcha', $Options, false);
                 touchValue('NoConfirmEmail', $Options, true);
                 touchValue('NoActivity', $Options, true);
-                touchValue('SaveRoles', $Options, c('Garden.SSO.SyncRoles', false));
+
+                // Translate SSO style roles to an array of role IDs suitable for registration.
+                if (!empty($UserData['Roles']) && !isset($UserData['RoleID'])) {
+                    $UserData['RoleID'] = $this->lookupRoleIDs($UserData['Roles']);
+                }
+                touchValue('SaveRoles', $Options, !empty($UserData['RoleID']) && c('Garden.SSO.SyncRoles', false));
 
                 trace($UserData, 'Registering User');
                 $UserID = $this->register($UserData, $Options);
@@ -786,10 +781,6 @@ class UserModel extends Gdn_Model {
                     'Provider' => $ProviderKey,
                     'UserID' => $UserID
                 ));
-
-                if ($UserInserted && c('Garden.Registration.SendConnectEmail', true)) {
-                    $Provider = $this->SQL->getWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->firstRow(DATASET_TYPE_ARRAY);
-                }
             } else {
                 trace($this->Validation->resultsText(), TRACE_ERROR);
             }
@@ -4353,5 +4344,29 @@ class UserModel extends Gdn_Model {
 
         return $PermissionsKeyValue;
         ;
+    }
+
+    /**
+     * @param $Roles
+     * @return array
+     */
+    protected function lookupRoleIDs($Roles) {
+        if (is_string($Roles)) {
+            $Roles = explode(',', $Roles);
+        } elseif (!is_array($Roles)) {
+            $Roles = array();
+        }
+        $Roles = array_map('trim', $Roles);
+        $Roles = array_map('strtolower', $Roles);
+
+        $AllRoles = RoleModel::roles();
+        $RoleIDs = array();
+        foreach ($AllRoles as $RoleID => $Role) {
+            $Name = strtolower($Role['Name']);
+            if (in_array($Name, $Roles) || in_array($RoleID, $Roles)) {
+                $RoleIDs[] = $RoleID;
+            }
+        }
+        return $RoleIDs;
     }
 }

@@ -272,7 +272,7 @@ class AssetModel extends Gdn_Model {
         $Paths = array();
 
         // 2. Check for a full path.
-        if (strpos($Filename, '/') !== false) {
+        if (strpos($Filename, '/') === 0) {
             $Filename = ltrim($Filename, '/');
 
             // Direct path was given

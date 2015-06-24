@@ -79,10 +79,13 @@ abstract class SortableModule extends ComponentModule {
             return $this;
         }
         $divider = array(
-            'sort' => $sort,
             'key' => $key,
             'dividerCssClass' => $cssClass
         );
+
+        if ($sort) {
+            $divider['sort'] = $sort;
+        }
 
         $this->addKey($divider);
         $divider['dividerCssClass'] = $cssClass.' '.$this->buildCssClass($this->dividerCssClassPrefix, $divider);
@@ -113,10 +116,13 @@ abstract class SortableModule extends ComponentModule {
             'headerText' => $text,
             'headerIcon' => $icon,
             'headerBadge' => $badge,
-            'sort' => $sort,
             'key' => $key,
             'headerCssClass' => $cssClass
         );
+
+        if ($sort) {
+            $group['sort'] = $sort;
+        }
 
         $this->addKey($group);
 
@@ -155,9 +161,12 @@ abstract class SortableModule extends ComponentModule {
             'linkIcon' => $icon,
             'linkBadge' => $badge,
             'linkPopinRel' => $popinRel,
-            'sort' => $sort,
             'key' => $key,
         );
+
+        if ($sort) {
+            $link['sort'] = $sort;
+        }
 
         $this->addKey($link);
         $link['linkCssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);

@@ -1207,7 +1207,7 @@
 
                                 var payloadHeight = payload.original_height;
                                 var payloadWidth = payload.original_width;
-                                var editorWidth = $(editor.textarea.element).width();
+                                var editorWidth = $('#Form_Body').width();
 
                                 // Image max-width is 100%. Change the height to refect scaling down the width.
                                 if (editorWidth < payloadWidth) {

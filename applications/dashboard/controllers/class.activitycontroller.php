@@ -163,7 +163,7 @@ class ActivityController extends Gdn_Controller {
       if (!$ID)
          throw NotFoundException();
       
-      if ($Session->CheckPermission('Garden.Activity.Delete') || $Comment['InsertUserID'] = $Session->UserID) {
+      if ($Session->CheckPermission('Garden.Activity.Delete') || $Comment['InsertUserID'] == $Session->UserID) {
          $this->ActivityModel->DeleteComment($ID);
       } else {
          throw PermissionException();

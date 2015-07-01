@@ -1471,14 +1471,20 @@ EOT;
 
             // Handle @mentions.
             if (C('Garden.Format.Mentions')) {
-                $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
-
                 // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
                 $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
-                    '/(^|[\s,\.>\(])@('.$Pattern.'{1,64})\b/i', //{3,20}
-                    '\1'.anchor('@$2', $urlFormat),
-                    $Mixed
+                    '/(^|[\s,\.>\(])@('.$Pattern.'{1,100})\b/i', //{3,20}
+                    function ($match) {
+                        $username = $match[2];
+
+                        return $match[1].anchor(
+                            htmlspecialchars($username),
+                            str_replace('{name}', rawurlencode($username), self::$MentionsUrlFormat)
+                        );
+                    },
+                    $Mixed,
+                    true
                 );
             }
 

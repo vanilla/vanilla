@@ -1479,7 +1479,7 @@ EOT;
                         $username = $match[2];
 
                         return $match[1].anchor(
-                            htmlspecialchars($username),
+                            '@'.htmlspecialchars($username),
                             str_replace('{name}', rawurlencode($username), self::$MentionsUrlFormat)
                         );
                     },

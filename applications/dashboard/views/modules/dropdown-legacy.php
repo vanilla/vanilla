@@ -1,20 +1,17 @@
-<?php
-$sender = $this->Data('sender');
 
-?>
-<span class="ToggleFlyout OptionsMenu <?php echo $sender->dropdownCssClass; ?>">
-    <span class="OptionsTitle" title="Options"><?php echo val('triggerText', $sender->trigger); ?></span>
+<span class="ToggleFlyout OptionsMenu <?php echo $this->dropdownCssClass; ?>">
+    <span class="OptionsTitle" title="Options"><?php echo val('triggerText', $this->trigger); ?></span>
     <span class="SpFlyoutHandle"></span>
-    <ul class="Flyout MenuItems <?php echo $sender->listCssClass; ?>" role="menu" aria-labelledby="<?php echo $sender->triggerId; ?>">
-        <?php foreach ($sender->items as $item) {
+    <ul class="Flyout MenuItems <?php echo $this->listCssClass; ?>" role="menu" aria-labelledby="<?php echo $this->triggerId; ?>">
+        <?php foreach ($this->items as $item) {
             if (val('type', $item) == 'group') { ?>
                 <li role="presentation" class="dropdown-header <?php echo val('headerCssClass', $item); ?>">
                     <?php if (val('headerIcon', $item)) {
-                        echo $sender->icon(val('headerIcon', $item));
+                        echo icon(val('headerIcon', $item));
                     }
                     echo val('headerText', $item);
                     if (val('headerBadge', $item)) {
-                        echo $sender->badge(val('headerBadge', $item));
+                        echo badge(val('headerBadge', $item));
                     } ?>
                 </li>
             <?php } ?>

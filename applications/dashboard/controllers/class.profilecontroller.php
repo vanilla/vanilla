@@ -996,7 +996,7 @@ class ProfileController extends Gdn_Controller {
         $Result = array();
         foreach ($Data as $K => $V) {
             if (is_array($V)) {
-                $Result[$K] = self::_emoveEmailPreferences($V);
+                $Result[$K] = self::_removeEmailPreferences($V);
             } else {
                 $Result[$K] = $V;
             }

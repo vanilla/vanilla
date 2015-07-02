@@ -68,7 +68,7 @@
             <li>
                 <?php
                 echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, array('value' => '1'));
-                echo $this->Form->CheckBox('RememberMe', t('Remember me on this computer'), array('value' => '1'));
+                echo $this->Form->CheckBox('RememberMe', 'Remember me on this computer', array('value' => '1'));
                 ?>
             </li>
             <li class="Buttons">

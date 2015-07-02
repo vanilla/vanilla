@@ -153,21 +153,4 @@ class DropdownModule extends SortableModule {
         $this->trigger['isAnchor'] = $this->trigger['type'] === 'anchor';
         return $this;
     }
-
-    /**
-     * Adds necessary Twitter Bootstrap assets for the dropdown menu to render.
-     * The default view requires these assets in order to render properly.
-     *
-     * @param $controller Controller object rendering the dropdown menu.
-     * @return object $this The calling DropdownModule object.
-     */
-    public function addBootstrapAssets($controller) {
-        $controller->AddCssFile('dropdowns.css', 'dashboard');
-        $controller->AddCssFile('buttons.css', 'dashboard');
-        $controller->AddCssFile('badges.css', 'dashboard');
-        $controller->AddCssFile('type.css', 'dashboard');
-
-        $controller->AddJsFile('dropdown.js', 'dashboard');
-        return $this;
-    }
 }

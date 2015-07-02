@@ -9,7 +9,7 @@
  * @since 2.3
  */
 
-abstract class SortableModule extends ComponentModule {
+abstract class SortableModule extends Gdn_Module {
 
     /**
      * @var array List of items to sort.
@@ -87,7 +87,7 @@ abstract class SortableModule extends ComponentModule {
             $divider['sort'] = $sort;
         }
 
-        $this->addKey($divider);
+        $this->touchKey($divider);
         $divider['dividerCssClass'] = $cssClass.' '.$this->buildCssClass($this->dividerCssClassPrefix, $divider);
 
         $this->addItem('divider', $divider);
@@ -124,7 +124,7 @@ abstract class SortableModule extends ComponentModule {
             $group['sort'] = $sort;
         }
 
-        $this->addKey($group);
+        $this->touchKey($group);
 
         if ($text) {
             $group['headerCssClass'] = $cssClass.' '.$this->buildCssClass($this->headerCssClassPrefix, $group);
@@ -168,7 +168,7 @@ abstract class SortableModule extends ComponentModule {
             $link['sort'] = $sort;
         }
 
-        $this->addKey($link);
+        $this->touchKey($link);
         $link['linkCssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);
 
         $listItemCssClasses = array();
@@ -180,7 +180,7 @@ abstract class SortableModule extends ComponentModule {
         }
         $link['listItemCssClass'] = implode(' ', $listItemCssClasses);
 
-        $this->addItem('link', $link);
+	    $this->addItem('link', $link);
         return $this;
     }
 
@@ -198,7 +198,7 @@ abstract class SortableModule extends ComponentModule {
      *
      * @param array $item The item to generate and add a key for.
      */
-    public function addKey(&$item) {
+    public function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
             $this->keyNumber = $this->keyNumber+1;
@@ -213,11 +213,10 @@ abstract class SortableModule extends ComponentModule {
      * @throws Exception
      */
     protected function addItem($type, $item) {
-        $this->addKey($item);
+        $this->touchKey($item);
         if (!is_array(val('key', $item))) {
             $item['key'] = explode('.', val('key', $item));
-        }
-        else {
+        } else {
             $item['key'] = array_values(val('key', $item));
         }
 
@@ -371,7 +370,7 @@ abstract class SortableModule extends ComponentModule {
      */
     public function prepare() {
         if ($this->isPrepared) {
-            return;
+            return !empty($this->items);
         }
         $this->isPrepared = true;
         $this->sortItems($this->items);

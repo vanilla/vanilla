@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * A component for a sortable list.
+ * A module for a sortable list.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -413,7 +413,7 @@ abstract class SortableModule extends Gdn_Module {
      * Prepares the items array for output by sorting, optionally flattening,
      * and making the index values of the items array numeric.
      *
-     * @return bool Whether to render the component.
+     * @return bool Whether to render the module.
      */
     public function prepare() {
         if ($this->isPrepared) {

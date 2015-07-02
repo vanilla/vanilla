@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * A dropdown menu component.
+ * A dropdown menu module.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -10,7 +10,7 @@
  */
 
 /**
- * A flawlessly configurable dropdown menu component.
+ * A flawlessly configurable dropdown menu module.
  *
  * The module includes a dropdown trigger and menu items. Menu items can be
  *
@@ -34,7 +34,7 @@
  * $dropdown->setTrigger('A New Name')
  * ->addLink('Link 1', '#') // automatically creates key: item1
  * ->addDivider() // automatically creates key: item2
- * ->addLink('Link 2', '#', 'link2', 'bg-danger') // creates item with key: link2
+ * ->addLink('Link 2', '#', 'link2', 'danger') // creates item with key: link2
  * ->addLink('Link 3', '#') // automatically creates key: item3
  * ->addLink('Link 4', '#') // automatically creates key: item4
  * ->addGroup('', 'group1') // creates group with no header

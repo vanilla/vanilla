@@ -77,18 +77,14 @@ class DropdownModule extends SortableModule {
     /**
      * @var array Collection of attributes for the dropdown menu trigger.
      * - **type**: string - One of the $triggerTypes.
-     * - **isButton**: bool - Helper flag for Mustache template rendering.
-     * - **isAnchor**: bool - Helper flag for Mustache template rendering.
-     * - **triggerText**: string - Text on the trigger.
-     * - **triggerCssClass**: string - CSS class for the trigger.
-     * - **triggerIcon**: string - Icon for the trigger.
+     * - **text**: string - Text on the trigger.
+     * - **cssClass**: string - CSS class for the trigger.
+     * - **icon**: string - Icon for the trigger.
      */
     public $trigger = array('type' => 'button',
-                            'isButton' => true,
-                            'isAnchor' => false,
-                            'triggerText' => '',
-                            'triggerCssClass' => 'btn-default',
-                            'triggerIcon' => 'caret-down');
+                            'text' => '',
+                            'cssClass' => '',
+                            'icon' => 'caret-down');
 
     /**
      * @var array Allowed trigger types.
@@ -98,12 +94,12 @@ class DropdownModule extends SortableModule {
     /**
      * @var string A potential CSS class of the dropdown menu wrapper container.
      */
-    public $dropdownCssClass;
+    public $cssClass;
 
     /**
      * @var string A potential CSS class of the list <ul> block.
      */
-    public $listCssClass = ''; // Twitter Bootstrap supports 'dropdown-menu-right' to align the dropdown box to the right of its container.
+    public $listCssClass = '';
 
     /**
      * @var string The dropdown menu wrapper container element tag.
@@ -119,11 +115,11 @@ class DropdownModule extends SortableModule {
      * @param string $listCssClass A potential CSS class of the list <ul> block.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
-    public function __construct($triggerId, $triggerText = '', $dropdownCssClass = '', $listCssClass = '', $useCssPrefix = true) {
+    public function __construct($triggerId, $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
         parent::__construct('dropdown', true, $useCssPrefix);
         $this->triggerId = $triggerId;
-        $this->trigger['triggerText'] = $triggerText;
-        $this->dropdownCssClass = $dropdownCssClass;
+        $this->trigger['text'] = $triggerText;
+        $this->cssClass = $cssClass;
         $this->listCssClass = trim($listCssClass);
 
         if ($useCssPrefix) {
@@ -142,15 +138,11 @@ class DropdownModule extends SortableModule {
      * @param string $icon Icon for the trigger.
      * @return object $this The calling DropdownModule object.
      */
-    public function setTrigger($text = '', $type = 'button', $class = 'btn-default', $icon = 'caret-down') {
-        $this->trigger['triggerText'] = $text;
+    public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down') {
+        $this->trigger['text'] = $text;
         $this->trigger['type'] = in_array($type, $this->triggerTypes) ? $type : 'button';
-        $this->trigger['triggerIcon'] = $icon;
-        $this->trigger['triggerCssClass'] = trim($class);
-
-        //for mustache logic
-        $this->trigger['isButton'] = $this->trigger['type'] === 'button';
-        $this->trigger['isAnchor'] = $this->trigger['type'] === 'anchor';
+        $this->trigger['icon'] = $icon;
+        $this->trigger['cssClass'] = trim($cssClass);
         return $this;
     }
 }

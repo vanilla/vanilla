@@ -30,23 +30,23 @@
  *
  * Here is an example menu creation:
  *
- *  $dropdown = new DropdownModule('my-dropdown', 'Trigger Name');
- *  $dropdown->addBootstrapAssets($this);
- *  $dropdown->setTrigger('A New Name', 'button', 'btn-default', 'caret-down')
- *  ->addLink('Link 1', '#') // automatically creates key: item1
- *  ->addDivider() // automatically creates key: item2
- *  ->addLink('Link 2', '#', true, 'link2', false, '', '', false, 'bg-danger') // creates item with key: link2
- *  ->addLink('Link 3', '#') // automatically creates key: item3
- *  ->addLink('Link 4', '#') // automatically creates key: item4
- *  ->addGroup('', true, 'group1') // creates group with no header
- *  ->addGroup('Group 3', true, 'group3') // creates group with header: 'Group 3', empty so will not display
- *  ->addGroup('Group 2', true, 'group2') // creates group with header: 'Group 2'
- *  ->addLink('Link 5', '#', true, false, array('before', 'link2'), '', '4') // automatically creates key: item5. Inserts before Link 2
- *  ->addLink('Link 6', '#') // automatically creates key: item6
- *  ->addLink('Link 7', '#') // automatically creates key: item7
- *  ->addLink('Link 8', '#', true, 'group2.link8', false, 'flame', '', true) // adds to Group 2
- *  ->addLink('Link 9', '#', true, 'group1.link9') // adds to Group 1
- *  ->addLink('Link 10', '#', true, 'group1.link10'); // adds to Group 1
+ * $dropdown = new DropdownModule('my-dropdown', 'Trigger Name');
+ * $dropdown->setTrigger('A New Name')
+ * ->addLink('Link 1', '#') // automatically creates key: item1
+ * ->addDivider() // automatically creates key: item2
+ * ->addLink('Link 2', '#', 'link2', 'bg-danger') // creates item with key: link2
+ * ->addLink('Link 3', '#') // automatically creates key: item3
+ * ->addLink('Link 4', '#') // automatically creates key: item4
+ * ->addGroup('', 'group1') // creates group with no header
+ * ->addGroup('Group 3', 'group3') // creates group with header: 'Group 3', empty so will not display
+ * ->addGroup('Group 2', 'group2') // creates group with header: 'Group 2'
+ * ->addLink('Link 5', '#', '', '', array('before', 'link2'), false, array('badge' => '4')) // automatically creates key: item5. Inserts before Link 2
+ * ->addLink('Link 6', '#') // automatically creates key: item6
+ * ->addLink('Link 7', '#') // automatically creates key: item7
+ * ->addLink('Link 8', '#', 'group2.link8', '', array(), false, array('icon' => 'flame')) // adds to Group 2
+ * ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
+ * ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
+ * echo $dropdown;
  *
  * Which results in a menu:
  *

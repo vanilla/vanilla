@@ -51,6 +51,8 @@ abstract class SortableModule extends Gdn_Module {
      */
     private $isPrepared = false;
 
+    private $allowedItemModifiers = array('popinRel', 'icon', 'badge');
+
     /**
      * Constructor. Should be called by all extending classes' constructors.
      *
@@ -65,6 +67,18 @@ abstract class SortableModule extends Gdn_Module {
     }
 
     /**
+     * @param bool $isAllowed Whether to actually add the item.
+     * @return $this
+     */
+    public function addDividerIf($isAllowed = true) {
+        if (!$isAllowed) {
+            return $this;
+        } else {
+            return $this->addDivider();
+        }
+    }
+
+    /**
      * Add a divider to the items array.
      *
      * @param bool $isAllowed Whether to actually add the item.
@@ -74,54 +88,69 @@ abstract class SortableModule extends Gdn_Module {
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addDivider($isAllowed = true, $key = '',  $sort = array(), $cssClass = '') {
-        if (!$isAllowed) {
-            return $this;
-        }
-        $divider = array(
-            'key' => $key,
-            'dividerCssClass' => $cssClass
-        );
-
+    public function addDivider($key = '', $cssClass = '', $sort = array()) {
+        $divider['key'] = $key;
         if ($sort) {
             $divider['sort'] = $sort;
         }
 
         $this->touchKey($divider);
-        $divider['dividerCssClass'] = $cssClass.' '.$this->buildCssClass($this->dividerCssClassPrefix, $divider);
+        $divider['cssClass'] = $cssClass.' '.$this->buildCssClass($this->dividerCssClassPrefix, $divider);
 
         $this->addItem('divider', $divider);
         return $this;
     }
 
     /**
-     * Add a group to the items array.
+     * Add a group to the items array if it satisfies the $isAllowed condition.
      *
-     * @param string $text The display text for the group header.
      * @param bool $isAllowed Whether to actually add the item.
+     * @param string $text The display text for the group header.
      * @param string $key The item's key (for sorting and CSS targeting).
-     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
-     * @param string $icon Name of the icon for the item, excluding the 'icon-' prefix.
-     * @param string $badge Info to put into a badge, usually a number.
-     * @param string $popinRel Endpoint for a popin.
      * @param string $cssClass The group header's CSS class.
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
+     * - **popinRel**: string - Endpoint for a popin.
+     * - **badge**: string - Info to put into a badge, usually a number.
+     * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addGroup($text = '', $isAllowed = true, $key = '',  $sort = array(), $icon = '', $badge = '', $popinRel = '', $cssClass = '') {
+    public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
         if (!$isAllowed) {
             return $this;
+        } else {
+            return $this->addGroup($text, $key, $cssClass, $sort, $modifiers);
         }
+    }
+
+    /**
+     * Add a group to the items array.
+     *
+     * @param string $text The display text for the group header.
+     * @param string $key The item's key (for sorting and CSS targeting).
+     * @param string $cssClass The group header's CSS class.
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
+     * - **popinRel**: string - Endpoint for a popin.
+     * - **badge**: string - Info to put into a badge, usually a number.
+     * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
+     * @return object $this The calling object.
+     * @throws Exception
+     */
+    public function addGroup($text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
         $group = array(
-            'headerText' => $text,
-            'headerIcon' => $icon,
-            'headerBadge' => $badge,
+            'text' => $text,
             'key' => $key,
-            'headerCssClass' => $cssClass
+            'cssClass' => $cssClass
         );
 
         if ($sort) {
             $group['sort'] = $sort;
+        }
+
+        if (!empty($modifiers)) {
+            $this->addItemModifiers($group, $modifiers);
         }
 
         $this->touchKey($group);
@@ -134,33 +163,50 @@ abstract class SortableModule extends Gdn_Module {
     }
 
     /**
+     * Add a link to the items array if it satisfies the $isAllowed condition.
+     *
+     * @param bool $isAllowed Whether to actually add the item.
+     * @param string $text The display text for the link.
+     * @param string $url The destination url for the link.
+     * @param string $key The item's key (for sorting and CSS targeting).
+     * @param string $cssClass The link's CSS class.
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param bool $disabled Whether to disable the link.
+     * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
+     * - **popinRel**: string - Endpoint for a popin.
+     * - **badge**: string - Info to put into a badge, usually a number.
+     * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
+     * @return object $this The calling object.
+     * @throws Exception
+     */
+    public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = array(), $disabled = false, $modifiers = array()) {
+        if (!$isAllowed) {
+            return $this;
+        } else {
+            return $this->addLink($text, $url, $key, $cssClass, $sort, $disabled, $modifiers);
+        }
+    }
+
+    /**
      * Add a link to the items array.
      *
      * @param string $text The display text for the link.
      * @param string $url The destination url for the link.
-     * @param bool $isAllowed Whether to actually add the item.
      * @param string $key The item's key (for sorting and CSS targeting).
-     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
-     * @param string $icon Name of the icon for the item, excluding the 'icon-' prefix.
-     * @param string $badge Info to put into a badge, usually a number.
-     * @param string $popinRel Endpoint for a popin.
-     * @param bool $disabled Whether to disable the link.
      * @param string $cssClass The link's CSS class.
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param bool $disabled Whether to disable the link.
+     * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
+     * - **popinRel**: string - Endpoint for a popin.
+     * - **badge**: string - Info to put into a badge, usually a number.
+     * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addLink($text, $url, $isAllowed = true, $key = '', $sort = array(), $icon = '', $badge = '', $popinRel = '', $disabled = false, $cssClass = '') {
-        if (!$isAllowed) {
-            return $this;
-        }
-
+    public function addLink($text, $url, $key = '', $cssClass = '', $sort = array(), $disabled = false, $modifiers = array()) {
         $link = array(
-            'linkText' => $text,
-            'linkText' => $text,
-            'linkUrl' => $url,
-            'linkIcon' => $icon,
-            'linkBadge' => $badge,
-            'linkPopinRel' => $popinRel,
+            'text' => $text,
+            'url' => $url,
             'key' => $key,
         );
 
@@ -168,8 +214,12 @@ abstract class SortableModule extends Gdn_Module {
             $link['sort'] = $sort;
         }
 
+        if (!empty($modifiers)) {
+            $this->addItemModifiers($link, $modifiers);
+        }
+
         $this->touchKey($link);
-        $link['linkCssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);
+        $link['cssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);
 
         $listItemCssClasses = array();
         if ($disabled) {
@@ -185,12 +235,17 @@ abstract class SortableModule extends Gdn_Module {
     }
 
     /**
-     * Checks whether the items array is empty.
+     * Adds the attributes in the modifiers array to the item.
+     * Constrains the modifier to those defined in $this->allowedItemModifiers.
      *
-     * @return bool Whether the items array is empty.
+     * @param array $item The item to modify.
+     * @param array $modifiers The modifiers to add to the item.
      */
-    public function hasItems() {
-        return (!empty($this->items));
+    public function addItemModifiers(&$item, $modifiers) {
+        $modifiers = array_intersect_key($modifiers, array_flip($this->allowedItemModifiers));
+        foreach($modifiers as $attribute => $value) {
+            $item[$attribute] = $value;
+        }
     }
 
     /**
@@ -224,14 +279,6 @@ abstract class SortableModule extends Gdn_Module {
 
         // Make sure the link has its type.
         $item['type'] = $type;
-
-        // Set type boolean for mustache logic.
-        $item['is'.ucfirst($type)] = true;
-
-        // Explicitly set group as false to aid recursion in mustache.
-        if ($type != 'group') {
-            $item['isGroup'] = false;
-        }
 
         // Walk into the items list to set the item.
         $items =& $this->items;
@@ -377,38 +424,7 @@ abstract class SortableModule extends Gdn_Module {
         if ($this->flatten) {
             $this->items = $this->flattenArray($this->items);
         }
-        else {
-            $this->items = $this->resetArrayIndices($this->items);
-        }
         return !empty($this->items);
-    }
-
-    /**
-     * Recursive function that resets the indices of the items array to
-     * be numeric. Necessary for mustache logic.
-     *
-     * @param array $items The items array to reset indices on.
-     * @return array The updated items array.
-     */
-    public function resetArrayIndices($items) {
-        foreach ($items as $index => &$item) {
-            unset($item['_sort'], $item['key']); //remove data we don't need anymore
-
-            // Remove empty groups.
-            if (val('type', $item) == 'group' && !val('items', $item)) {
-                unset($items[$index]);
-            }
-            if (val('items', $item)) {
-                $item['items'] = $this->resetArrayIndices($item['items']);
-                //for mustache logic
-                $item['hasChildren'] = true;
-            }
-            else {
-                //for mustache logic
-                $item['hasChildren'] = false;
-            }
-        }
-        return array_values($items);
     }
 
     /**

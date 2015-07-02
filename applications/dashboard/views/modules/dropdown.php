@@ -20,31 +20,31 @@ if ($trigger = val('trigger', $this)) {
 echo '<ul class="Flyout dropdown-menu '.val('listCssClass', $this).'" role="menu" aria-labelledby="'.val('triggerId', $this).'">';
 foreach (val('items', $this) as $item) {
     if (val('type', $item) == 'group') {
-        echo '<li role="presentation" class="dropdown-header '.val('headerCssClass', $item).'">';
-        if (val('headerIcon', $item)) {
-            echo icon(val('headerIcon', $item));
+        echo '<li role="presentation" class="dropdown-header '.val('cssClass', $item).'">';
+        if (val('icon', $item)) {
+            echo icon(val('icon', $item));
         }
-        echo val('headerText', $item);
-        if(val('headerBadge', $item)) {
-            echo badge(val('headerBadge', $item));
+        echo val('text', $item);
+        if(val('badge', $item)) {
+            echo badge(val('badge', $item));
         }
         echo '</li>';
     }
     if (val('type', $item) == 'link') {
         echo '<li role="presentation" class="'.val('listItemCssClass', $item).'">';
-        echo '<a role="menuitem" class="dropdown-menu-link '.val('linkCssClass', $item).'" tabindex="-1" href="'.val('linkUrl', $item).'">';
-        if (val('linkIcon', $item)) {
-            echo icon(val('linkIcon', $item));
+        echo '<a role="menuitem" class="dropdown-menu-link '.val('cssClass', $item).'" tabindex="-1" href="'.val('url', $item).'">';
+        if (val('icon', $item)) {
+            echo icon(val('icon', $item));
         }
-        echo val('linkText', $item);
-        if(val('linkBadge', $item)) {
-            echo badge(val('linkBadge', $item));
+        echo val('text', $item);
+        if(val('badge', $item)) {
+            echo badge(val('badge', $item));
         }
         echo '</a>';
         echo '</li>';
     }
     if (val('type', $item) == 'divider') {
-        echo '<li role="presentation" class="divider '.val('dividerCssClass', $item).'"></li>';
+        echo '<li role="presentation" class="divider '.val('cssClass', $item).'"></li>';
     }
 }
 echo '</ul>';

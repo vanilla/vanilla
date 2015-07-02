@@ -317,6 +317,11 @@ $PermissionModel->Define(
 
 $PermissionModel->Undefine('Vanilla.Spam.Manage');
 
+// Only setup default permissions if no role permissions are set.
+$hasPermissions = $SQL->where('RoleID >', 0)->get('Permission')->firstRow(DATASET_TYPE_ARRAY);
+if (!$hasPermissions) {
+    PermissionModel::resetAllRoles();
+}
 
 /*
 Apr 26th, 2010

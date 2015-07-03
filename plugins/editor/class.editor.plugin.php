@@ -567,7 +567,7 @@ class EditorPlugin extends Gdn_Plugin {
         // they can override the styles with this file.
         $CssInfo = AssetModel::cssPath('wysiwyg.css', 'plugins/editor');
         if ($CssInfo) {
-            $CssPath = Asset($CssInfo[1]);
+            $CssPath = asset($CssInfo[1]);
         }
 
         // Load JavaScript used by every editor view.
@@ -595,6 +595,7 @@ class EditorPlugin extends Gdn_Plugin {
         $ConfigMaxSize = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize', '1MB'));
         $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
         $c->addDefinition('maxUploadSize', $MaxSize);
+
         // Set file input name
         $c->addDefinition('editorFileInputName', $this->editorFileInputName);
         $Sender->setData('_editorFileInputName', $this->editorFileInputName);
@@ -632,7 +633,8 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // If force Wysiwyg enabled in settings
-        if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true) {
+        $needsConversion = (!in_array($this->Format, array('Html', 'Wysiwyg')));
+        if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
             $wysiwygBody = Gdn_Format::to($Sender->getValue('Body'), $this->Format);
             $Sender->setValue('Body', $wysiwygBody);
 
@@ -652,7 +654,7 @@ class EditorPlugin extends Gdn_Plugin {
                 $this->EventArguments['EditorToolbar'] =& $editorToolbar;
                 $this->fireEvent('InitEditorToolbar');
 
-               // Set data for view
+                // Set data for view
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
@@ -675,9 +677,7 @@ class EditorPlugin extends Gdn_Plugin {
     * @param array $Args
     */
     public function postController_editorUpload_create($Sender, $Args = array()) {
-        // Require new image thumbnail generator function. Currently it's
-        // being symlinked from my vhosts/tests directory. When it makes it
-        // into core, it will be available in functions.general.php
+        // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';
 
         // Grab raw upload data ($_FILES), essentially. It's only needed
@@ -698,8 +698,7 @@ class EditorPlugin extends Gdn_Plugin {
         $Upload = new Gdn_Upload();
 
         // This will validate, such as size maxes, file extensions. Upon doing
-        // this, $_FILES is set as a protected property, so all the other
-        // Gdn_Upload methods work on it.
+        // this, $_FILES is set as a protected property, so all the other Gdn_Upload methods work on it.
         $tmpFilePath = $Upload->validateUpload($this->editorFileInputName);
 
         // Get base destination path for editor uploads
@@ -718,11 +717,8 @@ class EditorPlugin extends Gdn_Plugin {
             // will create a filename, with extension, and check if its dir can be writable.
             $absoluteFileDestination = $this->getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension);
 
-           // This is returned by SaveAs
-           //$filePathparsed = Gdn_Upload::Parse($absoluteFileDestination);
-
-           // Save original file to uploads, then manipulate from this location if
-           // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
+            // Save original file to uploads, then manipulate from this location if
+            // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
             if (empty($imageType)) {
                 $filePathParsed = $Upload->saveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
             } else {
@@ -732,7 +728,6 @@ class EditorPlugin extends Gdn_Plugin {
             }
 
             // Determine if image, and thus requires thumbnail generation, or simply saving the file.
-
             // Not all files will be images.
             $thumbHeight = '';
             $thumbWidth = '';
@@ -742,8 +737,7 @@ class EditorPlugin extends Gdn_Plugin {
             $thumbUrl = '';
 
             // This is a redundant check, because it's in the thumbnail function,
-            // but there's no point calling it blindly on every file, so just
-            // check here before calling it.
+            // but there's no point calling it blindly on every file, so just check here before calling it.
             $generate_thumbnail = false;
             if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
                 $imageHeight = $tmpheight;
@@ -754,8 +748,7 @@ class EditorPlugin extends Gdn_Plugin {
             // Save data to database using model with media table
             $Model = new Gdn_Model('Media');
 
-            // Will be passed to model for database insertion/update.
-            // All thumb vars will be empty.
+            // Will be passed to model for database insertion/update. All thumb vars will be empty.
             $Media = array(
                 'Name' => $fileName,
                 'Type' => $fileData['type'],
@@ -771,7 +764,7 @@ class EditorPlugin extends Gdn_Plugin {
                 'ThumbPath' => $thumbPathParsed['SaveName']
             );
 
-            // Get MediaID and pass it to client in payload
+            // Get MediaID and pass it to client in payload.
             $MediaID = $Model->save($Media);
             $Media['MediaID'] = $MediaID;
 

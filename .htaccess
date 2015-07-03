@@ -12,6 +12,7 @@
 
     # The basic rewrite rule.
     RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php/$1 [QSA,E=X_REWRITE:1,L]
 
     # Add the proper X_REWRITE server variable for rewritten requests.

@@ -1068,7 +1068,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         if ($Sender->data('Messages')) {
-            $Message = $Sender->data('Messages')->Result();
+            $Message = $Sender->data('Messages')->result();
             $MessageID = val(0, $Message)->MessageID;
             $MessageIDList = array($MessageID);
             if (count($MessageIDList)) {
@@ -1239,7 +1239,7 @@ class EditorPlugin extends Gdn_Plugin {
         // SHA1 of the tmp file
         // $fileSHA1 = sha1_file($tmpFilePath);
         // Instead just use the RandomString function that Gdn_Upload->GenerateTargetName is using.
-        $fileRandomString = strtolower(RandomString(14));
+        $fileRandomString = strtolower(randomString(14));
 
         // Use first two characters from fileMD5 as subdirectory,
         // and use the rest as the file name.

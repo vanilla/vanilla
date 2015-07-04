@@ -149,7 +149,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         // Make sure none of the selected discussions are ghost redirects.
         $discussionTypes = array_column($Discussions, 'Type');
         if (in_array('redirect', $discussionTypes)) {
-            throw Gdn_UserException('You cannot merge redirects.', 400);
+            throw new Gdn_UserException('You cannot merge redirects.', 400);
         }
 
         // Perform the merge

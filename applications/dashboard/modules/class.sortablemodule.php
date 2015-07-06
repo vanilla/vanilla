@@ -61,27 +61,32 @@ abstract class SortableModule extends Gdn_Module {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the generated CSS classes for the items.
      */
     public function __construct($view, $flatten, $useCssPrefix = false) {
-        parent::__construct($view);
+        $this->setView($view);
         $this->flatten = $flatten;
         $this->useCssPrefix = $useCssPrefix;
     }
 
     /**
+     * Add a divider to the items array if it satisfies the $isAllowed condition.
+     *
      * @param bool $isAllowed Whether to actually add the item.
-     * @return $this
+     * @param string $key The item's key (for sorting and CSS targeting).
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @param string $cssClass The divider's CSS class.
+     * @return object $this The calling object.
+     * @throws Exception
      */
-    public function addDividerIf($isAllowed = true) {
+    public function addDividerIf($isAllowed = true, $key = '', $cssClass = '', $sort = array()) {
         if (!$isAllowed) {
             return $this;
         } else {
-            return $this->addDivider();
+            return $this->addDivider($key, $cssClass, $sort);
         }
     }
 
     /**
      * Add a divider to the items array.
      *
-     * @param bool $isAllowed Whether to actually add the item.
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @param string $cssClass The divider's CSS class.
@@ -410,8 +415,7 @@ abstract class SortableModule extends Gdn_Module {
     }
 
     /**
-     * Prepares the items array for output by sorting, optionally flattening,
-     * and making the index values of the items array numeric.
+     * Prepares the items array for output by sorting and optionally flattening.
      *
      * @return bool Whether to render the module.
      */

@@ -22,10 +22,11 @@
  * Each item must have a unique key. If not supplied, the class will generate
  * one in the format: 'item*', where * is an auto incrementing number.
  * Keys can be used for sorting purposes and for adding links to a group.
- * For example, you could add a property to an item of 'sort'=>array('before'=>'key1')
+ * For example, you could set the sort property to an item to array('before'=>'key1')
  * and it would place the item before another item with the key of 'key1'.
  * If you have a group with the key of 'key2', you can add to this group by
- * adding a new item with the property of 'key'=>'key2.newItemKey'
+ * setting the key of a new item to 'key2.newItemKey'.
+ * The sort property can also be an integer, indicating the item's position in the menu.
  *
  *
  * Here is an example menu creation:

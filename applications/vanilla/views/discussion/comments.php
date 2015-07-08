@@ -16,5 +16,14 @@ foreach ($Comments as $Comment) {
     if (is_numeric($Comment->CommentID))
         $CurrentOffset++;
     $this->CurrentComment = $Comment;
+
+    $renderComment = true;
+    $this->EventArguments['Comment'] = $Comment;
+    $this->EventArguments['RenderComment'] = &$renderComment;
+    $this->fireEvent('BeforeWriteComment');
+    if (!$renderComment) {
+        continue;
+    }
+
     WriteComment($Comment, $this, $Session, $CurrentOffset);
 }

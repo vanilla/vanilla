@@ -1759,7 +1759,6 @@ class DiscussionModel extends VanillaModel {
 
                     // Notify all of the users that were mentioned in the discussion.
                     $Usernames = GetMentions($DiscussionName.' '.$Story);
-                    $Usernames = array_unique($Usernames);
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $Activity;

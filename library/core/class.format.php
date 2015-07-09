@@ -1023,57 +1023,70 @@ class Gdn_Format {
         }
     }
 
-    public static function tagContent($Html, $Callback, $SkipAnchors = true) {
-        $Regex = "`([<>])`i";
-        $Parts = preg_split($Regex, $Html, null, PREG_SPLIT_DELIM_CAPTURE);
 
-//      echo htmlspecialchars($Html);
-//      echo '<pre>';
-//      echo htmlspecialchars(print_r($Parts, TRUE));
-//      echo '</pre>';
+    /**
+     * Executes the callback function on parts of the string excluding html tags.
+     * Optionally skips the contents of an anchor tag <a> or a code tag <code>.
+     *
+     * @param string $html The html-formatted string to parse.
+     * @param callable $callback The callback function to execute on appropriate segments of the string.
+     * @param bool $skipAnchors Whether to call the callback function on anchor tag content.
+     * @param bool $skipCode  Whether to call the callback function on code tag content.
+     * @return string
+     */
+    public static function tagContent($html, $callback, $skipAnchors = true, $skipCode = true) {
+        $regex = "`([<>])`i";
+        $parts = preg_split($regex, $html, null, PREG_SPLIT_DELIM_CAPTURE);
 
-        $InTag = false;
-        $InAnchor = false;
-        $TagName = false;
+        $inTag = false;
+        $inAnchor = false;
+        $inCode = false;
+        $tagName = false;
 
-        foreach ($Parts as $i => $Str) {
-            switch ($Str) {
+        foreach ($parts as $i => $str) {
+            switch ($str) {
                 case '<':
-                    $InTag = true;
+                    $inTag = true;
                     break;
                 case '>':
-                    $InTag = false;
+                    $inTag = false;
                     break;
                 case '':
                     break;
                 default;
-                    if ($InTag) {
-                        if ($Str[0] == '/') {
-                            $TagName = preg_split('`\s`', substr($Str, 1), 2);
-                            $TagName = $TagName[0];
+                    if ($inTag) {
+                        if ($str[0] == '/') {
+                            $tagName = preg_split('`\s`', substr($str, 1), 2);
+                            $tagName = $tagName[0];
 
-                            if ($TagName == 'a') {
-                                $InAnchor = false;
+                            if ($tagName == 'a') {
+                                $inAnchor = false;
+                            }
+                            if ($tagName == 'code') {
+                                $inCode = false;
                             }
                         } else {
-                            $TagName = preg_split('`\s`', trim($Str), 2);
-                            $TagName = $TagName[0];
+                            $tagName = preg_split('`\s`', trim($str), 2);
+                            $tagName = $tagName[0];
 
-                            if ($TagName == 'a') {
-                                $InAnchor = true;
+                            if ($tagName == 'a') {
+                                $inAnchor = true;
+                            }
+                            if ($tagName == 'code') {
+                                $inCode = true;
                             }
                         }
                     } else {
-                        if (!$InAnchor || !$SkipAnchors) {
-                            $Parts[$i] = call_user_func($Callback, $Str);
+                        if (!($inAnchor && $skipAnchors) && !($inCode && $skipCode)) {
+                            // We're not in an anchor and not in a code block
+                            $parts[$i] = call_user_func($callback, $str);
                         }
                     }
                     break;
             }
         }
 
-//      return htmlspecialchars(implode('', $Parts));
-        return implode($Parts);
+        return implode($parts);
     }
 
     /** Formats the anchor tags around the links in text.
@@ -1459,6 +1472,71 @@ EOT;
         }
     }
 
+    /**
+     * Adds a link to all mentions in a given string.
+     * Supports most usernames by using double-quotes, for example:  @"a $pecial user's! name."
+     * Without double-quotes, a mentioned username is terminated by any of the following characters:
+     * whitespace | . | , | ; | ? | ! | :
+     *
+     * @param string $str The html-formatted string to format mentions in.
+     * @return string The formatted string.
+     */
+    public static function formatMentions($str) {
+        $parts = preg_split('`\B@`', $str);
+
+        // We have no mentions here.
+        if (count($parts) == 1) {
+            return $str;
+        }
+
+        foreach ($parts as $i => $str) {
+            if ($i == 0) {
+                // Text before the mention.
+                $str[$i] = htmlspecialchars($str);
+                continue;
+            }
+
+            if (empty($str)) {
+                // There was an escaped @@.
+                $parts[$i - 1] = '';
+                continue;
+            }
+
+            if (preg_match('`\w$`', $parts[$i - 1])) {
+                $str[$i] = htmlspecialchars($str);
+                continue;
+            }
+
+            // Grab the mention.
+            $mention = false;
+            $suffix = '';
+            if ($str[0] == '"') {
+                // Quoted mention.
+                $pos = strpos($str, '"', 1);
+
+                if ($pos === false) {
+                    $str = substr($str, 1);
+                } else {
+                    $mention = substr($str, 1, $pos - 1);
+                    $suffix = substr($str, $pos + 1);
+                }
+            }
+            if (!$mention && !empty($str)) {
+                // Unquoted mention.
+                $parts2 = preg_split('`([\s.,;?!:])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $mention = $parts2[0];
+                $suffix = val(1, $parts2, '') . val(2, $parts2, '');
+            }
+
+            if ($mention) {
+                $parts[$i] = Anchor('@'.$mention, str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat)).$suffix;
+            } else {
+                $parts[$i] = '@' . $parts[$i];
+            }
+        }
+        return implode('', $parts);
+    }
+
     public static function mentions($Mixed) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Mentions');
@@ -1471,15 +1549,8 @@ EOT;
 
             // Handle @mentions.
             if (C('Garden.Format.Mentions')) {
-                $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
-
-                // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
-                $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
-                $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
-                    '/(^|[\s,\.>\(])@('.$Pattern.'{1,64})\b/i', //{3,20}
-                    '\1'.anchor('@$2', $urlFormat),
-                    $Mixed
-                );
+                // Only format mentions that are not already in anchor tags or code tags.
+                $Mixed = self::tagContent($Mixed, 'Gdn_Format::formatMentions');
             }
 
             // Handle #hashtag searches

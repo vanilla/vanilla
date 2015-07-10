@@ -380,6 +380,7 @@ EOT;
         $this->addJsFile('entry.js');
         $this->View = 'connect';
         $IsPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
+        $UserSelect = $this->Form->getFormValue('UserSelect');
 
         if (!$IsPostBack) {
             // Here are the initial data array values. that can be set by a plugin.
@@ -517,6 +518,10 @@ EOT;
                 $UserModel->SQL->orWhere('Email', $this->Form->getFormValue('Email'));
                 $Search = true;
             }
+            if (is_numeric($UserSelect)) {
+                $UserModel->SQL->orWhere('UserID', $UserSelect);
+                $Search = true;
+            }
 
             if ($Search) {
                 $ExistingUsers = $UserModel->getWhere()->resultArray();
@@ -604,7 +609,10 @@ EOT;
                 $EmailValid = validateRequired($this->Form->getFormValue('Email'));
             }
 
-            if ($this->Form->getFormValue('Name') && $EmailValid && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+            if ((!$UserSelect || $UserSelect == 'other') &&
+                $this->Form->getFormValue('Name') && $EmailValid &&
+                (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+
                 // There is no existing user with the suggested name so we can just create the user.
                 $User = $this->Form->formValues();
                 $User = $this->UserModel->filterForm($User, true);
@@ -627,6 +635,7 @@ EOT;
                         'UniqueID' => $this->Form->getFormValue('UniqueID')));
 
                     $this->Form->setFormValue('UserID', $UserID);
+                    $this->Form->setFormValue('UserSelect', false);
 
                     Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
                     Gdn::userModel()->fireEvent('AfterSignIn');
@@ -649,8 +658,6 @@ EOT;
         if ($IsPostBack) {
             // The user has made their decision.
             $PasswordHash = new Gdn_PasswordHash();
-
-            $UserSelect = $this->Form->getFormValue('UserSelect');
 
             if (!$UserSelect || $UserSelect == 'other') {
                 // The user entered a username.

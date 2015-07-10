@@ -158,15 +158,15 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param PermissionModel $Sender Instance of permission model that fired the event
      */
-    public function permissionModel_DefaultPermissions_Handler($Sender) {
+    public function permissionModel_defaultPermissions_handler($Sender) {
         // Guest defaults
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_GUEST,
             array(
                 'Vanilla.Discussions.View' => 1
             )
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_GUEST,
             array(
                 'Vanilla.Discussions.View' => 1
@@ -176,13 +176,13 @@ class VanillaHooks implements Gdn_IPlugin {
         );
 
         // Unconfirmed defaults
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
             array(
                 'Vanilla.Discussions.View' => 1
             )
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
             array(
                 'Vanilla.Discussions.View' => 1
@@ -192,13 +192,13 @@ class VanillaHooks implements Gdn_IPlugin {
         );
 
         // Applicant defaults
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_APPLICANT,
             array(
                 'Vanilla.Discussions.View' => 1
             )
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_APPLICANT,
             array(
                 'Vanilla.Discussions.View' => 1
@@ -208,7 +208,7 @@ class VanillaHooks implements Gdn_IPlugin {
         );
 
         // Member defaults
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_MEMBER,
             array(
                 'Vanilla.Discussions.Add' => 1,
@@ -216,7 +216,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Add' => 1
             )
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_MEMBER,
             array(
                 'Vanilla.Discussions.Add' => 1,
@@ -228,7 +228,7 @@ class VanillaHooks implements Gdn_IPlugin {
         );
 
         // Moderator defaults
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
             array(
                 'Vanilla.Discussions.Add' => 1,
@@ -243,7 +243,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Delete' => 1
             )
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
             array(
                 'Vanilla.Discussions.Add' => 1,
@@ -262,7 +262,7 @@ class VanillaHooks implements Gdn_IPlugin {
         );
 
         // Administrator defaults
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
             array(
                 'Vanilla.Discussions.Add' => 1,
@@ -277,7 +277,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Delete' => 1
             )
         );
-        $Sender->AddDefault(
+        $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
             array(
                 'Vanilla.Discussions.Add' => 1,

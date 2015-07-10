@@ -909,5 +909,6 @@ class UpdateModel extends Gdn_Model {
                 }
             }
         }
+        $this->fireEvent('AfterStructure');
     }
 }

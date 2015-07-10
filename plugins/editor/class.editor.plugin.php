@@ -38,7 +38,7 @@ class EditorPlugin extends Gdn_Plugin {
     protected $pluginInfo = array();
 
     /** @var array List of possible formats the editor supports. */
-    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
+    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx', 'IPB');
 
     /** @var string Default format being used for current rendering. Can be one of the formats listed in $Formats. */
     protected $Format;

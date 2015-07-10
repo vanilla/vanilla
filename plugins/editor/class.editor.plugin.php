@@ -587,6 +587,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
+        $c->addDefinition('ipbHelpText', t('editor.IPBHelpText', ''));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
 
         // Set variables for file uploads

@@ -46,7 +46,7 @@ class DebuggerPlugin extends Gdn_Plugin {
      */
     public function base_afterBody_handler($Sender) {
         $Session = Gdn::session();
-        if (!Debug() && !$Session->checkPermission('Plugins.Debugger.View')) {
+        if (!Debug() || !$Session->checkPermission('Plugins.Debugger.View')) {
             return;
         }
 

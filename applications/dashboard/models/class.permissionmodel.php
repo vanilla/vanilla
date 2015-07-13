@@ -1106,13 +1106,13 @@ class PermissionModel extends Gdn_Model {
                     $Where['JunctionColumn'] = $Values['JunctionColumn'];
                 }
                 $Where['JunctionID'] = $Values['JunctionID'];
-
-                unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
             } else {
                 $Where['JunctionTable'] = null; // no junction table.
                 $Where['JunctionColumn'] = null;
                 $Where['JunctionID'] = null;
             }
+            
+            unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
 
             $this->SQL->replace('Permission', $this->_Backtick($Values), $Where, true);
 

@@ -38,7 +38,7 @@ class EditorPlugin extends Gdn_Plugin {
     protected $pluginInfo = array();
 
     /** @var array List of possible formats the editor supports. */
-    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx', 'IPB');
+    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
 
     /** @var string Default format being used for current rendering. Can be one of the formats listed in $Formats. */
     protected $Format;
@@ -76,6 +76,10 @@ class EditorPlugin extends Gdn_Plugin {
         $this->AssetPath = Asset('/plugins/editor');
         $this->pluginInfo = Gdn::pluginManager()->getPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
+
+        // Check for additional formats
+        $this->EventArguments['formats'] =& $this->Formats;
+        $this->fireEvent('GetFormats');
 
         // Check upload permissions
         $this->canUpload = Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false);
@@ -587,8 +591,19 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
-        $c->addDefinition('ipbHelpText', t('editor.IPBHelpText', ''));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
+
+        $additionalDefinitions = array();
+        $this->EventArguments['definitions'] =& $additionalDefinitions;
+        $this->fireEvent('GetJSDefinitions');
+
+        // Make sure we still have an array after all event handlers have had their turn and iterate through the result.
+        if (is_array($additionalDefinitions)) {
+            foreach ($additionalDefinitions as $defKey => $defVal) {
+                $c->addDefinition($defKey, $defVal);
+            }
+            unset($defKey, $defVal);
+        }
 
         // Set variables for file uploads
         $PostMaxSize = Gdn_Upload::unformatFileSize(ini_get('post_max_size'));

@@ -143,6 +143,11 @@ if (!class_exists('HeadModule', false)) {
                 $Options = array();
             }
 
+            if (is_array($AddVersion)) {
+                $Options = $AddVersion;
+                $AddVersion = true;
+            }
+
             $Attributes = array();
             if ($Src) {
                 $Attributes['src'] = asset($Src, false, $AddVersion);

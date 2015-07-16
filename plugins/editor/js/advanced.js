@@ -424,7 +424,10 @@ var wysihtml5ParserRules = {
         "del": {},
         "blockquote": {
             "check_attributes": {
-                "cite": "url"
+                "cite": "url",
+                "data-author": "allow",
+                "data-cid": "numbers",
+                "data-time": "allow"
             }
         },
         "style": {

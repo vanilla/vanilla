@@ -412,7 +412,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
         $realKey = $this->makeKey($key, $finalOptions);
 
-        // Sharding, write real keys
+        // Sharding, write real keys and manifest
         if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
             $manifest = $this->shard($realKey, $value, $shards);
             $shards = $manifest->shards;
@@ -439,6 +439,7 @@ class Gdn_Memcached extends Gdn_Cache {
             return Gdn_Cache::CACHEOP_SUCCESS;
         }
 
+        // Unsharded, write key
         $stored = $this->memcache->set($realKey, $value, $expiry);
 
         // Check if things went ok

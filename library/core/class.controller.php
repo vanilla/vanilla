@@ -1775,11 +1775,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                     list($Path, $UrlPath) = $Search;
 
                     if ($Path !== false) {
+                        $AddVersion = true;
                         if (!isUrl($Path)) {
                             $Path = substr($Path, strlen(PATH_ROOT));
                             $Path = str_replace(DS, '/', $Path);
+                            $AddVersion = val('AddVersion', $Options, true);
                         }
-                        $this->Head->addScript($Path, 'text/javascript', $Options);
+                        $this->Head->addScript($Path, 'text/javascript', $AddVersion, $Options);
                         continue;
                     }
                 }

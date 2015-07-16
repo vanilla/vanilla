@@ -1752,7 +1752,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->EventArguments['Cdns'] = &$Cdns;
                 $this->fireEvent('AfterJsCdns');
 
-                $this->Head->addScript('', 'text/javascript', array('content' => $this->definitionList(false)));
+                $this->Head->addScript('', 'text/javascript', false, array('content' => $this->definitionList(false)));
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];

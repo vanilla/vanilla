@@ -905,9 +905,9 @@ class Gdn_Format {
 
                 // Allow the code tag to keep all enclosed HTML encoded.
                 $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($Matches) {
-                    $Result = "<code{$Matches[1]}>".
+                    $Result = "<pre><code{$Matches[1]}>".
                         htmlspecialchars($Matches[2]).
-                        '</code>';
+                        '</code></pre>';
                     return $Result;
                 }, $Mixed);
 

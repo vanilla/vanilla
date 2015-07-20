@@ -71,6 +71,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 
          $('.Message').livequery(function () {
             $('pre', this).addClass('prettyprint$Class');
+            // Let prettyprint determine styling, rather than the editor.
+            $('code', this).removeClass('CodeInline');
+            $('pre', this).removeClass('CodeBlock');
             if (pp)
                prettyPrint();
             $('pre', this).removeClass('prettyprint')

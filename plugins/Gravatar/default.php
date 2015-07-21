@@ -108,7 +108,8 @@ class GravatarPlugin extends Gdn_Plugin {
                     $url .= '&d='.$default;
                 }
             } else {
-                $default = urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.png'), true));
+                $defaultSize = ($size > 80) ? '_250' : '';
+                $default = urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default'.$defaultSize.'.png'), true));
                 $url .= '&d='.$default;
             }
 

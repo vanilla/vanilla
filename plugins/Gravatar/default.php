@@ -71,8 +71,8 @@ if (!function_exists('UserPhotoDefaultUrl')) {
             .'gravatar_id='.md5(strtolower($Email))
             .'&amp;size='.c('Garden.Thumbnail.Width', 50);
 
-        if (c('Plugins.Gravatar.UseVanillicon', true)) {
-            $Url .= '&default='.urlencode(Gdn::request()->scheme().'://vanillicon.com/'.md5($Email).'.png');
+        if (c('Plugins.Gravatar.UseVanillicon', true) && class_exists('VanilliconPlugin')) {
+            return VanilliconPlugin::vanilliconUrl($User);
         } else {
             $Url .= '&default='.urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.png'), true));
         }

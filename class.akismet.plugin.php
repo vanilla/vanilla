@@ -155,3 +155,4 @@ class AkismetPlugin extends Gdn_Plugin {
         $Cf->RenderAll();
     }
 }
+

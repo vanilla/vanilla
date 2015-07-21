@@ -82,18 +82,16 @@ class VanilliconPlugin extends Gdn_Plugin {
         $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
         $cf->renderAll();
     }
-}
 
-if (!function_exists('UserPhotoDefaultUrl')) {
-   /**
-    * Calculate the user's default photo url.
-    *
-    * @param array|object $user The user to examine.
-    * @param array $options An array of options.
-    * - Size: The size of the photo.
-    * @return string Returns the vanillicon url for the user.
-    */
-    function userPhotoDefaultUrl($user, $options = array()) {
+    /**
+     * Calculate the user's vanillicon avatar url.
+     *
+     * @param array|object $user The user to examine.
+     * @param array $options An array of options.
+     * - Size: The size of the photo.
+     * @return string Returns the vanillicon url for the user.
+     */
+    public static function vanilliconUrl($user, $options = array()) {
         static $iconSize = null, $type = null;
         if ($iconSize === null) {
             $thumbSize = c('Garden.Thumbnail.Size');
@@ -121,5 +119,19 @@ if (!function_exists('UserPhotoDefaultUrl')) {
         }
 
         return $photoUrl;
+    }
+}
+
+if (!function_exists('UserPhotoDefaultUrl')) {
+   /**
+    * Calculate the user's default photo url.
+    *
+    * @param array|object $user The user to examine.
+    * @param array $options An array of options.
+    * - Size: The size of the photo.
+    * @return string Returns the vanillicon url for the user.
+    */
+    function userPhotoDefaultUrl($user, $options = array()) {
+        return VanilliconPlugin::vanilliconUrl($user, $options);
     }
 }

@@ -3906,7 +3906,8 @@ if (!function_exists('userAgentType')) {
             'playstation vita',
             'windows phone',
             'iphone',
-            'ipod'
+            'ipod',
+            'nintendo 3ds'
         );
         $directAgentsMatch = implode('|', $directAgents);
         if (preg_match("/({$directAgentsMatch})/i", $userAgent)) {

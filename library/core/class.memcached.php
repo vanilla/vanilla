@@ -205,13 +205,15 @@ class Gdn_Memcached extends Gdn_Cache {
         static $servers = null;
         if (is_null($servers)) {
             $serverList = $this->servers();
-            $ns = count($serverList);
+            $numShards = count($serverList);
             $servers = array();
 
             if ($this->canAutoShard()) {
                 // Use getServerByKey to determine server keys
 
-                $i = $ns * 10;
+                // Here we loop until we have found keys for all the servers
+
+                $i = $numShards * 10;
                 do {
                     $i--; // limited iterations
                     $shardKey = betterRandomString(6, 'a0');
@@ -220,19 +222,19 @@ class Gdn_Memcached extends Gdn_Cache {
                     if ($shardServerName) {
                         $servers[$shardServerName] = $shardKey;
                     }
-                } while ($i > 0 && count($servers) < $ns);
+                } while ($i > 0 && count($servers) < $numShards);
 
             }
 
             if (!count($servers)) {
-                // Use random server keys
+                // Use random server keys and hope for the best
 
                 foreach ($serverList as $server) {
                     $serverName = $server['host'];
                     $servers[$serverName] = betterRandomString(6, 'a0');
                 }
-
             }
+
         }
         return $servers;
     }
@@ -278,9 +280,19 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param int|boolean $shards number of shards, or simply bool true
      * @return array
      */
-    public function shard($key, $value, $shards) {
+    public function shard($key, $value, $shards = true) {
 
         $shardMap = $this->shardMap();
+
+        // Limit the number of shards to a sane value to reduce overhead (but only if $shards wasn't explicitly specified)
+        if (!is_numeric($shards) && count($shardMap) > Gdn_Cache::CACHE_MAX_SHARDS) {
+            if (mt_rand(1,2) % 2) {
+                $shardMap = array_slice($shardMap, 0, Gdn_Cache::CACHE_MAX_SHARDS);
+            } else {
+                $shardMap = array_slice($shardMap, -Gdn_Cache::CACHE_MAX_SHARDS);
+            }
+        }
+
         $mapSize = count($shardMap);
         $shardMap = array_values($shardMap);
 

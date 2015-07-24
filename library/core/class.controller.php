@@ -1740,7 +1740,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if (arrayHasValue($this->_CssFiles, 'style.css')) {
                     $this->addJsFile('custom.js'); // only to non-admin pages.
                 }
-                // And now search for/add all JS files.
+
                 $Cdns = array();
                 if (!c('Garden.Cdns.Disable', false)) {
                     $Cdns = array(
@@ -1748,82 +1748,45 @@ class Gdn_Controller extends Gdn_Pluggable {
                     );
                 }
 
+                // And now search for/add all JS files.
                 $this->EventArguments['Cdns'] = &$Cdns;
                 $this->fireEvent('AfterJsCdns');
 
-                $this->Head->addScript('', 'text/javascript', array('content' => $this->definitionList(false)));
+                $this->Head->addScript('', 'text/javascript', false, array('content' => $this->definitionList(false)));
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];
+                    if (!is_array($JsInfo['Options'])) {
+                        $JsInfo['Options'] = array();
+                    }
+                    $Options = &$JsInfo['Options'];
 
                     if (isset($Cdns[$JsFile])) {
                         $JsFile = $Cdns[$JsFile];
                     }
 
-                    if (strpos($JsFile, '//') !== false) {
-                        // This is a link to an external file.
-                        $this->Head->addScript($JsFile, 'text/javascript', val('Options', $JsInfo, array()));
+                    $AppFolder = $JsInfo['AppFolder'];
+                    $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
+                    $Search = AssetModel::JsPath($JsFile, $LookupFolder, $ThemeType);
+                    if (!$Search) {
                         continue;
-                    } elseif (strpos($JsFile, '/') !== false) {
-                        // A direct path to the file was given.
-                        $JsPaths = array(combinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
-                    } else {
-                        $AppFolder = $JsInfo['AppFolder'];
-                        if ($AppFolder == '') {
-                            $AppFolder = $this->ApplicationFolder;
-                        }
-
-                        // JS can come from a theme, an any of the application folder, or it can come from the global js folder:
-                        $JsPaths = array();
-                        if ($this->Theme) {
-                            // 1. Application-specific js. eg. root/themes/theme_name/app_name/design/
-                            $JsPaths[] = PATH_THEMES.DS.$this->Theme.DS.$AppFolder.DS.'js'.DS.$JsFile;
-                            // 2. Garden-wide theme view. eg. root/themes/theme_name/design/
-                            $JsPaths[] = PATH_THEMES.DS.$this->Theme.DS.'js'.DS.$JsFile;
-                        }
-
-                        // 3. The application or plugin folder.
-                        if (stringBeginsWith(trim($AppFolder, '/'), 'plugins/')) {
-                            $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/js/$JsFile";
-                            $JsPaths[] = PATH_PLUGINS.strstr($AppFolder, '/')."/$JsFile";
-                        } else {
-                            $JsPaths[] = PATH_APPLICATIONS."/$AppFolder/js/$JsFile";
-                        }
-
-                        // 4. Global JS folder. eg. root/js/
-                        $JsPaths[] = PATH_ROOT.DS.'js'.DS.$JsFile;
-                        // 5. Global JS library folder. eg. root/js/library/
-                        $JsPaths[] = PATH_ROOT.DS.'js'.DS.'library'.DS.$JsFile;
                     }
 
-                    // Find the first file that matches the path.
-                    $JsPath = false;
-                    foreach ($JsPaths as $Glob) {
-                        $Paths = safeGlob($Glob);
-                        if (is_array($Paths) && count($Paths) > 0) {
-                            $JsPath = $Paths[0];
-                            break;
+                    list($Path, $UrlPath) = $Search;
+
+                    if ($Path !== false) {
+                        $AddVersion = true;
+                        if (!isUrl($Path)) {
+                            $Path = substr($Path, strlen(PATH_ROOT));
+                            $Path = str_replace(DS, '/', $Path);
+                            $AddVersion = val('AddVersion', $Options, true);
                         }
-                    }
-
-                    if ($JsPath !== false) {
-                        $JsSrc = str_replace(
-                            array(PATH_ROOT, DS),
-                            array('', '/'),
-                            $JsPath
-                        );
-
-                        $Options = (array)$JsInfo['Options'];
-                        $Options['path'] = $JsPath;
-                        $Version = val('Version', $JsInfo);
-                        if ($Version) {
-                            touchValue('version', $Options, $Version);
-                        }
-
-                        $this->Head->addScript($JsSrc, 'text/javascript', $Options);
+                        $this->Head->addScript($Path, 'text/javascript', $AddVersion, $Options);
+                        continue;
                     }
                 }
             }
+
             // Add the favicon.
             $Favicon = C('Garden.FavIcon');
             if ($Favicon) {

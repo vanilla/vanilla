@@ -30,8 +30,12 @@ $PluginInfo['Gravatar'] = array(
 class GravatarPlugin extends Gdn_Plugin {
 
 
-    public $configs = array('Plugins.Gravatar.UseVanillicon' => 'Whether to use Vanillicon as the default image for users without a Gravatar avatar.',
-                            'Plugins.Gravatar.DefaultAvatar' => 'Url of the default avatar image. Must have Plugins.Gravatar.UseVanillicon set to false or the Vanillicon plugin disabled.');
+    public $configs = array('Plugins.Gravatar.UseVanillicon' => array('description' => 'Whether to use Vanillicon as the default image for users without a Gravatar avatar.',
+                                                                      'type' => 'boolean',
+                                                                      'title' => 'Use Vanillicon as a default avatar'),
+                            'Plugins.Gravatar.DefaultAvatar' => array('description' => 'Url of the default avatar image. Must have Plugins.Gravatar.UseVanillicon set to false or have the Vanillicon plugin disabled to appear.',
+                                                                      'type' => 'string',
+                                                                      'title' => 'Default avatar image path'));
 
     /**
      *

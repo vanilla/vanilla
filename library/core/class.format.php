@@ -1481,7 +1481,7 @@ EOT;
      * @param string $str The html-formatted string to format mentions in.
      * @return string The formatted string.
      */
-    public static function formatMentions($str) {
+    protected static function formatMentionsCallback($str) {
         $parts = preg_split('`\B@`', $str);
 
         // We have no mentions here.
@@ -1550,7 +1550,7 @@ EOT;
             // Handle @mentions.
             if (C('Garden.Format.Mentions')) {
                 // Only format mentions that are not already in anchor tags or code tags.
-                $Mixed = self::tagContent($Mixed, 'Gdn_Format::formatMentions');
+                $Mixed = self::tagContent($Mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches

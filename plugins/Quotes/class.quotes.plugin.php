@@ -230,7 +230,6 @@ class QuotesPlugin extends Gdn_Plugin {
      * Add 'Quote' option to Discussion.
      */
     public function base_AfterFlag_handler($Sender, $Args) {
-        echo Gdn_Theme::BulletItem('Flags');
         $this->addQuoteButton($Sender, $Args);
     }
 
@@ -252,6 +251,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
+        echo Gdn_Theme::BulletItem('Flags');
         echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 

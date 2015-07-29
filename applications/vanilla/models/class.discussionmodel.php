@@ -144,7 +144,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
      */
-    public function discussionSummaryQuery($AdditionalFields = array(), $Join = true) {
+    public function discussionSummaryQuery($AdditionalFields = array()) {
         // Verify permissions (restricting by category if necessary)
         if ($this->Watching) {
             $Perms = CategoryModel::CategoryWatch();
@@ -159,30 +159,7 @@ class DiscussionModel extends VanillaModel {
         // Buid main query
         $this->SQL
             ->select('d.*')
-            ->select('d.InsertUserID', '', 'FirstUserID')
-            ->select('d.DateInserted', '', 'FirstDate')
-            ->select('d.DateLastComment', '', 'LastDate')
-            ->select('d.LastCommentUserID', '', 'LastUserID')
             ->from('Discussion d');
-
-        if ($Join) {
-            $this->SQL
-                ->select('iu.Name', '', 'FirstName')// <-- Need these for rss!
-                ->select('iu.Photo', '', 'FirstPhoto')
-                ->select('iu.Email', '', 'FirstEmail')
-                ->join('User iu', 'd.InsertUserID = iu.UserID', 'left')// First comment author is also the discussion insertuserid
-
-                ->select('lcu.Name', '', 'LastName')
-                ->select('lcu.Photo', '', 'LastPhoto')
-                ->select('lcu.Email', '', 'LastEmail')
-                ->join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left')// Last comment user
-
-                ->select('ca.Name', '', 'Category')
-                ->select('ca.UrlCode', '', 'CategoryUrlCode')
-                ->select('ca.PermissionCategoryID')
-                ->join('Category ca', 'd.CategoryID = ca.CategoryID', 'left'); // Category
-
-        }
 
         // Add any additional fields that were requested
         if (is_array($AdditionalFields)) {
@@ -314,7 +291,7 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'LastCommentUserID'));
         CategoryModel::JoinCategories($Data);
 
         // Change discussions returned based on additional criteria
@@ -429,7 +406,7 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'LastCommentUserID'));
         CategoryModel::JoinCategories($Data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -543,7 +520,7 @@ class DiscussionModel extends VanillaModel {
         $this->AddDiscussionColumns($Data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'LastCommentUserID'));
         CategoryModel::JoinCategories($Data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -654,14 +631,6 @@ class DiscussionModel extends VanillaModel {
         $Discussion->CategoryUrlCode = $Category['UrlCode'];
         $Discussion->PermissionCategoryID = $Category['PermissionCategoryID'];
 
-        // Add some legacy calculated columns.
-        if (!property_exists($Discussion, 'FirstUserID')) {
-            $Discussion->FirstUserID = $Discussion->InsertUserID;
-            $Discussion->FirstDate = $Discussion->DateInserted;
-            $Discussion->LastUserID = $Discussion->LastCommentUserID;
-            $Discussion->LastDate = $Discussion->DateLastComment;
-        }
-
         // Add the columns from UserDiscussion if they don't exist.
         if (!property_exists($Discussion, 'CountCommentWatch')) {
             $Discussion->WatchUserID = null;
@@ -715,11 +684,6 @@ class DiscussionModel extends VanillaModel {
             $Discussion->CountUnreadComments = 0;
 
         $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : null;
-
-        if ($Discussion->LastUserID == null) {
-            $Discussion->LastUserID = $Discussion->InsertUserID;
-            $Discussion->LastDate = $Discussion->DateInserted;
-        }
 
         $this->EventArguments['Discussion'] = $Discussion;
         $this->fireEvent('SetCalculatedFields');
@@ -849,7 +813,8 @@ class DiscussionModel extends VanillaModel {
             $this->AddDenormalizedViews($Data);
         }
 
-        Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
+        // Join in the users.
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'LastCommentUserID'));
         CategoryModel::JoinCategories($Data);
 
         // Prep and fire event
@@ -921,10 +886,6 @@ class DiscussionModel extends VanillaModel {
         // This puts the paging into an index scan rather than a table scan.
         $this->SQL
             ->select('d2.*')
-            ->select('d2.InsertUserID', '', 'FirstUserID')
-            ->select('d2.DateInserted', '', 'FirstDate')
-            ->select('d2.DateLastComment', '', 'LastDate')
-            ->select('d2.LastCommentUserID', '', 'LastUserID')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->where('d.InsertUserID', $UserID)
@@ -993,7 +954,7 @@ class DiscussionModel extends VanillaModel {
         $this->AddDiscussionColumns($Data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
+        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'LastCommentUserID'));
         CategoryModel::JoinCategories($Data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -1289,25 +1250,14 @@ class DiscussionModel extends VanillaModel {
         $Hash = ForeignIDHash($ForeignID);
         $Session = Gdn::session();
         $this->fireEvent('BeforeGetForeignID');
+        
         $this->SQL
             ->select('d.*')
-            ->select('ca.Name', '', 'Category')
-            ->select('ca.UrlCode', '', 'CategoryUrlCode')
-            ->select('ca.PermissionCategoryID')
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
-            ->select('d.DateLastComment', '', 'LastDate')
-            ->select('d.LastCommentUserID', '', 'LastUserID')
-            ->select('lcu.Name', '', 'LastName')
-            ->select('iu.Name', '', 'InsertName')
-            ->select('iu.Photo', '', 'InsertPhoto')
             ->from('Discussion d')
-            ->join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
-            ->join('User iu', 'd.InsertUserID = iu.UserID', 'left')// Insert user
-            ->join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left')// Last comment
-            ->join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left')// Last comment user
             ->where('d.ForeignID', $Hash);
 
         if ($Type != '') {
@@ -1317,7 +1267,18 @@ class DiscussionModel extends VanillaModel {
         $Discussion = $this->SQL
             ->get()
             ->firstRow();
+        
+        if (!$Discussion) {
+            return $Discussion;
+        }
+        
+        // Join in the users.
+        $Discussion = array($Discussion);
+        Gdn::userModel()->joinUsers($Discussion, array('InsertUserID', 'LastCommentUserID'));
+        $Discussion = $Discussion[0];
 
+        $this->Calculate($Discussion);
+        
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Discussion);
         }
@@ -1345,8 +1306,6 @@ class DiscussionModel extends VanillaModel {
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
-            ->select('d.DateLastComment', '', 'LastDate')
-            ->select('d.LastCommentUserID', '', 'LastUserID')
             ->from('Discussion d')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
             ->where('d.DiscussionID', $DiscussionID)
@@ -1359,7 +1318,7 @@ class DiscussionModel extends VanillaModel {
 
         // Join in the users.
         $Discussion = array($Discussion);
-        Gdn::userModel()->joinUsers($Discussion, array('LastUserID', 'InsertUserID'));
+        Gdn::userModel()->joinUsers($Discussion, array('InsertUserID', 'LastCommentUserID'));
         $Discussion = $Discussion[0];
 
         $this->Calculate($Discussion);
@@ -2247,8 +2206,6 @@ class DiscussionModel extends VanillaModel {
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.UserID', '', 'WatchUserID')
             ->select('w.Participated')
-            ->select('d.DateLastComment', '', 'LastDate')
-            ->select('d.LastCommentUserID', '', 'LastUserID')
             ->select('lcu.Name', '', 'LastName')
             ->from('Discussion d')
             ->join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = $UserID", 'left')

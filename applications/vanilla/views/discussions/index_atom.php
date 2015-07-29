@@ -12,7 +12,7 @@ foreach ($this->DiscussionData->result() as $Discussion) {
         <id><?php echo $Discussion->DiscussionID.'@'.Url('/discussions'); ?></id>
         <author>
             <name><?php echo Gdn_Format::text($Discussion->FirstName); ?></name>
-            <uri><?php echo htmlspecialchars(url('/profile/'.$Discussion->InsertUserID.'/'.$Discussion->FirstName, true)); ?></uri>
+            <uri><?php echo htmlspecialchars(url('/profile/'.$Discussion->InsertUserID.'/'.$Discussion->InsertName, true)); ?></uri>
         </author>
         <updated><?php echo date('c', Gdn_Format::ToTimeStamp($Discussion->DateLastComment)); ?></updated>
         <summary><![CDATA[<?php echo Gdn_Format::RssHtml($Discussion->Body, $Discussion->Format); ?>]]></summary>

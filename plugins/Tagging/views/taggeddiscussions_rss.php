@@ -10,7 +10,7 @@ foreach ($this->DiscussionData->Result() as $Discussion) {
         <title><?php echo Gdn_Format::text($Discussion->Name); ?></title>
         <link><?php echo htmlspecialchars(url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::url($Discussion->Name), true)); ?></link>
         <pubDate><?php echo date(DATE_RSS, Gdn_Format::ToTimeStamp($Discussion->DateInserted)); ?></pubDate>
-        <dc:creator><?php echo Gdn_Format::text($Discussion->FirstName); ?></dc:creator>
+        <dc:creator><?php echo Gdn_Format::text($Discussion->InsertName); ?></dc:creator>
         <guid isPermaLink="false"><?php echo $Discussion->DiscussionID.'@'.Url('/discussions'); ?></guid>
         <description><![CDATA[<?php echo Gdn_Format::to($Discussion->Body, $Discussion->Format); ?>]]></description>
     </item>

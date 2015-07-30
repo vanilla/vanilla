@@ -859,16 +859,16 @@ if (!function_exists('userPhoto')) {
             $Options = array('LinkClass' => $Options);
         }
 
-        if ($Px = GetValue('Px', $Options)) {
-            $User = UserBuilder($User, $Px);
+        if ($Px = val('Px', $Options)) {
+            $User = userBuilder($User, $Px);
         } else {
             $User = (object)$User;
         }
 
-        $LinkClass = ConcatSep(' ', GetValue('LinkClass', $Options, ''), 'PhotoWrap');
-        $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto');
+        $LinkClass = concatSep(' ', val('LinkClass', $Options, ''), 'PhotoWrap');
+        $ImgClass = val('ImageClass', $Options, 'ProfilePhoto');
 
-        $Size = GetValue('Size', $Options);
+        $Size = val('Size', $Options);
         if ($Size) {
             $LinkClass .= " PhotoWrap{$Size}";
             $ImgClass .= " {$ImgClass}{$Size}";
@@ -876,36 +876,36 @@ if (!function_exists('userPhoto')) {
             $ImgClass .= " {$ImgClass}Medium"; // backwards compat
         }
 
-        $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
-        $UserCssClass = GetValue('_CssClass', $FullUser);
+        $FullUser = Gdn::userModel()->getID(val('UserID', $User), DATASET_TYPE_ARRAY);
+        $UserCssClass = val('_CssClass', $FullUser);
         if ($UserCssClass) {
             $LinkClass .= ' '.$UserCssClass;
         }
 
         $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
-        $Photo = GetValue('Photo', $User);
-        $Name = GetValue('Name', $User);
-        $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
+        $Photo = val('Photo', $User, val('PhotoUrl', $User));
+        $Name = val('Name', $User);
+        $Title = htmlspecialchars(val('Title', $Options, $Name));
 
         if ($FullUser && $FullUser['Banned']) {
-            $Photo = C('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
-            $Title .= ' ('.T('Banned').')';
+            $Photo = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
+            $Title .= ' ('.t('Banned').')';
         }
 
         if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
-            $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+            $Photo = userPhotoDefaultUrl($User, $ImgClass);
         }
 
         if ($Photo) {
             if (!isUrl($Photo)) {
-                $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+                $PhotoUrl = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
             } else {
                 $PhotoUrl = $Photo;
             }
-            $Href = Url(UserUrl($User));
+            $Href = url(userUrl($User));
             return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
+            .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
             .'</a>';
         } else {
             return '';

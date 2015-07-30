@@ -53,7 +53,7 @@ foreach ($this->data('Categories') as $CategoryRow) {
             </li>';
             $Alt = FALSE;
         } else {
-            $LastComment = UserBuilder($Category, 'Last');
+            $LastComment = UserBuilder($Category, 'LastComment');
             $AltCss = $Alt ? ' Alt' : '';
             $Alt = !$Alt;
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">

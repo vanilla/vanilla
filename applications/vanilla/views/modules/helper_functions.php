@@ -4,12 +4,12 @@ if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($Discussion, $Px = 'Bookmark') {
         ?>
         <li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
-   <span class="Options">
-      <?php
-      //      echo OptionsList($Discussion);
-      echo BookmarkButton($Discussion);
-      ?>
-   </span>
+            <span class="Options">
+                <?php
+                //      echo OptionsList($Discussion);
+                echo BookmarkButton($Discussion);
+                ?>
+            </span>
 
             <div class="Title"><?php
                 echo anchor(Gdn_Format::text($Discussion->Name, false), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
@@ -17,12 +17,17 @@ if (!function_exists('WriteModuleDiscussion')):
             <div class="Meta">
                 <?php
                 $Last = new stdClass();
-                $Last->UserID = $Discussion->LastUserID;
-                $Last->Name = $Discussion->LastName;
+                if ($Discussion->LastCommentUserID) {
+                    $Last->UserID = $Discussion->LastCommentUserID;
+                    $Last->Name = $Discussion->LastCommentName;
+                } else {
+                    $Last->UserID = $Discussion->InsertUserID;
+                    $Last->Name = $Discussion->InsertName;
+                }
 
                 echo NewComments($Discussion);
 
-                echo '<span class="MItem">'.Gdn_Format::date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';
+                echo '<span class="MItem">'.Gdn_Format::date($Discussion->DateLastComment, 'html').UserAnchor($Last).'</span>';
                 ?>
             </div>
         </li>

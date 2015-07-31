@@ -305,7 +305,7 @@ if ($PermissionModel instanceof PermissionModel) {
 
 // Define the set of permissions that Garden uses.
 $PermissionModel->define(array(
-    'Garden.Email.View' => 'Garden.SignIn.Allow',
+    'Garden.Email.View', // => 'Garden.SignIn.Allow',
     'Garden.Settings.Manage',
     'Garden.Settings.View',
     'Garden.SignIn.Allow' => 1,
@@ -316,12 +316,12 @@ $PermissionModel->define(array(
     'Garden.Activity.Delete',
     'Garden.Activity.View' => 1,
     'Garden.Profiles.View' => 1,
-    'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
-    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
+    'Garden.Profiles.Edit', // => 'Garden.SignIn.Allow',
+    'Garden.Curation.Manage', // => 'Garden.Moderation.Manage',
     'Garden.Moderation.Manage',
-    'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
+    'Garden.PersonalInfo.View', // => 'Garden.Moderation.Manage',
     'Garden.AdvancedNotifications.Allow',
-    'Garden.Community.Manage' => 'Garden.Settings.Manage'
+    'Garden.Community.Manage' // => 'Garden.Settings.Manage'
 ));
 
 $PermissionModel->undefine(array(

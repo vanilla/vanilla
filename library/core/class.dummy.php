@@ -20,7 +20,7 @@ class Gdn_Dummy {
     public function __call($Name, $Arguments) {
         return $this;
     }
-   
+
     public static function __callStatic($Name, $Arguments) {
         return self::getInstance();
     }
@@ -28,24 +28,24 @@ class Gdn_Dummy {
     public function __get($Name) {
         return $this;
     }
-   
+
     public function __set($Name, $Value) {
         return $this;
     }
-   
-   /**
-    * Holds a static instance of this class.
-    *
-    * @var Dummy
-    */
+
+    /**
+     * Holds a static instance of this class.
+     *
+     * @var Dummy
+     */
     private static $_Instance;
-   
-   /**
-    * Return the singleton instance of this object.
-    *
-    * @static
-    * @return Dummy The singleton instance of this class.
-    */
+
+    /**
+     * Return the singleton instance of this object.
+     *
+     * @static
+     * @return Dummy The singleton instance of this class.
+     */
     public static function getInstance() {
         if (!isset(self::$_Instance)) {
             self::$_Instance = new Gdn_Dummy();

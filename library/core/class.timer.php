@@ -22,7 +22,7 @@ class Gdn_Timer {
 
     /** @var int Seconds. */
     public $SplitTime;
-    
+
     /**
      *
      *
@@ -36,7 +36,7 @@ class Gdn_Timer {
         }
         return $Result;
     }
-    
+
     /**
      *
      *
@@ -48,7 +48,7 @@ class Gdn_Timer {
             $this->write($Message, $this->FinishTime, $this->StartTime);
         }
     }
-   
+
     /**
      *
      *
@@ -60,7 +60,7 @@ class Gdn_Timer {
         $s = $Span - $m * 60;
         return sprintf('%d:%05.2f', $m, $s);
     }
-    
+
     /**
      *
      *
@@ -70,12 +70,12 @@ class Gdn_Timer {
         $this->StartTime = microtime(true);
         $this->SplitTime = $this->StartTime;
         $this->FinishTime = null;
-        
+
         if ($Message) {
             $this->write($Message, $this->StartTime);
         }
     }
-    
+
     /**
      *
      *
@@ -88,7 +88,7 @@ class Gdn_Timer {
         }
         $this->write($Message, $this->SplitTime, $PrevSplit);
     }
-    
+
     /**
      *
      *

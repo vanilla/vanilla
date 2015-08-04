@@ -48,12 +48,12 @@ class Gdn_SliceProvider {
             case true:
                 $ReplacementIndex = 2;
                 break;
-         
+
             case false:
                 $ReplacementIndex = 1;
                 break;
         }
-      
+
         if ($ExplodedPath[0] == strtolower(Gdn::dispatcher()->application()) && $ExplodedPath[1] == strtolower(Gdn::dispatcher()->controller())) {
             $ReplacementIndex++;
         }
@@ -62,7 +62,7 @@ class Gdn_SliceProvider {
         $SlicePath = implode('/', $ExplodedPath);
         return Gdn::Slice($SlicePath);
     }
-   
+
     /**
      *
      *
@@ -76,7 +76,7 @@ class Gdn_SliceProvider {
                     $this->SliceConfig['css'][] = $Asset;
                 }
                 break;
-            
+
             case 'js':
                 if (!in_array($Asset, $this->SliceConfig['js'])) {
                     $this->SliceConfig['js'][] = $Asset;
@@ -84,7 +84,7 @@ class Gdn_SliceProvider {
                 break;
         }
     }
-   
+
     /**
      *
      *

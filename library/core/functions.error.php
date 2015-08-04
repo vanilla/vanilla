@@ -56,7 +56,7 @@ class Gdn_ErrorException extends ErrorException {
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
     $ErrorReporting = error_reporting();
 
-   // Don't do anything for @supressed errors.
+    // Don't do anything for @supressed errors.
     if ($ErrorReporting === 0) {
         return;
     }
@@ -66,7 +66,7 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
             Trace("$Message in $File line $Line", TRACE_NOTICE);
         }
 
-       // Ignore errors that are below the current error reporting level.
+        // Ignore errors that are below the current error reporting level.
         return false;
     }
 
@@ -92,9 +92,9 @@ function Gdn_ExceptionHandler($Exception) {
         }
         $Backtrace = $Exception->getTrace();
 
-       // Clean the output buffer in case an error was encountered in-page.
+        // Clean the output buffer in case an error was encountered in-page.
         @ob_end_clean();
-       // prevent headers already sent error
+        // prevent headers already sent error
         if (!headers_sent()) {
             if ($ErrorNumber >= 100 && $ErrorNumber < 600) {
                 $Code = $ErrorNumber;
@@ -122,7 +122,7 @@ function Gdn_ExceptionHandler($Exception) {
         if ($MessageCount == 4) {
             list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
         } elseif ($MessageCount == 3) {
-                  list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
+            list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
         } elseif (function_exists('GetValueR')) {
             $IsError = (GetValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
             $N = ($IsError) ? '1' : '0';
@@ -148,7 +148,7 @@ function Gdn_ExceptionHandler($Exception) {
             $Debug = false;
         }
 
-       // Make sure all of the required custom functions and variables are defined.
+        // Make sure all of the required custom functions and variables are defined.
         $PanicError = false; // Should we just dump a message and forget about the master view?
         if (!defined('DS')) {
             $PanicError = true;
@@ -164,7 +164,7 @@ function Gdn_ExceptionHandler($Exception) {
         }
         $WebRoot = '';
 
-       // Try and rollback a database transaction.
+        // Try and rollback a database transaction.
         if (class_exists('Gdn', false)) {
             $Database = Gdn::database();
             if (is_object($Database)) {
@@ -173,12 +173,12 @@ function Gdn_ExceptionHandler($Exception) {
         }
 
         if ($PanicError === false) {
-           // See if we can get the file that caused the error
+            // See if we can get the file that caused the error
             if (is_string($File) && is_numeric($ErrorNumber)) {
                 $ErrorLines = @file($File);
             }
 
-           // If this error was encountered during an ajax request, don't bother gettting the css or theme files
+            // If this error was encountered during an ajax request, don't bother gettting the css or theme files
             if ($DeliveryType == DELIVERY_TYPE_ALL) {
                 $CssPaths = array(); // Potential places where the css can be found in the filesystem.
                 $MasterViewPaths = array();
@@ -201,17 +201,17 @@ function Gdn_ExceptionHandler($Exception) {
                     $MasterViewCss .= '.css';
 
                     if ($CurrentTheme != '') {
-                       // Look for CSS in the theme folder:
+                        // Look for CSS in the theme folder:
                         $CssPaths[] = PATH_THEMES.DS.$CurrentTheme.DS.'design'.DS.$MasterViewCss;
 
-                       // Look for Master View in the theme folder:
+                        // Look for Master View in the theme folder:
                         $MasterViewPaths[] = PATH_THEMES.DS.$CurrentTheme.DS.'views'.DS.$MasterViewName;
                     }
                 }
 
-               // Look for CSS in the dashboard design folder.
+                // Look for CSS in the dashboard design folder.
                 $CssPaths[] = PATH_APPLICATIONS.DS.'dashboard'.DS.'design'.DS.$MasterViewCss;
-               // Look for Master View in the dashboard view folder.
+                // Look for Master View in the dashboard view folder.
                 $MasterViewPaths[] = PATH_APPLICATIONS.DS.'dashboard'.DS.'views'.DS.$MasterViewName;
 
                 $CssPath = false;
@@ -253,7 +253,7 @@ function Gdn_ExceptionHandler($Exception) {
                 echo '<div class="BonkError Hidden">';
             }
 
-           // This is an ajax request, so dump an error that is more eye-friendly in the debugger
+            // This is an ajax request, so dump an error that is more eye-friendly in the debugger
             echo '<h1>FATAL ERROR IN: ', $SenderObject, '.', $SenderMethod, "();</h1>\n<pre class=\"AjaxError\">\"".$SenderMessage."\"\n";
             if ($SenderCode != '') {
                 echo htmlspecialchars($SenderCode, ENT_COMPAT, C('Garden.Charset', 'UTF-8'))."\n";
@@ -281,7 +281,7 @@ function Gdn_ExceptionHandler($Exception) {
                 for ($i = 0; $i < $BacktraceCount; ++$i) {
                     if (array_key_exists('file', $Backtrace[$i])) {
                         $File = $Backtrace[$i]['file'].' '
-                        .$Backtrace[$i]['line'];
+                            .$Backtrace[$i]['line'];
                     }
                     echo '['.$File.']', ' '
                     , array_key_exists('class', $Backtrace[$i]) ? $Backtrace[$i]['class'] : 'PHP'
@@ -296,7 +296,7 @@ function Gdn_ExceptionHandler($Exception) {
                 echo '</div>';
             }
         } else {
-           // If the master view wasn't found, assume a panic state and dump the error.
+            // If the master view wasn't found, assume a panic state and dump the error.
             if ($Master === false) {
                 echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -314,7 +314,7 @@ function Gdn_ExceptionHandler($Exception) {
                 if (is_array($ErrorLines) && $Line > -1) {
                     echo '<h3><strong>The error occurred on or near:</strong> ', $File, '</h3>
          <pre>';
-                     $LineCount = count($ErrorLines);
+                    $LineCount = count($ErrorLines);
                     $Padding = strlen($Line + 4);
                     for ($i = 0; $i < $LineCount; ++$i) {
                         if ($i > $Line - 6 && $i < $Line + 4) {
@@ -355,7 +355,7 @@ function Gdn_ExceptionHandler($Exception) {
             }
         }
 
-       // Attempt to log an error message no matter what.
+        // Attempt to log an error message no matter what.
         LogException($Exception);
     } catch (Exception $e) {
         print get_class($e)." thrown within the exception handler.<br/>Message: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
@@ -364,27 +364,27 @@ function Gdn_ExceptionHandler($Exception) {
 }
 
 if (!function_exists('ErrorMessage')) {
-   /**
-    * Returns an error message formatted in a way that the custom ErrorHandler
-    * function can understand (allows a little more information to be displayed
-    * on errors).
-    *
-    * @param string The actual error message.
-    * @param string The name of the object that encountered the error.
-    * @param string The name of the method that encountered the error.
-    * @param string Any additional information that could be useful to debuggers.
-    */
+    /**
+     * Returns an error message formatted in a way that the custom ErrorHandler
+     * function can understand (allows a little more information to be displayed
+     * on errors).
+     *
+     * @param string The actual error message.
+     * @param string The name of the object that encountered the error.
+     * @param string The name of the method that encountered the error.
+     * @param string Any additional information that could be useful to debuggers.
+     */
     function errorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
         return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
     }
 }
 
 if (!function_exists('LogException')) {
-   /**
-    * Log an exception.
-    *
-    * @param Exception $Ex
-    */
+    /**
+     * Log an exception.
+     *
+     * @param Exception $Ex
+     */
     function logException($Ex) {
         if (!class_exists('Gdn', false)) {
             return;
@@ -423,19 +423,19 @@ if (!function_exists('LogException')) {
 }
 
 if (!function_exists('LogMessage')) {
-   /**
-    * Logs errors to a file. This function does not throw errors because it is
-    * a last-ditch effort after errors have already been rendered.
-    *
-    * @param string The file to save the error log in.
-    * @param int The line number that encountered the error.
-    * @param string The name of the object that encountered the error.
-    * @param string The name of the method that encountered the error.
-    * @param string The error message.
-    * @param string Any additional information that could be useful to debuggers.
-    */
+    /**
+     * Logs errors to a file. This function does not throw errors because it is
+     * a last-ditch effort after errors have already been rendered.
+     *
+     * @param string The file to save the error log in.
+     * @param int The line number that encountered the error.
+     * @param string The name of the object that encountered the error.
+     * @param string The name of the method that encountered the error.
+     * @param string The error message.
+     * @param string Any additional information that could be useful to debuggers.
+     */
     function logMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
-       // Figure out where to save the log
+        // Figure out where to save the log
         if (class_exists('Gdn', false)) {
             $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', false);
             if ($LogErrors === true) {
@@ -447,7 +447,7 @@ if (!function_exists('LogMessage')) {
                     $Log .= ", $Code";
                 }
 
-               // Fail silently (there could be permission issues on badly set up servers).
+                // Fail silently (there could be permission issues on badly set up servers).
                 $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
                 if ($ErrorLogFile == '') {
                     @error_log($Log);
@@ -462,12 +462,12 @@ if (!function_exists('LogMessage')) {
 }
 
 if (!function_exists('Boop')) {
-   /**
-    * Logs a message or print_r()'s an array to the screen.
-    *
-    * @param mixed $Message The object or string to log to the screen
-    * @param optional $Arguments A list of arguments to log to the screen as if from a function call
-    */
+    /**
+     * Logs a message or print_r()'s an array to the screen.
+     *
+     * @param mixed $Message The object or string to log to the screen
+     * @param optional $Arguments A list of arguments to log to the screen as if from a function call
+     */
     function boop($Message, $Arguments = array(), $Vardump = false) {
         if (!defined('BOOP') || !BOOP) {
             return;
@@ -507,12 +507,12 @@ if (!function_exists('CleanErrorArguments')) {
                     if (is_object($Value)) {
                         $Value = Gdn_Format::objectAsArray($Value);
                         $Var[$Key] = $Value;
-                     }
+                    }
 
                     if (is_array($Value)) {
                         cleanErrorArguments($Var[$Key], $BlackList);
                     }
-                 }
+                }
             }
         }
     }
@@ -527,8 +527,8 @@ set_exception_handler('Gdn_ExceptionHandler');
 /**
  * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string $RecordType The translation code of the type of object that wasn't found.
- * @return Gdn_UserException
+ * @param string $Code The translation code of the type of object that wasn't found.
+ * @return Exception
  */
 function notFoundException($RecordType = 'Page') {
     Gdn::dispatcher()

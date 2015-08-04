@@ -23,7 +23,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
     const ACTION_DISABLE = 2;
 
-   //const ACTION_REMOVE  = 3;
+    //const ACTION_REMOVE  = 3;
 
     const ACCESS_CLASSNAME = 'classname';
 
@@ -69,37 +69,37 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /** @var bool Whether to use APC for plugin cache storage. */
     protected $Apc = false;
 
-   /**
+    /**
      *
-    */
+     */
     public function __construct() {
         parent::__construct();
     }
 
-   /**
-    * Sets up the plugin framework
-    *
-    * This method indexes all available plugins and extracts their information.
-    * It then determines which plugins have been enabled, and includes them.
-    * Finally, it parses all plugin files and extracts their events and plugged
-    * methods.
-    */
+    /**
+     * Sets up the plugin framework
+     *
+     * This method indexes all available plugins and extracts their information.
+     * It then determines which plugins have been enabled, and includes them.
+     * Finally, it parses all plugin files and extracts their events and plugged
+     * methods.
+     */
     public function start($Force = false) {
 
         if (function_exists('apc_fetch') && C('Garden.Apc', false)) {
             $this->Apc = true;
         }
 
-       // Build list of all available plugins
+        // Build list of all available plugins
         $this->availablePlugins($Force);
 
-       // Build list of all enabled plugins
+        // Build list of all enabled plugins
         $this->enabledPlugins($Force);
 
-       // Include enabled plugin source files
+        // Include enabled plugin source files
         $this->includePlugins();
 
-       // Register hooked methods
+        // Register hooked methods
         $this->registerPlugins();
 
         $this->Started = true;
@@ -128,11 +128,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $this->PluginsByClass = array();
             $this->PluginFoldersByPath = array();
 
-           // Check cache freshness
+            // Check cache freshness
             foreach ($this->searchPaths() as $SearchPath => $Trash) {
                 unset($SearchPathCache);
 
-               // Check Cache
+                // Check Cache
                 $SearchPathCacheKey = 'Garden.Plugins.PathCache.'.$SearchPath;
                 if ($this->Apc) {
                     $SearchPathCache = apc_fetch($SearchPathCacheKey);
@@ -170,11 +170,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 $PathIntegrityHash = md5(serialize($PathListing));
                 $CacheIntegrityHash = GetValue('CacheIntegrityHash', $SearchPathCache);
                 if ($CacheIntegrityHash != $PathIntegrityHash) {
-                   // Trace('Need to re-index plugin cache');
-                   // Need to re-index this folder
+                    // Trace('Need to re-index plugin cache');
+                    // Need to re-index this folder
 
-                   // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for
-                   // so that the merge below does what was intended
+                    // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for
+                    // so that the merge below does what was intended
                     $this->PluginCache = array_diff_key($this->PluginCache, $CachePluginInfo);
                     $this->PluginsByClass = array_diff_key($this->PluginsByClass, $CacheClassInfo);
 
@@ -249,19 +249,19 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     public function enabledPlugins($Force = false) {
 
         if (!is_array($this->EnabledPlugins) || $Force) {
-           // Make sure all known plugins are cached
+            // Make sure all known plugins are cached
             $this->availablePlugins($Force);
 
             $this->EnabledPlugins = array();
             $EnabledPlugins = C('EnabledPlugins', array());
 
             foreach ($EnabledPlugins as $PluginName => $PluginStatus) {
-               // Plugins can be explicitly disabled
+                // Plugins can be explicitly disabled
                 if ($PluginStatus === false) {
                     continue;
                 }
 
-               // Check that the plugin is in AvailablePlugins...
+                // Check that the plugin is in AvailablePlugins...
                 $Plugin = $this->getPluginInfo($PluginName);
                 if ($Plugin === false) {
                     continue;
@@ -274,26 +274,26 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return array_intersect_key($this->availablePlugins(), $this->EnabledPlugins);
     }
 
-   /**
-    * Includes all of the plugin files for enabled plugins.
-    *
-    * Files are included in from the roots of each plugin directory if they have the following names.
-    * - default.php
-    * - *plugin.php
-    *
-    * @param array $EnabledPlugins An array of plugins that should be included.
-    * If this argument is null then all enabled plugins will be included.
-    * @return array The plugin info array for all included plugins.
-    */
+    /**
+     * Includes all of the plugin files for enabled plugins.
+     *
+     * Files are included in from the roots of each plugin directory if they have the following names.
+     * - default.php
+     * - *plugin.php
+     *
+     * @param array $EnabledPlugins An array of plugins that should be included.
+     * If this argument is null then all enabled plugins will be included.
+     * @return array The plugin info array for all included plugins.
+     */
     public function includePlugins($EnabledPlugins = null) {
 
-       // Include all of the plugins.
+        // Include all of the plugins.
         if (is_null($EnabledPlugins)) {
             $EnabledPlugins = $this->enabledPlugins();
         }
 
         $PluginManager = &$this;
-       // Get a list of files to include.
+        // Get a list of files to include.
         foreach ($EnabledPlugins as $PluginName => $Trash) {
             $PluginInfo = $this->getPluginInfo($PluginName);
 
@@ -408,7 +408,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
         $PluginFiles = scandir($PluginPath);
         $TestPatterns = array(
-         'default.php', '*plugin.php'
+            'default.php', '*plugin.php'
         );
         foreach ($PluginFiles as $PluginFile) {
             foreach ($TestPatterns as $Test) {
@@ -421,43 +421,43 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return false;
     }
 
-   /**
-    * Register all enabled plugins' event handlers and overrides
-    *
-    * Examines all declared classes, identifying which ones implement
-    * Gdn_IPlugin and registers all of their event handlers and method
-    * overrides. It recognizes them because Handlers end with _Handler,
-    * _Before, and _After and overrides end with "_Override". They are prefixed
-    * with the name of the class and method (or event) to be handled or
-    * overridden.
-    *
-    * For example:
-    *
-    *  class MyPlugin implements Gdn_IPlugin {
-    *   public function MyController_SignIn_After($Sender) {
-    *      // Do something neato
-    *   }
-    *   public function Url_AppRoot_Override($WithDomain) {
-    *      return "MyCustomAppRoot!";
-    *   }
-    *  }
-    */
+    /**
+     * Register all enabled plugins' event handlers and overrides
+     *
+     * Examines all declared classes, identifying which ones implement
+     * Gdn_IPlugin and registers all of their event handlers and method
+     * overrides. It recognizes them because Handlers end with _Handler,
+     * _Before, and _After and overrides end with "_Override". They are prefixed
+     * with the name of the class and method (or event) to be handled or
+     * overridden.
+     *
+     * For example:
+     *
+     *  class MyPlugin implements Gdn_IPlugin {
+     *   public function MyController_SignIn_After($Sender) {
+     *      // Do something neato
+     *   }
+     *   public function Url_AppRoot_Override($WithDomain) {
+     *      return "MyCustomAppRoot!";
+     *   }
+     *  }
+     */
     public function registerPlugins() {
 
-       // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
+        // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
         foreach (get_declared_classes() as $ClassName) {
             if ($ClassName == 'Gdn_Plugin') {
                 continue;
             }
 
-           // Only register the plugin if it implements the Gdn_IPlugin interface
+            // Only register the plugin if it implements the Gdn_IPlugin interface
             if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
-               // If this plugin was already indexed, skip it.
+                // If this plugin was already indexed, skip it.
                 if (array_key_exists($ClassName, $this->RegisteredPlugins)) {
                     continue;
                 }
 
-               // Register this plugin's methods
+                // Register this plugin's methods
                 $this->registerPlugin($ClassName);
 
             }
@@ -487,7 +487,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         foreach ($ClassMethods as $Method) {
             $MethodName = strtolower($Method);
-           // Loop through their individual methods looking for event handlers and method overrides.
+            // Loop through their individual methods looking for event handlers and method overrides.
             if (isset($MethodName[9])) {
                 $Suffix = trim(strrchr($MethodName, '_'), '_');
                 switch ($Suffix) {
@@ -556,19 +556,19 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         foreach ($this->enabledPlugins() as $PluginName => $Trash) {
             $PluginInfo = $this->getPluginInfo($PluginName);
 
-           // Remove plugin hooks from plugins that dont explicitly claim to be friendly with mobile themes
+            // Remove plugin hooks from plugins that dont explicitly claim to be friendly with mobile themes
             if (!val('MobileFriendly', $PluginInfo)) {
                 $this->unregisterPlugin(val('ClassName', $PluginInfo));
             }
         }
     }
 
-   /**
-    * Check whether a plugin is enabled
-    *
-    * @param string $PluginName
-    * @return bool
-    */
+    /**
+     * Check whether a plugin is enabled
+     *
+     * @param string $PluginName
+     * @return bool
+     */
     public function checkPlugin($PluginName) {
         if (array_key_exists($PluginName, $this->enabledPlugins())) {
             return true;
@@ -587,23 +587,23 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return array
      */
     public function getEventHandlers($Sender, $EventName, $HandlerType = 'Handler', $Options = array()) {
-       // Figure out the classname.
+        // Figure out the classname.
         if (isset($Options['ClassName'])) {
             $ClassName = $Options['ClassName'];
         } elseif (property_exists($Sender, 'ClassName') && $Sender->ClassName)
-         $ClassName = $Sender->ClassName;
+            $ClassName = $Sender->ClassName;
         else {
             $ClassName = get_class($Sender);
         }
 
-       // Build the list of event handler names.
+        // Build the list of event handler names.
         $Names = array(
-         "{$ClassName}_{$EventName}_{$HandlerType}",
-         "Base_{$EventName}_{$HandlerType}",
-         "{$ClassName}_{$EventName}_All",
-         "Base_{$EventName}_All");
+            "{$ClassName}_{$EventName}_{$HandlerType}",
+            "Base_{$EventName}_{$HandlerType}",
+            "{$ClassName}_{$EventName}_All",
+            "Base_{$EventName}_All");
 
-       // Grab the event handlers.
+        // Grab the event handlers.
         $Handlers = array();
         foreach ($Names as $Name) {
             $Name = strtolower($Name);
@@ -639,16 +639,16 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return ($PluginName !== false) ? GetValue($PluginName, $Available, false) : false;
     }
 
-   /**
-    * Gets an instance of a given plugin.
-    *
-    * @param string $AccessName The key of the plugin.
-    * @param string $AccessType The type of key for the plugin which must be one of the following:
-    *  - Gdn_PluginManager::ACCESS_PLUGINNAME
-    *  - Gdn_PluginManager::ACCESS_CLASSNAME
-    * @param mixed $Sender An object to pass to a new plugin instantiation.
-    * @return Gdn_IPlugin The plugin instance.
-    */
+    /**
+     * Gets an instance of a given plugin.
+     *
+     * @param string $AccessName The key of the plugin.
+     * @param string $AccessType The type of key for the plugin which must be one of the following:
+     *  - Gdn_PluginManager::ACCESS_PLUGINNAME
+     *  - Gdn_PluginManager::ACCESS_CLASSNAME
+     * @param mixed $Sender An object to pass to a new plugin instantiation.
+     * @return Gdn_IPlugin The plugin instance.
+     */
     public function getPluginInstance($AccessName, $AccessType = self::ACCESS_CLASSNAME, $Sender = null) {
         $ClassName = null;
         switch ($AccessType) {
@@ -674,114 +674,114 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return $this->Instances[$ClassName];
     }
 
-   /**
-    * Returns whether or not a plugin is enabled.
-    *
-    * @param string $Name The name of the plugin.
-    * @return bool Whether or not the plugin is enabled.
-    * @since 2.2
-    */
+    /**
+     * Returns whether or not a plugin is enabled.
+     *
+     * @param string $Name The name of the plugin.
+     * @return bool Whether or not the plugin is enabled.
+     * @since 2.2
+     */
     public function isEnabled($Name) {
         $Enabled = $this->EnabledPlugins;
         return isset($Enabled[$Name]) && $Enabled[$Name];
     }
 
-   /**
-    * Registers a plugin method name as a handler.
+    /**
+     * Registers a plugin method name as a handler.
      *
-    * @param string $HandlerClassName The name of the plugin class that will handle the event.
-    * @param string $HandlerMethodName The name of the plugin method being registered to handle the event.
-    * @param string $EventClassName The name of the class that will fire the event.
-    * @param string $EventName The name of the event that will fire.
-    * @param string $EventHandlerType The type of event handler.
-    */
+     * @param string $HandlerClassName The name of the plugin class that will handle the event.
+     * @param string $HandlerMethodName The name of the plugin method being registered to handle the event.
+     * @param string $EventClassName The name of the class that will fire the event.
+     * @param string $EventName The name of the event that will fire.
+     * @param string $EventHandlerType The type of event handler.
+     */
     public function registerHandler($HandlerClassName, $HandlerMethodName, $EventClassName = '', $EventName = '', $EventHandlerType = '') {
         $HandlerKey = $HandlerClassName.'.'.$HandlerMethodName;
         $EventKey = strtolower($EventClassName == '' ? $HandlerMethodName : $EventClassName.'_'.$EventName.'_'.$EventHandlerType);
 
-       // Create a new array of handler class names if it doesn't exist yet.
+        // Create a new array of handler class names if it doesn't exist yet.
         if (array_key_exists($EventKey, $this->_EventHandlerCollection) === false) {
             $this->_EventHandlerCollection[$EventKey] = array();
         }
 
-       // Specify this class as a handler for this method if it hasn't been done yet.
+        // Specify this class as a handler for this method if it hasn't been done yet.
         if (in_array($HandlerKey, $this->_EventHandlerCollection[$EventKey]) === false) {
             $this->_EventHandlerCollection[$EventKey][] = $HandlerKey;
         }
     }
 
-   /**
-    * Registers a plugin override method.
+    /**
+     * Registers a plugin override method.
      *
-    * @param string $OverrideClassName The name of the plugin class that will override the existing method.
-    * @param string $OverrideMethodName The name of the plugin method being registered to override the existing method.
-    * @param string $EventClassName The name of the class that will fire the event.
-    * @param string $EventName The name of the event that will fire.
-    */
+     * @param string $OverrideClassName The name of the plugin class that will override the existing method.
+     * @param string $OverrideMethodName The name of the plugin method being registered to override the existing method.
+     * @param string $EventClassName The name of the class that will fire the event.
+     * @param string $EventName The name of the event that will fire.
+     */
     public function registerOverride($OverrideClassName, $OverrideMethodName, $EventClassName = '', $EventName = '') {
         $OverrideKey = $OverrideClassName.'.'.$OverrideMethodName;
         $EventKey = strtolower($EventClassName == '' ? $OverrideMethodName : $EventClassName.'_'.$EventName.'_Override');
 
-       // Throw an error if this method has already been overridden.
+        // Throw an error if this method has already been overridden.
         if (array_key_exists($EventKey, $this->_MethodOverrideCollection) === true) {
             trigger_error(ErrorMessage('Any object method can only be overridden by a single plugin. The "'.$EventKey.'" override has already been assigned by the "'.$this->_MethodOverrideCollection[$EventKey].'" plugin. It cannot also be overridden by the "'.$OverrideClassName.'" plugin.', 'PluginManager', 'RegisterOverride'), E_USER_ERROR);
         }
 
-       // Otherwise, specify this class as the source for the override.
+        // Otherwise, specify this class as the source for the override.
         $this->_MethodOverrideCollection[$EventKey] = $OverrideKey;
     }
 
-   /**
-    * Registers a plugin new method.
+    /**
+     * Registers a plugin new method.
      *
-    * @param string $NewMethodClassName The name of the plugin class that will add a new method.
-    * @param string $NewMethodName The name of the plugin method being added.
-    * @param string $EventClassName The name of the class that will fire the event.
-    * @param string $EventName The name of the event that will fire.
-    */
+     * @param string $NewMethodClassName The name of the plugin class that will add a new method.
+     * @param string $NewMethodName The name of the plugin method being added.
+     * @param string $EventClassName The name of the class that will fire the event.
+     * @param string $EventName The name of the event that will fire.
+     */
     public function registerNewMethod($NewMethodClassName, $NewMethodName, $EventClassName = '', $EventName = '') {
         $NewMethodKey = $NewMethodClassName.'.'.$NewMethodName;
         $EventKey = strtolower($EventClassName == '' ? $NewMethodName : $EventClassName.'_'.$EventName.'_Create');
 
-       // Throw an error if this method has already been created.
+        // Throw an error if this method has already been created.
         if (array_key_exists($EventKey, $this->_NewMethodCollection) === true) {
             trigger_error('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->_NewMethodCollection[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', E_USER_NOTICE);
             return;
         }
 
-       // Otherwise, specify this class as the source for the new method.
+        // Otherwise, specify this class as the source for the new method.
         $this->_NewMethodCollection[$EventKey] = $NewMethodKey;
     }
 
-   /**
-    * Transfer control to the plugins
-    *
-    * Looks through $this->_EventHandlerCollection for matching event
-    * signatures to handle. If it finds any, it executes them in the order it
-    * found them. It instantiates any plugins and adds them as properties to
-    * this class (unless they were previously instantiated), and then calls
-    * the handler in question.
-    *
-    * @param object The object that fired the event being handled.
-    * @param string The name of the class that fired the event being handled.
-    * @param string The name of the event being fired.
-    * @param string The type of handler being fired (Handler, Before, After).
-    * @return bool True if an event was executed.
-    */
+    /**
+     * Transfer control to the plugins
+     *
+     * Looks through $this->_EventHandlerCollection for matching event
+     * signatures to handle. If it finds any, it executes them in the order it
+     * found them. It instantiates any plugins and adds them as properties to
+     * this class (unless they were previously instantiated), and then calls
+     * the handler in question.
+     *
+     * @param object The object that fired the event being handled.
+     * @param string The name of the class that fired the event being handled.
+     * @param string The name of the event being fired.
+     * @param string The type of handler being fired (Handler, Before, After).
+     * @return bool True if an event was executed.
+     */
     public function callEventHandlers($Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler', $Options = array()) {
         $Return = false;
 
-       // Look through $this->_EventHandlerCollection for relevant handlers
+        // Look through $this->_EventHandlerCollection for relevant handlers
         if ($this->callEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType)) {
             $Return = true;
         }
 
-       // Look for "Base" (aka any class that has $EventName)
+        // Look for "Base" (aka any class that has $EventName)
         if ($this->callEventHandler($Sender, 'Base', $EventName, $EventHandlerType)) {
             $Return = true;
         }
 
-       // Look for Wildcard event handlers
+        // Look for Wildcard event handlers
         $WildEventKey = $EventClassName.'_'.$EventName.'_'.$EventHandlerType;
         if ($this->callEventHandler($Sender, 'Base', 'All', $EventHandlerType, $WildEventKey)) {
             $Return = true;
@@ -820,7 +820,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $this->trace("CallEventHandler $EventClassName $EventName $EventHandlerType");
         $Return = false;
 
-       // Backwards compatible for event key.
+        // Backwards compatible for event key.
         if (is_string($Options)) {
             $PassedEventKey = $Options;
             $Options = array();
@@ -837,13 +837,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $PassedEventKey = $EventKey;
         }
 
-       // For "All" events, calculate the stack
+        // For "All" events, calculate the stack
         if ($EventName == 'All') {
             $Stack = debug_backtrace();
-           // this call
+            // this call
             array_shift($Stack);
 
-           // plural call
+            // plural call
             array_shift($Stack);
 
             $EventCaller = array_shift($Stack);
@@ -852,7 +852,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         $this->trace($this->_EventHandlerCollection[$EventKey], 'Event Handlers');
 
-       // Loop through the handlers and execute them
+        // Loop through the handlers and execute them
         foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
             $PluginKeyParts = explode('.', $PluginKey);
             if (count($PluginKeyParts) == 2) {
@@ -879,17 +879,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return $Return;
     }
 
-   /**
-    * Looks through $this->_MethodOverrideCollection for a matching method
-    * signature to override. It instantiates any plugins and adds them as
-    * properties to this class (unless they were previously instantiated), then
-    * calls the method in question.
-    *
-    * @param object The object being worked on.
-    * @param string The name of the class that called the method being overridden.
-    * @param string The name of the method that is being overridden.
-    * @return mixed Return value of overridden method.
-    */
+    /**
+     * Looks through $this->_MethodOverrideCollection for a matching method
+     * signature to override. It instantiates any plugins and adds them as
+     * properties to this class (unless they were previously instantiated), then
+     * calls the method in question.
+     *
+     * @param object The object being worked on.
+     * @param string The name of the class that called the method being overridden.
+     * @param string The name of the method that is being overridden.
+     * @return mixed Return value of overridden method.
+     */
     public function callMethodOverride($Sender, $ClassName, $MethodName) {
         $EventKey = strtolower($ClassName.'_'.$MethodName.'_Override');
         $OverrideKey = ArrayValue($EventKey, $this->_MethodOverrideCollection, '');
@@ -903,29 +903,29 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return $this->getPluginInstance($OverrideClassName, self::ACCESS_CLASSNAME, $Sender)->$OverrideMethodName($Sender, $Sender->EventArguments);
     }
 
-   /**
-    * Checks to see if there are any plugins that override the method being
-    * executed.
-    *
-    * @param string The name of the class that called the method being overridden.
-    * @param string The name of the method that is being overridden.
-    * @return bool True if an override exists.
-    */
+    /**
+     * Checks to see if there are any plugins that override the method being
+     * executed.
+     *
+     * @param string The name of the class that called the method being overridden.
+     * @param string The name of the method that is being overridden.
+     * @return bool True if an override exists.
+     */
     public function hasMethodOverride($ClassName, $MethodName) {
         return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Override'), $this->_MethodOverrideCollection) ? true : false;
     }
 
-   /**
-    * Looks through $this->_NewMethodCollection for a matching method signature
-    * to call. It instantiates any plugins and adds them as properties to this
-    * class (unless they were previously instantiated), then calls the method
-    * in question.
-    *
-    * @param object The object being worked on.
-    * @param string The name of the class that called the method being created.
-    * @param string The name of the method that is being created.
-    * @return mixed Return value of new method.
-    */
+    /**
+     * Looks through $this->_NewMethodCollection for a matching method signature
+     * to call. It instantiates any plugins and adds them as properties to this
+     * class (unless they were previously instantiated), then calls the method
+     * in question.
+     *
+     * @param object The object being worked on.
+     * @param string The name of the class that called the method being created.
+     * @param string The name of the method that is being created.
+     * @return mixed Return value of new method.
+     */
     public function callNewMethod($Sender, $ClassName, $MethodName) {
         $Return = false;
         $EventKey = strtolower($ClassName.'_'.$MethodName.'_Create');
@@ -940,17 +940,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return $this->getPluginInstance($NewMethodClassName, self::ACCESS_CLASSNAME, $Sender)->$NewMethodName($Sender, GetValue('RequestArgs', $Sender, array()));
     }
 
-   /**
-    * Get the callback for an event handler.
+    /**
+     * Get the callback for an event handler.
      *
-    * @param string $ClassName The name of the class throwing the event.
-    * @param string $MethodName The name of the event.
-    * @param string $Type The type of event handler.
-    *  - Create: A new method creation.
-    *  - Override: A method override.
-    * @return callback
-    * @since 2.1
-    */
+     * @param string $ClassName The name of the class throwing the event.
+     * @param string $MethodName The name of the event.
+     * @param string $Type The type of event handler.
+     *  - Create: A new method creation.
+     *  - Override: A method override.
+     * @return callback
+     * @since 2.1
+     */
     public function getCallback($ClassName, $MethodName, $Type = 'Create') {
         $EventKey = strtolower("{$ClassName}_{$MethodName}_{$Type}");
 
@@ -972,13 +972,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return array($Instance, $MethodName);
     }
 
-   /**
+    /**
      * Checks to see if there are any plugins that create the method being executed.
-    *
-    * @param string The name of the class that called the method being created.
-    * @param string The name of the method that is being created.
-    * @return True if method exists.
-    */
+     *
+     * @param string The name of the class that called the method being created.
+     * @param string The name of the method that is being created.
+     * @return True if method exists.
+     */
     public function hasNewMethod($ClassName, $MethodName) {
         $Key = strtolower($ClassName.'_'.$MethodName.'_Create');
         if (array_key_exists($Key, $this->_NewMethodCollection)) {
@@ -997,7 +997,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return null|void
      */
     public function scanPluginFile($PluginFile, $VariableName = null) {
-       // Find the $PluginInfo array
+        // Find the $PluginInfo array
         if (!file_exists($PluginFile)) {
             return;
         }
@@ -1043,7 +1043,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             eval($PluginInfoString);
         }
 
-       // Define the folder name and assign the class name for the newly added item
+        // Define the folder name and assign the class name for the newly added item
         if (isset(${$VariableName}) && is_array(${$VariableName})) {
             $Item = array_pop($Trash = array_keys(${$VariableName}));
 
@@ -1070,24 +1070,24 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         return null;
     }
 
-   /**
-    * Get the current search paths
-    *
-    * By default, get all the paths as built by the constructor. Includes the two (or one) default plugin paths
-    * of PATH_PLUGINS and PATH_LOCAL_PLUGINS, as well as any extra paths defined in the config variable.
-    *
-    * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
-    * @return array Search paths
-    */
+    /**
+     * Get the current search paths
+     *
+     * By default, get all the paths as built by the constructor. Includes the two (or one) default plugin paths
+     * of PATH_PLUGINS and PATH_LOCAL_PLUGINS, as well as any extra paths defined in the config variable.
+     *
+     * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
+     * @return array Search paths
+     */
     public function searchPaths($OnlyCustom = false) {
         if (is_null($this->PluginSearchPaths) || is_null($this->AlternatePluginSearchPaths)) {
             $this->PluginSearchPaths = array();
             $this->AlternatePluginSearchPaths = array();
 
-           // Add default search path(s) to list
+            // Add default search path(s) to list
             $this->PluginSearchPaths[rtrim(PATH_PLUGINS, '/')] = 'core';
 
-           // Check for, and load, alternate search paths from config
+            // Check for, and load, alternate search paths from config
             $RawAlternatePaths = C('Garden.PluginManager.Search', null);
             if (!is_null($RawAlternatePaths)) {
                 $AlternatePaths = $RawAlternatePaths;
@@ -1141,27 +1141,27 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
     }
 
-   /**
-    * Test to see if a plugin throws fatal errors.
-    */
+    /**
+     * Test to see if a plugin throws fatal errors.
+     */
     public function testPlugin($PluginName, &$Validation, $Setup = false) {
-       // Make sure that the plugin's requirements are met
-       // Required Plugins
+        // Make sure that the plugin's requirements are met
+        // Required Plugins
         $PluginInfo = $this->getPluginInfo($PluginName);
         $RequiredPlugins = val('RequiredPlugins', $PluginInfo, false);
         CheckRequirements($PluginName, $RequiredPlugins, $this->enabledPlugins(), 'plugin');
 
-       // Required Themes
+        // Required Themes
         $EnabledThemes = Gdn::themeManager()->enabledThemeInfo();
         $RequiredThemes = ArrayValue('RequiredTheme', $PluginInfo, false);
         CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
 
-       // Required Applications
+        // Required Applications
         $EnabledApplications = Gdn::applicationManager()->enabledApplications();
         $RequiredApplications = ArrayValue('RequiredApplications', $PluginInfo, false);
         CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
 
-       // Include the plugin, instantiate it, and call its setup method
+        // Include the plugin, instantiate it, and call its setup method
         $PluginClassName = ArrayValue('ClassName', $PluginInfo, false);
         $PluginFolder = ArrayValue('Folder', $PluginInfo, false);
         if ($PluginFolder == '') {
@@ -1170,7 +1170,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         $this->pluginHook($PluginName, self::ACTION_ENABLE, $Setup);
 
-       // If setup succeeded, register any specified permissions
+        // If setup succeeded, register any specified permissions
         $PermissionName = val('RegisterPermissions', $PluginInfo, false);
         if ($PermissionName != false) {
             $PermissionModel = Gdn::permissionModel();
@@ -1192,15 +1192,15 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @throws Gdn_UserException
      */
     public function enablePlugin($PluginName, $Validation, $Setup = false, $EnabledPluginValueIndex = 'Folder') {
-       // Check that the plugin is in AvailablePlugins...
+        // Check that the plugin is in AvailablePlugins...
         $PluginInfo = $this->getPluginInfo($PluginName);
 
-       // Couldn't load the plugin info.
+        // Couldn't load the plugin info.
         if (!$PluginInfo) {
             return false;
         }
 
-       // Check to see if the plugin is already enabled.
+        // Check to see if the plugin is already enabled.
         if (array_key_exists($PluginName, $this->enabledPlugins())) {
             throw new Gdn_UserException(T('The plugin is already enabled.'));
         }
@@ -1211,7 +1211,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             return false;
         }
 
-       // Write enabled state to config
+        // Write enabled state to config
         SaveToConfig("EnabledPlugins.{$PluginName}", true);
         Logger::event(
             'addon_enabled',
@@ -1241,7 +1241,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @throws Exception
      */
     public function disablePlugin($PluginName) {
-       // Get the plugin and make sure its name is the correct case.
+        // Get the plugin and make sure its name is the correct case.
         $Plugin = $this->getPluginInfo($PluginName);
         if ($Plugin) {
             $PluginName = $Plugin['Index'];
@@ -1251,8 +1251,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         $enabled = $this->isEnabled($PluginName);
 
-       // 1. Check to make sure that no other enabled plugins rely on this one
-       // Get all available plugins and compile their requirements
+        // 1. Check to make sure that no other enabled plugins rely on this one
+        // Get all available plugins and compile their requirements
         foreach ($this->enabledPlugins() as $CheckingName => $Trash) {
             $CheckingInfo = $this->getPluginInfo($CheckingName);
             $RequiredPlugins = ArrayValue('RequiredPlugins', $CheckingInfo, false);
@@ -1261,22 +1261,22 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             }
         }
 
-       // 2. Perform necessary hook action
+        // 2. Perform necessary hook action
         $this->pluginHook($PluginName, self::ACTION_DISABLE, true);
 
-       // 3. Disable it.
+        // 3. Disable it.
         SaveToConfig("EnabledPlugins.{$PluginName}", false);
         unset($this->EnabledPlugins[$PluginName]);
         if ($enabled) {
-        Logger::event(
-            'addon_disabled',
-            LogLevel::NOTICE,
-            'The {addonName} plugin was disabled.',
-            array('addonName' => $PluginName)
-        );
+            Logger::event(
+                'addon_disabled',
+                LogLevel::NOTICE,
+                'The {addonName} plugin was disabled.',
+                array('addonName' => $PluginName)
+            );
         }
 
-       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
+        // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
         Gdn::locale()->refresh();
 
         $this->EventArguments['AddonName'] = $PluginName;
@@ -1303,20 +1303,20 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 if (strpos($Parts[$i], '@') !== false) {
                     $Author['Email'] = $Parts[$i];
                 } elseif (preg_match('`^https?://`', $Parts[$i]))
-                $Author['Url'] = $Parts[$i];
+                    $Author['Url'] = $Parts[$i];
             }
             $Result[] = $Author;
         }
 
         if (strtolower($Format) == 'html') {
-           // Build the html for the authors.
+            // Build the html for the authors.
             $Htmls = array();
             foreach ($Result as $Author) {
                 $Name = $Author['Name'];
                 if (isset($Author['Url'])) {
                     $Url = $Author['Url'];
                 } elseif (isset($Author['Email']))
-                $Url = "mailto:{$Author['Email']}";
+                    $Url = "mailto:{$Author['Email']}";
 
                 if (isset($Url)) {
                     $Htmls[] = '<a href="'.htmlspecialchars($Url).'">'.htmlspecialchars($Name).'</a>';
@@ -1328,14 +1328,14 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
     }
 
-   /**
-    * Hooks to the various actions, i.e. enable, disable and remove.
-    *
-    * @param string $PluginName
-    * @param string $ForAction which action to hook it to, i.e. enable, disable or remove
-    * @param boolean $Callback whether to perform the hook method
-    * @return void
-    */
+    /**
+     * Hooks to the various actions, i.e. enable, disable and remove.
+     *
+     * @param string $PluginName
+     * @param string $ForAction which action to hook it to, i.e. enable, disable or remove
+     * @param boolean $Callback whether to perform the hook method
+     * @return void
+     */
     private function pluginHook($PluginName, $ForAction, $Callback = false) {
 
         switch ($ForAction) {
@@ -1345,7 +1345,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             case self::ACTION_DISABLE:
                 $HookMethod = 'OnDisable';
                 break;
-           //case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
+            //case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
             case self::ACTION_ONLOAD:
                 $HookMethod = 'OnLoad';
                 break;
@@ -1366,13 +1366,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
     }
 
-   /**
-    * Executes the plugin hook action if it exists.
-    *
-    * @param string $PluginClassName
-    * @param string $HookMethod
-    * @return void
-    */
+    /**
+     * Executes the plugin hook action if it exists.
+     *
+     * @param string $PluginClassName
+     * @param string $HookMethod
+     * @return void
+     */
     private function pluginCallbackExecution($PluginClassName, $HookMethod) {
         if (class_exists($PluginClassName)) {
             $Plugin = new $PluginClassName();

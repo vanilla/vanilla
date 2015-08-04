@@ -77,22 +77,22 @@ class Gdn_CookieIdentity {
         $this->SessionExpiry = val('SessionExpiry', $Config, $DefaultConfig['SessionExpiry']);
     }
 
-   /**
-    * Destroys the user's session cookie - essentially de-authenticating them.
-    */
+    /**
+     * Destroys the user's session cookie - essentially de-authenticating them.
+     */
     protected function _clearIdentity() {
-       // Destroy the cookie.
+        // Destroy the cookie.
         $this->UserID = 0;
         $this->_deleteCookie($this->CookieName);
     }
 
-   /**
-    * Returns the unique id assigned to the user in the database (retrieved
-    * from the session cookie if the cookie authenticates) or FALSE if not
-    * found or authentication fails.
-    *
-    * @return int
-    */
+    /**
+     * Returns the unique id assigned to the user in the database (retrieved
+     * from the session cookie if the cookie authenticates) or FALSE if not
+     * found or authentication fails.
+     *
+     * @return int
+     */
     public function getIdentity() {
         if (!is_null($this->UserID)) {
             return $this->UserID;
@@ -147,24 +147,24 @@ class Gdn_CookieIdentity {
         return true;
     }
 
-   /**
-    * Returns $this->_HashHMAC with the provided data, the default hashing method
-    * (md5), and the server's COOKIE.SALT string as the key.
-    *
-    * @param string $Data The data to place in the hash.
-    */
+    /**
+     * Returns $this->_HashHMAC with the provided data, the default hashing method
+     * (md5), and the server's COOKIE.SALT string as the key.
+     *
+     * @param string $Data The data to place in the hash.
+     */
     protected static function _hash($Data, $CookieHashMethod, $CookieSalt) {
         return Gdn_CookieIdentity::_hashHMAC($CookieHashMethod, $Data, $CookieSalt);
     }
 
-   /**
-    * Returns the provided data hashed with the specified method using the
-    * specified key.
-    *
-    * @param string $HashMethod The hashing method to use on $Data. Options are MD5 or SHA1.
-    * @param string $Data The data to place in the hash.
-    * @param string $Key The key to use when hashing the data.
-    */
+    /**
+     * Returns the provided data hashed with the specified method using the
+     * specified key.
+     *
+     * @param string $HashMethod The hashing method to use on $Data. Options are MD5 or SHA1.
+     * @param string $Data The data to place in the hash.
+     * @param string $Key The key to use when hashing the data.
+     */
     protected static function _hashHMAC($HashMethod, $Data, $Key) {
         $PackFormats = array('md5' => 'H32', 'sha1' => 'H40');
 
@@ -173,7 +173,7 @@ class Gdn_CookieIdentity {
         }
 
         $PackFormat = $PackFormats[$HashMethod];
-       // this is the equivalent of "strlen($Key) > 64":
+        // this is the equivalent of "strlen($Key) > 64":
         if (isset($Key[63])) {
             $Key = pack($PackFormat, $HashMethod($Key));
         } else {
@@ -186,12 +186,12 @@ class Gdn_CookieIdentity {
         return $HashMethod($OuterPad.pack($PackFormat, $HashMethod($InnerPad.$Data)));
     }
 
-   /**
-    * Generates the user's session cookie.
-    *
-    * @param int $UserID The unique id assigned to the user in the database.
-    * @param boolean $Persist Should the user's session remain persistent across visits?
-    */
+    /**
+     * Generates the user's session cookie.
+     *
+     * @param int $UserID The unique id assigned to the user in the database.
+     * @param boolean $Persist Should the user's session remain persistent across visits?
+     */
     public function setIdentity($UserID, $Persist = false) {
         if (is_null($UserID)) {
             $this->_clearIdentity();
@@ -200,70 +200,70 @@ class Gdn_CookieIdentity {
 
         $this->UserID = $UserID;
 
-       // If we're persisting, both the cookie and its payload expire in 30days
+        // If we're persisting, both the cookie and its payload expire in 30days
         if ($Persist) {
             $PayloadExpires = strtotime($this->PersistExpiry);
             $CookieExpires = $PayloadExpires;
 
-        // Otherwise the payload expires in 2 days and the cookie expires on borwser restart
+            // Otherwise the payload expires in 2 days and the cookie expires on borwser restart
         } else {
-           // Note: $CookieExpires = 0 causes cookie to die when browser closes.
+            // Note: $CookieExpires = 0 causes cookie to die when browser closes.
             $PayloadExpires = strtotime($this->SessionExpiry);
             $CookieExpires = 0;
         }
 
-       // Create the cookie
+        // Create the cookie
         $KeyData = $UserID.'-'.$PayloadExpires;
         $this->_setCookie($this->CookieName, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
         $this->setVolatileMarker($UserID);
     }
 
-   /**
-    *
-    *
-    * @param integer $UserID
-    * @return void
-    */
+    /**
+     *
+     *
+     * @param integer $UserID
+     * @return void
+     */
     public function setVolatileMarker($UserID) {
         if (is_null($UserID)) {
             return;
         }
 
-       // Note: 172800 is 60*60*24*2 or 2 days
+        // Note: 172800 is 60*60*24*2 or 2 days
         $PayloadExpires = time() + 172800;
-       // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
+        // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
         $CookieExpires = 0;
 
         $KeyData = $UserID.'-'.$PayloadExpires;
         $this->_setCookie($this->VolatileMarker, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
     }
 
-   /**
-    * Set a cookie, using path, domain, salt, and hash method from core config
-    *
+    /**
+     * Set a cookie, using path, domain, salt, and hash method from core config
+     *
      * @param string $CookieName Name of the cookie
      * @param string $KeyData
      * @param mixed $CookieContents
-    * @param integer $CookieExpires
-    * @return void
-    */
+     * @param integer $CookieExpires
+     * @return void
+     */
     protected function _setCookie($CookieName, $KeyData, $CookieContents, $CookieExpires) {
         self::setCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
     }
 
-   /**
-    * Set a cookie, using specified path, domain, salt and hash method
-    *
+    /**
+     * Set a cookie, using specified path, domain, salt and hash method
+     *
      * @param string $CookieName Name of the cookie
      * @param string $KeyData
      * @param mixed $CookieContents
-    * @param integer $CookieExpires
+     * @param integer $CookieExpires
      * @param string $Path Optional. Cookie path (auto load from config)
      * @param string $Domain Optional. Cookie domain (auto load from config)
      * @param string $CookieHashMethod Optional. Cookie hash method (auto load from config)
      * @param string $CookieSalt Optional. Cookie salt (auto load from config)
-    * @return void
-    */
+     * @return void
+     */
     public static function setCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $Path = null, $Domain = null, $CookieHashMethod = null, $CookieSalt = null) {
 
         if (is_null($Path)) {
@@ -274,7 +274,7 @@ class Gdn_CookieIdentity {
             $Domain = Gdn::config('Garden.Cookie.Domain', '');
         }
 
-       // If the domain being set is completely incompatible with the current domain then make the domain work.
+        // If the domain being set is completely incompatible with the current domain then make the domain work.
         $CurrentHost = Gdn::request()->host();
         if (!stringEndsWith($CurrentHost, trim($Domain, '.'))) {
             $Domain = '';
@@ -288,12 +288,12 @@ class Gdn_CookieIdentity {
             $CookieSalt = Gdn::config('Garden.Cookie.Salt');
         }
 
-       // Create the cookie signature
+        // Create the cookie signature
         $KeyHash = self::_hash($KeyData, $CookieHashMethod, $CookieSalt);
         $KeyHashHash = self::_hashHMAC($CookieHashMethod, $KeyData, $KeyHash);
         $Cookie = array($KeyData, $KeyHashHash, time());
 
-       // Attach cookie payload
+        // Attach cookie payload
         if (!is_null($CookieContents)) {
             $CookieContents = (array)$CookieContents;
             $Cookie = array_merge($Cookie, $CookieContents);
@@ -301,7 +301,7 @@ class Gdn_CookieIdentity {
 
         $CookieContents = implode('|', $Cookie);
 
-       // Create the cookie.
+        // Create the cookie.
         safeCookie($CookieName, $CookieContents, $CookieExpires, $Path, $Domain, null, true);
         $_COOKIE[$CookieName] = $CookieContents;
     }

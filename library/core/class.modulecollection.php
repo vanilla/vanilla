@@ -16,7 +16,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
 
     /** @var array  */
     public $Items = array();
-   
+
     /**
      *
      *
@@ -40,7 +40,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
                 if (!GetValue('Visible', $Item, true)) {
                     continue;
                 }
-            
+
                 $LengthBefore = ob_get_length();
                 $Item->render();
                 $LengthAfter = ob_get_length();
@@ -57,7 +57,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
         }
         unset($this->EventArguments['AssetName']);
     }
-   
+
     /**
      * Build output HTML.
      *

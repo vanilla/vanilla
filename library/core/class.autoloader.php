@@ -49,12 +49,12 @@ class Gdn_Autoloader {
     /** @var array List of priority/preferred CONTEXT+Extension[+MapType] groups for the next lookup */
     protected static $priorities;
 
-   /**
+    /**
      * Attach mappings for vanilla extension folders.
-    *
+     *
      * @param string $ExtensionType The type of extension to map.
      * This should be one of: CONTEXT_THEME, CONTEXT_PLUGIN, CONTEXT_APPLICATION.
-    */
+     */
     public static function attach($ExtensionType) {
 
         switch ($ExtensionType) {
@@ -78,7 +78,7 @@ class Gdn_Autoloader {
                             $SearchPathName = md5($SearchPath);
                         }
 
-                       // If we have already loaded the plugin manager, use its internal folder list
+                        // If we have already loaded the plugin manager, use its internal folder list
                         if (Gdn::pluginManager()->started()) {
                             $Folders = Gdn::pluginManager()->enabledPluginFolders($SearchPath);
                             foreach ($Folders as $PluginFolder) {
@@ -153,8 +153,8 @@ class Gdn_Autoloader {
      * @return bool
      */
     protected static function doLookup($ClassName, $MapType) {
-       // We loop over the caches twice. First, hit only their cached data.
-       // If all cache hits miss, search filesystem.
+        // We loop over the caches twice. First, hit only their cached data.
+        // If all cache hits miss, search filesystem.
 
         if (!is_array(self::$maps)) {
             return false;
@@ -162,13 +162,13 @@ class Gdn_Autoloader {
 
         $Priorities = array();
 
-       // Binary flip - cacheonly or cache+fs
+        // Binary flip - cacheonly or cache+fs
         foreach (array(true, false) as $MapOnly) {
             $SkipMaps = array();
             $ContextType = null;
             $SkipTillNextContext = false;
 
-           // Drill to the caches associated with this map type
+            // Drill to the caches associated with this map type
             foreach (self::$maps as $MapHash => &$Map) {
                 if ($MapType !== null && $Map->mapType() != $MapType) {
                     continue;
@@ -176,7 +176,7 @@ class Gdn_Autoloader {
 
                 $MapContext = self::getContextType($MapHash);
                 if ($MapContext != $ContextType) {
-                   // Hit new context
+                    // Hit new context
                     $SkipMaps = array();
                     $ContextType = $MapContext;
 
@@ -186,7 +186,7 @@ class Gdn_Autoloader {
 
                     if (array_key_exists($ContextType, $Priorities) && is_array($Priorities[$ContextType])) {
                         foreach ($Priorities[$ContextType] as $PriorityMapHash => $PriorityInfo) {
-                           // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
+                            // If we're in a RESTRICT priority and we come to the end, wait till we hit the next context before looking further
                             if ($PriorityMapHash == 'FAIL_CONTEXT_IF_NOT_FOUND') {
                                 $SkipTillNextContext = true;
                                 break;
@@ -198,19 +198,19 @@ class Gdn_Autoloader {
                                 return $File;
                             }
 
-                           // Don't check this map again
+                            // Don't check this map again
                             array_push($SkipMaps, $PriorityMapHash);
                         }
                     }
                 }
 
-               // If this map was already checked by a priority, or if we've exhausted a RESTRICT priority, skip maps until the next
-               // context level is reached.
+                // If this map was already checked by a priority, or if we've exhausted a RESTRICT priority, skip maps until the next
+                // context level is reached.
                 if (in_array($MapHash, $SkipMaps) || $SkipTillNextContext === true) {
                     continue;
                 }
 
-               // Finally, search this map.
+                // Finally, search this map.
                 $File = $Map->lookup($ClassName, $MapOnly);
                 if ($File !== false) {
                     return $File;
@@ -248,7 +248,7 @@ class Gdn_Autoloader {
      * @return string
      */
     public static function getMapType($ClassName) {
-       // Strip leading 'Gdn_'
+        // Strip leading 'Gdn_'
         if (substr($ClassName, 0, 4) == 'Gdn_') {
             $ClassName = substr($ClassName, 4);
         }
@@ -293,12 +293,12 @@ class Gdn_Autoloader {
         return $File;
     }
 
-   /**
+    /**
      * Get an Autoloader Map by hash.
-    *
-    * @param type $MapHash
-    * @return Gdn_Autoloader_Map
-    */
+     *
+     * @param type $MapHash
+     * @return Gdn_Autoloader_Map
+     */
     public static function map($MapHash) {
         if (array_key_exists($MapHash, self::$maps)) {
             return self::$maps[$MapHash];
@@ -310,15 +310,15 @@ class Gdn_Autoloader {
         return false;
     }
 
-   /**
+    /**
      * Lookup and return an autoloader map.
-    *
-    * @param type $MapType
-    * @param type $ContextType
-    * @param type $Extension
-    * @param type $MapRootLocation
-    * @return Gdn_Autoloader_Map
-    */
+     *
+     * @param type $MapType
+     * @param type $ContextType
+     * @param type $Extension
+     * @param type $MapRootLocation
+     * @return Gdn_Autoloader_Map
+     */
     public static function getMap($MapType, $ContextType, $Extension = self::CONTEXT_CORE, $MapRootLocation = PATH_CACHE) {
         $MapHash = self::makeMapHash($MapType, $ContextType, $Extension, $MapRootLocation);
         return self::map($MapHash);
@@ -326,8 +326,8 @@ class Gdn_Autoloader {
 
     public static function priority($ContextType, $Extension, $MapType = null, $PriorityType = self::PRIORITY_TYPE_PREFER, $PriorityDuration = self::PRIORITY_ONCE) {
         $MapGroupIdentifier = implode('|', array(
-         $ContextType,
-         $Extension
+            $ContextType,
+            $Extension
         ));
 
         $MapGroupHashes = val($MapGroupIdentifier, self::$mapGroups, array());
@@ -343,7 +343,7 @@ class Gdn_Autoloader {
             $PriorityHashes[$MapHash] = array(
                 'maptype' => $ThisMapType,
                 'duration' => $PriorityDuration,
-            'prioritytype' => $PriorityType
+                'prioritytype' => $PriorityType
             );
         }
 
@@ -362,7 +362,7 @@ class Gdn_Autoloader {
             );
         }
 
-       // Add new priorities to list
+        // Add new priorities to list
         self::$priorities[$ContextType][$PriorityType] = array_merge(
             self::$priorities[$ContextType][$PriorityType],
             $PriorityHashes
@@ -383,14 +383,14 @@ class Gdn_Autoloader {
             return false;
         }
 
-       /**
-       * First, gather the RESTRICT requirements. If these exist, they are the only hashes that will be sent, and a 'FAIL_IF_NOT_FOUND'
-       * flag will be appended to the list to halt lookups.
-       *
-       * If there are no RESTRICT priorities, check for PREFER priorities and send those.
-       *
-       * Always optionally filter on $MapType if provided.
-       */
+        /**
+         * First, gather the RESTRICT requirements. If these exist, they are the only hashes that will be sent, and a 'FAIL_IF_NOT_FOUND'
+         * flag will be appended to the list to halt lookups.
+         *
+         * If there are no RESTRICT priorities, check for PREFER priorities and send those.
+         *
+         * Always optionally filter on $MapType if provided.
+         */
         foreach (array(self::PRIORITY_TYPE_RESTRICT, self::PRIORITY_TYPE_PREFER) as $PriorityType) {
             if (!sizeof(self::$priorities[$ContextType][$PriorityType])) {
                 continue;
@@ -446,22 +446,22 @@ class Gdn_Autoloader {
 
         $Extension = val('Extension', $Options, null);
 
-       // Determine cache root on-disk location
+        // Determine cache root on-disk location
         $Hits = 0;
         str_replace(PATH_ROOT, '', $SearchPath, $Hits);
         $MapRootLocation = PATH_CACHE;
 
-       // Build a unique identifier that refers to this map (same map type, context, extension, and cachefile location)
+        // Build a unique identifier that refers to this map (same map type, context, extension, and cachefile location)
         $MapIdentifier = implode('|', array(
-         $MapType,
-         $ContextType,
-         $Extension,
-         $MapRootLocation
+            $MapType,
+            $ContextType,
+            $Extension,
+            $MapRootLocation
         ));
         $Options['MapIdentifier'] = $MapIdentifier;
         $MapHash = md5($MapIdentifier);
 
-       // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
+        // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
         $MapHash = 'context:'.val($ContextType, array_flip(self::$contextOrder)).'_'.$Extension.'_'.$MapHash;
         $MapHash = self::makeMapHash($MapType, $ContextType, $Extension, $MapRootLocation);
 
@@ -478,15 +478,15 @@ class Gdn_Autoloader {
 
         $AddPathResult = self::$maps[$MapHash]->addPath($SearchPath, $Options);
 
-       /*
-        * Build a unique identifier that refers to this cached list (context and extension)
-        *
-        * For example, CONTEXT_APPLICATION and 'dashboard' would refer to all maps that store
-        * information about the dashboard application: its controllers, models, modules, etc.
-        */
+        /*
+         * Build a unique identifier that refers to this cached list (context and extension)
+         *
+         * For example, CONTEXT_APPLICATION and 'dashboard' would refer to all maps that store
+         * information about the dashboard application: its controllers, models, modules, etc.
+         */
         $MapGroupIdentifier = implode('|', array(
-         $ContextType,
-         $Extension
+            $ContextType,
+            $Extension
         ));
 
         if (!is_array(self::$mapGroups)) {
@@ -513,15 +513,15 @@ class Gdn_Autoloader {
      */
     public static function makeMapHash($MapType, $ContextType, $Extension, $MapRootLocation) {
         $MapIdentifier = implode('|', array(
-         $MapType,
-         $ContextType,
-         $Extension,
-         $MapRootLocation
+            $MapType,
+            $ContextType,
+            $Extension,
+            $MapRootLocation
         ));
 
         $MapHash = md5($MapIdentifier);
 
-       // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
+        // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
         $MapHash = 'context:'.val($ContextType, array_flip(self::$contextOrder)).'_'.$Extension.'_'.$MapHash;
 
         return $MapHash;
@@ -539,15 +539,15 @@ class Gdn_Autoloader {
         $Map->index();
     }
 
-   /**
+    /**
      * This method frees the map storing information about the specified resource.
-    *
+     *
      * Takes a map type, and an array of information about the resource in question:
      * a plugin info array, in the case of a plugin, or
-    *
+     *
      * @param string $ContextType type of map to consider (one of the MAP_ constants).
      * @param array $MapResourceArray array of information about the mapped resource.
-    */
+     */
     public static function smartFree($ContextType = null, $MapResourceArray = null) {
 
         $CacheFolder = @opendir(PATH_CACHE);
@@ -563,12 +563,12 @@ class Gdn_Autoloader {
 
     }
 
-   /**
+    /**
      * Register core mappings.
-    *
+     *
      * Set up the autoloader with known search directories, hook into the SPL autoloader
-    * and load existing caches.
-    */
+     * and load existing caches.
+     */
     public static function start() {
 
         self::$prefixes = array(
@@ -578,34 +578,34 @@ class Gdn_Autoloader {
             self::CONTEXT_THEME => 't'
         );
         self::$contextOrder = array(
-         self::CONTEXT_THEME,
-         self::CONTEXT_LOCALE,
-         self::CONTEXT_PLUGIN,
-         self::CONTEXT_APPLICATION,
-         self::CONTEXT_CORE
+            self::CONTEXT_THEME,
+            self::CONTEXT_LOCALE,
+            self::CONTEXT_PLUGIN,
+            self::CONTEXT_APPLICATION,
+            self::CONTEXT_CORE
         );
 
         self::$maps = array();
         self::$mapGroups = array();
 
-       // Register autoloader with the SPL
+        // Register autoloader with the SPL
         spl_autoload_register(array('Gdn_Autoloader', 'lookup'));
 
-       // Configure library/core and library/database
+        // Configure library/core and library/database
         self::registerMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/core');
         self::registerMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/database');
         self::registerMap(self::MAP_LIBRARY, self::CONTEXT_CORE, PATH_LIBRARY.'/vendors');
 
-       // Register shutdown function to auto save changed cache files
+        // Register shutdown function to auto save changed cache files
         register_shutdown_function(array('Gdn_Autoloader', 'shutdown'));
     }
 
-   /**
+    /**
      * Save the current caches.
-    *
-    * This method executes once, just as the framework is shutting down. Its purpose
-    * is to save the library maps to disk if they've changed.
-    */
+     *
+     * This method executes once, just as the framework is shutting down. Its purpose
+     * is to save the library maps to disk if they've changed.
+     */
     public static function shutdown() {
         foreach (self::$maps as $MapHash => &$Map) {
             $Map->shutdown();
@@ -759,7 +759,7 @@ class Gdn_Autoloader_Map {
             }
             $FullPath = CombinePaths(array($Path, $FileName));
 
-           // If this is a folder...
+            // If this is a folder...
             if (is_dir($FullPath)) {
                 if ($Recursive) {
                     $File = $this->findFile($FullPath, $SearchFiles, $Recursive);
@@ -804,7 +804,7 @@ class Gdn_Autoloader_Map {
             }
             $FullPath = CombinePaths(array($Path, $FileName));
 
-           // If this is a folder, maybe recurse it eh?
+            // If this is a folder, maybe recurse it eh?
             if (is_dir($FullPath)) {
                 if ($Recursive) {
                     $Recurse = $this->findFiles($FullPath, $FileMasks, $Recursive);
@@ -817,7 +817,7 @@ class Gdn_Autoloader_Map {
                 }
             } else {
                 foreach ($FileMasks as $FileMask) {
-                   // If this file matches one of the masks, add it to this loops's found files
+                    // If this file matches one of the masks, add it to this loops's found files
                     if (fnmatch($FileMask, $FileName)) {
                         $FoundFiles[] = $FullPath;
                         break;
@@ -829,11 +829,11 @@ class Gdn_Autoloader_Map {
         return $FoundFiles;
     }
 
-   /**
-    * Autoloader cache static constructor
-    *
-    * @return Gdn_Autoloader_Map
-    */
+    /**
+     * Autoloader cache static constructor
+     *
+     * @return Gdn_Autoloader_Map
+     */
     public static function load($MapType, $ContextType, $MapRootLocation, $Options) {
         return new Gdn_Autoloader_Map($MapType, $ContextType, $MapRootLocation, $Options);
     }
@@ -848,28 +848,28 @@ class Gdn_Autoloader_Map {
     public function lookup($ClassName, $MapOnly = true) {
         $MapName = $this->mapInfo['name'];
 
-       // Lazyload cache data
+        // Lazyload cache data
         if (is_null($this->map)) {
             $this->map = array();
             $OnDiskMapFile = $this->mapInfo['ondisk'];
 
-           // Loading cache data from disk
+            // Loading cache data from disk
             if (file_exists($OnDiskMapFile)) {
                 $Structure = $this->mapInfo['structure'];
                 $MapContents = parse_ini_file($OnDiskMapFile, true);
 
                 try {
-                   // Detect legacy flat files which are now stored split
+                    // Detect legacy flat files which are now stored split
                     if ($Structure == self::STRUCTURE_SPLIT && array_key_exists(self::TOPIC_DEFAULT, $MapContents)) {
                         throw new Exception();
                     }
 
-                   // Bad file?
+                    // Bad file?
                     if ($MapContents == false || !is_array($MapContents)) {
                         throw new Exception();
                     }
 
-                   // All's well that ends well. Load the cache.
+                    // All's well that ends well. Load the cache.
                     $this->map = $MapContents;
                 } catch (Exception $Ex) {
                     @unlink($OnDiskMapFile);
@@ -877,12 +877,12 @@ class Gdn_Autoloader_Map {
             }
         }
 
-       // Always look by lowercase classname
+        // Always look by lowercase classname
         $ClassName = strtolower($ClassName);
 
         switch ($this->mapInfo['structure']) {
             case 'split':
-               // This file stored split, so look for this class in each virtual sub-path, by topic
+                // This file stored split, so look for this class in each virtual sub-path, by topic
                 foreach ($this->paths as $Path => $PathOptions) {
                     $LookupSplitTopic = val('topic', $PathOptions);
                     if (array_key_exists($LookupSplitTopic, $this->map) && array_key_exists($ClassName, $this->map[$LookupSplitTopic])) {
@@ -893,7 +893,7 @@ class Gdn_Autoloader_Map {
 
             default:
             case 'flat':
-               // This file is stored flat, so just look in the DEFAULT_TOPIC
+                // This file is stored flat, so just look in the DEFAULT_TOPIC
                 $LookupSplitTopic = self::TOPIC_DEFAULT;
                 if (array_key_exists($LookupSplitTopic, $this->map) && array_key_exists($ClassName, $this->map[$LookupSplitTopic])) {
                     return val($ClassName, $this->map[$LookupSplitTopic]);
@@ -901,7 +901,7 @@ class Gdn_Autoloader_Map {
                 break;
         }
 
-       // Look at the filesystem, too
+        // Look at the filesystem, too
         if (!$MapOnly) {
             if (substr($ClassName, 0, 4) == 'gdn_') {
                 $FSClassName = substr($ClassName, 4);
@@ -910,8 +910,8 @@ class Gdn_Autoloader_Map {
             }
 
             $Files = array(
-            sprintf(self::LOOKUP_CLASS_MASK, $FSClassName),
-            sprintf(self::LOOKUP_INTERFACE_MASK, $FSClassName)
+                sprintf(self::LOOKUP_CLASS_MASK, $FSClassName),
+                sprintf(self::LOOKUP_INTERFACE_MASK, $FSClassName)
             );
 
             foreach ($this->paths as $Path => $PathOptions) {
@@ -936,16 +936,16 @@ class Gdn_Autoloader_Map {
         return false;
     }
 
-   /**
-    * Try to index the entire map
-    *
-    * @return void
-    */
+    /**
+     * Try to index the entire map
+     *
+     * @return void
+     */
     public function index($ExtraPaths = null) {
 
         $FileMasks = array(
-         sprintf(self::LOOKUP_CLASS_MASK, '*'),
-         sprintf(self::LOOKUP_INTERFACE_MASK, '*')
+            sprintf(self::LOOKUP_CLASS_MASK, '*'),
+            sprintf(self::LOOKUP_INTERFACE_MASK, '*')
         );
 
         $ExtraPathsRemove = null;
@@ -980,18 +980,18 @@ class Gdn_Autoloader_Map {
                     $this->mapInfo['dirty'] = true;
                 }
 
-   //            $ProvidesClasses = $this->Investigate($File);
+//            $ProvidesClasses = $this->Investigate($File);
 //            if ($ProvidesClasses === false) continue;
-   //
-   //            foreach ($ProvidesClasses as $ProvidedClass) {
-   //               $ProvidedClass = strtolower($ProvidedClass);
-   //               $this->Map[$SplitTopic][$ProvidedClass] = $File;
+//
+//            foreach ($ProvidesClasses as $ProvidedClass) {
+//               $ProvidedClass = strtolower($ProvidedClass);
+//               $this->Map[$SplitTopic][$ProvidedClass] = $File;
 //               $this->MapInfo['dirty'] = true;
-   //            }
+//            }
             }
         }
 
-       // Save
+        // Save
         $this->shutdown();
 
         if (!is_null($ExtraPathsRemove)) {
@@ -1014,7 +1014,7 @@ class Gdn_Autoloader_Map {
         $Lines = file($File);
         $ClassesFound = array();
         foreach ($Lines as $Line) {
-           //strtolower(substr(trim($Line), 0, 6)) == 'class '
+            //strtolower(substr(trim($Line), 0, 6)) == 'class '
             if (preg_match('/^class[\s]+([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)[\s]+(?:.*)?{/', $Line, $Matches)) {
                 $ClassesFound[] = $Matches[1];
                 continue;
@@ -1042,7 +1042,7 @@ class Gdn_Autoloader_Map {
         $FileName = basename($File);
         $Modes = array(
             'class' => self::LOOKUP_CLASS_MASK,
-         'interface' => self::LOOKUP_INTERFACE_MASK
+            'interface' => self::LOOKUP_INTERFACE_MASK
         );
         foreach ($Modes as $ModeType => $ModeMask) {
             $MatchModeMask = sprintf($ModeMask, '*');
@@ -1085,7 +1085,7 @@ class Gdn_Autoloader_Map {
             // If there is only 1 slash, add another to have a valid network path.
             if (preg_match('`^/[^/]`', $path) && stripos(PHP_OS, 'win') === 0) {
                 $path = "/".$path;
-    }
+            }
         }
 
         return $path;

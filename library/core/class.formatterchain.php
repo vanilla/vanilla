@@ -32,22 +32,22 @@ class Gdn_FormatterChain {
     /** @var array  */
     protected $_Formatters = array();
 
-   /** Add a formatter to the chain. This method isn't usuall called directly. Use Gdn_FormatterChain::Chain() instead.
-    *
-    * @param object $Formatter The formatter to install.
-    * @param int $Priority The priority of the formatter in the chain. High priorities come first.
-    */
+    /** Add a formatter to the chain. This method isn't usuall called directly. Use Gdn_FormatterChain::Chain() instead.
+     *
+     * @param object $Formatter The formatter to install.
+     * @param int $Priority The priority of the formatter in the chain. High priorities come first.
+     */
     public function add($Formatter, $Priority = Gdn_FormatterChain::PRIORITY_DEFAULT) {
-       // Make sure the priority isn't out of bounds.
+        // Make sure the priority isn't out of bounds.
         if ($Priority < self::PRIORITY_LAST) {
             $Priority = self::PRIORITY_LAST;
         } elseif ($Priority > self::PRIORITY_FIRST)
-         $Priority = self::PRIORITY_FIRST;
+            $Priority = self::PRIORITY_FIRST;
 
         $FArray = array($Formatter, $Priority);
         $this->_Formatters[] = $FArray;
 
-       // Resort the array so it's in priority order.
+        // Resort the array so it's in priority order.
         usort($this->_Formatters, array('Gdn_FormatterChain', 'Compare'));
     }
 
@@ -55,14 +55,14 @@ class Gdn_FormatterChain {
      * Add a formatter and create a chain in the Gdn factory.
      *
      * This is a conveinience method for chaining formatters without having to deal with the object creation logic.
-    *
-    * @param string $Type The type of formatter.
-    * @param object $Formatter The formatter to install.
-    * @param int $Priority The priority of the formatter in the chain. High priorities come first.
-    * @return Gdn_FormatterChain The chain object that was created.
-    */
+     *
+     * @param string $Type The type of formatter.
+     * @param object $Formatter The formatter to install.
+     * @param int $Priority The priority of the formatter in the chain. High priorities come first.
+     * @return Gdn_FormatterChain The chain object that was created.
+     */
     public static function chain($Type, $Formatter, $Priority = Gdn_FormatterChain::PRIORITY_DEFAULT) {
-       // Grab the existing formatter from the factory.
+        // Grab the existing formatter from the factory.
         $Formatter = Gdn::factory($Type.'Formatter');
 
         if ($Formatter === null) {
@@ -73,7 +73,7 @@ class Gdn_FormatterChain {
         } else {
             Gdn::factoryUninstall($Type.'Formatter');
 
-           // Look for a priority on the existing object.
+            // Look for a priority on the existing object.
             if (property_exists($Formatter, 'Priority')) {
                 $Priority = $Formatter->Priority;
             } else {
@@ -88,27 +88,27 @@ class Gdn_FormatterChain {
         return $Chain;
     }
 
-   /** The function used to sort formatters in the chain.
-    *
-    * @param array $A The first formatter array to compare.
-    * @param array $B The second formatter array to compare.
-    * @return int
-    */
+    /** The function used to sort formatters in the chain.
+     *
+     * @param array $A The first formatter array to compare.
+     * @param array $B The second formatter array to compare.
+     * @return int
+     */
     public static function compare($A, $B) {
         if ($A[1] < $B[1]) {
             return 1;
         } elseif ($A[1] > $B[1])
-         return -1;
+            return -1;
         else {
             return 0;
         }
     }
 
-   /** Format a string with all of the formatters in turn.
-    *
-    * @param string $String The string to format.
-    * @return string The formatted string.
-    */
+    /** Format a string with all of the formatters in turn.
+     *
+     * @param string $String The string to format.
+     * @return string The formatted string.
+     */
     public function format($String) {
         $Result = $String;
         foreach ($this->_Formatters as $FArray) {

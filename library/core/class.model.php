@@ -6,8 +6,6 @@
  * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
-    exit();
-      }
  * @since 2.0
  */
 
@@ -19,75 +17,75 @@
  * complicated procedures related to different tables.
  */
 class Gdn_Model extends Gdn_Pluggable {
-    /**  @var Gdn_DataSet An object representation of the current working dataset. */
 
+    /**  @var Gdn_DataSet An object representation of the current working dataset. */
     public $Data;
 
     /**  @var Gdn_Database Database object. */
     public $Database;
 
-   /**
+    /**
      * @var string The name of the field that stores the insert date for a record. This
-    * field will be automatically filled by the model if it exists.
-    */
+     * field will be automatically filled by the model if it exists.
+     */
     public $DateInserted = 'DateInserted';
 
-   /**
+    /**
      * @var string The name of the field that stores the update date for a record. This
-    * field will be automatically filled by the model if it exists.
-    */
+     * field will be automatically filled by the model if it exists.
+     */
     public $DateUpdated = 'DateUpdated';
 
-   /**
+    /**
      * @var string The name of the field that stores the id of the user that inserted it.
-    * This field will be automatically filled by the model if it exists and
-    * @@Session::UserID is a valid integer.
-    */
+     * This field will be automatically filled by the model if it exists and
+     * @@Session::UserID is a valid integer.
+     */
     public $InsertUserID = 'InsertUserID';
 
-   /**
+    /**
      * @var string The name of the table that this model is intended to represent. The
-    * default value assigned to $this->Name will be the name that the
-    * model was instantiated with (defined in $this->__construct()).
-    */
+     * default value assigned to $this->Name will be the name that the
+     * model was instantiated with (defined in $this->__construct()).
+     */
     public $Name;
 
-   /**
+    /**
      * @var stringThe name of the primary key field of this model. The default is 'id'. If
-    * $this->DefineSchema() is called, this value will be automatically changed
-    * to any primary key discovered when examining the table schema.
-    */
+     * $this->DefineSchema() is called, this value will be automatically changed
+     * to any primary key discovered when examining the table schema.
+     */
     public $PrimaryKey = 'id';
 
-   /**
+    /**
      * @var Gdn_Schema An object that is used to store and examine database schema information
      * related to this model. This object is defined and populated with $this->DefineSchema().
-    */
+     */
     public $Schema;
 
     /** @var Gdn_SQLDriver Contains the sql driver for the object. */
     public $SQL;
 
-   /**
+    /**
      * @var string The name of the field that stores the id of the user that updated it.
      * This field will be automatically filled by the model if it exists and @@Session::UserID is a valid integer.
-    */
+     */
     public $UpdateUserID = 'UpdateUserID';
 
-   /**
+    /**
      * @var Gdn_Validation An object that is used to manage and execute data integrity rules on this
-    * object. By default, this object only enforces maxlength, data types, and
-    * required fields (defined when $this->DefineSchema() is called).
-    */
+     * object. By default, this object only enforces maxlength, data types, and
+     * required fields (defined when $this->DefineSchema() is called).
+     */
     public $Validation;
 
 
-   /**
-    * Class constructor. Defines the related database table name.
-    *
-    * @param string $Name An optional parameter that allows you to explicitly define the name of
+    /**
+     * Class constructor. Defines the related database table name.
+     *
+     * @param string $Name An optional parameter that allows you to explicitly define the name of
      * the table that this model represents. You can also explicitly set this value with $this->Name.
-    */
+     */
     public function __construct($Name = '') {
         if ($Name == '') {
             $Name = get_class($this);
@@ -101,19 +99,19 @@ class Gdn_Model extends Gdn_Pluggable {
         parent::__construct();
     }
 
-   /**
-    * A overridable function called before the various get queries.
-    */
+    /**
+     * A overridable function called before the various get queries.
+     */
     protected function _beforeGet() {
     }
 
-   /**
-    * Take all of the values that aren't in the schema and put them into the attributes column.
-    *
-    * @param array $Data
-    * @param string $Name
-    * @return array
-    */
+    /**
+     * Take all of the values that aren't in the schema and put them into the attributes column.
+     *
+     * @param array $Data
+     * @param string $Name
+     * @return array
+     */
     protected function collapseAttributes($Data, $Name = 'Attributes') {
         $this->defineSchema();
 
@@ -129,14 +127,14 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Row;
     }
 
-   /**
-    * Expand all of the values in the attributes column so they become part of the row.
-    *
-    * @param array $Row
-    * @param string $Name
-    * @return array
-    * @since 2.2
-    */
+    /**
+     * Expand all of the values in the attributes column so they become part of the row.
+     *
+     * @param array $Row
+     * @param string $Name
+     * @return array
+     * @since 2.2
+     */
     protected function expandAttributes($Row, $Name = 'Attributes') {
         if (isset($Row[$Name])) {
             $Attributes = $Row[$Name];
@@ -153,18 +151,18 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Row;
     }
 
-   /**
-    * Connects to the database and defines the schema associated with
-    * $this->Name. Also instantiates and automatically defines
-    * $this->Validation.
-    * @return Gdn_Schema Returns the schema for this model.
-    */
+    /**
+     * Connects to the database and defines the schema associated with
+     * $this->Name. Also instantiates and automatically defines
+     * $this->Validation.
+     * @return Gdn_Schema Returns the schema for this model.
+     */
     public function defineSchema() {
         if (!isset($this->Schema)) {
             $this->Schema = new Gdn_Schema($this->Name, $this->Database);
             $this->PrimaryKey = $this->Schema->primaryKey($this->Name, $this->Database);
             if (is_array($this->PrimaryKey)) {
-               //print_r($this->PrimaryKey);
+                //print_r($this->PrimaryKey);
                 $this->PrimaryKey = $this->PrimaryKey[0];
             }
 
@@ -174,21 +172,21 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
 
-   /**
-    *  Takes a set of form data ($Form->_PostValues), validates them, and
-    * inserts or updates them to the datatabase.
-    *
-    * @param array $FormPostValues An associative array of $Field => $Value pairs that represent data posted
-    * from the form in the $_POST or $_GET collection.
-    * @param array $Settings If a custom model needs special settings in order to perform a save, they
-    * would be passed in using this variable as an associative array.
-    * @return unknown
-    */
+    /**
+     *  Takes a set of form data ($Form->_PostValues), validates them, and
+     * inserts or updates them to the datatabase.
+     *
+     * @param array $FormPostValues An associative array of $Field => $Value pairs that represent data posted
+     * from the form in the $_POST or $_GET collection.
+     * @param array $Settings If a custom model needs special settings in order to perform a save, they
+     * would be passed in using this variable as an associative array.
+     * @return unknown
+     */
     public function save($FormPostValues, $Settings = false) {
-       // Define the primary key in this model's table.
+        // Define the primary key in this model's table.
         $this->defineSchema();
 
-       // See if a primary key value was posted and decide how to save
+        // See if a primary key value was posted and decide how to save
         $PrimaryKeyVal = val($this->PrimaryKey, $FormPostValues, false);
         $Insert = $PrimaryKeyVal == false ? true : false;
         if ($Insert) {
@@ -197,7 +195,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $this->addUpdateFields($FormPostValues);
         }
 
-       // Validate the form posted values
+        // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert) === true) {
             $Fields = $this->Validation->validationFields();
             $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to insert or update the primary key
@@ -212,14 +210,14 @@ class Gdn_Model extends Gdn_Pluggable {
         return $PrimaryKeyVal;
     }
 
-   /**
-    * Update a row in the database.
-    *
-    * @since 2.1
-    * @param int $RowID
-    * @param array|string $Property
-    * @param atom $Value
-    */
+    /**
+     * Update a row in the database.
+     *
+     * @since 2.1
+     * @param int $RowID
+     * @param array|string $Property
+     * @param atom $Value
+     */
     public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
             $Property = array($Property => $Value);
@@ -231,12 +229,12 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->SQL->put($this->Name, $Set, array($this->PrimaryKey => $RowID));
     }
 
-   /**
-    * Serialize Attributes and Data columns in a row.
-    *
-    * @param array $Row
-    * @since 2.1
-    */
+    /**
+     * Serialize Attributes and Data columns in a row.
+     *
+     * @param array $Row
+     * @since 2.1
+     */
     public static function serializeRow(&$Row) {
         foreach ($Row as $Name => &$Value) {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
@@ -246,22 +244,22 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
 
-   /**
+    /**
      *
      *
-    * @param array $Fields
-    * @return bool
-    */
+     * @param array $Fields
+     * @return bool
+     */
     public function insert($Fields) {
         $Result = false;
         $this->addInsertFields($Fields);
         if ($this->validate($Fields, true)) {
-           // Strip out fields that aren't in the schema.
-           // This is done after validation to allow custom validations to work.
+            // Strip out fields that aren't in the schema.
+            // This is done after validation to allow custom validations to work.
             $SchemaFields = $this->Schema->fields();
             $Fields = array_intersect_key($Fields, $SchemaFields);
 
-           // Quote all of the fields.
+            // Quote all of the fields.
             $QuotedFields = array();
             foreach ($Fields as $Name => $Value) {
                 if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
@@ -277,18 +275,18 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
 
-   /**
+    /**
      *
      *
-    * @param array $Fields
-    * @param array $Where
-    * @param array $Limit
+     * @param array $Fields
+     * @param array $Where
+     * @param array $Limit
      * @return Gdn_Dataset
-    */
+     */
     public function update($Fields, $Where = false, $Limit = false) {
         $Result = false;
 
-       // primary key (always included in $Where when updating) might be "required"
+        // primary key (always included in $Where when updating) might be "required"
         $AllFields = $Fields;
         if (is_array($Where)) {
             $AllFields = array_merge($Fields, $Where);
@@ -297,12 +295,12 @@ class Gdn_Model extends Gdn_Pluggable {
         if ($this->validate($AllFields)) {
             $this->addUpdateFields($Fields);
 
-           // Strip out fields that aren't in the schema.
-           // This is done after validation to allow custom validations to work.
+            // Strip out fields that aren't in the schema.
+            // This is done after validation to allow custom validations to work.
             $SchemaFields = $this->Schema->fields();
             $Fields = array_intersect_key($Fields, $SchemaFields);
 
-           // Quote all of the fields.
+            // Quote all of the fields.
             $QuotedFields = array();
             foreach ($Fields as $Name => $Value) {
                 if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
@@ -318,14 +316,14 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
 
-   /**
+    /**
      *
      *
-    * @param unknown_type $Where
-    * @param unknown_type $Limit
-    * @param unknown_type $ResetData
+     * @param unknown_type $Where
+     * @param unknown_type $Limit
+     * @param unknown_type $ResetData
      * @return Gdn_Dataset
-    */
+     */
     public function delete($Where = '', $Limit = false, $ResetData = false) {
         if (is_numeric($Where)) {
             $Where = array($this->PrimaryKey => $Where);
@@ -339,12 +337,12 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Result;
     }
 
-   /**
-    * Filter out any potentially insecure fields before they go to the database.
+    /**
+     * Filter out any potentially insecure fields before they go to the database.
      *
-    * @param array $Data
+     * @param array $Data
      * @return array
-    */
+     */
     public function filterForm($Data) {
         $Data = array_diff_key($Data, array(
             'Attributes' => 0,
@@ -364,12 +362,12 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Data;
     }
 
-   /**
-    * Returns an array with only those keys that are actually in the schema.
-    *
-    * @param array $Data An array of key/value pairs.
-    * @return array The filtered array.
-    */
+    /**
+     * Returns an array with only those keys that are actually in the schema.
+     *
+     * @param array $Data An array of key/value pairs.
+     * @return array The filtered array.
+     */
     public function filterSchema($Data) {
         $Fields = $this->Schema->fields($this->Name);
 
@@ -378,7 +376,7 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
 
-   /**
+    /**
      *
      *
      * @param string $OrderFields
@@ -386,19 +384,19 @@ class Gdn_Model extends Gdn_Pluggable {
      * @param int|bool $Limit
      * @param int|bool $Offset
      * @return Gdn_Dataset
-    */
+     */
     public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
         $this->_beforeGet();
 
         return $this->SQL->get($this->Name, $OrderFields, $OrderDirection, $Limit, $PageNumber);
     }
 
-   /**
+    /**
      * Returns a count of the # of records in the table.
      *
-    * @param array $Wheres
+     * @param array $Wheres
      * @return Gdn_Dataset
-    */
+     */
     public function getCount($Wheres = '') {
         $this->_beforeGet();
 
@@ -417,16 +415,16 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Data === false ? 0 : $Data->Count;
     }
 
-   /**
-    * Get the data from the model based on its primary key.
-    *
-    * @param mixed $ID The value of the primary key in the database.
-    * @param string $DatasetType The format of the result dataset.
-    * @param array $Options options to pass to the database.
-    * @return array|object
-    *
-    * @since 2.3 Added the $Options parameter.
-    */
+    /**
+     * Get the data from the model based on its primary key.
+     *
+     * @param mixed $ID The value of the primary key in the database.
+     * @param string $DatasetType The format of the result dataset.
+     * @param array $Options options to pass to the database.
+     * @return array|object
+     *
+     * @since 2.3 Added the $Options parameter.
+     */
     public function getID($ID, $DatasetType = false, $Options = array()) {
         $this->options($Options);
         $Result = $this->getWhere(array($this->PrimaryKey => $ID))->firstRow($DatasetType);
@@ -458,49 +456,49 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Result;
     }
 
-   /**
-    * Get a dataset for the model with a where filter.
-    *
+    /**
+     * Get a dataset for the model with a where filter.
+     *
      * @param array|bool $Where A filter suitable for passing to Gdn_SQLDriver::Where().
-    * @param string $OrderFields A comma delimited string to order the data.
-    * @param string $OrderDirection One of <b>asc</b> or <b>desc</b>
+     * @param string $OrderFields A comma delimited string to order the data.
+     * @param string $OrderDirection One of <b>asc</b> or <b>desc</b>
      * @param int|bool $Limit
      * @param int|bool $Offset
-    * @return Gdn_DataSet
-    */
+     * @return Gdn_DataSet
+     */
     public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         $this->_beforeGet();
         return $this->SQL->getWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
     }
 
-   /**
-    * Returns the $this->Validation->ValidationResults() array.
-    *
-    * @return array
-    */
+    /**
+     * Returns the $this->Validation->ValidationResults() array.
+     *
+     * @return array
+     */
     public function validationResults() {
         return $this->Validation->results();
     }
 
 
-   /**
-    * @param array $FormPostValues
-    * @param bool $Insert
-    * @return bool
-    */
+    /**
+     * @param array $FormPostValues
+     * @param bool $Insert
+     * @return bool
+     */
     public function validate($FormPostValues, $Insert = false) {
         $this->defineSchema();
         return $this->Validation->validate($FormPostValues, $Insert);
     }
 
 
-   /**
-    * Adds $this->InsertUserID and $this->DateInserted fields to an associative
-    * array of fieldname/values if those fields exist on the table being
-    * inserted.
-    *
-    * @param array $Fields The array of fields to add the values to.
-    */
+    /**
+     * Adds $this->InsertUserID and $this->DateInserted fields to an associative
+     * array of fieldname/values if those fields exist on the table being
+     * inserted.
+     *
+     * @param array $Fields The array of fields to add the values to.
+     */
     protected function addInsertFields(&$Fields) {
         $this->defineSchema();
         if ($this->Schema->fieldExists($this->Name, $this->DateInserted)) {
@@ -522,12 +520,12 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
 
-   /**
-    * Adds $this->UpdateUserID and $this->DateUpdated fields to an associative
+    /**
+     * Adds $this->UpdateUserID and $this->DateUpdated fields to an associative
      * array of fieldname/values if those fields exist on the table being updated.
-    *
-    * @param array $Fields The array of fields to add the values to.
-    */
+     *
+     * @param array $Fields The array of fields to add the values to.
+     */
     protected function addUpdateFields(&$Fields) {
         $this->defineSchema();
         if ($this->Schema->fieldExists($this->Name, $this->DateUpdated)) {
@@ -548,14 +546,14 @@ class Gdn_Model extends Gdn_Pluggable {
         }
     }
 
-   /**
-    * Gets/sets an option on the object.
-    *
-    * @param string|array $Key The key of the option.
-    * @param mixed $Value The value of the option or not specified just to get the current value.
-    * @return mixed The value of the option or $this if $Value is specified.
-    * @since 2.3
-    */
+    /**
+     * Gets/sets an option on the object.
+     *
+     * @param string|array $Key The key of the option.
+     * @param mixed $Value The value of the option or not specified just to get the current value.
+     * @return mixed The value of the option or $this if $Value is specified.
+     * @since 2.3
+     */
     public function options($Key, $Value = null) {
         if (is_array($Key)) {
             foreach ($Key as $K => $V) {
@@ -649,31 +647,31 @@ class Gdn_Model extends Gdn_Pluggable {
         return $Value;
     }
 
-   /**
+    /**
      * Get something from $Record['Attributes'] by dot-formatted key.
-    *
+     *
      * Pass record byref.
-    *
-    * @param array $Record
-    * @param string $Attribute
-    * @param mixed $Default Optional.
-    * @return mixed
-    */
+     *
+     * @param array $Record
+     * @param string $Attribute
+     * @param mixed $Default Optional.
+     * @return mixed
+     */
     public static function getRecordAttribute(&$Record, $Attribute, $Default = null) {
         $RV = "Attributes.{$Attribute}";
         return valr($RV, $Record, $Default);
     }
 
-   /**
+    /**
      * Set something on $Record['Attributes'] by dot-formatted key.
-    *
+     *
      * Pass record byref.
-    *
-    * @param array $Record
-    * @param string $Attribute
-    * @param mixed $Value
-    * @return mixed
-    */
+     *
+     * @param array $Record
+     * @param string $Attribute
+     * @param mixed $Value
+     * @return mixed
+     */
     public static function setRecordAttribute(&$Record, $Attribute, $Value) {
         if (!array_key_exists('Attributes', $Record)) {
             $Record['Attributes'] = array();

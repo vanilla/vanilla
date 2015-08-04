@@ -82,7 +82,7 @@ class Gdn_Theme {
         }
 
         if (val('HideLast', $Options)) {
-           // Remove the last item off the list.
+            // Remove the last item off the list.
             array_pop($Data);
         }
 
@@ -101,7 +101,7 @@ class Gdn_Theme {
                 $HomeLinkFound = true;
             }
 
-           // Add the breadcrumb wrapper.
+            // Add the breadcrumb wrapper.
             if ($Count > 0) {
                 $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
             }
@@ -118,7 +118,7 @@ class Gdn_Theme {
             $Count++;
         }
 
-       // Close the stack.
+        // Close the stack.
         for ($Count--; $Count > 0; $Count--) {
             $Result .= '</span>';
         }
@@ -127,22 +127,22 @@ class Gdn_Theme {
         return $Result;
     }
 
-   /**
-    * Call before writing an item and it will optionally write a bullet seperator.
-    *
-    * @param string $Section The name of the section.
-    * @param bool $Return whether or not to return the result or echo it.
-    * @return string
-    * @since 2.1
-    */
+    /**
+     * Call before writing an item and it will optionally write a bullet seperator.
+     *
+     * @param string $Section The name of the section.
+     * @param bool $Return whether or not to return the result or echo it.
+     * @return string
+     * @since 2.1
+     */
     public static function bulletItem($Section, $Return = true) {
         $Result = '';
 
         if (self::$_BulletSection === false) {
             self::$_BulletSection = $Section;
         } elseif (self::$_BulletSection != $Section) {
-                   $Result = "<!-- $Section -->".self::$_BulletSep;
-                   self::$_BulletSection = $Section;
+            $Result = "<!-- $Section -->".self::$_BulletSep;
+            self::$_BulletSection = $Section;
         }
 
         if ($Return) {
@@ -152,12 +152,12 @@ class Gdn_Theme {
         }
     }
 
-   /**
-    * Call before starting a row of bullet-seperated items.
-    *
-    * @param strng|bool $Sep The seperator used to seperate each section.
-    * @since 2.1
-    */
+    /**
+     * Call before starting a row of bullet-seperated items.
+     *
+     * @param strng|bool $Sep The seperator used to seperate each section.
+     * @since 2.1
+     */
     public static function bulletRow($Sep = false) {
         if (!$Sep) {
             if (!self::$_BulletSep) {
@@ -170,11 +170,11 @@ class Gdn_Theme {
     }
 
 
-   /**
-    * Returns whether or not the page is in the current section.
+    /**
+     * Returns whether or not the page is in the current section.
      *
-    * @param string|array $Section
-    */
+     * @param string|array $Section
+     */
     public static function inSection($Section) {
         $Section = (array)$Section;
         foreach ($Section as $Name) {
@@ -326,7 +326,7 @@ class Gdn_Theme {
                 break;
             case 'signin':
             case 'signinout':
-               // The destination is the signin/signout toggle link.
+                // The destination is the signin/signout toggle link.
                 if ($Session->isValid()) {
                     if (!$Text) {
                         $Text = T('Sign Out');
@@ -367,7 +367,7 @@ class Gdn_Theme {
             $Class = concatSep(' ', $Class, 'Selected');
         }
 
-       // Build the final result.
+        // Build the final result.
         $Result = $Format;
         $Result = str_replace('%url', $Url, $Result);
         $Result = str_replace('%text', $Text, $Result);
@@ -376,29 +376,29 @@ class Gdn_Theme {
         return $Result;
     }
 
-   /**
-    * Renders the banner logo, or just the banner title if the logo is not defined.
-    *
-    * @param array $Properties
-    */
+    /**
+     * Renders the banner logo, or just the banner title if the logo is not defined.
+     *
+     * @param array $Properties
+     */
     public static function logo($Properties = array()) {
         $Logo = C('Garden.Logo');
 
         if ($Logo) {
             $Logo = ltrim($Logo, '/');
 
-           // Fix the logo path.
+            // Fix the logo path.
             if (stringBeginsWith($Logo, 'uploads/')) {
                 $Logo = substr($Logo, strlen('uploads/'));
             }
 
-           // Set optional title text.
+            // Set optional title text.
             if (empty($Properties['title']) && C('Garden.LogoTitle')) {
                 $Properties['title'] = C('Garden.LogoTitle');
             }
         }
 
-       // Use the site title as alt if none was given.
+        // Use the site title as alt if none was given.
         $Title = C('Garden.Title', 'Title');
         if (empty($Properties['alt'])) {
             $Properties['alt'] = $Title;
@@ -407,12 +407,12 @@ class Gdn_Theme {
         echo $Logo ? Img(Gdn_Upload::url($Logo), $Properties) : $Title;
     }
 
-   /**
-    * Returns the mobile banner logo. If there is no mobile logo defined then this will just return
-    * the regular logo or the mobile title.
-    *
-    * @return string
-    */
+    /**
+     * Returns the mobile banner logo. If there is no mobile logo defined then this will just return
+     * the regular logo or the mobile title.
+     *
+     * @return string
+     */
     public static function mobileLogo() {
         $Logo = C('Garden.MobileLogo', C('Garden.Logo'));
         $Title = C('Garden.MobileTitle', C('Garden.Title', 'Title'));
@@ -437,7 +437,7 @@ class Gdn_Theme {
 
             $Result = Gdn::cache()->get($Key);
             if ($Result !== Gdn_Cache::CACHEOP_FAILURE) {
-   //            Trace('Module: '.$Result, $Key);
+//            Trace('Module: '.$Result, $Key);
                 return $Result;
             }
         }
@@ -472,7 +472,7 @@ class Gdn_Theme {
         }
 
         if (isset($Key)) {
-  //         Trace($Result, "Store $Key");
+//         Trace($Result, "Store $Key");
             Gdn::cache()->store($Key, $Result, array(Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']));
         }
 
@@ -510,14 +510,14 @@ class Gdn_Theme {
         return 'unknown';
     }
 
-   /**
-    * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
+    /**
+     * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
      *
-    * @since 2.1
+     * @since 2.1
      *
      * @param string $Section The name of the section.
      * @param string $Method One of: add, remove, set, get.
-    */
+     */
     public static function section($Section, $Method = 'add') {
         $Section = array_fill_keys((array)$Section, true);
 

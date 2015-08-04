@@ -34,32 +34,32 @@ if (!function_exists('bigPlural')) {
 }
 
 if (!function_exists('bullet')) {
-   /**
-    * Return a bullet character in html.
+    /**
+     * Return a bullet character in html.
      *
-    * @param string $Pad A string used to pad either side of the bullet.
-    * @return string
-    *
-    * @changes
-    *    2.2 Added the $Pad parameter.
-    */
+     * @param string $Pad A string used to pad either side of the bullet.
+     * @return string
+     *
+     * @changes
+     *    2.2 Added the $Pad parameter.
+     */
     function bullet($Pad = '') {
-       //·
+        //·
         return $Pad.'<span class="Bullet">&middot;</span>'.$Pad;
     }
 }
 
 if (!function_exists('buttonDropDown')) {
-   /**
+    /**
      * Write a button drop down control.
-    *
-    * @param array $Links An array of arrays with the following keys:
-    *  - Text: The text of the link.
-    *  - Url: The url of the link.
-    * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
-    * @param string $Label The text of the button.
-    * @since 2.1
-    */
+     *
+     * @param array $Links An array of arrays with the following keys:
+     *  - Text: The text of the link.
+     *  - Url: The url of the link.
+     * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
+     * @param string $Label The text of the button.
+     * @since 2.1
+     */
     function buttonDropDown($Links, $CssClass = 'Button', $Label = false) {
         if (!is_array($Links) || count($Links) < 1) {
             return;
@@ -80,14 +80,14 @@ if (!function_exists('buttonDropDown')) {
 
             echo Anchor($Link['Text'], $Link['Url'], GetValue('ButtonCssClass', $Link, $CssClass));
         } else {
-           // NavButton or Button?
+            // NavButton or Button?
             $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
             if (strpos($CssClass, 'Primary') !== false) {
                 $ButtonClass .= ' Primary';
             }
-           // Strip "Button" or "NavButton" off the group class.
+            // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup'.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
-  //            echo Anchor($Text, $Url, $ButtonClass);
+//            echo Anchor($Text, $Url, $ButtonClass);
 
             echo '<ul class="Dropdown MenuItems">';
             foreach ($Links as $Link) {
@@ -102,16 +102,16 @@ if (!function_exists('buttonDropDown')) {
 }
 
 if (!function_exists('buttonGroup')) {
-   /**
+    /**
      * Write a button group control.
-    *
-    * @param array $Links An array of arrays with the following keys:
-    *  - Text: The text of the link.
-    *  - Url: The url of the link.
-    * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
-    * @param string|false $Default The url of the default link.
-    * @since 2.1
-    */
+     *
+     * @param array $Links An array of arrays with the following keys:
+     *  - Text: The text of the link.
+     *  - Url: The url of the link.
+     * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
+     * @param string|false $Default The url of the default link.
+     * @since 2.1
+     */
     function buttonGroup($Links, $CssClass = 'Button', $Default = false) {
         if (!is_array($Links) || count($Links) < 1) {
             return;
@@ -131,7 +131,7 @@ if (!function_exists('buttonGroup')) {
                 $Default = $Default['Url'];
             }
 
-           // Find the default button.
+            // Find the default button.
             $Default = ltrim($Default, '/');
             foreach ($Links as $Link) {
                 if (StringBeginsWith(ltrim($Link['Url'], '/'), $Default)) {
@@ -149,12 +149,12 @@ if (!function_exists('buttonGroup')) {
         if (count($Links) < 2) {
             echo Anchor($Text, $Url, $CssClass);
         } else {
-           // NavButton or Button?
+            // NavButton or Button?
             $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
             if (strpos($CssClass, 'Primary') !== false) {
                 $ButtonClass .= ' Primary';
             }
-           // Strip "Button" or "NavButton" off the group class.
+            // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup Multi '.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
             echo Anchor($Text, $Url, $ButtonClass);
 
@@ -167,16 +167,16 @@ if (!function_exists('buttonGroup')) {
 
             echo '</div>';
         }
-        }
     }
+}
 
 if (!function_exists('category')) {
-/**
- * Get the current category on the page.
+    /**
+     * Get the current category on the page.
      *
- * @param int $Depth The level you want to look at.
- * @param array $Category
- */
+     * @param int $Depth The level you want to look at.
+     * @param array $Category
+     */
     function category($Depth = null, $Category = null) {
         if (!$Category) {
             $Category = Gdn::Controller()->Data('Category');
@@ -197,7 +197,7 @@ if (!function_exists('category')) {
         $Category = (array)$Category;
 
         if ($Depth !== null) {
-           // Get the category at the correct level.
+            // Get the category at the correct level.
             while ($Category['Depth'] > $Depth) {
                 $Category = CategoryModel::Categories($Category['ParentCategoryID']);
                 if (!$Category) {
@@ -211,12 +211,12 @@ if (!function_exists('category')) {
 }
 
 if (!function_exists('categoryUrl')) {
-/**
- * Return a url for a category. This function is in here and not functions.general so that plugins can override.
+    /**
+     * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
- * @param array $Category
- * @return string
- */
+     * @param array $Category
+     * @return string
+     */
     function categoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category)) {
             $Category = CategoryModel::Categories($Category);
@@ -225,11 +225,11 @@ if (!function_exists('categoryUrl')) {
 
         $Result = '/categories/'.rawurlencode($Category['UrlCode']);
         if ($Page && $Page > 1) {
-             $Result .= '/p'.$Page;
+            $Result .= '/p'.$Page;
         }
         return Url($Result, $WithDomain);
-}
     }
+}
 
 if (!function_exists('condense')) {
     function condense($Html) {
@@ -244,14 +244,14 @@ if (!function_exists('countString')) {
         if (!$Number && $Number !== null) {
             return '';
         }
-      
+
         if (is_array($Options)) {
             $Options = array_change_key_case($Options);
             $CssClass = val('cssclass', $Options, '');
         } else {
             $CssClass = $Options;
         }
-      
+
         if ($Number) {
             $CssClass = trim($CssClass.' Count', ' ');
             return "<span class=\"$CssClass\">$Number</span>";
@@ -266,27 +266,27 @@ if (!function_exists('countString')) {
 }
 
 if (!function_exists('cssClass')) {
-/**
- * Add CSS class names to a row depending on other elements/values in that row.
+    /**
+     * Add CSS class names to a row depending on other elements/values in that row.
      *
- * Used by category, discussion, and comment lists.
- *
+     * Used by category, discussion, and comment lists.
+     *
      * @param array|object $Row
- * @return string The CSS classes to be inserted into the row.
- */
+     * @return string The CSS classes to be inserted into the row.
+     */
     function cssClass($Row, $InList = true) {
         static $Alt = false;
         $Row = (array)$Row;
         $CssClass = 'Item';
         $Session = Gdn::Session();
 
-       // Alt rows
+        // Alt rows
         if ($Alt) {
             $CssClass .= ' Alt';
         }
         $Alt = !$Alt;
 
-       // Category list classes
+        // Category list classes
         if (array_key_exists('UrlCode', $Row)) {
             $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
         }
@@ -302,7 +302,7 @@ if (!function_exists('cssClass')) {
             $CssClass .= ' Archived';
         }
 
-       // Discussion list classes.
+        // Discussion list classes.
         if ($InList) {
             $CssClass .= GetValue('Bookmarked', $Row) == '1' ? ' Bookmarked' : '';
 
@@ -310,7 +310,7 @@ if (!function_exists('cssClass')) {
             if ($Announce == 2) {
                 $CssClass .= ' Announcement Announcement-Category';
             } elseif ($Announce) {
-             $CssClass .= ' Announcement Announcement-Everywhere';
+                $CssClass .= ' Announcement Announcement-Everywhere';
             }
 
             $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
@@ -326,12 +326,12 @@ if (!function_exists('cssClass')) {
                     $CssClass .= ' Unread';
                 }
             } elseif (($IsRead = GetValue('Read', $Row, null)) !== null) {
-               // Category list
+                // Category list
                 $CssClass .= $IsRead ? ' Read' : ' Unread';
             }
         }
 
-       // Comment list classes
+        // Comment list classes
         if (array_key_exists('CommentID', $Row)) {
             $CssClass .= ' ItemComment';
         } elseif (array_key_exists('DiscussionID', $Row)) {
@@ -346,7 +346,7 @@ if (!function_exists('cssClass')) {
             $CssClass .= ' '.$_CssClss;
         }
 
-       // Insert User classes.
+        // Insert User classes.
         if ($UserID = GetValue('InsertUserID', $Row)) {
             $User = Gdn::UserModel()->GetID($UserID);
             if ($_CssClss = GetValue('_CssClass', $User)) {
@@ -373,8 +373,8 @@ if (!function_exists('dateUpdated')) {
             }
 
             $Result = ' <span title="'.htmlspecialchars($Title).'" class="DateUpdated">'.
-              sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).
-              '</span> ';
+                sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).
+                '</span> ';
 
             if ($Wrap) {
                 $Result = $Wrap[0].$Result.$Wrap[1];
@@ -389,9 +389,9 @@ if (!function_exists('dateUpdated')) {
  * Writes an anchor tag
  */
 if (!function_exists('anchor')) {
-   /**
-    * Builds and returns an anchor tag.
-    */
+    /**
+     * Builds and returns an anchor tag.
+     */
     function anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = false) {
         if (!is_array($CssClass) && $CssClass != '') {
             $CssClass = array('class' => $CssClass);
@@ -427,12 +427,12 @@ if (!function_exists('anchor')) {
 }
 
 if (!function_exists('commentUrl')) {
-/**
+    /**
      * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
      *
- * @param object $Comment
- * @return string
- */
+     * @param object $Comment
+     * @return string
+     */
     function commentUrl($Comment, $WithDomain = true) {
         $Comment = (object)$Comment;
         $Result = "/discussion/comment/{$Comment->CommentID}#Comment_{$Comment->CommentID}";
@@ -441,12 +441,12 @@ if (!function_exists('commentUrl')) {
 }
 
 if (!function_exists('discussionUrl')) {
-/**
+    /**
      * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
      *
- * @param object $Discussion
- * @return string
- */
+     * @param object $Discussion
+     * @return string
+     */
     function discussionUrl($Discussion, $Page = '', $WithDomain = true) {
         $Discussion = (object)$Discussion;
         $Name = Gdn_Format::Url($Discussion->Name);
@@ -460,17 +460,17 @@ if (!function_exists('discussionUrl')) {
             }
         }
         return Url($Result, $WithDomain);
-}
     }
+}
 
 if (!function_exists('fixnl2br')) {
-   /**
-    * Removes the break above and below tags that have a natural margin.
+    /**
+     * Removes the break above and below tags that have a natural margin.
      *
-    * @param string $Text The text to fix.
-    * @return string
-    * @since 2.1
-    */
+     * @param string $Text The text to fix.
+     * @return string
+     * @since 2.1
+     */
     function fixnl2br($Text) {
         $allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
         $Text = preg_replace('!(?:<br\s*/>){1,2}\s*(<'.$allblocks.'[^>]*>)!', "\n$1", $Text);
@@ -480,15 +480,15 @@ if (!function_exists('fixnl2br')) {
 }
 
 if (!function_exists('formatPossessive')) {
-/**
+    /**
      * Format a word using English "possessive" formatting.
      *
- * This can be overridden in language definition files like:
+     * This can be overridden in language definition files like:
      *
      * ```
      * /applications/garden/locale/en-US.php.
      * ```
- */
+     */
     function formatPossessive($Word) {
         if (function_exists('formatPossessiveCustom')) {
             return formatPossesiveCustom($Word);
@@ -537,7 +537,7 @@ if (!function_exists('formatUsername')) {
                         $Format = ucfirst($Format);
                     }
                     return T("Format $Format", $Format);
-                              }
+                }
                 break;
             default:
                 return $Name;
@@ -546,12 +546,12 @@ if (!function_exists('formatUsername')) {
 }
 
 if (!function_exists('hasEditProfile')) {
-   /**
-    * Determine whether or not a given user has the edit profile link.
-    *
-    * @param int $userID The user ID to check.
-    * @return bool Return true if the user should have the edit profile link or false otherwise.
-    */
+    /**
+     * Determine whether or not a given user has the edit profile link.
+     *
+     * @param int $userID The user ID to check.
+     * @return bool Return true if the user should have the edit profile link or false otherwise.
+     */
     function hasEditProfile($userID) {
         if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))) {
             return true;
@@ -566,7 +566,7 @@ if (!function_exists('hasEditProfile')) {
             C('Garden.Profile.Titles') ||
             C('Garden.Profile.Locations', false) ||
             C('Garden.Registration.Method') != 'Connect'
-         );
+        );
 
         return $result;
     }
@@ -579,9 +579,9 @@ if (!function_exists('hoverHelp')) {
 }
 
 if (!function_exists('img')) {
-/**
-    * Returns an img tag.
-    */
+    /**
+     * Returns an img tag.
+     */
     function img($Image, $Attributes = '', $WithDomain = false) {
         if ($Attributes != '') {
             $Attributes = Attribute($Attributes);
@@ -596,13 +596,13 @@ if (!function_exists('img')) {
 }
 
 if (!function_exists('inCategory')) {
-   /**
+    /**
      * Return whether or not the page is in a given category.
-    *
-    * @param string $Category The url code of the category.
-    * @return boolean
-    * @since 2.1
-    */
+     *
+     * @param string $Category The url code of the category.
+     * @return boolean
+     * @since 2.1
+     */
     function inCategory($Category) {
         $Breadcrumbs = (array)Gdn::Controller()->Data('Breadcrumbs', array());
 
@@ -617,22 +617,22 @@ if (!function_exists('inCategory')) {
 }
 
 if (!function_exists('inSection')) {
-   /**
-    * Returns whether or not the page is in one of the given section(s).
+    /**
+     * Returns whether or not the page is in one of the given section(s).
      *
-    * @param string|array $Section
-    * @return bool
+     * @param string|array $Section
+     * @return bool
      * @since 2.1
-    */
+     */
     function inSection($Section) {
         return Gdn_Theme::InSection($Section);
     }
 }
 
 if (!function_exists('ipAnchor')) {
-   /**
-    * Returns an IP address with a link to the user search.
-    */
+    /**
+     * Returns an IP address with a link to the user search.
+     */
     function ipAnchor($IP, $CssClass = '') {
         if ($IP) {
             return Anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
@@ -643,29 +643,29 @@ if (!function_exists('ipAnchor')) {
 }
 
 if (!function_exists('panelHeading')) {
-   /**
-    * Define default head tag for the side panel.
-    *
-    * @param string $content The content of the tag.
-    * @param string $attributes The attributes of the tag.
-    *
-    * @return string The full tag.
-    */
+    /**
+     * Define default head tag for the side panel.
+     *
+     * @param string $content The content of the tag.
+     * @param string $attributes The attributes of the tag.
+     *
+     * @return string The full tag.
+     */
     function panelHeading($content, $attributes = '') {
         return Wrap($content, 'h4', $attributes);
     }
 }
 
 if (!function_exists('plural')) {
-/**
+    /**
      * Return the plural version of a word depending on a number.
      *
- * This can be overridden in language definition files like:
+     * This can be overridden in language definition files like:
      *
      * ```
- * /applications/garden/locale/en-US/definitions.php.
+     * /applications/garden/locale/en-US/definitions.php.
      * ```
- */
+     */
     function plural($Number, $Singular, $Plural, $FormattedNumber = false) {
         // Make sure to fix comma-formatted numbers
         $WorkingNumber = str_replace(',', '', $Number);
@@ -680,17 +680,17 @@ if (!function_exists('plural')) {
 }
 
 if (!function_exists('pluralTranslate')) {
-   /**
-    * Translate a plural string.
-    *
-    * @param int $Number
-    * @param string $Singular
-    * @param string $Plural
-    * @param string|false $SingularDefault
-    * @param string|false $PluralDefault
-    * @return string
-    * @since 2.1
-    */
+    /**
+     * Translate a plural string.
+     *
+     * @param int $Number
+     * @param string $Singular
+     * @param string $Plural
+     * @param string|false $SingularDefault
+     * @param string|false $PluralDefault
+     * @return string
+     * @since 2.1
+     */
     function pluralTranslate($Number, $Singular, $Plural, $SingularDefault = false, $PluralDefault = false) {
         if ($Number == 1) {
             return T($Singular, $SingularDefault);
@@ -710,9 +710,9 @@ if (!function_exists('searchExcerpt')) {
             $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
         }
 
-       // Split the string into lines.
+        // Split the string into lines.
         $Lines = explode("\n", $PlainText);
-       // Find the first line that includes a search term.
+        // Find the first line that includes a search term.
         foreach ($Lines as $i => &$Line) {
             $Line = trim($Line);
             if (!$Line) {
@@ -728,7 +728,7 @@ if (!function_exists('searchExcerpt')) {
                     $Line = substrWord($Line, $Term, $Length);
 
                     if ($Mark) {
-                    return MarkString($SearchTerms, $Line);
+                        return MarkString($SearchTerms, $Line);
                     } else {
                         return $Line;
                     }
@@ -736,7 +736,7 @@ if (!function_exists('searchExcerpt')) {
             }
         }
 
-       // No line was found so return the first non-blank line.
+        // No line was found so return the first non-blank line.
         foreach ($Lines as $Line) {
             if ($Line) {
                 return SliceString($Line, $Length);
@@ -746,7 +746,7 @@ if (!function_exists('searchExcerpt')) {
     }
 
     function substrWord($str, $start, $length) {
-       // If we are offsetting on a word then find it.
+        // If we are offsetting on a word then find it.
         if (is_string($start)) {
             $pos = mb_stripos($str, $start);
             if ($pos !== false && (($pos + strlen($start)) <= $length)) {
@@ -756,7 +756,7 @@ if (!function_exists('searchExcerpt')) {
             }
         }
 
-       // Find the word break from the offset.
+        // Find the word break from the offset.
         if ($start > 0) {
             $pos = mb_strpos($str, ' ', $start);
             if ($pos !== false) {
@@ -777,8 +777,8 @@ if (!function_exists('searchExcerpt')) {
             if ($length - $start <= 0) {
                 $start = 0;
             } else {
-                          // Zoom the offset back a bit.
-                          $pos = mb_strpos($str, ' ', max(0, $len - $length));
+                // Zoom the offset back a bit.
+                $pos = mb_strpos($str, ' ', max(0, $len - $length));
                 if ($pos === false) {
                     $pos = $len - $length;
                 }
@@ -787,13 +787,13 @@ if (!function_exists('searchExcerpt')) {
 
         $result = mb_substr($str, $start, $length);
         return $result;
-}
     }
+}
 
 if (!function_exists('userAnchor')) {
-/**
+    /**
      * Take a user object, and writes out an anchor of the user's name to the user's profile.
- */
+     */
     function userAnchor($User, $CssClass = null, $Options = null) {
         static $NameUnique = null;
         if ($NameUnique === null) {
@@ -804,7 +804,7 @@ if (!function_exists('userAnchor')) {
             $Options = $CssClass;
             $CssClass = null;
         } elseif (is_string($Options)) {
-         $Options = array('Px' => $Options);
+            $Options = array('Px' => $Options);
         }
 
         $Px = GetValue('Px', $Options, '');
@@ -814,9 +814,9 @@ if (!function_exists('userAnchor')) {
         $Text = GetValue('Text', $Options, htmlspecialchars($Name)); // Allow anchor text to be overridden.
 
         $Attributes = array(
-          'class' => $CssClass,
-          'rel' => GetValue('Rel', $Options)
-          );
+            'class' => $CssClass,
+            'rel' => GetValue('Rel', $Options)
+        );
         if (isset($Options['title'])) {
             $Attributes['title'] = $Options['title'];
         }
@@ -826,11 +826,11 @@ if (!function_exists('userAnchor')) {
 }
 
 if (!function_exists('userBuilder')) {
-   /**
+    /**
      * Take an object & prefix value and convert it to a user object that can be used by UserAnchor() && UserPhoto().
      *
      * The object must have the following fields: UserID, Name, Photo.
-    */
+     */
     function userBuilder($Object, $UserPrefix = '') {
         $Object = (object)$Object;
         $User = new stdClass();
@@ -848,12 +848,12 @@ if (!function_exists('userBuilder')) {
 }
 
 if (!function_exists('userPhoto')) {
-   /**
-    * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
-    *
+    /**
+     * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
+     *
      * @param object|array $User A user object or array.
-    * @param array $Options
-    */
+     * @param array $Options
+     */
     function userPhoto($User, $Options = array()) {
         if (is_string($Options)) {
             $Options = array('LinkClass' => $Options);
@@ -914,11 +914,11 @@ if (!function_exists('userPhoto')) {
 }
 
 if (!function_exists('userPhotoUrl')) {
-   /**
+    /**
      * Take a user object an return the URL to their photo.
-    *
-    * @param object|array $User
-    */
+     *
+     * @param object|array $User
+     */
     function userPhotoUrl($User) {
         $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
         $Photo = GetValue('Photo', $User);
@@ -943,16 +943,16 @@ if (!function_exists('userPhotoUrl')) {
 }
 
 if (!function_exists('userUrl')) {
-   /**
+    /**
      * Return the URL for a user.
-    *
-    * @param array|object $User The user to get the url for.
+     *
+     * @param array|object $User The user to get the url for.
      * @param string $Px The prefix to apply before fieldnames.
-    * @param string $Method Optional. ProfileController method to target.
+     * @param string $Method Optional. ProfileController method to target.
      * @param array? $Get An optional query string array to add to the URL.
-    * @return string The url suitable to be passed into the Url() function.
+     * @return string The url suitable to be passed into the Url() function.
      * @since 2.1
-    */
+     */
     function userUrl($User, $Px = '', $Method = '', $Get = null) {
         static $NameUnique = null;
         if ($NameUnique === null) {
@@ -963,9 +963,9 @@ if (!function_exists('userUrl')) {
         $UserName = preg_replace('/([\?&]+)/', '', $UserName);
 
         $Result = '/profile/'.
-         ($Method ? trim($Method, '/').'/' : '').
-         ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
-         rawurlencode($UserName);
+            ($Method ? trim($Method, '/').'/' : '').
+            ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
+            rawurlencode($UserName);
 
         if (!empty($Get)) {
             $Result .= '?'.http_build_query($Get);
@@ -989,8 +989,8 @@ if (!function_exists('wrap')) {
             $Attributes = Attribute($Attributes);
         }
 
-       // Strip the first part of the tag as the closing tag - this allows us to
-       // easily throw 'span class="something"' into the $Tag field.
+        // Strip the first part of the tag as the closing tag - this allows us to
+        // easily throw 'span class="something"' into the $Tag field.
         $Space = strpos($Tag, ' ');
         $ClosingTag = $Space ? substr($Tag, 0, $Space) : $Tag;
         return '<'.$Tag.$Attributes.'>'.$String.'</'.$ClosingTag.'>';
@@ -998,15 +998,15 @@ if (!function_exists('wrap')) {
 }
 
 if (!function_exists('wrapIf')) {
-   /**
-    * Wrap the provided string if it isn't empty.
-    *
-    * @param string $String
-    * @param string $Tag
-    * @param array $Attributes
-    * @return string
-    * @since 2.1
-    */
+    /**
+     * Wrap the provided string if it isn't empty.
+     *
+     * @param string $String
+     * @param string $Tag
+     * @param array $Attributes
+     * @return string
+     * @since 2.1
+     */
     function wrapIf($String, $Tag = 'span', $Attributes = '') {
         if (empty($String)) {
             return '';
@@ -1024,9 +1024,9 @@ if (!function_exists('discussionLink')) {
         $DiscussionID = GetValue('DiscussionID', $Discussion);
         $DiscussionName = GetValue('Name', $Discussion);
         $Parts = array(
-         'discussion',
-         $DiscussionID,
-         Gdn_Format::Url($DiscussionName)
+            'discussion',
+            $DiscussionID,
+            Gdn_Format::Url($DiscussionName)
         );
         if ($Extended) {
             $Parts[] = ($Discussion->CountCommentWatch > 0) ? '#Item_'.$Discussion->CountCommentWatch : '';
@@ -1043,7 +1043,7 @@ if (!function_exists('registerUrl')) {
             return '';
         }
 
-       // Check to see if there is even a sign in button.
+        // Check to see if there is even a sign in button.
         if (!$force && $registrationMethod === 'connect') {
             $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
             if ($defaultProvider && !val('RegisterUrl', $defaultProvider)) {
@@ -1057,7 +1057,7 @@ if (!function_exists('registerUrl')) {
 
 if (!function_exists('signInUrl')) {
     function signInUrl($target = '', $force = false) {
-       // Check to see if there is even a sign in button.
+        // Check to see if there is even a sign in button.
         if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
             $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
             if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
@@ -1072,7 +1072,7 @@ if (!function_exists('signInUrl')) {
 if (!function_exists('signOutUrl')) {
     function signOutUrl($Target = '') {
         if ($Target) {
-           // Strip out the SSO from the target so that the user isn't signed back in again.
+            // Strip out the SSO from the target so that the user isn't signed back in again.
             $Parts = explode('?', $Target, 2);
             if (isset($Parts[1])) {
                 parse_str($Parts[1], $Query);
@@ -1150,14 +1150,14 @@ if (!function_exists('writeReactions')) {
         echo '<div class="Reactions">';
         Gdn_Theme::BulletRow();
 
-       // Write the flags.
+        // Write the flags.
         static $Flags = null;
         if ($Flags === null) {
             Gdn::Controller()->EventArguments['Flags'] = &$Flags;
             Gdn::Controller()->FireEvent('Flags');
         }
 
-       // Allow addons to work with flags
+        // Allow addons to work with flags
         Gdn::Controller()->EventArguments['Flags'] = &$Flags;
         Gdn::Controller()->FireEvent('BeforeFlag');
 
@@ -1165,7 +1165,7 @@ if (!function_exists('writeReactions')) {
             echo Gdn_Theme::BulletItem('Flags');
 
             echo ' <span class="FlagMenu ToggleFlyout">';
-           // Write the handle.
+            // Write the handle.
             echo Anchor(Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T('Flag'), 'span', array('class' => 'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title' => 'Flag'), true);
             echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';

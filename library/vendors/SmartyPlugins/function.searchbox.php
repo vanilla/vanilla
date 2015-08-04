@@ -18,13 +18,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 function smarty_function_searchbox($Params, &$Smarty) {
    $Placeholder = array_key_exists('placeholder', $Params) ? GetValue('placeholder', $Params, '', TRUE) : T('SearchBoxPlaceHolder', 'Search');
-   /* @var Gdn_Form */
    $Form = Gdn::Factory('Form');
    $Form->InputPrefix = '';
    $Result =
       $Form->Open(array('action' => Url('/search'), 'method' => 'get')).
-      $Form->Label('Search', 'Search', array('class' => 'sr-only')).
-      $Form->TextBox('Search', array('placeholder' => $Placeholder, 'accesskey' => '/')).
+      $Form->TextBox('Search', array('placeholder' => $Placeholder)).
       $Form->Button('Go', array('Name' => '')).
       $Form->Close();
 

@@ -67,7 +67,7 @@ if (!function_exists('ValidateRequired')) {
         }
 
         if (is_string($value)) {
-           // Empty strings should pass if the default value of the field is an empty string.
+            // Empty strings should pass if the default value of the field is an empty string.
             if ($value === '' && val('Default', $field, null) === '') {
                 return true;
             }
@@ -103,13 +103,13 @@ if (!function_exists('ValidateMeAction')) {
 }
 
 if (!function_exists('validateNoLinks')) {
-   /**
+    /**
      * Make sure a string has no links.
-    *
+     *
      * @param mixed $value The value to validate.
      * @return bool Returns true if the value validates or false otherwise.
-    * @since 2.1
-    */
+     * @since 2.1
+     */
     function validateNoLinks($value) {
         $Matched = preg_match('`https?://`i', $value);
         return !$Matched;
@@ -117,17 +117,17 @@ if (!function_exists('validateNoLinks')) {
 }
 
 if (!function_exists('validateRequiredArray')) {
-   /**
+    /**
      * Validate that a value is an array and is not empty.
      *
-    * Checkbox lists and DropDown lists that have no values selected return a
+     * Checkbox lists and DropDown lists that have no values selected return a
      * value of false. Since this could be a valid entry in any other kind of
-    * input, these "array" form-data types need their own "required" validation
-    * method.
+     * input, these "array" form-data types need their own "required" validation
+     * method.
      *
      * @param mixed $value The value to validate.
      * @return bool Returns true if the value validates or false otherwise.
-    */
+     */
     function validateRequiredArray($value) {
         if (is_array($value) === true) {
             return !empty($value);
@@ -181,10 +181,6 @@ if (!function_exists('validateOldPassword')) {
         $UserModel = new UserModel();
         $UserID = $Session->UserID;
         return (bool)$UserModel->validateCredentials('', $UserID, $OldPassword);
-            '',
-            $UserID,
-            $OldPassword
-        );
     }
 }
 
@@ -231,8 +227,8 @@ if (!function_exists('validateUsernameRegex')) {
         static $ValidateUsernameRegex;
 
         if (is_null($ValidateUsernameRegex)) {
-           // Set our default ValidationRegex based on Unicode support.
-           // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
+            // Set our default ValidationRegex based on Unicode support.
+            // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
             $DefaultPattern = (unicodeRegexSupport()) ? '\pN\pL\pM\pPc' : '\w';
 
             $ValidateUsernameRegex = sprintf(
@@ -301,7 +297,7 @@ if (!function_exists('validateDate')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateDate($value) {
-       // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format
+        // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format
         if (empty($value)) {
             return true; // blank dates validated through required.
         } else {
@@ -333,7 +329,7 @@ if (!function_exists('validateMinimumAge')) {
      */
     function validateMinimumAge($value) {
         $MinimumAge = C('Garden.Validate.MinimumAge', 13);
-       // Dates should be in YYYY-MM-DD format
+        // Dates should be in YYYY-MM-DD format
         if (preg_match("/^[\d]{4}-{1}[\d]{2}-{1}[\d]{2}$/", $value) == 1) {
             $Year = intval(substr($value, 0, 4));
             $Month = intval(substr($value, 5, 2));
@@ -341,9 +337,9 @@ if (!function_exists('validateMinimumAge')) {
             $CurrentDay = date('j');
             $CurrentMonth = date('n');
             $CurrentYear = date('Y');
-           // The minimum age for joining is 13 years before now.
+            // The minimum age for joining is 13 years before now.
             if ($Year + $MinimumAge < $CurrentYear
-            || ($Year + $MinimumAge == $CurrentYear && $Month < $CurrentMonth)
+                || ($Year + $MinimumAge == $CurrentYear && $Month < $CurrentMonth)
                 || ($Year + $MinimumAge == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay)
             ) {
                 return true;
@@ -400,15 +396,15 @@ if (!function_exists('validateDecimal')) {
 }
 
 if (!function_exists('validateString')) {
-   /**
-    * Validate that a value can be converted into a string.
-    *
-    * This function will pass on numbers or booleans because those values can be converted to a string.
-    *
+    /**
+     * Validate that a value can be converted into a string.
+     *
+     * This function will pass on numbers or booleans because those values can be converted to a string.
+     *
      * @param mixed $value The value to validate.
      * @param object $field The database field object to validate against.
      * @return bool Returns true if {@link $value} is a valid string.
-    */
+     */
     function validateString($value, $field) {
         if (!$value || (is_string($value) && !trim($value))) {
             return true;
@@ -426,7 +422,7 @@ if (!function_exists('validateTime')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateTime($value) {
-       // TODO: VALIDATE AS HH:MM:SS OR HH:MM
+        // TODO: VALIDATE AS HH:MM:SS OR HH:MM
         return false;
     }
 }
@@ -439,7 +435,7 @@ if (!function_exists('validateTimestamp')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateTimestamp($value) {
-       // TODO: VALIDATE A TIMESTAMP
+        // TODO: VALIDATE A TIMESTAMP
         return false;
     }
 }
@@ -514,7 +510,7 @@ if (!function_exists('validatePermissionFormat')) {
      * otherwise.
      */
     function validatePermissionFormat($value) {
-       // Make sure there are at least three "parts" to each permission.
+        // Make sure there are at least three "parts" to each permission.
         if (is_array($value) === false) {
             $value = explode(',', $value);
         }
@@ -534,19 +530,19 @@ if (!function_exists('validatePermissionFormat')) {
 }
 
 if (!function_exists('validateMatch')) {
-   /**
+    /**
      * Validate a value in an odd and soon to be removed way.
      *
-    * Takes the FieldName being validated, appends "Match" to it, and searches
-    * $PostedFields for the Match fieldname, compares their values, and returns
-    * true if they match.
+     * Takes the FieldName being validated, appends "Match" to it, and searches
+     * $PostedFields for the Match fieldname, compares their values, and returns
+     * true if they match.
      *
      * @param mixed $value The value to validate.
      * @param object $field The field meta information.
      * @param array $data The full posted data.
      * @return bool Returns true if the value is valid or false otherwise.
      * @deprecated
-    */
+     */
     function validateMatch($value, $field, $data) {
         $MatchValue = ArrayValue($field->Name.'Match', $data);
         return $value == $MatchValue ? true : false;
@@ -585,14 +581,14 @@ if (!function_exists('validateMinTextLength')) {
 }
 
 if (!function_exists('validateStrength')) {
-   /**
+    /**
      * Validate a password's strength.
-    *
+     *
      * @param string $value The value to validate.
      * @param object $field Not used.
      * @param array $data The full post data.
      * @return bool Returns true if the value represents a strong enough password or false otherwise.
-    */
+     */
     function validateStrength($value, $field, $data) {
         $UsernameValue = GetValue('Name', $data);
         $PScore = PasswordStrength($value, $UsernameValue);
@@ -613,7 +609,7 @@ if (!function_exists('validateVersion')) {
         }
 
         if (preg_match('`(?:\d+\.)*\d+\s*([a-z]*)\d*`i', $value, $Matches)) {
-           // Get the version word out of the matches and validate it.
+            // Get the version word out of the matches and validate it.
             $Word = $Matches[1];
             if (!in_array(trim($Word), array('', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p'))) {
                 return false;
@@ -625,13 +621,13 @@ if (!function_exists('validateVersion')) {
 }
 
 if (!function_exists('validatePhoneNA')) {
-/**
- * Validate phone number against North American Numbering Plan.
+    /**
+     * Validate phone number against North American Numbering Plan.
      *
      * @param mixed $value The value to validate.
      * @return bool|string Returns true if the value is a valid phone number or an error string otherwise.
- * @link http://blog.stevenlevithan.com/archives/validate-phone-number
- */
+     * @link http://blog.stevenlevithan.com/archives/validate-phone-number
+     */
     function validatePhoneNA($value) {
         if ($value == '') {
             return true; // Do not require by default.
@@ -642,12 +638,12 @@ if (!function_exists('validatePhoneNA')) {
 }
 
 if (!function_exists('validatePhoneInt')) {
-/**
- * Loose validation for international phone number (but must start with a plus sign).
+    /**
+     * Loose validation for international phone number (but must start with a plus sign).
      *
      * @param mixed $value The value to validate.
      * @return bool|string Returns true if the value is a valid phone number or an error string otherwise.
- */
+     */
     function validatePhoneInt($value) {
         if ($value == '') {
             return true; // Do not require by default.
@@ -667,19 +663,19 @@ if (!function_exists('validateUrl')) {
     function validateUrl($value) {
         if (empty($value)) {
             return true;
-    }
+        }
         $Valid = (bool)filter_var($value, FILTER_VALIDATE_URL);
         return $Valid;
-}
+    }
 }
 
 if (!function_exists('validateZipCode')) {
-/**
- * Validate US zip code (5-digit or 9-digit with hyphen).
+    /**
+     * Validate US zip code (5-digit or 9-digit with hyphen).
      *
      * @param mixed $value The value to validate.
      * @return bool|string
- */
+     */
     function validateZipCode($value) {
         if ($value == '') {
             return true; // Do not require by default.

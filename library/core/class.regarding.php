@@ -21,18 +21,18 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         parent::__construct();
     }
 
-   /* With regard to... */
+    /* With regard to... */
 
-   /**
-    * Start a RegardingEntity for a comment
-    *
-    * Able to autoparent to its discussion owner if verfied.
-    *
-    * @param $CommentID int ID of the comment
-    * @param $Verify optional boolean whether or not to verify this. default true.
-    * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
-    * @return Gdn_RegardingEntity
-    */
+    /**
+     * Start a RegardingEntity for a comment
+     *
+     * Able to autoparent to its discussion owner if verfied.
+     *
+     * @param $CommentID int ID of the comment
+     * @param $Verify optional boolean whether or not to verify this. default true.
+     * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
+     * @return Gdn_RegardingEntity
+     */
     public function comment($CommentID, $Verify = true, $AutoParent = true) {
         $Regarding = $this->regarding('Comment', $CommentID, $Verify);
         if ($Verify && $AutoParent) {
@@ -41,27 +41,27 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         return $Regarding;
     }
 
-   /**
-    * Start a RegardingEntity for a discussion
-    *
-    * @param $DiscussionID int ID of the discussion
-    * @param $Verify optional boolean whether or not to verify this. default true.
-    * @return Gdn_RegardingEntity
-    */
+    /**
+     * Start a RegardingEntity for a discussion
+     *
+     * @param $DiscussionID int ID of the discussion
+     * @param $Verify optional boolean whether or not to verify this. default true.
+     * @return Gdn_RegardingEntity
+     */
     public function discussion($DiscussionID, $Verify = true) {
         return $this->regarding('Discussion', $DiscussionID, $Verify);
     }
 
-   /**
-    * Start a RegardingEntity for a conversation message
-    *
-    * Able to autoparent to its conversation owner if verfied.
-    *
-    * @param $MessageID int ID of the conversation message
-    * @param $Verify optional boolean whether or not to verify this. default true.
-    * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
-    * @return Gdn_RegardingEntity
-    */
+    /**
+     * Start a RegardingEntity for a conversation message
+     *
+     * Able to autoparent to its conversation owner if verfied.
+     *
+     * @param $MessageID int ID of the conversation message
+     * @param $Verify optional boolean whether or not to verify this. default true.
+     * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
+     * @return Gdn_RegardingEntity
+     */
     public function message($MessageID, $Verify = true, $AutoParent = true) {
         $Regarding = $this->regarding('ConversationMessage', $MessageID, $Verify);
         if ($Verify && $AutoParent) {
@@ -70,13 +70,13 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         return $Regarding;
     }
 
-   /**
-    * Start a RegardingEntity for a conversation
-    *
-    * @param $ConversationID int ID of the conversation
-    * @param $Verify optional boolean whether or not to verify this. default true.
-    * @return Gdn_RegardingEntity
-    */
+    /**
+     * Start a RegardingEntity for a conversation
+     *
+     * @param $ConversationID int ID of the conversation
+     * @param $Verify optional boolean whether or not to verify this. default true.
+     * @return Gdn_RegardingEntity
+     */
     public function conversation($ConversationID, $Verify = true) {
         return $this->regarding('Conversation', $ConversationID, $Verify);
     }
@@ -99,7 +99,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
                 throw new Exception(sprintf(T("Could not find a model for %s objects."), ucfirst($ThingType)));
             }
 
-           // If we can lookup this object, it is verified
+            // If we can lookup this object, it is verified
             $VerifyModel = new $ModelName;
             $SourceElement = $VerifyModel->getID($ThingID);
             if ($SourceElement !== false) {
@@ -141,10 +141,10 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $ForeignType
      * @param null $ForeignID
      * @return array|bool
-    */
+     */
     public function matchEvent($RegardingType, $ForeignType, $ForeignID = null) {
         $RegardingData = val('RegardingData', $this->EventArguments);
-   
+
         $FoundRegardingType = strtolower(GetValue('Type', $RegardingData));
         if (!is_array($RegardingType)) {
             $RegardingType = array($RegardingType);
@@ -158,7 +158,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         if (!$Found) {
             return false;
         }
-      
+
         $FoundForeignType = strtolower(val('ForeignType', $RegardingData));
         if (!is_array($ForeignType)) {
             $ForeignType = array($ForeignType);
@@ -172,22 +172,22 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         if (!$Found) {
             return false;
         }
-      
+
         if (!is_null($ForeignID)) {
             $FoundForeignID = val('ForeignID', $RegardingData);
             if ($FoundForeignID != $ForeignID) {
                 return false;
             }
         }
-      
+
         return $this->EventArguments;
     }
 
-   /*
-    * Event system: Hook into core events
-    */
+    /*
+     * Event system: Hook into core events
+     */
 
-   // Cache regarding data for displayed comments
+    // Cache regarding data for displayed comments
 //   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
 //      if (GetValue('RegardingCache', $Sender, NULL) != NULL) return;
 //
@@ -218,16 +218,16 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         $ChildRegardingData = $this->regardingModel()->getAll($ForeignType, $ForeignIDs);
         $ParentRegardingData = $this->regardingModel()->get($ParentType, $ParentID);
 
- /*
-       $MediaArray = array();
-       if ($MediaData !== FALSE) {
-         $MediaData->DataSeek(-1);
-         while ($Media = $MediaData->NextRow()) {
-            $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
-            $this->MediaCacheById[GetValue('MediaID',$Media)] = $Media;
-         }
-       }
- */
+        /*
+              $MediaArray = array();
+              if ($MediaData !== FALSE) {
+                 $MediaData->DataSeek(-1);
+                 while ($Media = $MediaData->NextRow()) {
+                    $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
+                    $this->MediaCacheById[GetValue('MediaID',$Media)] = $Media;
+                 }
+              }
+        */
 
         $this->RegardingCache = array();
     }

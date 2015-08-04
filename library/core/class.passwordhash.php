@@ -10,8 +10,8 @@
  * @package Core
  * @since 2.0
  */
-include_once PATH_LIBRARY.'/vendors/phpass/PasswordHash.php';
 
+include_once PATH_LIBRARY.'/vendors/phpass/PasswordHash.php';
 
 /**
  * Wrapper for the Portable PHP password hashing framework.
@@ -21,11 +21,11 @@ class Gdn_PasswordHash extends PasswordHash {
     /** @var bool  */
     public $Weak = false;
 
-   /**
+    /**
      * Constructor.
-    */
+     */
     function __construct() {
-       // 8 iteration to create a Portable hash
+        // 8 iteration to create a Portable hash
         parent::passwordHash(8, false);
     }
 
@@ -54,7 +54,7 @@ class Gdn_PasswordHash extends PasswordHash {
             }
         }
     }
-   
+
     /**
      * Check an IPB hash.
      *
@@ -74,18 +74,18 @@ class Gdn_PasswordHash extends PasswordHash {
         return false;
     }
 
-   /**
-    * Check a password against a stored password.
-    *
-    * The stored password can be plain, a md5 hash or a phpass hash.
-    * If the password wasn't a phppass hash, the Weak property is set to True.
-    *
-    * @param string $Password
-    * @param string $StoredHash
-    * @param string $Method
-    * @param string $Username
-    * @return boolean
-    */
+    /**
+     * Check a password against a stored password.
+     *
+     * The stored password can be plain, a md5 hash or a phpass hash.
+     * If the password wasn't a phppass hash, the Weak property is set to True.
+     *
+     * @param string $Password
+     * @param string $StoredHash
+     * @param string $Method
+     * @param string $Username
+     * @return boolean
+     */
     function checkPassword($Password, $StoredHash, $Method = false, $Username = null) {
         $Result = false;
         $ResetUrl = Url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
@@ -111,7 +111,7 @@ class Gdn_PasswordHash extends PasswordHash {
                 $Result = $ComputedHash == $Hash;
                 break;
             case 'mybb':
-               // Hash has a fixed length of 32, and we concat the salt to it.
+                // Hash has a fixed length of 32, and we concat the salt to it.
                 $SaltLength = strlen($StoredHash) - 32;
                 $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
                 $MyStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
@@ -126,38 +126,38 @@ class Gdn_PasswordHash extends PasswordHash {
                 $Parts = explode('$', $StoredHash);
                 $StoredHash = val(0, $Parts);
                 $StoredSalt = val(1, $Parts);
-            
+
                 if (md5($Password) == $StoredHash) {
                     $Result = true;
                 } elseif (sha1($Password) == $StoredHash)
-                $Result = true;
+                    $Result = true;
                 elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
-                $Result = true;
+                    $Result = true;
                 else {
                     $Result = false;
                 }
-            
+
                 break;
             case 'reset':
                 throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), $ResetUrl));
-            break;
+                break;
             case 'random':
                 throw new Gdn_UserException(sprintf(T('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $ResetUrl));
-            break;
+                break;
             case 'smf':
                 $Result = (sha1(strtolower($Username).$Password) == $StoredHash);
                 break;
             case 'vbulletin':
-               // assume vbulletin's password hash has a fixed length of 32, the salt length will vary between version 3 and 4
+                // assume vbulletin's password hash has a fixed length of 32, the salt length will vary between version 3 and 4
                 $SaltLength = strlen($StoredHash) - 32;
                 $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
                 $VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
-            
+
                 $VbHash = md5(md5($Password).$Salt);
                 $Result = $VbHash == $VbStoredHash;
                 break;
             case 'vbulletin5': // Since 5.1
-               // md5 sum the raw password before crypt. Nice work as usual vb.
+                // md5 sum the raw password before crypt. Nice work as usual vb.
                 $Result = $StoredHash === crypt(md5($Password), $StoredHash);
                 break;
             case 'xenforo':
@@ -172,9 +172,9 @@ class Gdn_PasswordHash extends PasswordHash {
                     }
                     $Salt = val('salt', $Data);
                     $ComputedHash = hash($Function, hash($Function, $Password).$Salt);
-               
+
                     $Result = $ComputedHash == $Hash;
-                              }
+                }
                 break;
             case 'yaf':
                 $Result = $this->checkYAF($Password, $StoredHash);
@@ -189,7 +189,7 @@ class Gdn_PasswordHash extends PasswordHash {
         }
         return $Result;
     }
-   
+
     /**
      * Check a Vanilla hash.
      *
@@ -202,25 +202,25 @@ class Gdn_PasswordHash extends PasswordHash {
         if (!isset($StoredHash[0])) {
             return false;
         }
-      
+
         if ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
             $Result = parent::checkPassword($Password, $StoredHash);
 
-           // Check to see if this password should be rehashed to crypt-blowfish.
+            // Check to see if this password should be rehashed to crypt-blowfish.
             if (!$this->portable_hashes && CRYPT_BLOWFISH == 1 && substr($StoredHash, 0, 3) === '$P$') {
                 $this->Weak = true;
             }
 
             return $Result;
         } elseif ($Password && $StoredHash !== '*'
-         && ($Password === $StoredHash || md5($Password) === $StoredHash)
+            && ($Password === $StoredHash || md5($Password) === $StoredHash)
         ) {
             $this->Weak = true;
             return true;
         }
         return false;
     }
-   
+
     /**
      * Check a YAF hash.
      *
@@ -239,12 +239,12 @@ class Gdn_PasswordHash extends PasswordHash {
             $Hash = bin2hex(base64_decode($Hash));
             $Password = mb_convert_encoding($Password, 'UTF-16LE');
 
-           // There are two ways of building the hash string in yaf.
+            // There are two ways of building the hash string in yaf.
             if ($Compare == 's') {
-               // Compliant with ASP.NET Membership method of hash/salt
+                // Compliant with ASP.NET Membership method of hash/salt
                 $HashString = $Salt.$Password;
             } else {
-               // The yaf algorithm has a quirk where they knock a
+                // The yaf algorithm has a quirk where they knock a
                 $HashString = substr($Password, 0, -1).$Salt.chr(0);
             }
 

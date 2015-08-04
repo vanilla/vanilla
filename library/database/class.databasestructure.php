@@ -44,26 +44,26 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /** @var string The name of the storage engine for this table. */
     protected $_TableStorageEngine;
 
-   /**
-    * The constructor for this class. Automatically fills $this->ClassName.
-    *
-    * @param string $Database
-    * @todo $Database needs a description.
-    */
+    /**
+     * The constructor for this class. Automatically fills $this->ClassName.
+     *
+     * @param string $Database
+     * @todo $Database needs a description.
+     */
     public function __construct($Database = null) {
         parent::__construct();
-      
+
         if (is_null($Database)) {
             $this->Database = Gdn::database();
         } else {
             $this->Database = $Database;
         }
-      
+
         $this->databasePrefix($this->Database->DatabasePrefix);
-      
+
         $this->reset();
     }
-   
+
     /**
      *
      *
@@ -77,16 +77,16 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     protected function _createColumn($Name, $Type, $Null, $Default, $KeyType) {
         $Length = '';
         $Precision = '';
-      
-       // Check to see if the type starts with a 'u' for unsigned.
+
+        // Check to see if the type starts with a 'u' for unsigned.
         if (is_string($Type) && strncasecmp($Type, 'u', 1) == 0) {
             $Type = substr($Type, 1);
             $Unsigned = true;
         } else {
             $Unsigned = false;
         }
-      
-       // Check for a length in the type.
+
+        // Check for a length in the type.
         if (is_string($Type) && preg_match('/(\w+)\s*\(\s*(\d+)\s*(?:,\s*(\d+)\s*)?\)/', $Type, $Matches)) {
             $Type = $Matches[1];
             $Length = $Matches[2];
@@ -94,7 +94,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
                 $Precision = $Matches[3];
             }
         }
-      
+
         $Column = new stdClass();
         $Column->Name = $Name;
         $Column->Type = is_array($Type) ? 'enum' : $Type;
@@ -106,15 +106,15 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $Column->KeyType = $KeyType;
         $Column->Unsigned = $Unsigned;
         $Column->AutoIncrement = false;
-      
-       // Handle enums and sets as types.
+
+        // Handle enums and sets as types.
         if (is_array($Type)) {
             if (count($Type) === 2 && is_array(arrayValue(1, $Type))) {
-               // The type is specified as the first element in the array.
+                // The type is specified as the first element in the array.
                 $Column->Type = $Type[0];
                 $Column->Enum = $Type[1];
             } else {
-               // This is an enum.
+                // This is an enum.
                 $Column->Type = 'enum';
                 $Column->Enum = $Type;
             }
@@ -122,24 +122,24 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             $Column->Type = $Type;
             $Column->Enum = false;
         }
-      
+
         return $Column;
     }
-   
-   /**
-    * Defines a column to be added to $this->Table().
-    *
-    * @param string $Name The name of the column to create.
-    * @param mixed $Type The data type of the column to be created. Types with a length speecifty the length in barackets.
-    * * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
-    * * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
-    * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
-    * * TRUE: Nulls are allowed.
-    * * FALSE: Nulls are not allowed.
-    * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
-    * @param string $KeyType What type of key is this column on the table? Options
-    * are primary, key, and FALSE (not a key).
-    */
+
+    /**
+     * Defines a column to be added to $this->Table().
+     *
+     * @param string $Name The name of the column to create.
+     * @param mixed $Type The data type of the column to be created. Types with a length speecifty the length in barackets.
+     * * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
+     * * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
+     * @param boolean $NullDefault Whether or not nulls are allowed, if not a default can be specified.
+     * * TRUE: Nulls are allowed.
+     * * FALSE: Nulls are not allowed.
+     * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
+     * @param string $KeyType What type of key is this column on the table? Options
+     * are primary, key, and FALSE (not a key).
+     */
     public function column($Name, $Type, $NullDefault = false, $KeyType = false) {
         if (is_null($NullDefault) || $NullDefault === true) {
             $Null = true;
@@ -155,12 +155,12 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             $Default = $NullDefault;
         }
 
-       // Check the key type for validity. A column can be in many keys by specifying an array as key type.
+        // Check the key type for validity. A column can be in many keys by specifying an array as key type.
         $KeyTypes = (array)$KeyType;
         $KeyTypes1 = array();
         foreach ($KeyTypes as $KeyType1) {
             $Parts = explode('.', $KeyType1, 2);
-         
+
             if (in_array($Parts[0], array('primary', 'key', 'index', 'unique', 'fulltext', false))) {
                 $KeyTypes1[] = $KeyType1;
             }
@@ -168,7 +168,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         if (count($KeyTypes1) == 0) {
             $KeyType = false;
         } elseif (count($KeyTypes1) == 1)
-         $KeyType = $KeyTypes1[0];
+            $KeyType = $KeyTypes1[0];
         else {
             $KeyType = $KeyTypes1;
         }
@@ -180,10 +180,10 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
     /**
      * Returns whether or not a column exists in the database.
-    *
-    * @param string $ColumnName The name of the column to check.
-    * @return bool
-    */
+     *
+     * @param string $ColumnName The name of the column to check.
+     * @return bool
+     */
     public function columnExists($ColumnName) {
         $Result = array_key_exists($ColumnName, $this->existingColumns());
         if (!$Result) {
@@ -196,8 +196,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
         return $Result;
     }
-   
-   /**
+
+    /**
      * An associative array of $ColumnName => $ColumnProperties columns for the table.
      *
      * @return array
@@ -212,7 +212,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
                         return $Def;
                     }
                 }
-                           return null;
+                return null;
             }
         }
         return $this->_Columns;
@@ -230,7 +230,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         if (is_string($Column)) {
             $Column = $this->_Columns[$Column];
         }
-        
+
         $Type = val('Type', $Column);
         $Length = val('Length', $Column);
         $Precision = val('Precision', $Column);
@@ -254,12 +254,12 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $Result;
     }
 
-   /**
-    * Gets and/or sets the database prefix.
-    *
-    * @param string $DatabasePrefix
-    * @todo $DatabasePrefix needs a description.
-    */
+    /**
+     * Gets and/or sets the database prefix.
+     *
+     * @param string $DatabasePrefix
+     * @todo $DatabasePrefix needs a description.
+     */
     public function databasePrefix($DatabasePrefix = '') {
         if ($DatabasePrefix != '') {
             $this->_DatabasePrefix = $DatabasePrefix;
@@ -268,18 +268,18 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this->_DatabasePrefix;
     }
 
-   /**
-    * Drops $this->Table() from the database.
-    */
+    /**
+     * Drops $this->Table() from the database.
+     */
     public function drop() {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Drop'), E_USER_ERROR);
     }
 
-   /**
-    * Drops $Name column from $this->Table().
-    *
-    * @param string $Name The name of the column to drop from $this->Table().
-    */
+    /**
+     * Drops $Name column from $this->Table().
+     *
+     * @param string $Name The name of the column to drop from $this->Table().
+     */
     public function dropColumn($Name) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'DropColumn'), E_USER_ERROR);
     }
@@ -312,21 +312,21 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this;
     }
 
-   /**
-    * Defines a primary key column on a table.
-    *
-    * @param string $Name The name of the column.
-    * @param string $Type The data type of the column.
-    * @return Gdn_DatabaseStructure $this.
-    */
+    /**
+     * Defines a primary key column on a table.
+     *
+     * @param string $Name The name of the column.
+     * @param string $Type The data type of the column.
+     * @return Gdn_DatabaseStructure $this.
+     */
     public function primaryKey($Name, $Type = 'int') {
         $Column = $this->_createColumn($Name, $Type, false, null, 'primary');
         $Column->AutoIncrement = true;
         $this->_Columns[$Name] = $Column;
-      
+
         return $this;
     }
-    
+
     /**
      * Send a query to the database and return the result.
      *
@@ -345,48 +345,48 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             return $Result;
         }
     }
-   
-   /**
-    * Renames a column in $this->Table().
-    *
-    * @param string $OldName The name of the column to be renamed.
-    * @param string $NewName The new name for the column being renamed.
-    */
+
+    /**
+     * Renames a column in $this->Table().
+     *
+     * @param string $OldName The name of the column to be renamed.
+     * @param string $NewName The new name for the column being renamed.
+     */
     public function renameColumn($OldName, $NewName) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'RenameColumn'), E_USER_ERROR);
     }
 
-   /**
-    * Renames a table in the database.
-    *
-    * @param string $OldName The name of the table to be renamed.
-    * @param string $NewName The new name for the table being renamed.
-    * @param boolean $UsePrefix A boolean value indicating if $this->_DatabasePrefix should be prefixed
-    * before $OldName and $NewName.
-    */
+    /**
+     * Renames a table in the database.
+     *
+     * @param string $OldName The name of the table to be renamed.
+     * @param string $NewName The new name for the table being renamed.
+     * @param boolean $UsePrefix A boolean value indicating if $this->_DatabasePrefix should be prefixed
+     * before $OldName and $NewName.
+     */
     public function renameTable($OldName, $NewName, $UsePrefix = false) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'RenameTable'), E_USER_ERROR);
     }
 
-   /**
-    * Creates the table and columns specified with $this->Table() and
-    * $this->Column(). If no table or columns have been specified, this method
-    * will throw a fatal error.
-    *
-    * @param boolean $Explicit If TRUE, and the table specified with $this->Table() already exists, this
-    * method will remove any columns from the table that were not defined with
-    * $this->Column().
-    * @param boolean $Drop If TRUE, and the table specified with $this->Table() already exists, this
-    * method will drop the table before attempting to re-create it.
-    */
+    /**
+     * Creates the table and columns specified with $this->Table() and
+     * $this->Column(). If no table or columns have been specified, this method
+     * will throw a fatal error.
+     *
+     * @param boolean $Explicit If TRUE, and the table specified with $this->Table() already exists, this
+     * method will remove any columns from the table that were not defined with
+     * $this->Column().
+     * @param boolean $Drop If TRUE, and the table specified with $this->Table() already exists, this
+     * method will drop the table before attempting to re-create it.
+     */
     public function set($Explicit = false, $Drop = false) {
-       /// Throw an event so that the structure can be overridden.
+        /// Throw an event so that the structure can be overridden.
         $this->EventArguments['Explicit'] = $Explicit;
         $this->EventArguments['Drop'] = $Drop;
         $this->fireEvent('BeforeSet');
 
         try {
-           // Make sure that table and columns have been defined
+            // Make sure that table and columns have been defined
             if ($this->_TableName == '') {
                 throw new Exception(T('You must specify a table before calling DatabaseStructure::Set()'));
             }
@@ -397,17 +397,17 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
             if ($this->tableExists()) {
                 if ($Drop) {
-                   // Drop the table.
+                    // Drop the table.
                     $this->drop();
 
-                   // And re-create it.
+                    // And re-create it.
                     return $this->_create();
                 }
 
-               // If the table already exists, go into modify mode.
+                // If the table already exists, go into modify mode.
                 return $this->_modify($Explicit, $Drop);
             } else {
-               // If it doesn't already exist, go into create mode.
+                // If it doesn't already exist, go into create mode.
                 return $this->_create();
             }
         } catch (Exception $Ex) {
@@ -416,17 +416,17 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
     }
 
-   /**
-    * Specifies the name of the table to create or modify.
-    *
-    * @param string $Name The name of the table.
-    * @param string $CharacterEncoding The default character encoding to specify for this table.
-    */
+    /**
+     * Specifies the name of the table to create or modify.
+     *
+     * @param string $Name The name of the table.
+     * @param string $CharacterEncoding The default character encoding to specify for this table.
+     */
     public function table($Name = '', $CharacterEncoding = '') {
         if (!$Name) {
             return $this->_TableName;
         }
-        
+
         $this->_TableName = $Name;
         if ($CharacterEncoding == '') {
             $CharacterEncoding = Gdn::config('Database.CharacterEncoding', '');
@@ -439,8 +439,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Whether or not the table exists in the database.
      *
-    * @return bool
-    */
+     * @return bool
+     */
     public function tableExists($TableName = null) {
         if ($this->_TableExists === null || $TableName !== null) {
             if ($TableName === null) {
@@ -463,9 +463,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
     /**
      * Returns the name of the table being defined in this object.
-    *
-    * @return string
-    */
+     *
+     * @return string
+     */
     public function tableName() {
         return $this->_TableName;
     }
@@ -473,18 +473,18 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Gets an arrya of type names allowed in the structure.
      *
-    * @param string $Class The class of types to get. Valid values are:
-    *  - <b>int</b>: Integer types.
-    *  - <b>float</b>: Floating point types.
-    *  - <b>decimal</b>: Precise decimal types.
-    *  - <b>numeric</b>: float, int and decimal.
-    *  - <b>string</b>: String types.
-    *  - <b>date</b>: Date types.
-    *  - <b>length</b>: Types that have a length.
-    *  - <b>precision</b>: Types that have a precision.
-    *  - <b>other</b>: Types that don't fit into any other category on their own.
-    *  - <b>all</b>: All recognized types.
-    */
+     * @param string $Class The class of types to get. Valid values are:
+     *  - <b>int</b>: Integer types.
+     *  - <b>float</b>: Floating point types.
+     *  - <b>decimal</b>: Precise decimal types.
+     *  - <b>numeric</b>: float, int and decimal.
+     *  - <b>string</b>: String types.
+     *  - <b>date</b>: Date types.
+     *  - <b>length</b>: Types that have a length.
+     *  - <b>precision</b>: Types that have a precision.
+     *  - <b>other</b>: Types that don't fit into any other category on their own.
+     *  - <b>all</b>: All recognized types.
+     */
     public function types($Class = 'all') {
         $Date = array('datetime', 'date');
         $Decimal = array('decimal', 'numeric');
@@ -519,19 +519,19 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
     }
 
-   /**
-    * Specifies the name of the view to create or modify.
-    *
-    * @param string $Name The name of the view.
+    /**
+     * Specifies the name of the view to create or modify.
+     *
+     * @param string $Name The name of the view.
      * @param string $Query Query to create as the view. Typically this can be generated with the $Database object.
-    */
+     */
     public function view($Name, $Query) {
         trigger_error(errorMessage('The selected database engine can not create or modify views.', $this->ClassName, 'View'), E_USER_ERROR);
     }
 
-   /**
-    * Creates the table defined with $this->Table() and $this->Column().
-    */
+    /**
+     * Creates the table defined with $this->Table() and $this->Column().
+     */
     protected function _create() {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Create'), E_USER_ERROR);
     }
@@ -539,8 +539,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Gets the column definitions for the columns in the database.
      *
-    * @return array
-    */
+     * @return array
+     */
     public function existingColumns() {
         if ($this->_ExistingColumns === null) {
             if ($this->TableExists()) {
@@ -552,12 +552,12 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         return $this->_ExistingColumns;
     }
 
-   /**
-    * Modifies $this->Table() with the columns specified with $this->Column().
-    *
-    * @param boolean $Explicit If TRUE, this method will remove any columns from the table that were not
-    * defined with $this->Column().
-    */
+    /**
+     * Modifies $this->Table() with the columns specified with $this->Column().
+     *
+     * @param boolean $Explicit If TRUE, this method will remove any columns from the table that were not
+     * defined with $this->Column().
+     */
     protected function _modify($Explicit = false) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Modify'), E_USER_ERROR);
     }
@@ -565,8 +565,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Reset the internal state of this object so that it can be reused.
      *
-    * @return Gdn_DatabaseStructure $this
-    */
+     * @return Gdn_DatabaseStructure $this
+     */
     public function reset() {
         $this->_CharacterEncoding = '';
         $this->_Columns = array();

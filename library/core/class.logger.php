@@ -47,11 +47,11 @@ class Logger {
     /** @var string The global level at which events are committed to the log. */
     protected static $logLevel;
 
-   /**
+    /**
      *
      *
-    * @param LoggerInterface $value Specify a new value to set the logger to.
-    */
+     * @param LoggerInterface $value Specify a new value to set the logger to.
+     */
     public static function setLogger(LoggerInterface $value = null) {
         if ($value !== null) {
             self::$instance = $value;
@@ -60,11 +60,11 @@ class Logger {
         }
     }
 
-   /**
+    /**
      *
      *
-    * @return LoggerInterface
-    */
+     * @return LoggerInterface
+     */
     public static function getLogger() {
         if (!self::$instance) {
             self::setLogger();
@@ -72,38 +72,38 @@ class Logger {
         return self::$instance;
     }
 
-   /**
-    * Log an event
-    *
-    * @param string $event
-    * @param string $level
-    * @param string $message
-    * @param array $context
-    */
+    /**
+     * Log an event
+     *
+     * @param string $event
+     * @param string $level
+     * @param string $message
+     * @param array $context
+     */
     public static function event($event, $level, $message, $context = array()) {
         $context['event'] = $event;
         static::log($level, $message, $context);
     }
 
-   /**
-    * Get the numeric priority for a log level.
-    *
-    * The priorities are set to the LOG_* constants from the {@link syslog()} function.
-    * A lower number is more severe.
-    *
-    * @param string $level The string log level.
-    * @return int Returns the numeric log level or `-1` if the level is invalid.
-    */
+    /**
+     * Get the numeric priority for a log level.
+     *
+     * The priorities are set to the LOG_* constants from the {@link syslog()} function.
+     * A lower number is more severe.
+     *
+     * @param string $level The string log level.
+     * @return int Returns the numeric log level or `-1` if the level is invalid.
+     */
     public static function levelPriority($level) {
         static $priorities = array(
-         Logger::DEBUG => LOG_DEBUG,
-         Logger::INFO => LOG_INFO,
-         Logger::NOTICE => LOG_NOTICE,
-         Logger::WARNING => LOG_WARNING,
-         Logger::ERROR => LOG_ERR,
-         Logger::CRITICAL => LOG_CRIT,
-         Logger::ALERT => LOG_ALERT,
-         Logger::EMERGENCY => LOG_EMERG
+            Logger::DEBUG => LOG_DEBUG,
+            Logger::INFO => LOG_INFO,
+            Logger::NOTICE => LOG_NOTICE,
+            Logger::WARNING => LOG_WARNING,
+            Logger::ERROR => LOG_ERR,
+            Logger::CRITICAL => LOG_CRIT,
+            Logger::ALERT => LOG_ALERT,
+            Logger::EMERGENCY => LOG_EMERG
         );
 
         if (isset($priorities[$level])) {
@@ -113,19 +113,19 @@ class Logger {
         }
     }
 
-   /**
-    * Log the access of a resource.
-    *
-    * Since resources can be accessed with every page view this event will only log when the cache is enabled
-    * and once every five minutes.
-    *
-    * @param string $event The name of the event to log.
-    * @param string $level The log level of the event.
-    * @param string $message The log message format.
-    * @param array $context Additional information to pass to the event.
-    */
+    /**
+     * Log the access of a resource.
+     *
+     * Since resources can be accessed with every page view this event will only log when the cache is enabled
+     * and once every five minutes.
+     *
+     * @param string $event The name of the event to log.
+     * @param string $level The log level of the event.
+     * @param string $message The log message format.
+     * @param array $context Additional information to pass to the event.
+     */
     public static function logAccess($event, $level, $message, $context = array()) {
-       // Throttle the log access to 1 event every 5 minutes.
+        // Throttle the log access to 1 event every 5 minutes.
         if (Gdn::cache()->activeEnabled()) {
             $userID = Gdn::session()->UserID;
             $path = Gdn::request()->path();
@@ -137,13 +137,13 @@ class Logger {
         }
     }
 
-   /**
-    * Gets or sets the current log level.
-    *
-    * @param string $value Pass a non-empty string to set a new log level.
-    * @return string Returns the current logLevel.
-    * @throws Exception Throws an exception of {@link $value} is an incorrect log level.
-    */
+    /**
+     * Gets or sets the current log level.
+     *
+     * @param string $value Pass a non-empty string to set a new log level.
+     * @return string Returns the current logLevel.
+     * @throws Exception Throws an exception of {@link $value} is an incorrect log level.
+     */
     public static function logLevel($value = '') {
         if ($value !== '') {
             if (self::levelPriority($value) > LOG_DEBUG) {
@@ -156,38 +156,38 @@ class Logger {
         return self::$logLevel;
     }
 
-   /**
-    * Adds default fields to context if they do not exist
-    *
-    * @param string $level
-    * @param string $message
-    * @param array $context
-    */
+    /**
+     * Adds default fields to context if they do not exist
+     *
+     * @param string $level
+     * @param string $message
+     * @param array $context
+     */
     public static function log($level, $message, $context = array()) {
         if (self::levelPriority($level) > self::levelPriority(self::logLevel())) {
             return;
         }
 
-       // Add default fields to the context if they don't exist.
+        // Add default fields to the context if they don't exist.
         $defaults = array(
             'userid' => Gdn::session()->UserID,
             'username' => val("Name", Gdn::session()->User, 'anonymous'),
             'ip' => Gdn::request()->ipAddress(),
-         'timestamp' => time(),
+            'timestamp' => time(),
             'method' => Gdn::request()->requestMethod(),
-         'domain' => rtrim(Url('/', true), '/'),
+            'domain' => rtrim(Url('/', true), '/'),
             'path' => Gdn::request()->path()
         );
         $context = $context + $defaults;
         static::getLogger()->log($level, $message, $context);
     }
 
-   /**
-    * Return the string label for a numeric log priority.
-    *
-    * @param int $priority One of the LOG_* log levels.
-    * @return string Returns one of the constants from this class or "unknown" if the priority isn't known.
-    */
+    /**
+     * Return the string label for a numeric log priority.
+     *
+     * @param int $priority One of the LOG_* log levels.
+     * @return string Returns one of the constants from this class or "unknown" if the priority isn't known.
+     */
     public static function priorityLabel($priority) {
         switch ($priority) {
             case LOG_DEBUG:

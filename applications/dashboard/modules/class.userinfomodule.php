@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -13,36 +15,38 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class UserInfoModule extends Gdn_Module {
    
-   public $User;
-   public $Roles;
+    public $User;
+    public $Roles;
    
-   public function __construct($Sender = '') {
-      $this->User = FALSE;
-      $this->Path(__FILE__);
-      parent::__construct($Sender);
-   }
+    public function __construct($Sender = '') {
+        $this->User = false;
+        $this->Path(__FILE__);
+        parent::__construct($Sender);
+    }
    
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
    
-   public function LoadData() {
-      $UserID = Gdn::Controller()->Data('Profile.UserID', Gdn::Session()->UserID);
-      $this->User = Gdn::UserModel()->GetID($UserID);
-      $this->Roles = Gdn::UserModel()->GetRoles($UserID)->ResultArray();
-      // Hide personal info roles
-      if (!CheckPermission('Garden.PersonalInfo.View')) {
-         $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
-      }
-   }
+    public function LoadData() {
+        $UserID = Gdn::Controller()->Data('Profile.UserID', Gdn::Session()->UserID);
+        $this->User = Gdn::UserModel()->GetID($UserID);
+        $this->Roles = Gdn::UserModel()->GetRoles($UserID)->ResultArray();
+       // Hide personal info roles
+        if (!CheckPermission('Garden.PersonalInfo.View')) {
+            $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
+        }
+    }
 
-   public function ToString() {
-      if (!$this->User)
-         $this->LoadData();
+    public function ToString() {
+        if (!$this->User) {
+            $this->LoadData();
+        }
       
-      if (is_object($this->User))
-         return parent::ToString();
+        if (is_object($this->User)) {
+            return parent::ToString();
+        }
 
-      return '';
-   }
+        return '';
+    }
 }

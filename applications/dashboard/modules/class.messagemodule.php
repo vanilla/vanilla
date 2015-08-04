@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -10,17 +12,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class MessageModule extends Gdn_Module {
 
-   protected $_Message;
+    protected $_Message;
 
-   public function __construct($Sender = '', $Message = FALSE) {
-      parent::__construct($Sender);
+    public function __construct($Sender = '', $Message = false) {
+        parent::__construct($Sender);
       
-      $this->_ApplicationFolder = 'dashboard';
-      $this->_Message = $Message;
-   }
+        $this->_ApplicationFolder = 'dashboard';
+        $this->_Message = $Message;
+    }
    
-   public function AssetTarget() {
-      return $this->_Message == FALSE ? 'Content' : GetValue('AssetTarget', $this->_Message);
-   }
-   
+    public function AssetTarget() {
+        return $this->_Message == false ? 'Content' : GetValue('AssetTarget', $this->_Message);
+    }
 }

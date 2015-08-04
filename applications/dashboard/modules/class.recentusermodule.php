@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -13,27 +15,29 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class RecentUserModule extends Gdn_Module {
    
-   public function __construct($Sender = '') {
-      parent::__construct($Sender);
-   }
+    public function __construct($Sender = '') {
+        parent::__construct($Sender);
+    }
    
-   public function GetData($Limit = 20) {
-      $UserModel = new UserModel();
-      $this->_Sender->RecentUserData = $UserModel->GetActiveUsers($Limit);
-   }
+    public function GetData($Limit = 20) {
+        $UserModel = new UserModel();
+        $this->_Sender->RecentUserData = $UserModel->GetActiveUsers($Limit);
+    }
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
 
-   public function ToString() {
-      if (!C('Garden.Modules.ShowRecentUserModule'))
-         return '';
+    public function ToString() {
+        if (!C('Garden.Modules.ShowRecentUserModule')) {
+            return '';
+        }
 
-      $Data = $this->_Sender->RecentUserData;
-      if ($Data !== FALSE && $Data->NumRows() > 0)
-         return parent::ToString();
+        $Data = $this->_Sender->RecentUserData;
+        if ($Data !== false && $Data->NumRows() > 0) {
+            return parent::ToString();
+        }
 
-      return '';
-   }
+        return '';
+    }
 }

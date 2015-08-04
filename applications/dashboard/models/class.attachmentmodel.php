@@ -59,42 +59,42 @@ class AttachmentModel extends Gdn_Model {
    /**
     * @var AttachmentModel
     */
-   static $Instance = NULL;
+    static $Instance = null;
 
    /// Methods ///
 
-   public function __construct() {
-      parent::__construct('Attachment');
-      $this->PrimaryKey = 'AttachmentID';
-   }
+    public function __construct() {
+        parent::__construct('Attachment');
+        $this->PrimaryKey = 'AttachmentID';
+    }
 
    /**
     * Calculate any necessary values on an attachment row after it comes from the database.
     * @param array $Row The attachment row.
     */
-   protected function CalculateRow(&$Row) {
-      if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {
-         if (is_array($Row['Attributes'])) {
-            $Attributes = $Row['Attributes'];
-         } else {
-            $Attributes = unserialize($Row['Attributes']);
-         }
-         if (is_array($Attributes)) {
-            $Row = array_replace($Row, $Attributes);
-         }
-      }
-      unset($Row['Attributes']);
+    protected function CalculateRow(&$Row) {
+        if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {
+            if (is_array($Row['Attributes'])) {
+                $Attributes = $Row['Attributes'];
+            } else {
+                $Attributes = unserialize($Row['Attributes']);
+            }
+            if (is_array($Attributes)) {
+                $Row = array_replace($Row, $Attributes);
+            }
+        }
+        unset($Row['Attributes']);
 
-      $InsertUser = Gdn::UserModel()->GetID($Row['InsertUserID']);
-      $Row['InsertUser'] = array(
+        $InsertUser = Gdn::UserModel()->GetID($Row['InsertUserID']);
+        $Row['InsertUser'] = array(
          'Name' => $InsertUser->Name,
          'ProfileLink' => UserAnchor($InsertUser)
-      );
-   }
+        );
+    }
 
-   public static function Enabled() {
-      return C('Garden.AttachmentsEnabled', FALSE);
-   }
+    public static function Enabled() {
+        return C('Garden.AttachmentsEnabled', false);
+    }
 
    /**
     * Gather all of the ids from a dataset to get it ready to join attachments in.
@@ -111,17 +111,17 @@ class AttachmentModel extends Gdn_Model {
     * @param array $Dataset
     * @param array $IDs
     */
-   public static function GatherIDs($Dataset, &$IDs = array()) {
-      if ((is_array($Dataset) && isset($Dataset[0])) || $Dataset instanceof Gdn_DataSet)  {
-         foreach ($Dataset as $Row) {
-            $id = self::RowID($Row);
+    public static function GatherIDs($Dataset, &$IDs = array()) {
+        if ((is_array($Dataset) && isset($Dataset[0])) || $Dataset instanceof Gdn_DataSet) {
+            foreach ($Dataset as $Row) {
+                $id = self::RowID($Row);
+                $IDs[$id] = $id;
+            }
+        } else {
+            $id = self::RowID($Dataset);
             $IDs[$id] = $id;
-         }
-      } else {
-         $id = self::RowID($Dataset);
-         $IDs[$id] = $id;
-      }
-   }
+        }
+    }
 
 
    /**
@@ -131,17 +131,17 @@ class AttachmentModel extends Gdn_Model {
     * @return string $ForeignId
     * @throws Gdn_UserException
     */
-   public static function RowID($Row) {
-      if ($id = val('CommentID', $Row)) {
-         return 'c-'.$id;
-      } elseif ($id = val('DiscussionID', $Row)) {
-         return 'd-'.$id;
-      } elseif ($id = val('UserID', $Row)) {
-         return 'u-'.$id;
-      }
-      throw new Gdn_UserException('Failed to get Type...');
+    public static function RowID($Row) {
+        if ($id = val('CommentID', $Row)) {
+            return 'c-'.$id;
+        } elseif ($id = val('DiscussionID', $Row)) {
+            return 'd-'.$id;
+        } elseif ($id = val('UserID', $Row)) {
+            return 'u-'.$id;
+        }
+        throw new Gdn_UserException('Failed to get Type...');
 
-   }
+    }
 
    /**
     * {@inheritDoc}
@@ -149,40 +149,40 @@ class AttachmentModel extends Gdn_Model {
     * @see Gdn_Model::GetID
     */
 
-   public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY, $Options = array()) {
-      $DatasetType = DATASET_TYPE_ARRAY;
+    public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY, $Options = array()) {
+        $DatasetType = DATASET_TYPE_ARRAY;
 
-      $Row = (array) parent::GetID($ID, $DatasetType, $Options);
-      $this->CalculateRow($Row);
-      return $Row;
-   }
+        $Row = (array) parent::GetID($ID, $DatasetType, $Options);
+        $this->CalculateRow($Row);
+        return $Row;
+    }
 
    /**
     * {@inheritDoc}
     * in addition; We CalculateRow for each record found (Add Attachments)
     * @see Gdn_Model::GetWhere
     */
-   public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+    public function GetWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
 
-      $Data = parent::GetWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
-      $Rows =& $Data->ResultArray();
-      foreach ($Rows as &$Row) {
-         $this->CalculateRow($Row);
-      }
+        $Data = parent::GetWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
+        $Rows =& $Data->ResultArray();
+        foreach ($Rows as &$Row) {
+            $this->CalculateRow($Row);
+        }
 
-      return $Data;
-   }
+        return $Data;
+    }
 
    /**
     * Return the singleton instance of this class.
     * @return AttachmentModel
     */
-   public static function Instance() {
-      if (!isset(self::$Instance)) {
-         self::$Instance = new AttachmentModel();
-      }
-      return self::$Instance;
-   }
+    public static function Instance() {
+        if (!isset(self::$Instance)) {
+            self::$Instance = new AttachmentModel();
+        }
+        return self::$Instance;
+    }
 
    /**
     * Joins attachments to data
@@ -197,25 +197,26 @@ class AttachmentModel extends Gdn_Model {
     * @param $Data2 - Optional set of Data to which to attach comments
     *
     */
-   public function JoinAttachments(&$Data, &$Data2 = NULL) {
-      if ($Data == NULL) {
-         return;
-      }
-      // Gather the Ids.
-      $ForeignIDs = array();
-      self::GatherIDs($Data, $ForeignIDs);
-      if ($Data2)
-         self::GatherIDs($Data2, $ForeignIDs);
-      // Get the attachments.
-      $Attachments = $this->GetWhere(array('ForeignID' => array_keys($ForeignIDs)), 'DateInserted', 'desc')->ResultArray();
-      $Attachments = Gdn_DataSet::Index($Attachments, 'ForeignID', array('Unique' => FALSE));
+    public function JoinAttachments(&$Data, &$Data2 = null) {
+        if ($Data == null) {
+            return;
+        }
+       // Gather the Ids.
+        $ForeignIDs = array();
+        self::GatherIDs($Data, $ForeignIDs);
+        if ($Data2) {
+            self::GatherIDs($Data2, $ForeignIDs);
+        }
+       // Get the attachments.
+        $Attachments = $this->GetWhere(array('ForeignID' => array_keys($ForeignIDs)), 'DateInserted', 'desc')->ResultArray();
+        $Attachments = Gdn_DataSet::Index($Attachments, 'ForeignID', array('Unique' => false));
 
-      // Join the attachments.
-      $this->JoinAttachmentsTo($Data, $Attachments);
-      if ($Data2) {
-         $this->JoinAttachmentsTo($Data2, $Attachments);
-      }
-   }
+       // Join the attachments.
+        $this->JoinAttachmentsTo($Data, $Attachments);
+        if ($Data2) {
+            $this->JoinAttachmentsTo($Data2, $Attachments);
+        }
+    }
 
    /**
     * @param ProfileController $Sender
@@ -224,36 +225,36 @@ class AttachmentModel extends Gdn_Model {
     * @param int $Limit
     * @return bool
     */
-   public function JoinAttachmentsToUser($Sender, $Args, $Where = array(), $Limit = 20) {
-      $User = $Sender->User;
-      if (!is_object($User)) {
-         return FALSE;
-      }
-      $Where = array_merge(array('ForeignUserID' => $User->UserID), $Where);
+    public function JoinAttachmentsToUser($Sender, $Args, $Where = array(), $Limit = 20) {
+        $User = $Sender->User;
+        if (!is_object($User)) {
+            return false;
+        }
+        $Where = array_merge(array('ForeignUserID' => $User->UserID), $Where);
 
-      $Attachments = $this->GetWhere($Where, '', 'desc', $Limit)->ResultArray();
-      $Sender->SetData('Attachments',  $Attachments);
-      return TRUE;
-   }
+        $Attachments = $this->GetWhere($Where, '', 'desc', $Limit)->ResultArray();
+        $Sender->SetData('Attachments', $Attachments);
+        return true;
+    }
 
-   protected function JoinAttachmentsTo(&$Data, $Attachments) {
-      if (is_a($Data, 'Gdn_DataSet') || (is_array($Data) && isset($Data[0]))) {
-         // This is a dataset.
-         foreach ($Data as &$Row) {
-            // This is a single record.
-            $RowID = self::RowID($Row);
-            if (isset($Attachments[$RowID])) {
-               SetValue('Attachments', $Row, $Attachments[$RowID]);
+    protected function JoinAttachmentsTo(&$Data, $Attachments) {
+        if (is_a($Data, 'Gdn_DataSet') || (is_array($Data) && isset($Data[0]))) {
+           // This is a dataset.
+            foreach ($Data as &$Row) {
+               // This is a single record.
+                $RowID = self::RowID($Row);
+                if (isset($Attachments[$RowID])) {
+                    SetValue('Attachments', $Row, $Attachments[$RowID]);
+                }
             }
-         }
-      } else {
-         // This is a single record.
-         $RowID = self::RowID($Data);
-         if (isset($Attachments[$RowID])) {
-            SetValue('Attachments', $Data, $Attachments[$RowID]);
-         }
-      }
-   }
+        } else {
+           // This is a single record.
+            $RowID = self::RowID($Data);
+            if (isset($Attachments[$RowID])) {
+                SetValue('Attachments', $Data, $Attachments[$RowID]);
+            }
+        }
+    }
 
    /**
     * {@inheritDoc}
@@ -261,70 +262,72 @@ class AttachmentModel extends Gdn_Model {
     * @param bool $Settings
     * @return bool|mixed Primary Key Value
     */
-   public function Save($Data, $Settings = FALSE) {
-      $this->DefineSchema();
-      $SchemaFields = $this->Schema->Fields();
+    public function Save($Data, $Settings = false) {
+        $this->DefineSchema();
+        $SchemaFields = $this->Schema->Fields();
 
-      $SaveData = array();
-      $Attributes = array();
+        $SaveData = array();
+        $Attributes = array();
 
-      // Grab the current attachment.
-      if (isset($Data['AttachmentID'])) {
-         $PrimaryKeyVal = $Data['AttachmentID'];
-         $CurrentAttachment = $this->SQL->GetWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
-         if ($CurrentAttachment) {
+       // Grab the current attachment.
+        if (isset($Data['AttachmentID'])) {
+            $PrimaryKeyVal = $Data['AttachmentID'];
+            $CurrentAttachment = $this->SQL->GetWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
+            if ($CurrentAttachment) {
+                $Attributes = @unserialize($CurrentAttachment['Attributes']);
+                if (!$Attributes) {
+                    $Attributes = array();
+                }
 
-            $Attributes = @unserialize($CurrentAttachment['Attributes']);
-            if (!$Attributes)
-               $Attributes = array();
+                $Insert = false;
+            } else {
+                $Insert = true;
+            }
+        } else {
+            $PrimaryKeyVal = false;
+            $Insert = true;
+        }
 
-            $Insert = FALSE;
-         } else
-            $Insert = TRUE;
-      } else {
-         $PrimaryKeyVal = FALSE;
-         $Insert = TRUE;
-      }
+       // Grab any values that aren't in the db schema and stick them in attributes.
+        foreach ($Data as $Name => $Value) {
+            if ($Name == 'Attributes') {
+                continue;
+            }
+            if (isset($SchemaFields[$Name])) {
+                $SaveData[$Name] = $Value;
+            } elseif ($Value === null) {
+                unset($Attributes[$Name]);
+            } else {
+                $Attributes[$Name] = $Value;
+            }
+        }
+        if (sizeof($Attributes)) {
+            $SaveData['Attributes'] = $Attributes;
+        } else {
+            $SaveData['Attributes'] = null;
+        }
 
-      // Grab any values that aren't in the db schema and stick them in attributes.
-      foreach ($Data as $Name => $Value) {
-         if ($Name == 'Attributes')
-            continue;
-         if (isset($SchemaFields[$Name])) {
-            $SaveData[$Name] = $Value;
-         } elseif ($Value === NULL) {
-            unset($Attributes[$Name]);
-         } else {
-            $Attributes[$Name] = $Value;
-         }
-      }
-      if (sizeof($Attributes)) {
-         $SaveData['Attributes'] = $Attributes;
-      } else {
-         $SaveData['Attributes'] = NULL;
-      }
+        if ($Insert) {
+            $this->AddInsertFields($SaveData);
+        } else {
+            $this->AddUpdateFields($SaveData);
+        }
 
-      if ($Insert) {
-         $this->AddInsertFields($SaveData);
-      } else {
-         $this->AddUpdateFields($SaveData);
-      }
+       // Validate the form posted values.
+        if ($this->Validate($SaveData, $Insert) === true) {
+            $Fields = $this->Validation->ValidationFields();
 
-      // Validate the form posted values.
-      if ($this->Validate($SaveData, $Insert) === TRUE) {
-         $Fields = $this->Validation->ValidationFields();
-
-         if ($Insert === FALSE) {
-            $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
-            $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
-         } else {
-            $PrimaryKeyVal = $this->Insert($Fields);
-         }
-      } else {
-         $PrimaryKeyVal = FALSE;
-      }
-      return $PrimaryKeyVal;
-   }
+            if ($Insert === false) {
+                $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
+                $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+            } else {
+                $PrimaryKeyVal = $this->Insert($Fields);
+            }
+        } else {
+            $PrimaryKeyVal = false;
+        }
+        return $PrimaryKeyVal;
+    }
 
    /**
     * Given an attachment type, returns the view function to display attachment.
@@ -332,11 +335,10 @@ class AttachmentModel extends Gdn_Model {
     * @param string $Type Attachment type.
     * @return string Function name.
     */
-   public static function GetWriteAttachmentMethodName($Type) {
-      $method = str_replace('-', ' ', $Type);
-      $method = ucwords($method);
-      $method = str_replace(' ', '', $method);
-      return 'Write' . $method . 'Attachment';
-   }
-
+    public static function GetWriteAttachmentMethodName($Type) {
+        $method = str_replace('-', ' ', $Type);
+        $method = ucwords($method);
+        $method = str_replace(' ', '', $method);
+        return 'Write' . $method . 'Attachment';
+    }
 }

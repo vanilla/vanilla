@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -13,26 +15,27 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class GuestModule extends Gdn_Module {
    
-   public $MessageCode = 'GuestModule.Message';
-   public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
+    public $MessageCode = 'GuestModule.Message';
+    public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
    
-   public function __construct($Sender = '', $ApplicationFolder = FALSE) {
-      if (!$ApplicationFolder)
-         $ApplicationFolder = 'Dashboard';
-      parent::__construct($Sender, $ApplicationFolder);
+    public function __construct($Sender = '', $ApplicationFolder = false) {
+        if (!$ApplicationFolder) {
+            $ApplicationFolder = 'Dashboard';
+        }
+        parent::__construct($Sender, $ApplicationFolder);
       
-      $this->Visible = C('Garden.Modules.ShowGuestModule');
-   }
+        $this->Visible = C('Garden.Modules.ShowGuestModule');
+    }
    
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
    
-   public function ToString() {
-      if (!Gdn::Session()->IsValid())
-         return parent::ToString();
+    public function ToString() {
+        if (!Gdn::Session()->IsValid()) {
+            return parent::ToString();
+        }
 
-      return '';
-   }   
-
+        return '';
+    }
 }

@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * The Plugin controller offers plugins a place to have their own pages. Create
@@ -10,7 +12,7 @@
  *  public function PluginController_MyNewMethod_Create($Sender) {
  *     $Sender->Render('/path/to/some/view.php');
  *  }
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden

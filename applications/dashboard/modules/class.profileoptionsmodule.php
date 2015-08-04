@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -13,44 +15,45 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class ProfileOptionsModule extends Gdn_Module {
 
-   public function AssetTarget() {
-      return 'Content';
-   }
+    public function AssetTarget() {
+        return 'Content';
+    }
 
-   public function ToString() {
-      $Session = Gdn::Session();
-      $Controller = Gdn::Controller();
-      $UserID = $Controller->User->UserID;
-      $MemberOptions = array();
-      $ProfileOptions = array();
-      $Controller->EventArguments['UserID'] = $UserID;
-      $Controller->EventArguments['ProfileOptions'] = &$ProfileOptions;
-      $Controller->EventArguments['MemberOptions'] = &$MemberOptions;
-      if ($Controller->EditMode) {
-         return '<div class="ProfileOptions">'.Anchor(T('Back to Profile'), UserUrl($Controller->User), array('class' => 'ProfileButtons')).'</div>';
-//         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
-      } else {
-         // Profile Editing
-         if (hasEditProfile($Controller->User->UserID)) {
-            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
-         } elseif ($Session->IsValid() && $UserID == $Session->UserID) {
-            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Preferences'), 'Url' => UserUrl($Controller->User, '', 'preferences'));
-         }
-
-         // Ban/Unban
-         $MayBan = CheckPermission('Garden.Moderation.Manage') || CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Users.Ban');
-         if ($MayBan && $UserID != $Session->UserID) {
-            if ($Controller->User->Banned) {
-               $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
-            } elseif (!$Controller->User->Admin) {
-               $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
+    public function ToString() {
+        $Session = Gdn::Session();
+        $Controller = Gdn::Controller();
+        $UserID = $Controller->User->UserID;
+        $MemberOptions = array();
+        $ProfileOptions = array();
+        $Controller->EventArguments['UserID'] = $UserID;
+        $Controller->EventArguments['ProfileOptions'] = &$ProfileOptions;
+        $Controller->EventArguments['MemberOptions'] = &$MemberOptions;
+        if ($Controller->EditMode) {
+            return '<div class="ProfileOptions">'.Anchor(T('Back to Profile'), UserUrl($Controller->User), array('class' => 'ProfileButtons')).'</div>';
+  //         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
+        } else {
+           // Profile Editing
+            if (hasEditProfile($Controller->User->UserID)) {
+                $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
+            } elseif ($Session->IsValid() && $UserID == $Session->UserID) {
+                $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Preferences'), 'Url' => UserUrl($Controller->User, '', 'preferences'));
             }
-         }
 
-         // Delete content.
-         if (CheckPermission('Garden.Moderation.Manage'))
-            $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
-      }
-      return parent::ToString();
-   }
+           // Ban/Unban
+            $MayBan = CheckPermission('Garden.Moderation.Manage') || CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Users.Ban');
+            if ($MayBan && $UserID != $Session->UserID) {
+                if ($Controller->User->Banned) {
+                    $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
+                } elseif (!$Controller->User->Admin) {
+                    $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
+                }
+            }
+
+           // Delete content.
+            if (CheckPermission('Garden.Moderation.Manage')) {
+                $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            }
+        }
+        return parent::ToString();
+    }
 }

@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * This is a placeholder controller that allows plugins to have methods off of the root of the site.
@@ -14,9 +16,10 @@
  */
 
 class RootController extends Gdn_Controller {
-   public function FetchViewLocation($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $ThrowError = TRUE) {
-      if (!$ControllerName)
-         $ControllerName = '';
-      return parent::FetchViewLocation($View, $ControllerName, $ApplicationFolder, $ThrowError);
-   }
+    public function FetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true) {
+        if (!$ControllerName) {
+            $ControllerName = '';
+        }
+        return parent::FetchViewLocation($View, $ControllerName, $ApplicationFolder, $ThrowError);
+    }
 }

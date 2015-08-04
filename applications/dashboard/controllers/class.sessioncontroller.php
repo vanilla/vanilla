@@ -1,8 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
  
 /**
  * Convenience access to current user's session.
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -15,15 +17,16 @@ class SessionController extends DashboardController {
     *
     * Looks for Name and Value POST/GET variables to pass along to Gdn_Session.
     */
-   public function Stash() {
-      $this->DeliveryType(DELIVERY_TYPE_BOOL);
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $Name = TrueStripSlashes(GetValue('Name', $_POST, ''));
-      $Value = TrueStripSlashes(GetValue('Value', $_POST, ''));
-      $Response = Gdn::Session()->Stash($Name, $Value);
-      if ($Name != '' && $Value == '')
-         $this->SetJson('Unstash', $Response);
+    public function Stash() {
+        $this->DeliveryType(DELIVERY_TYPE_BOOL);
+        $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+        $Name = TrueStripSlashes(GetValue('Name', $_POST, ''));
+        $Value = TrueStripSlashes(GetValue('Value', $_POST, ''));
+        $Response = Gdn::Session()->Stash($Name, $Value);
+        if ($Name != '' && $Value == '') {
+            $this->SetJson('Unstash', $Response);
+        }
 
-      $this->Render();
-   }
+        $this->Render();
+    }
 }

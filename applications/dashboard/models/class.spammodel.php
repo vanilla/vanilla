@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
@@ -6,19 +8,20 @@
 
 class SpamModel extends Gdn_Pluggable {
    /// PROPERTIES ///
-   protected static $_Instance;
+    protected static $_Instance;
    
-   public static $Disabled = FALSE;
+    public static $Disabled = false;
 
 
    /// METHODS ///
 
-   protected static function _Instance() {
-      if (!self::$_Instance)
-         self::$_Instance = new SpamModel();
+    protected static function _Instance() {
+        if (!self::$_Instance) {
+            self::$_Instance = new SpamModel();
+        }
 
-      return self::$_Instance;
-   }
+        return self::$_Instance;
+    }
 
    /**
     * Return whether or not the spam model is disabled.
@@ -26,12 +29,12 @@ class SpamModel extends Gdn_Pluggable {
     * @param bool|null $value
     * @return bool
     */
-   public static function Disabled($value = null) {
-      if ($value !== null) {
-         self::$Disabled = $value;
-      }
-      return self::$Disabled;
-   }
+    public static function Disabled($value = null) {
+        if ($value !== null) {
+            self::$Disabled = $value;
+        }
+        return self::$Disabled;
+    }
 
    /**
     * Check whether or not the record is spam.
@@ -43,63 +46,64 @@ class SpamModel extends Gdn_Pluggable {
     * @param array $Options Options for fine-tuning this method call.
     *  - Log: Log the record if it is found to be spam.
     */
-   public static function IsSpam($RecordType, $Data, $Options = array()) {
-      if (self::$Disabled)
-         return FALSE;
+    public static function IsSpam($RecordType, $Data, $Options = array()) {
+        if (self::$Disabled) {
+            return false;
+        }
       
-      // Set some information about the user in the data.
-      if ($RecordType == 'Registration') {
-         TouchValue('Username', $Data, $Data['Name']);
-      } else {
-         TouchValue('InsertUserID', $Data, Gdn::Session()->UserID);
+       // Set some information about the user in the data.
+        if ($RecordType == 'Registration') {
+            TouchValue('Username', $Data, $Data['Name']);
+        } else {
+            TouchValue('InsertUserID', $Data, Gdn::Session()->UserID);
          
-         $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Data), DATASET_TYPE_ARRAY);
+            $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Data), DATASET_TYPE_ARRAY);
          
-         if ($User) {
-            if (GetValue('Verified', $User)) {
-               // The user has been verified and isn't a spammer.
-               return FALSE;
+            if ($User) {
+                if (GetValue('Verified', $User)) {
+                   // The user has been verified and isn't a spammer.
+                    return false;
+                }
+                TouchValue('Username', $Data, $User['Name']);
+                TouchValue('Email', $Data, $User['Email']);
+                TouchValue('IPAddress', $Data, $User['LastIPAddress']);
             }
-            TouchValue('Username', $Data, $User['Name']);
-            TouchValue('Email', $Data, $User['Email']);
-            TouchValue('IPAddress', $Data, $User['LastIPAddress']);
-         }
-      }
+        }
       
-      if (!isset($Data['Body']) && isset($Data['Story'])) {
-         $Data['Body'] = $Data['Story'];
-      }
+        if (!isset($Data['Body']) && isset($Data['Story'])) {
+            $Data['Body'] = $Data['Story'];
+        }
       
-      TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
+        TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
 
-      $Sp = self::_Instance();
+        $Sp = self::_Instance();
       
-      $Sp->EventArguments['RecordType'] = $RecordType;
-      $Sp->EventArguments['Data'] =& $Data;
-      $Sp->EventArguments['Options'] =& $Options;
-      $Sp->EventArguments['IsSpam'] = FALSE;
+        $Sp->EventArguments['RecordType'] = $RecordType;
+        $Sp->EventArguments['Data'] =& $Data;
+        $Sp->EventArguments['Options'] =& $Options;
+        $Sp->EventArguments['IsSpam'] = false;
 
-      $Sp->FireEvent('CheckSpam');
-      $Spam = $Sp->EventArguments['IsSpam'];
+        $Sp->FireEvent('CheckSpam');
+        $Spam = $Sp->EventArguments['IsSpam'];
 
-      // Log the spam entry.
-      if ($Spam && GetValue('Log', $Options, TRUE)) {
-         $LogOptions = array();
-         switch ($RecordType) {
-            case 'Registration':
-               $LogOptions['GroupBy'] = array('RecordIPAddress');
-               break;
-            case 'Comment':
-            case 'Discussion':
-            case 'Activity':
-            case 'ActivityComment':
-               $LogOptions['GroupBy'] = array('RecordID');
-               break;
-         }
+       // Log the spam entry.
+        if ($Spam && GetValue('Log', $Options, true)) {
+            $LogOptions = array();
+            switch ($RecordType) {
+                case 'Registration':
+                    $LogOptions['GroupBy'] = array('RecordIPAddress');
+                    break;
+                case 'Comment':
+                case 'Discussion':
+                case 'Activity':
+                case 'ActivityComment':
+                    $LogOptions['GroupBy'] = array('RecordID');
+                    break;
+            }
 
-         LogModel::Insert('Spam', $RecordType, $Data, $LogOptions);
-      }
+            LogModel::Insert('Spam', $RecordType, $Data, $LogOptions);
+        }
 
-      return $Spam;
-   }
+        return $Spam;
+    }
 }

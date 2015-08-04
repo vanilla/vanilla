@@ -1,29 +1,39 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+<?php
+/**
+ * Search model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
 */
 
+/**
+ * Handles search data.
+ */
 class SearchModel extends Gdn_Model {
-    /// PROPERTIES ///
+
+    /** @var array Parameters. */
     protected $_Parameters = array();
     
+    /** @var array SQL. */
     protected $_SearchSql = array();
 
+    /** @var string Mode. */
     protected $_SearchMode = 'match';
 
+    /** @var bool Whether to force the mode. */
     public $ForceSearchMode = '';
 
+    /** @var string Search string. */
     protected $_SearchText = '';
     
-    /// METHODS ///
-    public function AddSearch($Sql) {
+    /**
+     *
+     *
+     * @param $Sql
+     */
+    public function addSearch($Sql) {
         $this->_SearchSql[] = $Sql;
     }
 
@@ -32,15 +42,15 @@ class SearchModel extends Gdn_Model {
     * @param Gdn_SQLDriver $Sql
     * @param string $Columns a comma seperated list of columns to search on.
     */
-    public function AddMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
+    public function addMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
         if ($this->_SearchMode == 'like') {
             if ($LikeRelavenceColumn) {
-                $Sql->Select($LikeRelavenceColumn, '', 'Relavence');
+                $Sql->select($LikeRelavenceColumn, '', 'Relavence');
             } else {
-                $Sql->Select(1, '', 'Relavence');
+                $Sql->select(1, '', 'Relavence');
             }
 
-            $Sql->BeginWhereGroup();
+            $Sql->beginWhereGroup();
 
             $ColumnsArray = explode(',', $Columns);
          
@@ -50,36 +60,53 @@ class SearchModel extends Gdn_Model {
 
                 $Param = $this->Parameter();
                 if ($First) {
-                    $Sql->Where("$Column like $Param", null, false, false);
+                    $Sql->where("$Column like $Param", null, false, false);
                     $First = false;
                 } else {
-                    $Sql->OrWhere("$Column like $Param", null, false, false);
+                    $Sql->orWhere("$Column like $Param", null, false, false);
                 }
             }
 
-            $Sql->EndWhereGroup();
+            $Sql->endWhereGroup();
         } else {
             $Boolean = $this->_SearchMode == 'boolean' ? ' in boolean mode' : '';
 
             $Param = $this->Parameter();
-            $Sql->Select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
+            $Sql->select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
             $Param = $this->Parameter();
-            $Sql->Where("match($Columns) against ($Param{$Boolean})", null, false, false);
+            $Sql->where("match($Columns) against ($Param{$Boolean})", null, false, false);
         }
     }
     
-    public function Parameter() {
+    /**
+     *
+     *
+     * @return string
+     */
+    public function parameter() {
         $Parameter = ':Search'.count($this->_Parameters);
         $this->_Parameters[$Parameter] = '';
         return $Parameter;
     }
     
-    public function Reset() {
+    /**
+     *
+     */
+    public function reset() {
         $this->_Parameters = array();
         $this->_SearchSql = '';
     }
     
-    public function Search($Search, $Offset = 0, $Limit = 20) {
+    /**
+     *
+     *
+     * @param $Search
+     * @param int $Offset
+     * @param int $Limit
+     * @return array|null
+     * @throws Exception
+     */
+    public function search($Search, $Offset = 0, $Limit = 20) {
         // If there are no searches then return an empty array.
         if (trim($Search) == '') {
             return array();
@@ -89,7 +116,7 @@ class SearchModel extends Gdn_Model {
         if ($this->ForceSearchMode) {
             $SearchMode = $this->ForceSearchMode;
         } else {
-            $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
+            $SearchMode = strtolower(c('Garden.Search.Mode', 'matchboolean'));
         }
       
         if ($SearchMode == 'matchboolean') {
@@ -102,7 +129,7 @@ class SearchModel extends Gdn_Model {
             $this->_SearchMode = $SearchMode;
         }
       
-        if ($ForceDatabaseEngine = C('Database.ForceStorageEngine')) {
+        if ($ForceDatabaseEngine = c('Database.ForceStorageEngine')) {
             if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0) {
                 $SearchMode = 'like';
             }
@@ -115,7 +142,7 @@ class SearchModel extends Gdn_Model {
         $this->_SearchMode = $SearchMode;
 
         $this->EventArguments['Search'] = $Search;
-        $this->FireEvent('Search');
+        $this->fireEvent('Search');
       
         if (count($this->_SearchSql) == 0) {
             return array();
@@ -123,15 +150,15 @@ class SearchModel extends Gdn_Model {
 
         // Perform the search by unioning all of the sql together.
         $Sql = $this->SQL
-            ->Select()
-            ->From('_TBL_ s')
-            ->OrderBy('s.DateInserted', 'desc')
-            ->Limit($Limit, $Offset)
+            ->select()
+            ->from('_TBL_ s')
+            ->orderBy('s.DateInserted', 'desc')
+            ->limit($Limit, $Offset)
             ->GetSelect();
         
         $Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
         
-        $this->FireEvent('AfterBuildSearchQuery');
+        $this->fireEvent('AfterBuildSearchQuery');
 
         if ($this->_SearchMode == 'like') {
             $Search = '%'.$Search.'%';
@@ -141,20 +168,20 @@ class SearchModel extends Gdn_Model {
             $this->_Parameters[$Key] = $Search;
         }
         
-        $Parameters= $this->_Parameters;
-        $this->Reset();
-        $this->SQL->Reset();
-        $Result = $this->Database->Query($Sql, $Parameters)->ResultArray();
+        $Parameters = $this->_Parameters;
+        $this->reset();
+        $this->SQL->reset();
+        $Result = $this->Database->query($Sql, $Parameters)->resultArray();
       
         foreach ($Result as $Key => $Value) {
             if (isset($Value['Summary'])) {
-                $Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], $Value['Format']));
+                $Value['Summary'] = Condense(Gdn_Format::to($Value['Summary'], $Value['Format']));
                 $Result[$Key] = $Value;
             }
          
             switch ($Value['RecordType']) {
                 case 'Discussion':
-                    $Discussion = ArrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
+                    $Discussion = arrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
                     $Result[$Key]['Url'] = DiscussionUrl($Discussion, 1);
                     break;
             }
@@ -163,8 +190,13 @@ class SearchModel extends Gdn_Model {
         return $Result;
     }
    
-   
-    public function SearchMode($Value = null) {
+    /**
+     *
+     *
+     * @param null $Value
+     * @return null|string
+     */
+    public function searchMode($Value = null) {
         if ($Value !== null) {
             $this->_SearchMode = $Value;
         }

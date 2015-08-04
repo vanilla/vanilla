@@ -1,13 +1,11 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+<?php
+/**
+ * Menu module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
 */
 
 if (!class_exists('MenuModule', false)) {
@@ -17,43 +15,46 @@ if (!class_exists('MenuModule', false)) {
     */
     class MenuModule extends Gdn_Module {
       
-       /**
-       * An array of menu items.
-       */
+        /**  @var array Menu items. */
         public $Items;
       
-       /**
-       * The html id attribute to be applied to the root element of the menu.
-       * Default is "Menu".
-       */
+        /** @var string The html id attribute to be applied to the root element of the menu.vDefault is "Menu". */
         public $HtmlId;
       
-       /**
-       * The class attribute to be applied to the root element of the
-       * breadcrumb. Default is none.
-       */
+        /** @var string The class attribute to be applied to the root element of the breadcrumb. Default is none. */
         public $CssClass;
       
-       /**
-       * An array of menu group names arranged in the order that the menu
-       * should be rendered.
-       */
+        /** @var array Menu group names arranged in the order that the menu should be rendered. */
         public $Sort;
       
        /**
-       * A route that, if found in the menu links, should cause that link to
-       * have the Highlight class applied. This property is assigned with
-       * $this->Highlight();
+         * @var string A route that, if found in the menu links, should cause that link to
+         * have the Highlight class applied. This property is assigned with $this->Highlight();
        */
         private $_HighlightRoute;
    
+        /**
+         *
+         *
+         * @param string $Sender
+         */
         public function __construct($Sender = '') {
             $this->HtmlId = 'Menu';
             $this->ClearGroups();
             parent::__construct($Sender);
         }
       
-        public function AddLink($Group, $Text, $Url, $Permission = false, $Attributes = '', $AnchorAttributes = '') {
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         * @param $Url
+         * @param bool $Permission
+         * @param string $Attributes
+         * @param string $AnchorAttributes
+         */
+        public function addLink($Group, $Text, $Url, $Permission = false, $Attributes = '', $AnchorAttributes = '') {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->Items[$Group] = array();
             }
@@ -61,7 +62,15 @@ if (!class_exists('MenuModule', false)) {
             $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes);
         }
       
-        public function AddItem($Group, $Text, $Permission = false, $Attributes = '') {
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         * @param bool $Permission
+         * @param string $Attributes
+         */
+        public function addItem($Group, $Text, $Permission = false, $Attributes = '') {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->Items[$Group] = array();
             }
@@ -69,19 +78,38 @@ if (!class_exists('MenuModule', false)) {
             $this->Items[$Group][] = array('Text' => $Text, 'Url' => false, 'Permission' => $Permission, 'Attributes' => $Attributes);
         }
       
-        public function AssetTarget() {
+        /**
+         *
+         *
+         * @return string
+         */
+        public function assetTarget() {
             return 'Menu';
         }
       
-        public function ClearGroups() {
+        /**
+         *
+         */
+        public function clearGroups() {
             $this->Items = array();
         }
       
-        public function HighlightRoute($Route) {
+        /**
+         *
+         *
+         * @param $Route
+         */
+        public function highlightRoute($Route) {
             $this->_HighlightRoute = $Route;
         }
       
-        public function RemoveLink($Group, $Text) {
+        /**
+         *
+         *
+         * @param $Group
+         * @param $Text
+         */
+        public function removeLink($Group, $Text) {
             if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
                 foreach ($this->Items[$Group] as $Index => $GroupArray) {
                     if ($this->Items[$Group][$Index]['Text'] == $Text) {
@@ -96,20 +124,27 @@ if (!class_exists('MenuModule', false)) {
        /**
        * Removes all links from a specific group.
        */
-        public function RemoveLinks($Group) {
+        public function removeLinks($Group) {
             $this->Items[$Group] = array();
         }
       
        /**
        * Removes an entire group of links, and the group itself, from the menu.
        */
-        public function RemoveGroup($Group) {
+        public function removeGroup($Group) {
             if (array_key_exists($Group, $this->Items)) {
                 unset($this->Items[$Group]);
             }
         }
       
-        public function ToString($HighlightRoute = '') {
+        /**
+         *
+         *
+         * @param string $HighlightRoute
+         * @return string
+         * @throws Exception
+         */
+        public function toString($HighlightRoute = '') {
             if ($HighlightRoute == '') {
                 $HighlightRoute = $this->_HighlightRoute;
             }
@@ -118,16 +153,16 @@ if (!class_exists('MenuModule', false)) {
                 $HighlightRoute = Gdn_Url::Request();
             }
             
-            $this->FireEvent('BeforeToString');
+            $this->fireEvent('BeforeToString');
          
             $Username = '';
             $UserID = '';
             $Session_TransientKey = '';
             $Permissions = array();
-            $Session = Gdn::Session();
+            $Session = Gdn::session();
             $HasPermissions = false;
             $Admin = false;
-            if ($Session->IsValid() === true) {
+            if ($Session->isValid() === true) {
                 $UserID = $Session->User->UserID;
                 $Username = $Session->User->Name;
                 $Session_TransientKey = $Session->TransientKey();
@@ -179,21 +214,21 @@ if (!class_exists('MenuModule', false)) {
                                 $Group .= "</li>\r\n";
                             }
                      
-                            $Url = ArrayValue('Url', $Link);
+                            $Url = arrayValue('Url', $Link);
                             if (substr($Link['Text'], 0, 1) === '\\') {
                                 $Text = substr($Link['Text'], 1);
                             } else {
                                 $Text = str_replace('{Username}', $Username, $Link['Text']);
                             }
-                            $Attributes = ArrayValue('Attributes', $Link, array());
-                            $AnchorAttributes = ArrayValue('AnchorAttributes', $Link, array());
+                            $Attributes = arrayValue('Attributes', $Link, array());
+                            $AnchorAttributes = arrayValue('AnchorAttributes', $Link, array());
                             if ($Url !== false) {
-                                $Url = Url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
-                                $CurrentLink = $Url == Url($HighlightRoute);
+                                $Url = url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
+                                $CurrentLink = $Url == url($HighlightRoute);
                         
-                                $CssClass = ArrayValue('class', $Attributes, '');
+                                $CssClass = arrayValue('class', $Attributes, '');
                                 if ($CurrentLink) {
-                                    $Attributes['class'] = $CssClass . ' Highlight';
+                                    $Attributes['class'] = $CssClass.' Highlight';
                                 }
                                 
                                 $Group .= '<li'.Attribute($Attributes).'><a'.Attribute($AnchorAttributes).' href="'.$Url.'">'.$Text.'</a>';
@@ -209,7 +244,7 @@ if (!class_exists('MenuModule', false)) {
                     }
 
                     if ($Group != '' && $LinkCount > 0) {
-                        $Menu .= $Group . "</li>\r\n";
+                        $Menu .= $Group."</li>\r\n";
                     }
                 }
                 if ($Menu != '') {

@@ -1,7 +1,16 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
+/**
+ * Site totals module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
+/**
+ * Site-wide stats.
+ */
 class SiteTotalsModule extends Gdn_Module {
    
     public function __construct() {
@@ -9,41 +18,41 @@ class SiteTotalsModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
    
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
    
     protected function _GetData() {
-        $Px = Gdn::Database()->DatabasePrefix;
+        $Px = Gdn::database()->DatabasePrefix;
         $Sql = "show table status where Name in ('{$Px}User', '{$Px}Discussion', '{$Px}Comment')";
       
         $Result = array('User' => 0, 'Discussion' => 0, 'Comment' => 0);
         foreach ($Result as $Name => $Value) {
-            $Result[$Name] = $this->GetCount($Name);
+            $Result[$Name] = $this->getCount($Name);
         }
-        $this->SetData('Totals', $Result);
+        $this->setData('Totals', $Result);
     }
    
-    protected function GetCount($Table) {
+    protected function getCount($Table) {
        // Try and get the count from the cache.
         $Key = "$Table.CountRows";
-        $Count = Gdn::Cache()->Get($Key);
+        $Count = Gdn::cache()->get($Key);
         if ($Count !== Gdn_Cache::CACHEOP_FAILURE) {
             return $Count;
         }
       
        // The count wasn't in the cache so grab it from the table.
-        $Count = Gdn::SQL()
-         ->Select($Table.'ID', 'count', 'CountRows')
-         ->From($Table)
-         ->Get()->Value('CountRows');
+        $Count = Gdn::sql()
+            ->select($Table.'ID', 'count', 'CountRows')
+            ->from($Table)
+            ->get()->value('CountRows');
       
        // Save the value to the cache.
-        Gdn::Cache()->Store($Key, $Count, array(Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)));
+        Gdn::cache()->store($Key, $Count, array(Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)));
         return $Count;
     }
    
-    public function ToString() {
+    public function toString() {
         $this->_GetData();
         return parent::ToString();
     }

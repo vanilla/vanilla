@@ -1,52 +1,53 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.1
  */
 
+/**
+ * Handles the admin utility /dba endpoint.
+ */
 class DbaController extends DashboardController {
-   /// Properties ///
 
-   /**
-    * @var Gdn_Form
-    */
+    /** @var Gdn_Form */
     public $Form = null;
 
-   /**
-    * @var DBAModel
-    */
+    /** @var DBAModel */
     public $Model = null;
 
-
-   /// Methods ///
-
-    public function __construct() {
-        parent::__construct();
-    }
-
-    public function Initialize() {
-        parent::Initialize();
-        Gdn_Theme::Section('Dashboard');
+   /**
+     * Runs before every call to this controller.
+    */
+    public function initialize() {
+        parent::initialize();
+        Gdn_Theme::section('Dashboard');
         $this->Model = new DBAModel();
         $this->Form = new Gdn_Form();
         $this->Form->InputPrefix = '';
 
-        $this->AddJsFile('dba.js');
+        $this->addJsFile('dba.js');
     }
 
-    public function Counts($Table = false, $Column = false, $From = false, $To = false, $Max = false) {
+    /**
+     * Recalculate counters.
+     *
+     * @param bool $Table
+     * @param bool $Column
+     * @param bool $From
+     * @param bool $To
+     * @param bool $Max
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function counts($Table = false, $Column = false, $From = false, $To = false, $Max = false) {
         set_time_limit(300);
-        $this->Permission('Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
 
-        if ($Table && $Column && strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
+        if ($Table && $Column && strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {
             if (!ValidateRequired($Table)) {
                 throw new Gdn_UserException("Table is required.");
             }
@@ -54,16 +55,16 @@ class DbaController extends DashboardController {
                 throw new Gdn_UserException("Column is required.");
             }
 
-            $Result = $this->Model->Counts($Table, $Column, $From, $To);
-            $this->SetData('Result', $Result);
+            $Result = $this->Model->counts($Table, $Column, $From, $To);
+            $this->setData('Result', $Result);
         } else {
-            $this->SetData('Jobs', array());
-            $this->FireEvent('CountJobs');
+            $this->setData('Jobs', array());
+            $this->fireEvent('CountJobs');
         }
 
-        $this->SetData('Title', T('Recalculate Counts'));
-        $this->AddSideMenu();
-        $this->Render('Job');
+        $this->setData('Title', t('Recalculate Counts'));
+        $this->addSideMenu();
+        $this->render('Job');
     }
 
    /**
@@ -72,68 +73,149 @@ class DbaController extends DashboardController {
     * Useful for after an import that didn't include permissions
     * but did include a whole lotta roles you don't want to edit manually.
     */
-    public function FixPermissions() {
-        $this->Permission('Garden.Settings.Manage');
+    public function fixPermissions() {
+        $this->permission('Garden.Settings.Manage');
 
-        if ($this->Request->IsAuthenticatedPostBack()) {
-            $Result = $this->Model->FixPermissions();
-            $this->SetData('Result', $Result);
+        if ($this->Request->isAuthenticatedPostBack()) {
+            $Result = $this->Model->fixPermissions();
+            $this->setData('Result', $Result);
         }
 
-        $this->SetData('Title', "Fix missing permission records after import");
-        $this->_SetJob($this->Data('Title'));
-        $this->AddSideMenu();
-        $this->Render('Job');
+        $this->setData('Title', "Fix missing permission records after import");
+        $this->_setJob($this->data('Title'));
+        $this->addSideMenu();
+        $this->render('Job');
     }
 
    /**
     * Fix the category tree after an import that only gives a sort & parent.
     */
-    public function RebuildCategoryTree() {
-        $this->Permission('Garden.Settings.Manage');
+    public function rebuildCategoryTree() {
+        $this->permission('Garden.Settings.Manage');
 
-        if ($this->Request->IsAuthenticatedPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack()) {
             $CategoryModel = new CategoryModel();
-            $CategoryModel->RebuildTree();
-            $this->SetData('Result', array('Complete' => true));
+            $CategoryModel->rebuildTree();
+            $this->setData('Result', array('Complete' => true));
         }
 
-        $this->SetData('Title', "Fix category tree from an import.");
-        $this->_SetJob($this->Data('Title'));
-        $this->AddSideMenu();
-        $this->Render('Job');
+        $this->setData('Title', "Fix category tree from an import.");
+        $this->_setJob($this->data('Title'));
+        $this->addSideMenu();
+        $this->render('Job');
     }
 
-    public function FixUrlCodes($Table, $Column) {
-        $this->Permission('Garden.Settings.Manage');
+    /**
+     *
+     *
+     * @param $Table
+     * @param $Column
+     */
+    public function fixUrlCodes($Table, $Column) {
+        $this->permission('Garden.Settings.Manage');
 
-        if ($this->Request->IsAuthenticatedPostBack()) {
-            $Result = $this->Model->FixUrlCodes($Table, $Column);
-            $this->SetData('Result', $Result);
+        if ($this->Request->isAuthenticatedPostBack()) {
+            $Result = $this->Model->fixUrlCodes($Table, $Column);
+            $this->setData('Result', $Result);
         }
 
-        $this->SetData('Title', "Fix url codes for $Table.$Column");
-        $this->_SetJob($this->Data('Title'));
-        $this->AddSideMenu();
-        $this->Render('Job');
+        $this->setData('Title', "Fix url codes for $Table.$Column");
+        $this->_setJob($this->data('Title'));
+        $this->addSideMenu();
+        $this->render('Job');
     }
 
-    public function HtmlEntityDecode($Table, $Column) {
-        $this->Permission('Garden.Settings.Manage');
+    /**
+     *
+     *
+     * @param $Table
+     * @param $Column
+     */
+    public function htmlEntityDecode($Table, $Column) {
+        $this->permission('Garden.Settings.Manage');
 
- //      die($this->Request->RequestMethod());
-        if (strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
-            $Result = $this->Model->HtmlEntityDecode($Table, $Column);
-            $this->SetData('Result', $Result);
+//      die($this->Request->requestMethod());
+        if (strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {
+            $Result = $this->Model->htmlEntityDecode($Table, $Column);
+            $this->setData('Result', $Result);
         }
 
-        $this->SetData('Title', "Decode Html Entities for $Table.$Column");
-        $this->_SetJob($this->Data('Title'));
-        $this->AddSideMenu();
-        $this->Render('Job');
+        $this->setData('Title', "Decode Html Entities for $Table.$Column");
+        $this->_setJob($this->data('Title'));
+        $this->addSideMenu();
+        $this->render('Job');
     }
 
-    protected function _SetJob($Name) {
+    /**
+     * Scan a table for invalid InsertUserID values and update with SystemUserID
+     *
+     * @param bool|string $Table The name of the table to fix InsertUserID in.
+     */
+    public function fixInsertUserID($Table = false) {
+        $this->permission('Garden.Settings.Manage');
+
+        if ($this->Request->isAuthenticatedPostBack() && $Table) {
+            $this->Model->fixInsertUserID($Table);
+
+            $this->setData(
+                'Result',
+                array('Complete' => true)
+            );
+        } else {
+            $Tables = array(
+                'Fix comments' => 'Comment',
+                'Fix discussions' => 'Discussion'
+            );
+            $Jobs = array();
+
+            foreach ($Tables as $CurrentLabel => $CurrentTable) {
+                $Jobs[$CurrentLabel] = "/dba/fixinsertuserid.json?".http_build_query(array('table' => $CurrentTable));
+            }
+            unset($CurrentLabel, $CurrentTable);
+
+            $this->setData('Jobs', $Jobs);
+        }
+
+        $this->setData('Title', t('Fix Invalid InsertUserID'));
+        $this->addSideMenu();
+        $this->render('Job');
+    }
+
+    /**
+     * Look for users with an invalid role and apply the role specified to those users.
+     */
+    public function fixUserRole() {
+        $this->permission('Garden.Settings.Manage');
+
+        if ($this->Request->isAuthenticatedPostBack()) {
+            if (ValidateRequired($this->Form->getFormValue('DefaultUserRole'))) {
+                $this->Model->fixUserRole($this->Form->getFormValue('DefaultUserRole'));
+                $this->setData('CompletedFix', true);
+            }
+        }
+
+        $this->addSideMenu();
+        $this->render();
+    }
+
+    /**
+     * Reset all role permissions based on role type.
+     */
+    public function resetPermissions() {
+        $this->permission('Garden.Settings.Manage');
+
+        if ($this->Request->isAuthenticatedPostBack()) {
+            PermissionModel::resetAllRoles();
+            $this->setData('Result', array('Complete' => true));
+        }
+
+        $this->setData('Title', 'Reset all role permissions');
+        $this->_setJob($this->data('Title'));
+        $this->addSideMenu();
+        $this->render('Job');
+    }
+
+    protected function _setJob($Name) {
         $Args = array_change_key_case($this->ReflectArgs);
         $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);
         $this->Data['Jobs'][$Name] = $Url;

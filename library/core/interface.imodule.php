@@ -1,51 +1,43 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
  * Module interface
  *
- * An interface for in-page modules.
- *
- * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
+/**
+ * An interface for in-page modules.
+ */
 interface Gdn_IModule {
-//   public function __construct($Sender);
 
    /**
     * Returns the name of the asset where this component should be rendered.
     */
-    public function AssetTarget();
-
+    public function assetTarget();
 
    /**
     * Returns the xhtml for this module as a fully parsed and rendered string.
     */
-    public function FetchView();
-
+    public function fetchView();
 
    /**
     * Returns the location of the view for this module in the filesystem.
     *
-    * @param unknown_type $View
-    * @param unknown_type $ApplicationFolder
-    * @todo update doc with arguments type
+     * @param string $View The name of the view to lookup.
+     * @param string $ApplicationFolder The name of the application folder that contains the view.
     */
-    public function FetchViewLocation($View = '', $ApplicationFolder = '');
-
+    public function fetchViewLocation($View = '', $ApplicationFolder = '');
 
    /**
     * Returns the name of the module.
     */
-    public function Name();
+    public function name();
 
    /**
     * Renders the module.
     */
-    public function Render();
+    public function render();
 }

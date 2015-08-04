@@ -1,46 +1,39 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Handles accessing & displaying a single discussion.
+ * Discussion controller
  *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.0
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
+ * @since 2.0
  */
 
-class DiscussionController extends VanillaController {
    /**
-    * Models to include.
-    *
-    * @since 2.0.0
-    * @access public
-    * @var array
+ * Handles accessing & displaying a single discussion via /discussion endpoint.
     */
+class DiscussionController extends VanillaController {
+
+    /** @var array Models to include. */
     public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
 
-   /**
-    * Unique identifier.
-    *
-    * @since 2.0.0
-    * @access public
-    * @var array
-    */
+    /** @var array Unique identifier. */
     public $CategoryID;
+    /** @var DiscussionModel */
 
-   /**
-    * @var DiscussionModel
-    */
     public $DiscussionModel;
 
-
+   /**
+     *
+     *
+     * @param $Name
+     * @return mixed
+     * @throws Exception
+    */
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':
-                Deprecated('DiscussionController->CommentData', "DiscussionController->Data('Comments')");
-                return $this->Data('Comments');
+                Deprecated('DiscussionController->CommentData', "DiscussionController->data('Comments')");
+                return $this->data('Comments');
             break;
         }
         throw new Exception("DiscussionController->$Name not found.", 400);
@@ -56,57 +49,57 @@ class DiscussionController extends VanillaController {
     * @param string $DiscussionStub URL-safe title slug
     * @param int $Page The current page of comments
     */
-    public function Index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
+    public function index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
        // Setup head
-        $Session = Gdn::Session();
-        $this->AddJsFile('jquery.autosize.min.js');
-        $this->AddJsFile('autosave.js');
-        $this->AddJsFile('discussion.js');
-        Gdn_Theme::Section('Discussion');
+        $Session = Gdn::session();
+        $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('autosave.js');
+        $this->addJsFile('discussion.js');
+        Gdn_Theme::section('Discussion');
 
        // Load the discussion record
         $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
         if (!array_key_exists('Discussion', $this->Data)) {
-            $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), true);
+            $this->setData('Discussion', $this->DiscussionModel->getID($DiscussionID), true);
         }
 
         if (!is_object($this->Discussion)) {
-            throw new Exception(sprintf(T('%s Not Found'), T('Discussion')), 404);
+            throw notFoundException('Discussion');
         }
 
        // Define the query offset & limit.
-        $Limit = C('Vanilla.Comments.PerPage', 30);
+        $Limit = c('Vanilla.Comments.PerPage', 30);
 
         $OffsetProvided = $Page != '';
-        list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+        list($Offset, $Limit) = offsetLimit($Page, $Limit);
 
        // Check permissions
-        $this->Permission('Vanilla.Discussions.View', true, 'Category', $this->Discussion->PermissionCategoryID);
-        $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
+        $this->permission('Vanilla.Discussions.View', true, 'Category', $this->Discussion->PermissionCategoryID);
+        $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
-        if (strcasecmp(GetValue('Type', $this->Discussion), 'redirect') === 0) {
-            $this->RedirectDiscussion($this->Discussion);
+        if (strcasecmp(val('Type', $this->Discussion), 'redirect') === 0) {
+            $this->redirectDiscussion($this->Discussion);
         }
 
-        $Category = CategoryModel::Categories($this->Discussion->CategoryID);
-        $this->SetData('Category', $Category);
+        $Category = CategoryModel::categories($this->Discussion->CategoryID);
+        $this->setData('Category', $Category);
 
-        if ($CategoryCssClass = GetValue('CssClass', $Category)) {
-            Gdn_Theme::Section($CategoryCssClass);
+        if ($CategoryCssClass = val('CssClass', $Category)) {
+            Gdn_Theme::section($CategoryCssClass);
         }
 
-        $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
+        $this->setData('Breadcrumbs', CategoryModel::getAncestors($this->CategoryID));
 
        // Setup
-        $this->Title($this->Discussion->Name);
+        $this->title($this->Discussion->Name);
 
        // Actual number of comments, excluding the discussion itself.
         $ActualResponses = $this->Discussion->CountComments;
 
         $this->Offset = $Offset;
-        if (C('Vanilla.Comments.AutoOffset')) {
+        if (c('Vanilla.Comments.AutoOffset')) {
   //         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
-  //            $this->AddDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
+//            $this->addDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
             if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
                // Round down to the appropriate offset based on the user's read comments & comments per page
                 $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
@@ -142,48 +135,48 @@ class DiscussionController extends VanillaController {
             $LatestItem += 1;
         }
 
-        $this->SetData('_LatestItem', $LatestItem);
+        $this->setData('_LatestItem', $LatestItem);
 
        // Set the canonical url to have the proper page title.
-        $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, 0, false)));
+        $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
 
- //      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
+//      url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::session()->UserID != 0)), true), Gdn::session()->UserID == 0);
 
        // Load the comments
-        $this->SetData('Comments', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset));
+        $this->setData('Comments', $this->CommentModel->get($DiscussionID, $Limit, $this->Offset));
 
         $PageNumber = PageNumber($this->Offset, $Limit);
-        $this->SetData('Page', $PageNumber);
+        $this->setData('Page', $PageNumber);
         $this->_SetOpenGraph();
 
 
         include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
         if ($PageNumber == 1) {
-            $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
+            $this->description(sliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160));
            // Add images to head for open graph
-            $Dom = str_get_html(Gdn_Format::To($this->Discussion->Body, $this->Discussion->Format));
+            $Dom = str_get_html(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
         } else {
-            $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
+            $this->Data['Title'] .= sprintf(t(' - Page %s'), PageNumber($this->Offset, $Limit));
 
-            $FirstComment = $this->Data('Comments')->FirstRow();
-            $FirstBody = GetValue('Body', $FirstComment);
-            $FirstFormat = GetValue('Format', $FirstComment);
-            $this->Description(SliceParagraph(Gdn_Format::PlainText($FirstBody, $FirstFormat), 160));
+            $FirstComment = $this->data('Comments')->firstRow();
+            $FirstBody = val('Body', $FirstComment);
+            $FirstFormat = val('Format', $FirstComment);
+            $this->description(sliceParagraph(Gdn_Format::plainText($FirstBody, $FirstFormat), 160));
            // Add images to head for open graph
-            $Dom = str_get_html(Gdn_Format::To($FirstBody, $FirstFormat));
+            $Dom = str_get_html(Gdn_Format::to($FirstBody, $FirstFormat));
         }
 
         if ($Dom) {
             foreach ($Dom->find('img') as $img) {
                 if (isset($img->src)) {
-                    $this->Image($img->src);
+                    $this->image($img->src);
                 }
             }
         }
 
        // Queue notification.
-        if ($this->Request->Get('new') && C('Vanilla.QueueNotifications')) {
-            $this->AddDefinition('NotifyNewDiscussion', 1);
+        if ($this->Request->get('new') && c('Vanilla.QueueNotifications')) {
+            $this->addDefinition('NotifyNewDiscussion', 1);
         }
 
        // Make sure to set the user's discussion watch records
@@ -192,81 +185,81 @@ class DiscussionController extends VanillaController {
        // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
         $this->EventArguments['PagerType'] = 'Pager';
-        $this->FireEvent('BeforeBuildPager');
-        $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->fireEvent('BeforeBuildPager');
+        $this->Pager = $PagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
 
-        $this->Pager->Configure(
+        $this->Pager->configure(
             $this->Offset,
             $Limit,
             $ActualResponses,
             array('DiscussionUrl')
         );
         $this->Pager->Record = $this->Discussion;
-        PagerModule::Current($this->Pager);
-        $this->FireEvent('AfterBuildPager');
+        PagerModule::current($this->Pager);
+        $this->fireEvent('AfterBuildPager');
 
        // Define the form for the comment input
         $this->Form = Gdn::Factory('Form', 'Comment');
-        $this->Form->Action = Url('/post/comment/');
+        $this->Form->Action = url('/post/comment/');
         $this->DiscussionID = $this->Discussion->DiscussionID;
-        $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
-        $this->Form->AddHidden('CommentID', '');
+        $this->Form->addHidden('DiscussionID', $this->DiscussionID);
+        $this->Form->addHidden('CommentID', '');
 
        // Look in the session stash for a comment
         $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', false);
         if ($StashComment) {
-            $this->Form->SetFormValue('Body', $StashComment);
+            $this->Form->setFormValue('Body', $StashComment);
         }
 
        // Retrieve & apply the draft if there is one:
-        if (Gdn::Session()->UserID) {
+        if (Gdn::session()->UserID) {
             $DraftModel = new DraftModel();
-            $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
-            $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
-            if ($Draft && !$this->Form->IsPostBack()) {
-                $this->Form->SetValue('Body', $Draft->Body);
-                $this->Form->SetValue('Format', $Draft->Format);
+            $Draft = $DraftModel->get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->firstRow();
+            $this->Form->addHidden('DraftID', $Draft ? $Draft->DraftID : '');
+            if ($Draft && !$this->Form->isPostBack()) {
+                $this->Form->setValue('Body', $Draft->Body);
+                $this->Form->setValue('Format', $Draft->Format);
             }
         }
 
        // Deliver JSON data if necessary
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-            $this->SetJson('LessRow', $this->Pager->ToString('less'));
-            $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+            $this->setJson('LessRow', $this->Pager->toString('less'));
+            $this->setJson('MoreRow', $this->Pager->toString('more'));
             $this->View = 'comments';
         }
 
         // Inform moderator of checked comments in this discussion
-        $CheckedComments = $Session->GetAttribute('CheckedComments', array());
+        $CheckedComments = $Session->getAttribute('CheckedComments', array());
         if (count($CheckedComments) > 0) {
-            ModerationController::InformCheckedComments($this);
+            ModerationController::informCheckedComments($this);
         }
 
        // Add modules
-        $this->AddModule('DiscussionFilterModule');
-        $this->AddModule('NewDiscussionModule');
-        $this->AddModule('CategoriesModule');
-        $this->AddModule('BookmarkedModule');
+        $this->addModule('DiscussionFilterModule');
+        $this->addModule('NewDiscussionModule');
+        $this->addModule('CategoriesModule');
+        $this->addModule('BookmarkedModule');
 
-        $this->CanEditComments = Gdn::Session()->CheckPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
+        $this->CanEditComments = Gdn::session()->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
 
        // Report the discussion id so js can use it.
-        $this->AddDefinition('DiscussionID', $DiscussionID);
+        $this->addDefinition('DiscussionID', $DiscussionID);
 
-        $this->FireEvent('BeforeDiscussionRender');
+        $this->fireEvent('BeforeDiscussionRender');
 
-        $AttachmentModel = AttachmentModel::Instance();
-        if (AttachmentModel::Enabled()) {
-            $AttachmentModel->JoinAttachments($this->Data['Discussion'], $this->Data['Comments']);
+        $AttachmentModel = AttachmentModel::instance();
+        if (AttachmentModel::enabled()) {
+            $AttachmentModel->joinAttachments($this->Data['Discussion'], $this->Data['Comments']);
 
-            $this->FireEvent('FetchAttachmentViews');
-            if ($this->DeliveryMethod() === DELIVERY_METHOD_XHTML) {
-                require_once $this->FetchViewLocation('attachment', 'attachments', 'dashboard');
+            $this->fireEvent('FetchAttachmentViews');
+            if ($this->deliveryMethod() === DELIVERY_METHOD_XHTML) {
+                require_once $this->fetchViewLocation('attachment', 'attachments', 'dashboard');
             }
         }
 
-        $this->Render();
+        $this->render();
     }
 
    /**
@@ -278,34 +271,34 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID
     * @param int $LastCommentID Only shows comments posted after this one
     */
-    public function GetNew($DiscussionID, $LastCommentID = 0) {
-        $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), true);
+    public function getNew($DiscussionID, $LastCommentID = 0) {
+        $this->setData('Discussion', $this->DiscussionModel->getID($DiscussionID), true);
 
        // Check permissions.
-        $this->Permission('Vanilla.Discussions.View', true, 'Category', $this->Discussion->PermissionCategoryID);
-        $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
+        $this->permission('Vanilla.Discussions.View', true, 'Category', $this->Discussion->PermissionCategoryID);
+        $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
        // Get the comments.
-        $Comments = $this->CommentModel->GetNew($DiscussionID, $LastCommentID)->Result();
-        $this->SetData('Comments', $Comments, true);
+        $Comments = $this->CommentModel->getNew($DiscussionID, $LastCommentID)->result();
+        $this->setData('Comments', $Comments, true);
 
        // Set the data.
         if (count($Comments) > 0) {
             $LastComment = $Comments[count($Comments) - 1];
            // Mark the comment read.
-            $this->SetData('Offset', $this->Discussion->CountComments, true);
-            $this->CommentModel->SetWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
+            $this->setData('Offset', $this->Discussion->CountComments, true);
+            $this->CommentModel->setWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
 
-            $LastCommentID = $this->Json('LastCommentID');
+            $LastCommentID = $this->json('LastCommentID');
             if (is_null($LastCommentID) || $LastComment->CommentID > $LastCommentID) {
-                $this->Json('LastCommentID', $LastComment->CommentID);
+                $this->json('LastCommentID', $LastComment->CommentID);
             }
         } else {
-            $this->SetData('Offset', $this->CommentModel->GetOffset($LastCommentID), true);
+            $this->setData('Offset', $this->CommentModel->getOffset($LastCommentID), true);
         }
 
         $this->View = 'comments';
-        $this->Render();
+        $this->render();
     }
 
    /**
@@ -316,12 +309,11 @@ class DiscussionController extends VanillaController {
     * @since 2.0.0
     * @access public
     */
-    public function Initialize() {
-        parent::Initialize();
-        $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
-        $this->AddDefinition('ConfirmDeleteCommentHeading', T('ConfirmDeleteCommentHeading', 'Delete Comment'));
-        $this->AddDefinition('ConfirmDeleteCommentText', T('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'));
-        $this->Menu->HighlightRoute('/discussions');
+    public function initialize() {
+        parent::initialize();
+        $this->addDefinition('ConfirmDeleteCommentHeading', t('ConfirmDeleteCommentHeading', 'Delete Comment'));
+        $this->addDefinition('ConfirmDeleteCommentText', t('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'));
+        $this->Menu->highlightRoute('/discussions');
     }
 
    /**
@@ -332,24 +324,24 @@ class DiscussionController extends VanillaController {
     *
     * @param int $CommentID Unique comment ID
     */
-    public function Comment($CommentID) {
+    public function comment($CommentID) {
        // Get the discussionID
-        $Comment = $this->CommentModel->GetID($CommentID);
+        $Comment = $this->CommentModel->getID($CommentID);
         if (!$Comment) {
-            throw NotFoundException('Comment');
+            throw notFoundException('Comment');
         }
 
         $DiscussionID = $Comment->DiscussionID;
 
        // Figure out how many comments are before this one
-        $Offset = $this->CommentModel->GetOffset($Comment);
-        $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
+        $Offset = $this->CommentModel->getOffset($Comment);
+        $Limit = Gdn::config('Vanilla.Comments.PerPage', 30);
 
-        $PageNumber = PageNumber($Offset, $Limit, true);
-        $this->SetData('Page', $PageNumber);
+        $PageNumber = pageNumber($Offset, $Limit, true);
+        $this->setData('Page', $PageNumber);
 
         $this->View = 'index';
-        $this->Index($DiscussionID, 'x', $PageNumber);
+        $this->index($DiscussionID, 'x', $PageNumber);
     }
 
    /**
@@ -364,23 +356,23 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param string $TransientKey Single-use hash to prove intent.
     */
-    public function DismissAnnouncement($DiscussionID = '') {
+    public function dismissAnnouncement($DiscussionID = '') {
        // Confirm announcements may be dismissed
-        if (!C('Vanilla.Discussions.Dismiss', 1)) {
-            throw PermissionException('Vanilla.Discussions.Dismiss');
+        if (!c('Vanilla.Discussions.Dismiss', 1)) {
+            throw permissionException('Vanilla.Discussions.Dismiss');
         }
 
        // Make sure we are posting back.
-        if (!$this->Request->IsPostBack()) {
-            throw PermissionException('Javascript');
+        if (!$this->Request->isPostBack()) {
+            throw permissionException('Javascript');
         }
 
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
         if (is_numeric($DiscussionID)
          && $DiscussionID > 0
          && $Session->UserID > 0
         ) {
-            $this->DiscussionModel->DismissAnnouncement($DiscussionID, $Session->UserID);
+            $this->DiscussionModel->dismissAnnouncement($DiscussionID, $Session->UserID);
         }
 
        // Redirect back where the user came from if necessary
@@ -388,9 +380,9 @@ class DiscussionController extends VanillaController {
             SafeRedirect('discussions');
         }
 
-        $this->JsonTarget("#Discussion_$DiscussionID", null, 'SlideUp');
+        $this->jsonTarget("#Discussion_$DiscussionID", null, 'SlideUp');
 
-        $this->Render('Blank', 'Utility', 'Dashboard');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
    /**
@@ -404,59 +396,59 @@ class DiscussionController extends VanillaController {
     *
     * @param int $DiscussionID Unique discussion ID.
     */
-    public function Bookmark($DiscussionID = null) {
+    public function bookmark($DiscussionID = null) {
        // Make sure we are posting back.
-        if (!$this->Request->IsAuthenticatedPostBack()) {
-            throw PermissionException('Javascript');
+        if (!$this->Request->isAuthenticatedPostBack()) {
+            throw permissionException('Javascript');
         }
 
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
 
         if (!$Session->UserID) {
-            throw PermissionException('SignedIn');
+            throw permissionException('SignedIn');
         }
 
        // Check the form to see if the data was posted.
         $Form = new Gdn_Form();
-        $DiscussionID = $Form->GetFormValue('DiscussionID', $DiscussionID);
-        $Bookmark = $Form->GetFormValue('Bookmark', null);
-        $UserID = $Form->GetFormValue('UserID', $Session->UserID);
+        $DiscussionID = $Form->getFormValue('DiscussionID', $DiscussionID);
+        $Bookmark = $Form->getFormValue('Bookmark', null);
+        $UserID = $Form->getFormValue('UserID', $Session->UserID);
 
        // Check the permission on the user.
         if ($UserID != $Session->UserID) {
-            $this->Permission('Garden.Moderation.Manage');
+            $this->permission('Garden.Moderation.Manage');
         }
 
-        $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+        $Discussion = $this->DiscussionModel->getID($DiscussionID);
         if (!$Discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
-        $Bookmark = $this->DiscussionModel->Bookmark($DiscussionID, $UserID, $Bookmark);
+        $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 
        // Set the new value for api calls and json targets.
-        $this->SetData(array(
+        $this->setData(array(
          'UserID' => $UserID,
          'DiscussionID' => $DiscussionID,
          'Bookmarked' => (bool)$Bookmark
          ));
-        SetValue('Bookmarked', $Discussion, (int)$Bookmark);
+        setValue('Bookmarked', $Discussion, (int)$Bookmark);
 
        // Update the user's bookmark count
-        $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($UserID);
-        $this->JsonTarget('.User-CountBookmarks', (string)$CountBookmarks);
+        $CountBookmarks = $this->DiscussionModel->setUserBookmarkCount($UserID);
+        $this->jsonTarget('.User-CountBookmarks', (string)$CountBookmarks);
 
        //  Short circuit if this is an api call.
-        if ($this->DeliveryType() === DELIVERY_TYPE_DATA) {
-            $this->Render('Blank', 'Utility', 'Dashboard');
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            $this->render('Blank', 'Utility', 'Dashboard');
             return;
         }
 
        // Return the appropriate bookmark.
-        require_once $this->FetchViewLocation('helper_functions', 'Discussions');
-        $Html = BookmarkButton($Discussion);
- //      $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Bookmark,.Section-Discussion .PageTitle .Bookmark", $Html, 'ReplaceWith');
-        $this->JsonTarget("!element", $Html, 'ReplaceWith');
+        require_once $this->fetchViewLocation('helper_functions', 'Discussions');
+        $Html = bookmarkButton($Discussion);
+//      $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Bookmark,.Section-Discussion .PageTitle .Bookmark", $Html, 'ReplaceWith');
+        $this->jsonTarget("!element", $Html, 'ReplaceWith');
 
        // Add the bookmark to the bookmarks module.
         if ($Bookmark) {
@@ -466,29 +458,29 @@ class DiscussionController extends VanillaController {
                // When there is only one bookmark we have to get the whole module.
                 $Target = '#Panel';
                 $Type = 'Append';
-                $Bookmarks->GetData();
-                $Data = $Bookmarks->ToString();
+                $Bookmarks->getData();
+                $Data = $Bookmarks->toString();
             } else {
                 $Target = '#Bookmark_List';
                 $Type = 'Prepend';
-                $Loc = $Bookmarks->FetchViewLocation('discussion');
+                $Loc = $Bookmarks->fetchViewLocation('discussion');
 
                 ob_start();
                 include($Loc);
                 $Data = ob_get_clean();
             }
 
-            $this->JsonTarget($Target, $Data, $Type);
+            $this->jsonTarget($Target, $Data, $Type);
         } else {
            // Send command to remove bookmark html.
             if ($CountBookmarks == 0) {
-                $this->JsonTarget('#Bookmarks', null, 'Remove');
+                $this->jsonTarget('#Bookmarks', null, 'Remove');
             } else {
-                $this->JsonTarget('#Bookmark_'.$DiscussionID, null, 'Remove');
+                $this->jsonTarget('#Bookmark_'.$DiscussionID, null, 'Remove');
             }
         }
 
-        $this->Render('Blank', 'Utility', 'Dashboard');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
    /**
@@ -505,49 +497,55 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param string $TransientKey Single-use hash to prove intent.
     */
-    public function Announce($DiscussionID = '', $Target = '') {
-        $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+    public function announce($DiscussionID = '', $Target = '') {
+        $Discussion = $this->DiscussionModel->getID($DiscussionID);
         if (!$Discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
-        $this->Permission('Vanilla.Discussions.Announce', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->permission('Vanilla.Discussions.Announce', true, 'Category', $Discussion->PermissionCategoryID);
 
-        if ($this->Form->AuthenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack()) {
            // Save the property.
             $CacheKeys = array(
-            $this->DiscussionModel->GetAnnouncementCacheKey(),
-            $this->DiscussionModel->GetAnnouncementCacheKey(val('CategoryID', $Discussion))
+                $this->DiscussionModel->getAnnouncementCacheKey(),
+                $this->DiscussionModel->getAnnouncementCacheKey(val('CategoryID', $Discussion))
             );
-            $this->DiscussionModel->SQL->Cache($CacheKeys);
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->GetFormValue('Announce', 0));
+            $this->DiscussionModel->SQL->cache($CacheKeys);
+            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
 
             if ($Target) {
-                $this->RedirectUrl = Url($Target);
+                $this->RedirectUrl = url($Target);
             }
         } else {
             if (!$Discussion->Announce) {
                 $Discussion->Announce = 2;
             }
-            $this->Form->SetData($Discussion);
+            $this->Form->setData($Discussion);
         }
 
         $Discussion = (array)$Discussion;
-        $Category = CategoryModel::Categories($Discussion['CategoryID']);
+        $Category = CategoryModel::categories($Discussion['CategoryID']);
 
-        $this->SetData('Discussion', $Discussion);
-        $this->SetData('Category', $Category);
+        $this->setData('Discussion', $Discussion);
+        $this->setData('Category', $Category);
 
-        $this->Title(T('Announce'));
-        $this->Render();
+        $this->title(t('Announce'));
+        $this->render();
     }
 
-    public function SendOptions($Discussion) {
-        require_once $this->FetchViewLocation('helper_functions', 'Discussion');
+    /**
+     *
+     *
+     * @param $Discussion
+     * @throws Exception
+     */
+    public function sendOptions($Discussion) {
+        require_once $this->fetchViewLocation('helper_functions', 'Discussion');
         ob_start();
-        WriteDiscussionOptions($Discussion);
+        writeDiscussionOptions($Discussion);
         $Options = ob_get_clean();
 
-        $this->JsonTarget("#Discussion_{$Discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+        $this->jsonTarget("#Discussion_{$Discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
     }
 
    /**
@@ -563,36 +561,36 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param bool $Sink Whether or not to unsink the discussion.
     */
-    public function Sink($DiscussionID = '', $Sink = true, $From = 'list') {
+    public function sink($DiscussionID = '', $Sink = true, $From = 'list') {
        // Make sure we are posting back.
-        if (!$this->Request->IsAuthenticatedPostBack()) {
-            throw PermissionException('Javascript');
+        if (!$this->Request->isAuthenticatedPostBack()) {
+            throw permissionException('Javascript');
         }
 
-        $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+        $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
         if (!$Discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
-        $this->Permission('Vanilla.Discussions.Sink', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->permission('Vanilla.Discussions.Sink', true, 'Category', $Discussion->PermissionCategoryID);
 
        // Sink the discussion.
-        $this->DiscussionModel->SetField($DiscussionID, 'Sink', $Sink);
+        $this->DiscussionModel->setField($DiscussionID, 'Sink', $Sink);
         $Discussion->Sink = $Sink;
 
        // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = GetIncomingValue('Target', 'discussions');
-            SafeRedirect($Target);
+            $Target = getIncomingValue('Target', 'discussions');
+            safeRedirect($Target);
         }
 
-        $this->SendOptions($Discussion);
+        $this->sendOptions($Discussion);
 
-        $this->JsonTarget("#Discussion_$DiscussionID", null, 'Highlight');
-        $this->JsonTarget(".Discussion #Item_0", null, 'Highlight');
+        $this->jsonTarget("#Discussion_$DiscussionID", null, 'Highlight');
+        $this->jsonTarget(".Discussion #Item_0", null, 'Highlight');
 
-        $this->Render('Blank', 'Utility', 'Dashboard');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
    /**
@@ -608,45 +606,45 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param bool $Close Whether or not to close the discussion.
     */
-    public function Close($DiscussionID = '', $Close = true, $From = 'list') {
+    public function close($DiscussionID = '', $Close = true, $From = 'list') {
        // Make sure we are posting back.
-        if (!$this->Request->IsAuthenticatedPostBack()) {
-            throw PermissionException('Javascript');
+        if (!$this->Request->isAuthenticatedPostBack()) {
+            throw permissionException('Javascript');
         }
 
-        $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+        $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
         if (!$Discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
-        $this->Permission('Vanilla.Discussions.Close', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->permission('Vanilla.Discussions.Close', true, 'Category', $Discussion->PermissionCategoryID);
 
        // Close the discussion.
-        $this->DiscussionModel->SetField($DiscussionID, 'Closed', $Close);
+        $this->DiscussionModel->setField($DiscussionID, 'Closed', $Close);
         $Discussion->Closed = $Close;
 
        // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = GetIncomingValue('Target', 'discussions');
-            SafeRedirect($Target);
+            $Target = getIncomingValue('Target', 'discussions');
+            safeRedirect($Target);
         }
 
         $this->SendOptions($Discussion);
 
         if ($Close) {
-            require_once $this->FetchViewLocation('helper_functions', 'Discussions');
-            $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Meta-Discussion", Tag($Discussion, 'Closed', 'Closed'), 'Prepend');
-            $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'AddClass');
+            require_once $this->fetchViewLocation('helper_functions', 'Discussions');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Meta-Discussion", tag($Discussion, 'Closed', 'Closed'), 'Prepend');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'AddClass');
         } else {
-            $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Tag-Closed", null, 'Remove');
-            $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'RemoveClass');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Tag-Closed", null, 'Remove');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'RemoveClass');
         }
 
-        $this->JsonTarget("#Discussion_$DiscussionID", null, 'Highlight');
-        $this->JsonTarget(".Discussion #Item_0", null, 'Highlight');
+        $this->jsonTarget("#Discussion_$DiscussionID", null, 'Highlight');
+        $this->jsonTarget(".Discussion #Item_0", null, 'Highlight');
 
-        $this->Render('Blank', 'Utility', 'Dashboard');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
    /**
@@ -659,35 +657,35 @@ class DiscussionController extends VanillaController {
     *
     * @param int $DiscussionID Unique discussion ID.
     */
-    public function Delete($DiscussionID, $Target = '') {
-        $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+    public function delete($DiscussionID, $Target = '') {
+        $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
         if (!$Discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
-        $this->Permission('Vanilla.Discussions.Delete', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->permission('Vanilla.Discussions.Delete', true, 'Category', $Discussion->PermissionCategoryID);
 
-        if ($this->Form->AuthenticatedPostBack()) {
-            if (!$this->DiscussionModel->Delete($DiscussionID)) {
-                $this->Form->AddError('Failed to delete discussion');
+        if ($this->Form->authenticatedPostBack()) {
+            if (!$this->DiscussionModel->delete($DiscussionID)) {
+                $this->Form->addError('Failed to delete discussion');
             }
 
-            if ($this->Form->ErrorCount() == 0) {
+            if ($this->Form->errorCount() == 0) {
                 if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-                    SafeRedirect($Target);
+                    safeRedirect($Target);
                 }
 
                 if ($Target) {
-                    $this->RedirectUrl = Url($Target);
+                    $this->RedirectUrl = url($Target);
                 }
 
-                $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", null, 'SlideUp');
+                $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", null, 'SlideUp');
             }
         }
 
-        $this->SetData('Title', T('Delete Discussion'));
-        $this->Render();
+        $this->setData('Title', t('Delete Discussion'));
+        $this->render();
     }
 
    /**
@@ -704,42 +702,42 @@ class DiscussionController extends VanillaController {
     * @param int $CommentID Unique comment ID.
     * @param string $TransientKey Single-use hash to prove intent.
     */
-    public function DeleteComment($CommentID = '', $TransientKey = '') {
-        $Session = Gdn::Session();
+    public function deleteComment($CommentID = '', $TransientKey = '') {
+        $Session = Gdn::session();
         $DefaultTarget = '/discussions/';
         $ValidCommentID = is_numeric($CommentID) && $CommentID > 0;
-        $ValidUser = $Session->UserID > 0 && $Session->ValidateTransientKey($TransientKey);
+        $ValidUser = $Session->UserID > 0 && $Session->validateTransientKey($TransientKey);
 
         if ($ValidCommentID && $ValidUser) {
            // Get comment and discussion data
-            $Comment = $this->CommentModel->GetID($CommentID);
-            $DiscussionID = GetValue('DiscussionID', $Comment);
-            $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            $Comment = $this->CommentModel->getID($CommentID);
+            $DiscussionID = val('DiscussionID', $Comment);
+            $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
             if ($Comment && $Discussion) {
-                $DefaultTarget = DiscussionUrl($Discussion);
+                $DefaultTarget = discussionUrl($Discussion);
 
                // Make sure comment is this user's or they have Delete permission
-                if ($Comment->InsertUserID != $Session->UserID || !C('Vanilla.Comments.AllowSelfDelete')) {
-                    $this->Permission('Vanilla.Comments.Delete', true, 'Category', $Discussion->PermissionCategoryID);
+                if ($Comment->InsertUserID != $Session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
+                    $this->permission('Vanilla.Comments.Delete', true, 'Category', $Discussion->PermissionCategoryID);
                 }
 
                // Make sure that content can (still) be edited
-                $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+                $EditContentTimeout = c('Garden.EditContentTimeout', -1);
                 $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
                 if (!$CanEdit) {
-                    $this->Permission('Vanilla.Comments.Delete', true, 'Category', $Discussion->PermissionCategoryID);
+                    $this->permission('Vanilla.Comments.Delete', true, 'Category', $Discussion->PermissionCategoryID);
                 }
 
                // Delete the comment
-                if (!$this->CommentModel->Delete($CommentID)) {
-                    $this->Form->AddError('Failed to delete comment');
+                if (!$this->CommentModel->delete($CommentID)) {
+                    $this->Form->addError('Failed to delete comment');
                 }
             } else {
-                $this->Form->AddError('Invalid comment');
+                $this->Form->addError('Invalid comment');
             }
         } else {
-            $this->Form->AddError('ErrPermission');
+            $this->Form->addError('ErrPermission');
         }
 
        // Redirect
@@ -748,13 +746,13 @@ class DiscussionController extends VanillaController {
             SafeRedirect($Target);
         }
 
-        if ($this->Form->ErrorCount() > 0) {
-            $this->SetJson('ErrorMessage', $this->Form->Errors());
+        if ($this->Form->errorCount() > 0) {
+            $this->setJson('ErrorMessage', $this->Form->errors());
         } else {
-            $this->JsonTarget("#Comment_$CommentID", '', 'SlideUp');
+            $this->jsonTarget("#Comment_$CommentID", '', 'SlideUp');
         }
 
-        $this->Render();
+        $this->render();
     }
 
    /**
@@ -765,12 +763,12 @@ class DiscussionController extends VanillaController {
     * @param int $Offset
     * @param int $Limit
     */
-    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
-        $this->Title(T('Comments'));
+    public function embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+        $this->title(t('Comments'));
 
        // Add theme data
-        $this->Theme = C('Garden.CommentsTheme', $this->Theme);
-        Gdn_Theme::Section('Comments');
+        $this->Theme = c('Garden.CommentsTheme', $this->Theme);
+        Gdn_Theme::section('Comments');
 
        // Force view options
         $this->MasterView = 'empty';
@@ -778,50 +776,50 @@ class DiscussionController extends VanillaController {
 
        // Add some css to help with the transparent bg on embedded comments
         if ($this->Head) {
-            $this->Head->AddString('<style type="text/css">
+            $this->Head->addString('<style type="text/css">
 body { background: transparent !important; }
 </style>');
         }
 
        // Javascript files & options
-        $this->AddJsFile('jquery.gardenmorepager.js');
-        $this->AddJsFile('jquery.autosize.min.js');
-        $this->AddJsFile('discussion.js');
-        $this->RemoveJsFile('autosave.js');
-        $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
-        $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
-        $this->AddDefinition('Embedded', true);
+        $this->addJsFile('jquery.gardenmorepager.js');
+        $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('discussion.js');
+        $this->removeJsFile('autosave.js');
+        $this->addDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
+        $this->addDefinition('SelfUrl', Gdn::request()->PathAndQuery());
+        $this->addDefinition('Embedded', true);
 
        // Define incoming variables (prefer querystring parameters over method parameters)
         $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
-        $DiscussionID = GetIncomingValue('vanilla_discussion_id', $DiscussionID);
-        $Offset = GetIncomingValue('Offset', $Offset);
-        $Limit = GetIncomingValue('Limit', $Limit);
-        $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
+        $DiscussionID = getIncomingValue('vanilla_discussion_id', $DiscussionID);
+        $Offset = getIncomingValue('Offset', $Offset);
+        $Limit = getIncomingValue('Limit', $Limit);
+        $vanilla_identifier = getIncomingValue('vanilla_identifier', '');
 
        // Only allow vanilla identifiers of 32 chars or less - md5 if larger
         if (strlen($vanilla_identifier) > 32) {
             $vanilla_identifier = md5($vanilla_identifier);
         }
-        $vanilla_type = GetIncomingValue('vanilla_type', 'page');
-        $vanilla_url = GetIncomingValue('vanilla_url', '');
-        $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
+        $vanilla_type = getIncomingValue('vanilla_type', 'page');
+        $vanilla_url = getIncomingValue('vanilla_url', '');
+        $vanilla_category_id = getIncomingValue('vanilla_category_id', '');
         $ForeignSource = array(
          'vanilla_identifier' => $vanilla_identifier,
          'vanilla_type' => $vanilla_type,
          'vanilla_url' => $vanilla_url,
          'vanilla_category_id' => $vanilla_category_id
         );
-        $this->SetData('ForeignSource', $ForeignSource);
+        $this->setData('ForeignSource', $ForeignSource);
 
        // Set comment sorting
-        $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
-        $this->SetData('SortComments', $SortComments);
+        $SortComments = c('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
+        $this->setData('SortComments', $SortComments);
 
        // Retrieve the discussion record
         $Discussion = false;
         if ($DiscussionID > 0) {
-            $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            $Discussion = $this->DiscussionModel->getID($DiscussionID);
         } elseif ($vanilla_identifier != '' && $vanilla_type != '') {
             $Discussion = $this->DiscussionModel->GetForeignID($vanilla_identifier, $vanilla_type);
         }
@@ -830,24 +828,24 @@ body { background: transparent !important; }
         if ($Discussion) {
            // Allow Vanilla.Comments.View to be defined to limit access to embedded comments only.
            // Otherwise, go with normal discussion view permissions. Either will do.
-            $this->Permission(array('Vanilla.Discussions.View', 'Vanilla.Comments.View'), false, 'Category', $Discussion->PermissionCategoryID);
+            $this->permission(array('Vanilla.Discussions.View', 'Vanilla.Comments.View'), false, 'Category', $Discussion->PermissionCategoryID);
 
-            $this->SetData('Discussion', $Discussion, true);
-            $this->SetData('DiscussionID', $Discussion->DiscussionID, true);
-            $this->Title($Discussion->Name);
+            $this->setData('Discussion', $Discussion, true);
+            $this->setData('DiscussionID', $Discussion->DiscussionID, true);
+            $this->title($Discussion->Name);
 
            // Actual number of comments, excluding the discussion itself
             $ActualResponses = $Discussion->CountComments;
 
            // Define the query offset & limit
             if (!is_numeric($Limit) || $Limit < 0) {
-                $Limit = C('Garden.Embed.CommentsPerPage', 30);
+                $Limit = c('Garden.Embed.CommentsPerPage', 30);
             }
 
             $OffsetProvided = $Offset != '';
-            list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
+            list($Offset, $Limit) = offsetLimit($Offset, $Limit);
             $this->Offset = $Offset;
-            if (C('Vanilla.Comments.AutoOffset')) {
+            if (c('Vanilla.Comments.AutoOffset')) {
                 if ($ActualResponses <= $Limit) {
                     $this->Offset = 0;
                 }
@@ -864,114 +862,114 @@ body { background: transparent !important; }
             }
 
            // Set the canonical url to have the proper page title.
-            $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
+            $this->canonicalUrl(discussionUrl($Discussion, pageNumber($this->Offset, $Limit)));
 
            // Load the comments.
-            $CurrentOrderBy = $this->CommentModel->OrderBy();
-            if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted')) {
-                $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
+            $CurrentOrderBy = $this->CommentModel->orderBy();
+            if (stringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted')) {
+                $this->CommentModel->orderBy('c.DateInserted '.$SortComments); // allow custom sort
             }
-            $this->SetData('Comments', $this->CommentModel->Get($Discussion->DiscussionID, $Limit, $this->Offset), true);
+            $this->setData('Comments', $this->CommentModel->get($Discussion->DiscussionID, $Limit, $this->Offset), true);
 
-            if (count($this->CommentModel->Where()) > 0) {
+            if (count($this->CommentModel->where()) > 0) {
                 $ActualResponses = false;
             }
 
-            $this->SetData('_Count', $ActualResponses);
+            $this->setData('_Count', $ActualResponses);
 
            // Build a pager
             $PagerFactory = new Gdn_PagerFactory();
             $this->EventArguments['PagerType'] = 'MorePager';
-            $this->FireEvent('BeforeBuildPager');
-            $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+            $this->fireEvent('BeforeBuildPager');
+            $this->Pager = $PagerFactory->getPager($this->EventArguments['PagerType'], $this);
             $this->Pager->ClientID = 'Pager';
             $this->Pager->MoreCode = 'More Comments';
-            $this->Pager->Configure(
+            $this->Pager->configure(
                 $this->Offset,
                 $Limit,
                 $ActualResponses,
-                'discussion/embed/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/%1$s'
+                'discussion/embed/'.$Discussion->DiscussionID.'/'.Gdn_Format::url($Discussion->Name).'/%1$s'
             );
-            $this->Pager->CurrentRecords = $this->Comments->NumRows();
-            $this->FireEvent('AfterBuildPager');
+            $this->Pager->CurrentRecords = $this->Comments->numRows();
+            $this->fireEvent('AfterBuildPager');
         }
 
        // Define the form for the comment input
         $this->Form = Gdn::Factory('Form', 'Comment');
-        $this->Form->Action = Url('/post/comment/');
-        $this->Form->AddHidden('CommentID', '');
-        $this->Form->AddHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).
-        $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
+        $this->Form->Action = url('/post/comment/');
+        $this->Form->addHidden('CommentID', '');
+        $this->Form->addHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).
+        $this->Form->addHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
 
        // Grab the page title
-        if ($this->Request->Get('title')) {
-            $this->Form->SetValue('Name', $this->Request->Get('title'));
+        if ($this->Request->get('title')) {
+            $this->Form->setValue('Name', $this->Request->get('title'));
         }
 
        // Set existing DiscussionID for comment form
         if ($Discussion) {
-            $this->Form->AddHidden('DiscussionID', $Discussion->DiscussionID);
+            $this->Form->addHidden('DiscussionID', $Discussion->DiscussionID);
         }
 
         foreach ($ForeignSource as $Key => $Val) {
            // Drop the foreign source information into the form so it can be used if creating a discussion
-            $this->Form->AddHidden($Key, $Val);
+            $this->Form->addHidden($Key, $Val);
 
            // Also drop it into the definitions so it can be picked up for stashing comments
-            $this->AddDefinition($Key, $Val);
+            $this->addDefinition($Key, $Val);
         }
 
        // Retrieve & apply the draft if there is one:
         $Draft = false;
-        if (Gdn::Session()->UserID && $Discussion) {
+        if (Gdn::session()->UserID && $Discussion) {
             $DraftModel = new DraftModel();
-            $Draft = $DraftModel->Get(Gdn::Session()->UserID, 0, 1, $Discussion->DiscussionID)->FirstRow();
-            $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+            $Draft = $DraftModel->get(Gdn::session()->UserID, 0, 1, $Discussion->DiscussionID)->firstRow();
+            $this->Form->addHidden('DraftID', $Draft ? $Draft->DraftID : '');
         }
 
         if ($Draft) {
-            $this->Form->SetFormValue('Body', $Draft->Body);
+            $this->Form->setFormValue('Body', $Draft->Body);
         } else {
            // Look in the session stash for a comment
-            $StashComment = Gdn::Session()->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', false);
+            $StashComment = Gdn::session()->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', false);
             if ($StashComment) {
-                $this->Form->SetValue('Body', $StashComment);
-                $this->Form->SetFormValue('Body', $StashComment);
+                $this->Form->setValue('Body', $StashComment);
+                $this->Form->setFormValue('Body', $StashComment);
             }
         }
 
        // Deliver JSON data if necessary
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
             if ($this->Discussion) {
-                $this->SetJson('LessRow', $this->Pager->ToString('less'));
-                $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+                $this->setJson('LessRow', $this->Pager->toString('less'));
+                $this->setJson('MoreRow', $this->Pager->toString('more'));
             }
             $this->View = 'comments';
         }
 
        // Ordering note for JS
         if ($SortComments == 'desc') {
-            $this->AddDefinition('PrependNewComments', '1');
+            $this->addDefinition('PrependNewComments', '1');
         }
 
        // Report the discussion id so js can use it.
         if ($Discussion) {
-            $this->AddDefinition('DiscussionID', $Discussion->DiscussionID);
+            $this->addDefinition('DiscussionID', $Discussion->DiscussionID);
         }
 
-        $this->FireEvent('BeforeDiscussionRender');
-        $this->Render();
+        $this->fireEvent('BeforeDiscussionRender');
+        $this->render();
     }
 
    /**
     * Redirect to the url specified by the discussion.
     * @param array|object $Discussion
     */
-    protected function RedirectDiscussion($Discussion) {
-        $Body = Gdn_Format::To(GetValue('Body', $Discussion), GetValue('Format', $Discussion));
+    protected function redirectDiscussion($Discussion) {
+        $Body = Gdn_Format::to(val('Body', $Discussion), val('Format', $Discussion));
         if (preg_match('`href="([^"]+)"`i', $Body, $Matches)) {
             $Url = $Matches[1];
-            SafeRedirect($Url, 301);
+            safeRedirect($Url, 301);
         }
     }
 
@@ -979,49 +977,49 @@ body { background: transparent !important; }
     * Re-fetch a discussion's content based on its foreign url.
     * @param type $DiscussionID
     */
-    public function RefetchPageInfo($DiscussionID) {
+    public function refetchPageInfo($DiscussionID) {
        // Make sure we are posting back.
-        if (!$this->Request->IsPostBack()) {
-            throw PermissionException('Javascript');
+        if (!$this->Request->isPostBack()) {
+            throw permissionException('Javascript');
         }
 
        // Grab the discussion.
-        $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+        $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
         if (!$Discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
        // Make sure the user has permission to edit this discussion.
-        $this->Permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
 
-        $ForeignUrl = GetValueR('Attributes.ForeignUrl', $Discussion);
+        $ForeignUrl = valr('Attributes.ForeignUrl', $Discussion);
         if (!$ForeignUrl) {
-            throw new Gdn_UserException(T("This discussion isn't associated with a url."));
+            throw new Gdn_UserException(t("This discussion isn't associated with a url."));
         }
 
-        $Stub = $this->DiscussionModel->FetchPageInfo($ForeignUrl, true);
+        $Stub = $this->DiscussionModel->fetchPageInfo($ForeignUrl, true);
 
        // Save the stub.
-        $this->DiscussionModel->SetField($DiscussionID, (array)$Stub);
+        $this->DiscussionModel->setField($DiscussionID, (array)$Stub);
 
        // Send some of the stuff back.
         if (isset($Stub['Name'])) {
-            $this->JsonTarget('.PageTitle h1', Gdn_Format::Text($Stub['Name']));
+            $this->jsonTarget('.PageTitle h1', Gdn_Format::text($Stub['Name']));
         }
         if (isset($Stub['Body'])) {
-            $this->JsonTarget("#Discussion_$DiscussionID .Message", Gdn_Format::To($Stub['Body'], $Stub['Format']));
+            $this->jsonTarget("#Discussion_$DiscussionID .Message", Gdn_Format::to($Stub['Body'], $Stub['Format']));
         }
 
-        $this->InformMessage('The page was successfully fetched.');
+        $this->informMessage('The page was successfully fetched.');
 
-        $this->Render('Blank', 'Utility', 'Dashboard');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
-    protected function _SetOpenGraph() {
+    protected function _setOpenGraph() {
         if (!$this->Head) {
             return;
         }
-        $this->Head->AddTag('meta', array('property' => 'og:type', 'content' => 'article'));
+        $this->Head->addTag('meta', array('property' => 'og:type', 'content' => 'article'));
     }
 }

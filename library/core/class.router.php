@@ -1,38 +1,44 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Routing system
- *
- * Allows paths within the application to redirect, either internally or via
- * http, to other locations.
+ * Routing system.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
+/**
+ * Allows paths within the application to redirect, either internally or via
+ * http, to other locations.
+ */
 class Gdn_Router extends Gdn_Pluggable {
 
+    /** @var array */
     public $Routes;
+
+    /** @var array */
     public $ReservedRoutes;
+
+    /** @var array */
     public $RouteTypes;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
         $this->RouteTypes = array(
-         'Internal'     => 'Internal',
-         'Temporary'    => 'Temporary (302)',
-         'Permanent'    => 'Permanent (301)',
+            'Internal' => 'Internal',
+            'Temporary' => 'Temporary (302)',
+            'Permanent' => 'Permanent (301)',
          'NotAuthorized' => 'Not Authorized (401)',
-         'NotFound'     => 'Not Found (404)',
-         'Test'         => 'Test'
+            'NotFound' => 'Not Found (404)',
+            'Test' => 'Test'
         );
         $this->ReservedRoutes = array('DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode');
-        $this->_LoadRoutes();
+        $this->_loadRoutes();
     }
    
    /**
@@ -42,13 +48,13 @@ class Gdn_Router extends Gdn_Pluggable {
     *
     * @return array|bool A route or false if there is no matching route.
     */
-    public function GetRoute($Route, $Indexed = true) {
+    public function getRoute($Route, $Indexed = true) {
         if ($Indexed && is_numeric($Route) && $Route !== false) {
             $Keys = array_keys($this->Routes);
-            $Route = ArrayValue($Route, $Keys);
+            $Route = arrayValue($Route, $Keys);
         }
       
-        $Decoded = $this->_DecodeRouteKey($Route);
+        $Decoded = $this->_decodeRouteKey($Route);
         if ($Decoded !== false && array_key_exists($Decoded, $this->Routes)) {
             $Route = $Decoded;
         }
@@ -60,14 +66,20 @@ class Gdn_Router extends Gdn_Pluggable {
        //return $this->Routes[$Route];
 
         return array_merge($this->Routes[$Route], array(
-         'TypeLocale'         => T($this->RouteTypes[$this->Routes[$Route]['Type']]),
-         'FinalDestination'   => $this->Routes[$Route]['Destination']
+            'TypeLocale' => T($this->RouteTypes[$this->Routes[$Route]['Type']]),
+            'FinalDestination' => $this->Routes[$Route]['Destination']
         ));
 
     }
    
-    public function GetDestination($Request) {
-        $Route = $this->MatchRoute($Request);
+    /**
+     *
+     *
+     * @param $Request
+     * @return bool
+     */
+    public function getDestination($Request) {
+        $Route = $this->matchRoute($Request);
       
         if ($Route !== false) {
             return isset($Route['FinalDestination']) ? $Route['FinalDestination'] : $Route['Destination'];
@@ -84,29 +96,39 @@ class Gdn_Router extends Gdn_Pluggable {
     * @param string $Type
     * @param bool $Save Optional. Save this to the config or just in memory?
     */
-    public function SetRoute($Route, $Destination, $Type, $Save = true) {
-        $Key = $this->_EncodeRouteKey($Route);
+    public function setRoute($Route, $Destination, $Type, $Save = true) {
+        $Key = $this->_encodeRouteKey($Route);
         SaveToConfig('Routes.'.$Key, array($Destination, $Type), $Save);
-        $this->_LoadRoutes();
+        $this->_loadRoutes();
     }
    
-    public function DeleteRoute($Route) {
-        $Route = $this->GetRoute($Route);
+    /**
+     *
+     *
+     * @param $Route
+     */
+    public function deleteRoute($Route) {
+        $Route = $this->getRoute($Route);
       
        // Is a valid route?
         if ($Route !== false) {
             if (!in_array($Route['Route'], $this->ReservedRoutes)) {
                 RemoveFromConfig('Routes.'.$Route['Key']);
-                $this->_LoadRoutes();
+                $this->_loadRoutes();
             }
         }
     }
    
-    public function MatchRoute($Request) {
-   
+    /**
+     *
+     *
+     * @param $Request
+     * @return array|bool
+     */
+    public function matchRoute($Request) {
        // Check for a literal match
-        if ($this->GetRoute($Request, false)) {
-            return $this->GetRoute($Request);
+        if ($this->getRoute($Request, false)) {
+            return $this->getRoute($Request);
         }
          
         foreach ($this->Routes as $Route => $RouteData) {
@@ -120,7 +142,7 @@ class Gdn_Router extends Gdn_Pluggable {
            // Check for a match
             if (preg_match('#^'.$Route.'#', $Request)) {
                // Route matched!
-                $Final = $this->GetRoute($Route);
+                $Final = $this->getRoute($Route);
                 $Final['FinalDestination'] = $Final['Destination'];
             
                // Do we have a back-reference?
@@ -135,11 +157,17 @@ class Gdn_Router extends Gdn_Pluggable {
         return false; // No route matched
     }
 
-    public function ReverseRoute($Url) {
-        $Root = rtrim(Gdn::Request()->Domain().'/'.Gdn::Request()->WebRoot(), '/');
+    /**
+     *
+     *
+     * @param $Url
+     * @return bool|int|string
+     */
+    public function reverseRoute($Url) {
+        $Root = rtrim(Gdn::request()->domain().'/'.Gdn::request()->webRoot(), '/');
 
-        if (StringBeginsWith($Url, $Root)) {
-            $Url = StringBeginsWith($Url, $Root, true, true);
+        if (stringBeginsWith($Url, $Root)) {
+            $Url = stringBeginsWith($Url, $Root, true, true);
             $WithDomain = true;
         } else {
             $WithDomain = false;
@@ -174,7 +202,12 @@ class Gdn_Router extends Gdn_Pluggable {
         }
     }
    
-    public function GetRouteTypes() {
+    /**
+     *
+     *
+     * @return array
+     */
+    public function getRouteTypes() {
         $RT = array();
         foreach ($this->RouteTypes as $RouteType => $RouteTypeText) {
             $RT[$RouteType] = T($RouteTypeText);
@@ -182,25 +215,35 @@ class Gdn_Router extends Gdn_Pluggable {
         return $RT;
     }
    
-    private function _LoadRoutes() {
-        $Routes = Gdn::Config('Routes', array());
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    private function _loadRoutes() {
+        $Routes = Gdn::config('Routes', array());
         $this->EventArguments['Routes'] = &$Routes;
-        $this->FireEvent("BeforeLoadRoutes");
+        $this->fireEvent("BeforeLoadRoutes");
         foreach ($Routes as $Key => $Destination) {
-            $Route = $this->_DecodeRouteKey($Key);
-            $RouteData = $this->_ParseRoute($Destination);
+            $Route = $this->_decodeRouteKey($Key);
+            $RouteData = $this->_parseRoute($Destination);
          
             $this->Routes[$Route] = array_merge(array(
-            'Route'        => $Route,
-            'Key'          => $Key,
-            'Reserved'     => in_array($Route, $this->ReservedRoutes)
+                'Route' => $Route,
+                'Key' => $Key,
+                'Reserved' => in_array($Route, $this->ReservedRoutes)
             ), $RouteData);
         }
-        $this->FireEvent("AfterLoadRoutes");
+        $this->fireEvent("AfterLoadRoutes");
     }
    
-    private function _ParseRoute($Destination) {
-   
+    /**
+     *
+     *
+     * @param $Destination
+     * @return array|mixed
+     */
+    private function _parseRoute($Destination) {
        // If Destination is a serialized array
         if (is_string($Destination) && ($Decoded = @unserialize($Destination)) !== false) {
             $Destination = $Decoded;
@@ -213,29 +256,48 @@ class Gdn_Router extends Gdn_Pluggable {
    
        // If Destination is a simple string...
         if (!is_array($Destination)) {
-            $Destination = $this->_FormatRoute($Destination, 'Internal');
+            $Destination = $this->_formatRoute($Destination, 'Internal');
         }
       
        // If Destination is an array with no named keys...
         if (!array_key_exists('Destination', $Destination)) {
-            $Destination = $this->_FormatRoute($Destination[0], $Destination[1]);
+            $Destination = $this->_formatRoute($Destination[0], $Destination[1]);
         }
             
         return $Destination;
     }
    
-    private function _FormatRoute($Destination, $RouteType) {
+    /**
+     *
+     *
+     * @param $Destination
+     * @param $RouteType
+     * @return array
+     */
+    private function _formatRoute($Destination, $RouteType) {
         return array(
-         'Destination'        => $Destination,
-         'Type'               => $RouteType
+            'Destination' => $Destination,
+            'Type' => $RouteType
         );
     }
    
-    protected function _EncodeRouteKey($Key) {
+    /**
+     *
+     *
+     * @param $Key
+     * @return mixed
+     */
+    protected function _encodeRouteKey($Key) {
         return str_replace('/', '_', in_array($Key, $this->ReservedRoutes) ? $Key : base64_encode($Key));
     }
    
-    protected function _DecodeRouteKey($Key) {
+    /**
+     *
+     *
+     * @param $Key
+     * @return string
+     */
+    protected function _decodeRouteKey($Key) {
         return in_array($Key, $this->ReservedRoutes) ? $Key : base64_decode(str_replace('_', '/', $Key));
     }
 }

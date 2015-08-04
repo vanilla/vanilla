@@ -1,13 +1,11 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+<?php
+/**
+ * Settings module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
 */
 
 /**
@@ -16,8 +14,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SettingsModule extends Gdn_Module {
    
     const TYPE_APPLICATION = 'application';
-    const TYPE_PLUGIN      = 'plugin';
-    const TYPE_THEME       = 'theme';
+
+    const TYPE_PLUGIN = 'plugin';
+
+    const TYPE_THEME = 'theme';
    
    /**
     * Is the application/plugin/theme removable?
@@ -26,25 +26,25 @@ class SettingsModule extends Gdn_Module {
     * @param string $Name
     * @return boolean
     */
-    public static function IsRemovable($Type, $Name) {
+    public static function isRemovable($Type, $Name) {
       
         switch ($Type) {
             case self::TYPE_APPLICATION:
                 $ApplicationManager = Gdn::Factory('ApplicationManager');
             
                 if ($IsRemovable = !array_key_exists($Name, $ApplicationManager->EnabledApplications())) {
-                    $ApplicationInfo   = ArrayValue($Name, $ApplicationManager->AvailableApplications(), array());
-                    $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
+                    $ApplicationInfo = arrayValue($Name, $ApplicationManager->AvailableApplications(), array());
+                    $ApplicationFolder = arrayValue('Folder', $ApplicationInfo, '');
                
-                    $IsRemovable = IsWritable(PATH_APPLICATIONS . DS . $ApplicationFolder);
+                    $IsRemovable = IsWritable(PATH_APPLICATIONS.DS.$ApplicationFolder);
                 }
                 break;
             case self::TYPE_PLUGIN:
-                if ($IsRemovable = !array_key_exists($Name, Gdn::PluginManager()->EnabledPlugins())) {
-                    $PluginInfo   = ArrayValue($Name, Gdn::PluginManager()->AvailablePlugins(), false);
-                    $PluginFolder = ArrayValue('Folder', $PluginInfo, false);
+                if ($IsRemovable = !array_key_exists($Name, Gdn::pluginManager()->EnabledPlugins())) {
+                    $PluginInfo = arrayValue($Name, Gdn::pluginManager()->AvailablePlugins(), false);
+                    $PluginFolder = arrayValue('Folder', $PluginInfo, false);
                
-                    $IsRemovable = IsWritable(PATH_PLUGINS . DS . $PluginFolder);
+                    $IsRemovable = IsWritable(PATH_PLUGINS.DS.$PluginFolder);
                 }
                 break;
             case self::TYPE_THEME:

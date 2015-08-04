@@ -1,2 +1,2 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->Data('_Module')->Render();
+$this->data('_Module')->render();

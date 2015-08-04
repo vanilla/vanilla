@@ -1,17 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 if (!property_exists($this, 'HideActivity'))
-   $this->HideActivity = FALSE;
-   
-if (!property_exists($this, 'ProfileUserID'))
-   $this->ProfileUserID = '';
-   
-if (!function_exists('WriteActivity'))
-   include($this->FetchViewLocation('helper_functions', 'activity'));
+    $this->HideActivity = FALSE;
 
-foreach ($this->Data('Activities') as $Activity) {
-   if ($this->HideActivity)
-      $Activity->ActivityType .= ' Hidden';
-   
-   WriteActivity($Activity, $this, $Session);
+if (!property_exists($this, 'ProfileUserID'))
+    $this->ProfileUserID = '';
+
+if (!function_exists('WriteActivity'))
+    include($this->fetchViewLocation('helper_functions', 'activity'));
+
+foreach ($this->data('Activities') as $Activity) {
+    if ($this->HideActivity)
+        $Activity->ActivityType .= ' Hidden';
+
+    WriteActivity($Activity, $this, $Session);
 }

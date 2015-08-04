@@ -5,12 +5,12 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
-      <title><?php echo $this->Head->Title(); ?></title>
-      <link><?php echo htmlspecialchars(Url('/', TRUE, TRUE)); ?></link>
+      <title><?php echo $this->Head->title(); ?></title>
+      <link><?php echo htmlspecialchars(url('/', TRUE, true)); ?></link>
       <pubDate><?php echo date('r'); ?></pubDate>
       <?php
          $this->RenderAsset('RssHead');
-      
+
          /* Sample RSS Content:
          <item>
             <title>Atom-Powered Robots Run Amok</title>
@@ -22,5 +22,6 @@
          */
          $this->RenderAsset('Content');
       ?>
+   <language><?php echo Gdn::Locale()->Locale; ?></language>
    </channel>
 </rss>

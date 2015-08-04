@@ -1,6 +1,13 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
+/**
+ * Gdn_Plugin
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
+ */
 
 /**
  * Plugin base class
@@ -8,18 +15,15 @@
  * A simple framework that all plugins should extend. Aside from the implementation of
  * Gdn_IPlugin, this class provides some convenience methods to make plugin development
  * easier and faster.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
-
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
+    /** @var object */
     protected $Sender;
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
     }
@@ -32,20 +36,36 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     *
     * @return Gdn_Plugin
     */
-    public static function Instance() {
-        return Gdn::PluginManager()->GetPluginInstance(get_called_class(), Gdn_PluginManager::ACCESS_CLASSNAME);
+    public static function instance() {
+        return Gdn::pluginManager()->getPluginInstance(get_called_class(), Gdn_PluginManager::ACCESS_CLASSNAME);
     }
 
-    public function GetPluginName() {
-        return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function getPluginName() {
+        return val('Name', Gdn::pluginManager()->getPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
     }
 
-    public function GetPluginIndex() {
-        return GetValue('Index', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function getPluginIndex() {
+        return val('Index', Gdn::pluginManager()->getPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
     }
 
-    public function GetPluginFolder($Absolute = true) {
-        $Folder = GetValue('PluginRoot', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
+    /**
+     *
+     *
+     * @param bool $Absolute
+     * @return mixed
+     */
+    public function getPluginFolder($Absolute = true) {
+        $Folder = val('PluginRoot', Gdn::pluginManager()->getPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));
         if (!$Absolute) {
             $Folder = str_replace(rtrim(PATH_PLUGINS, '/'), 'plugins', $Folder);
         }
@@ -60,8 +80,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param mixed $Default Optional value to return if the key cannot be found
     * @return mixed value of the provided key
     */
-    public function GetPluginKey($Key, $Default = null) {
-        return GetValue($Key, Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME), $Default);
+    public function getPluginKey($Key, $Default = null) {
+        return val($Key, Gdn::pluginManager()->getPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME), $Default);
     }
 
    /**
@@ -72,8 +92,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $AbsolutePath boolean whether or not to prepend the full document root to the path
     * @return string path to the file
     */
-    public function GetResource($Filepath, $Include = false, $Absolute = true) {
-        $RequiredFilename = implode(DS, array($this->GetPluginFolder($Absolute), $Filepath));
+    public function getResource($Filepath, $Include = false, $Absolute = true) {
+        $RequiredFilename = implode(DS, array($this->getPluginFolder($Absolute), $Filepath));
         if ($Include && file_exists($RequiredFilename)) {
             include($RequiredFilename);
         }
@@ -90,33 +110,41 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $ViewName string name of the view file, including extension
     * @return string path to the view file, relative to the document root.
     */
-    public function GetView($ViewName) {
-        $PluginDirectory = implode(DS, array($this->GetPluginFolder(true), 'views'));
+    public function getView($ViewName) {
+        $PluginDirectory = implode(DS, array($this->getPluginFolder(true), 'views'));
         return $PluginDirectory.DS.$ViewName;
     }
 
-    public function GetWebResource($Filepath, $WithDomain = false) {
+    /**
+     *
+     *
+     * @param $Filepath
+     * @param bool $WithDomain
+     * @return string
+     */
+    public function getWebResource($Filepath, $WithDomain = false) {
         $WebResource = $this->GetResource($Filepath, false, false);
 
         if ($WithDomain === '/') {
             return $WebResource;
         }
 
-        if (Gdn_Url::WebRoot()) {
-            $WebResource = '/'.CombinePaths(array(Gdn_Url::WebRoot(),$WebResource));
+        if (Gdn_Url::webRoot()) {
+            $WebResource = '/'.CombinePaths(array(Gdn_Url::webRoot(), $WebResource));
         }
 
         if ($WithDomain === '//') {
-            $WebResource = '//'.Gdn::Request()->HostAndPort().$WebResource;
+            $WebResource = '//'.Gdn::request()->hostAndPort().$WebResource;
         } elseif ($WithDomain)
-         $WebResource = Gdn::Request()->Scheme().'//'.Gdn::Request()->HostAndPort().$WebResource;
+            $WebResource = Gdn::request()->scheme().'//'.Gdn::request()->hostAndPort().$WebResource;
 
         return $WebResource;
     }
 
-   /** Implementaion of Gdn_IPlugin::Setup().
+    /**
+     * Implementaion of Gdn_IPlugin::Setup().
     */
-    public function Setup() {
+    public function setup() {
        // Do nothing...
     }
 
@@ -140,11 +168,11 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $AutoUnfold optional Automatically return key item for single key queries
     * @return array results or $Default
     */
-    protected function GetUserMeta($UserID, $Key, $Default = null, $AutoUnfold = false) {
+    protected function getUserMeta($UserID, $Key, $Default = null, $AutoUnfold = false) {
         $MetaKey = $this->MakeMetaKey($Key);
-        $R = $this->UserMetaModel()->GetUserMeta($UserID, $MetaKey, $Default);
+        $R = $this->userMetaModel()->getUserMeta($UserID, $MetaKey, $Default);
         if ($AutoUnfold) {
-            $R = GetValue($MetaKey, $R, $Default);
+            $R = val($MetaKey, $R, $Default);
         }
         return $R;
     }
@@ -166,9 +194,9 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $Value mixed optional value to set, null to delete
     * @return void
     */
-    protected function SetUserMeta($UserID, $Key, $Value = null) {
-        $MetaKey = $this->MakeMetaKey($Key);
-        $this->UserMetaModel()->SetUserMeta($UserID, $MetaKey, $Value);
+    protected function setUserMeta($UserID, $Key, $Value = null) {
+        $MetaKey = $this->makeMetaKey($Key);
+        $this->userMetaModel()->setUserMeta($UserID, $MetaKey, $Value);
     }
 
    /**
@@ -179,7 +207,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $UserMetaKey string fully qualified meta key
     * @return string relative meta key
     */
-    protected function TrimMetaKey($FullyQualifiedUserKey) {
+    protected function trimMetaKey($FullyQualifiedUserKey) {
         $Key = explode('.', $FullyQualifiedUserKey);
         if ($Key[0] == 'Plugin' && sizeof($Key) >= 3) {
             return implode('.', array_slice($Key, 2));
@@ -196,43 +224,48 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $UserKey string relative user meta key
     * @return string fully qualified meta key
     */
-    protected function MakeMetaKey($RelativeUserKey) {
-        return implode('.', array('Plugin',$this->GetPluginIndex(),$this->TrimMetaKey($RelativeUserKey)));
+    protected function makeMetaKey($RelativeUserKey) {
+        return implode('.', array('Plugin', $this->getPluginIndex(), $this->trimMetaKey($RelativeUserKey)));
     }
 
-    public function Controller_Index($Sender) {
-        $Sender->Title($this->GetPluginKey('Name'));
-        $Sender->AddSideMenu('plugin/'.$this->GetPluginIndex());
-        $Sender->SetData('Description', $this->GetPluginKey('Description'));
+    /**
+     *
+     *
+     * @param $Sender
+     */
+    public function controller_index($Sender) {
+        $Sender->title($this->getPluginKey('Name'));
+        $Sender->addSideMenu('plugin/'.$this->getPluginIndex());
+        $Sender->setData('Description', $this->getPluginKey('Description'));
 
-        $CSSFile = $this->GetResource('css/'.strtolower($this->GetPluginIndex()).'.css', false, false);
+        $CSSFile = $this->getResource('css/'.strtolower($this->getPluginIndex()).'.css', false, false);
         if (file_exists($CSSFile)) {
-            $Sender->AddCssFile($CSSFile);
+            $Sender->addCssFile($CSSFile);
         }
 
-        $ViewFile = $this->GetView(strtolower($this->GetPluginIndex()).'.php');
-        $Sender->Render($ViewFile);
+        $ViewFile = $this->getView(strtolower($this->getPluginIndex()).'.php');
+        $Sender->render($ViewFile);
     }
 
    /**
-    * Automatically handle the toggle effect
+     * Automatically handle the toggle effect.
     *
     * @param object $Sender Reference to the invoking controller
     * @param mixed $Redirect
     */
-    public function AutoToggle($Sender, $Redirect = null) {
-        $PluginName = $this->GetPluginIndex();
+    public function autoToggle($Sender, $Redirect = null) {
+        $PluginName = $this->getPluginIndex();
         $EnabledKey = "Plugins.{$PluginName}.Enabled";
         $CurrentConfig = C($EnabledKey, false);
-        $PassedKey = GetValue(1, $Sender->RequestArgs);
+        $PassedKey = val(1, $Sender->RequestArgs);
 
-        if ($Sender->Form->AuthenticatedPostBack() || Gdn::Session()->ValidateTransientKey($PassedKey)) {
+        if ($Sender->Form->authenticatedPostBack() || Gdn::session()->validateTransientKey($PassedKey)) {
             $CurrentConfig = !$CurrentConfig;
             SaveToConfig($EnabledKey, $CurrentConfig);
         }
 
-        if ($Sender->Form->AuthenticatedPostBack()) {
-            $this->Controller_Index($Sender);
+        if ($Sender->Form->authenticatedPostBack()) {
+            $this->controller_index($Sender);
         } else {
             if ($Redirect === false) {
                 return $CurrentConfig;
@@ -246,16 +279,22 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return $CurrentConfig;
     }
 
-    public function AutoTogglePath($Path = null) {
+    /**
+     *
+     *
+     * @param null $Path
+     * @return null|string
+     */
+    public function autoTogglePath($Path = null) {
         if (is_null($Path)) {
-            $PluginName = $this->GetPluginIndex();
-            $Path = '/dashboard/plugin/'.strtolower($PluginName).'/toggle/'.Gdn::Session()->TransientKey();
+            $PluginName = $this->getPluginIndex();
+            $Path = '/dashboard/plugin/'.strtolower($PluginName).'/toggle/'.Gdn::session()->transientKey();
         }
         return $Path;
     }
 
    /**
-    * Convenience method for determining 2nd level activation
+     * Convenience method for determining 2nd level activation.
     *
     * This method checks the secondary "Plugin.PLUGINNAME.Enabled" setting that has becoming the de-facto
     * standard for keeping plugins enabled but de-activated.
@@ -268,7 +307,15 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         return C($EnabledKey, false);
     }
 
-    public function Dispatch($Sender, $RequestArgs = array()) {
+    /**
+     *
+     *
+     * @param $Sender
+     * @param array $RequestArgs
+     * @return mixed
+     * @throws Exception
+     */
+    public function dispatch($Sender, $RequestArgs = array()) {
         $this->Sender = $Sender;
         $Sender->Form = new Gdn_Form();
 
@@ -285,7 +332,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
         if (method_exists($this, $ControllerMethod)) {
             $Sender->Plugin = $this;
-            return call_user_func(array($this,$ControllerMethod), $Sender);
+            return call_user_func(array($this, $ControllerMethod), $Sender);
         } else {
             $PluginName = get_class($this);
             throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
@@ -293,19 +340,24 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
    /**
-    * Passthru render request to sender
+     * Passthru render request to sender.
     *
     * This render method automatically adds the correct ApplicationFolder parameter
     * so that $Sender->Render() will first check the plugin's views/ folder.
     *
     * @param string $ViewName
     */
-    public function Render($ViewName) {
-        $PluginFolder = $this->GetPluginFolder(false);
-        $this->Sender->Render($ViewName, '', $PluginFolder);
+    public function render($ViewName) {
+        $PluginFolder = $this->getPluginFolder(false);
+        $this->Sender->render($ViewName, '', $PluginFolder);
     }
 
-    public function UserMetaModel() {
-        return Gdn::UserMetaModel();
+    /**
+     * Instance of UserMetaModel.
+     *
+     * @return UserMetaModel
+     */
+    public function userMetaModel() {
+        return Gdn::userMetaModel();
     }
 }

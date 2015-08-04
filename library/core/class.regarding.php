@@ -1,21 +1,22 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Regarding system
- *
- * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc
+ * Regarding system.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
+/**
+ * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
+ */
 class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
     }
@@ -32,10 +33,10 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
     * @return Gdn_RegardingEntity
     */
-    public function Comment($CommentID, $Verify = true, $AutoParent = true) {
-        $Regarding = $this->Regarding('Comment', $CommentID, $Verify);
+    public function comment($CommentID, $Verify = true, $AutoParent = true) {
+        $Regarding = $this->regarding('Comment', $CommentID, $Verify);
         if ($Verify && $AutoParent) {
-            $Regarding->AutoParent('discussion');
+            $Regarding->autoParent('discussion');
         }
         return $Regarding;
     }
@@ -47,8 +48,8 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $Verify optional boolean whether or not to verify this. default true.
     * @return Gdn_RegardingEntity
     */
-    public function Discussion($DiscussionID, $Verify = true) {
-        return $this->Regarding('Discussion', $DiscussionID, $Verify);
+    public function discussion($DiscussionID, $Verify = true) {
+        return $this->regarding('Discussion', $DiscussionID, $Verify);
     }
 
    /**
@@ -61,10 +62,10 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $AutoParent optional boolean whether or not to try to autoparent. default true.
     * @return Gdn_RegardingEntity
     */
-    public function Message($MessageID, $Verify = true, $AutoParent = true) {
-        $Regarding = $this->Regarding('ConversationMessage', $MessageID, $Verify);
+    public function message($MessageID, $Verify = true, $AutoParent = true) {
+        $Regarding = $this->regarding('ConversationMessage', $MessageID, $Verify);
         if ($Verify && $AutoParent) {
-            $Regarding->AutoParent('conversation');
+            $Regarding->autoParent('conversation');
         }
         return $Regarding;
     }
@@ -76,11 +77,20 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $Verify optional boolean whether or not to verify this. default true.
     * @return Gdn_RegardingEntity
     */
-    public function Conversation($ConversationID, $Verify = true) {
-        return $this->Regarding('Conversation', $ConversationID, $Verify);
+    public function conversation($ConversationID, $Verify = true) {
+        return $this->regarding('Conversation', $ConversationID, $Verify);
     }
 
-    protected function Regarding($ThingType, $ThingID, $Verify = true) {
+    /**
+     *
+     *
+     * @param $ThingType
+     * @param $ThingID
+     * @param bool $Verify
+     * @return Gdn_RegardingEntity
+     * @throws Exception
+     */
+    protected function regarding($ThingType, $ThingID, $Verify = true) {
         $Verified = false;
         if ($Verify) {
             $ModelName = ucfirst($ThingType).'Model';
@@ -91,7 +101,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 
            // If we can lookup this object, it is verified
             $VerifyModel = new $ModelName;
-            $SourceElement = $VerifyModel->GetID($ThingID);
+            $SourceElement = $VerifyModel->getID($ThingID);
             if ($SourceElement !== false) {
                 $Verified = true;
             }
@@ -103,7 +113,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         if ($Verified !== false) {
             $Regarding = new Gdn_RegardingEntity($ThingType, $ThingID);
             if ($Verify) {
-                $Regarding->VerifiedAs($SourceElement);
+                $Regarding->verifiedAs($SourceElement);
             }
 
             return $Regarding;
@@ -112,21 +122,29 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         throw new Exception(sprintf(T("Could not verify entity relationship '%s(%d)' for Regarding call"), $ModelName, $ThingID));
     }
 
-   // Transparent forwarder to built-in starter methods
-    public function That() {
+    /**
+     * Transparent forwarder to built-in starter methods.
+     *
+     * @return mixed
+     */
+    public function that() {
         $Args = func_get_args();
         $ThingType = array_shift($Args);
 
         return call_user_func_array(array($this, $ThingType), $Args);
     }
 
-   /*
-    * Event system: Provide information for external hooks
+    /**
+     *  Event system: Provide information for external hooks.
+     *
+     * @param $RegardingType
+     * @param $ForeignType
+     * @param null $ForeignID
+     * @return array|bool
     */
+    public function matchEvent($RegardingType, $ForeignType, $ForeignID = null) {
+        $RegardingData = val('RegardingData', $this->EventArguments);
    
-    public function MatchEvent($RegardingType, $ForeignType, $ForeignID = null) {
-        $RegardingData = GetValue('RegardingData', $this->EventArguments);
-      
         $FoundRegardingType = strtolower(GetValue('Type', $RegardingData));
         if (!is_array($RegardingType)) {
             $RegardingType = array($RegardingType);
@@ -141,7 +159,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
             return false;
         }
       
-        $FoundForeignType = strtolower(GetValue('ForeignType', $RegardingData));
+        $FoundForeignType = strtolower(val('ForeignType', $RegardingData));
         if (!is_array($ForeignType)) {
             $ForeignType = array($ForeignType);
         }
@@ -156,7 +174,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         }
       
         if (!is_null($ForeignID)) {
-            $FoundForeignID = GetValue('ForeignID', $RegardingData);
+            $FoundForeignID = val('ForeignID', $RegardingData);
             if ($FoundForeignID != $ForeignID) {
                 return false;
             }
@@ -186,12 +204,19 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
 //      $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
 //   }
 
-    protected function CacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
-
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $ParentType
+     * @param $ParentID
+     * @param $ForeignType
+     * @param $ForeignIDs
+     */
+    protected function cacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
         $Sender->RegardingCache = array();
-
-        $ChildRegardingData = $this->RegardingModel()->GetAll($ForeignType, $ForeignIDs);
-        $ParentRegardingData = $this->RegardingModel()->Get($ParentType, $ParentID);
+        $ChildRegardingData = $this->regardingModel()->getAll($ForeignType, $ForeignIDs);
+        $ParentRegardingData = $this->regardingModel()->get($ParentType, $ParentID);
 
  /*
        $MediaArray = array();
@@ -207,33 +232,43 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         $this->RegardingCache = array();
     }
 
-    public function DiscussionController_BeforeCommentBody_Handler($Sender) {
+    /**
+     *
+     *
+     * @param $Sender
+     */
+    public function discussionController_beforeCommentBody_handler($Sender) {
         $Context = strtolower($Sender->EventArguments['Type']);
 
-        $RegardingID = GetValue('RegardingID', $Sender->EventArguments['Object'], null);
+        $RegardingID = val('RegardingID', $Sender->EventArguments['Object'], null);
         if (is_null($RegardingID) || $RegardingID < 0) {
             return;
         }
 
         try {
-            $RegardingData = $this->RegardingModel()->GetID($RegardingID);
-            $EntityModelName = ucfirst(GetValue('ForeignType', $RegardingData)).'Model';
+            $RegardingData = $this->regardingModel()->getID($RegardingID);
+            $EntityModelName = ucfirst(val('ForeignType', $RegardingData)).'Model';
             if (class_exists($EntityModelName)) {
                 $EntityModel = new $EntityModelName();
-                $Entity = $EntityModel->GetID(GetValue('ForeignID', $RegardingData));
+                $Entity = $EntityModel->getID(val('ForeignID', $RegardingData));
                 $this->EventArguments = array_merge($this->EventArguments, array(
-                'EventSender'     => $Sender,
-                'Entity'          => $Entity,
-                'RegardingData'   => $RegardingData,
-                'Options'         => null
+                    'EventSender' => $Sender,
+                    'Entity' => $Entity,
+                    'RegardingData' => $RegardingData,
+                    'Options' => null
                 ));
-                $this->FireEvent('RegardingDisplay');
+                $this->fireEvent('RegardingDisplay');
             }
         } catch (Exception $e) {
         }
     }
 
-    public function RegardingModel() {
+    /**
+     *
+     *
+     * @return RegardingModel
+     */
+    public function regardingModel() {
         static $RegardingModel = null;
         if (is_null($RegardingModel)) {
             $RegardingModel = new RegardingModel();
@@ -241,6 +276,9 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
         return $RegardingModel;
     }
 
-    public function Setup() {
+    /**
+     * Do nothing.
+     */
+    public function setup() {
     }
 }

@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
    checkNoPassword.apply($('.js-nopassword input[type=checkbox]'));
 
    // Hide/Reveal reset password input
-   var hideNewPassword = function () {
+    var hideNewPassword = function() {
          $('#NewPassword').hide();
       },
       // When any of these events are triggered, the "New Password" input will
@@ -67,7 +67,7 @@ jQuery(document).ready(function($) {
    // When the password options are clicked, check to see if the admin/mod
    // wishes to set a new password for the user. If that's the case, show the
    // password reset input. Otherwise, hide it.
-   $(document).on('click', '.PasswordOptions', function () {
+    $(document).on('click', '.PasswordOptions', function() {
       if ($("input:radio[name='ResetPassword']:checked").val() == 'Manual') {
          $('#NewPassword').slideDown('fast');
       } else {

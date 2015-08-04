@@ -1,33 +1,31 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Handles analyzing and returning various parts of the current url.
+ * Gdn_Url
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
+/**
+ * Handles analyzing and returning various parts of the current url.
+ */
 class Gdn_Url {
 
-
    /**
-    * Returns the path to the application's dispatcher. Optionally with the
-    * domain prepended.
+     * Returns the path to the application's dispatcher. Optionally with the domain prepended.
     *  ie. http://domain.com/[web_root]/index.php?/request
     *
     * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
     * @return string
     */
-    public static function WebRoot($WithDomain = false) {
-        $WebRoot = Gdn::Request()->WebRoot();
+    public static function webRoot($WithDomain = false) {
+        $WebRoot = Gdn::request()->webRoot();
 
         if ($WithDomain) {
-            $Result = Gdn::Request()->Domain().'/'.$WebRoot;
+            $Result = Gdn::request()->domain().'/'.$WebRoot;
         } else {
             $Result = $WebRoot;
         }
@@ -35,18 +33,16 @@ class Gdn_Url {
         return $Result;
     }
 
-
    /**
     * Returns the domain from the current url. ie. "http://localhost/" in
     * "http://localhost/this/that/garden/index.php?/controller/action/"
     *
     * @return string
     */
-    public static function Domain() {
+    public static function domain() {
        // Attempt to get the domain from the configuration array
-        return Gdn::Request()->Domain();
+        return Gdn::request()->domain();
     }
-
 
    /**
     * Returns the host from the current url. ie. "localhost" in
@@ -54,10 +50,9 @@ class Gdn_Url {
     *
     * @return string
     */
-    public static function Host() {
-        return Gdn::Request()->RequestHost();
+    public static function host() {
+        return Gdn::request()->requestHost();
     }
-
 
    /**
     * Returns any GET parameters from the querystring. ie. "this=that&y=n" in
@@ -65,10 +60,9 @@ class Gdn_Url {
     *
     * @return string
     */
-    public static function QueryString() {
-        return http_build_query(Gdn::Request()->GetRequestArguments(Gdn_Request::INPUT_GET));
+    public static function queryString() {
+        return http_build_query(Gdn::request()->getRequestArguments(Gdn_Request::INPUT_GET));
     }
-
 
    /**
     * Returns the Request part of the current url. ie. "/controller/action/" in
@@ -79,10 +73,10 @@ class Gdn_Url {
     * @param boolean $RemoveSyndication
     * @return string
     */
-    public static function Request($WithWebRoot = false, $WithDomain = false, $RemoveSyndication = false) {
-        $Result = Gdn::Request()->Path();
+    public static function request($WithWebRoot = false, $WithDomain = false, $RemoveSyndication = false) {
+        $Result = Gdn::request()->path();
         if ($WithWebRoot) {
-            $Result = self::WebRoot($WithDomain).'/'.$Result;
+            $Result = self::webRoot($WithDomain).'/'.$Result;
         }
         return $Result;
     }

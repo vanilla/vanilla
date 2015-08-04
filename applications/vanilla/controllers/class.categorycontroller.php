@@ -1,20 +1,19 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Category controller
+ * Discussion controller
  *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.17.9
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
+ * @since 2.0.17.9
  */
 
-class CategoryController extends VanillaController {
    /**
-    * @var Gdn_CategoryModel
+ * Handles the /category endpoint.
     */
+class CategoryController extends VanillaController {
+
+    /** @var Gdn_CategoryModel */
     public $CategoryModel;
 
     public function __construct() {
@@ -22,26 +21,26 @@ class CategoryController extends VanillaController {
         $this->CategoryModel = new CategoryModel();
     }
 
-    public function Follow($CategoryID, $Value, $TKey) {
-        if (Gdn::Session()->ValidateTransientKey($TKey)) {
+    public function follow($CategoryID, $Value, $TKey) {
+        if (Gdn::session()->validateTransientKey($TKey)) {
             $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => !(bool)$Value));
         }
 
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
-            Redirect('/categories');
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect('/categories');
         }
 
-        $this->Render();
+        $this->render();
     }
 
-    public function MarkRead($CategoryID, $TKey) {
-        if (Gdn::Session()->ValidateTransientKey($TKey)) {
-            $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
+    public function markRead($CategoryID, $TKey) {
+        if (Gdn::session()->validateTransientKey($TKey)) {
+            $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
         }
-        if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
-            Redirect('/categories');
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect('/categories');
         }
 
-        $this->Render();
+        $this->render();
     }
 }

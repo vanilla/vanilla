@@ -1,20 +1,29 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Spam model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
  */
 
+/**
+ * Handles spam data.
+ */
 class SpamModel extends Gdn_Pluggable {
-   /// PROPERTIES ///
+
+    /** @var SpamModel */
     protected static $_Instance;
    
+    /** @var bool */
     public static $Disabled = false;
 
-
-   /// METHODS ///
-
+    /**
+     *
+     *
+     * @return SpamModel
+     */
     protected static function _Instance() {
         if (!self::$_Instance) {
             self::$_Instance = new SpamModel();
@@ -29,7 +38,7 @@ class SpamModel extends Gdn_Pluggable {
     * @param bool|null $value
     * @return bool
     */
-    public static function Disabled($value = null) {
+    public static function disabled($value = null) {
         if ($value !== null) {
             self::$Disabled = $value;
         }
@@ -46,27 +55,27 @@ class SpamModel extends Gdn_Pluggable {
     * @param array $Options Options for fine-tuning this method call.
     *  - Log: Log the record if it is found to be spam.
     */
-    public static function IsSpam($RecordType, $Data, $Options = array()) {
+    public static function isSpam($RecordType, $Data, $Options = array()) {
         if (self::$Disabled) {
             return false;
         }
       
        // Set some information about the user in the data.
         if ($RecordType == 'Registration') {
-            TouchValue('Username', $Data, $Data['Name']);
+            touchValue('Username', $Data, $Data['Name']);
         } else {
-            TouchValue('InsertUserID', $Data, Gdn::Session()->UserID);
+            touchValue('InsertUserID', $Data, Gdn::session()->UserID);
          
-            $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Data), DATASET_TYPE_ARRAY);
+            $User = Gdn::userModel()->getID(val('InsertUserID', $Data), DATASET_TYPE_ARRAY);
          
             if ($User) {
-                if (GetValue('Verified', $User)) {
+                if (val('Verified', $User)) {
                    // The user has been verified and isn't a spammer.
                     return false;
                 }
-                TouchValue('Username', $Data, $User['Name']);
-                TouchValue('Email', $Data, $User['Email']);
-                TouchValue('IPAddress', $Data, $User['LastIPAddress']);
+                touchValue('Username', $Data, $User['Name']);
+                touchValue('Email', $Data, $User['Email']);
+                touchValue('IPAddress', $Data, $User['LastIPAddress']);
             }
         }
       
@@ -74,7 +83,7 @@ class SpamModel extends Gdn_Pluggable {
             $Data['Body'] = $Data['Story'];
         }
       
-        TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
+        touchValue('IPAddress', $Data, Gdn::request()->ipAddress());
 
         $Sp = self::_Instance();
       
@@ -83,11 +92,11 @@ class SpamModel extends Gdn_Pluggable {
         $Sp->EventArguments['Options'] =& $Options;
         $Sp->EventArguments['IsSpam'] = false;
 
-        $Sp->FireEvent('CheckSpam');
+        $Sp->fireEvent('CheckSpam');
         $Spam = $Sp->EventArguments['IsSpam'];
 
        // Log the spam entry.
-        if ($Spam && GetValue('Log', $Options, true)) {
+        if ($Spam && val('Log', $Options, true)) {
             $LogOptions = array();
             switch ($RecordType) {
                 case 'Registration':
@@ -101,7 +110,7 @@ class SpamModel extends Gdn_Pluggable {
                     break;
             }
 
-            LogModel::Insert('Spam', $RecordType, $Data, $LogOptions);
+            LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
         }
 
         return $Spam;

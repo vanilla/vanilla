@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tiny diff is, as the name already suggests, a small PHP class that can create a diff without having to rely on any external libraries or utilities. Thanks to Dan Horrigan for helping me out with this class
  *
@@ -30,8 +31,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-class Tiny_diff
-{
+class Tiny_diff {
     /**
      * Compare two strings and return the difference
      *
@@ -42,39 +42,38 @@ class Tiny_diff
      * @return string
      */
     public function compare($old, $new, $mode = 'normal') {
-    
         // Mixed
         if ($mode === 'mixed') {
         // Insert characters
-            $ins_begin  = '<ins>+ ';
-            $ins_end    = '</ins>' . PHP_EOL;
+            $ins_begin = '<ins>+ ';
+            $ins_end = '</ins>'.PHP_EOL;
 
             // Delete characters
-            $del_begin      = '<del>- ';
-            $del_end        = '</del>' . PHP_EOL;
+            $del_begin = '<del>- ';
+            $del_end = '</del>'.PHP_EOL;
         } // HTML mode
         elseif ($mode === 'html') {
         // Insert characters
-            $ins_begin  = '<ins>';
-            $ins_end    = '</ins>' . PHP_EOL;
+            $ins_begin = '<ins>';
+            $ins_end = '</ins>'.PHP_EOL;
 
             // Delete characters
-            $del_begin      = '<del>';
-            $del_end        = '</del>' . PHP_EOL;
+            $del_begin = '<del>';
+            $del_end = '</del>'.PHP_EOL;
         } // Normal mode
         else {
             // Insert characters
-            $ins_begin  = '+ ';
-            $ins_end    = PHP_EOL;
+            $ins_begin = '+ ';
+            $ins_end = PHP_EOL;
 
             // Delete characters
-            $del_begin      = '- ';
-            $del_end        = PHP_EOL;
+            $del_begin = '- ';
+            $del_end = PHP_EOL;
         }
 
         // Turn the strings into an array so it's a bit easier to parse them
-        $diff   = $this->diff(explode(PHP_EOL, $old), explode(PHP_EOL, $new));
-        $result     = '';
+        $diff = $this->diff(explode(PHP_EOL, $old), explode(PHP_EOL, $new));
+        $result = '';
       
         if ($mode == 'raw') {
             return $diff;
@@ -82,10 +81,10 @@ class Tiny_diff
 
         foreach ($diff as $line) {
             if (is_array($line)) {
-                $result .= !empty($line['del']) ? $del_begin . implode(PHP_EOL, $line['del']) . $del_end : '';
-                $result .= !empty($line['ins']) ? $ins_begin . implode(PHP_EOL, $line['ins']) . $ins_end : '';
+                $result .= !empty($line['del']) ? $del_begin.implode(PHP_EOL, $line['del']).$del_end : '';
+                $result .= !empty($line['ins']) ? $ins_begin.implode(PHP_EOL, $line['ins']).$ins_end : '';
             } else {
-                $result .= $line . PHP_EOL;
+                $result .= $line.PHP_EOL;
             }
         }
 
@@ -105,7 +104,6 @@ class Tiny_diff
      * @param string $new The new block of data
      */
     private function diff($old, $new) {
-    
         $maxlen = 0;
         // Go through each old line.
         foreach ($old as $old_line => $old_value) {
@@ -123,7 +121,7 @@ class Tiny_diff
             }
         }
         if ($maxlen == 0) {
-            return array(array('del'=>$old, 'ins'=>$new));
+            return array(array('del' => $old, 'ins' => $new));
         }
         return array_merge(
             self::diff(array_slice($old, 0, $old_max), array_slice($new, 0, $new_max)),

@@ -1,26 +1,32 @@
 jQuery(document).ready(function($) {
-   
-   // Load news & tutorials from Vanilla
-   var lists = $('div.Column div.List'),
-      newsColumn = $('div.NewsColumn div.List'),
-      helpColumn = $('div.HelpColumn div.List');
 
-   loadFeed = function(container, type, rows, format) {
-      $.ajax({
-         type: "GET",
-         url: gdn.url('/dashboard/utility/getfeed/'+type+'/'+rows+'/'+format+'/'),
-         success: function(data) {
-            container.removeClass('Loading');
-            container.html(data);
-         },
-         error: function() {
-            container.removeClass('Loading');
-            container.text('Failed to load '+type+' feed.');
-         }
-      });
-   };
+    // Load news & tutorials from Vanilla
+    var lists = $('div.Column div.List'),
+        newsColumn = $('div.NewsColumn div.List'),
+        releasesColumn = $('div.ReleasesColumn div.List');
 
-   lists.addClass('Loading');
-   loadFeed(newsColumn, 'news', 3, 'extended');
-   loadFeed(helpColumn, 'help', 3, 'extended');   
+    loadFeed = function(container, feedUrl) {
+        $.ajax({
+            type: "GET",
+            url: gdn.url(feedUrl),
+            success: function(data) {
+                container.removeClass('Loading');
+                container.html(data);
+            },
+            error: function() {
+                container.removeClass('Loading');
+                container.text('Failed to load ' + type + ' feed.');
+            }
+        });
+    };
+
+    lists.addClass('Loading');
+    var newsUrl = gdn.definition("DashboardNewsFeed", "/dashboard/utility/getfeed/news/5/normal");
+    var releasesUrl = gdn.definition("DashboardReleasesFeed", "/dashboard/utility/getfeed/releases/2/extended");
+    if (newsUrl) {
+        loadFeed(newsColumn, newsUrl);
+    }
+    if (releasesUrl) {
+        loadFeed(releasesColumn, releasesUrl);
+    }
 });

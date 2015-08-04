@@ -1,19 +1,17 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Garden.Modules
+ * New Discussion module
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
  */
 
 /**
  * Renders the "Start a New Discussion" button.
  */
 class NewDiscussionModule extends Gdn_Module {
-
-    public function AssetTarget() {
-        return 'Panel';
-    }
 
    /** @var int Which category we are viewing (if any). */
     public $CategoryID = null;
@@ -45,7 +43,16 @@ class NewDiscussionModule extends Gdn_Module {
     public function __construct($Sender = '', $ApplicationFolder = false) {
         parent::__construct($Sender, 'Vanilla');
        // Customize main button by setting Vanilla.DefaultNewButton to URL code. Example: "post/question"
-        $this->DefaultButton = C('Vanilla.DefaultNewButton', false);
+        $this->DefaultButton = c('Vanilla.DefaultNewButton', false);
+    }
+
+    /**
+     *
+     *
+     * @return string
+     */
+    public function assetTarget() {
+        return 'Panel';
     }
 
    /**
@@ -54,7 +61,7 @@ class NewDiscussionModule extends Gdn_Module {
     * @param $Text
     * @param $Url
     */
-    public function AddButton($Text, $Url) {
+    public function addButton($Text, $Url) {
         $this->Buttons[] = array('Text' => $Text, 'Url' => $Url);
     }
 
@@ -63,27 +70,27 @@ class NewDiscussionModule extends Gdn_Module {
     *
     * @return string
     */
-    public function ToString() {
+    public function toString() {
        // Set CategoryID if we have one.
         if ($this->CategoryID === null) {
-            $this->CategoryID = Gdn::Controller()->Data('Category.CategoryID', false);
+            $this->CategoryID = Gdn::controller()->data('Category.CategoryID', false);
         }
 
        // Allow plugins and themes to modify parameters.
-        Gdn::Controller()->EventArguments['NewDiscussionModule'] = &$this;
-        Gdn::Controller()->FireEvent('BeforeNewDiscussionButton');
+        Gdn::controller()->EventArguments['NewDiscussionModule'] = &$this;
+        Gdn::controller()->fireEvent('BeforeNewDiscussionButton');
 
        // Make sure the user has the most basic of permissions first.
         $PermissionCategory = CategoryModel::PermissionCategory($this->CategoryID);
         if ($this->CategoryID) {
-            $Category = CategoryModel::Categories($this->CategoryID);
-            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', true, 'Category', GetValue('CategoryID', $PermissionCategory));
+            $Category = CategoryModel::categories($this->CategoryID);
+            $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('CategoryID', $PermissionCategory));
         } else {
-            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', true, 'Category', 'any');
+            $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', 'any');
         }
 
        // Determine if this is a guest & we're using "New Discussion" button as call to action.
-        $PrivilegedGuest = ($this->ShowGuests && !Gdn::Session()->IsValid());
+        $PrivilegedGuest = ($this->ShowGuests && !Gdn::session()->isValid());
 
        // No module for you!
         if (!$HasPermission && !$PrivilegedGuest) {
@@ -94,22 +101,22 @@ class NewDiscussionModule extends Gdn_Module {
         $DiscussionTypes = CategoryModel::AllowedDiscussionTypes($PermissionCategory);
 
         foreach ($DiscussionTypes as $Key => $Type) {
-            if (isset($Type['AddPermission']) && !Gdn::Session()->CheckPermission($Type['AddPermission'])) {
+            if (isset($Type['AddPermission']) && !Gdn::session()->checkPermission($Type['AddPermission'])) {
                 unset($DiscussionTypes[$Key]);
                 continue;
             }
 
            // If user !$HasPermission, they are $PrivilegedGuest so redirect to $GuestUrl.
-            $Url = ($HasPermission) ? GetValue('AddUrl', $Type) : $this->GuestUrl;
+            $Url = ($HasPermission) ? val('AddUrl', $Type) : $this->GuestUrl;
             if (!$Url) {
                 continue;
             }
 
             if (isset($Category) && $HasPermission) {
-                $Url .= '/'.rawurlencode(GetValue('UrlCode', $Category));
+                $Url .= '/'.rawurlencode(val('UrlCode', $Category));
             }
 
-            $this->AddButton(T(GetValue('AddText', $Type)), $Url);
+            $this->AddButton(t(val('AddText', $Type)), $Url);
         }
 
        // Add QueryString to URL if one is defined.

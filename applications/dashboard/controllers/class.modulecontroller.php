@@ -1,23 +1,29 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
  * Provides a way to widgetize modules.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
 
+/**
+ * Handles /module endpoint.
+ */
 class ModuleController extends Gdn_Controller {
+
    /**
     * Creates and renders an instance of a module.
+     *
+     * @param string $Module
+     * @param string $AppFolder
+     * @param string $DeliveryType
+     * @throws NotFoundException
     */
-    public function Index($Module, $AppFolder = '', $DeliveryType = '') {
+    public function index($Module, $AppFolder = '', $DeliveryType = '') {
         if (!$DeliveryType) {
-            $this->DeliveryType(DELIVERY_TYPE_VIEW);
+            $this->deliveryType(DELIVERY_TYPE_VIEW);
         }
       
         $ModuleClassExists = class_exists($Module);
@@ -43,17 +49,17 @@ class ModuleController extends Gdn_Controller {
                 $ModuleInstance->Visible = true;
             
                 $WhiteList = array('Limit', 'Help');
-                foreach ($this->Request->Get() as $Key => $Value) {
+                foreach ($this->Request->get() as $Key => $Value) {
                     if (in_array($Key, $WhiteList)) {
                         $ModuleInstance->$Key = $Value;
                     }
                 }
             
-                $this->SetData('_Module', $ModuleInstance);
-                $this->Render('Index', false, 'dashboard');
+                $this->setData('_Module', $ModuleInstance);
+                $this->render('Index', false, 'dashboard');
                 return;
             }
         }
-        throw NotFoundException($Module);
+        throw notFoundException($Module);
     }
 }

@@ -1,46 +1,71 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Validating, Setting, and Retrieving session data in cookies.
+ * Gdn_CookieIdentity
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
+/**
+ * Validating, Setting, and Retrieving session data in cookies.
+ */
 class Gdn_CookieIdentity {
 
+    /** @var int|null */
     public $UserID = null;
 
+    /** @var string */
     public $CookieName;
+
+    /** @var string */
     public $CookiePath;
+
+    /** @var string */
     public $CookieDomain;
+
+    /** @var string */
     public $VolatileMarker;
+
+    /** @var bool */
     public $CookieHashMethod;
+
+    /** @var string */
     public $CookieSalt;
 
+    /** @var string */
     public $PersistExpiry = '30 days';
+
+    /** @var string */
     public $SessionExpiry = '2 days';
 
+    /**
+     *
+     *
+     * @param null $Config
+     */
     public function __construct($Config = null) {
-        $this->Init($Config);
+        $this->init($Config);
     }
 
-    public function Init($Config = null) {
+    /**
+     *
+     *
+     * @param null $Config
+     */
+    public function init($Config = null) {
         if (is_null($Config)) {
-            $Config = Gdn::Config('Garden.Cookie');
+            $Config = Gdn::config('Garden.Cookie');
         } elseif (is_string($Config))
-         $Config = Gdn::Config($Config);
+            $Config = Gdn::config($Config);
 
         $DefaultConfig = array_replace(
             array('PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'),
-            Gdn::Config('Garden.Cookie')
+            Gdn::config('Garden.Cookie')
         );
         $this->CookieName = val('Name', $Config, $DefaultConfig['Name']);
         $this->CookiePath = val('Path', $Config, $DefaultConfig['Path']);
@@ -55,10 +80,10 @@ class Gdn_CookieIdentity {
    /**
     * Destroys the user's session cookie - essentially de-authenticating them.
     */
-    protected function _ClearIdentity() {
+    protected function _clearIdentity() {
        // Destroy the cookie.
         $this->UserID = 0;
-        $this->_DeleteCookie($this->CookieName);
+        $this->_deleteCookie($this->CookieName);
     }
 
    /**
@@ -68,17 +93,17 @@ class Gdn_CookieIdentity {
     *
     * @return int
     */
-    public function GetIdentity() {
+    public function getIdentity() {
         if (!is_null($this->UserID)) {
             return $this->UserID;
         }
 
-        if (!$this->_CheckCookie($this->CookieName)) {
-            $this->_ClearIdentity();
+        if (!$this->_checkCookie($this->CookieName)) {
+            $this->_clearIdentity();
             return 0;
         }
 
-        list($UserID, $Expiration) = $this->GetCookiePayload($this->CookieName);
+        list($UserID, $Expiration) = $this->getCookiePayload($this->CookieName);
 
         if (!is_numeric($UserID) || $UserID < -2) { // allow for handshake special id
             return 0;
@@ -87,21 +112,33 @@ class Gdn_CookieIdentity {
         return $this->UserID = $UserID;
     }
 
-    public function HasVolatileMarker($CheckUserID) {
-        $HasMarker = $this->CheckVolatileMarker($CheckUserID);
+    /**
+     *
+     *
+     * @param $CheckUserID
+     * @return bool
+     */
+    public function hasVolatileMarker($CheckUserID) {
+        $HasMarker = $this->checkVolatileMarker($CheckUserID);
         if (!$HasMarker) {
-            $this->SetVolatileMarker($CheckUserID);
+            $this->setVolatileMarker($CheckUserID);
         }
 
         return $HasMarker;
     }
 
-    public function CheckVolatileMarker($CheckUserID) {
+    /**
+     *
+     *
+     * @param $CheckUserID
+     * @return bool
+     */
+    public function checkVolatileMarker($CheckUserID) {
         if (!$this->_CheckCookie($this->VolatileMarker)) {
             return false;
         }
 
-        list($UserID, $Expiration) = $this->GetCookiePayload($this->CookieName);
+        list($UserID, $Expiration) = $this->getCookiePayload($this->CookieName);
 
         if ($UserID != $CheckUserID) {
             return false;
@@ -116,8 +153,8 @@ class Gdn_CookieIdentity {
     *
     * @param string $Data The data to place in the hash.
     */
-    protected static function _Hash($Data, $CookieHashMethod, $CookieSalt) {
-        return Gdn_CookieIdentity::_HashHMAC($CookieHashMethod, $Data, $CookieSalt);
+    protected static function _hash($Data, $CookieHashMethod, $CookieSalt) {
+        return Gdn_CookieIdentity::_hashHMAC($CookieHashMethod, $Data, $CookieSalt);
     }
 
    /**
@@ -128,7 +165,7 @@ class Gdn_CookieIdentity {
     * @param string $Data The data to place in the hash.
     * @param string $Key The key to use when hashing the data.
     */
-    protected static function _HashHMAC($HashMethod, $Data, $Key) {
+    protected static function _hashHMAC($HashMethod, $Data, $Key) {
         $PackFormats = array('md5' => 'H32', 'sha1' => 'H40');
 
         if (!isset($PackFormats[$HashMethod])) {
@@ -146,7 +183,7 @@ class Gdn_CookieIdentity {
         $InnerPad = (substr($Key, 0, 64) ^ str_repeat(chr(0x36), 64));
         $OuterPad = (substr($Key, 0, 64) ^ str_repeat(chr(0x5C), 64));
 
-        return $HashMethod($OuterPad . pack($PackFormat, $HashMethod($InnerPad . $Data)));
+        return $HashMethod($OuterPad.pack($PackFormat, $HashMethod($InnerPad.$Data)));
     }
 
    /**
@@ -155,9 +192,9 @@ class Gdn_CookieIdentity {
     * @param int $UserID The unique id assigned to the user in the database.
     * @param boolean $Persist Should the user's session remain persistent across visits?
     */
-    public function SetIdentity($UserID, $Persist = false) {
+    public function setIdentity($UserID, $Persist = false) {
         if (is_null($UserID)) {
-            $this->_ClearIdentity();
+            $this->_clearIdentity();
             return;
         }
 
@@ -177,8 +214,8 @@ class Gdn_CookieIdentity {
 
        // Create the cookie
         $KeyData = $UserID.'-'.$PayloadExpires;
-        $this->_SetCookie($this->CookieName, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
-        $this->SetVolatileMarker($UserID);
+        $this->_setCookie($this->CookieName, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
+        $this->setVolatileMarker($UserID);
     }
 
    /**
@@ -187,7 +224,7 @@ class Gdn_CookieIdentity {
     * @param integer $UserID
     * @return void
     */
-    public function SetVolatileMarker($UserID) {
+    public function setVolatileMarker($UserID) {
         if (is_null($UserID)) {
             return;
         }
@@ -198,62 +235,62 @@ class Gdn_CookieIdentity {
         $CookieExpires = 0;
 
         $KeyData = $UserID.'-'.$PayloadExpires;
-        $this->_SetCookie($this->VolatileMarker, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
+        $this->_setCookie($this->VolatileMarker, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
     }
 
    /**
     * Set a cookie, using path, domain, salt, and hash method from core config
     *
-    * @param string  $CookieName Name of the cookie
-    * @param string  $KeyData
-    * @param mixed   $CookieContents
+     * @param string $CookieName Name of the cookie
+     * @param string $KeyData
+     * @param mixed $CookieContents
     * @param integer $CookieExpires
     * @return void
     */
-    protected function _SetCookie($CookieName, $KeyData, $CookieContents, $CookieExpires) {
-        self::SetCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
+    protected function _setCookie($CookieName, $KeyData, $CookieContents, $CookieExpires) {
+        self::setCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
     }
 
    /**
     * Set a cookie, using specified path, domain, salt and hash method
     *
-    * @param string  $CookieName Name of the cookie
-    * @param string  $KeyData
-    * @param mixed   $CookieContents
+     * @param string $CookieName Name of the cookie
+     * @param string $KeyData
+     * @param mixed $CookieContents
     * @param integer $CookieExpires
-    * @param string  $Path Optional. Cookie path (auto load from config)
-    * @param string  $Domain Optional. Cookie domain (auto load from config)
-    * @param string  $CookieHashMethod Optional. Cookie hash method (auto load from config)
-    * @param string  $CookieSalt Optional. Cookie salt (auto load from config)
+     * @param string $Path Optional. Cookie path (auto load from config)
+     * @param string $Domain Optional. Cookie domain (auto load from config)
+     * @param string $CookieHashMethod Optional. Cookie hash method (auto load from config)
+     * @param string $CookieSalt Optional. Cookie salt (auto load from config)
     * @return void
     */
-    public static function SetCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $Path = null, $Domain = null, $CookieHashMethod = null, $CookieSalt = null) {
+    public static function setCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $Path = null, $Domain = null, $CookieHashMethod = null, $CookieSalt = null) {
 
         if (is_null($Path)) {
-            $Path = Gdn::Config('Garden.Cookie.Path', '/');
+            $Path = Gdn::config('Garden.Cookie.Path', '/');
         }
 
         if (is_null($Domain)) {
-            $Domain = Gdn::Config('Garden.Cookie.Domain', '');
+            $Domain = Gdn::config('Garden.Cookie.Domain', '');
         }
 
        // If the domain being set is completely incompatible with the current domain then make the domain work.
-        $CurrentHost = Gdn::Request()->Host();
-        if (!StringEndsWith($CurrentHost, trim($Domain, '.'))) {
+        $CurrentHost = Gdn::request()->host();
+        if (!stringEndsWith($CurrentHost, trim($Domain, '.'))) {
             $Domain = '';
         }
 
         if (!$CookieHashMethod) {
-            $CookieHashMethod = Gdn::Config('Garden.Cookie.HashMethod');
+            $CookieHashMethod = Gdn::config('Garden.Cookie.HashMethod');
         }
 
         if (!$CookieSalt) {
-            $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
+            $CookieSalt = Gdn::config('Garden.Cookie.Salt');
         }
 
        // Create the cookie signature
-        $KeyHash = self::_Hash($KeyData, $CookieHashMethod, $CookieSalt);
-        $KeyHashHash = self::_HashHMAC($CookieHashMethod, $KeyData, $KeyHash);
+        $KeyHash = self::_hash($KeyData, $CookieHashMethod, $CookieSalt);
+        $KeyHashHash = self::_hashHMAC($CookieHashMethod, $KeyData, $KeyHash);
         $Cookie = array($KeyData, $KeyHashHash, time());
 
        // Attach cookie payload
@@ -269,51 +306,73 @@ class Gdn_CookieIdentity {
         $_COOKIE[$CookieName] = $CookieContents;
     }
 
-    protected function _CheckCookie($CookieName) {
-        $CookieStatus = self::CheckCookie($CookieName, $this->CookieHashMethod, $this->CookieSalt);
+    /**
+     *
+     *
+     * @param $CookieName
+     * @return bool
+     */
+    protected function _checkCookie($CookieName) {
+        $CookieStatus = self::checkCookie($CookieName, $this->CookieHashMethod, $this->CookieSalt);
         if ($CookieStatus === false) {
-            $this->_DeleteCookie($CookieName);
+            $this->_deleteCookie($CookieName);
         }
         return $CookieStatus;
     }
 
-    public static function CheckCookie($CookieName, $CookieHashMethod = null, $CookieSalt = null) {
+    /**
+     *
+     *
+     * @param $CookieName
+     * @param null $CookieHashMethod
+     * @param null $CookieSalt
+     * @return bool
+     */
+    public static function checkCookie($CookieName, $CookieHashMethod = null, $CookieSalt = null) {
         if (empty($_COOKIE[$CookieName])) {
             return false;
         }
 
         if (is_null($CookieHashMethod)) {
-            $CookieHashMethod = Gdn::Config('Garden.Cookie.HashMethod');
+            $CookieHashMethod = Gdn::config('Garden.Cookie.HashMethod');
         }
 
         if (is_null($CookieSalt)) {
-            $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
+            $CookieSalt = Gdn::config('Garden.Cookie.Salt');
         }
 
         $CookieData = explode('|', $_COOKIE[$CookieName]);
         if (count($CookieData) < 5) {
-            self::DeleteCookie($CookieName);
+            self::deleteCookie($CookieName);
             return false;
         }
 
         list($HashKey, $CookieHash, $Time, $UserID, $PayloadExpires) = $CookieData;
         if ($PayloadExpires < time() && $PayloadExpires != 0) {
-            self::DeleteCookie($CookieName);
+            self::deleteCookie($CookieName);
             return false;
         }
-        $KeyHash = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
-        $CheckHash = self::_HashHMAC($CookieHashMethod, $HashKey, $KeyHash);
+        $KeyHash = self::_hash($HashKey, $CookieHashMethod, $CookieSalt);
+        $CheckHash = self::_hashHMAC($CookieHashMethod, $HashKey, $KeyHash);
 
         if (!CompareHashDigest($CookieHash, $CheckHash)) {
-            self::DeleteCookie($CookieName);
+            self::deleteCookie($CookieName);
             return false;
         }
 
         return true;
     }
 
-    public static function GetCookiePayload($CookieName, $CookieHashMethod = null, $CookieSalt = null) {
-        if (!self::CheckCookie($CookieName)) {
+    /**
+     *
+     *
+     * @param $CookieName
+     * @param null $CookieHashMethod
+     * @param null $CookieSalt
+     * @return array|bool
+     */
+    public static function getCookiePayload($CookieName, $CookieHashMethod = null, $CookieSalt = null) {
+        if (!self::checkCookie($CookieName)) {
             return false;
         }
 
@@ -329,22 +388,33 @@ class Gdn_CookieIdentity {
         return $Payload;
     }
 
-    protected function _DeleteCookie($CookieName) {
+    /**
+     *
+     *
+     * @param $CookieName
+     */
+    protected function _deleteCookie($CookieName) {
         unset($_COOKIE[$CookieName]);
-        self::DeleteCookie($CookieName, $this->CookiePath, $this->CookieDomain);
+        self::deleteCookie($CookieName, $this->CookiePath, $this->CookieDomain);
     }
 
-    public static function DeleteCookie($CookieName, $Path = null, $Domain = null) {
-
+    /**
+     *
+     *
+     * @param $CookieName
+     * @param null $Path
+     * @param null $Domain
+     */
+    public static function deleteCookie($CookieName, $Path = null, $Domain = null) {
         if (is_null($Path)) {
-            $Path = Gdn::Config('Garden.Cookie.Path');
+            $Path = Gdn::config('Garden.Cookie.Path');
         }
 
         if (is_null($Domain)) {
-            $Domain = Gdn::Config('Garden.Cookie.Domain');
+            $Domain = Gdn::config('Garden.Cookie.Domain');
         }
 
-        $CurrentHost = Gdn::Request()->Host();
+        $CurrentHost = Gdn::request()->host();
         if (!StringEndsWith($CurrentHost, trim($Domain, '.'))) {
             $Domain = '';
         }

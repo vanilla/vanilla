@@ -16,4 +16,4 @@ Gdn::FactoryInstall('Head', 'HeadModule');
 
 // Menu.
 Gdn::FactoryInstall('Menu', 'MenuModule');
-Gdn::Dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));
+Gdn::dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));

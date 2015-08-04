@@ -1,33 +1,70 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+<?php
+/**
+ * For exporting other database structures into a format that can be imported.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.1
 */
 
 /**
- * Object for exporting other database structures into a format that can be imported.
+ * Export handler.
+ *
  * @see Gdn_ImportModel
  */
 class ExportModel {
+
+    /** Comment character to use in export. */
     const COMMENT = '//';
+
+    /** Delimiter character to use in export. */
     const DELIM = ',';
+
+    /** Escape character to use in export. */
     const ESCAPE = '\\';
+
+    /** Newline character to use in export. */
     const NEWLINE = "\n";
+
+    /** Null character to use in export. */
     const NULL = '\N';
+
+    /** Quote character to use in export. */
     const QUOTE = '"';
+
+    /** @var object|null File pointer. */
+    protected $_File = null;
     
+    /** @var object|null PDO connection. */
+    protected $_PDO = null;
+
+    /** @var bool Whether or not to use compression when creating the file.  */
+    public $UseCompression = true;
+
+    /** @var string The database prefix that ExportTable() it will replace :_ with in a query string. */
+    public $Prefix = '';
+
+    /** @var array Data format we support exporting. */
+    protected $_Structures = array(
+        'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+        'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
+        'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
+        'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
+        'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
+        'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
+        'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
+        'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('u', 'm', 'f'), 'Score' => 'float'),
+        'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
+    );
+
     /**
      * Create the export file and begin the export.
+     *
      * @param string $Path The path to the export file.
      * @param string $Source The source program that created the export. This may be used by the import routine to do additional processing.
      */
-    public function BeginExport($Path, $Source = '') {
+    public function beginExport($Path, $Source = '') {
         $this->BeginTime = microtime(true);
         $TimeStart = list($sm, $ss) = explode(' ', microtime());
         
@@ -48,10 +85,11 @@ class ExportModel {
     
     /**
      * Write a comment to the export file.
+     *
      * @param string $Message The message to write.
      * @param bool $Echo Whether or not to echo the message in addition to writing it to the file.
      */
-    public function Comment($Message, $Echo = true) {
+    public function comment($Message, $Echo = true) {
         fwrite($this->_File, self::COMMENT.' '.str_replace(self::NEWLINE, self::NEWLINE.self::COMMENT.' ', $Message).self::NEWLINE);
         if ($Echo) {
             echo $Message, "\n";
@@ -59,9 +97,11 @@ class ExportModel {
     }
     
     /**
-     * End the export and close the export file. This method must be called if BeginExport() has been called or else the export file will not be closed.
+     * End the export and close the export file.
+     *
+     * This method must be called if BeginExport() has been called or else the export file will not be closed.
      */
-    public function EndExport() {
+    public function endExport() {
         $this->EndTime = microtime(true);
         $this->TotalTime = $this->EndTime - $this->BeginTime;
         $m = floor($this->TotalTime / 60);
@@ -76,20 +116,18 @@ class ExportModel {
         }
     }
     
-    protected $_File = null;
-    
-    protected $_PDO = null;
     /**
      * Gets or sets the PDO connection to the database.
+     *
      * @param mixed $DsnOrPDO One of the following:
      *  - <b>String</b>: The dsn to the database.
      *  - <b>PDO</b>: An existing connection to the database.
      *  - <b>Null</b>: The PDO connection will not be set.
-     *  @param string $Username The username for the database if a dsn is specified.
-     *  @param string $Password The password for the database if a dsn is specified.
-     *  @return PDO The current database connection.
+     * @param string $Username The username for the database if a dsn is specified.
+     * @param string $Password The password for the database if a dsn is specified.
+     * @return PDO The current database connection.
      */
-    public function PDO($DsnOrPDO = null, $Username = null, $Password = null) {
+    public function pDO($DsnOrPDO = null, $Username = null, $Password = null) {
         if (!is_null($DsnOrPDO)) {
             if ($DsnOrPDO instanceof PDO) {
                 $this->_PDO = $DsnOrPDO;
@@ -105,21 +143,22 @@ class ExportModel {
     
     /**
      * Export a table to the export file.
+     *
      * @param string $TableName the name of the table to export. This must correspond to one of the accepted vanilla tables.
      * @param mixed $Query The query that will fetch the data for the export this can be one of the following:
      *  - <b>String</b>: Represents a string of sql to execute.
      *  - <b>PDOStatement</b>: Represents an already executed query resultset.
      *  - <b>Array</b>: Represents an array of associative arrays or objects containing the data in the export.
-     *  @param array $Mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
+     * @param array $Mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
      *  For a list of the export tables and columns see $this->Structure().
      */
-    public function ExportTable($TableName, $Query, $Mappings = array()) {
+    public function exportTable($TableName, $Query, $Mappings = array()) {
         $fp = $this->_File;
         
         // Make sure the table is valid for export.
         if (!array_key_exists($TableName, $this->_Structures)) {
             $this->Comment("Error: $TableName is not a valid export."
-                ." The valid tables for export are ". implode(", ", array_keys($this->_Structures)));
+                ." The valid tables for export are ".implode(", ", array_keys($this->_Structures)));
             fwrite($fp, self::NEWLINE);
             return;
         }
@@ -195,31 +234,16 @@ class ExportModel {
             $Data->closeCursor();
         }
     }
+
     
-    /**
-     * @var string The database prefix. When you pass a sql string to ExportTable() it will replace occurances of :_ with this property.
-     * @see vnExport::ExportTable()
-     */
-    public $Prefix = '';
     
-    protected $_Structures = array(
-        'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-        'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
-        'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-        'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
-        'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
-        'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
-        'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
-        'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('u', 'm', 'f'), 'Score' => 'float'),
-        'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
-        );
     /**
      * Returns an array of all the expected export tables and expected columns in the exports.
      * When exporting tables using ExportTable() all of the columns in this structure will always be exported in the order here, regardless of how their order in the query.
      * @return array
      * @see vnExport::ExportTable()
      */
-    public function Structures() {
+    public function structures() {
         return $this->_Structures;
     }
     
@@ -233,7 +257,7 @@ class ExportModel {
      * The version is used when importing to determine the format of this file.
      * @return string
      */
-    public function Version() {
+    public function version() {
         return '1.0';
     }
 }

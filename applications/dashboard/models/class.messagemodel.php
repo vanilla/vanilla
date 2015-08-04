@@ -1,19 +1,22 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+<?php
+/**
+ * Message model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
 */
 
+/**
+ * Handles message data.
+ */
 class MessageModel extends Gdn_Model {
    
+    /** @var array Non-standard message location allowed. */
     private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
    
+    /** @var array Current message data. */
     protected static $Messages;
    
    /**
@@ -21,55 +24,69 @@ class MessageModel extends Gdn_Model {
     */
     public function __construct() {
         parent::__construct('Message');
-      
-      
     }
    
-    public function Delete($Where = '', $Limit = false, $ResetData = false) {
-        parent::Delete($Where, $Limit, $ResetData);
-        self::Messages(null);
+    /**
+     * Delete a message.
+     *
+     * @param string $Where
+     * @param bool $Limit
+     * @param bool $ResetData
+     */
+    public function delete($Where = '', $Limit = false, $ResetData = false) {
+        parent::delete($Where, $Limit, $ResetData);
+        self::messages(null);
     }
    
    /**
     * Returns a single message object for the specified id or FALSE if not found.
     *
-    * @param int The MessageID to filter to.
+     * @param int $MessageID The MessageID to filter to.
+     * @return array Requested message.
     */
-    public function GetID($MessageID) {
-        if (Gdn::Cache()->ActiveEnabled()) {
-            return self::Messages($MessageID);
+    public function getID($MessageID) {
+        if (Gdn::cache()->activeEnabled()) {
+            return self::messages($MessageID);
         } else {
-            return parent::GetID($MessageID);
+            return parent::getID($MessageID);
         }
     }
    
    /**
     * Build the Message's Location property and add it.
     *
-    * @param mixed $Message Array or object.
-    * @return mixed Array or object given with Location property/key added.
+     * @param array|object $Message Message data.
+     * @return array|object Message data with Location property/key added.
     */
-    public function DefineLocation($Message) {
-        $Controller = GetValue('Controller', $Message);
-        $Application = GetValue('Application', $Message);
-        $Method = GetValue('Method', $Message);
+    public function defineLocation($Message) {
+        $Controller = val('Controller', $Message);
+        $Application = val('Application', $Message);
+        $Method = val('Method', $Message);
       
         if (in_array($Controller, $this->_SpecialLocations)) {
-            SetValue('Location', $Message, $Controller);
+            setValue('Location', $Message, $Controller);
         } else {
-            SetValue('Location', $Message, $Application);
-            if (!StringIsNullOrEmpty($Controller)) {
-                SetValue('Location', $Message, GetValue('Location', $Message).'/'.$Controller);
+            setValue('Location', $Message, $Application);
+            if (!stringIsNullOrEmpty($Controller)) {
+                setValue('Location', $Message, val('Location', $Message).'/'.$Controller);
             }
-            if (!StringIsNullOrEmpty($Method)) {
-                SetValue('Location', $Message, GetValue('Location', $Message).'/'.$Method);
+            if (!stringIsNullOrEmpty($Method)) {
+                setValue('Location', $Message, val('Location', $Message).'/'.$Method);
             }
         }
       
         return $Message;
     }
    
-    protected function InCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
+    /**
+     * Whether we are in (or optionally below) a category.
+     *
+     * @param int $NeedleCategoryID
+     * @param int $HaystackCategoryID
+     * @param bool $IncludeSubcategories
+     * @return bool
+     */
+    protected static function inCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = false) {
         if (!$HaystackCategoryID) {
             return true;
         }
@@ -79,7 +96,7 @@ class MessageModel extends Gdn_Model {
         }
       
         if ($IncludeSubcategories) {
-            $Cat = CategoryModel::Categories($NeedleCategoryID);
+            $Cat = CategoryModel::categories($NeedleCategoryID);
             for ($i = 0; $i < 10; $i++) {
                 if (!$Cat) {
                     break;
@@ -89,16 +106,24 @@ class MessageModel extends Gdn_Model {
                     return true;
                 }
             
-                $Cat = CategoryModel::Categories($Cat['ParentCategoryID']);
+                $Cat = CategoryModel::categories($Cat['ParentCategoryID']);
             }
         }
       
         return false;
     }
    
-    public function GetMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = null) {
-        $Session = Gdn::Session();
-        $Prefs = $Session->GetPreference('DismissedMessages', array());
+    /**
+     * Get what messages are active for a template location.
+     *
+     * @param $Location
+     * @param array $Exceptions
+     * @param null $CategoryID
+     * @return array|null
+     */
+    public function getMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = null) {
+        $Session = Gdn::session();
+        $Prefs = $Session->getPreference('DismissedMessages', array());
         if (count($Prefs) == 0) {
             $Prefs[] = 0;
         }
@@ -107,9 +132,9 @@ class MessageModel extends Gdn_Model {
          
         list($Application, $Controller, $Method) = explode('/', strtolower($Location));
       
-        if (Gdn::Cache()->ActiveEnabled()) {
+        if (Gdn::cache()->activeEnabled()) {
            // Get the messages from the cache.
-            $Messages = self::Messages();
+            $Messages = self::messages();
             $Result = array();
             foreach ($Messages as $MessageID => $Message) {
                 if (in_array($MessageID, $Prefs) || !$Message['Enabled']) {
@@ -127,7 +152,7 @@ class MessageModel extends Gdn_Model {
                 } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
                 $Visible = true;
             
-                if ($Visible && !$this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message))) {
+                if ($Visible && !self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message))) {
                     $Visible = false;
                 }
             
@@ -139,24 +164,24 @@ class MessageModel extends Gdn_Model {
         }
       
         $Result = $this->SQL
-         ->Select()
-         ->From('Message')
-         ->Where('Enabled', '1')
-         ->BeginWhereGroup()
-         ->WhereIn('Controller', $Exceptions)
-         ->OrOp()
-         ->BeginWhereGroup()
-         ->OrWhere('Application', $Application)
-         ->Where('Controller', $Controller)
-         ->Where('Method', $Method)
-         ->EndWhereGroup()
-         ->EndWhereGroup()
-         ->WhereNotIn('MessageID', $Prefs)
-         ->OrderBy('Sort', 'asc')
-         ->Get()->ResultArray();
+            ->select()
+            ->from('Message')
+            ->where('Enabled', '1')
+            ->beginWhereGroup()
+            ->whereIn('Controller', $Exceptions)
+            ->orOp()
+            ->beginWhereGroup()
+            ->orWhere('Application', $Application)
+            ->where('Controller', $Controller)
+            ->where('Method', $Method)
+            ->endWhereGroup()
+            ->endWhereGroup()
+            ->whereNotIn('MessageID', $Prefs)
+            ->orderBy('Sort', 'asc')
+            ->get()->resultArray();
       
         $Result = array_filter($Result, function ($Message) use ($CategoryID) {
-            return $this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message));
+            return MessageModel::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
         });
       
         return $Result;
@@ -164,14 +189,16 @@ class MessageModel extends Gdn_Model {
    
    /**
     * Returns a distinct array of controllers that have enabled messages.
+     *
+     * @return array Locations with enabled messages.
     */
-    public function GetEnabledLocations() {
+    public function getEnabledLocations() {
         $Data = $this->SQL
-         ->Select('Application,Controller,Method')
-         ->From('Message')
-         ->Where('Enabled', '1')
-         ->GroupBy('Application,Controller,Method')
-         ->Get();
+            ->select('Application,Controller,Method')
+            ->from('Message')
+            ->where('Enabled', '1')
+            ->groupBy('Application,Controller,Method')
+            ->get();
          
         $Locations = array();
         foreach ($Data as $Row) {
@@ -180,10 +207,10 @@ class MessageModel extends Gdn_Model {
             } else {
                 $Location = $Row->Application;
                 if ($Row->Controller != '') {
-                    $Location .= '/' . $Row->Controller;
+                    $Location .= '/'.$Row->Controller;
                 }
                 if ($Row->Method != '') {
-                    $Location .= '/' . $Row->Method;
+                    $Location .= '/'.$Row->Method;
                 }
                 $Locations[] = $Location;
             }
@@ -191,48 +218,64 @@ class MessageModel extends Gdn_Model {
         return $Locations;
     }
    
-    public static function Messages($ID = false) {
+    /**
+     * Get all messages or one message.
+     *
+     * @param int|bool $ID ID of message to get.
+     * @return array|null
+     */
+    public static function messages($ID = false) {
         if ($ID === null) {
-            Gdn::Cache()->Remove('Messages');
+            Gdn::cache()->remove('Messages');
             return;
         }
       
-        $Messages = Gdn::Cache()->Get('Messages');
+        $Messages = Gdn::cache()->get('Messages');
         if ($Messages === Gdn_Cache::CACHEOP_FAILURE) {
-            $Messages = Gdn::SQL()->Get('Message', 'Sort')->ResultArray();
-            $Messages = Gdn_DataSet::Index($Messages, array('MessageID'));
-            Gdn::Cache()->Store('Messages', $Messages);
+            $Messages = Gdn::sql()->get('Message', 'Sort')->resultArray();
+            $Messages = Gdn_DataSet::index($Messages, array('MessageID'));
+            Gdn::cache()->store('Messages', $Messages);
         }
         if ($ID === false) {
             return $Messages;
         } else {
-            return GetValue($ID, $Messages);
+            return val($ID, $Messages);
         }
     }
    
-    public function Save($FormPostValues, $Settings = false) {
+    /**
+     * Save a message.
+     *
+     * @param array $FormPostValues Message data.
+     * @param bool $Settings
+     * @return int The MessageID.
+     */
+    public function save($FormPostValues, $Settings = false) {
        // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
-        $Location = ArrayValue('Location', $FormPostValues, '');
+        $Location = arrayValue('Location', $FormPostValues, '');
         if ($Location != '') {
             $Location = explode('/', $Location);
-            $Application = GetValue(0, $Location, '');
+            $Application = val(0, $Location, '');
             if (in_array($Application, $this->_SpecialLocations)) {
                 $FormPostValues['Application'] = null;
                 $FormPostValues['Controller'] = $Application;
                 $FormPostValues['Method'] = null;
             } else {
                 $FormPostValues['Application'] = $Application;
-                $FormPostValues['Controller'] = GetValue(1, $Location, '');
-                $FormPostValues['Method'] = GetValue(2, $Location, '');
+                $FormPostValues['Controller'] = val(1, $Location, '');
+                $FormPostValues['Method'] = val(2, $Location, '');
             }
         }
-        Gdn::Cache()->Remove('Messages');
+        Gdn::cache()->remove('Messages');
 
-        return parent::Save($FormPostValues, $Settings);
+        return parent::save($FormPostValues, $Settings);
     }
    
-    public function SetMessageCache() {
+    /**
+     * Save our current message locations in the config.
+     */
+    public function setMessageCache() {
        // Retrieve an array of all controllers that have enabled messages associated
-        SaveToConfig('Garden.Messages.Cache', $this->GetEnabledLocations());
+        saveToConfig('Garden.Messages.Cache', $this->getEnabledLocations());
     }
 }

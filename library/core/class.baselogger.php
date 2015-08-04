@@ -1,8 +1,13 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * BaseLogger
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.2
  */
+
 /**
  * A base logger interface that does nothing.
  */
@@ -18,7 +23,6 @@ class BaseLogger implements LoggerInterface {
     public function emergency($message, array $context = array()) {
         $this->log(Logger::EMERGENCY, $message, $context);
     }
-
 
     /**
      * Action must be taken immediately.
@@ -48,8 +52,7 @@ class BaseLogger implements LoggerInterface {
     }
 
     /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
+     * Runtime errors that do not require immediate action but should typically be logged and monitored.
      *
      * @param string $message
      * @param array $context
@@ -117,8 +120,8 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function log($level, $message, array $context = array()) {
-        Trace(FormatString($message, $context), 'FormattedMessage');
-        Trace($context, 'context');
+        trace(formatString($message, $context), 'FormattedMessage');
+        trace($context, 'context');
 
     }
 }

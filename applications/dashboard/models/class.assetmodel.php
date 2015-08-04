@@ -1,46 +1,61 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Contains functions for combining javascript and css files.
+ * Contains functions for combining Javascript and CSS files.
  *
- * Events:
- * - AssetModel_StyleCss_Handler(...)
+ * Use the AssetModel_StyleCss_Handler event to include CSS files in your plugin.
  *
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.1
  */
 
+/**
+ * Manages Assets.
+ */
 class AssetModel extends Gdn_Model {
+
+    /** @var array List of CSS files to serve. */
     protected $_CssFiles = array();
 
+     /** @var string */
     public $UrlPrefix = '';
 
-    public function AddCssFile($Filename, $Folder = false, $Options = false) {
+    /**
+     * Add to the list of CSS files to serve.
+     *
+     * @param $Filename
+     * @param bool $Folder
+     * @param bool $Options
+     */
+    public function addCssFile($Filename, $Folder = false, $Options = false) {
         if (is_string($Options)) {
             $Options = array('Css' => $Options);
         }
         $this->_CssFiles[] = array($Filename, $Folder, $Options);
     }
 
-    public function ServeCss($ThemeType, $Filename) {
+    /**
+     * Serve all CSS files.
+     *
+     * @param $ThemeType
+     * @param $Filename
+     * @throws Exception
+     */
+    public function serveCss($ThemeType, $Filename) {
        // Split the filename into filename and etag.
         if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
             $Basename = $Matches[1];
             $ETag = $Matches[2];
         } else {
-            throw NotFoundException();
+            throw notFoundException();
         }
 
         $Basename = ucfirst($Basename);
 
         $this->EventArguments['Basename'] = $Basename;
         $this->EventArguments['ETag'] = $ETag;
-        $this->FireEvent('BeforeServeCss');
+        $this->fireEvent('BeforeServeCss');
 
         if (function_exists('header_remove')) {
             header_remove('Set-Cookie');
@@ -54,7 +69,7 @@ class AssetModel extends Gdn_Model {
             die();
         }
 
-        $RequestETags = GetValue('HTTP_IF_NONE_MATCH', $_SERVER);
+        $RequestETags = val('HTTP_IF_NONE_MATCH', $_SERVER);
         if (get_magic_quotes_gpc()) {
             $RequestETags = stripslashes($RequestETags);
         }
@@ -85,6 +100,7 @@ class AssetModel extends Gdn_Model {
         ob_start();
         echo "/* CSS generated for etag: $CurrentETag.\n *\n";
 
+        $NotFound = array();
         $Paths = $this->GetCssFiles($ThemeType, $Basename, $ETag, $NotFound);
 
        // First, do a pass through the files to generate some information.
@@ -109,7 +125,7 @@ class AssetModel extends Gdn_Model {
 
             echo "/* File: $UrlPath */\n";
 
-            $Css = GetValue('Css', $Options);
+            $Css = val('Css', $Options);
             if (!$Css) {
                 $Css = file_get_contents($Path);
             }
@@ -133,18 +149,30 @@ class AssetModel extends Gdn_Model {
         file_put_contents($CachePath, $Css);
     }
 
-    public function GetCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
+    /**
+     *
+     *
+     * @param $ThemeType
+     * @param $Basename
+     * @param $ETag
+     * @param null $NotFound
+     * @return array
+     * @throws Exception
+     */
+    public function getCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
         $NotFound = array();
 
        // Gather all of the css paths.
         switch ($Basename) {
             case 'Style':
                 $this->_CssFiles = array(
-                array('style.css', 'dashboard', array('Sort' => -10)));
+                    array('style.css', 'dashboard', array('Sort' => -10))
+                );
                 break;
             case 'Admin':
                 $this->_CssFiles = array(
-                array('admin.css', 'dashboard', array('Sort' => -10)));
+                    array('admin.css', 'dashboard', array('Sort' => -10))
+                );
                 break;
             default:
                 $this->_CssFiles = array();
@@ -153,41 +181,42 @@ class AssetModel extends Gdn_Model {
        // Throw an event so that plugins can add their css too.
         $this->EventArguments['ETag'] = $ETag;
         $this->EventArguments['ThemeType'] = $ThemeType;
-        $this->FireEvent($Basename.'Css');
+        $this->fireEvent($Basename.'Css');
 
        // Include theme customizations last so that they override everything else.
         switch ($Basename) {
             case 'Style':
-                $this->AddCssFile('custom.css', false, array('Sort' => 10));
+                $this->addCssFile('custom.css', false, array('Sort' => 10));
 
-                if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-                    $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
+                if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
+                    $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
                     if (is_string($Filenames) && $Filenames != '%s') {
-                        $this->AddCssFile(ChangeBasename('custom.css', $Filenames), false, array('Sort' => 11));
+                        $this->addCssFile(changeBasename('custom.css', $Filenames), false, array('Sort' => 11));
                     }
                 }
 
                 break;
             case 'Admin':
-                $this->AddCssFile('customadmin.css', false, array('Sort' => 10));
+                $this->addCssFile('customadmin.css', false, array('Sort' => 10));
                 break;
         }
 
-        $this->FireEvent('AfterGetCssFiles');
+        $this->fireEvent('AfterGetCssFiles');
 
        // Hunt the css files down.
         $Paths = array();
         foreach ($this->_CssFiles as $Info) {
             $Filename = $Info[0];
-            $Folder = GetValue(1, $Info);
-            $Options = GetValue(2, $Info);
-            $Css = GetValue('Css', $Options);
+            $Folder = val(1, $Info);
+            $Options = val(2, $Info);
+            $Css = val('Css', $Options);
 
             if ($Css) {
                // Add some literal Css.
                 $Paths[] = array(false, $Folder, $Options);
+
             } else {
-                list($Path, $UrlPath) = self::CssPath($ThemeType, $Filename, $Folder);
+                list($Path, $UrlPath) = self::CssPath($Filename, $Folder, $ThemeType);
                 if ($Path) {
                     $Paths[] = array($Path, $UrlPath, $Options);
                 } else {
@@ -202,9 +231,16 @@ class AssetModel extends Gdn_Model {
         return $Paths;
     }
 
+    /**
+     *
+     *
+     * @param $A
+     * @param $B
+     * @return int
+     */
     protected function _ComparePath($A, $B) {
-        $SortA = GetValue('Sort', $A[2], 0);
-        $SortB = GetValue('Sort', $B[2], 0);
+        $SortA = val('Sort', $A[2], 0);
+        $SortB = val('Sort', $B[2], 0);
 
         if ($SortA == $SortB) {
             return 0;
@@ -215,66 +251,192 @@ class AssetModel extends Gdn_Model {
         return -1;
     }
 
-    public static function CssPath($ThemeType, $Filename, $Folder) {
+    /**
+     * Lookup the path to a CSS file and return its info array
+     *
+     * @param string $Filename name/relative path to css file
+     * @param string $Folder optional. app or plugin folder to search
+     * @param string $ThemeType mobile or desktop
+     * @return array|bool
+     */
+    public static function cssPath($Filename, $Folder = '', $ThemeType = '') {
         if (!$ThemeType) {
-            $ThemeType = IsMobile() ? 'mobile' : 'desktop';
+            $ThemeType = isMobile() ? 'mobile' : 'desktop';
         }
 
        // 1. Check for a url.
-        if (IsUrl($Filename)) {
+        if (isUrl($Filename)) {
             return array($Filename, $Filename);
         }
 
+        $Paths = array();
+
        // 2. Check for a full path.
-        if (strpos($Filename, '/') !== false) {
-            $Filename = '/'.ltrim($Filename, '/');
+        if (strpos($Filename, '/') === 0) {
+            $Filename = ltrim($Filename, '/');
+
+            // Direct path was given
+            $Filename = "/{$Filename}";
             $Path = PATH_ROOT.$Filename;
             if (file_exists($Path)) {
+                Deprecated("AssetModel::CssPath() with direct paths");
                 return array($Path, $Filename);
-            } else {
+            }
                 return false;
             }
-        }
 
        // 3. Check the theme.
-        if ($Theme = Gdn::ThemeManager()->ThemeFromType($ThemeType)) {
-            $Paths[] = array(PATH_THEMES."/$Theme/design/$Filename", "/themes/$Theme/design/$Filename");
+        $Theme = Gdn::ThemeManager()->ThemeFromType($ThemeType);
+        if ($Theme) {
+            $Path = "/$Theme/design/$Filename";
+            $Paths[] = array(PATH_THEMES.$Path, "/themes{$Path}");
         }
 
+        // 4. Static, Plugin, or App relative file
         if ($Folder) {
-           // 4. Check static, a plugin or application.
             if (in_array($Folder, array('resources', 'static'))) {
-                $path = "/resources/css/$Filename";
-                $Paths[] = array(PATH_ROOT.$path, $path);
-            } elseif (StringBeginsWith($Folder, 'plugins/')) {
+                $Path = "/resources/design/{$Filename}";
+                $Paths[] = array(PATH_ROOT.$Path, $Path);
+
+            // A plugin-relative path was given
+            } elseif (stringBeginsWith($Folder, 'plugins/')) {
                 $Folder = substr($Folder, strlen('plugins/'));
-                $Paths[] = array(PATH_PLUGINS."/$Folder/design/$Filename", "/plugins/$Folder/design/$Filename");
-                $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/$Folder/$Filename");
+                $Path = "/{$Folder}/design/{$Filename}";
+                $Paths[] = array(PATH_PLUGINS.$Path, "/plugins$Path");
+
+                // Allow direct-to-file links for plugins
+                $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}", true); // deprecated
+
+            // An app-relative path was given
             } else {
-                $Paths[] = array(PATH_APPLICATIONS."/$Folder/design/$Filename", "/applications/$Folder/design/$Filename");
+                $Path = "/{$Folder}/design/{$Filename}";
+                $Paths[] = array(PATH_APPLICATIONS.$Path, "/applications{$Path}");
             }
         }
 
-       // 5. Check the default.
+        // 5. Check the default application.
         if ($Folder != 'dashboard') {
-            $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/$Filename");
+            $Paths[] = array(PATH_APPLICATIONS."/dashboard/design/$Filename", "/applications/dashboard/design/$Filename", true); // deprecated
         }
 
         foreach ($Paths as $Info) {
             if (file_exists($Info[0])) {
+                if (!empty($Info[2])) {
+                    // This path is deprecated.
+                    unset($Info[2]);
+                    Deprecated("The css file '$Filename' in folder '$Folder'");
+                }
+
                 return $Info;
             }
+        }
+        if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
+            trace("Could not find file '$Filename' in folder '$Folder'.");
         }
 
         return false;
     }
 
-   /** Generate an e-tag for the application from the versions of all of its enabled applications/plugins. **/
-    public static function ETag() {
+    /**
+     * Lookup the path to a JS file and return its info array
+     *
+     * @param string $filename name/relative path to js file
+     * @param string $folder optional. app or plugin folder to search
+     * @param string $themeType mobile or desktop
+     * @return array|bool
+     */
+    public static function jsPath($filename, $folder = '', $themeType = '') {
+        if (!$themeType) {
+            $themeType = isMobile() ? 'mobile' : 'desktop';
+            }
+
+        // 1. Check for a url.
+        if (isUrl($filename)) {
+            return array($filename, $filename);
+        }
+
+        $paths = array();
+
+        // 2. Check for a full path.
+        if (strpos($filename, '/') === 0) {
+            $filename = ltrim($filename, '/');
+
+            // Direct path was given
+            $filename = "/{$filename}";
+            $path = PATH_ROOT.$filename;
+            if (file_exists($path)) {
+                deprecated("AssetModel::JsPath() with direct paths");
+                return array($path, $filename);
+            }
+        return false;
+        }
+
+        // 3. Check the theme.
+        $theme = Gdn::themeManager()->themeFromType($themeType);
+        if ($theme) {
+            $path = "/{$theme}/js/{$filename}";
+            $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
+    }
+
+        // 4. Static, Plugin, or App relative file
+        if ($folder) {
+            if (in_array($folder, array('resources', 'static'))) {
+                $path = "/resources/js/{$filename}";
+                $paths[] = array(PATH_ROOT.$path, $path);
+
+            // A plugin-relative path was given
+            } elseif (stringBeginsWith($folder, 'plugins/')) {
+                $folder = substr($folder, strlen('plugins/'));
+                $path = "/{$folder}/js/{$filename}";
+                $paths[] = array(PATH_PLUGINS.$path, "/plugins{$path}");
+
+                // Allow direct-to-file links for plugins
+                $paths[] = array(PATH_PLUGINS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true); // deprecated
+
+            // An app-relative path was given
+            } else {
+
+                // App-relative path under the theme
+                if ($theme) {
+                    $path = "/{$theme}/{$folder}/js/{$filename}";
+                    $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
+                }
+
+                $path = "/{$folder}/js/{$filename}";
+                $paths[] = array(PATH_APPLICATIONS.$path, "/applications{$path}");
+            }
+        }
+
+        // 5. Check the global js folder.
+        $paths[] = array(PATH_ROOT."/js/{$filename}", "/js/{$filename}");
+        $paths[] = array(PATH_ROOT."/js/library/{$filename}", "/js/library/{$filename}");
+
+        foreach ($paths as $info) {
+            if (file_exists($info[0])) {
+                if (!empty($info[2])) {
+                    // This path is deprecated.
+                    unset($info[2]);
+                    deprecated("The js file '$filename' in folder '$folder'");
+                }
+
+                return $info;
+            }
+        }
+        if (!stringEndsWith($filename, 'custom.js')) {
+            trace("Could not find file '$filename' in folder '$folder'.");
+        }
+
+        return false;
+    }
+
+    /**
+     * Generate an e-tag for the application from the versions of all of its enabled applications/plugins.
+     **/
+    public static function eTag() {
         $Data = array();
         $Data['vanilla-core-'.APPLICATION_VERSION] = true;
 
-        $Plugins = Gdn::PluginManager()->EnabledPlugins();
+        $Plugins = Gdn::pluginManager()->EnabledPlugins();
         foreach ($Plugins as $Info) {
             $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = true;
         }
@@ -289,11 +451,11 @@ class AssetModel extends Gdn_Model {
        // Add the desktop theme version.
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->DesktopTheme());
         if (!empty($Info)) {
-            $Version = GetValue('Version', $Info, 'v0');
+            $Version = val('Version', $Info, 'v0');
             $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
 
-            if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-                $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
+            if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
+                $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
                 $Data[$Filenames] = true;
             }
         }
@@ -301,16 +463,16 @@ class AssetModel extends Gdn_Model {
        // Add the mobile theme version.
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->MobileTheme());
         if (!empty($Info)) {
-            $Version = GetValue('Version', $Info, 'v0');
+            $Version = val('Version', $Info, 'v0');
             $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
         }
 
-        Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;
+        Gdn::pluginManager()->EventArguments['ETagData'] =& $Data;
 
         $Suffix = '';
-        Gdn::PluginManager()->EventArguments['Suffix'] =& $Suffix;
-        Gdn::PluginManager()->FireAs('AssetModel')->FireEvent('GenerateETag');
-        unset(Gdn::PluginManager()->EventArguments['ETagData']);
+        Gdn::pluginManager()->EventArguments['Suffix'] =& $Suffix;
+        Gdn::pluginManager()->FireAs('AssetModel')->fireEvent('GenerateETag');
+        unset(Gdn::pluginManager()->EventArguments['ETagData']);
 
         ksort($Data);
         $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;

@@ -1,25 +1,30 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
 /**
- * English version of object possession. (ie. "Bob's thing" VS "Jess' thing").
+ * Default user-facing text strings.
  *
- * @param string The word to format.
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  */
+
 if (!function_exists('FormatPossessive')) {
-   function FormatPossessive($Word) {
-      return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
-   }
+    /**
+     * English version of object possession. (ie. "Bob's thing" VS "Jess' thing").
+     *
+     * @param string The word to format.
+     * @return string
+     */
+    function formatPossessive($Word) {
+        return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+    }
 }
 
 $Definition['Apply for Membership'] = 'Register';
+
+$Definition['BanReason.1'] = 'Banned by a community manager.';
+$Definition['BanReason.2'] = 'Banned by IP address, email, or name.';
+$Definition['BanReason.4'] = 'Temporarily banned by a community manager.';
+$Definition['BanReason.8'] = 'Banned by warnings.';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
@@ -46,6 +51,7 @@ $Definition['ValidateVersion'] = 'The %s field is not a valid version number. Se
 $Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ValidateString'] = '%s is not a valid string.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
+$Definition['ValidateUrl'] = 'The %s field is not a valid url.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
@@ -142,7 +148,7 @@ $Definition['Saved'] = 'Your changes have been saved.';
 $Definition['%s new plural'] = '%s new';
 $Definition['TermsOfService'] = 'Terms of Service';
 $Definition['TermsOfServiceText'] =
-"You agree, through your use of this service, that you will not use this
+    "You agree, through your use of this service, that you will not use this
 community to post any material which is knowingly false and/or defamatory,
 inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually
 oriented, threatening, invasive of a person's privacy, or otherwise violative

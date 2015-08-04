@@ -1,59 +1,59 @@
 <?php if (!defined('APPLICATION')) exit();
-$Discussion = $this->Data('Discussion');
-$ForeignSource = $this->Data('ForeignSource');
-$SortComments = $this->Data('SortComments');
-$Comments = $this->Data('Comments', FALSE);
+$Discussion = $this->data('Discussion');
+$ForeignSource = $this->data('ForeignSource');
+$SortComments = $this->data('SortComments');
+$Comments = $this->data('Comments', false);
 $HasCommentData = $Comments !== FALSE;
-$Session = Gdn::Session();
+$Session = Gdn::session();
 if (!function_exists('WriteComment'))
-   include($this->FetchViewLocation('helper_functions', 'discussion'));
+    include($this->fetchViewLocation('helper_functions', 'discussion'));
 
 ?>
 <div class="Embed">
-<?php
-echo '<span class="BeforeCommentHeading">';
-$this->FireEvent('CommentHeading');
-echo '</span>';
+    <?php
+    echo '<span class="BeforeCommentHeading">';
+    $this->fireEvent('CommentHeading');
+    echo '</span>';
 
-if ($SortComments == 'desc')
-   WriteEmbedCommentForm();
-else if ($HasCommentData && $Comments->NumRows() > 0)
-   echo Wrap(T('Comments'), 'h2');
-?>
-<ul class="DataList MessageList Comments">
-   <?php
-   if ($HasCommentData) {
-      $this->FireEvent('BeforeCommentsRender');
-      $CurrentOffset = $this->Offset;
-      foreach ($Comments as $Comment) {
-         ++$CurrentOffset;
-         $this->CurrentComment = $Comment;
-         WriteComment($Comment, $this, $Session, $CurrentOffset);
-      }
-   }
-   ?>
-</ul>
-<?php
-if ($HasCommentData) {
-   if ($this->Pager->LastPage()) {
-      $LastCommentID = $this->AddDefinition('LastCommentID');
-      if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
-         $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
-      $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
-   }
-   
-   // Send the user to the discussion in the forum when paging
-   if (C('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
-      $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
-      echo '<div class="PageToForum Foot">';
-      echo Anchor(T('More Comments'), $DiscussionUrl);
-      echo '</div>';
-   } else 
-      echo $this->Pager->ToString('more');
-}
+    if ($SortComments == 'desc')
+        WriteEmbedCommentForm();
+    else if ($HasCommentData && $Comments->numRows() > 0)
+        echo wrap(t('Comments'), 'h2');
+    ?>
+    <ul class="DataList MessageList Comments">
+        <?php
+        if ($HasCommentData) {
+            $this->fireEvent('BeforeCommentsRender');
+            $CurrentOffset = $this->Offset;
+            foreach ($Comments as $Comment) {
+                ++$CurrentOffset;
+                $this->CurrentComment = $Comment;
+                WriteComment($Comment, $this, $Session, $CurrentOffset);
+            }
+        }
+        ?>
+    </ul>
+    <?php
+    if ($HasCommentData) {
+        if ($this->Pager->LastPage()) {
+            $LastCommentID = $this->addDefinition('LastCommentID');
+            if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
+                $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
+            $this->addDefinition('Vanilla_Comments_AutoRefresh', Gdn::config('Vanilla.Comments.AutoRefresh', 0));
+        }
 
-if ($SortComments != 'desc')
-   WriteEmbedCommentForm();
+        // Send the user to the discussion in the forum when paging
+        if (c('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
+            $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
+            echo '<div class="PageToForum Foot">';
+            echo anchor(t('More Comments'), $DiscussionUrl);
+            echo '</div>';
+        } else
+            echo $this->Pager->toString('more');
+    }
 
-?>
+    if ($SortComments != 'desc')
+        WriteEmbedCommentForm();
+
+    ?>
 </div>

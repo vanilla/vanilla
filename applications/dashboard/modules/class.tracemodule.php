@@ -1,7 +1,18 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
+/**
+ * Trace module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
+/**
+ * Assist with debugging.
+ *
+ * @see trace()
+ */
 class TraceModule extends Gdn_Module {
    
     public function __construct() {
@@ -9,20 +20,20 @@ class TraceModule extends Gdn_Module {
         $this->_ApplicationFolder = 'dashboard';
     }
    
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
    
-    public function ToString() {
+    public function toString() {
         try {
-            $Traces = Trace();
+            $Traces = trace();
             if (!$Traces) {
                 return '';
             }
 
-            $this->SetData('Traces', $Traces);
+            $this->setData('Traces', $Traces);
       
-            return $this->FetchView();
+            return $this->fetchView();
         } catch (Exception $Ex) {
             return $Ex->getMessage();
         }

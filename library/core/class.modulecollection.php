@@ -1,23 +1,28 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-
+<?php
 /**
- * Module collection
+ * Gdn_ModuleCollection
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
  * @since 2.0
  */
 
+/**
+ * Module collection.
+ */
 class Gdn_ModuleCollection extends Gdn_Module {
-   /// PROPERTIES ///
+
+    /** @var array  */
     public $Items = array();
    
-   /// METHODS ///
-    public function Render() {
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    public function render() {
         $RenderedCount = 0;
         foreach ($this->Items as $Item) {
             $this->EventArguments['AssetName'] = $this->AssetName;
@@ -25,7 +30,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
             if (is_string($Item)) {
                 if (!empty($Item)) {
                     if ($RenderedCount > 0) {
-                        $this->FireEvent('BetweenRenderAsset');
+                        $this->fireEvent('BetweenRenderAsset');
                     }
 
                     echo $Item;
@@ -37,12 +42,12 @@ class Gdn_ModuleCollection extends Gdn_Module {
                 }
             
                 $LengthBefore = ob_get_length();
-                $Item->Render();
+                $Item->render();
                 $LengthAfter = ob_get_length();
 
                 if ($LengthBefore !== false && $LengthAfter > $LengthBefore) {
                     if ($RenderedCount > 0) {
-                        $this->FireEvent('BetweenRenderAsset');
+                        $this->fireEvent('BetweenRenderAsset');
                     }
                     $RenderedCount++;
                 }
@@ -53,9 +58,15 @@ class Gdn_ModuleCollection extends Gdn_Module {
         unset($this->EventArguments['AssetName']);
     }
    
-    public function ToString() {
+    /**
+     * Build output HTML.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function toString() {
         ob_start();
-        $this->Render();
+        $this->render();
         return ob_get_clean();
     }
 }

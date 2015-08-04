@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T("Confirm Email") ?></h1>
+<h1><?php echo t("Confirm Email") ?></h1>
 <div>
-   <?php
-   echo $this->Form->Open();
-   echo $this->Form->Errors();
-   echo '<div class="P">';
+    <?php
+    echo $this->Form->open();
+    echo $this->Form->errors();
+    echo '<div class="P">';
 
-   if ($this->Form->ErrorCount() == 0)
-      echo T('Your request has been sent.', 'Your request has been sent. Check your email for further instructions.');
+    if ($this->Form->errorCount() == 0)
+        echo t('Your request has been sent.', 'Your request has been sent. Check your email for further instructions.');
 
-   echo '</div>';
-   echo $this->Form->Close(); ?>
+    echo '</div>';
+    echo $this->Form->close(); ?>
 </div>

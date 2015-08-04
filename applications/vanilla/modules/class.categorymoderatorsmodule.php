@@ -1,13 +1,11 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+<?php
+/**
+ * Category Moderators module
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Vanilla
+ * @since 2.0
 */
 
 /**
@@ -20,16 +18,16 @@ class CategoryModeratorsModule extends Gdn_Module {
         $this->ModeratorData = false;
     }
    
-    public function GetData($Category) {
+    public function getData($Category) {
         $this->ModeratorData = array($Category);
         CategoryModel::JoinModerators($this->ModeratorData);
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
+    public function toString() {
         if (is_array($this->ModeratorData)
          && count($this->ModeratorData) > 0
          && is_array($this->ModeratorData[0]->Moderators)

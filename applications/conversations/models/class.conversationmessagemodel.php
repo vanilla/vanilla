@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -26,10 +28,10 @@ class ConversationMessageModel extends ConversationsModel {
     * @since 2.0.0
     * @access public
     */
-   public function __construct() {
-      parent::__construct('ConversationMessage');
-      $this->PrimaryKey = 'MessageID';
-   }
+    public function __construct() {
+        parent::__construct('ConversationMessage');
+        $this->PrimaryKey = 'MessageID';
+    }
 
    /**
     * Get messages by conversation.
@@ -46,16 +48,18 @@ class ConversationMessageModel extends ConversationsModel {
     * @param array $Wheres SQL conditions.
     * @return Gdn_DataSet SQL results.
     */
-   public function Get($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
-      if ($Limit == '')
-         $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);
+    public function Get($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
+        if ($Limit == '') {
+            $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);
+        }
 
-      $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
-      if (is_array($Wheres))
-         $this->SQL->Where($Wheres);
+        $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
+        if (is_array($Wheres)) {
+            $this->SQL->Where($Wheres);
+        }
 
-      $this->FireEvent('BeforeGet');
-      return $this->SQL
+        $this->FireEvent('BeforeGet');
+        return $this->SQL
          ->Select('cm.*')
          ->Select('iu.Name', '', 'InsertName')
          ->Select('iu.Email', '', 'InsertEmail')
@@ -66,13 +70,13 @@ class ConversationMessageModel extends ConversationsModel {
          ->Join('User iu', 'cm.InsertUserID = iu.UserID', 'left')
          ->BeginWhereGroup()
          ->Where('uc.DateCleared is null')
-         ->OrWhere('uc.DateCleared <', 'cm.DateInserted', TRUE, FALSE) // Make sure that cleared conversations do not show up unless they have new messages added.
+         ->OrWhere('uc.DateCleared <', 'cm.DateInserted', true, false) // Make sure that cleared conversations do not show up unless they have new messages added.
          ->EndWhereGroup()
          ->Where('cm.ConversationID', $ConversationID)
          ->OrderBy('cm.DateInserted', 'asc')
          ->Limit($Limit, $Offset)
          ->Get();
-   }
+    }
 
    /**
     * Get the data from the model based on its primary key.
@@ -81,10 +85,10 @@ class ConversationMessageModel extends ConversationsModel {
     * @param string $DatasetType The format of the result dataset.
     * @return Gdn_DataSet
     */
-   public function GetID($ID, $DatasetType = FALSE) {
-      $Result = $this->GetWhere(array("MessageID" => $ID))->FirstRow($DatasetType);
-      return $Result;
-   }
+    public function GetID($ID, $DatasetType = false) {
+        $Result = $this->GetWhere(array("MessageID" => $ID))->FirstRow($DatasetType);
+        return $Result;
+    }
 
    /**
     * Get only new messages from conversation.
@@ -96,11 +100,11 @@ class ConversationMessageModel extends ConversationsModel {
     * @param int $LastMessageID Unique ID of last message to be viewed.
     * @return Gdn_DataSet SQL results.
     */
-   public function GetNew($ConversationID, $LastMessageID) {
-      $Session = Gdn::Session();
-      $this->SQL->Where('MessageID > ', $LastMessageID);
-      return $this->Get($ConversationID, $Session->UserID);
-   }
+    public function GetNew($ConversationID, $LastMessageID) {
+        $Session = Gdn::Session();
+        $this->SQL->Where('MessageID > ', $LastMessageID);
+        return $this->Get($ConversationID, $Session->UserID);
+    }
 
    /**
     * Get number of messages in a conversation.
@@ -113,28 +117,30 @@ class ConversationMessageModel extends ConversationsModel {
     * @param array $Wheres SQL conditions.
     * @return int Number of messages.
     */
-   public function GetCount($ConversationID, $ViewingUserID, $Wheres = '') {
-      if (is_array($Wheres))
-         $this->SQL->Where($Wheres);
+    public function GetCount($ConversationID, $ViewingUserID, $Wheres = '') {
+        if (is_array($Wheres)) {
+            $this->SQL->Where($Wheres);
+        }
 
-      $Data = $this->SQL
+        $Data = $this->SQL
          ->Select('cm.MessageID', 'count', 'Count')
          ->From('ConversationMessage cm')
          ->Join('Conversation c', 'cm.ConversationID = c.ConversationID')
          ->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID and uc.UserID = '.$ViewingUserID)
          ->BeginWhereGroup()
          ->Where('uc.DateCleared is null')
-         ->OrWhere('uc.DateCleared >', 'c.DateUpdated', TRUE, FALSE) // Make sure that cleared conversations do not show up unless they have new messages added.
+         ->OrWhere('uc.DateCleared >', 'c.DateUpdated', true, false) // Make sure that cleared conversations do not show up unless they have new messages added.
          ->EndWhereGroup()
          ->GroupBy('cm.ConversationID')
          ->Where('cm.ConversationID', $ConversationID)
          ->Get();
 
-      if ($Data->NumRows() > 0)
-         return $Data->FirstRow()->Count;
+        if ($Data->NumRows() > 0) {
+            return $Data->FirstRow()->Count;
+        }
 
-      return 0;
-   }
+        return 0;
+    }
 
    /**
     * Get number of messages that meet criteria.
@@ -145,20 +151,22 @@ class ConversationMessageModel extends ConversationsModel {
     * @param array $Wheres SQL conditions.
     * @return int Number of messages.
     */
-   public function GetCountWhere($Wheres = '') {
-      if (is_array($Wheres))
-         $this->SQL->Where($Wheres);
+    public function GetCountWhere($Wheres = '') {
+        if (is_array($Wheres)) {
+            $this->SQL->Where($Wheres);
+        }
 
-      $Data = $this->SQL
+        $Data = $this->SQL
          ->Select('MessageID', 'count', 'Count')
          ->From('ConversationMessage')
          ->Get();
 
-      if ($Data->NumRows() > 0)
-         return $Data->FirstRow()->Count;
+        if ($Data->NumRows() > 0) {
+            return $Data->FirstRow()->Count;
+        }
 
-      return 0;
-   }
+        return 0;
+    }
 
    /**
     * Save message from form submission.
@@ -169,59 +177,62 @@ class ConversationMessageModel extends ConversationsModel {
     * @param array $FormPostValues Values submitted via form.
     * @return int Unique ID of message created or updated.
     */
-   public function Save($FormPostValues, $Conversation = NULL, $Options = array()) {
-      $Session = Gdn::Session();
+    public function Save($FormPostValues, $Conversation = null, $Options = array()) {
+        $Session = Gdn::Session();
 
-      // Define the primary key in this model's table.
-      $this->DefineSchema();
+       // Define the primary key in this model's table.
+        $this->DefineSchema();
 
-      // Add & apply any extra validation rules:
-      $this->Validation->ApplyRule('Body', 'Required');
-      $this->AddInsertFields($FormPostValues);
+       // Add & apply any extra validation rules:
+        $this->Validation->ApplyRule('Body', 'Required');
+        $this->AddInsertFields($FormPostValues);
 
-      $this->EventArguments['FormPostValues'] = $FormPostValues;
-      $this->FireEvent('BeforeSaveValidation');
+        $this->EventArguments['FormPostValues'] = $FormPostValues;
+        $this->FireEvent('BeforeSaveValidation');
 
-      // Determine if spam check should be skipped.
-      $SkipSpamCheck = (!empty($Options['NewConversation']));
+       // Determine if spam check should be skipped.
+        $SkipSpamCheck = (!empty($Options['NewConversation']));
 
-      // Validate the form posted values
-      $MessageID = FALSE;
-      if($this->Validate($FormPostValues)
-      && !$this->CheckForSpam('ConversationMessage', $SkipSpamCheck)) {
-         $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-         TouchValue('Format', $Fields, C('Garden.InputFormatter', 'Html'));
+       // Validate the form posted values
+        $MessageID = false;
+        if ($this->Validate($FormPostValues)
+        && !$this->CheckForSpam('ConversationMessage', $SkipSpamCheck)) {
+            $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
+            TouchValue('Format', $Fields, C('Garden.InputFormatter', 'Html'));
 
-         $this->EventArguments['Fields'] = $Fields;
-         $this->FireEvent('BeforeSave');
+            $this->EventArguments['Fields'] = $Fields;
+            $this->FireEvent('BeforeSave');
 
-         $MessageID = $this->SQL->Insert($this->Name, $Fields);
-         $this->LastMessageID = $MessageID;
-         $ConversationID = ArrayValue('ConversationID', $Fields, 0);
+            $MessageID = $this->SQL->Insert($this->Name, $Fields);
+            $this->LastMessageID = $MessageID;
+            $ConversationID = ArrayValue('ConversationID', $Fields, 0);
 
-         if (!$Conversation)
-            $Conversation = $this->SQL->GetWhere('Conversation', array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
+            if (!$Conversation) {
+                $Conversation = $this->SQL->GetWhere('Conversation', array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
+            }
 
-         $Message = $this->GetID($MessageID);
-         $this->EventArguments['Conversation'] = $Conversation;
-         $this->EventArguments['Message'] = $Message;
-         $this->FireEvent('AfterSave');
+            $Message = $this->GetID($MessageID);
+            $this->EventArguments['Conversation'] = $Conversation;
+            $this->EventArguments['Message'] = $Message;
+            $this->FireEvent('AfterSave');
 
-         // Get the new message count for the conversation.
-         $SQLR = $this->SQL
+           // Get the new message count for the conversation.
+            $SQLR = $this->SQL
             ->Select('MessageID', 'count', 'CountMessages')
             ->Select('MessageID', 'max', 'LastMessageID')
             ->From('ConversationMessage')
             ->Where('ConversationID', $ConversationID)
             ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-         if (sizeof($SQLR)) {
-            list($CountMessages, $LastMessageID) = array_values($SQLR);
-         } else { return; }
+            if (sizeof($SQLR)) {
+                list($CountMessages, $LastMessageID) = array_values($SQLR);
+            } else {
+                return;
+            }
 
-         // Update the conversation's DateUpdated field.
-         $DateUpdated = Gdn_Format::ToDateTime();
+           // Update the conversation's DateUpdated field.
+            $DateUpdated = Gdn_Format::ToDateTime();
 
-         $this->SQL
+            $this->SQL
             ->Update('Conversation c')
             ->Set('CountMessages', $CountMessages)
             ->Set('LastMessageID', $LastMessageID)
@@ -230,8 +241,8 @@ class ConversationMessageModel extends ConversationsModel {
             ->Where('ConversationID', $ConversationID)
             ->Put();
 
-         // Update the last message of the users that were previously up-to-date on their read messages.
-         $this->SQL
+           // Update the last message of the users that were previously up-to-date on their read messages.
+            $this->SQL
             ->Update('UserConversation uc')
             ->Set('uc.LastMessageID', $MessageID)
             ->Set('uc.DateConversationUpdated', $DateUpdated)
@@ -241,8 +252,8 @@ class ConversationMessageModel extends ConversationsModel {
             ->Where('uc.UserID <>', $Session->UserID)
             ->Put();
 
-         // Update the date updated of the users that were not up-to-date.
-         $this->SQL
+           // Update the date updated of the users that were not up-to-date.
+            $this->SQL
             ->Update('UserConversation uc')
             ->Set('uc.DateConversationUpdated', $DateUpdated)
             ->Where('uc.ConversationID', $ConversationID)
@@ -251,8 +262,8 @@ class ConversationMessageModel extends ConversationsModel {
             ->Where('uc.UserID <>', $Session->UserID)
             ->Put();
 
-         // Update the sending user.
-         $this->SQL
+           // Update the sending user.
+            $this->SQL
             ->Update('UserConversation uc')
             ->Set('uc.CountReadMessages', $CountMessages)
             ->Set('Deleted', 0)
@@ -261,8 +272,8 @@ class ConversationMessageModel extends ConversationsModel {
             ->Where('UserID', $Session->UserID)
             ->Put();
 
-         // Find users involved in this conversation
-         $UserData = $this->SQL
+           // Find users involved in this conversation
+            $UserData = $this->SQL
             ->Select('UserID')
             ->Select('LastMessageID')
             ->Select('Deleted')
@@ -270,94 +281,96 @@ class ConversationMessageModel extends ConversationsModel {
             ->Where('ConversationID', $ConversationID)
             ->Get()->Result(DATASET_TYPE_ARRAY);
 
-         $UpdateCountUserIDs = array();
-         $NotifyUserIDs = array();
+            $UpdateCountUserIDs = array();
+            $NotifyUserIDs = array();
 
-         // Collapse for call to UpdateUserCache and ActivityModel.
-         $InsertUserFound = FALSE;
-         foreach ($UserData as $UpdateUser) {
-            $LastMessageID = GetValue('LastMessageID', $UpdateUser);
-            $UserID = GetValue('UserID', $UpdateUser);
-            $Deleted = GetValue('Deleted', $UpdateUser);
+           // Collapse for call to UpdateUserCache and ActivityModel.
+            $InsertUserFound = false;
+            foreach ($UserData as $UpdateUser) {
+                $LastMessageID = GetValue('LastMessageID', $UpdateUser);
+                $UserID = GetValue('UserID', $UpdateUser);
+                $Deleted = GetValue('Deleted', $UpdateUser);
 
-            if ($UserID == GetValue('InsertUserID', $Fields)) {
-               $InsertUserFound = TRUE;
-               if ($Deleted) {
-                  $this->SQL->Put('UserConversation', array('Deleted' => 0, 'DateConversationUpdated' => $DateUpdated), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
-               }
+                if ($UserID == GetValue('InsertUserID', $Fields)) {
+                    $InsertUserFound = true;
+                    if ($Deleted) {
+                        $this->SQL->Put('UserConversation', array('Deleted' => 0, 'DateConversationUpdated' => $DateUpdated), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
+                    }
+                }
+
+               // Update unread for users that were up to date
+                if ($LastMessageID == $MessageID) {
+                    $UpdateCountUserIDs[] = $UserID;
+                }
+
+               // Send activities to users that have not deleted the conversation
+                if (!$Deleted) {
+                    $NotifyUserIDs[] = $UserID;
+                }
             }
 
-            // Update unread for users that were up to date
-            if ($LastMessageID == $MessageID)
-               $UpdateCountUserIDs[] = $UserID;
-
-            // Send activities to users that have not deleted the conversation
-            if (!$Deleted)
-               $NotifyUserIDs[] = $UserID;
-         }
-
-         if (!$InsertUserFound) {
-            $UserConversation = array(
-               'UserID' => GetValue('InsertUserID', $Fields),
-               'ConversationID' => $ConversationID,
-               'LastMessageID' => $LastMessageID,
-               'CountReadMessages' => $CountMessages,
-               'DateConversationUpdated' => $DateUpdated);
-            $this->SQL->Insert('UserConversation', $UserConversation);
-         }
-
-         if (sizeof($UpdateCountUserIDs)) {
-            $ConversationModel = new ConversationModel();
-            $ConversationModel->UpdateUserUnreadCount($UpdateCountUserIDs, TRUE);
-         }
-
-         $this->FireEvent('AfterAdd');
-
-         $ActivityModel = new ActivityModel();
-         foreach ($NotifyUserIDs as $NotifyUserID) {
-            if ($Session->UserID == $NotifyUserID)
-               continue; // don't notify self.
-
-            // Notify the users of the new message.
-            $ActivityID = $ActivityModel->Add(
-               $Session->UserID,
-               'ConversationMessage',
-               '',
-               $NotifyUserID,
-               '',
-               "/messages/{$ConversationID}#{$MessageID}",
-               FALSE
-            );
-            $Story = GetValue('Body', $Fields, '');
-
-            if (C('Conversations.Subjects.Visible')) {
-               $Story = ConcatSep("\n\n", GetValue('Subject', $Conversation, ''), $Story);
+            if (!$InsertUserFound) {
+                $UserConversation = array(
+                'UserID' => GetValue('InsertUserID', $Fields),
+                'ConversationID' => $ConversationID,
+                'LastMessageID' => $LastMessageID,
+                'CountReadMessages' => $CountMessages,
+                'DateConversationUpdated' => $DateUpdated);
+                $this->SQL->Insert('UserConversation', $UserConversation);
             }
-            $ActivityModel->SendNotification($ActivityID, $Story);
-         }
-      }
-      return $MessageID;
-   }
+
+            if (sizeof($UpdateCountUserIDs)) {
+                $ConversationModel = new ConversationModel();
+                $ConversationModel->UpdateUserUnreadCount($UpdateCountUserIDs, true);
+            }
+
+            $this->FireEvent('AfterAdd');
+
+            $ActivityModel = new ActivityModel();
+            foreach ($NotifyUserIDs as $NotifyUserID) {
+                if ($Session->UserID == $NotifyUserID) {
+                    continue; // don't notify self.
+                }
+               // Notify the users of the new message.
+                $ActivityID = $ActivityModel->Add(
+                    $Session->UserID,
+                    'ConversationMessage',
+                    '',
+                    $NotifyUserID,
+                    '',
+                    "/messages/{$ConversationID}#{$MessageID}",
+                    false
+                );
+                $Story = GetValue('Body', $Fields, '');
+
+                if (C('Conversations.Subjects.Visible')) {
+                    $Story = ConcatSep("\n\n", GetValue('Subject', $Conversation, ''), $Story);
+                }
+                $ActivityModel->SendNotification($ActivityID, $Story);
+            }
+        }
+        return $MessageID;
+    }
 
    /**
     * @param array $FormPostValues
     * @param bool $Insert
     * @return bool
     */
-   public function Validate($FormPostValues, $Insert = FALSE) {
-      $valid = parent::Validate($FormPostValues, $Insert);
+    public function Validate($FormPostValues, $Insert = false) {
+        $valid = parent::Validate($FormPostValues, $Insert);
 
-      if (!CheckPermission('Garden.Moderation.Manage') && C('Conversations.MaxRecipients')) {
-         $max = C('Conversations.MaxRecipients');
-         if (isset($FormPostValues['RecipientUserID']) && count($FormPostValues['RecipientUserID']) > $max) {
-            $this->Validation->AddValidationResult(
-               'To',
-               Plural($max, "You are limited to %s recipient.", "You are limited to %s recipients.")
-            );
-            $valid = false;
-         }
-      }
+        if (!CheckPermission('Garden.Moderation.Manage') && C('Conversations.MaxRecipients')) {
+            $max = C('Conversations.MaxRecipients');
+            if (isset($FormPostValues['RecipientUserID']) && count($FormPostValues['RecipientUserID']) > $max) {
+                $this->Validation->AddValidationResult(
+                    'To',
+                    Plural($max, "You are limited to %s recipient.", "You are limited to %s recipients.")
+                );
+                $valid = false;
+            }
+        }
 
-      return $valid;
-   }
+        return $valid;
+    }
 }

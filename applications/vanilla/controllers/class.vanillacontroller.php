@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Master application controller for Vanilla, extended by all others except Settings.
@@ -19,27 +21,26 @@ class VanillaController extends Gdn_Controller {
     * @since 2.0.0
     * @access public
     */
-   public function Initialize() {
-      // Set up head
-      $this->Head = new HeadModule($this);
-      $this->AddJsFile('jquery.js');
-      $this->AddJsFile('jquery-ui.js');
-      $this->AddJsFile('jquery.livequery.js');
-      $this->AddJsFile('jquery.form.js');
-      $this->AddJsFile('jquery.popup.js');
-      $this->AddJsFile('jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('jquery.atwho.js');
-      $this->AddJsFile('global.js');
-      $this->AddCssFile('style.css');
-      $this->AddCssFile('vanillicon.css', 'static');
+    public function Initialize() {
+       // Set up head
+        $this->Head = new HeadModule($this);
+        $this->AddJsFile('jquery.js');
+        $this->AddJsFile('jquery-ui.js');
+        $this->AddJsFile('jquery.livequery.js');
+        $this->AddJsFile('jquery.form.js');
+        $this->AddJsFile('jquery.popup.js');
+        $this->AddJsFile('jquery.gardenhandleajaxform.js');
+        $this->AddJsFile('jquery.atwho.js');
+        $this->AddJsFile('global.js');
+        $this->AddCssFile('style.css');
+        $this->AddCssFile('vanillicon.css', 'static');
 
 
-      // Add modules
-//      $this->AddModule('MeModule');
-      $this->AddModule('GuestModule');
-      $this->AddModule('SignedInModule');
+       // Add modules
+ //      $this->AddModule('MeModule');
+        $this->AddModule('GuestModule');
+        $this->AddModule('SignedInModule');
 
-      parent::Initialize();
-   }
-
+        parent::Initialize();
+    }
 }

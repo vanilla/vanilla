@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -16,30 +18,33 @@ class CategoryFollowToggleModule extends Gdn_Module {
    /**
     * Set the preference in the user's session.
     */
-   public function SetToggle() {
-      $Session = Gdn::Session();
-      if (!$Session->IsValid())
-         return;
+    public function SetToggle() {
+        $Session = Gdn::Session();
+        if (!$Session->IsValid()) {
+            return;
+        }
       
-      $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
-      if ($ShowAllCategories != '') {
-         $ShowAllCategories = $ShowAllCategories == 'true' ? TRUE : FALSE;
-         $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
-         if ($ShowAllCategories != $ShowAllCategoriesPref)
-            $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+        $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
+        if ($ShowAllCategories != '') {
+            $ShowAllCategories = $ShowAllCategories == 'true' ? true : false;
+            $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
+            if ($ShowAllCategories != $ShowAllCategoriesPref) {
+                $Session->SetPreference('ShowAllCategories', $ShowAllCategories);
+            }
             
-         Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
-      }
-   }
+            Redirect('/'.ltrim(Gdn::Request()->Path(), '/'));
+        }
+    }
    
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    public function AssetTarget() {
+        return 'Panel';
+    }
 
-   public function ToString() {
-      if (Gdn::Session()->IsValid())
-         return parent::ToString();
+    public function ToString() {
+        if (Gdn::Session()->IsValid()) {
+            return parent::ToString();
+        }
 
-      return '';
-   }
+        return '';
+    }
 }

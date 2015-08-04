@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 /**
  * Vanilla stub content for a new forum.
  *
@@ -11,7 +13,7 @@ $SQL = Gdn::Database()->SQL();
 // Only do this once, ever.
 $Row = $SQL->Get('Discussion', '', 'asc', 1)->FirstRow(DATASET_TYPE_ARRAY);
 if ($Row) {
-   return;
+    return;
 }
 
 $DiscussionModel = new DiscussionModel();

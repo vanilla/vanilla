@@ -8,9 +8,9 @@
  * @since 2.0.17.9
  */
 
-   /**
+/**
  * Handles the /category endpoint.
-    */
+ */
 class CategoryController extends VanillaController {
 
     /** @var Gdn_CategoryModel */

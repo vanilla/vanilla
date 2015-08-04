@@ -71,7 +71,7 @@ if ($Drop || !$CategoryExists) {
     $SQL->insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
 } elseif ($CategoryExists && !$PermissionCategoryIDExists) {
     if (!c('Garden.Permissions.Disabled.Category')) {
-       // Existing installations need to be set up with per/category permissions.
+        // Existing installations need to be set up with per/category permissions.
         $SQL->update('Category')->set('PermissionCategoryID', 'CategoryID', false)->put();
         $SQL->update('Permission')->set('JunctionColumn', 'PermissionCategoryID')->where('JunctionColumn', 'CategoryID')->put();
     }
@@ -93,7 +93,7 @@ $LastCommentUserIDExists = $Construct->columnExists('LastCommentUserID');
 $CountBookmarksExists = $Construct->columnExists('CountBookmarks');
 
 $Construct
-   ->PrimaryKey('DiscussionID')
+    ->PrimaryKey('DiscussionID')
     ->column('Type', 'varchar(10)', true, 'index')
     ->column('ForeignID', 'varchar(32)', true, 'index')// For relating foreign records to discussions
     ->column('CategoryID', 'int', false, array('index.CategoryPages', 'index.CategoryInserted'))
@@ -168,7 +168,7 @@ if ($Construct->TableExists()) {
 
 $Construct
     ->table('Comment')
-   ->PrimaryKey('CommentID')
+    ->PrimaryKey('CommentID')
     ->column('DiscussionID', 'int', false, 'index.1')
     //->column('Type', 'varchar(10)', true)
     //->column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
@@ -226,7 +226,7 @@ $Construct->table('User')
     ->set();
 
 $Construct->table('Draft')
-   ->PrimaryKey('DraftID')
+    ->PrimaryKey('DraftID')
     ->column('DiscussionID', 'int', true, 'key')
     ->column('CategoryID', 'int', true, 'key')
     ->column('InsertUserID', 'int', false, 'key')
@@ -293,8 +293,8 @@ $PermissionModel->SQL = $SQL;
 // Define some global vanilla permissions.
 $PermissionModel->Define(array(
     'Vanilla.Approval.Require',
-   'Vanilla.Comments.Me' => 1,
-    ));
+    'Vanilla.Comments.Me' => 1,
+));
 $PermissionModel->Undefine(array('Vanilla.Settings.Manage', 'Vanilla.Categories.Manage'));
 
 // Define some permissions for the Vanilla categories.
@@ -367,7 +367,7 @@ $Construct
     ->column('DiscussionID', 'int', false, 'primary')
     ->column('CategoryID', 'int', false, 'index')
     ->column('DateInserted', 'datetime', !$DateInsertedExists)
-   ->Engine('InnoDB')
+    ->Engine('InnoDB')
     ->set($Explicit, $Drop);
 
 if (!$DateInsertedExists) {

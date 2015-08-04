@@ -12,7 +12,7 @@
  * Renders user drafts. If rendered within a discussion, it only shows drafts related to that discussion.
  */
 class DraftsModule extends Gdn_Module {
-   
+
     /** @var  Gdn_Form */
     public $Form;
 

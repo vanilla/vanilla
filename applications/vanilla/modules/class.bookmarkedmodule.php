@@ -6,7 +6,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
-*/
+ */
 
 /**
  * Renders recently active bookmarked discussions.
@@ -21,13 +21,13 @@ class BookmarkedModule extends Gdn_Module {
 
     /** @var string */
     public $ListID = 'Bookmark_List';
-   
+
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
         $this->Visible = c('Vanilla.Modules.ShowBookmarkedModule', true);
     }
-   
+
     public function getData() {
         if (Gdn::session()->isValid()) {
             $BookmarkIDs = Gdn::sql()
@@ -43,7 +43,7 @@ class BookmarkedModule extends Gdn_Module {
                 DiscussionModel::CategoryPermissions();
 
                 $DiscussionModel->SQL->whereIn('d.DiscussionID', $BookmarkIDs);
-            
+
                 $Bookmarks = $DiscussionModel->get(
                     0,
                     $this->Limit,
@@ -64,13 +64,13 @@ class BookmarkedModule extends Gdn_Module {
         if (!$this->data('Bookmarks')) {
             $this->GetData();
         }
-      
+
         $Bookmarks = $this->data('Bookmarks');
-      
+
         if (is_object($Bookmarks) && ($Bookmarks->numRows() > 0 || $this->Help)) {
             return parent::ToString();
         }
-      
+
         return '';
     }
 }

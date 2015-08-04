@@ -6,7 +6,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
-*/
+ */
 
 /**
  * Renders the discussion categories.
@@ -30,11 +30,11 @@ class CategoriesModule extends Gdn_Module {
         return 'Panel';
     }
 
-   /**
-    * Get the data for this module.
-    */
+    /**
+     * Get the data for this module.
+     */
     protected function getData() {
-       // Allow plugins to set different data.
+        // Allow plugins to set different data.
         $this->fireEvent('GetData');
         if ($this->Data) {
             return;
@@ -43,7 +43,7 @@ class CategoriesModule extends Gdn_Module {
         $Categories = CategoryModel::categories();
         $Categories2 = $Categories;
 
-       // Filter out the categories we aren't watching.
+        // Filter out the categories we aren't watching.
         foreach ($Categories2 as $i => $Category) {
             if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
                 unset($Categories[$i]);

@@ -13,22 +13,22 @@
  */
 class DraftModel extends VanillaModel {
 
-   /**
-    * Class constructor. Defines the related database table name.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Class constructor. Defines the related database table name.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function __construct() {
         parent::__construct('Draft');
     }
 
-   /**
-    * Build base SQL query used by get methods.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Build base SQL query used by get methods.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function draftQuery() {
         $this->SQL
             ->select('d.*')
@@ -38,8 +38,8 @@ class DraftModel extends VanillaModel {
     /**
      * Gets drafts matching the given criteria.
      *
-    * @since 2.0.0
-    * @access public
+     * @since 2.0.0
+     * @access public
      *
      * @param int $UserID Unique ID of user that wrote the drafts.
      * @param int $Offset Number of results to skip.
@@ -71,11 +71,11 @@ class DraftModel extends VanillaModel {
         return $this->SQL->get();
     }
 
-   /**
+    /**
      * Gets data for a single draft.
      *
-    * @since 2.0.0
-    * @access public
+     * @since 2.0.0
+     * @access public
      *
      * @param int $DraftID Unique ID of draft to get data for.
      * @return object SQL results.
@@ -88,11 +88,11 @@ class DraftModel extends VanillaModel {
             ->firstRow();
     }
 
-   /**
+    /**
      * Gets number of drafts a user has.
      *
-    * @since 2.0.0
-    * @access public
+     * @since 2.0.0
+     * @access public
      *
      * @param int $UserID Unique ID of user to count drafts for.
      * @return int Total drafts.
@@ -104,14 +104,14 @@ class DraftModel extends VanillaModel {
             ->where('InsertUserID', $UserID)
             ->get()
             ->firstRow()
-         ->CountDrafts;
+            ->CountDrafts;
     }
 
-   /**
+    /**
      * Insert or update a draft from form values.
      *
-    * @since 2.0.0
-    * @access public
+     * @since 2.0.0
+     * @access public
      *
      * @param array $FormPostValues Form values sent from form model.
      * @return int Unique ID of draft.
@@ -119,10 +119,10 @@ class DraftModel extends VanillaModel {
     public function save($FormPostValues) {
         $Session = Gdn::session();
 
-       // Define the primary key in this model's table.
+        // Define the primary key in this model's table.
         $this->defineSchema();
 
-       // Add & apply any extra validation rules:
+        // Add & apply any extra validation rules:
         $this->Validation->applyRule('Body', 'Required');
         $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
@@ -130,7 +130,7 @@ class DraftModel extends VanillaModel {
             $this->Validation->applyRule('Body', 'Length');
         }
 
-       // Get the DraftID from the form so we know if we are inserting or updating.
+        // Get the DraftID from the form so we know if we are inserting or updating.
         $DraftID = arrayValue('DraftID', $FormPostValues, '');
         $Insert = $DraftID == '' ? true : false;
 
@@ -138,13 +138,13 @@ class DraftModel extends VanillaModel {
             unset($FormPostValues['DraftID']);
         }
 
-       // Remove the discussionid from the form value collection if it's empty
+        // Remove the discussionid from the form value collection if it's empty
         if (array_key_exists('DiscussionID', $FormPostValues) && $FormPostValues['DiscussionID'] == '') {
             unset($FormPostValues['DiscussionID']);
         }
 
         if ($Insert) {
-           // If no categoryid is defined, grab the first available.
+            // If no categoryid is defined, grab the first available.
             if (ArrayValue('CategoryID', $FormPostValues) === false) {
                 $FormPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
             }
@@ -154,7 +154,7 @@ class DraftModel extends VanillaModel {
         $this->AddInsertFields($FormPostValues);
         $this->AddUpdateFields($FormPostValues);
 
-       // Remove checkboxes from the fields if they were unchecked
+        // Remove checkboxes from the fields if they were unchecked
         if (ArrayValue('Announce', $FormPostValues, '') === false) {
             unset($FormPostValues['Announce']);
         }
@@ -167,18 +167,18 @@ class DraftModel extends VanillaModel {
             unset($FormPostValues['Sink']);
         }
 
-       // Validate the form posted values
+        // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
             $DraftID = intval(ArrayValue('DraftID', $Fields, 0));
 
-           // If the post is new and it validates, make sure the user isn't spamming
+            // If the post is new and it validates, make sure the user isn't spamming
             if ($DraftID > 0) {
-               // Update the draft
+                // Update the draft
                 $Fields = RemoveKeyFromArray($Fields, 'DraftID'); // Remove the primary key from the fields for saving
                 $this->SQL->put($this->Name, $Fields, array($this->PrimaryKey => $DraftID));
             } else {
-               // Insert the draft
+                // Insert the draft
                 unset($Fields['DraftID']);
                 $DraftID = $this->SQL->insert($this->Name, $Fields);
                 $this->UpdateUser($Session->UserID);
@@ -188,19 +188,19 @@ class DraftModel extends VanillaModel {
         return $DraftID;
     }
 
-   /**
+    /**
      * Deletes a specified draft.
      *
      * This is a hard delete that completely removes it.
      *
-    * @since 2.0.0
-    * @access public
+     * @since 2.0.0
+     * @access public
      *
      * @param int $DraftID Unique ID of the draft to be deleted.
      * @return bool Always returns TRUE.
      */
     public function delete($DraftID) {
-       // Get some information about this draft
+        // Get some information about this draft
         $DraftUser = $this->SQL
             ->select('InsertUserID')
             ->from('Draft')
@@ -216,19 +216,19 @@ class DraftModel extends VanillaModel {
         return true;
     }
 
-   /**
+    /**
      * Updates a user's draft count.
      *
-    * @since 2.0.0
-    * @access public
+     * @since 2.0.0
+     * @access public
      *
      * @param int $UserID Unique ID of the user to be updated.
      */
     public function updateUser($UserID) {
-       // Retrieve a draft count
+        // Retrieve a draft count
         $CountDrafts = $this->getCount($UserID);
 
-       // Update CountDrafts column of user table fot this user
+        // Update CountDrafts column of user table fot this user
         Gdn::userModel()->setField($UserID, 'CountDrafts', $CountDrafts);
     }
 }

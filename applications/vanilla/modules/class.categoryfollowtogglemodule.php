@@ -6,22 +6,22 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
-*/
+ */
 
 /**
  * Allows the user to show all unfollowed categories so they can re-follow them.
  */
 class CategoryFollowToggleModule extends Gdn_Module {
-   
-   /**
-    * Set the preference in the user's session.
-    */
+
+    /**
+     * Set the preference in the user's session.
+     */
     public function setToggle() {
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             return;
         }
-      
+
         $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
         if ($ShowAllCategories != '') {
             $ShowAllCategories = $ShowAllCategories == 'true' ? true : false;
@@ -29,11 +29,11 @@ class CategoryFollowToggleModule extends Gdn_Module {
             if ($ShowAllCategories != $ShowAllCategoriesPref) {
                 $Session->setPreference('ShowAllCategories', $ShowAllCategories);
             }
-            
+
             redirect('/'.ltrim(Gdn::request()->Path(), '/'));
         }
     }
-   
+
     public function assetTarget() {
         return 'Panel';
     }

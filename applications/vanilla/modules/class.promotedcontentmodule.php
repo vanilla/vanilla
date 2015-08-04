@@ -20,14 +20,14 @@ class PromotedContentModule extends Gdn_Module {
     /** @var integer Max number of records to be fetched. */
     const MAX_LIMIT = 50;
 
-   /**
+    /**
      * @var string How should we choose the content?
-    *  - role        Author's Role
-    *  - rank        Author's Rank
-    *  - category    Content's Category
-    *  - score       Content's Score
-    *  - promoted
-    */
+     *  - role        Author's Role
+     *  - rank        Author's Rank
+     *  - category    Content's Category
+     *  - score       Content's Score
+     *  - promoted
+     */
     public $Selector;
 
     /** @var string|int Parameters for the selector method. */
@@ -53,14 +53,14 @@ class PromotedContentModule extends Gdn_Module {
 
     /** @var array Whitelist of accepted parameters. */
     public $Properties = array(
-      'Selector',
-      'Selection',
-      'ContentType',
-      'Limit',
-      'Group',
-      'TitleLimit',
-      'BodyLimit',
-      'Expiry'
+        'Selector',
+        'Selection',
+        'ContentType',
+        'Limit',
+        'Group',
+        'TitleLimit',
+        'BodyLimit',
+        'Expiry'
     );
 
     public function __construct() {
@@ -68,58 +68,58 @@ class PromotedContentModule extends Gdn_Module {
         $this->_ApplicationFolder = 'vanilla';
     }
 
-   /**
-    * Set class properties.
-    *
-    * @param array $Parameters Use lowercase key names that map to class properties.
-    */
+    /**
+     * Set class properties.
+     *
+     * @param array $Parameters Use lowercase key names that map to class properties.
+     */
     public function load($Parameters = array()) {
         $Result = $this->validate($Parameters);
         if ($Result === true) {
-           // Match existing properties to validates parameters.
+            // Match existing properties to validates parameters.
             foreach ($this->Properties as $Property) {
                 $key = strtolower($Property);
                 if (isset($Parameters[$key])) {
                     $this->$Property = $Parameters[$key];
-            }
                 }
+            }
             if (isset($Parameters['limit'])) {
                 $this->Limit = min($this->Limit, self::MAX_LIMIT);
             }
             return true;
         } else {
-           // Error messages.
+            // Error messages.
             return $Result;
         }
     }
 
-   /**
-    * Validate data to be used as class properties.
-    *
+    /**
+     * Validate data to be used as class properties.
+     *
      * @param array $Parameters .
-    * @return string|true True on success or string (message) on error.
-    */
+     * @return string|true True on success or string (message) on error.
+     */
     public function validate($Parameters = array()) {
         $validation = new Gdn_Validation();
 
-       // Validate integer properties.
+        // Validate integer properties.
         $validation->applyRule('expiry', 'Integer');
         $validation->applyRule('limit', 'Integer');
         $validation->applyRule('bodylimit', 'Integer');
         $validation->applyRule('titlelimit', 'Integer');
         $validation->applyRule('group', 'Integer');
 
-       // Validate selection.
+        // Validate selection.
         $validation->applyRule('selection', 'String');
 
-       // Validate selector.
+        // Validate selector.
         $validation->applyRule('selector', 'Required');
         $selectorWhitelist = array('role', 'rank', 'category', 'score', 'promoted');
         if (isset($Parameters['selector']) && !in_array($Parameters['selector'], $selectorWhitelist)) {
             $validation->addValidationResult('selector', 'Invalid selector.');
         }
 
-       // Validate ContentType.
+        // Validate ContentType.
         $typeWhitelist = array('all', 'discussions', 'comments');
         if (isset($Parameters['contenttype']) && !in_array($Parameters['contenttype'], $typeWhitelist)) {
             $validation->addValidationResult('contenttype', 'Invalid contenttype.');
@@ -129,9 +129,9 @@ class PromotedContentModule extends Gdn_Module {
         return ($result === true) ? true : $validation->resultsText();
     }
 
-   /**
-    * Get data based on class properties.
-    */
+    /**
+     * Get data based on class properties.
+     */
     public function getData() {
         $this->setData('Content', false);
         $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
@@ -142,12 +142,12 @@ class PromotedContentModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Select content based on author RoleID.
-    *
-    * @param array|int $Parameters
-    * @return array|false
-    */
+    /**
+     * Select content based on author RoleID.
+     *
+     * @param array|int $Parameters
+     * @return array|false
+     */
     protected function selectByRole($Parameters) {
         if (!is_array($Parameters)) {
             $RoleID = $Parameters;
@@ -155,7 +155,7 @@ class PromotedContentModule extends Gdn_Module {
             $RoleID = val('RoleID', $Parameters, null);
         }
 
-       // Lookup role name -> roleID
+        // Lookup role name -> roleID
         if ($RoleID && is_string($RoleID)) {
             $RoleModel = new RoleModel();
             $Roles = explode(',', $RoleID);
@@ -176,14 +176,14 @@ class PromotedContentModule extends Gdn_Module {
             return false;
         }
 
-       // Check cache
+        // Check cache
         sort($RoleID);
         $RoleIDKey = implode('-', $RoleID);
         $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleIDKey}";
         $Content = Gdn::cache()->get($SelectorRoleCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-           // Get everyone with this Role
+            // Get everyone with this Role
             $UserIDs = Gdn::sql()->select('ur.UserID')
                 ->from('UserRole ur')
                 ->where('ur.RoleID', $RoleID)
@@ -191,7 +191,7 @@ class PromotedContentModule extends Gdn_Module {
                 ->get()->result(DATASET_TYPE_ARRAY);
             $UserIDs = consolidateArrayValuesByKey($UserIDs, 'UserID');
 
-           // Get matching Discussions
+            // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
@@ -202,7 +202,7 @@ class PromotedContentModule extends Gdn_Module {
                     ->get()->result(DATASET_TYPE_ARRAY);
             }
 
-           // Get matching Comments
+            // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
                 $Comments = Gdn::sql()->select('c.*')
@@ -215,14 +215,14 @@ class PromotedContentModule extends Gdn_Module {
                 $this->JoinCategory($Comments);
             }
 
-           // Interleave
+            // Interleave
             $Content = $this->Union('DateInserted', array(
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
             $this->Prepare($Content);
 
-           // Add result to cache
+            // Add result to cache
             Gdn::cache()->store($SelectorRoleCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
@@ -233,14 +233,14 @@ class PromotedContentModule extends Gdn_Module {
         return $Content;
     }
 
-   /**
-    * Select content based on author RankID.
-    *
-    * @param array|int $Parameters
-    * @return array|false
-    */
+    /**
+     * Select content based on author RankID.
+     *
+     * @param array|int $Parameters
+     * @return array|false
+     */
     protected function selectByRank($Parameters) {
-       // Must have Ranks enabled.
+        // Must have Ranks enabled.
         if (!class_exists('RankModel')) {
             return false;
         }
@@ -251,24 +251,24 @@ class PromotedContentModule extends Gdn_Module {
             $RankID = val('RankID', $Parameters, null);
         }
 
-       // Check for Rank passed by name.
+        // Check for Rank passed by name.
         if (!is_numeric($RankID)) {
             $RankModel = new RankModel();
             $Rank = $RankModel->getWhere(array('Name' => $RankID))->firstRow();
             $RankID = val('RankID', $Rank);
         }
 
-       // Disallow blank or multiple ranks.
+        // Disallow blank or multiple ranks.
         if (!$RankID || is_array($RankID)) {
             return false;
         }
 
-       // Check cache
+        // Check cache
         $SelectorRankCacheKey = "modules.promotedcontent.rank.{$RankID}";
         $Content = Gdn::cache()->get($SelectorRankCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-           // Get everyone with this Role
+            // Get everyone with this Role
             $UserIDs = Gdn::sql()->select('u.UserID')
                 ->from('User u')
                 ->where('u.RankID', $RankID)
@@ -276,7 +276,7 @@ class PromotedContentModule extends Gdn_Module {
                 ->get()->result(DATASET_TYPE_ARRAY);
             $UserIDs = consolidateArrayValuesByKey($UserIDs, 'UserID');
 
-           // Get matching Discussions
+            // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
@@ -287,7 +287,7 @@ class PromotedContentModule extends Gdn_Module {
                     ->get()->result(DATASET_TYPE_ARRAY);
             }
 
-           // Get matching Comments
+            // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
                 $Comments = Gdn::sql()->select('c.*')
@@ -300,14 +300,14 @@ class PromotedContentModule extends Gdn_Module {
                 $this->JoinCategory($Comments);
             }
 
-           // Interleave
+            // Interleave
             $Content = $this->Union('DateInserted', array(
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
             $this->Prepare($Content);
 
-           // Add result to cache
+            // Add result to cache
             Gdn::cache()->store($SelectorRankCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
@@ -318,12 +318,12 @@ class PromotedContentModule extends Gdn_Module {
         return $Content;
     }
 
-   /**
-    * Select content based on its CategoryID.
-    *
-    * @param array|int $Parameters
-    * @return array|false
-    */
+    /**
+     * Select content based on its CategoryID.
+     *
+     * @param array|int $Parameters
+     * @return array|false
+     */
     protected function selectByCategory($Parameters) {
         if (!is_array($Parameters)) {
             $CategoryID = $Parameters;
@@ -331,21 +331,21 @@ class PromotedContentModule extends Gdn_Module {
             $CategoryID = val('CategoryID', $Parameters, null);
         }
 
-       // Allow category names, and validate category exists.
+        // Allow category names, and validate category exists.
         $Category = CategoryModel::categories($CategoryID);
         $CategoryID = val('CategoryID', $Category);
 
-       // Disallow invalid or multiple categories.
+        // Disallow invalid or multiple categories.
         if (!$CategoryID || is_array($CategoryID)) {
             return false;
         }
 
-       // Check cache
+        // Check cache
         $SelectorCategoryCacheKey = "modules.promotedcontent.category.{$CategoryID}";
         $Content = Gdn::cache()->get($SelectorCategoryCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-           // Get matching Discussions
+            // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
@@ -356,7 +356,7 @@ class PromotedContentModule extends Gdn_Module {
                     ->get()->result(DATASET_TYPE_ARRAY);
             }
 
-           // Get matching Comments
+            // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
                 $CommentDiscussionIDs = Gdn::sql()->select('d.DiscussionID')
@@ -377,14 +377,14 @@ class PromotedContentModule extends Gdn_Module {
                 $this->JoinCategory($Comments);
             }
 
-           // Interleave
+            // Interleave
             $Content = $this->Union('DateInserted', array(
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
             $this->Prepare($Content);
 
-           // Add result to cache
+            // Add result to cache
             Gdn::cache()->store($SelectorCategoryCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
@@ -395,12 +395,12 @@ class PromotedContentModule extends Gdn_Module {
         return $Content;
     }
 
-   /**
-    * Select content based on its Score.
-    *
-    * @param array|int $Parameters
-    * @return array|false
-    */
+    /**
+     * Select content based on its Score.
+     *
+     * @param array|int $Parameters
+     * @return array|false
+     */
     protected function selectByScore($Parameters) {
         if (!is_array($Parameters)) {
             $MinScore = $Parameters;
@@ -412,12 +412,12 @@ class PromotedContentModule extends Gdn_Module {
             $MinScore = false;
         }
 
-       // Check cache
+        // Check cache
         $SelectorScoreCacheKey = "modules.promotedcontent.score.{$MinScore}";
         $Content = Gdn::cache()->get($SelectorScoreCacheKey);
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
-           // Get matching Discussions
+            // Get matching Discussions
             $Discussions = array();
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
@@ -430,7 +430,7 @@ class PromotedContentModule extends Gdn_Module {
                 $Discussions = $Discussions->get()->result(DATASET_TYPE_ARRAY);
             }
 
-           // Get matching Comments
+            // Get matching Comments
             $Comments = array();
             if ($this->ShowComments()) {
                 $Comments = Gdn::sql()->select('c.*')
@@ -445,14 +445,14 @@ class PromotedContentModule extends Gdn_Module {
                 $this->JoinCategory($Comments);
             }
 
-           // Interleave
+            // Interleave
             $Content = $this->Union('DateInserted', array(
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
             $this->Prepare($Content);
 
-           // Add result to cache
+            // Add result to cache
             Gdn::cache()->store($SelectorScoreCacheKey, $Content, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
             ));
@@ -463,14 +463,14 @@ class PromotedContentModule extends Gdn_Module {
         return $Content;
     }
 
-   /**
-    * Selected content that passed the Promoted threshold.
-    *
-    * This uses the Reactions caching system & options.
-    *
-    * @param array $Parameters Not used.
-    * @return array|false $Content
-    */
+    /**
+     * Selected content that passed the Promoted threshold.
+     *
+     * This uses the Reactions caching system & options.
+     *
+     * @param array $Parameters Not used.
+     * @return array|false $Content
+     */
     protected function selectByPromoted($Parameters) {
         if (!class_exists('ReactionModel')) {
             return;
@@ -498,11 +498,11 @@ class PromotedContentModule extends Gdn_Module {
         return $Content;
     }
 
-   /**
-    * Attach CategoryID to Comments
-    *
-    * @param array $Comments
-    */
+    /**
+     * Attach CategoryID to Comments
+     *
+     * @param array $Comments
+     */
     protected function joinCategory(&$Comments) {
         $DiscussionIDs = array();
 
@@ -528,13 +528,13 @@ class PromotedContentModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Interleave two or more result arrays by a common field
-    *
-    * @param string $Field
-    * @param array $Sections Array of result arrays
-    * @return array
-    */
+    /**
+     * Interleave two or more result arrays by a common field
+     *
+     * @param string $Field
+     * @param array $Sections Array of result arrays
+     * @return array
+     */
     protected function union($Field, $Sections) {
         if (!is_array($Sections)) {
             return;
@@ -558,11 +558,11 @@ class PromotedContentModule extends Gdn_Module {
         return array_values($Interleaved);
     }
 
-   /**
-    * Pre-process content into a uniform format for output
-    *
+    /**
+     * Pre-process content into a uniform format for output
+     *
      * @param Array $content By reference
-    */
+     */
     protected function prepare(&$content) {
 
         foreach ($content as &$item) {
@@ -575,7 +575,7 @@ class PromotedContentModule extends Gdn_Module {
                 case 'comment':
                     $itemFields = array_merge($itemFields, array('CommentID'));
 
-                   // Comment specific
+                    // Comment specific
                     $itemProperties['Name'] = sprintf(t('Re: %s'), valr('Discussion.Name', $item, val('Name', $item)));
                     $url = CommentUrl($item);
                     break;
@@ -597,7 +597,7 @@ class PromotedContentModule extends Gdn_Module {
             $itemProperties = array_merge($itemProperties, $filteredItem);
             $item = $itemProperties;
 
-           // Attach User
+            // Attach User
             $userFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
 
             $user = Gdn::userModel()->getID($userID);
@@ -627,11 +627,11 @@ class PromotedContentModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Strip out content that this user is not allowed to see
-    *
-    * @param array $Content Content array, by reference
-    */
+    /**
+     * Strip out content that this user is not allowed to see
+     *
+     * @param array $Content Content array, by reference
+     */
     protected function security(&$Content) {
         if (!is_array($Content)) {
             return;
@@ -639,12 +639,12 @@ class PromotedContentModule extends Gdn_Module {
         $Content = array_filter($Content, array($this, 'SecurityFilter'));
     }
 
-   /**
-    * Determine if we have permission to view this content.
-    *
-    * @param $ContentItem
-    * @return bool
-    */
+    /**
+     * Determine if we have permission to view this content.
+     *
+     * @param $ContentItem
+     * @return bool
+     */
     protected function securityFilter($ContentItem) {
         $CategoryID = val('CategoryID', $ContentItem, null);
         if (is_null($CategoryID) || $CategoryID === false) {
@@ -660,48 +660,48 @@ class PromotedContentModule extends Gdn_Module {
         return true;
     }
 
-   /**
-    * Condense an interleaved content list down to the required size
-    *
-    * @param array $Content
-    * @param array $Limit
-    */
+    /**
+     * Condense an interleaved content list down to the required size
+     *
+     * @param array $Content
+     * @param array $Limit
+     */
     protected function condense(&$Content, $Limit) {
         $Content = array_slice($Content, 0, $Limit);
     }
 
-   /**
-    * Whether to display promoted comments.
-    *
-    * @return bool
-    */
+    /**
+     * Whether to display promoted comments.
+     *
+     * @return bool
+     */
     public function showComments() {
         return ($this->ContentType == 'all' || $this->ContentType == 'comments') ? true : false;
     }
 
-   /**
-    * Whether to display promoted discussions.
-    *
-    * @return bool
-    */
+    /**
+     * Whether to display promoted discussions.
+     *
+     * @return bool
+     */
     public function showDiscussions() {
         return ($this->ContentType == 'all' || $this->ContentType == 'discussions') ? true : false;
     }
 
-   /**
-    * Default asset target for this module.
-    *
-    * @return string
-    */
+    /**
+     * Default asset target for this module.
+     *
+     * @return string
+     */
     public function assetTarget() {
         return 'Content';
     }
 
-   /**
-    * Render.
-    *
-    * @return string
-    */
+    /**
+     * Render.
+     *
+     * @return string
+     */
     public function toString() {
         if ($this->data('Content', null) == null) {
             $this->GetData();

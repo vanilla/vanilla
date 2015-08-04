@@ -1,9 +1,11 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Handles analyzing and returning various parts of the current url.
  *
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -21,16 +23,17 @@ class Gdn_Url {
     * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
     * @return string
     */
-   public static function WebRoot($WithDomain = FALSE) {
-      $WebRoot = Gdn::Request()->WebRoot();
+    public static function WebRoot($WithDomain = false) {
+        $WebRoot = Gdn::Request()->WebRoot();
 
-      if ($WithDomain)
-         $Result = Gdn::Request()->Domain().'/'.$WebRoot;
-      else
-         $Result = $WebRoot;
+        if ($WithDomain) {
+            $Result = Gdn::Request()->Domain().'/'.$WebRoot;
+        } else {
+            $Result = $WebRoot;
+        }
 
-      return $Result;
-   }
+        return $Result;
+    }
 
 
    /**
@@ -39,10 +42,10 @@ class Gdn_Url {
     *
     * @return string
     */
-   public static function Domain() {
-      // Attempt to get the domain from the configuration array
-      return Gdn::Request()->Domain();
-   }
+    public static function Domain() {
+       // Attempt to get the domain from the configuration array
+        return Gdn::Request()->Domain();
+    }
 
 
    /**
@@ -51,9 +54,9 @@ class Gdn_Url {
     *
     * @return string
     */
-   public static function Host() {
-      return Gdn::Request()->RequestHost();
-   }
+    public static function Host() {
+        return Gdn::Request()->RequestHost();
+    }
 
 
    /**
@@ -62,9 +65,9 @@ class Gdn_Url {
     *
     * @return string
     */
-   public static function QueryString() {
-      return http_build_query(Gdn::Request()->GetRequestArguments(Gdn_Request::INPUT_GET));
-   }
+    public static function QueryString() {
+        return http_build_query(Gdn::Request()->GetRequestArguments(Gdn_Request::INPUT_GET));
+    }
 
 
    /**
@@ -76,10 +79,11 @@ class Gdn_Url {
     * @param boolean $RemoveSyndication
     * @return string
     */
-   public static function Request($WithWebRoot = FALSE, $WithDomain = FALSE, $RemoveSyndication = FALSE) {
-      $Result = Gdn::Request()->Path();
-      if($WithWebRoot)
-         $Result = self::WebRoot($WithDomain).'/'.$Result;
-      return $Result;
-   }
+    public static function Request($WithWebRoot = false, $WithDomain = false, $RemoveSyndication = false) {
+        $Result = Gdn::Request()->Path();
+        if ($WithWebRoot) {
+            $Result = self::WebRoot($WithDomain).'/'.$Result;
+        }
+        return $Result;
+    }
 }

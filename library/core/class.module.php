@@ -1,12 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Module base class
  *
  * Provides basic functionality when extended by real modules.
- * 
+ *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -19,7 +21,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @var string
     */
-   public $AssetName = '';
+    public $AssetName = '';
 
 
    /**
@@ -27,14 +29,14 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @var string
     */
-   protected $_ApplicationFolder;
+    protected $_ApplicationFolder;
    
    /**
     * Data that is passed into the view.
-    * 
+    *
     * @var array
     */
-   public $Data = array();
+    public $Data = array();
 
 
    /**
@@ -43,7 +45,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @var Gdn_Controller
     */
-   protected $_Sender;
+    protected $_Sender;
 
 
    /**
@@ -51,9 +53,9 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @var string
     */
-   protected $_ThemeFolder;
+    protected $_ThemeFolder;
    
-   public $Visible = TRUE;
+    public $Visible = true;
 
 
    /**
@@ -61,61 +63,65 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @param object $Sender
     */
-   public function __construct($Sender = '', $ApplicationFolder = FALSE) {
-      if (!$Sender)
-         $Sender = Gdn::Controller();
+    public function __construct($Sender = '', $ApplicationFolder = false) {
+        if (!$Sender) {
+            $Sender = Gdn::Controller();
+        }
       
-      if (is_object($Sender)) {
-         $this->_ApplicationFolder = $Sender->ApplicationFolder;
-         $this->_ThemeFolder = $Sender->Theme;
-      } else {
-         $this->_ApplicationFolder = 'dashboard';
-         $this->_ThemeFolder = Gdn::Config('Garden.Theme');
-      }
-      if ($ApplicationFolder !== FALSE)
-         $this->_ApplicationFolder = $ApplicationFolder;
+        if (is_object($Sender)) {
+            $this->_ApplicationFolder = $Sender->ApplicationFolder;
+            $this->_ThemeFolder = $Sender->Theme;
+        } else {
+            $this->_ApplicationFolder = 'dashboard';
+            $this->_ThemeFolder = Gdn::Config('Garden.Theme');
+        }
+        if ($ApplicationFolder !== false) {
+            $this->_ApplicationFolder = $ApplicationFolder;
+        }
       
-      if (is_object($Sender))
-         $this->_Sender = $Sender;
+        if (is_object($Sender)) {
+            $this->_Sender = $Sender;
+        }
          
-      parent::__construct();
-   }
+        parent::__construct();
+    }
 
 
    /**
     * Returns the name of the asset where this component should be rendered.
     */
-   public function AssetTarget() {
-      trigger_error(ErrorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
-   }
+    public function AssetTarget() {
+        trigger_error(ErrorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
+    }
    
-   public function Data($Name = NULL, $Default = '') {
-      if ($Name == NULL)
-         $Result = $this->Data;
-      else
-         $Result = GetValueR($Name, $this->Data, $Default);
-      return $Result;
-   }
+    public function Data($Name = null, $Default = '') {
+        if ($Name == null) {
+            $Result = $this->Data;
+        } else {
+            $Result = GetValueR($Name, $this->Data, $Default);
+        }
+        return $Result;
+    }
 
    /**
     * Returns the xhtml for this module as a fully parsed and rendered string.
     *
     * @return string
     */
-   public function FetchView($View = '') {
-      $ViewPath = $this->FetchViewLocation($View);
-      $String = '';
-      ob_start();
-      if(is_object($this->_Sender) && isset($this->_Sender->Data)) {
-         $Data = $this->_Sender->Data;
-      } else {
-         $Data = array();
-      }
-      include ($ViewPath);
-      $String = ob_get_contents();
-      @ob_end_clean();
-      return $String;
-   }
+    public function FetchView($View = '') {
+        $ViewPath = $this->FetchViewLocation($View);
+        $String = '';
+        ob_start();
+        if (is_object($this->_Sender) && isset($this->_Sender->Data)) {
+            $Data = $this->_Sender->Data;
+        } else {
+            $Data = array();
+        }
+        include ($ViewPath);
+        $String = ob_get_contents();
+        @ob_end_clean();
+        return $String;
+    }
 
 
    /**
@@ -125,63 +131,70 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * @param string $ApplicationFolder
     * @return array
     */
-   public function FetchViewLocation($View = '', $ApplicationFolder = '') {
-      if ($View == '')
-         $View = strtolower($this->Name());
+    public function FetchViewLocation($View = '', $ApplicationFolder = '') {
+        if ($View == '') {
+            $View = strtolower($this->Name());
+        }
          
-      if (substr($View, -6) == 'module')
-         $View = substr($View, 0, -6);
+        if (substr($View, -6) == 'module') {
+            $View = substr($View, 0, -6);
+        }
                
-      if (substr($View, 0, 4) == 'gdn_')
-         $View = substr($View, 4);
+        if (substr($View, 0, 4) == 'gdn_') {
+            $View = substr($View, 4);
+        }
 
-      if ($ApplicationFolder == '')
-         $ApplicationFolder = strpos($this->_ApplicationFolder, '/') ? $this->_ApplicationFolder : strtolower($this->_ApplicationFolder);
+        if ($ApplicationFolder == '') {
+            $ApplicationFolder = strpos($this->_ApplicationFolder, '/') ? $this->_ApplicationFolder : strtolower($this->_ApplicationFolder);
+        }
 
-      $ThemeFolder = $this->_ThemeFolder;
+        $ThemeFolder = $this->_ThemeFolder;
       
-      $ViewPath = NULL;
+        $ViewPath = null;
       
-      // Try to use Gdn_Controller's FetchViewLocation
-      if (Gdn::Controller() instanceof Gdn_Controller) {
-         try {
-            $ViewPath = Gdn::Controller()->FetchViewLocation($View, 'modules', $ApplicationFolder);
-         } catch (Exception $Ex) {}
-      }
+       // Try to use Gdn_Controller's FetchViewLocation
+        if (Gdn::Controller() instanceof Gdn_Controller) {
+            try {
+                $ViewPath = Gdn::Controller()->FetchViewLocation($View, 'modules', $ApplicationFolder);
+            } catch (Exception $Ex) {
+            }
+        }
       
-      if (!$ViewPath) {
-         
-         $ViewPaths = array();
-         // 1. An explicitly defined path to a view
-         if (strpos($View, '/') !== FALSE)
-            $ViewPaths[] = $View;
+        if (!$ViewPath) {
+            $ViewPaths = array();
+           // 1. An explicitly defined path to a view
+            if (strpos($View, '/') !== false) {
+                $ViewPaths[] = $View;
+            }
 
-         // 2. A theme
-         if ($ThemeFolder != '') {
-            // a. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
-            $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, $ApplicationFolder, 'views', 'modules', $View . '.php'));
+           // 2. A theme
+            if ($ThemeFolder != '') {
+               // a. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
+                $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, $ApplicationFolder, 'views', 'modules', $View . '.php'));
             
-            // b. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
-            $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, 'views', 'modules', $View . '.php'));
-         }
+               // b. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
+                $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, 'views', 'modules', $View . '.php'));
+            }
 
-         // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
-         if ($this->_ApplicationFolder)
-            $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View . '.php'));
-         else
-            $ViewPaths[] = dirname($this->Path())."/../views/modules/$View.php";
+           // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
+            if ($this->_ApplicationFolder) {
+                $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View . '.php'));
+            } else {
+                $ViewPaths[] = dirname($this->Path())."/../views/modules/$View.php";
+            }
 
-         // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
-         $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View . '.php'));
+           // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
+            $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View . '.php'));
 
-         $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
-      }
+            $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
+        }
       
-      if ($ViewPath === FALSE)
-         throw new Exception(ErrorMessage('Could not find a `' . $View . '` view for the `' . $this->Name() . '` module in the `' . $ApplicationFolder . '` application.', get_class($this), 'FetchView'), E_USER_ERROR);
+        if ($ViewPath === false) {
+            throw new Exception(ErrorMessage('Could not find a `' . $View . '` view for the `' . $this->Name() . '` module in the `' . $ApplicationFolder . '` application.', get_class($this), 'FetchView'), E_USER_ERROR);
+        }
 
-      return $ViewPath;
-   }
+        return $ViewPath;
+    }
 
 
    /**
@@ -190,28 +203,28 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @return string
     */
-   public function Name() {
-      return get_class($this);
-   }
+    public function Name() {
+        return get_class($this);
+    }
 
-   public function Path($NewValue = FALSE) {
-      static $Path = FALSE;
-      if ($NewValue !== FALSE)
-         $Path = $NewValue;
-      elseif ($Path === FALSE) {
-         $RO = new ReflectionObject($this);
-         $Path = $RO->getFileName();
-      }
-      return $Path;
-   }
+    public function Path($NewValue = false) {
+        static $Path = false;
+        if ($NewValue !== false) {
+            $Path = $NewValue;
+        } elseif ($Path === false) {
+                   $RO = new ReflectionObject($this);
+                   $Path = $RO->getFileName();
+        }
+        return $Path;
+    }
    
-   public function Render() {
-      echo $this->ToString();
-   }
+    public function Render() {
+        echo $this->ToString();
+    }
    
-   public function SetData($Name, $Value) {
-      $this->Data[$Name] = $Value;
-   }
+    public function SetData($Name, $Value) {
+        $this->Data[$Name] = $Value;
+    }
 
    /**
     * Returns the component as a string to be rendered to the screen. Unless
@@ -220,11 +233,13 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @return string
     */
-   public function ToString() {
-      if ($this->Visible)
-         return $this->FetchView();
-      else return '';
-   }
+    public function ToString() {
+        if ($this->Visible) {
+            return $this->FetchView();
+        } else {
+            return '';
+        }
+    }
 
    /**
     * Magic method for type casting to string.
@@ -232,7 +247,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * @todo check if you want to keep this.
     * @return string
     */
-   public function __toString() {
-      return $this->ToString();
-   }
+    public function __toString() {
+        return $this->ToString();
+    }
 }

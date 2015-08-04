@@ -1,8 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Module interface
- * 
+ *
  * An interface for in-page modules.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
@@ -18,13 +20,13 @@ interface Gdn_IModule {
    /**
     * Returns the name of the asset where this component should be rendered.
     */
-   public function AssetTarget();
+    public function AssetTarget();
 
 
    /**
     * Returns the xhtml for this module as a fully parsed and rendered string.
     */
-   public function FetchView();
+    public function FetchView();
 
 
    /**
@@ -34,16 +36,16 @@ interface Gdn_IModule {
     * @param unknown_type $ApplicationFolder
     * @todo update doc with arguments type
     */
-   public function FetchViewLocation($View = '', $ApplicationFolder = '');
+    public function FetchViewLocation($View = '', $ApplicationFolder = '');
 
 
    /**
     * Returns the name of the module.
     */
-   public function Name();
+    public function Name();
 
    /**
     * Renders the module.
     */
-   public function Render();
+    public function Render();
 }

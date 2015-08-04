@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Theme manager
@@ -19,24 +21,24 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    /**
     * An array of search paths for themes and their files
     */
-   protected $ThemeSearchPaths = NULL;
-   protected $AlternateThemeSearchPaths = NULL;
+    protected $ThemeSearchPaths = null;
+    protected $AlternateThemeSearchPaths = null;
 
    /**
     * An array of available plugins. Never access this directly, instead use
     * $this->AvailablePlugins();
     */
-   protected $ThemeCache = NULL;
+    protected $ThemeCache = null;
 
    /**
     * Whether to use APC for theme cache storage
     * @var type
     */
-   protected $Apc = FALSE;
+    protected $Apc = false;
 
-   public function __construct() {
-      parent::__construct();
-   }
+    public function __construct() {
+        parent::__construct();
+    }
 
    /**
     * Sets up the theme framework
@@ -46,154 +48,162 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     * Finally, it parses all plugin files and extracts their events and plugged
     * methods.
     */
-   public function Start($Force = FALSE) {
+    public function Start($Force = false) {
 
-      if (function_exists('apc_fetch') && C('Garden.Apc', FALSE))
-         $this->Apc = TRUE;
+        if (function_exists('apc_fetch') && C('Garden.Apc', false)) {
+            $this->Apc = true;
+        }
 
-      // Build list of all available themes
-      $this->AvailableThemes($Force);
+       // Build list of all available themes
+        $this->AvailableThemes($Force);
 
-      // If there is a hooks file in the theme folder, include it.
-      $ThemeName = $this->CurrentTheme();
-      $ThemeInfo = $this->GetThemeInfo($ThemeName);
-      $ThemeHooks = val('RealHooksFile', $ThemeInfo, NULL);
-      if (file_exists($ThemeHooks))
-         include_once($ThemeHooks);
-   }
+       // If there is a hooks file in the theme folder, include it.
+        $ThemeName = $this->CurrentTheme();
+        $ThemeInfo = $this->GetThemeInfo($ThemeName);
+        $ThemeHooks = val('RealHooksFile', $ThemeInfo, null);
+        if (file_exists($ThemeHooks)) {
+            include_once($ThemeHooks);
+        }
+    }
 
    /**
     * Looks through the themes directory for valid themes and returns them as
     * an associative array of "Theme Name" => "Theme Info Array". It also adds
     * a "Folder" definition to the Theme Info Array for each.
     */
-   public function AvailableThemes($Force = FALSE) {
-      if (is_null($this->ThemeCache) || $Force) {
+    public function AvailableThemes($Force = false) {
+        if (is_null($this->ThemeCache) || $Force) {
+            $this->ThemeCache = array();
 
-         $this->ThemeCache = array();
+           // Check cache freshness
+            foreach ($this->SearchPaths() as $SearchPath => $Trash) {
+                unset($SearchPathCache);
 
-         // Check cache freshness
-         foreach ($this->SearchPaths() as $SearchPath => $Trash) {
-            unset($SearchPathCache);
+               // Check Cache
+                $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
+                if ($this->Apc) {
+                    $SearchPathCache = apc_fetch($SearchPathCacheKey);
+                } else {
+                    $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
+                }
 
-            // Check Cache
-            $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
-            if ($this->Apc) {
-               $SearchPathCache = apc_fetch($SearchPathCacheKey);
-            } else {
-               $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+                $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
+                if ($CacheHit && is_array($SearchPathCache)) {
+                    $CacheIntegrityCheck = (sizeof(array_intersect(array_keys($SearchPathCache), array('CacheIntegrityHash', 'ThemeInfo'))) == 2);
+                    if (!$CacheIntegrityCheck) {
+                        $SearchPathCache = array(
+                        'CacheIntegrityHash'    => null,
+                        'ThemeInfo'             => array()
+                        );
+                    }
+                }
+
+                $CacheThemeInfo = &$SearchPathCache['ThemeInfo'];
+                if (!is_array($CacheThemeInfo)) {
+                    $CacheThemeInfo = array();
+                }
+
+                $PathListing = scandir($SearchPath, 0);
+                sort($PathListing);
+
+                $PathIntegrityHash = md5(serialize($PathListing));
+                if (val('CacheIntegrityHash', $SearchPathCache) != $PathIntegrityHash) {
+                   // Trace('Need to re-index theme cache');
+                   // Need to re-index this folder
+                    $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
+                    if ($PathIntegrityHash === false) {
+                        continue;
+                    }
+
+                    $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
+                    if ($this->Apc) {
+                        apc_store($SearchPathCacheKey, $SearchPathCache);
+                    } else {
+                        Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => true));
+                    }
+                }
+
+                $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);
             }
+        }
 
-            $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
-            if ($CacheHit && is_array($SearchPathCache)) {
-               $CacheIntegrityCheck = (sizeof(array_intersect(array_keys($SearchPathCache), array('CacheIntegrityHash', 'ThemeInfo'))) == 2);
-               if (!$CacheIntegrityCheck) {
-                  $SearchPathCache = array(
-                     'CacheIntegrityHash'    => NULL,
-                     'ThemeInfo'             => array()
-                  );
-               }
-            }
+        return $this->ThemeCache;
+    }
 
-            $CacheThemeInfo = &$SearchPathCache['ThemeInfo'];
-            if (!is_array($CacheThemeInfo))
-               $CacheThemeInfo = array();
-
+    public function IndexSearchPath($SearchPath, &$ThemeInfo, $PathListing = null) {
+        if (is_null($PathListing) || !is_array($PathListing)) {
             $PathListing = scandir($SearchPath, 0);
             sort($PathListing);
+        }
 
-            $PathIntegrityHash = md5(serialize($PathListing));
-            if (val('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
-               // Trace('Need to re-index theme cache');
-               // Need to re-index this folder
-               $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
-               if ($PathIntegrityHash === FALSE)
-                  continue;
+        if ($PathListing === false) {
+            return false;
+        }
 
-               $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-               if ($this->Apc) {
-                  apc_store($SearchPathCacheKey, $SearchPathCache);
-               } else {
-                  Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
-               }
+        foreach ($PathListing as $ThemeFolderName) {
+            if (substr($ThemeFolderName, 0, 1) == '.') {
+                continue;
             }
 
-            $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);
-         }
-      }
+            $ThemePath = CombinePaths(array($SearchPath,$ThemeFolderName));
+            $ThemeFiles = $this->FindThemeFiles($ThemePath);
 
-      return $this->ThemeCache;
-   }
+            if (val('about', $ThemeFiles) === false) {
+                continue;
+            }
 
-   public function IndexSearchPath($SearchPath, &$ThemeInfo, $PathListing = NULL) {
-      if (is_null($PathListing) || !is_array($PathListing)) {
-         $PathListing = scandir($SearchPath, 0);
-         sort($PathListing);
-      }
+            $ThemeAboutFile = val('about', $ThemeFiles);
+            $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
 
-      if ($PathListing === FALSE)
-         return FALSE;
+           // Don't index archived themes.
+  //         if (val('Archived', $SearchThemeInfo, FALSE))
+  //            continue;
 
-      foreach ($PathListing as $ThemeFolderName) {
-         if (substr($ThemeFolderName, 0, 1) == '.')
-            continue;
+           // Add the screenshot.
+            if (array_key_exists('screenshot', $ThemeFiles)) {
+                $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('screenshot', $ThemeFiles)), '/');
+                $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, true);
+            }
 
-         $ThemePath = CombinePaths(array($SearchPath,$ThemeFolderName));
-         $ThemeFiles = $this->FindThemeFiles($ThemePath);
+           // Add the mobile screenshot.
+            if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
+                $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('mobilescreenshot', $ThemeFiles)), '/');
+                $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, true);
+            }
 
-         if (val('about', $ThemeFiles) === FALSE)
-            continue;
+            if (array_key_exists('hooks', $ThemeFiles)) {
+                $SearchThemeInfo['HooksFile'] = val('hooks', $ThemeFiles, false);
+                $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
+            }
 
-         $ThemeAboutFile = val('about', $ThemeFiles);
-         $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
+            if ($SearchThemeInfo === false) {
+                continue;
+            }
 
-         // Don't index archived themes.
-//         if (val('Archived', $SearchThemeInfo, FALSE))
-//            continue;
+            $ThemeInfo[$ThemeFolderName] = $SearchThemeInfo;
+        }
 
-         // Add the screenshot.
-         if (array_key_exists('screenshot', $ThemeFiles)) {
-            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('screenshot', $ThemeFiles)),'/');
-            $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
-         }
+        return md5(serialize($PathListing));
+    }
 
-         // Add the mobile screenshot.
-         if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
-            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('mobilescreenshot', $ThemeFiles)),'/');
-            $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
-         }
+    public function ClearThemeCache($SearchPaths = null) {
+        if (!is_null($SearchPaths)) {
+            if (!is_array($SearchPaths)) {
+                $SearchPaths = array($SearchPaths);
+            }
+        } else {
+            $SearchPaths = $this->SearchPaths();
+        }
 
-         if (array_key_exists('hooks', $ThemeFiles)) {
-            $SearchThemeInfo['HooksFile'] = val('hooks', $ThemeFiles, FALSE);
-            $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
-         }
-
-         if ($SearchThemeInfo === FALSE)
-            continue;
-
-         $ThemeInfo[$ThemeFolderName] = $SearchThemeInfo;
-      }
-
-      return md5(serialize($PathListing));
-   }
-
-   public function ClearThemeCache($SearchPaths = NULL) {
-      if (!is_null($SearchPaths)) {
-         if (!is_array($SearchPaths))
-            $SearchPaths = array($SearchPaths);
-      } else {
-         $SearchPaths = $this->SearchPaths();
-      }
-
-      foreach ($SearchPaths as $SearchPath => $SearchPathName) {
-         $SearchPathCacheKey = "Garden.Themes.PathCache.{$SearchPath}";
-         if ($this->Apc) {
-            apc_delete($SearchPathCacheKey);
-         } else {
-            Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
-         }
-      }
-   }
+        foreach ($SearchPaths as $SearchPath => $SearchPathName) {
+            $SearchPathCacheKey = "Garden.Themes.PathCache.{$SearchPath}";
+            if ($this->Apc) {
+                apc_delete($SearchPathCacheKey);
+            } else {
+                Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
+            }
+        }
+    }
 
    /**
     * Get the current search paths
@@ -204,311 +214,326 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
     * @return array Search paths
     */
-   public function SearchPaths($OnlyCustom = FALSE) {
-      if (is_null($this->ThemeSearchPaths) || is_null($this->AlternateThemeSearchPaths)) {
+    public function SearchPaths($OnlyCustom = false) {
+        if (is_null($this->ThemeSearchPaths) || is_null($this->AlternateThemeSearchPaths)) {
+            $this->ThemeSearchPaths = array();
+            $this->AlternateThemeSearchPaths = array();
 
-         $this->ThemeSearchPaths = array();
-         $this->AlternateThemeSearchPaths = array();
-
-         // Add default search path(s) to list
-         $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 'core';
+           // Add default search path(s) to list
+            $this->ThemeSearchPaths[rtrim(PATH_THEMES, '/')] = 'core';
 
                   // Check for, and load, alternate search paths from config
-         $RawAlternatePaths = C('Garden.PluginManager.Search', NULL);
-         if (!is_null($RawAlternatePaths)) {
+            $RawAlternatePaths = C('Garden.PluginManager.Search', null);
+            if (!is_null($RawAlternatePaths)) {
+   /*
+               // Handle serialized and unserialized alternate path arrays
+               $AlternatePaths = unserialize($RawAlternatePaths);
+               if ($AlternatePaths === FALSE && is_array($RawAlternatePaths))
+   */
+                $AlternatePaths = $RawAlternatePaths;
 
-/*
-            // Handle serialized and unserialized alternate path arrays
-            $AlternatePaths = unserialize($RawAlternatePaths);
-            if ($AlternatePaths === FALSE && is_array($RawAlternatePaths))
-*/
-               $AlternatePaths = $RawAlternatePaths;
+                if (!is_array($AlternatePaths)) {
+                    $AlternatePaths = array($AlternatePaths   => 'alternate');
+                }
 
-            if (!is_array($AlternatePaths))
-               $AlternatePaths = array($AlternatePaths   => 'alternate');
-
-            foreach ($AlternatePaths as $AltPath => $AltName) {
-               $this->AlternateThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
-               if (is_dir($AltPath))
-                  $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+                foreach ($AlternatePaths as $AltPath => $AltName) {
+                    $this->AlternateThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+                    if (is_dir($AltPath)) {
+                        $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+                    }
+                }
             }
-         }
-      }
+        }
 
-      if (!$OnlyCustom)
-         return $this->ThemeSearchPaths;
+        if (!$OnlyCustom) {
+            return $this->ThemeSearchPaths;
+        }
 
-      return $this->AlternateThemeSearchPaths;
-   }
+        return $this->AlternateThemeSearchPaths;
+    }
 
-   public function FindThemeFiles($ThemePath) {
-      if (!is_dir($ThemePath))
-         return FALSE;
+    public function FindThemeFiles($ThemePath) {
+        if (!is_dir($ThemePath)) {
+            return false;
+        }
 
-      $ThemeFiles = scandir($ThemePath);
-      $TestPatterns = array(
+        $ThemeFiles = scandir($ThemePath);
+        $TestPatterns = array(
          'about\.php'                           => 'about',
          '.*\.theme\.php'                       => 'about',
          'class\..*themehooks\.php'             => 'hooks',
          'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot',
          'mobile\.(gif|jpg|jpeg|png)'           => 'mobilescreenshot'
-      );
+        );
 
-      $MatchedThemeFiles = array();
-      foreach ($ThemeFiles as $ThemeFile) {
-         foreach ($TestPatterns as $TestPattern => $FileType) {
-            if (preg_match('!'.$TestPattern.'!', $ThemeFile))
-               $MatchedThemeFiles[$FileType] = CombinePaths(array($ThemePath, $ThemeFile));
-         }
-      }
-
-      return array_key_exists('about', $MatchedThemeFiles) ? $MatchedThemeFiles : FALSE;
-   }
-
-   public function ScanThemeFile($ThemeFile, $VariableName = NULL) {
-      // Find the $PluginInfo array
-      if (!file_exists($ThemeFile)) return;
-      $Lines = file($ThemeFile);
-
-      $InfoBuffer = FALSE;
-      $ClassBuffer = FALSE;
-      $ClassName = '';
-      $ThemeInfoString = '';
-      if (!$VariableName)
-         $VariableName = 'ThemeInfo';
-
-      $ParseVariableName = '$'.$VariableName;
-      ${$VariableName} = array();
-
-      foreach ($Lines as $Line) {
-         if ($InfoBuffer && substr(trim($Line), -2) == ');') {
-            $ThemeInfoString .= $Line;
-            $ClassBuffer = TRUE;
-            $InfoBuffer = FALSE;
-         }
-
-         if (StringBeginsWith(trim($Line), $ParseVariableName))
-            $InfoBuffer = TRUE;
-
-         if ($InfoBuffer)
-            $ThemeInfoString .= $Line;
-
-         if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
-            $Parts = explode(' ', $Line);
-            if (count($Parts) > 2)
-               $ClassName = $Parts[1];
-
-            break;
-         }
-
-      }
-      unset($Lines);
-      if ($ThemeInfoString != '')
-         @eval($ThemeInfoString);
-
-      // Define the folder name and assign the class name for the newly added item
-      if (isset(${$VariableName}) && is_array(${$VariableName})) {
-         $Item = array_pop($Trash = array_keys(${$VariableName}));
-
-         ${$VariableName}[$Item]['Index'] = $Item;
-         ${$VariableName}[$Item]['AboutFile'] = $ThemeFile;
-         ${$VariableName}[$Item]['RealAboutFile'] = realpath($ThemeFile);
-         ${$VariableName}[$Item]['ThemeRoot'] = dirname($ThemeFile);
-
-         if (!array_key_exists('Name', ${$VariableName}[$Item]))
-            ${$VariableName}[$Item]['Name'] = $Item;
-
-         if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
-            ${$VariableName}[$Item]['Folder'] = basename(dirname($ThemeFile));
-         }
-
-         return ${$VariableName}[$Item];
-      } elseif ($VariableName !== NULL) {
-         if (isset(${$VariableName}))
-            return ${$VariableName};
-      }
-
-      return NULL;
-   }
-
-   public function GetThemeInfo($ThemeName) {
-      return val($ThemeName, $this->AvailableThemes(), FALSE);
-   }
-
-   public function CurrentTheme() {
-      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
-   }
-
-   public function DesktopTheme() {
-      return C('Garden.Theme', 'default');
-   }
-
-   public function DisableTheme() {
-      if ($this->CurrentTheme() == 'default') {
-         throw new Gdn_UserException(T('You cannot disable the default theme.'));
-      }
-      $oldTheme = $this->EnabledTheme();
-      RemoveFromConfig('Garden.Theme');
-      $newTheme = $this->EnabledTheme();
-
-      if ($oldTheme != $newTheme) {
-         Logger::event(
-            'theme_changed',
-            'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
-            array(
-               'themeType' => 'desktop',
-               'oldTheme' => $oldTheme,
-               'newTheme' => $newTheme
-            )
-         );
-      }
-   }
-
-   public function EnabledTheme() {
-      $ThemeName = Gdn::Config('Garden.Theme', 'default');
-      return $ThemeName;
-   }
-
-   public function EnabledThemeInfo($ReturnInSourceFormat = FALSE) {
-      $EnabledThemeName = $this->EnabledTheme();
-      $ThemeInfo = $this->GetThemeInfo($EnabledThemeName);
-
-      if ($ThemeInfo === FALSE)
-         return array();
-
-      if ($ReturnInSourceFormat)
-         return $ThemeInfo;
-
-      // Update the theme info for a format consumable by views.
-      if (is_array($ThemeInfo) & isset($ThemeInfo['Options'])) {
-         $Options =& $ThemeInfo['Options'];
-         if (isset($Options['Styles'])) {
-            foreach ($Options['Styles'] as $Key => $Params) {
-               if (is_string($Params)) {
-                  $Options['Styles'][$Key] = array('Basename' => $Params);
-               } elseif (is_array($Params) && isset($Params[0])) {
-                  $Params['Basename'] = $Params[0];
-                  unset($Params[0]);
-                  $Options['Styles'][$Key] = $Params;
-               }
+        $MatchedThemeFiles = array();
+        foreach ($ThemeFiles as $ThemeFile) {
+            foreach ($TestPatterns as $TestPattern => $FileType) {
+                if (preg_match('!'.$TestPattern.'!', $ThemeFile)) {
+                    $MatchedThemeFiles[$FileType] = CombinePaths(array($ThemePath, $ThemeFile));
+                }
             }
-         }
-         if (isset($Options['Text'])) {
-            foreach ($Options['Text'] as $Key => $Params) {
-               if (is_string($Params)) {
-                  $Options['Text'][$Key] = array('Type' => $Params);
-               } elseif (is_array($Params) && isset($Params[0])) {
-                  $Params['Type'] = $Params[0];
-                  unset($Params[0]);
-                  $Options['Text'][$Key] = $Params;
-               }
+        }
+
+        return array_key_exists('about', $MatchedThemeFiles) ? $MatchedThemeFiles : false;
+    }
+
+    public function ScanThemeFile($ThemeFile, $VariableName = null) {
+       // Find the $PluginInfo array
+        if (!file_exists($ThemeFile)) {
+            return;
+        }
+        $Lines = file($ThemeFile);
+
+        $InfoBuffer = false;
+        $ClassBuffer = false;
+        $ClassName = '';
+        $ThemeInfoString = '';
+        if (!$VariableName) {
+            $VariableName = 'ThemeInfo';
+        }
+
+        $ParseVariableName = '$'.$VariableName;
+        ${$VariableName} = array();
+
+        foreach ($Lines as $Line) {
+            if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+                $ThemeInfoString .= $Line;
+                $ClassBuffer = true;
+                $InfoBuffer = false;
             }
-         }
-      }
-      return $ThemeInfo;
-   }
 
-   public function EnableTheme($ThemeName, $IsMobile = FALSE) {
-      // Make sure to run the setup
-      $this->TestTheme($ThemeName);
+            if (StringBeginsWith(trim($Line), $ParseVariableName)) {
+                $InfoBuffer = true;
+            }
 
-      // Set the theme.
-      $ThemeInfo = $this->GetThemeInfo($ThemeName);
-      $ThemeFolder = val('Folder', $ThemeInfo, '');
+            if ($InfoBuffer) {
+                $ThemeInfoString .= $Line;
+            }
 
-      $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
+            if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
+                $Parts = explode(' ', $Line);
+                if (count($Parts) > 2) {
+                    $ClassName = $Parts[1];
+                }
 
-      if ($ThemeFolder == '') {
-         throw new Exception(T('The theme folder was not properly defined.'));
-      } else {
-         $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
-         if ($Options) {
-            if ($IsMobile) {
-               SaveToConfig(array(
-                  'Garden.MobileTheme' => $ThemeName,
-                  'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
-               ));
+                break;
+            }
+
+        }
+        unset($Lines);
+        if ($ThemeInfoString != '') {
+            @eval($ThemeInfoString);
+        }
+
+       // Define the folder name and assign the class name for the newly added item
+        if (isset(${$VariableName}) && is_array(${$VariableName})) {
+            $Item = array_pop($Trash = array_keys(${$VariableName}));
+
+            ${$VariableName}[$Item]['Index'] = $Item;
+            ${$VariableName}[$Item]['AboutFile'] = $ThemeFile;
+            ${$VariableName}[$Item]['RealAboutFile'] = realpath($ThemeFile);
+            ${$VariableName}[$Item]['ThemeRoot'] = dirname($ThemeFile);
+
+            if (!array_key_exists('Name', ${$VariableName}[$Item])) {
+                $$VariableName
+            }[$Item]['Name'] = $Item;
+
+            if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
+                ${$VariableName}[$Item]['Folder'] = basename(dirname($ThemeFile));
+            }
+
+            return ${$VariableName}[$Item];
+        } elseif ($VariableName !== null) {
+            if (isset(${$VariableName})) {
+                return $$VariableName
+            };
+        }
+
+        return null;
+    }
+
+    public function GetThemeInfo($ThemeName) {
+        return val($ThemeName, $this->AvailableThemes(), false);
+    }
+
+    public function CurrentTheme() {
+        return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+    }
+
+    public function DesktopTheme() {
+        return C('Garden.Theme', 'default');
+    }
+
+    public function DisableTheme() {
+        if ($this->CurrentTheme() == 'default') {
+            throw new Gdn_UserException(T('You cannot disable the default theme.'));
+        }
+        $oldTheme = $this->EnabledTheme();
+        RemoveFromConfig('Garden.Theme');
+        $newTheme = $this->EnabledTheme();
+
+        if ($oldTheme != $newTheme) {
+            Logger::event(
+                'theme_changed',
+                'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
+                array(
+                'themeType' => 'desktop',
+                'oldTheme' => $oldTheme,
+                'newTheme' => $newTheme
+                )
+            );
+        }
+    }
+
+    public function EnabledTheme() {
+        $ThemeName = Gdn::Config('Garden.Theme', 'default');
+        return $ThemeName;
+    }
+
+    public function EnabledThemeInfo($ReturnInSourceFormat = false) {
+        $EnabledThemeName = $this->EnabledTheme();
+        $ThemeInfo = $this->GetThemeInfo($EnabledThemeName);
+
+        if ($ThemeInfo === false) {
+            return array();
+        }
+
+        if ($ReturnInSourceFormat) {
+            return $ThemeInfo;
+        }
+
+       // Update the theme info for a format consumable by views.
+        if (is_array($ThemeInfo) & isset($ThemeInfo['Options'])) {
+            $Options =& $ThemeInfo['Options'];
+            if (isset($Options['Styles'])) {
+                foreach ($Options['Styles'] as $Key => $Params) {
+                    if (is_string($Params)) {
+                        $Options['Styles'][$Key] = array('Basename' => $Params);
+                    } elseif (is_array($Params) && isset($Params[0])) {
+                        $Params['Basename'] = $Params[0];
+                        unset($Params[0]);
+                        $Options['Styles'][$Key] = $Params;
+                    }
+                }
+            }
+            if (isset($Options['Text'])) {
+                foreach ($Options['Text'] as $Key => $Params) {
+                    if (is_string($Params)) {
+                        $Options['Text'][$Key] = array('Type' => $Params);
+                    } elseif (is_array($Params) && isset($Params[0])) {
+                        $Params['Type'] = $Params[0];
+                        unset($Params[0]);
+                        $Options['Text'][$Key] = $Params;
+                    }
+                }
+            }
+        }
+        return $ThemeInfo;
+    }
+
+    public function EnableTheme($ThemeName, $IsMobile = false) {
+       // Make sure to run the setup
+        $this->TestTheme($ThemeName);
+
+       // Set the theme.
+        $ThemeInfo = $this->GetThemeInfo($ThemeName);
+        $ThemeFolder = val('Folder', $ThemeInfo, '');
+
+        $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
+
+        if ($ThemeFolder == '') {
+            throw new Exception(T('The theme folder was not properly defined.'));
+        } else {
+            $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
+            if ($Options) {
+                if ($IsMobile) {
+                    SaveToConfig(array(
+                    'Garden.MobileTheme' => $ThemeName,
+                    'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                    ));
+                } else {
+                    SaveToConfig(array(
+                    'Garden.Theme' => $ThemeName,
+                    'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                    ));
+                }
             } else {
-               SaveToConfig(array(
-                  'Garden.Theme' => $ThemeName,
-                  'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
-               ));
+                if ($IsMobile) {
+                    SaveToConfig('Garden.MobileTheme', $ThemeName);
+                    RemoveFromConfig('Garden.MobileThemeOptions');
+                } else {
+                    SaveToConfig('Garden.Theme', $ThemeName);
+                    RemoveFromConfig('Garden.ThemeOptions');
+                }
             }
-         } else {
-            if ($IsMobile) {
-               SaveToConfig('Garden.MobileTheme', $ThemeName);
-               RemoveFromConfig('Garden.MobileThemeOptions');
-            } else {
-               SaveToConfig('Garden.Theme', $ThemeName);
-               RemoveFromConfig('Garden.ThemeOptions');
+        }
+
+        if ($oldTheme !== $ThemeName) {
+            Logger::event(
+                'theme_changed',
+                Logger::NOTICE,
+                'The {themeType} theme changed from {oldTheme} to {newTheme}.',
+                array(
+                'themeType' => $IsMobile ? 'mobile' : 'desktop',
+                'oldTheme' => $oldTheme,
+                'newTheme' => $ThemeName
+                )
+            );
+        }
+
+       // Tell the locale cache to refresh itself.
+        Gdn::Locale()->Refresh();
+        return true;
+    }
+
+    public function TestTheme($ThemeName) {
+       // Get some info about the currently enabled theme.
+        $EnabledTheme = $this->EnabledThemeInfo();
+        $EnabledThemeFolder = val('Folder', $EnabledTheme, '');
+        $OldClassName = $EnabledThemeFolder . 'ThemeHooks';
+
+       // Make sure that the theme's requirements are met
+        $ApplicationManager = new Gdn_ApplicationManager();
+        $EnabledApplications = $ApplicationManager->EnabledApplications();
+
+        $NewThemeInfo = $this->GetThemeInfo($ThemeName);
+        $ThemeName = val('Index', $NewThemeInfo, $ThemeName);
+        $RequiredApplications = ArrayValue('RequiredApplications', $NewThemeInfo, false);
+        $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');
+        CheckRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
+
+       // If there is a hooks file, include it and run the setup method.
+        $ClassName = "{$ThemeFolder}ThemeHooks";
+        $HooksFile = val("HooksFile", $NewThemeInfo, null);
+        if (!is_null($HooksFile) && file_exists($HooksFile)) {
+            include_once($HooksFile);
+            if (class_exists($ClassName)) {
+                $ThemeHooks = new $ClassName();
+                $ThemeHooks->Setup();
             }
-         }
-      }
+        }
 
-      if ($oldTheme !== $ThemeName) {
-         Logger::event(
-            'theme_changed',
-            Logger::NOTICE,
-            'The {themeType} theme changed from {oldTheme} to {newTheme}.',
-            array(
-               'themeType' => $IsMobile ? 'mobile' : 'desktop',
-               'oldTheme' => $oldTheme,
-               'newTheme' => $ThemeName
-            )
-         );
-      }
+       // If there is a hooks in the old theme, include it and run the ondisable method.
+        if (class_exists($OldClassName)) {
+            $ThemeHooks = new $OldClassName();
+            if (method_exists($ThemeHooks, 'OnDisable')) {
+                $ThemeHooks->OnDisable();
+            }
+        }
 
-      // Tell the locale cache to refresh itself.
-      Gdn::Locale()->Refresh();
-      return TRUE;
-   }
+        return true;
+    }
 
-   public function TestTheme($ThemeName) {
-      // Get some info about the currently enabled theme.
-      $EnabledTheme = $this->EnabledThemeInfo();
-      $EnabledThemeFolder = val('Folder', $EnabledTheme, '');
-      $OldClassName = $EnabledThemeFolder . 'ThemeHooks';
+    public function MobileTheme() {
+        return C('Garden.MobileTheme', 'default');
+    }
 
-      // Make sure that the theme's requirements are met
-      $ApplicationManager = new Gdn_ApplicationManager();
-      $EnabledApplications = $ApplicationManager->EnabledApplications();
-
-      $NewThemeInfo = $this->GetThemeInfo($ThemeName);
-      $ThemeName = val('Index', $NewThemeInfo, $ThemeName);
-      $RequiredApplications = ArrayValue('RequiredApplications', $NewThemeInfo, FALSE);
-      $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');
-      CheckRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
-
-      // If there is a hooks file, include it and run the setup method.
-      $ClassName = "{$ThemeFolder}ThemeHooks";
-      $HooksFile = val("HooksFile", $NewThemeInfo, NULL);
-      if (!is_null($HooksFile) && file_exists($HooksFile)) {
-         include_once($HooksFile);
-         if (class_exists($ClassName)) {
-            $ThemeHooks = new $ClassName();
-            $ThemeHooks->Setup();
-         }
-      }
-
-      // If there is a hooks in the old theme, include it and run the ondisable method.
-      if (class_exists($OldClassName)) {
-         $ThemeHooks = new $OldClassName();
-         if (method_exists($ThemeHooks, 'OnDisable')) {
-            $ThemeHooks->OnDisable();
-         }
-      }
-
-      return TRUE;
-   }
-
-   public function MobileTheme() {
-      return C('Garden.MobileTheme', 'default');
-   }
-
-   public function ThemeFromType($Type) {
-      if ($Type === 'mobile')
-         return $this->MobileTheme();
-      else
-         return $this->DesktopTheme();
-   }
+    public function ThemeFromType($Type) {
+        if ($Type === 'mobile') {
+            return $this->MobileTheme();
+        } else {
+            return $this->DesktopTheme();
+        }
+    }
 }

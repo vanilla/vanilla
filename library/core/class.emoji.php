@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Interpreting Emoji emoticons
@@ -20,7 +22,7 @@ class Emoji {
     *
     * @var array All of the emoji aliases.
     */
-   protected $aliases;
+    protected $aliases;
 
    /**
     * The archive is an array of deprecated emoji to new emoji that allows us to rename emoji with compatibility.
@@ -33,24 +35,24 @@ class Emoji {
     *
     * @var array All of the emoji archive.
     */
-   protected $archive;
+    protected $archive;
 
    /**
     * @var string The base path where the emoji are located.
     */
-   protected $assetPath = '/resources/emoji';
+    protected $assetPath = '/resources/emoji';
 
    /**
     *
     * @var string If assetPath is modified, this will hold the original path.
     */
-   protected $assetPathOriginal;
+    protected $assetPathOriginal;
 
    /**
     * @var array An emoji alias list that represents the emoji that display
     * in an editor drop down. Typically, it is a copy of the alias list.
     */
-   protected $editorList;
+    protected $editorList;
 
    /**
     * This array contains all of the emoji avaliable in the system. The array is in the following format:
@@ -63,7 +65,7 @@ class Emoji {
     *
     * @var array All of the available emoji.
     */
-   protected $emoji;
+    protected $emoji;
 
    /**
     *
@@ -71,52 +73,52 @@ class Emoji {
     * set of emoji supplied by plugin, if any. This is useful when merging the
     * custom ones with the original ones, which have different assetPaths.
     */
-   protected $emojiOriginalUnaccountedFor;
+    protected $emojiOriginalUnaccountedFor;
 
    /**
     * This is the emoji name that will represent the error emoji.
     *
     * @var string If emoji is missing, use grey_question emoji.
     */
-   protected $errorEmoji = 'error';
+    protected $errorEmoji = 'error';
 
    /**
     *
     * @var bool Setting to true will allow editor to interpret emoji aliases as
     *           Html equivalent markup.
     */
-   public $enabled = true;
+    public $enabled = true;
 
    /**
     * @var string The sprintf format for emoji with the following parameters.
     * - %1$s: The emoji path.
     * - %2$s: The emoji code.
     */
-   protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
+    protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
    /**
     *
     * @var Emoji The singleton instance of this class.
     */
-   public static $instance;
+    public static $instance;
 
    /**
     *
     * @var string left-side delimiter surrounding emoji, typically a full-colon
     */
-   public $ldelim = ':';
+    public $ldelim = ':';
 
    /**
     *
     * @var string right-side delimiter surrounding emoji, typically a full-colon
     */
-   public $rdelim = ':';
+    public $rdelim = ':';
 
    /// Methods ///
 
-   protected function __construct() {
-      // Initialize the canonical list. (emoji)
-      $this->emoji = array(
+    protected function __construct() {
+       // Initialize the canonical list. (emoji)
+        $this->emoji = array(
         // Smileys
         'smile'                        => 'smile.png',
         'smiley'                       => 'smiley.png',
@@ -193,15 +195,15 @@ class Emoji {
 
         // Custom icons, canonical naming
         'trollface'                    => 'trollface.png'
-      );
+        );
 
-      // Some aliases self-referencing the canonical list. Use this syntax.
+       // Some aliases self-referencing the canonical list. Use this syntax.
 
-      // This is used in cases where emoji image cannot be found.
-      $this->emoji['error'] = &$this->emoji['grey_question'];
+       // This is used in cases where emoji image cannot be found.
+        $this->emoji['error'] = &$this->emoji['grey_question'];
 
-      // Initialize the alias list. (emoticons)
-      $this->aliases = array(
+       // Initialize the alias list. (emoticons)
+        $this->aliases = array(
          ':)'          => 'smile',
          ':D'          => 'lol',
          '=)'          => 'smiley',
@@ -222,9 +224,9 @@ class Emoji {
          'o:)'         => 'innocent',
          '<3'          => 'heart',
          '>:)'         => 'naughty'
-       );
+        );
 
-      $this->archive = array(
+        $this->archive = array(
          'disappointed_relieved'          => 'disappointed_relieved.png',
          'dizzy_face'                     => 'dizzy.png',
          'broken_heart'                   => 'heartbreak.png',
@@ -236,9 +238,9 @@ class Emoji {
          'stuck_out_tongue'               => 'tongue.png',
          'stuck_out_tongue_winking_eye'   => 'stuck_out_tongue_winking_eye.png',
          'stuck_out_tongue_closed_eyes'   => 'stuck_out_tongue_closed_eyes.png',
-      );
+        );
 
-      $this->editorList = array(
+        $this->editorList = array(
          ':)'          => 'smile',
          ':D'          => 'lol',
          ':('          => 'disappointed',
@@ -255,44 +257,44 @@ class Emoji {
          '<3'          => 'heart',
          'o:)'         => 'innocent',
          '>:)'         => 'naughty'
-      );
+        );
 
-      if (C('Garden.EmojiSet') === 'none') {
-         $this->enabled = false;
-      }
+        if (C('Garden.EmojiSet') === 'none') {
+            $this->enabled = false;
+        }
 
-      Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
+        Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
 
-      // Add emoji to definition list for whole site. This used to be in the
-      // advanced editor plugin, but since moving atmentions to core, had to
-      // make sure they were still being added. This will make sure that
-      // emoji autosuggest works. Note: emoji will not be core yet, so the only
-      // way that this gets called is by the editor when it instantiates. Core
-      // does not instantiate this class anywhere, so there will not be any
-      // suggestions for emoji yet, but keep here for whenever Advanced Editor
-      // is running.
-      $c = Gdn::Controller();
-      if ($c && $this->enabled) {
-         $emojis = $this->getEmoji();
-         $emojiAssetPath = $this->getAssetPath();
-         $emoji = array();
+       // Add emoji to definition list for whole site. This used to be in the
+       // advanced editor plugin, but since moving atmentions to core, had to
+       // make sure they were still being added. This will make sure that
+       // emoji autosuggest works. Note: emoji will not be core yet, so the only
+       // way that this gets called is by the editor when it instantiates. Core
+       // does not instantiate this class anywhere, so there will not be any
+       // suggestions for emoji yet, but keep here for whenever Advanced Editor
+       // is running.
+        $c = Gdn::Controller();
+        if ($c && $this->enabled) {
+            $emojis = $this->getEmoji();
+            $emojiAssetPath = $this->getAssetPath();
+            $emoji = array();
 
-         foreach ($emojis as $name => $data) {
-            $emoji[] = array(
+            foreach ($emojis as $name => $data) {
+                $emoji[] = array(
                 "name" => "". $name ."",
                 "url" =>  Asset($emojiAssetPath . '/' . $data)
-            );
-         }
+                );
+            }
 
-         $emoji = array(
+            $emoji = array(
             'assetPath' => Asset($this->getAssetPath()),
             'format' => $this->getFormat(),
             'emoji' => $this->getEmoji()
-         );
+            );
 
-         $c->AddDefinition('emoji', $emoji);
-      }
-   }
+            $c->AddDefinition('emoji', $emoji);
+        }
+    }
 
    /**
     * This method is deprecated. See {@link Emoji::getEmojiPath()}.
@@ -300,19 +302,19 @@ class Emoji {
     * @param string $emojiName
     * @return string
     */
-   public function buildEmojiPath($emojiName) {
-      Deprecated('buildEmojiPath', 'getEmojiPath');
-      return $this->getEmojiPath($emojiName);
-   }
+    public function buildEmojiPath($emojiName) {
+        Deprecated('buildEmojiPath', 'getEmojiPath');
+        return $this->getEmojiPath($emojiName);
+    }
 
    /**
     * Check the alias array and filter out all of the emoji that are not present in the main emoji list.
     */
-   protected function checkAliases() {
-      $this->aliases = array_filter($this->aliases, function ($emojiName) {
-         return isset($this->emojo[$emojiName]);
-      });
-   }
+    protected function checkAliases() {
+        $this->aliases = array_filter($this->aliases, function ($emojiName) {
+            return isset($this->emojo[$emojiName]);
+        });
+    }
 
    /**
     * Populate this with any aliases required for plugin, make sure they point
@@ -330,27 +332,27 @@ class Emoji {
     *
     * @return array Returns an array of alias to emoji name entries.
     */
-   public function getAliases() {
-      return $this->aliases;
-   }
+    public function getAliases() {
+        return $this->aliases;
+    }
 
    /**
     * Gets the asset path location.
     *
     * @return string The asset path location
     */
-   public function getAssetPath() {
-      return $this->assetPath;
-   }
+    public function getAssetPath() {
+        return $this->assetPath;
+    }
 
    /**
     * Gets the emoji archive.
     *
     * @return array Returns an array of emoji name to emoji file names representing the emoji archie.
     */
-   public function getArchive() {
-      return $this->archive;
-   }
+    public function getArchive() {
+        return $this->archive;
+    }
 
    /**
     * Set the emoji archive.
@@ -358,23 +360,23 @@ class Emoji {
     * @param array $archive
     * @return Emoji Returns $this for fluent calls.
     */
-   public function setArchive($archive) {
-      $this->archive = $archive;
-      return $this;
-   }
+    public function setArchive($archive) {
+        $this->archive = $archive;
+        return $this;
+    }
 
    /**
     * Get the emoji editor list.
     *
     * @return array Returns an array of Emojis that can appear in an editor drop down.
     */
-   public function getEditorList() {
-      if ($this->editorList === null) {
-         return $this->getAliases();
-      }
+    public function getEditorList() {
+        if ($this->editorList === null) {
+            return $this->getAliases();
+        }
 
-      return $this->editorList;
-   }
+        return $this->editorList;
+    }
 
    /**
     * This is the canonical, e.g., official, list of emoji names along with
@@ -384,19 +386,19 @@ class Emoji {
     *
     * @return string|array File name or full canonical array
     */
-   public function getEmoji() {
-      // Return first value from canonical array
-      return $this->emoji;
-   }
+    public function getEmoji() {
+       // Return first value from canonical array
+        return $this->emoji;
+    }
 
    /**
     *
     * @return array List of Emojis that will appear in the editor.
     */
-   public function getEmojiEditorList() {
-      Deprecated('getEmojiEditorList', 'getEditorList');
-      return $this->getEditorList();
-   }
+    public function getEmojiEditorList() {
+        Deprecated('getEmojiEditorList', 'getEditorList');
+        return $this->getEditorList();
+    }
 
    /**
     * Provide this method with the official emoji filename and it will return the correct path.
@@ -404,43 +406,43 @@ class Emoji {
     * @param string $emojiName File name of emoji icon.
     * @return string Root-relative path.
     */
-   public function getEmojiPath($emojiName) {
+    public function getEmojiPath($emojiName) {
 
-      // By default, just characters will be outputted (img alt text)
-      $filePath = $emojiFileName = '';
+       // By default, just characters will be outputted (img alt text)
+        $filePath = $emojiFileName = '';
 
-      if (isset($this->emoji[$emojiName])) {
-         $filePath = $this->assetPath;
-         $emojiFileName = $this->emoji[$emojiName];
-      } elseif (isset($this->archive[$emojiName])) {
-         $filePath = $this->assetPath;
-         $emojiFileName = $this->archive[$emojiName];
-      } else {
-         return '';
-      }
+        if (isset($this->emoji[$emojiName])) {
+            $filePath = $this->assetPath;
+            $emojiFileName = $this->emoji[$emojiName];
+        } elseif (isset($this->archive[$emojiName])) {
+            $filePath = $this->assetPath;
+            $emojiFileName = $this->archive[$emojiName];
+        } else {
+            return '';
+        }
 
-      return $filePath . '/' . $emojiFileName;
-   }
+        return $filePath . '/' . $emojiFileName;
+    }
 
    /**
     * Checks whether or not the emoji has an editor list.
     *
     * @return bool Returns true if there is an editor list or false otherwise.
     */
-   public function hasEditorList() {
-      $editorList = $this->getEditorList();
-      return $this->enabled && !empty($editorList);
-   }
+    public function hasEditorList() {
+        $editorList = $this->getEditorList();
+        return $this->enabled && !empty($editorList);
+    }
 
    /**
     * Set the list of emoji that can be used by the editor.
     *
     * @param array $value The new editor list.
     */
-   public function setEmojiEditorList($value) {
-      Deprecated('setEmojiEditorList', 'setEditorList');
-      return $this->setEditorList($value);
-   }
+    public function setEmojiEditorList($value) {
+        Deprecated('setEmojiEditorList', 'setEditorList');
+        return $this->setEditorList($value);
+    }
 
 
    /**
@@ -449,31 +451,31 @@ class Emoji {
     * @param array $value The new editor list.
     * @return Emoji Returns $this for fluent calls.
     */
-   public function setEditorList($value) {
-      // Convert the editor list to the proper format.
-      $list = array();
-      $aliases2 = array_flip($this->aliases);
-      foreach ($value as $emoji) {
-         if (isset($this->aliases[$emoji])) {
-            $list[$emoji] = $this->aliases[$emoji];
-         } elseif (isset($aliases2[$emoji])) {
-            $list[$aliases2[$emoji]] = $emoji;
-         } elseif (isset($this->emoji[$emoji])) {
-            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
-         }
-      }
-      $this->editorList = $list;
-      return $this;
-   }
+    public function setEditorList($value) {
+       // Convert the editor list to the proper format.
+        $list = array();
+        $aliases2 = array_flip($this->aliases);
+        foreach ($value as $emoji) {
+            if (isset($this->aliases[$emoji])) {
+                $list[$emoji] = $this->aliases[$emoji];
+            } elseif (isset($aliases2[$emoji])) {
+                $list[$aliases2[$emoji]] = $emoji;
+            } elseif (isset($this->emoji[$emoji])) {
+                $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
+            }
+        }
+        $this->editorList = $list;
+        return $this;
+    }
 
    /**
     * Gets the emoji format used in {@link Emoji::img()}.
     *
     * @return string Returns the current emoji format.
     */
-   public function getFormat() {
-      return $this->format;
-   }
+    public function getFormat() {
+        return $this->format;
+    }
 
    /**
     * Sets the emoji format used in {@link Emoji::img()}.
@@ -481,10 +483,10 @@ class Emoji {
     * @param string $format
     * @return Emoji Returns $this for fluent calls.
     */
-   public function setFormat($format) {
-      $this->format = $format;
-      return $this;
-   }
+    public function setFormat($format) {
+        $this->format = $format;
+        return $this;
+    }
 
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
@@ -493,21 +495,21 @@ class Emoji {
     * @param string $emoji_name The name given to Emoji.
     * @return string The html that represents the emoji.
     */
-   public function img($emoji_path, $emoji_name) {
-      $dir = Asset(dirname($emoji_path));
-      $filename = basename($emoji_path);
-      $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
-      $basename = basename($filename, $ext);
-      $src = Asset($emoji_path);
+    public function img($emoji_path, $emoji_name) {
+        $dir = Asset(dirname($emoji_path));
+        $filename = basename($emoji_path);
+        $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
+        $basename = basename($filename, $ext);
+        $src = Asset($emoji_path);
 
-      $img = str_replace(
-         array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
-         array($src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext),
-         $this->format
-         );
+        $img = str_replace(
+            array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
+            array($src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext),
+            $this->format
+        );
 
-      return $img;
-   }
+        return $img;
+    }
 
    /**
     * Set the aliases array.
@@ -515,27 +517,27 @@ class Emoji {
     * @param array $aliases The new aliases array.
     * @return Emoji Returns $this for fluent calls.
     */
-   public function setAliases($aliases) {
-      $this->aliases = $aliases;
-      return $this;
-   }
+    public function setAliases($aliases) {
+        $this->aliases = $aliases;
+        return $this;
+    }
 
    /**
     *
     * @param string $assetPath
     */
-   public function setAssetPath($assetPath) {
-      $this->assetPath = $assetPath;
-   }
+    public function setAssetPath($assetPath) {
+        $this->assetPath = $assetPath;
+    }
 
    /**
     * Sets custom emoji, and saves the original ones that are unaccounted for.
     *
     * @param array $emoji
     */
-   public function setEmoji($emoji) {
-      $this->emoji = $emoji;
-   }
+    public function setEmoji($emoji) {
+        $this->emoji = $emoji;
+    }
 
    /**
     * Set the emoji from a manifest.
@@ -546,37 +548,37 @@ class Emoji {
     * - format (optional): The string format of the emoji replacement.
     * @param string $assetPath The asset path root to all of the emoji files.
     */
-   public function setFromManifest($manifest, $assetPath = '') {
-      // Set the default asset root.
-      if ($assetPath) {
-         $this->setAssetPath(StringBeginsWith($assetPath, PATH_ROOT, true, true));
-      }
+    public function setFromManifest($manifest, $assetPath = '') {
+       // Set the default asset root.
+        if ($assetPath) {
+            $this->setAssetPath(StringBeginsWith($assetPath, PATH_ROOT, true, true));
+        }
 
-      // Set the emoji settings from the manifest.
-      if (array_key_exists('emoji', $manifest)) {
-         $this->setEmoji($manifest['emoji']);
-      }
+       // Set the emoji settings from the manifest.
+        if (array_key_exists('emoji', $manifest)) {
+            $this->setEmoji($manifest['emoji']);
+        }
 
-      if (array_key_exists('aliases', $manifest)) {
-         $this->setAliases($manifest['aliases']);
-      } else {
-         $this->checkAliases();
-      }
+        if (array_key_exists('aliases', $manifest)) {
+            $this->setAliases($manifest['aliases']);
+        } else {
+            $this->checkAliases();
+        }
 
-      if (array_key_exists('archive', $manifest)) {
-         $this->setArchive($manifest['archive']);
-      } else {
-         $this->setArchive(array());
-      }
+        if (array_key_exists('archive', $manifest)) {
+            $this->setArchive($manifest['archive']);
+        } else {
+            $this->setArchive(array());
+        }
 
-      if (!empty($manifest['format'])) {
-         $this->format = $manifest['format'];
-      }
+        if (!empty($manifest['format'])) {
+            $this->format = $manifest['format'];
+        }
 
-      if (array_key_exists('editor', $manifest)) {
-         $this->setEditorList($manifest['editor']);
-      }
-   }
+        if (array_key_exists('editor', $manifest)) {
+            $this->setEditorList($manifest['editor']);
+        }
+    }
 
    /**
     * Translate all emoji aliases to their corresponding Html image tags.
@@ -587,57 +589,57 @@ class Emoji {
     * @param string $Text The actual user-submitted post
     * @return string Return the emoji-formatted post
     */
-   public function translateToHtml($Text) {
-      if (!$this->enabled) {
-         return $Text;
-      }
+    public function translateToHtml($Text) {
+        if (!$this->enabled) {
+            return $Text;
+        }
 
-		$Text = ' '. $Text .' ';
+        $Text = ' '. $Text .' ';
 
-      // First, translate all aliases. Canonical emoji will get translated
-      // out of a loop.
-      $emojiAliasList = $this->aliases;
+       // First, translate all aliases. Canonical emoji will get translated
+       // out of a loop.
+        $emojiAliasList = $this->aliases;
 
-      // Loop through and apply changes to all visible aliases from dropdown
-		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
-         $emojiFilePath  = $this->getEmojiPath($emojiCanonical);
+       // Loop through and apply changes to all visible aliases from dropdown
+        foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
+            $emojiFilePath  = $this->getEmojiPath($emojiCanonical);
 
-			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
-				$Text = preg_replace(
-               '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
-               $this->img($emojiFilePath, $emojiAlias),
-					$Text
-				);
-         }
-		}
+            if (strpos($Text, htmlentities($emojiAlias)) !== false) {
+                $Text = preg_replace(
+                    '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
+                    $this->img($emojiFilePath, $emojiAlias),
+                    $Text
+                );
+            }
+        }
 
-      // Second, translate canonical list, without looping.
-      $ldelim = preg_quote($this->ldelim, '`');
-      $rdelim = preg_quote($this->rdelim, '`');
-      $emoji = $this;
+       // Second, translate canonical list, without looping.
+        $ldelim = preg_quote($this->ldelim, '`');
+        $rdelim = preg_quote($this->rdelim, '`');
+        $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
-         $emoji_name = trim($m[1], ':');
-         $emoji_path = $emoji->getEmojiPath($emoji_name);
-         if ($emoji_path) {
-            return $emoji->img($emoji_path, $emoji->ldelim.$emoji_name.$emoji->rdelim);
-         } else {
-            return $m[0];
-         }
-      }, $Text);
+        $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function ($m) use ($emoji) {
+            $emoji_name = trim($m[1], ':');
+            $emoji_path = $emoji->getEmojiPath($emoji_name);
+            if ($emoji_path) {
+                return $emoji->img($emoji_path, $emoji->ldelim.$emoji_name.$emoji->rdelim);
+            } else {
+                return $m[0];
+            }
+        }, $Text);
 
-		return substr($Text, 1, -1);
-	}
+        return substr($Text, 1, -1);
+    }
 
    /**
     * Get the singleton instance of this class.
     * @return Emoji
     */
-   public static function instance() {
-      if (Emoji::$instance === null) {
-         Emoji::$instance = new Emoji();
-      }
+    public static function instance() {
+        if (Emoji::$instance === null) {
+            Emoji::$instance = new Emoji();
+        }
 
-      return Emoji::$instance;
-   }
+        return Emoji::$instance;
+    }
 }

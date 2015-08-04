@@ -1,9 +1,11 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Module collection
  *
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -12,45 +14,48 @@
 
 class Gdn_ModuleCollection extends Gdn_Module {
    /// PROPERTIES ///
-   public $Items = array();
+    public $Items = array();
    
    /// METHODS ///
-   public function Render() {
-      $RenderedCount = 0;
-      foreach ($this->Items as $Item) {
-         $this->EventArguments['AssetName'] = $this->AssetName;
+    public function Render() {
+        $RenderedCount = 0;
+        foreach ($this->Items as $Item) {
+            $this->EventArguments['AssetName'] = $this->AssetName;
 
-         if (is_string($Item)) {
-            if (!empty($Item)) {
-               if ($RenderedCount > 0)
-                  $this->FireEvent('BetweenRenderAsset');
+            if (is_string($Item)) {
+                if (!empty($Item)) {
+                    if ($RenderedCount > 0) {
+                        $this->FireEvent('BetweenRenderAsset');
+                    }
 
-               echo $Item;
-               $RenderedCount++;
-            }
-         } elseif ($Item instanceof Gdn_IModule) {
-            if (!GetValue('Visible', $Item, TRUE))
-               continue;
+                    echo $Item;
+                    $RenderedCount++;
+                }
+            } elseif ($Item instanceof Gdn_IModule) {
+                if (!GetValue('Visible', $Item, true)) {
+                    continue;
+                }
             
-            $LengthBefore = ob_get_length();
-            $Item->Render();
-            $LengthAfter = ob_get_length();
+                $LengthBefore = ob_get_length();
+                $Item->Render();
+                $LengthAfter = ob_get_length();
 
-            if ($LengthBefore !== FALSE && $LengthAfter > $LengthBefore) {
-               if ($RenderedCount > 0)
-                  $this->FireEvent('BetweenRenderAsset');
-               $RenderedCount++;
+                if ($LengthBefore !== false && $LengthAfter > $LengthBefore) {
+                    if ($RenderedCount > 0) {
+                        $this->FireEvent('BetweenRenderAsset');
+                    }
+                    $RenderedCount++;
+                }
+            } else {
+                throw new Exception();
             }
-         } else {
-            throw new Exception();
-         }
-      }
-      unset($this->EventArguments['AssetName']);
-   }
+        }
+        unset($this->EventArguments['AssetName']);
+    }
    
-   public function ToString() {
-      ob_start();
-      $this->Render();
-      return ob_get_clean();
-   }
+    public function ToString() {
+        ob_start();
+        $this->Render();
+        return ob_get_clean();
+    }
 }

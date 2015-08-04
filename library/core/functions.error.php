@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Catch and render errors
@@ -14,245 +16,263 @@
 
 class Gdn_ErrorException extends ErrorException {
 
-   protected $_Context;
+    protected $_Context;
 
-   public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
-      parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
-      $this->_Context = $Context;
-   }
+    public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
+        parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
+        $this->_Context = $Context;
+    }
 
-   public function getContext() {
-      return $this->_Context;
-   }
+    public function getContext() {
+        return $this->_Context;
+    }
 }
 
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
-   $ErrorReporting = error_reporting();
+    $ErrorReporting = error_reporting();
 
    // Don't do anything for @supressed errors.
-   if ($ErrorReporting === 0) {
-      return;
-   }
+    if ($ErrorReporting === 0) {
+        return;
+    }
 
-   if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
-      if (function_exists('Trace')) {
-         Trace("$Message in $File line $Line", TRACE_NOTICE);
-      }
+    if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
+        if (function_exists('Trace')) {
+            Trace("$Message in $File line $Line", TRACE_NOTICE);
+        }
 
-      // Ignore errors that are below the current error reporting level.
-      return FALSE;
-   }
+       // Ignore errors that are below the current error reporting level.
+        return false;
+    }
 
-   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
 }
 
 /**
  * A custom error handler that displays much more, very useful information when
  * errors are encountered in Garden.
- *	@param Exception $Exception The exception that was thrown.
+ *  @param Exception $Exception The exception that was thrown.
  */
 function Gdn_ExceptionHandler($Exception) {
-   try {
-      $ErrorNumber = $Exception->getCode();
-      $Message = $Exception->getMessage();
-      $File = $Exception->getFile();
-      $Line = $Exception->getLine();
-		if(method_exists($Exception, 'getContext'))
-			$Arguments = $Exception->getContext();
-		else
-			$Arguments = '';
-      $Backtrace = $Exception->getTrace();
+    try {
+        $ErrorNumber = $Exception->getCode();
+        $Message = $Exception->getMessage();
+        $File = $Exception->getFile();
+        $Line = $Exception->getLine();
+        if (method_exists($Exception, 'getContext')) {
+            $Arguments = $Exception->getContext();
+        } else {
+            $Arguments = '';
+        }
+        $Backtrace = $Exception->getTrace();
 
-      // Clean the output buffer in case an error was encountered in-page.
-      @ob_end_clean();
-      // prevent headers already sent error
-      if (!headers_sent()) {
-         if ($ErrorNumber >= 100 && $ErrorNumber < 600)
-            $Code = $ErrorNumber;
-         else
-            $Code = 500;
+       // Clean the output buffer in case an error was encountered in-page.
+        @ob_end_clean();
+       // prevent headers already sent error
+        if (!headers_sent()) {
+            if ($ErrorNumber >= 100 && $ErrorNumber < 600) {
+                $Code = $ErrorNumber;
+            } else {
+                $Code = 500;
+            }
 
-         if (class_exists('Gdn_Controller', false)) {
-            $msg = Gdn_Controller::GetStatusMessage($Code);
-         } else {
-            $msg = 'Error';
-         }
+            if (class_exists('Gdn_Controller', false)) {
+                $msg = Gdn_Controller::GetStatusMessage($Code);
+            } else {
+                $msg = 'Error';
+            }
 
-         safeHeader("HTTP/1.0 $Code $msg", TRUE, $ErrorNumber);
-         safeHeader('Content-Type: text/html; charset=utf-8');
-      }
+            safeHeader("HTTP/1.0 $Code $msg", true, $ErrorNumber);
+            safeHeader('Content-Type: text/html; charset=utf-8');
+        }
 
-      $SenderMessage = $Message;
-      $SenderObject = 'PHP';
-      $SenderMethod = 'Gdn_ErrorHandler';
-      $SenderCode = FALSE;
-      $SenderTrace = $Backtrace;
-      $MessageInfo = explode('|', $Message);
-      $MessageCount = count($MessageInfo);
-      if ($MessageCount == 4)
-         list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
-      else if ($MessageCount == 3)
-         list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
-      elseif (function_exists('GetValueR')) {
+        $SenderMessage = $Message;
+        $SenderObject = 'PHP';
+        $SenderMethod = 'Gdn_ErrorHandler';
+        $SenderCode = false;
+        $SenderTrace = $Backtrace;
+        $MessageInfo = explode('|', $Message);
+        $MessageCount = count($MessageInfo);
+        if ($MessageCount == 4) {
+            list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
+        } elseif ($MessageCount == 3) {
+                  list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
+        } elseif (function_exists('GetValueR')) {
             $IsError = (GetValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
             $N = ($IsError) ? '1' : '0';
             $SenderMethod = GetValueR($N.'.function', $SenderTrace, $SenderMethod);
             $SenderObject = GetValueR($N.'.class', $SenderTrace, $SenderObject);
-      }
+        }
 
-      $SenderMessage = htmlspecialchars($SenderMessage);
+        $SenderMessage = htmlspecialchars($SenderMessage);
 
-      $Master = FALSE;  // The parsed master view
-      $CssPath = FALSE; // The web-path to the css file
-      $ErrorLines = FALSE; // The lines near the error's line #
-      $DeliveryType = defined('DELIVERY_TYPE_ALL') ? DELIVERY_TYPE_ALL : 'ALL';
-      if (array_key_exists('DeliveryType', $_POST)) {
-         $DeliveryType = $_POST['DeliveryType'];
-      } else if (array_key_exists('DeliveryType', $_GET)) {
-         $DeliveryType = $_GET['DeliveryType'];
-      }
+        $Master = false;  // The parsed master view
+        $CssPath = false; // The web-path to the css file
+        $ErrorLines = false; // The lines near the error's line #
+        $DeliveryType = defined('DELIVERY_TYPE_ALL') ? DELIVERY_TYPE_ALL : 'ALL';
+        if (array_key_exists('DeliveryType', $_POST)) {
+            $DeliveryType = $_POST['DeliveryType'];
+        } elseif (array_key_exists('DeliveryType', $_GET)) {
+            $DeliveryType = $_GET['DeliveryType'];
+        }
 
-      if (function_exists('Debug') && Debug())
-         $Debug = TRUE;
-      else
-         $Debug = FALSE;
+        if (function_exists('Debug') && Debug()) {
+            $Debug = true;
+        } else {
+            $Debug = false;
+        }
 
-      // Make sure all of the required custom functions and variables are defined.
-      $PanicError = FALSE; // Should we just dump a message and forget about the master view?
-      if (!defined('DS')) $PanicError = TRUE;
-      if (!defined('PATH_ROOT')) $PanicError = TRUE;
-      if (!defined('APPLICATION')) define('APPLICATION', 'Garden');
-      if (!defined('APPLICATION_VERSION')) define('APPLICATION_VERSION', 'Unknown');
-      $WebRoot = '';
+       // Make sure all of the required custom functions and variables are defined.
+        $PanicError = false; // Should we just dump a message and forget about the master view?
+        if (!defined('DS')) {
+            $PanicError = true;
+        }
+        if (!defined('PATH_ROOT')) {
+            $PanicError = true;
+        }
+        if (!defined('APPLICATION')) {
+            define('APPLICATION', 'Garden');
+        }
+        if (!defined('APPLICATION_VERSION')) {
+            define('APPLICATION_VERSION', 'Unknown');
+        }
+        $WebRoot = '';
 
-      // Try and rollback a database transaction.
-      if(class_exists('Gdn', FALSE)) {
-         $Database = Gdn::Database();
-         if(is_object($Database))
-            $Database->RollbackTransaction();
-      }
+       // Try and rollback a database transaction.
+        if (class_exists('Gdn', false)) {
+            $Database = Gdn::Database();
+            if (is_object($Database)) {
+                $Database->RollbackTransaction();
+            }
+        }
 
-      if ($PanicError === FALSE) {
-         // See if we can get the file that caused the error
-         if (is_string($File) && is_numeric($ErrorNumber))
-            $ErrorLines = @file($File);
-
-         // If this error was encountered during an ajax request, don't bother gettting the css or theme files
-         if ($DeliveryType == DELIVERY_TYPE_ALL) {
-            $CssPaths = array(); // Potential places where the css can be found in the filesystem.
-            $MasterViewPaths = array();
-            $MasterViewName = 'error.master.php';
-            $MasterViewCss = 'error.css';
-
-            if ($Debug) {
-               $MasterViewName = 'deverror.master.php';
+        if ($PanicError === false) {
+           // See if we can get the file that caused the error
+            if (is_string($File) && is_numeric($ErrorNumber)) {
+                $ErrorLines = @file($File);
             }
 
-            if (class_exists('Gdn', FALSE)) {
-               $CurrentTheme = ''; // The currently selected theme
-               $CurrentTheme = C('Garden.Theme', '');
-               $MasterViewName = C('Garden.Errors.MasterView', $MasterViewName);
-               $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
-               if ($MasterViewCss == '')
-                  $MasterViewCss = 'error';
+           // If this error was encountered during an ajax request, don't bother gettting the css or theme files
+            if ($DeliveryType == DELIVERY_TYPE_ALL) {
+                $CssPaths = array(); // Potential places where the css can be found in the filesystem.
+                $MasterViewPaths = array();
+                $MasterViewName = 'error.master.php';
+                $MasterViewCss = 'error.css';
 
-               $MasterViewCss .= '.css';
+                if ($Debug) {
+                    $MasterViewName = 'deverror.master.php';
+                }
 
-               if ($CurrentTheme != '') {
-                  // Look for CSS in the theme folder:
-                  $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . $MasterViewCss;
+                if (class_exists('Gdn', false)) {
+                    $CurrentTheme = ''; // The currently selected theme
+                    $CurrentTheme = C('Garden.Theme', '');
+                    $MasterViewName = C('Garden.Errors.MasterView', $MasterViewName);
+                    $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
+                    if ($MasterViewCss == '') {
+                        $MasterViewCss = 'error';
+                    }
 
-                  // Look for Master View in the theme folder:
-                  $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . $MasterViewName;
-               }
+                    $MasterViewCss .= '.css';
+
+                    if ($CurrentTheme != '') {
+                       // Look for CSS in the theme folder:
+                        $CssPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'design' . DS . $MasterViewCss;
+
+                       // Look for Master View in the theme folder:
+                        $MasterViewPaths[] = PATH_THEMES . DS . $CurrentTheme . DS . 'views' . DS . $MasterViewName;
+                    }
+                }
+
+               // Look for CSS in the dashboard design folder.
+                $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $MasterViewCss;
+               // Look for Master View in the dashboard view folder.
+                $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . $MasterViewName;
+
+                $CssPath = false;
+                $Count = count($CssPaths);
+                for ($i = 0; $i < $Count; ++$i) {
+                    if (file_exists($CssPaths[$i])) {
+                        $CssPath = $CssPaths[$i];
+                        break;
+                    }
+                }
+                if ($CssPath !== false) {
+                    $CssPath = str_replace(
+                        array(PATH_ROOT, DS),
+                        array('', '/'),
+                        $CssPath
+                    );
+                    $CssPath = ($WebRoot == '' ? '' : '/'. $WebRoot) . $CssPath;
+                }
+
+                $MasterViewPath = false;
+                $Count = count($MasterViewPaths);
+                for ($i = 0; $i < $Count; ++$i) {
+                    if (file_exists($MasterViewPaths[$i])) {
+                        $MasterViewPath = $MasterViewPaths[$i];
+                        break;
+                    }
+                }
+
+                if ($MasterViewPath !== false) {
+                    include($MasterViewPath);
+                    $Master = true;
+                }
+            }
+        }
+
+        if ($DeliveryType != DELIVERY_TYPE_ALL) {
+            if (!$Debug) {
+                echo '<b class="Bonk">Whoops! There was an error.</b>';
+                echo '<div class="BonkError Hidden">';
             }
 
-            // Look for CSS in the dashboard design folder.
-            $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $MasterViewCss;
-            // Look for Master View in the dashboard view folder.
-            $MasterViewPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . $MasterViewName;
-
-            $CssPath = FALSE;
-            $Count = count($CssPaths);
-            for ($i = 0; $i < $Count; ++$i) {
-               if (file_exists($CssPaths[$i])) {
-                  $CssPath = $CssPaths[$i];
-                  break;
-               }
-            }
-            if ($CssPath !== FALSE) {
-               $CssPath = str_replace(
-                  array(PATH_ROOT, DS),
-                  array('', '/'),
-                  $CssPath
-               );
-               $CssPath = ($WebRoot == '' ? '' : '/'. $WebRoot) . $CssPath;
+           // This is an ajax request, so dump an error that is more eye-friendly in the debugger
+            echo '<h1>FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();</h1>\n<pre class=\"AjaxError\">\"".$SenderMessage."\"\n";
+            if ($SenderCode != '') {
+                echo htmlspecialchars($SenderCode, ENT_COMPAT, C('Garden.Charset', 'UTF-8'))."\n";
             }
 
-            $MasterViewPath = FALSE;
-            $Count = count($MasterViewPaths);
-            for ($i = 0; $i < $Count; ++$i) {
-               if (file_exists($MasterViewPaths[$i])) {
-                  $MasterViewPath = $MasterViewPaths[$i];
-                  break;
-               }
+            if (is_array($ErrorLines) && $Line > -1) {
+                echo "\nLOCATION: ",$File,"\n";
             }
 
-            if ($MasterViewPath !== FALSE) {
-               include($MasterViewPath);
-               $Master = TRUE;
+            $LineCount = count($ErrorLines);
+            $Padding = strlen($Line+5);
+            for ($i = 0; $i < $LineCount; ++$i) {
+                if ($i > $Line-6 && $i < $Line+4) {
+                    if ($i == $Line - 1) {
+                        echo '>>';
+                    }
+
+                    echo '> '.str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])),"\n";
+                }
             }
-         }
-      }
 
-      if ($DeliveryType != DELIVERY_TYPE_ALL) {
-         if (!$Debug) {
-            echo '<b class="Bonk">Whoops! There was an error.</b>';
-            echo '<div class="BonkError Hidden">';
-         }
-
-         // This is an ajax request, so dump an error that is more eye-friendly in the debugger
-         echo '<h1>FATAL ERROR IN: ',$SenderObject,'.',$SenderMethod,"();</h1>\n<pre class=\"AjaxError\">\"".$SenderMessage."\"\n";
-         if ($SenderCode != '')
-            echo htmlspecialchars($SenderCode, ENT_COMPAT, C('Garden.Charset', 'UTF-8'))."\n";
-
-         if (is_array($ErrorLines) && $Line > -1)
-            echo "\nLOCATION: ",$File,"\n";
-
-         $LineCount = count($ErrorLines);
-         $Padding = strlen($Line+5);
-         for ($i = 0; $i < $LineCount; ++$i) {
-            if ($i > $Line-6 && $i < $Line+4) {
-               if ($i == $Line - 1)
-                  echo '>>';
-
-               echo '> '.str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])),"\n";
+            if (is_array($Backtrace)) {
+                echo "\nBACKTRACE:\n";
+                $BacktraceCount = count($Backtrace);
+                for ($i = 0; $i < $BacktraceCount; ++$i) {
+                    if (array_key_exists('file', $Backtrace[$i])) {
+                        $File = $Backtrace[$i]['file'].' '
+                        .$Backtrace[$i]['line'];
+                    }
+                    echo '['.$File.']' , ' '
+                    ,array_key_exists('class', $Backtrace[$i]) ? $Backtrace[$i]['class'] : 'PHP'
+                    ,array_key_exists('type', $Backtrace[$i]) ? $Backtrace[$i]['type'] : '::'
+                    ,$Backtrace[$i]['function'],'();'
+                    ,"\n";
+                }
             }
-         }
+            echo '</pre>';
 
-         if (is_array($Backtrace)) {
-            echo "\nBACKTRACE:\n";
-            $BacktraceCount = count($Backtrace);
-            for ($i = 0; $i < $BacktraceCount; ++$i) {
-               if (array_key_exists('file', $Backtrace[$i])) {
-                  $File = $Backtrace[$i]['file'].' '
-                  .$Backtrace[$i]['line'];
-               }
-               echo '['.$File.']' , ' '
-                  ,array_key_exists('class', $Backtrace[$i]) ? $Backtrace[$i]['class'] : 'PHP'
-                  ,array_key_exists('type', $Backtrace[$i]) ? $Backtrace[$i]['type'] : '::'
-                  ,$Backtrace[$i]['function'],'();'
-               ,"\n";
+            if (!$Debug) {
+                echo '</div>';
             }
-         }
-         echo '</pre>';
-
-         if (!$Debug)
-            echo '</div>';
-      } else {
-         // If the master view wasn't found, assume a panic state and dump the error.
-         if ($Master === FALSE) {
-            echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+        } else {
+           // If the master view wasn't found, assume a panic state and dump the error.
+            if ($Master === false) {
+                echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
    <head>
       <title>Fatal Error</title>
@@ -261,23 +281,24 @@ function Gdn_ExceptionHandler($Exception) {
       <h1>Fatal Error in   ',$SenderObject,'.',$SenderMethod,'();</h1>
       <h2>',$SenderMessage,"</h2>\n";
 
-      if ($SenderCode != '')
-         echo '<code>',htmlentities($SenderCode, ENT_COMPAT, 'UTF-8'),"</code>\n";
+                if ($SenderCode != '') {
+                    echo '<code>',htmlentities($SenderCode, ENT_COMPAT, 'UTF-8'),"</code>\n";
+                }
 
-      if (is_array($ErrorLines) && $Line > -1) {
-         echo '<h3><strong>The error occurred on or near:</strong> ',$File,'</h3>
+                if (is_array($ErrorLines) && $Line > -1) {
+                    echo '<h3><strong>The error occurred on or near:</strong> ',$File,'</h3>
          <pre>';
-            $LineCount = count($ErrorLines);
-            $Padding = strlen($Line+4);
-            for ($i = 0; $i < $LineCount; ++$i) {
-               if ($i > $Line-6 && $i < $Line+4) {
-                  echo str_pad($i, $Padding, " ", STR_PAD_LEFT),': ',htmlentities($ErrorLines[$i], ENT_COMPAT, 'UTF-8');
-               }
-            }
-         echo "</pre>\n";
-      }
+                     $LineCount = count($ErrorLines);
+                     $Padding = strlen($Line+4);
+                    for ($i = 0; $i < $LineCount; ++$i) {
+                        if ($i > $Line-6 && $i < $Line+4) {
+                            echo str_pad($i, $Padding, " ", STR_PAD_LEFT),': ',htmlentities($ErrorLines[$i], ENT_COMPAT, 'UTF-8');
+                        }
+                    }
+                    echo "</pre>\n";
+                }
 
-      echo '<h2>Need Help?</h2>
+                echo '<h2>Need Help?</h2>
       <p>If you are a user of this website, you can report this message to a website administrator.</p>
       <p>If you are an administrator of this website, you can get help at the <a href="http://vanillaforums.org/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
       <h2>Additional information for support personnel:</h2>
@@ -287,31 +308,33 @@ function Gdn_ExceptionHandler($Exception) {
          <li><strong>PHP Version:</strong> ',PHP_VERSION,'</li>
          <li><strong>Operating System:</strong> ',PHP_OS,"</li>\n";
 
-         if (array_key_exists('SERVER_SOFTWARE', $_SERVER))
-            echo '<li><strong>Server Software:</strong> ',$_SERVER['SERVER_SOFTWARE'],"</li>\n";
+                if (array_key_exists('SERVER_SOFTWARE', $_SERVER)) {
+                    echo '<li><strong>Server Software:</strong> ',$_SERVER['SERVER_SOFTWARE'],"</li>\n";
+                }
 
-         if (array_key_exists('HTTP_REFERER', $_SERVER))
-            echo '<li><strong>Referer:</strong> ',$_SERVER['HTTP_REFERER'],"</li>\n";
+                if (array_key_exists('HTTP_REFERER', $_SERVER)) {
+                    echo '<li><strong>Referer:</strong> ',$_SERVER['HTTP_REFERER'],"</li>\n";
+                }
 
-         if (array_key_exists('HTTP_USER_AGENT', $_SERVER))
-            echo '<li><strong>User Agent:</strong> ',$_SERVER['HTTP_USER_AGENT'],"</li>\n";
+                if (array_key_exists('HTTP_USER_AGENT', $_SERVER)) {
+                    echo '<li><strong>User Agent:</strong> ',$_SERVER['HTTP_USER_AGENT'],"</li>\n";
+                }
 
-         if (array_key_exists('REQUEST_URI', $_SERVER))
-            echo '<li><strong>Request Uri:</strong> ',$_SERVER['REQUEST_URI'],"</li>\n";
-      echo '</ul>
+                if (array_key_exists('REQUEST_URI', $_SERVER)) {
+                    echo '<li><strong>Request Uri:</strong> ',$_SERVER['REQUEST_URI'],"</li>\n";
+                }
+                echo '</ul>
    </body>
    </html>';
-         }
-      }
+            }
+        }
 
-      // Attempt to log an error message no matter what.
-      LogException($Exception);
-   }
-   catch (Exception $e)
-   {
-      print get_class($e)." thrown within the exception handler.<br/>Message: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
-      exit();
-   }
+       // Attempt to log an error message no matter what.
+        LogException($Exception);
+    } catch (Exception $e) {
+        print get_class($e)." thrown within the exception handler.<br/>Message: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
+        exit();
+    }
 }
 
 if (!function_exists('ErrorMessage')) {
@@ -325,9 +348,9 @@ if (!function_exists('ErrorMessage')) {
     * @param string The name of the method that encountered the error.
     * @param string Any additional information that could be useful to debuggers.
     */
-   function ErrorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
-      return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
-   }
+    function ErrorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
+        return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
+    }
 }
 
 if (!function_exists('LogException')) {
@@ -336,37 +359,41 @@ if (!function_exists('LogException')) {
     *
     * @param Exception $Ex
     */
-   function LogException($Ex) {
-      if(!class_exists('Gdn', FALSE))
-         return;
-      if (!Gdn::Config('Garden.Errors.LogEnabled', FALSE))
-         return;
+    function LogException($Ex) {
+        if (!class_exists('Gdn', false)) {
+            return;
+        }
+        if (!Gdn::Config('Garden.Errors.LogEnabled', false)) {
+            return;
+        }
 
-      if ($Ex instanceof Gdn_UserException) return;
+        if ($Ex instanceof Gdn_UserException) {
+            return;
+        }
 
-      try {
-         $Px = Gdn::Request()->Host().' Garden ';
-      } catch (Exception $Ex) {
-         $Px = 'Garden ';
-      }
+        try {
+            $Px = Gdn::Request()->Host().' Garden ';
+        } catch (Exception $Ex) {
+            $Px = 'Garden ';
+        }
 
-      $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
-      if (!$ErrorLogFile) {
-         $Type = 0;
-      } else {
-         $Type = 3;
-         $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
-         $Px = "$Date $Px";
-      }
+        $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
+        if (!$ErrorLogFile) {
+            $Type = 0;
+        } else {
+            $Type = 3;
+            $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
+            $Px = "$Date $Px";
+        }
 
-      $Message = 'Exception: '.$Ex->getMessage().' in '.$Ex->getFile().' on '.$Ex->getLine();
-      @error_log($Px.$Message, $Type, $ErrorLogFile);
+        $Message = 'Exception: '.$Ex->getMessage().' in '.$Ex->getFile().' on '.$Ex->getLine();
+        @error_log($Px.$Message, $Type, $ErrorLogFile);
 
-      $TraceLines = explode("\n", $Ex->getTraceAsString());
-      foreach ($TraceLines as $i => $Line) {
-         @error_log("$Px  $Line", $Type, $ErrorLogFile);
-      }
-   }
+        $TraceLines = explode("\n", $Ex->getTraceAsString());
+        foreach ($TraceLines as $i => $Line) {
+            @error_log("$Px  $Line", $Type, $ErrorLogFile);
+        }
+    }
 }
 
 if (!function_exists('LogMessage')) {
@@ -381,27 +408,31 @@ if (!function_exists('LogMessage')) {
     * @param string The error message.
     * @param string Any additional information that could be useful to debuggers.
     */
-   function LogMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
-      // Figure out where to save the log
-      if(class_exists('Gdn', FALSE)) {
-         $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', FALSE);
-         if ($LogErrors === TRUE) {
-            $Log = "[Garden] $File, $Line, $Object.$Method()";
-            if ($Message <> '') $Log .= ", $Message";
-            if ($Code <> '') $Log .= ", $Code";
+    function LogMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
+       // Figure out where to save the log
+        if (class_exists('Gdn', false)) {
+            $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', false);
+            if ($LogErrors === true) {
+                $Log = "[Garden] $File, $Line, $Object.$Method()";
+                if ($Message <> '') {
+                    $Log .= ", $Message";
+                }
+                if ($Code <> '') {
+                    $Log .= ", $Code";
+                }
 
-            // Fail silently (there could be permission issues on badly set up servers).
-            $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
-            if ($ErrorLogFile == '') {
-               @error_log($Log);
-            } else {
-               $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
-               $Log = "$Date: $Log\n";
-               @error_log($Log, 3, $ErrorLogFile);
+               // Fail silently (there could be permission issues on badly set up servers).
+                $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
+                if ($ErrorLogFile == '') {
+                    @error_log($Log);
+                } else {
+                    $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
+                    $Log = "$Date: $Log\n";
+                    @error_log($Log, 3, $ErrorLogFile);
+                }
             }
-         }
-      }
-   }
+        }
+    }
 }
 
 if (!function_exists('Boop')) {
@@ -411,40 +442,48 @@ if (!function_exists('Boop')) {
     * @param mixed $Message The object or string to log to the screen
     * @param optional $Arguments A list of arguments to log to the screen as if from a function call
     */
-   function Boop($Message, $Arguments=array(), $Vardump = FALSE) {
-      if (!defined('BOOP') || !BOOP) return;
+    function Boop($Message, $Arguments = array(), $Vardump = false) {
+        if (!defined('BOOP') || !BOOP) {
+            return;
+        }
 
-      if (is_array($Message) || is_object($Message) || $Vardump === TRUE) {
-         if ($Vardump) var_dump($Message);
-         else print_r($Message);
-      } else
-         echo $Message;
+        if (is_array($Message) || is_object($Message) || $Vardump === true) {
+            if ($Vardump) {
+                var_dump($Message);
+            } else {
+                print_r($Message);
+            }
+        } else {
+            echo $Message;
+        }
 
-      if (!is_null($Arguments) && sizeof($Arguments))
-         echo " (".implode(', ',$Arguments).")";
+        if (!is_null($Arguments) && sizeof($Arguments)) {
+            echo " (".implode(', ', $Arguments).")";
+        }
 
-      echo "\n";
-   }
+        echo "\n";
+    }
 }
 
 if (!function_exists('CleanErrorArguments')) {
-   function CleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
-      if (is_array($Var)) {
-         foreach ($Var as $Key => $Value) {
-            if (in_array(strtolower($Key), $BlackList)) {
-               $Var[$Key] = 'SECURITY';
-            } else {
-               if (is_object($Value)) {
-                  $Value = Gdn_Format::ObjectAsArray($Value);
-                  $Var[$Key] = $Value;
-               }
+    function CleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
+        if (is_array($Var)) {
+            foreach ($Var as $Key => $Value) {
+                if (in_array(strtolower($Key), $BlackList)) {
+                    $Var[$Key] = 'SECURITY';
+                } else {
+                    if (is_object($Value)) {
+                        $Value = Gdn_Format::ObjectAsArray($Value);
+                        $Var[$Key] = $Value;
+                     }
 
-               if (is_array($Value))
-                  CleanErrorArguments($Var[$Key], $BlackList);
+                    if (is_array($Value)) {
+                        CleanErrorArguments($Var[$Key], $BlackList);
+                    }
+                 }
             }
-         }
-      }
-   }
+        }
+    }
 }
 
 // Set up Garden to handle php errors.
@@ -460,10 +499,10 @@ set_exception_handler('Gdn_ExceptionHandler');
  * @return Gdn_UserException
  */
 function NotFoundException($RecordType = 'Page') {
-   Gdn::Dispatcher()
+    Gdn::Dispatcher()
       ->PassData('RecordType', $RecordType)
       ->PassData('Description', sprintf(T('The %s you were looking for could not be found.'), strtolower($RecordType)));
-   return new Gdn_UserException(sprintf(T('%s not found.'), T($RecordType)), 404);
+    return new Gdn_UserException(sprintf(T('%s not found.'), T($RecordType)), 404);
 }
 
 /**
@@ -472,18 +511,20 @@ function NotFoundException($RecordType = 'Page') {
  * @param string|null $Permission The name of the permission that was required.
  * @return Exception
  */
-function PermissionException($Permission = NULL) {
-   if (!$Permission)
-      $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
-   elseif ($Permission == 'Banned')
+function PermissionException($Permission = null) {
+    if (!$Permission) {
+        $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
+    } elseif ($Permission == 'Banned')
       $Message = T("You've been banned.");
-   elseif (StringBeginsWith($Permission, '@'))
-      $Message = StringBeginsWith($Permission, '@', TRUE, TRUE);
-   else
-      $Message = T(
-         "PermissionRequired.$Permission",
-         sprintf(T('You need the %s permission to do that.'), $Permission));
-   return new Gdn_UserException($Message, 403);
+    elseif (StringBeginsWith($Permission, '@'))
+      $Message = StringBeginsWith($Permission, '@', true, true);
+    else {
+        $Message = T(
+            "PermissionRequired.$Permission",
+            sprintf(T('You need the %s permission to do that.'), $Permission)
+        );
+    }
+    return new Gdn_UserException($Message, 403);
 }
 
 /**
@@ -492,12 +533,13 @@ function PermissionException($Permission = NULL) {
  * @param string|null $Permission The name of the permission that was required.
  * @return Exception
  */
-function ForbiddenException($Resource = NULL) {
-   if (!$Resource)
-      $Message = T('ForbiddenErrorMessage', "You are not allowed to do that.");
-   elseif (StringBeginsWith($Resource, '@'))
-      $Message = StringBeginsWith($Resource, '@', TRUE, TRUE);
-   else
-      $Message = sprintf(T('You are not allowed to %s.'), $Resource);
-   return new Gdn_UserException($Message, 403);
+function ForbiddenException($Resource = null) {
+    if (!$Resource) {
+        $Message = T('ForbiddenErrorMessage', "You are not allowed to do that.");
+    } elseif (StringBeginsWith($Resource, '@'))
+      $Message = StringBeginsWith($Resource, '@', true, true);
+    else {
+        $Message = sprintf(T('You are not allowed to %s.'), $Resource);
+    }
+    return new Gdn_UserException($Message, 403);
 }

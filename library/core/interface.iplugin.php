@@ -1,14 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 /**
  * Plugin interface
- * 
+ *
  * A simple interface that all plugins must follow. Aside from the Setup
  * method, this is used more to identify plugins than to enforce structure upon
  * them.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -30,7 +32,7 @@ interface Gdn_IPlugin {
     *
     * @return boolean
     */
-   public function Setup();
+    public function Setup();
    
    /**
     * These methods are invoked if present, but are not required and will be silently ignored

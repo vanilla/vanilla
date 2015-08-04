@@ -46,7 +46,7 @@ class GravatarPlugin extends Gdn_Plugin {
             if (c('Plugins.Gravatar.UseVanillicon', true)) {
                 $Url .= '&default='.urlencode(Gdn::request()->scheme().'://vanillicon.com/'.md5($Email).'_200.png');
             } else {
-                $Url .= '&default='.urlencode(asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default_250.png'), true));
+                $Url .= '&default='.urlencode(asset(c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar', 'plugins/Gravatar/default_250.png')), true));
             }
 
 
@@ -74,7 +74,7 @@ if (!function_exists('UserPhotoDefaultUrl')) {
         if (c('Plugins.Gravatar.UseVanillicon', true)) {
             $Url .= '&default='.urlencode(Gdn::request()->scheme().'://vanillicon.com/'.md5($Email).'.png');
         } else {
-            $Url .= '&default='.urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.png'), true));
+            $Url .= '&default='.urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar', 'plugins/Gravatar/default.png')), true));
         }
 
         return $Url;

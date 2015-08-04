@@ -6,7 +6,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
-*/
+ */
 
 /**
  * Used to manage adding/removing different locale files.
@@ -41,11 +41,11 @@ class LocaleModel {
      * @return array
      */
     public function availableLocales() {
-       // Get the list of locales that are supported.
+        // Get the list of locales that are supported.
         $Locales = array_column($this->availableLocalePacks(), 'Locale', 'Locale');
         $Locales['en'] = 'en'; // the default locale is always available.
         ksort($Locales);
-   
+
         return $Locales;
     }
 
@@ -71,7 +71,7 @@ class LocaleModel {
      * @throws Exception
      */
     public function copyDefinitions($SourcePath, $DestPath) {
-       // Load the definitions from the source path.
+        // Load the definitions from the source path.
         $Definitions = $this->loadDefinitions($SourcePath);
 
         $TmpPath = dirname($DestPath).'/tmp_'.randomString(10);
@@ -154,17 +154,17 @@ class LocaleModel {
             $DestPath = $BasePath.'/changes.php';
         }
 
-       // Load the given locale pack.
+        // Load the given locale pack.
         $Definitions = $this->loadDefinitions($Path, $DestPath);
         $BaseDefinitions = $this->loadDefinitions($BasePath, $DestPath);
 
-       // Figure out the missing definitions.
+        // Figure out the missing definitions.
         $MissingDefinitions = array_diff_key($BaseDefinitions, $Definitions);
 
-       // Figure out the extraneous definitions.
+        // Figure out the extraneous definitions.
         $ExtraDefinitions = array_diff($Definitions, $BaseDefinitions);
 
-       // Generate the changes file.
+        // Generate the changes file.
         $TmpPath = dirname($BasePath).'/tmp_'.RandomString(10);
         $fp = fopen($TmpPath, 'wb');
         if (!$fp) {
@@ -201,42 +201,42 @@ class LocaleModel {
         return $Result;
     }
 
-   /**
+    /**
      * Temporarily enable a locale pack without installing it/
-    *
-    * @param string $LocaleKey The key of the folder.
+     *
+     * @param string $LocaleKey The key of the folder.
      * @throws NotFoundException
-    */
+     */
     public function testLocale($LocaleKey) {
         $Available = $this->availableLocalePacks();
         if (!isset($Available[$LocaleKey])) {
             throw notFoundException('Locale');
         }
 
-       // Grab all of the definition files from the locale.
+        // Grab all of the definition files from the locale.
         $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
-      
-       // Unload the dynamic config
+
+        // Unload the dynamic config
         Gdn::locale()->unload();
-      
-       // Load each locale file, checking for errors
+
+        // Load each locale file, checking for errors
         foreach ($Paths as $Path) {
             Gdn::locale()->load($Path, false);
         }
     }
 
-   /**
-    * Write a locale's definitions to a file.
-    *
-    * @param resource $fp The file to write to.
-    * @param array $Definitions The definitions to write.
-    */
+    /**
+     * Write a locale's definitions to a file.
+     *
+     * @param resource $fp The file to write to.
+     * @param array $Definitions The definitions to write.
+     */
     public static function writeDefinitions($fp, $Definitions) {
-       // Write the definitions.
+        // Write the definitions.
         uksort($Definitions, 'strcasecmp');
         $LastC = '';
         foreach ($Definitions as $Key => $Value) {
-           // Add a blank line between letters of the alphabet.
+            // Add a blank line between letters of the alphabet.
             if (isset($Key[0]) && strcasecmp($LastC, $Key[0]) != 0) {
                 fwrite($fp, "\n");
                 $LastC = $Key[0];

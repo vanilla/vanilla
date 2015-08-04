@@ -6,7 +6,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
-*/
+ */
 
 /**
  * Handle display of a message.
@@ -24,11 +24,11 @@ class MessageModule extends Gdn_Module {
      */
     public function __construct($Sender = '', $Message = false) {
         parent::__construct($Sender);
-      
+
         $this->_ApplicationFolder = 'dashboard';
         $this->_Message = $Message;
     }
-   
+
     /**
      *
      *

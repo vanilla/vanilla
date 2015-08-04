@@ -21,51 +21,51 @@ class NavModule extends Gdn_Module {
 
     /** @var string The id of the menu, if any. */
     public $id = null;
-    /** @var array An array of items in the menu. */
 
+    /** @var array An array of items in the menu. */
     protected $items = array();
 
-   /**
+    /**
      *
      *
      * @param string $Sender
-    */
+     */
     public function __construct($Sender = '') {
         $this->_ApplicationFolder = 'dashboard';
 
         parent::__construct($Sender);
     }
 
-   /**
-    * Add a divider to the items array.
-    *
-    * @param string $key The key of the divider.
-    * @param array $options Options for the divider.
-    */
+    /**
+     * Add a divider to the items array.
+     *
+     * @param string $key The key of the divider.
+     * @param array $options Options for the divider.
+     */
     public function addDivider($key, $options = array()) {
         $this->addItem('divider', $key, $options);
     }
 
-   /**
-    * Add a group to the items array.
-    *
-    * @param string $key The group key. Dot syntax is allowed to nest groups within eachother.
-    * @param array $group The group with the following key(s):
-    * - **text**: The text of the group. Html is allowed.
-    * - **sort**: Specify a custom sort order for the item.
-    *   This can be either a number or an array in the form ('before|after', 'key').
-    */
+    /**
+     * Add a group to the items array.
+     *
+     * @param string $key The group key. Dot syntax is allowed to nest groups within eachother.
+     * @param array $group The group with the following key(s):
+     * - **text**: The text of the group. Html is allowed.
+     * - **sort**: Specify a custom sort order for the item.
+     *   This can be either a number or an array in the form ('before|after', 'key').
+     */
     public function addGroup($key, $group) {
         $this->addItem('group', $key, $group);
     }
 
-   /**
-    * Add an item to the items array.
-    *
-    * @param string $type The type of item (link, group, or divider).
-    * @param string $key The item key. Dot syntax is allowed to nest items into groups.
-    * @param array $item The item to add.
-    */
+    /**
+     * Add an item to the items array.
+     *
+     * @param string $type The type of item (link, group, or divider).
+     * @param string $key The item key. Dot syntax is allowed to nest items into groups.
+     * @param array $item The item to add.
+     */
     protected function addItem($type, $key, $item) {
         if (!is_array($key)) {
             $key = explode('.', $key);
@@ -75,35 +75,35 @@ class NavModule extends Gdn_Module {
 
         $item = (array)$item;
 
-       // Make sure the link has its type.
+        // Make sure the link has its type.
         $item['type'] = $type;
 
-       // Walk into the items list to set the item.
+        // Walk into the items list to set the item.
         $items =& $this->items;
         foreach ($key as $i => $key_part) {
             if ($i === count($key) - 1) {
-               // Add the item here.
+                // Add the item here.
                 if (array_key_exists($key_part, $items)) {
-                   // The item is already here so merge this one on top of it.
+                    // The item is already here so merge this one on top of it.
                     if ($items[$key_part]['type'] !== $type) {
                         throw new \Exception("$key of type $type does not match exsisting type {$items[$key_part]['type']}.", 500);
                     }
 
                     $items[$key_part] = array_merge($items[$key_part], $item);
                 } else {
-                   // The item is new so just add it here.
+                    // The item is new so just add it here.
                     touchValue('_sort', $item, count($items));
                     $items[$key_part] = $item;
                 }
             } else {
-               // This is a group.
+                // This is a group.
                 if (!array_key_exists($key_part, $items)) {
-                   // The group doesn't exist so lazy-create it.
+                    // The group doesn't exist so lazy-create it.
                     $items[$key_part] = array('type' => 'group', 'text' => '', 'items' => array(), '_sort' => count($items));
                 } elseif ($items[$key_part]['type'] !== 'group') {
                     throw new \Exception("$key_part is not a group", 500);
                 } elseif (!array_key_exists('items', $items[$key_part])) {
-                   // Lazy create the items array.
+                    // Lazy create the items array.
                     $items[$key_part]['items'] = array();
                 }
 
@@ -112,18 +112,18 @@ class NavModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Add a link to the menu.
-    *
-    * @param string|array $key The key of the link. You can nest links in a group by using dot syntax to specify its key.
-    * @param array $link The link with the following keys:
-    * - **url**: The url of the link.
-    * - **text**: The text of the link. Html is allowed.
-    * - **icon**: The html of the icon.
-    * - **badge**: The link contain a badge. such as a count or alert. Html is allowed.
-    * - **sort**: Specify a custom sort order for the item.
-    *   This can be either a number or an array in the form ('before|after', 'key').
-    */
+    /**
+     * Add a link to the menu.
+     *
+     * @param string|array $key The key of the link. You can nest links in a group by using dot syntax to specify its key.
+     * @param array $link The link with the following keys:
+     * - **url**: The url of the link.
+     * - **text**: The text of the link. Html is allowed.
+     * - **icon**: The html of the icon.
+     * - **badge**: The link contain a badge. such as a count or alert. Html is allowed.
+     * - **sort**: Specify a custom sort order for the item.
+     *   This can be either a number or an array in the form ('before|after', 'key').
+     */
     public function addLink($key, $link) {
         $this->addItem('link', $key, $link);
     }
@@ -150,9 +150,9 @@ class NavModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Render the menu as a nav.
-    */
+    /**
+     * Render the menu as a nav.
+     */
     public function render() {
         echo '<nav '.$this->getAttibutes().">\n";
         $this->renderItems($this->items);
@@ -232,19 +232,19 @@ class NavModule extends Gdn_Module {
         $items = $group['items'];
         unset($group['text'], $group['items']);
 
-       // Don't render an empty group.
+        // Don't render an empty group.
         if (empty($items)) {
             return;
         }
 
         echo '<div '.attribute($group).">\n";
 
-       // Write the heading.
+        // Write the heading.
         if ($text) {
             echo "<h3>$text</h3>\n";
         }
 
-       // Write the group items.
+        // Write the group items.
         $this->renderItems($items, $level + 1);
 
         echo "</div>\n";
@@ -260,11 +260,11 @@ class NavModule extends Gdn_Module {
         echo "<div class=\"nav-divider\"></div>\n";
     }
 
-   /**
-    * Sort the items in a given dataset (array).
-    *
-    * @param array $items
-    */
+    /**
+     * Sort the items in a given dataset (array).
+     *
+     * @param array $items
+     */
     public static function sortItems(&$items) {
         uasort($items, function ($a, $b) use ($items) {
             $sort_a = NavModule::sortItemsOrder($a, $items);
@@ -273,35 +273,35 @@ class NavModule extends Gdn_Module {
             if ($sort_a > $sort_b) {
                 return 1;
             } elseif ($sort_a < $sort_b)
-            return -1;
+                return -1;
             else {
                 return 0;
             }
         });
     }
 
-   /**
-    * Get the sort order of an item in the items array.
-    * This function looks at the following keys:
-    * - **sort (numeric)**: A specific numeric sort was provided.
-    * - **sort array('before|after', 'key')**: You can specify that the item is before or after another item.
-    * - **_sort**: The order the item was added is used.
-    *
-    * @param array $item The item to get the sort order from.
-    * @param array $items The entire list of items.
-    * @param int $depth The current recursive depth used to prevent inifinite recursion.
-    * @return number
-    */
+    /**
+     * Get the sort order of an item in the items array.
+     * This function looks at the following keys:
+     * - **sort (numeric)**: A specific numeric sort was provided.
+     * - **sort array('before|after', 'key')**: You can specify that the item is before or after another item.
+     * - **_sort**: The order the item was added is used.
+     *
+     * @param array $item The item to get the sort order from.
+     * @param array $items The entire list of items.
+     * @param int $depth The current recursive depth used to prevent inifinite recursion.
+     * @return number
+     */
     public static function sortItemsOrder($item, $items, $depth = 0) {
         $default_sort = val('_sort', $item, 100);
 
-       // Check to see if a custom sort has been specified.
+        // Check to see if a custom sort has been specified.
         if (isset($item['sort'])) {
             if (is_numeric($item['sort'])) {
-               // This is a numeric sort
+                // This is a numeric sort
                 return $item['sort'] * 10000 + $default_sort;
             } elseif (is_array($item['sort']) && $depth < 10) {
-               // This sort is before or after another depth.
+                // This sort is before or after another depth.
                 list($op, $key) = $item['sort'];
 
                 if (array_key_exists($key, $items)) {

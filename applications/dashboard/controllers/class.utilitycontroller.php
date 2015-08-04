@@ -13,29 +13,29 @@
  */
 class UtilityController extends DashboardController {
 
-   /** @var array Models to automatically instantiate. */
+    /** @var array Models to automatically instantiate. */
     public $Uses = array('Form');
 
-   /**
+    /**
      * @var array Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
-    * Typically, HTTP headers in the $_SERVER array will be prefixed with
-    * `HTTP_` or `X_`. These are not so we list them here for later reference.
-    */
+     * Typically, HTTP headers in the $_SERVER array will be prefixed with
+     * `HTTP_` or `X_`. These are not so we list them here for later reference.
+     */
     protected static $specialHeaders = array(
-      'CONTENT_TYPE',
-      'CONTENT_LENGTH',
-      'PHP_AUTH_USER',
-      'PHP_AUTH_PW',
-      'PHP_AUTH_DIGEST',
-      'AUTH_TYPE'
+        'CONTENT_TYPE',
+        'CONTENT_LENGTH',
+        'PHP_AUTH_USER',
+        'PHP_AUTH_PW',
+        'PHP_AUTH_DIGEST',
+        'AUTH_TYPE'
     );
 
-   /**
-    * Gather all of the global styles together.
-    * @param string ThemeType Either `desktop` or `mobile`.
-    * @param string $Filename The basename of the file to
-    * @since 2.1
-    */
+    /**
+     * Gather all of the global styles together.
+     * @param string ThemeType Either `desktop` or `mobile`.
+     * @param string $Filename The basename of the file to
+     * @since 2.1
+     */
     public function css($ThemeType, $Filename) {
         $AssetModel = new AssetModel();
         $AssetModel->ServeCss($ThemeType, $Filename);
@@ -152,10 +152,10 @@ class UtilityController extends DashboardController {
 //      $this->render();
 //   }
 
-   /**
-    * Redirect to another page.
-    * @since 2.0.18b4
-    */
+    /**
+     * Redirect to another page.
+     * @since 2.0.18b4
+     */
 //   public function redirect() {
 //      $Args = func_get_args();
 //      $Path = $this->Request->Path();
@@ -180,15 +180,15 @@ class UtilityController extends DashboardController {
 //      redirect($Url.$Query);
 //   }
 
-   /**
-    * Set the sort order for data on an arbitrary database table.
-    *
-    * Expect post values TransientKey, Target (redirect URL), Table (database table name),
-    * and TableID (an array of sort order => unique ID).
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Set the sort order for data on an arbitrary database table.
+     *
+     * Expect post values TransientKey, Target (redirect URL), Table (database table name),
+     * and TableID (an array of sort order => unique ID).
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function sort() {
         $this->permission('Garden.Settings.Manage');
 
@@ -223,31 +223,31 @@ class UtilityController extends DashboardController {
         $this->render('Blank');
     }
 
-   /**
-    * Allows the setting of data into one of two serialized data columns on the
-    * user table: Preferences and Attributes.
-    *
-    * The method expects "Name" & "Value" to be in the $_POST collection. This method always
-    * saves to the row of the user id performing this action (ie. $Session->UserID). The
-    * type of property column being saved should be specified in the url:
-    * i.e. /dashboard/utility/set/preference/name/value/transientKey
-    * or /dashboard/utility/set/attribute/name/value/transientKey
-    *
-    * @since 2.0.0
-    * @access public
-    * @param string $UserPropertyColumn The type of value being saved: preference or attribute.
-    * @param string $Name The name of the property being saved.
-    * @param string $Value The value of the property being saved.
-    * @param string $TransientKey A unique transient key to authenticate that the user intended to perform this action.
-    */
+    /**
+     * Allows the setting of data into one of two serialized data columns on the
+     * user table: Preferences and Attributes.
+     *
+     * The method expects "Name" & "Value" to be in the $_POST collection. This method always
+     * saves to the row of the user id performing this action (ie. $Session->UserID). The
+     * type of property column being saved should be specified in the url:
+     * i.e. /dashboard/utility/set/preference/name/value/transientKey
+     * or /dashboard/utility/set/attribute/name/value/transientKey
+     *
+     * @since 2.0.0
+     * @access public
+     * @param string $UserPropertyColumn The type of value being saved: preference or attribute.
+     * @param string $Name The name of the property being saved.
+     * @param string $Value The value of the property being saved.
+     * @param string $TransientKey A unique transient key to authenticate that the user intended to perform this action.
+     */
     public function set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Session = Gdn::session();
         $Success = false;
         if (in_array($UserPropertyColumn, array('preference', 'attribute'))
-         && $Name != ''
-         && $Value != ''
-         && $Session->UserID > 0
+            && $Name != ''
+            && $Value != ''
+            && $Session->UserID > 0
             && $Session->validateTransientKey($TransientKey)
         ) {
             $UserModel = Gdn::factory("UserModel");
@@ -259,7 +259,7 @@ class UtilityController extends DashboardController {
             $this->Form->addError('ErrorBool');
         }
 
-       // Redirect back where the user came from if necessary
+        // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($_SERVER['HTTP_REFERER']);
         } else {
@@ -279,16 +279,16 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
-   /**
-    * Update database structure based on current definitions in each app's structure.php file.
-    *
-    * @since 2.0.?
-    * @access public
-    * @param string $AppName Unique app name or 'all' (default).
-    * @param int $CaptureOnly Whether to list changes rather than execture (0 or 1).
-    * @param int $Drop Whether to drop first (0 or 1).
-    * @param int $Explicit Whether to force to only columns currently listed (0 or 1).
-    */
+    /**
+     * Update database structure based on current definitions in each app's structure.php file.
+     *
+     * @since 2.0.?
+     * @access public
+     * @param string $AppName Unique app name or 'all' (default).
+     * @param int $CaptureOnly Whether to list changes rather than execture (0 or 1).
+     * @param int $Drop Whether to drop first (0 or 1).
+     * @param int $Explicit Whether to force to only columns currently listed (0 or 1).
+     */
     public function structure($AppName = 'all', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
         $this->permission('Garden.Settings.Manage');
         $Files = array();
@@ -303,7 +303,7 @@ class UtilityController extends DashboardController {
             }
             $AppName = 'all';
         } else {
-             // Load that specific application structure file.
+            // Load that specific application structure file.
             $Files[] = combinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
         }
         $Validation = new Gdn_Validation();
@@ -332,7 +332,7 @@ class UtilityController extends DashboardController {
             }
         }
 
-       // Run the structure of all of the plugins.
+        // Run the structure of all of the plugins.
         $Plugins = Gdn::pluginManager()->enabledPlugins();
         foreach ($Plugins as $PluginKey => $Plugin) {
             $PluginInstance = Gdn::pluginManager()->getPluginInstance($PluginKey, Gdn_PluginManager::ACCESS_PLUGINNAME);
@@ -357,25 +357,25 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
-   /**
-    * Run a structure update on the database.
-    *
-    * @since 2.0.?
-    * @access public
-    */
+    /**
+     * Run a structure update on the database.
+     *
+     * @since 2.0.?
+     * @access public
+     */
     public function update() {
         try {
-           // Check for permission or flood control.
-           // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+            // Check for permission or flood control.
+            // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
             $Now = time();
             $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
 
             if ($LastTime + (60 * 60 * 24) > $Now) {
-               // Check for flood control.
+                // Check for flood control.
                 $Count = Gdn::get('Garden.Update.Count', 0) + 1;
                 if ($Count > 5) {
                     if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                       // We are only allowing an update of 5 times every 24 hours.
+                        // We are only allowing an update of 5 times every 24 hours.
                         throw permissionException();
                     }
                 }
@@ -390,7 +390,7 @@ class UtilityController extends DashboardController {
         }
 
         try {
-           // Run the structure.
+            // Run the structure.
             $UpdateModel = new UpdateModel();
             $UpdateModel->runStructure();
             $this->setData('Success', true);
@@ -416,22 +416,22 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
-   /**
-    * Because people try this a lot and get confused.
-    *
-    * @since 2.0.18
-    * @access public
-    */
+    /**
+     * Because people try this a lot and get confused.
+     *
+     * @since 2.0.18
+     * @access public
+     */
     public function upgrade() {
         $this->update();
     }
 
-   /**
-    * Signs of life.
-    *
-    * @since 2.0.?
-    * @access public
-    */
+    /**
+     * Signs of life.
+     *
+     * @since 2.0.?
+     * @access public
+     */
     public function alive() {
         $this->setData('Success', true);
         $this->MasterView = 'empty';
@@ -456,7 +456,7 @@ class UtilityController extends DashboardController {
 
         $valid = true;
 
-       // Test the cache.
+        // Test the cache.
         if (Gdn::cache()->activeEnabled()) {
             $k = betterRandomString(20);
             Gdn::cache()->store($k, 1);
@@ -474,7 +474,7 @@ class UtilityController extends DashboardController {
             $this->setData('cache', 'disabled');
         }
 
-       // Test the db.
+        // Test the db.
         try {
             $users = Gdn::sql()->get('User', 'UserID', 'asc', 1);
             $this->setData('database', true);
@@ -499,14 +499,14 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
-   /**
-    * Set the user's timezone (hour offset).
-    *
-    * @since 2.0.0
-    * @access public
-    * @param string $ClientDate Client-reported datetime.
-    * @param string $TransientKey Security token.
-    */
+    /**
+     * Set the user's timezone (hour offset).
+     *
+     * @since 2.0.0
+     * @access public
+     * @param string $ClientDate Client-reported datetime.
+     * @param string $TransientKey Security token.
+     */
     public function setClientHour($ClientHour = '', $TransientKey = '') {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Success = false;
@@ -553,23 +553,23 @@ class UtilityController extends DashboardController {
     }
 
     /**
-    * Grab a feed from the mothership.
-    *
-    * @since 2.0.?
-    * @access public
-    * @param string $Type Type of feed.
-    * @param int $Length Number of items to get.
-    * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
-    */
+     * Grab a feed from the mothership.
+     *
+     * @since 2.0.?
+     * @access public
+     * @param string $Type Type of feed.
+     * @param int $Length Number of items to get.
+     * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
+     */
     public function getFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
         echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
         $this->deliveryType(DELIVERY_TYPE_NONE);
         $this->render();
     }
 
-   /**
-    * Return some meta information about any page on the internet in JSON format.
-    */
+    /**
+     * Return some meta information about any page on the internet in JSON format.
+     */
     public function fetchPageInfo($Url = '') {
         $PageInfo = fetchPageInfo($Url);
         $this->setData('PageInfo', $PageInfo);

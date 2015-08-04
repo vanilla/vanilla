@@ -13,9 +13,9 @@
  */
 class NotificationsController extends Gdn_Controller {
 
-   /**
-    * CSS, JS and module includes.
-    */
+    /**
+     * CSS, JS and module includes.
+     */
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
@@ -29,52 +29,52 @@ class NotificationsController extends Gdn_Controller {
         $this->addModule('GuestModule');
         parent::initialize();
     }
-   
-   /**
-    * Adds inform messages to response for inclusion in pages dynamically.
-    *
-    * @since 2.0.18
-    * @access public
-    */
+
+    /**
+     * Adds inform messages to response for inclusion in pages dynamically.
+     *
+     * @since 2.0.18
+     * @access public
+     */
     public function inform() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-      
-       // Retrieve all notifications and inform them.
+
+        // Retrieve all notifications and inform them.
         NotificationsController::informNotifications($this);
         $this->fireEvent('BeforeInformNotifications');
-      
+
         $this->render();
     }
-   
-   /**
-    * Grabs all new notifications and adds them to the sender's inform queue.
-    *
-    * This method gets called by dashboard's hooks file to display new
-    * notifications on every pageload.
-    *
-    * @since 2.0.18
-    * @access public
-    *
-    * @param Gdn_Controller $Sender The object calling this method.
-    */
+
+    /**
+     * Grabs all new notifications and adds them to the sender's inform queue.
+     *
+     * This method gets called by dashboard's hooks file to display new
+     * notifications on every pageload.
+     *
+     * @since 2.0.18
+     * @access public
+     *
+     * @param Gdn_Controller $Sender The object calling this method.
+     */
     public static function informNotifications($Sender) {
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             return;
         }
-      
+
         $ActivityModel = new ActivityModel();
-       // Get five pending notifications.
+        // Get five pending notifications.
         $Where = array(
             'NotifyUserID' => Gdn::session()->UserID,
-          'Notified' => ActivityModel::SENT_PENDING);
-      
-       // If we're in the middle of a visit only get very recent notifications.
+            'Notified' => ActivityModel::SENT_PENDING);
+
+        // If we're in the middle of a visit only get very recent notifications.
         $Where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
-      
+
         $Activities = $ActivityModel->getWhere($Where, 0, 5)->resultArray();
-      
+
         $ActivityIDs = array_column($Activities, 'ActivityID');
         $ActivityModel->setNotified($ActivityIDs);
 
@@ -93,8 +93,8 @@ class NotificationsController extends Gdn_Controller {
             }
             $Excerpt = Gdn_Format::plainText($Activity['Story']);
             $ActivityClass = ' Activity-'.$Activity['ActivityType'];
-         
-         
+
+
             $Sender->informMessage(
                 $UserPhoto
                 .Wrap($Activity['Headline'], 'div', array('class' => 'Title'))

@@ -6,7 +6,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
-*/
+ */
 
 /**
  * Builds a pager control related to a dataset.
@@ -31,18 +31,18 @@ class PagerModule extends Gdn_Module {
     /** @var string Translation code to be used for "Next Page" link. */
     public $MoreCode;
 
-   /**
+    /**
      * @var string If there are no pages to page through, this string will be returned in
-    * place of the pager. Default is an empty string.
-    */
+     * place of the pager. Default is an empty string.
+     */
     public $PagerEmpty;
 
-   /**
+    /**
      * @var string The xhtml code that should wrap around the pager link.
-    *  ie. '<div %1$s>%2$s</div>';
-    * where %1$s represents id and class attributes (if defined by
-    * $this->ClientID and $this->CssClass) and %2$s represents the pager link.
-    */
+     *  ie. '<div %1$s>%2$s</div>';
+     * where %1$s represents id and class attributes (if defined by
+     * $this->ClientID and $this->CssClass) and %2$s represents the pager link.
+     */
     public $Wrapper;
 
     /** @var string Translation code to be used for "less" link. */
@@ -66,19 +66,19 @@ class PagerModule extends Gdn_Module {
     /** @var int The last offset of the current page. (ie. Offset to LastOffset of TotalRecords). */
     private $_LastOffset;
 
-   /**
+    /**
      * @var bool Certain properties are required to be defined before the pager can build
-    * itself. Once they are created, this property is set to true so they are
-    * not needlessly recreated.
-    */
+     * itself. Once they are created, this property is set to true so they are
+     * not needlessly recreated.
+     */
     private $_PropertiesDefined;
 
-   /**
+    /**
      * @var bool A boolean value indicating if the total number of records is known or
-    * not. Retrieving this number can be a costly database query, so sometimes
-    * it is not retrieved and simple "next/previous" links are displayed
-    * instead. Default is FALSE, meaning that the simple pager is displayed.
-    */
+     * not. Retrieving this number can be a costly database query, so sometimes
+     * it is not retrieved and simple "next/previous" links are displayed
+     * instead. Default is FALSE, meaning that the simple pager is displayed.
+     */
     private $_Totalled;
 
     /**
@@ -112,8 +112,8 @@ class PagerModule extends Gdn_Module {
         return false;
     }
 
-   /**
-    * Define all required parameters to create the Pager and PagerDetails.
+    /**
+     * Define all required parameters to create the Pager and PagerDetails.
      *
      * @param $Offset
      * @param $Limit
@@ -121,7 +121,7 @@ class PagerModule extends Gdn_Module {
      * @param $Url
      * @param bool $ForceConfigure
      * @throws Exception
-    */
+     */
     public function configure($Offset, $Limit, $TotalRecords, $Url, $ForceConfigure = false) {
         if ($this->_PropertiesDefined === false || $ForceConfigure === true) {
             if (is_array($Url)) {
@@ -129,7 +129,7 @@ class PagerModule extends Gdn_Module {
                     $this->UrlCallBack = array_pop($Url);
                 } else {
                     $this->UrlCallBack = $Url;
-                              }
+                }
             } else {
                 $this->Url = $Url;
             }
@@ -150,11 +150,11 @@ class PagerModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Gets the controller this pager is for.
+    /**
+     * Gets the controller this pager is for.
      *
-    * @return Gdn_Controller.
-    */
+     * @return Gdn_Controller.
+     */
     public function controller() {
         return $this->_Sender;
     }
@@ -199,11 +199,11 @@ class PagerModule extends Gdn_Module {
         return $Details;
     }
 
-   /**
-    * Whether or not this is the first page of the pager.
-    *
-    * @return bool True if this is the first page.
-    */
+    /**
+     * Whether or not this is the first page of the pager.
+     *
+     * @return bool True if this is the first page.
+     */
     public function firstPage() {
         $Result = $this->Offset == 0;
         return $Result;
@@ -218,7 +218,7 @@ class PagerModule extends Gdn_Module {
      * @return mixed|string
      */
     public static function formatUrl($Url, $Page, $Limit = '') {
-       // Check for new style page.
+        // Check for new style page.
         if (strpos($Url, '{Page}') !== false) {
             return str_replace(array('{Page}', '{Size}'), array($Page, $Limit), $Url);
         } else {
@@ -226,11 +226,11 @@ class PagerModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Whether or not this is the last page of the pager.
-    *
-    * @return bool True if this is the last page.
-    */
+    /**
+     * Whether or not this is the last page of the pager.
+     *
+     * @return bool True if this is the last page.
+     */
     public function lastPage() {
         return $this->Offset + $this->Limit >= $this->TotalRecords;
     }
@@ -246,7 +246,7 @@ class PagerModule extends Gdn_Module {
         if ($Page == $CurrentPage - 1) {
             return 'prev';
         } elseif ($Page == $CurrentPage + 1)
-         return 'next';
+            return 'next';
 
         return null;
     }
@@ -265,18 +265,18 @@ class PagerModule extends Gdn_Module {
         }
     }
 
-   /**
-    * Builds page navigation links.
-    *
-    * @param string $Type Type of link to return: 'more' or 'less'.
-    * @return string HTML page navigation links.
-    */
+    /**
+     * Builds page navigation links.
+     *
+     * @param string $Type Type of link to return: 'more' or 'less'.
+     * @return string HTML page navigation links.
+     */
     public function toString($Type = 'more') {
         if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
 
-       // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
+        // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
         $this->Url = str_replace(array('%1$s', '%2$s', '%s'), '{Page}', $this->Url);
 
         if ($this->TotalRecords === false) {
@@ -285,23 +285,23 @@ class PagerModule extends Gdn_Module {
 
         $this->CssClass = ConcatSep(' ', $this->CssClass, 'NumberedPager');
 
-       // Get total page count, allowing override
+        // Get total page count, allowing override
         $PageCount = ceil($this->TotalRecords / $this->Limit);
         $this->EventArguments['PageCount'] = &$PageCount;
         $this->fireEvent('BeforePagerSetsCount');
         $this->_PageCount = $PageCount;
         $CurrentPage = PageNumber($this->Offset, $this->Limit);
 
-       // Show $Range pages on either side of current
+        // Show $Range pages on either side of current
         $Range = c('Garden.Modules.PagerRange', 3);
 
-       // String to represent skipped pages
+        // String to represent skipped pages
         $Separator = c('Garden.Modules.PagerSeparator', '&#8230;');
 
-       // Show current page plus $Range pages on either side
+        // Show current page plus $Range pages on either side
         $PagesToDisplay = ($Range * 2) + 1;
         if ($PagesToDisplay + 2 >= $PageCount) {
-           // Don't display an ellipses if the page count is only a little bigger that the number of pages.
+            // Don't display an ellipses if the page count is only a little bigger that the number of pages.
             $PagesToDisplay = $PageCount;
         }
 
@@ -309,25 +309,25 @@ class PagerModule extends Gdn_Module {
         $PreviousText = t($this->LessCode);
         $NextText = t($this->MoreCode);
 
-       // Previous
+        // Previous
         if ($CurrentPage == 1) {
             $Pager = '<span class="Previous">'.$PreviousText.'</span>';
         } else {
             $Pager .= anchor($PreviousText, $this->PageUrl($CurrentPage - 1), 'Previous', array('rel' => 'prev'));
         }
 
-       // Build Pager based on number of pages (Examples assume $Range = 3)
+        // Build Pager based on number of pages (Examples assume $Range = 3)
         if ($PageCount <= 1) {
-           // Don't build anything
+            // Don't build anything
 
         } elseif ($PageCount <= $PagesToDisplay) {
-           // We don't need elipsis (ie. 1 2 3 4 5 6 7)
+            // We don't need elipsis (ie. 1 2 3 4 5 6 7)
             for ($i = 1; $i <= $PageCount; $i++) {
                 $Pager .= anchor($i, $this->PageUrl($i), $this->_GetCssClass($i, $CurrentPage), array('rel' => self::Rel($i, $CurrentPage)));
             }
 
         } elseif ($CurrentPage + $Range <= $PagesToDisplay + 1) { // +1 prevents 1 ... 2
-           // We're on a page that is before the first elipsis (ex: 1 2 3 4 5 6 7 ... 81)
+            // We're on a page that is before the first elipsis (ex: 1 2 3 4 5 6 7 ... 81)
             for ($i = 1; $i <= $PagesToDisplay; $i++) {
                 $PageParam = 'p'.$i;
                 $Pager .= anchor($i, $this->PageUrl($i), $this->_GetCssClass($i, $CurrentPage), array('rel' => self::Rel($i, $CurrentPage)));
@@ -337,7 +337,7 @@ class PagerModule extends Gdn_Module {
             $Pager .= anchor($PageCount, $this->PageUrl($PageCount), $this->_GetCssClass($PageCount, $CurrentPage));
 
         } elseif ($CurrentPage + $Range >= $PageCount - 1) { // -1 prevents 80 ... 81
-           // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
+            // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
             $Pager .= anchor(1, $this->PageUrl(1), $this->_GetCssClass(1, $CurrentPage));
             $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
 
@@ -347,7 +347,7 @@ class PagerModule extends Gdn_Module {
             }
 
         } else {
-           // We're between the two elipsises (ex: 1 ... 4 5 6 7 8 9 10 ... 81)
+            // We're between the two elipsises (ex: 1 ... 4 5 6 7 8 9 10 ... 81)
             $Pager .= anchor(1, $this->PageUrl(1), $this->_GetCssClass(1, $CurrentPage));
             $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
 
@@ -360,7 +360,7 @@ class PagerModule extends Gdn_Module {
             $Pager .= anchor($PageCount, $this->PageUrl($PageCount), $this->_GetCssClass($PageCount, $CurrentPage));
         }
 
-       // Next
+        // Next
         if ($CurrentPage == $PageCount) {
             $Pager .= '<span class="Next">'.$NextText.'</span>';
         } else {
@@ -452,7 +452,7 @@ class PagerModule extends Gdn_Module {
         $Pager->HtmlBefore = val('HtmlBefore', $Options, val('HtmlBefore', $Pager, ''));
         $Pager->CurrentRecords = val('CurrentRecords', $Options, $Pager->Controller()->data('_CurrentRecords', $Pager->CurrentRecords));
 
-       // Try and figure out the offset based on the parameters coming in to the controller.
+        // Try and figure out the offset based on the parameters coming in to the controller.
         if (!$Pager->Offset) {
             $Page = $Pager->Controller()->Request->get('Page', false);
             if (!$Page) {
@@ -503,14 +503,14 @@ class PagerModule extends Gdn_Module {
         if ($ThisPage == 1) {
             $Result .= ' FirstPage';
         } elseif ($ThisPage == $this->_PageCount)
-         $Result .= ' LastPage';
+            $Result .= ' LastPage';
 
         return $Result;
     }
 
-   /**
-    * Are there more pages after the current one?
-    */
+    /**
+     * Are there more pages after the current one?
+     */
     public function hasMorePages() {
         return $this->TotalRecords > $this->Offset + $this->Limit;
     }

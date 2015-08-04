@@ -6,7 +6,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
-*/
+ */
 
 /**
  * Export handler.
@@ -35,7 +35,7 @@ class ExportModel {
 
     /** @var object|null File pointer. */
     protected $_File = null;
-    
+
     /** @var object|null PDO connection. */
     protected $_PDO = null;
 
@@ -67,14 +67,14 @@ class ExportModel {
     public function beginExport($Path, $Source = '') {
         $this->BeginTime = microtime(true);
         $TimeStart = list($sm, $ss) = explode(' ', microtime());
-        
+
         if ($this->UseCompression && function_exists('gzopen')) {
             $fp = gzopen($Path, 'wb');
         } else {
             $fp = fopen($Path, 'wb');
         }
         $this->_File = $fp;
-        
+
         fwrite($fp, 'Vanilla Export: '.$this->Version());
         if ($Source) {
             fwrite($fp, self::DELIM.' Source: '.$Source);
@@ -82,7 +82,7 @@ class ExportModel {
         fwrite($fp, self::NEWLINE.self::NEWLINE);
         $this->Comment('Exported Started: '.date('Y-m-d H:i:s'));
     }
-    
+
     /**
      * Write a comment to the export file.
      *
@@ -95,7 +95,7 @@ class ExportModel {
             echo $Message, "\n";
         }
     }
-    
+
     /**
      * End the export and close the export file.
      *
@@ -106,16 +106,16 @@ class ExportModel {
         $this->TotalTime = $this->EndTime - $this->BeginTime;
         $m = floor($this->TotalTime / 60);
         $s = $this->TotalTime - $m * 60;
-        
+
         $this->Comment('Exported Completed: '.date('Y-m-d H:i:s').sprintf(', Elapsed Time: %02d:%02.2f', $m, $s));
-        
+
         if ($this->UseCompression && function_exists('gzopen')) {
             gzclose($this->_File);
         } else {
             fclose($this->_File);
         }
     }
-    
+
     /**
      * Gets or sets the PDO connection to the database.
      *
@@ -140,7 +140,7 @@ class ExportModel {
         }
         return $this->_PDO;
     }
-    
+
     /**
      * Export a table to the export file.
      *
@@ -154,7 +154,7 @@ class ExportModel {
      */
     public function exportTable($TableName, $Query, $Mappings = array()) {
         $fp = $this->_File;
-        
+
         // Make sure the table is valid for export.
         if (!array_key_exists($TableName, $this->_Structures)) {
             $this->Comment("Error: $TableName is not a valid export."
@@ -163,10 +163,10 @@ class ExportModel {
             return;
         }
         $Structure = $this->_Structures[$TableName];
-        
+
         // Start with the table name.
         fwrite($fp, 'Table: '.$TableName.self::NEWLINE);
-        
+
         // Get the data for the query.
         if (is_string($Query)) {
             $Query = str_replace(':_', $this->Prefix, $Query); // replace prefix.
@@ -174,19 +174,19 @@ class ExportModel {
         } elseif ($Query instanceof PDOStatement) {
             $Data = $Query;
         }
-        
+
         // Set the search and replace to escape strings.
         $EscapeSearch = array(self::ESCAPE, self::DELIM, self::NEWLINE, self::QUOTE); // escape must go first
         $EscapeReplace = array(self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE);
-        
+
         // Write the column header.
         fwrite($fp, implode(self::DELIM, array_keys($Structure)).self::NEWLINE);
-        
+
         // Loop through the data and write it to the file.
         foreach ($Data as $Row) {
             $Row = (array)$Row;
             $First = true;
-            
+
             // Loop through the columns in the export structure and grab their values from the row.
             $ExRow = array();
             foreach ($Structure as $Field => $Type) {
@@ -208,7 +208,7 @@ class ExportModel {
                 } elseif (is_string($Value)) {
                     //if(mb_detect_encoding($Value) != 'UTF-8')
                     //   $Value = utf8_encode($Value);
-                    
+
                     $Value = self::QUOTE
                         .str_replace($EscapeSearch, $EscapeReplace, $Value)
                         .self::QUOTE;
@@ -218,7 +218,7 @@ class ExportModel {
                     // Unknown format.
                     $Value = self::NULL;
                 }
-                
+
                 $ExRow[] = $Value;
             }
             // Write the data.
@@ -226,17 +226,17 @@ class ExportModel {
             // End the record.
             fwrite($fp, self::NEWLINE);
         }
-        
+
         // Write an empty line to signify the end of the table.
         fwrite($fp, self::NEWLINE);
-        
+
         if ($Data instanceof PDOStatement) {
             $Data->closeCursor();
         }
     }
 
-    
-    
+
+
     /**
      * Returns an array of all the expected export tables and expected columns in the exports.
      * When exporting tables using ExportTable() all of the columns in this structure will always be exported in the order here, regardless of how their order in the query.
@@ -246,12 +246,7 @@ class ExportModel {
     public function structures() {
         return $this->_Structures;
     }
-    
-    /**
-     * @var bool Whether or not to use compression when creating the file.
-     */
-    public $UseCompression = true;
-    
+
     /**
      * Returns the version of export file that will be created with this export.
      * The version is used when importing to determine the format of this file.

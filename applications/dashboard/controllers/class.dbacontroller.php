@@ -19,9 +19,9 @@ class DbaController extends DashboardController {
     /** @var DBAModel */
     public $Model = null;
 
-   /**
+    /**
      * Runs before every call to this controller.
-    */
+     */
     public function initialize() {
         parent::initialize();
         Gdn_Theme::section('Dashboard');
@@ -67,12 +67,12 @@ class DbaController extends DashboardController {
         $this->render('Job');
     }
 
-   /**
-    * Set Member-like permissions on all roles with missing permissions.
-    *
-    * Useful for after an import that didn't include permissions
-    * but did include a whole lotta roles you don't want to edit manually.
-    */
+    /**
+     * Set Member-like permissions on all roles with missing permissions.
+     *
+     * Useful for after an import that didn't include permissions
+     * but did include a whole lotta roles you don't want to edit manually.
+     */
     public function fixPermissions() {
         $this->permission('Garden.Settings.Manage');
 
@@ -87,9 +87,9 @@ class DbaController extends DashboardController {
         $this->render('Job');
     }
 
-   /**
-    * Fix the category tree after an import that only gives a sort & parent.
-    */
+    /**
+     * Fix the category tree after an import that only gives a sort & parent.
+     */
     public function rebuildCategoryTree() {
         $this->permission('Garden.Settings.Manage');
 

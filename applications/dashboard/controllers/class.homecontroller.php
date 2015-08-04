@@ -13,12 +13,12 @@
  */
 class HomeController extends Gdn_Controller {
 
-   /**
-    * JS & CSS includes for all methods in this controller.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * JS & CSS includes for all methods in this controller.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
@@ -32,12 +32,12 @@ class HomeController extends Gdn_Controller {
         parent::initialize();
     }
 
-   /**
-    * Display dashboard welcome message.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Display dashboard welcome message.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function index() {
         $this->View = 'FileNotFound';
         $this->fileNotFound();
@@ -53,9 +53,6 @@ class HomeController extends Gdn_Controller {
         $this->MasterView = 'default';
 
         $this->CssClass = 'SplashMessage NoPanel';
-        if ($this->Data('CssClass')) {
-            $this->CssClass .= ' '.$this->Data('CssClass');
-        }
 
         $this->setData('_NoMessages', true);
 
@@ -66,13 +63,13 @@ class HomeController extends Gdn_Controller {
         $this->render();
     }
 
-   /**
-    * A standard 404 File Not Found error message is delivered when this action
-    * is encountered.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * A standard 404 File Not Found error message is delivered when this action
+     * is encountered.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function fileNotFound() {
         $this->removeCssFile('admin.css');
         $this->addCssFile('style.css');
@@ -97,59 +94,59 @@ class HomeController extends Gdn_Controller {
         }
     }
 
-   /**
-    * Display 'site down for maintenance' page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Display 'site down for maintenance' page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function updateMode() {
         safeHeader("HTTP/1.0 503", true, 503);
         $this->setData('UpdateMode', true);
         $this->render();
     }
 
-   /**
-    * Display 'content deleted' page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Display 'content deleted' page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function deleted() {
         safeHeader("HTTP/1.0 410", true, 410);
         Gdn_Theme::section('Error');
         $this->render();
     }
 
-   /**
-    * Display TOS page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Display TOS page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function termsOfService() {
         $this->render();
     }
 
-   /**
-    * Display privacy info page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Display privacy info page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function privacyPolicy() {
         $this->render();
     }
 
-   /**
-    * Display 'no permission' page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Display 'no permission' page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function unauthorized() {
         Gdn_Theme::section('Error');
-      
+
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             safeHeader("HTTP/1.0 401", true, 401);
             $this->render();

@@ -43,7 +43,7 @@ class AssetModel extends Gdn_Model {
      * @throws Exception
      */
     public function serveCss($ThemeType, $Filename) {
-       // Split the filename into filename and etag.
+        // Split the filename into filename and etag.
         if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
             $Basename = $Matches[1];
             $ETag = $Matches[2];
@@ -93,7 +93,7 @@ class AssetModel extends Gdn_Model {
             die();
         }
 
-       // Include minify...
+        // Include minify...
         set_include_path(PATH_LIBRARY."/vendors/Minify/lib".PATH_SEPARATOR.get_include_path());
         require_once PATH_LIBRARY."/vendors/Minify/lib/Minify/CSS.php";
 
@@ -103,14 +103,14 @@ class AssetModel extends Gdn_Model {
         $NotFound = array();
         $Paths = $this->GetCssFiles($ThemeType, $Basename, $ETag, $NotFound);
 
-       // First, do a pass through the files to generate some information.
+        // First, do a pass through the files to generate some information.
         foreach ($Paths as $Info) {
             list($Path, $UrlPath) = $Info;
 
             echo " * $UrlPath\n";
         }
 
-       // Echo the paths that weren't found to help debugging.
+        // Echo the paths that weren't found to help debugging.
         foreach ($NotFound as $Info) {
             list($Filename, $Folder) = $Info;
 
@@ -119,7 +119,7 @@ class AssetModel extends Gdn_Model {
 
         echo " */\n\n";
 
-       // Now that we have all of the paths we want to serve them.
+        // Now that we have all of the paths we want to serve them.
         foreach ($Paths as $Info) {
             list($Path, $UrlPath, $Options) = $Info;
 
@@ -131,17 +131,17 @@ class AssetModel extends Gdn_Model {
             }
 
             $Css = Minify_CSS::minify($Css, array(
-               'preserveComments' => true,
-               'prependRelativePath' => $this->UrlPrefix.Asset(dirname($UrlPath).'/'),
-               'currentDir' => dirname($Path),
-               'minify' => true
+                'preserveComments' => true,
+                'prependRelativePath' => $this->UrlPrefix.Asset(dirname($UrlPath).'/'),
+                'currentDir' => dirname($Path),
+                'minify' => true
             ));
             echo $Css;
 
             echo "\n\n";
         }
 
-       // Create a cached copy of the file.
+        // Create a cached copy of the file.
         $Css = ob_get_flush();
         if (!file_exists(dirname($CachePath))) {
             mkdir(dirname($CachePath), 0775, true);
@@ -162,7 +162,7 @@ class AssetModel extends Gdn_Model {
     public function getCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
         $NotFound = array();
 
-       // Gather all of the css paths.
+        // Gather all of the css paths.
         switch ($Basename) {
             case 'Style':
                 $this->_CssFiles = array(
@@ -178,12 +178,12 @@ class AssetModel extends Gdn_Model {
                 $this->_CssFiles = array();
         }
 
-       // Throw an event so that plugins can add their css too.
+        // Throw an event so that plugins can add their css too.
         $this->EventArguments['ETag'] = $ETag;
         $this->EventArguments['ThemeType'] = $ThemeType;
         $this->fireEvent($Basename.'Css');
 
-       // Include theme customizations last so that they override everything else.
+        // Include theme customizations last so that they override everything else.
         switch ($Basename) {
             case 'Style':
                 $this->addCssFile('custom.css', false, array('Sort' => 10));
@@ -203,7 +203,7 @@ class AssetModel extends Gdn_Model {
 
         $this->fireEvent('AfterGetCssFiles');
 
-       // Hunt the css files down.
+        // Hunt the css files down.
         $Paths = array();
         foreach ($this->_CssFiles as $Info) {
             $Filename = $Info[0];
@@ -212,7 +212,7 @@ class AssetModel extends Gdn_Model {
             $Css = val('Css', $Options);
 
             if ($Css) {
-               // Add some literal Css.
+                // Add some literal Css.
                 $Paths[] = array(false, $Folder, $Options);
 
             } else {
@@ -225,7 +225,7 @@ class AssetModel extends Gdn_Model {
             }
         }
 
-       // Sort the paths.
+        // Sort the paths.
         usort($Paths, array('AssetModel', '_ComparePath'));
 
         return $Paths;
@@ -264,14 +264,14 @@ class AssetModel extends Gdn_Model {
             $ThemeType = isMobile() ? 'mobile' : 'desktop';
         }
 
-       // 1. Check for a url.
+        // 1. Check for a url.
         if (isUrl($Filename)) {
             return array($Filename, $Filename);
         }
 
         $Paths = array();
 
-       // 2. Check for a full path.
+        // 2. Check for a full path.
         if (strpos($Filename, '/') === 0) {
             $Filename = ltrim($Filename, '/');
 
@@ -282,10 +282,10 @@ class AssetModel extends Gdn_Model {
                 Deprecated("AssetModel::CssPath() with direct paths");
                 return array($Path, $Filename);
             }
-                return false;
-            }
+            return false;
+        }
 
-       // 3. Check the theme.
+        // 3. Check the theme.
         $Theme = Gdn::ThemeManager()->ThemeFromType($ThemeType);
         if ($Theme) {
             $Path = "/$Theme/design/$Filename";
@@ -348,7 +348,7 @@ class AssetModel extends Gdn_Model {
     public static function jsPath($filename, $folder = '', $themeType = '') {
         if (!$themeType) {
             $themeType = isMobile() ? 'mobile' : 'desktop';
-            }
+        }
 
         // 1. Check for a url.
         if (isUrl($filename)) {
@@ -368,7 +368,7 @@ class AssetModel extends Gdn_Model {
                 deprecated("AssetModel::JsPath() with direct paths");
                 return array($path, $filename);
             }
-        return false;
+            return false;
         }
 
         // 3. Check the theme.
@@ -376,7 +376,7 @@ class AssetModel extends Gdn_Model {
         if ($theme) {
             $path = "/{$theme}/js/{$filename}";
             $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
-    }
+        }
 
         // 4. Static, Plugin, or App relative file
         if ($folder) {
@@ -440,15 +440,15 @@ class AssetModel extends Gdn_Model {
         foreach ($Plugins as $Info) {
             $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = true;
         }
- //      echo(Gdn_Upload::FormatFileSize(strlen(serialize($Plugins))));
- //      decho($Plugins);
+//      echo(Gdn_Upload::FormatFileSize(strlen(serialize($Plugins))));
+//      decho($Plugins);
 
         $Applications = Gdn::ApplicationManager()->EnabledApplications();
         foreach ($Applications as $Info) {
             $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = true;
         }
 
-       // Add the desktop theme version.
+        // Add the desktop theme version.
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->DesktopTheme());
         if (!empty($Info)) {
             $Version = val('Version', $Info, 'v0');
@@ -460,7 +460,7 @@ class AssetModel extends Gdn_Model {
             }
         }
 
-       // Add the mobile theme version.
+        // Add the mobile theme version.
         $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->MobileTheme());
         if (!empty($Info)) {
             $Version = val('Version', $Info, 'v0');
@@ -476,8 +476,8 @@ class AssetModel extends Gdn_Model {
 
         ksort($Data);
         $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;
- //      decho($Data);
- //      die();
+//      decho($Data);
+//      die();
         return $Result;
     }
 }

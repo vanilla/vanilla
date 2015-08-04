@@ -6,19 +6,19 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
-*/
+ */
 
 /**
  * Renders the "You should register or sign in" panel box.
  */
 class GuestModule extends Gdn_Module {
-   
+
     /** @var string  */
     public $MessageCode = 'GuestModule.Message';
 
     /** @var string  */
     public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
-   
+
     /**
      *
      *
@@ -30,10 +30,10 @@ class GuestModule extends Gdn_Module {
             $ApplicationFolder = 'Dashboard';
         }
         parent::__construct($Sender, $ApplicationFolder);
-      
+
         $this->Visible = c('Garden.Modules.ShowGuestModule');
     }
-   
+
     /**
      *
      *
@@ -42,7 +42,7 @@ class GuestModule extends Gdn_Module {
     public function assetTarget() {
         return 'Panel';
     }
-   
+
     /**
      * Render.
      *

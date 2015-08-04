@@ -13,11 +13,11 @@
  */
 class SessionController extends DashboardController {
 
-   /**
-    * Stash a value in the user's session, or unstash it if no value was provided to stash.
-    *
-    * Looks for Name and Value POST/GET variables to pass along to Gdn_Session.
-    */
+    /**
+     * Stash a value in the user's session, or unstash it if no value was provided to stash.
+     *
+     * Looks for Name and Value POST/GET variables to pass along to Gdn_Session.
+     */
     public function stash() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);

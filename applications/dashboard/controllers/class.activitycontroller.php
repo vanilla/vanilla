@@ -8,9 +8,9 @@
  * @since 2.0
  */
 
-   /**
+/**
  * Handles /activity endpoint.
-    */
+ */
 class ActivityController extends Gdn_Controller {
 
     /**  @var array Models to include. */
@@ -19,12 +19,12 @@ class ActivityController extends Gdn_Controller {
     /** @var ActivityModel */
     public $ActivityModel;
 
-   /**
+    /**
      * Create some virtual properties.
      *
      * @param $Name
      * @return Gdn_DataSet
-    */
+     */
     public function __get($Name) {
         switch ($Name) {
             case 'CommentData':
@@ -39,14 +39,14 @@ class ActivityController extends Gdn_Controller {
         }
     }
 
-   /**
-    * Include JS, CSS, and modules used by all methods.
-    *
-    * Always called by dispatcher before controller's requested method.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Include JS, CSS, and modules used by all methods.
+     *
+     * Always called by dispatcher before controller's requested method.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
@@ -59,7 +59,7 @@ class ActivityController extends Gdn_Controller {
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
 
-       // Add Modules
+        // Add Modules
         $this->addModule('GuestModule');
         $this->addModule('SignedInModule');
 
@@ -68,16 +68,16 @@ class ActivityController extends Gdn_Controller {
         $this->setData('Breadcrumbs', array(array('Name' => t('Activity'), 'Url' => '/activity')));
     }
 
-   /**
-    * Display a single activity item & comments.
-    *
-    * Email notifications regarding activities link to this method.
-    *
-    * @since 2.0.0
-    * @access public
-    *
-    * @param int $ActivityID Unique ID of activity item to display.
-    */
+    /**
+     * Display a single activity item & comments.
+     *
+     * Email notifications regarding activities link to this method.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param int $ActivityID Unique ID of activity item to display.
+     */
     public function item($ActivityID = 0) {
         $this->addJsFile('activity.js');
         $this->title(t('Activity Item'));
@@ -93,14 +93,14 @@ class ActivityController extends Gdn_Controller {
         $this->render();
     }
 
-   /**
-    * Default activity stream.
-    *
-    * @since 2.0.0
-    * @access public
-    *
-    * @param int $Offset Number of activity items to skip.
-    */
+    /**
+     * Default activity stream.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param int $Offset Number of activity items to skip.
+     */
     public function index($Filter = false, $Page = false) {
         switch (strtolower($Filter)) {
             case 'mods':
@@ -124,21 +124,21 @@ class ActivityController extends Gdn_Controller {
                 throw notFoundException();
         }
 
-       // Which page to load
+        // Which page to load
         list($Offset, $Limit) = offsetLimit($Page, 30);
         $Offset = is_numeric($Offset) ? $Offset : 0;
         if ($Offset < 0) {
             $Offset = 0;
         }
 
-       // Page meta.
+        // Page meta.
         $this->addJsFile('activity.js');
 
         if ($this->Head) {
             $this->Head->addRss(url('/activity/feed.rss', true), $this->Head->title());
         }
 
-       // Comment submission
+        // Comment submission
         $Session = Gdn::session();
         $Comment = $this->Form->getFormValue('Comment');
         $Activities = $this->ActivityModel->getWhere(array('NotifyUserID' => $NotifyUserID), $Offset, $Limit)->resultArray();
@@ -184,15 +184,15 @@ class ActivityController extends Gdn_Controller {
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
-   /**
-    * Delete an activity item.
-    *
-    * @since 2.0.0
-    * @access public
-    *
-    * @param int $ActivityID Unique ID of item to delete.
-    * @param string $TransientKey Verify intent.
-    */
+    /**
+     * Delete an activity item.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param int $ActivityID Unique ID of item to delete.
+     * @param string $TransientKey Verify intent.
+     */
     public function delete($ActivityID = '', $TransientKey = '') {
         $session = Gdn::session();
         if (!$session->validateTransientKey($TransientKey)) {
@@ -213,18 +213,18 @@ class ActivityController extends Gdn_Controller {
             redirect(GetIncomingValue('Target', $this->SelfUrl));
         }
 
-       // Still here? Getting a 404.
+        // Still here? Getting a 404.
         $this->ControllerName = 'Home';
         $this->View = 'FileNotFound';
         $this->render();
     }
 
-   /**
-    * Comment on an activity item.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Comment on an activity item.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function comment() {
         $this->permission('Garden.Profiles.Edit');
 
@@ -232,15 +232,15 @@ class ActivityController extends Gdn_Controller {
         $this->Form->setModel($this->ActivityModel);
         $NewActivityID = 0;
 
-       // Form submitted
+        // Form submitted
         if ($this->Form->authenticatedPostBack()) {
             $Body = $this->Form->getValue('Body', '');
             $ActivityID = $this->Form->getValue('ActivityID', '');
             if (is_numeric($ActivityID) && $ActivityID > 0) {
                 $ActivityComment = array(
-                'ActivityID' => $ActivityID,
-                'Body' => $Body,
-                'Format' => 'Text');
+                    'ActivityID' => $ActivityID,
+                    'Body' => $Body,
+                    'Format' => 'Text');
 
                 $ID = $this->ActivityModel->comment($ActivityComment);
 
@@ -259,7 +259,7 @@ class ActivityController extends Gdn_Controller {
             }
         }
 
-       // Redirect back to the sending location if this isn't an ajax request
+        // Redirect back to the sending location if this isn't an ajax request
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = $this->Form->getValue('Return');
             if (!$Target) {
@@ -267,14 +267,14 @@ class ActivityController extends Gdn_Controller {
             }
             redirect($Target);
         } else {
-           // Load the newly added comment.
+            // Load the newly added comment.
             $this->setData('Comment', $this->ActivityModel->getComment($ID));
 
-           // Set it in the appropriate view.
+            // Set it in the appropriate view.
             $this->View = 'comment';
         }
 
-       // And render
+        // And render
         $this->render();
     }
 
@@ -319,25 +319,25 @@ class ActivityController extends Gdn_Controller {
             }
 
             if ($UserID != Gdn::session()->UserID) {
-               // This is a wall post.
+                // This is a wall post.
                 $Activity = array(
-                'ActivityType' => 'WallPost',
-                'ActivityUserID' => $UserID,
+                    'ActivityType' => 'WallPost',
+                    'ActivityUserID' => $UserID,
                     'RegardingUserID' => Gdn::session()->UserID,
                     'HeadlineFormat' => t('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
-                'Story' => $Data['Comment'],
-                'Format' => $Data['Format'],
-                'Data' => array('Bump' => true)
+                    'Story' => $Data['Comment'],
+                    'Format' => $Data['Format'],
+                    'Data' => array('Bump' => true)
                 );
             } else {
-               // This is a status update.
+                // This is a status update.
                 $Activity = array(
-                'ActivityType' => 'Status',
+                    'ActivityType' => 'Status',
                     'HeadlineFormat' => t('HeadlineFormat.Status', '{ActivityUserID,user}'),
-                'Story' => $Data['Comment'],
-                'Format' => $Data['Format'],
-                'NotifyUserID' => $NotifyUserID,
-                'Data' => array('Bump' => true)
+                    'Story' => $Data['Comment'],
+                    'Format' => $Data['Format'],
+                    'NotifyUserID' => $NotifyUserID,
+                    'Data' => array('Bump' => true)
                 );
                 $this->setJson('StatusMessage', Gdn_Format::plainText($Activity['Story'], $Activity['Format']));
             }

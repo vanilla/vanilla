@@ -23,12 +23,12 @@ class ImportController extends DashboardController {
         Gdn_Theme::section('Dashboard');
     }
 
-   /**
-    * Export core Vanilla and Conversations tables.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Export core Vanilla and Conversations tables.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function export() {
         $this->permission('Garden.Export'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
 
@@ -37,7 +37,7 @@ class ImportController extends DashboardController {
         $Ex->pdo(Gdn::database()->connection());
         $Ex->Prefix = Gdn::database()->DatabasePrefix;
 
-       /// 2. Do the export. ///
+        /// 2. Do the export. ///
         $Ex->UseCompression = true;
         $Ex->beginExport(PATH_ROOT.DS.'uploads'.DS.'export '.date('Y-m-d His').'.txt.gz', 'Vanilla 2.0');
 
@@ -56,12 +56,12 @@ class ImportController extends DashboardController {
         $Ex->endExport();
     }
 
-   /**
-    * Manage importing process.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Manage importing process.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function go() {
         $this->permission('Garden.Settings.Manage');
 
@@ -99,7 +99,7 @@ class ImportController extends DashboardController {
 
             /*elseif(is_array($Result)) {
 				saveToConfig(array(
-                   'Garden.Import.CurrentStep' => $CurrentStep,
+					'Garden.Import.CurrentStep' => $CurrentStep,
 					'Garden.Import.CurrentStepData' => arrayValue('Data', $Result)));
 				$this->setData('CurrentStepMessage', arrayValue('Message', $Result));
 			}*/
@@ -122,22 +122,22 @@ class ImportController extends DashboardController {
         $this->render();
     }
 
-   /**
-    * Main import page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Main import page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function index() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
         $Timer = new Gdn_Timer();
 
-       // Determine the current step.
+        // Determine the current step.
         $this->Form = new Gdn_Form();
         $Imp = new ImportModel();
         $Imp->loadState();
 
-       // Search for the list of acceptable imports.
+        // Search for the list of acceptable imports.
         $ImportPaths = array();
         $ExistingPaths = SafeGlob(PATH_UPLOADS.'/export*', array('gz', 'txt'));
         $ExistingPaths2 = SafeGlob(PATH_UPLOADS.'/porter/export*', array('gz'));
@@ -145,11 +145,11 @@ class ImportController extends DashboardController {
         foreach ($ExistingPaths as $Path) {
             $ImportPaths[$Path] = basename($Path);
         }
-       // Add the database as a path.
+        // Add the database as a path.
         $ImportPaths = array_merge(array('db:' => t('This Database')), $ImportPaths);
 
         if ($Imp->CurrentStep < 1) {
-           // Check to see if there is a file.
+            // Check to see if there is a file.
             $ImportPath = c('Garden.Import.ImportPath');
             $Validation = new Gdn_Validation();
 
@@ -165,7 +165,7 @@ class ImportController extends DashboardController {
                     $TmpFile = $Upload->ValidateUpload('ImportFile', false);
                 } else {
                     $TmpFile = '';
-                              }
+                }
 
                 if ($TmpFile) {
                     $Filename = $_FILES['ImportFile']['name'];
@@ -185,15 +185,15 @@ class ImportController extends DashboardController {
                 } elseif (($PathSelect = $this->Form->getFormValue('PathSelect'))) {
                     if ($PathSelect == 'NEW') {
                         $Validation->addValidationResult('ImportFile', 'ValidateRequired');
-                     } else {
+                    } else {
                         $Imp->ImportPath = $PathSelect;
-                     }
+                    }
                 } elseif (!$Imp->ImportPath && count($ImportPaths) == 0) {
-                   // There was no file uploaded this request or before.
+                    // There was no file uploaded this request or before.
                     $Validation->addValidationResult('ImportFile', $Upload->Exception);
                 }
 
-              // Validate the overwrite.
+                // Validate the overwrite.
                 if (true || strcasecmp($this->Form->getFormValue('Overwrite'), 'Overwrite') == 0) {
                     if (!stringBeginsWith($this->Form->getFormValue('PathSelect'), 'Db:', true)) {
                         $Validation->applyRule('Email', 'Required');
@@ -239,16 +239,16 @@ class ImportController extends DashboardController {
         $this->render();
     }
 
-   /**
-    * Restart the import process. Undo any work we've done so far and erase state.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Restart the import process. Undo any work we've done so far and erase state.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function restart() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
 
-       // Delete the individual table files.
+        // Delete the individual table files.
         $Imp = new ImportModel();
         try {
             $Imp->loadState();

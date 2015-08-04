@@ -6,13 +6,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
-*/
+ */
 
 /**
  * Renders the activity filter menu.
  */
 class ActivityFilterModule extends Gdn_Module {
-   
+
     /**
      *
      *

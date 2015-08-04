@@ -12,46 +12,46 @@
  * Authentication manager.
  */
 class AuthenticationController extends DashboardController {
-   /**
-    * Models to include.
-    *
-    * @since 2.0.3
-    * @access public
-    * @var array
-    */
+    /**
+     * Models to include.
+     *
+     * @since 2.0.3
+     * @access public
+     * @var array
+     */
     public $Uses = array('Form', 'Database');
-   
-   /**
-    * @see /library/core/class.controller.php
-    */
+
+    /**
+     * @see /library/core/class.controller.php
+     */
     public $ModuleSortContainer = 'Dashboard';
 
-   /**
-    * Garden's form object.
-    *
-    * @since 2.0.3
-    * @access public
-    * @var Gdn_Form
-    */
+    /**
+     * Garden's form object.
+     *
+     * @since 2.0.3
+     * @access public
+     * @var Gdn_Form
+     */
     public $Form;
-   
-   /**
-    * Highlight route and do authenticator setup.
-    *
-    * Always called by dispatcher before controller's requested method.
-    *
-    * @since 2.0.3
-    * @access public
-    */
+
+    /**
+     * Highlight route and do authenticator setup.
+     *
+     * Always called by dispatcher before controller's requested method.
+     *
+     * @since 2.0.3
+     * @access public
+     */
     public function initialize() {
         parent::initialize();
         Gdn_Theme::section('Dashboard');
         if ($this->Menu) {
             $this->Menu->highlightRoute('/dashboard/authentication');
         }
-         
+
         $this->enableSlicing($this);
-      
+
         $Authenticators = Gdn::authenticator()->GetAvailable();
         $this->ChooserList = array();
         $this->ConfigureList = array();
@@ -64,70 +64,70 @@ class AuthenticationController extends DashboardController {
         $this->CurrentAuthenticationAlias = Gdn::authenticator()->authenticateWith('default')->getAuthenticationSchemeAlias();
     }
 
-   /**
-    * Default method ('Choose' alias).
-    *
-    * @since 2.0.3
-    * @access public
-    *
-    * @param string $AuthenticationSchemeAlias
-    */
+    /**
+     * Default method ('Choose' alias).
+     *
+     * @since 2.0.3
+     * @access public
+     *
+     * @param string $AuthenticationSchemeAlias
+     */
     public function index($AuthenticationSchemeAlias = null) {
         $this->View = 'choose';
         $this->choose($AuthenticationSchemeAlias);
     }
-   
-   /**
-    * Select Authentication method.
-    *
-    * @since 2.0.3
-    * @access public
-    *
-    * @param string $AuthenticationSchemeAlias
-    */
+
+    /**
+     * Select Authentication method.
+     *
+     * @since 2.0.3
+     * @access public
+     *
+     * @param string $AuthenticationSchemeAlias
+     */
     public function choose($AuthenticationSchemeAlias = null) {
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/authentication');
         $this->title(t('Authentication'));
         $this->addCssFile('authentication.css');
-      
+
         $PreFocusAuthenticationScheme = null;
         if (!is_null($AuthenticationSchemeAlias)) {
             $PreFocusAuthenticationScheme = $AuthenticationSchemeAlias;
         }
-      
+
         if ($this->Form->authenticatedPostback()) {
             $NewAuthSchemeAlias = $this->Form->getValue('Garden.Authentication.Chooser');
             $AuthenticatorInfo = Gdn::authenticator()->getAuthenticatorInfo($NewAuthSchemeAlias);
             if ($AuthenticatorInfo !== false) {
                 $CurrentAuthenticatorAlias = Gdn::authenticator()->AuthenticateWith('default')->getAuthenticationSchemeAlias();
-            
-               // Disable current
+
+                // Disable current
                 $AuthenticatorDisableEvent = "DisableAuthenticator".ucfirst($CurrentAuthenticatorAlias);
                 $this->fireEvent($AuthenticatorDisableEvent);
-            
-               // Enable new
+
+                // Enable new
                 $AuthenticatorEnableEvent = "EnableAuthenticator".ucfirst($NewAuthSchemeAlias);
                 $this->fireEvent($AuthenticatorEnableEvent);
-            
+
                 $PreFocusAuthenticationScheme = $NewAuthSchemeAlias;
                 $this->CurrentAuthenticationAlias = Gdn::authenticator()->authenticateWith('default')->getAuthenticationSchemeAlias();
             }
         }
-      
+
         $this->setData('AuthenticationConfigureList', $this->ConfigureList);
         $this->setData('PreFocusAuthenticationScheme', $PreFocusAuthenticationScheme);
         $this->render();
     }
-   
-   /**
-    * Configure authentication method.
-    *
-    * @since 2.0.3
-    * @access public
-    *
-    * @param string $AuthenticationSchemeAlias
-    */
+
+    /**
+     * Configure authentication method.
+     *
+     * @since 2.0.3
+     * @access public
+     *
+     * @param string $AuthenticationSchemeAlias
+     */
     public function configure($AuthenticationSchemeAlias = null) {
         $Message = t("Please choose an authenticator to configure.");
         if (!is_null($AuthenticationSchemeAlias)) {
@@ -142,7 +142,7 @@ class AuthenticationController extends DashboardController {
                 }
             }
         }
-      
+
         $this->setData('ConfigureMessage', $Message);
         $this->render();
     }

@@ -12,10 +12,10 @@
  * Module for a list of links.
  */
 class SiteNavModule extends NavModule {
-   
+
     /** @var array  */
     protected $customSections = array('EditProfile', 'Profile');
-   
+
     /**
      *
      *
@@ -23,8 +23,8 @@ class SiteNavModule extends NavModule {
      */
     public function render() {
         $section_found = false;
-      
-       // The module contains different links depending on its section.
+
+        // The module contains different links depending on its section.
         foreach ($this->customSections as $section) {
             if (InSection($section)) {
                 $this->fireEvent($section);
@@ -32,15 +32,15 @@ class SiteNavModule extends NavModule {
                 break;
             }
         }
-      
-       // If a section wasn't found then add the default nav.
+
+        // If a section wasn't found then add the default nav.
         if (!$section_found) {
             $this->fireEvent('default');
         }
-      
-       // Fire an event for everything.
+
+        // Fire an event for everything.
         $this->fireEvent('all');
-      
+
         parent::render();
     }
 }

@@ -12,25 +12,25 @@
  * Root class for the Dashboard's controllers.
  */
 class DashboardController extends Gdn_Controller {
-   /**
-    * Set PageName.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Set PageName.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function __construct() {
         parent::__construct();
         $this->PageName = 'dashboard';
     }
 
-   /**
-    * Include JS, CSS, and modules used by all methods.
-    *
-    * Always called by dispatcher before controller's requested method.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Include JS, CSS, and modules used by all methods.
+     *
+     * Always called by dispatcher before controller's requested method.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
@@ -57,33 +57,33 @@ class DashboardController extends Gdn_Controller {
         parent::initialize();
     }
 
-   /**
-    * Build and add the Dashboard's side navigation menu.
-    *
-    * @since 2.0.0
-    * @access public
-    *
-    * @param string $CurrentUrl Used to highlight correct route in menu.
-    */
+    /**
+     * Build and add the Dashboard's side navigation menu.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param string $CurrentUrl Used to highlight correct route in menu.
+     */
     public function addSideMenu($CurrentUrl = false) {
         if (!$CurrentUrl) {
             $CurrentUrl = strtolower($this->SelfUrl);
         }
 
-       // Only add to the assets if this is not a view-only request
+        // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-           // Configure SideMenu module
+            // Configure SideMenu module
             $SideMenu = new SideMenuModule($this);
             $SideMenu->EventName = 'GetAppSettingsMenuItems';
             $SideMenu->HtmlId = '';
             $SideMenu->highlightRoute($CurrentUrl);
             $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
 
-           // Hook for adding to menu
-  //         $this->EventArguments['SideMenu'] = &$SideMenu;
+            // Hook for adding to menu
+//         $this->EventArguments['SideMenu'] = &$SideMenu;
 //         $this->fireEvent('GetAppSettingsMenuItems');
 
-           // Add the module
+            // Add the module
             $this->addModule($SideMenu, 'Panel');
         }
     }

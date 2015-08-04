@@ -6,20 +6,20 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
-*/
+ */
 
 /**
  * Handles regarding data.
  */
 class RegardingModel extends Gdn_Model {
-   
-   /**
-    * Class constructor. Defines the related database table name.
-    */
+
+    /**
+     * Class constructor. Defines the related database table name.
+     */
     public function __construct() {
         parent::__construct('Regarding');
     }
-   
+
     /**
      *
      *
@@ -30,7 +30,7 @@ class RegardingModel extends Gdn_Model {
         $Regarding = $this->getWhere(array('RegardingID' => $RegardingID))->firstRow();
         return $Regarding;
     }
-   
+
     /**
      *
      *
@@ -44,7 +44,7 @@ class RegardingModel extends Gdn_Model {
             'ForeignID' => $ForeignID
         ))->firstRow(DATASET_TYPE_ARRAY);
     }
-   
+
     /**
      *
      *
@@ -60,7 +60,7 @@ class RegardingModel extends Gdn_Model {
             'ForeignID' => $ForeignID
         ))->firstRow(DATASET_TYPE_ARRAY);
     }
-   
+
     /**
      *
      *
@@ -72,7 +72,7 @@ class RegardingModel extends Gdn_Model {
         if (count($ForeignIDs) == 0) {
             return new Gdn_DataSet(array());
         }
-      
+
         return Gdn::sql()->select('*')
             ->from('Regarding')
             ->where('ForeignType', $ForeignType)

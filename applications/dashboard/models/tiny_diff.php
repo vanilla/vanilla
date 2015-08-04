@@ -44,7 +44,7 @@ class Tiny_diff {
     public function compare($old, $new, $mode = 'normal') {
         // Mixed
         if ($mode === 'mixed') {
-        // Insert characters
+            // Insert characters
             $ins_begin = '<ins>+ ';
             $ins_end = '</ins>'.PHP_EOL;
 
@@ -53,7 +53,7 @@ class Tiny_diff {
             $del_end = '</del>'.PHP_EOL;
         } // HTML mode
         elseif ($mode === 'html') {
-        // Insert characters
+            // Insert characters
             $ins_begin = '<ins>';
             $ins_end = '</ins>'.PHP_EOL;
 
@@ -74,7 +74,7 @@ class Tiny_diff {
         // Turn the strings into an array so it's a bit easier to parse them
         $diff = $this->diff(explode(PHP_EOL, $old), explode(PHP_EOL, $new));
         $result = '';
-      
+
         if ($mode == 'raw') {
             return $diff;
         }
@@ -107,7 +107,7 @@ class Tiny_diff {
         $maxlen = 0;
         // Go through each old line.
         foreach ($old as $old_line => $old_value) {
-        // Get the new lines that match the old line
+            // Get the new lines that match the old line
             $new_lines = array_keys($new, $old_value);
 
             // Go through each new line number

@@ -13,9 +13,9 @@
  */
 class StatisticsController extends DashboardController {
 
-   /** @var array Models to automatically instantiate. */
+    /** @var array Models to automatically instantiate. */
     public $Uses = array('Form');
-   
+
     /**
      * Output available info.
      */
@@ -23,13 +23,13 @@ class StatisticsController extends DashboardController {
         $this->setData('FirstDate', Gdn::statistics()->firstDate());
         $this->render();
     }
-   
-   /**
-    * Highlight menu path. Automatically run on every use.
-    *
-    * @since 2.0.17
-    * @access public
-    */
+
+    /**
+     * Highlight menu path. Automatically run on every use.
+     *
+     * @since 2.0.17
+     * @access public
+     */
     public function initialize() {
         parent::initialize();
         Gdn_Theme::section('Dashboard');
@@ -37,41 +37,41 @@ class StatisticsController extends DashboardController {
             $this->Menu->highlightRoute('/dashboard/settings');
         }
     }
-   
-   /**
-    * Statistics setup & configuration.
-    *
-    * @since 2.0.17
-    * @access public
-    */
+
+    /**
+     * Statistics setup & configuration.
+     *
+     * @since 2.0.17
+     * @access public
+     */
     public function index() {
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/statistics');
         //$this->addJsFile('statistics.js');
         $this->title(t('Vanilla Statistics'));
         $this->enableSlicing($this);
-      
+
         if ($this->Form->isPostBack()) {
             $Flow = true;
-         
+
             if ($Flow && $this->Form->getFormValue('Reregister')) {
                 Gdn::Statistics()->register();
             }
-         
+
             if ($Flow && $this->Form->getFormValue('Save')) {
                 Gdn::installationID($this->Form->getFormValue('InstallationID'));
                 Gdn::installationSecret($this->Form->getFormValue('InstallationSecret'));
                 $this->informMessage(t("Your settings have been saved."));
             }
-         
+
             if ($Flow && $this->Form->getFormValue('AllowLocal')) {
                 saveToConfig('Garden.Analytics.AllowLocal', true);
             }
-         
+
             if ($Flow && $this->Form->getFormValue('Allow')) {
                 saveToConfig('Garden.Analytics.Enabled', true);
             }
-         
+
             if ($Flow && $this->Form->getFormValue('ClearCredentials')) {
                 Gdn::installationID(false);
                 Gdn::installationSecret(false);
@@ -82,7 +82,7 @@ class StatisticsController extends DashboardController {
             $this->Form->setValue('InstallationID', Gdn::installationID());
             $this->Form->setValue('InstallationSecret', Gdn::installationSecret());
         }
-      
+
         $AnalyticsEnabled = Gdn_Statistics::checkIsEnabled();
         if ($AnalyticsEnabled) {
             $ConfFile = Gdn::config()->defaultPath();
@@ -91,9 +91,9 @@ class StatisticsController extends DashboardController {
                 $AnalyticsEnabled = false;
             }
         }
-      
+
         $this->setData('AnalyticsEnabled', $AnalyticsEnabled);
-      
+
         $NotifyMessage = Gdn::get('Garden.Analytics.Notify', false);
         $this->setData('NotifyMessage', $NotifyMessage);
         if ($NotifyMessage !== false) {
@@ -102,13 +102,13 @@ class StatisticsController extends DashboardController {
 
         $this->render();
     }
-   
-   /**
-    * Verify connection credentials.
-    *
-    * @since 2.0.17
-    * @access public
-    */
+
+    /**
+     * Verify connection credentials.
+     *
+     * @since 2.0.17
+     * @access public
+     */
     public function verify() {
         $CredentialsValid = Gdn::statistics()->validateCredentials();
         $this->setData('StatisticsVerified', $CredentialsValid);

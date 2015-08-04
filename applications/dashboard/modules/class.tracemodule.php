@@ -14,16 +14,16 @@
  * @see trace()
  */
 class TraceModule extends Gdn_Module {
-   
+
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'dashboard';
     }
-   
+
     public function assetTarget() {
         return 'Content';
     }
-   
+
     public function toString() {
         try {
             $Traces = trace();
@@ -32,7 +32,7 @@ class TraceModule extends Gdn_Module {
             }
 
             $this->setData('Traces', $Traces);
-      
+
             return $this->fetchView();
         } catch (Exception $Ex) {
             return $Ex->getMessage();

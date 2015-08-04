@@ -29,11 +29,11 @@ class ConfigurationModule extends Gdn_Module {
     /** @var ConfigurationModule */
     public $ConfigurationModule = null;
 
-   /**
+    /**
      *
      *
-    * @param Gdn_Controller $Controller The controller using this model.
-    */
+     * @param Gdn_Controller $Controller The controller using this model.
+     */
     public function __construct($Sender = null) {
         parent::__construct($Sender);
 
@@ -44,28 +44,28 @@ class ConfigurationModule extends Gdn_Module {
         $this->ConfigurationModule = $this;
     }
 
-   /**
+    /**
      *
      *
-    * @return Gdn_Controller
-    */
+     * @return Gdn_Controller
+     */
     public function controller() {
         return $this->_Sender;
     }
 
-   /**
+    /**
      *
-    *
-    * @param Gdn_Form $NewValue
-    * @return Gdn_Form
-    */
+     *
+     * @param Gdn_Form $NewValue
+     * @return Gdn_Form
+     */
     public function form($NewValue = null) {
         static $Form = null;
 
         if ($NewValue !== null) {
             $Form = $NewValue;
         } elseif ($Form === null)
-         $Form = new Gdn_Form();
+            $Form = new Gdn_Form();
 
         return $Form;
     }
@@ -104,7 +104,7 @@ class ConfigurationModule extends Gdn_Module {
         $Form = $this->Form();
 
         if ($Form->authenticatedPostBack()) {
-           // Grab the data from the form.
+            // Grab the data from the form.
             $Data = array();
             $Post = $Form->formValues();
 
@@ -112,7 +112,7 @@ class ConfigurationModule extends Gdn_Module {
                 $Name = $Row['Name'];
                 $Config = $Row['Config'];
 
-               // For API calls make this a sparse save.
+                // For API calls make this a sparse save.
                 if ($this->Controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
                     continue;
                 }
@@ -131,11 +131,11 @@ class ConfigurationModule extends Gdn_Module {
                 $this->Controller()->setData($Name, $Value);
             }
 
-           // Save it to the config.
+            // Save it to the config.
             saveToConfig($Data, array('RemoveEmpty' => true));
             $this->_Sender->informMessage(t('Saved'));
         } else {
-           // Load the form data from the config.
+            // Load the form data from the config.
             $Data = array();
             foreach ($this->_Schema as $Row) {
                 $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
@@ -162,7 +162,7 @@ class ConfigurationModule extends Gdn_Module {
             $LabelCode = $SchemaRow['Name'];
         }
 
-       // Split camel case labels into seperate words.
+        // Split camel case labels into seperate words.
         $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
         $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
         $LabelCode = trim($LabelCode);
@@ -186,11 +186,11 @@ class ConfigurationModule extends Gdn_Module {
         $this->RenderAll = false;
     }
 
-   /**
-    * Set the data definition to load/save from the config.
+    /**
+     * Set the data definition to load/save from the config.
      *
-    * @param array $Def A list of fields from the config that this form will use.
-    */
+     * @param array $Def A list of fields from the config that this form will use.
+     */
     public function schema($Def = null) {
         if ($Def !== null) {
             $Schema = array();

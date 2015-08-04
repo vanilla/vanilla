@@ -6,13 +6,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
-*/
+ */
 
 /**
  * Class ToggleMenuModule.
  */
 class ToggleMenuModule extends Gdn_Module {
-   
+
     /** @var array  */
     private $_Labels = array();
 
@@ -33,7 +33,7 @@ class ToggleMenuModule extends Gdn_Module {
 
         $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
     }
-   
+
     /**
      *
      *
@@ -44,15 +44,15 @@ class ToggleMenuModule extends Gdn_Module {
         if ($Label != '') {
             $this->_CurrentLabelCode = $Label;
         }
-      
-       // If the current code hasn't been assigned, use the first available label
+
+        // If the current code hasn't been assigned, use the first available label
         if (!$this->_CurrentLabelCode && count($this->_Labels) > 0) {
             return $this->_Labels[0]['Code'];
         }
 
         return $this->_CurrentLabelCode;
     }
-   
+
     /**
      *
      *
@@ -65,7 +65,7 @@ class ToggleMenuModule extends Gdn_Module {
             if ($Url == '') {
                 $Url = '#';
             }
-         
+
             $Name = val('Name', $Label, '');
             $Code = val('Code', $Label, '');
             $Active = strcasecmp($Code, $this->CurrentLabelCode()) == 0;

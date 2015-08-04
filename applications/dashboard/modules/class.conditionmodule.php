@@ -6,13 +6,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
-*/
+ */
 
 class ConditionModule extends Gdn_Module {
 
     /** @var null  */
     protected $_Conditions = null;
-   
+
     /** @var string  */
     public $Prefix = 'Cond';
 
@@ -34,7 +34,7 @@ class ConditionModule extends Gdn_Module {
         }
 
         if ($Value === true) {
-           // Remove blank conditions from the array. This is used for saving.
+            // Remove blank conditions from the array. This is used for saving.
             $Result = array();
             foreach ($this->_Conditions as $Condition) {
                 if (count($Condition) < 2 || !$Condition[0]) {
@@ -52,15 +52,15 @@ class ConditionModule extends Gdn_Module {
         $this->_Sender->addJsFile('condition.js');
 
         if ($Form->authenticatedPostBack()) {
-           // Grab the conditions from the form and convert them to the conditions array.
+            // Grab the conditions from the form and convert them to the conditions array.
             $this->Conditions($this->_FromForm());
         } else {
         }
 
         $this->Types = array_merge(array('' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'), Gdn_Condition::AllTypes());
-       //die(print_r($this->Types));
+        //die(print_r($this->Types));
 
-       // Get all of the permissions that are valid for the permissions dropdown.
+        // Get all of the permissions that are valid for the permissions dropdown.
         $PermissionModel = new PermissionModel();
         $Permissions = $PermissionModel->GetGlobalPermissions(0);
         $Permissions = array_keys($Permissions);
@@ -69,7 +69,7 @@ class ConditionModule extends Gdn_Module {
         $Permissions = array_merge(array('' => '('.sprintf(t('Select a %s'), t('Permission')).')'), $Permissions);
         $this->Permissions = $Permissions;
 
-       // Get all of the roles.
+        // Get all of the roles.
         $RoleModel = new RoleModel();
         $Roles = $RoleModel->getArray();
         $Roles = array_merge(array('-' => '('.sprintf(t('Select a %s'), t('Role')).')'), $Roles);
@@ -79,7 +79,7 @@ class ConditionModule extends Gdn_Module {
         return parent::ToString();
     }
 
-   /** Grab the values from the form into the conditions array. */
+    /** Grab the values from the form into the conditions array. */
     protected function _FromForm() {
         $Form = new Gdn_Form();
         $Px = $this->Prefix;

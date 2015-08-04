@@ -1,0 +1,238 @@
+/*!
+ * Font Vanillicon
+ *
+ * Vanillicon is the icon font for use on Vanilla Forums and is an extension of
+ * the excellent Font Awesome.
+ *
+ * Authors
+ * -----------------------------------------------------------------------------
+ * - Todd Burry <todd@vanillaforums.com>
+ * - Kasper Isager <kasper@vanillaforums.com>
+ *
+ * License
+ * -----------------------------------------------------------------------------
+ * - The Font Vanillicon font is licensed under the SIL OFL 1.1 -
+ *   http://scripts.sil.org/OFL
+ * - The Font Vanillicon CSS, LESS, and Sass files are licensed under the
+ *   MIT License - http://opensource.org/licenses/mit-license.html
+ *
+ * - All brand icons are trademarks of their respective owners.
+ *   The use of these trademarks does not indicate endorsement of the trademark
+ *   holder by Vanilla Forums, nor vice versa.
+ */
+
+
+@font-face {
+    font-family: "vanillicon";
+    src: url("../fonts/vanillicon/vanillicon.eot?9fcf6099a9");
+    src: url("../fonts/vanillicon/vanillicon.eot?9fcf6099a9#iefix") format("embedded-opentype"),
+         url("../fonts/vanillicon/vanillicon.woff?9fcf6099a9") format("woff"),
+         url("../fonts/vanillicon/vanillicon.ttf?9fcf6099a9") format("truetype"),
+         url("../fonts/vanillicon/vanillicon.svg?9fcf6099a9#vanillicon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.icon:before {
+    display: inline-block;
+    font-family: "vanillicon";
+    font-variant: normal;
+    font-weight: normal;
+    font-style: normal;
+    min-width: 1em;
+    text-align: center;
+    text-decoration: inherit;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+.icon-adjust:before { content: "\f100"; }
+.icon-agree:before { content: "\f101"; }
+.icon-align-center:before { content: "\f102"; }
+.icon-align-justify:before { content: "\f103"; }
+.icon-align-left:before { content: "\f104"; }
+.icon-align-right:before { content: "\f105"; }
+.icon-angry:before { content: "\f106"; }
+.icon-archive:before { content: "\f107"; }
+.icon-arrow-down:before { content: "\f108"; }
+.icon-arrow-left:before { content: "\f109"; }
+.icon-arrow-right:before { content: "\f10a"; }
+.icon-arrow-up:before { content: "\f10b"; }
+.icon-ban:before { content: "\f10c"; }
+.icon-bar-chart:before { content: "\f10d"; }
+.icon-bell:before { content: "\f10e"; }
+.icon-bold:before { content: "\f10f"; }
+.icon-bookmark:before { content: "\f110"; }
+.icon-bookmark-empty:before { content: "\f111"; }
+.icon-bug:before { content: "\f112"; }
+.icon-bullhorn:before { content: "\f113"; }
+.icon-bullseye:before { content: "\f114"; }
+.icon-calendar:before { content: "\f115"; }
+.icon-camera:before { content: "\f116"; }
+.icon-caret-down:before { content: "\f117"; }
+.icon-caret-left:before { content: "\f118"; }
+.icon-caret-right:before { content: "\f119"; }
+.icon-caret-up:before { content: "\f11a"; }
+.icon-certificate:before { content: "\f11b"; }
+.icon-check:before { content: "\f11c"; }
+.icon-check-empty:before { content: "\f11d"; }
+.icon-check-sign:before { content: "\f11e"; }
+.icon-chevron-down:before { content: "\f11f"; }
+.icon-chevron-left:before { content: "\f120"; }
+.icon-chevron-right:before { content: "\f121"; }
+.icon-chevron-sign-down:before { content: "\f122"; }
+.icon-chevron-sign-left:before { content: "\f123"; }
+.icon-chevron-sign-right:before { content: "\f124"; }
+.icon-chevron-sign-up:before { content: "\f125"; }
+.icon-chevron-up:before { content: "\f126"; }
+.icon-circle:before { content: "\f127"; }
+.icon-circle-blank:before { content: "\f128"; }
+.icon-cloud:before { content: "\f129"; }
+.icon-cloud-download:before { content: "\f12a"; }
+.icon-cloud-upload:before { content: "\f12b"; }
+.icon-code:before { content: "\f12c"; }
+.icon-cog:before { content: "\f12d"; }
+.icon-cogs:before { content: "\f12e"; }
+.icon-collapse:before { content: "\f12f"; }
+.icon-collapse-top:before { content: "\f130"; }
+.icon-comment:before { content: "\f131"; }
+.icon-comments:before { content: "\f132"; }
+.icon-compass:before { content: "\f133"; }
+.icon-compose:before { content: "\f134"; }
+.icon-crown:before { content: "\f135"; }
+.icon-dashboard:before { content: "\f136"; }
+.icon-discussion:before { content: "\f137"; }
+.icon-dot-circle:before { content: "\f138"; }
+.icon-dropbox:before { content: "\f139"; }
+.icon-edit:before { content: "\f13a"; }
+.icon-edit-sign:before { content: "\f13b"; }
+.icon-ellipsis:before { content: "\f13c"; }
+.icon-exclamation-sign:before { content: "\f13d"; }
+.icon-expand:before { content: "\f13e"; }
+.icon-external-link:before { content: "\f13f"; }
+.icon-eye-close:before { content: "\f140"; }
+.icon-eye-open:before { content: "\f141"; }
+.icon-facebook:before { content: "\f142"; }
+.icon-facebook-alt:before { content: "\f143"; }
+.icon-file:before { content: "\f144"; }
+.icon-file-text:before { content: "\f145"; }
+.icon-filter:before { content: "\f146"; }
+.icon-flag:before { content: "\f147"; }
+.icon-flame:before { content: "\f148"; }
+.icon-folder-close:before { content: "\f149"; }
+.icon-folder-open:before { content: "\f14a"; }
+.icon-font:before { content: "\f14b"; }
+.icon-frown:before { content: "\f14c"; }
+.icon-gift:before { content: "\f14d"; }
+.icon-github:before { content: "\f14e"; }
+.icon-globe:before { content: "\f14f"; }
+.icon-google-plus:before { content: "\f150"; }
+.icon-google-plus-alt:before { content: "\f151"; }
+.icon-group:before { content: "\f152"; }
+.icon-hand-down:before { content: "\f153"; }
+.icon-hand-left:before { content: "\f154"; }
+.icon-hand-right:before { content: "\f155"; }
+.icon-hand-up:before { content: "\f156"; }
+.icon-heart:before { content: "\f157"; }
+.icon-home:before { content: "\f158"; }
+.icon-inbox:before { content: "\f159"; }
+.icon-indent-left:before { content: "\f15a"; }
+.icon-indent-right:before { content: "\f15b"; }
+.icon-info-sign:before { content: "\f15c"; }
+.icon-italic:before { content: "\f1ba"; }
+.icon-jail:before { content: "\f15e"; }
+.icon-key:before { content: "\f15f"; }
+.icon-lightbulb:before { content: "\f160"; }
+.icon-link:before { content: "\f161"; }
+.icon-linkedin:before { content: "\f162"; }
+.icon-linkedin-alt:before { content: "\f163"; }
+.icon-list-ol:before { content: "\f164"; }
+.icon-list-ul:before { content: "\f165"; }
+.icon-lock:before { content: "\f166"; }
+.icon-lol:before { content: "\f167"; }
+.icon-mail:before { content: "\f168"; }
+.icon-mail-open:before { content: "\f169"; }
+.icon-map-marker:before { content: "\f16a"; }
+.icon-meh:before { content: "\f16b"; }
+.icon-menu:before { content: "\f16c"; }
+.icon-minus-sign:before { content: "\f16d"; }
+.icon-mobile-phone:before { content: "\f16e"; }
+.icon-mod:before { content: "\f16f"; }
+.icon-nib:before { content: "\f1bb"; }
+.icon-note:before { content: "\f170"; }
+.icon-ok:before { content: "\f171"; }
+.icon-ok-circle:before { content: "\f172"; }
+.icon-ok-sign:before { content: "\f173"; }
+.icon-paper-clip:before { content: "\f174"; }
+.icon-paragraph:before { content: "\f175"; }
+.icon-pencil:before { content: "\f176"; }
+.icon-permalink:before { content: "\f177"; }
+.icon-picture:before { content: "\f178"; }
+.icon-pinterest:before { content: "\f179"; }
+.icon-pinterest-alt:before { content: "\f17a"; }
+.icon-play-circle:before { content: "\f17b"; }
+.icon-plus-sign:before { content: "\f17c"; }
+.icon-poll:before { content: "\f17d"; }
+.icon-preview:before { content: "\f17e"; }
+.icon-pushpin:before { content: "\f17f"; }
+.icon-question:before { content: "\f180"; }
+.icon-question-sign:before { content: "\f181"; }
+.icon-quote:before { content: "\f182"; }
+.icon-refresh:before { content: "\f183"; }
+.icon-remove:before { content: "\f184"; }
+.icon-remove-sign:before { content: "\f185"; }
+.icon-repeat:before { content: "\f186"; }
+.icon-reply:before { content: "\f187"; }
+.icon-reply-all:before { content: "\f188"; }
+.icon-report:before { content: "\f189"; }
+.icon-resize-full:before { content: "\f18a"; }
+.icon-resize-small:before { content: "\f18b"; }
+.icon-retweet:before { content: "\f18c"; }
+.icon-robot:before { content: "\f1bc"; }
+.icon-rss:before { content: "\f18d"; }
+.icon-salesforce:before { content: "\f1bd"; }
+.icon-search:before { content: "\f18e"; }
+.icon-select:before { content: "\f18f"; }
+.icon-share:before { content: "\f190"; }
+.icon-shield:before { content: "\f191"; }
+.icon-sign-blank:before { content: "\f192"; }
+.icon-signin:before { content: "\f193"; }
+.icon-signout:before { content: "\f194"; }
+.icon-skull:before { content: "\f195"; }
+.icon-smile:before { content: "\f196"; }
+.icon-source:before { content: "\f197"; }
+.icon-spam:before { content: "\f198"; }
+.icon-star:before { content: "\f199"; }
+.icon-star-empty:before { content: "\f19a"; }
+.icon-star-half-empty:before { content: "\f19b"; }
+.icon-steam:before { content: "\f19c"; }
+.icon-strikethrough:before { content: "\f19d"; }
+.icon-subscript:before { content: "\f19e"; }
+.icon-superscript:before { content: "\f19f"; }
+.icon-table:before { content: "\f1a0"; }
+.icon-tag:before { content: "\f1a1"; }
+.icon-tags:before { content: "\f1a2"; }
+.icon-th:before { content: "\f1a3"; }
+.icon-th-large:before { content: "\f1a4"; }
+.icon-th-list:before { content: "\f1a5"; }
+.icon-thumbs-down:before { content: "\f1a6"; }
+.icon-thumbs-up:before { content: "\f1a7"; }
+.icon-ticket:before { content: "\f1a8"; }
+.icon-time:before { content: "\f1a9"; }
+.icon-trash:before { content: "\f1aa"; }
+.icon-troll:before { content: "\f1ab"; }
+.icon-trophy:before { content: "\f1ac"; }
+.icon-twitter:before { content: "\f1ad"; }
+.icon-twitter-alt:before { content: "\f1ae"; }
+.icon-underline:before { content: "\f1af"; }
+.icon-undo:before { content: "\f1b0"; }
+.icon-unlink:before { content: "\f1b1"; }
+.icon-unlock:before { content: "\f1b2"; }
+.icon-user:before { content: "\f1b3"; }
+.icon-vcard:before { content: "\f1b4"; }
+.icon-video:before { content: "\f1b5"; }
+.icon-warn:before { content: "\f1b6"; }
+.icon-warning-sign:before { content: "\f1b7"; }
+.icon-wtf:before { content: "\f1b8"; }
+.icon-zendesk:before { content: "\f1b9"; }

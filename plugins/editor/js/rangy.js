@@ -50,7 +50,7 @@
         if (end < 0) {
             end += el.value.length;
         }
-        return { start: start, end: end };
+        return {start: start, end: end};
     }
 
     function makeSelection(el, start, end) {
@@ -186,7 +186,7 @@
 
         var updateSelectionAfterInsert = function(el, startIndex, text, selectionBehaviour) {
             var endIndex = startIndex + text.length;
-            
+
             selectionBehaviour = (typeof selectionBehaviour == "string") ?
                 selectionBehaviour.toLowerCase() : "";
 
@@ -196,7 +196,7 @@
                 var normalizedText = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
                 endIndex = startIndex + normalizedText.length;
                 var firstLineBreakIndex = startIndex + normalizedText.indexOf("\n");
-                
+
                 if (el.value.slice(firstLineBreakIndex, firstLineBreakIndex + 2) == "\r\n") {
                     // Browser uses \r\n, so we need to account for extra \r characters
                     endIndex += normalizedText.match(/\n/g).length;

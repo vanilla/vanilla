@@ -1,6 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * Garden Constants.
+ * Framework constants.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
  */
 
 // If you want to change where the garden libraries are located on your server, edit these paths:
@@ -47,18 +52,28 @@ define('SYNDICATION_NONE', 'NONE');
 define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
+// Debug error types.
 define('TRACE_INFO', 'Info');
 define('TRACE_ERROR', 'Error');
 define('TRACE_WARNING', 'Warning');
 define('TRACE_NOTICE', 'Notice');
 
 // Environment
-define('ENVIRONMENT_PHP_VERSION','5.2.0');
+define('ENVIRONMENT_PHP_VERSION', '5.3.0');
 
-if (!defined('E_USER_DEPRECATED'))
-   define('E_USER_DEPRECATED', E_USER_WARNING);
+if (!defined('E_USER_DEPRECATED')) {
+    define('E_USER_DEPRECATED', E_USER_WARNING);
+}
 
 define('SPAM', 'SPAM');
 define('UNAPPROVED', 'UNAPPROVED');
-   
+
+// Numeric keys for Vanilla's addon types.
+define('ADDON_TYPE_PLUGIN', 1);
+define('ADDON_TYPE_THEME', 2);
+define('ADDON_TYPE_LOCALE', 4);
+define('ADDON_TYPE_APPLICATION', 5);
+define('ADDON_TYPE_CORE', 10);
+
+// Signal we did all this ^.
 define('VANILLA_CONSTANTS', TRUE);

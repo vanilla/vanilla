@@ -276,6 +276,8 @@ pre.CodeBlock {
   padding: inherit;
   font: inherit;
   outline: none; }
+  .editor-composer img {
+    max-width: 100%; }
 
 /**
  * Adjust some styles explicitly within the editor composer. These match the

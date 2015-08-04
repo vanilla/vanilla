@@ -18,8 +18,9 @@ if ($this->User->Photo != '') {
 
 // Define the current thumbnail icon
 $Thumbnail = $this->User->Photo;
-if (!$Thumbnail && function_exists('UserPhotoDefaultUrl'))
-    $Thumbnail = UserPhotoDefaultUrl($this->User);
+if (!$Thumbnail) {
+    $Thumbnail = UserModel::getDefaultAvatarUrl($this->User);
+}
 
 if ($Thumbnail && !isUrl($Thumbnail))
     $Thumbnail = Gdn_Upload::url(changeBasename($Thumbnail, 'n%s'));

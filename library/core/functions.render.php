@@ -893,8 +893,8 @@ if (!function_exists('userPhoto')) {
             $Title .= ' ('.t('Banned').')';
         }
 
-        if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
-            $Photo = userPhotoDefaultUrl($User, $ImgClass);
+        if (!$Photo) {
+            $Photo = UserModel::getDefaultAvatarUrl($User, 'thumbnail');
         }
 
         if ($Photo) {
@@ -926,8 +926,8 @@ if (!function_exists('userPhotoUrl')) {
             $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
         }
 
-        if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
-            $Photo = UserPhotoDefaultUrl($User);
+        if (!$Photo) {
+            $Photo = UserModel::getDefaultAvatarUrl($User);
         }
 
         if ($Photo) {

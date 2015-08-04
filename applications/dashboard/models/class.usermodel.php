@@ -941,7 +941,6 @@ class UserModel extends Gdn_Model {
 
         // Join the user data using prefixes (ex: 'Name' for 'InsertUserID' becomes 'InsertName')
         $Join = val('Join', $Options, array('Name', 'Email', 'Photo'));
-        $UserPhotoDefaultUrl = function_exists('UserPhotoDefaultUrl');
 
         foreach ($Data2 as &$Row) {
             foreach ($Prefixes as $Px) {
@@ -952,9 +951,7 @@ class UserModel extends Gdn_Model {
                         $Value = $User[$Column];
                         if ($Column == 'Photo') {
                             if (!$Value) {
-                                if ($UserPhotoDefaultUrl) {
-                                    $Value = UserPhotoDefaultUrl($User);
-                                }
+                                $Value = self::getDefaultAvatarUrl($User);
                             } elseif (!isUrl($Value)) {
                                 $Value = Gdn_Upload::url(changeBasename($Value, 'n%s'));
                             }
@@ -970,6 +967,30 @@ class UserModel extends Gdn_Model {
 
             }
         }
+    }
+
+    /**
+     * Returns the url to the default avatar for a user.
+     *
+     * @param User $user The user to get the default avatar for.
+     * @param string $size The size of avatar to return (only respected for dashboard-uploaded default avatars).
+     * @return string The url to the default avatar image.
+     */
+    public static function getDefaultAvatarUrl($user = array(), $size = 'thumbnail') {
+        if ($user && function_exists('UserPhotoDefaultUrl')) {
+            return UserPhotoDefaultUrl($user);
+        }
+        if ($avatar = c('Garden.DefaultAvatar', false)) {
+            if (strpos($avatar, 'uploads')) {
+                if($size == 'thumbnail') {
+                    return changeBasename($avatar, 'n%s');
+                } elseif ($size == 'profile') {
+                    return changeBasename($avatar, 'p%s');
+                }
+            }
+            return $avatar;
+        }
+        return '';
     }
 
     /**

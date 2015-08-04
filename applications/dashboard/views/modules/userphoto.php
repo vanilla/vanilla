@@ -8,6 +8,9 @@ if (!$User)
     return;
 
 $Photo = $User->Photo;
+if (!$Photo) {
+    $Photo = UserModel::getDefaultAvatarUrl($User, 'profile');
+}
 
 if ($User->Banned) {
     $BannedPhoto = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');

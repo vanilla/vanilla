@@ -108,12 +108,12 @@ class GravatarPlugin extends Gdn_Plugin {
                     }
                 } else {
                     // v1 Vanillicon.
-                    $default = VanilliconPlugin::vanilliconUrl($user);
+                    $default = VanilliconPlugin::vanilliconUrl($user, array('Size' => '200'));
                     $url .= '&d='.$default;
                 }
             } else {
                 $defaultSize = ($size > 80) ? '_250' : '';
-                $default = urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default'.$defaultSize.'.png'), true));
+                $default = urlencode(asset(c('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default'.$defaultSize.'.png'), true));
                 $url .= '&d='.$default;
             }
 

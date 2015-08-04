@@ -1669,8 +1669,12 @@ class DiscussionModel extends VanillaModel {
                   CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
 
                   // Clear the cache if necessary.
-                  if (GetValue('Announce', $Fields)) {
-                     Gdn::Cache()->Remove($this->GetAnnouncementCacheKey(GetValue('CategoryID', $Fields)));
+                  if (val('Announce', $Fields)) {
+                     Gdn::cache()->Remove($this->GetAnnouncementCacheKey(val('CategoryID', $Fields)));
+
+                     if (val('Announce', $Fields) == 1) {
+                        Gdn::cache()->Remove($this->GetAnnouncementCacheKey());
+                     }
                   }
                }
 

@@ -679,17 +679,14 @@ $Construct->Table('Queue')
 $Construct->table('Regarding')
     ->primaryKey('RegardingID')
     ->column('Type', 'varchar(100)', false, 'key')
-   ->Column('DateInserted', 'datetime', true, 'index')
     ->column('InsertUserID', 'int', false)
     ->column('DateInserted', 'datetime', false)
     ->column('ForeignType', 'varchar(32)', false)
     ->column('ForeignID', 'int(11)', false)
-   ->Column('Format', 'varchar(20)')
     ->column('OriginalContent', 'text', true)
     ->column('ParentType', 'varchar(32)', true)
     ->column('ParentID', 'int(11)', true)
     ->column('ForeignURL', 'varchar(255)', true)
-   ->Column('DateStatus', 'datetime', true)
     ->column('Comment', 'text', false)
     ->column('Reports', 'int(11)', true)
     ->engine('InnoDB')
@@ -735,8 +732,6 @@ $Construct
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)
     ->set(false, false);
-
-   ->Set(false, false);
 
 // Merge backup.
 $Construct

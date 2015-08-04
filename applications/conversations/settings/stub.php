@@ -14,7 +14,7 @@
 if (!$Drop) {
     return;
 }
-   
+
 $SQL = Gdn::database()->sql();
 
 // Prep default content
@@ -26,18 +26,18 @@ $Contributors = Gdn_Format::serialize(array($SystemUserID, $TargetUserID));
 
 // Insert stub conversation
 $ConversationID = $SQL->insert('Conversation', array(
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now,
-   'Contributors' => $Contributors,
-   'CountMessages' => 1
+    'InsertUserID' => $SystemUserID,
+    'DateInserted' => $Now,
+    'Contributors' => $Contributors,
+    'CountMessages' => 1
 ));
 
 $MessageID = $SQL->insert('ConversationMessage', array(
-   'ConversationID' => $ConversationID,
+    'ConversationID' => $ConversationID,
     'Body' => t('StubConversationBody', $ConversationBody),
-   'Format' => 'Html',
-   'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now
+    'Format' => 'Html',
+    'InsertUserID' => $SystemUserID,
+    'DateInserted' => $Now
 ));
 
 $SQL->update('Conversation')
@@ -46,9 +46,9 @@ $SQL->update('Conversation')
     ->put();
 
 $SQL->insert('UserConversation', array(
-   'ConversationID' => $ConversationID,
-   'UserID' => $TargetUserID,
-   'CountReadMessages' => 0,
-   'LastMessageID' => $MessageID,
-   'DateConversationUpdated' => $Now
+    'ConversationID' => $ConversationID,
+    'UserID' => $TargetUserID,
+    'CountReadMessages' => 0,
+    'LastMessageID' => $MessageID,
+    'DateConversationUpdated' => $Now
 ));

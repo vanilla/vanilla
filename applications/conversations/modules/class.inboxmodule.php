@@ -18,15 +18,15 @@ class InboxModule extends Gdn_Module {
 
     /** @var int */
     public $UserID = null;
-   
+
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'conversations';
         $this->UserID = Gdn::session()->UserID;
     }
-   
+
     public function getData() {
-       // Fetch from model.
+        // Fetch from model.
         $Model = new ConversationModel();
         $Result = $Model->get(
             $this->UserID,
@@ -34,21 +34,21 @@ class InboxModule extends Gdn_Module {
             $this->Limit,
             array()
         );
-      
-       // Join in the participants.
+
+        // Join in the participants.
         $Model->joinParticipants($Result);
         $this->setData('Conversations', $Result);
     }
-   
+
     public function toString() {
         if (!Gdn::session()->isValid()) {
             return '';
         }
-      
+
         if (!$this->data('Conversations')) {
             $this->getData();
         }
-      
+
         return parent::toString();
     }
 }

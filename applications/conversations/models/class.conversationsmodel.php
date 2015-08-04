@@ -13,27 +13,27 @@
  */
 abstract class ConversationsModel extends Gdn_Model {
 
-   /**
-    * Class constructor. Defines the related database table name.
-    *
-    * @since 2.2
-    * @access public
-    */
+    /**
+     * Class constructor. Defines the related database table name.
+     *
+     * @since 2.2
+     * @access public
+     */
     public function __construct($Name = '') {
         parent::__construct($Name);
     }
 
-   /**
-    * Checks to see if the user is spamming. Returns TRUE if the user is spamming.
-    *
-    * Users cannot post more than $SpamCount comments within $SpamTime
-    * seconds or their account will be locked for $SpamLock seconds.
-    *
-    * @since 2.2
-    * @return bool Whether spam check is positive (TRUE = spammer).
-    */
+    /**
+     * Checks to see if the user is spamming. Returns TRUE if the user is spamming.
+     *
+     * Users cannot post more than $SpamCount comments within $SpamTime
+     * seconds or their account will be locked for $SpamLock seconds.
+     *
+     * @since 2.2
+     * @return bool Whether spam check is positive (TRUE = spammer).
+     */
     public function checkForSpam($Type, $SkipSpamCheck = false) {
-       // If spam checking is disabled or user is an admin, skip
+        // If spam checking is disabled or user is an admin, skip
         $SpamCheckEnabled = val('SpamCheck', $this, true);
         if ($SkipSpamCheck == true || $SpamCheckEnabled === false || checkPermission('Garden.Moderation.Manage')) {
             return false;
@@ -41,12 +41,12 @@ abstract class ConversationsModel extends Gdn_Model {
 
         $Spam = false;
 
-       // Validate $Type
+        // Validate $Type
         if (!in_array($Type, array('Conversation', 'ConversationMessage'))) {
             trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $Type), 'ConversationsModel', 'CheckForSpam'), E_USER_ERROR);
         }
 
-       // Get spam config settings
+        // Get spam config settings
         $SpamCount = c("Conversations.$Type.SpamCount", 1);
         if (!is_numeric($SpamCount) || $SpamCount < 1) {
             $SpamCount = 1; // 1 spam minimum
@@ -59,7 +59,7 @@ abstract class ConversationsModel extends Gdn_Model {
         if (!is_numeric($SpamLock) || $SpamLock < 60) {
             $SpamLock = 60; // 60 second minimum lockout
         }
-       // Check for a spam lock first.
+        // Check for a spam lock first.
         $Now = time();
         $TimeSpamLock = (int)Gdn::session()->getAttribute("Time{$Type}SpamLock", 0);
         $WaitTime = $SpamLock - ($Now - $TimeSpamLock);
@@ -81,7 +81,7 @@ abstract class ConversationsModel extends Gdn_Model {
         $TimeSpamCheck = (int)Gdn::session()->getAttribute('Time'.$Type.'SpamCheck', 0);
         $SecondsSinceSpamCheck = time() - $TimeSpamCheck;
 
-       // Apply a spam lock if necessary
+        // Apply a spam lock if necessary
         $Attributes = array();
         if ($SecondsSinceSpamCheck < $SpamTime && $CountSpamCheck >= $SpamCount) {
             $Spam = true;
@@ -95,7 +95,7 @@ abstract class ConversationsModel extends Gdn_Model {
                 )
             );
 
-           // Update the 'waiting period' every time they try to post again
+            // Update the 'waiting period' every time they try to post again
             $Attributes["Time{$Type}SpamLock"] = $Now;
             $Attributes['Count'.$Type.'SpamCheck'] = 0;
         } else {
@@ -106,7 +106,7 @@ abstract class ConversationsModel extends Gdn_Model {
                 $Attributes['Count'.$Type.'SpamCheck'] = $CountSpamCheck + 1;
             }
         }
-       // Update the user profile after every comment
+        // Update the user profile after every comment
         $UserModel = Gdn::userModel();
         if (Gdn::session()->UserID) {
             $UserModel->saveAttribute(Gdn::session()->UserID, $Attributes);
@@ -115,13 +115,13 @@ abstract class ConversationsModel extends Gdn_Model {
         return $Spam;
     }
 
-   /**
-    * Get all the members of a conversation from the $ConversationID.
-    *
-    * @param int $ConversationID The conversation ID.
-    *
-    * @return array Array of user IDs.
-    */
+    /**
+     * Get all the members of a conversation from the $ConversationID.
+     *
+     * @param int $ConversationID The conversation ID.
+     *
+     * @return array Array of user IDs.
+     */
     public function getConversationMembers($ConversationID) {
         $ConversationMembers = array();
 
@@ -137,14 +137,14 @@ abstract class ConversationsModel extends Gdn_Model {
         return $ConversationMembers;
     }
 
-   /**
-    * Check if user posting to the conversation is already a member.
-    *
-    * @param int $ConversationID The conversation ID.
-    * @param int $UserID The user id.
-    *
-    * @return bool
-    */
+    /**
+     * Check if user posting to the conversation is already a member.
+     *
+     * @param int $ConversationID The conversation ID.
+     * @param int $UserID The user id.
+     *
+     * @return bool
+     */
     public function validConversationMember($ConversationID, $UserID) {
         $ConversationMembers = $this->getConversationMembers($ConversationID);
         return (in_array($UserID, $ConversationMembers));

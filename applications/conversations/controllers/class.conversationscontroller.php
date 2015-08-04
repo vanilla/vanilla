@@ -12,34 +12,34 @@
  * Master controller for Conversations for others to extend.
  */
 class ConversationsController extends Gdn_Controller {
-   /**
-    * Returns an array of pages that contain settings information for this application.
-    *
-    * @return array
-    */
+    /**
+     * Returns an array of pages that contain settings information for this application.
+     *
+     * @return array
+     */
     public function getSettingsPages(&$Menu) {
-       // There are no configuration pages for Conversations
+        // There are no configuration pages for Conversations
     }
 
-   /**
-    * Do-nothing construct to let children constructs bubble up.
-    *
-    * @access public
-    */
+    /**
+     * Do-nothing construct to let children constructs bubble up.
+     *
+     * @access public
+     */
     public function __construct() {
         parent::__construct();
     }
 
-   /**
-    * Include JS, CSS, and modules used by all methods.
-    *
-    * Always called by dispatcher before controller's requested method.
-    *
-    * @since 2.0.0
-    * @access public
-    */
+    /**
+     * Include JS, CSS, and modules used by all methods.
+     *
+     * Always called by dispatcher before controller's requested method.
+     *
+     * @since 2.0.0
+     * @access public
+     */
     public function initialize() {
-       // You've got to be signed in to send private messages.
+        // You've got to be signed in to send private messages.
         if (!Gdn::session()->isValid()) {
             redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         }

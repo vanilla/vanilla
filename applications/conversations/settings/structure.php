@@ -98,7 +98,7 @@ $Construct->table('ConversationMessage')
     ->set($Explicit, $Drop);
 
 if ($UpdateCountMessages) {
-   // Calculate the count column.
+    // Calculate the count column.
     $UpSql = "update {$Px}Conversation c
 set CountMessages = (
    select count(MessageID)
@@ -107,7 +107,7 @@ set CountMessages = (
     $Construct->query($UpSql);
 }
 if ($UpdateLastMessageID) {
-   // Calculate the count column.
+    // Calculate the count column.
     $UpSql = "update {$Px}Conversation c
 set LastMessageID = (
    select max(MessageID)
@@ -170,6 +170,6 @@ if ($SQL->getWhere('ActivityType', array('Name' => 'AddedToConversation'))->numR
 
 $PermissionModel = Gdn::permissionModel();
 $PermissionModel->define(array(
-   'Conversations.Moderation.Manage' => 0,
-   'Conversations.Conversations.Add' => 'Garden.Profiles.Edit',
+    'Conversations.Moderation.Manage' => 0,
+    'Conversations.Conversations.Add' => 'Garden.Profiles.Edit',
 ));

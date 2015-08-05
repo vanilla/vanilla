@@ -1393,7 +1393,7 @@ class ProfileController extends Gdn_Controller {
             $this->EventArguments['User'] = $this->User;
             $this->fireEvent('GetConnections');
             if (count($this->data('Connections')) > 0) {
-                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow');
+                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', array('class' => 'link-social'));
             }
         }
     }

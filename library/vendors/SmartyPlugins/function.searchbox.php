@@ -17,12 +17,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @return The url.
  */
 function smarty_function_searchbox($params, &$smarty) {
-   $placeholder = array_key_exists('placeholder', $params) ? GetValue('placeholder', $params, '', TRUE) : T('SearchBoxPlaceHolder', 'Search');
+   $placeholder = array_key_exists('placeholder', $params) ? val('placeholder', $params, '', TRUE) : t('SearchBoxPlaceHolder', 'Search');
    /* @var Gdn_Form $form */
    $form = Gdn::factory('Form');
    $form->InputPrefix = '';
    $result =
-      $form->open(array('action' => Url('/search'), 'method' => 'get')).
+      $form->open(array('action' => url('/search'), 'method' => 'get')).
       $form->textBox('Search', array('placeholder' => $placeholder, 'accesskey' => '/')).
       $form->button('Go', array('Name' => '')).
       $form->close();

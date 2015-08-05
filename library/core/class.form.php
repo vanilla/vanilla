@@ -816,9 +816,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 $EndYear = substr($YearRange, 5);
             }
         }
-        if ($YearRange === false || $StartYear > $EndYear) {
-            $StartYear = 1900;
-            $EndYear = date('Y');
+        if ($YearRange === false) {
+            $StartYear = date('Y');
+            $EndYear = 1900;
         }
 
         $Months = array_map(
@@ -834,8 +834,8 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $Years = array();
         $Years[0] = T('Year');
-        for ($i = $EndYear; $i >= $StartYear; --$i) {
-            $Years[$i] = $i;
+        foreach (range($StartYear, $EndYear) as $Year) {
+            $Years[$Year] = $Year;
         }
 
         // Show inline errors?

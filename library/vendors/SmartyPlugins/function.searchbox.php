@@ -13,19 +13,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Writes the search box to the page.
  *
  * @param array The parameters passed into the function. This currently takes no parameters.
- * @param Smarty The smarty object rendering the template.
+ * @param $smarty The smarty object rendering the template.
  * @return The url.
  */
-function smarty_function_searchbox($Params, &$Smarty) {
-   $Placeholder = array_key_exists('placeholder', $Params) ? GetValue('placeholder', $Params, '', TRUE) : T('SearchBoxPlaceHolder', 'Search');
-   $Form = Gdn::Factory('Form');
-   $Form->InputPrefix = '';
-   $Result =
-      $Form->Open(array('action' => Url('/search'), 'method' => 'get')).
-      $Form->TextBox('Search', array('placeholder' => $Placeholder)).
-      $Form->Button('Go', array('Name' => '')).
-      $Form->Close();
+function smarty_function_searchbox($params, &$smarty) {
+   $placeholder = array_key_exists('placeholder', $params) ? GetValue('placeholder', $params, '', TRUE) : T('SearchBoxPlaceHolder', 'Search');
+   /* @var Gdn_Form $form */
+   $form = Gdn::factory('Form');
+   $form->InputPrefix = '';
+   $result =
+      $form->open(array('action' => Url('/search'), 'method' => 'get')).
+      $form->textBox('Search', array('placeholder' => $placeholder, 'accesskey' => '/')).
+      $form->button('Go', array('Name' => '')).
+      $form->close();
 
-   return $Result;
+   return $result;
 }
 

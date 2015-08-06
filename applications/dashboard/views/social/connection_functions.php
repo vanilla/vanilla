@@ -17,9 +17,10 @@ function writeConnection($Connection) {
 //      $Addendums[] = wrap(t('requires registration'), 'span', array('class' => 'RequiresRegistration'));
 
     $Configured = val('Configured', $Connection);
-    if (!$Configured)
+    if (!$Configured) {
         $Addendums[] = wrap(t('not configured'), 'span', array('class' => 'NotConfigured'));
-
+    }
+    
     $Index = val('Index', $Connection, val('ProviderKey', $Connection));
 
     ?>
@@ -31,10 +32,11 @@ function writeConnection($Connection) {
          <span class="Connection-Info">
             <span class="Connection-Name">
                <?php
-               if ($Enabled)
+               if ($Enabled && !empty($SettingsUrl)) {
                    echo anchor(val('Name', $Connection, t('Unknown')), $SettingsUrl);
-               else
+               } else {
                    echo val('Name', $Connection, t('Unknown'));
+               }
                ?>
 
                 <?php if (sizeof($Addendums)): ?>
@@ -49,7 +51,9 @@ function writeConnection($Connection) {
          <span class="Connection-Buttons">
             <?php
             if ($Enabled) {
-                echo anchor(sprite('SpOptions'), "/social/{$Connection['Index']}", 'Connection-Configure').' ';
+                if (!empty($SettingsUrl)) {
+                    echo anchor(sprite('SpOptions'), "/social/{$Connection['Index']}", 'Connection-Configure').' ';
+                }
                 $SliderState = 'Active';
                 echo wrap(Anchor(t('Enabled'), "/social/disable/$Index", 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
             } else {

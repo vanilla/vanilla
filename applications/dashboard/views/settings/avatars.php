@@ -3,10 +3,10 @@ $session = Gdn::session();
 $defaultAvatar = $this->data('DefaultAvatar');
 $thumbsize = $this->data('ThumbSize');
 ?>
-<h1><?php echo t('Default Avatar'); ?></h1>
+<h1><?php echo t('Avatars'); ?></h1>
 
 <?php
-echo wrap(t('DefaultAvatarDescription', 'Your forum\'s default avatar.'), 'div', array('class' => 'Info')
+echo wrap(t('DefaultAvatarDescription', 'Choose your default avatar.'), 'div', array('class' => 'Info')
 );
 
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));

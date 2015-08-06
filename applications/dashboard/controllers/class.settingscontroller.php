@@ -126,20 +126,21 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Upload and edit the thumbnail of the default avatar.
+     * Manage avatar settings and
+     * upload and edit the thumbnail of the default avatar.
      *
      * Saves three avatar images into /uploads:
      *   The default image, which is not cropped.
      *   p* : The profile-sized image.
      *   n* : The thumbnail-sized image.
      */
-    public function defaultAvatar() {
+    public function avatars() {
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/settings/defaultavatar');
+        $this->addSideMenu('dashboard/settings/avatars');
         $this->addJsFile('jquery.jcrop.min.js');
         $this->addJsFile('profile.js');
         $this->addCssFile('jcrop.css');
-        $this->title(t('Default Avatar'));
+        $this->title(t('Avatars'));
         $thumbSize = c('Garden.Thumbnail.Size', 40);
         $this->setData('ThumbSize', $thumbSize);
 
@@ -159,7 +160,7 @@ class SettingsController extends DashboardController {
         if ($avatar) {
             // Set more hidden jcrop form fields based on the size of the profile-sized avatar
             $upload = new Gdn_Upload();
-            $source = $upload->CopyLocal(basename(changeBasename($avatar, "p%s")));
+            $source = $upload->copyLocal(basename(changeBasename($avatar, "p%s")));
             $sourceSize = getimagesize($source);
             $this->setData('DefaultAvatar', $avatar);
             $this->Form->addHidden('WidthSource', $sourceSize[0]);
@@ -204,7 +205,7 @@ class SettingsController extends DashboardController {
 
                         // Update the source size for jcrop.
                         $upload = new Gdn_Upload();
-                        $source = $upload->CopyLocal(val('Name', $profile));
+                        $source = $upload->copyLocal(val('Name', $profile));
                         $sourceSize = getimagesize($source);
 
                         $thumbOptions = array('Crop' => true, 'SourceX' => $this->Form->getValue('x'), 'SourceY' => $this->Form->getValue('y'), 'SourceWidth' => $this->Form->getValue('w'), 'SourceHeight' => $this->Form->getValue('h'));
@@ -1458,10 +1459,10 @@ class SettingsController extends DashboardController {
             $upload->delete(basename($avatar));
             $upload->delete(basename(changeBasename($avatar, 'p%s')));
             $upload->delete(basename(changeBasename($avatar, 'n%s')));
-            RemoveFromConfig('Garden.DefaultAvatar');
+            removeFromConfig('Garden.DefaultAvatar');
             @unlink(PATH_ROOT.DS.$avatar);
         }
-        redirect('/settings/defaultavatar');
+        redirect('dashboard/settings/avatars');
     }
 
     /**

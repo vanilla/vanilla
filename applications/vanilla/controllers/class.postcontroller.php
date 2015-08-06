@@ -243,6 +243,10 @@ class PostController extends VanillaController {
                         }
                         if ($DiscussionID == SPAM || $DiscussionID == UNAPPROVED) {
                             $this->StatusMessage = t('DiscussionRequiresApprovalStatus', 'Your discussion will appear after it is approved.');
+
+                            // Clear out the form so that a draft won't save.
+                            $this->Form->formValues(array());
+
                             $this->render('Spam');
                             return;
                         }

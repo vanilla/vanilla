@@ -87,6 +87,12 @@ jQuery(document).ready(function($) {
             action += 'discussionid=' + discussionID;
         }
 
+        if (gdn.definition('disableAjax', true) && type == 'Post') {
+            $(frm).append("<input type='hidden' name='Type' value='" + type + "' />");
+            $(frm).submit();
+            return false;
+        }
+
         $(frm).find(':submit').attr('disabled', 'disabled');
         $(parent).find('a.Back').after('<span class="TinyProgress">&#160;</span>');
         // Also add a spinner for comments being edited

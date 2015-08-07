@@ -57,6 +57,10 @@ class DiscussionController extends VanillaController {
         $this->addJsFile('discussion.js');
         Gdn_Theme::section('Discussion');
 
+        if (c("Vanilla.Discussion.DisableAjax")) {
+            $this->addDefinition("disableAjax", "true");
+        }
+
         // Load the discussion record
         $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
         if (!array_key_exists('Discussion', $this->Data)) {

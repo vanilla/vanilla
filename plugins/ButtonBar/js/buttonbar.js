@@ -219,6 +219,21 @@ $.fn.insertRoundTag = function(tagName, opts, props) {
 jQuery(document).ready(function($) {
 
     ButtonBar = {
+
+        // Search for new button bars and handle their events.
+        init: function (selector) {
+            selector = selector || '.ButtonBar';
+
+            $('.ButtonBar')
+                .closest('form')
+                .find('div.TextBoxWrapper textarea')
+                .each(function (i, textarea) {
+                    if ($(textarea).hasClass('BodyBox')) {
+                        ButtonBar.AttachTo(textarea);
+                    }
+                });
+        },
+
         AttachTo: function(TextArea) {
             // Load the buttonbar and bind this textarea to it
             var ThisButtonBar = $(TextArea).closest('form').find('.ButtonBar');
@@ -664,14 +679,7 @@ jQuery(document).ready(function($) {
 
     }
 
-    // Always find new button bars and handle their events
-    if (jQuery().livequery) {
-        $('.ButtonBar').livequery(function() {
-            var TextAreas = $(this).closest('form').find('div.TextBoxWrapper textarea');
-            $.each(TextAreas, function(i, TextArea) {
-                if ($(TextArea).hasClass('BodyBox'))
-                    ButtonBar.AttachTo(TextArea);
-            });
-        });
-    }
+    $(document).on('EditCommentFormLoaded popupReveal', ButtonBar.init);
+    ButtonBar.init();
+
 });

@@ -27,7 +27,6 @@ class DbaController extends DashboardController {
         Gdn_Theme::section('Dashboard');
         $this->Model = new DBAModel();
         $this->Form = new Gdn_Form();
-        $this->Form->InputPrefix = '';
 
         $this->addJsFile('dba.js');
     }

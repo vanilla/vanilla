@@ -34,13 +34,6 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     public $IDPrefix = 'Form_';
 
-    /**
-     * @var string All form-related elements (form, input, select, etc) will have
-     *    this value prefixed on their name attribute. Default is "Form".
-     *    If a model is assigned, the model name is used instead.
-     */
-    public $InputPrefix = '';
-
     /** @var string Form submit method. Options are 'post' or 'get'. */
     public $Method = 'post';
 
@@ -1482,19 +1475,13 @@ PASSWORDMETER;
      * @todo check that missing DataObject parameter
      */
     public function open($Attributes = array()) {
-//      if ($this->InputPrefix)
-//         Trace($this->InputPrefix, 'InputPrefix');
-
         if (!is_array($Attributes)) {
             $Attributes = array();
         }
 
         $Return = '<form';
-        if ($this->InputPrefix != '' || array_key_exists('id', $Attributes)) {
-            $Return .= $this->_idAttribute(
-                $this->InputPrefix,
-                $Attributes
-            );
+        if (array_key_exists('id', $Attributes)) {
+            $Return .= $this->_idAttribute('', $Attributes);
         }
 
         // Method
@@ -1834,10 +1821,10 @@ PASSWORDMETER;
     }
 
     /**
-     * Returns a boolean value indicating if the current page has an authenticated postback.
-     *
-     * It validates the postback by looking at a transient value that was rendered using $this->Open()
-     * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
+     * Returns a boolean value indicating if the current page has an
+     * authenticated postback. It validates the postback by looking at a
+     * transient value that was rendered using $this->Open() and submitted with
+     * the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
      * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
      * @return bool Returns true if the postback could be authenticated or false otherwise.
@@ -1901,11 +1888,7 @@ PASSWORDMETER;
      * @return string
      */
     public function escapeFieldName($FieldName) {
-        $Return = $this->InputPrefix;
-        if ($Return != '') {
-            $Return .= '/';
-        }
-        return $Return.$this->escapeString($FieldName);
+        return $this->escapeString($FieldName);
     }
 
     /**
@@ -1994,22 +1977,14 @@ PASSWORDMETER;
         }
 
         if (!is_array($this->_FormValues)) {
-            $TableName = $this->InputPrefix;
-            if (strlen($TableName) > 0) {
-                $TableName .= '/';
-            }
-            $TableNameLength = strlen($TableName);
             $this->_FormValues = array();
-            $Collection = $this->Method == 'get' ? $_GET : $_POST; // TODO wtf globals
-            $InputType = $this->Method == 'get' ? INPUT_GET : INPUT_POST;
 
+            $Request = Gdn::request();
+            $Collection = $this->Method == 'get' ? $Request->get() : $Request->post();
 
-            foreach ($Collection as $Field => $Value) {
-                $FieldName = substr($Field, $TableNameLength);
+            foreach ($Collection as $FieldName => $Value) {
                 $FieldName = $this->_unescapeString($FieldName);
-                if (substr($Field, 0, $TableNameLength) == $TableName) {
-                    $this->_FormValues[$FieldName] = $Value;
-                }
+                $this->_FormValues[$FieldName] = $Value;
             }
 
             // Make sure that unchecked checkboxes get added to the collection

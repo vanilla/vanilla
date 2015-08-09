@@ -1965,8 +1965,6 @@ PASSWORDMETER;
             return;
         }
 
-        $MagicQuotes = get_magic_quotes_gpc();
-
         if (!is_array($this->_FormValues)) {
             $TableName = $this->InputPrefix;
             if (strlen($TableName) > 0) {
@@ -1982,16 +1980,6 @@ PASSWORDMETER;
                 $FieldName = substr($Field, $TableNameLength);
                 $FieldName = $this->_unescapeString($FieldName);
                 if (substr($Field, 0, $TableNameLength) == $TableName) {
-                    if ($MagicQuotes) {
-                        if (is_array($Value)) {
-                            foreach ($Value as $i => $v) {
-                                $Value[$i] = stripcslashes($v);
-                            }
-                        } else {
-                            $Value = stripcslashes($Value);
-                        }
-                    }
-
                     $this->_FormValues[$FieldName] = $Value;
                 }
             }

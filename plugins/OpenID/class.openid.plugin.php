@@ -189,7 +189,6 @@ class OpenIDPlugin extends Gdn_Plugin {
      */
     public function entryController_openID_create($Sender, $Args) {
         $this->EventArguments = $Args;
-        $Sender->Form->InputPrefix = '';
 
         try {
             $OpenID = $this->getOpenID();

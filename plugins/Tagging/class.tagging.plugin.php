@@ -646,7 +646,6 @@ class TaggingPlugin extends Gdn_Plugin {
         $TagTypes = $TagModel->getTagTypes();
 
         $Sender->Form->Method = 'get';
-        $Sender->Form->InputPrefix = '';
 
         list($Offset, $Limit) = offsetLimit($Page, 100);
         $Sender->setData('_Limit', $Limit);

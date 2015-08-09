@@ -34,7 +34,6 @@ class SearchController extends Gdn_Controller {
 
         // Form prep
         $Form->Method = 'get';
-        $Form->InputPrefix = '';
         $this->Form = $Form;
     }
 

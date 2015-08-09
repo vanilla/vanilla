@@ -34,7 +34,6 @@ class LogController extends DashboardController {
     public function confirm($Action, $LogIDs = '') {
         $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
 
-        $this->Form->InputPrefix = '';
         $this->Form->IDPrefix = 'Confirm_';
 
         if (trim($LogIDs)) {
@@ -256,7 +255,6 @@ class LogController extends DashboardController {
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
         $this->addJsFile('jquery-ui.js');
-        $this->Form->InputPrefix = '';
     }
 
     /**

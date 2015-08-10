@@ -1147,23 +1147,15 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * Encodes the string in a php-form safe-encoded format.
+     * @see Gdn_Form::escapeFieldName()
+     * @deprecated
      *
-     * @param string $String The string to encode.
+     * @param string $string
      * @return string
      */
-    public function escapeString($String) {
-        $Array = false;
-        if (substr($String, -2) == '[]') {
-            $String = substr($String, 0, -2);
-            $Array = true;
-        }
-        $Return = urlencode(str_replace(' ', '_', $String));
-        if ($Array === true) {
-            $Return .= '[]';
-        }
-
-        return str_replace('.', '-dot-', $Return);
+    public function escapeString($string) {
+        deprecated('Gd_Form::escapeString()');
+        return $this->escapeFieldName($string);
     }
 
     /**
@@ -2004,7 +1996,7 @@ PASSWORDMETER;
             $Collection = $this->Method == 'get' ? $Request->get() : $Request->post();
 
             foreach ($Collection as $FieldName => $Value) {
-                $FieldName = $this->_unescapeString($FieldName);
+                $FieldName = $this->unescapeFieldName($FieldName);
                 $this->_FormValues[$FieldName] = $Value;
             }
 
@@ -2643,7 +2635,7 @@ PASSWORDMETER;
     protected function _nameAttribute($FieldName, $Attributes) {
         // Name from attributes overrides the default.
         $Name = $this->escapeFieldName(arrayValueI('name', $Attributes, $FieldName));
-        return (empty($Name)) ? '' : ' name="'.htmlspecialchars($Name, ENT_COMPAT, c('Garden.Charset', 'UTF-8')).'"';
+        return ' name="'.htmlspecialchars($Name, ENT_COMPAT, c('Garden.Charset', 'UTF-8')).'"';
     }
 
     /**

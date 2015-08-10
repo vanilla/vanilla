@@ -1227,6 +1227,23 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
             $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
             $this->setHeader('X-Content-Type-Options', 'nosniff');
+
+            // Cross-Origin Resource Sharing (CORS)
+
+            /**
+             * Access-Control-Allow-Origin
+             * If a Origin header is sent by the client, attempt to verify it against the list of
+             * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
+             * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
+             * response using the client's Origin header value.
+             */
+            $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
+            if ($origin) {
+                $originHost = parse_url($origin, PHP_URL_HOST);
+                if ($originHost && isTrustedDomain($originHost)) {
+                    $this->setHeader('Access-Control-Allow-Origin', $origin);
+                }
+            }
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {

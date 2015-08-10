@@ -1090,6 +1090,7 @@ if (!function_exists('socialSignInButton')) {
         TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
         $Title = $Attributes['title'];
         $Class = val('class', $Attributes, '');
+        unset($Attributes['class']);
 
         switch ($Type) {
             case 'icon':

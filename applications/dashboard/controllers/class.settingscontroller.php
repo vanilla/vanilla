@@ -137,34 +137,75 @@ class SettingsController extends DashboardController {
     public function avatars() {
         $this->permission('Garden.Community.Manage');
         $this->addSideMenu('dashboard/settings/avatars');
-        $this->addJsFile('jquery.jcrop.min.js');
-        $this->addJsFile('profile.js');
-        $this->addCssFile('jcrop.css');
+        $this->addJsFile('avatars.js');
         $this->title(t('Avatars'));
-        $thumbSize = c('Garden.Thumbnail.Size', 40);
-        $this->setData('ThumbSize', $thumbSize);
 
+        $validation = new Gdn_Validation();
+        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', t('Thumbnail size must be an integer.'));
+        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', t('Max avatar width must be an integer.'));
+        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', t('Max avatar height must be an integer.'));
+
+        if ($avatar = c('Garden.DefaultAvatar')) {
+            $upload = new Gdn_Upload();
+            // Make sure we're dealing with an uploaded image. We won't manipulate and save externally-hosted images.
+            if ($upload->parse($avatar)) {
+                $this->setData('avatar', changeBasename(c('Garden.DefaultAvatar'), 'n%s'));
+            } else {
+                $this->setData('avatar', c('Garden.DefaultAvatar'));
+            }
+        } else {
+            $this->setData('avatar', 'applications/dashboard/design/images/defaulticon.png');
+        }
+
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField(array(
+            'Garden.Thumbnail.Size',
+            'Garden.Profile.MaxWidth',
+            'Garden.Profile.MaxHeight'
+        ));
+        $this->Form->setModel($configurationModel);
+
+        // If seeing the form for the first time...
+        if (!$this->Form->authenticatedPostBack()) {
+            // Apply the config settings to the form.
+            $this->Form->setData($configurationModel->Data);
+            $this->setData('lessHidden', 'Hidden');
+        } else {
+            $this->setData('moreHidden', 'Hidden');
+            if ($this->Form->save() !== false) {
+                $this->informMessage(t("Your settings have been saved."));
+            }
+        }
+        $this->render();
+    }
+
+    public function defaultAvatar() {
+        $this->permission('Garden.Community.Manage');
+        $this->addSideMenu('dashboard/settings/avatars');
+        $this->title(t('Default Avatar'));
+        $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+        $this->addJsFile('avatars.js');
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $this->Form->setModel($configurationModel);
-
-        // Add some more hidden form fields for jcrop
-        $this->Form->addHidden('x', '0');
-        $this->Form->addHidden('y', '0');
-        $this->Form->addHidden('w', $thumbSize);
-        $this->Form->addHidden('h', $thumbSize);
-        $this->Form->addHidden('ThumbSize', $thumbSize);
-
-        // Get the current avatar.
-        $avatar = c('Garden.DefaultAvatar');
-        if ($avatar) {
-            // Set more hidden jcrop form fields based on the size of the profile-sized avatar
+        if ($avatar = c('Garden.DefaultAvatar')) {
             $upload = new Gdn_Upload();
-            $source = $upload->copyLocal(basename(changeBasename($avatar, "p%s")));
-            $sourceSize = getimagesize($source);
-            $this->setData('DefaultAvatar', $avatar);
-            $this->Form->addHidden('WidthSource', $sourceSize[0]);
-            $this->Form->addHidden('HeightSource', $sourceSize[1]);
+            // Make sure we're dealing with an uploaded image. We won't manipulate and save externally-hosted images.
+            if ($upload->parse($avatar)) {
+                $source = $upload->copyLocal(basename(changeBasename($avatar, "p%s")));
+                $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+
+                // TODO: I hate these settings
+                $crop->setCurrentCroppedImageUrl(changeBasename($avatar, "n%s"));
+                $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
+
+                // Set crop data for the view.
+                $this->setData('crop', $crop);
+            } else {
+                $this->setData('avatar', c('Garden.DefaultAvatar'));
+            }
+        } else {
+            $this->setData('avatar', 'applications/dashboard/design/images/defaulticon.png');
         }
 
         // If seeing the form for the first time...
@@ -172,86 +213,94 @@ class SettingsController extends DashboardController {
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
-            $saveData = array();
             if ($this->Form->save() !== false) {
                 $upload = new Gdn_UploadImage();
-                try {
-                    $newUpload = false;
-                    // Validate the upload, fallback to existing avatar.
-                    if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
-                        $newUpload = true;
-                    } else {
-                        $tmpAvatar = $source;
-                    }
-                    if ($tmpAvatar) {
-                        // Generate the target image name
-                        $targetImage = $upload->generateTargetName(PATH_UPLOADS);
-                        $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
-
-                        // Save the full size image.
-                        $parts = Gdn_UploadImage::saveImageAs(
-                            $tmpAvatar,
-                            $imageBaseName
-                        );
-
-                        // Save the profile size image.
-                        $profile = Gdn_UploadImage::saveImageAs(
-                            $tmpAvatar,
-                            "p$imageBaseName",
-                            c('Garden.Profile.MaxHeight', 1000),
-                            c('Garden.Profile.MaxWidth', 250),
-                            array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                        );
-
-                        // Update the source size for jcrop.
-                        $upload = new Gdn_Upload();
-                        $source = $upload->copyLocal(val('Name', $profile));
-                        $sourceSize = getimagesize($source);
-
-                        $thumbOptions = array('Crop' => true, 'SourceX' => $this->Form->getValue('x'), 'SourceY' => $this->Form->getValue('y'), 'SourceWidth' => $this->Form->getValue('w'), 'SourceHeight' => $this->Form->getValue('h'));
-                        if ($newUpload) {
-                            $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
-                        }
-
-                        // Save the thumbnail size image.
-                        Gdn_UploadImage::saveImageAs(
-                            $tmpAvatar,
-                            "n$imageBaseName",
-                            $thumbSize,
-                            $thumbSize,
-                            $thumbOptions
-                        );
-
-                        $imageBaseName = $parts['SaveName'];
-                        $saveData['Garden.DefaultAvatar'] = Gdn_Upload::url($imageBaseName);
-                    }
-                } catch (Exception $ex) {
-                    $this->Form->addError($ex);
+                $newAvatars = false;
+                if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
+                    // New upload
+                    $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                    $newAvatars = $this->saveDefaultAvatars($tmpAvatar, $upload, $thumbOptions);
+                } else if ($avatar && $crop && $crop->isCropped()) {
+                    // New thumbnail
+                    $tmpAvatar = $source;
+                    $thumbOptions = array('Crop' => true,
+                        'SourceX' => $crop->getCropXValue(),
+                        'SourceY' => $crop->getCropYValue(),
+                        'SourceWidth' => $crop->getCropWidth(),
+                        'SourceHeight' => $crop->getCropHeight());
+                    $newAvatars = $this->saveDefaultAvatars($tmpAvatar, $upload, $thumbOptions);
                 }
                 // No errors, delete old avatars, update data and forms, and save the avatar to config.
                 if ($this->Form->errorCount() == 0) {
                     // Delete any previously uploaded images.
-                    if ($avatar) {
+                    if ($avatar && $newAvatars) {
                         $upload->delete(basename($avatar));
                         $upload->delete(basename(changeBasename($avatar, 'p%s')));
                         $upload->delete(basename(changeBasename($avatar, 'n%s')));
                     }
-                    // Save the path to the avatar in the config.
-                    saveToConfig($saveData);
 
-                    // Update hidden jcrop form values.
-                    $this->Form->addHidden('WidthSource', $sourceSize[0]);
-                    $this->Form->addHidden('HeightSource', $sourceSize[1]);
+                    if (!$crop && $newAvatars) {
+                        $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+                        $this->setData('crop', $crop);
+                    }
 
-                    // Set view data.
-                    $this->setData('DefaultAvatar', c('Garden.DefaultAvatar'));
-                    $this->setData('ThumbSize', c('Garden.Thumbnail.Size', 40));
+                    if ($crop) {
+                        $avatar = c('Garden.DefaultAvatar');
+                        $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+                        // Set view data.
+                        if ($newAvatars) {
+                            $source = $upload->copyLocal(basename(changeBasename($avatar, "p%s")));
+                            $crop->setSource($source);
+                        }
+                        $crop->setSize($thumbnailSize, $thumbnailSize);
+                        $crop->setCurrentCroppedImageUrl(changeBasename($avatar, "n%s"));
+                        $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
+                    }
                 }
-
                 $this->informMessage(t("Your settings have been saved."));
             }
         }
         $this->render();
+    }
+
+    public function saveDefaultAvatars($source, $upload, $thumbOptions) {
+        try {
+            // Generate the target image name
+            $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+            $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+
+            // Save the full size image.
+            $parts = Gdn_UploadImage::saveImageAs(
+                $source,
+                $imageBaseName
+            );
+
+            // Save the profile size image.
+            Gdn_UploadImage::saveImageAs(
+                $source,
+                "p$imageBaseName",
+                c('Garden.Profile.MaxHeight', 1000),
+                c('Garden.Profile.MaxWidth', 250),
+                array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+            );
+
+            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+            // Save the thumbnail size image.
+            Gdn_UploadImage::saveImageAs(
+                $source,
+                "n$imageBaseName",
+                $thumbnailSize,
+                $thumbnailSize,
+                $thumbOptions
+            );
+        } catch (Exception $ex) {
+            $this->Form->addError($ex);
+            return false;
+        }
+
+        $imageBaseName = $parts['SaveName'];
+        saveToConfig('Garden.DefaultAvatar', Gdn_Upload::url($imageBaseName));
+        return true;
     }
 
     /**
@@ -1462,7 +1511,7 @@ class SettingsController extends DashboardController {
             removeFromConfig('Garden.DefaultAvatar');
             @unlink(PATH_ROOT.DS.$avatar);
         }
-        redirect('dashboard/settings/avatars');
+        redirect('dashboard/settings/defaultavatar');
     }
 
     /**

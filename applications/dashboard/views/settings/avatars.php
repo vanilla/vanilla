@@ -1,61 +1,50 @@
-<?php if (!defined('APPLICATION')) exit();
-$session = Gdn::session();
-$defaultAvatar = $this->data('DefaultAvatar');
-$thumbsize = $this->data('ThumbSize');
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo t('Avatars'); ?></h1>
-
 <?php
-echo wrap(t('DefaultAvatarDescription', 'Choose your default avatar.'), 'div', array('class' => 'Info')
-);
-
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
-echo $this->Form->errors();
+echo wrap(t('Manage your avatar settings.'), 'div', array('class' => 'Info'));
 ?>
-<ul>
-    <li>
-        <?php
-        if ($defaultAvatar) {
-            echo wrap(t('DefaultAvatarBrowse', 'Upload a new default avatar.'), 'span', array('class' => 'Info'));
-        }
-        echo $this->Form->input('DefaultAvatar', 'file');
-        if ($defaultAvatar) {
-            echo '</li><li>'.wrap(anchor(t('Remove Default Avatar'), '/dashboard/settings/removedefaultavatar/'.$session->TransientKey(), 'SmallButton'), 'span', array('style' => 'padding: 10px 0;')).'</li>';
-        }
-        ?>
-    </li>
-</ul>
-<?php
-if ($defaultAvatar) { ?>
-    <table style='table-layout: fixed;'>
-        <thead>
-        <tr>
+<h1><?php echo t('Default Avatar'); ?></h1>
+<div class="avatars">
+    <div class="Padded current-avatar">
+        <?php echo img($this->data('avatar'), array('style' => 'min-width: '.c('Garden.Thumbnail.Size').'px; min-height: '.c('Garden.Thumbnail.Size').'px;')); ?>
+    </div>
+    <div class="change-avatar">
+        <?php echo anchor('Change', '/dashboard/settings/defaultavatar', 'Button Primary'); ?>
+    </div>
+    <div class="Padded more-block">
+        <a href="" class="more-link js-more-link <?php echo $this->data('moreHidden'); ?>">Show advanced settings</a>
+        <a href="" class="less-link js-less-link <?php echo $this->data('lessHidden'); ?>">Hide advanced settings</a>
+    </div>
+</div>
+<div class="js-avatars-advanced-settings <?php echo $this->data('lessHidden'); ?>">
+    <?php echo $this->Form->open(array('enctype' => 'multipart/form-data')); ?>
+    <h1><?php echo t('Avatar sizes'); ?></h1>
+    <?php echo wrap(t('Change the sizes that avatar images are saved at.').' '.t('Changes will apply to newly uploaded avatars only.'), 'div', array('class' => 'Info'));
+    echo $this->Form->errors(); ?>
+    <ul>
+        <li>
             <?php
-            echo '<td>'.t('Avatar').'</td>';
-            echo '<td>'.t('Thumbnail').'</td>';
+            echo $this->Form->label('Thumbnail Size', 'Garden.Thumbnail.Size');
+            echo wrap(t('Avatars will have their thumbnails saved at this size.'), 'div', array('class' => 'Info'));
+            echo $this->Form->textBox('Garden.Thumbnail.Size', array('class' => 'SmallInput')).' px';
             ?>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                <?php
-                echo img(changeBasename($defaultAvatar, 'p%s'), array('id' => 'cropbox'));
-                echo '<label>'.t('Define Thumbnail', 'Click and drag across the picture to define your thumbnail.').'</label>';
-                ?>
-            </td>
-            <td>
-                <div style="<?php echo 'width:'.$thumbsize.'px;height:'.$thumbsize.'px;'; ?>overflow:hidden;">
-                    <?php
-                    echo img(changeBasename($defaultAvatar, 'n%s'), array('class' => 'js-thumbnail thumbnail', 'style' => 'min-width: '.$thumbsize.'px; min-height: '.$thumbsize.'px;'));
-                    echo img(changeBasename($defaultAvatar, 'p%s'), array('id' => 'preview'));
-                    ?>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-<?php } ?>
-<div>
-    <?php echo $this->Form->close('Save', '', array('class' => 'Button Primary', 'style' => 'margin-top: 20px;')); ?>
+        </li>
+        <li>
+            <?php
+            echo $this->Form->label('Max Avatar Width', 'Garden.Profile.MaxWidth');
+            echo wrap(t('Avatars will be scaled down if they exceed this width.'), 'div', array('class' => 'Info'));
+            echo $this->Form->textBox('Garden.Profile.MaxWidth', array('class' => 'SmallInput')).' px';
+            ?>
+        </li>
+        <li>
+            <?php
+            echo $this->Form->label('Max Avatar Height', 'Garden.Profile.MaxHeight');
+            echo wrap(t('Avatars will be scaled down if they exceed this height.'), 'div', array('class' => 'Info'));
+            echo $this->Form->textBox('Garden.Profile.MaxHeight', array('class' => 'SmallInput')).' px';
+            ?>
+        </li>
+    </ul>
+    <div>
+        <?php echo $this->Form->close('Save', '', array('class' => 'Button Primary', 'style' => 'margin-top: 20px;')); ?>
+    </div>
 </div>

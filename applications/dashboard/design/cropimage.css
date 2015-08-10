@@ -50,3 +50,19 @@
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
 }
+
+.box-image {
+    padding: 20px;
+    float: left;
+}
+
+.box-crop::after {
+    display: table;
+    clear: both;
+    content: '';
+}
+
+.box-crop {
+    float: left;
+    width: 100%;
+}

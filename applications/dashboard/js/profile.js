@@ -45,7 +45,6 @@ jQuery(document).ready(function($) {
         });
 
     function setPreviewAndCoords(c) {
-        $('.js-thumbnail').hide();
         var thumbSize = $('#Form_ThumbSize').val();
         var sourceHeight = $('#Form_HeightSource').val();
         var sourceWidth = $('#Form_WidthSource').val();

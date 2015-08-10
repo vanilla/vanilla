@@ -3840,7 +3840,7 @@ if (!function_exists('isTrustedDomain')) {
      * Check the provided domain name (or request host, if domain is not supplied)
      * to determine if it is a trusted domain.
      *
-     * @param bool|false $domain Domain name to compare against our list of trusted domains.
+     * @param string|null $domain Domain name to compare against our list of trusted domains.
      *
      * @return bool True if verified as a trusted domain.  False if unable to verify domain.
      */

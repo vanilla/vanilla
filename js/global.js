@@ -1740,7 +1740,7 @@ jQuery(document).ready(function($) {
                         // but it's the only way, as spaces make searching
                         // more ambiguous.
                         // \xA0 non-breaking space
-                        regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+                        regexp = new RegExp(flag + '([^"]\\S*)$|' + flag + '"([^"\\n]*)"$', 'gi');
 
                         match = regexp.exec(subtext);
                         if (match) {

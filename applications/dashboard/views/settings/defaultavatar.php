@@ -8,12 +8,12 @@ $defaultAvatar = c('Garden.DefaultAvatar');
 $session = Gdn::session();
 ?>
 <?php
-if ($defaultAvatar) {
-    echo val('crop', $this->Data);
+if ($this->data('crop')) {
+    echo $this->data('crop');
 } else { ?>
     <div class="avatars">
         <div class="Padded current-avatar">
-            <?php echo img($this->data('avatar'), array('style' => 'min-width: '.c('Garden.Thumbnail.Size').'px; min-height: '.c('Garden.Thumbnail.Size').'px;')); ?>
+            <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
         </div>
     </div>
 <?php }?>

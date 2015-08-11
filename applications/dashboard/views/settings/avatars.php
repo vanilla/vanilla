@@ -6,7 +6,7 @@ echo wrap(t('Manage your avatar settings.'), 'div', array('class' => 'Info'));
 <h1><?php echo t('Default Avatar'); ?></h1>
 <div class="avatars">
     <div class="Padded current-avatar">
-        <?php echo img($this->data('avatar'), array('style' => 'min-width: '.c('Garden.Thumbnail.Size').'px; min-height: '.c('Garden.Thumbnail.Size').'px;')); ?>
+        <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
     </div>
     <div class="change-avatar">
         <?php echo anchor('Change', '/dashboard/settings/defaultavatar', 'Button Primary'); ?>

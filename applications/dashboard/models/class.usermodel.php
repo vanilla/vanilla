@@ -981,7 +981,7 @@ class UserModel extends Gdn_Model {
             return UserPhotoDefaultUrl($user);
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
-            if (strpos($avatar, 'uploads')) {
+            if (strpos($avatar, 'uploads/defaultavatar')) {
                 if($size == 'thumbnail') {
                     return changeBasename($avatar, 'n%s');
                 } elseif ($size == 'profile') {
@@ -990,7 +990,7 @@ class UserModel extends Gdn_Model {
             }
             return $avatar;
         }
-        return '';
+        return 'applications/dashboard/design/images/defaulticon.png';
     }
 
     /**

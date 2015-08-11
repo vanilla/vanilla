@@ -950,9 +950,7 @@ class UserModel extends Gdn_Model {
                     foreach ($Join as $Column) {
                         $Value = $User[$Column];
                         if ($Column == 'Photo') {
-                            if (!$Value) {
-                                $Value = self::getDefaultAvatarUrl($User);
-                            } elseif (!isUrl($Value)) {
+                            if ($Value && !isUrl($Value)) {
                                 $Value = Gdn_Upload::url(changeBasename($Value, 'n%s'));
                             }
                         }
@@ -981,7 +979,7 @@ class UserModel extends Gdn_Model {
             return UserPhotoDefaultUrl($user);
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
-            if (strpos($avatar, 'uploads/defaultavatar')) {
+            if (strpos($avatar, 'uploads/defaultavatar') !== false) {
                 if($size == 'thumbnail') {
                     return changeBasename($avatar, 'n%s');
                 } elseif ($size == 'profile') {

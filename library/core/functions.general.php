@@ -3847,9 +3847,18 @@ if (!function_exists('isTrustedDomain')) {
     function isTrustedDomain($domain = null) {
         static $trustedDomains = null;
 
-        // If we weren't provided a host, fall back to the request host.
+        // If we weren't provided a host, fall back to the referring host, if available.
         if (!$domain) {
-            $domain = Gdn::request()->host();
+            $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER', false);
+            if ($referrer) {
+                $referrerDomain = parse_url($referrer, PHP_URL_HOST);
+            }
+
+            if (!empty($referrerDomain)) {
+                $domain = $referrerDomain;
+            } else {
+                return false;
+            }
         }
 
         // If we haven't already compiled an array of trusted domains, grab them.

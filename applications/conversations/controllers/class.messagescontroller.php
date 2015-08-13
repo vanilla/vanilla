@@ -351,6 +351,9 @@ class MessagesController extends ConversationsController {
             $Limit
         );
 
+        $this->EventArguments['MessageData'] = $this->MessageData;
+        $this->fireEvent('beforeMessages');
+
         $this->setData('Messages', $this->MessageData);
 
         // Figure out who's participating.

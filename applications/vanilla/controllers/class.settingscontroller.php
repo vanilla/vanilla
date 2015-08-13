@@ -561,18 +561,18 @@ class SettingsController extends Gdn_Controller {
         $this->addSideMenu('vanilla/settings/managecategories');
 
         $this->addJsFile('categories.js');
-        $this->addJsFile('js/library/jquery.alphanumeric.js');
+        $this->addJsFile('jquery.alphanumeric.js');
 
 
         // This now works on latest jQuery version 1.10.2
         //
         // Jan29, 2014, upgraded jQuery UI to 1.10.3 from 1.8.11
-        $this->addJsFile('js/library/nestedSortable/jquery-ui.min.js');
+        $this->addJsFile('nestedSortable/jquery-ui.min.js');
         // Newer nestedSortable, but does not work.
         //$this->addJsFile('js/library/nestedSortable/jquery.mjs.nestedSortable.js');
         // old jquery-ui
         //$this->addJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');
-        $this->addJsFile('js/library/nestedSortable.1.3.4/jquery.ui.nestedSortable.js');
+        $this->addJsFile('nestedSortable.1.3.4/jquery.ui.nestedSortable.js');
 
         $this->title(t('Categories'));
 

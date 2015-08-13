@@ -85,9 +85,8 @@ class SetupController extends DashboardController {
                     // Now that the application is installed, select a more user friendly error page.
                     $Config = array('Garden.Installed' => true);
                     saveToConfig($Config);
+                    $this->fireAs('UpdateModel')->fireEvent('AfterStructure');
                     $this->fireEvent('Installed');
-
-                    PermissionModel::ResetAllRoles();
 
                     // Go to the dashboard
                     redirect('/settings/gettingstarted');

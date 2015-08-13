@@ -146,6 +146,12 @@ class SplitMergePlugin extends Gdn_Plugin {
         $Discussions = $DiscussionModel->SQL->whereIn('DiscussionID', $DiscussionIDs)->get('Discussion')->resultArray();
         $Sender->setData('Discussions', $Discussions);
 
+        // Make sure none of the selected discussions are ghost redirects.
+        $discussionTypes = array_column($Discussions, 'Type');
+        if (in_array('redirect', $discussionTypes)) {
+            throw new Gdn_UserException('You cannot merge redirects.', 400);
+        }
+
         // Perform the merge
         if ($Sender->Form->authenticatedPostBack()) {
             // Create a new discussion record

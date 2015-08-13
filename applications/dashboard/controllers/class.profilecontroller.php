@@ -996,7 +996,7 @@ class ProfileController extends Gdn_Controller {
         $Result = array();
         foreach ($Data as $K => $V) {
             if (is_array($V)) {
-                $Result[$K] = self::_emoveEmailPreferences($V);
+                $Result[$K] = self::_removeEmailPreferences($V);
             } else {
                 $Result[$K] = $V;
             }
@@ -1393,7 +1393,7 @@ class ProfileController extends Gdn_Controller {
             $this->EventArguments['User'] = $this->User;
             $this->fireEvent('GetConnections');
             if (count($this->data('Connections')) > 0) {
-                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow');
+                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', array('class' => 'link-social'));
             }
         }
     }

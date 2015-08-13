@@ -602,6 +602,8 @@ class CategoryModel extends Gdn_Model {
         $Sql = clone Gdn::sql();
         $Sql->reset();
 
+        $Discussions = null;
+
         // Grab the discussions.
         if (count($DiscussionIDs) > 0) {
             $Discussions = $Sql->whereIn('DiscussionID', $DiscussionIDs)->get('Discussion')->resultArray();

@@ -1096,6 +1096,13 @@ class EditorPlugin extends Gdn_Plugin {
 
         $DiscussionID = null;
         $Comments = $Sender->data('Comments');
+        if ($answers = $Sender->data('Answers')) {
+            $commentsArray = $Comments->resultObject();
+            $commentsArray = array_merge($answers, $commentsArray);
+            $commentsData = new Gdn_DataSet();
+            $commentsData->importDataset($commentsArray);
+            $Comments = $commentsData;
+        }
         $CommentIDList = array();
         $MediaData = array();
 

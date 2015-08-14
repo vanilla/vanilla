@@ -577,7 +577,15 @@ class SettingsController extends Gdn_Controller {
         $this->title(t('Categories'));
 
         // Get category data
-        $this->setData('CategoryData', $this->CategoryModel->GetAll('TreeLeft'), true);
+        $CategoryData = $this->CategoryModel->getAll('TreeLeft');
+
+        // Set CanDelete per-category so we can override later if we want.
+        $canDelete = checkPermission('Garden.Settings.Manage');
+        array_walk($CategoryData->result(), function (&$value) use ($canDelete) {
+            setvalr('CanDelete', $value, $canDelete);
+        });
+
+        $this->setData('CategoryData', $CategoryData, true);
 
         // Setup & save forms
         $Validation = new Gdn_Validation();

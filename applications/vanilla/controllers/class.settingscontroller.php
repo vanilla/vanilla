@@ -581,8 +581,8 @@ class SettingsController extends Gdn_Controller {
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission('Garden.Settings.Manage');
-        array_walk($CategoryData->result(), function (&$Value) use ($canDelete) {
-            setvalr('CanDelete', $Value, $canDelete);
+        array_walk($CategoryData->result(), function (&$value) use ($canDelete) {
+            setvalr('CanDelete', $value, $canDelete);
         });
 
         $this->setData('CategoryData', $CategoryData, true);

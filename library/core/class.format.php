@@ -1273,7 +1273,7 @@ EOT;
         ) {
             $ID = $Matches[2];
             $Result = <<<EOT
-      <iframe src="//player.vimeo.com/video/{$ID}" width="{$Width}" height="{$Height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<iframe src="//player.vimeo.com/video/{$ID}" width="{$Width}" height="{$Height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
 
         // Imgur GifV
@@ -1281,8 +1281,14 @@ EOT;
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $ID = $Matches[1];
+            $ModernBrowser = T('Your browser does not support HTML5 video!');
             $Result = <<<EOT
-<div class="imgur-gifv VideoWrap"><video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop"><source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4" ></source><object type="application/x-shockwave-flash" data="https://s.imgur.com/include/flash/gifplayer.swf?imgur_video=https://i.imgur.com/{$ID}.mp4&imgur_width=auto&imgur_height=auto"></object></video></div>
+<div class="imgur-gifv VideoWrap">
+    <video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
+        <source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4">
+        <p>{$ModernBrowser} https://i.imgur.com/{$ID}.gifv</p>
+    </video>
+</div>
 EOT;
 
         // Twitter

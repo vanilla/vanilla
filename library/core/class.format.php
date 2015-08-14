@@ -1282,12 +1282,7 @@ EOT;
         ) {
             $ID = $Matches[1];
             $Result = <<<EOT
-<div class="imgur-gifv VideoWrap">
-    <video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop" width="auto" height="auto">
-    <source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4" ></source>
-    <object type="application/x-shockwave-flash" height="auto" width="auto" data="https://s.imgur.com/include/flash/gifplayer.swf?imgur_video=https://i.imgur.com/{$ID}.mp4&imgur_width=auto&imgur_height=auto"></object>
-    </video>
-</div>
+<div class="imgur-gifv VideoWrap"><video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop"><source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4" ></source><object type="application/x-shockwave-flash" data="https://s.imgur.com/include/flash/gifplayer.swf?imgur_video=https://i.imgur.com/{$ID}.mp4&imgur_width=auto&imgur_height=auto"></object></video></div>
 EOT;
 
         // Twitter

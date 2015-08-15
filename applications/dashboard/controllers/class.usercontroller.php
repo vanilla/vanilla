@@ -919,7 +919,7 @@ class UserController extends DashboardController {
      */
     public function save() {
         $this->permission('Garden.Users.Edit');
-        if (!Gdn::request()->isPostBack()) {
+        if (!Gdn::request()->isAuthenticatedPostBack()) {
             throw new Exception('Requires POST', 405);
         }
 

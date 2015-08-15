@@ -322,8 +322,10 @@ class SettingsController extends DashboardController {
                 $this->View = 'Ban';
                 break;
             case 'delete':
-                $BanModel->delete(array('BanID' => $ID));
-                $this->View = 'BanDelete';
+                if ($this->Form->authenticatedPostBack()) {
+                    $BanModel->delete(array('BanID' => $ID));
+                    $this->View = 'BanDelete';
+                }
                 break;
             default:
                 $Bans = $BanModel->getWhere(array(), 'BanType, BanValue', 'asc', $Limit, $Offset)->resultArray();

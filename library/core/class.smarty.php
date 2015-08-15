@@ -34,7 +34,7 @@ class Gdn_Smarty {
 
         // Get an ID for the body.
         $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($Controller->RequestMethod)));
-        $Smarty->assign('BodyID', $BodyIdentifier);
+        $Smarty->assign('BodyID', Gdn_Format::text($BodyIdentifier));
         //$Smarty->assign('Config', Gdn::Config());
 
         // Assign some information about the user.
@@ -50,7 +50,7 @@ class Gdn_Smarty {
             $Photo = $Session->User->Photo;
             if ($Photo) {
                 if (!IsUrl($Photo)) {
-                    $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+                    $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
                 }
             } else {
                 if (function_exists('UserPhotoDefaultUrl')) {
@@ -58,7 +58,7 @@ class Gdn_Smarty {
                 } elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
                     $Photo = Gdn_Upload::url($ConfigPhoto);
                 else {
-                    $Photo = Asset('/applications/dashboard/design/images/defaulticon.png', true);
+                    $Photo = asset('/applications/dashboard/design/images/defaulticon.png', true);
                 }
             }
             $User['Photo'] = $Photo;

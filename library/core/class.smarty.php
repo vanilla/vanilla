@@ -34,7 +34,7 @@ class Gdn_Smarty {
 
         // Get an ID for the body.
         $BodyIdentifier = strtolower($Controller->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($Controller->RequestMethod)));
-        $Smarty->assign('BodyID', Gdn_Format::text($BodyIdentifier));
+        $Smarty->assign('BodyID', htmlspecialchars($BodyIdentifier));
         //$Smarty->assign('Config', Gdn::Config());
 
         // Assign some information about the user.

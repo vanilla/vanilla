@@ -1,12 +1,12 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo Gdn_Format::text(Gdn::locale()->Locale); ?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
 <head>
     <?php $this->renderAsset('Head'); ?>
     <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
     <meta name="robots" content="noindex,nofollow"/>
 </head>
-<body id="<?php echo Gdn_Format::text($BodyIdentifier); ?>" class="<?php echo Gdn_Format::text($this->CssClass); ?>">
+<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
 <div id="Frame">
     <div id="Head">
         <h1><?php echo anchor(c('Garden.Title').' '.Wrap(t('Visit Site')), '/'); ?></h1>

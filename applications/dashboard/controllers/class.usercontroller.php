@@ -335,6 +335,7 @@ class UserController extends DashboardController {
 
     /**
      * Ban a user and optionally delete their content.
+     *
      * @since 2.1
      * @param type $UserID
      */

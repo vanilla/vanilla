@@ -1667,11 +1667,8 @@ class CategoryModel extends Gdn_Model {
         // Make sure that the UrlCode is unique among categories.
         $this->SQL->select('CategoryID')
             ->from('Category')
+            ->where('CategoryID <>', $CategoryID)
             ->where('UrlCode', $UrlCode);
-
-        if ($CategoryID) {
-            $this->SQL->where('CategoryID <>', $CategoryID);
-        }
 
         if ($this->SQL->get()->numRows()) {
             $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');

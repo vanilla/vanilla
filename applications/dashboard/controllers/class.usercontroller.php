@@ -1081,7 +1081,7 @@ class UserController extends DashboardController {
         $data = Gdn::userModel()->tagSearch($query, $limit);
         foreach ($data as &$user) {
             // Sanitize usernames.
-            $user['name'] = Gdn_Format::text($user['name']);
+            $user['name'] = htmlspecialchars($user['name']);
         }
         die(json_encode($data));
     }

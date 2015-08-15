@@ -1800,21 +1800,14 @@ PASSWORDMETER;
     }
 
     /**
-     * Returns a boolean value indicating if the current page has an
-     * authenticated postback. It validates the postback by looking at a
-     * transient value that was rendered using $this->Open() and submitted with
-     * the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
+     * Returns a boolean value indicating if the current page has an authenticated postback.
+     *
+     * It validates the postback by looking at a transient value that was rendered using $this->Open()
+     * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
      * @return bool
      */
     public function authenticatedPostBack() {
-        // Commenting this out because, technically, a get request is not a "postback".
-        // And since I typically use AuthenticatedPostBack to validate that a form has
-        // been posted back a get request should not be considered an authenticated postback.
-        //if ($this->Method == "get") {
-        // forms sent with "get" method do not require authentication.
-        //   return TRUE;
-        //} else {
         $KeyName = $this->escapeFieldName('TransientKey');
         $PostBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $KeyName, false);
 
@@ -1823,20 +1816,13 @@ PASSWORDMETER;
             return false;
         }
 
-        // DEBUG:
-        //$Result .= '<div>KeyName: '.$KeyName.'</div>';
-        //echo '<div>PostBackKey: '.$PostBackKey.'</div>';
-        //echo '<div>TransientKey: '.$Session->TransientKey().'</div>';
-        //echo '<div>AuthenticatedPostBack: ' . ($Session->ValidateTransientKey($PostBackKey) ? 'Yes' : 'No');
-        //die();
         return Gdn::session()->validateTransientKey($PostBackKey);
-        //}
     }
 
     /**
      * Checks $this->FormValues() to see if the specified button translation
      * code was submitted with the form (helps figuring out what button was
-     *  pressed to submit the form when there is more than one button available).
+     * pressed to submit the form when there is more than one button available).
      *
      * @param string $ButtonCode The translation code of the button to check for.
      * @return boolean

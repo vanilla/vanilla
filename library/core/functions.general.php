@@ -1700,7 +1700,7 @@ if (!function_exists('getRecord')) {
         switch (strtolower($recordType)) {
             case 'discussion':
                 $Model = new DiscussionModel();
-                $Row = $Model->GetID($id);
+                $Row = $Model->getID($id);
                 $Row->Url = DiscussionUrl($Row);
                 $Row->ShareUrl = $Row->Url;
                 if ($Row) {
@@ -1709,12 +1709,12 @@ if (!function_exists('getRecord')) {
                 break;
             case 'comment':
                 $Model = new CommentModel();
-                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
+                $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Url'] = Url("/discussion/comment/$id#Comment_$id", true);
 
                     $Model = new DiscussionModel();
-                    $Discussion = $Model->GetID($Row['DiscussionID']);
+                    $Discussion = $Model->getID($Row['DiscussionID']);
                     if ($Discussion) {
                         $Discussion->Url = DiscussionUrl($Discussion);
                         $Row['ShareUrl'] = $Discussion->Url;
@@ -1726,7 +1726,7 @@ if (!function_exists('getRecord')) {
                 break;
             case 'activity':
                 $Model = new ActivityModel();
-                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
+                $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Name'] = formatString($Row['HeadlineFormat'], $Row);
                     $Row['Body'] = $Row['Story'];
@@ -1734,11 +1734,11 @@ if (!function_exists('getRecord')) {
                 }
                 break;
             default:
-                throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($recordType)));
+                throw new Gdn_UserException('Unknown record type requested.');
         }
 
         if ($throw) {
-            throw NotFoundException($recordType);
+            throw NotFoundException();
         } else {
             return false;
         }

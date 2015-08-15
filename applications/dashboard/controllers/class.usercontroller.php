@@ -1071,14 +1071,18 @@ class UserController extends DashboardController {
     }
 
     /**
+     * JSON output of a username search.
      *
-     *
-     * @param $q
+     * @param string $query
      * @param int $limit
      */
-    public function tagSearch($q, $limit = 10) {
-        $Data = Gdn::userModel()->tagSearch($q, $limit);
-        die(json_encode($Data));
+    public function tagSearch($query, $limit = 10) {
+        $data = Gdn::userModel()->tagSearch($query, $limit);
+        foreach ($data as &$user) {
+            // Sanitize usernames.
+            $user['name'] = Gdn_Format::text($user['name']);
+        }
+        die(json_encode($data));
     }
 
     /**

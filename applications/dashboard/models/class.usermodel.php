@@ -2453,21 +2453,22 @@ class UserModel extends Gdn_Model {
 
     /**
      * A simple search for tag queries.
+     *
      * @param string $Search
      * @since 2.2
      */
     public function tagSearch($Search, $Limit = 10) {
         $Search = trim(str_replace(array('%', '_'), array('\%', '\_'), $Search));
 
-        $Results = $this->SQL
+        return $this->SQL
             ->select('UserID', '', 'id')
             ->select('Name', '', 'name')
             ->from('User')
             ->like('Name', $Search, 'right')
             ->where('Deleted', 0)
             ->limit($Limit)
-            ->get()->resultArray();
-        return $Results;
+            ->get()
+            ->resultArray();
     }
 
     /**

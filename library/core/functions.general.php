@@ -1694,24 +1694,14 @@ if (!function_exists('getPostValue')) {
 }
 
 if (!function_exists('getRecord')) {
-    /**
-     *
-     *
-     * @param $recordType
-     * @param $id
-     * @param bool|false $throw
-     * @return bool|mixed|object
-     * @throws Exception
-     * @throws Gdn_UserException
-     */
     function getRecord($recordType, $id, $throw = false) {
+        $Row = false;
+
         switch (strtolower($recordType)) {
             case 'discussion':
                 $Model = new DiscussionModel();
                 $Row = $Model->getID($id);
-                // Require view permission.
-                Gdn::controller()->permission('Vanilla.Discussions.View', true, 'Category', $Row->PermissionCategoryID);
-                $Row->Url = discussionUrl($Row);
+                $Row->Url = DiscussionUrl($Row);
                 $Row->ShareUrl = $Row->Url;
                 if ($Row) {
                     return (array)$Row;
@@ -1721,12 +1711,10 @@ if (!function_exists('getRecord')) {
                 $Model = new CommentModel();
                 $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
-                    $Row['Url'] = url("/discussion/comment/$id#Comment_$id", true);
+                    $Row['Url'] = Url("/discussion/comment/$id#Comment_$id", true);
 
                     $Model = new DiscussionModel();
                     $Discussion = $Model->getID($Row['DiscussionID']);
-                    // Require view permission.
-                    Gdn::controller()->permission('Vanilla.Discussions.View', true, 'Category', $Discussion->PermissionCategoryID);
                     if ($Discussion) {
                         $Discussion->Url = DiscussionUrl($Discussion);
                         $Row['ShareUrl'] = $Discussion->Url;
@@ -1739,10 +1727,6 @@ if (!function_exists('getRecord')) {
             case 'activity':
                 $Model = new ActivityModel();
                 $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
-                // Only allow public activity to be shared.
-                if (ActivityModel::NOTIFY_PUBLIC != val('NotifyUserID', $Row)) {
-                    throw permissionException();
-                }
                 if ($Row) {
                     $Row['Name'] = formatString($Row['HeadlineFormat'], $Row);
                     $Row['Body'] = $Row['Story'];

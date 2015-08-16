@@ -1077,8 +1077,8 @@ class UserController extends DashboardController {
      * @param string $query
      * @param int $limit
      */
-    public function tagSearch($query, $limit = 10) {
-        $data = Gdn::userModel()->tagSearch($query, $limit);
+    public function tagSearch($q, $limit = 10) {
+        $data = Gdn::userModel()->tagSearch($q, $limit);
         $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
         $this->sendHeaders();
         die(json_encode($data));

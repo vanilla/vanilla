@@ -437,7 +437,7 @@ if (!function_exists('asset')) {
                             $Version = val('Version', $PluginInfo, $Version);
                             break;
                         case 'applications':
-                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo($Key);
+                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo(ucfirst($Key));
                             $Version = val('Version', $AppInfo, $Version);
                             break;
                         case 'themes':

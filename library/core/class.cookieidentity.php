@@ -375,7 +375,7 @@ class Gdn_CookieIdentity {
         $Key = explode('-', $Payload[0]);
         $Expiration = array_pop($Key);
         $UserID = implode('-', $Key);
-        $Payload = array_slice($Payload, -4);
+        $Payload = array_slice($Payload, 4);
         $Payload = array_merge(array($UserID, $Expiration), $Payload);
 
         return $Payload;

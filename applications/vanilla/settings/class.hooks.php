@@ -418,7 +418,7 @@ class VanillaHooks implements Gdn_IPlugin {
 //      }
 
         if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            $PostBack = $Sender->Form->isAuthenticatedPostBack();
+            $PostBack = $Sender->Form->authenticatedPostBack();
             $Set = array();
 
             // Add the category definitions to for the view to pick up.

@@ -118,6 +118,7 @@ class Gdn_ApplicationManager {
      * @return bool|mixed Returns the application's info, a specific value, or false if the application cannot be found.
      */
     public function getApplicationInfo($applicationName, $key = null) {
+        $applicationName = ucfirst($applicationName);
         $ApplicationInfo = val($applicationName, $this->availableApplications(), null);
         if (is_null($ApplicationInfo)) {
             return false;
@@ -311,7 +312,7 @@ class Gdn_ApplicationManager {
                 )
             );
         }
-        
+
         // 2. Disable it
         removeFromConfig("EnabledApplications.{$applicationName}");
 

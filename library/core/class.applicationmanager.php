@@ -311,7 +311,7 @@ class Gdn_ApplicationManager {
                 )
             );
         }
-
+        
         // 2. Disable it
         removeFromConfig("EnabledApplications.{$applicationName}");
 

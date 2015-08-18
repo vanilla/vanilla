@@ -279,7 +279,7 @@ class AssetModel extends Gdn_Model {
             $Filename = "/{$Filename}";
             $Path = PATH_ROOT.$Filename;
             if (file_exists($Path)) {
-                Deprecated("AssetModel::CssPath() with direct paths");
+                Deprecated(htmlspecialchars($Path).": AssetModel::CssPath() with direct paths");
                 return array($Path, $Filename);
             }
             return false;
@@ -365,7 +365,7 @@ class AssetModel extends Gdn_Model {
             $filename = "/{$filename}";
             $path = PATH_ROOT.$filename;
             if (file_exists($path)) {
-                deprecated("AssetModel::JsPath() with direct paths");
+                deprecated(htmlspecialchars($path).": AssetModel::JsPath() with direct paths");
                 return array($path, $filename);
             }
             return false;

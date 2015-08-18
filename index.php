@@ -17,7 +17,7 @@ ini_set('display_errors', 0);
 ini_set('track_errors', 1);
 
 ob_start();
-
+// Comment
 // Define the constants we need to get going.
 
 define('DS', '/');

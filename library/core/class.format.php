@@ -276,12 +276,31 @@ class Gdn_Format {
             } else {
                 try {
                     $Mixed2 = $Mixed;
-                    //$Mixed2 = str_replace("\n", '<br />', $Mixed2);
 
-                    $Mixed2 = preg_replace("#\[noparse\](.*?)\[/noparse\]#sie", "str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1'))", $Mixed2);
+                    $Mixed2 = str_replace("\r\n", "\n", $Mixed2);
+
+                    $Mixed2 = preg_replace_callback(
+                        "#\[noparse\](.*?)\[/noparse\]#si",
+                        function($m) {
+                            return str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), htmlspecialchars($m[1]));
+                        },
+                        $Mixed2
+                    );
+
                     $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
                     $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
-                    $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#sie", "'<div class=\"PreContainer\"><pre>'.str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1')).'</pre></div>'", $Mixed2);
+
+                    $Mixed2 = preg_replace_callback(
+                        "#\\n?\[code\](.*?)\[/code\]\\n?#si",
+                        function($m) {
+                            $str = htmlspecialchars(trim($m[1], "\n"));
+                            return '<pre>'.str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), $str).'</pre>';
+                        },
+                        $Mixed2
+                    );
+
+                    $Mixed2 = str_replace("\n", "<br />", $Mixed2);
+
                     $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si", '<b>\\1</b>', $Mixed2);
                     $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si", '<i>\\1</i>', $Mixed2);
                     $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si", '<u>\\1</u>', $Mixed2);

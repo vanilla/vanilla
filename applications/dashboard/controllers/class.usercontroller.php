@@ -995,7 +995,7 @@ class UserController extends DashboardController {
 
         $Form = new Gdn_Form();
 
-        if ($this->Request->isPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack()) {
             // Make sure everything has been posted.
             $Form->validateRule('ClientID', 'ValidateRequired');
             $Form->validateRule('UniqueID', 'ValidateRequired');

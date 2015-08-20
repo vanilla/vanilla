@@ -953,7 +953,7 @@ class SettingsController extends DashboardController {
                         $Value = $Default;
                     }
 
-                    $this->Form->setFormValue($this->Form->escapeString('Text_'.$Key), $Value);
+                    $this->Form->setValue($this->Form->escapeString('Text_'.$Key), $Value);
                 }
             }
 

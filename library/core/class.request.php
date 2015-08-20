@@ -346,8 +346,8 @@ class Gdn_Request {
      * @return type
      * @since 2.1
      */
-    public function IsAuthenticatedPostBack() {
-        if (!$this->IsPostBack()) {
+    public function isAuthenticatedPostBack() {
+        if (!$this->isPostBack()) {
             return false;
         }
 

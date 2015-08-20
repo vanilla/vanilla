@@ -1068,24 +1068,20 @@ class Gdn_Autoloader_Map {
     }
 
     /**
-     * Fix path with backslash for Windows OS.
+     * Normalize paths
      *
-     * Check to see if the path is not empty and if it is not in a form of drive: then replace any "\" with "/" to avoid
-     * the parse_fn_file bug and it also further check to see if it has only one "/" and the OS is "WIN" then it will prepend "/"
-     * in front of the path so it has the correct file path.
+     * Replaces any "\" with "/" and prepends another slash to a single leading slash. 
      *
      * @param string $path
      * @return string
      */
     function fixBackSlash($path) {
-        if (!empty($path) && !preg_match('`^[a-z]:`i', $path)) {
-            // Convert to slash to avoid parse_in_file create array with missing backslash.
-            $path = str_replace("\\", "/", $path);
+        // Convert to slash to avoid parse_in_file create array with missing backslash.
+        $path = str_replace('\\', '/', $path);
 
-            // If there is only 1 slash, add another to have a valid network path.
-            if (preg_match('`^/[^/]`', $path) && stripos(PHP_OS, 'win') === 0) {
-                $path = "/".$path;
-            }
+        // If there is only 1 slash, add another to have a valid network path.
+        if (preg_match('`^/[^/]`', $path) && stripos(PHP_OS, 'win') === 0) {
+            $path = '/'.$path;
         }
 
         return $path;

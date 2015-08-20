@@ -322,8 +322,10 @@ class SettingsController extends DashboardController {
                 $this->View = 'Ban';
                 break;
             case 'delete':
-                $BanModel->delete(array('BanID' => $ID));
-                $this->View = 'BanDelete';
+                if ($this->Form->authenticatedPostBack()) {
+                    $BanModel->delete(array('BanID' => $ID));
+                    $this->View = 'BanDelete';
+                }
                 break;
             default:
                 $Bans = $BanModel->getWhere(array(), 'BanType, BanValue', 'asc', $Limit, $Offset)->resultArray();
@@ -951,7 +953,7 @@ class SettingsController extends DashboardController {
                         $Value = $Default;
                     }
 
-                    $this->Form->setFormValue($this->Form->escapeString('Text_'.$Key), $Value);
+                    $this->Form->setValue($this->Form->escapeString('Text_'.$Key), $Value);
                 }
             }
 

@@ -1183,8 +1183,9 @@ class Gdn_Format {
             if ($Tag == 'a') {
                 $InAnchor = false;
             }
-        } elseif ($Matches[3])
+        } elseif ($Matches[3]) {
             $InTag--;
+        }
 
         if (!isset($Matches[4]) || $InTag || $InAnchor) {
             return $Matches[0];
@@ -1208,7 +1209,6 @@ class Gdn_Format {
         $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]*)))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i';
         $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
         $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
-        $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w]{40})';
         $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w]+)';
         $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w-]+)';
         $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
@@ -1216,6 +1216,7 @@ class Gdn_Format {
         $TwitchUrlMatch = 'http://www.twitch.tv/([\w]+)';
         $HitboxUrlMatch = 'http://www.hitbox.tv/([\w]+)';
         $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)';
+        $ImgurGifvUrlMatch = 'https?\://i\.imgur\.com/([a-z0-9]+)\.gifv';
 
         // YouTube
         if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
@@ -1266,16 +1267,31 @@ EOT;
             $Result .= '</span>';
 
 
-            // Vimeo
+        // Vimeo
         } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $ID = $Matches[2];
             $Result = <<<EOT
-      <iframe src="//player.vimeo.com/video/{$ID}" width="{$Width}" height="{$Height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<iframe src="//player.vimeo.com/video/{$ID}" width="{$Width}" height="{$Height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
 
-            // Twitter
+        // Imgur GifV
+        } elseif (preg_match("`{$ImgurGifvUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Gifv', true)
+            && !c('Garden.Format.DisableUrlEmbeds')
+        ) {
+            $ID = $Matches[1];
+            $ModernBrowser = T('Your browser does not support HTML5 video!');
+            $Result = <<<EOT
+<div class="imgur-gifv VideoWrap">
+    <video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
+        <source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4">
+        <p>{$ModernBrowser} https://i.imgur.com/{$ID}.gifv</p>
+    </video>
+</div>
+EOT;
+
+        // Twitter
         } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && C('Garden.Format.Twitter', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
@@ -1283,36 +1299,27 @@ EOT;
 <div class="twitter-card" data-tweeturl="{$Matches[0]}" data-tweetid="{$Matches[1]}"><a href="{$Matches[0]}" class="tweet-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
 EOT;
 
-            // Github
-// @tim : 2013-08-22
-// Experiment on hold
-//
-//      } elseif (preg_match("`{$GithubCommitUrlMatch}`", $Url, $Matches) && C('Garden.Format.Github', true)) {
-//         $Result = <<<EOT
-//<div class="github-commit" data-commiturl="{$Matches[0]}" data-commituser="{$Matches[1]}" data-commitrepo="{$Matches[2]}" data-commithash="{$Matches[3]}"><a href="{$Matches[0]}" class="commit-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
-//EOT;
-
-            // Vine
+        // Vine
         } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
-<div class="VideoWrap">
+<div class="vine-video VideoWrap">
    <iframe class="vine-embed" src="//vine.co/v/{$Matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
 
-            // Instagram
+        // Instagram
         } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Instagram', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
-<div class="VideoWrap">
+<div class="instagram-video VideoWrap">
    <iframe src="//instagram.com/p/{$Matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 EOT;
 
-            // Pintrest
+        // Pintrest
         } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
@@ -1320,7 +1327,7 @@ EOT;
 <a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
 EOT;
 
-            // Getty
+        // Getty
         } elseif (preg_match("`({$GettyUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Getty', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
@@ -1328,7 +1335,7 @@ EOT;
 <iframe src="//embed.gettyimages.com/embed/{$Matches[2]}" width="{$Matches[3]}" height="{$Matches[4]}" frameborder="0" scrolling="no"></iframe>
 EOT;
 
-            // Twitch
+        // Twitch
         } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Twitch', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
@@ -1336,7 +1343,7 @@ EOT;
 <object type="application/x-shockwave-flash" height="378" width="620" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={$Matches[2]}" bgcolor="#000000"><param name="allowFullScreen" value="true" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" /><param name="flashvars" value="hostname=www.twitch.tv&channel={$Matches[2]}&auto_play=false&start_volume=25" /></object><a href="http://www.twitch.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.twitch.tv</a>
 EOT;
 
-            //Hitbox
+        // Hitbox
         } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Hitbox', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
@@ -1345,7 +1352,7 @@ EOT;
 <a href="http://www.hitbox.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.hitbox.tv</a>
 EOT;
 
-            // Soundcloud
+        // Soundcloud
         } elseif (preg_match("`({$SoundcloudUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Soundcloud', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
@@ -1353,11 +1360,11 @@ EOT;
 <iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/{$Matches[2]}/{$Matches[3]}&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>
 EOT;
 
-            // Unformatted links
+        // Unformatted links
         } elseif (!self::$FormatLinks) {
             $Result = $Url;
 
-            // Formatted links
+        // Formatted links
         } else {
             // Strip punctuation off of the end of the url.
             $Punc = '';

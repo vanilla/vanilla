@@ -58,7 +58,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
 
             $Session = Gdn::session();
             $WelcomeMessage = '<div class="GettingStarted">'
-                .anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->transientKey(), 'Dismiss')
+                .anchor('&times;', '/dashboard/plugin/dismissgettingstarted/'.$Session->transientKey(), 'Dismiss')
                 ."<h1>".t("Here's how to get started:")."</h1>"
                 .'<ul>
       <li class="One'.(c('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">

@@ -6,6 +6,13 @@
     echo $this->Form->errors();
     ?>
     <ul>
+        <?php
+        if ($this->data('_WarnConnect')) {
+            echo '<li><div class="Gloss">',
+                t('Editing Username and Email is disabled.', 'Single Sign On is managing users. Editing your Username and Email is disabled.'),
+                '</div></li>';
+        }
+        ?>
         <li class="User-Name">
             <?php
             echo $this->Form->label('Username', 'Name');

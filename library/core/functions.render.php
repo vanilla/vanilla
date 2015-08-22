@@ -562,11 +562,11 @@ if (!function_exists('hasEditProfile')) {
 
         $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
 
-        $result &= (
-            C('Garden.Profile.Titles') ||
-            C('Garden.Profile.Locations', false) ||
-            C('Garden.Registration.Method') != 'Connect'
-        );
+        // $result &= (
+        //     C('Garden.Profile.Titles') ||
+        //     C('Garden.Profile.Locations', false) ||
+        //     C('Garden.Registration.Method') != 'Connect'
+        // );
 
         return $result;
     }

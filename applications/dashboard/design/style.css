@@ -5724,6 +5724,28 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 /**
+ * Text formatting alignment
+ */
+
+.AlignLeft {
+    float: left;
+    margin: 0 10px 10px 0;
+    text-align: left;
+}
+
+.AlignCenter {
+    margin: 0 auto;
+    display: block;
+    text-align: center;
+}
+
+.AlignRight {
+    float: right;
+    margin: 0 0 10px 10px;
+    text-align: right;
+}
+
+/**
  * Socialcons
  */
 

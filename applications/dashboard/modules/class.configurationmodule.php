@@ -141,7 +141,7 @@ class ConfigurationModule extends Gdn_Module {
                 $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
             }
             $Form->setData($Data);
-            $this->Controller()->Data = $Data;
+            $this->Controller()->Data = array_merge($this->Controller()->Data, $Data);
         }
     }
 

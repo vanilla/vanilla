@@ -3837,28 +3837,17 @@ if (!function_exists('isSafeUrl')) {
 
 if (!function_exists('isTrustedDomain')) {
     /**
-     * Check the provided domain name (or request host, if domain is not supplied)
-     * to determine if it is a trusted domain.
+     * Check the provided domain name to determine if it is a trusted domain.
      *
-     * @param string|null $domain Domain name to compare against our list of trusted domains.
+     * @param string $domain Domain name to compare against our list of trusted domains.
      *
      * @return bool True if verified as a trusted domain.  False if unable to verify domain.
      */
-    function isTrustedDomain($domain = null) {
+    function isTrustedDomain($domain) {
         static $trustedDomains = null;
 
-        // If we weren't provided a host, fall back to the referring host, if available.
-        if (!$domain) {
-            $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER', false);
-            if ($referrer) {
-                $referrerDomain = parse_url($referrer, PHP_URL_HOST);
-            }
-
-            if (!empty($referrerDomain)) {
-                $domain = $referrerDomain;
-            } else {
-                return false;
-            }
+        if (empty($domain)) {
+            return false;
         }
 
         // If we haven't already compiled an array of trusted domains, grab them.

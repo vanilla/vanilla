@@ -51,9 +51,9 @@ class CropImageModule extends Gdn_Module {
      *
      * @param object $sender The sending controller object.
      * @param bool $form The form to insert the crop module into.
-     * @param $width The width of the final cropped image.
-     * @param $height The height of the final cropped image.
-     * @param $source The path to the local copy of the image.
+     * @param int $width The width of the final cropped image.
+     * @param int $height The height of the final cropped image.
+     * @param string $source The path to the local copy of the image.
      */
     public function __construct($sender, $form, $width, $height, $source) {
         $this->form = $form;
@@ -62,7 +62,7 @@ class CropImageModule extends Gdn_Module {
         $this->source = $source;
 
         $this->addHiddenFields($this->form, $this->width, $this->height, $this->source);
-        $this->addAssets($this->sender);
+        $this->addAssets($sender);
     }
 
     /**
@@ -200,10 +200,10 @@ class CropImageModule extends Gdn_Module {
     /**
      * Adds the necessary fields to the form for jcrop.
      *
-     * @param $form The form the crop module is inserted into.
-     * @param $width The width of the final cropped image.
-     * @param $height The height of the final cropped image.
-     * @param $source The path to the local copy of the image.
+     * @param Form $form The form the crop module is inserted into.
+     * @param int $width The width of the final cropped image.
+     * @param int $height The height of the final cropped image.
+     * @param string $source The path to the local copy of the image.
      */
     private function addHiddenFields($form, $width, $height, $source) {
         // JS-manipulated values
@@ -223,9 +223,9 @@ class CropImageModule extends Gdn_Module {
     /**
      * Updates the form's hidden crop width and crop height fields.
      *
-     * @param $form The form the crop module is inserted into.
-     * @param $width The width of the final cropped image.
-     * @param $height The height of the final cropped image.
+     * @param Form $form The form the crop module is inserted into.
+     * @param int $width The width of the final cropped image.
+     * @param int $height The height of the final cropped image.
      */
     private function updateHiddenSize($form, $width, $height) {
         $form->addHidden('CropSizeWidth', $width, true);

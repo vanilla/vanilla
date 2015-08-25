@@ -9,7 +9,7 @@
         <?php echo '<h4>'.t('Thumbnail').'</h4>'; ?>
         <div class="thumbnail-preview" style="<?php echo 'width:'.$this->getWidth().'px;height:'.$this->getHeight().'px;'; ?>overflow:hidden;">
             <?php
-            echo img($this->getCurrentCroppedImageUrl(), array('id' => 'current-crop', 'style' => 'min-width: '.$this->getWidth().'px; min-height: '.$this->getHeight().'px;'));
+            echo img($this->getExistingCropUrl(), array('id' => 'current-crop', 'style' => 'min-width: '.$this->getWidth().'px; min-height: '.$this->getHeight().'px;'));
             echo img($this->getSourceImageUrl(), array('id' => 'preview')); ?>
         </div>
         <?php

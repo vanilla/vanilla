@@ -200,7 +200,7 @@ class SettingsController extends DashboardController {
 
             //Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
-            $crop->setCurrentCroppedImageUrl(changeBasename($avatar, "n%s"));
+            $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
             $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
             $this->setData('crop', $crop);
         } else {
@@ -236,7 +236,7 @@ class SettingsController extends DashboardController {
                     $source = $upload->copyLocal(trim(changeBasename($avatar, "p%s"), 'uploads'));
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setSize($thumbnailSize, $thumbnailSize);
-                    $crop->setCurrentCroppedImageUrl(changeBasename($avatar, "n%s"));
+                    $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
                     $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
                     $this->setData('crop', $crop);
                 }

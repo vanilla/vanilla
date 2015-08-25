@@ -403,7 +403,6 @@ class Gdn_Request {
         }
 
         // The host can have the port passed in, remove it here if it exists
-        $RawHost = $Host;
         $HostParts = explode(':', $Host, 2);
         $Host = $HostParts[0];
 

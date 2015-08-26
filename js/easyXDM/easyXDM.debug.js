@@ -746,7 +746,9 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.PostMessageTransport(config)];
             break;
         case "2":
-            config.remoteHelper = resolveUrl(config.remoteHelper);
+            if (config.isHost) {
+                config.remoteHelper = resolveUrl(config.remoteHelper);
+            }
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
             })];
@@ -828,7 +830,7 @@ function removeFromStack(element){
 /** 
  * @class easyXDM
  * A javascript library providing cross-browser, cross-domain messaging/RPC.
- * @version 2.4.16.0
+ * @version 2.4.19.3
  * @singleton
  */
 apply(easyXDM, {
@@ -836,7 +838,7 @@ apply(easyXDM, {
      * The version of the library
      * @type {string}
      */
-    version: "2.4.16.0",
+    version: "2.4.19.3",
     /**
      * This is a map containing all the query parameters passed to the document.
      * All the values has been decoded using decodeURIComponent.
@@ -1178,6 +1180,9 @@ easyXDM.DomHelper = {
          */
         get: function(name, del){
             this._trace("retrieving function " + name);
+            if (!_map.hasOwnProperty(name)) {
+                return;
+            }
             var fn = _map[name];
             if (!fn) {
                 this._trace(name + " not found");
@@ -1670,7 +1675,11 @@ easyXDM.stack.FlashTransport = function(config){
         }
         
         // create the object/embed
-        var flashVars = "callback=flash_loaded" + domain.replace(/[\-.]/g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
+        var flashVars = "callback=flash_loaded" + encodeURIComponent(domain.replace(/[\-.]/g, "_"))
+            + "&proto=" + global.location.protocol
+            + "&domain=" + encodeURIComponent(getDomainName(global.location.href))
+            + "&port=" + encodeURIComponent(getPort(global.location.href))
+            + "&ns=" + encodeURIComponent(namespace);
         flashVars += "&log=true";
         swfContainer.innerHTML = "<object height='20' width='20' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
         "<param name='allowScriptAccess' value='always'></param>" +
@@ -2392,7 +2401,6 @@ easyXDM.stack.ReliableBehavior = function(config){
                 currentMessage = "";
                 if (callback) {
                     callback(true);
-                    callback = null;
                 }
             }
             if (message.length > 0) {

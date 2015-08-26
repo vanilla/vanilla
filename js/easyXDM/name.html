@@ -24,6 +24,9 @@
                 else {
                     channel = hash.substring(0, indexOf);
                     url = decodeURIComponent(hash.substring(indexOf + 1));
+                    if (url && !/^https?:\/\//.test(url)) {
+                        throw new Error('Invalid url');
+                    }
                 }
                 switch (location.hash.substring(2, 3)) {
                     case "2":

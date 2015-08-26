@@ -657,7 +657,7 @@ class FacebookPlugin extends Gdn_Plugin {
         if ($NewValue !== null) {
             $this->_RedirectUri = $NewValue;
         } elseif ($this->_RedirectUri === null) {
-            $RedirectUri = url('/entry/connect/facebook', true);
+            $RedirectUri = url('entry/connect/facebook', true);
             if (strpos($RedirectUri, '=') !== false) {
                 $p = strrchr($RedirectUri, '=');
                 $Uri = substr($RedirectUri, 0, -strlen($p));

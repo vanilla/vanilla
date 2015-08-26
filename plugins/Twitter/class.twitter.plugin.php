@@ -655,7 +655,7 @@ class TwitterPlugin extends Gdn_Plugin {
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => 'Twitter',
             'ProviderKey' => self::ProviderKey,
-            'ConnectUrl' => '/entry/twauthorize/profile',
+            'ConnectUrl' => 'entry/twauthorize/profile',
             'Profile' => array(
                 'Name' => '@'.GetValue('screen_name', $Profile),
                 'Photo' => val('profile_image_url_https', $Profile)

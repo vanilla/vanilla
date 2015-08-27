@@ -2409,54 +2409,54 @@ if (!function_exists('parseUrl')) {
     /**
      * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
      *
-     * @param string $Url The url to parse.
-     * @param int $Component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
+     * @param string $url The url to parse.
+     * @param int $component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
      * PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
      * @deprecated
      */
-    function parseUrl($Url, $Component = -1) {
-        // Retrieve all the parts
-        $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
-        $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
-        $PHP_URL_PORT = @parse_url($Url, PHP_URL_PORT);
-        $PHP_URL_USER = @parse_url($Url, PHP_URL_USER);
-        $PHP_URL_PASS = @parse_url($Url, PHP_URL_PASS);
-        $PHP_URL_PATH = @parse_url($Url, PHP_URL_PATH);
-        $PHP_URL_QUERY = @parse_url($Url, PHP_URL_QUERY);
-        $PHP_URL_FRAGMENT = @parse_url($Url, PHP_URL_FRAGMENT);
+    function parseUrl($url, $component = -1) {
+        $defaults = [
+            'scheme' => 'http',
+            'host' => '',
+            'port' => null,
+            'user' => '',
+            'pass' => '',
+            'path' => '',
+            'query' => '',
+            'fragment' => ''
+        ];
 
-        // Build a cleaned up array to return
-        $Parts = array(
-            'scheme' => $PHP_URL_SCHEME == null ? 'http' : $PHP_URL_SCHEME,
-            'host' => $PHP_URL_HOST == null ? '' : $PHP_URL_HOST,
-            'port' => $PHP_URL_PORT == null ? $PHP_URL_SCHEME == 'https' ? '443' : '80' : $PHP_URL_PORT,
-            'user' => $PHP_URL_USER == null ? '' : $PHP_URL_USER,
-            'pass' => $PHP_URL_PASS == null ? '' : $PHP_URL_PASS,
-            'path' => $PHP_URL_PATH == null ? '' : $PHP_URL_PATH,
-            'query' => $PHP_URL_QUERY == null ? '' : $PHP_URL_QUERY,
-            'fragment' => $PHP_URL_FRAGMENT == null ? '' : $PHP_URL_FRAGMENT
-        );
+        $parts = parse_url($url);
+        if (is_array($parts)) {
+            $parts = array_replace($defaults, $parts);
+        } else {
+            $parts = $defaults;
+        }
+
+        if ($parts['port'] === null) {
+            $parts['port'] = $parts['scheme'] === 'https' ? '443' : '80';
+        }
 
         // Return
-        switch ($Component) {
+        switch ($component) {
             case PHP_URL_SCHEME:
-                return $Parts['scheme'];
+                return $parts['scheme'];
             case PHP_URL_HOST:
-                return $Parts['host'];
+                return $parts['host'];
             case PHP_URL_PORT:
-                return $Parts['port'];
+                return $parts['port'];
             case PHP_URL_USER:
-                return $Parts['user'];
+                return $parts['user'];
             case PHP_URL_PASS:
-                return $Parts['pass'];
+                return $parts['pass'];
             case PHP_URL_PATH:
-                return $Parts['path'];
+                return $parts['path'];
             case PHP_URL_QUERY:
-                return $Parts['query'];
+                return $parts['query'];
             case PHP_URL_FRAGMENT:
-                return $Parts['fragment'];
+                return $parts['fragment'];
             default:
-                return $Parts;
+                return $parts;
         }
     }
 }

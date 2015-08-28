@@ -64,6 +64,8 @@ class DiscussionController extends VanillaController {
         }
 
         if (!is_object($this->Discussion)) {
+            $this->EventArguments['DiscussionID'] = $DiscussionID;
+            $this->fireEvent('DiscussionNotFound');
             throw notFoundException('Discussion');
         }
 

@@ -403,8 +403,13 @@ class Gdn_Request {
         }
 
         // The host can have the port passed in, remove it here if it exists
-        $Host = explode(':', $Host, 2);
-        $Host = $Host[0];
+        $HostParts = explode(':', $Host, 2);
+        $Host = $HostParts[0];
+
+        $RawPort = null;
+        if (count($HostParts) > 1) {
+            $RawPort = $HostParts[1];
+        }
 
         $this->requestHost($Host);
         $this->requestMethod(isset($_SERVER['REQUEST_METHOD']) ? val('REQUEST_METHOD', $_SERVER) : 'CONSOLE');
@@ -466,10 +471,14 @@ class Gdn_Request {
 
         if (isset($_SERVER['SERVER_PORT'])) {
             $Port = $_SERVER['SERVER_PORT'];
-        } elseif ($Scheme === 'https')
-            $Port = 443;
-        else {
-            $Port = 80;
+        } elseif ($RawPort) {
+            $Port = $RawPort;
+        } else {
+            if ($Scheme === 'https') {
+                $Port = 443;
+            } else {
+                $Port = 80;
+            }
         }
         $this->port($Port);
 

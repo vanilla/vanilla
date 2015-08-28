@@ -21,7 +21,7 @@
     </div>
     <div class="Banner">
         <div class="Row">
-            <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
+            <strong class="SiteTitle"><a href="{link path="/"}"><img src="/three5six.png" alt="Three5Six" /></a></strong>
             <!--
             We've placed this optional advertising space below. Just comment out the line and replace "Advertising Space" with your 728x90 ad banner.
             -->

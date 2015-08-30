@@ -228,7 +228,10 @@ jQuery(document).ready(function($) {
                 .closest('form')
                 .find('div.TextBoxWrapper textarea')
                 .each(function (i, textarea) {
-                    if ($(textarea).hasClass('BodyBox')) {
+                    var $textarea = $(textarea);
+
+                    if ($textarea.hasClass('BodyBox') && !$textarea.data('ButtonBar')) {
+                        $textarea.data('ButtonBar', '1');
                         ButtonBar.AttachTo(textarea);
                     }
                 });

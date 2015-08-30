@@ -1,5 +1,6 @@
 (function($) {
-    $.fn.setAsEditor = function() {
+    $.fn.setAsEditor = function(selector) {
+        selector = selector || '.BodyBox';
 
         // If editor can be loaded, add class to body
         $('body').addClass('editor-active');
@@ -1785,12 +1786,11 @@
             }
         } //editorInit
 
-        // Deprecated livequery.
-        if (jQuery().livequery) {
-            this.livequery(function() {
-                editorInit('', $(this));
-            });
-        }
+        // Initialize new editors.
+        $(document).on('EditCommentFormLoaded popupReveal', function () {
+            editorInit('', $(selector));
+        })
+        editorInit('', this);
 
         // jQuery chaining
         return this;

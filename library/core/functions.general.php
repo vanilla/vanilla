@@ -437,7 +437,7 @@ if (!function_exists('asset')) {
                             $Version = val('Version', $PluginInfo, $Version);
                             break;
                         case 'applications':
-                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo($Key);
+                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo(ucfirst($Key));
                             $Version = val('Version', $AppInfo, $Version);
                             break;
                         case 'themes':
@@ -1709,7 +1709,6 @@ if (!function_exists('getMentions')) {
 }
 
 if (!function_exists('getAllMentions')) {
-
     /**
      * Parses a string for all mentioned usernames and returns an array of these usernames.
      *
@@ -1745,6 +1744,7 @@ if (!function_exists('getAllMentions')) {
             }
             $mentions[] = $mention;
         }
+
         return $mentions;
     }
 }
@@ -1784,7 +1784,7 @@ if (!function_exists('getRecord')) {
         switch (strtolower($recordType)) {
             case 'discussion':
                 $Model = new DiscussionModel();
-                $Row = $Model->GetID($id);
+                $Row = $Model->getID($id);
                 $Row->Url = DiscussionUrl($Row);
                 $Row->ShareUrl = $Row->Url;
                 if ($Row) {
@@ -1793,12 +1793,12 @@ if (!function_exists('getRecord')) {
                 break;
             case 'comment':
                 $Model = new CommentModel();
-                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
+                $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Url'] = Url("/discussion/comment/$id#Comment_$id", true);
 
                     $Model = new DiscussionModel();
-                    $Discussion = $Model->GetID($Row['DiscussionID']);
+                    $Discussion = $Model->getID($Row['DiscussionID']);
                     if ($Discussion) {
                         $Discussion->Url = DiscussionUrl($Discussion);
                         $Row['ShareUrl'] = $Discussion->Url;
@@ -1810,7 +1810,7 @@ if (!function_exists('getRecord')) {
                 break;
             case 'activity':
                 $Model = new ActivityModel();
-                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
+                $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Name'] = formatString($Row['HeadlineFormat'], $Row);
                     $Row['Body'] = $Row['Story'];
@@ -1818,11 +1818,11 @@ if (!function_exists('getRecord')) {
                 }
                 break;
             default:
-                throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($recordType)));
+                throw new Gdn_UserException('Unknown record type requested.');
         }
 
         if ($throw) {
-            throw NotFoundException($recordType);
+            throw NotFoundException();
         } else {
             return false;
         }
@@ -2493,54 +2493,54 @@ if (!function_exists('parseUrl')) {
     /**
      * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
      *
-     * @param string $Url The url to parse.
-     * @param int $Component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
+     * @param string $url The url to parse.
+     * @param int $component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
      * PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
      * @deprecated
      */
-    function parseUrl($Url, $Component = -1) {
-        // Retrieve all the parts
-        $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
-        $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
-        $PHP_URL_PORT = @parse_url($Url, PHP_URL_PORT);
-        $PHP_URL_USER = @parse_url($Url, PHP_URL_USER);
-        $PHP_URL_PASS = @parse_url($Url, PHP_URL_PASS);
-        $PHP_URL_PATH = @parse_url($Url, PHP_URL_PATH);
-        $PHP_URL_QUERY = @parse_url($Url, PHP_URL_QUERY);
-        $PHP_URL_FRAGMENT = @parse_url($Url, PHP_URL_FRAGMENT);
+    function parseUrl($url, $component = -1) {
+        $defaults = [
+            'scheme' => 'http',
+            'host' => '',
+            'port' => null,
+            'user' => '',
+            'pass' => '',
+            'path' => '',
+            'query' => '',
+            'fragment' => ''
+        ];
 
-        // Build a cleaned up array to return
-        $Parts = array(
-            'scheme' => $PHP_URL_SCHEME == null ? 'http' : $PHP_URL_SCHEME,
-            'host' => $PHP_URL_HOST == null ? '' : $PHP_URL_HOST,
-            'port' => $PHP_URL_PORT == null ? $PHP_URL_SCHEME == 'https' ? '443' : '80' : $PHP_URL_PORT,
-            'user' => $PHP_URL_USER == null ? '' : $PHP_URL_USER,
-            'pass' => $PHP_URL_PASS == null ? '' : $PHP_URL_PASS,
-            'path' => $PHP_URL_PATH == null ? '' : $PHP_URL_PATH,
-            'query' => $PHP_URL_QUERY == null ? '' : $PHP_URL_QUERY,
-            'fragment' => $PHP_URL_FRAGMENT == null ? '' : $PHP_URL_FRAGMENT
-        );
+        $parts = parse_url($url);
+        if (is_array($parts)) {
+            $parts = array_replace($defaults, $parts);
+        } else {
+            $parts = $defaults;
+        }
+
+        if ($parts['port'] === null) {
+            $parts['port'] = $parts['scheme'] === 'https' ? '443' : '80';
+        }
 
         // Return
-        switch ($Component) {
+        switch ($component) {
             case PHP_URL_SCHEME:
-                return $Parts['scheme'];
+                return $parts['scheme'];
             case PHP_URL_HOST:
-                return $Parts['host'];
+                return $parts['host'];
             case PHP_URL_PORT:
-                return $Parts['port'];
+                return $parts['port'];
             case PHP_URL_USER:
-                return $Parts['user'];
+                return $parts['user'];
             case PHP_URL_PASS:
-                return $Parts['pass'];
+                return $parts['pass'];
             case PHP_URL_PATH:
-                return $Parts['path'];
+                return $parts['path'];
             case PHP_URL_QUERY:
-                return $Parts['query'];
+                return $parts['query'];
             case PHP_URL_FRAGMENT:
-                return $Parts['fragment'];
+                return $parts['fragment'];
             default:
-                return $Parts;
+                return $parts;
         }
     }
 }
@@ -3990,7 +3990,8 @@ if (!function_exists('userAgentType')) {
             'playstation vita',
             'windows phone',
             'iphone',
-            'ipod'
+            'ipod',
+            'nintendo 3ds'
         );
         $directAgentsMatch = implode('|', $directAgents);
         if (preg_match("/({$directAgentsMatch})/i", $userAgent)) {

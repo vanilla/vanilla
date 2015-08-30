@@ -334,18 +334,6 @@ $PermissionModel->undefine(array(
     'Garden.Messages.Manage'
 ));
 
-//// Photo Table
-//$Construct->table('Photo');
-//
-//$PhotoTableExists = $Construct->TableExists('Photo');
-//
-//$Construct
-//	->PrimaryKey('PhotoID')
-//   ->column('Name', 'varchar(255)')
-//   ->column('InsertUserID', 'int', TRUE, 'key')
-//   ->column('DateInserted', 'datetime')
-//   ->set($Explicit, $Drop);
-
 // Invitation Table
 $Construct->table('Invitation')
     ->primaryKey('InvitationID')
@@ -359,7 +347,7 @@ $Construct->table('Invitation')
     ->column('DateExpires', 'datetime', true)
     ->set($Explicit, $Drop);
 
-// Fix negative invitation expiry dates..
+// Fix negative invitation expiry dates.
 $InviteExpiry = c('Garden.Registration.InviteExpiration');
 if ($InviteExpiry && substr($InviteExpiry, 0, 1) === '-') {
     $InviteExpiry = substr($InviteExpiry, 1);

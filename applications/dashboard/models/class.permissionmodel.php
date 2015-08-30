@@ -109,14 +109,14 @@ class PermissionModel extends Gdn_Model {
             }
         }
 
-        $this->AddDefault(
+        $this->addDefault(
             RoleModel::TYPE_GUEST,
             array(
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
             )
         );
-        $this->AddDefault(
+        $this->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
             $Permissions = array(
                 'Garden.SignIn.Allow' => 1,
@@ -125,7 +125,7 @@ class PermissionModel extends Gdn_Model {
                 'Garden.Email.View' => 1
             )
         );
-        $this->AddDefault(
+        $this->addDefault(
             RoleModel::TYPE_APPLICANT,
             $Permissions = array(
                 'Garden.SignIn.Allow' => 1,
@@ -134,7 +134,7 @@ class PermissionModel extends Gdn_Model {
                 'Garden.Email.View' => 1
             )
         );
-        $this->AddDefault(
+        $this->addDefault(
             RoleModel::TYPE_MODERATOR,
             $Permissions = array(
                 'Garden.SignIn.Allow' => 1,
@@ -147,7 +147,7 @@ class PermissionModel extends Gdn_Model {
                 'Garden.Email.View' => 1
             )
         );
-        $this->AddDefault(
+        $this->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
             array(
                 'Garden.SignIn.Allow' => 1,
@@ -170,7 +170,7 @@ class PermissionModel extends Gdn_Model {
                 'Garden.Moderation.Manage' => 1
             )
         );
-        $this->AddDefault(
+        $this->addDefault(
             RoleModel::TYPE_MEMBER,
             array(
                 'Garden.SignIn.Allow' => 1,
@@ -181,19 +181,18 @@ class PermissionModel extends Gdn_Model {
             )
         );
 
-        // Allow the ability for other applications and plug-ins to speakup with their own default permissions.
+        // Allow the ability for other applications and plug-ins to speak up with their own default permissions.
         $this->fireEvent('DefaultPermissions');
     }
 
     /**
-     *
+     * Remove the cached permissions for all users.
      */
     public function clearPermissions() {
         static $PermissionsCleared = false;
 
         if (!$PermissionsCleared) {
-            // Remove the cached permissions for all users.
-            Gdn::userModel()->ClearPermissions();
+            Gdn::userModel()->clearPermissions();
             $PermissionsCleared = true;
         }
     }
@@ -210,7 +209,7 @@ class PermissionModel extends Gdn_Model {
     public function define($PermissionNames, $Type = 'tinyint', $JunctionTable = null, $JunctionColumn = null) {
         $PermissionNames = (array)$PermissionNames;
 
-        $Structure = $this->Database->Structure();
+        $Structure = $this->Database->structure();
         $Structure->table('Permission');
         $DefaultPermissions = array();
 
@@ -303,7 +302,7 @@ class PermissionModel extends Gdn_Model {
      */
     public function getDefaults() {
         if (empty($this->DefaultPermissions)) {
-            $this->AssignDefaults();
+            $this->assignDefaults();
         }
 
         return $this->DefaultPermissions;
@@ -1107,13 +1106,13 @@ class PermissionModel extends Gdn_Model {
                     $Where['JunctionColumn'] = $Values['JunctionColumn'];
                 }
                 $Where['JunctionID'] = $Values['JunctionID'];
-
-                unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
             } else {
                 $Where['JunctionTable'] = null; // no junction table.
                 $Where['JunctionColumn'] = null;
                 $Where['JunctionID'] = null;
             }
+            
+            unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
 
             $this->SQL->replace('Permission', $this->_Backtick($Values), $Where, true);
 
@@ -1190,7 +1189,7 @@ class PermissionModel extends Gdn_Model {
         // Iterate through our roles and reset their permissions.
         $Permissions = Gdn::permissionModel();
         foreach ($Roles as $RoleID => $Role) {
-            $Permissions->ResetRole($RoleID);
+            $Permissions->resetRole($RoleID);
         }
     }
 
@@ -1208,8 +1207,8 @@ class PermissionModel extends Gdn_Model {
             $RoleType = RoleModel::TYPE_MEMBER;
         }
 
-        $Defaults = $this->GetDefaults();
-        $RowDefaults = $this->GetRowDefaults();
+        $Defaults = $this->getDefaults();
+        $RowDefaults = $this->getRowDefaults();
 
         $ResetValues = array_fill_keys(array_keys($RowDefaults), 0);
 

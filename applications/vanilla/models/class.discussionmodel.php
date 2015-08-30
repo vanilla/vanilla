@@ -1507,7 +1507,11 @@ class DiscussionModel extends VanillaModel {
         }
 
         $this->EventArguments['DiscussionID'] = $RowID;
-        $this->EventArguments['SetField'] = $Property;
+        if (!is_array($Property)) {
+            $this->EventArguments['SetField'] = array($Property => $Value);
+        } else {
+            $this->EventArguments['SetField'] = $Property;
+        }
 
         parent::SetField($RowID, $Property, $Value);
         $this->fireEvent('AfterSetField');
@@ -1763,6 +1767,16 @@ class DiscussionModel extends VanillaModel {
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $Activity;
 
+                    // Notify everyone that has advanced notifications.
+                    if (!c('Vanilla.QueueNotifications')) {
+                        try {
+                            $Fields['DiscussionID'] = $DiscussionID;
+                            $this->NotifyNewDiscussion($Fields, $ActivityModel, $Activity);
+                        } catch (Exception $Ex) {
+                            throw $Ex;
+                        }
+                    }
+
                     // Notifications for mentions
                     foreach ($Usernames as $Username) {
                         $User = $UserModel->GetByUsername($Username);
@@ -1779,16 +1793,6 @@ class DiscussionModel extends VanillaModel {
 
                         $Activity['NotifyUserID'] = val('UserID', $User);
                         $ActivityModel->Queue($Activity, 'Mention');
-                    }
-
-                    // Notify everyone that has advanced notifications.
-                    if (!c('Vanilla.QueueNotifications')) {
-                        try {
-                            $Fields['DiscussionID'] = $DiscussionID;
-                            $this->NotifyNewDiscussion($Fields, $ActivityModel, $Activity);
-                        } catch (Exception $Ex) {
-                            throw $Ex;
-                        }
                     }
 
                     // Throw an event for users to add their own events.

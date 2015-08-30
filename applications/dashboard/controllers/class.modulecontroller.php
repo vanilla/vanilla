@@ -32,14 +32,17 @@ class ModuleController extends Gdn_Controller {
             // Make sure that the class implements Gdn_IModule
             $ReflectionClass = new ReflectionClass($Module);
             if ($ReflectionClass->implementsInterface("Gdn_IModule")) {
+                // Check any incoming app folder against real application list.
+                $appWhitelist = Gdn::applicationManager()->enabledApplicationFolders();
+
                 // Set the proper application folder on this controller so that things render properly.
-                if ($AppFolder) {
+                if ($AppFolder && in_array($AppFolder, $appWhitelist)) {
                     $this->ApplicationFolder = $AppFolder;
                 } else {
                     $Filename = str_replace('\\', '/', substr($ReflectionClass->getFileName(), strlen(PATH_ROOT)));
                     // Figure our the application folder for the module.
                     $Parts = explode('/', trim($Filename, '/'));
-                    if ($Parts[0] == 'applications') {
+                    if ($Parts[0] == 'applications' && in_array($Parts[1], $appWhitelist)) {
                         $this->ApplicationFolder = $Parts[1];
                     }
                 }
@@ -51,6 +54,10 @@ class ModuleController extends Gdn_Controller {
                 $WhiteList = array('Limit', 'Help');
                 foreach ($this->Request->get() as $Key => $Value) {
                     if (in_array($Key, $WhiteList)) {
+                        // Set a sane max limit for this open-ended way of calling modules.
+                        if ($Key == 'Limit' && $Value > 200) {
+                            throw new Exception(t('Invalid limit.'), 400);
+                        }
                         $ModuleInstance->$Key = $Value;
                     }
                 }

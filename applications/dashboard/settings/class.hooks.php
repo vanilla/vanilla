@@ -392,4 +392,12 @@ class DashboardHooks implements Gdn_IPlugin {
         // Add a stub group for moderation.
         $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
     }
+
+    public function updateModel_afterStructure_handler($sender) {
+        // Only setup default permissions if no role permissions are set.
+        $hasPermissions = Gdn::sql()->getWhere('Permission', array('RoleID >' => 0))->firstRow(DATASET_TYPE_ARRAY);
+        if (!$hasPermissions) {
+            PermissionModel::resetAllRoles();
+        }
+    }
 }

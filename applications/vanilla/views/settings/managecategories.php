@@ -73,7 +73,6 @@ if (c('Vanilla.Categories.Use')) {
     $LastRight = 0;
     $OpenCount = 0;
     $Loop = 0;
-    $CanDelete = checkPermission('Garden.Settings.Manage');
     foreach ($this->CategoryData->result() as $Category) {
         if ($Category->CategoryID > 0) {
             // Only check stack if there is one
@@ -104,7 +103,7 @@ if (c('Vanilla.Categories.Use')) {
 
             echo "\n".'<li id="list_'.$Category->CategoryID.'">';
             // DEBUG: echo wrap($Category->Name.' [countright: '.$CountRight.' lastcount: '.$LastRight.' opencount: '.$OpenCount.']', 'div');
-            $CategoryUrl = CategoryUrl($Category);
+            $CategoryUrl = categoryUrl($Category);
 
             if ($Category->Photo) {
                 $Photo = img(Gdn_Upload::url($Category->Photo), array('class' => 'CategoryPhoto'));
@@ -125,7 +124,7 @@ if (c('Vanilla.Categories.Use')) {
                   </td>
                   <td class="Buttons">'
                 .anchor(t('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
-                .($CanDelete ? anchor(t('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
+                .(val('CanDelete', $Category) ? anchor(t('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
                 .'</td>
                </tr>
             </table>'

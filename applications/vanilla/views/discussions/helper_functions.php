@@ -197,7 +197,7 @@ if (!function_exists('WriteDiscussion')):
     }
 endif;
 
-if (!function_exists('DiscussionSorter')):
+if (!function_exists('WriteDiscussionSorter')):
 
     function writeDiscussionSorter($Selected = null, $Options = null) {
         if ($Selected === null) {

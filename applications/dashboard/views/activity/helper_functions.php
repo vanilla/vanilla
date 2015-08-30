@@ -51,7 +51,7 @@ function writeActivity($Activity, &$Sender, &$Session) {
 <li id="Activity_<?php echo $Activity->ActivityID; ?>" class="<?php echo $CssClass; ?>">
    <?php
     if (ActivityModel::canDelete($Activity)) {
-        echo '<div class="Options">'.anchor('×', 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
+        echo '<div class="Options">'.anchor('&times;', 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
     }
     if ($PhotoAnchor != '') {
         ?>

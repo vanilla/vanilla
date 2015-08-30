@@ -317,7 +317,6 @@ $PermissionModel->Define(
 
 $PermissionModel->Undefine('Vanilla.Spam.Manage');
 
-
 /*
 Apr 26th, 2010
 Removed FirstComment from :_Discussion and moved it into the discussion table.

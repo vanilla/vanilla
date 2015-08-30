@@ -291,7 +291,7 @@ class Emoji {
      */
     protected function checkAliases() {
         $this->aliases = array_filter($this->aliases, function ($emojiName) {
-            return isset($this->emojo[$emojiName]);
+            return isset($this->emoji[$emojiName]);
         });
     }
 

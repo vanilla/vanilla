@@ -1352,7 +1352,7 @@ EOT;
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
-                    $this->Form->setFormValue('Target', '/entry/ registerthanks');
+                    $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
                     return;
                 } elseif (!$AuthUserID) {

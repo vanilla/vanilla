@@ -1352,7 +1352,7 @@ EOT;
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
-                    $this->Form->setFormValue('Target', '/entry/registerthanks');
+                    $this->Form->setFormValue('Target', '/entry/ registerthanks');
                     $this->_setRedirect();
                     return;
                 } elseif (!$AuthUserID) {
@@ -1362,18 +1362,18 @@ EOT;
                     Gdn::session()->start($AuthUserID);
 
                     if ($this->Form->getFormValue('RememberMe')) {
-                        Gdn::authenticator()->SetIdentity($AuthUserID, true);
+                        Gdn::authenticator()->setIdentity($AuthUserID, true);
                     }
 
                     try {
-                        $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+                        $this->UserModel->sendWelcomeEmail($AuthUserID, '', 'Register');
                     } catch (Exception $Ex) {
                     }
 
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->RedirectTo();
+                    $Route = $this->redirectTo();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                         $this->RedirectUrl = url($Route);
                     } else {

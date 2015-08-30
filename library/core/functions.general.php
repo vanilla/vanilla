@@ -1640,10 +1640,9 @@ if (!function_exists('getIncomingValue')) {
 }
 
 if (!function_exists('getMentions')) {
-
     /**
-     * Takes an html-formatted string and returns an array of all the
-     * usernames that were mentioned.
+     * Get all usernames mentioned in an HTML string.
+     *
      * Optionally skips the contents of an anchor tag <a> or a code tag <code>.
      *
      * @param string $html The html-formatted string to parse.

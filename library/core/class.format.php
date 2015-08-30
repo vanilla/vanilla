@@ -1474,6 +1474,7 @@ EOT;
 
     /**
      * Adds a link to all mentions in a given string.
+     *
      * Supports most usernames by using double-quotes, for example:  @"a $pecial user's! name."
      * Without double-quotes, a mentioned username is terminated by any of the following characters:
      * whitespace | . | , | ; | ? | ! | :
@@ -1490,14 +1491,14 @@ EOT;
         }
 
         foreach ($parts as $i => $str) {
+            // Text before the mention.
             if ($i == 0) {
-                // Text before the mention.
                 $str[$i] = htmlspecialchars($str);
                 continue;
             }
 
+            // There was an escaped @@.
             if (empty($str)) {
-                // There was an escaped @@.
                 $parts[$i - 1] = '';
                 continue;
             }
@@ -1510,8 +1511,9 @@ EOT;
             // Grab the mention.
             $mention = false;
             $suffix = '';
+
+            // Quoted mention.
             if ($str[0] == '"') {
-                // Quoted mention.
                 $pos = strpos($str, '"', 1);
 
                 if ($pos === false) {
@@ -1521,22 +1523,30 @@ EOT;
                     $suffix = substr($str, $pos + 1);
                 }
             }
+
+            // Unquoted mention.
             if (!$mention && !empty($str)) {
-                // Unquoted mention.
                 $parts2 = preg_split('`([\s.,;?!:])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
                 $suffix = val(1, $parts2, '') . val(2, $parts2, '');
             }
 
             if ($mention) {
-                $parts[$i] = Anchor('@'.$mention, str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat)).$suffix;
+                $parts[$i] = anchor('@'.$mention, str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat)).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }
         }
+
         return implode('', $parts);
     }
 
+    /**
+     *
+     *
+     * @param $Mixed
+     * @return mixed|string
+     */
     public static function mentions($Mixed) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Mentions');

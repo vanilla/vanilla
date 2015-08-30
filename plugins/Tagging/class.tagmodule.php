@@ -1,190 +1,239 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Tagging plugin.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Tagging
+ */
 
+/**
+ * Class TagModule
+ */
 class TagModule extends Gdn_Module {
 
-   protected $_TagData;
-   protected $ParentID;
-   protected $ParentType;
-   protected $CategorySearch;
+    protected $_TagData;
 
-   public function __construct($Sender = '') {
-      $this->_TagData = FALSE;
-      $this->ParentID = NULL;
-      $this->ParentType = 'Global';
-      $this->CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
-      parent::__construct($Sender);
-   }
+    protected $ParentID;
 
-   public function __set($Name, $Value) {
-      if ($Name == 'Context') {
-         $this->AutoContext($Value);
-      }
-   }
+    protected $ParentType;
 
-   protected function AutoContext($Hint = NULL) {
-      // If we're already configured, don't auto configure
-      if (!is_null($this->ParentID) && is_null($Hint)) {
-         return;
-      }
+    protected $CategorySearch;
 
-      // If no hint was given, determine by environment
-      if (is_null($Hint)) {
-         if (Gdn::Controller() instanceof Gdn_Controller) {
-            $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID', NULL);
-            $CategoryID = Gdn::Controller()->Data('Category.CategoryID', NULL);
+    /**
+     * @param string $Sender
+     */
+    public function __construct($Sender = '') {
+        $this->_TagData = false;
+        $this->ParentID = null;
+        $this->ParentType = 'Global';
+        $this->CategorySearch = c('Plugins.Tagging.CategorySearch', false);
+        parent::__construct($Sender);
+    }
 
-            if ($DiscussionID) {
-               $Hint = 'Discussion';
-            } elseif ($CategoryID) {
-               $Hint = 'Category';
-            } else {
-               $Hint = 'Global';
+    /**
+     *
+     *
+     * @param $Name
+     * @param $Value
+     */
+    public function __set($Name, $Value) {
+        if ($Name == 'Context') {
+            $this->autoContext($Value);
+        }
+    }
+
+    /**
+     *
+     *
+     * @param null $Hint
+     */
+    protected function autoContext($Hint = null) {
+        // If we're already configured, don't auto configure
+        if (!is_null($this->ParentID) && is_null($Hint)) {
+            return;
+        }
+
+        // If no hint was given, determine by environment
+        if (is_null($Hint)) {
+            if (Gdn::controller() instanceof Gdn_Controller) {
+                $DiscussionID = Gdn::controller()->data('Discussion.DiscussionID', null);
+                $CategoryID = Gdn::controller()->data('Category.CategoryID', null);
+
+                if ($DiscussionID) {
+                    $Hint = 'Discussion';
+                } elseif ($CategoryID) {
+                    $Hint = 'Category';
+                } else {
+                    $Hint = 'Global';
+                }
             }
-         }
-      }
+        }
 
-      switch ($Hint) {
-         case 'Discussion':
-            $this->ParentType = 'Discussion';
-            $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID');
-            $this->ParentID = $DiscussionID;
-            break;
+        switch ($Hint) {
+            case 'Discussion':
+                $this->ParentType = 'Discussion';
+                $DiscussionID = Gdn::controller()->data('Discussion.DiscussionID');
+                $this->ParentID = $DiscussionID;
+                break;
 
-         case 'Category':
-            if ($this->CategorySearch) {
-               $this->ParentType = 'Category';
-               $CategoryID = Gdn::Controller()->Data('Category.CategoryID');
-               $this->ParentID = $CategoryID;
-            }
-            break;
-      }
+            case 'Category':
+                if ($this->CategorySearch) {
+                    $this->ParentType = 'Category';
+                    $CategoryID = Gdn::controller()->data('Category.CategoryID');
+                    $this->ParentID = $CategoryID;
+                }
+                break;
+        }
 
-      if (!$this->ParentID) {
-         $this->ParentID = 0;
-         $this->ParentType = 'Global';
-      }
+        if (!$this->ParentID) {
+            $this->ParentID = 0;
+            $this->ParentType = 'Global';
+        }
 
-   }
+    }
 
-   public function GetData() {
-      $TagQuery = Gdn::SQL();
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    public function getData() {
+        $TagQuery = Gdn::sql();
 
-      $this->AutoContext();
+        $this->autoContext();
 
-      $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
-      switch ($this->ParentType) {
-         case 'Discussion':
-            $Tags = TagModel::instance()->getDiscussionTags($this->ParentID, false);
-            break;
-         case 'Category':
-            $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-               ->Select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
-               ->Where('td.CategoryID', $this->ParentID)
-               ->GroupBy('td.TagID')
-               ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
-            break;
+        $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
+        switch ($this->ParentType) {
+            case 'Discussion':
+                $Tags = TagModel::instance()->getDiscussionTags($this->ParentID, false);
+                break;
+            case 'Category':
+                $TagQuery->join('TagDiscussion td', 't.TagID = td.TagID')
+                    ->select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
+                    ->where('td.CategoryID', $this->ParentID)
+                    ->groupBy('td.TagID')
+                    ->cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+                break;
 
-         case 'Global':
-            $TagCacheKey = 'TagModule-Global';
-            $TagQuery->Where('t.CountDiscussions >', 0, FALSE)
-               ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            case 'Global':
+                $TagCacheKey = 'TagModule-Global';
+                $TagQuery->where('t.CountDiscussions >', 0, false)
+                    ->cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
 
-            if ($this->CategorySearch) {
-               $TagQuery->Where('t.CategoryID', '-1');
-            }
+                if ($this->CategorySearch) {
+                    $TagQuery->where('t.CategoryID', '-1');
+                }
 
-            break;
-      }
+                break;
+        }
 
-      if (isset($Tags)) {
-         $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
-      } else {
-         $this->_TagData = $TagQuery
-            ->Select('t.*')
-            ->From('Tag t')
-            ->OrderBy('t.CountDiscussions', 'desc')
-            ->Limit(25)
-            ->Get();
-      }
+        if (isset($Tags)) {
+            $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
+        } else {
+            $this->_TagData = $TagQuery
+                ->select('t.*')
+                ->from('Tag t')
+                ->orderBy('t.CountDiscussions', 'desc')
+                ->limit(25)
+                ->get();
+        }
 
-      $this->_TagData->DatasetType(DATASET_TYPE_ARRAY);
-   }
+        $this->_TagData->datasetType(DATASET_TYPE_ARRAY);
+    }
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    /**
+     *
+     *
+     * @return string
+     */
+    public function assetTarget() {
+        return 'Panel';
+    }
 
-   public function InlineDisplay() {
-      if (!$this->_TagData) {
-         $this->GetData();
-      }
+    /**
+     *
+     *
+     * @return string
+     */
+    public function inlineDisplay() {
+        if (!$this->_TagData) {
+            $this->getData();
+        }
 
-      if ($this->_TagData->NumRows() == 0) {
-         return '';
-      }
+        if ($this->_TagData->numRows() == 0) {
+            return '';
+        }
 
-      $String = '';
-      ob_start();
-      ?>
-      <div class="InlineTags Meta">
-         <?php echo T('Tagged'); ?>:
-         <ul>
-         <?php foreach ($this->_TagData->ResultArray() as $Tag): ?>
-            <?php if ($Tag['Name'] != ''): ?>
-            <li><?php
-               echo Anchor(htmlspecialchars(TagFullName($Tag)),
-                       TagUrl($Tag, '', '/'),
-                       array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
-                    );
-            ?></li>
-            <?php endif; ?>
-         <?php endforeach; ?>
-         </ul>
-      </div>
-      <?php
-      $String = ob_get_contents();
-      @ob_end_clean();
-      return $String;
-   }
+        $String = '';
+        ob_start();
+        ?>
+        <div class="InlineTags Meta">
+            <?php echo t('Tagged'); ?>:
+            <ul>
+                <?php foreach ($this->_TagData->resultArray() as $Tag) :
+?>
+                    <?php if ($Tag['Name'] != '') :
+?>
+                        <li><?php
+                            echo anchor(
+                                htmlspecialchars(TagFullName($Tag)),
+                                TagUrl($Tag, '', '/'),
+                                array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+                            );
+                            ?></li>
+                    <?php
+endif; ?>
+                <?php
+endforeach; ?>
+            </ul>
+        </div>
+        <?php
+        $String = ob_get_contents();
+        @ob_end_clean();
+        return $String;
+    }
 
-   public function ToString() {
-      if (!$this->_TagData) {
-         $this->GetData();
-      }
+    /**
+     *
+     *
+     * @return string
+     */
+    public function toString() {
+        if (!$this->_TagData) {
+            $this->getData();
+        }
 
-      if ($this->_TagData->NumRows() == 0) {
-         return '';
-      }
+        if ($this->_TagData->numRows() == 0) {
+            return '';
+        }
 
-      $String = '';
-      ob_start();
-      ?>
-      <div class="Box Tags">
-         <?php echo panelHeading(T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
-         <ul class="TagCloud">
-         <?php foreach ($this->_TagData->Result() as $Tag): ?>
-            <?php if ($Tag['Name'] != ''): ?>
-            <li><?php
-               echo Anchor(TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
-                  TagUrl($Tag),
-                  array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
-               );
-            ?></li>
-            <?php endif; ?>
-         <?php endforeach; ?>
-         </ul>
-      </div>
-      <?php
-      $String = ob_get_contents();
-      @ob_end_clean();
-      return $String;
-   }
+        $String = '';
+        ob_start();
+        ?>
+        <div class="Box Tags">
+            <?php echo panelHeading(t($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
+            <ul class="TagCloud">
+                <?php foreach ($this->_TagData->result() as $Tag) :
+?>
+                    <?php if ($Tag['Name'] != '') :
+?>
+                        <li><?php
+                            echo anchor(
+                                TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
+                                TagUrl($Tag, '', '/'),
+                                array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+                            );
+                            ?></li>
+                    <?php
+endif; ?>
+                <?php
+endforeach; ?>
+            </ul>
+        </div>
+        <?php
+        $String = ob_get_contents();
+        @ob_end_clean();
+        return $String;
+    }
 }

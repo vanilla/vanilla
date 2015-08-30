@@ -1,0 +1,12 @@
+.forceWysiwyg {
+  opacity: 1;
+  height: 130px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.forceWysiwygDisabled {
+  opacity: 0;
+  height: 0px;
+  pointer-events: none;
+}

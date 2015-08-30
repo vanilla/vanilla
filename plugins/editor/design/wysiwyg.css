@@ -1,0 +1,290 @@
+/**
+ * Editor action styles within editor and post
+ */
+.post-font-size-smaller {
+  font-size: smaller; }
+
+.post-font-size-larger {
+  font-size: larger; }
+
+.post-font-size-xx-large {
+  font-size: xx-large; }
+
+.post-font-size-x-large {
+  font-size: x-large; }
+
+.post-font-size-large {
+  font-size: 18px; }
+
+.post-font-size-medium, .post-font-size-normal, .post-font-size-default {
+  font-size: 13px; }
+
+.post-font-size-small {
+  font-size: 11px; }
+
+.post-font-size-x-small {
+  font-size: x-small; }
+
+.post-font-size-xx-small {
+  font-size: xx-small; }
+
+/**
+ * These two are not actually inserted into the editor. They are only used for
+ * the dropdown.
+ */
+.post-font-size-h1 {
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 31px !important; }
+
+.post-font-size-h2 {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 26px !important; }
+
+/* Colours based on http://clrs.cc/
+cell-* are used for the dropdown */
+.post-color-black {
+  color: #111111; }
+
+.cell-color-black, .post-highlightcolor-black {
+  background-color: #111111; }
+
+.post-color-silver {
+  color: #dddddd; }
+
+.cell-color-silver, .post-highlightcolor-silver {
+  background-color: #dddddd; }
+
+.post-color-gray {
+  color: #aaaaaa; }
+
+.cell-color-gray, .post-highlightcolor-gray {
+  background-color: #aaaaaa; }
+
+.post-color-white {
+  color: #ffffff; }
+
+.cell-color-white, .post-highlightcolor-white {
+  background-color: #ffffff; }
+
+.post-color-maroon {
+  color: #85144b; }
+
+.cell-color-maroon, .post-highlightcolor-maroon {
+  background-color: #85144b; }
+
+.post-color-red {
+  color: #ff4136; }
+
+.cell-color-red, .post-highlightcolor-red {
+  background-color: #ff4136; }
+
+.post-color-purple {
+  color: #7b11d0; }
+
+.cell-color-purple, .post-highlightcolor-purple {
+  background-color: #7b11d0; }
+
+.post-color-fuchsia {
+  color: #f012be; }
+
+.cell-color-fuchsia, .post-highlightcolor-fuchsia {
+  background-color: #f012be; }
+
+.post-color-green {
+  color: #2ecc40; }
+
+.cell-color-green, .post-highlightcolor-green {
+  background-color: #2ecc40; }
+
+.post-color-lime {
+  color: #01ff70; }
+
+.cell-color-lime, .post-highlightcolor-lime {
+  background-color: #01ff70; }
+
+.post-color-olive {
+  color: #3d9970; }
+
+.cell-color-olive, .post-highlightcolor-olive {
+  background-color: #3d9970; }
+
+.post-color-yellow {
+  color: #ffdc00; }
+
+.cell-color-yellow, .post-highlightcolor-yellow {
+  background-color: #ffdc00; }
+
+.post-color-navy {
+  color: #001f3f; }
+
+.cell-color-navy, .post-highlightcolor-navy {
+  background-color: #001f3f; }
+
+.post-color-blue {
+  color: #0074d9; }
+
+.cell-color-blue, .post-highlightcolor-blue {
+  background-color: #0074d9; }
+
+.post-color-teal {
+  color: #39cccc; }
+
+.cell-color-teal, .post-highlightcolor-teal {
+  background-color: #39cccc; }
+
+.post-color-aqua {
+  color: #7fdbff; }
+
+.cell-color-aqua, .post-highlightcolor-aqua {
+  background-color: #7fdbff; }
+
+.post-color-orange {
+  color: #ffa500; }
+
+.cell-color-orange, .post-highlightcolor-orange {
+  background-color: #ffa500; }
+
+.post-text-align-right {
+  text-align: right; }
+
+.post-text-align-center {
+  text-align: center; }
+
+.post-text-align-left {
+  text-align: left; }
+
+.post-text-align-justify {
+  text-align: justify; }
+
+.post-float-left {
+  float: left;
+  margin: 0 8px 8px 0; }
+
+.post-float-right {
+  float: right;
+  margin: 0 0 8px 8px; }
+
+.post-clear-right {
+  clear: right; }
+
+.post-clear-left {
+  clear: left; }
+
+/**
+ * Font families
+ */
+.post-fontfamily-default {
+  font-family: inherit; }
+
+.post-fontfamily-arial {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; }
+
+.post-fontfamily-comicsansms {
+  font-family: 'Comic Sans MS', cursive !important; }
+
+.post-fontfamily-couriernew {
+  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace; }
+
+.post-fontfamily-georgia {
+  font-family: Georgia, Times, 'Times New Roman', serif; }
+
+.post-fontfamily-impact {
+  font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif; }
+
+.post-fontfamily-timesnewroman {
+  font-family: 'Times New Roman', Times, Baskerville, Georgia, serif; }
+
+.post-fontfamily-trebuchetms {
+  font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; }
+
+.post-fontfamily-verdana {
+  font-family: Verdana, Geneva, sans-serif; }
+
+/* Custom classes */
+
+blockquote.Quote {
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 4px solid rgba(0, 0, 0, 0.1);
+  margin: 1em;
+  padding: 1ex 10px; }
+
+pre.CodeBlock {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07); }
+
+
+.Spoiler {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  margin: 1em 0;
+  padding: 1ex 16px; }
+
+.Message .Spoiler {
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  height: 0;
+  width: 0;
+  margin: 5px 0;
+  padding: 8px 16px;
+  position: relative;
+  cursor: pointer;
+  font-size: 0; }
+
+.Message .Spoiler:hover {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.1) !important; }
+
+.Message .Spoiler:before {
+  content: '...';
+  position: absolute;
+  top: -7px;
+  left: 9px;
+  font-size: 14px; }
+
+.Spoiled {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 20px;
+  font-size: inherit;
+  margin: 5px 0;
+  transition: padding 0.1s ease; }
+
+.AlignLeft {
+  text-align: left; }
+
+.AlignCenter {
+  text-align: center; }
+
+.AlignRight {
+  text-align: right; }
+
+/**
+ * Target iframe and actual body within editor iframe. Do not use body to set
+ * background color of composer. By default it will be inherited from
+ * textarea automatically, but if for some reason you want to override the
+ * styles directly, use .editor-composer (body) for fonts and padding, and use
+ * .wysihtml5-sandbox (iframe) to modify the iframe (do background-color on
+ * this).
+ */
+/* iframe */
+
+/* body within iframe */
+.editor-composer {
+  margin: 0;
+  border: 0;
+  padding: inherit;
+  font: inherit;
+  outline: none; }
+  .editor-composer img {
+    max-width: 100%; }
+
+/**
+ * Adjust some styles explicitly within the editor composer. These match the
+ * styles in styles.css. These rules match the font sizes for post-font-size-h*
+ */
+.editor-composer h1 {
+  font-size: 21px; }
+.editor-composer h2 {
+  font-size: 18px; }
+/*# sourceMappingURL=wysiwyg.css.map */

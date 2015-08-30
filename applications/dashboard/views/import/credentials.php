@@ -1,18 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 ?>
-<ul>
-   <li>
-   <?php
-   echo $this->Form->Label('Email', 'Email'),
-      $this->Form->TextBox('Email');
-
-   echo $this->Form->Label('Password', 'Password'),
-      $this->Form->Input('Password', 'password');
-
-   echo $this->Form->CheckBox('UseCurrentPassword', 'Use My Current Password');
-   ?>
-   </li>
-</ul>
-<?php echo $this->Form->Close('OK');
+    <ul>
+        <li>
+            <?php
+            echo $this->Form->label('Email', 'Email'),
+            $this->Form->textBox('Email');
+            ?>
+        </li>
+    </ul>
+<?php echo $this->Form->close('OK');

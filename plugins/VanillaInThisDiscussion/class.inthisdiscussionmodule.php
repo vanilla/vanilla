@@ -1,69 +1,94 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * InThisDiscussion module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package InThisDiscussion
+ */
 
 /**
  * Renders a list of users who are taking part in a particular discussion.
  */
 class InThisDiscussionModule extends Gdn_Module {
 
-   protected $_UserData;
+    /** @var array */
+    protected $_UserData;
 
-   public function __construct($Sender = '') {
-      $this->_UserData = FALSE;
-      parent::__construct($Sender);
-   }
+    /**
+     *
+     *
+     * @param string $Sender
+     */
+    public function __construct($Sender = '') {
+        $this->_UserData = false;
+        parent::__construct($Sender);
+    }
 
-   public function GetData($DiscussionID, $Limit = 50) {
-      $SQL = Gdn::SQL();
-      $this->_UserData = $SQL
-         ->Select('u.UserID, u.Name, u.Photo')
-         ->Select('c.DateInserted', 'max', 'DateLastActive')
-         ->From('User u')
-         ->Join('Comment c', 'u.UserID = c.InsertUserID')
-         ->Where('c.DiscussionID', $DiscussionID)
-         ->GroupBy('u.UserID, u.Name')
-         ->OrderBy('c.DateInserted', 'desc')
-         ->Limit($Limit)
-         ->Get();
-   }
+    /**
+     *
+     *
+     * @param $DiscussionID
+     * @param int $Limit
+     * @throws Exception
+     */
+    public function getData($DiscussionID, $Limit = 50) {
+        $SQL = Gdn::sql();
+        $this->_UserData = $SQL
+            ->select('u.UserID, u.Name, u.Photo')
+            ->select('c.DateInserted', 'max', 'DateLastActive')
+            ->from('User u')
+            ->join('Comment c', 'u.UserID = c.InsertUserID')
+            ->where('c.DiscussionID', $DiscussionID)
+            ->groupBy('u.UserID, u.Name')
+            ->orderBy('c.DateInserted', 'desc')
+            ->limit($Limit)
+            ->get();
+    }
 
-   public function AssetTarget() {
-      return 'Panel';
-   }
+    /**
+     * Default render location.
+     *
+     * @return string
+     */
+    public function assetTarget() {
+        return 'Panel';
+    }
 
-   public function ToString() {
-      if ($this->_UserData->NumRows() == 0)
-         return '';
+    /**
+     * Build HTML.
+     *
+     * @return string HTML.
+     */
+    public function toString() {
+        if ($this->_UserData->numRows() == 0) {
+            return '';
+        }
 
-      $String = '';
-      ob_start();
-      ?>
-      <div class="Box">
-         <?php echo panelHeading(T('In this Discussion')); ?>
-         <ul class="PanelInfo">
-            <?php foreach ($this->_UserData->Result() as $User): ?>
-               <li>
-                  <?php
-                  echo Anchor(
-                     Wrap(Wrap(Gdn_Format::Date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
-                     Wrap(Wrap(GetValue('Name', $User), 'span', array('class' => 'Username')), 'span'),
-                     UserUrl($User)
-                  )
-                  ?>
-               </li>
-            <?php endforeach; ?>
-         </ul>
-      </div>
-      <?php
-      $String = ob_get_contents();
-      @ob_end_clean();
-      return $String;
-   }
+        $String = '';
+        ob_start();
+        ?>
+        <div class="Box">
+            <?php echo panelHeading(t('In this Discussion')); ?>
+            <ul class="PanelInfo">
+                <?php foreach ($this->_UserData->Result() as $User) :
+?>
+                    <li>
+                        <?php
+                        echo anchor(
+                            wrap(wrap(Gdn_Format::date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
+                            wrap(wrap(val('Name', $User), 'span', array('class' => 'Username')), 'span'),
+                            userUrl($User)
+                        )
+                        ?>
+                    </li>
+                <?php
+endforeach; ?>
+            </ul>
+        </div>
+        <?php
+        $String = ob_get_contents();
+        @ob_end_clean();
+        return $String;
+    }
 }

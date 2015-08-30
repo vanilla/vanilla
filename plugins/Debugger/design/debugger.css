@@ -1,0 +1,51 @@
+.DebugInfo {
+    clear: both;
+    background: #eeeeee;
+    color: #000;
+    font-weight: bold;
+    border-top: 1px solid #bbbbbb;
+    padding: 10px 20px;
+    margin: 0;
+    text-align: left;
+}
+
+.DebugInfo h2, .DebugInfo h3 {
+    font-size: 140%;
+    font-weight: bold;
+    margin: 0;
+    padding: 4px 0;
+}
+
+.DebugInfo pre {
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    font-family: monospace;
+    padding: 4px 8px;
+    margin: 4px 0px 8px;
+    overflow: auto;
+    font-size: 12px;
+    font-weight: normal;
+    background: #fafafa;
+    color: #000;
+    border: none;
+    box-shadow: inset 0 0 2px #999;
+}
+
+.DebugInfo span {
+    padding: 0 4px;
+    margin: 0 10px;
+    font-family: trebuchet ms;
+    font-size: 12px;
+    font-weight: normal;
+    color: #454545;
+}
+
+.DebugInfo small {
+    padding: 0 4px;
+    margin: 0 10px;
+    font-family: trebuchet ms;
+    font-size: 12px;
+    font-weight: normal;
+    color: #ff0084;
+}

@@ -1,43 +1,46 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * Category controller
- * 
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0.17.9
+ * Discussion controller
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
+ * @since 2.0.17.9
  */
 
+/**
+ * Handles the /category endpoint.
+ */
 class CategoryController extends VanillaController {
-   /**
-    * @var Gdn_CategoryModel
-    */
-   public $CategoryModel;
 
-   public function  __construct() {
-      parent::__construct();
-      $this->CategoryModel = new CategoryModel();
-   }
+    /** @var Gdn_CategoryModel */
+    public $CategoryModel;
 
-   public function Follow($CategoryID, $Value, $TKey) {
-      if (Gdn::Session()->ValidateTransientKey($TKey)) {
-         $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => !(bool)$Value));
-      }
+    public function __construct() {
+        parent::__construct();
+        $this->CategoryModel = new CategoryModel();
+    }
 
-      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-         Redirect('/categories');
+    public function follow($CategoryID, $Value, $TKey) {
+        if (Gdn::session()->validateTransientKey($TKey)) {
+            $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => !(bool)$Value));
+        }
 
-      $this->Render();
-   }
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect('/categories');
+        }
 
-   public function MarkRead($CategoryID, $TKey) {
-      if (Gdn::Session()->ValidateTransientKey($TKey)) {
-         $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
-      }
-      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-         Redirect('/categories');
+        $this->render();
+    }
 
-      $this->Render();
-   }
+    public function markRead($CategoryID, $TKey) {
+        if (Gdn::session()->validateTransientKey($TKey)) {
+            $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
+        }
+        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect('/categories');
+        }
+
+        $this->render();
+    }
 }

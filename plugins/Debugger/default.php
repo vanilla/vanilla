@@ -1,102 +1,140 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Debugger
+ */
 
 // Define the plugin:
 $PluginInfo['Debugger'] = array(
-   'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
-   'Version' => '1.0.1',
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE, // This is an array of plugin names/versions that this plugin requires
-   'HasLocale' => FALSE, // Does this plugin have any locale definitions?
-   'RegisterPermissions' => array('Plugins.Debugger.View','Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
-   'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca',
-   'MobileFriendly' => TRUE,
+    'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
+    'Version' => '1.1.1',
+    'RegisterPermissions' => array('Plugins.Debugger.View', 'Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
+    'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
+    'Author' => "Mark O'Sullivan",
+    'AuthorEmail' => 'mark@vanillaforums.com',
+    'AuthorUrl' => 'http://markosullivan.ca',
+    'MobileFriendly' => true,
 );
 
-// Install the debugger database.
-$tmp = Gdn::FactoryOverwrite(TRUE);
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
-Gdn::FactoryOverwrite($tmp);
-unset($tmp);
-
+/**
+ * Class DebuggerPlugin
+ */
 class DebuggerPlugin extends Gdn_Plugin {
-   // Specifying "Base" as the class name allows us to make the method get called for every
-   // class that implements a base class's method. For example, Base_Render_After
-   // would allow all controllers that call Controller.Render() to have that method
-   // be called. It saves you from having to go:
-   // Table_Render_After, Row_Render_After, Item_Render_After,
-   // SignIn_Render_After, etc. and it essentially *_Render_After
 
-   public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('debugger.css', 'plugins/Debugger');
-   }
+    /**
+     * Install the debugger database.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
 
-   public function Base_AfterBody_Handler($Sender) {
-      $Session = Gdn::Session();
-      if(!Debug() && !$Session->CheckPermission('Plugins.Debugger.View')) {
-         return;
-      }
+    /**
+     * Add CSS file to all pages.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function assetModel_styleCss_handler($Sender, $Args) {
+        $Sender->addCssFile('debugger.css', 'plugins/Debugger');
+    }
 
-      require $Sender->FetchViewLocation('Debug', '', 'plugins/Debugger');
-   }
+    /**
+     * Add Debugger info to every page.
+     *
+     * @param $Sender
+     */
+    public function base_afterBody_handler($Sender) {
+        $Session = Gdn::session();
+        if (!Debug() || !$Session->checkPermission('Plugins.Debugger.View')) {
+            return;
+        }
 
-   public static function FormatData($Data, $Indent = '') {
-      $Result = '';
-      if (is_array($Data)) {
-         foreach ($Data as $Key => $Value) {
-            if ($Key === NULL)
-               $Key = 'NULL';
-            $Result .= "$Indent<b>$Key</b>: ";
+        require $Sender->fetchViewLocation('Debug', '', 'plugins/Debugger');
+    }
 
-            if ($Value === NULL) {
-               $Result .= "NULL\n";
-            } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
-               $Result .= htmlspecialchars(var_export($Value, TRUE))."\n";
-            } else {
-               if (is_a($Value, 'Gdn_DataSet'))
-                  $Result .= "DataSet";
+    /**
+     * Register the debug database that captures the queries.
+     *
+     * This event happens as early as possible so that all queries can be captured.
+     *
+     * @param Gdn_PluginManager $sender The {@link Gdn_PluginManager} firing the event.
+     */
+    public function gdn_pluginManager_afterStart_handler($sender) {
+        $tmp = Gdn::factoryOverwrite(true);
+        Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', dirname(__FILE__).DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryOverwrite($tmp);
+        unset($tmp);
+    }
 
-               $Result .=
-                  "\n"
-                  .self::FormatData($Value, $Indent.'   ');
+    /**
+     * Build HTML.
+     *
+     * @param $Data
+     * @param string $Indent
+     * @return string
+     */
+    public static function formatData($Data, $Indent = '') {
+        $Result = '';
+        if (is_array($Data)) {
+            foreach ($Data as $Key => $Value) {
+                if ($Key === null)
+                    $Key = 'NULL';
+                $Result .= "$Indent<b>$Key</b>: ";
+
+                if ($Value === null) {
+                    $Result .= "NULL\n";
+                } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
+                    $Result .= htmlspecialchars(var_export($Value, true))."\n";
+                } else {
+                    if (is_a($Value, 'Gdn_DataSet'))
+                        $Result .= "DataSet";
+
+                    $Result .=
+                        "\n"
+                        .self::formatData($Value, $Indent.'   ');
+                }
             }
-         }
-      } elseif (is_a($Data, 'Gdn_DataSet')) {
-         $Data = $Data->Result();
-         if (count($Data) == 0)
-            return $Result.'EMPTY<br />';
+        } elseif (is_a($Data, 'Gdn_DataSet')) {
+            $Data = $Data->result();
+            if (count($Data) == 0)
+                return $Result.'EMPTY<br />';
 
-         $Fields = array_keys((array)reset($Data));
-         $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
-            .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields))."\n";
-         return $Result;
-      } elseif (is_a($Data, 'stdClass')) {
-         $Data = (array)$Data;
-         return self::FormatData($Data, $Indent);
-      } elseif (is_object($Data)) {
-         $Result .= $Indent.get_class($Data);
-      } else {
-         return trim(var_export($Data, TRUE));
-      }
-      return $Result;
-   }
+            $Fields = array_keys((array)reset($Data));
+            $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
+                .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields))."\n";
+            return $Result;
+        } elseif (is_a($Data, 'stdClass')) {
+            $Data = (array)$Data;
+            return self::formatData($Data, $Indent);
+        } elseif (is_object($Data)) {
+            $Result .= $Indent.get_class($Data);
+        } else {
+            return trim(var_export($Data, true));
+        }
+        return $Result;
+    }
 
-   public function PluginController_Debugger_Create($Sender) {
-      $Sender->Render();
-   }
+    /**
+     *
+     *
+     * @param $Sender
+     */
+    public function pluginController_debugger_create($Sender) {
+        $Sender->render();
+    }
 
-   public function Setup() {
-      // This setup method should trigger errors when it encounters them - the plugin manager will catch the errors...
-   }
+    /**
+     *
+     */
+    public function setup() {
+        saveToConfig('Debug', true);
+    }
+
+    /**
+     *
+     */
+    public function onDisable() {
+        saveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
+    }
 }

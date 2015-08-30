@@ -1,38 +1,58 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Guest module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
 /**
  * Renders the "You should register or sign in" panel box.
  */
 class GuestModule extends Gdn_Module {
-   
-   public $MessageCode = 'GuestModule.Message';
-   public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
-   
-   public function __construct($Sender = '', $ApplicationFolder = FALSE) {
-      if (!$ApplicationFolder)
-         $ApplicationFolder = 'Dashboard';
-      parent::__construct($Sender, $ApplicationFolder);
-      
-      $this->Visible = C('Garden.Modules.ShowGuestModule');
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
-   
-   public function ToString() {
-      if (!Gdn::Session()->IsValid())
-         return parent::ToString();
 
-      return '';
-   }   
+    /** @var string  */
+    public $MessageCode = 'GuestModule.Message';
 
+    /** @var string  */
+    public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
+
+    /**
+     *
+     *
+     * @param string $Sender
+     * @param bool $ApplicationFolder
+     */
+    public function __construct($Sender = '', $ApplicationFolder = false) {
+        if (!$ApplicationFolder) {
+            $ApplicationFolder = 'Dashboard';
+        }
+        parent::__construct($Sender, $ApplicationFolder);
+
+        $this->Visible = c('Garden.Modules.ShowGuestModule');
+    }
+
+    /**
+     *
+     *
+     * @return string
+     */
+    public function assetTarget() {
+        return 'Panel';
+    }
+
+    /**
+     * Render.
+     *
+     * @return string
+     */
+    public function toString() {
+        if (!Gdn::session()->isValid()) {
+            return parent::ToString();
+        }
+
+        return '';
+    }
 }

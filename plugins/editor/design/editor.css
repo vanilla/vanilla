@@ -1,0 +1,1160 @@
+.bodybox-wrap {
+    position: relative;
+}
+
+.editor-upload-progress {
+    position: absolute;
+    width: 0%;
+    overflow: hidden;
+    background: #38ABE3 url(/applications/dashboard/design/images/upload-progress-back.gif) repeat;
+    margin: -2px 0 0 0;
+    width: 0;
+    height: 5px;
+    border: 1px solid #38ABE3;
+    opacity: 0;
+    box-shadow: 0 1px 2px -1px #fff;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.editor-upload-progress.fade-out {
+    opacity: 0 !important;
+    transition: opacity 0.7s ease;
+}
+
+.editor-drop-cue .BodyBox, .editor-drop-cue iframe.wysihtml5-sandbox {
+    border: 2px dashed rgba(0, 0, 0, 0.25) !important;
+    border-radius: 2px !important;
+}
+
+.editor-upload-attention {
+    display: none;
+    position: absolute;
+    top: 15px;
+    width: 160px;
+    left: 50%;
+    margin-left: -80px;
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.4);
+    padding: 10px 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 2px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 500;
+}
+
+.editor-drop-cue .editor-upload-attention {
+    display: block;
+}
+
+/* If editor is fullpage */
+#editor-fullpage-candidate .editor-upload-progress {
+    margin: 0;
+}
+
+#editor-fullpage-candidate .editor-upload-attention {
+    top: 60px;
+}
+
+.editor-upload-previews, .editor-upload-saved {
+    overflow: hidden;
+    padding: 5px;
+    margin: 0 -10px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+}
+
+.editor-file-preview {
+    position: relative;
+    float: left;
+    height: 32px;
+    width: 220px;
+    padding: 0;
+    margin: 5px;
+    overflow: hidden;
+    font-size: 12px;
+    color: #999;
+    text-shadow: 0 0 1px #fff;
+    background-color: #eaeaea;
+    /*rgba(0,0,0,0.05);*/
+    border: 1px solid #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    /* This is for the transition when removing/reattaching files. Height
+     is necessary due to floated elements and width, which cause them to
+     occupy space under image until width is full. */
+    transition: all 0.1s ease;
+    -webkit-animation-duration: 0.8s;
+    animation-duration: 0.8s;
+    -webkit-animation-name: editor-file-preview;
+    animation-name: editor-file-preview;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-duration: 0.4s;
+    animation-duration: 0.4s;
+    /* File permissions */
+}
+
+.editor-file-preview .file-preview {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 30px;
+}
+
+.editor-file-preview .file-preview.img {
+    padding: 0;
+    background-position: center;
+    background-size: 50px auto;
+}
+
+.editor-file-preview .file-preview.icon-file {
+    font-size: 18px;
+    line-height: 30px;
+    text-align: center;
+}
+
+.editor-file-preview .file-data {
+    float: left;
+    width: 158px;
+    padding: 2px 0;
+    margin: 0 0 0 5px;
+    line-height: 13px;
+}
+
+.editor-file-preview .file-data .filename {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    color: rgba(0, 0, 0, 0.75);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.editor-file-preview .file-data .meta {
+    display: block;
+    margin: 0;
+    font-size: 10px;
+}
+
+.editor-file-preview .file-data .meta em {
+    font-style: italic;
+}
+
+.editor-file-preview .editor-file-remove {
+    float: right;
+    height: 30px;
+    cursor: pointer;
+    background-color: #fff;
+    box-shadow: inset 2px 0 2px -3px #000;
+}
+
+.editor-file-preview .editor-file-remove:after {
+    display: block;
+    width: 24px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 30px;
+    text-align: center;
+    content: "\00D7";
+}
+
+.editor-file-preview .editor-file-remove:hover:after {
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.editor-file-preview .editor-file-reattach {
+    display: none;
+}
+
+.editor-file-preview.file-readonly .file-data {
+    width: 178px;
+}
+
+.editor-file-preview.file-readonly .editor-file-remove, .editor-file-preview.file-readonly .editor-file-reattach {
+    display: none;
+}
+
+/* Any files in this wrapper have no delete options. Only when moved into
+.editor-upload-previews will the options be activated */
+.editor-upload-readonly .file-data {
+    width: 178px;
+}
+
+.editor-upload-readonly .editor-file-remove, .editor-upload-readonly .editor-file-reattach, .editor-upload-readonly .in-body {
+    display: none;
+}
+
+.editor-file-removed {
+    width: 32px;
+    height: 32px;
+    opacity: 0.25 !important;
+}
+
+.editor-file-removed .editor-file-reattach {
+    display: block;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+}
+
+@-webkit-keyframes editor-file-preview {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+@keyframes editor-file-preview {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+/**
+ * Editor toolbar
+ */
+.editor {
+    display: none;
+    padding: 5px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.editor-active .editor {
+    display: block;
+}
+
+.editor .icon {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 0 1px;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+}
+
+.editor .editor-sep {
+    margin: 0 5px;
+    border-left: 1px solid;
+    border-left-color: #999;
+    border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+.editor .editor-dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+.editor .icon-caret-down {
+    position: relative;
+    top: -2px;
+    right: -2px;
+    min-width: 0 !important;
+    padding: 0 0 0 5px;
+    font-size: 75%;
+    pointer-events: none;
+}
+
+.editor-help-text {
+    font-size: 11px;
+}
+
+/* State of icons */
+.editor .icon:hover, .wysihtml5-command-active, .wysihtml5-action-active, .wysihtml5-command-dialog-opened, .editor-dropdown-open > .editor-action {
+    background-color: #999;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+/**
+ * Dropdowns
+ */
+.editor-insert-dialog {
+    position: absolute;
+    z-index: 100;
+    display: none;
+    padding: 5px;
+    margin: 5px 0 0 0;
+    width: 300px;
+}
+
+.editor-dropdown-open .editor-insert-dialog {
+    display: block;
+}
+
+.MenuButtons {
+    margin-top: 5px;
+    text-align: right;
+}
+
+.MenuButtons .Button {
+    min-width: 55px;
+}
+
+.editor-dropdown-open .editor-insert-dialog label {
+    display: inline !important;
+}
+
+.editor-insert-dialog input.InputBox {
+    width: 100%;
+    margin: 0;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.dd-separator {
+    background-color: rgba(0, 0, 0, 0.1);
+    height: 1px;
+    margin: 5px 0;
+}
+
+/**
+ * Colors dropdown
+ */
+.editor-dropdown-color .editor-insert-dialog {
+    width: 56px;
+}
+
+.editor-dropdown-color.color-has-highlight .editor-insert-dialog {
+    width: 134px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color {
+    width: 24px;
+    height: 24px;
+    float: left;
+    cursor: pointer;
+    border: 1px solid #fff;
+    box-shadow: inset 0 0 0 1px #fff;
+    transition: -webkit-transform 0.2s ease;
+    transition: transform 0.2s ease;
+    margin: 1px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color:hover, .editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
+    border: 1px solid transparent;
+    -webkit-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    transform: scale(1.1);
+    position: relative;
+    z-index: 10;
+    border: 1px solid transparent;
+    border-radius: 2px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group {
+    width: 56px;
+    display: inline-block;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group .icon {
+    display: block;
+    padding: 5px 0 5px 2px;
+    background: 0;
+    cursor: default;
+}
+
+.editor-dropdown-color .editor-insert-dialog .highlight-color {
+    border-left: 1px solid #EFEFEF;
+    padding-left: 10px;
+    margin-left: 10px;
+}
+
+/**
+ * Headers dropdown
+ */
+.editor-dd-format + .editor-insert-dialog {
+    padding: 5px 0;
+    width: auto;
+    /*
+        max-height: 230px;
+        overflow-y: auto;
+        */
+}
+
+.editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
+    border-radius: 0;
+}
+
+/**
+ * Emoji drop down
+ */
+.editor-dd-emoji + .editor-insert-dialog {
+    width: 136px;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+.editor-dd-emoji + .editor-insert-dialog .emoji-wrap {
+    line-height: 34px;
+    width: 34px;
+    overflow: hidden;
+    text-align: center;
+    float: left;
+}
+
+.editor-dd-emoji + .editor-insert-dialog .emoji-wrap:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+.editor-dd-emoji + .editor-insert-dialog .emoji {
+    line-height: 34px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/**
+ * File and image dropdown
+ */
+.editor-file-image {
+    padding: 0;
+}
+
+.editor-file-image .drop-section {
+    padding: 10px;
+}
+
+.editor-file-image .file-drop {
+    display: none;
+    padding: 30px;
+    margin: 10px 10px 0 10px;
+    text-align: center;
+    border: 2px dashed rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+}
+
+.editor-file-image .file-drop.can-drop {
+    display: block !important;
+}
+
+.editor-file-image .file-input {
+    overflow: hidden;
+    white-space: nowrap;
+    padding-top: 10px;
+}
+
+.editor-file-image .file-input input[type=file] {
+    visibility: visible !important;
+}
+
+.editor-file-image .image-input {
+    padding: 0;
+    border-top: 1px solid #da8f8f;
+}
+
+.editor-file-image .image-input input {
+    padding: 10px;
+    margin: 0;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border: 0;
+}
+
+.editor-file-image.drag-passthrough {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 200ms ease;
+    -webkit-transform: scale(0);
+    -ms-transform: scale(0);
+    transform: scale(0);
+}
+
+.editor-dropdown-image .editor-file-image .image-input {
+    border-top: 0;
+}
+
+/* If uploads disabled entirely, hide some options in the dropdown */
+.editor-uploads-disabled .file-drop, .editor-uploads-disabled .file-input {
+    display: none;
+}
+
+.editor-uploads-disabled .image-input {
+    border: 0;
+}
+
+/**
+ * Going full page
+ */
+.editor-toggle-fullpage-button {
+    float: right;
+}
+
+/* Added to body class with JS, so force specificity for everything
+   below; this makes editing very easy */
+.editor-fullpage {
+    overflow: hidden !important;
+}
+
+.editor-fullpage .TextBoxWrapper {
+    padding: 0;
+}
+
+.editor-fullpage .TextBoxWrapper .BodyBox, .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+    width: 100% !important;
+    color: #000;
+    -moz-box-sizing: border-box !important;
+    box-sizing: border-box !important;
+    transition: background-color 400ms ease, color 400ms ease;
+}
+
+.editor-fullpage .TextBoxWrapper .BodyBox {
+    min-height: 400px;
+}
+
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+    height: 400px !important;
+}
+
+.editor-fullpage #editor-fullpage-candidate {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100000;
+    /* So high because a client actually had 99999 in a theme */
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    overflow-y: auto;
+    background-color: #fff;
+    transition: background-color 400ms ease;
+}
+
+.editor-fullpage #editor-fullpage-candidate input {
+    -moz-box-sizing: border-box !important;
+    box-sizing: border-box !important;
+}
+
+.editor-fullpage #editor-fullpage-candidate .editor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100001;
+    /* So high because a client actually had 99999 in a theme */
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid transparent;
+    box-shadow: 0 2px 5px -5px #000;
+    transition: all 400ms ease;
+}
+
+.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
+    padding: 50px 0 10px 0;
+    margin: 0 auto;
+}
+
+.editor-fullpage #editor-fullpage-candidate .editor, .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper, .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+    max-width: 800px;
+    -webkit-animation-duration: 800ms;
+    animation-duration: 800ms;
+    -webkit-animation-name: editor-anim-editor;
+    animation-name: editor-anim-editor;
+}
+
+.editor-fullpage #editor-fullpage-candidate .editor-help-text {
+    display: none;
+}
+
+.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+    margin: 0 auto;
+}
+
+/**
+ * Experimental toggle lights on/off.
+ */
+.editor-toggle-lights-button {
+    display: none !important;
+}
+
+.editor-fullpage .editor-toggle-lights-button {
+    float: right;
+    /*display: inline-block !important;*/
+}
+
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
+    background-color: #000;
+}
+
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 5px 5px -5px #999;
+}
+
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .icon:hover, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-active, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-action-active, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-dialog-opened {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .editor-sep {
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .BodyBox, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .wysihtml5-sandbox {
+    color: #999 !important;
+    background-color: #000 !important;
+    border-color: #222 !important;
+}
+
+/* This should match the above values, and needs to be added as a class name
+directly on the iframe's bodybox contenteditable. */
+.iframe-bodybox-lightsoff {
+    background-color: transparent !important;
+    color: #999999 !important;
+}
+
+.iframe-bodybox-lightson {
+    background-color: transparent !important;
+    color: #000 !important;
+}
+
+@-webkit-keyframes editor-anim-editor {
+    0% {
+        opacity: 0;
+    }
+}
+
+@keyframes editor-anim-editor {
+    0% {
+        opacity: 0;
+    }
+}
+
+/**
+ * Hide some actions per editor view.
+ *
+ * Html, BBCode, and Markdown views have slight differences than the Wysiwyg,
+ * so hide the particular ones.
+ */
+.editor-format-html .editor-toggle-source, .editor-format-bbcode .editor-toggle-source, .editor-format-markdown .editor-toggle-source, .editor-format-html .sep-switches, .editor-format-bbcode .sep-switches, .editor-format-markdown .sep-switches, .editor-format-markdown .sep-align, .editor-format-markdown .icon-align-left, .editor-format-markdown .icon-align-center, .editor-format-markdown .icon-align-right, .editor-format-html .editor-image-align, .editor-format-bbcode .editor-image-align, .editor-format-markdown .editor-image-align, .editor-format-bbcode .editor-action-heading1, .editor-format-bbcode .editor-action-heading2, .editor-format-bbcode .editor-action-separator {
+    /* Defined as important, because some themes have overriden with their own
+        !important values. */
+    display: none !important;
+}
+
+.editor-format-text .editor-sep, .editor-format-text .icon-bold, .editor-format-text .icon-italic, .editor-format-text .icon-strikethrough, .editor-format-text .icon-list-ol, .editor-format-text .icon-list-ul, .editor-format-text .editor-dropdown-link, .editor-format-text .editor-action-headers, .editor-format-text .icon-align-left, .editor-format-text .icon-align-center, .editor-format-text .icon-align-right, .editor-format-text .editor-toggle-source, .editor-format-text .editor-toggle-fullpage-button, .editor-format-textex .editor-sep, .editor-format-textex .icon-bold, .editor-format-textex .icon-italic, .editor-format-textex .icon-strikethrough, .editor-format-textex .icon-list-ol, .editor-format-textex .icon-list-ul, .editor-format-textex .editor-dropdown-link, .editor-format-textex .editor-action-headers, .editor-format-textex .icon-align-left, .editor-format-textex .icon-align-center, .editor-format-textex .icon-align-right, .editor-format-textex .editor-toggle-source, .editor-format-textex .editor-toggle-fullpage-button {
+    display: none !important;
+}
+
+.editor-format-text .editor-dropdown-image, .editor-format-text .editor-dropdown-upload {
+    display: none !important;
+}
+
+/**
+ * When wysiwyg editor switches to code view, disable functionality and visibly
+ * disable the common action buttons, which should no longer have any affect.
+ * The class, wysihtml5-commands-disabled, is added to editor bar when
+ * the code switch button is clicked, so tie into it.
+ */
+.wysihtml5-commands-disabled .editor-action {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.wysihtml5-commands-disabled .editor-toggle-source, .wysihtml5-commands-disabled .editor-toggle-fullpage-button {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/**
+ * Brute force hide other editors enabled after this one.
+ *
+ * In case some of the other editors were enabled after this one, just have
+ * them hidden from page, essentially making this editor the veto. This is
+ * a last ditch effort to at least make sure editor is usable when others
+ * are enabled.
+ */
+.editor-active .cleditorMain iframe {
+    display: none !important;
+}
+
+.editor-active .cleditorMain .wysihtml5-sandbox {
+    display: block !important;
+}
+
+.editor-active .cleditorToolbar, .editor-active .ButtonBar, .editor-active .ButtonBarMarkupHint {
+    display: none !important;
+}
+
+/* Media query: Hiding non-essential buttons */
+@media (max-width: 767px) {
+    /* This is not necessary or very specific, but on mobile, apple products
+        add rounded corners */
+    .editor-optional-button {
+        display: none !important;
+    }
+
+    .editor-fullpage .TextBoxWrapper .BodyBox, .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+        height: auto !important;
+    }
+
+    textarea {
+        border-radius: 0;
+    }
+}
+
+/**
+ * Mobile tweaks, specifically for Lithe Mobile
+ */
+.editor-mobile .editor-dropdown-upload {
+    position: static;
+}
+
+.editor-mobile .editor-dropdown-upload .editor-insert-dialog {
+    left: 0;
+    right: 0;
+    top: auto;
+    width: auto;
+}
+
+.editor-mobile .editor-dropdown-default .editor-dd-emoji + .editor-insert-dialog {
+    min-width: 132px;
+    padding: 5px;
+}
+
+.editor-mobile .editor-dropdown-default .editor-dd-format + .editor-insert-dialog {
+    right: auto;
+    left: 0;
+}
+
+.editor-mobile .editor-dropdown-default .editor-dd-format + .editor-insert-dialog a {
+    display: block;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.editor-mobile .editor-dropdown-link .editor-insert-dialog {
+    padding: 5px;
+}
+
+.editor-mobile #drop-cue-dropdown, .editor-mobile .file-input .file-or {
+    display: none !important;
+}
+
+.editor-mobile .FileBox {
+    overflow: hidden;
+}
+
+.editor-mobile .FileBox label, .editor-mobile .FileBox input {
+    float: left;
+    width: auto;
+}
+
+.editor-mobile .FileBox label {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.editor-mobile .FileBox label .icon:hover {
+    background-color: inherit;
+}
+
+/**
+ * Modify this file to change the styling of the content
+ * in the Wysiwyg editor.
+ */
+/**
+ * Editor action styles within editor and post
+ */
+.post-font-size-smaller {
+    font-size: smaller;
+}
+
+.post-font-size-larger {
+    font-size: larger;
+}
+
+.post-font-size-xx-large {
+    font-size: xx-large;
+}
+
+.post-font-size-x-large {
+    font-size: x-large;
+}
+
+.post-font-size-large {
+    font-size: 18px;
+}
+
+.post-font-size-medium, .post-font-size-normal, .post-font-size-default {
+    font-size: 13px;
+}
+
+.post-font-size-small {
+    font-size: 11px;
+}
+
+.post-font-size-x-small {
+    font-size: x-small;
+}
+
+.post-font-size-xx-small {
+    font-size: xx-small;
+}
+
+/**
+ * These two are not actually inserted into the editor. They are only used for
+ * the dropdown.
+ */
+.post-font-size-h1 {
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 31px !important;
+}
+
+.post-font-size-h2 {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 26px !important;
+}
+
+/* Colours based on http://clrs.cc/
+cell-* are used for the dropdown */
+.post-color-black {
+    color: #111111;
+}
+
+.cell-color-black, .post-highlightcolor-black {
+    background-color: #111111;
+}
+
+.post-color-silver {
+    color: #dddddd;
+}
+
+.cell-color-silver, .post-highlightcolor-silver {
+    background-color: #dddddd;
+}
+
+.post-color-gray {
+    color: #aaaaaa;
+}
+
+.cell-color-gray, .post-highlightcolor-gray {
+    background-color: #aaaaaa;
+}
+
+.post-color-white {
+    color: #ffffff;
+}
+
+.cell-color-white, .post-highlightcolor-white {
+    background-color: #ffffff;
+}
+
+.post-color-maroon {
+    color: #85144b;
+}
+
+.cell-color-maroon, .post-highlightcolor-maroon {
+    background-color: #85144b;
+}
+
+.post-color-red {
+    color: #ff4136;
+}
+
+.cell-color-red, .post-highlightcolor-red {
+    background-color: #ff4136;
+}
+
+.post-color-purple {
+    color: #7b11d0;
+}
+
+.cell-color-purple, .post-highlightcolor-purple {
+    background-color: #7b11d0;
+}
+
+.post-color-fuchsia {
+    color: #f012be;
+}
+
+.cell-color-fuchsia, .post-highlightcolor-fuchsia {
+    background-color: #f012be;
+}
+
+.post-color-green {
+    color: #2ecc40;
+}
+
+.cell-color-green, .post-highlightcolor-green {
+    background-color: #2ecc40;
+}
+
+.post-color-lime {
+    color: #01ff70;
+}
+
+.cell-color-lime, .post-highlightcolor-lime {
+    background-color: #01ff70;
+}
+
+.post-color-olive {
+    color: #3d9970;
+}
+
+.cell-color-olive, .post-highlightcolor-olive {
+    background-color: #3d9970;
+}
+
+.post-color-yellow {
+    color: #ffdc00;
+}
+
+.cell-color-yellow, .post-highlightcolor-yellow {
+    background-color: #ffdc00;
+}
+
+.post-color-navy {
+    color: #001f3f;
+}
+
+.cell-color-navy, .post-highlightcolor-navy {
+    background-color: #001f3f;
+}
+
+.post-color-blue {
+    color: #0074d9;
+}
+
+.cell-color-blue, .post-highlightcolor-blue {
+    background-color: #0074d9;
+}
+
+.post-color-teal {
+    color: #39cccc;
+}
+
+.cell-color-teal, .post-highlightcolor-teal {
+    background-color: #39cccc;
+}
+
+.post-color-aqua {
+    color: #7fdbff;
+}
+
+.cell-color-aqua, .post-highlightcolor-aqua {
+    background-color: #7fdbff;
+}
+
+.post-color-orange {
+    color: #ffa500;
+}
+
+.cell-color-orange, .post-highlightcolor-orange {
+    background-color: #ffa500;
+}
+
+.post-text-align-right {
+    text-align: right;
+}
+
+.post-text-align-center {
+    text-align: center;
+}
+
+.post-text-align-left {
+    text-align: left;
+}
+
+.post-text-align-justify {
+    text-align: justify;
+}
+
+.post-float-left {
+    float: left;
+    margin: 0 8px 8px 0;
+}
+
+.post-float-right {
+    float: right;
+    margin: 0 0 8px 8px;
+}
+
+.post-clear-right {
+    clear: right;
+}
+
+.post-clear-left {
+    clear: left;
+}
+
+/**
+ * Font families
+ */
+.post-fontfamily-default {
+    font-family: inherit;
+}
+
+.post-fontfamily-arial {
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+.post-fontfamily-comicsansms {
+    font-family: 'Comic Sans MS', cursive !important;
+}
+
+.post-fontfamily-couriernew {
+    font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+}
+
+.post-fontfamily-georgia {
+    font-family: Georgia, Times, 'Times New Roman', serif;
+}
+
+.post-fontfamily-impact {
+    font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif;
+}
+
+.post-fontfamily-timesnewroman {
+    font-family: 'Times New Roman', Times, Baskerville, Georgia, serif;
+}
+
+.post-fontfamily-trebuchetms {
+    font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+}
+
+.post-fontfamily-verdana {
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+/* Custom classes */
+
+blockquote.Quote {
+    background: rgba(0, 0, 0, 0.05);
+    border-left: 4px solid rgba(0, 0, 0, 0.1);
+    margin: 1em;
+    padding: 1ex 10px;
+}
+
+pre.CodeBlock {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.Spoiler {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    margin: 1em 0;
+    padding: 1ex 16px;
+}
+
+.Message .Spoiler {
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    height: 0;
+    width: 0;
+    margin: 5px 0;
+    padding: 8px 16px;
+    position: relative;
+    cursor: pointer;
+    font-size: 0;
+}
+
+.Message .Spoiler:hover {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.Message .Spoiler:before {
+    content: '...';
+    position: absolute;
+    top: -7px;
+    left: 9px;
+    font-size: 14px;
+}
+
+.Spoiled {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    padding: 20px;
+    font-size: inherit;
+    margin: 5px 0;
+    transition: padding 0.1s ease;
+}
+
+.AlignLeft {
+    text-align: left;
+}
+
+.AlignCenter {
+    text-align: center;
+}
+
+.AlignRight {
+    text-align: right;
+}
+
+/**
+ * Target iframe and actual body within editor iframe. Do not use body to set
+ * background color of composer. By default it will be inherited from
+ * textarea automatically, but if for some reason you want to override the
+ * styles directly, use .editor-composer (body) for fonts and padding, and use
+ * .wysihtml5-sandbox (iframe) to modify the iframe (do background-color on
+ * this).
+ */
+/* iframe */
+
+/* body within iframe */
+.editor-composer {
+    margin: 0;
+    border: 0;
+    padding: inherit;
+    font: inherit;
+    outline: none;
+}
+
+/**
+ * Adjust some styles explicitly within the editor composer. These match the
+ * styles in styles.css. These rules match the font sizes for post-font-size-h*
+ */
+.editor-composer h1 {
+    font-size: 21px;
+}
+
+.editor-composer h2 {
+    font-size: 18px;
+}
+
+/* Keep here to address iframe/body padding text creep issue, see autogrow js
+for more information about the issue */
+.wysihtml5-sandbox {
+    padding: 0 !important;
+}
+
+/*# sourceMappingURL=editor.css.map */

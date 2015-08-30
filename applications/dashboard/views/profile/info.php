@@ -1,44 +1,48 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 if (!is_array($this->Roles))
-   $this->Roles = array();
+    $this->Roles = array();
 
-$this->FireEvent('BeforeInfo');
-if (Gdn::Config('Garden.Profile.ShowAbout')) {
-?>
-<div class="Info About">
-   <h3><?php echo T('Basic Information'); ?></h3>
-   <dl>
-      <?php               
-      if ($this->User->Banned) {
-         echo '<dt class="Value"><span class="Tag Tag-Banned">'.T('Banned').'</span></dt>';
-      }
-         
-      if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Moderation.Manage')) {
-         echo '<dt>'.T('Email').'</dt>
+$this->fireEvent('BeforeInfo');
+if (Gdn::config('Garden.Profile.ShowAbout')) {
+    ?>
+    <div class="Info About">
+        <h3><?php echo t('Basic Information'); ?></h3>
+        <dl>
+            <?php
+            if ($this->User->Banned) {
+                echo '<dt class="Value"><span class="Tag Tag-Banned">'.t('Banned').'</span></dt>';
+            }
+
+            if ($this->User->ShowEmail == 1 || $Session->checkPermission('Garden.Moderation.Manage')) {
+                echo '<dt>'.t('Email').'</dt>
          <dd>'.Gdn_Format::Email($this->User->Email).'</dd>';
-      }
-      ?>
-      <dt class="Label Joined"><?php echo T('Joined'); ?><dt>
-      <dd class="Value Joined"><?php echo Gdn_Format::Date($this->User->DateFirstVisit); ?></dd>
-      <dt class="Label Visits"><?php echo T('Visits'); ?><dt>
-      <dd class="Value Visits"><?php echo $this->User->CountVisits; ?></dd>
-      <dt class="Label LastActive"><?php echo T('Last Active'); ?><dt>
-      <dd class="Value LastActive"><?php echo Gdn_Format::Date($this->User->DateLastActive); ?></dd>
-      <dt class="Label Roles"><?php echo T('Roles'); ?><dt>
-      <dd class="Value Roles"><?php echo implode(', ', $this->Roles); ?></dd>
-      <?php               
-      if ($this->User->InviteUserID > 0) {
-         $Inviter = new stdClass();
-         $Inviter->UserID = $this->User->InviteUserID;
-         $Inviter->Name = $this->User->InviteName;
-         echo '<dt class="Label InvitedBy">'.T('Invited by').'</dt>
+            }
+            ?>
+            <dt class="Label Joined"><?php echo t('Joined'); ?>
+            <dt>
+            <dd class="Value Joined"><?php echo Gdn_Format::date($this->User->DateFirstVisit); ?></dd>
+            <dt class="Label Visits"><?php echo t('Visits'); ?>
+            <dt>
+            <dd class="Value Visits"><?php echo $this->User->CountVisits; ?></dd>
+            <dt class="Label LastActive"><?php echo t('Last Active'); ?>
+            <dt>
+            <dd class="Value LastActive"><?php echo Gdn_Format::date($this->User->DateLastActive); ?></dd>
+            <dt class="Label Roles"><?php echo t('Roles'); ?>
+            <dt>
+            <dd class="Value Roles"><?php echo implode(', ', $this->Roles); ?></dd>
+            <?php
+            if ($this->User->InviteUserID > 0) {
+                $Inviter = new stdClass();
+                $Inviter->UserID = $this->User->InviteUserID;
+                $Inviter->Name = $this->User->InviteName;
+                echo '<dt class="Label InvitedBy">'.t('Invited by').'</dt>
          <dd class="Value InvitedBy">'.UserAnchor($Inviter).'</dd>';
-      }
-      $this->FireEvent('OnBasicInfo');
-      ?>
-   </dl>
-</div>
+            }
+            $this->fireEvent('OnBasicInfo');
+            ?>
+        </dl>
+    </div>
 <?php
 }
-$this->FireEvent('AfterInfo');
+$this->fireEvent('AfterInfo');

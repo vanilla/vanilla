@@ -1,80 +1,96 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Add People module.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Conversations
+ * @since 2.0
+ */
 
 /**
  * Renders a form that allows people to be added to conversations.
  */
 class AddPeopleModule extends Gdn_Module {
 
-   public $Conversation;
-   public $Form;
+    /** @var array */
+    public $Conversation;
 
-   /** @var bool Whether user is allowed to use this form. */
-   public $AddUserAllowed = TRUE;
+    /** @var Gdn_Form */
+    public $Form;
 
-   public function __construct($Sender = '') {
-      $Session = Gdn::Session();
-      if (property_exists($Sender, 'Conversation'))
-         $this->Conversation = $Sender->Conversation;
+    /** @var bool Whether user is allowed to use this form. */
+    public $AddUserAllowed = true;
 
-      // Allowed to use this module?
-      $this->AddUserAllowed = $Sender->ConversationModel->AddUserAllowed($this->Conversation->ConversationID);
+    /**
+     *
+     *
+     * @param string $Sender
+     * @throws Exception
+     */
+    public function __construct($Sender = '') {
+        $Session = Gdn::session();
+        if (property_exists($Sender, 'Conversation')) {
+            $this->Conversation = $Sender->Conversation;
+        }
 
-      $this->Form = Gdn::Factory('Form', 'AddPeople');
-      // $this->Form->Action = $Sender->SelfUrl;
-      // If the form was posted back, check for people to add to the conversation
-      if ($this->Form->AuthenticatedPostBack()) {
-         // Defer exceptions until they try to use the form so we don't fill our logs
-         if (!$this->AddUserAllowed || !CheckPermission('Conversations.Conversations.Add')) {
-            throw PermissionException();
-         }
+        // Allowed to use this module?
+        $this->AddUserAllowed = $Sender->ConversationModel->addUserAllowed($this->Conversation->ConversationID);
 
-         $NewRecipientUserIDs = array();
-         $NewRecipients = explode(',', $this->Form->GetFormValue('AddPeople', ''));
-         $UserModel = Gdn::Factory("UserModel");
-         foreach ($NewRecipients as $Name) {
-            if (trim($Name) != '') {
-               $User = $UserModel->GetByUsername(trim($Name));
-               if (is_object($User))
-                  $NewRecipientUserIDs[] = $User->UserID;
+        $this->Form = Gdn::factory('Form', 'AddPeople');
+        // $this->Form->Action = $Sender->SelfUrl;
+        // If the form was posted back, check for people to add to the conversation
+        if ($this->Form->authenticatedPostBack()) {
+            // Defer exceptions until they try to use the form so we don't fill our logs
+            if (!$this->AddUserAllowed || !checkPermission('Conversations.Conversations.Add')) {
+                throw permissionException();
             }
-         }
-         $Sender->ConversationModel->AddUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
-         // if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
-         //    Redirect('/messages/'.$this->Conversation->ConversationID);
-            
-         $Sender->InformMessage(T('Your changes were saved.'));
-         $Sender->RedirectUrl = Url('/messages/'.$this->Conversation->ConversationID);
-      }
-      $this->_ApplicationFolder = $Sender->Application;
-      $this->_ThemeFolder = $Sender->Theme;
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
 
-   /**
-    * Render the module.
-    *
-    * @return string Rendered HTML.
-    */
-   public function ToString() {
-      // Simplify our permission logic
-      $ConversationExists = (is_object($this->Conversation) && $this->Conversation->ConversationID > 0);
-      $CanAddUsers = ($this->AddUserAllowed && CheckPermission('Conversations.Conversations.Add'));
+            $NewRecipientUserIDs = array();
+            $NewRecipients = explode(',', $this->Form->getFormValue('AddPeople', ''));
+            $UserModel = Gdn::factory("UserModel");
+            foreach ($NewRecipients as $Name) {
+                if (trim($Name) != '') {
+                    $User = $UserModel->getByUsername(trim($Name));
+                    if (is_object($User)) {
+                        $NewRecipientUserIDs[] = $User->UserID;
+                    }
+                }
+            }
+            $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
+            // if ($Sender->deliveryType() == DELIVERY_TYPE_ALL)
+            //    redirect('/messages/'.$this->Conversation->ConversationID);
 
-      if ($ConversationExists && $CanAddUsers) {
-         return parent::ToString();
-      }
+            $Sender->informMessage(t('Your changes were saved.'));
+            $Sender->RedirectUrl = url('/messages/'.$this->Conversation->ConversationID);
+        }
+        $this->_ApplicationFolder = $Sender->Application;
+        $this->_ThemeFolder = $Sender->Theme;
+    }
 
-      return '';
-   }
+    /**
+     *
+     *
+     * @return string
+     */
+    public function assetTarget() {
+        return 'Panel';
+    }
+
+    /**
+     * Render the module.
+     *
+     * @return string Rendered HTML.
+     */
+    public function toString() {
+        // Simplify our permission logic
+        $ConversationExists = (is_object($this->Conversation) && $this->Conversation->ConversationID > 0);
+        $CanAddUsers = ($this->AddUserAllowed && checkPermission('Conversations.Conversations.Add'));
+
+        if ($ConversationExists && $CanAddUsers) {
+            return parent::toString();
+        }
+
+        return '';
+    }
 }

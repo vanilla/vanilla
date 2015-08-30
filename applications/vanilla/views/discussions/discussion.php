@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 if (!function_exists('WriteDiscussion'))
-   include($this->FetchViewLocation('helper_functions', 'discussions'));
-   
+    include($this->fetchViewLocation('helper_functions', 'discussions'));
+
 WriteDiscussion($Discussion, $this, $Session, '');

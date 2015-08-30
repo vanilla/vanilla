@@ -1,191 +1,249 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+<?php
+/**
+ * Invitation model.
+ *
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
+ * @since 2.0
+ */
 
+/**
+ * Handles invitation data.
+ */
 class InvitationModel extends Gdn_Model {
-   /**
-    * Class constructor. Defines the related database table name.
-    */
-   public function __construct() {
-      parent::__construct('Invitation');
-   }
 
-   public function GetByInvitationID($InvitationID) {
-      $DataSet = $this->SQL->From('Invitation i')
-         ->Join('User su', 'i.InsertUserID = su.UserID')
-         ->Join('User au', 'i.AcceptedUserID = au.UserID', 'left')
-         ->Select('i.*')
-         ->Select('au.UserID', '', 'AcceptedUserID')
-         ->Select('au.Email', '', 'AcceptedEmail')
-         ->Select('au.Name', '', 'AcceptedName')
-         ->Select('su.UserID', '', 'SenderUserID')
-         ->Select('su.Email', '', 'SenderEmail')
-         ->Select('su.Name', '', 'SenderName')
-         ->Where('i.InvitationID', $InvitationID)
-         ->Get();
-      return $DataSet->FirstRow();
-   }
+    /**
+     * Class constructor. Defines the related database table name.
+     */
+    public function __construct() {
+        parent::__construct('Invitation');
+    }
 
-   public function GetByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
-      $this->SQL->Select('i.*')
-         ->Select('u.Name', '', 'AcceptedName')
-         ->From('Invitation i')
-         ->Join('User u', 'i.AcceptedUserID = u.UserID', 'left')
-         ->Where('i.InsertUserID', $UserID)
-         ->OrderBy('i.DateInserted', 'desc')
-         ->Limit($Limit, $Offset);
+    /**
+     *
+     *
+     * @param $InvitationID
+     * @return array|bool|stdClass
+     */
+    public function getByInvitationID($InvitationID) {
+        $DataSet = $this->SQL->from('Invitation i')
+            ->join('User su', 'i.InsertUserID = su.UserID')
+            ->join('User au', 'i.AcceptedUserID = au.UserID', 'left')
+            ->select('i.*')
+            ->select('au.UserID', '', 'AcceptedUserID')
+            ->select('au.Email', '', 'AcceptedEmail')
+            ->select('au.Name', '', 'AcceptedName')
+            ->select('su.UserID', '', 'SenderUserID')
+            ->select('su.Email', '', 'SenderEmail')
+            ->select('su.Name', '', 'SenderName')
+            ->where('i.InvitationID', $InvitationID)
+            ->get();
+        return $DataSet->firstRow();
+    }
+
+    /**
+     *
+     *
+     * @param $UserID
+     * @param string $InvitationID
+     * @param int $Limit
+     * @param int $Offset
+     * @return Gdn_DataSet
+     * @throws Exception
+     */
+    public function getByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
+        $this->SQL->select('i.*')
+            ->select('u.Name', '', 'AcceptedName')
+            ->from('Invitation i')
+            ->join('User u', 'i.AcceptedUserID = u.UserID', 'left')
+            ->where('i.InsertUserID', $UserID)
+            ->orderBy('i.DateInserted', 'desc')
+            ->limit($Limit, $Offset);
 
 
-      if (is_numeric($InvitationID))
-         $this->SQL->Where('Invitation.InvitationID', $InvitationID);
+        if (is_numeric($InvitationID)) {
+            $this->SQL->where('Invitation.InvitationID', $InvitationID);
+        }
 
-      return $this->SQL->Get();
-   }
+        return $this->SQL->get();
+    }
 
-   public function Save($FormPostValues, $UserModel, $Options = array()) {
-      $Session = Gdn::Session();
-      $UserID = $Session->UserID;
-      $SendEmail = GetValue('SendEmail', $Options, TRUE);
+    /**
+     *
+     *
+     * @param array $FormPostValues
+     * @param array|bool $UserModel
+     * @param array $Options
+     * @return bool
+     * @throws Exception
+     */
+    public function save($FormPostValues, $UserModel, $Options = array()) {
+        $Session = Gdn::session();
+        $UserID = $Session->UserID;
+        $SendEmail = val('SendEmail', $Options, true);
+        $Resend = val('Resend', $Options, false);
 
-      // Define the primary key in this model's table.
-      $this->DefineSchema();
+        // Define the primary key in this model's table.
+        $this->defineSchema();
 
-      // Add & apply any extra validation rules:
-      $this->Validation->ApplyRule('Email', 'Email');
+        // Add & apply any extra validation rules:
+        $this->Validation->applyRule('Email', 'Email');
 
-      // Make sure required db fields are present.
-      $this->AddInsertFields($FormPostValues);
-      if (!isset($FormPostValues['DateExpires'])) {
-         $Expires = strtotime(C('Garden.Registration.InviteExpiration'));
-         if ($Expires > time()) {
-            $FormPostValues['DateExpires'] = Gdn_Format::ToDateTime($Expires);
-         }
-      }
-
-      $FormPostValues['Code'] = $this->GetInvitationCode();
-
-      // Validate the form posted values
-      if ($this->Validate($FormPostValues, TRUE) === TRUE) {
-         $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated
-         $Email = ArrayValue('Email', $Fields, '');
-
-         // Make sure this user has a spare invitation to send.
-         $InviteCount = $UserModel->GetInvitationCount($UserID);
-         if ($InviteCount == 0) {
-            $this->Validation->AddValidationResult('Email', 'You do not have enough invitations left.');
-            return FALSE;
-         }
-
-         // Make sure that the email does not already belong to an account in the application.
-         $TestData = $UserModel->GetWhere(array('Email' => $Email));
-         if ($TestData->NumRows() > 0) {
-            $this->Validation->AddValidationResult('Email', 'The email you have entered is already related to an existing account.');
-            return FALSE;
-         }
-
-         // Make sure that the email does not already belong to an invitation in the application.
-         $TestData = $this->GetWhere(array('Email' => $Email));
-         if ($TestData->NumRows() > 0) {
-            $this->Validation->AddValidationResult('Email', 'An invitation has already been sent to the email you entered.');
-            return FALSE;
-         }
-
-         // Define the fields to be inserted
-         $Fields = $this->Validation->SchemaValidationFields();
-
-         // Call the base model for saving
-         $InvitationID = $this->Insert($Fields);
-
-         // Now that saving has succeeded, update the user's invitation settings
-         if ($InviteCount > 0)
-            $UserModel->ReduceInviteCount($UserID);
-
-         // And send the invitation email
-         if ($SendEmail) {
-            try {
-               $this->Send($InvitationID);
-            } catch (Exception $ex) {
-               $this->Validation->AddValidationResult('Email', sprintf(T('Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'), strip_tags($ex->getMessage())));
-               return FALSE;
+        // Make sure required db fields are present.
+        $this->AddInsertFields($FormPostValues);
+        if (!isset($FormPostValues['DateExpires'])) {
+            $Expires = strtotime(c('Garden.Registration.InviteExpiration'));
+            if ($Expires > time()) {
+                $FormPostValues['DateExpires'] = Gdn_Format::toDateTime($Expires);
             }
-         }
-         return TRUE;
-      }
-      return FALSE;
-   }
+        }
 
-   public function Send($InvitationID) {
-      $Invitation = $this->GetByInvitationID($InvitationID);
-      $Session = Gdn::Session();
-      if ($Invitation === FALSE) {
-         throw new Exception(T('ErrorRecordNotFound'));
-      } elseif ($Session->UserID != $Invitation->SenderUserID) {
-         throw new Exception(T('InviteErrorPermission', T('ErrorPermission')));
-      } else {
-         // Some information for the email
-         $RegistrationUrl = ExternalUrl("entry/registerinvitation/{$Invitation->Code}");
+        $FormPostValues['Code'] = $this->GetInvitationCode();
 
-         $AppTitle = Gdn::Config('Garden.Title');
-         $Email = new Gdn_Email();
-         $Email->Subject(sprintf(T('[%s] Invitation'), $AppTitle));
-         $Email->To($Invitation->Email);
-         $Email->Message(
-            sprintf(
-               T('EmailInvitation'),
-               $Invitation->SenderName,
-               $AppTitle,
-               $RegistrationUrl
-            )
-         );
-         $Email->Send();
-      }
-   }
+        // Validate the form posted values
+        if ($this->validate($FormPostValues, true) === true) {
+            $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated
+            $Email = arrayValue('Email', $Fields, '');
 
-   public function Delete($InvitationID) {
-      $Session = Gdn::Session();
-      $UserID = $Session->UserID;
+            // Make sure this user has a spare invitation to send.
+            $InviteCount = $UserModel->GetInvitationCount($UserID);
+            if ($InviteCount == 0) {
+                $this->Validation->addValidationResult('Email', 'You do not have enough invitations left.');
+                return false;
+            }
 
-      // Validate that this user can delete this invitation:
-      $Invitation = $this->GetID($InvitationID, DATASET_TYPE_ARRAY);
+            // Make sure that the email does not already belong to an account in the application.
+            $TestData = $UserModel->getWhere(array('Email' => $Email));
+            if ($TestData->numRows() > 0) {
+                $this->Validation->addValidationResult('Email', 'The email you have entered is already related to an existing account.');
+                return false;
+            }
 
-      // Does the invitation exist?
-      if (!$Invitation)
-         throw NotFoundException('Invitation');
+            // Make sure that the email does not already belong to an invitation in the application.
+            $TestData = $this->getWhere(array('Email' => $Email));
+            $DeleteID = false;
+            if ($TestData->numRows() > 0) {
+                if (!$Resend) {
+                    $this->Validation->addValidationResult('Email', 'An invitation has already been sent to the email you entered.');
+                    return false;
+                } else {
+                    // Mark the old invitation for deletion.
+                    $DeleteID = val('InvitationID', $TestData->firstRow(DATASET_TYPE_ARRAY));
+                }
+            }
 
-      // Does this user own the invitation?
-      if ($UserID != $Invitation['InsertUserID'] && !$Session->CheckPermission('Garden.Moderation.Manage'))
-         throw PermissionException('@'.T('InviteErrorPermission', T('ErrorPermission')));
+            // Define the fields to be inserted
+            $Fields = $this->Validation->SchemaValidationFields();
 
-      // Delete it.
-      $this->SQL->Delete($this->Name, array('InvitationID' => $InvitationID));
+            // Call the base model for saving
+            $InvitationID = $this->insert($Fields);
 
-      // Add the invitation back onto the user's account if the invitation has not been accepted.
-      if (!$Invitation->AcceptedUserID) {
-         Gdn::UserModel()->IncreaseInviteCount($UserID);
-      }
+            // Delete an old invitation.
+            if ($InvitationID && $DeleteID) {
+                $this->delete($DeleteID);
+            }
 
-      return TRUE;
-   }
+            // Now that saving has succeeded, update the user's invitation settings
+            if ($InviteCount > 0) {
+                $UserModel->ReduceInviteCount($UserID);
+            }
 
-   /**
-    * Returns a unique 8 character invitation code
-    */
-   protected function GetInvitationCode() {
-      // Generate a new invitation code.
-      $Code = BetterRandomString(16, 'Aa0');
+            // And send the invitation email
+            if ($SendEmail) {
+                try {
+                    $this->send($InvitationID);
+                } catch (Exception $ex) {
+                    $this->Validation->addValidationResult('Email', sprintf(t('Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'), strip_tags($ex->getMessage())));
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
-      // Make sure the string doesn't already exist in the invitation table
-      $CodeData = $this->GetWhere(array('Code' => $Code));
-      if ($CodeData->NumRows() > 0) {
-         return $this->GetInvitationCode();
-      } else {
-         return $Code;
-      }
-   }
+    /**
+     *
+     *
+     * @param $InvitationID
+     * @throws Exception
+     */
+    public function send($InvitationID) {
+        $Invitation = $this->GetByInvitationID($InvitationID);
+        $Session = Gdn::session();
+        if ($Invitation === false) {
+            throw new Exception(t('ErrorRecordNotFound'));
+        } elseif ($Session->UserID != $Invitation->SenderUserID) {
+            throw new Exception(t('InviteErrorPermission', t('ErrorPermission')));
+        } else {
+            // Some information for the email
+            $RegistrationUrl = ExternalUrl("entry/registerinvitation/{$Invitation->Code}");
+
+            $AppTitle = Gdn::config('Garden.Title');
+            $Email = new Gdn_Email();
+            $Email->subject(sprintf(t('[%s] Invitation'), $AppTitle));
+            $Email->to($Invitation->Email);
+            $Email->message(
+                sprintf(
+                    t('EmailInvitation'),
+                    $Invitation->SenderName,
+                    $AppTitle,
+                    $RegistrationUrl
+                )
+            );
+            $Email->send();
+        }
+    }
+
+    /**
+     *
+     *
+     * @param string|unknown_type $InvitationID
+     * @return bool
+     * @throws Exception
+     */
+    public function delete($InvitationID) {
+        $Session = Gdn::session();
+        $UserID = $Session->UserID;
+
+        // Validate that this user can delete this invitation:
+        $Invitation = $this->getID($InvitationID, DATASET_TYPE_ARRAY);
+
+        // Does the invitation exist?
+        if (!$Invitation) {
+            throw notFoundException('Invitation');
+        }
+
+        // Does this user own the invitation?
+        if ($UserID != $Invitation['InsertUserID'] && !$Session->checkPermission('Garden.Moderation.Manage')) {
+            throw permissionException('@'.t('InviteErrorPermission', t('ErrorPermission')));
+        }
+
+        // Delete it.
+        $this->SQL->delete($this->Name, array('InvitationID' => $InvitationID));
+
+        // Add the invitation back onto the user's account if the invitation has not been accepted.
+        if (!$Invitation->AcceptedUserID) {
+            Gdn::userModel()->IncreaseInviteCount($UserID);
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns a unique 8 character invitation code.
+     */
+    protected function getInvitationCode() {
+        // Generate a new invitation code.
+        $Code = BetterRandomString(16, 'Aa0');
+
+        // Make sure the string doesn't already exist in the invitation table
+        $CodeData = $this->getWhere(array('Code' => $Code));
+        if ($CodeData->numRows() > 0) {
+            return $this->GetInvitationCode();
+        } else {
+            return $Code;
+        }
+    }
 }

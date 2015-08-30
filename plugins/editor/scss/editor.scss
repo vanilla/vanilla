@@ -1,0 +1,647 @@
+// ## Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `npm run build` command. Don't manually edit this section!
+//
+// bower:scss
+@import "../bower_components/bourbon/dist/_bourbon.scss";
+// endbower
+// bower:sass
+// endbower
+@import "globals/variables";
+@import "partials/fileupload";
+
+/**
+ * Editor toolbar
+ */
+
+.editor {
+  display: none; // By default, when JS not enabled, do not display editor.
+  padding: 5px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: none;
+
+  .editor-active & {
+    display: block; // Show the editor if JS is enabled.
+  }
+
+  .icon {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 0 1px;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+  }
+
+  .editor-sep {
+    margin: 0 5px;
+    border-left: 1px solid;
+    border-left-color: #999;
+    border-left-color: rgba($black, .10);
+  }
+
+  .editor-dropdown {
+    display: inline-block;
+    position: relative;
+  }
+
+  // Clicking on down caret does nothing, so let click seep through to parent
+  .icon-caret-down {
+    position: relative;
+    top: -2px;
+    right: -2px;
+    min-width: 0 !important;
+    padding: 0 0 0 5px;
+    font-size: 75%;
+    pointer-events: none;
+  }
+}
+
+.editor-help-text {
+  font-size: 11px;
+}
+
+/* State of icons */
+.editor .icon:hover,
+.wysihtml5-command-active,
+.wysihtml5-action-active,
+.wysihtml5-command-dialog-opened,
+.editor-dropdown-open > .editor-action {
+  background-color: #999;
+  background-color: rgba($black, .10);
+  border-radius: 2px;
+}
+
+/**
+ * Dropdowns
+ */
+
+.editor-insert-dialog {
+  position: absolute;
+  z-index: 100;
+  display: none;
+  padding: 5px;
+  margin: 5px 0 0 0;
+  width: 300px;
+}
+
+.editor-dropdown-open .editor-insert-dialog {
+  display: block;
+}
+
+.MenuButtons {
+  margin-top: 5px;
+  text-align: right;
+
+  .Button {
+    min-width: 55px;
+  }
+}
+
+.editor-dropdown-open .editor-insert-dialog label {
+  display: inline !important;
+}
+
+.editor-insert-dialog input.InputBox {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.dd-separator {
+  background-color: rgba(0, 0, 0, 0.10);
+  height: 1px;
+  margin: 5px 0;
+}
+
+/**
+ * Colors dropdown
+ */
+
+.editor-dropdown-color .editor-insert-dialog {
+  width: 56px;
+}
+
+.editor-dropdown-color.color-has-highlight .editor-insert-dialog {
+  width: 134px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color {
+  width: 24px;
+  height: 24px;
+  float: left;
+  cursor: pointer;
+  border: 1px solid #fff;
+  box-shadow: inset 0 0 0 1px #fff;
+  transition: transform 0.2s ease;
+  margin: 1px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color:hover,
+.editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
+  border: 1px solid transparent;
+  transform: scale(1.10);
+  position: relative;
+  z-index: 10;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group {
+  width: 56px;
+  display: inline-block;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group .icon {
+  display: block;
+  padding: 5px 0 5px 2px;
+  background: 0;
+  cursor: default;
+}
+
+.editor-dropdown-color .editor-insert-dialog .highlight-color {
+  border-left: 1px solid #EFEFEF;
+  padding-left: 10px;
+  margin-left: 10px;
+}
+
+/**
+ * Headers dropdown
+ */
+
+.editor-dd-format {
+  + .editor-insert-dialog {
+    padding: 5px 0;
+    width: auto;
+
+    /*
+    max-height: 230px;
+    overflow-y: auto;
+    */
+
+    .wysihtml5-command-active {
+      border-radius: 0;
+    }
+  }
+}
+
+/**
+ * Emoji drop down
+ */
+$emoji-width: 34px;
+
+.editor-dd-emoji {
+  + .editor-insert-dialog {
+    width: $emoji-width * 4;
+    box-sizing: content-box;
+    //      box-sizing: border-box;
+    //      overflow: hidden;
+
+    // Since making emoji pluggable, the .emoji tag is wrapped in a span,
+    // with its .emoji class name removed and just added to the child, being
+    // the img tag. The parent span tag has the .emoji-$name and
+    // .editor-action
+    .emoji-wrap {
+      line-height: $emoji-width;
+      width: $emoji-width;
+      overflow: hidden;
+      text-align: center;
+      float: left;
+
+      &:hover {
+        cursor: pointer;
+        background-color: rgba($black, .10);
+        border-radius: 2px;
+      }
+    }
+
+    .emoji {
+      line-height: $emoji-width;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+}
+
+/**
+ * File and image dropdown
+ */
+
+.editor-file-image {
+  padding: 0;
+
+  .drop-section {
+    padding: 10px;
+  }
+
+  .file-drop {
+    display: none;
+    padding: 30px;
+    margin: 10px 10px 0 10px;
+    text-align: center;
+    border: 2px dashed rgba($black, .25);
+    border-radius: 2px;
+
+    &.can-drop {
+      display: block !important;
+    }
+  }
+
+  .file-input {
+    overflow: hidden;
+    white-space: nowrap;
+    padding-top: 10px;
+
+    input[type=file] {
+      visibility: visible !important;
+    }
+  }
+
+  .image-input {
+    padding: 0;
+    border-top: 1px solid #da8f8f;
+
+    input {
+      padding: 10px;
+      margin: 0;
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+      border: 0;
+    }
+  }
+
+  &.drag-passthrough {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 200ms ease;
+    transform: scale(0);
+  }
+}
+
+.editor-dropdown-image .editor-file-image .image-input {
+  border-top: 0;
+}
+
+/* If uploads disabled entirely, hide some options in the dropdown */
+.editor-uploads-disabled {
+  .file-drop,
+  .file-input {
+    display: none;
+  }
+
+  .image-input {
+    border: 0;
+  }
+}
+
+/**
+ * Going full page
+ */
+
+.editor-toggle-fullpage-button {
+  float: right;
+}
+
+/* Added to body class with JS, so force specificity for everything
+   below; this makes editing very easy */
+
+.editor-fullpage {
+  overflow: hidden !important;
+
+  // For some reason this element has right padding in core that does nothing,
+  // except offset the textarea in fullpage. Removing it in regular view has no
+  // affect, so it's not doing anything
+  .TextBoxWrapper {
+    padding: 0;
+
+    // Have to be a bit rough here, because styles defined inline by wysihtml5
+    .BodyBox,
+    .wysihtml5-sandbox {
+      width: 100% !important;
+      color: #000; // Will only be used by non-wysiwyg when in fullpage mode.
+      box-sizing: border-box !important; // Fix some content boxes
+      transition: background-color 400ms ease, color 400ms ease;
+    }
+
+    // Set default heights for each editor view. Regular (markdown, html,
+    // bbcode) all require min-height to be set to not interfere with
+    // autogrow, while wysiwgy requires height to not interfere with autogrow.
+    .BodyBox {
+      min-height: 400px;
+    }
+
+    .wysihtml5-sandbox {
+      height: 400px !important;
+    }
+  }
+
+  #editor-fullpage-candidate {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100000; /* So high because a client actually had 99999 in a theme */
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    overflow-y: auto;
+    background-color: #fff;
+    transition: background-color 400ms ease;
+
+    // Fix some content boxes
+    input {
+      box-sizing: border-box !important;
+    }
+
+    .editor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100001; /* So high because a client actually had 99999 in a theme */
+      margin: 0 auto;
+      background-color: rgba($white, .95);
+      border: 1px solid transparent;
+      box-shadow: 0 2px 5px -5px $black;
+      transition: all 400ms ease;
+    }
+
+    .TextBoxWrapper {
+      padding: 50px 0 10px 0;
+      margin: 0 auto;
+    }
+
+    .editor,
+    .TextBoxWrapper,
+    .editor-upload-previews {
+      max-width: 800px;
+      animation-duration: 800ms;
+      animation-name: editor-anim-editor;
+    }
+
+    .editor-help-text {
+      display: none;
+    }
+
+    .editor-upload-previews {
+      margin: 0 auto;
+    }
+  }
+}
+
+/**
+ * Experimental toggle lights on/off.
+ */
+
+.editor-toggle-lights-button {
+  display: none !important;
+}
+
+.editor-fullpage .editor-toggle-lights-button {
+  float: right;
+  /*display: inline-block !important;*/
+}
+
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
+  background-color: $black;
+
+  .editor {
+    color: $white;
+    background-color: rgba($black, .80);
+    box-shadow: 0 5px 5px -5px #999;
+  }
+
+  .editor .icon:hover,
+  .wysihtml5-command-active,
+  .wysihtml5-action-active,
+  .wysihtml5-command-dialog-opened {
+    background-color: rgba($white, .25);
+  }
+
+  .editor .editor-sep {
+    border-left: 1px solid rgba($white, .25);
+  }
+
+  // !important due to iframe getting its styles overridden inline by JS
+  .TextBoxWrapper .BodyBox,
+  .TextBoxWrapper .wysihtml5-sandbox {
+    color: #999 !important;
+    background-color: $black !important;
+    border-color: #222 !important;
+  }
+}
+
+/* This should match the above values, and needs to be added as a class name
+directly on the iframe's bodybox contenteditable. */
+.iframe-bodybox-lightsoff {
+  background-color: transparent !important;
+  color: #999999 !important;
+}
+
+.iframe-bodybox-lightson {
+  background-color: transparent !important;
+  color: #000 !important;
+}
+
+// Animation definition for fade in editor on fullpage
+@keyframes editor-anim-editor {
+  0% {
+    opacity: 0;
+  }
+}
+
+/**
+ * Hide some actions per editor view.
+ *
+ * Html, BBCode, and Markdown views have slight differences than the Wysiwyg,
+ * so hide the particular ones.
+ */
+.editor-format-html .editor-toggle-source,
+.editor-format-bbcode .editor-toggle-source,
+.editor-format-markdown .editor-toggle-source,
+.editor-format-html .sep-switches,
+.editor-format-bbcode .sep-switches,
+.editor-format-markdown .sep-switches,
+.editor-format-markdown .sep-align,
+.editor-format-markdown .icon-align-left,
+.editor-format-markdown .icon-align-center,
+.editor-format-markdown .icon-align-right,
+.editor-format-html .editor-image-align,
+.editor-format-bbcode .editor-image-align,
+.editor-format-markdown .editor-image-align,
+.editor-format-bbcode .editor-action-heading1,
+.editor-format-bbcode .editor-action-heading2,
+.editor-format-bbcode .editor-action-separator {
+  /* Defined as important, because some themes have overriden with their own
+     !important values. */
+  display: none !important;
+}
+
+.editor-format-text,
+.editor-format-textex {
+  .editor-sep,
+  .icon-bold,
+  .icon-italic,
+  .icon-strikethrough,
+  .icon-list-ol,
+  .icon-list-ul,
+  .editor-dropdown-link,
+  .editor-action-headers,
+  .icon-align-left,
+  .icon-align-center,
+  .icon-align-right,
+  .editor-toggle-source,
+  .editor-toggle-fullpage-button {
+    display: none !important;
+  }
+}
+
+.editor-format-text {
+  .editor-dropdown-image,
+  .editor-dropdown-upload {
+    display: none !important;
+  }
+}
+
+/**
+ * When wysiwyg editor switches to code view, disable functionality and visibly
+ * disable the common action buttons, which should no longer have any affect.
+ * The class, wysihtml5-commands-disabled, is added to editor bar when
+ * the code switch button is clicked, so tie into it.
+ */
+
+.wysihtml5-commands-disabled {
+  .editor-action {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .editor-toggle-source,
+  .editor-toggle-fullpage-button {
+    opacity: 1;
+    pointer-events: auto;
+
+  }
+}
+
+/**
+ * Brute force hide other editors enabled after this one.
+ *
+ * In case some of the other editors were enabled after this one, just have
+ * them hidden from page, essentially making this editor the veto. This is
+ * a last ditch effort to at least make sure editor is usable when others
+ * are enabled.
+ */
+
+.editor-active .cleditorMain iframe {
+  display: none !important;
+}
+
+.editor-active .cleditorMain .wysihtml5-sandbox {
+  display: block !important;
+}
+
+.editor-active .cleditorToolbar,
+.editor-active .ButtonBar,
+.editor-active .ButtonBarMarkupHint {
+  display: none !important;
+}
+
+/* Media query: Hiding non-essential buttons */
+@media (max-width: 767px) {
+  .editor-optional-button {
+    display: none !important;
+  }
+
+  .editor-fullpage .TextBoxWrapper .BodyBox,
+  .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+    height: auto !important;
+  }
+
+  /* This is not necessary or very specific, but on mobile, apple products
+     add rounded corners */
+  textarea {
+    border-radius: 0;
+  }
+}
+
+/**
+ * Mobile tweaks, specifically for Lithe Mobile
+ */
+.editor-mobile {
+  .editor-dropdown-upload {
+    position: static;
+
+    .editor-insert-dialog {
+      left: 0;
+      right: 0;
+      top: auto;
+      width: auto;
+    }
+  }
+
+  .editor-dropdown-default {
+
+    .editor-dd-emoji + .editor-insert-dialog {
+      min-width: 132px;
+      padding: 5px;
+    }
+
+    .editor-dd-format + .editor-insert-dialog {
+      right: auto;
+      left: 0;
+      a {
+        display: block;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .editor-dropdown-link {
+    .editor-insert-dialog {
+      padding: 5px;
+    }
+  }
+
+  #drop-cue-dropdown,
+  .file-input .file-or {
+    display: none !important;
+  }
+
+  .FileBox {
+    overflow: hidden;
+
+    label,
+    input {
+      float: left;
+      width: auto;
+    }
+
+    label {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    label .icon:hover {
+      background-color: inherit;
+    }
+
+  }
+}
+
+/**
+ * Modify this file to change the styling of the content
+ * in the Wysiwyg editor.
+ */
+
+@import "wysiwyg";
+
+/* Keep here to address iframe/body padding text creep issue, see autogrow js
+for more information about the issue */
+.wysihtml5-sandbox {
+  padding: 0 !important;
+}

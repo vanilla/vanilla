@@ -1,38 +1,38 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Controller = Gdn::Controller();
-$Session = Gdn::Session();
-$ModPermission = $Session->CheckPermission('Garden.Moderation.Manage');
-$AdminPermission = $Session->CheckPermission('Garden.Settings.Manage');
+$Controller = Gdn::controller();
+$Session = Gdn::session();
+$ModPermission = $Session->checkPermission('Garden.Moderation.Manage');
+$AdminPermission = $Session->checkPermission('Garden.Settings.Manage');
 if (!$ModPermission && !$AdminPermission)
-   return;
+    return;
 
 ?>
 <div class="BoxFilter BoxActivityFilter">
-   <ul class="FilterMenu">
-      <li <?php if ($Controller->Data('Filter') == 'public') echo 'class="Active"'; ?>>
-         <?php
-         echo Anchor(Sprite('SpActivity').' '.T('Recent Activity'), '/activity');
-         ?>
-      </li>
-      <?php
-      if ($ModPermission): 
-      ?>
-      <li <?php if ($Controller->Data('Filter') == 'mods') echo 'class="Active"'; ?>>
-         <?php
-         echo Anchor(Sprite('SpMod').' '.T('Moderator Activity'), '/activity/mods');
-         ?>
-      </li>
-      <?php
-      endif;
-      
-      if ($AdminPermission):
-      ?>
-      <li <?php if ($Controller->Data('Filter') == 'admins') echo 'class="Active"'; ?>>
-         <?php
-         echo Anchor(Sprite('SpDashboard').' '.T('Administrator Activity'), '/activity/admins');
-         ?>
-      </li>
-      <?php endif; ?>
-   </ul>
+    <ul class="FilterMenu">
+        <li <?php if ($Controller->data('Filter') == 'public') echo 'class="Active"'; ?>>
+            <?php
+            echo anchor(sprite('SpActivity').' '.t('Recent Activity'), '/activity');
+            ?>
+        </li>
+        <?php
+        if ($ModPermission):
+            ?>
+            <li <?php if ($Controller->data('Filter') == 'mods') echo 'class="Active"'; ?>>
+                <?php
+                echo anchor(sprite('SpMod').' '.t('Moderator Activity'), '/activity/mods');
+                ?>
+            </li>
+        <?php
+        endif;
+
+        if ($AdminPermission):
+            ?>
+            <li <?php if ($Controller->data('Filter') == 'admins') echo 'class="Active"'; ?>>
+                <?php
+                echo anchor(sprite('SpDashboard').' '.t('Administrator Activity'), '/activity/admins');
+                ?>
+            </li>
+        <?php endif; ?>
+    </ul>
 </div>

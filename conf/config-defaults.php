@@ -29,7 +29,7 @@ $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
 // An array of folders the application should never search through when searching for classes. (note: plugins had to be removed so that locale searches could get the locale folder from the plugin's folder).
 $Configuration['Garden']['FolderBlacklist']                     = array('.', '..', '_svn', '.git');
-$Configuration['Garden']['Locale']                              = 'en-CA';
+$Configuration['Garden']['Locale']                              = 'en';
 $Configuration['Garden']['LocaleCodeset']                       = 'UTF8';
 $Configuration['Garden']['Title']                               = 'Vanilla 2';
 $Configuration['Garden']['Domain']                              = '';
@@ -63,6 +63,7 @@ $Configuration['Garden']['Registration']['InviteRoles']         = 'FALSE';
 $Configuration['Garden']['Registration']['ConfirmEmail']        = FALSE;
 $Configuration['Garden']['Registration']['ConfirmEmailRole']    = 3;
 $Configuration['Garden']['Registration']['MinPasswordLength']   = 6;
+$Configuration['Garden']['Registration']['NameUnique']          = true;
 $Configuration['Garden']['TermsOfService']                      = '/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Email']['UseSmtp']                    = FALSE;
 $Configuration['Garden']['Email']['SmtpHost']                   = '';
@@ -110,6 +111,7 @@ $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 $Configuration['Garden']['Embed']['CommentsPerPage']            = 50;
 $Configuration['Garden']['Embed']['SortComments']               = 'desc';
 $Configuration['Garden']['Embed']['PageToForum']                = TRUE;
+$Configuration['Garden']['BannedPhoto']                         = 'https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/banned_large.png';
 
 
 // Formatting
@@ -147,5 +149,5 @@ $Configuration['Modules']['Conversations']['Content'] = array('MessageModule', '
 $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['DefaultForumRoot'] = 'discussions';
 $Configuration['Routes']['Default404'] = array('dashboard/home/filenotfound', 'NotFound');
-$Configuration['Routes']['DefaultPermission'] = array('dashboard/home/permission', 'NotAuthorized');
+$Configuration['Routes']['DefaultPermission'] = array('dashboard/home/unauthorized', 'NotAuthorized');
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';

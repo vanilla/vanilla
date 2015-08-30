@@ -1,152 +1,160 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  * Manages default info, error, and site status pages.
  *
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Dashboard
  * @since 2.0
  */
 
+/**
+ * Handles /home endpoint.
+ */
 class HomeController extends Gdn_Controller {
-   /**
-    * JS & CSS includes for all methods in this controller.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function Initialize() {
-      $this->Head = new HeadModule($this);
-      $this->AddJsFile('jquery.js');
-      $this->AddJsFile('jquery.livequery.js');
-      $this->AddJsFile('jquery.form.js');
-      $this->AddJsFile('jquery.popup.js');
-      $this->AddJsFile('jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('global.js');
-      $this->AddCssFile('admin.css');
-      $this->MasterView = 'empty';
-      parent::Initialize();
-   }
 
-   /**
-    * Display dashboard welcome message.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function Index() {
-      $this->View = 'FileNotFound';
-      $this->FileNotFound();
-   }
+    /**
+     * JS & CSS includes for all methods in this controller.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function initialize() {
+        $this->Head = new HeadModule($this);
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('global.js');
+        $this->addCssFile('admin.css');
+        $this->MasterView = 'empty';
+        parent::initialize();
+    }
 
-   public function Error() {
-      $this->RemoveCssFile('admin.css');
-      $this->AddCssFile('style.css');
-      $this->AddCssFile('vanillicon.css', 'static');
-      $this->MasterView = 'default';
+    /**
+     * Display dashboard welcome message.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function index() {
+        $this->View = 'FileNotFound';
+        $this->fileNotFound();
+    }
 
-      $this->CssClass = 'SplashMessage NoPanel';
+    /**
+     * Display error page.
+     */
+    public function error() {
+        $this->removeCssFile('admin.css');
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
+        $this->MasterView = 'default';
 
-      $this->SetData('_NoMessages', TRUE);
+        $this->CssClass = 'SplashMessage NoPanel';
+        if ($this->data('CssClass')) {
+            $this->CssClass .= ' '.$this->data('CssClass');
+        }
 
-      $Code = $this->Data('Code', 400);
-      safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), TRUE, $Code);
-      Gdn_Theme::Section('Error');
+        $this->setData('_NoMessages', true);
 
-      $this->Render();
-   }
+        $Code = $this->data('Code', 400);
+        safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
+        Gdn_Theme::section('Error');
 
-   /**
-    * A standard 404 File Not Found error message is delivered when this action
-    * is encountered.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function FileNotFound() {
-      $this->RemoveCssFile('admin.css');
-      $this->AddCssFile('style.css');
-      $this->AddCssFile('vanillicon.css', 'static');
+        $this->render();
+    }
 
-      $this->MasterView = 'default';
+    /**
+     * A standard 404 File Not Found error message is delivered when this action
+     * is encountered.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function fileNotFound() {
+        $this->removeCssFile('admin.css');
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
 
-      $this->CssClass = 'SplashMessage NoPanel';
+        $this->MasterView = 'default';
 
-      if ($this->Data('ViewPaths')) {
-         Trace($this->Data('ViewPaths'), 'View Paths');
-      }
+        $this->CssClass = 'SplashMessage NoPanel';
 
-      $this->SetData('_NoMessages', TRUE);
-      Gdn_Theme::Section('Error');
+        if ($this->data('ViewPaths')) {
+            trace($this->data('ViewPaths'), 'View Paths');
+        }
 
-      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
-         safeHeader("HTTP/1.0 404", TRUE, 404);
-         $this->Render();
-      } else
-         $this->RenderException(NotFoundException());
-   }
+        $this->setData('_NoMessages', true);
+        Gdn_Theme::section('Error');
 
-   /**
-    * Display 'site down for maintenance' page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function UpdateMode() {
-      safeHeader("HTTP/1.0 503", TRUE, 503);
-      $this->SetData('UpdateMode', TRUE);
-      $this->Render();
-   }
+        if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
+            safeHeader("HTTP/1.0 404", true, 404);
+            $this->render();
+        } else {
+            $this->RenderException(NotFoundException());
+        }
+    }
 
-   /**
-    * Display 'content deleted' page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function Deleted() {
-      safeHeader("HTTP/1.0 410", TRUE, 410);
-      Gdn_Theme::Section('Error');
-      $this->Render();
-   }
+    /**
+     * Display 'site down for maintenance' page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function updateMode() {
+        safeHeader("HTTP/1.0 503", true, 503);
+        $this->setData('UpdateMode', true);
+        $this->render();
+    }
 
-   /**
-    * Display TOS page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function TermsOfService() {
-      require_once PATH_LIBRARY.'/vendors/markdown/markdown.php';
+    /**
+     * Display 'content deleted' page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function deleted() {
+        safeHeader("HTTP/1.0 410", true, 410);
+        Gdn_Theme::section('Error');
+        $this->render();
+    }
 
-      $this->Render();
-   }
+    /**
+     * Display TOS page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function termsOfService() {
+        $this->render();
+    }
 
-   /**
-    * Display privacy info page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function PrivacyPolicy() {
-      $this->Render();
-   }
+    /**
+     * Display privacy info page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function privacyPolicy() {
+        $this->render();
+    }
 
-   /**
-    * Display 'no permission' page.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-   public function Permission() {
-      Gdn_Theme::Section('Error');
-      
-      if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
-         safeHeader("HTTP/1.0 401", TRUE, 401);
-         $this->Render();
-      } else
-         $this->RenderException(PermissionException());
-   }
+    /**
+     * Display 'no permission' page.
+     *
+     * @since 2.0.0
+     * @access public
+     */
+    public function unauthorized() {
+        Gdn_Theme::section('Error');
 
+        if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
+            safeHeader("HTTP/1.0 401", true, 401);
+            $this->render();
+        } else {
+            $this->RenderException(permissionException());
+        }
+    }
 }

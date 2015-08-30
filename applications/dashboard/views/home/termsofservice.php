@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo T('TermsOfService');?></h1>
+<h1><?php echo t('TermsOfService'); ?></h1>
 <div class="Legal">
-   <?php echo Markdown(T('TermsOfServiceText'));?>
+    <?php echo Gdn_Format::Markdown(t('TermsOfServiceText')); ?>
 </div>

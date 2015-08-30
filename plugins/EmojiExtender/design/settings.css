@@ -1,0 +1,49 @@
+.emojiext-list li {
+    display: inline-block;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 50%;
+}
+
+@media screen and (max-width: 1100px) {
+    .emojiext-list li {
+        width: 100%;
+    }
+}
+
+.emojiext-list label {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: block !important;
+    overflow: hidden;
+    padding: 15px;
+}
+
+.emojiext-list label img {
+    height: 128px;
+    width: 128px;
+    float: left;
+    margin-right: 15px;
+}
+
+.emojiext-list input[type=radio] {
+    position: absolute;
+    opacity: 0;
+}
+
+.emojiext-list input[type=radio]:checked ~ label {
+    border-color: #82BDDD;
+}
+
+.Dashboard.Settings.EmojiExtender div ~ label {
+    display: inline-block;
+    width: 125px;
+    height: 155px;
+    margin: 30px 40px 30px 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 0 30px;
+    cursor: pointer;
+}

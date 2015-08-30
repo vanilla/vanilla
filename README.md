@@ -25,7 +25,7 @@ Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
 You can join us on the [Vanilla Community Forums](http://vanillaforums.org/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](http://vanillaforums.org/addon/vanilla-core). Currently, it is the 2.1 branch. We will support the 2.0 branch with security patches until the end of 2014.
+The latest stable release is always [listed here](http://vanillaforums.org/addon/vanilla-core). Currently, it is the 2.1 branch.
 
 New plugins and themes can be listed in the [Official Addon Directory](http://vanillaforums.org/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
@@ -41,13 +41,15 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 ## Self-Hosting Requirements
 
-* PHP version 5.2 or newer with --enable-mbstring
-* pdo_mysql module must be enabled
-* MySQL 5 or newer
+* PHP version 5.3 or newer with `--enable-mbstring`.
+* pdo_mysql module must be enabled.
+* MySQL 5 or newer.
 
-Vanilla 2.1 will be the last version to support PHP 5.2. PHP 5.4 or higher will be required in the future.
+Vanilla 2.2 requires PHP 5.3. Running `master` branch requires PHP 5.4, as will future official releases.
 
-Vanilla ships with a `.htaccess` file for Apache support. Nginx and IIS require additional configuration.
+Vanilla is compatible up to PHP 5.6 (the current release) and we always recommend using the lastest stable PHP release whenever possible.
+
+Vanilla ships with a `.htaccess` file required for Apache support. Nginx and IIS require additional configuration.
 
 On the client side, Vanilla should run & look good in just about any modern browser.
 Using IE? How exotic. You'll want IE8 or greater. IE7 *might* work if you squint hard and click gently, but we make no promises.
@@ -71,12 +73,13 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
-* Go to `yourforum.com/index.php?p=/utility/update` to force any updates needed.
+* Go to `yourforum.com/utility/update` to force any updates needed.
 * If it fails, try it a second times by refreshing the page.
 
-To upgrade to **2.1 from 2.0.18**, add this step:
+To upgrade from **2.0.18 or earlier**, add these steps:
 
 * Delete the file [`/themes/mobile/views/discussions/helper_functions.php`](https://github.com/vanillaforums/Garden/blob/2.0/themes/mobile/views/discussions/helper_functions.php)
+* Delete the file [`/applications/dashboard/views/default.master.php`](https://github.com/vanilla/vanilla/blob/2.0/applications/dashboard/views/default.master.php)
 
 To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Porter as if it were a migration. Your theme and any customizations will need to be recreated. Backup your Vanilla 1 data and files completely, then delete them from your server before attempting to install Vanilla 2.
 
@@ -109,17 +112,12 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 We've adopted the [git flow branching model](http://nvie.com/posts/a-successful-git-branching-model) in our projects.
 The creators of git flow released a [short intro video](http://vimeo.com/16018419) to explain the model.
 
-The `master` branch is production-ready for a our cloud product but is not yet vetted for open source release.
-Only small patches and `hotfix/x` branches land against `master`, and it always has a stable version number.
-The `develop` and `stage` branches are pre-production and are where we land `feature/x` branches for integration testing.
+The `master` branch is production-ready for our cloud product but is not yet vetted for open source release (alternate platforms & configurations).
+Reviewed, stable changes land against `master` via pull-request.
 
-Our open source release branches are named by version number, e.g. `2.0` and `2.1`.
+Our open source release branches are named by version number, e.g. `release/2.2`.
 We begin release branches with a beta (b1) designation and progress them thru release candidate to stable.
 All open source releases (included pre-releases) are tagged.
-
-After `2.1`, we will be leap-frogging version numbers between `master` and releases.
-Releases will receive the next odd-point number and `master` will then jump to the next even-point number.
-Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta begins, `master` will move to 2.4.
 
 ## Reporting Security Issues
 
@@ -128,7 +126,7 @@ We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
-Copyright &copy; 2009-2014 Vanilla Forums Inc.
+Copyright &copy; 2008-2015 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.

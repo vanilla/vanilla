@@ -1,89 +1,87 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
+$Session = Gdn::session();
 $Alt = FALSE;
-$SubjectsVisible = C('Conversations.Subjects.Visible');
+$SubjectsVisible = c('Conversations.Subjects.Visible');
 
-foreach ($this->Data('Conversations') as $Conversation) {
-   $Conversation = (object)$Conversation;
-   $Alt = $Alt == TRUE ? FALSE : TRUE;
-
-
-   // Figure out the last photo.
-   $LastPhoto = '';
-   if (empty($Conversation->Participants)) {
-      $User = Gdn::UserModel()->GetID($Conversation->LastInsertUserID);
-      $LastPhoto = UserPhoto($User);
-   } else {
-      foreach ($Conversation->Participants as $User) {
-         if ($User['UserID'] == $Conversation->LastInsertUserID) {
-            $LastPhoto = UserPhoto($User);
-            if ($LastPhoto)
-               break;
-         } elseif (!$LastPhoto) {
-            $LastPhoto = UserPhoto($User);
-         }
-      }
-   }
-
-   $CssClass = 'Item';
-   $CssClass .= $Alt ? ' Alt' : '';
-   $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
-   $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
-   $CssClass .= ' '.($Conversation->CountNewMessages <= 0 ? 'Read' : 'Unread');
-
-   $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
-   if ($Conversation->LastFormat == 'Text')
-      $Message = (SliceString(Gdn_Format::To($Conversation->LastBody, $Conversation->LastFormat), 100));
-   else
-      $Message = (SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastBody, $Conversation->LastFormat), FALSE), 100));
-
-   if (StringIsNullOrEmpty(trim($Message)))
-      $Message = T('Blank Message');
+foreach ($this->data('Conversations') as $Conversation) {
+    $Conversation = (object)$Conversation;
+    $Alt = $Alt == TRUE ? FALSE : TRUE;
 
 
-   $this->EventArguments['Conversation'] = $Conversation;
-?>
-<li class="<?php echo $CssClass; ?>">
-   <?php
-   $Names = ConversationModel::ParticipantTitle($Conversation, FALSE);
-   ?>
-   <div class="ItemContent Conversation">
-      <?php
-      $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
+    // Figure out the last photo.
+    $LastPhoto = '';
+    if (empty($Conversation->Participants)) {
+        $User = Gdn::userModel()->getID($Conversation->LastInsertUserID);
+        $LastPhoto = userPhoto($User);
+    } else {
+        foreach ($Conversation->Participants as $User) {
+            if ($User['UserID'] == $Conversation->LastInsertUserID) {
+                $LastPhoto = userPhoto($User);
+                if ($LastPhoto)
+                    break;
+            } elseif (!$LastPhoto) {
+                $LastPhoto = userPhoto($User);
+            }
+        }
+    }
 
-      echo '<h3 class="Users">';
+    $CssClass = 'Item';
+    $CssClass .= $Alt ? ' Alt' : '';
+    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
+    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
+    $CssClass .= ' '.($Conversation->CountNewMessages <= 0 ? 'Read' : 'Unread');
 
-      if ($Names) {
-         if ($LastPhoto) {
-            echo '<div class="Author Photo">'.$LastPhoto.'</div>';
-         }
+    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
+    $Message = (sliceString(Gdn_Format::plainText($Conversation->LastBody, $Conversation->LastFormat), 100));
 
-         echo Anchor(htmlspecialchars($Names), $Url);
-      }
-      if ($Subject = GetValue('Subject', $Conversation)) {
-         if ($Names)
-            echo Bullet(' ');
+    if (stringIsNullOrEmpty(trim($Message))) {
+        $Message = t('Blank Message');
+    }
 
-         echo '<span class="Subject">'.Anchor(htmlspecialchars($Subject), $Url).'</span>';
-      }
 
-      echo '</h3>';
-      ?>
-      <div class="Excerpt"><?php echo Anchor($Message, $Url, 'Message'); ?></div>
-      <div class="Meta">
-         <?php
-         $this->FireEvent('BeforeConversationMeta');
+    $this->EventArguments['Conversation'] = $Conversation;
+    ?>
+    <li class="<?php echo $CssClass; ?>">
+        <?php
+        $Names = ConversationModel::participantTitle($Conversation, false);
+        ?>
+        <div class="ItemContent Conversation">
+            <?php
+            $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
 
-         echo ' <span class="MItem CountMessages">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
+            echo '<h3 class="Users">';
 
-         if ($Conversation->CountNewMessages > 0) {
-            echo ' <strong class="HasNew"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
-         }
+            if ($Names) {
+                if ($LastPhoto) {
+                    echo '<div class="Author Photo">'.$LastPhoto.'</div>';
+                }
 
-         echo ' <span class="MItem LastDateInserted">'.Gdn_Format::Date($Conversation->LastDateInserted).'</span> ';
-         ?>
-      </div>
-   </div>
-</li>
+                echo anchor(htmlspecialchars($Names), $Url);
+            }
+            if ($Subject = val('Subject', $Conversation)) {
+                if ($Names)
+                    echo Bullet(' ');
+
+                echo '<span class="Subject">'.anchor(htmlspecialchars($Subject), $Url).'</span>';
+            }
+
+            echo '</h3>';
+            ?>
+            <div class="Excerpt"><?php echo anchor($Message, $Url, 'Message'); ?></div>
+            <div class="Meta">
+                <?php
+                $this->fireEvent('BeforeConversationMeta');
+
+                echo ' <span class="MItem CountMessages">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
+
+                if ($Conversation->CountNewMessages > 0) {
+                    echo ' <strong class="HasNew"> '.plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
+                }
+
+                echo ' <span class="MItem LastDateInserted">'.Gdn_Format::date($Conversation->LastDateInserted).'</span> ';
+                ?>
+            </div>
+        </div>
+    </li>
 <?php
 }

@@ -1,35 +1,35 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box InThisConversation">
-   <?php echo panelHeading(T('In this Conversation')); ?>
-   <ul class="PanelInfo">
-   <?php foreach ($this->Data->Result() as $User): ?>
-      <li>
-         <?php
-         $Username = htmlspecialchars(GetValue('Name', $User));
-         $Photo = GetValue('Photo', $User);
+    <?php echo panelHeading(t('In this Conversation')); ?>
+    <ul class="PanelInfo">
+        <?php foreach ($this->Data->result() as $User): ?>
+            <li>
+                <?php
+                $Username = htmlspecialchars(val('Name', $User));
+                $Photo = val('Photo', $User);
 
-         if (GetValue('Deleted', $User)) {
-            echo Anchor(
-               Wrap(
-                  Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
-                  Wrap($Username, 'del', array('class' => 'Username')),
-                  'span', array('class' => 'Conversation-User',)
-               ),
-               UserUrl($User),
-               array('title' => sprintf(T('%s has left this conversation.'), $Username))
-            );
-         } else {
-            echo Anchor(
-               Wrap(
-                  Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
-                  Wrap($Username, 'span', array('class' => 'Username')),
-                  'span', array('class' => 'Conversation-User')
-               ),
-               UserUrl($User)
-            );
-         }
-         ?>
-      </li>
-   <?php endforeach; ?>
-   </ul>
+                if (val('Deleted', $User)) {
+                    echo anchor(
+                        wrap(
+                            ($Photo ? img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')) : '').' '.
+                            wrap($Username, 'del', array('class' => 'Username')),
+                            'span', array('class' => 'Conversation-User',)
+                        ),
+                        userUrl($User),
+                        array('title' => sprintf(t('%s has left this conversation.'), $Username))
+                    );
+                } else {
+                    echo anchor(
+                        wrap(
+                            ($Photo ? img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')) : '').' '.
+                            wrap($Username, 'span', array('class' => 'Username')),
+                            'span', array('class' => 'Conversation-User')
+                        ),
+                        userUrl($User)
+                    );
+                }
+                ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
 </div>

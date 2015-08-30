@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+      }
 
 // User.
 Gdn::FactoryInstall(Gdn::AliasUserModel, 'UserModel');
@@ -14,4 +16,4 @@ Gdn::FactoryInstall('Head', 'HeadModule');
 
 // Menu.
 Gdn::FactoryInstall('Menu', 'MenuModule');
-Gdn::Dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));
+Gdn::dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));

@@ -1,13 +1,14 @@
-<?php if (!defined('APPLICATION')) exit(); 
-$ConnectSource = $this->Form->GetFormValue('ProviderName');
+<?php if (!defined('APPLICATION')) exit();
+$ConnectSource = $this->Form->getFormValue('ProviderName');
 ?>
 <div class="Connect">
-	<h1><?php echo StringIsNullOrEmpty($ConnectSource) ? T("Sign in") : sprintf(T('%s Connect'), $ConnectSource); ?></h1>
-	<div>
-	<?php
-		echo $this->Form->Open();
-		echo $this->Form->Errors();
-		echo $this->Form->Close();
-   ?>
-	</div>
+    <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign in") : sprintf(t('%s Connect'), $ConnectSource); ?></h1>
+
+    <div>
+        <?php
+        echo $this->Form->open();
+        echo $this->Form->errors();
+        echo $this->Form->close();
+        ?>
+    </div>
 </div>

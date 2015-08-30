@@ -848,9 +848,9 @@ jQuery(document).ready(function($) {
     }
 
     // Handle autodismissals
-    $('div.InformWrapper.AutoDismiss:first').livequery(function() {
-        gdn.setAutoDismiss();
-    });
+	$(document).on('informMessage', function() {
+		gdn.setAutoDismiss();
+	});
 
     // Prevent autodismiss if hovering any inform messages
     $(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
@@ -1149,11 +1149,6 @@ jQuery(document).ready(function($) {
 
     var d = new Date()
     var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
-
-    // Set the ClientHour if there is an input looking for it.
-    $('input:hidden[name$=HourOffset]').livequery(function() {
-        $(this).val(hourOffset);
-    });
 
     // Ajax/Save the ClientHour if it is different from the value in the db.
     var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
@@ -1832,9 +1827,10 @@ jQuery(document).ready(function($) {
     // calls this function directly when in wysiwyg format, as it needs to
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
-        $('.BodyBox').livequery(function() {
-            gdn.atCompleteInit(this, '');
+        $(document).on('EditCommentFormLoaded popupReveal', function() {
+            gdn.atCompleteInit('.BodyBox', '');
         });
+        gdn.atCompleteInit('.BodyBox', '');
     }
 
 

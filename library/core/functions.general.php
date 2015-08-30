@@ -3931,6 +3931,44 @@ if (!function_exists('isSafeUrl')) {
 
 }
 
+if (!function_exists('isTrustedDomain')) {
+    /**
+     * Check the provided domain name to determine if it is a trusted domain.
+     *
+     * @param string $domain Domain name to compare against our list of trusted domains.
+     *
+     * @return bool True if verified as a trusted domain.  False if unable to verify domain.
+     */
+    function isTrustedDomain($domain) {
+        static $trustedDomains = null;
+
+        if (empty($domain)) {
+            return false;
+        }
+
+        // If we haven't already compiled an array of trusted domains, grab them.
+        if (!is_array($trustedDomains)) {
+            $trustedDomains = trustedDomains();
+        }
+
+        /**
+         * Iterate through each of our trusted domains.
+         * Chop off any whitespace from the trusted domain and prepare it for regex.
+         * See if the current trusted domain matches fully against the domain we're
+         *   testing or if it matches its end (e.g. domain.tld should match domain.tld and sub.domain.tld)
+         */
+        foreach ($trustedDomains as $trustedDomain) {
+            $trustedDomain = preg_quote(trim($trustedDomain));
+            if (preg_match("/(^|\.){$trustedDomain}$/i", $domain)) {
+                return true;
+            }
+        }
+
+        // No matches?  Must not be a trusted domain.
+        return false;
+    }
+}
+
 if (!function_exists('userAgentType')) {
     /**
      *

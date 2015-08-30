@@ -1026,6 +1026,7 @@ class Gdn_Format {
 
     /**
      * Executes the callback function on parts of the string excluding html tags.
+     *
      * Optionally skips the contents of an anchor tag <a> or a code tag <code>.
      *
      * @param string $html The html-formatted string to parse.
@@ -1479,6 +1480,8 @@ EOT;
      * Without double-quotes, a mentioned username is terminated by any of the following characters:
      * whitespace | . | , | ; | ? | ! | :
      *
+     * @since 2.3
+     *
      * @param string $str The html-formatted string to format mentions in.
      * @return string The formatted string.
      */
@@ -1542,7 +1545,7 @@ EOT;
     }
 
     /**
-     *
+     * Handle mentions formatting.
      *
      * @param $Mixed
      * @return mixed|string
@@ -1587,6 +1590,7 @@ EOT;
 
     /**
      * Do a preg_replace, but don't affect things inside <code> tags.
+     * 
      * The three parameters are identical to the ones you'd pass
      * preg_replace.
      *

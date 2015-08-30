@@ -1653,7 +1653,7 @@ if (!function_exists('getMentions')) {
 
         // This one grabs mentions that start at the beginning of $String
         preg_match_all(
-            '/(?:^|[\s,\.>\(])@(\w{1,64})\b/i',
+            '/(?:^|[\s,\.>\(])@(\w{1,100})\b/i',
             $String,
             $Matches
         );

@@ -80,7 +80,7 @@ class ConfigurationModule extends Gdn_Module {
 
         if ($HasFiles === null) {
             $HasFiles = false;
-            foreach ($this->Schema() as $K => $Row) {
+            foreach ($this->schema() as $K => $Row) {
                 if (strtolower(val('Control', $Row)) == 'imageupload') {
                     $HasFiles = true;
                     break;
@@ -98,10 +98,10 @@ class ConfigurationModule extends Gdn_Module {
      */
     public function initialize($Schema = null) {
         if ($Schema !== null) {
-            $this->Schema($Schema);
+            $this->schema($Schema);
         }
 
-        $Form = $this->Form();
+        $Form = $this->form();
 
         if ($Form->authenticatedPostBack()) {
             // Grab the data from the form.
@@ -113,22 +113,22 @@ class ConfigurationModule extends Gdn_Module {
                 $Config = $Row['Config'];
 
                 // For API calls make this a sparse save.
-                if ($this->Controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
+                if ($this->controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
                     continue;
                 }
 
                 if (strtolower(val('Control', $Row)) == 'imageupload') {
-                    $Form->SaveImage($Name, arrayTranslate($Row, array('Prefix', 'Size')));
+                    $Form->saveImage($Name, arrayTranslate($Row, array('Prefix', 'Size')));
                 }
 
-                $Value = $Form->getFormValue($Name);
+                $Value = trim($Form->getFormValue($Name));
 
                 if ($Value == val('Default', $Value, '')) {
                     $Value = '';
                 }
 
                 $Data[$Config] = $Value;
-                $this->Controller()->setData($Name, $Value);
+                $this->controller()->setData($Name, $Value);
             }
 
             // Save it to the config.

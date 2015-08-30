@@ -243,24 +243,6 @@ class DashboardHooks implements Gdn_IPlugin {
     }
 
     /**
-     *
-     *
-     * @since 2.3
-     * @param $sender
-     */
-    public function gdn_session_afterGetSession_handler($sender, $args) {
-        $User = $args['User'];
-
-        RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
-
-        // If we require confirmation and user is not confirmed
-        if (UserModel::requireConfirmEmail() && !val('Confirmed', $User)) {
-
-        }
-
-    }
-
-    /**
      * Method for plugins that want a friendly /sso method to hook into.
      *
      * @param RootController $Sender

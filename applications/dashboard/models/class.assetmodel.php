@@ -70,9 +70,6 @@ class AssetModel extends Gdn_Model {
         }
 
         $RequestETags = val('HTTP_IF_NONE_MATCH', $_SERVER);
-        if (get_magic_quotes_gpc()) {
-            $RequestETags = stripslashes($RequestETags);
-        }
         $RequestETags = explode(',', $RequestETags);
         foreach ($RequestETags as $RequestETag) {
             if ($RequestETag == $ETag) {

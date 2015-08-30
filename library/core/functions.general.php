@@ -3232,7 +3232,11 @@ if (!function_exists('removeKeysFromNestedArray')) {
 }
 
 if (!function_exists('removeQuoteSlashes')) {
+    /**
+     * @deprecated
+     */
     function removeQuoteSlashes($String) {
+        deprecated('removeQuoteSlashes()');
         return str_replace("\\\"", '"', $String);
     }
 }
@@ -3702,11 +3706,19 @@ if (!function_exists('trace')) {
 
 if (!function_exists('trueStripSlashes')) {
     if (get_magic_quotes_gpc()) {
+        /**
+         * @deprecated
+         */
         function trueStripSlashes($String) {
+            deprecated('trueStripSlashes()');
             return stripslashes($String);
         }
     } else {
+        /**
+         * @deprecated
+         */
         function trueStripSlashes($String) {
+            deprecated('trueStripSlashes()');
             return $String;
         }
     }

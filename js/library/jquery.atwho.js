@@ -488,8 +488,7 @@
             if (!view.visible()) {
               return;
             }
-            e.preventDefault();
-            view.choose();
+            view.choose(e);
             break;
           default:
             $.noop();
@@ -822,7 +821,7 @@
           $menu.find('.cur').removeClass('cur');
           return $(e.currentTarget).addClass('cur');
         }).on('click', function(e) {
-          _this.choose();
+          _this.choose(e);
           return e.preventDefault();
         });
         return this.$el.on('mouseenter.atwho-view', 'ul', function(e) {
@@ -836,13 +835,15 @@
         return this.$el.is(":visible");
       };
 
-      View.prototype.choose = function() {
+      View.prototype.choose = function(event) {
         var $li, content;
-        $li = this.$el.find(".cur");
-        content = this.context.insert_content_for($li);
-        this.context.insert(this.context.callbacks("before_insert").call(this.context, content, $li), $li);
-        this.context.trigger("inserted", [$li]);
-        return this.hide();
+        if (($li = this.$el.find(".cur")).length) {
+          event.preventDefault();
+          content = this.context.insert_content_for($li);
+          this.context.insert(this.context.callbacks("before_insert").call(this.context, content, $li), $li);
+          this.context.trigger("inserted", [$li]);
+          return this.hide();
+        }
       };
 
       View.prototype.reposition = function(rect) {

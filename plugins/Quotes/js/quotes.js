@@ -119,7 +119,15 @@ Gdn_Quotes.prototype.Quote = function(ObjectID, QuoteLink) {
         return;
     }
 
-    var ScrollY = this.GetEditor().offset().top - 100;
+    var ScrollY;
+
+    // DEPRECATED: cleditor support
+    if ($('div.cleditorMain').length) {
+        ScrollY = $(this.GetEditor().get(0).editor.$frame).offset().top - 100;
+    } else {
+        ScrollY = this.GetEditor().offset().top - 100;
+    }
+
     $('html,body').animate({scrollTop: ScrollY}, 800);
 };
 
@@ -172,6 +180,12 @@ Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
 
     QuoteText = QuoteText + '\n';
     Editor.val(Editor.val() + QuoteText);
+
+    // DEPRECATED: cleditor support
+    if ($('div.cleditorMain').length) {
+        Editor.val(Editor.val() + '<br/>');
+        Editor.get(0).editor.updateFrame();
+    }
 
     Editor
         .focus()

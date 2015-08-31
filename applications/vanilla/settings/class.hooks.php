@@ -386,7 +386,7 @@ class VanillaHooks implements Gdn_IPlugin {
             $Sender->AddProfileTab(t('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', $CommentsLabel);
             // Add the discussion tab's CSS and Javascript.
             $Sender->addJsFile('jquery.gardenmorepager.js');
-            $Sender->addJsFile('discussions.js');
+            $Sender->addJsFile('discussions.js', 'vanilla');
         }
     }
 

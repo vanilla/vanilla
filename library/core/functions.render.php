@@ -559,16 +559,7 @@ if (!function_exists('hasEditProfile')) {
         if ($userID != Gdn::session()->UserID) {
             return false;
         }
-
-        $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
-
-        // $result &= (
-        //     C('Garden.Profile.Titles') ||
-        //     C('Garden.Profile.Locations', false) ||
-        //     C('Garden.Registration.Method') != 'Connect'
-        // );
-
-        return $result;
+        return checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
     }
 }
 

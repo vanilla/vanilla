@@ -121,7 +121,12 @@ class ConfigurationModule extends Gdn_Module {
                     $Form->saveImage($Name, arrayTranslate($Row, array('Prefix', 'Size')));
                 }
 
-                $Value = trim($Form->getFormValue($Name));
+                $Value = $Form->getFormValue($Name);
+
+                // Trim all incoming values by default.
+                if (val('Trim', $Row, true)) {
+                    $Value = trim($Value);
+                }
 
                 if ($Value == val('Default', $Value, '')) {
                     $Value = '';

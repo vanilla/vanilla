@@ -2382,7 +2382,7 @@ class UserModel extends Gdn_Model {
                 $Row->Photo = Gdn_Upload::url($Row->Photo);
             }
 
-            $Row->Attributes = @unserialize($Row->Preferences);
+            $Row->Attributes = @unserialize($Row->Attributes);
             $Row->Preferences = @unserialize($Row->Preferences);
         }
 

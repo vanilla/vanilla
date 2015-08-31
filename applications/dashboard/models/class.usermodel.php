@@ -409,15 +409,15 @@ class UserModel extends Gdn_Model {
 
         switch (strtolower($Column)) {
             case 'countdiscussions':
-                Gdn::database()->query(DBAModel::GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID', $Where));
+                Gdn::database()->query(DBAModel::getCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID', $Where));
                 break;
             case 'countcomments':
-                Gdn::database()->query(DBAModel::GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID', $Where));
+                Gdn::database()->query(DBAModel::getCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID', $Where));
                 break;
         }
 
         if ($UserID) {
-            $this->ClearCache($UserID);
+            $this->clearCache($UserID);
         }
     }
 
@@ -470,7 +470,7 @@ class UserModel extends Gdn_Model {
                 $LogModel = new LogModel();
 
                 try {
-                    $LogModel->Restore($BanLogID);
+                    $LogModel->restore($BanLogID);
                 } catch (Exception $Ex) {
                     if ($Ex->getCode() != 404) {
                         throw $Ex;
@@ -1538,7 +1538,7 @@ class UserModel extends Gdn_Model {
         }
 
         // If we require confirmation and user is not confirmed
-        $ConfirmEmail = c('Garden.Registration.ConfirmEmail', false);
+        $ConfirmEmail = self::requireConfirmEmail();
         $Confirmed = val('Confirmed', $User);
         if ($ConfirmEmail && !$Confirmed) {
             // Replace permissions with those of the ConfirmEmailRole

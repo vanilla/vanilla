@@ -1641,27 +1641,111 @@ if (!function_exists('getIncomingValue')) {
 
 if (!function_exists('getMentions')) {
     /**
-     * @param $String
-     * @return array
+     * Get all usernames mentioned in an HTML string.
+     *
+     * Optionally skips the contents of an anchor tag <a> or a code tag <code>.
+     *
+     * @param string $html The html-formatted string to parse.
+     * @param bool $skipAnchors Whether to call the callback function on anchor tag content.
+     * @param bool $skipCode  Whether to call the callback function on code tag content.
+     * @return array An array of usernames that are mentioned.
      */
-    function getMentions($String) {
+    function getMentions($html, $skipAnchors = true, $skipCode = true) {
         // Check for a custom mentions formatter and use it.
-        $Formatter = Gdn::Factory('MentionsFormatter');
-        if (is_object($Formatter)) {
-            return $Formatter->GetMentions($String);
+        $formatter = Gdn::Factory('mentionsFormatter');
+        if (is_object($formatter)) {
+            return $formatter->getMentions($html);
         }
 
-        // This one grabs mentions that start at the beginning of $String
-        preg_match_all(
-            '/(?:^|[\s,\.>\(])@(\w{1,64})\b/i',
-            $String,
-            $Matches
-        );
-        if (count($Matches) > 1) {
-            $Result = array_unique($Matches[1]);
-            return $Result;
+        $regex = "`([<>])`i";
+        $parts = preg_split($regex, $html, null, PREG_SPLIT_DELIM_CAPTURE);
+
+        $inTag = false;
+        $inAnchor = false;
+        $inCode = false;
+        $tagName = false;
+        $mentions = array();
+
+        // Only format mentions that are not parts of html tags and are not already enclosed
+        // within anchor tags or code tags.
+        foreach ($parts as $i => $str) {
+            if ($str) {
+                if ($str == '<') {
+                    $inTag = true;
+                }
+                if ($str == '>') {
+                    $inTag = false;
+                }
+                if ($inTag) {
+                    if ($str[0] == '/') {
+                        $tagName = preg_split('`\s`', substr($str, 1), 2);
+                        $tagName = $tagName[0];
+
+                        if ($tagName == 'a') {
+                            $inAnchor = false;
+                        }
+                        if ($tagName == 'code') {
+                            $inCode = false;
+                        }
+                    } else {
+                        $tagName = preg_split('`\s`', trim($str), 2);
+                        $tagName = $tagName[0];
+
+                        if ($tagName == 'a') {
+                            $inAnchor = true;
+                        }
+                        if ($tagName == 'code') {
+                            $inCode = true;
+                        }
+                    }
+                } elseif (!($inAnchor && $skipAnchors) && !($inCode && $skipCode)) {
+                    // Passes all tests, let's extract all the mentions from this segment.
+                    $mentions = array_merge($mentions, getAllMentions($str));
+                }
+            }
         }
-        return array();
+        return array_unique($mentions);
+    }
+}
+
+if (!function_exists('getAllMentions')) {
+    /**
+     * Parses a string for all mentioned usernames and returns an array of these usernames.
+     *
+     * @param $str The string to parse.
+     * @return array The mentioned usernames.
+     */
+    function getAllMentions($str) {
+        $parts = preg_split('`\B@`', $str);
+        $mentions = array();
+        if (count($parts) == 1) {
+            return array();
+        }
+        foreach ($parts as $i => $part) {
+            if (empty($part) || $i == 0) {
+                continue;
+            }
+            // Grab the mention.
+            $mention = false;
+            if ($part[0] == '"') {
+                // Quoted mention.
+                $pos = strpos($part, '"', 1);
+
+                if ($pos === false) {
+                    $part = substr($part, 1);
+                } else {
+                    $mention = substr($part, 1, $pos - 1);
+                }
+            }
+            if (!$mention && !empty($part)) {
+                // Unquoted mention.
+                $parts2 = preg_split('`([\s.,;?!:])`', $part, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $mention = $parts2[0];
+            }
+            $mentions[] = $mention;
+        }
+
+        return $mentions;
     }
 }
 
@@ -3148,7 +3232,11 @@ if (!function_exists('removeKeysFromNestedArray')) {
 }
 
 if (!function_exists('removeQuoteSlashes')) {
+    /**
+     * @deprecated
+     */
     function removeQuoteSlashes($String) {
+        deprecated('removeQuoteSlashes()');
         return str_replace("\\\"", '"', $String);
     }
 }
@@ -3618,11 +3706,19 @@ if (!function_exists('trace')) {
 
 if (!function_exists('trueStripSlashes')) {
     if (get_magic_quotes_gpc()) {
+        /**
+         * @deprecated
+         */
         function trueStripSlashes($String) {
+            deprecated('trueStripSlashes()');
             return stripslashes($String);
         }
     } else {
+        /**
+         * @deprecated
+         */
         function trueStripSlashes($String) {
+            deprecated('trueStripSlashes()');
             return $String;
         }
     }
@@ -3833,6 +3929,44 @@ if (!function_exists('isSafeUrl')) {
         return false;
     }
 
+}
+
+if (!function_exists('isTrustedDomain')) {
+    /**
+     * Check the provided domain name to determine if it is a trusted domain.
+     *
+     * @param string $domain Domain name to compare against our list of trusted domains.
+     *
+     * @return bool True if verified as a trusted domain.  False if unable to verify domain.
+     */
+    function isTrustedDomain($domain) {
+        static $trustedDomains = null;
+
+        if (empty($domain)) {
+            return false;
+        }
+
+        // If we haven't already compiled an array of trusted domains, grab them.
+        if (!is_array($trustedDomains)) {
+            $trustedDomains = trustedDomains();
+        }
+
+        /**
+         * Iterate through each of our trusted domains.
+         * Chop off any whitespace from the trusted domain and prepare it for regex.
+         * See if the current trusted domain matches fully against the domain we're
+         *   testing or if it matches its end (e.g. domain.tld should match domain.tld and sub.domain.tld)
+         */
+        foreach ($trustedDomains as $trustedDomain) {
+            $trustedDomain = preg_quote(trim($trustedDomain));
+            if (preg_match("/(^|\.){$trustedDomain}$/i", $domain)) {
+                return true;
+            }
+        }
+
+        // No matches?  Must not be a trusted domain.
+        return false;
+    }
 }
 
 if (!function_exists('userAgentType')) {

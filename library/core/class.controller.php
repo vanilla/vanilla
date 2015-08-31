@@ -247,7 +247,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         if (Gdn::session()->isValid()) {
             $this->_Headers = array_merge($this->_Headers, array(
-                'Cache-Control' => 'private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
+                'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
                 'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
                 'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
             ));
@@ -1227,6 +1227,23 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
             $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
             $this->setHeader('X-Content-Type-Options', 'nosniff');
+
+            // Cross-Origin Resource Sharing (CORS)
+
+            /**
+             * Access-Control-Allow-Origin
+             * If a Origin header is sent by the client, attempt to verify it against the list of
+             * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
+             * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
+             * response using the client's Origin header value.
+             */
+            $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
+            if ($origin) {
+                $originHost = parse_url($origin, PHP_URL_HOST);
+                if ($originHost && isTrustedDomain($originHost)) {
+                    $this->setHeader('Access-Control-Allow-Origin', $origin);
+                }
+            }
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {

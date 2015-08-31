@@ -1104,19 +1104,24 @@ jQuery(document).ready(function($) {
 
     // When a stash anchor is clicked, look for inputs with values to stash
     $('a.Stash').click(function(e) {
-        // Embedded comments
         var comment = $('#Form_Comment textarea').val(),
-            placeholder = $('#Form_Comment textarea').attr('placeholder'),
-            vanilla_identifier = gdn.definition('vanilla_identifier');
+            placeholder = $('#Form_Comment textarea').attr('placeholder');
 
-        if (vanilla_identifier && comment != '' && comment != placeholder) {
+        // Stash a comment:
+        if (comment != '' && comment != placeholder) {
+            var vanilla_identifier = gdn.definition('vanilla_identifier', false);
+
+            if (vanilla_identifier) {
+                // Embedded comment:
+                var stash_name = 'CommentForForeignID_' + vanilla_identifier;
+            } else {
+                // Non-embedded comment:
+                var stash_name = 'CommentForDiscussionID_' + gdn.definition('DiscussionID'); 
+            }
             var href = $(this).attr('href');
             e.preventDefault();
 
-
-            stash('CommentForForeignID_' + vanilla_identifier, comment, function() {
-                window.top.location = href;
-            });
+            stash(stash_name, comment);
         }
     });
 

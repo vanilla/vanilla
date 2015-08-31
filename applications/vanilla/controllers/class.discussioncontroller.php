@@ -211,6 +211,7 @@ class DiscussionController extends VanillaController {
         // Look in the session stash for a comment
         $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', false);
         if ($StashComment) {
+            $this->Form->setValue('Body', $StashComment);
             $this->Form->setFormValue('Body', $StashComment);
         }
 

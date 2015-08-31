@@ -365,7 +365,7 @@ class Gdn_Session {
      * @param bool $Persist If setting an identity, should we persist it beyond browser restart?
      */
     public function start($UserID = false, $SetIdentity = true, $Persist = false) {
-        if (!C('Garden.Installed', false)) {
+        if (!c('Garden.Installed', false)) {
             return;
         }
         // Retrieve the authenticated UserID from the Authenticator module.

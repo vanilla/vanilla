@@ -105,9 +105,8 @@ $Construct
 
 // Modify all users with ConfirmEmail role to be unconfirmed
 if ($UserExists && !$ConfirmedExists) {
-    $ConfirmEmail = c('Garden.Registration.ConfirmEmail', false);
     $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
-    if ($ConfirmEmail && !empty($ConfirmEmailRoleID)) {
+    if (UserModel::requireConfirmEmail() && !empty($ConfirmEmailRoleID)) {
         // Select unconfirmed users
         $Users = Gdn::sql()->select('UserID')->from('UserRole')->where('RoleID', $ConfirmEmailRoleID)->get();
         $UserIDs = array();

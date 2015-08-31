@@ -1300,7 +1300,7 @@ class ImportModel extends Gdn_Model {
      */
     protected function _LoadTableWithInsert($Tablename, $Path) {
         // This option could take a while so set the timeout.
-        set_time_limit(60 * 5);
+        set_time_limit(60 * 10);
 
         // Get the column count of the table.
         $St = Gdn::structure();
@@ -1546,7 +1546,7 @@ class ImportModel extends Gdn_Model {
      */
     public function processImportFile() {
         // This one step can take a while so give it more time.
-        set_time_limit(60 * 5);
+        set_time_limit(60 * 10);
 
         $Path = $this->ImportPath;
         $BasePath = dirname($Path).DS.'import';
@@ -1931,7 +1931,7 @@ class ImportModel extends Gdn_Model {
      */
     public function updateCounts() {
         // This option could take a while so set the timeout.
-        set_time_limit(60 * 5);
+        set_time_limit(60 * 10);
 
         // Define the necessary SQL.
         $Sqls = array();

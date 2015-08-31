@@ -1828,9 +1828,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
                 $MasterViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*'));
             }
-            // 3. Application default. eg. root/app_name/views/
+            // 3. Plugin default. eg. root/plugin_name/views/
+            $MasterViewPaths[] = combinePaths(array(PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
+            // 4. Application default. eg. root/app_name/views/
             $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
-            // 4. Garden default. eg. root/dashboard/views/
+            // 5. Garden default. eg. root/dashboard/views/
             $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', $this->MasterView.'.master*'));
         }
 

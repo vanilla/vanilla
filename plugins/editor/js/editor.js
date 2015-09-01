@@ -823,7 +823,7 @@
             var editorKey = 'editor-uploads-';
             var editorForm = $dndCueWrapper.closest('form');
 
-            var savedUploadsContainer = '';
+            var savedUploadsContainer = savedContainer = '';
             var mainCommentForm = '';
             if (editorForm) {
                 var formCommentId = $(editorForm).find('#Form_CommentID');
@@ -848,20 +848,30 @@
                 // Build editorKey
                 if (formCommentId.length
                     && parseInt(formCommentId[0].value) > 0) {
+                    var type = 'CommentID';
+                    var id = formCommentId[0].value;
                     editorKey += 'commentid' + formCommentId[0].value;
                 } else if (formDiscussionId.length
                     && parseInt(formDiscussionId[0].value) > 0) {
+                    var type = 'DiscussionID';
+                    var id = formDiscussionId[0].value;
                     editorKey += 'discussionid' + formDiscussionId[0].value;
                 } else if (formConversationId.length
                     && parseInt(formConversationId[0].value) > 0) {
+                    var type = 'ConversationID';
+                    var id = formConversationId[0].value;
                     editorKey += 'conversationid' + formConversationId[0].value;
                 }
 
-                // Make saved files editable
+                // Make saved files editable from the form
                 if (!mainCommentBox && editorKey != 'editor-uploads-') {
                     var savedContainer = $('#' + editorKey);
                     if (savedContainer.length && savedContainer.html().trim() != '') {
-                        savedUploadsContainer = savedContainer;
+                        savedContainer.hide();
+                        // Move existing uploads into preview container for better UX.
+                        var form = $('#Form_' + type + ':input[value="' + id + '"]').closest('form').find('.bodybox-wrap');
+                        form.children('.editor-upload-previews').html(savedContainer.html());
+                        savedUploadsContainer = form.children('.editor-upload-previews');
                     }
                 }
             }
@@ -950,11 +960,13 @@
                 // Turn read-only mode on. Event is fired from conversations.js
                 // and discussion.js.
                 $(editorForm).on('clearCommentForm', function(e) {
-                    $(savedUploadsContainer).addClass('editor-upload-readonly');
+                    $(savedContainer).addClass('editor-upload-readonly');
+                    $(savedContainer).show();
                 });
 
                 $(editorForm).on('clearMessageForm', function(e) {
-                    $(savedUploadsContainer).addClass('editor-upload-readonly');
+                    $(savedContainer).addClass('editor-upload-readonly');
+                    $(savedContainer).show();
                 });
 
                 $(savedUploadsContainer)

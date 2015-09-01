@@ -300,8 +300,6 @@ jQuery(document).ready(function($) {
                 }
             });
         } else {
-            resetCommentForm($(parent).find('form'));
-            clearCommentForm($(parent).find('form'));
             $(parent).find('div.EditCommentForm').remove();
             $(parent).find('span.TinyProgress').remove();
             $(msg).show();

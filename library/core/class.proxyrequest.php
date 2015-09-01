@@ -13,6 +13,7 @@
  * This class abstracts the work of doing external requests.
  */
 class ProxyRequest {
+    const MAX_LOG_BODYLENGTH = 500;
 
     protected $CookieJar;
 
@@ -526,7 +527,7 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_URL, $Url);
         curl_setopt($Handler, CURLOPT_PORT, $Port);
 
-        if (val('Log', $Options, true)) {
+        if (val('Log', $Options, false)) {
             Logger::event('http_request', Logger::DEBUG, '{method} {url}', $logContext);
         }
 
@@ -541,7 +542,9 @@ class ProxyRequest {
 
         $logContext['responseCode'] = $this->ResponseStatus;
         $logContext['responseTime'] = $this->ResponseTime;
-        if (debug()) {
+
+        // Add the response body to the log entry if it isn't too long or we are debugging.
+        if (debug() || strlen($this->responseBody) < self::MAX_LOG_BODYLENGTH) {
             if ($this->ContentType == 'application/json') {
                 $body = @json_decode($this->ResponseBody, true);
                 if (!$body) {

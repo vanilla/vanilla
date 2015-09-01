@@ -109,7 +109,7 @@ $CanAddTags = $this->data('_CanAddTags');
                             'TagName Tag_'.str_replace(' ', '_', $Tag['Name'])
                         );
 
-                        echo ' '.anchor('×', "/settings/tags/delete/{$Tag['TagID']}", 'Delete Popup');
+                        echo ' '.anchor('&times;', "/settings/tags/delete/{$Tag['TagID']}", 'Delete Popup');
                     }
                     ?>
                 </div>

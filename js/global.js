@@ -43,46 +43,14 @@ jQuery(document).ready(function($) {
 
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
+    // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
     var uTF8Encode = function(string) {
-        string = string.replace(/\x0d\x0a/g, "\x0a");
-        var output = "";
-        for (var n = 0; n < string.length; n++) {
-            var c = string.charCodeAt(n);
-            if (c < 128) {
-                output += String.fromCharCode(c);
-            } else if ((c > 127) && (c < 2048)) {
-                output += String.fromCharCode((c >> 6) | 192);
-                output += String.fromCharCode((c & 63) | 128);
-            } else {
-                output += String.fromCharCode((c >> 12) | 224);
-                output += String.fromCharCode(((c >> 6) & 63) | 128);
-                output += String.fromCharCode((c & 63) | 128);
-            }
-        }
-        return output;
-    };
+        return unescape(encodeURIComponent(string));
+    }
 
-    var uTF8Decode = function(input) {
-        var string = "";
-        var i = 0;
-        var c = c1 = c2 = 0;
-        while (i < input.length) {
-            c = input.charCodeAt(i);
-            if (c < 128) {
-                string += String.fromCharCode(c);
-                i++;
-            } else if ((c > 191) && (c < 224)) {
-                c2 = input.charCodeAt(i + 1);
-                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-                i += 2;
-            } else {
-                c2 = input.charCodeAt(i + 1);
-                c3 = input.charCodeAt(i + 2);
-                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-                i += 3;
-            }
-        }
-        return string;
+    // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
+    var uTF8Decode = function(string) {
+        return decodeURIComponent(escape(string));
     }
 
     $.extend({
@@ -880,9 +848,9 @@ jQuery(document).ready(function($) {
     }
 
     // Handle autodismissals
-    $('div.InformWrapper.AutoDismiss:first').livequery(function() {
-        gdn.setAutoDismiss();
-    });
+	$(document).on('informMessage', function() {
+		gdn.setAutoDismiss();
+	});
 
     // Prevent autodismiss if hovering any inform messages
     $(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
@@ -944,7 +912,7 @@ jQuery(document).ready(function($) {
 
                 // If the message is dismissable, add a close button
                 if (css.indexOf('Dismissable') > 0)
-                    message = '<a class="Close"><span>×</span></a>' + message;
+                    message = '<a class="Close"><span>&times;</span></a>' + message;
 
                 message = '<div class="InformMessage">' + message + '</div>';
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
@@ -1136,19 +1104,24 @@ jQuery(document).ready(function($) {
 
     // When a stash anchor is clicked, look for inputs with values to stash
     $('a.Stash').click(function(e) {
-        // Embedded comments
         var comment = $('#Form_Comment textarea').val(),
-            placeholder = $('#Form_Comment textarea').attr('placeholder'),
-            vanilla_identifier = gdn.definition('vanilla_identifier');
+            placeholder = $('#Form_Comment textarea').attr('placeholder');
 
-        if (vanilla_identifier && comment != '' && comment != placeholder) {
+        // Stash a comment:
+        if (comment != '' && comment != placeholder) {
+            var vanilla_identifier = gdn.definition('vanilla_identifier', false);
+
+            if (vanilla_identifier) {
+                // Embedded comment:
+                var stash_name = 'CommentForForeignID_' + vanilla_identifier;
+            } else {
+                // Non-embedded comment:
+                var stash_name = 'CommentForDiscussionID_' + gdn.definition('DiscussionID'); 
+            }
             var href = $(this).attr('href');
             e.preventDefault();
 
-
-            stash('CommentForForeignID_' + vanilla_identifier, comment, function() {
-                window.top.location = href;
-            });
+            stash(stash_name, comment);
         }
     });
 
@@ -1181,11 +1154,6 @@ jQuery(document).ready(function($) {
 
     var d = new Date()
     var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
-
-    // Set the ClientHour if there is an input looking for it.
-    $('input:hidden[name$=HourOffset]').livequery(function() {
-        $(this).val(hourOffset);
-    });
 
     // Ajax/Save the ClientHour if it is different from the value in the db.
     var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
@@ -1864,9 +1832,10 @@ jQuery(document).ready(function($) {
     // calls this function directly when in wysiwyg format, as it needs to
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
-        $('.BodyBox').livequery(function() {
-            gdn.atCompleteInit(this, '');
+        $(document).on('EditCommentFormLoaded popupReveal', function() {
+            gdn.atCompleteInit('.BodyBox', '');
         });
+        gdn.atCompleteInit('.BodyBox', '');
     }
 
 

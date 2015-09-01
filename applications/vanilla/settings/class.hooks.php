@@ -39,109 +39,108 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @since 2.1
      *
-     * @param int $UserID The ID of the user to delete.
-     * @param array $Options An array of options:
+     * @param int $userID The ID of the user to delete.
+     * @param array $options An array of options:
      *  - DeleteMethod: One of delete, wipe, or NULL
      */
-    public function deleteUserData($UserID, $Options = array(), &$Data = null) {
-        $SQL = Gdn::sql();
+    public function deleteUserData($userID, $options = array(), &$data = null) {
+        $sql = Gdn::sql();
 
         // Remove discussion watch records and drafts.
-        $SQL->delete('UserDiscussion', array('UserID' => $UserID));
+        $sql->delete('UserDiscussion', array('UserID' => $userID));
 
-        Gdn::userModel()->GetDelete('Draft', array('InsertUserID' => $UserID), $Data);
+        Gdn::userModel()->getDelete('Draft', array('InsertUserID' => $userID), $data);
 
         // Comment deletion depends on method selected
-        $DeleteMethod = val('DeleteMethod', $Options, 'delete');
-        if ($DeleteMethod == 'delete') {
-            // Clear out the last posts to the categories.
-            $SQL
-                ->update('Category c')
-                ->join('Discussion d', 'd.DiscussionID = c.LastDiscussionID')
-                ->where('d.InsertUserID', $UserID)
-                ->set('c.LastDiscussionID', null)
-                ->set('c.LastCommentID', null)
-                ->put();
+        $deleteMethod = val('DeleteMethod', $options, 'delete');
+        if ($deleteMethod == 'delete') {
+            // Get a list of category IDs that has this user as the most recent poster.
+            $discussionCats = $sql
+                ->select('cat.CategoryID')
+                ->from('Category cat')
+                ->join('Discussion d', 'd.DiscussionID = cat.LastDiscussionID')
+                ->where('d.InsertUserID', $userID)
+                ->get()->resultArray();
 
-            $SQL
-                ->update('Category c')
-                ->join('Comment d', 'd.CommentID = c.LastCommentID')
-                ->where('d.InsertUserID', $UserID)
-                ->set('c.LastDiscussionID', null)
-                ->set('c.LastCommentID', null)
-                ->put();
+            $commentCats = $sql
+                ->select('cat.CategoryID')
+                ->from('Category cat')
+                ->join('Comment c', 'c.CommentID = cat.LastCommentID')
+                ->where('c.InsertUserID', $userID)
+                ->get()->resultArray();
+
+            $categoryIDs = array_unique(array_merge(array_column($discussionCats, 'CategoryID'), array_column($commentCats, 'CategoryID')));
 
             // Grab all of the discussions that the user has engaged in.
-            $DiscussionIDs = $SQL
+            $discussionIDs = $sql
                 ->select('DiscussionID')
                 ->from('Comment')
-                ->where('InsertUserID', $UserID)
+                ->where('InsertUserID', $userID)
                 ->groupBy('DiscussionID')
                 ->get()->resultArray();
-            $DiscussionIDs = consolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+            $discussionIDs = array_column($discussionIDs, 'DiscussionID');
 
 
-            Gdn::userModel()->GetDelete('Comment', array('InsertUserID' => $UserID), $Data);
+            Gdn::userModel()->getDelete('Comment', array('InsertUserID' => $userID), $data);
 
             // Update the comment counts.
-            $CommentCounts = $SQL
+            $commentCounts = $sql
                 ->select('DiscussionID')
                 ->select('CommentID', 'count', 'CountComments')
                 ->select('CommentID', 'max', 'LastCommentID')
-                ->whereIn('DiscussionID', $DiscussionIDs)
+                ->whereIn('DiscussionID', $discussionIDs)
                 ->groupBy('DiscussionID')
                 ->get('Comment')->resultArray();
 
-            foreach ($CommentCounts as $Row) {
-                $SQL->put(
+            foreach ($commentCounts as $row) {
+                $sql->put(
                     'Discussion',
-                    array('CountComments' => $Row['CountComments'] + 1, 'LastCommentID' => $Row['LastCommentID']),
-                    array('DiscussionID' => $Row['DiscussionID'])
+                    array('CountComments' => $row['CountComments'] + 1, 'LastCommentID' => $row['LastCommentID']),
+                    array('DiscussionID' => $row['DiscussionID'])
                 );
             }
 
             // Update the last user IDs.
-            $SQL->update('Discussion d')
+            $sql->update('Discussion d')
                 ->join('Comment c', 'd.LastCommentID = c.CommentID', 'left')
                 ->set('d.LastCommentUserID', 'c.InsertUserID', false, false)
-                ->set('d.DateLastComment', 'c.DateInserted', false, false)
-                ->whereIn('d.DiscussionID', $DiscussionIDs)
+                ->set('d.DateLastComment', 'coalesce(c.DateInserted, d.DateInserted)', false, false)
+                ->whereIn('d.DiscussionID', $discussionIDs)
                 ->put();
 
             // Update the last posts.
-            $Discussions = $SQL
-                ->whereIn('DiscussionID', $DiscussionIDs)
-                ->where('LastCommentUserID', $UserID)
+            $discussions = $sql
+                ->whereIn('DiscussionID', $discussionIDs)
+                ->where('LastCommentUserID', $userID)
                 ->get('Discussion');
 
-            // Delete the user's dicussions
-            Gdn::userModel()->GetDelete('Discussion', array('InsertUserID' => $UserID), $Data);
+            // Delete the user's discussions.
+            Gdn::userModel()->getDelete('Discussion', array('InsertUserID' => $userID), $data);
 
-            // Update the appropriat recent posts in the categories.
-            $CategoryModel = new CategoryModel();
-            $Categories = $CategoryModel->getWhere(array('LastDiscussionID' => null))->resultArray();
-            foreach ($Categories as $Category) {
-                $CategoryModel->SetRecentPost($Category['CategoryID']);
+            // Update the appropriate recent posts in the categories.
+            $categoryModel = new CategoryModel();
+            foreach ($categoryIDs as $categoryID) {
+                $categoryModel->setRecentPost($categoryID);
             }
-        } elseif ($DeleteMethod == 'wipe') {
-            // Erase the user's dicussions
-            $SQL->update('Discussion')
+        } elseif ($deleteMethod == 'wipe') {
+            // Erase the user's discussions.
+            $sql->update('Discussion')
                 ->set('Body', t('The user and all related content has been deleted.'))
                 ->set('Format', 'Deleted')
-                ->where('InsertUserID', $UserID)
+                ->where('InsertUserID', $userID)
                 ->put();
 
-            $SQL->update('Comment')
+            $sql->update('Comment')
                 ->set('Body', t('The user and all related content has been deleted.'))
                 ->set('Format', 'Deleted')
-                ->where('InsertUserID', $UserID)
+                ->where('InsertUserID', $userID)
                 ->put();
         } else {
             // Leave comments
         }
 
         // Remove the user's profile information related to this application
-        $SQL->update('User')
+        $sql->update('User')
             ->set(array(
                 'CountDiscussions' => 0,
                 'CountUnreadDiscussions' => 0,
@@ -149,7 +148,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 'CountDrafts' => 0,
                 'CountBookmarks' => 0
             ))
-            ->where('UserID', $UserID)
+            ->where('UserID', $userID)
             ->put();
     }
 
@@ -418,7 +417,7 @@ class VanillaHooks implements Gdn_IPlugin {
 //      }
 
         if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            $PostBack = $Sender->Form->isPostBack();
+            $PostBack = $Sender->Form->authenticatedPostBack();
             $Set = array();
 
             // Add the category definitions to for the view to pick up.

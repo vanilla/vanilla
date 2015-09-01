@@ -277,6 +277,7 @@ function Gdn_Quotes() {
 
             case 'default':
             default:
+                jQuery(Editor).focus();
                 // Do nothing special
                 break;
         }

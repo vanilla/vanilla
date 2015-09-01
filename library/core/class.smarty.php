@@ -41,7 +41,7 @@ class Gdn_Smarty {
         $Session = Gdn::session();
         if ($Session->isValid()) {
             $User = array(
-                'Name' => $Session->User->Name,
+                'Name' => htmlspecialchars($Session->User->Name),
                 'Photo' => '',
                 'CountNotifications' => (int)val('CountNotifications', $Session->User, 0),
                 'CountUnreadConversations' => (int)val('CountUnreadConversations', $Session->User, 0),
@@ -49,7 +49,7 @@ class Gdn_Smarty {
 
             $Photo = $Session->User->Photo;
             if ($Photo) {
-                if (!IsUrl($Photo)) {
+                if (!isUrl($Photo)) {
                     $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
                 }
             } else {

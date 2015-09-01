@@ -984,9 +984,6 @@
                             name: 'RemoveMediaIDs[]',
                             value: mediaId
                         }).appendTo($(editorForm));
-
-                        // Remove element from body.
-                        removeImageFromBody($editorFilePreview);
                     })
                     // This will remove the hidden input
                     .on('click.saved-file-reattach', '.editor-file-reattach', function(e) {
@@ -995,9 +992,6 @@
 
                         // Remove hidden input from form
                         $('#file-remove-' + mediaId).remove();
-
-                        // Re-attach
-                        insertImageIntoBody($editorFilePreview);
                     });
             }
 
@@ -1783,7 +1777,7 @@
                                 }
 
                                 // Enable file uploads
-                                fileUploadsInit($currentEditableTextarea, '');
+                                fileUploadsInit($currentEditableTextarea[0], '');
 
                                 insertImageUrl($currentEditableTextarea);
                             });

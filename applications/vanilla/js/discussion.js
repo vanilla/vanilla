@@ -159,8 +159,8 @@ jQuery(document).ready(function($) {
                     $(btn).hide();
                     $(parent).find('.WriteButton').removeClass('Hidden');
 
-                    $(frm).trigger('PreviewLoaded', [frm]);
                     $(frm).find('.TextBoxWrapper').hide().after(json.Data);
+                    $(frm).trigger('PreviewLoaded', [frm]);
 
                 } else if (!draft) {
                     // Clean up the form

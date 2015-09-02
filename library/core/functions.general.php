@@ -3771,8 +3771,10 @@ if (!function_exists('viewLocation')) {
      * @param string $Controller The name of the controller invoking the view or blank.
      * @param string $Folder The application folder or plugins/plugin folder.
      * @return string|false The path to the view or false if it wasn't found.
+     * @deprecated
      */
     function viewLocation($View, $Controller, $Folder) {
+        deprecated('viewLocation()');
         $Paths = array();
 
         if (strpos($View, '/') !== false) {

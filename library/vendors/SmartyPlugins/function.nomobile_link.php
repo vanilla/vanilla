@@ -14,10 +14,10 @@
  * @return string
  */
 function smarty_function_nomobile_link($Params, &$Smarty) {
-   $Path = val('path', $Params, '', true);
-   $Text = val('text', $Params, '', true);
-   $Wrap = val('wrap', $Params, 'li');
-   return Gdn_Theme::link('profile/nomobile',
-      val('text', $Params, t("Full Site")),
-      val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+    $Path = val('path', $Params, '', true);
+    $Text = val('text', $Params, '', true);
+    $Wrap = val('wrap', $Params, 'li');
+    return Gdn_Theme::link('profile/nomobile',
+        val('text', $Params, t("Full Site")),
+        val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

@@ -16,6 +16,6 @@
  * @return The text.
  */
 function smarty_function_text($Params, &$Smarty) {
-   $Result = Gdn_Theme::Text(val('code', $Params, ''), val('default', $Params, ''));
+    $Result = Gdn_Theme::text(val('code', $Params, ''), val('default', $Params, ''));
 	return $Result;
 }

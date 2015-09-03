@@ -14,8 +14,8 @@
  * @return string
  */
 function smarty_function_signinout_link($Params, &$Smarty) {
-   $Wrap = val('wrap', $Params, 'li');
-   return Gdn_Theme::link('signinout',
-      val('text', $Params, ''),
-      val('format', $Params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $Wrap)));
+    $Wrap = val('wrap', $Params, 'li');
+    return Gdn_Theme::link('signinout',
+        val('text', $Params, ''),
+        val('format', $Params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $Wrap)));
 }

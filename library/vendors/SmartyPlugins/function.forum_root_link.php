@@ -20,12 +20,14 @@
  * @return The url.
  */
 function smarty_function_forum_root_link($Params, &$Smarty) {
-   $Text = val('text', $Params, '', true);
-   $Format = val('format', $Params, '<li><a href="%url" class="%class">%text</a></li>');
-   
-   $Options = array();
-   if (isset($Params['class'])) $Options['class'] = $Params['class'];
+    $Text = val('text', $Params, '', true);
+    $Format = val('format', $Params, '<li><a href="%url" class="%class">%text</a></li>');
 
-   $Result = Gdn_Theme::link('forumroot', $Text, $Format, $Options);
-   return $Result;
+    $Options = array();
+    if (isset($Params['class'])) {
+        $Options['class'] = $Params['class'];
+    }
+
+    $Result = Gdn_Theme::link('forumroot', $Text, $Format, $Options);
+    return $Result;
 }

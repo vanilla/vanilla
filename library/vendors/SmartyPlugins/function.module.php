@@ -14,9 +14,9 @@
  * @return string
  */
 function smarty_function_module($Params, &$Smarty) {
-   $Name = val('name', $Params);
-   unset($Params['name']);
+    $Name = val('name', $Params);
+    unset($Params['name']);
    
-   $Result = Gdn_Theme::Module($Name, $Params);
+    $Result = Gdn_Theme::module($Name, $Params);
 	return $Result;
 }

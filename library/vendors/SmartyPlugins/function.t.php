@@ -9,14 +9,14 @@
 /**
  * Returns the  custom text from a theme.
  *
- * @param array $Param The parameters passed into the function. This currently takes no parameters.
+ * @param array $Params The parameters passed into the function. This currently takes no parameters.
  *  - <b>code</b>: The text code set in the theme's information.
  *  - <b>default</b>: The default text if the user hasn't overridden.
- * @param Smarty The smarty object rendering the template.
+ * @param Smarty $Smarty The smarty object rendering the template.
  * @return The text.
  */
 function smarty_function_t($Params, &$Smarty) {
-   $Code = val('c', $Params, '');
-   $Result = t($Code, val('d', $Params, $Code));
+    $Code = val('c', $Params, '');
+    $Result = t($Code, val('d', $Params, $Code));
 	return $Result;
 }

@@ -12,8 +12,9 @@
  * @see t()
  */
 function smarty_modifier_translate($Code, $Default = false) {
-   if ($Default === false)
-      $Default = $Code;
-   
+    if ($Default === false) {
+        $Default = $Code;
+    }
+
 	return t($Code, $Default);
 }

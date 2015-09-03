@@ -14,8 +14,8 @@
  * @return string
  */
 function smarty_function_inbox_link($Params, &$Smarty) {
-   $Wrap = val('wrap', $Params, 'li');
-   return Gdn_Theme::link('inbox',
-      val('text', $Params, t('Inbox')),
-      val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+    $Wrap = val('wrap', $Params, 'li');
+    return Gdn_Theme::link('inbox',
+        val('text', $Params, t('Inbox')),
+        val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

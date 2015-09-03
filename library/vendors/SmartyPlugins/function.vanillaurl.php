@@ -9,10 +9,10 @@
 /**
  * Writes the site logo to the page.
  *
- * @param array The parameters passed into the function. This currently takes no parameters.
- * @param Smarty The smarty object rendering the template.
- * @return The url.
+ * @param array $Params The parameters passed into the function. This currently takes no parameters.
+ * @param Smarty $Smarty The smarty object rendering the template.
+ * @return string The url.
  */
 function smarty_function_vanillaurl($Params, &$Smarty) {
-   return C('Garden.VanillaUrl');
+    return c('Garden.VanillaUrl');
 }

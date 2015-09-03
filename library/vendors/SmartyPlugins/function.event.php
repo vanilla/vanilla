@@ -14,6 +14,6 @@
  * @return string
  */
 function smarty_function_event($Params, &$Smarty) {
-	$Name = val('name', $Params);
-	$Smarty->Controller->fireEvent($Name);
+	 $Name = val('name', $Params);
+	 $Smarty->Controller->fireEvent($Name);
 }

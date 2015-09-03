@@ -14,13 +14,13 @@
  * @return string
  */
 function smarty_function_signin_link($Params, &$Smarty) {
-   if (!Gdn::Session()->IsValid()) {
-      $Wrap = val('wrap', $Params, 'li');
-      return Gdn_Theme::link(
-         'signinout',
-         val('text', $Params, ''),
-         val('format', $Params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $Wrap)),
-         $Params
-      );
-   }
+    if (!Gdn::session()->isValid()) {
+        $Wrap = val('wrap', $Params, 'li');
+        return Gdn_Theme::link(
+            'signinout',
+            val('text', $Params, ''),
+            val('format', $Params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $Wrap)),
+            $Params
+        );
+    }
 }

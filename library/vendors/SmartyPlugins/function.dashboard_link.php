@@ -14,10 +14,10 @@
  * @return string
  */
 function smarty_function_dashboard_link($Params, &$Smarty) {
-   $Path = val('path', $Params, '', true);
-   $Text = val('text', $Params, '', true);
-   $Wrap = val('wrap', $Params, 'li');
-   return Gdn_Theme::link('dashboard',
-      val('text', $Params, ''),
-      val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+    $Path = val('path', $Params, '', true);
+    $Text = val('text', $Params, '', true);
+    $Wrap = val('wrap', $Params, 'li');
+    return Gdn_Theme::link('dashboard',
+        val('text', $Params, ''),
+        val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

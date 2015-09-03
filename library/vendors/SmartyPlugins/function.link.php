@@ -1,13 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-
+<?php
+/**
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanilla-smarty
+ * @since 2.0
+ */
 
 /**
  * Takes a route and prepends the web root (expects "/controller/action/params" as $Path).
@@ -23,13 +20,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @return The url.
  */
 function smarty_function_link($Params, &$Smarty) {
-   $Path = GetValue('path', $Params, '', TRUE);
-   $Text = GetValue('text', $Params, '', TRUE);
-   $NoTag = GetValue('notag', $Params, FALSE, TRUE);
-   $CustomFormat = GetValue('format', $Params, FALSE, TRUE);
+   $Path = val('path', $Params, '', true);
+   $Text = val('text', $Params, '', true);
+   $NoTag = val('notag', $Params, false, true);
+   $CustomFormat = val('format', $Params, false, true);
 
    if(!$Text && $Path != 'signinout' && $Path != 'signin')
-      $NoTag = TRUE;
+      $NoTag = true;
 
    if ($CustomFormat)
       $Format = $CustomFormat;
@@ -44,7 +41,7 @@ function smarty_function_link($Params, &$Smarty) {
    if (isset($Params['tk'])) $Options['TK'] = $Params['tk'];
    if (isset($Params['target'])) $Options['Target'] = $Params['target'];
 
-   $Result = Gdn_Theme::Link($Path, $Text, $Format, $Options);
+   $Result = Gdn_Theme::link($Path, $Text, $Format, $Options);
 
    return $Result;
 }

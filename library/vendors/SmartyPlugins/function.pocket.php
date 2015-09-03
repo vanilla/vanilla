@@ -1,8 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @package Dashboard
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanilla-smarty
+ * @since 2.0
  */
 
 /**
@@ -18,7 +19,7 @@ function smarty_function_pocket($Params, $Smarty) {
    if (!class_exists('PocketsPlugin'))
       return '';
 
-   $Name = GetValue('name', $Params);
+   $Name = val('name', $Params);
    unset($Params['name']);
 
    $Result = PocketsPlugin::PocketString($Name, $Params);

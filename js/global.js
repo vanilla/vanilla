@@ -445,7 +445,7 @@ jQuery(document).ready(function($) {
             }
         }
 
-        for (i = 0; i < targets.length; i++) {
+        for (var i = 0; i < targets.length; i++) {
             var item = targets[i];
 
             if (jQuery.isArray(item.Target)) {

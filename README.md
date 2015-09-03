@@ -74,9 +74,15 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Go to `yourforum.com/utility/update` to force any updates needed.
-* If it fails, try it a second times by refreshing the page.
+* If it fails, try it a second times by refreshing the page. 
 
-To upgrade from **2.0.18 or earlier**, add these steps:
+To upgrade **to 2.2**:
+
+* Confirm 2.2 works on your server configuration before upgrading your production install.
+* Update any locales you have installed. Their name format changed in 2.2. Verify they are working after upgrade.
+* Apache users must update their `.htaccess` file.
+
+To upgrade **from 2.0.18 or earlier**, add these steps:
 
 * Delete the file [`/themes/mobile/views/discussions/helper_functions.php`](https://github.com/vanillaforums/Garden/blob/2.0/themes/mobile/views/discussions/helper_functions.php)
 * Delete the file [`/applications/dashboard/views/default.master.php`](https://github.com/vanilla/vanilla/blob/2.0/applications/dashboard/views/default.master.php)

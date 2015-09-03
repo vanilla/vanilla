@@ -409,15 +409,15 @@ class UserModel extends Gdn_Model {
 
         switch (strtolower($Column)) {
             case 'countdiscussions':
-                Gdn::database()->query(DBAModel::GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID', $Where));
+                Gdn::database()->query(DBAModel::getCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID', $Where));
                 break;
             case 'countcomments':
-                Gdn::database()->query(DBAModel::GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID', $Where));
+                Gdn::database()->query(DBAModel::getCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID', $Where));
                 break;
         }
 
         if ($UserID) {
-            $this->ClearCache($UserID);
+            $this->clearCache($UserID);
         }
     }
 
@@ -470,7 +470,7 @@ class UserModel extends Gdn_Model {
                 $LogModel = new LogModel();
 
                 try {
-                    $LogModel->Restore($BanLogID);
+                    $LogModel->restore($BanLogID);
                 } catch (Exception $Ex) {
                     if ($Ex->getCode() != 404) {
                         throw $Ex;
@@ -1557,7 +1557,7 @@ class UserModel extends Gdn_Model {
         }
 
         // If we require confirmation and user is not confirmed
-        $ConfirmEmail = c('Garden.Registration.ConfirmEmail', false);
+        $ConfirmEmail = self::requireConfirmEmail();
         $Confirmed = val('Confirmed', $User);
         if ($ConfirmEmail && !$Confirmed) {
             // Replace permissions with those of the ConfirmEmailRole
@@ -1940,17 +1940,23 @@ class UserModel extends Gdn_Model {
             $this->Validation->applyRule('Email', 'Email');
         }
 
+        // AllIPAdresses is stored as a CSV, so handle the case where an array is submitted.
+        if (array_key_exists('AllIPAddresses', $FormPostValues) && is_array($FormPostValues['AllIPAddresses'])) {
+            $FormPostValues['AllIPAddresses'] = implode(',', $FormPostValues['AllIPAddresses']);
+        }
+
         if ($this->validate($FormPostValues, $Insert) && $UniqueValid) {
-            $Fields = $this->Validation->validationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
+            // All fields on the form that need to be validated (including non-schema field rules defined above)
+            $Fields = $this->Validation->validationFields();
             $RoleIDs = val('RoleID', $Fields, 0);
             $Username = val('Name', $Fields);
             $Email = val('Email', $Fields);
-            $Fields = $this->Validation->schemaValidationFields(); // Only fields that are present in the schema
+
+            // Only fields that are present in the schema
+            $Fields = $this->Validation->schemaValidationFields();
+
             // Remove the primary key from the fields collection before saving
             $Fields = removeKeyFromArray($Fields, $this->PrimaryKey);
-            if (array_key_exists('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
-                $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
-            }
 
             if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
                 // Encrypt the password for saving only if it won't be hashed in _Insert()
@@ -2395,7 +2401,7 @@ class UserModel extends Gdn_Model {
                 $Row->Photo = Gdn_Upload::url($Row->Photo);
             }
 
-            $Row->Attributes = @unserialize($Row->Preferences);
+            $Row->Attributes = @unserialize($Row->Attributes);
             $Row->Preferences = @unserialize($Row->Preferences);
         }
 
@@ -2472,21 +2478,22 @@ class UserModel extends Gdn_Model {
 
     /**
      * A simple search for tag queries.
+     *
      * @param string $Search
      * @since 2.2
      */
     public function tagSearch($Search, $Limit = 10) {
         $Search = trim(str_replace(array('%', '_'), array('\%', '\_'), $Search));
 
-        $Results = $this->SQL
+        return $this->SQL
             ->select('UserID', '', 'id')
             ->select('Name', '', 'name')
             ->from('User')
             ->like('Name', $Search, 'right')
             ->where('Deleted', 0)
             ->limit($Limit)
-            ->get()->resultArray();
-        return $Results;
+            ->get()
+            ->resultArray();
     }
 
     /**

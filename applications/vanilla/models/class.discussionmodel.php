@@ -1507,7 +1507,11 @@ class DiscussionModel extends VanillaModel {
         }
 
         $this->EventArguments['DiscussionID'] = $RowID;
-        $this->EventArguments['SetField'] = $Property;
+        if (!is_array($Property)) {
+            $this->EventArguments['SetField'] = array($Property => $Value);
+        } else {
+            $this->EventArguments['SetField'] = $Property;
+        }
 
         parent::SetField($RowID, $Property, $Value);
         $this->fireEvent('AfterSetField');
@@ -1705,6 +1709,10 @@ class DiscussionModel extends VanillaModel {
                         // Clear the cache if necessary.
                         if (val('Announce', $Fields)) {
                             Gdn::cache()->Remove($this->GetAnnouncementCacheKey(val('CategoryID', $Fields)));
+
+                            if (val('Announce', $Fields) == 1) {
+                                Gdn::cache()->Remove($this->GetAnnouncementCacheKey());
+                            }
                         }
                     }
 
@@ -1759,7 +1767,6 @@ class DiscussionModel extends VanillaModel {
 
                     // Notify all of the users that were mentioned in the discussion.
                     $Usernames = GetMentions($DiscussionName.' '.$Story);
-                    $Usernames = array_unique($Usernames);
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $Activity;

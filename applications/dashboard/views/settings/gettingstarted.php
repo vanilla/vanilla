@@ -199,7 +199,7 @@ echo $this->Form->errors();
             <div class="Video"><?php echo TutLink('introduction', FALSE, 'large'); ?></div>
         </div>
         <div class="Step">
-            <div class="NumberPoint">1</div>
+            <div class="NumberPoint"><?= t('1'); ?></div>
             <h2><?php echo t('The Basics'); ?></h2>
 
             <p><?php echo t('Learn how to use the basic functionality of your forum.'); ?></p>
@@ -213,7 +213,7 @@ echo $this->Form->errors();
             </div>
         </div>
         <div class="Step">
-            <div class="NumberPoint">2</div>
+            <div class="NumberPoint"><?= t('2'); ?></div>
             <h2><?php echo t("Appearance"); ?></h2>
 
             <p><?php echo t("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></p>
@@ -223,7 +223,7 @@ echo $this->Form->errors();
             </div>
         </div>
         <div class="Step">
-            <div class="NumberPoint">3</div>
+            <div class="NumberPoint"><?= t('3'); ?></div>
             <h2><?php echo t('Organize'); ?></h2>
 
             <p><?php echo t('Create & organize discussion categories and manage your users.'); ?></p>
@@ -238,7 +238,7 @@ echo $this->Form->errors();
             </div>
         </div>
         <div class="Step">
-            <div class="NumberPoint">4</div>
+            <div class="NumberPoint"><?= t('4'); ?></div>
             <h2><?php echo t('Encourage your friends to join your new community!'); ?></h2>
 
             <div class="TextBoxWrapper">

@@ -247,7 +247,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         if (Gdn::session()->isValid()) {
             $this->_Headers = array_merge($this->_Headers, array(
-                'Cache-Control' => 'private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
+                'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
                 'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
                 'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
             ));
@@ -772,8 +772,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             $View .= '_rss';
         }
 
-        $ViewPath2 = viewLocation($View, $ControllerName, $ApplicationFolder);
-
         $LocationName = concatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
         $ViewPath = arrayValue($LocationName, $this->_ViewLocations, false);
         if ($ViewPath === false) {
@@ -849,10 +847,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             Gdn::dispatcher()->passData('ViewPaths', $ViewPaths);
             throw NotFoundException('View');
 //         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
-        }
-
-        if ($ViewPath2 != $ViewPath) {
-            Trace("View paths do not match: $ViewPath != $ViewPath2", TRACE_WARNING);
         }
 
         return $ViewPath;
@@ -1227,6 +1221,23 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
             $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
             $this->setHeader('X-Content-Type-Options', 'nosniff');
+
+            // Cross-Origin Resource Sharing (CORS)
+
+            /**
+             * Access-Control-Allow-Origin
+             * If a Origin header is sent by the client, attempt to verify it against the list of
+             * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
+             * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
+             * response using the client's Origin header value.
+             */
+            $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
+            if ($origin) {
+                $originHost = parse_url($origin, PHP_URL_HOST);
+                if ($originHost && isTrustedDomain($originHost)) {
+                    $this->setHeader('Access-Control-Allow-Origin', $origin);
+                }
+            }
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
@@ -1800,8 +1811,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         // Master views come from one of four places:
         $MasterViewPaths = array();
 
-        $MasterViewPath2 = viewLocation($this->masterView().'.master', '', $this->ApplicationFolder);
-
         if (strpos($this->MasterView, '/') !== false) {
             $MasterViewPaths[] = combinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
         } else {
@@ -1811,9 +1820,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
                 $MasterViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*'));
             }
-            // 3. Application default. eg. root/app_name/views/
+            // 3. Plugin default. eg. root/plugin_name/views/
+            $MasterViewPaths[] = combinePaths(array(PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
+            // 4. Application default. eg. root/app_name/views/
             $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
-            // 4. Garden default. eg. root/dashboard/views/
+            // 5. Garden default. eg. root/dashboard/views/
             $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', $this->MasterView.'.master*'));
         }
 
@@ -1825,10 +1836,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $MasterViewPath = $Paths[0];
                 break;
             }
-        }
-
-        if ($MasterViewPath != $MasterViewPath2) {
-            trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
         }
 
         $this->EventArguments['MasterViewPath'] = &$MasterViewPath;

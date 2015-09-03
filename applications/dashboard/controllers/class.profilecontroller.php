@@ -1019,19 +1019,20 @@ class ProfileController extends Gdn_Controller {
      * @access public
      * @param mixed $UserReference Unique identifier, possibly username or ID.
      * @param string $Username .
-     * @param string $TransientKey Security token.
+     * @param string $tk Security token.
      */
-    public function removePicture($UserReference = '', $Username = '', $TransientKey = '') {
+    public function removePicture($UserReference = '', $Username = '', $tk = '') {
         $this->permission('Garden.SignIn.Allow');
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
         }
 
-        // Get user data & another permission check
+        // Get user data & another permission check.
         $this->getUserInfo($UserReference, $Username, '', true);
+
         $RedirectUrl = userUrl($this->User, '', 'picture');
-        if ($Session->validateTransientKey($TransientKey) && is_object($this->User)) {
+        if ($Session->validateTransientKey($tk) && is_object($this->User)) {
             $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
                 // Do removal, set message, redirect
@@ -1345,7 +1346,7 @@ class ProfileController extends Gdn_Controller {
             $Module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
 
             if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), combinePaths(array(userUrl($this->User, '', 'removepicture'), $Session->transientKey())), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
+                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
             }
 
             $Module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
@@ -1386,6 +1387,10 @@ class ProfileController extends Gdn_Controller {
             if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
                 $Module->addLink('Options', sprite('SpThumbnail').' '.t('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
             }
+
+            if ($this->User->Photo != '' && $AllowImages) {
+                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
+            }
         }
 
         if ($this->User->UserID == $ViewingUserID || $Session->checkPermission('Garden.Users.Edit')) {
@@ -1393,7 +1398,7 @@ class ProfileController extends Gdn_Controller {
             $this->EventArguments['User'] = $this->User;
             $this->fireEvent('GetConnections');
             if (count($this->data('Connections')) > 0) {
-                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow');
+                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', array('class' => 'link-social'));
             }
         }
     }

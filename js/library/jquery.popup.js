@@ -365,7 +365,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
           <div class="Content"> \
           </div> \
           <div class="Footer"> \
-            <a href="#" class="Close"><span>×</span></a> \
+            <a href="#" class="Close"><span>&times;</span></a> \
           </div> \
         </div> \
       </div> \

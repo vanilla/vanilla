@@ -335,6 +335,7 @@ class UserController extends DashboardController {
 
     /**
      * Ban a user and optionally delete their content.
+     *
      * @since 2.1
      * @param type $UserID
      */
@@ -919,7 +920,7 @@ class UserController extends DashboardController {
      */
     public function save() {
         $this->permission('Garden.Users.Edit');
-        if (!Gdn::request()->isPostBack()) {
+        if (!Gdn::request()->isAuthenticatedPostBack()) {
             throw new Exception('Requires POST', 405);
         }
 
@@ -994,7 +995,7 @@ class UserController extends DashboardController {
 
         $Form = new Gdn_Form();
 
-        if ($this->Request->isPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack()) {
             // Make sure everything has been posted.
             $Form->validateRule('ClientID', 'ValidateRequired');
             $Form->validateRule('UniqueID', 'ValidateRequired');
@@ -1071,14 +1072,16 @@ class UserController extends DashboardController {
     }
 
     /**
+     * JSON output of a username search.
      *
-     *
-     * @param $q
+     * @param string $query
      * @param int $limit
      */
     public function tagSearch($q, $limit = 10) {
-        $Data = Gdn::userModel()->tagSearch($q, $limit);
-        die(json_encode($Data));
+        $data = Gdn::userModel()->tagSearch($q, $limit);
+        $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
+        $this->sendHeaders();
+        die(json_encode($data));
     }
 
     /**

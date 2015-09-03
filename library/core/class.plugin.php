@@ -327,12 +327,13 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
             $TestControllerMethod = 'Controller_'.$MethodName;
             if (method_exists($this, $TestControllerMethod)) {
                 $ControllerMethod = $TestControllerMethod;
+                array_shift($RequestArgs);
             }
         }
 
         if (method_exists($this, $ControllerMethod)) {
             $Sender->Plugin = $this;
-            return call_user_func(array($this, $ControllerMethod), $Sender);
+            return call_user_func(array($this, $ControllerMethod), $Sender, $RequestArgs);
         } else {
             $PluginName = get_class($this);
             throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");

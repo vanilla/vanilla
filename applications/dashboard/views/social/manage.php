@@ -24,7 +24,7 @@
         min-width: 700px;
     }
 
-    .Conneciton-Header * {
+    .Connection-Header * {
         line-height: 48px;
         position: relative;
     }

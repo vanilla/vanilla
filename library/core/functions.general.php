@@ -437,7 +437,7 @@ if (!function_exists('asset')) {
                             $Version = val('Version', $PluginInfo, $Version);
                             break;
                         case 'applications':
-                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo($Key);
+                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo(ucfirst($Key));
                             $Version = val('Version', $AppInfo, $Version);
                             break;
                         case 'themes':
@@ -1641,27 +1641,111 @@ if (!function_exists('getIncomingValue')) {
 
 if (!function_exists('getMentions')) {
     /**
-     * @param $String
-     * @return array
+     * Get all usernames mentioned in an HTML string.
+     *
+     * Optionally skips the contents of an anchor tag <a> or a code tag <code>.
+     *
+     * @param string $html The html-formatted string to parse.
+     * @param bool $skipAnchors Whether to call the callback function on anchor tag content.
+     * @param bool $skipCode  Whether to call the callback function on code tag content.
+     * @return array An array of usernames that are mentioned.
      */
-    function getMentions($String) {
+    function getMentions($html, $skipAnchors = true, $skipCode = true) {
         // Check for a custom mentions formatter and use it.
-        $Formatter = Gdn::Factory('MentionsFormatter');
-        if (is_object($Formatter)) {
-            return $Formatter->GetMentions($String);
+        $formatter = Gdn::Factory('mentionsFormatter');
+        if (is_object($formatter)) {
+            return $formatter->getMentions($html);
         }
 
-        // This one grabs mentions that start at the beginning of $String
-        preg_match_all(
-            '/(?:^|[\s,\.>\(])@(\w{1,64})\b/i',
-            $String,
-            $Matches
-        );
-        if (count($Matches) > 1) {
-            $Result = array_unique($Matches[1]);
-            return $Result;
+        $regex = "`([<>])`i";
+        $parts = preg_split($regex, $html, null, PREG_SPLIT_DELIM_CAPTURE);
+
+        $inTag = false;
+        $inAnchor = false;
+        $inCode = false;
+        $tagName = false;
+        $mentions = array();
+
+        // Only format mentions that are not parts of html tags and are not already enclosed
+        // within anchor tags or code tags.
+        foreach ($parts as $i => $str) {
+            if ($str) {
+                if ($str == '<') {
+                    $inTag = true;
+                }
+                if ($str == '>') {
+                    $inTag = false;
+                }
+                if ($inTag) {
+                    if ($str[0] == '/') {
+                        $tagName = preg_split('`\s`', substr($str, 1), 2);
+                        $tagName = $tagName[0];
+
+                        if ($tagName == 'a') {
+                            $inAnchor = false;
+                        }
+                        if ($tagName == 'code') {
+                            $inCode = false;
+                        }
+                    } else {
+                        $tagName = preg_split('`\s`', trim($str), 2);
+                        $tagName = $tagName[0];
+
+                        if ($tagName == 'a') {
+                            $inAnchor = true;
+                        }
+                        if ($tagName == 'code') {
+                            $inCode = true;
+                        }
+                    }
+                } elseif (!($inAnchor && $skipAnchors) && !($inCode && $skipCode)) {
+                    // Passes all tests, let's extract all the mentions from this segment.
+                    $mentions = array_merge($mentions, getAllMentions($str));
+                }
+            }
         }
-        return array();
+        return array_unique($mentions);
+    }
+}
+
+if (!function_exists('getAllMentions')) {
+    /**
+     * Parses a string for all mentioned usernames and returns an array of these usernames.
+     *
+     * @param $str The string to parse.
+     * @return array The mentioned usernames.
+     */
+    function getAllMentions($str) {
+        $parts = preg_split('`\B@`', $str);
+        $mentions = array();
+        if (count($parts) == 1) {
+            return array();
+        }
+        foreach ($parts as $i => $part) {
+            if (empty($part) || $i == 0) {
+                continue;
+            }
+            // Grab the mention.
+            $mention = false;
+            if ($part[0] == '"') {
+                // Quoted mention.
+                $pos = strpos($part, '"', 1);
+
+                if ($pos === false) {
+                    $part = substr($part, 1);
+                } else {
+                    $mention = substr($part, 1, $pos - 1);
+                }
+            }
+            if (!$mention && !empty($part)) {
+                // Unquoted mention.
+                $parts2 = preg_split('`([\s.,;?!:])`', $part, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $mention = $parts2[0];
+            }
+            $mentions[] = $mention;
+        }
+
+        return $mentions;
     }
 }
 
@@ -1700,7 +1784,7 @@ if (!function_exists('getRecord')) {
         switch (strtolower($recordType)) {
             case 'discussion':
                 $Model = new DiscussionModel();
-                $Row = $Model->GetID($id);
+                $Row = $Model->getID($id);
                 $Row->Url = DiscussionUrl($Row);
                 $Row->ShareUrl = $Row->Url;
                 if ($Row) {
@@ -1709,12 +1793,12 @@ if (!function_exists('getRecord')) {
                 break;
             case 'comment':
                 $Model = new CommentModel();
-                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
+                $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Url'] = Url("/discussion/comment/$id#Comment_$id", true);
 
                     $Model = new DiscussionModel();
-                    $Discussion = $Model->GetID($Row['DiscussionID']);
+                    $Discussion = $Model->getID($Row['DiscussionID']);
                     if ($Discussion) {
                         $Discussion->Url = DiscussionUrl($Discussion);
                         $Row['ShareUrl'] = $Discussion->Url;
@@ -1726,7 +1810,7 @@ if (!function_exists('getRecord')) {
                 break;
             case 'activity':
                 $Model = new ActivityModel();
-                $Row = $Model->GetID($id, DATASET_TYPE_ARRAY);
+                $Row = $Model->getID($id, DATASET_TYPE_ARRAY);
                 if ($Row) {
                     $Row['Name'] = formatString($Row['HeadlineFormat'], $Row);
                     $Row['Body'] = $Row['Story'];
@@ -1734,11 +1818,11 @@ if (!function_exists('getRecord')) {
                 }
                 break;
             default:
-                throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($recordType)));
+                throw new Gdn_UserException('Unknown record type requested.');
         }
 
         if ($throw) {
-            throw NotFoundException($recordType);
+            throw NotFoundException();
         } else {
             return false;
         }
@@ -2409,54 +2493,54 @@ if (!function_exists('parseUrl')) {
     /**
      * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
      *
-     * @param string $Url The url to parse.
-     * @param int $Component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
+     * @param string $url The url to parse.
+     * @param int $component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
      * PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
      * @deprecated
      */
-    function parseUrl($Url, $Component = -1) {
-        // Retrieve all the parts
-        $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
-        $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
-        $PHP_URL_PORT = @parse_url($Url, PHP_URL_PORT);
-        $PHP_URL_USER = @parse_url($Url, PHP_URL_USER);
-        $PHP_URL_PASS = @parse_url($Url, PHP_URL_PASS);
-        $PHP_URL_PATH = @parse_url($Url, PHP_URL_PATH);
-        $PHP_URL_QUERY = @parse_url($Url, PHP_URL_QUERY);
-        $PHP_URL_FRAGMENT = @parse_url($Url, PHP_URL_FRAGMENT);
+    function parseUrl($url, $component = -1) {
+        $defaults = [
+            'scheme' => 'http',
+            'host' => '',
+            'port' => null,
+            'user' => '',
+            'pass' => '',
+            'path' => '',
+            'query' => '',
+            'fragment' => ''
+        ];
 
-        // Build a cleaned up array to return
-        $Parts = array(
-            'scheme' => $PHP_URL_SCHEME == null ? 'http' : $PHP_URL_SCHEME,
-            'host' => $PHP_URL_HOST == null ? '' : $PHP_URL_HOST,
-            'port' => $PHP_URL_PORT == null ? $PHP_URL_SCHEME == 'https' ? '443' : '80' : $PHP_URL_PORT,
-            'user' => $PHP_URL_USER == null ? '' : $PHP_URL_USER,
-            'pass' => $PHP_URL_PASS == null ? '' : $PHP_URL_PASS,
-            'path' => $PHP_URL_PATH == null ? '' : $PHP_URL_PATH,
-            'query' => $PHP_URL_QUERY == null ? '' : $PHP_URL_QUERY,
-            'fragment' => $PHP_URL_FRAGMENT == null ? '' : $PHP_URL_FRAGMENT
-        );
+        $parts = parse_url($url);
+        if (is_array($parts)) {
+            $parts = array_replace($defaults, $parts);
+        } else {
+            $parts = $defaults;
+        }
+
+        if ($parts['port'] === null) {
+            $parts['port'] = $parts['scheme'] === 'https' ? '443' : '80';
+        }
 
         // Return
-        switch ($Component) {
+        switch ($component) {
             case PHP_URL_SCHEME:
-                return $Parts['scheme'];
+                return $parts['scheme'];
             case PHP_URL_HOST:
-                return $Parts['host'];
+                return $parts['host'];
             case PHP_URL_PORT:
-                return $Parts['port'];
+                return $parts['port'];
             case PHP_URL_USER:
-                return $Parts['user'];
+                return $parts['user'];
             case PHP_URL_PASS:
-                return $Parts['pass'];
+                return $parts['pass'];
             case PHP_URL_PATH:
-                return $Parts['path'];
+                return $parts['path'];
             case PHP_URL_QUERY:
-                return $Parts['query'];
+                return $parts['query'];
             case PHP_URL_FRAGMENT:
-                return $Parts['fragment'];
+                return $parts['fragment'];
             default:
-                return $Parts;
+                return $parts;
         }
     }
 }
@@ -3148,7 +3232,11 @@ if (!function_exists('removeKeysFromNestedArray')) {
 }
 
 if (!function_exists('removeQuoteSlashes')) {
+    /**
+     * @deprecated
+     */
     function removeQuoteSlashes($String) {
+        deprecated('removeQuoteSlashes()');
         return str_replace("\\\"", '"', $String);
     }
 }
@@ -3618,11 +3706,19 @@ if (!function_exists('trace')) {
 
 if (!function_exists('trueStripSlashes')) {
     if (get_magic_quotes_gpc()) {
+        /**
+         * @deprecated
+         */
         function trueStripSlashes($String) {
+            deprecated('trueStripSlashes()');
             return stripslashes($String);
         }
     } else {
+        /**
+         * @deprecated
+         */
         function trueStripSlashes($String) {
+            deprecated('trueStripSlashes()');
             return $String;
         }
     }
@@ -3675,8 +3771,10 @@ if (!function_exists('viewLocation')) {
      * @param string $Controller The name of the controller invoking the view or blank.
      * @param string $Folder The application folder or plugins/plugin folder.
      * @return string|false The path to the view or false if it wasn't found.
+     * @deprecated
      */
     function viewLocation($View, $Controller, $Folder) {
+        deprecated('viewLocation()');
         $Paths = array();
 
         if (strpos($View, '/') !== false) {
@@ -3833,6 +3931,44 @@ if (!function_exists('isSafeUrl')) {
         return false;
     }
 
+}
+
+if (!function_exists('isTrustedDomain')) {
+    /**
+     * Check the provided domain name to determine if it is a trusted domain.
+     *
+     * @param string $domain Domain name to compare against our list of trusted domains.
+     *
+     * @return bool True if verified as a trusted domain.  False if unable to verify domain.
+     */
+    function isTrustedDomain($domain) {
+        static $trustedDomains = null;
+
+        if (empty($domain)) {
+            return false;
+        }
+
+        // If we haven't already compiled an array of trusted domains, grab them.
+        if (!is_array($trustedDomains)) {
+            $trustedDomains = trustedDomains();
+        }
+
+        /**
+         * Iterate through each of our trusted domains.
+         * Chop off any whitespace from the trusted domain and prepare it for regex.
+         * See if the current trusted domain matches fully against the domain we're
+         *   testing or if it matches its end (e.g. domain.tld should match domain.tld and sub.domain.tld)
+         */
+        foreach ($trustedDomains as $trustedDomain) {
+            $trustedDomain = preg_quote(trim($trustedDomain));
+            if (preg_match("/(^|\.){$trustedDomain}$/i", $domain)) {
+                return true;
+            }
+        }
+
+        // No matches?  Must not be a trusted domain.
+        return false;
+    }
 }
 
 if (!function_exists('userAgentType')) {

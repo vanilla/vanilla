@@ -14,7 +14,7 @@
 class MessageModel extends Gdn_Model {
 
     /** @var array Non-standard message location allowed. */
-    private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
+    private $_SpecialLocations = array('[Base]', '[NonAdmin]');
 
     /** @var array Current message data. */
     protected static $Messages;

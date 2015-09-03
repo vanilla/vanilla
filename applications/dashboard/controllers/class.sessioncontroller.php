@@ -21,8 +21,8 @@ class SessionController extends DashboardController {
     public function stash() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Name = TrueStripSlashes(val('Name', $_POST, ''));
-        $Value = TrueStripSlashes(val('Value', $_POST, ''));
+        $Name = val('Name', $_POST, '');
+        $Value = val('Value', $_POST, '');
         $Response = Gdn::session()->Stash($Name, $Value);
         if ($Name != '' && $Value == '') {
             $this->setJson('Unstash', $Response);

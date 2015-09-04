@@ -15,7 +15,7 @@
  * @return The rendered asset.
  */
 function smarty_function_include_file($Params, &$Smarty) {
-   $Name = ltrim(ArrayValue('name', $Params), '/');
+   $Name = ltrim(val('name', $Params), '/');
    if (strpos($Name, '..') !== false) {
       return '<!-- Error, moving up directory path not allowed -->';
    }

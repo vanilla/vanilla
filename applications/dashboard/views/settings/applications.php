@@ -47,20 +47,20 @@ $DisabledCount = $AppCount - $EnabledCount;
         $State = strtolower($Css);
         if ($this->Filter == 'all' || $this->Filter == $State) {
             $Alt = $Alt ? FALSE : TRUE;
-            $Version = arrayValue('Version', $AppInfo, '');
-            $ScreenName = arrayValue('Name', $AppInfo, $AppName);
-            $SettingsUrl = $State == 'enabled' ? arrayValue('SettingsUrl', $AppInfo, '') : '';
-            $AppUrl = arrayValue('Url', $AppInfo, '');
-            $Author = arrayValue('Author', $AppInfo, '');
-            $AuthorUrl = arrayValue('AuthorUrl', $AppInfo, '');
-            $NewVersion = arrayValue('NewVersion', $AppInfo, '');
+            $Version = val('Version', $AppInfo, '');
+            $ScreenName = val('Name', $AppInfo, $AppName);
+            $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $AppInfo, '') : '';
+            $AppUrl = val('Url', $AppInfo, '');
+            $Author = val('Author', $AppInfo, '');
+            $AuthorUrl = val('AuthorUrl', $AppInfo, '');
+            $NewVersion = val('NewVersion', $AppInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
             $RowClass = $Css;
             if ($Alt) $RowClass .= ' Alt';
             ?>
             <tr class="More <?php echo $RowClass; ?>">
                 <th><?php echo $ScreenName; ?></th>
-                <td><?php echo arrayValue('Description', $AppInfo, ''); ?></td>
+                <td><?php echo val('Description', $AppInfo, ''); ?></td>
             </tr>
             <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
                 <td class="Info"><?php
@@ -76,7 +76,7 @@ $DisabledCount = $AppCount - $EnabledCount;
                     }
                     ?></td>
                 <td class="Alt Info"><?php
-                    $RequiredApplications = arrayValue('RequiredApplications', $AppInfo, false);
+                    $RequiredApplications = val('RequiredApplications', $AppInfo, false);
                     $Info = '';
                     if ($Version != '')
                         $Info = sprintf(t('Version %s'), $Version);

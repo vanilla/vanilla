@@ -520,8 +520,8 @@ class SettingsController extends DashboardController {
             // Grab all of the plugins & versions
             $Plugins = Gdn::pluginManager()->availablePlugins();
             foreach ($Plugins as $Plugin => $Info) {
-                $Name = arrayValue('Name', $Info, $Plugin);
-                $Version = arrayValue('Version', $Info, '');
+                $Name = val('Name', $Info, $Plugin);
+                $Version = val('Version', $Info, '');
                 if ($Version != '') {
                     $UpdateData[] = array(
                         'Name' => $Name,
@@ -535,8 +535,8 @@ class SettingsController extends DashboardController {
             $ApplicationManager = Gdn::factory('ApplicationManager');
             $Applications = $ApplicationManager->availableApplications();
             foreach ($Applications as $Application => $Info) {
-                $Name = arrayValue('Name', $Info, $Application);
-                $Version = arrayValue('Version', $Info, '');
+                $Name = val('Name', $Info, $Application);
+                $Version = val('Version', $Info, '');
                 if ($Version != '') {
                     $UpdateData[] = array(
                         'Name' => $Name,
@@ -550,8 +550,8 @@ class SettingsController extends DashboardController {
             $ThemeManager = new Gdn_ThemeManager;
             $Themes = $ThemeManager->availableThemes();
             foreach ($Themes as $Theme => $Info) {
-                $Name = arrayValue('Name', $Info, $Theme);
-                $Version = arrayValue('Version', $Info, '');
+                $Name = val('Name', $Info, $Theme);
+                $Version = val('Version', $Info, '');
                 if ($Version != '') {
                     $UpdateData[] = array(
                         'Name' => $Name,

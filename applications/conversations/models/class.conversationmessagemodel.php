@@ -195,7 +195,7 @@ class ConversationMessageModel extends ConversationsModel {
 
             $MessageID = $this->SQL->insert($this->Name, $Fields);
             $this->LastMessageID = $MessageID;
-            $ConversationID = arrayValue('ConversationID', $Fields, 0);
+            $ConversationID = val('ConversationID', $Fields, 0);
 
             if (!$Conversation) {
                 $Conversation = $this->SQL

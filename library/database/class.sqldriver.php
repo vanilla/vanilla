@@ -748,7 +748,7 @@ abstract class Gdn_SQLDriver {
             $Field = $Expr['Field'];
             $Function = $Expr['Function'];
             $Alias = $Expr['Alias'];
-            $CaseOptions = ArrayValue('CaseOptions', $Expr);
+            $CaseOptions = val('CaseOptions', $Expr);
             if ($Field != '*' && !is_numeric($Field)) {
                 $Field = $this->escapeIdentifier($Field);
             }
@@ -936,7 +936,7 @@ abstract class Gdn_SQLDriver {
         if (is_null($Fields)) {
             // Group by every item in the select that isn't a function.
             foreach ($this->_Selects as $Alias => $Select) {
-                if (ArrayValue('Function', $Select) == '') {
+                if (val('Function', $Select) == '') {
                     $this->_GroupBys[] = $Select['Field'];
                 }
             }

@@ -214,19 +214,19 @@ if (!class_exists('MenuModule', false)) {
                                 $Group .= "</li>\r\n";
                             }
 
-                            $Url = arrayValue('Url', $Link);
+                            $Url = val('Url', $Link);
                             if (substr($Link['Text'], 0, 1) === '\\') {
                                 $Text = substr($Link['Text'], 1);
                             } else {
                                 $Text = str_replace('{Username}', $Username, $Link['Text']);
                             }
-                            $Attributes = arrayValue('Attributes', $Link, array());
-                            $AnchorAttributes = arrayValue('AnchorAttributes', $Link, array());
+                            $Attributes = val('Attributes', $Link, array());
+                            $AnchorAttributes = val('AnchorAttributes', $Link, array());
                             if ($Url !== false) {
                                 $Url = url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
                                 $CurrentLink = $Url == url($HighlightRoute);
 
-                                $CssClass = arrayValue('class', $Attributes, '');
+                                $CssClass = val('class', $Attributes, '');
                                 if ($CurrentLink) {
                                     $Attributes['class'] = $CssClass.' Highlight';
                                 }

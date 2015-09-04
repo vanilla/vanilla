@@ -452,7 +452,7 @@ class Gdn_Validation {
             $this->_ValidationFields = array();
         }
 
-        $Value = arrayValue($FieldName, $PostedFields, null);
+        $Value = val($FieldName, $PostedFields, null);
         $this->_ValidationFields[$FieldName] = $Value;
     }
 
@@ -623,7 +623,7 @@ class Gdn_Validation {
                                 // If $ValidationResult is not FALSE, assume it is an error message
                                 $ErrorCode = $ValidationResult === false ? $Function : $ValidationResult;
                                 // If there is a custom error, use it above all else
-                                $ErrorCode = arrayValue($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
+                                $ErrorCode = val($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
                                 // Add the result
                                 $this->addValidationResult($FieldName, $ErrorCode);
                                 // Only add one error per field
@@ -633,7 +633,7 @@ class Gdn_Validation {
                             if (ValidateRegex($FieldValue, $Regex) !== true) {
                                 $ErrorCode = 'Regex';
                                 // If there is a custom error, use it above all else
-                                $ErrorCode = arrayValue($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
+                                $ErrorCode = val($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
                                 // Add the result
                                 $this->addValidationResult($FieldName, $ErrorCode);
                             }

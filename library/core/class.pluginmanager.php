@@ -892,7 +892,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public function callMethodOverride($Sender, $ClassName, $MethodName) {
         $EventKey = strtolower($ClassName.'_'.$MethodName.'_Override');
-        $OverrideKey = ArrayValue($EventKey, $this->_MethodOverrideCollection, '');
+        $OverrideKey = val($EventKey, $this->_MethodOverrideCollection, '');
         $OverrideKeyParts = explode('.', $OverrideKey);
         if (count($OverrideKeyParts) != 2) {
             return false;
@@ -929,7 +929,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     public function callNewMethod($Sender, $ClassName, $MethodName) {
         $Return = false;
         $EventKey = strtolower($ClassName.'_'.$MethodName.'_Create');
-        $NewMethodKey = ArrayValue($EventKey, $this->_NewMethodCollection, '');
+        $NewMethodKey = val($EventKey, $this->_NewMethodCollection, '');
         $NewMethodKeyParts = explode('.', $NewMethodKey);
         if (count($NewMethodKeyParts) != 2) {
             return false;
@@ -1153,17 +1153,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         // Required Themes
         $EnabledThemes = Gdn::themeManager()->enabledThemeInfo();
-        $RequiredThemes = ArrayValue('RequiredTheme', $PluginInfo, false);
+        $RequiredThemes = val('RequiredTheme', $PluginInfo, false);
         CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
 
         // Required Applications
         $EnabledApplications = Gdn::applicationManager()->enabledApplications();
-        $RequiredApplications = ArrayValue('RequiredApplications', $PluginInfo, false);
+        $RequiredApplications = val('RequiredApplications', $PluginInfo, false);
         CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
 
         // Include the plugin, instantiate it, and call its setup method
-        $PluginClassName = ArrayValue('ClassName', $PluginInfo, false);
-        $PluginFolder = ArrayValue('Folder', $PluginInfo, false);
+        $PluginClassName = val('ClassName', $PluginInfo, false);
+        $PluginFolder = val('Folder', $PluginInfo, false);
         if ($PluginFolder == '') {
             throw new Exception(T('The plugin folder was not properly defined.'));
         }
@@ -1255,7 +1255,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         // Get all available plugins and compile their requirements
         foreach ($this->enabledPlugins() as $CheckingName => $Trash) {
             $CheckingInfo = $this->getPluginInfo($CheckingName);
-            $RequiredPlugins = ArrayValue('RequiredPlugins', $CheckingInfo, false);
+            $RequiredPlugins = val('RequiredPlugins', $CheckingInfo, false);
             if (is_array($RequiredPlugins) && array_key_exists($PluginName, $RequiredPlugins) === true) {
                 throw new Exception(sprintf(T('You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'), $PluginName, $CheckingName));
             }
@@ -1351,9 +1351,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 break;
         }
 
-        $PluginInfo = ArrayValue($PluginName, $this->availablePlugins(), false);
-        $PluginFolder = ArrayValue('Folder', $PluginInfo, false);
-        $PluginClassName = ArrayValue('ClassName', $PluginInfo, false);
+        $PluginInfo = val($PluginName, $this->availablePlugins(), false);
+        $PluginFolder = val('Folder', $PluginInfo, false);
+        $PluginClassName = val('ClassName', $PluginInfo, false);
 
         if ($PluginFolder !== false && $PluginClassName !== false && class_exists($PluginClassName) === false) {
             if ($ForAction !== self::ACTION_DISABLE) {

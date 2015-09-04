@@ -514,8 +514,8 @@ class PermissionModel extends Gdn_Model {
      */
     public function getJunctionPermissions($Where, $JunctionTable = null, $LimitToSuffix = '', $Options = array()) {
         $Namespaces = $this->GetAllowedPermissionNamespaces();
-        $RoleID = arrayValue('RoleID', $Where, null);
-        $JunctionID = arrayValue('JunctionID', $Where, null);
+        $RoleID = val('RoleID', $Where, null);
+        $JunctionID = val('JunctionID', $Where, null);
         $SQL = $this->SQL;
 
         // Load all of the default junction permissions.
@@ -962,11 +962,11 @@ class PermissionModel extends Gdn_Model {
                     $Parts = explode('/', $Key);
                     $JunctionTable = $Parts[0];
                     $JunctionColumn = $Parts[1];
-                    $JunctionID = arrayValue('JunctionID', $Overrides, $Parts[2]);
+                    $JunctionID = val('JunctionID', $Overrides, $Parts[2]);
                     if (count($Parts) >= 4) {
                         $RoleID = $Parts[3];
                     } else {
-                        $RoleID = arrayValue('RoleID', $Overrides, null);
+                        $RoleID = val('RoleID', $Overrides, null);
                     }
                 } else {
                     // This is a global permission.
@@ -975,7 +975,7 @@ class PermissionModel extends Gdn_Model {
                     $JunctionTable = null;
                     $JunctionColumn = null;
                     $JunctionID = null;
-                    $RoleID = arrayValue('RoleID', $Overrides, null);
+                    $RoleID = val('RoleID', $Overrides, null);
                 }
 
                 // Check for a row in the result for these permissions.
@@ -1341,7 +1341,7 @@ class PermissionModel extends Gdn_Model {
      * @param bool $IncludeRole
      */
     protected function _UnpivotPermissionsRow($Row, &$Result, $IncludeRole = false) {
-        $GlobalName = arrayValue('Name', $Row);
+        $GlobalName = val('Name', $Row);
 
         // Loop through each permission in the row and place them in the correct place in the grid.
         foreach ($Row as $PermissionName => $Value) {

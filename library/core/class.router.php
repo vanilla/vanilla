@@ -51,7 +51,7 @@ class Gdn_Router extends Gdn_Pluggable {
     public function getRoute($Route, $Indexed = true) {
         if ($Indexed && is_numeric($Route) && $Route !== false) {
             $Keys = array_keys($this->Routes);
-            $Route = arrayValue($Route, $Keys);
+            $Route = val($Route, $Keys);
         }
 
         $Decoded = $this->_decodeRouteKey($Route);

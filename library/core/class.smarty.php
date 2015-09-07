@@ -53,13 +53,7 @@ class Gdn_Smarty {
                     $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
                 }
             } else {
-                if (function_exists('UserPhotoDefaultUrl')) {
-                    $Photo = UserPhotoDefaultUrl($Session->User, 'ProfilePhoto');
-                } elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
-                    $Photo = Gdn_Upload::url($ConfigPhoto);
-                else {
-                    $Photo = asset('/applications/dashboard/design/images/defaulticon.png', true);
-                }
+                $Photo = UserModel::getDefaultAvatarUrl($Session->User);
             }
             $User['Photo'] = $Photo;
         } else {

@@ -154,6 +154,7 @@ class DashboardHooks implements Gdn_IPlugin {
         }
 
         $Menu->addLink('Appearance', t('Messages'), '/dashboard/message', 'Garden.Community.Manage', array('class' => 'nav-messages'));
+        $Menu->addLink('Appearance', t('Avatars'), '/dashboard/settings/avatars', 'Garden.Community.Manage', array('class' => 'nav-avatars'));
 
         $Menu->addItem('Users', t('Users'), false, array('class' => 'Users'));
         $Menu->addLink('Users', t('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), array('class' => 'nav-users'));

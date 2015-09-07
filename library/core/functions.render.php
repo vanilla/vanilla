@@ -898,10 +898,6 @@ if (!function_exists('userPhoto')) {
             $Title .= ' ('.t('Banned').')';
         }
 
-        if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
-            $Photo = userPhotoDefaultUrl($User, $ImgClass);
-        }
-
         if ($Photo) {
             if (!isUrl($Photo)) {
                 $PhotoUrl = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
@@ -909,12 +905,13 @@ if (!function_exists('userPhoto')) {
                 $PhotoUrl = $Photo;
             }
             $Href = url(userUrl($User));
-            return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
-            .'</a>';
         } else {
-            return '';
+            $PhotoUrl = UserModel::getDefaultAvatarUrl($User, 'thumbnail');
         }
+
+        return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
+        .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
+        .'</a>';
     }
 }
 
@@ -931,10 +928,6 @@ if (!function_exists('userPhotoUrl')) {
             $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
         }
 
-        if (!$Photo && function_exists('UserPhotoDefaultUrl')) {
-            $Photo = userPhotoDefaultUrl($User);
-        }
-
         if ($Photo) {
             if (!isUrl($Photo)) {
                 $PhotoUrl = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
@@ -943,7 +936,7 @@ if (!function_exists('userPhotoUrl')) {
             }
             return $PhotoUrl;
         }
-        return '';
+        return UserModel::getDefaultAvatarUrl($User);
     }
 }
 

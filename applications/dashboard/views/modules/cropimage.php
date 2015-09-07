@@ -1,12 +1,12 @@
 <div class="box-crop">
     <div class="box-image box-source">
         <?php
-        echo '<h4>'.t('Avatar').'</h4>';
+        echo '<h2>'.t('Avatar').'</h2>';
         echo img($this->getSourceImageUrl(), array('id' => 'cropbox'));
         echo '<label>'.t('Define Thumbnail', 'Click and drag across the picture to define the thumbnail.').'</label>'; ?>
     </div>
     <div class="box-image box-cropped-image">
-        <?php echo '<h4>'.t('Thumbnail').'</h4>'; ?>
+        <?php echo '<h2>'.t('Thumbnail').'</h2>'; ?>
         <div class="thumbnail-preview" style="<?php echo 'width:'.$this->getWidth().'px;height:'.$this->getHeight().'px;'; ?>overflow:hidden;">
             <?php
             echo img($this->getExistingCropUrl(), array('id' => 'current-crop', 'style' => 'min-width: '.$this->getWidth().'px; min-height: '.$this->getHeight().'px;'));

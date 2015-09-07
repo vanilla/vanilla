@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
             },
             error: function() {
                 container.removeClass('Loading');
-                container.text('Failed to load ' + type + ' feed.');
+                container.text('Failed to load feed.');
             }
         });
     };

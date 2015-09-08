@@ -194,7 +194,7 @@ class SettingsController extends DashboardController {
 
         if (($avatar = c('Garden.DefaultAvatar')) && $this->isUploadedDefaultAvatar($avatar)) {
             //Get the image source so we can manipulate it in the crop module.
-            $upload = new Gdn_Upload();
+            $upload = new Gdn_UploadImage();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
             $basename = changeBasename($avatar, "p%s");
             $path = substr($basename, strpos($basename, self::DEFAULT_AVATAR_FOLDER));
@@ -264,7 +264,7 @@ class SettingsController extends DashboardController {
         try {
             $upload = new Gdn_UploadImage();
             // Generate the target image name
-            $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+            $targetImage = $upload->generateTargetName('defaultavatar');
             $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
 
             // Save the full size image.
@@ -297,7 +297,7 @@ class SettingsController extends DashboardController {
         }
 
         $imageBaseName = $parts['SaveName'];
-        saveToConfig('Garden.DefaultAvatar', Gdn_Upload::url($imageBaseName));
+        saveToConfig('Garden.DefaultAvatar', Gdn_UploadImage::url($imageBaseName));
         return true;
     }
 

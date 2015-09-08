@@ -10,6 +10,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 
 function smarty_function_event($Params, &$Smarty) {
-	$Name = ArrayValue('name', $Params);
+	$Name = val('name', $Params);
 	$Smarty->Controller->FireEvent($Name);
 }

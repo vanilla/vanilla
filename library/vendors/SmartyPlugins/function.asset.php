@@ -21,10 +21,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @return The rendered asset.
  */
 function smarty_function_asset($Params, &$Smarty) {
-	$Name = ArrayValue('name', $Params);
-	$Tag = ArrayValue('tag', $Params, '');
-	$Id = ArrayValue('id', $Params, $Name);
-	$Class = ArrayValue('class', $Params, '');
+	$Name = val('name', $Params);
+	$Tag = val('tag', $Params, '');
+	$Id = val('id', $Params, $Name);
+	$Class = val('class', $Params, '');
 	if ($Class != '')
 		$Class = ' class="'.$Class.'"';
 	

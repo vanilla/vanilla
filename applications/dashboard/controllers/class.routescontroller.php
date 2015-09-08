@@ -88,7 +88,7 @@ class RoutesController extends DashboardController {
             }
 
             if ($ConfigurationModel->validate($FormPostValues)) {
-                $NewRouteName = arrayValue('Route', $FormPostValues);
+                $NewRouteName = val('Route', $FormPostValues);
 
                 if ($this->Route !== false && $NewRouteName != $this->Route['Route']) {
                     Gdn::router()->DeleteRoute($this->Route['Route']);
@@ -96,8 +96,8 @@ class RoutesController extends DashboardController {
 
                 Gdn::router()->SetRoute(
                     $NewRouteName,
-                    arrayValue('Target', $FormPostValues),
-                    arrayValue('Type', $FormPostValues)
+                    val('Target', $FormPostValues),
+                    val('Type', $FormPostValues)
                 );
 
                 $this->informMessage(t("The route was saved successfully."));

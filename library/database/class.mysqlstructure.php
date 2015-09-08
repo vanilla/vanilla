@@ -114,8 +114,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $this->Database->DatabasePrefix = $OldPrefix;
 
         // Get the definition for this column
-        $OldColumn = arrayValue($OldName, $Schema);
-        $NewColumn = arrayValue($NewName, $Schema);
+        $OldColumn = val($OldName, $Schema);
+        $NewColumn = val($NewName, $Schema);
 
         // Make sure that one column, or the other exists
         if (!$OldColumn && !$NewColumn) {
@@ -233,7 +233,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
         // Build the rest of the keys.
         foreach ($Indexes as $IndexType => $IndexGroups) {
-            $CreateString = arrayValue($IndexType, array('FK' => 'key', 'IX' => 'index'));
+            $CreateString = val($IndexType, array('FK' => 'key', 'IX' => 'index'));
             foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
                 if (!$IndexGroup) {
                     foreach ($ColumnNames as $ColumnName) {
@@ -371,7 +371,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         // Make the multi-column keys into sql statements.
         foreach ($Indexes as $ColumnKeyType => $IndexGroups) {
-            $CreateType = arrayValue($ColumnKeyType, array('index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key'));
+            $CreateType = val($ColumnKeyType, array('index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key'));
 
             if ($ColumnKeyType == 'primary') {
                 $Result['PRIMARY'] = 'primary key (`'.implode('`, `', $IndexGroups['']).'`)';

@@ -114,7 +114,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                         $CssClass .= ' Last';
 
                     $CssClass = trim($CssClass);
-                    $CurrentValue = arrayValue($Role['RoleID'], $this->ExistingRoleInvitations, false);
+                    $CurrentValue = val($Role['RoleID'], $this->ExistingRoleInvitations, false);
                     ?>
                     <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                         <th><?php echo $Role['Name']; ?></th>

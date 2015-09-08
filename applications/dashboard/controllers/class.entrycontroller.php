@@ -1099,7 +1099,7 @@ EOT;
 
         if ($this->Form->isPostBack() === true) {
             $FormValues = $this->Form->formValues();
-            if (ArrayValue('StopLinking', $FormValues)) {
+            if (val('StopLinking', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_ABORTED;
 
                 $UserEventData = array_merge(array(
@@ -1112,7 +1112,7 @@ EOT;
                 Gdn::request()->withRoute('DefaultController');
                 return Gdn::dispatcher()->dispatch();
 
-            } elseif (ArrayValue('NewAccount', $FormValues)) {
+            } elseif (val('NewAccount', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_CREATED;
 
                 // Try and synchronize the user with the new username/email.
@@ -1146,7 +1146,7 @@ EOT;
                 if ($UserID > 0) {
                     $Data = $FormValues;
                     $Data['UserID'] = $UserID;
-                    $Data['Email'] = arrayValue('SignInEmail', $FormValues, '');
+                    $Data['Email'] = val('SignInEmail', $FormValues, '');
                     $UserID = $this->UserModel->synchronize($UserInfo['UserKey'], $Data);
                 }
             }
@@ -1202,8 +1202,8 @@ EOT;
             $this->Form->addHidden('Consumer', $UserInfo['ConsumerKey']);
         }
 
-        $this->setData('Name', arrayValue('Name', $this->Form->HiddenInputs));
-        $this->setData('Email', arrayValue('Email', $this->Form->HiddenInputs));
+        $this->setData('Name', val('Name', $this->Form->HiddenInputs));
+        $this->setData('Email', val('Email', $this->Form->HiddenInputs));
 
         $this->render();
     }

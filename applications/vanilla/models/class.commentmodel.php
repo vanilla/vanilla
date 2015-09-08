@@ -810,7 +810,7 @@ class CommentModel extends VanillaModel {
         }
 
         // Validate $CommentID and whether this is an insert
-        $CommentID = arrayValue('CommentID', $FormPostValues);
+        $CommentID = val('CommentID', $FormPostValues);
         $CommentID = is_numeric($CommentID) && $CommentID > 0 ? $CommentID : false;
         $Insert = $CommentID === false;
         if ($Insert) {

@@ -183,7 +183,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '<input type="'.$Type.'"';
         $Return .= $this->_idAttribute($ButtonCode, $Attributes);
         $Return .= $this->_nameAttribute($ButtonCode, $Attributes);
-        $Return .= ' value="'.t($ButtonCode, arrayValue('value', $Attributes)).'"';
+        $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
         $Return .= $this->_attributesToString($Attributes);
         $Return .= " />\n";
         return $Return;
@@ -2001,20 +2001,20 @@ PASSWORDMETER;
                         ) ===
                             false
                         ) { // Saving dates in the format: YYYY-MM-DD
-                            $Year = arrayValue(
+                            $Year = val(
                                 $DateFields[$i].
                                 '_Year',
                                 $this->_FormValues,
                                 0
                             );
                         }
-                        $Month = arrayValue(
+                        $Month = val(
                             $DateFields[$i].
                             '_Month',
                             $this->_FormValues,
                             0
                         );
-                        $Day = arrayValue(
+                        $Day = val(
                             $DateFields[$i].
                             '_Day',
                             $this->_FormValues,
@@ -2066,7 +2066,7 @@ PASSWORDMETER;
      * @return unknown
      */
     public function getFormValue($FieldName, $Default = '') {
-        return arrayValue($FieldName, $this->formValues(), $Default);
+        return val($FieldName, $this->formValues(), $Default);
     }
 
     /**
@@ -2088,7 +2088,7 @@ PASSWORDMETER;
         if ($this->isMyPostBack()) {
             $Return = $this->getFormValue($FieldName, $Default);
         } else {
-            $Return = arrayValue($FieldName, $this->_DataArray, $Default);
+            $Return = val($FieldName, $this->_DataArray, $Default);
         }
         return $Return;
     }

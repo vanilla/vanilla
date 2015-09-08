@@ -36,8 +36,8 @@ $Session = Gdn::session();
                 <td class="Info nowrap"><?php
                     printf(
                         t('%1$s on %2$s'),
-                        arrayValue($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
-                        arrayValue($Message->Location, $this->_GetLocationData(), 'Custom Page')
+                        val($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
+                        val($Message->Location, $this->_GetLocationData(), 'Custom Page')
                     );
 
                     if (val('CategoryID', $Message) && $Category = CategoryModel::categories($Message->CategoryID)) {

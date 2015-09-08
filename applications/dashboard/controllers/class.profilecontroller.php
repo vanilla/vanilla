@@ -1151,6 +1151,9 @@ class ProfileController extends Gdn_Controller {
         $Upload = new Gdn_UploadImage();
         $PhotoParsed = Gdn_Upload::Parse($Basename);
         $Source = $Upload->CopyLocal($Basename);
+        Trace($Source);
+        Trace($PhotoParsed);
+        Trace($Basename);
 
         if (!$Source) {
             $this->Form->addError('You cannot edit the thumbnail of an externally linked profile picture.');
@@ -1164,6 +1167,9 @@ class ProfileController extends Gdn_Controller {
             trim(pathinfo($this->User->Photo, PATHINFO_EXTENSION), '.'),
             true
         );
+
+        Trace($NewPhoto);
+        Trace(trim(pathinfo($this->User->Photo, PATHINFO_EXTENSION)));
 
         // Add some more hidden form fields for jcrop
         $this->Form->addHidden('x', '0');

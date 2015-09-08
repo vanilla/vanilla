@@ -264,7 +264,7 @@ class SettingsController extends DashboardController {
         try {
             $upload = new Gdn_UploadImage();
             // Generate the target image name
-            $targetImage = $upload->generateTargetName('defaultavatar');
+            $targetImage = $upload->generateTargetName(PATH_UPLOADS);
             $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
 
             // Save the full size image.

@@ -325,8 +325,8 @@ class VanillaHooks implements Gdn_IPlugin {
         static $PermissionModel = null;
 
 
-        $UserID = arrayValue(0, $Sender->EventArguments, '');
-        $CategoryID = arrayValue(1, $Sender->EventArguments, '');
+        $UserID = val(0, $Sender->EventArguments, '');
+        $CategoryID = val(1, $Sender->EventArguments, '');
         $Permission = val(2, $Sender->EventArguments, 'Vanilla.Discussions.View');
         if ($UserID && $CategoryID) {
             if ($PermissionModel === null) {
@@ -386,7 +386,7 @@ class VanillaHooks implements Gdn_IPlugin {
             $Sender->AddProfileTab(t('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', $CommentsLabel);
             // Add the discussion tab's CSS and Javascript.
             $Sender->addJsFile('jquery.gardenmorepager.js');
-            $Sender->addJsFile('discussions.js');
+            $Sender->addJsFile('discussions.js', 'vanilla');
         }
     }
 

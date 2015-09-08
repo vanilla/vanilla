@@ -338,7 +338,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!is_null($Definition)) {
             $this->_Definitions[$Term] = $Definition;
         }
-        return arrayValue($Term, $this->_Definitions);
+        return val($Term, $this->_Definitions);
     }
 
     /**
@@ -772,10 +772,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $View .= '_rss';
         }
 
-        $ViewPath2 = viewLocation($View, $ControllerName, $ApplicationFolder);
-
         $LocationName = concatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
-        $ViewPath = arrayValue($LocationName, $this->_ViewLocations, false);
+        $ViewPath = val($LocationName, $this->_ViewLocations, false);
         if ($ViewPath === false) {
             // Define the search paths differently depending on whether or not we are in a plugin or application.
             $ApplicationFolder = trim($ApplicationFolder, '/');
@@ -849,10 +847,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             Gdn::dispatcher()->passData('ViewPaths', $ViewPaths);
             throw NotFoundException('View');
 //         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
-        }
-
-        if ($ViewPath2 != $ViewPath) {
-            Trace("View paths do not match: $ViewPath != $ViewPath2", TRACE_WARNING);
         }
 
         return $ViewPath;
@@ -1064,7 +1058,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!is_null($Value)) {
             $this->_Json[$Key] = $Value;
         }
-        return arrayValue($Key, $this->_Json, null);
+        return val($Key, $this->_Json, null);
     }
 
     /**
@@ -1817,8 +1811,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         // Master views come from one of four places:
         $MasterViewPaths = array();
 
-        $MasterViewPath2 = viewLocation($this->masterView().'.master', '', $this->ApplicationFolder);
-
         if (strpos($this->MasterView, '/') !== false) {
             $MasterViewPaths[] = combinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
         } else {
@@ -1844,10 +1836,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $MasterViewPath = $Paths[0];
                 break;
             }
-        }
-
-        if ($MasterViewPath != $MasterViewPath2) {
-            trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
         }
 
         $this->EventArguments['MasterViewPath'] = &$MasterViewPath;

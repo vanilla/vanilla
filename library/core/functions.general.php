@@ -357,8 +357,10 @@ if (!function_exists('arrayValue')) {
      * @param string $needle The key to look for in the $Haystack associative array.
      * @param array $haystack The associative array in which to search for the $Needle key.
      * @param string $default The default value to return if the requested value is not found. Default is false.
+     * @deprecated since 2.3
      */
     function arrayValue($needle, $haystack, $default = false) {
+        deprecated('arrayValue', 'val');
         $result = val($needle, $haystack, $default);
         return $result;
     }
@@ -413,7 +415,7 @@ if (!function_exists('asset')) {
         if (IsUrl($Destination)) {
             $Result = $Destination;
         } else {
-            $Result = Gdn::Request()->UrlDomain($WithDomain).Gdn::Request()->AssetRoot().'/'.ltrim($Destination, '/');
+            $Result = Gdn::request()->urlDomain($WithDomain).Gdn::request()->assetRoot().'/'.ltrim($Destination, '/');
         }
 
         if ($AddVersion) {
@@ -433,16 +435,16 @@ if (!function_exists('asset')) {
 
                     switch ($Type) {
                         case 'plugins':
-                            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
+                            $PluginInfo = Gdn::pluginManager()->getPluginInfo($Key);
                             $Version = val('Version', $PluginInfo, $Version);
                             break;
                         case 'applications':
-                            $AppInfo = Gdn::ApplicationManager()->GetApplicationInfo(ucfirst($Key));
+                            $AppInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($Key));
                             $Version = val('Version', $AppInfo, $Version);
                             break;
                         case 'themes':
                             if ($ThemeVersion === null) {
-                                $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
+                                $ThemeInfo = Gdn::themeManager()->getThemeInfo(Theme());
                                 if ($ThemeInfo !== false) {
                                     $ThemeVersion = val('Version', $ThemeInfo, $Version);
                                 } else {
@@ -618,7 +620,7 @@ if (!function_exists('checkRequirements')) {
                     $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
                 } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
                     // If the item exists and is enabled, check the version
-                    $EnabledVersion = ArrayValue('Version', ArrayValue($RequiredItemName, $EnabledItems, array()), '');
+                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
                     // Compare the versions.
                     if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
                         $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
@@ -2693,7 +2695,7 @@ if (!function_exists('proxyHead')) {
             curl_setopt($Handler, CURLOPT_PORT, $Port);
             curl_setopt($Handler, CURLOPT_HEADER, 1);
             curl_setopt($Handler, CURLOPT_NOBODY, 1);
-            curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+            curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
             curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($Handler, CURLOPT_HTTPHEADER, $Headers);
 
@@ -2728,7 +2730,7 @@ if (!function_exists('proxyHead')) {
             $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
             $Header = array(
                 'Host' => $HostHeader,
-                'User-Agent' => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
+                'User-Agent' => val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
                 'Accept' => '*/*',
                 'Accept-Charset' => 'utf-8',
                 'Referer' => $Referer,
@@ -2841,7 +2843,7 @@ if (!function_exists('proxyRequest')) {
             curl_setopt($Handler, CURLOPT_PORT, $Port);
             curl_setopt($Handler, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($Handler, CURLOPT_HEADER, 1);
-            curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+            curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
             curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
 
             if ($Cookie != '') {
@@ -2895,7 +2897,7 @@ if (!function_exists('proxyRequest')) {
                 // If you've got basic authentication enabled for the app, you're going to need to explicitly define
                 // the user/pass for this fsock call.
                 // "Authorization: Basic ". base64_encode ("username:password")."\r\n" .
-                ."User-Agent: ".ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
+                ."User-Agent: ".val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
                 ."Accept: */*\r\n"
                 ."Accept-Charset: utf-8;\r\n"
                 ."Referer: {$Referer}\r\n"
@@ -3771,8 +3773,10 @@ if (!function_exists('viewLocation')) {
      * @param string $Controller The name of the controller invoking the view or blank.
      * @param string $Folder The application folder or plugins/plugin folder.
      * @return string|false The path to the view or false if it wasn't found.
+     * @deprecated
      */
     function viewLocation($View, $Controller, $Folder) {
+        deprecated('viewLocation()');
         $Paths = array();
 
         if (strpos($View, '/') !== false) {

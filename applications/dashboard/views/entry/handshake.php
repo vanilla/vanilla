@@ -13,8 +13,8 @@
         //T('There is already an account with the same username (%1$s) or email (%2$s) as you. You can either create a new account, or you can enter the credentials for your existing forum account.'),
         echo wrap(t("This is the first time you've visited the discussion forums."), 'strong');
         echo wrap(t("You can either create a new account, or enter your credentials if you have an existing account."), 'div');
-        // arrayValue('Name', $this->Data),
-        // arrayValue('Email', $this->Data)
+        // val('Name', $this->Data),
+        // val('Email', $this->Data)
         // );
         ?></div>
     <ul class="NewAccount">

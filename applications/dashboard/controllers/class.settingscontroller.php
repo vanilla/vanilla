@@ -174,7 +174,7 @@ class SettingsController extends DashboardController {
      * @return bool Whether the avatar has been uploaded from the dashboard.
      */
     public function isUploadedDefaultAvatar($avatar) {
-        return (strpos($avatar, 'uploads/'.self::DEFAULT_AVATAR_FOLDER) !== false);
+        return (strpos($avatar, '/'.self::DEFAULT_AVATAR_FOLDER.'/') !== false);
     }
 
     /**
@@ -197,8 +197,7 @@ class SettingsController extends DashboardController {
             $upload = new Gdn_Upload();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
             $basename = changeBasename($avatar, "p%s");
-            $path = parseUrl($basename, PHP_URL_PATH);
-            $path = str_replace('/uploads', '', $path);
+            $path = substr($basename, strpos($basename, self::DEFAULT_AVATAR_FOLDER));
             $source = $upload->copyLocal($path);
 
             //Set up cropping.
@@ -237,10 +236,8 @@ class SettingsController extends DashboardController {
 
                     // Update crop properties.
                     $basename = changeBasename($avatar, "p%s");
-                    $path = parseUrl($basename, PHP_URL_PATH);
-                    $path = str_replace('/uploads', '', $path);
+                    $path = substr($basename, strpos($basename, self::DEFAULT_AVATAR_FOLDER));
                     $source = $upload->copyLocal($path);
-
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setSize($thumbnailSize, $thumbnailSize);
                     $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));

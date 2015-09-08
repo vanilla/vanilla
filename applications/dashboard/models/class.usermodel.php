@@ -979,11 +979,11 @@ class UserModel extends Gdn_Model {
             return UserPhotoDefaultUrl($user);
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
-            if (strpos($avatar, '/defaultavatar/') !== false) {
+            if (strpos($avatar, 'defaultavatar/') !== false) {
                 if($size == 'thumbnail') {
-                    return changeBasename($avatar, 'n%s');
+                    return Gdn_UploadImage::url(changeBasename($avatar, 'n%s'));
                 } elseif ($size == 'profile') {
-                    return changeBasename($avatar, 'p%s');
+                    return Gdn_UploadImage::url(changeBasename($avatar, 'p%s'));
                 }
             }
             return $avatar;

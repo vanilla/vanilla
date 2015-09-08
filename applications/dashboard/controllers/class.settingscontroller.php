@@ -174,7 +174,7 @@ class SettingsController extends DashboardController {
      * @return bool Whether the avatar has been uploaded from the dashboard.
      */
     public function isUploadedDefaultAvatar($avatar) {
-        return (strpos($avatar, '/'.self::DEFAULT_AVATAR_FOLDER.'/') !== false);
+        return (strpos($avatar, self::DEFAULT_AVATAR_FOLDER.'/') !== false);
     }
 
     /**
@@ -199,11 +199,11 @@ class SettingsController extends DashboardController {
             $basename = changeBasename($avatar, "p%s");
             $path = substr($basename, strpos($basename, self::DEFAULT_AVATAR_FOLDER));
             $source = $upload->copyLocal($path);
-
+            
             //Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
-            $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
-            $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
+            $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
+            $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
             $this->setData('crop', $crop);
         } else {
             $this->setData('avatar', UserModel::getDefaultAvatarUrl());
@@ -240,8 +240,8 @@ class SettingsController extends DashboardController {
                     $source = $upload->copyLocal($path);
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setSize($thumbnailSize, $thumbnailSize);
-                    $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
-                    $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
+                    $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
+                    $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
                     $this->setData('crop', $crop);
                 }
             }
@@ -297,7 +297,8 @@ class SettingsController extends DashboardController {
         }
 
         $imageBaseName = $parts['SaveName'];
-        saveToConfig('Garden.DefaultAvatar', Gdn_UploadImage::url($imageBaseName));
+        decho('Save name: '.$imageBaseName);
+        saveToConfig('Garden.DefaultAvatar', $imageBaseName);
         return true;
     }
 

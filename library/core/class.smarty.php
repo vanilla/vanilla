@@ -41,7 +41,7 @@ class Gdn_Smarty {
         $Session = Gdn::session();
         if ($Session->isValid()) {
             $User = array(
-                'Name' => $Session->User->Name,
+                'Name' => htmlspecialchars($Session->User->Name),
                 'Photo' => '',
                 'CountNotifications' => (int)val('CountNotifications', $Session->User, 0),
                 'CountUnreadConversations' => (int)val('CountUnreadConversations', $Session->User, 0),
@@ -49,17 +49,11 @@ class Gdn_Smarty {
 
             $Photo = $Session->User->Photo;
             if ($Photo) {
-                if (!IsUrl($Photo)) {
+                if (!isUrl($Photo)) {
                     $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
                 }
             } else {
-                if (function_exists('UserPhotoDefaultUrl')) {
-                    $Photo = UserPhotoDefaultUrl($Session->User, 'ProfilePhoto');
-                } elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
-                    $Photo = Gdn_Upload::url($ConfigPhoto);
-                else {
-                    $Photo = asset('/applications/dashboard/design/images/defaulticon.png', true);
-                }
+                $Photo = UserModel::getDefaultAvatarUrl($Session->User);
             }
             $User['Photo'] = $Photo;
         } else {

@@ -298,7 +298,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param bool $Query
      */
     public function authorize($Query = false) {
-        // Aquire the request token.
+        // Acquire the request token.
         $Consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
         $RedirectUri = $this->redirectUri();
         if ($Query) {
@@ -925,8 +925,8 @@ class TwitterPlugin extends Gdn_Plugin {
         $Sender->permission('Garden.Settings.Manage');
         if ($Sender->Form->authenticatedPostBack()) {
             $Settings = array(
-                'Plugins.Twitter.ConsumerKey' => $Sender->Form->getFormValue('ConsumerKey'),
-                'Plugins.Twitter.Secret' => $Sender->Form->getFormValue('Secret'),
+                'Plugins.Twitter.ConsumerKey' => trim($Sender->Form->getFormValue('ConsumerKey')),
+                'Plugins.Twitter.Secret' => trim($Sender->Form->getFormValue('Secret')),
                 'Plugins.Twitter.SocialSignIn' => $Sender->Form->getFormValue('SocialSignIn'),
                 'Plugins.Twitter.SocialReactions' => $Sender->Form->getFormValue('SocialReactions'),
                 'Plugins.Twitter.SocialSharing' => $Sender->Form->getFormValue('SocialSharing')

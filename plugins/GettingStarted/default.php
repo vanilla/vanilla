@@ -78,7 +78,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
         <li class="Three'.(c('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
         <strong>'.anchor(t('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
         <p>'.t(
-            'Categories are used to help organize discussions.',
+            'Categories are used to organize discussions.',
             'Categories are used to help your users organize their discussions in a way that is meaningful for your community.'
         ).'</p>
         </li>

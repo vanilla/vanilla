@@ -214,6 +214,8 @@ class CropImageModule extends Gdn_Module {
 
         // Constants
         $sourceSize = getimagesize($source);
+        Trace($source);
+        Trace($sourceSize);
         $form->addHidden('WidthSource', $sourceSize[0], true);
         $form->addHidden('HeightSource', $sourceSize[1], true);
         $form->addHidden('CropSizeWidth', $width, true);

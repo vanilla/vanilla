@@ -38,7 +38,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     /**
      * @var string The filename of view to render, excluding the extension.
      */
-    private $view;
+    protected $view;
 
     /**
      * Class constructor

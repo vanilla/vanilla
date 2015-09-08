@@ -174,7 +174,7 @@ class SettingsController extends DashboardController {
      * @return bool Whether the avatar has been uploaded from the dashboard.
      */
     public function isUploadedDefaultAvatar($avatar) {
-        return (!isUrl($avatar) && StringBeginsWith($avatar, 'uploads/'.self::DEFAULT_AVATAR_FOLDER));
+        return (strpos($avatar, 'uploads/'.self::DEFAULT_AVATAR_FOLDER) !== false);
     }
 
     /**
@@ -196,7 +196,10 @@ class SettingsController extends DashboardController {
             //Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_Upload();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
-            $source = $upload->copyLocal(trim(changeBasename($avatar, "p%s"), 'uploads'));
+            $basename = changeBasename($avatar, "p%s");
+            $path = parseUrl($basename, PHP_URL_PATH);
+            $path = str_replace('/uploads', '', $path);
+            $source = $upload->copyLocal($path);
 
             //Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
@@ -233,7 +236,11 @@ class SettingsController extends DashboardController {
                     $thumbnailSize = c('Garden.Thumbnail.Size', 40);
 
                     // Update crop properties.
-                    $source = $upload->copyLocal(trim(changeBasename($avatar, "p%s"), 'uploads'));
+                    $basename = changeBasename($avatar, "p%s");
+                    $path = parseUrl($basename, PHP_URL_PATH);
+                    $path = str_replace('/uploads', '', $path);
+                    $source = $upload->copyLocal($path);
+
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setSize($thumbnailSize, $thumbnailSize);
                     $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
@@ -293,7 +300,7 @@ class SettingsController extends DashboardController {
         }
 
         $imageBaseName = $parts['SaveName'];
-        saveToConfig('Garden.DefaultAvatar', 'uploads/'.$imageBaseName);
+        saveToConfig('Garden.DefaultAvatar', Gdn_Upload::url($imageBaseName));
         return true;
     }
 

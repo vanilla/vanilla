@@ -197,9 +197,8 @@ class SettingsController extends DashboardController {
             $upload = new Gdn_UploadImage();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
             $basename = changeBasename($avatar, "p%s");
-            $path = substr($basename, strpos($basename, self::DEFAULT_AVATAR_FOLDER));
-            $source = $upload->copyLocal($path);
-            
+            $source = $upload->copyLocal($basename);
+
             //Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
             $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
@@ -236,8 +235,7 @@ class SettingsController extends DashboardController {
 
                     // Update crop properties.
                     $basename = changeBasename($avatar, "p%s");
-                    $path = substr($basename, strpos($basename, self::DEFAULT_AVATAR_FOLDER));
-                    $source = $upload->copyLocal($path);
+                    $source = $upload->copyLocal($basename);
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setSize($thumbnailSize, $thumbnailSize);
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
@@ -297,7 +295,6 @@ class SettingsController extends DashboardController {
         }
 
         $imageBaseName = $parts['SaveName'];
-        decho('Save name: '.$imageBaseName);
         saveToConfig('Garden.DefaultAvatar', $imageBaseName);
         return true;
     }

@@ -28,4 +28,3 @@ function smarty_block_permission($Params, $Content, &$Smarty, &$Repeat) {
         }
     }
 }
-

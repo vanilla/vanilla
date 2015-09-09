@@ -892,6 +892,7 @@ if (!function_exists('userPhoto')) {
         $Photo = val('Photo', $User, val('PhotoUrl', $User));
         $Name = val('Name', $User);
         $Title = htmlspecialchars(val('Title', $Options, $Name));
+        $Href = url(userUrl($User));
 
         if ($FullUser && $FullUser['Banned']) {
             $Photo = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
@@ -904,7 +905,6 @@ if (!function_exists('userPhoto')) {
             } else {
                 $PhotoUrl = $Photo;
             }
-            $Href = url(userUrl($User));
         } else {
             $PhotoUrl = UserModel::getDefaultAvatarUrl($User, 'thumbnail');
         }

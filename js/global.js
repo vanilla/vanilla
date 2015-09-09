@@ -1228,7 +1228,7 @@ jQuery(document).ready(function($) {
 
         // Verify we have a valid videoid
         var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?$/;
-        if (!videoid.test(pattern)) {
+        if (!pattern.test(videoid)) {
             return false;
         }
 

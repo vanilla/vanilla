@@ -20,7 +20,14 @@ $Session = Gdn::session();
     </div>
     <h1><?php echo t('Manage Categories'); ?></h1>
     <div class="Info">
-        <?php echo t('Categories are used to help organize discussions.', 'Categories are used to help organize discussions. Drag &amp; drop the categories to sort and nest them.'); ?>
+        <?php
+            echo t(
+                'Categories are used to organize discussions.',
+                'Categories are used to help your users organize their discussions in a way that is meaningful for your community.'
+            ),
+            ' ',
+            t('Drag and drop the categories below to sort and nest them.');
+        ?>
     </div>
     <div class="FilterMenu"><?php
         if (c('Vanilla.Categories.Use')) {

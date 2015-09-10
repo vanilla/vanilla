@@ -17,7 +17,7 @@ echo $this->Form->errors();
             echo $this->Form->label('Value or Pattern', 'BanValue');
             echo $this->Form->textBox('BanValue');
             ?>
-            <span><?php echo t('Use asterisks for wildcards, e.g. &lsquo;*@hotmail.com&rsquo;'); ?></span>
+            <span><?php echo t('Use asterisks for wildcards', 'Use asterisks for wildcards, e.g. &lsquo;*@hotmail.com&rsquo;'); ?></span>
         </li>
         <li>
             <?php

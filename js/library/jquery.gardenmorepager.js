@@ -73,8 +73,6 @@
                $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
-               json = $.postParseJson(json);
-
                if (self.pager_in_container == true) {
                   if (type == 'more') {
                      self.pager_row.before(json.Data);

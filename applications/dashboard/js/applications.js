@@ -15,8 +15,6 @@ jQuery(document).ready(function($) {
                 $(btn).after('<span class="Progress">&#160;</span>');
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 if (json.FormSaved == true) {
                     gdn.inform(json);
                     if (json.RedirectUrl) {

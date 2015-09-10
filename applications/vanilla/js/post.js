@@ -52,8 +52,6 @@ jQuery(document).ready(function($) {
                 $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 // Remove any old popups if not saving as a draft
                 if (!draft)
                     $('div.Popup').remove();
@@ -121,8 +119,6 @@ jQuery(document).ready(function($) {
                 $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 // Remove any old popups if not saving as a draft
                 if (!draft)
                     $('div.Popup').remove();

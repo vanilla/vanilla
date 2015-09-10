@@ -85,8 +85,6 @@ jQuery(document).ready(function($) {
                 gdn.informError(xhr);
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 gdn.inform(json);
 
                 // Remove any old errors from the form
@@ -133,8 +131,6 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    json = $.postParseJson(json);
-
                     gdn.inform(json);
 
                     if (json['FormSaved'] == true) {

@@ -15,10 +15,6 @@ jQuery(document).ready(function($) {
         if ($(this).hasClass('WriteButton')) {
             var frm = $(this).parents('.MessageForm').find('form');
             frm.trigger('WriteButtonClick', [frm]);
-
-            // Reveal the "Preview" button and hide this one
-            $(this).parents('.CommentForm').find('.PreviewButton').show();
-            $(this).addClass('Hidden');
         }
 
         resetCommentForm(this);
@@ -223,6 +219,9 @@ jQuery(document).ready(function($) {
         $(parent).find('.Preview').remove();
         $(parent).find('.TextBoxWrapper').show();
         $('.TinyProgress').remove();
+
+        parent.find('.PreviewButton').show();
+        parent.find('.WriteButton').addClass('Hidden');
     }
 
     // Utility function to clear out the comment form

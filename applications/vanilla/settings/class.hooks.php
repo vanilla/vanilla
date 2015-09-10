@@ -694,7 +694,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $Args = Gdn::request()->Post('Args');
         parse_str($Args, $Args);
         $ResolvedPath = trim(Gdn::request()->Post('ResolvedPath'), '/');
-        $ResolvedArgs = @json_decode(Gdn::request()->Post('ResolvedArgs'));
+        $ResolvedArgs = Gdn::request()->Post('ResolvedArgs');
         $DiscussionID = null;
         $DiscussionModel = new DiscussionModel();
 

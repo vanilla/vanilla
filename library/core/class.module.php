@@ -36,6 +36,11 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     public $Visible = true;
 
     /**
+     * @var string The filename of view to render, excluding the extension.
+     */
+    public $view;
+
+    /**
      * Class constructor
      *
      * @param object $Sender
@@ -61,6 +66,20 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         }
 
         parent::__construct();
+    }
+
+    /**
+     * @return string
+     */
+    public function getView() {
+        return $this->view;
+    }
+
+    /**
+     * @param string $view
+     */
+    public function setView($view) {
+        $this->view = $view;
     }
 
     /**
@@ -91,8 +110,16 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      *
      * @return string
      */
-    public function fetchView($View = '') {
-        $ViewPath = $this->fetchViewLocation($View);
+    public function fetchView($view = '') {
+        if ($view) {
+            $this->view = $view;
+        }
+        if (method_exists($this, 'prepare')) {
+            if (!$this->prepare()) {
+                return '';
+            }
+        }
+        $viewPath = $this->fetchViewLocation($this->view);
         $String = '';
         ob_start();
         if (is_object($this->_Sender) && isset($this->_Sender->Data)) {
@@ -100,7 +127,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         } else {
             $Data = array();
         }
-        include($ViewPath);
+        include($viewPath);
         $String = ob_get_contents();
         @ob_end_clean();
         return $String;

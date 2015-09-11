@@ -174,7 +174,7 @@ class SettingsController extends DashboardController {
      * @return bool Whether the avatar has been uploaded from the dashboard.
      */
     public function isUploadedDefaultAvatar($avatar) {
-        return (!isUrl($avatar) && StringBeginsWith($avatar, 'uploads/'.self::DEFAULT_AVATAR_FOLDER));
+        return (strpos($avatar, self::DEFAULT_AVATAR_FOLDER.'/') !== false);
     }
 
     /**
@@ -194,14 +194,15 @@ class SettingsController extends DashboardController {
 
         if (($avatar = c('Garden.DefaultAvatar')) && $this->isUploadedDefaultAvatar($avatar)) {
             //Get the image source so we can manipulate it in the crop module.
-            $upload = new Gdn_Upload();
+            $upload = new Gdn_UploadImage();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
-            $source = $upload->copyLocal(trim(changeBasename($avatar, "p%s"), 'uploads'));
+            $basename = changeBasename($avatar, "p%s");
+            $source = $upload->copyLocal($basename);
 
             //Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
-            $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
-            $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
+            $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
+            $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
             $this->setData('crop', $crop);
         } else {
             $this->setData('avatar', UserModel::getDefaultAvatarUrl());
@@ -233,11 +234,12 @@ class SettingsController extends DashboardController {
                     $thumbnailSize = c('Garden.Thumbnail.Size', 40);
 
                     // Update crop properties.
-                    $source = $upload->copyLocal(trim(changeBasename($avatar, "p%s"), 'uploads'));
+                    $basename = changeBasename($avatar, "p%s");
+                    $source = $upload->copyLocal($basename);
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setSize($thumbnailSize, $thumbnailSize);
-                    $crop->setExistingCropUrl(changeBasename($avatar, "n%s"));
-                    $crop->setSourceImageUrl(changeBasename($avatar, "p%s"));
+                    $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
+                    $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
                     $this->setData('crop', $crop);
                 }
             }
@@ -293,7 +295,7 @@ class SettingsController extends DashboardController {
         }
 
         $imageBaseName = $parts['SaveName'];
-        saveToConfig('Garden.DefaultAvatar', 'uploads/'.$imageBaseName);
+        saveToConfig('Garden.DefaultAvatar', $imageBaseName);
         return true;
     }
 
@@ -692,8 +694,8 @@ class SettingsController extends DashboardController {
             // Grab all of the plugins & versions
             $Plugins = Gdn::pluginManager()->availablePlugins();
             foreach ($Plugins as $Plugin => $Info) {
-                $Name = arrayValue('Name', $Info, $Plugin);
-                $Version = arrayValue('Version', $Info, '');
+                $Name = val('Name', $Info, $Plugin);
+                $Version = val('Version', $Info, '');
                 if ($Version != '') {
                     $UpdateData[] = array(
                         'Name' => $Name,
@@ -707,8 +709,8 @@ class SettingsController extends DashboardController {
             $ApplicationManager = Gdn::factory('ApplicationManager');
             $Applications = $ApplicationManager->availableApplications();
             foreach ($Applications as $Application => $Info) {
-                $Name = arrayValue('Name', $Info, $Application);
-                $Version = arrayValue('Version', $Info, '');
+                $Name = val('Name', $Info, $Application);
+                $Version = val('Version', $Info, '');
                 if ($Version != '') {
                     $UpdateData[] = array(
                         'Name' => $Name,
@@ -722,8 +724,8 @@ class SettingsController extends DashboardController {
             $ThemeManager = new Gdn_ThemeManager;
             $Themes = $ThemeManager->availableThemes();
             foreach ($Themes as $Theme => $Info) {
-                $Name = arrayValue('Name', $Info, $Theme);
-                $Version = arrayValue('Version', $Info, '');
+                $Name = val('Name', $Info, $Theme);
+                $Version = val('Version', $Info, '');
                 if ($Version != '') {
                     $UpdateData[] = array(
                         'Name' => $Name,

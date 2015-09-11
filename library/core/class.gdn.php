@@ -272,7 +272,7 @@ class Gdn {
 
         $PropertyName = $Config['PropertyName'];
         $SourceAlias = $Config['SourceAlias'];
-        $Override = ArrayValue('Override', $Config, true);
+        $Override = val('Override', $Config, true);
 
         self::factoryInstallDependency($Alias, $PropertyName, $SourceAlias, $Override);
     }
@@ -302,8 +302,8 @@ class Gdn {
         }
 
         $FactoryType = $Config['FactoryType'];
-        $Data = ArrayValue('Data', $Config, null);
-        $Override = ArrayValue('Override', $Config, true);
+        $Data = val('Data', $Config, null);
+        $Override = val('Override', $Config, true);
 
         self::factoryInstall($Alias, $Config['ClassName'], $Config['Path'], $FactoryType, $Data, $Override);
 

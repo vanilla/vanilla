@@ -952,6 +952,8 @@ class UserModel extends Gdn_Model {
                         if ($Column == 'Photo') {
                             if ($Value && !isUrl($Value)) {
                                 $Value = Gdn_Upload::url(changeBasename($Value, 'n%s'));
+                            } elseif (!$Value) {
+                                $Value = UserModel::getDefaultAvatarUrl($User);
                             }
                         }
                         setValue($Px.$Column, $Row, $Value);
@@ -979,11 +981,11 @@ class UserModel extends Gdn_Model {
             return UserPhotoDefaultUrl($user);
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
-            if (strpos($avatar, 'uploads/defaultavatar') !== false) {
+            if (strpos($avatar, 'defaultavatar/') !== false) {
                 if($size == 'thumbnail') {
-                    return changeBasename($avatar, 'n%s');
+                    return Gdn_UploadImage::url(changeBasename($avatar, 'n%s'));
                 } elseif ($size == 'profile') {
-                    return changeBasename($avatar, 'p%s');
+                    return Gdn_UploadImage::url(changeBasename($avatar, 'p%s'));
                 }
             }
             return $avatar;
@@ -2007,7 +2009,7 @@ class UserModel extends Gdn_Model {
                 if ($UserID > 0) {
                     // If they are changing the username & email, make sure they aren't
                     // already being used (by someone other than this user)
-                    if (ArrayValue('Name', $Fields, '') != '' || arrayValue('Email', $Fields, '') != '') {
+                    if (val('Name', $Fields, '') != '' || val('Email', $Fields, '') != '') {
                         if (!$this->validateUniqueFields($Username, $Email, $UserID)) {
                             return false;
                         }
@@ -2021,7 +2023,7 @@ class UserModel extends Gdn_Model {
                     $this->SQL->put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
 
                     // Record activity if the person changed his/her photo.
-                    $Photo = arrayValue('Photo', $FormPostValues);
+                    $Photo = val('Photo', $FormPostValues);
                     if ($Photo !== false) {
                         if (val('CheckExisting', $Settings)) {
                             $User = $this->getID($UserID);
@@ -2531,7 +2533,7 @@ class UserModel extends Gdn_Model {
         // the user's email from the invitation:
         $InviteUserID = 0;
         $InviteUsername = '';
-        $InvitationCode = arrayValue('InvitationCode', $FormPostValues, '');
+        $InvitationCode = val('InvitationCode', $FormPostValues, '');
 
         $Invitation = $this->SQL->getWhere('Invitation', array('Code' => $InvitationCode))->firstRow();
 
@@ -2569,8 +2571,8 @@ class UserModel extends Gdn_Model {
             }
 
             $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-            $Username = arrayValue('Name', $Fields);
-            $Email = arrayValue('Email', $Fields);
+            $Username = val('Name', $Fields);
+            $Email = val('Email', $Fields);
             $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
@@ -2670,8 +2672,8 @@ class UserModel extends Gdn_Model {
             }
 
             $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-            $Username = arrayValue('Name', $Fields);
-            $Email = arrayValue('Email', $Fields);
+            $Username = val('Name', $Fields);
+            $Email = val('Email', $Fields);
             $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
@@ -2743,15 +2745,15 @@ class UserModel extends Gdn_Model {
 
         if ($this->validate($FormPostValues, true) === true) {
             $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-            $Username = arrayValue('Name', $Fields);
-            $Email = arrayValue('Email', $Fields);
+            $Username = val('Name', $Fields);
+            $Email = val('Email', $Fields);
             $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
             $Fields['Roles'] = $RoleIDs;
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
             // If in Captcha registration mode, check the captcha value
             if ($CheckCaptcha && Gdn::config('Garden.Registration.Method') == 'Captcha') {
-                $CaptchaPublicKey = arrayValue('Garden.Registration.CaptchaPublicKey', $FormPostValues, '');
+                $CaptchaPublicKey = val('Garden.Registration.CaptchaPublicKey', $FormPostValues, '');
                 $CaptchaValid = ValidateCaptcha($CaptchaPublicKey);
                 if ($CaptchaValid !== true) {
                     $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA value was not entered correctly. Please try again.');
@@ -2802,7 +2804,7 @@ class UserModel extends Gdn_Model {
         $this->defineSchema();
 
         // Set the hour offset based on the client's clock.
-        $ClientHour = arrayValue('ClientHour', $Fields, '');
+        $ClientHour = val('ClientHour', $Fields, '');
         if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
             $HourOffset = $ClientHour - date('G', time());
             $Fields['HourOffset'] = $HourOffset;
@@ -3703,7 +3705,7 @@ class UserModel extends Gdn_Model {
 //      if ($Data !== FALSE) {
 //         $Attributes = Gdn_Format::Unserialize($Data->Attributes);
 //         if (is_array($Attributes))
-//            $Result = arrayValue($Attribute, $Attributes, $DefaultValue);
+//            $Result = val($Attribute, $Attributes, $DefaultValue);
 //
 //      }
 
@@ -3895,7 +3897,7 @@ class UserModel extends Gdn_Model {
     public function synchronize($UserKey, $Data) {
         $UserID = 0;
 
-        $Attributes = arrayValue('Attributes', $Data);
+        $Attributes = val('Attributes', $Data);
         if (is_string($Attributes)) {
             $Attributes = @unserialize($Attributes);
         }
@@ -3910,10 +3912,10 @@ class UserModel extends Gdn_Model {
             // Prepare the user data.
             $UserData['Name'] = $Data['Name'];
             $UserData['Password'] = RandomString(16);
-            $UserData['Email'] = arrayValue('Email', $Data, 'no@email.com');
-            $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Data, 'u'), 0, 1));
-            $UserData['HourOffset'] = arrayValue('HourOffset', $Data, 0);
-            $UserData['DateOfBirth'] = arrayValue('DateOfBirth', $Data, '');
+            $UserData['Email'] = val('Email', $Data, 'no@email.com');
+            $UserData['Gender'] = strtolower(substr(val('Gender', $Data, 'u'), 0, 1));
+            $UserData['HourOffset'] = val('HourOffset', $Data, 0);
+            $UserData['DateOfBirth'] = val('DateOfBirth', $Data, '');
             $UserData['CountNotifications'] = 0;
             $UserData['Attributes'] = $Attributes;
             $UserData['InsertIPAddress'] = Gdn::request()->ipAddress();

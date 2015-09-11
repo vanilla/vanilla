@@ -131,7 +131,7 @@ class DraftModel extends VanillaModel {
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.
-        $DraftID = arrayValue('DraftID', $FormPostValues, '');
+        $DraftID = val('DraftID', $FormPostValues, '');
         $Insert = $DraftID == '' ? true : false;
 
         if (!$DraftID) {
@@ -145,7 +145,7 @@ class DraftModel extends VanillaModel {
 
         if ($Insert) {
             // If no categoryid is defined, grab the first available.
-            if (ArrayValue('CategoryID', $FormPostValues) === false) {
+            if (val('CategoryID', $FormPostValues) === false) {
                 $FormPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
             }
 
@@ -155,22 +155,22 @@ class DraftModel extends VanillaModel {
         $this->AddUpdateFields($FormPostValues);
 
         // Remove checkboxes from the fields if they were unchecked
-        if (ArrayValue('Announce', $FormPostValues, '') === false) {
+        if (val('Announce', $FormPostValues, '') === false) {
             unset($FormPostValues['Announce']);
         }
 
-        if (ArrayValue('Closed', $FormPostValues, '') === false) {
+        if (val('Closed', $FormPostValues, '') === false) {
             unset($FormPostValues['Closed']);
         }
 
-        if (ArrayValue('Sink', $FormPostValues, '') === false) {
+        if (val('Sink', $FormPostValues, '') === false) {
             unset($FormPostValues['Sink']);
         }
 
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
-            $DraftID = intval(ArrayValue('DraftID', $Fields, 0));
+            $DraftID = intval(val('DraftID', $Fields, 0));
 
             // If the post is new and it validates, make sure the user isn't spamming
             if ($DraftID > 0) {

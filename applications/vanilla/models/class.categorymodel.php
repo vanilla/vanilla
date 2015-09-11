@@ -1642,10 +1642,10 @@ class CategoryModel extends Gdn_Model {
         $this->defineSchema();
 
         // Get data from form
-        $CategoryID = arrayValue('CategoryID', $FormPostValues);
-        $NewName = arrayValue('Name', $FormPostValues, '');
-        $UrlCode = arrayValue('UrlCode', $FormPostValues, '');
-        $AllowDiscussions = arrayValue('AllowDiscussions', $FormPostValues, '');
+        $CategoryID = val('CategoryID', $FormPostValues);
+        $NewName = val('Name', $FormPostValues, '');
+        $UrlCode = val('UrlCode', $FormPostValues, '');
+        $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
         $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
@@ -1685,7 +1685,7 @@ class CategoryModel extends Gdn_Model {
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->SchemaValidationFields();
             $Fields = RemoveKeyFromArray($Fields, 'CategoryID');
-            $AllowDiscussions = arrayValue('AllowDiscussions', $Fields) == '1' ? true : false;
+            $AllowDiscussions = val('AllowDiscussions', $Fields) == '1' ? true : false;
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
             if ($Insert === false) {

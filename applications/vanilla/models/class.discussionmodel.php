@@ -264,6 +264,7 @@ class DiscussionModel extends VanillaModel {
                 ->select('0', '', 'Bookmarked')
                 ->select('0', '', 'CountCommentWatch')
                 ->select('0', '', 'Participated')
+                ->select('0', '', 'Read')
                 ->select('d.Announce', '', 'IsAnnounce');
         }
 
@@ -1554,7 +1555,7 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Get the DiscussionID from the form so we know if we are inserting or updating.
-        $DiscussionID = arrayValue('DiscussionID', $FormPostValues, '');
+        $DiscussionID = val('DiscussionID', $FormPostValues, '');
 
         // See if there is a source ID.
         if (val('SourceID', $FormPostValues)) {
@@ -1576,13 +1577,13 @@ class DiscussionModel extends VanillaModel {
             unset($FormPostValues['DiscussionID']);
             // If no categoryid is defined, grab the first available.
             if (!val('CategoryID', $FormPostValues) && !c('Vanilla.Categories.Use')) {
-                $FormPostValues['CategoryID'] = val('CategoryID', CategoryModel::DefaultCategory(), -1);
+                $FormPostValues['CategoryID'] = val('CategoryID', CategoryModel::defaultCategory(), -1);
             }
 
-            $this->AddInsertFields($FormPostValues);
+            $this->addInsertFields($FormPostValues);
 
             // The UpdateUserID used to be required. Just add it if it still is.
-            if (!$this->Schema->GetProperty('UpdateUserID', 'AllowNull', true)) {
+            if (!$this->Schema->getProperty('UpdateUserID', 'AllowNull', true)) {
                 $FormPostValues['UpdateUserID'] = $FormPostValues['InsertUserID'];
             }
 
@@ -1590,19 +1591,19 @@ class DiscussionModel extends VanillaModel {
             $FormPostValues['DateLastComment'] = $FormPostValues['DateInserted'];
         } else {
             // Add the update fields.
-            $this->AddUpdateFields($FormPostValues);
+            $this->addUpdateFields($FormPostValues);
         }
 
         // Set checkbox values to zero if they were unchecked
-        if (ArrayValue('Announce', $FormPostValues, '') === false) {
+        if (val('Announce', $FormPostValues, '') === false) {
             $FormPostValues['Announce'] = 0;
         }
 
-        if (ArrayValue('Closed', $FormPostValues, '') === false) {
+        if (val('Closed', $FormPostValues, '') === false) {
             $FormPostValues['Closed'] = 0;
         }
 
-        if (ArrayValue('Sink', $FormPostValues, '') === false) {
+        if (val('Sink', $FormPostValues, '') === false) {
             $FormPostValues['Sink'] = 0;
         }
 
@@ -1623,9 +1624,9 @@ class DiscussionModel extends VanillaModel {
 
         if (count($ValidationResults) == 0) {
             // If the post is new and it validates, make sure the user isn't spamming
-            if (!$Insert || !$this->CheckForSpam('Discussion')) {
+            if (!$Insert || !$this->checkForSpam('Discussion')) {
                 // Get all fields on the form that relate to the schema
-                $Fields = $this->Validation->SchemaValidationFields();
+                $Fields = $this->Validation->schemaValidationFields();
 
                 // Get DiscussionID if one was sent
                 $DiscussionID = intval(val('DiscussionID', $Fields, 0));
@@ -1646,21 +1647,21 @@ class DiscussionModel extends VanillaModel {
                     // Clear the cache if necessary.
                     $CacheKeys = array();
                     if (val('Announce', $Stored) != val('Announce', $Fields)) {
-                        $CacheKeys[] = $this->GetAnnouncementCacheKey();
-                        $CacheKeys[] = $this->GetAnnouncementCacheKey(val('CategoryID', $Stored));
+                        $CacheKeys[] = $this->getAnnouncementCacheKey();
+                        $CacheKeys[] = $this->getAnnouncementCacheKey(val('CategoryID', $Stored));
                     }
                     if (val('CategoryID', $Stored) != val('CategoryID', $Fields)) {
-                        $CacheKeys[] = $this->GetAnnouncementCacheKey(val('CategoryID', $Fields));
+                        $CacheKeys[] = $this->getAnnouncementCacheKey(val('CategoryID', $Fields));
                     }
                     foreach ($CacheKeys as $CacheKey) {
-                        Gdn::cache()->Remove($CacheKey);
+                        Gdn::cache()->remove($CacheKey);
                     }
 
-                    self::SerializeRow($Fields);
+                    self::serializeRow($Fields);
                     $this->SQL->put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
                     setValue('DiscussionID', $Fields, $DiscussionID);
-                    LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
+                    LogModel::logChange('Edit', 'Discussion', (array)$Fields, $Stored);
 
                     if (val('CategoryID', $Stored) != val('CategoryID', $Fields)) {
                         $StoredCategoryID = val('CategoryID', $Stored);
@@ -1677,20 +1678,20 @@ class DiscussionModel extends VanillaModel {
                     }
 
                     // Check for spam.
-                    $Spam = SpamModel::IsSpam('Discussion', $Fields);
+                    $Spam = SpamModel::isSpam('Discussion', $Fields);
                     if ($Spam) {
                         return SPAM;
                     }
 
                     // Check for approval
-                    $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+                    $ApprovalRequired = checkRestriction('Vanilla.Approval.Require');
                     if ($ApprovalRequired && !val('Verified', Gdn::session()->User)) {
                         LogModel::insert('Pending', 'Discussion', $Fields);
                         return UNAPPROVED;
                     }
 
                     // Create discussion
-                    $this->SerializeRow($Fields);
+                    $this->serializeRow($Fields);
                     $DiscussionID = $this->SQL->insert($this->Name, $Fields);
                     $Fields['DiscussionID'] = $DiscussionID;
 
@@ -1704,21 +1705,21 @@ class DiscussionModel extends VanillaModel {
                             'LastDateInserted' => $Fields['DateInserted'],
                             'LastUrl' => DiscussionUrl($Fields)
                         );
-                        CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
+                        CategoryModel::setCache($Fields['CategoryID'], $CategoryCache);
 
                         // Clear the cache if necessary.
                         if (val('Announce', $Fields)) {
-                            Gdn::cache()->Remove($this->GetAnnouncementCacheKey(val('CategoryID', $Fields)));
+                            Gdn::cache()->remove($this->getAnnouncementCacheKey(val('CategoryID', $Fields)));
 
                             if (val('Announce', $Fields) == 1) {
-                                Gdn::cache()->Remove($this->GetAnnouncementCacheKey());
+                                Gdn::cache()->remove($this->getAnnouncementCacheKey());
                             }
                         }
                     }
 
                     // Update the user's discussion count.
                     $InsertUser = Gdn::userModel()->getID($Fields['InsertUserID']);
-                    $this->UpdateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
+                    $this->updateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
 
                     // Mark the user as participated.
                     $this->SQL->replace(
@@ -1732,8 +1733,8 @@ class DiscussionModel extends VanillaModel {
                     $FormPostValues['DiscussionID'] = $DiscussionID;
 
                     // Do data prep.
-                    $DiscussionName = arrayValue('Name', $Fields, '');
-                    $Story = arrayValue('Body', $Fields, '');
+                    $DiscussionName = val('Name', $Fields, '');
+                    $Story = val('Body', $Fields, '');
                     $NotifiedUsers = array();
 
                     $UserModel = Gdn::userModel();
@@ -1766,7 +1767,7 @@ class DiscussionModel extends VanillaModel {
                     }
 
                     // Notify all of the users that were mentioned in the discussion.
-                    $Usernames = GetMentions($DiscussionName.' '.$Story);
+                    $Usernames = getMentions($DiscussionName.' '.$Story);
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $Activity;
@@ -1775,7 +1776,7 @@ class DiscussionModel extends VanillaModel {
                     if (!c('Vanilla.QueueNotifications')) {
                         try {
                             $Fields['DiscussionID'] = $DiscussionID;
-                            $this->NotifyNewDiscussion($Fields, $ActivityModel, $Activity);
+                            $this->notifyNewDiscussion($Fields, $ActivityModel, $Activity);
                         } catch (Exception $Ex) {
                             throw $Ex;
                         }
@@ -1783,20 +1784,20 @@ class DiscussionModel extends VanillaModel {
 
                     // Notifications for mentions
                     foreach ($Usernames as $Username) {
-                        $User = $UserModel->GetByUsername($Username);
+                        $User = $UserModel->getByUsername($Username);
                         if (!$User) {
                             continue;
                         }
 
                         // Check user can still see the discussion.
-                        if (!$UserModel->GetCategoryViewPermission($User->UserID, val('CategoryID', $Fields))) {
+                        if (!$UserModel->getCategoryViewPermission($User->UserID, val('CategoryID', $Fields))) {
                             continue;
                         }
 
                         $Activity['HeadlineFormat'] = t('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
 
                         $Activity['NotifyUserID'] = val('UserID', $User);
-                        $ActivityModel->Queue($Activity, 'Mention');
+                        $ActivityModel->queue($Activity, 'Mention');
                     }
 
                     // Throw an event for users to add their own events.
@@ -1807,7 +1808,7 @@ class DiscussionModel extends VanillaModel {
                     $this->fireEvent('BeforeNotification');
 
                     // Send all notifications.
-                    $ActivityModel->SaveQueue();
+                    $ActivityModel->saveQueue();
                 }
 
                 // Get CategoryID of this discussion
@@ -1817,11 +1818,11 @@ class DiscussionModel extends VanillaModel {
 
                 // Update discussion counter for affected categories.
                 if ($Insert || $StoredCategoryID) {
-                    $this->IncrementNewDiscussion($Discussion);
+                    $this->incrementNewDiscussion($Discussion);
                 }
 
                 if ($StoredCategoryID) {
-                    $this->UpdateDiscussionCount($StoredCategoryID);
+                    $this->updateDiscussionCount($StoredCategoryID);
                 }
 
                 // Fire an event that the discussion was saved.

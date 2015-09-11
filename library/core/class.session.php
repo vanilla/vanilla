@@ -305,7 +305,7 @@ class Gdn_Session {
         // WARNING: THIS DOES NOT CHECK THE DEFAULT CONFIG-DEFINED SETTINGS.
         // IF A USER HAS NEVER SAVED THEIR PREFERENCES, THIS WILL RETURN
         // INCORRECT VALUES.
-        return ArrayValue($PreferenceName, $this->_Preferences, $DefaultValue);
+        return val($PreferenceName, $this->_Preferences, $DefaultValue);
     }
 
     /**
@@ -318,7 +318,7 @@ class Gdn_Session {
      */
     public function getAttribute($AttributeName, $DefaultValue = false) {
         if (is_array($this->_Attributes)) {
-            return ArrayValue($AttributeName, $this->_Attributes, $DefaultValue);
+            return val($AttributeName, $this->_Attributes, $DefaultValue);
         }
         return $DefaultValue;
     }
@@ -390,7 +390,7 @@ class Gdn_Session {
                 $this->_Permissions = Gdn_Format::unserialize($this->User->Permissions);
                 $this->_Preferences = Gdn_Format::unserialize($this->User->Preferences);
                 $this->_Attributes = Gdn_Format::unserialize($this->User->Attributes);
-                $this->_TransientKey = is_array($this->_Attributes) ? arrayValue('TransientKey', $this->_Attributes) : false;
+                $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
 
                 if ($this->_TransientKey === false) {
                     $this->_TransientKey = $UserModel->setTransientKey($this->UserID);

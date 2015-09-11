@@ -338,7 +338,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!is_null($Definition)) {
             $this->_Definitions[$Term] = $Definition;
         }
-        return arrayValue($Term, $this->_Definitions);
+        return val($Term, $this->_Definitions);
     }
 
     /**
@@ -773,7 +773,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         $LocationName = concatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
-        $ViewPath = arrayValue($LocationName, $this->_ViewLocations, false);
+        $ViewPath = val($LocationName, $this->_ViewLocations, false);
         if ($ViewPath === false) {
             // Define the search paths differently depending on whether or not we are in a plugin or application.
             $ApplicationFolder = trim($ApplicationFolder, '/');
@@ -1058,7 +1058,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!is_null($Value)) {
             $this->_Json[$Key] = $Value;
         }
-        return arrayValue($Key, $this->_Json, null);
+        return val($Key, $this->_Json, null);
     }
 
     /**

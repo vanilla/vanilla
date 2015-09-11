@@ -252,7 +252,7 @@ class MessageModel extends Gdn_Model {
      */
     public function save($FormPostValues, $Settings = false) {
         // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
-        $Location = arrayValue('Location', $FormPostValues, '');
+        $Location = val('Location', $FormPostValues, '');
         if ($Location != '') {
             $Location = explode('/', $Location);
             $Application = val(0, $Location, '');

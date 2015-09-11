@@ -75,11 +75,11 @@ $DisabledCount = $PluginCount - $EnabledCount;
             $Alt = $Alt ? FALSE : TRUE;
             $Version = Gdn_Format::Display(val('Version', $PluginInfo, ''));
             $ScreenName = Gdn_Format::Display(val('Name', $PluginInfo, $PluginName));
-            $SettingsUrl = $State == 'enabled' ? arrayValue('SettingsUrl', $PluginInfo, '') : '';
-            $PluginUrl = arrayValue('PluginUrl', $PluginInfo, '');
-            $Author = arrayValue('Author', $PluginInfo, '');
-            $AuthorUrl = arrayValue('AuthorUrl', $PluginInfo, '');
-            $NewVersion = arrayValue('NewVersion', $PluginInfo, '');
+            $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $PluginInfo, '') : '';
+            $PluginUrl = val('PluginUrl', $PluginInfo, '');
+            $Author = val('Author', $PluginInfo, '');
+            $AuthorUrl = val('AuthorUrl', $PluginInfo, '');
+            $NewVersion = val('NewVersion', $PluginInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
             $RowClass = $Css;
             if ($Alt) $RowClass .= ' Alt';
@@ -105,8 +105,8 @@ $DisabledCount = $PluginCount - $EnabledCount;
 
                     ?></td>
                 <td class="Alt Info"><?php
-                    $RequiredApplications = arrayValue('RequiredApplications', $PluginInfo, false);
-                    $RequiredPlugins = arrayValue('RequiredPlugins', $PluginInfo, false);
+                    $RequiredApplications = val('RequiredApplications', $PluginInfo, false);
+                    $RequiredPlugins = val('RequiredPlugins', $PluginInfo, false);
                     $Info = '';
                     if ($Version != '')
                         $Info = sprintf(t('Version %s'), $Version);

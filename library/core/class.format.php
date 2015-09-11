@@ -1856,9 +1856,9 @@ EOT;
             $Year = $Matches[1];
             $Month = $Matches[2];
             $Day = $Matches[3];
-            $Hour = arrayValue(4, $Matches, 0);
-            $Minute = arrayValue(5, $Matches, 0);
-            $Second = arrayValue(6, $Matches, 0);
+            $Hour = val(4, $Matches, 0);
+            $Minute = val(5, $Matches, 0);
+            $Second = val(6, $Matches, 0);
             return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
         } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $DateTime, $Matches)) {
             $Year = $Matches[1];

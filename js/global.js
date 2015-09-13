@@ -323,18 +323,6 @@ jQuery(document).ready(function($) {
     if ($.fn.handleAjaxForm)
         $('.AjaxForm').not('.Message .AjaxForm').handleAjaxForm();
 
-    // Make the highlight effect themable.
-    if ($.effects && $.effects.highlight) {
-        $.effects.highlight0 = $.effects.highlight;
-
-        $.effects.highlight = function(opts) {
-            var color = $('#HighlightColor').css('backgroundColor');
-            if (color)
-                opts.options.color = color;
-            return $.effects.highlight0.call(this, opts);
-        };
-    }
-
     // Handle ToggleMenu toggling and set up default state
     $('[class^="Toggle-"]').hide(); // hide all toggle containers
     $('.ToggleMenu a').click(function() {
@@ -1931,3 +1919,15 @@ if (typeof String.prototype.trim !== 'function') {
         return this.replace(/^\s+|\s+$/g, '');
     }
 }
+
+// jQuery UI .effect() replacement using CSS classes.
+jQuery.fn.effect = function(name) {
+    var that = this,
+        name = name + '-effect';
+
+    return this
+        .addClass(name)
+        .one('animationend webkitAnimationEnd', function () {
+            that.removeClass(name);
+        });
+};

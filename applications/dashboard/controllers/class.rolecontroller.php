@@ -187,7 +187,6 @@ class RoleController extends DashboardController {
 
         $this->addSideMenu('dashboard/role');
         $this->addJsFile('jquery.tablednd.js');
-        $this->addJsFile('jquery-ui.js');
         $this->title(t('Roles & Permissions'));
 
         if (!$RoleID) {

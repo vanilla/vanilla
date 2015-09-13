@@ -6267,3 +6267,23 @@ Styleguide Attachments
     transition: all 0.2s ease;
     opacity: 1;
 }
+
+/* Effects */
+
+@-webkit-keyframes highlight {
+    0% {background-color: #ff9;}
+    10% {background-color: #ff9;}
+}
+
+@keyframes highlight {
+    0% {background-color: #ff9;}
+    10% {background-color: #ff9;}
+}
+
+.highlight-effect{
+    -webkit-animation: highlight .8s;
+}
+
+.highlight-effect{
+    animation: highlight .8s;
+}

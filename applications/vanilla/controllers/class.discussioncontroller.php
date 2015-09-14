@@ -181,8 +181,10 @@ class DiscussionController extends VanillaController {
             $this->addDefinition('NotifyNewDiscussion', 1);
         }
 
-        // Make sure to set the user's discussion watch records
-        $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+        // Make sure to set the user's discussion watch records if this is not an API request.
+        if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
+            $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+        }
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();

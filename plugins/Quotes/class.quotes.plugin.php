@@ -12,7 +12,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.10',
+    'Version' => '1.7',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'HasLocale' => true,
@@ -31,7 +31,7 @@ $PluginInfo['Quotes'] = array(
  *  1.6.4   Moved button to reactions area & changed js accordingly.
  *  1.6.8   Textarea target will now automatically resize to fit text body.
  *  1.6.9   Security fix.
- *
+ *  1.7     Eliminate livequery and js refactor.
  */
 class QuotesPlugin extends Gdn_Plugin {
 
@@ -230,7 +230,6 @@ class QuotesPlugin extends Gdn_Plugin {
      * Add 'Quote' option to Discussion.
      */
     public function base_AfterFlag_handler($Sender, $Args) {
-        echo Gdn_Theme::BulletItem('Flags');
         $this->addQuoteButton($Sender, $Args);
     }
 
@@ -252,6 +251,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
+        echo Gdn_Theme::BulletItem('Flags');
         echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 

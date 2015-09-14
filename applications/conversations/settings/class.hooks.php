@@ -18,7 +18,7 @@ class ConversationsHooks implements Gdn_IPlugin {
      *
      * @param DbaController $Sender
      */
-    public function dbaController_countJobs_Hhndler($Sender) {
+    public function dbaController_countJobs_Handler($Sender) {
         $Counts = array(
             'Conversation' => array('CountMessages', 'CountParticipants', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID')
 //          'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID')
@@ -217,7 +217,7 @@ class ConversationsHooks implements Gdn_IPlugin {
 
         $ApplicationInfo = array();
         include(combinePaths(array(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'about.php')));
-        $Version = arrayValue('Version', arrayValue('Conversations', $ApplicationInfo, array()), 'Undefined');
+        $Version = val('Version', val('Conversations', $ApplicationInfo, array()), 'Undefined');
         saveToConfig('Conversations.Version', $Version);
     }
 }

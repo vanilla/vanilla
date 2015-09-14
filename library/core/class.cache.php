@@ -101,6 +101,15 @@ abstract class Gdn_Cache {
     /** Seconds. */
     const APC_CACHE_DURATION = 300;
 
+    /** Max number of shards. 0 = no limit */
+    const CACHE_SHARD_MAX_SHARDS = 0;
+
+    /** Min size for a shard, in bytes. 0 = no limit */
+    const CACHE_SHARD_MIN_SIZE = 10000;
+
+    /** Auto shard keys that are larger than this, in bytes. */
+    const CACHE_SHARD_AUTO_SIZE = 100000;
+
     /**  @var array Local in-memory cache of fetched data. This prevents duplicate gets to memcache. */
     protected static $localCache = array();
 

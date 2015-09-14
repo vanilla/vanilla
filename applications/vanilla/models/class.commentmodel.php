@@ -810,7 +810,7 @@ class CommentModel extends VanillaModel {
         }
 
         // Validate $CommentID and whether this is an insert
-        $CommentID = arrayValue('CommentID', $FormPostValues);
+        $CommentID = val('CommentID', $FormPostValues);
         $CommentID = is_numeric($CommentID) && $CommentID > 0 ? $CommentID : false;
         $Insert = $CommentID === false;
         if ($Insert) {
@@ -1273,7 +1273,7 @@ class CommentModel extends VanillaModel {
      * Delete a comment.
      *
      * This is a hard delete that completely removes it from the database.
-     * Events: DeleteComment.
+     * Events: DeleteComment, BeforeDeleteComment.
      *
      * @since 2.0.0
      * @access public
@@ -1301,6 +1301,7 @@ class CommentModel extends VanillaModel {
 
         $this->EventArguments['Discussion'] = $Discussion;
         $this->fireEvent('DeleteComment');
+        $this->fireEvent('BeforeDeleteComment');
 
         // Log the deletion.
         $Log = val('Log', $Options, 'Delete');

@@ -104,7 +104,7 @@ class InvitationModel extends Gdn_Model {
         // Validate the form posted values
         if ($this->validate($FormPostValues, true) === true) {
             $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated
-            $Email = arrayValue('Email', $Fields, '');
+            $Email = val('Email', $Fields, '');
 
             // Make sure this user has a spare invitation to send.
             $InviteCount = $UserModel->GetInvitationCount($UserID);

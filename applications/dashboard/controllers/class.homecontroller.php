@@ -53,6 +53,9 @@ class HomeController extends Gdn_Controller {
         $this->MasterView = 'default';
 
         $this->CssClass = 'SplashMessage NoPanel';
+        if ($this->data('CssClass')) {
+            $this->CssClass .= ' '.$this->data('CssClass');
+        }
 
         $this->setData('_NoMessages', true);
 
@@ -144,7 +147,7 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function permission() {
+    public function unauthorized() {
         Gdn_Theme::section('Error');
 
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {

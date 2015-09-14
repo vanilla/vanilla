@@ -39,7 +39,7 @@ $PluginInfo['ProfileExtender'] = array(
 class ProfileExtenderPlugin extends Gdn_Plugin {
 
     /** @var array */
-    public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'Website', 'Real Name');
+    public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name');
 
     /**
      * Available form field types in format Gdn_Type => DisplayName.
@@ -148,6 +148,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 case 'LinkedIn':
                     $Fields['LinkedIn'] = anchor($Value, 'http://www.linkedin.com/in/'.$Value);
                     break;
+                case 'GitHub':
+                    $Fields['GitHub'] = anchor($Value, 'https://github.com/'.$Value);
+                    break;
                 case 'Google':
                     $Fields['Google'] = anchor('Google+', $Value, '', array('rel' => 'me'));
                     break;
@@ -202,14 +205,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Verify field form type
             if (!isset($Field['FormType'])) {
                 $Fields[$Name]['FormType'] = 'TextBox';
-            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes))
+            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes)) {
                 unset($this->ProfileFields[$Name]);
-        }
-
-        // Special case for birthday field
-        if (isset($Fields['DateOfBirth'])) {
-            $Fields['DateOfBirth']['FormType'] = 'Date';
-            $Fields['DateOfBirth']['Label'] = t('Birthday');
+            } elseif ($Fields[$Name]['FormType'] == 'DateOfBirth') {
+                // Special case for birthday field
+                $Fields[$Name]['FormType'] = 'Date';
+                $Fields[$Name]['Label'] = t('Birthday');
+            }
         }
 
         return $Fields;

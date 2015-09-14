@@ -317,7 +317,6 @@ $PermissionModel->Define(
 
 $PermissionModel->Undefine('Vanilla.Spam.Manage');
 
-
 /*
 Apr 26th, 2010
 Removed FirstComment from :_Discussion and moved it into the discussion table.
@@ -410,5 +409,5 @@ include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 // Set current Vanilla.Version
 $ApplicationInfo = array();
 include(CombinePaths(array(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'about.php')));
-$Version = arrayValue('Version', arrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');
+$Version = val('Version', val('Vanilla', $ApplicationInfo, array()), 'Undefined');
 saveToConfig('Vanilla.Version', $Version);

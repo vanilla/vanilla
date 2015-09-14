@@ -1,4 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanilla-smarty
+ * @since 2.0
+ */
 
 /**
  * Converts a string to an asset url.
@@ -11,5 +17,5 @@
  * @see Asset()
  */
 function smarty_modifier_asset_url($path, $withDomain = false, $addVersion = false) {
-   return Asset($path, $withDomain, $addVersion);
+    return asset($path, $withDomain, $addVersion);
 }

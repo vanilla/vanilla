@@ -64,7 +64,9 @@ class DiscussionController extends VanillaController {
         }
 
         if (!is_object($this->Discussion)) {
-            throw new Exception(sprintf(t('%s Not Found'), t('Discussion')), 404);
+            $this->EventArguments['DiscussionID'] = $DiscussionID;
+            $this->fireEvent('DiscussionNotFound');
+            throw notFoundException('Discussion');
         }
 
         // Define the query offset & limit.
@@ -209,6 +211,7 @@ class DiscussionController extends VanillaController {
         // Look in the session stash for a comment
         $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', false);
         if ($StashComment) {
+            $this->Form->setValue('Body', $StashComment);
             $this->Form->setFormValue('Body', $StashComment);
         }
 
@@ -311,7 +314,6 @@ class DiscussionController extends VanillaController {
      */
     public function initialize() {
         parent::initialize();
-        $this->addDefinition('ImageResized', t('This image has been resized to fit in the page. Click to enlarge.'));
         $this->addDefinition('ConfirmDeleteCommentHeading', t('ConfirmDeleteCommentHeading', 'Delete Comment'));
         $this->addDefinition('ConfirmDeleteCommentText', t('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'));
         $this->Menu->highlightRoute('/discussions');

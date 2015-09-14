@@ -602,6 +602,8 @@ class CategoryModel extends Gdn_Model {
         $Sql = clone Gdn::sql();
         $Sql->reset();
 
+        $Discussions = null;
+
         // Grab the discussions.
         if (count($DiscussionIDs) > 0) {
             $Discussions = $Sql->whereIn('DiscussionID', $DiscussionIDs)->get('Discussion')->resultArray();
@@ -628,8 +630,7 @@ class CategoryModel extends Gdn_Model {
                 $NameUrl = Gdn_Format::text($Discussion['Name'], true);
                 $Row['LastUrl'] = DiscussionUrl($Discussion, false, '/').'#latest';
             }
-            $Comment = val($Row['LastCommentID'], $Comments);
-            if ($Comment) {
+            if (!empty($Comments) && ($Comment = val($Row['LastCommentID'], $Comments))) {
                 $Row['LastUserID'] = $Comment['InsertUserID'];
                 $Row['LastDateInserted'] = $Comment['DateInserted'];
                 $Row['DateLastComment'] = $Comment['DateInserted'];
@@ -1641,10 +1642,10 @@ class CategoryModel extends Gdn_Model {
         $this->defineSchema();
 
         // Get data from form
-        $CategoryID = arrayValue('CategoryID', $FormPostValues);
-        $NewName = arrayValue('Name', $FormPostValues, '');
-        $UrlCode = arrayValue('UrlCode', $FormPostValues, '');
-        $AllowDiscussions = arrayValue('AllowDiscussions', $FormPostValues, '');
+        $CategoryID = val('CategoryID', $FormPostValues);
+        $NewName = val('Name', $FormPostValues, '');
+        $UrlCode = val('UrlCode', $FormPostValues, '');
+        $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
         $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
@@ -1684,7 +1685,7 @@ class CategoryModel extends Gdn_Model {
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->SchemaValidationFields();
             $Fields = RemoveKeyFromArray($Fields, 'CategoryID');
-            $AllowDiscussions = arrayValue('AllowDiscussions', $Fields) == '1' ? true : false;
+            $AllowDiscussions = val('AllowDiscussions', $Fields) == '1' ? true : false;
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
             if ($Insert === false) {

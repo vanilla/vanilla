@@ -70,9 +70,6 @@ class AssetModel extends Gdn_Model {
         }
 
         $RequestETags = val('HTTP_IF_NONE_MATCH', $_SERVER);
-        if (get_magic_quotes_gpc()) {
-            $RequestETags = stripslashes($RequestETags);
-        }
         $RequestETags = explode(',', $RequestETags);
         foreach ($RequestETags as $RequestETag) {
             if ($RequestETag == $ETag) {
@@ -261,25 +258,25 @@ class AssetModel extends Gdn_Model {
      */
     public static function cssPath($Filename, $Folder = '', $ThemeType = '') {
         if (!$ThemeType) {
-            $ThemeType = IsMobile() ? 'mobile' : 'desktop';
+            $ThemeType = isMobile() ? 'mobile' : 'desktop';
         }
 
         // 1. Check for a url.
-        if (IsUrl($Filename)) {
+        if (isUrl($Filename)) {
             return array($Filename, $Filename);
         }
 
         $Paths = array();
 
         // 2. Check for a full path.
-        if (strpos($Filename, '/') !== false) {
+        if (strpos($Filename, '/') === 0) {
             $Filename = ltrim($Filename, '/');
 
             // Direct path was given
             $Filename = "/{$Filename}";
             $Path = PATH_ROOT.$Filename;
             if (file_exists($Path)) {
-                Deprecated("AssetModel::CssPath() with direct paths");
+                Deprecated(htmlspecialchars($Path).": AssetModel::CssPath() with direct paths");
                 return array($Path, $Filename);
             }
             return false;
@@ -298,7 +295,7 @@ class AssetModel extends Gdn_Model {
                 $Path = "/resources/design/{$Filename}";
                 $Paths[] = array(PATH_ROOT.$Path, $Path);
 
-                // A plugin-relative path was given
+            // A plugin-relative path was given
             } elseif (stringBeginsWith($Folder, 'plugins/')) {
                 $Folder = substr($Folder, strlen('plugins/'));
                 $Path = "/{$Folder}/design/{$Filename}";
@@ -307,7 +304,7 @@ class AssetModel extends Gdn_Model {
                 // Allow direct-to-file links for plugins
                 $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}", true); // deprecated
 
-                // An app-relative path was given
+            // An app-relative path was given
             } else {
                 $Path = "/{$Folder}/design/{$Filename}";
                 $Paths[] = array(PATH_APPLICATIONS.$Path, "/applications{$Path}");
@@ -332,6 +329,98 @@ class AssetModel extends Gdn_Model {
         }
         if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
             trace("Could not find file '$Filename' in folder '$Folder'.");
+        }
+
+        return false;
+    }
+
+    /**
+     * Lookup the path to a JS file and return its info array
+     *
+     * @param string $filename name/relative path to js file
+     * @param string $folder optional. app or plugin folder to search
+     * @param string $themeType mobile or desktop
+     * @return array|bool
+     */
+    public static function jsPath($filename, $folder = '', $themeType = '') {
+        if (!$themeType) {
+            $themeType = isMobile() ? 'mobile' : 'desktop';
+        }
+
+        // 1. Check for a url.
+        if (isUrl($filename)) {
+            return array($filename, $filename);
+        }
+
+        $paths = array();
+
+        // 2. Check for a full path.
+        if (strpos($filename, '/') === 0) {
+            $filename = ltrim($filename, '/');
+
+            // Direct path was given
+            $filename = "/{$filename}";
+            $path = PATH_ROOT.$filename;
+            if (file_exists($path)) {
+                deprecated(htmlspecialchars($path).": AssetModel::JsPath() with direct paths");
+                return array($path, $filename);
+            }
+            return false;
+        }
+
+        // 3. Check the theme.
+        $theme = Gdn::themeManager()->themeFromType($themeType);
+        if ($theme) {
+            $path = "/{$theme}/js/{$filename}";
+            $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
+        }
+
+        // 4. Static, Plugin, or App relative file
+        if ($folder) {
+            if (in_array($folder, array('resources', 'static'))) {
+                $path = "/resources/js/{$filename}";
+                $paths[] = array(PATH_ROOT.$path, $path);
+
+            // A plugin-relative path was given
+            } elseif (stringBeginsWith($folder, 'plugins/')) {
+                $folder = substr($folder, strlen('plugins/'));
+                $path = "/{$folder}/js/{$filename}";
+                $paths[] = array(PATH_PLUGINS.$path, "/plugins{$path}");
+
+                // Allow direct-to-file links for plugins
+                $paths[] = array(PATH_PLUGINS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true); // deprecated
+
+            // An app-relative path was given
+            } else {
+
+                // App-relative path under the theme
+                if ($theme) {
+                    $path = "/{$theme}/{$folder}/js/{$filename}";
+                    $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
+                }
+
+                $path = "/{$folder}/js/{$filename}";
+                $paths[] = array(PATH_APPLICATIONS.$path, "/applications{$path}");
+            }
+        }
+
+        // 5. Check the global js folder.
+        $paths[] = array(PATH_ROOT."/js/{$filename}", "/js/{$filename}");
+        $paths[] = array(PATH_ROOT."/js/library/{$filename}", "/js/library/{$filename}");
+
+        foreach ($paths as $info) {
+            if (file_exists($info[0])) {
+                if (!empty($info[2])) {
+                    // This path is deprecated.
+                    unset($info[2]);
+                    deprecated("The js file '$filename' in folder '$folder'");
+                }
+
+                return $info;
+            }
+        }
+        if (!stringEndsWith($filename, 'custom.js')) {
+            trace("Could not find file '$filename' in folder '$folder'.");
         }
 
         return false;

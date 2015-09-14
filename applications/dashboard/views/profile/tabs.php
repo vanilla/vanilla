@@ -2,7 +2,7 @@
 
 // Get the tab sort order from the user-prefs.
 $SortOrder = FALSE;
-$SortOrder = arrayValue('ProfileTabOrder', $this->User->Preferences, false);
+$SortOrder = val('ProfileTabOrder', $this->User->Preferences, false);
 // If not in the user prefs, get the sort order from the application prefs.
 if ($SortOrder === FALSE)
     $SortOrder = Gdn::config('Garden.ProfileTabOrder');

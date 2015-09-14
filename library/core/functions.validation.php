@@ -148,10 +148,10 @@ if (!function_exists('validateConnection')) {
      * @deprecated
      */
     function validateConnection($value, $field, $data) {
-        $DatabaseHost = ArrayValue('Database.Host', $data, '~~Invalid~~');
-        $DatabaseName = ArrayValue('Database.Name', $data, '~~Invalid~~');
-        $DatabaseUser = ArrayValue('Database.User', $data, '~~Invalid~~');
-        $DatabasePassword = ArrayValue('Database.Password', $data, '~~Invalid~~');
+        $DatabaseHost = val('Database.Host', $data, '~~Invalid~~');
+        $DatabaseName = val('Database.Name', $data, '~~Invalid~~');
+        $DatabaseUser = val('Database.User', $data, '~~Invalid~~');
+        $DatabasePassword = val('Database.Password', $data, '~~Invalid~~');
         $ConnectionString = getConnectionString($DatabaseName, $DatabaseHost);
         try {
             $Connection = new PDO(
@@ -176,7 +176,7 @@ if (!function_exists('validateOldPassword')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateOldPassword($value, $field, $data) {
-        $OldPassword = ArrayValue('OldPassword', $data, '');
+        $OldPassword = val('OldPassword', $data, '');
         $Session = Gdn::Session();
         $UserModel = new UserModel();
         $UserID = $Session->UserID;
@@ -306,9 +306,9 @@ if (!function_exists('validateDate')) {
                 $Year = $Matches[1];
                 $Month = $Matches[2];
                 $Day = $Matches[3];
-                $Hour = ArrayValue(4, $Matches, 0);
-                $Minutes = ArrayValue(5, $Matches, 0);
-                $Seconds = ArrayValue(6, $Matches, 0);
+                $Hour = val(4, $Matches, 0);
+                $Minutes = val(5, $Matches, 0);
+                $Seconds = val(6, $Matches, 0);
 
                 return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
             }
@@ -544,7 +544,7 @@ if (!function_exists('validateMatch')) {
      * @deprecated
      */
     function validateMatch($value, $field, $data) {
-        $MatchValue = ArrayValue($field->Name.'Match', $data);
+        $MatchValue = val($field->Name.'Match', $data);
         return $value == $MatchValue ? true : false;
     }
 }

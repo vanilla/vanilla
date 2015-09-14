@@ -183,7 +183,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '<input type="'.$Type.'"';
         $Return .= $this->_idAttribute($ButtonCode, $Attributes);
         $Return .= $this->_nameAttribute($ButtonCode, $Attributes);
-        $Return .= ' value="'.t($ButtonCode, arrayValue('value', $Attributes)).'"';
+        $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
         $Return .= $this->_attributesToString($Attributes);
         $Return .= " />\n";
         return $Return;
@@ -816,9 +816,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 $EndYear = substr($YearRange, 5);
             }
         }
-        if ($YearRange === false || $StartYear > $EndYear) {
-            $StartYear = 1900;
-            $EndYear = date('Y');
+        if ($YearRange === false) {
+            $StartYear = date('Y');
+            $EndYear = 1900;
         }
 
         $Months = array_map(
@@ -834,8 +834,8 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $Years = array();
         $Years[0] = T('Year');
-        for ($i = $StartYear; $i <= $EndYear; ++$i) {
-            $Years[$i] = $i;
+        foreach (range($StartYear, $EndYear) as $Year) {
+            $Years[$Year] = $Year;
         }
 
         // Show inline errors?
@@ -1800,21 +1800,14 @@ PASSWORDMETER;
     }
 
     /**
-     * Returns a boolean value indicating if the current page has an
-     * authenticated postback. It validates the postback by looking at a
-     * transient value that was rendered using $this->Open() and submitted with
-     * the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
+     * Returns a boolean value indicating if the current page has an authenticated postback.
+     *
+     * It validates the postback by looking at a transient value that was rendered using $this->Open()
+     * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
      * @return bool
      */
     public function authenticatedPostBack() {
-        // Commenting this out because, technically, a get request is not a "postback".
-        // And since I typically use AuthenticatedPostBack to validate that a form has
-        // been posted back a get request should not be considered an authenticated postback.
-        //if ($this->Method == "get") {
-        // forms sent with "get" method do not require authentication.
-        //   return TRUE;
-        //} else {
         $KeyName = $this->escapeFieldName('TransientKey');
         $PostBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $KeyName, false);
 
@@ -1823,20 +1816,13 @@ PASSWORDMETER;
             return false;
         }
 
-        // DEBUG:
-        //$Result .= '<div>KeyName: '.$KeyName.'</div>';
-        //echo '<div>PostBackKey: '.$PostBackKey.'</div>';
-        //echo '<div>TransientKey: '.$Session->TransientKey().'</div>';
-        //echo '<div>AuthenticatedPostBack: ' . ($Session->ValidateTransientKey($PostBackKey) ? 'Yes' : 'No');
-        //die();
         return Gdn::session()->validateTransientKey($PostBackKey);
-        //}
     }
 
     /**
      * Checks $this->FormValues() to see if the specified button translation
      * code was submitted with the form (helps figuring out what button was
-     *  pressed to submit the form when there is more than one button available).
+     * pressed to submit the form when there is more than one button available).
      *
      * @param string $ButtonCode The translation code of the button to check for.
      * @return boolean
@@ -1965,8 +1951,6 @@ PASSWORDMETER;
             return;
         }
 
-        $MagicQuotes = get_magic_quotes_gpc();
-
         if (!is_array($this->_FormValues)) {
             $TableName = $this->InputPrefix;
             if (strlen($TableName) > 0) {
@@ -1982,16 +1966,6 @@ PASSWORDMETER;
                 $FieldName = substr($Field, $TableNameLength);
                 $FieldName = $this->_unescapeString($FieldName);
                 if (substr($Field, 0, $TableNameLength) == $TableName) {
-                    if ($MagicQuotes) {
-                        if (is_array($Value)) {
-                            foreach ($Value as $i => $v) {
-                                $Value[$i] = stripcslashes($v);
-                            }
-                        } else {
-                            $Value = stripcslashes($Value);
-                        }
-                    }
-
                     $this->_FormValues[$FieldName] = $Value;
                 }
             }
@@ -2027,20 +2001,20 @@ PASSWORDMETER;
                         ) ===
                             false
                         ) { // Saving dates in the format: YYYY-MM-DD
-                            $Year = arrayValue(
+                            $Year = val(
                                 $DateFields[$i].
                                 '_Year',
                                 $this->_FormValues,
                                 0
                             );
                         }
-                        $Month = arrayValue(
+                        $Month = val(
                             $DateFields[$i].
                             '_Month',
                             $this->_FormValues,
                             0
                         );
-                        $Day = arrayValue(
+                        $Day = val(
                             $DateFields[$i].
                             '_Day',
                             $this->_FormValues,
@@ -2092,7 +2066,7 @@ PASSWORDMETER;
      * @return unknown
      */
     public function getFormValue($FieldName, $Default = '') {
-        return arrayValue($FieldName, $this->formValues(), $Default);
+        return val($FieldName, $this->formValues(), $Default);
     }
 
     /**
@@ -2114,7 +2088,7 @@ PASSWORDMETER;
         if ($this->isMyPostBack()) {
             $Return = $this->getFormValue($FieldName, $Default);
         } else {
-            $Return = arrayValue($FieldName, $this->_DataArray, $Default);
+            $Return = val($FieldName, $this->_DataArray, $Default);
         }
         return $Return;
     }

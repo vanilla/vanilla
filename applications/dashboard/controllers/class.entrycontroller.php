@@ -380,6 +380,7 @@ EOT;
         $this->addJsFile('entry.js');
         $this->View = 'connect';
         $IsPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
+        $UserSelect = $this->Form->getFormValue('UserSelect');
 
         if (!$IsPostBack) {
             // Here are the initial data array values. that can be set by a plugin.
@@ -504,17 +505,23 @@ EOT;
             $AutoConnect = c('Garden.Registration.AutoConnect');
 
             if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
-                $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
+                $searchName = $this->Form->getFormValue('ConnectName');
+            } else {
+                $searchName = $this->Form->getFormValue('Name');
             }
 
             // Get the existing users that match the name or email of the connection.
             $Search = false;
-            if ($this->Form->getFormValue('Name') && $NameUnique) {
-                $UserModel->SQL->orWhere('Name', $this->Form->getFormValue('Name'));
+            if ($searchName && $NameUnique) {
+                $UserModel->SQL->orWhere('Name', $searchName);
                 $Search = true;
             }
             if ($this->Form->getFormValue('Email') && ($EmailUnique || $AutoConnect)) {
                 $UserModel->SQL->orWhere('Email', $this->Form->getFormValue('Email'));
+                $Search = true;
+            }
+            if (is_numeric($UserSelect)) {
+                $UserModel->SQL->orWhere('UserID', $UserSelect);
                 $Search = true;
             }
 
@@ -526,6 +533,10 @@ EOT;
 
             // Check to automatically link the user.
             if ($AutoConnect && count($ExistingUsers) > 0) {
+                if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
+                    $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
+                }
+
                 foreach ($ExistingUsers as $Row) {
                     if (strcasecmp($this->Form->getFormValue('Email'), $Row['Email']) === 0) {
                         $UserID = $Row['UserID'];
@@ -604,7 +615,10 @@ EOT;
                 $EmailValid = validateRequired($this->Form->getFormValue('Email'));
             }
 
-            if ($this->Form->getFormValue('Name') && $EmailValid && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+            if ((!$UserSelect || $UserSelect == 'other') &&
+                $this->Form->getFormValue('Name') && $EmailValid &&
+                (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+
                 // There is no existing user with the suggested name so we can just create the user.
                 $User = $this->Form->formValues();
                 $User = $this->UserModel->filterForm($User, true);
@@ -627,6 +641,7 @@ EOT;
                         'UniqueID' => $this->Form->getFormValue('UniqueID')));
 
                     $this->Form->setFormValue('UserID', $UserID);
+                    $this->Form->setFormValue('UserSelect', false);
 
                     Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
                     Gdn::userModel()->fireEvent('AfterSignIn');
@@ -649,8 +664,6 @@ EOT;
         if ($IsPostBack) {
             // The user has made their decision.
             $PasswordHash = new Gdn_PasswordHash();
-
-            $UserSelect = $this->Form->getFormValue('UserSelect');
 
             if (!$UserSelect || $UserSelect == 'other') {
                 // The user entered a username.
@@ -1086,7 +1099,7 @@ EOT;
 
         if ($this->Form->isPostBack() === true) {
             $FormValues = $this->Form->formValues();
-            if (ArrayValue('StopLinking', $FormValues)) {
+            if (val('StopLinking', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_ABORTED;
 
                 $UserEventData = array_merge(array(
@@ -1099,7 +1112,7 @@ EOT;
                 Gdn::request()->withRoute('DefaultController');
                 return Gdn::dispatcher()->dispatch();
 
-            } elseif (ArrayValue('NewAccount', $FormValues)) {
+            } elseif (val('NewAccount', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_CREATED;
 
                 // Try and synchronize the user with the new username/email.
@@ -1133,7 +1146,7 @@ EOT;
                 if ($UserID > 0) {
                     $Data = $FormValues;
                     $Data['UserID'] = $UserID;
-                    $Data['Email'] = arrayValue('SignInEmail', $FormValues, '');
+                    $Data['Email'] = val('SignInEmail', $FormValues, '');
                     $UserID = $this->UserModel->synchronize($UserInfo['UserKey'], $Data);
                 }
             }
@@ -1189,8 +1202,8 @@ EOT;
             $this->Form->addHidden('Consumer', $UserInfo['ConsumerKey']);
         }
 
-        $this->setData('Name', arrayValue('Name', $this->Form->HiddenInputs));
-        $this->setData('Email', arrayValue('Email', $this->Form->HiddenInputs));
+        $this->setData('Name', val('Name', $this->Form->HiddenInputs));
+        $this->setData('Email', val('Email', $this->Form->HiddenInputs));
 
         $this->render();
     }
@@ -1355,18 +1368,18 @@ EOT;
                     Gdn::session()->start($AuthUserID);
 
                     if ($this->Form->getFormValue('RememberMe')) {
-                        Gdn::authenticator()->SetIdentity($AuthUserID, true);
+                        Gdn::authenticator()->setIdentity($AuthUserID, true);
                     }
 
                     try {
-                        $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+                        $this->UserModel->sendWelcomeEmail($AuthUserID, '', 'Register');
                     } catch (Exception $Ex) {
                     }
 
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->RedirectTo();
+                    $Route = $this->redirectTo();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                         $this->RedirectUrl = url($Route);
                     } else {

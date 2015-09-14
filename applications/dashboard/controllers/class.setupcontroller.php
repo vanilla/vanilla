@@ -85,9 +85,8 @@ class SetupController extends DashboardController {
                     // Now that the application is installed, select a more user friendly error page.
                     $Config = array('Garden.Installed' => true);
                     saveToConfig($Config);
+                    $this->fireAs('UpdateModel')->fireEvent('AfterStructure');
                     $this->fireEvent('Installed');
-
-                    PermissionModel::ResetAllRoles();
 
                     // Go to the dashboard
                     redirect('/settings/gettingstarted');
@@ -234,7 +233,7 @@ class SetupController extends DashboardController {
                 $Disconnected = !(bool)@fsockopen('ajax.googleapis.com', 80);
 
                 saveToConfig(array(
-                    'Garden.Version' => arrayValue('Version', val('Dashboard', $ApplicationInfo, array()), 'Undefined'),
+                    'Garden.Version' => val('Version', val('Dashboard', $ApplicationInfo, array()), 'Undefined'),
                     'Garden.Cdns.Disable' => $Disconnected,
                     'Garden.CanProcessImages' => function_exists('gd_info'),
                     'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled

@@ -39,51 +39,19 @@ jQuery(document).ready(function($) {
     $.postParseJson = function(json) {
         if (json.Data) json.Data = $.base64Decode(json.Data);
         return json;
-    }
+    };
 
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
+    // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
     var uTF8Encode = function(string) {
-        string = string.replace(/\x0d\x0a/g, "\x0a");
-        var output = "";
-        for (var n = 0; n < string.length; n++) {
-            var c = string.charCodeAt(n);
-            if (c < 128) {
-                output += String.fromCharCode(c);
-            } else if ((c > 127) && (c < 2048)) {
-                output += String.fromCharCode((c >> 6) | 192);
-                output += String.fromCharCode((c & 63) | 128);
-            } else {
-                output += String.fromCharCode((c >> 12) | 224);
-                output += String.fromCharCode(((c >> 6) & 63) | 128);
-                output += String.fromCharCode((c & 63) | 128);
-            }
-        }
-        return output;
+        return unescape(encodeURIComponent(string));
     };
 
-    var uTF8Decode = function(input) {
-        var string = "";
-        var i = 0;
-        var c = c1 = c2 = 0;
-        while (i < input.length) {
-            c = input.charCodeAt(i);
-            if (c < 128) {
-                string += String.fromCharCode(c);
-                i++;
-            } else if ((c > 191) && (c < 224)) {
-                c2 = input.charCodeAt(i + 1);
-                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-                i += 2;
-            } else {
-                c2 = input.charCodeAt(i + 1);
-                c3 = input.charCodeAt(i + 2);
-                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-                i += 3;
-            }
-        }
-        return string;
-    }
+    // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
+    var uTF8Decode = function(string) {
+        return decodeURIComponent(escape(string));
+    };
 
     $.extend({
         // private property
@@ -149,7 +117,7 @@ jQuery(document).ready(function($) {
 
     // Grab a definition from object in the page
     gdn.definition = function(definition, defaultVal, set) {
-        if (defaultVal == null)
+        if (defaultVal === undefined)
             defaultVal = definition;
 
         if (!(definition in gdn.meta)) {
@@ -161,7 +129,7 @@ jQuery(document).ready(function($) {
         }
 
         return gdn.meta[definition];
-    }
+    };
 
     gdn.disable = function(e, progressClass) {
         var href = $(e).attr('href');
@@ -169,7 +137,7 @@ jQuery(document).ready(function($) {
             $.data(e, 'hrefBak', href);
         }
         $(e).addClass(progressClass ? progressClass : 'InProgress').removeAttr('href').attr('disabled', true);
-    }
+    };
 
     gdn.enable = function(e) {
         $(e).attr('disabled', false).removeClass('InProgress');
@@ -178,7 +146,7 @@ jQuery(document).ready(function($) {
             $(e).attr('href', href);
             $.removeData(e, 'hrefBak');
         }
-    }
+    };
 
     gdn.elementSupports = function(element, attribute) {
         var test = document.createElement(element);
@@ -186,7 +154,7 @@ jQuery(document).ready(function($) {
             return true;
         else
             return false;
-    }
+    };
 
     gdn.getMeta = function(key, defaultValue) {
         if (gdn.meta[key] === undefined) {
@@ -195,13 +163,14 @@ jQuery(document).ready(function($) {
             return gdn.meta[key];
         }
     };
+
     gdn.setMeta = function(key, value) {
         gdn.meta[key] = value;
-    }
+    };
 
     gdn.querySep = function(url) {
         return url.indexOf('?') == -1 ? '?' : '&';
-    }
+    };
 
     // password strength check
     gdn.password = function(password, username) {
@@ -264,7 +233,7 @@ jQuery(document).ready(function($) {
         }
 
         return response;
-    }
+    };
 
     // Go to notifications if clicking on a user's notification count
     $('li.UserNotifications a span').click(function() {
@@ -397,7 +366,7 @@ jQuery(document).ready(function($) {
     // If a page loads with a hidden redirect url, go there after a few moments.
     var RedirectUrl = gdn.definition('RedirectUrl', '');
     var CheckPopup = gdn.definition('CheckPopup', '');
-    if (RedirectUrl != '') {
+    if (RedirectUrl !== '') {
         if (CheckPopup && window.opener) {
             window.opener.location.replace(RedirectUrl);
             window.close();
@@ -434,11 +403,11 @@ jQuery(document).ready(function($) {
             if (txt.length > iMaxChars)
                 $(this).val(txt.substr(0, iMaxChars));
         });
-    }
+    };
 
     // Generate a random string of specified length
     gdn.generateString = function(length) {
-        if (length == null)
+        if (length === undefined)
             length = 5;
 
         var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
@@ -467,18 +436,20 @@ jQuery(document).ready(function($) {
             return;
 
         var tar = function(q) {
-            switch (q) {
-                case '!element':
-                    return $elem;
-                case '!parent':
-                    return $parent;
-                default:
-                    return q;
-            }
-        }
+                switch (q) {
+                    case '!element':
+                        return $elem;
+                    case '!parent':
+                        return $parent;
+                    default:
+                        return q;
+                }
+            },
+            item,
+            $target;
 
-        for (i = 0; i < targets.length; i++) {
-            var item = targets[i];
+        for (var i = 0; i < targets.length; i++) {
+            item = targets[i];
 
             if (jQuery.isArray(item.Target)) {
                 $target = $(tar(item.Target[0]), tar(item.Target[1]));
@@ -576,11 +547,11 @@ jQuery(document).ready(function($) {
     };
 
     gdn.loaded = function(Library) {
-        if (Library != null)
+        if (Library)
             gdn.Libraries[Library] = true;
 
-        $(document).trigger('libraryloaded', [Library])
-    }
+        $(document).trigger('libraryloaded', [Library]);
+    };
 
     gdn.available = function(Library) {
         if (!(Library instanceof Array))
@@ -591,7 +562,7 @@ jQuery(document).ready(function($) {
             if (gdn.Libraries[Lib] !== true) return false;
         }
         return true;
-    }
+    };
 
     gdn.url = function(path) {
         if (path.indexOf("//") >= 0)
@@ -617,7 +588,7 @@ jQuery(document).ready(function($) {
             if (!$this.val() && placeholder) {
                 $this.val(placeholder);
                 $this.blur(function() {
-                    if ($this.val() == '')
+                    if ($this.val() === '')
                         $this.val(placeholder);
                 });
                 $this.focus(function() {
@@ -658,7 +629,7 @@ jQuery(document).ready(function($) {
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
-                    if (settings.complete != undefined) {
+                    if (settings.complete !== undefined) {
                         settings.complete($elem);
                     }
                 }
@@ -698,7 +669,7 @@ jQuery(document).ready(function($) {
                 gdn.informError(xhr);
             },
             success: function(json) {
-                if (json == null) json = {};
+                if (json === null) json = {};
 
                 var informed = gdn.inform(json);
                 gdn.processTargets(json.Targets, $elem, $parent);
@@ -737,7 +708,7 @@ jQuery(document).ready(function($) {
         var $flyout = $('.Flyout', this);
         var isHandle = false;
 
-        if ($(e.target).closest('.Flyout').length == 0) {
+        if ($(e.target).closest('.Flyout').length === 0) {
             e.stopPropagation();
             isHandle = true;
         } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
@@ -765,7 +736,7 @@ jQuery(document).ready(function($) {
         }
 
         if ($flyout.css('display') == 'none') {
-            if (lastOpen != null) {
+            if (lastOpen !== null) {
                 $('.Flyout', lastOpen).hide();
                 $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
             }
@@ -811,14 +782,14 @@ jQuery(document).ready(function($) {
         }
     });
 
-    if (window.location.hash == '') {
+    if (window.location.hash === '') {
         // Jump to the hash if desired.
-        if (gdn.definition('LocationHash', 0) != 0) {
+        if (gdn.definition('LocationHash', 0) !== 0) {
             $(window).load(function() {
                 window.location.hash = gdn.definition('LocationHash');
             });
         }
-        if (gdn.definition('ScrollTo', 0) != 0) {
+        if (gdn.definition('ScrollTo', 0) !== 0) {
             var scrollTo = $(gdn.definition('ScrollTo'));
             if (scrollTo.length > 0) {
                 $('html').animate({
@@ -839,7 +810,7 @@ jQuery(document).ready(function($) {
             'ResolvedArgs': gdn.definition('ResolvedArgs')
         };
 
-        if (gdn.definition('TickExtra', null) != null)
+        if (gdn.definition('TickExtra', null) !== null)
             SendData.TickExtra = gdn.definition('TickExtra');
 
         jQuery.ajax({
@@ -851,7 +822,7 @@ jQuery(document).ready(function($) {
                 gdn.inform(json);
             }
         });
-    }
+    };
 
     // Ping back to the deployment server to track views, and trigger
     // conditional stats tasks
@@ -877,12 +848,12 @@ jQuery(document).ready(function($) {
             }, 7000);
             $('div.InformMessages').attr('autodismisstimerid', timerId);
         }
-    }
+    };
 
     // Handle autodismissals
-    $('div.InformWrapper.AutoDismiss:first').livequery(function() {
-        gdn.setAutoDismiss();
-    });
+	$(document).on('informMessage', function() {
+		gdn.setAutoDismiss();
+	});
 
     // Prevent autodismiss if hovering any inform messages
     $(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
@@ -902,49 +873,54 @@ jQuery(document).ready(function($) {
         if (!response)
             return false;
 
-        if (!response.InformMessages || response.InformMessages.length == 0)
+        if (!response.InformMessages || response.InformMessages.length === 0)
             return false;
 
         // If there is no message container in the page, add one
         var informMessages = $('div.InformMessages');
-        if (informMessages.length == 0) {
+        if (informMessages.length === 0) {
             $('<div class="InformMessages"></div>').appendTo('body');
             informMessages = $('div.InformMessages');
         }
-        var wrappers = $('div.InformMessages div.InformWrapper');
+        var wrappers = $('div.InformMessages div.InformWrapper'),
+            css,
+            elementId,
+            sprite,
+            dismissCallback,
+            dismissCallbackUrl;
 
         // Loop through the inform messages and add them to the container
         for (var i = 0; i < response.InformMessages.length; i++) {
             css = 'InformWrapper';
-            if (response.InformMessages[i]['CssClass'])
-                css += ' ' + response.InformMessages[i]['CssClass'];
+            if (response.InformMessages[i].CssClass)
+                css += ' ' + response.InformMessages[i].CssClass;
 
             elementId = '';
-            if (response.InformMessages[i]['id'])
-                elementId = response.InformMessages[i]['id'];
+            if (response.InformMessages[i].id)
+                elementId = response.InformMessages[i].id;
 
             sprite = '';
-            if (response.InformMessages[i]['Sprite']) {
+            if (response.InformMessages[i].Sprite) {
                 css += ' HasSprite';
-                sprite = response.InformMessages[i]['Sprite'];
+                sprite = response.InformMessages[i].Sprite;
             }
 
-            dismissCallback = response.InformMessages[i]['DismissCallback'];
-            dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
+            dismissCallback = response.InformMessages[i].DismissCallback;
+            dismissCallbackUrl = response.InformMessages[i].DismissCallbackUrl;
             if (dismissCallbackUrl)
                 dismissCallbackUrl = gdn.url(dismissCallbackUrl);
 
             try {
-                var message = response.InformMessages[i]['Message'];
-                var emptyMessage = message == '';
+                var message = response.InformMessages[i].Message;
+                var emptyMessage = message === '';
 
                 // Is there a sprite?
-                if (sprite != '')
+                if (sprite !== '')
                     message = '<span class="InformSprite ' + sprite + '"></span>' + message;
 
                 // If the message is dismissable, add a close button
                 if (css.indexOf('Dismissable') > 0)
-                    message = '<a class="Close"><span>×</span></a>' + message;
+                    message = '<a class="Close"><span>&times;</span></a>' + message;
 
                 message = '<div class="InformMessage">' + message + '</div>';
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
@@ -959,7 +935,7 @@ jQuery(document).ready(function($) {
                     }
                 }
                 if (!skip) {
-                    if (elementId != '') {
+                    if (elementId !== '') {
                         $('#' + elementId).remove();
                         elementId = ' id="' + elementId + '"';
                     }
@@ -995,28 +971,28 @@ jQuery(document).ready(function($) {
         informMessages.show();
         $(document).trigger('informMessage');
         return true;
-    }
+    };
 
     // Send an informMessage to the screen (same arguments as controller.InformMessage).
     gdn.informMessage = function(message, options) {
         if (!options)
-            options = new Array();
+            options = [];
 
         if (typeof(options) == 'string') {
             var css = options;
-            options = new Array();
-            options['CssClass'] = css;
+            options = [];
+            options.CssClass = css;
         }
-        options['Message'] = message;
-        if (!options['CssClass'])
-            options['CssClass'] = 'Dismissable AutoDismiss';
+        options.Message = message;
+        if (!options.CssClass)
+            options.CssClass = 'Dismissable AutoDismiss';
 
         gdn.inform({'InformMessages': new Array(options)});
-    }
+    };
 
     // Inform an error returned from an ajax call.
     gdn.informError = function(xhr, silentAbort) {
-        if (xhr == undefined || xhr == null)
+        if (xhr === undefined || xhr === null)
             return;
 
         if (typeof(xhr) == 'string')
@@ -1025,7 +1001,7 @@ jQuery(document).ready(function($) {
         var message = xhr.responseText;
         var code = xhr.status;
 
-        if (message == undefined || message == null || message == '') {
+        if (!message) {
             switch (xhr.statusText) {
                 case 'error':
                     if (silentAbort)
@@ -1047,11 +1023,11 @@ jQuery(document).ready(function($) {
         } catch (e) {
         }
 
-        if (message == '')
+        if (message === '')
             message = 'There was an error performing your request. Please try again.';
 
         gdn.informMessage('<span class="InformSprite Lightbulb Error' + code + '"></span>' + message, 'HasSprite Dismissable');
-    }
+    };
 
     // Pick up the inform message stack and display it on page load
     var informMessageStack = gdn.definition('InformMessageStack', false);
@@ -1093,7 +1069,7 @@ jQuery(document).ready(function($) {
                 notificationsPinging--;
             }
         });
-    }
+    };
     gdn.pingForNotifications = pingForNotifications;
 
     if (gdn.definition('SignedIn', '0') != '0' && gdn.definition('DoInform', '1') != '0') {
@@ -1111,7 +1087,7 @@ jQuery(document).ready(function($) {
     });
 
     // Stash something in the user's session (or unstash the value if it was not provided)
-    stash = function(name, value, callback) {
+    var stash = function(name, value, callback) {
         $.ajax({
             type: "POST",
             url: gdn.url('session/stash'),
@@ -1132,60 +1108,63 @@ jQuery(document).ready(function($) {
         });
 
         return '';
-    }
+    };
 
     // When a stash anchor is clicked, look for inputs with values to stash
     $('a.Stash').click(function(e) {
-        // Embedded comments
         var comment = $('#Form_Comment textarea').val(),
             placeholder = $('#Form_Comment textarea').attr('placeholder'),
-            vanilla_identifier = gdn.definition('vanilla_identifier');
+            stash_name;
 
-        if (vanilla_identifier && comment != '' && comment != placeholder) {
+        // Stash a comment:
+        if (comment !== '' && comment !== placeholder) {
+            var vanilla_identifier = gdn.definition('vanilla_identifier', false);
+
+            if (vanilla_identifier) {
+                // Embedded comment:
+                stash_name = 'CommentForForeignID_' + vanilla_identifier;
+            } else {
+                // Non-embedded comment:
+                stash_name = 'CommentForDiscussionID_' + gdn.definition('DiscussionID');
+            }
             var href = $(this).attr('href');
             e.preventDefault();
 
-
-            stash('CommentForForeignID_' + vanilla_identifier, comment, function() {
-                window.top.location = href;
-            });
+            stash(stash_name, comment);
         }
     });
 
     String.prototype.addCommas = function() {
-        nStr = this;
-        x = nStr.split('.');
-        x1 = x[0];
-        x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
+        var nStr = this,
+            x = nStr.split('.'),
+            x1 = x[0],
+            x2 = x.length > 1 ? '.' + x[1] : '',
+            rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         return x1 + x2;
-    }
+    };
 
     Array.prototype.sum = function() {
         for (var i = 0, sum = 0; i < this.length; sum += this[i++]);
         return sum;
-    }
+    };
+
     Array.prototype.max = function() {
-        return Math.max.apply({}, this)
-    }
+        return Math.max.apply({}, this);
+    };
+
     Array.prototype.min = function() {
-        return Math.min.apply({}, this)
-    }
+        return Math.min.apply({}, this);
+    };
 
     if (/msie/.test(navigator.userAgent.toLowerCase())) {
         $('body').addClass('MSIE');
     }
 
-    var d = new Date()
+    var d = new Date();
     var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
-
-    // Set the ClientHour if there is an input looking for it.
-    $('input:hidden[name$=HourOffset]').livequery(function() {
-        $(this).val(hourOffset);
-    });
 
     // Ajax/Save the ClientHour if it is different from the value in the db.
     var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
@@ -1197,13 +1176,13 @@ jQuery(document).ready(function($) {
     }
 
     // Add "checked" class to item rows if checkboxes are checked within.
-    checkItems = function() {
+    var checkItems = function() {
         var container = $(this).parents('.Item');
         if ($(this).prop('checked'))
             $(container).addClass('Checked');
         else
             $(container).removeClass('Checked');
-    }
+    };
     $('.Item :checkbox').each(checkItems);
     $('.Item :checkbox').change(checkItems);
 
@@ -1249,7 +1228,7 @@ jQuery(document).ready(function($) {
 
         // Verify we have a valid videoid
         var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?$/;
-        if (videoid.match(pattern) == null) {
+        if (!pattern.test(videoid)) {
             return false;
         }
 
@@ -1279,7 +1258,7 @@ jQuery(document).ready(function($) {
      * included in the page, or if the connection was slow, resulting in
      * `window.twttr` being undefined. The promise guarantees this won't happen.
      */
-    twitterCardEmbed = (function() {
+    var twitterCardEmbed = (function() {
         'use strict';
 
         // Call to transform all tweet URLs into embedded cards. Expose to global
@@ -1295,7 +1274,7 @@ jQuery(document).ready(function($) {
                     // Candidate found, prepare transition.
                     card.addClass('twitter-card-preload');
 
-                    twttr.widgets.createTweet(tweetID, cardref, function(iframe) {
+                    window.twttr.widgets.createTweet(tweetID, cardref, function(iframe) {
                         card.find('.tweet-url').remove();
                         // Fade it in.
                         card.addClass('twitter-card-loaded');
@@ -1313,7 +1292,7 @@ jQuery(document).ready(function($) {
             ).done(function() {
                     // The promise returned successfully (script loaded and executed),
                     // so convert tweets already on page.
-                    twttr.ready(tweets);
+                    window.twttr.ready(window.tweets);
 
                     // Attach event for embed whenever new comments are posted, so they
                     // are automatically loaded. Currently works for new comments,
@@ -1324,7 +1303,7 @@ jQuery(document).ready(function($) {
                     ];
 
                     $(document).on(newPostTriggers.join(' '), function(e, data) {
-                        twttr.ready(tweets);
+                        window.twttr.ready(window.tweets);
                     });
                 });
         }
@@ -1457,7 +1436,7 @@ jQuery(document).ready(function($) {
         ];
 
         $(document).on(autosizeTriggers.join(' '), function(e, data) {
-            var data = (typeof data == 'object') ? data : '';
+            data = (typeof data == 'object') ? data : '';
             $(data || e.target || this).parent().find('textarea').each(function(i, el) {
                 gdn.autosize(el);
             });
@@ -1523,9 +1502,7 @@ jQuery(document).ready(function($) {
         emojiTemplate = '<li data-value=":${name}:" class="at-suggest-emoji"><span class="emoji-wrap">' + emojiTemplate + '</span> <span class="emoji-name">${name}</span></li>';
 
         // Handle iframe situation
-        var iframe_window = (iframe)
-            ? iframe.contentWindow
-            : '';
+        var iframe_window = (iframe) ? iframe.contentWindow : '';
 
         $(editorElement)
             .atwho({
@@ -1538,7 +1515,7 @@ jQuery(document).ready(function($) {
                     remote_filter: function(query, callback) {
                         // Do this because of undefined when adding spaces to
                         // matcher callback, as it will be monitoring changes.
-                        var query = query || '';
+                        query = query || '';
 
                         // Only all query strings greater than min_characters
                         if (query.length >= min_characters) {
@@ -1584,7 +1561,7 @@ jQuery(document).ready(function($) {
                             var empty_query = false;
 
                             // Loop through cache of empty query strings.
-                            for (key in gdn.atempty) {
+                            for (var key in gdn.atempty) {
                                 if (gdn.atempty.hasOwnProperty(key)) {
                                     // See if cached empty results match the start
                                     // of the latest query. If so, then no point
@@ -1644,15 +1621,11 @@ jQuery(document).ready(function($) {
 
                         // Check if there are any whitespaces, and if so, add
                         // quotation marks around the whole name.
-                        var requires_quotation = (/\s/g.test(username))
-                            ? true
-                            : false;
+                        var requires_quotation = /\s/g.test(username);
 
                         // Check if there are already quotation marks around
                         // the string--double or single.
-                        var has_quotation = (/(\"|\')(.+)(\"|\')/g.test(username))
-                            ? true
-                            : false;
+                        var has_quotation = /(\"|\')(.+)(\"|\')/g.test(username);
 
                         var insert = username;
 
@@ -1668,9 +1641,7 @@ jQuery(document).ready(function($) {
                         // from being inserted into the page.
                         var raw_at_match = this.raw_at_match || '';
 
-                        var at_quote = (/.?@(\"|\')/.test(raw_at_match))
-                            ? true
-                            : false;
+                        var at_quote = /.?@(\"|\')/.test(raw_at_match);
 
                         // If at_quote is false, then insert the at character,
                         // otherwise it means the user typed a quotation mark
@@ -1773,20 +1744,20 @@ jQuery(document).ready(function($) {
 
         // http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
         String.prototype.width = function(font) {
-            var f = font || "15px 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif'";
-            o = $('<div>' + this + '</div>')
-                .css({
-                    'position': 'absolute',
-                    'float': 'left',
-                    'white-space': 'nowrap',
-                    'visibility': 'hidden',
-                    'font': f
-                })
-                .appendTo($('body')),
+            var f = font || "15px 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif'",
+                o = $('<div>' + this + '</div>')
+                    .css({
+                        'position': 'absolute',
+                        'float': 'left',
+                        'white-space': 'nowrap',
+                        'visibility': 'hidden',
+                        'font': f
+                    })
+                    .appendTo($('body')),
                 w = o.width();
             o.remove();
             return w;
-        }
+        };
 
         // Only necessary for iframe.
         // Based on work here: https://github.com/ichord/At.js/issues/124
@@ -1864,9 +1835,10 @@ jQuery(document).ready(function($) {
     // calls this function directly when in wysiwyg format, as it needs to
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
-        $('.BodyBox').livequery(function() {
-            gdn.atCompleteInit(this, '');
+        $(document).on('EditCommentFormLoaded popupReveal', function() {
+            gdn.atCompleteInit('.BodyBox', '');
         });
+        gdn.atCompleteInit('.BodyBox', '');
     }
 
 
@@ -1918,8 +1890,7 @@ jQuery(window).load(function() {
      */
 
     (function($) {
-        var
-            props = ['Width', 'Height'],
+        var props = ['Width', 'Height'],
             prop;
 
         while (prop = props.pop()) {
@@ -1929,15 +1900,14 @@ jQuery(window).load(function() {
                         return this[0][natural];
                     } :
                     function() {
-                        var
-                            node = this[0],
+                        var node = this[0],
                             img,
                             value;
 
                         if (node.tagName.toLowerCase() === 'img') {
                             img = new Image();
-                            img.src = node.src,
-                                value = img[prop];
+                            img.src = node.src;
+                            value = img[prop];
                         }
                         return value;
                     };
@@ -1946,11 +1916,10 @@ jQuery(window).load(function() {
     }(jQuery));
 
     jQuery('div.Message img').each(function(i, img) {
-        var img = jQuery(img);
+        img = jQuery(img);
         var container = img.closest('div.Message');
         if (img.naturalWidth() > container.width() && container.width() > 0) {
-            img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-            img.wrap('<a href="' + $(img).attr('src') + '" target="_blank"></a>');
+            img.wrap('<a href="' + jQuery(img).attr('src') + '" target="_blank"></a>');
         }
     });
 
@@ -1961,5 +1930,5 @@ jQuery(window).load(function() {
 if (typeof String.prototype.trim !== 'function') {
     String.prototype.trim = function() {
         return this.replace(/^\s+|\s+$/g, '');
-    }
+    };
 }

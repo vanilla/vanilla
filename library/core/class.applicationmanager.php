@@ -294,6 +294,24 @@ class Gdn_ApplicationManager {
             }
         }
 
+        // 3. Check to make sure that no other enabled plugins rely on this one
+        $DependendPlugins = array();
+        foreach (Gdn::pluginManager()->enabledPlugins() as $CheckingName => $CheckingInfo) {
+            $RequiredApplications = val('RequiredApplications', $CheckingInfo, false);
+            if (is_array($RequiredApplications) && array_key_exists($applicationName, $RequiredApplications) === true) {
+            	$DependendPlugins[] = $CheckingName;
+            }
+        }
+        if (!empty($DependendPlugins)) {
+            throw new Exception(
+                sprintf(
+                    t('You cannot disable the %1$s application because the following plugins require it in order to function: %2$s'),
+                    $applicationName,
+                    implode(', ', $DependendPlugins)
+                )
+            );
+        }
+        
         // 2. Disable it
         removeFromConfig("EnabledApplications.{$applicationName}");
 

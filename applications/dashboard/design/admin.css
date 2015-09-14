@@ -846,6 +846,14 @@ input.SmallInput {
     width: 80px;
 }
 
+.Inline {
+    display: inline;
+}
+div.Popup ul li label.Inline,
+form ul li label.Inline {
+    display: inline-block;
+}
+
 /* FormTable */
 table {
     width: 100%;
@@ -2459,6 +2467,10 @@ ol.Sortable {
     color: #333;
     font-size: 12px;
     display: block;
+}
+
+.FeedItem h2 {
+    margin-bottom: 0;
 }
 
 .Selected {

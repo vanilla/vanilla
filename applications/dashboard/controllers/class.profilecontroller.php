@@ -480,9 +480,6 @@ class ProfileController extends Gdn_Controller {
             $this->Head->addTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
         }
 
-        // if ($this->User->UserID == Gdn::session()->UserID)
-        //    return $this->Notifications($Page);
-        // elseif (c('Garden.Profile.ShowActivities', true))
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
         } else {
@@ -999,7 +996,7 @@ class ProfileController extends Gdn_Controller {
         $Result = array();
         foreach ($Data as $K => $V) {
             if (is_array($V)) {
-                $Result[$K] = self::_emoveEmailPreferences($V);
+                $Result[$K] = self::_removeEmailPreferences($V);
             } else {
                 $Result[$K] = $V;
             }
@@ -1022,19 +1019,20 @@ class ProfileController extends Gdn_Controller {
      * @access public
      * @param mixed $UserReference Unique identifier, possibly username or ID.
      * @param string $Username .
-     * @param string $TransientKey Security token.
+     * @param string $tk Security token.
      */
-    public function removePicture($UserReference = '', $Username = '', $TransientKey = '') {
+    public function removePicture($UserReference = '', $Username = '', $tk = '') {
         $this->permission('Garden.SignIn.Allow');
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
         }
 
-        // Get user data & another permission check
+        // Get user data & another permission check.
         $this->getUserInfo($UserReference, $Username, '', true);
+
         $RedirectUrl = userUrl($this->User, '', 'picture');
-        if ($Session->validateTransientKey($TransientKey) && is_object($this->User)) {
+        if ($Session->validateTransientKey($tk) && is_object($this->User)) {
             $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
                 // Do removal, set message, redirect
@@ -1348,7 +1346,7 @@ class ProfileController extends Gdn_Controller {
             $Module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
 
             if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), combinePaths(array(userUrl($this->User, '', 'removepicture'), $Session->transientKey())), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
+                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
             }
 
             $Module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
@@ -1389,6 +1387,10 @@ class ProfileController extends Gdn_Controller {
             if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
                 $Module->addLink('Options', sprite('SpThumbnail').' '.t('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
             }
+
+            if ($this->User->Photo != '' && $AllowImages) {
+                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
+            }
         }
 
         if ($this->User->UserID == $ViewingUserID || $Session->checkPermission('Garden.Users.Edit')) {
@@ -1396,7 +1398,7 @@ class ProfileController extends Gdn_Controller {
             $this->EventArguments['User'] = $this->User;
             $this->fireEvent('GetConnections');
             if (count($this->data('Connections')) > 0) {
-                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow');
+                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', array('class' => 'link-social'));
             }
         }
     }
@@ -1476,7 +1478,7 @@ class ProfileController extends Gdn_Controller {
             $UserID = Gdn::session()->UserID;
         }
 
-        if (($UserID != Gdn::session()->UserID || !Gdn::session()->UserID) && !Gdn::session()->checkPermission('Garden.Users.Edit')) {
+        if (($UserID != Gdn::session()->UserID || !Gdn::session()->UserID) && !checkPermission('Garden.Users.Edit')) {
             throw new Exception(t('You do not have permission to view other profiles.'), 401);
         }
 
@@ -1485,12 +1487,12 @@ class ProfileController extends Gdn_Controller {
         // Get the user.
         $User = $UserModel->getID($UserID, DATASET_TYPE_ARRAY);
         if (!$User) {
-            throw new Exception(t('User not found.'), 404);
+            throw notFoundException('User');
         }
 
         $PhotoUrl = $User['Photo'];
         if ($PhotoUrl && strpos($PhotoUrl, '//') == false) {
-            $PhotoUrl = url('/uploads/'.ChangeBasename($PhotoUrl, 'n%s'), true);
+            $PhotoUrl = url('/uploads/'.changeBasename($PhotoUrl, 'n%s'), true);
         }
         $User['Photo'] = $PhotoUrl;
 
@@ -1529,14 +1531,14 @@ class ProfileController extends Gdn_Controller {
         $this->Roles = array();
         if ($UserReference == '') {
             if ($Username) {
-                $this->User = $this->UserModel->GetByUsername($Username);
+                $this->User = $this->UserModel->getByUsername($Username);
             } else {
                 $this->User = $this->UserModel->getID(Gdn::session()->UserID);
             }
         } elseif (is_numeric($UserReference) && $Username != '') {
             $this->User = $this->UserModel->getID($UserReference);
         } else {
-            $this->User = $this->UserModel->GetByUsername($UserReference);
+            $this->User = $this->UserModel->getByUsername($UserReference);
         }
 
         $this->fireEvent('UserLoaded');
@@ -1546,7 +1548,7 @@ class ProfileController extends Gdn_Controller {
         } elseif ($this->User->Deleted == 1) {
             redirect('dashboard/home/deleted');
         } else {
-            $this->RoleData = $this->UserModel->GetRoles($this->User->UserID);
+            $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {
                 $this->Roles = array_column($this->RoleData->resultArray(), 'Name');
             }
@@ -1605,6 +1607,14 @@ class ProfileController extends Gdn_Controller {
         }
     }
 
+    /**
+     *
+     *
+     * @param string|int|null $UserReference
+     * @param int|null $UserID
+     * @return string
+     * @throws Exception
+     */
     public function getProfileUrl($UserReference = null, $UserID = null) {
         if (!property_exists($this, 'User')) {
             $this->getUserInfo();
@@ -1636,7 +1646,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Application Application name. Defaults to Dashboard.
      */
     public function setTabView($CurrentTab, $View = '', $Controller = 'Profile', $Application = 'Dashboard') {
-        $this->BuildProfile();
+        $this->buildProfile();
         if ($View == '') {
             $View = $CurrentTab;
         }

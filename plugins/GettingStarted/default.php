@@ -97,7 +97,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
         )).'</p>
         </li>
         <li class="Six'.(c('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">
-        <strong>'.anchor(t('Manage your Plugins'), 'settings/plugins').'</strong>
+        <strong>'.anchor(t('Manage Plugins'), 'settings/plugins').'</strong>
         <p>'.t(
             'Change the way your community works with plugins.',
             'Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.'

@@ -23,7 +23,7 @@ if (!$CancelUrl) {
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->CategoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => TRUE));
+        echo $this->Form->CategoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => TRUE, 'categoryPermission' => 'Discussions.Add'));
         echo '</div>';
         echo '</div>';
     }

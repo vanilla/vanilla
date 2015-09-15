@@ -130,11 +130,21 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add Tabby to inbox textarea.
+     * Add Tabby to conversations textarea.
      *
      * @param MessagesController $Sender
      */
     public function messagesController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
+    }
+
+    /**
+     * Add Prettify formatting to profile posts.
+     *
+     * @param DiscussionController $Sender
+     */
+    public function profileController_render_before($Sender) {
         $this->addPretty($Sender);
         $this->addTabby($Sender);
     }

@@ -258,7 +258,7 @@ class SettingsController extends DashboardController {
      * @param array $thumbOptions The options to save the thumbnail-sized avatar with.
      * @return bool Whether the saves were successful.
      */
-    public function saveDefaultAvatars($source, $thumbOptions) {
+    private function saveDefaultAvatars($source, $thumbOptions) {
         try {
             $upload = new Gdn_UploadImage();
             // Generate the target image name
@@ -1513,7 +1513,7 @@ class SettingsController extends DashboardController {
      *
      * @param string $avatar The avatar to delete.
      */
-    public function deleteDefaultAvatars($avatar = '') {
+    private function deleteDefaultAvatars($avatar = '') {
         if ($avatar && $this->isUploadedDefaultAvatar($avatar)) {
             $upload = new Gdn_Upload();
             $upload->delete(self::DEFAULT_AVATAR_FOLDER.'/'.basename($avatar));

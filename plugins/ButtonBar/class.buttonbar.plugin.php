@@ -58,7 +58,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
         $Sender->addDefinition('ButtonBarLinkUrl', t('ButtonBar.LinkUrlText', 'Enter your URL:'));
         $Sender->addDefinition('ButtonBarImageUrl', t('ButtonBar.ImageUrlText', 'Enter image URL:'));
         $Sender->addDefinition('ButtonBarBBCodeHelpText', t('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
-        $Sender->addDefinition('ButtonBarHtmlHelpText', t('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+        $Sender->addDefinition('ButtonBarHtmlHelpText', t('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple HTML</a></b> in your post.'));
         $Sender->addDefinition('ButtonBarMarkdownHelpText', t('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
 
         $Sender->addDefinition('InputFormat', $Formatter);

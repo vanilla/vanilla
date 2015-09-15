@@ -80,7 +80,7 @@ $this->fireEvent('BeforeCommentForm');
                         if (!$AllowSigninPopup)
                             $Attributes['target'] = '_parent';
 
-                        $AuthenticationUrl = SignInUrl($this->data('ForeignUrl', '/'));
+                        $AuthenticationUrl = SignInUrl($this->SelfUrl);
                         $CssClass = 'Button Primary Stash';
                         if ($AllowSigninPopup)
                             $CssClass .= ' SignInPopup';

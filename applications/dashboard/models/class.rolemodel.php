@@ -523,7 +523,7 @@ class RoleModel extends Gdn_Model {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
-        $RoleID = arrayValue('RoleID', $FormPostValues);
+        $RoleID = val('RoleID', $FormPostValues);
         $Insert = $RoleID > 0 ? false : true;
         if ($Insert) {
             // Figure out the next role ID.
@@ -538,7 +538,7 @@ class RoleModel extends Gdn_Model {
 
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
-            $Permissions = arrayValue('Permission', $FormPostValues);
+            $Permissions = val('Permission', $FormPostValues);
             $Fields = $this->Validation->schemaValidationFields();
 
             if ($Insert === false) {

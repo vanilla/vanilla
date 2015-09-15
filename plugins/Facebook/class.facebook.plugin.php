@@ -441,8 +441,8 @@ class FacebookPlugin extends Gdn_Plugin {
         $Sender->permission('Garden.Settings.Manage');
         if ($Sender->Form->authenticatedPostBack()) {
             $Settings = array(
-                'Plugins.Facebook.ApplicationID' => $Sender->Form->getFormValue('ApplicationID'),
-                'Plugins.Facebook.Secret' => $Sender->Form->getFormValue('Secret'),
+                'Plugins.Facebook.ApplicationID' => trim($Sender->Form->getFormValue('ApplicationID')),
+                'Plugins.Facebook.Secret' => trim($Sender->Form->getFormValue('Secret')),
                 'Plugins.Facebook.UseFacebookNames' => $Sender->Form->getFormValue('UseFacebookNames'),
                 'Plugins.Facebook.SocialSignIn' => $Sender->Form->getFormValue('SocialSignIn'),
                 'Plugins.Facebook.SocialReactions' => $Sender->Form->getFormValue('SocialReactions'),

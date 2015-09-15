@@ -170,8 +170,8 @@ reason at all.
 You must be at least 13 years of age to use this service.";
 
 $Definition['Warning: This is for advanced users.'] = '<b>Warning</b>: This is for advanced users and requires that you make additional changes to your web server. This is usually only available if you have dedicated or vps hosting. Do not attempt this if you do not know what you are doing.';
-$Definition['Activity.Delete'] = '×';
-$Definition['Draft.Delete'] = '×';
+$Definition['Activity.Delete'] = '&times;';
+$Definition['Draft.Delete'] = '&times;';
 $Definition['ConnectName'] = 'Username';
 //$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 //<p>{Excerpt}</p>

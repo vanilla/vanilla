@@ -205,14 +205,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Verify field form type
             if (!isset($Field['FormType'])) {
                 $Fields[$Name]['FormType'] = 'TextBox';
-            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes))
+            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes)) {
                 unset($this->ProfileFields[$Name]);
-        }
-
-        // Special case for birthday field
-        if (isset($Fields['DateOfBirth'])) {
-            $Fields['DateOfBirth']['FormType'] = 'Date';
-            $Fields['DateOfBirth']['Label'] = t('Birthday');
+            } elseif ($Fields[$Name]['FormType'] == 'DateOfBirth') {
+                // Special case for birthday field
+                $Fields[$Name]['FormType'] = 'Date';
+                $Fields[$Name]['Label'] = t('Birthday');
+            }
         }
 
         return $Fields;

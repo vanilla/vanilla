@@ -82,6 +82,7 @@ if (!function_exists('GetOptions')):
             $Options .= '<li rel="Hide">'.anchor(t('Hide'), "/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
 
         // Allow plugins to add options
+        $Sender->EventArguments['Options'] = &$Options;
         $Sender->fireEvent('CategoryOptions');
 
         if ($Options != '') {

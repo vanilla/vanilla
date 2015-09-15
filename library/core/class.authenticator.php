@@ -162,7 +162,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
 
         if ($DataSource == $this) {
             foreach ($this->_DataHooks as $DataTarget => $DataHook) {
-                $this->_DataHooks[$DataTarget]['value'] = arrayValue($DataTarget, $DirectSupplied);
+                $this->_DataHooks[$DataTarget]['value'] = val($DataTarget, $DirectSupplied);
             }
 
             return;

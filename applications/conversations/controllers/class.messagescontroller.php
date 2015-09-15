@@ -118,6 +118,9 @@ class MessagesController extends ConversationsController {
             array('Name' => t('Inbox'), 'Url' => '/messages/inbox'),
             array('Name' => $this->data('Title'), 'Url' => 'messages/add')
         ));
+        
+        $this->CssClass = 'NoPanel';
+        
         $this->render();
     }
 
@@ -350,6 +353,9 @@ class MessagesController extends ConversationsController {
             $this->Offset,
             $Limit
         );
+
+        $this->EventArguments['MessageData'] = $this->MessageData;
+        $this->fireEvent('beforeMessages');
 
         $this->setData('Messages', $this->MessageData);
 

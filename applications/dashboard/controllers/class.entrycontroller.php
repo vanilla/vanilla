@@ -505,13 +505,15 @@ EOT;
             $AutoConnect = c('Garden.Registration.AutoConnect');
 
             if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
-                $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
+                $searchName = $this->Form->getFormValue('ConnectName');
+            } else {
+                $searchName = $this->Form->getFormValue('Name');
             }
 
             // Get the existing users that match the name or email of the connection.
             $Search = false;
-            if ($this->Form->getFormValue('Name') && $NameUnique) {
-                $UserModel->SQL->orWhere('Name', $this->Form->getFormValue('Name'));
+            if ($searchName && $NameUnique) {
+                $UserModel->SQL->orWhere('Name', $searchName);
                 $Search = true;
             }
             if ($this->Form->getFormValue('Email') && ($EmailUnique || $AutoConnect)) {
@@ -531,6 +533,10 @@ EOT;
 
             // Check to automatically link the user.
             if ($AutoConnect && count($ExistingUsers) > 0) {
+                if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
+                    $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
+                }
+
                 foreach ($ExistingUsers as $Row) {
                     if (strcasecmp($this->Form->getFormValue('Email'), $Row['Email']) === 0) {
                         $UserID = $Row['UserID'];
@@ -719,7 +725,7 @@ EOT;
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
-                if ($UserID) {
+                if ($UserID && c('Garden.Registration.SendConnectEmail', false)) {
                     // Send the welcome email.
                     $UserModel->sendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'))));
                 }
@@ -1093,7 +1099,7 @@ EOT;
 
         if ($this->Form->isPostBack() === true) {
             $FormValues = $this->Form->formValues();
-            if (ArrayValue('StopLinking', $FormValues)) {
+            if (val('StopLinking', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_ABORTED;
 
                 $UserEventData = array_merge(array(
@@ -1106,7 +1112,7 @@ EOT;
                 Gdn::request()->withRoute('DefaultController');
                 return Gdn::dispatcher()->dispatch();
 
-            } elseif (ArrayValue('NewAccount', $FormValues)) {
+            } elseif (val('NewAccount', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_CREATED;
 
                 // Try and synchronize the user with the new username/email.
@@ -1140,7 +1146,7 @@ EOT;
                 if ($UserID > 0) {
                     $Data = $FormValues;
                     $Data['UserID'] = $UserID;
-                    $Data['Email'] = arrayValue('SignInEmail', $FormValues, '');
+                    $Data['Email'] = val('SignInEmail', $FormValues, '');
                     $UserID = $this->UserModel->synchronize($UserInfo['UserKey'], $Data);
                 }
             }
@@ -1196,8 +1202,8 @@ EOT;
             $this->Form->addHidden('Consumer', $UserInfo['ConsumerKey']);
         }
 
-        $this->setData('Name', arrayValue('Name', $this->Form->HiddenInputs));
-        $this->setData('Email', arrayValue('Email', $this->Form->HiddenInputs));
+        $this->setData('Name', val('Name', $this->Form->HiddenInputs));
+        $this->setData('Email', val('Email', $this->Form->HiddenInputs));
 
         $this->render();
     }
@@ -1362,18 +1368,18 @@ EOT;
                     Gdn::session()->start($AuthUserID);
 
                     if ($this->Form->getFormValue('RememberMe')) {
-                        Gdn::authenticator()->SetIdentity($AuthUserID, true);
+                        Gdn::authenticator()->setIdentity($AuthUserID, true);
                     }
 
                     try {
-                        $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
+                        $this->UserModel->sendWelcomeEmail($AuthUserID, '', 'Register');
                     } catch (Exception $Ex) {
                     }
 
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->RedirectTo();
+                    $Route = $this->redirectTo();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                         $this->RedirectUrl = url($Route);
                     } else {

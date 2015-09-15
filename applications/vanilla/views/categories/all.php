@@ -11,7 +11,7 @@ $this->fireEvent('AfterPageTitle');
 
 $CatList = '';
 $DoHeadings = c('Vanilla.Categories.DoHeadings');
-$MaxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth') + $this->data('Category')->Depth;
+$MaxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth') + $this->data('Category.Depth', 0);
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = count($this->data('Categories'));
 
@@ -67,7 +67,7 @@ foreach ($this->data('Categories') as $CategoryRow) {
                 .$Category->Description
                 .'</div>
                   <div class="Meta">
-                     <span class="MItem RSS">'.anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
+                     <span class="MItem RSS">'.anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => T('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => T('RSS Feed'))).'</span>
                      <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
                      <span class="MItem CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
             if ($Category->LastTitle != '') {

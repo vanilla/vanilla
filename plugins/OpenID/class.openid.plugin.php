@@ -62,12 +62,6 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @return LightOpenID
      */
     public function getOpenID() {
-        if (get_magic_quotes_gpc()) {
-            foreach ($_GET as $Name => $Value) {
-                $_GET[$Name] = stripslashes($Value);
-            }
-        }
-
         $OpenID = new LightOpenID();
 
         if ($url = Gdn::request()->get('url')) {

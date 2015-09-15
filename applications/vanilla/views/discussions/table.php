@@ -18,11 +18,9 @@ if ($this->data('_PagerUrl')) {
 
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 
-if ($Description = $this->data('_Description')) {
-    echo '<div class="P PageDescription">';
-    echo $this->data('_Description', '&#160;');
-    echo '</div>';
-}
+$Description = $this->data('Category.Description', $this->Description());
+echo wrapIf($Description, 'div', array('class' => 'P PageDescription'));
+
 $this->fireEvent('AfterDescription');
 
 include $this->fetchViewLocation('Subtree', 'Categories', 'Vanilla');

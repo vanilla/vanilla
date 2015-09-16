@@ -328,14 +328,14 @@ class Gdn_Factory {
     }
 
     /**
-     * Search installed factories by prefix
+     * Search installed factories by fnmatch
      *
-     * @param string $prefix fnmatch-compatible search string
+     * @param string $search fnmatch-compatible search string
      * @return array list of matching definitions
      */
-    public function search($prefix) {
-        $arr = array_map(function ($ak, $av) use ($prefix) {
-            return fnmatch($prefix, $ak, FNM_CASEFOLD) ? [$ak => $av] : null;
+    public function search($search) {
+        $arr = array_map(function ($ak, $av) use ($search) {
+            return fnmatch($search, $ak, FNM_CASEFOLD) ? [$ak => $av] : null;
         }, array_keys($this->_Objects), array_values($this->_Objects));
 
         $arr = array_filter($arr);

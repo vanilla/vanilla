@@ -298,8 +298,8 @@ function Gdn_ExceptionHandler($Exception) {
         } else {
             // If the master view wasn't found, assume a panic state and dump the error.
             if ($Master === false) {
-                echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-   <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+                echo '<!DOCTYPE html>
+   <html>
    <head>
       <title>Fatal Error</title>
    </head>

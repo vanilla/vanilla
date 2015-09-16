@@ -140,7 +140,7 @@ class DbaController extends DashboardController {
             $this->setData('Result', $Result);
         }
 
-        $this->setData('Title', "Decode Html Entities for $Table.$Column");
+        $this->setData('Title', "Decode HTML Entities for $Table.$Column");
         $this->_setJob($this->data('Title'));
         $this->addSideMenu();
         $this->render('Job');

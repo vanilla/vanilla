@@ -586,9 +586,9 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('editorVersion', $this->pluginInfo['Version']);
         $c->addDefinition('editorInputFormat', $this->Format);
         $c->addDefinition('editorPluginAssets', $this->AssetPath);
-        $c->addDefinition('wysiwygHelpText', t('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
+        $c->addDefinition('wysiwygHelpText', t('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">WYSIWYG</a> in your post.'));
         $c->addDefinition('bbcodeHelpText', t('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
-        $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
+        $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple HTML</a> in your post.'));
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $CssPath);

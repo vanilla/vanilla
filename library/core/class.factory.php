@@ -312,8 +312,39 @@ class Gdn_Factory {
         if (array_key_exists($Alias, $this->_Dependencies)) {
             if (is_null($PropertyName)) {
                 unset($this->_Dependencies[$Alias]);
-            } elseif (array_key_exists($PropertyName, $this->_Dependencies[$Alias]))
+            } elseif (array_key_exists($PropertyName, $this->_Dependencies[$Alias])) {
                 unset($this->_Dependencies[$Alias][$PropertyName]);
+            }
         }
+    }
+
+    /**
+     * Get all currently defined factories
+     *
+     * @return array
+     */
+    public function all() {
+        return $this->_Objects;
+    }
+
+    /**
+     * Search installed factories by prefix
+     *
+     * @param string $prefix fnmatch-compatible search string
+     * @return array list of matching definitions
+     */
+    public function search($prefix) {
+        $arr = array_map(function ($ak, $av) use ($prefix) {
+            return fnmatch($prefix, $ak, FNM_CASEFOLD) ? [$ak => $av] : null;
+        }, array_keys($this->_Objects), array_values($this->_Objects));
+
+        $arr = array_filter($arr);
+        $arr = array_reduce($arr, function ($carry, $av) {
+            $key = array_pop(array_keys($av));
+            $carry[$key] = $av[$key];
+            return $carry;
+        }, []);
+
+        return $arr;
     }
 }

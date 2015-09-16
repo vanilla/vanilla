@@ -2,7 +2,7 @@
 $ConnectSource = $this->Form->getFormValue('ProviderName');
 ?>
 <div class="Connect">
-    <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign in") : sprintf(t('%s Connect'), $ConnectSource); ?></h1>
+    <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign In") : sprintf(t('%s Connect'), $ConnectSource); ?></h1>
 
     <div>
         <?php

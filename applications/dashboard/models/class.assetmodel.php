@@ -24,37 +24,37 @@ class AssetModel extends Gdn_Model {
     /**
      * Add to the list of CSS files to serve.
      *
-     * @param $Filename
-     * @param bool $Folder
-     * @param bool $Options
+     * @param $filename
+     * @param bool $folder
+     * @param bool $options
      */
-    public function addCssFile($Filename, $Folder = false, $Options = false) {
-        if (is_string($Options)) {
-            $Options = array('Css' => $Options);
+    public function addCssFile($filename, $folder = false, $options = false) {
+        if (is_string($options)) {
+            $options = ['Css' => $options];
         }
-        $this->_CssFiles[] = array($Filename, $Folder, $Options);
+        $this->_CssFiles[] = [$filename, $folder, $options];
     }
 
     /**
      * Serve all CSS files.
      *
-     * @param $ThemeType
-     * @param $Filename
+     * @param $themeType
+     * @param $filename
      * @throws Exception
      */
-    public function serveCss($ThemeType, $Filename) {
+    public function serveCss($themeType, $filename) {
         // Split the filename into filename and etag.
-        if (preg_match('`([\w-]+?)-(\w+).css$`', $Filename, $Matches)) {
-            $Basename = $Matches[1];
-            $ETag = $Matches[2];
+        if (preg_match('`([\w-]+?)-(\w+).css$`', $filename, $matches)) {
+            $basename = $matches[1];
+            $eTag = $matches[2];
         } else {
             throw notFoundException();
         }
 
-        $Basename = ucfirst($Basename);
+        $basename = ucfirst($basename);
 
-        $this->EventArguments['Basename'] = $Basename;
-        $this->EventArguments['ETag'] = $ETag;
+        $this->EventArguments['Basename'] = $basename;
+        $this->EventArguments['ETag'] = $eTag;
         $this->fireEvent('BeforeServeCss');
 
         if (function_exists('header_remove')) {
@@ -62,17 +62,17 @@ class AssetModel extends Gdn_Model {
         }
 
         safeHeader("Content-Type: text/css");
-        if (!in_array($Basename, array('Style', 'Admin'))) {
+        if (!in_array($basename, ['Style', 'Admin'])) {
             safeHeader("HTTP/1.0 404", true, 404);
 
-            echo "/* Could not find $Basename/$ETag */";
+            echo "/* Could not find {$basename}/{$eTag} */";
             die();
         }
 
-        $RequestETags = val('HTTP_IF_NONE_MATCH', $_SERVER);
-        $RequestETags = explode(',', $RequestETags);
-        foreach ($RequestETags as $RequestETag) {
-            if ($RequestETag == $ETag) {
+        $requestETags = val('HTTP_IF_NONE_MATCH', $_SERVER);
+        $requestETags = explode(',', $requestETags);
+        foreach ($requestETags as $requestETag) {
+            if ($requestETag == $eTag) {
                 safeHeader("HTTP/1.0 304", true, 304);
                 die();
             }
@@ -80,13 +80,13 @@ class AssetModel extends Gdn_Model {
 
         safeHeader("Cache-Control:public, max-age=14400");
 
-        $CurrentETag = self::ETag();
-        safeHeader("ETag: $CurrentETag");
+        $currentETag = self::eTag();
+        safeHeader("ETag: $currentETag");
 
-        $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$ThemeType.'-'.strtolower($Basename)."-$CurrentETag.css";
+        $cachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$themeType.'-'.strtolower($basename)."-{$currentETag}.css";
 
-        if (!Debug() && file_exists($CachePath)) {
-            readfile($CachePath);
+        if (!Debug() && file_exists($cachePath)) {
+            readfile($cachePath);
             die();
         }
 
@@ -95,154 +95,153 @@ class AssetModel extends Gdn_Model {
         require_once PATH_LIBRARY."/vendors/Minify/lib/Minify/CSS.php";
 
         ob_start();
-        echo "/* CSS generated for etag: $CurrentETag.\n *\n";
+        echo "/* CSS generated for etag: $currentETag.\n *\n";
 
-        $NotFound = array();
-        $Paths = $this->GetCssFiles($ThemeType, $Basename, $ETag, $NotFound);
+        $notFound = [];
+        $paths = $this->getCssFiles($themeType, $basename, $eTag, $notFound);
 
         // First, do a pass through the files to generate some information.
-        foreach ($Paths as $Info) {
-            list($Path, $UrlPath) = $Info;
+        foreach ($paths as $info) {
+            list($path, $urlPath) = $info;
 
-            echo " * $UrlPath\n";
+            echo " * $urlPath\n";
         }
 
         // Echo the paths that weren't found to help debugging.
-        foreach ($NotFound as $Info) {
-            list($Filename, $Folder) = $Info;
+        foreach ($notFound as $info) {
+            list($filename, $folder) = $info;
 
-            echo " * $Folder/$Filename NOT FOUND.\n";
+            echo " * $folder/$filename NOT FOUND.\n";
         }
 
         echo " */\n\n";
 
         // Now that we have all of the paths we want to serve them.
-        foreach ($Paths as $Info) {
-            list($Path, $UrlPath, $Options) = $Info;
+        foreach ($paths as $info) {
+            list($path, $urlPath, $options) = $info;
 
-            echo "/* File: $UrlPath */\n";
+            echo "/* File: $urlPath */\n";
 
-            $Css = val('Css', $Options);
-            if (!$Css) {
-                $Css = file_get_contents($Path);
+            $css = val('Css', $options);
+            if (!$css) {
+                $css = file_get_contents($path);
             }
 
-            $Css = Minify_CSS::minify($Css, array(
+            $css = Minify_CSS::minify($css, [
                 'preserveComments' => true,
-                'prependRelativePath' => $this->UrlPrefix.Asset(dirname($UrlPath).'/'),
-                'currentDir' => dirname($Path),
+                'prependRelativePath' => $this->UrlPrefix.asset(dirname($urlPath).'/'),
+                'currentDir' => dirname($path),
                 'minify' => true
-            ));
-            echo $Css;
-
+            ]);
+            echo $css;
             echo "\n\n";
         }
 
         // Create a cached copy of the file.
-        $Css = ob_get_flush();
-        if (!file_exists(dirname($CachePath))) {
-            mkdir(dirname($CachePath), 0775, true);
+        $css = ob_get_flush();
+        if (!file_exists(dirname($cachePath))) {
+            mkdir(dirname($cachePath), 0775, true);
         }
-        file_put_contents($CachePath, $Css);
+        file_put_contents($cachePath, $css);
     }
 
     /**
      *
      *
-     * @param $ThemeType
-     * @param $Basename
-     * @param $ETag
-     * @param null $NotFound
+     * @param $themeType
+     * @param $basename
+     * @param $eTag
+     * @param null $notFound
      * @return array
      * @throws Exception
      */
-    public function getCssFiles($ThemeType, $Basename, $ETag, &$NotFound = null) {
-        $NotFound = array();
+    public function getCssFiles($themeType, $basename, $eTag, &$notFound = null) {
+        $notFound = [];
 
         // Gather all of the css paths.
-        switch ($Basename) {
+        switch ($basename) {
             case 'Style':
-                $this->_CssFiles = array(
-                    array('style.css', 'dashboard', array('Sort' => -10))
-                );
+                $this->_CssFiles = [
+                    ['style.css', 'dashboard', ['Sort' => -10]]
+                ];
                 break;
             case 'Admin':
-                $this->_CssFiles = array(
-                    array('admin.css', 'dashboard', array('Sort' => -10))
-                );
+                $this->_CssFiles = [
+                    ['admin.css', 'dashboard', ['Sort' => -10]]
+                ];
                 break;
             default:
-                $this->_CssFiles = array();
+                $this->_CssFiles = [];
         }
 
         // Throw an event so that plugins can add their css too.
-        $this->EventArguments['ETag'] = $ETag;
-        $this->EventArguments['ThemeType'] = $ThemeType;
-        $this->fireEvent($Basename.'Css');
+        $this->EventArguments['ETag'] = $eTag;
+        $this->EventArguments['ThemeType'] = $themeType;
+        $this->fireEvent("{$basename}Css");
 
         // Include theme customizations last so that they override everything else.
-        switch ($Basename) {
+        switch ($basename) {
             case 'Style':
-                $this->addCssFile('custom.css', false, array('Sort' => 10));
+                $this->addCssFile('custom.css', false, ['Sort' => 10]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
-                    $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
-                    if (is_string($Filenames) && $Filenames != '%s') {
-                        $this->addCssFile(changeBasename('custom.css', $Filenames), false, array('Sort' => 11));
+                    $filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
+                    if (is_string($filenames) && $filenames != '%s') {
+                        $this->addCssFile(changeBasename('custom.css', $filenames), false, ['Sort' => 11]);
                     }
                 }
 
                 break;
             case 'Admin':
-                $this->addCssFile('customadmin.css', false, array('Sort' => 10));
+                $this->addCssFile('customadmin.css', false, ['Sort' => 10]);
                 break;
         }
 
         $this->fireEvent('AfterGetCssFiles');
 
         // Hunt the css files down.
-        $Paths = array();
-        foreach ($this->_CssFiles as $Info) {
-            $Filename = $Info[0];
-            $Folder = val(1, $Info);
-            $Options = val(2, $Info);
-            $Css = val('Css', $Options);
+        $paths = [];
+        foreach ($this->_CssFiles as $info) {
+            $filename = $info[0];
+            $folder = val(1, $info);
+            $options = val(2, $info);
+            $css = val('Css', $options);
 
-            if ($Css) {
+            if ($css) {
                 // Add some literal Css.
-                $Paths[] = array(false, $Folder, $Options);
+                $paths[] = [false, $folder, $options];
 
             } else {
-                list($Path, $UrlPath) = self::CssPath($Filename, $Folder, $ThemeType);
-                if ($Path) {
-                    $Paths[] = array($Path, $UrlPath, $Options);
+                list($path, $urlPath) = self::cssPath($filename, $folder, $themeType);
+                if ($path) {
+                    $paths[] = [$path, $urlPath, $options];
                 } else {
-                    $NotFound[] = array($Filename, $Folder, $Options);
+                    $notFound[] = [$filename, $folder, $options];
                 }
             }
         }
 
         // Sort the paths.
-        usort($Paths, array('AssetModel', '_ComparePath'));
+        usort($paths, ['AssetModel', '_comparePath']);
 
-        return $Paths;
+        return $paths;
     }
 
     /**
+     * Sorting callback
      *
-     *
-     * @param $A
-     * @param $B
+     * @param $a
+     * @param $b
      * @return int
      */
-    protected function _ComparePath($A, $B) {
-        $SortA = val('Sort', $A[2], 0);
-        $SortB = val('Sort', $B[2], 0);
+    protected function _comparePath($a, $b) {
+        $sortA = val('Sort', $a[2], 0);
+        $sortB = val('Sort', $b[2], 0);
 
-        if ($SortA == $SortB) {
+        if ($sortA == $sortB) {
             return 0;
         }
-        if ($SortA > $SortB) {
+        if ($sortA > $sortB) {
             return 1;
         }
         return -1;
@@ -251,84 +250,84 @@ class AssetModel extends Gdn_Model {
     /**
      * Lookup the path to a CSS file and return its info array
      *
-     * @param string $Filename name/relative path to css file
-     * @param string $Folder optional. app or plugin folder to search
-     * @param string $ThemeType mobile or desktop
+     * @param string $filename name/relative path to css file
+     * @param string $folder optional. app or plugin folder to search
+     * @param string $themeType mobile or desktop
      * @return array|bool
      */
-    public static function cssPath($Filename, $Folder = '', $ThemeType = '') {
-        if (!$ThemeType) {
-            $ThemeType = isMobile() ? 'mobile' : 'desktop';
+    public static function cssPath($filename, $folder = '', $themeType = '') {
+        if (!$themeType) {
+            $themeType = isMobile() ? 'mobile' : 'desktop';
         }
 
         // 1. Check for a url.
-        if (isUrl($Filename)) {
-            return array($Filename, $Filename);
+        if (isUrl($filename)) {
+            return [$filename, $filename];
         }
 
-        $Paths = array();
+        $paths = [];
 
         // 2. Check for a full path.
-        if (strpos($Filename, '/') === 0) {
-            $Filename = ltrim($Filename, '/');
+        if (strpos($filename, '/') === 0) {
+            $filename = ltrim($filename, '/');
 
             // Direct path was given
-            $Filename = "/{$Filename}";
-            $Path = PATH_ROOT.$Filename;
-            if (file_exists($Path)) {
-                Deprecated(htmlspecialchars($Path).": AssetModel::CssPath() with direct paths");
-                return array($Path, $Filename);
+            $filename = "/{$filename}";
+            $path = PATH_ROOT.$filename;
+            if (file_exists($path)) {
+                deprecated(htmlspecialchars($path).": AssetModel::CssPath() with direct paths");
+                return [$path, $filename];
             }
             return false;
         }
 
         // 3. Check the theme.
-        $Theme = Gdn::ThemeManager()->ThemeFromType($ThemeType);
-        if ($Theme) {
-            $Path = "/$Theme/design/$Filename";
-            $Paths[] = array(PATH_THEMES.$Path, "/themes{$Path}");
+        $theme = Gdn::ThemeManager()->ThemeFromType($themeType);
+        if ($theme) {
+            $path = "/$theme/design/$filename";
+            $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
         }
 
         // 4. Static, Plugin, or App relative file
-        if ($Folder) {
-            if (in_array($Folder, array('resources', 'static'))) {
-                $Path = "/resources/design/{$Filename}";
-                $Paths[] = array(PATH_ROOT.$Path, $Path);
+        if ($folder) {
+            if (in_array($folder, ['resources', 'static'])) {
+                $path = "/resources/design/{$filename}";
+                $paths[] = [PATH_ROOT.$path, $path];
 
             // A plugin-relative path was given
-            } elseif (stringBeginsWith($Folder, 'plugins/')) {
-                $Folder = substr($Folder, strlen('plugins/'));
-                $Path = "/{$Folder}/design/{$Filename}";
-                $Paths[] = array(PATH_PLUGINS.$Path, "/plugins$Path");
+            } elseif (stringBeginsWith($folder, 'plugins/')) {
+                $folder = substr($folder, strlen('plugins/'));
+                $path = "/{$folder}/design/{$filename}";
+                $paths[] = [PATH_PLUGINS.$path, "/plugins$path"];
 
                 // Allow direct-to-file links for plugins
-                $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/{$Folder}/{$Filename}", true); // deprecated
+                $paths[] = [PATH_PLUGINS."/$folder/$filename", "/plugins/{$folder}/{$filename}", true]; // deprecated
 
             // An app-relative path was given
             } else {
-                $Path = "/{$Folder}/design/{$Filename}";
-                $Paths[] = array(PATH_APPLICATIONS.$Path, "/applications{$Path}");
+                $path = "/{$folder}/design/{$filename}";
+                $paths[] = [PATH_APPLICATIONS.$path, "/applications{$path}"];
             }
         }
 
         // 5. Check the default application.
-        if ($Folder != 'dashboard') {
-            $Paths[] = array(PATH_APPLICATIONS."/dashboard/design/$Filename", "/applications/dashboard/design/$Filename", true); // deprecated
+        if ($folder != 'dashboard') {
+            $paths[] = [PATH_APPLICATIONS."/dashboard/design/$filename", "/applications/dashboard/design/$filename", true]; // deprecated
         }
 
-        foreach ($Paths as $Info) {
-            if (file_exists($Info[0])) {
-                if (!empty($Info[2])) {
+        foreach ($paths as $info) {
+            if (file_exists($info[0])) {
+                if (!empty($info[2])) {
                     // This path is deprecated.
-                    unset($Info[2]);
-                    Deprecated("The css file '$Filename' in folder '$Folder'");
+                    unset($info[2]);
+                    deprecated("The css file '$filename' in folder '$folder'");
                 }
 
-                return $Info;
+                return $info;
             }
         }
-        if (!(StringEndsWith($Filename, 'custom.css') || StringEndsWith($Filename, 'customadmin.css'))) {
-            trace("Could not find file '$Filename' in folder '$Folder'.");
+        if (!(stringEndsWith($filename, 'custom.css') || stringEndsWith($filename, 'customadmin.css'))) {
+            trace("Could not find file '$filename' in folder '$folder'.");
         }
 
         return false;
@@ -349,10 +348,10 @@ class AssetModel extends Gdn_Model {
 
         // 1. Check for a url.
         if (isUrl($filename)) {
-            return array($filename, $filename);
+            return [$filename, $filename];
         }
 
-        $paths = array();
+        $paths = [];
 
         // 2. Check for a full path.
         if (strpos($filename, '/') === 0) {
@@ -363,7 +362,7 @@ class AssetModel extends Gdn_Model {
             $path = PATH_ROOT.$filename;
             if (file_exists($path)) {
                 deprecated(htmlspecialchars($path).": AssetModel::JsPath() with direct paths");
-                return array($path, $filename);
+                return [$path, $filename];
             }
             return false;
         }
@@ -372,23 +371,23 @@ class AssetModel extends Gdn_Model {
         $theme = Gdn::themeManager()->themeFromType($themeType);
         if ($theme) {
             $path = "/{$theme}/js/{$filename}";
-            $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
+            $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
         }
 
         // 4. Static, Plugin, or App relative file
         if ($folder) {
-            if (in_array($folder, array('resources', 'static'))) {
+            if (in_array($folder, ['resources', 'static'])) {
                 $path = "/resources/js/{$filename}";
-                $paths[] = array(PATH_ROOT.$path, $path);
+                $paths[] = [PATH_ROOT.$path, $path];
 
             // A plugin-relative path was given
             } elseif (stringBeginsWith($folder, 'plugins/')) {
                 $folder = substr($folder, strlen('plugins/'));
                 $path = "/{$folder}/js/{$filename}";
-                $paths[] = array(PATH_PLUGINS.$path, "/plugins{$path}");
+                $paths[] = [PATH_PLUGINS.$path, "/plugins{$path}"];
 
                 // Allow direct-to-file links for plugins
-                $paths[] = array(PATH_PLUGINS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true); // deprecated
+                $paths[] = [PATH_PLUGINS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true]; // deprecated
 
             // An app-relative path was given
             } else {
@@ -396,17 +395,17 @@ class AssetModel extends Gdn_Model {
                 // App-relative path under the theme
                 if ($theme) {
                     $path = "/{$theme}/{$folder}/js/{$filename}";
-                    $paths[] = array(PATH_THEMES.$path, "/themes{$path}");
+                    $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
                 }
 
                 $path = "/{$folder}/js/{$filename}";
-                $paths[] = array(PATH_APPLICATIONS.$path, "/applications{$path}");
+                $paths[] = [PATH_APPLICATIONS.$path, "/applications{$path}"];
             }
         }
 
         // 5. Check the global js folder.
-        $paths[] = array(PATH_ROOT."/js/{$filename}", "/js/{$filename}");
-        $paths[] = array(PATH_ROOT."/js/library/{$filename}", "/js/library/{$filename}");
+        $paths[] = [PATH_ROOT."/js/{$filename}", "/js/{$filename}"];
+        $paths[] = [PATH_ROOT."/js/library/{$filename}", "/js/library/{$filename}"];
 
         foreach ($paths as $info) {
             if (file_exists($info[0])) {
@@ -428,53 +427,180 @@ class AssetModel extends Gdn_Model {
 
     /**
      * Generate an e-tag for the application from the versions of all of its enabled applications/plugins.
+     *
+     * @return string etag
      **/
     public static function eTag() {
-        $Data = array();
-        $Data['vanilla-core-'.APPLICATION_VERSION] = true;
+        $data = [];
+        $data['vanilla-core-'.APPLICATION_VERSION] = true;
 
-        $Plugins = Gdn::pluginManager()->EnabledPlugins();
-        foreach ($Plugins as $Info) {
-            $Data[strtolower("{$Info['Index']}-plugin-{$Info['Version']}")] = true;
+        $plugins = Gdn::pluginManager()->enabledPlugins();
+        foreach ($plugins as $info) {
+            $data[strtolower("{$info['Index']}-plugin-{$info['Version']}")] = true;
         }
-//      echo(Gdn_Upload::FormatFileSize(strlen(serialize($Plugins))));
-//      decho($Plugins);
 
-        $Applications = Gdn::ApplicationManager()->EnabledApplications();
-        foreach ($Applications as $Info) {
-            $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = true;
+        $applications = Gdn::applicationManager()->enabledApplications();
+        foreach ($applications as $info) {
+            $data[strtolower("{$info['Index']}-app-{$info['Version']}")] = true;
         }
 
         // Add the desktop theme version.
-        $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->DesktopTheme());
-        if (!empty($Info)) {
-            $Version = val('Version', $Info, 'v0');
-            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
+        $info = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->desktopTheme());
+        if (!empty($info)) {
+            $version = val('Version', $info, 'v0');
+            $data[strtolower("{$info['Index']}-theme-{$version}")] = true;
 
             if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
-                $Filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
-                $Data[$Filenames] = true;
+                $filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
+                $data[$filenames] = true;
             }
         }
 
         // Add the mobile theme version.
-        $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->MobileTheme());
-        if (!empty($Info)) {
-            $Version = val('Version', $Info, 'v0');
-            $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = true;
+        $info = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->mobileTheme());
+        if (!empty($info)) {
+            $version = val('Version', $info, 'v0');
+            $data[strtolower("{$info['Index']}-theme-{$version}")] = true;
         }
 
-        Gdn::pluginManager()->EventArguments['ETagData'] =& $Data;
+        Gdn::pluginManager()->EventArguments['ETagData'] =& $data;
 
-        $Suffix = '';
-        Gdn::pluginManager()->EventArguments['Suffix'] =& $Suffix;
-        Gdn::pluginManager()->FireAs('AssetModel')->fireEvent('GenerateETag');
+        $suffix = '';
+        Gdn::pluginManager()->EventArguments['Suffix'] =& $suffix;
+        Gdn::pluginManager()->fireAs('AssetModel')->fireEvent('GenerateETag');
         unset(Gdn::pluginManager()->EventArguments['ETagData']);
 
-        ksort($Data);
-        $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;
-//      decho($Data);
-//      die();
-        return $Result;
+        ksort($data);
+        $result = substr(md5(implode(',', array_keys($data))), 0, 8).$suffix;
+        return $result;
+    }
+
+    /**
+     * Generate a hash for a group of resources, based on keys + versions
+     *
+     * @param array $resources
+     * @return string
+     */
+    public function resourceHash($resources) {
+        $keys = array();
+
+        foreach ($resources as $key => $options) {
+           $version = val('version', $options, '');
+           $keys[] = "{$key} -> {$version}";
+        }
+
+        return md5(implode("\n", $keys));
+    }
+
+    /**
+     * Get list of defined view handlers
+     *
+     * @staticvar array $handlers
+     * @param boolean $fresh
+     * @return array
+     */
+    public static function viewHandlers($fresh = false) {
+        static $handlers = null;
+        if (is_null($handlers) || $fresh) {
+            $factories = Gdn::factory()->search('viewhandler.*');
+            $handlers = array_change_key_case($factories);
+        }
+
+        return $handlers;
+    }
+
+    /**
+     * Get list of allowed view extensions
+     *
+     * @param boolean $fresh
+     * @return array list of extensions
+     */
+    public static function viewExtensions($fresh = false) {
+        $handlers = self::viewHandlers($fresh);
+
+        $extensions = ['php'];
+        foreach ($handlers as $handlerTag => $handlerDef) {
+            $extensions[] = array_pop(explode('.', $handlerTag));
+        }
+        return $extensions;
+    }
+    /**
+     * Get the path to a view.
+     *
+     * @param string $view the name of the view.
+     * @param string $controller the name of the controller invoking the view or blank.
+     * @param string $folder the application folder or plugins/<plugin> folder.
+     * @param array|null $extensions optional. list of extensions to allow
+     * @return string|false The path to the view or false if it wasn't found.
+     */
+    public static function viewLocation($view, $controller, $folder, $extensions = null) {
+        $paths = [];
+
+        if (strpos($view, '/') !== false) {
+            // This is a path to the view from the root.
+            $paths[] = $view;
+        } else {
+            $view = strtolower($view);
+
+            // Trim "controller" from the end of controller name, if its there
+            $controller = strtolower(stringEndsWith($controller, 'Controller', true, true));
+            if ($controller) {
+                $controller = '/'.$controller;
+            }
+
+            // Get list of permitted view extensions
+            if (is_null($extensions)) {
+                $extensions = AssetModel::viewExtensions();
+            }
+
+            // 1. Gather paths from the theme, if enabled
+            if (Gdn::controller() instanceof Gdn_Controller) {
+                $theme = Gdn::controller()->Theme;
+                if ($theme) {
+                    foreach ($extensions as $ext) {
+                        $paths[] = PATH_THEMES."/{$theme}/views{$controller}/$view.$ext";
+                    }
+                }
+            }
+
+            // 2a. Gather paths from the plugin, if the folder is a plugin folder
+            if (stringBeginsWith($folder, 'plugins/')) {
+                // This is a plugin view.
+                foreach ($extensions as $ext) {
+                    $paths[] = PATH_ROOT."/{$folder}/views{$controller}/$view.$ext";
+                }
+
+            // 2b. Gather paths from the application as a fallback
+            } else {
+                // This is an application view.
+                $folder = strtolower($folder);
+                foreach ($extensions as $ext) {
+                    $paths[] = PATH_APPLICATIONS."/{$folder}/views{$controller}/$view.$ext";
+                }
+
+                if ($folder != 'dashboard' && stringEndsWith($view, '.master')) {
+                    // This is a master view that can always fall back to the dashboard.
+                    foreach ($extensions as $ext) {
+                        $paths[] = PATH_APPLICATIONS."/dashboard/views{$controller}/$view.$ext";
+                    }
+                }
+            }
+        }
+
+        // Now let's search the paths for the view.
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        trace([
+            'view' => $view,
+            'controller' => $controller,
+            'folder' => $folder
+        ], 'View');
+        trace($paths, __METHOD__);
+
+        return false;
     }
 }

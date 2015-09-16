@@ -510,12 +510,13 @@ class AssetModel extends Gdn_Model {
     /**
      * Get the path to a view.
      *
-     * @param string $view The name of the view.
-     * @param string $controller The name of the controller invoking the view or blank.
-     * @param string $folder The application folder or plugins/<plugin> folder.
+     * @param string $view the name of the view.
+     * @param string $controller the name of the controller invoking the view or blank.
+     * @param string $folder the application folder or plugins/<plugin> folder.
+     * @param array|null $extensions optional. list of extensions to allow
      * @return string|false The path to the view or false if it wasn't found.
      */
-    public static function viewLocation($view, $controller, $folder) {
+    public static function viewLocation($view, $controller, $folder, $extensions = null) {
         $paths = [];
 
         if (strpos($view, '/') !== false) {
@@ -531,7 +532,9 @@ class AssetModel extends Gdn_Model {
             }
 
             // Get list of permitted view extensions
-            $extensions = AssetModel::viewExtensions();
+            if (is_null($extensions)) {
+                $extensions = AssetModel::viewExtensions();
+            }
 
             // 1. Gather paths from the theme, if enabled
             if (Gdn::controller() instanceof Gdn_Controller) {

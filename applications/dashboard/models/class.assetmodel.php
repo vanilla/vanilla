@@ -476,6 +476,23 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
+     * Generate a hash for a group of resources, based on keys + versions
+     *
+     * @param array $resources
+     * @return string
+     */
+    public function resourceHash($resources) {
+        $keys = array();
+
+        foreach ($resources as $key => $options) {
+           $version = val('version', $options, '');
+           $keys[] = "{$key} -> {$version}";
+        }
+
+        return md5(implode("\n", $keys));
+    }
+
+    /**
      * Get list of defined view handlers
      *
      * @staticvar array $handlers

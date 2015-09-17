@@ -364,14 +364,14 @@ jQuery(document).ready(function($) {
     );
 
     // If a page loads with a hidden redirect url, go there after a few moments.
-    var RedirectUrl = gdn.definition('RedirectUrl', '');
-    var CheckPopup = gdn.definition('CheckPopup', '');
-    if (RedirectUrl !== '') {
-        if (CheckPopup && window.opener) {
-            window.opener.location.replace(RedirectUrl);
+    var redirectUrl = gdn.getMeta('RedirectUrl', '');
+    var checkPopup = gdn.getMeta('CheckPopup', false);
+    if (redirectUrl !== '') {
+        if (checkPopup && window.opener) {
+            window.opener.location = redirectUrl;
             window.close();
         } else {
-            document.location.replace(RedirectUrl);
+            document.location = redirectUrl;
         }
     }
 

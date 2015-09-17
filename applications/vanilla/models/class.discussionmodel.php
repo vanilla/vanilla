@@ -1629,8 +1629,8 @@ class DiscussionModel extends VanillaModel {
                 $Fields = $this->Validation->schemaValidationFields();
 
                 // Check for spam.
-                $Spam = SpamModel::isSpam('Discussion', $Fields);
-                if ($Spam) {
+                $spam = SpamModel::isSpam('Discussion', $Fields);
+                if ($spam) {
                     return SPAM;
                 }
 

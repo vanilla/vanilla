@@ -832,8 +832,8 @@ class CommentModel extends VanillaModel {
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
                 // Check for spam
-                $Spam = SpamModel::IsSpam('Comment', $Fields);
-                if ($Spam) {
+                $spam = SpamModel::isSpam('Comment', $Fields);
+                if ($spam) {
                     return SPAM;
                 }
 

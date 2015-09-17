@@ -827,7 +827,7 @@ class CommentModel extends VanillaModel {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
             // If the post is new and it validates, check for spam
-            if (!$this->CheckForSpam('Comment')) {
+            if (!$Insert || !$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 

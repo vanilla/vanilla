@@ -1636,6 +1636,12 @@ class DiscussionModel extends VanillaModel {
                 $StoredCategoryID = false;
 
                 if ($DiscussionID > 0) {
+                    // Check for spam.
+                    $Spam = SpamModel::isSpam('Discussion', $Fields);
+                    if ($Spam) {
+                        return SPAM;
+                    }
+
                     // Updating
                     $Stored = $this->getID($DiscussionID, DATASET_TYPE_OBJECT);
 

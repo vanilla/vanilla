@@ -827,11 +827,17 @@ class CommentModel extends VanillaModel {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
             // If the post is new and it validates, check for spam
-            if (!$Insert || !$this->CheckForSpam('Comment')) {
+            if (!$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
                 if ($Insert === false) {
+                    // Check for spam
+                    $Spam = SpamModel::IsSpam('Comment', $Fields);
+                    if ($Spam) {
+                        return SPAM;
+                    }
+
                     // Log the save.
                     LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                     // Save the new value.

@@ -1628,6 +1628,12 @@ class DiscussionModel extends VanillaModel {
                 // Get all fields on the form that relate to the schema
                 $Fields = $this->Validation->schemaValidationFields();
 
+                // Check for spam.
+                $Spam = SpamModel::isSpam('Discussion', $Fields);
+                if ($Spam) {
+                    return SPAM;
+                }
+
                 // Get DiscussionID if one was sent
                 $DiscussionID = intval(val('DiscussionID', $Fields, 0));
 
@@ -1636,12 +1642,6 @@ class DiscussionModel extends VanillaModel {
                 $StoredCategoryID = false;
 
                 if ($DiscussionID > 0) {
-                    // Check for spam.
-                    $Spam = SpamModel::isSpam('Discussion', $Fields);
-                    if ($Spam) {
-                        return SPAM;
-                    }
-
                     // Updating
                     $Stored = $this->getID($DiscussionID, DATASET_TYPE_OBJECT);
 
@@ -1681,12 +1681,6 @@ class DiscussionModel extends VanillaModel {
 
                     if (c('Vanilla.QueueNotifications')) {
                         $Fields['Notified'] = ActivityModel::SENT_PENDING;
-                    }
-
-                    // Check for spam.
-                    $Spam = SpamModel::isSpam('Discussion', $Fields);
-                    if ($Spam) {
-                        return SPAM;
                     }
 
                     // Check for approval

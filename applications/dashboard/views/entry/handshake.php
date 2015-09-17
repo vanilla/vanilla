@@ -2,7 +2,7 @@
 // Make sure to force this form to post to the correct place in case the view is
 // rendered within another view (ie. /dashboard/entry/index/):
 ?>
-<h1><?php echo t("Sign in") ?></h1>
+<h1><?php echo t("Sign In") ?></h1>
 <div class="Box">
     <?php
     echo $this->Form->open(array('Action' => url('/entry/handshake/'.$this->HandshakeScheme), 'id' => 'Form_User_Handshake'));

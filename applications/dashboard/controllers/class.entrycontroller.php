@@ -725,7 +725,7 @@ EOT;
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
-                if ($UserID) {
+                if ($UserID && c('Garden.Registration.SendConnectEmail', false)) {
                     // Send the welcome email.
                     $UserModel->sendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'))));
                 }

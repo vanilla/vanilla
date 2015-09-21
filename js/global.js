@@ -1922,8 +1922,8 @@ if (typeof String.prototype.trim !== 'function') {
 
 // jQuery UI .effect() replacement using CSS classes.
 jQuery.fn.effect = function(name) {
-    var that = this,
-        name = name + '-effect';
+    var that = this;
+    name = name + '-effect';
 
     return this
         .addClass(name)

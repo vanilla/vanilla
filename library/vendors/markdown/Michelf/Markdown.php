@@ -1,4 +1,15 @@
 <?php
+
+#
+#
+#           DO NOT UPDATE THIS FILE
+#           DO NOT BRING IN A NEW VERSION OF THIS LIBRARY
+#           VANILLA CHANGES WILL BE LOST
+#
+#           Please see /library/core/class.markdownvanilla.php
+#
+#
+
 #
 # Markdown  -  A text-to-HTML conversion tool for web writers
 #

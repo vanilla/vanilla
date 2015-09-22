@@ -182,7 +182,7 @@ class RoleController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function index($RoleID = null) {
+    public function index($roleID = null) {
         $this->_permission();
 
         $this->addSideMenu('dashboard/role');
@@ -190,29 +190,44 @@ class RoleController extends DashboardController {
         $this->addJsFile('jquery-ui.js');
         $this->title(t('Roles & Permissions'));
 
-        if (!$RoleID) {
-            $RoleData = $this->RoleModel->getWithRankPermissions()->resultArray();
+        if (!$roleID) {
+            $roles = $this->RoleModel->getWithRankPermissions()->resultArray();
 
             // Check to see which roles can be modified.
-            foreach ($RoleData as &$Row) {
-                $CanModify = true;
+            foreach ($roles as &$row) {
+                $canModify = true;
 
                 if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                    foreach ($this->RoleModel->RankPermissions as $Permission) {
-                        if ($Row[$Permission] && !Gdn::session()->checkPermission($Permission)) {
-                            $CanModify = false;
+                    foreach ($this->RoleModel->RankPermissions as $permission) {
+                        if ($row[$permission] && !Gdn::session()->checkPermission($permission)) {
+                            $canModify = false;
                             break;
                         }
                     }
                 }
-                $Row['CanModify'] = $CanModify;
+                $row['CanModify'] = $canModify;
             }
+            $this->setData('Roles', $roles);
+        } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            // This is an API request. Get the role in a nicer format.
+            $role = $this->RoleModel->getID($roleID, DATASET_TYPE_ARRAY);
+
+            // Get the global permissions.
+            $permissions = Gdn::permissionModel()->getGlobalPermissions($roleID);
+            unset($permissions['PermissionID']);
+
+            // Get the per-category permissions.
+            $permissions['Category'] = $this->RoleModel->getCategoryPermissions($roleID);
+
+            $role['Permissions'] = $permissions;
+
+            $this->setData('Role', $role);
+            saveToConfig('Api.Clean', false, false);
         } else {
-            $Role = $this->RoleModel->getID($RoleID);
-            $RoleData = array($Role);
+            $Role = $this->RoleModel->getID($roleID);
+            $this->setData('Roles', [$Role]);
         }
 
-        $this->setData('Roles', $RoleData);
         $this->render();
     }
 

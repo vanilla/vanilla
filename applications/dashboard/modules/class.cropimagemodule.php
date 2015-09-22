@@ -250,8 +250,8 @@ class CropImageModule extends Gdn_Module {
      * @param $sender The controller object to add assets to.
      */
     private function addAssets($sender) {
-        $sender->addJsFile('jquery.jcrop.min.js');
-        $sender->addJsFile('cropimage.js');
-        $sender->addCssFile('cropimage.css');
+        $sender->addJsFile('jquery.jcrop.min.js', 'dashboard');
+        $sender->addJsFile('cropimage.js', 'dashboard');
+        $sender->addCssFile('cropimage.css', 'dashboard');
     }
 }

@@ -35,10 +35,8 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     /** @var bool  */
     public $Visible = true;
 
-    /**
-     * @var string The filename of view to render, excluding the extension.
-     */
-    public $view;
+    /**  @var string The filename of view to render, excluding the extension. */
+    protected $view;
 
     /**
      * Class constructor
@@ -69,17 +67,19 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     }
 
     /**
-     * @return string
+     * @return string The filename of view to render, excluding the extension.
      */
     public function getView() {
         return $this->view;
     }
 
     /**
-     * @param string $view
+     * @param string $view The filename of view to render, excluding the extension.
+     * @return $this The calling module.
      */
     public function setView($view) {
         $this->view = $view;
+        return $this;
     }
 
     /**

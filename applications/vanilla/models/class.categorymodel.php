@@ -760,7 +760,7 @@ class CategoryModel extends Gdn_Model {
                 }
 
                 // Calculate the following field.
-                $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Row, false));
+                $Following = !((bool)val('Archived', $Category) || (bool)val('Unfollow', $Row, false));
                 $Categories[$ID]['Following'] = $Following;
 
                 // Calculate the read field.
@@ -1646,7 +1646,7 @@ class CategoryModel extends Gdn_Model {
         $NewName = val('Name', $FormPostValues, '');
         $UrlCode = val('UrlCode', $FormPostValues, '');
         $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
-        $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
+        $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues) || is_array(val('Permissions', $FormPostValues));
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
         if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
@@ -1731,9 +1731,21 @@ class CategoryModel extends Gdn_Model {
             if ($CategoryID) {
                 // Check to see if this category uses custom permissions.
                 if ($CustomPermissions) {
-                    $PermissionModel = Gdn::permissionModel();
-                    $Permissions = $PermissionModel->PivotPermissions(val('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-                    $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
+                    $permissionModel = Gdn::permissionModel();
+
+                    if (is_array(val('Permissions', $FormPostValues))) {
+                        // The permissions were posted in an API format provided by settings/getcategory
+                        $permissions = val('Permissions', $FormPostValues);
+                        foreach ($permissions as &$perm) {
+                            $perm['JunctionTable'] = 'Category';
+                            $perm['JunctionColumn'] = 'PermissionCategoryID';
+                            $perm['JunctionID'] = $CategoryID;
+                        }
+                    } else {
+                        // The permissions were posted in the web format provided by settings/addcategory and settings/editcategory
+                        $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
+                    }
+                    $permissionModel->saveAll($permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                     if (!$Insert) {
                         // Figure out my last permission and tree info.

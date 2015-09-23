@@ -340,7 +340,11 @@ class SettingsController extends Gdn_Controller {
         }
 
         // Add the permissions for the category.
-        $category['Permissions'] = $categoryModel->getRolePermissions($categoryID);
+        if ($category['PermissionCategoryID'] == $category['CategoryID']) {
+            $category['Permissions'] = $categoryModel->getRolePermissions($categoryID);
+        } else {
+            $category['Permissions'] = null;
+        }
 
         $this->setData('Category', $category);
         saveToConfig('Api.Clean', false, false);

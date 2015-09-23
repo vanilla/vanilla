@@ -1660,20 +1660,24 @@ class CategoryModel extends Gdn_Model {
         }
 
         $this->AddUpdateFields($FormPostValues);
-        $this->Validation->applyRule('UrlCode', 'Required');
-        $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        // Make sure that the UrlCode is unique among categories.
-        $this->SQL->select('CategoryID')
-            ->from('Category')
-            ->where('UrlCode', $UrlCode);
+        // Add some extra validation to the url code if one is provided.
+        if ($Insert || array_key_exists('UrlCode', $FormPostValues)) {
+            $this->Validation->applyRule('UrlCode', 'Required');
+            $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        if ($CategoryID) {
-            $this->SQL->where('CategoryID <>', $CategoryID);
-        }
+            // Make sure that the UrlCode is unique among categories.
+            $this->SQL->select('CategoryID')
+                ->from('Category')
+                ->where('UrlCode', $UrlCode);
 
-        if ($this->SQL->get()->numRows()) {
-            $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            if ($CategoryID) {
+                $this->SQL->where('CategoryID <>', $CategoryID);
+            }
+
+            if ($this->SQL->get()->numRows()) {
+                $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            }
         }
 
         //	Prep and fire event.

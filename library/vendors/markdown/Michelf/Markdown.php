@@ -1,4 +1,15 @@
 <?php
+
+#
+#
+#           DO NOT UPDATE THIS FILE
+#           DO NOT BRING IN A NEW VERSION OF THIS LIBRARY
+#           VANILLA CHANGES WILL BE LOST
+#
+#           Please see /library/core/class.markdownvanilla.php
+#
+#
+
 #
 # Markdown  -  A text-to-HTML conversion tool for web writers
 #
@@ -413,9 +424,6 @@ class Markdown implements MarkdownInterface {
 		"doLists"           => 40,
 		"doCodeBlocks"      => 50,
 		"doBlockQuotes"     => 60,
-
-		# Vanilla: add Spoilers
-		"doSpoilers"        => 55,
 		);
 
 	protected function runBlockGamut($text) {
@@ -488,11 +496,7 @@ class Markdown implements MarkdownInterface {
 		"encodeAmpsAndAngles" =>  40,
 
 		"doItalicsAndBold"    =>  50,
-		"doHardBreaks"        =>  60,
-
-		# Vanilla: add strikeout and soft breaks.
-		"doStrikeout" 			 =>  15,
-		"doSoftBreaks" 		 =>  80,
+		"doHardBreaks"        =>  60
 		);
 
 	protected function runSpanGamut($text) {
@@ -3159,65 +3163,6 @@ abstract class _MarkdownExtra_TmpImpl extends \Michelf\Markdown {
 		} else {
 			return $matches[0];
 		}
-	}
-
-	# Vanilla: add Spoilers implementation (3 methods).
-	function doSpoilers($text) {
-		$text = preg_replace_callback('/
-			  (								# Wrap whole match in $1
-				(?>
-				  ^[ ]*>![ ]?			# ">" at the start of a line
-					.+\n					# rest of the first line
-				  \n*						# blanks
-				)+
-			  )
-			/xm',
-			array(&$this, '_doSpoilers_callback'), $text);
-
-		return $text;
-	}
-	function _doSpoilers_callback($matches) {
-		$bq = $matches[1];
-		# trim one level of quoting - trim whitespace-only lines
-		$bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', '', $bq);
-		$bq = $this->runBlockGamut($bq);		# recurse
-
-		$bq = preg_replace('/^/m', "  ", $bq);
-		# These leading spaces cause problem with <pre> content,
-		# so we need to fix that:
-		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-			array(&$this, '_doSpoilers_callback2'), $bq);
-
-		return "\n". $this->hashBlock("<div class=\"Spoiler\">\n$bq\n</div>")."\n\n";
-	}
-	function _doSpoilers_callback2($matches) {
-		$pre = $matches[1];
-		$pre = preg_replace('/^  /m', '', $pre);
-		return $pre;
-	}
-
-	# Vanilla: add Strikeout implementation (2 methods).
-	protected function doStrikeout($text) {
-		$text = preg_replace_callback('/
-		~~ # open
-		(.+?) # $1 = strike text
-		~~ # close
-		/xm',
-		array($this, '_doStrikeout_callback'), $text);
-		return $text;
-	}
-	protected function _doStrikeout_callback($matches) {
-		return $this->hashPart("<s>".$this->runSpanGamut($matches[1])."</s>");
-	}
-
-	# Vanilla: add soft line breaks implementation (2 methods).
-	protected function doSoftBreaks($text) {
-		# Do soft line breaks for 1 return:
-		return preg_replace_callback('/\n{1}/',
-			array($this, '_doSoftBreaks_callback'), $text);
-	}
-	protected function _doSoftBreaks_callback($matches) {
-		return $this->hashPart("<br$this->empty_element_suffix\n");
 	}
 
 }

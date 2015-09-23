@@ -296,6 +296,9 @@ class SettingsController extends Gdn_Controller {
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirect('vanilla/settings/managecategories');
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
+                    $this->getCategory($CategoryID);
+                    return;
                 }
             } else {
                 unset($CategoryID);
@@ -529,6 +532,9 @@ class SettingsController extends Gdn_Controller {
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirect('vanilla/settings/managecategories');
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
+                    $this->getCategory($CategoryID);
+                    return;
                 }
             }
         } else {

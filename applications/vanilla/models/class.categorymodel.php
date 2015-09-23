@@ -931,18 +931,17 @@ class CategoryModel extends Gdn_Model {
      * Get data for a single category selected by ID. Disregards permissions.
      *
      * @since 2.0.0
-     * @access public
      *
-     * @param int $CategoryID Unique ID of category we're getting data for.
-     * @return object SQL results.
+     * @param int $categoryID The unique ID of category we're getting data for.
+     * @return object|array SQL results.
      */
-    public function getID($CategoryID, $DatasetType = DATASET_TYPE_OBJECT) {
-        $Category = $this->SQL->getWhere('Category', array('CategoryID' => $CategoryID))->firstRow($DatasetType);
-        if (isset($Category->AllowedDiscussionTypes) && is_string($Category->AllowedDiscussionTypes)) {
-            $Category->AllowedDiscussionTypes = unserialize($Category->AllowedDiscussionTypes);
+    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT) {
+        $category = $this->SQL->getWhere('Category', array('CategoryID' => $categoryID))->firstRow($datasetType);
+        if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
+            setValue('AllowedDiscussionTypes', $category, unserialize(val('AllowedDiscussionTypes', $category)));
         }
 
-        return $Category;
+        return $category;
     }
 
     /**
@@ -1095,6 +1094,26 @@ class CategoryModel extends Gdn_Model {
             ->where('d.UrlCode', $Code)
             ->orderBy('c.TreeLeft', 'asc')
             ->get();
+    }
+
+    /**
+     * Get the role specific permissions for a category.
+     *
+     * @param int $categoryID The ID of the category to get the permissions for.
+     * @return array Returns an array of permissions.
+     */
+    public function getRolePermissions($categoryID) {
+        $permissions = Gdn::permissionModel()->getJunctionPermissions(['JunctionID' => $categoryID], 'Category');
+        $result = [];
+
+        foreach ($permissions as $perm) {
+            $row = ['RoleID' => $perm['RoleID']];
+            unset($perm['Name'], $perm['RoleID'], $perm['JunctionID'], $perm['JunctionTable'], $perm['JunctionColumn']);
+            $row += $perm;
+            $result[] = $row;
+        }
+
+        return $result;
     }
 
     /**

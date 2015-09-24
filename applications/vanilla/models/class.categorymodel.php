@@ -760,7 +760,7 @@ class CategoryModel extends Gdn_Model {
                 }
 
                 // Calculate the following field.
-                $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Row, false));
+                $Following = !((bool)val('Archived', $Category) || (bool)val('Unfollow', $Row, false));
                 $Categories[$ID]['Following'] = $Following;
 
                 // Calculate the read field.
@@ -931,18 +931,17 @@ class CategoryModel extends Gdn_Model {
      * Get data for a single category selected by ID. Disregards permissions.
      *
      * @since 2.0.0
-     * @access public
      *
-     * @param int $CategoryID Unique ID of category we're getting data for.
-     * @return object SQL results.
+     * @param int $categoryID The unique ID of category we're getting data for.
+     * @return object|array SQL results.
      */
-    public function getID($CategoryID, $DatasetType = DATASET_TYPE_OBJECT) {
-        $Category = $this->SQL->getWhere('Category', array('CategoryID' => $CategoryID))->firstRow($DatasetType);
-        if (isset($Category->AllowedDiscussionTypes) && is_string($Category->AllowedDiscussionTypes)) {
-            $Category->AllowedDiscussionTypes = unserialize($Category->AllowedDiscussionTypes);
+    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT) {
+        $category = $this->SQL->getWhere('Category', array('CategoryID' => $categoryID))->firstRow($datasetType);
+        if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
+            setValue('AllowedDiscussionTypes', $category, unserialize(val('AllowedDiscussionTypes', $category)));
         }
 
-        return $Category;
+        return $category;
     }
 
     /**
@@ -1095,6 +1094,26 @@ class CategoryModel extends Gdn_Model {
             ->where('d.UrlCode', $Code)
             ->orderBy('c.TreeLeft', 'asc')
             ->get();
+    }
+
+    /**
+     * Get the role specific permissions for a category.
+     *
+     * @param int $categoryID The ID of the category to get the permissions for.
+     * @return array Returns an array of permissions.
+     */
+    public function getRolePermissions($categoryID) {
+        $permissions = Gdn::permissionModel()->getJunctionPermissions(['JunctionID' => $categoryID], 'Category');
+        $result = [];
+
+        foreach ($permissions as $perm) {
+            $row = ['RoleID' => $perm['RoleID']];
+            unset($perm['Name'], $perm['RoleID'], $perm['JunctionID'], $perm['JunctionTable'], $perm['JunctionColumn']);
+            $row += $perm;
+            $result[] = $row;
+        }
+
+        return $result;
     }
 
     /**
@@ -1646,7 +1665,7 @@ class CategoryModel extends Gdn_Model {
         $NewName = val('Name', $FormPostValues, '');
         $UrlCode = val('UrlCode', $FormPostValues, '');
         $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
-        $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
+        $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues) || is_array(val('Permissions', $FormPostValues));
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
         if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
@@ -1660,20 +1679,24 @@ class CategoryModel extends Gdn_Model {
         }
 
         $this->AddUpdateFields($FormPostValues);
-        $this->Validation->applyRule('UrlCode', 'Required');
-        $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        // Make sure that the UrlCode is unique among categories.
-        $this->SQL->select('CategoryID')
-            ->from('Category')
-            ->where('UrlCode', $UrlCode);
+        // Add some extra validation to the url code if one is provided.
+        if ($Insert || array_key_exists('UrlCode', $FormPostValues)) {
+            $this->Validation->applyRule('UrlCode', 'Required');
+            $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        if ($CategoryID) {
-            $this->SQL->where('CategoryID <>', $CategoryID);
-        }
+            // Make sure that the UrlCode is unique among categories.
+            $this->SQL->select('CategoryID')
+                ->from('Category')
+                ->where('UrlCode', $UrlCode);
 
-        if ($this->SQL->get()->numRows()) {
-            $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            if ($CategoryID) {
+                $this->SQL->where('CategoryID <>', $CategoryID);
+            }
+
+            if ($this->SQL->get()->numRows()) {
+                $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            }
         }
 
         //	Prep and fire event.
@@ -1731,9 +1754,21 @@ class CategoryModel extends Gdn_Model {
             if ($CategoryID) {
                 // Check to see if this category uses custom permissions.
                 if ($CustomPermissions) {
-                    $PermissionModel = Gdn::permissionModel();
-                    $Permissions = $PermissionModel->PivotPermissions(val('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-                    $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
+                    $permissionModel = Gdn::permissionModel();
+
+                    if (is_array(val('Permissions', $FormPostValues))) {
+                        // The permissions were posted in an API format provided by settings/getcategory
+                        $permissions = val('Permissions', $FormPostValues);
+                        foreach ($permissions as &$perm) {
+                            $perm['JunctionTable'] = 'Category';
+                            $perm['JunctionColumn'] = 'PermissionCategoryID';
+                            $perm['JunctionID'] = $CategoryID;
+                        }
+                    } else {
+                        // The permissions were posted in the web format provided by settings/addcategory and settings/editcategory
+                        $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
+                    }
+                    $permissionModel->saveAll($permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                     if (!$Insert) {
                         // Figure out my last permission and tree info.

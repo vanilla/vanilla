@@ -164,6 +164,11 @@ class RoleController extends DashboardController {
             // If the form has been posted back...
             // 2. Save the data (validation occurs within):
             if ($RoleID = $this->Form->save()) {
+                if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+                    $this->index($RoleID);
+                    return;
+                }
+
                 $this->informMessage(t('Your changes have been saved.'));
                 $this->RedirectUrl = url('dashboard/role');
                 // Reload the permission data.

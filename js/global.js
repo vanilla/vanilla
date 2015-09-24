@@ -21,7 +21,7 @@
         return false;
     };
 
-// Add a stub for embedding.
+    // Add a stub for embedding.
     Vanilla.parent = function() {
     };
     Vanilla.parent.callRemote = function(func, args, success, failure) {
@@ -31,6 +31,17 @@
     window.gdn = window.gdn || {};
     window.Vanilla = Vanilla;
 
+    gdn.getMeta = function(key, defaultValue) {
+        if (gdn.meta[key] === undefined) {
+            return defaultValue;
+        } else {
+            return gdn.meta[key];
+        }
+    };
+
+    gdn.setMeta = function(key, value) {
+        gdn.meta[key] = value;
+    };
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
@@ -154,18 +165,6 @@ jQuery(document).ready(function($) {
             return true;
         else
             return false;
-    };
-
-    gdn.getMeta = function(key, defaultValue) {
-        if (gdn.meta[key] === undefined) {
-            return defaultValue;
-        } else {
-            return gdn.meta[key];
-        }
-    };
-
-    gdn.setMeta = function(key, value) {
-        gdn.meta[key] = value;
     };
 
     gdn.querySep = function(url) {

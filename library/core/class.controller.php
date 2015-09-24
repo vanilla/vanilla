@@ -1675,7 +1675,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Only get css & ui components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
 
+                $CssAnchors = ['style.css', 'admin.css'];
+
                 $this->EventArguments['CssFiles'] = &$this->_CssFiles;
+                $this->EventArguments['CssAnchors'] = &$CssAnchors;
                 $this->fireEvent('BeforeAddCss');
 
                 $ETag = AssetModel::eTag();
@@ -1691,7 +1694,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $Options = &$CssInfo['Options'];
 
                     // style.css and admin.css deserve some custom processing.
-                    if (in_array($CssFile, array('style.css', 'admin.css'))) {
+                    if (in_array($CssFile, $CssAnchors)) {
                         if (!$CombineAssets) {
                             // Grab all of the css files from the asset model.
                             $AssetModel = new AssetModel();

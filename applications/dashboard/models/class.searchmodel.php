@@ -42,12 +42,12 @@ class SearchModel extends Gdn_Model {
      * @param Gdn_SQLDriver $Sql
      * @param string $Columns a comma seperated list of columns to search on.
      */
-    public function addMatchSql($Sql, $Columns, $LikeRelavenceColumn = '') {
+    public function addMatchSql($Sql, $Columns, $LikeRelevanceColumn = '') {
         if ($this->_SearchMode == 'like') {
-            if ($LikeRelavenceColumn) {
-                $Sql->select($LikeRelavenceColumn, '', 'Relavence');
+            if ($LikeRelevanceColumn) {
+                $Sql->select($LikeRelevanceColumn, '', 'Relevance');
             } else {
-                $Sql->select(1, '', 'Relavence');
+                $Sql->select(1, '', 'Relevance');
             }
 
             $Sql->beginWhereGroup();
@@ -58,7 +58,7 @@ class SearchModel extends Gdn_Model {
             foreach ($ColumnsArray as $Column) {
                 $Column = trim($Column);
 
-                $Param = $this->Parameter();
+                $Param = $this->parameter();
                 if ($First) {
                     $Sql->where("$Column like $Param", null, false, false);
                     $First = false;
@@ -71,9 +71,9 @@ class SearchModel extends Gdn_Model {
         } else {
             $Boolean = $this->_SearchMode == 'boolean' ? ' in boolean mode' : '';
 
-            $Param = $this->Parameter();
-            $Sql->select($Columns, "match(%s) against($Param{$Boolean})", 'Relavence');
-            $Param = $this->Parameter();
+            $Param = $this->parameter();
+            $Sql->select($Columns, "match(%s) against($Param{$Boolean})", 'Relevance');
+            $Param = $this->parameter();
             $Sql->where("match($Columns) against ($Param{$Boolean})", null, false, false);
         }
     }
@@ -154,7 +154,7 @@ class SearchModel extends Gdn_Model {
             ->from('_TBL_ s')
             ->orderBy('s.DateInserted', 'desc')
             ->limit($Limit, $Offset)
-            ->GetSelect();
+            ->getSelect();
 
         $Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
 
@@ -175,14 +175,14 @@ class SearchModel extends Gdn_Model {
 
         foreach ($Result as $Key => $Value) {
             if (isset($Value['Summary'])) {
-                $Value['Summary'] = Condense(Gdn_Format::to($Value['Summary'], $Value['Format']));
+                $Value['Summary'] = condense(Gdn_Format::to($Value['Summary'], $Value['Format']));
                 $Result[$Key] = $Value;
             }
 
             switch ($Value['RecordType']) {
                 case 'Discussion':
                     $Discussion = arrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
-                    $Result[$Key]['Url'] = DiscussionUrl($Discussion, 1);
+                    $Result[$Key]['Url'] = discussionUrl($Discussion, 1);
                     break;
             }
         }

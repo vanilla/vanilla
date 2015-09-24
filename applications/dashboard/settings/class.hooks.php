@@ -98,6 +98,9 @@ class DashboardHooks implements Gdn_IPlugin {
             if ($RemoteUrl) {
                 $Sender->addDefinition('RemoteUrl', $RemoteUrl);
             }
+            if ($remoteUrlFormat = c('Garden.Embed.RemoteUrlFormat')) {
+                $Sender->addDefinition('RemoteUrlFormat', $remoteUrlFormat);
+            }
 
             // Force embedding?
             if (!IsSearchEngine() && !IsMobile() && strtolower($Sender->ControllerName) != 'entry') {

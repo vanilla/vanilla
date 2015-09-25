@@ -1675,10 +1675,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Only get css & ui components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
 
-                $CssAnchors = ['style.css', 'admin.css'];
+                $CssAnchors = AssetModel::getAnchors();
 
                 $this->EventArguments['CssFiles'] = &$this->_CssFiles;
-                $this->EventArguments['CssAnchors'] = &$CssAnchors;
                 $this->fireEvent('BeforeAddCss');
 
                 $ETag = AssetModel::eTag();

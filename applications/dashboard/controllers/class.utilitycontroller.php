@@ -31,14 +31,15 @@ class UtilityController extends DashboardController {
     );
 
     /**
-     * Gather all of the global styles together.
-     * @param string ThemeType Either `desktop` or `mobile`.
-     * @param string $Filename The basename of the file to
+     * Serve combined CSS assets
+     *
+     * @param string $themeType Either `desktop` or `mobile`.
+     * @param string $filename The basename of the file to serve
      * @since 2.1
      */
-    public function css($ThemeType, $Filename) {
-        $AssetModel = new AssetModel();
-        $AssetModel->ServeCss($ThemeType, $Filename);
+    public function css($themeType, $filename) {
+        $assetModel = new AssetModel();
+        $assetModel->serveCss($themeType, $filename);
     }
 
     /**

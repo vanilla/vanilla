@@ -131,6 +131,28 @@ class HomeController extends Gdn_Controller {
         $this->render();
     }
 
+    protected function sanitizeData() {
+        $fields = array('Exception', 'Message', 'Description');
+
+        $method = $this->data('_Filter', 'safe');
+        switch ($method) {
+            case 'filter':
+                $callback = array('Gdn_Format', 'htmlFilter');
+                break;
+            case 'none':
+                return;
+            case 'safe':
+            default:
+                $callback = 'htmlspecialchars';
+        }
+
+        foreach ($fields as $field) {
+            if (isset($this->Data[$field]) && is_string($this->Data[$field])) {
+                $this->Data[$field] = call_user_func($callback, $this->Data[$field]);
+            }
+        }
+    }
+
     /**
      * Display privacy info page.
      *
@@ -156,5 +178,25 @@ class HomeController extends Gdn_Controller {
         } else {
             $this->RenderException(permissionException());
         }
+    }
+
+    /**
+     * Sanitize basic error data before rendering it off.
+     *
+     * By default the main error fields will be passed through htmlspecialchars.
+     * To opt out of this the _Filter data key can be set to one of the following:
+     *
+     * - none: Do not filter.
+     * - filter: Just do basic html filtering to remove scripts and other malicious tags.
+     *
+     * @param string $View
+     * @param string $ControllerName
+     * @param string $ApplicationFolder
+     * @param string $AssetName The name of the asset container that the content should be rendered in.
+     */
+    public function xRender($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') {
+        $this->sanitizeData();
+
+        return parent::xRender($View, $ControllerName, $ApplicationFolder, $AssetName);
     }
 }

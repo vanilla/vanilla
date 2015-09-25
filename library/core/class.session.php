@@ -472,7 +472,7 @@ class Gdn_Session {
         if (!$this->_TransientKey) {
             // Generate a transient key in the browser.
             $tk = substr(md5(microtime()), 0, 16);
-            setAppCookie('tk', $tk);
+            setAppCookie('tk', $tk, 0, true);
             $this->_TransientKey = $tk;
         }
         return $this->_TransientKey;

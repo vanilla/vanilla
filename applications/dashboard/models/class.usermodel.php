@@ -990,7 +990,7 @@ class UserModel extends Gdn_Model {
             }
             return $avatar;
         }
-        return 'applications/dashboard/design/images/defaulticon.png';
+        return url('applications/dashboard/design/images/defaulticon.png', true);
     }
 
     /**

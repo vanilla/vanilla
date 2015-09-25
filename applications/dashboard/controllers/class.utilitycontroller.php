@@ -24,6 +24,23 @@ set_time_limit(0);
 class UtilityController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
+
+    /** @var  Gdn_Form $Form */
+    public $Form;
+
+    /**
+     * @var array Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
+     * Typically, HTTP headers in the $_SERVER array will be prefixed with
+     * `HTTP_` or `X_`. These are not so we list them here for later reference.
+     */
+    protected static $specialHeaders = array(
+        'CONTENT_TYPE',
+        'CONTENT_LENGTH',
+        'PHP_AUTH_USER',
+        'PHP_AUTH_PW',
+        'PHP_AUTH_DIGEST',
+        'AUTH_TYPE'
+    );
    
    /**
     * Gather all of the global styles together.
@@ -267,14 +284,30 @@ class UtilityController extends DashboardController {
     * @since 2.0.?
     * @access public
      * @param string $appName Unique app name or 'all' (default).
-     * @param int $captureOnly Whether to list changes rather than execture (0 or 1).
      */
-    public function structure($appName = 'all', $captureOnly = '1') {
+    public function structure($appName = 'all') {
         $this->permission('Garden.Settings.Manage');
 
+        if (!$this->Form->authenticatedPostBack()) {
+            // The form requires a postback to do anything.
+            $step = 'start';
+        } else {
+            $step = !empty($this->Form->getFormValue('Scan')) ? 'scan' : (!empty($this->Form->getFormValue('Run')) ? 'run' : 'start');
+        }
 
-        $this->runStructure($appName, $captureOnly);
+        switch ($step) {
+            case 'scan':
+                $this->runStructure($appName, true);
+                break;
+            case 'run':
+                $this->runStructure($appName, false);
+                break;
+            case 'start';
+            default:
+                // Nothing to do here.
+        }
 
+        $this->setData('Step', $step);
         $this->addSideMenu('dashboard/settings/configure');
         $this->addCssFile('admin.css');
         $this->setData('Title', t('Database Structure Upgrades'));

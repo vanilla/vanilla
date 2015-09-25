@@ -1490,12 +1490,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a jsonp request.
-                    echo $Callback.'('.json_encode($Data).');';
+                    echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
                     return true;
                 } else {
                     safeHeader('Content-Type: application/json; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a regular json request.
-                    echo json_encode($Data);
+                    echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                     return true;
                 }
                 break;

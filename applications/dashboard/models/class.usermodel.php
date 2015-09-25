@@ -56,9 +56,9 @@ class UserModel extends Gdn_Model {
         parent::__construct('User');
 
         $this->addFilterField(array(
-            'Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0,
-            'Preferences' => 0, 'Permissions' => 0, 'LastIPAddress' => 0, 'AllIPAddresses' => 0, 'DateFirstVisit' => 0,
-            'DateLastActive' => 0, 'CountDiscussions' => 0, 'CountComments' => 0,'Score' => 0
+            'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
+            'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
+            'Score'
         ));
     }
 

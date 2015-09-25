@@ -1,11 +1,6 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
 
-   $('a.ClearConversation').popup({
-      confirm: true,
-      followConfirm: false
-   });
-
    // Hijack "add message" clicks and handle via ajax...
    $.fn.handleMessageForm = function() {
       this.click(function() {

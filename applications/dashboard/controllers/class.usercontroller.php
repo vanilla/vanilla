@@ -431,7 +431,7 @@ class UserController extends DashboardController {
    public function Delete2() {
       $this->Permission('Garden.Users.Delete');
       
-      if (!Gdn::Request()->IsPostBack())
+      if (!Gdn::Request()->IsAuthenticatedPostBack())
          throw new Exception('Requires POST', 405);
       
       $this->Form->ValidateRule('UserID', 'ValidateRequired');

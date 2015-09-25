@@ -60,6 +60,10 @@ class UserModel extends Gdn_Model {
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
             'Score'
         ));
+
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
+        }
     }
 
     /**
@@ -801,13 +805,6 @@ class UserModel extends Gdn_Model {
      * @return array
      */
     public function filterForm($data, $register = false) {
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $this->addFilterField(array('Banned', 'Verified', 'Confirmed'));
-        }
-
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $this->removeFilterField('RankID');
-        }
         if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
             $this->removeFilterField('Name');
         }

@@ -19,6 +19,9 @@ class MessagesController extends ConversationsController {
     /**  @var ConversationModel */
     public $ConversationModel;
 
+    /** @var Gdn_Form $Form */
+    public $Form;
+
     /** @var object A dataset of users taking part in this discussion. Used by $this->Index. */
     public $RecipientData;
 
@@ -258,6 +261,7 @@ class MessagesController extends ConversationsController {
      * @param int $ConversationID Unique ID of conversation to clear.
      */
     public function clear($ConversationID = false, $TransientKey = '') {
+        deprecated('/messages/clear', '/messages/leave');
         $Session = Gdn::session();
 
         // Yes/No response
@@ -273,6 +277,35 @@ class MessagesController extends ConversationsController {
             $this->RedirectUrl = url('/messages/all');
         }
 
+        $this->render();
+    }
+
+    /**
+     * Leave a conversation that a user is participating in.
+     *
+     * @param int $conversationID The ID of the conversation to leave.
+     */
+    public function leave($conversationID) {
+        if (!Gdn::session()->UserID) {
+            throw new Gdn_UserException('You must be signed in.', 403);
+        }
+
+        // Make sure the user has participated in the conversation before.
+        $row = Gdn::sql()->getWhere(
+            'UserConversation',
+            ['ConversationID' => $conversationID, 'UserID' => Gdn::session()->UserID]
+        )->firstRow();
+
+        if (!$row) {
+            throw notFoundException('Conversation');
+        }
+
+        if ($this->Form->authenticatedPostBack(true)) {
+            $this->ConversationModel->clear($conversationID, Gdn::session()->UserID);
+            $this->RedirectUrl = url('/messages/all');
+        }
+
+        $this->title(t('Leave Conversation'));
         $this->render();
     }
 

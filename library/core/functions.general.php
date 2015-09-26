@@ -1153,15 +1153,17 @@ if (!function_exists('forceIPv4')) {
      * @since 2.1
      */
     function forceIPv4($IP) {
-        if ($IP === '::1') {
-            return '127.0.0.1';
-        } elseif (strpos($IP, ':') === true) {
-            return '0.0.0.1';
-        } elseif (strpos($IP, '.') === false) {
-            return '0.0.0.2';
-        } else {
-            return substr($IP, 0, 15);
+        if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $IP;
         }
+
+        if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return '0.0.0.1';
+        }
+
+        // We've reached a mythical land of non-existence and probable exceptions.
+
+        return '0.0.0.2'; // This should never be returned but what do I know?
     }
 }
 

@@ -8,8 +8,8 @@
  * @since 2.0
  */
 
-if (PHP_VERSION_ID < 50400) {
-    die("Vanilla requires PHP 5.4 or greater.");
+if (PHP_VERSION_ID < 50300) {
+    die("Vanilla requires PHP 5.3 or greater.");
 }
 
 define('APPLICATION', 'Vanilla');

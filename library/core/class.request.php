@@ -447,7 +447,6 @@ class Gdn_Request {
             $IP = $OriginalIP;
         }
 
-        $IP = forceIPv4($IP);
         $this->requestAddress($IP);
 
         // Request Scheme

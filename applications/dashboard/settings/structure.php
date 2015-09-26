@@ -87,12 +87,12 @@ $Construct
     ->column('DateOfBirth', 'datetime', true)
     ->column('DateFirstVisit', 'datetime', true)
     ->column('DateLastActive', 'datetime', true, 'index')
-    ->column('LastIPAddress', 'varchar(15)', true)
+    ->column('LastIPAddress', 'varchar(39)', true)
     ->column('AllIPAddresses', 'varchar(100)', true)
     ->column('DateInserted', 'datetime', false, 'index')
-    ->column('InsertIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'varchar(39)', true)
     ->column('DateUpdated', 'datetime', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('UpdateIPAddress', 'varchar(39)', true)
     ->column('HourOffset', 'int', '0')
     ->column('Score', 'float', null)
     ->column('Admin', 'tinyint(1)', '0')
@@ -399,7 +399,7 @@ $Construct
 //   ->column('CountComments', 'int', '0')
     ->column('InsertUserID', 'int', true, 'key')
     ->column('DateInserted', 'datetime')
-    ->column('InsertIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'varchar(39)', true)
     ->column('DateUpdated', 'datetime', !$DateUpdatedExists, array('index', 'index.Recent', 'index.Feed'))
     ->column('Notified', 'tinyint(1)', 0, 'index.Notify')
     ->column('Emailed', 'tinyint(1)', 0)
@@ -460,7 +460,7 @@ $Construct
     ->column('Format', 'varchar(20)')
     ->column('InsertUserID', 'int')
     ->column('DateInserted', 'datetime')
-    ->column('InsertIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'varchar(39)', true)
     ->set($Explicit, $Drop);
 
 // Move activity comments to the activity comment table.
@@ -643,10 +643,10 @@ $Construct->table('Log')
     ->column('RecordID', 'int', null, 'index')
     ->column('RecordUserID', 'int', null, 'index')// user responsible for the record; indexed for user deletion
     ->column('RecordDate', 'datetime')
-    ->column('RecordIPAddress', 'varchar(15)', null, 'index')
+    ->column('RecordIPAddress', 'varchar(39)', null, 'index')
     ->column('InsertUserID', 'int')// user that put record in the log
     ->column('DateInserted', 'datetime', false, 'index')// date item added to log
-    ->column('InsertIPAddress', 'varchar(15)', null)
+    ->column('InsertIPAddress', 'varchar(39)', null)
     ->column('OtherUserIDs', 'varchar(255)', null)
     ->column('DateUpdated', 'datetime', null)
     ->column('ParentRecordID', 'int', null, 'index')
@@ -681,10 +681,10 @@ $Construct->table('Ban')
     ->column('CountBlockedRegistrations', 'uint', 0)
     ->column('InsertUserID', 'int')
     ->column('DateInserted', 'datetime')
-    ->column('InsertIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'varchar(39)', true)
     ->column('UpdateUserID', 'int', true)
     ->column('DateUpdated', 'datetime', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('UpdateIPAddress', 'varchar(39)', true)
     ->engine('InnoDB')
     ->set($Explicit, $Drop);
 
@@ -751,7 +751,7 @@ $Construct
     ->column('InsertIPAddress', 'varchar(64)')
     ->column('DateUpdated', 'datetime', true)
     ->column('UpdateUserID', 'int', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('UpdateIPAddress', 'varchar(39)', true)
     ->set($Explicit, $Drop);
 
 // Save the current input formatter to the user's config.

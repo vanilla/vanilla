@@ -2860,7 +2860,7 @@ class UserModel extends Gdn_Model {
             $AllIPs = array();
         }
         if ($IP = val('InsertIPAddress', $User)) {
-            array_unshift($AllIPs, ForceIPv4($IP));
+            array_unshift($AllIPs, $IP);
         }
         if ($IP = val('LastIPAddress', $User)) {
             array_unshift($AllIPs, $IP);
@@ -3636,11 +3636,7 @@ class UserModel extends Gdn_Model {
         }
         if ($v = val('AllIPAddresses', $User)) {
             if (is_string($v)) {
-                $IPAddresses = explode(',', $v);
-                foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = ForceIPv4($IPAddress);
-                }
-                setValue('AllIPAddresses', $User, $IPAddresses);
+                setValue('AllIPAddresses', $User, explode(',', $v));
             }
         }
 
@@ -4162,8 +4158,7 @@ class UserModel extends Gdn_Model {
 
         if (isset($Property['AllIPAddresses'])) {
             if (is_array($Property['AllIPAddresses'])) {
-                $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
-                $IPs = array_unique($IPs);
+                $IPs = array_unique($Property['AllIPAddresses']);
                 $Property['AllIPAddresses'] = implode(',', $IPs);
                 // Ensure this isn't too big for our column
                 while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {

@@ -88,7 +88,7 @@ $Construct
     ->column('DateFirstVisit', 'datetime', true)
     ->column('DateLastActive', 'datetime', true, 'index')
     ->column('LastIPAddress', 'varchar(39)', true)
-    ->column('AllIPAddresses', 'varchar(100)', true)
+    ->column('AllIPAddresses', 'varchar(1919)', true)
     ->column('DateInserted', 'datetime', false, 'index')
     ->column('InsertIPAddress', 'varchar(39)', true)
     ->column('DateUpdated', 'datetime', true)

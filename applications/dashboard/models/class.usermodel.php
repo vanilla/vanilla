@@ -54,6 +54,16 @@ class UserModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('User');
+
+        $this->addFilterField(array(
+            'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
+            'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
+            'Score'
+        ));
+
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
+        }
     }
 
     /**
@@ -798,31 +808,17 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     *
-     *
-     * @param array $Data
-     * @param bool $Register
+     * @param array $data
+     * @param bool $register
      * @return array
      */
-    public function filterForm($Data, $Register = false) {
-        $Data = parent::FilterForm($Data);
-        $Data = array_diff_key(
-            $Data,
-            array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0,
-                'Permissions' => 0, 'LastIPAddress' => 0, 'AllIPAddresses' => 0, 'DateFirstVisit' => 0, 'DateLastActive' => 0, 'CountDiscussions' => 0, 'CountComments' => 0,
-                'Score' => 0)
-        );
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0, 'Confirmed' => 0));
-        }
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            unset($Data['RankID']);
-        }
-        if (!$Register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
-            unset($Data['Name']);
+    public function filterForm($data, $register = false) {
+        if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
+            $this->removeFilterField('Name');
         }
 
-        return $Data;
+        $data = parent::FilterForm($data);
+        return $data;
 
     }
 

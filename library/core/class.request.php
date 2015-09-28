@@ -343,16 +343,24 @@ class Gdn_Request {
     /**
      * Returns a boolean value indicating if the current page has an authenticated postback.
      *
-     * @return type
+     * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
+     * @return bool Returns true if the postback could be authenticated or false otherwise.
+     * @throws Gdn_UserException Throws an exception when this is a postback AND the transient key doesn't validate.
      * @since 2.1
      */
-    public function isAuthenticatedPostBack() {
+    public function isAuthenticatedPostBack($throw = false) {
         if (!$this->isPostBack()) {
             return false;
         }
 
-        $PostBackKey = Gdn::request()->post('TransientKey', false);
-        return Gdn::session()->validateTransientKey($PostBackKey, false);
+        $transientKey = Gdn::request()->post('TransientKey', false);
+        $result = Gdn::session()->validateTransientKey($transientKey, false);
+
+        if (!$result && $throw) {
+            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+        }
+
+        return $result;
     }
 
     public function isPostBack() {

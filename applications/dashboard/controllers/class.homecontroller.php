@@ -131,16 +131,44 @@ class HomeController extends Gdn_Controller {
         $this->render();
     }
 
+    /**
+     * Sanitize a string according to the filter specified _Filter in the data array.
+     *
+     * The valid values for _Filter are:
+     *
+     * - none: No sanitization.
+     * - filter: Sanitize using {@link Gdn_Format::htmlFilter()}.
+     * - safe: Sanitize using {@link htmlspecialchars()}.
+     *
+     * @param string $string The string to sanitize.
+     * @return string Returns the sanitized string.
+     */
+    protected function sanitize($string) {
+        switch ($this->data('_Filter', 'safe')) {
+            case 'none':
+                return $string;
+            case 'filter':
+                return Gdn_Format::htmlFilter($string);
+            case 'safe':
+            default:
+                return htmlspecialchars($string);
+        }
+    }
+
+    /**
+     * Sanitize the main exception fields in the data array according to the _Filter key.
+     * @see HomeController::sanitize()
+     */
     protected function sanitizeData() {
         $fields = array('Exception', 'Message', 'Description');
 
         $method = $this->data('_Filter', 'safe');
         switch ($method) {
+            case 'none':
+                return;
             case 'filter':
                 $callback = array('Gdn_Format', 'htmlFilter');
                 break;
-            case 'none':
-                return;
             case 'safe':
             default:
                 $callback = 'htmlspecialchars';
@@ -178,25 +206,5 @@ class HomeController extends Gdn_Controller {
         } else {
             $this->RenderException(permissionException());
         }
-    }
-
-    /**
-     * Sanitize basic error data before rendering it off.
-     *
-     * By default the main error fields will be passed through htmlspecialchars.
-     * To opt out of this the _Filter data key can be set to one of the following:
-     *
-     * - none: Do not filter.
-     * - filter: Just do basic html filtering to remove scripts and other malicious tags.
-     *
-     * @param string $View
-     * @param string $ControllerName
-     * @param string $ApplicationFolder
-     * @param string $AssetName The name of the asset container that the content should be rendered in.
-     */
-    public function xRender($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') {
-        $this->sanitizeData();
-
-        return parent::xRender($View, $ControllerName, $ApplicationFolder, $AssetName);
     }
 }

@@ -138,6 +138,7 @@ class Gdn_Session {
         $Authenticator->authenticateWith()->deauthenticate();
         $this->setCookie('-Vv', null, -3600);
         $this->setCookie('-sid', null, -3600);
+        $this->setCookie('-tk', null, -3600);
 
         Gdn::PluginManager()->CallEventHandlers($this, 'Gdn_Session', 'End');
 
@@ -471,7 +472,7 @@ class Gdn_Session {
     public function ensureTransientKey() {
         if (!$this->_TransientKey) {
             // Generate a transient key in the browser.
-            $tk = substr(md5(microtime()), 0, 16);
+            $tk = betterRandomString(16, 'Aa0');
             setAppCookie('tk', $tk);
             $this->_TransientKey = $tk;
         }

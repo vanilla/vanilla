@@ -5,7 +5,7 @@
 
         <div id="Message">
             <?php
-            echo Gdn_Format::markdown($this->data('Exception', 'No error message supplied.'));
+            echo Gdn_Format::markdown($this->sanitize($this->data('Exception', 'No error message supplied.')));
             ?>
         </div>
     </div>

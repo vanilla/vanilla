@@ -630,6 +630,14 @@ class UserModel extends Gdn_Model {
             'uniqueid' => null,
             'client_id' => null), true);
 
+        // Remove important missing keys.
+        if (!array_key_exists($Data['photourl'])) {
+            unset($User['Photo']);
+        }
+        if (!array_key_exists($Data['roles'])) {
+            unset($User['Roles']);
+        }
+
         trace($User, 'SSO User');
 
         $UserID = Gdn::userModel()->connect($UniqueID, $ClientID, $User);
@@ -1871,6 +1879,8 @@ class UserModel extends Gdn_Model {
             $this->Validation->addRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
             // $this->Validation->AddValidationField('RoleID', $FormPostValues);
             $this->Validation->applyRule('RoleID', 'OneOrMoreArrayItemRequired');
+        } else {
+            $this->Validation->unapplyRule('RoleID', 'OneOrMoreArrayItemRequired');
         }
 
         // Make sure that checkbox vals are saved as the appropriate value

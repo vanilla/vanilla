@@ -393,10 +393,16 @@ EOT;
         $this->EventArguments = array($Method);
 
         // Fire ConnectData event & error handling.
-        $CurrentData = $this->Form->formValues();
+        $currentData = $this->Form->formValues();
+
+        // Filter the form data for users here. SSO plugins must reset validated data each postback.
+        $filteredData = Gdn::userModel()->filterForm($currentData, true);
+        $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
+        $this->Form->formValues($filteredData);
+
         try {
-            $this->fireEvent('ConnectData');
             $this->EventArguments['Form'] = $this->Form;
+            $this->fireEvent('ConnectData');
             $this->fireEvent('AfterConnectData');
         } catch (Gdn_UserException $Ex) {
             $this->Form->addError($Ex);
@@ -416,7 +422,7 @@ EOT;
                 $this->Form->addHidden('EmailVisible', true);
 
                 if ($IsPostBack) {
-                    $this->Form->setFormValue('Email', val('Email', $CurrentData));
+                    $this->Form->setFormValue('Email', val('Email', $currentData));
                 }
             }
         }
@@ -621,7 +627,6 @@ EOT;
 
                 // There is no existing user with the suggested name so we can just create the user.
                 $User = $this->Form->formValues();
-                $User = $this->UserModel->filterForm($User, true);
                 $User['Password'] = randomString(50); // some password is required
                 $User['HashMethod'] = 'Random';
                 $User['Source'] = $this->Form->getFormValue('Provider');
@@ -717,7 +722,6 @@ EOT;
             } elseif ($this->Form->errorCount() == 0) {
                 // The user doesn't exist so we need to add another user.
                 $User = $this->Form->formValues();
-                $User = $this->UserModel->filterForm($User, true);
                 $User['Name'] = $User['ConnectName'];
                 $User['Password'] = randomString(50); // some password is required
                 $User['HashMethod'] = 'Random';

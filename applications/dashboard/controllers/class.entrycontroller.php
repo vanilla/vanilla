@@ -307,6 +307,7 @@ class EntryController extends Gdn_Controller {
         // Filter the form data for users here. SSO plugins must reset validated data each postback.
         $filteredData = Gdn::userModel()->filterForm($currentData, true);
         $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
+        unset($filteredData['Roles'], $filteredData['RoleID']);
         $this->Form->formValues($filteredData);
 
       try {
@@ -506,7 +507,6 @@ class EntryController extends Gdn_Controller {
          if ($this->Form->GetFormValue('Name') && $EmailValid && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
             // There is no existing user with the suggested name so we can just create the user.
             $User = $this->Form->FormValues();
-            $User = $this->UserModel->FilterForm($User, TRUE);
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
             $User['Source'] = $this->Form->GetFormValue('Provider');
@@ -604,7 +604,6 @@ class EntryController extends Gdn_Controller {
          } elseif ($this->Form->ErrorCount() == 0) {
             // The user doesn't exist so we need to add another user.
             $User = $this->Form->FormValues();
-            $User = $this->UserModel->FilterForm($User, TRUE);
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';

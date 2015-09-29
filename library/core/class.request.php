@@ -445,7 +445,8 @@ class Gdn_Request {
 
                 // Fallback
             } else {
-                $IP = $_SERVER['REMOTE_ADDR'];
+                $IPs = explode(',', $_SERVER['REMOTE_ADDR']);
+                $IP = trim($IPs[0]);
             }
         }
 

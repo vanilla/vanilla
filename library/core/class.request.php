@@ -445,14 +445,14 @@ class Gdn_Request {
 
                 // Fallback
             } else {
-                $IP = $_SERVER['REMOTE_ADDR'];
-            }
-        }
+                $remoteAddr = val('REMOTE_ADDR', $_SERVER);
 
-        // Varnish
-        $OriginalIP = val('HTTP_X_ORIGINALLY_FORWARDED_FOR', $_SERVER, null);
-        if (!is_null($OriginalIP)) {
-            $IP = $OriginalIP;
+                if (strpos($remoteAddr, ',') !== false) {
+                    $remoteAddr = substr($remoteAddr, 0, strpos($remoteAddr, ','));
+                }
+
+                $IP = $remoteAddr;
+            }
         }
 
         $IP = forceIPv4($IP);

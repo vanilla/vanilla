@@ -302,8 +302,15 @@ class EntryController extends Gdn_Controller {
       $this->EventArguments = array($Method);
       
       // Fire ConnectData event & error handling.
-      $CurrentData = $this->Form->FormValues();
+        $currentData = $this->Form->formValues();
+
+        // Filter the form data for users here. SSO plugins must reset validated data each postback.
+        $filteredData = Gdn::userModel()->filterForm($currentData, true);
+        $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
+        $this->Form->formValues($filteredData);
+
       try {
+            $this->EventArguments['Form'] = $this->Form;
          $this->FireEvent('ConnectData');
       } catch (Gdn_UserException $Ex) {
          $this->Form->AddError($Ex);
@@ -322,7 +329,7 @@ class EntryController extends Gdn_Controller {
             $this->Form->AddHidden('EmailVisible', TRUE);
 
             if ($IsPostBack) {
-               $this->Form->SetFormValue('Email', GetValue('Email', $CurrentData));
+               $this->Form->SetFormValue('Email', GetValue('Email', $currentData));
             }
          }
       }

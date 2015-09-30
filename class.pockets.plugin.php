@@ -17,7 +17,7 @@ $PluginInfo['Pockets'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RegisterPermissions' => array('Plugins.Pockets.Manage', 'Garden.NoAds.Allow'),
+   'RegisterPermissions' => array('Plugins.Pockets.Manage' => 'Garden.Settings.Manage', 'Garden.NoAds.Allow'),
    'SettingsUrl' => '/settings/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',
    'MobileFriendly' => TRUE,

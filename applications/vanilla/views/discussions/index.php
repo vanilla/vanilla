@@ -7,9 +7,8 @@ echo '<h1 class="H HomepageTitle">'.
     $this->data('Title').
     '</h1>';
 
-if ($Description = $this->Description()) {
-    echo wrap($Description, 'div', array('class' => 'P PageDescription'));
-}
+$Description = $this->data('Category.Description', $this->Description());
+echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', array('class' => 'P PageDescription'));
 
 $this->fireEvent('AfterPageTitle');
 

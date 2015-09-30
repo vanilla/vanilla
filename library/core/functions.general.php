@@ -1216,7 +1216,7 @@ if (!function_exists('_formatStringCallback')) {
             if (isset($Args['_ContextUserID'])) {
                 $ContextUserID = $Args['_ContextUserID'];
             } else {
-                $ContextUserID = Gdn::Session() && Gdn::Session()->IsValid() ? Gdn::Session()->UserID : null;
+                $ContextUserID = Gdn::session() && Gdn::session()->isValid() ? Gdn::session()->UserID : null;
             }
 
             return;
@@ -1230,9 +1230,9 @@ if (!function_exists('_formatStringCallback')) {
         // Parse out the field and format.
         $Parts = explode(',', $Match);
         $Field = trim($Parts[0]);
-        $Format = trim(GetValue(1, $Parts, ''));
-        $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
-        $FormatArgs = GetValue(3, $Parts, '');
+        $Format = trim(val(1, $Parts, ''));
+        $SubFormat = strtolower(trim(val(2, $Parts, '')));
+        $FormatArgs = val(3, $Parts, '');
 
         if (in_array($Format, array('currency', 'integer', 'percent'))) {
             $FormatArgs = $SubFormat;
@@ -1243,7 +1243,7 @@ if (!function_exists('_formatStringCallback')) {
             $SubFormat = '';
         }
 
-        $Value = GetValueR($Field, $Args, '');
+        $Value = valr($Field, $Args, '');
         if ($Value == '' && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
             $Result = '';
         } else {
@@ -1251,16 +1251,16 @@ if (!function_exists('_formatStringCallback')) {
                 case 'date':
                     switch ($SubFormat) {
                         case 'short':
-                            $Result = Gdn_Format::Date($Value, '%d/%m/%Y');
+                            $Result = Gdn_Format::date($Value, '%d/%m/%Y');
                             break;
                         case 'medium':
-                            $Result = Gdn_Format::Date($Value, '%e %b %Y');
+                            $Result = Gdn_Format::date($Value, '%e %b %Y');
                             break;
                         case 'long':
-                            $Result = Gdn_Format::Date($Value, '%e %B %Y');
+                            $Result = Gdn_Format::date($Value, '%e %B %Y');
                             break;
                         default:
-                            $Result = Gdn_Format::Date($Value);
+                            $Result = Gdn_Format::date($Value);
                             break;
                     }
                     break;
@@ -1315,10 +1315,10 @@ if (!function_exists('_formatStringCallback')) {
                     $Result = rawurlencode($Value);
                     break;
                 case 'text':
-                    $Result = Gdn_Format::Text($Value, false);
+                    $Result = Gdn_Format::text($Value, false);
                     break;
                 case 'time':
-                    $Result = Gdn_Format::Date($Value, '%l:%M%p');
+                    $Result = Gdn_Format::date($Value, '%l:%M%p');
                     break;
                 case 'url':
                     if (strpos($Field, '/') !== false) {
@@ -1344,7 +1344,7 @@ if (!function_exists('_formatStringCallback')) {
                     $Gender = 'u';
 
                     if (!is_array($Value)) {
-                        $User = Gdn::UserModel()->GetID($Value);
+                        $User = Gdn::userModel()->getID($Value);
                         if ($User) {
                             $Gender = $User->Gender;
                         }
@@ -1360,11 +1360,11 @@ if (!function_exists('_formatStringCallback')) {
                             $Result = $FormatArgs;
                             break;
                         case 'p':
-                            $Result = GetValue(5, $Parts, GetValue(4, $Parts));
+                            $Result = val(5, $Parts, val(4, $Parts));
                             break;
                         case 'u':
                         default:
-                            $Result = GetValue(4, $Parts);
+                            $Result = val(4, $Parts);
                     }
 
                     break;
@@ -1382,21 +1382,21 @@ if (!function_exists('_formatStringCallback')) {
                     if (is_array($Value)) {
                         if (isset($Value['UserID'])) {
                             $User = $Value;
-                            $User['Name'] = FormatUsername($User, $Format, $ContextUserID);
+                            $User['Name'] = formatUsername($User, $Format, $ContextUserID);
 
-                            $Result = UserAnchor($User);
+                            $Result = userAnchor($User);
                         } else {
-                            $Max = C('Garden.FormatUsername.Max', 5);
+                            $Max = c('Garden.FormatUsername.Max', 5);
                             // See if there is another count.
-                            $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
+                            $ExtraCount = valr($Field.'_Count', $Args, 0);
 
                             $Count = count($Value);
                             $Result = '';
                             for ($i = 0; $i < $Count; $i++) {
                                 if ($i >= $Max && $Count > $Max + 1) {
                                     $Others = $Count - $i + $ExtraCount;
-                                    $Result .= ' '.T('sep and', 'and').' '
-                                        .Plural($Others, '%s other', '%s others');
+                                    $Result .= ' '.t('sep and', 'and').' '
+                                        .plural($Others, '%s other', '%s others');
                                     break;
                                 }
 
@@ -1415,20 +1415,20 @@ if (!function_exists('_formatStringCallback')) {
                                 if (isset($Special[$ID])) {
                                     $Result .= $Special[$ID];
                                 } else {
-                                    $User = Gdn::UserModel()->GetID($ID);
+                                    $User = Gdn::userModel()->getID($ID);
                                     if ($User) {
-                                        $User->Name = FormatUsername($User, $Format, $ContextUserID);
-                                        $Result .= UserAnchor($User);
+                                        $User->Name = formatUsername($User, $Format, $ContextUserID);
+                                        $Result .= userAnchor($User);
                                     }
                                 }
                             }
                         }
                     } else {
-                        $User = Gdn::UserModel()->GetID($Value);
+                        $User = Gdn::userModel()->getID($Value);
                         if ($User) {
-                            $User->Name = FormatUsername($User, $Format, $ContextUserID);
+                            $User->Name = formatUsername($User, $Format, $ContextUserID);
 
-                            $Result = UserAnchor($User);
+                            $Result = userAnchor($User);
                         } else {
                             $Result = '';
                         }

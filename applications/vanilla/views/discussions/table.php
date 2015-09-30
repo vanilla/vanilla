@@ -19,7 +19,7 @@ if ($this->data('_PagerUrl')) {
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 
 $Description = $this->data('Category.Description', $this->Description());
-echo wrapIf($Description, 'div', array('class' => 'P PageDescription'));
+echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', array('class' => 'P PageDescription'));
 
 $this->fireEvent('AfterDescription');
 

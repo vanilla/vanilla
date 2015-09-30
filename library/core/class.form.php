@@ -1805,18 +1805,26 @@ PASSWORDMETER;
      * It validates the postback by looking at a transient value that was rendered using $this->Open()
      * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
-     * @return bool
+     * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
+     * @return bool Returns true if the postback could be authenticated or false otherwise.
+     * @throws Gdn_UserException Throws an exception when this is a postback AND the transient key doesn't validate.
      */
-    public function authenticatedPostBack() {
-        $KeyName = $this->escapeFieldName('TransientKey');
-        $PostBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $KeyName, false);
+    public function authenticatedPostBack($throw = false) {
+        $keyName = $this->escapeFieldName('TransientKey');
+        $postBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $keyName, false);
 
         // If this isn't a postback then return false if there isn't a transient key.
-        if (!$PostBackKey && !Gdn::request()->isPostBack()) {
+        if (!$postBackKey && !Gdn::request()->isPostBack()) {
             return false;
         }
 
-        return Gdn::session()->validateTransientKey($PostBackKey);
+        $result = Gdn::session()->validateTransientKey($postBackKey);
+
+        if (!$result && $throw && Gdn::request()->isPostBack()) {
+            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+        }
+
+        return $result;
     }
 
     /**

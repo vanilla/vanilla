@@ -1490,12 +1490,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a jsonp request.
-                    echo $Callback.'('.json_encode($Data).');';
+                    echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
                     return true;
                 } else {
                     safeHeader('Content-Type: application/json; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a regular json request.
-                    echo json_encode($Data);
+                    echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                     return true;
                 }
                 break;
@@ -1675,6 +1675,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Only get css & ui components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
 
+                $CssAnchors = AssetModel::getAnchors();
+
                 $this->EventArguments['CssFiles'] = &$this->_CssFiles;
                 $this->fireEvent('BeforeAddCss');
 
@@ -1691,7 +1693,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $Options = &$CssInfo['Options'];
 
                     // style.css and admin.css deserve some custom processing.
-                    if (in_array($CssFile, array('style.css', 'admin.css'))) {
+                    if (in_array($CssFile, $CssAnchors)) {
                         if (!$CombineAssets) {
                             // Grab all of the css files from the asset model.
                             $AssetModel = new AssetModel();

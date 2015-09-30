@@ -22,6 +22,24 @@ class AssetModel extends Gdn_Model {
     public $UrlPrefix = '';
 
     /**
+     * Get list of CSS anchor files
+     *
+     * Fires an event to allow loaded applications to create their own CSS
+     * aggregation domains.
+     *
+     * @return array
+     */
+    public static function getAnchors() {
+        static $anchors = null;
+        if (is_null($anchors)) {
+            $anchors = ['style.css', 'admin.css'];
+            Gdn::pluginManager()->EventArguments['CssAnchors'] = &$anchors;
+            Gdn::pluginManager()->fireAs('AssetModel')->fireEvent('getAnchors');
+        }
+        return $anchors;
+    }
+
+    /**
      * Add to the list of CSS files to serve.
      *
      * @param $filename
@@ -51,7 +69,7 @@ class AssetModel extends Gdn_Model {
             throw notFoundException();
         }
 
-        $basename = ucfirst($basename);
+        $basename = strtolower($basename);
 
         $this->EventArguments['Basename'] = $basename;
         $this->EventArguments['ETag'] = $eTag;
@@ -61,8 +79,12 @@ class AssetModel extends Gdn_Model {
             header_remove('Set-Cookie');
         }
 
+        // Get list of anchor files
+        $anchors = $this->getAnchors();
+
         safeHeader("Content-Type: text/css");
-        if (!in_array($basename, ['Style', 'Admin'])) {
+        $anchorFileName = "{$basename}.css";
+        if (!in_array($anchorFileName, $anchors)) {
             safeHeader("HTTP/1.0 404", true, 404);
 
             echo "/* Could not find {$basename}/{$eTag} */";
@@ -83,7 +105,7 @@ class AssetModel extends Gdn_Model {
         $currentETag = self::eTag();
         safeHeader("ETag: $currentETag");
 
-        $cachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$themeType.'-'.strtolower($basename)."-{$currentETag}.css";
+        $cachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$themeType.'-'."{$basename}-{$currentETag}.css";
 
         if (!Debug() && file_exists($cachePath)) {
             readfile($cachePath);

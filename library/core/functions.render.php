@@ -637,7 +637,7 @@ if (!function_exists('img')) {
             $Image = smartAsset($Image, $WithDomain);
         }
 
-        return '<img src="'.$Image.'"'.$Attributes.' />';
+        return '<img src="'.htmlspecialchars($Image, ENT_QUOTES).'"'.$Attributes.' />';
     }
 }
 

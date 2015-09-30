@@ -1426,9 +1426,10 @@ if (!function_exists('_formatStringCallback')) {
                     } else {
                         $User = Gdn::userModel()->getID($Value);
                         if ($User) {
-                            $User->Name = formatUsername($User, $Format, $ContextUserID);
-
-                            $Result = userAnchor($User);
+                            // Store this name separately because of special 'You' case.
+                            $Name = formatUsername($User, $Format, $ContextUserID);
+                            // Manually build instead of using userAnchor() because of special 'You' case.
+                            $Result = anchor(htmlspecialchars($Name), userUrl($User));
                         } else {
                             $Result = '';
                         }

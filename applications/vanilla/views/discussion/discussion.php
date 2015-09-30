@@ -70,6 +70,12 @@ $this->fireEvent('BeforeDiscussionDisplay');
                     echo anchor(htmlspecialchars($this->data('Discussion.Category')), CategoryUrl($this->data('Discussion.CategoryUrlCode')));
                     echo '</span> ';
                 }
+
+                // Include IP Address if we have permission
+                if ($Session->checkPermission('Garden.PersonalInfo.View')) {
+                    echo wrap(IPAnchor($Discussion->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+                }
+
                 $this->fireEvent('DiscussionInfo');
                 $this->fireEvent('AfterDiscussionMeta'); // DEPRECATED
                 ?>

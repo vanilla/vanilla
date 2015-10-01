@@ -471,7 +471,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Gets an arrya of type names allowed in the structure.
+     * Gets an array of type names allowed in the structure.
      *
      * @param string $Class The class of types to get. Valid values are:
      *  - <b>int</b>: Integer types.
@@ -492,7 +492,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
         $String = array('varchar', 'char', 'mediumtext', 'text');
         $Length = array('varbinary');
-        $Other = array('enum', 'tinyblob', 'blob', 'mediumblob', 'longblob');
+        $Other = array('enum', 'tinyblob', 'blob', 'mediumblob', 'longblob', 'ipaddress');
 
         switch (strtolower($Class)) {
             case 'date':

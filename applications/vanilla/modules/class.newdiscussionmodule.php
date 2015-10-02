@@ -32,7 +32,7 @@ class NewDiscussionModule extends Gdn_Module {
     public $ShowGuests = false;
 
     /** @var string Where to send users without permission when $SkipPermissions is enabled. */
-    public $GuestUrl = '/entry/register?Target=';
+    public $GuestUrl = '/entry/signin?Target=';
 
     /**
      * Set default button.

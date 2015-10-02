@@ -106,15 +106,18 @@ class NewDiscussionModule extends Gdn_Module {
                 continue;
             }
 
-            // If user !$HasPermission, they are $PrivilegedGuest so redirect to $GuestUrl.
-            $Url = ($HasPermission) ? val('AddUrl', $Type) : $this->GuestUrl.val('AddUrl', $Type);
-
+            $Url = val('AddUrl', $Type);
             if (!$Url) {
                 continue;
             }
 
             if (isset($Category)) {
                 $Url .= '/'.rawurlencode(val('UrlCode', $Category));
+            }
+
+            // Present a signin redirect for a $PrivilegedGuest using GuestUrl's Target parameter.
+            if (!$HasPermission) {
+                $Url = $this->GuestUrl . $Url;
             }
 
             $this->addButton(t(val('AddText', $Type)), $Url);

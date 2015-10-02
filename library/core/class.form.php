@@ -370,7 +370,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 if ($Category['AllowDiscussions']) {
-                    $Disabled &= $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
+                    $Disabled = $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
                 }
 
                 $Return .= '<option value="'.$CategoryID.'"';

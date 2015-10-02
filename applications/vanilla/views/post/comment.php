@@ -72,19 +72,20 @@ $this->fireEvent('BeforeCommentForm');
                         if ($NewOrDraft)
                             echo ' '.anchor(t('Save Draft'), '#', 'Button DraftButton')."\n";
                     }
-                    if ($Session->isValid())
+                    if ($Session->isValid()) {
                         echo $this->Form->button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
+                    }
                     else {
                         $AllowSigninPopup = c('Garden.SignIn.Popup');
                         $Attributes = array('tabindex' => '-1');
-                        if (!$AllowSigninPopup)
+                        if (!$AllowSigninPopup) {
                             $Attributes['target'] = '_parent';
-
+                        }
                         $AuthenticationUrl = SignInUrl($this->SelfUrl);
                         $CssClass = 'Button Primary Stash';
-                        if ($AllowSigninPopup)
+                        if ($AllowSigninPopup) {
                             $CssClass .= ' SignInPopup';
-
+                        }
                         echo anchor(t('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
                     }
 

@@ -32,7 +32,7 @@ class NewDiscussionModule extends Gdn_Module {
     public $ShowGuests = false;
 
     /** @var string Where to send users without permission when $SkipPermissions is enabled. */
-    public $GuestUrl = '/entry/signin?Target=';
+    public $GuestUrl = '/entry/signin';
 
     /**
      * Set default button.
@@ -115,9 +115,9 @@ class NewDiscussionModule extends Gdn_Module {
                 $Url .= '/'.rawurlencode(val('UrlCode', $Category));
             }
 
-            // Present a signin redirect for a $PrivilegedGuest using GuestUrl's Target parameter.
+            // Present a signin redirect for a $PrivilegedGuest.
             if (!$HasPermission) {
-                $Url = $this->GuestUrl . $Url;
+                $Url = $this->GuestUrl . '?Target=' . $Url;
             }
 
             $this->addButton(t(val('AddText', $Type)), $Url);

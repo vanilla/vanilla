@@ -32,7 +32,7 @@ class NewDiscussionModule extends Gdn_Module {
     public $ShowGuests = false;
 
     /** @var string Where to send users without permission when $SkipPermissions is enabled. */
-    public $GuestUrl = '/entry/register';
+    public $GuestUrl = '/entry/register?Target=';
 
     /**
      * Set default button.
@@ -81,7 +81,7 @@ class NewDiscussionModule extends Gdn_Module {
         Gdn::controller()->fireEvent('BeforeNewDiscussionButton');
 
         // Make sure the user has the most basic of permissions first.
-        $PermissionCategory = CategoryModel::PermissionCategory($this->CategoryID);
+        $PermissionCategory = CategoryModel::permissionCategory($this->CategoryID);
         if ($this->CategoryID) {
             $Category = CategoryModel::categories($this->CategoryID);
             $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('CategoryID', $PermissionCategory));
@@ -98,7 +98,7 @@ class NewDiscussionModule extends Gdn_Module {
         }
 
         // Grab the allowed discussion types.
-        $DiscussionTypes = CategoryModel::AllowedDiscussionTypes($PermissionCategory);
+        $DiscussionTypes = CategoryModel::allowedDiscussionTypes($PermissionCategory);
 
         foreach ($DiscussionTypes as $Key => $Type) {
             if (isset($Type['AddPermission']) && !Gdn::session()->checkPermission($Type['AddPermission'])) {
@@ -107,16 +107,17 @@ class NewDiscussionModule extends Gdn_Module {
             }
 
             // If user !$HasPermission, they are $PrivilegedGuest so redirect to $GuestUrl.
-            $Url = ($HasPermission) ? val('AddUrl', $Type) : $this->GuestUrl;
+            $Url = ($HasPermission) ? val('AddUrl', $Type) : $this->GuestUrl.val('AddUrl', $Type);
+
             if (!$Url) {
                 continue;
             }
 
-            if (isset($Category) && $HasPermission) {
+            if (isset($Category)) {
                 $Url .= '/'.rawurlencode(val('UrlCode', $Category));
             }
 
-            $this->AddButton(t(val('AddText', $Type)), $Url);
+            $this->addButton(t(val('AddText', $Type)), $Url);
         }
 
         // Add QueryString to URL if one is defined.
@@ -126,6 +127,6 @@ class NewDiscussionModule extends Gdn_Module {
             }
         }
 
-        return parent::ToString();
+        return parent::toString();
     }
 }

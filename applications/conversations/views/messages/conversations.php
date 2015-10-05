@@ -62,7 +62,7 @@ foreach ($this->Data('Conversations') as $Conversation) {
          echo '<div class="Subject"><b>'.Anchor(htmlspecialchars($Subject), $Url).'</b></div>';
       }
       ?>
-      <div class="Excerpt"><?php echo Anchor($Message, $Url, 'Message'); ?></div>
+            <div class="Excerpt"><?php echo anchor(htmlspecialchars($Message), $Url, 'Message'); ?></div>
       <div class="Meta">
          <?php 
          $this->FireEvent('BeforeConversationMeta');

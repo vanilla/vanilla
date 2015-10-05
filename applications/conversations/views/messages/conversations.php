@@ -38,7 +38,6 @@ foreach ($this->data('Conversations') as $Conversation) {
         $Message = t('Blank Message');
     }
 
-
     $this->EventArguments['Conversation'] = $Conversation;
     ?>
     <li class="<?php echo $CssClass; ?>">
@@ -59,15 +58,15 @@ foreach ($this->data('Conversations') as $Conversation) {
                 echo anchor(htmlspecialchars($Names), $Url);
             }
             if ($Subject = val('Subject', $Conversation)) {
-                if ($Names)
+                if ($Names) {
                     echo Bullet(' ');
-
+                }
                 echo '<span class="Subject">'.anchor(htmlspecialchars($Subject), $Url).'</span>';
             }
 
             echo '</h3>';
             ?>
-            <div class="Excerpt"><?php echo anchor($Message, $Url, 'Message'); ?></div>
+            <div class="Excerpt"><?php echo anchor(htmlspecialchars($Message), $Url, 'Message'); ?></div>
             <div class="Meta">
                 <?php
                 $this->fireEvent('BeforeConversationMeta');

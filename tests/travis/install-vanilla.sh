@@ -4,7 +4,7 @@
 mysql -e 'create database travis_tests;'
 
 # Install Vanilla. The -f option will make curl return 22 on any HTTP error.
-curl -v \
+curl -vf \
     -d "Database-dot-Host=localhost" \
     -d "Database-dot-Name=travis_tests" \
     -d "Database-dot-User=travis" \

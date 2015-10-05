@@ -15,3 +15,5 @@ curl -v \
     -d "Password=travis" \
     -d "PasswordMatch=travis" \
     http://vanilla.test:8080/dashboard/setup.json &> /dev/stdout
+
+cat /tmp/error.log

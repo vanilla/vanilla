@@ -16,6 +16,9 @@ class SetupController extends DashboardController {
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form', 'Database');
 
+    /** @var  Gdn_Form $Form */
+    public $Form;
+
     /**
      * Add CSS & module, set error master view. Automatically run on every use.
      *
@@ -45,9 +48,7 @@ class SetupController extends DashboardController {
         // Fatal error if Garden has already been installed.
         $Installed = c('Garden.Installed');
         if ($Installed) {
-            $this->View = "AlreadyInstalled";
-            $this->render();
-            return;
+            throw new Gdn_UserException('Vanilla is installed!', 409);
         }
 
         if (!$this->_CheckPrerequisites()) {
@@ -85,11 +86,25 @@ class SetupController extends DashboardController {
                     // Now that the application is installed, select a more user friendly error page.
                     $Config = array('Garden.Installed' => true);
                     saveToConfig($Config);
+                    $this->setData('Installed', true);
                     $this->fireAs('UpdateModel')->fireEvent('AfterStructure');
                     $this->fireEvent('Installed');
 
-                    // Go to the dashboard
-                    redirect('/settings/gettingstarted');
+                    // Go to the dashboard.
+                    if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+                        redirect('/settings/gettingstarted');
+                    }
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+                    $maxCode = 0;
+                    $messages = array();
+
+                    foreach ($this->Form->errors() as $row) {
+                        list($code, $message) = $row;
+                        $maxCode = max($maxCode, $code);
+                        $messages[] = $message;
+                    }
+
+                    throw new Gdn_UserException(implode(' ', $messages), $maxCode);
                 }
             }
         }

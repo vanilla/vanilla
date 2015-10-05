@@ -14,4 +14,4 @@ curl -vf \
        -d "Name=travis" \
        -d "Password=travis" \
        -d "PasswordMatch=travis" \
-       http://vanilla.test/dashboard/setup.json
+       http://vanilla.test/dashboard/setup.json &> /dev/stdout

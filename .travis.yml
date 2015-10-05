@@ -26,7 +26,7 @@ addons:
 install:
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
-  - tests/install-vanilla.sh
+  - tests/travis/install-vanilla.sh
 
 script:
   - echo 'Hello world'

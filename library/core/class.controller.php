@@ -1461,8 +1461,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data['Exception'] = Gdn_Validation::resultsAsText($this->Form->validationResults());
         }
 
-
-        $this->SendHeaders();
+        $this->sendHeaders();
 
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);
@@ -1491,7 +1490,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
-                $this->setAccessControl();
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a jsonp request.

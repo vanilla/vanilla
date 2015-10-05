@@ -269,7 +269,7 @@ class SetupController extends DashboardController {
         // Make sure that the correct filesystem permissions are in place
         $PermissionProblem = false;
 
-        // Make sure the appropriate folders are writeable.
+        // Make sure the appropriate folders are writable.
         $ProblemDirectories = array();
         if (!is_readable(PATH_CONF) || !IsWritable(PATH_CONF)) {
             $ProblemDirectories[] = PATH_CONF;
@@ -296,21 +296,26 @@ class SetupController extends DashboardController {
             $this->Form->addError($PermissionError.$PermissionHelp);
         }
 
-        // Make sure the config folder is writeable
+        // Make sure the config folder is writable.
         if (!$PermissionProblem) {
             $ConfigFile = Gdn::config()->DefaultPath();
-            if (!file_exists($ConfigFile)) {
-                file_put_contents($ConfigFile, '');
-            }
 
-            // Make sure the config file is writeable
-            if (!is_readable($ConfigFile) || !IsWritable($ConfigFile)) {
-                $this->Form->addError(sprintf(t('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
-                $PermissionProblem = true;
+            if (file_exists($ConfigFile)) {
+                // Make sure the config file is writable.
+                if (!is_readable($ConfigFile) || !IsWritable($ConfigFile)) {
+                    $this->Form->addError(sprintf(t('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
+                    $PermissionProblem = true;
+                }
+            } else {
+                // Make sure the config file can be created.
+                if (!is_writeable(dirname($ConfigFile))) {
+                    $this->Form->addError(sprintf(t('Your configuration file cannot be created. PHP needs to be able to create this file: <code>%s</code>'), $ConfigFile));
+                    $PermissionProblem = true;
+                }
             }
         }
 
-        // Make sure the cache folder is writeable
+        // Make sure the cache folder is writable
         if (!$PermissionProblem) {
             if (!file_exists(PATH_CACHE.'/Smarty')) {
                 mkdir(PATH_CACHE.'/Smarty');

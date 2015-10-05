@@ -24,8 +24,8 @@ addons:
       - realpath
 
 install:
-  - composer install
-#  - travis/install-nginx.sh
+  - composer install -o
+  - tests/travis/nginx/install-nginx.sh
 
 script:
   - echo 'Hello world'

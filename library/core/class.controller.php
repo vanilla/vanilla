@@ -1223,21 +1223,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Cross-Origin Resource Sharing (CORS)
-
-            /**
-             * Access-Control-Allow-Origin
-             * If a Origin header is sent by the client, attempt to verify it against the list of
-             * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
-             * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
-             * response using the client's Origin header value.
-             */
-            $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
-            if ($origin) {
-                $originHost = parse_url($origin, PHP_URL_HOST);
-                if ($originHost && isTrustedDomain($originHost)) {
-                    $this->setHeader('Access-Control-Allow-Origin', $origin);
-                }
-            }
+            $this->setAccessControl();
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
@@ -1338,6 +1324,24 @@ class Gdn_Controller extends Gdn_Pluggable {
                 } else {
                     echo $View;
                 }
+            }
+        }
+    }
+
+    /**
+     * Set Access-Control-Allow-Origin header.
+     *
+     * If a Origin header is sent by the client, attempt to verify it against the list of
+     * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
+     * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
+     * response using the client's Origin header value.
+     */
+    public function setAccessControl() {
+        $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
+        if ($origin) {
+            $originHost = parse_url($origin, PHP_URL_HOST);
+            if ($originHost && isTrustedDomain($originHost)) {
+                $this->setHeader('Access-Control-Allow-Origin', $origin);
             }
         }
     }
@@ -1487,6 +1491,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
+                $this->setAccessControl();
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a jsonp request.

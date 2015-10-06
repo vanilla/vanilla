@@ -60,8 +60,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param bool $flatten Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
      * @param bool $useCssPrefix Whether to use CSS prefixes on the generated CSS classes for the items.
      */
-    public function __construct($view, $flatten, $useCssPrefix = false) {
-        $this->setView($view);
+    public function __construct($flatten, $useCssPrefix = false) {
         $this->flatten = $flatten;
         $this->useCssPrefix = $useCssPrefix;
     }
@@ -450,7 +449,7 @@ abstract class SortableModule extends Gdn_Module {
                 if (val('items', $item)) {
                     $subitems = $item['items'];
                     unset($item['items']);
-                    if (val('headerText', $item)) {
+                    if (val('text', $item)) {
                         $newitems[] = $item;
                     }
                 }

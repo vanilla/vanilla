@@ -31,7 +31,7 @@
  *
  * Here is an example menu creation:
  *
- * $dropdown = new DropdownModule('my-dropdown', 'Trigger Name');
+ * $dropdown = new DropdownModule('my-dropdown');
  * $dropdown->setTrigger('A New Name')
  * ->addLink('Link 1', '#') // automatically creates key: item1
  * ->addDivider() // automatically creates key: item2
@@ -110,14 +110,14 @@ class DropdownModule extends SortableModule {
     /**
      * Constructor.
      *
-     * @param string $triggerId The id value of the trigger.
+     * @param string $triggerId The html id value of the trigger tag. Needs to be unique.
      * @param string $triggerText Text on the trigger.
-     * @param string $dropdownCssClass A potential CSS class of the dropdown menu wrapper container.
+     * @param string $cssClass A potential CSS class of the dropdown menu wrapper container.
      * @param string $listCssClass A potential CSS class of the list <ul> block.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
-    public function __construct($triggerId, $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
-        parent::__construct('dropdown', true, $useCssPrefix);
+    public function __construct($triggerId = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
+        parent::__construct(true, $useCssPrefix);
         $this->triggerId = $triggerId;
         $this->trigger['text'] = $triggerText;
         $this->cssClass = $cssClass;
@@ -135,7 +135,7 @@ class DropdownModule extends SortableModule {
      *
      * @param string $text Text on the trigger.
      * @param string $type One of the triggerTypes - currently supports 'anchor' or 'button'.
-     * @param string $class CSS class for the trigger.
+     * @param string $cssClass CSS class for the trigger.
      * @param string $icon Icon for the trigger.
      * @return object $this The calling DropdownModule object.
      */

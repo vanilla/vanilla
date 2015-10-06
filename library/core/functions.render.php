@@ -1165,7 +1165,7 @@ if (!function_exists('writeReactions')) {
 
             echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo anchor(sprite('ReactFlag', 'ReactSprite').' '.wrap(t('Flag'), 'span', array('class' => 'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title' => 'Flag'), true);
+            echo anchor(sprite('ReactFlag', 'ReactSprite').' '.wrap(t('Flag'), 'span', array('class' => 'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title' => t('Flag')), true);
             echo sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {

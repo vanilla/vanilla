@@ -179,15 +179,16 @@ class AssetModel extends Gdn_Model {
      */
     public function getCssFiles($themeType, $basename, $eTag, &$notFound = null) {
         $notFound = [];
+        $basename = strtolower($basename);
 
         // Gather all of the css paths.
         switch ($basename) {
-            case 'Style':
+            case 'style':
                 $this->_CssFiles = [
                     ['style.css', 'dashboard', ['Sort' => -10]]
                 ];
                 break;
-            case 'Admin':
+            case 'admin':
                 $this->_CssFiles = [
                     ['admin.css', 'dashboard', ['Sort' => -10]]
                 ];
@@ -203,7 +204,7 @@ class AssetModel extends Gdn_Model {
 
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
-            case 'Style':
+            case 'style':
                 $this->addCssFile('custom.css', false, ['Sort' => 10]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
@@ -214,7 +215,7 @@ class AssetModel extends Gdn_Model {
                 }
 
                 break;
-            case 'Admin':
+            case 'admin':
                 $this->addCssFile('customadmin.css', false, ['Sort' => 10]);
                 break;
         }

@@ -393,10 +393,17 @@ EOT;
         $this->EventArguments = array($Method);
 
         // Fire ConnectData event & error handling.
-        $CurrentData = $this->Form->formValues();
+        $currentData = $this->Form->formValues();
+
+        // Filter the form data for users here. SSO plugins must reset validated data each postback.
+        $filteredData = Gdn::userModel()->filterForm($currentData, true);
+        $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
+        unset($filteredData['Roles'], $filteredData['RoleID']);
+        $this->Form->formValues($filteredData);
+
         try {
-            $this->fireEvent('ConnectData');
             $this->EventArguments['Form'] = $this->Form;
+            $this->fireEvent('ConnectData');
             $this->fireEvent('AfterConnectData');
         } catch (Gdn_UserException $Ex) {
             $this->Form->addError($Ex);
@@ -416,7 +423,7 @@ EOT;
                 $this->Form->addHidden('EmailVisible', true);
 
                 if ($IsPostBack) {
-                    $this->Form->setFormValue('Email', val('Email', $CurrentData));
+                    $this->Form->setFormValue('Email', val('Email', $currentData));
                 }
             }
         }
@@ -621,7 +628,6 @@ EOT;
 
                 // There is no existing user with the suggested name so we can just create the user.
                 $User = $this->Form->formValues();
-                $User = $this->UserModel->filterForm($User, true);
                 $User['Password'] = randomString(50); // some password is required
                 $User['HashMethod'] = 'Random';
                 $User['Source'] = $this->Form->getFormValue('Provider');
@@ -717,7 +723,6 @@ EOT;
             } elseif ($this->Form->errorCount() == 0) {
                 // The user doesn't exist so we need to add another user.
                 $User = $this->Form->formValues();
-                $User = $this->UserModel->filterForm($User, true);
                 $User['Name'] = $User['ConnectName'];
                 $User['Password'] = randomString(50); // some password is required
                 $User['HashMethod'] = 'Random';
@@ -725,7 +730,7 @@ EOT;
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
-                if ($UserID) {
+                if ($UserID && c('Garden.Registration.SendConnectEmail', false)) {
                     // Send the welcome email.
                     $UserModel->sendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'))));
                 }
@@ -769,8 +774,8 @@ EOT;
         if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->deliveryType() != DELIVERY_TYPE_ALL) {
             $this->deliveryMethod(DELIVERY_METHOD_JSON);
             $this->setHeader('Content-Type', 'application/json; charset='.c('Garden.Charset', 'utf-8'));
-        } elseif ($CheckPopup) {
-            $this->addDefinition('CheckPopup', $CheckPopup);
+        } elseif ($CheckPopup || $this->data('CheckPopup')) {
+            $this->addDefinition('CheckPopup', true);
         } else {
             redirect(url($this->RedirectUrl));
         }

@@ -78,13 +78,13 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                         return;
                     }
                     $(this).data('GooglePrettify', '1');
-                    
+
                     pre = $('pre', this).addClass('prettyprint$Class');
-                    
+
                     // Let prettyprint determine styling, rather than the editor.
                     $('code', this).removeClass('CodeInline');
                     pre.removeClass('CodeBlock');
-        
+
                     prettyPrint();
 
                     pre.removeClass('prettyprint');
@@ -125,6 +125,26 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      */
     public function postController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
+    }
+
+    /**
+     * Add Tabby to conversations textarea.
+     *
+     * @param MessagesController $Sender
+     */
+    public function messagesController_render_before($Sender) {
+        $this->addPretty($Sender);
+        $this->addTabby($Sender);
+    }
+
+    /**
+     * Add Prettify formatting to profile posts.
+     *
+     * @param DiscussionController $Sender
+     */
+    public function profileController_render_before($Sender) {
         $this->addPretty($Sender);
         $this->addTabby($Sender);
     }

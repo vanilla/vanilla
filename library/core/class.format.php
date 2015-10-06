@@ -1478,9 +1478,10 @@ EOT;
      * Format a string using Markdown syntax. Also purifies the output html.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true
      * @return string
      */
-    public static function markdown($Mixed) {
+    public static function markdown($Mixed, $Flavored = true) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Markdown');
         } else {
@@ -1489,7 +1490,14 @@ EOT;
                 return Gdn_Format::display($Mixed);
             } else {
                 require_once(PATH_LIBRARY.'/vendors/markdown/Michelf/MarkdownExtra.inc.php');
-                $Mixed = \Michelf\MarkdownExtra::defaultTransform($Mixed);
+                $Markdown = new MarkdownVanilla;
+
+                // Add Vanilla customizations.
+                if ($Flavored) {
+                    $Markdown->addAllFlavor();
+                }
+
+                $Mixed = $Markdown->transform($Mixed);
                 $Mixed = $Formatter->format($Mixed);
                 $Mixed = Gdn_Format::links($Mixed);
                 $Mixed = Gdn_Format::mentions($Mixed);
@@ -1616,7 +1624,7 @@ EOT;
 
     /**
      * Do a preg_replace, but don't affect things inside <code> tags.
-     * 
+     *
      * The three parameters are identical to the ones you'd pass
      * preg_replace.
      *

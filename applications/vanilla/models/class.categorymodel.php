@@ -1663,6 +1663,10 @@ class CategoryModel extends Gdn_Model {
         $this->Validation->applyRule('UrlCode', 'Required');
         $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
+        // Url slugs cannot be the name of a CategoriesController method or fully numeric.
+        $this->Validation->addRule('CategorySlug', 'regex:/^(?!(all|archives|discussions|index|table|[0-9]+)$).*/');
+        $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric or the name of an internal method.');
+
         // Make sure that the UrlCode is unique among categories.
         $this->SQL->select('CategoryID')
             ->from('Category')

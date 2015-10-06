@@ -40,7 +40,7 @@ class CategoriesController extends VanillaController {
     public function archives($Category, $Month, $Page = false) {
         $Category = CategoryModel::categories($Category);
         if (!$Category) {
-            throw notFoundException($Category);
+            throw notFoundException('Category');
         }
 
         if (!$Category['PermsDiscussionsView']) {
@@ -49,7 +49,7 @@ class CategoriesController extends VanillaController {
 
         $Timestamp = strtotime($Month);
         if (!$Timestamp) {
-            throw new Gdn_UserException("$Month is not a valid date.");
+            throw new Gdn_UserException("The archive month is not a valid date.");
         }
 
         $this->setData('Category', $Category);

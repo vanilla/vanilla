@@ -1,7 +1,45 @@
 (function(window, $, Vanilla) {
+    /**
+     * Check to see if the page should be force-embedded.
+     */
+    Vanilla.parent.forceEmbed = function() {
+        var forceEmbedDashboard = gdn.getMeta('ForceEmbedDashboard') == '1',
+            forceEmbedForum = gdn.getMeta('ForceEmbedForum') == '1',
+            inConnect = window.location.pathname.indexOf("/entry/connect") >= 0,
+            inDashboard = gdn.getMeta('InDashboard') == '1',
+            inIframe = window.top != window.self,
+            inPopup = window.opener != null;
+
+        if (!inIframe && !inPopup && !inConnect && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum))) {
+            document.location = Vanilla.parent.remoteUrl(null);
+        }
+    };
+
+    /**
+     * Return the deep link URL of the parent page for a given path.
+     * @param path The path to link to or the current path if null.
+     * @returns Returns the URL of the deep link.
+     */
+    Vanilla.parent.remoteUrl = function (path) {
+        if (path === null) {
+            path = gdn.getMeta('Path', '/');
+        }
+
+        if (path.length == 0 || path[0] != '/') {
+            path = '/' + path;
+        }
+
+        var remoteUrlFormat = gdn.getMeta('RemoteUrlFormat', gdn.getMeta('RemoteUrl', '') + '#%s');
+        var result = remoteUrlFormat.replace('%s', path);
+
+        return result;
+    };
+
     // Check to see if we are even embedded.
-    if (window.top == window.self)
+    if (window.top == window.self) {
+        Vanilla.parent.forceEmbed();
         return;
+    }
 
     // Call a remote function in the parent.
     Vanilla.parent.callRemote = function(func, args, success, failure) {

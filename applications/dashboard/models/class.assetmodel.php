@@ -558,10 +558,12 @@ class AssetModel extends Gdn_Model {
     public static function viewLocation($view, $controller, $folder, $extensions = null) {
         $paths = [];
 
-        if (strpos($view, '/') !== false) {
+        // If the first character is a forward slash, this is an absolute path
+        if (strpos($view, '/') === 0) {
             // This is a path to the view from the root.
             $paths[] = $view;
         } else {
+
             $view = strtolower($view);
 
             // Trim "controller" from the end of controller name, if its there
@@ -607,6 +609,7 @@ class AssetModel extends Gdn_Model {
                     }
                 }
             }
+
         }
 
         // Now let's search the paths for the view.

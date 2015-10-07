@@ -17,7 +17,7 @@ class UserController extends DashboardController {
     public $Uses = array('Database', 'Form');
 
     /** @var int The number of users when certain optimizations kick in. */
-    public $UserThreshold = 10000;
+    public $UserThreshold = 10;
 
     /** @var Gdn_Form */
     public $Form;

@@ -19,8 +19,6 @@ function tpl {
         -e "s|{PORT}|$PORT|g" \
         -e "s|{SERVER}|$SERVER|g" \
         < $1 > $2
-
-    cat $2
 }
 
 # Make some working directories.

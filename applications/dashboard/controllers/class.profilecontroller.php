@@ -1044,8 +1044,6 @@ class ProfileController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($RedirectUrl);
         } else {
-            $this->ControllerName = 'Home';
-            $this->View = 'FileNotFound';
             $this->RedirectUrl = url($RedirectUrl);
             $this->render();
         }

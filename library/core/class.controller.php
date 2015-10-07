@@ -1336,7 +1336,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
      * response using the client's Origin header value.
      */
-    public function setAccessControl() {
+    protected function setAccessControl() {
         $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
         if ($origin) {
             $originHost = parse_url($origin, PHP_URL_HOST);

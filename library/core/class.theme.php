@@ -457,8 +457,13 @@ class Gdn_Theme {
                 $ControllerProperties = Gdn::controller()->data('_properties.'.strtolower($Name), array());
                 $Properties = array_merge($ControllerProperties, $Properties);
 
-                foreach ($Properties as $Name => $Value) {
-                    $Module->$Name = $Value;
+                foreach ($Properties as $Name => $value) {
+                    // Check for a setter method
+                    if (method_exists($Module, $method = 'set'.ucfirst($Name))) {
+                        $Module->$method($value);
+                    } else {
+                        $Module->$Name = $value;
+                    }
                 }
 
                 $Result = $Module->toString();

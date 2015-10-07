@@ -54,6 +54,16 @@ class UserModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('User');
+
+        $this->addFilterField(array(
+            'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
+            'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
+            'Score', 'Photo'
+        ));
+
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
+        }
     }
 
     /**
@@ -630,6 +640,14 @@ class UserModel extends Gdn_Model {
             'uniqueid' => null,
             'client_id' => null), true);
 
+        // Remove important missing keys.
+        if (!array_key_exists($Data['photourl'])) {
+            unset($User['Photo']);
+        }
+        if (!array_key_exists($Data['roles'])) {
+            unset($User['Roles']);
+        }
+
         trace($User, 'SSO User');
 
         $UserID = Gdn::userModel()->connect($UniqueID, $ClientID, $User);
@@ -790,31 +808,17 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     *
-     *
-     * @param array $Data
-     * @param bool $Register
+     * @param array $data
+     * @param bool $register
      * @return array
      */
-    public function filterForm($Data, $Register = false) {
-        $Data = parent::FilterForm($Data);
-        $Data = array_diff_key(
-            $Data,
-            array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0,
-                'Permissions' => 0, 'LastIPAddress' => 0, 'AllIPAddresses' => 0, 'DateFirstVisit' => 0, 'DateLastActive' => 0, 'CountDiscussions' => 0, 'CountComments' => 0,
-                'Score' => 0)
-        );
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0, 'Confirmed' => 0));
-        }
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            unset($Data['RankID']);
-        }
-        if (!$Register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
-            unset($Data['Name']);
+    public function filterForm($data, $register = false) {
+        if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
+            $this->removeFilterField('Name');
         }
 
-        return $Data;
+        $data = parent::FilterForm($data);
+        return $data;
 
     }
 
@@ -990,7 +994,7 @@ class UserModel extends Gdn_Model {
             }
             return $avatar;
         }
-        return 'applications/dashboard/design/images/defaulticon.png';
+        return asset('applications/dashboard/design/images/defaulticon.png', true);
     }
 
     /**
@@ -1871,6 +1875,8 @@ class UserModel extends Gdn_Model {
             $this->Validation->addRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
             // $this->Validation->AddValidationField('RoleID', $FormPostValues);
             $this->Validation->applyRule('RoleID', 'OneOrMoreArrayItemRequired');
+        } else {
+            $this->Validation->unapplyRule('RoleID', 'OneOrMoreArrayItemRequired');
         }
 
         // Make sure that checkbox vals are saved as the appropriate value
@@ -3686,7 +3692,7 @@ class UserModel extends Gdn_Model {
      * @return string
      */
     public function setTransientKey($UserID, $ExplicitKey = '') {
-        $Key = $ExplicitKey == '' ? RandomString(12) : $ExplicitKey;
+        $Key = $ExplicitKey == '' ? betterRandomString(16, 'Aa0') : $ExplicitKey;
         $this->saveAttribute($UserID, 'TransientKey', $Key);
         return $Key;
     }

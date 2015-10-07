@@ -17,7 +17,7 @@ class UserController extends DashboardController {
     public $Uses = array('Database', 'Form');
 
     /** @var int The number of users when certain optimizations kick in. */
-    public $UserThreshold = 10;
+    public $UserThreshold = 10000;
 
     /** @var Gdn_Form */
     public $Form;
@@ -113,7 +113,7 @@ class UserController extends DashboardController {
                 $this->setData('_CurrentRecords', $count);
             } else {
                 // No users have been searched for, so give the total users overall.
-                $this->setData('RecordCount', $UserModel->searchCount());
+                $this->setData('RecordCount', $UserModel->getCount());
             }
         } else {
             $this->setData('RecordCount', $UserModel->searchCount($Filter));

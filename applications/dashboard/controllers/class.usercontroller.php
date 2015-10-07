@@ -88,13 +88,13 @@ class UserController extends DashboardController {
         //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
         list($Offset, $Limit) = offsetLimit($Page, 30);
 
-        $Filter = $this->_GetFilter();
+        $Filter = $this->_getFilter();
         if ($Filter) {
             $Filter['Keywords'] = $Keywords;
         } else {
             $Filter = array('Keywords' => (string)$Keywords);
         }
-        $Filter['Optimize'] = $this->PastUserThreshold();
+        $Filter['Optimize'] = $this->pastUserThreshold();
 
         // Sorting
         if (in_array($Order, array('DateInserted', 'DateFirstVisit', 'DateLastActive'))) {
@@ -106,15 +106,20 @@ class UserController extends DashboardController {
         }
 
         // Get user list
-        $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
+        $this->UserData = $UserModel->search($Filter, $Order, $OrderDir, $Limit, $Offset);
         $this->setData('Users', $this->UserData);
-        if ($this->PastUserThreshold()) {
-            $this->setData('_CurrentRecords', $this->UserData->count());
+        if ($this->pastUserThreshold()) {
+            if ($count = $this->UserData->count()) {
+                $this->setData('_CurrentRecords', $count);
+            } else {
+                // No users have been searched for, so give the total users overall.
+                $this->setData('RecordCount', $UserModel->searchCount());
+            }
         } else {
-            $this->setData('RecordCount', $UserModel->SearchCount($Filter));
+            $this->setData('RecordCount', $UserModel->searchCount($Filter));
         }
 
-        RoleModel::SetUserRoles($this->UserData->result());
+        RoleModel::setUserRoles($this->UserData->result());
 
         // Deliver json data if necessary
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {

@@ -17,7 +17,7 @@ if ($Photo) {
 }
 
 if ($User->Banned) {
-    $BannedPhoto = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
+    $BannedPhoto = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
     if ($BannedPhoto)
         $Photo = Gdn_Upload::url($BannedPhoto);
 }

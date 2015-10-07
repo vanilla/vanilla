@@ -895,7 +895,7 @@ if (!function_exists('userPhoto')) {
         $Href = url(userUrl($User));
 
         if ($FullUser && $FullUser['Banned']) {
-            $Photo = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
+            $Photo = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
             $Title .= ' ('.t('Banned').')';
         }
 
@@ -925,7 +925,7 @@ if (!function_exists('userPhotoUrl')) {
         $FullUser = Gdn::userModel()->getID(val('UserID', $User), DATASET_TYPE_ARRAY);
         $Photo = val('Photo', $User);
         if ($FullUser && $FullUser['Banned']) {
-            $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
+            $Photo = 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_100.png';
         }
 
         if ($Photo) {

@@ -24,6 +24,23 @@ set_time_limit(0);
 class UtilityController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
+
+    /** @var  Gdn_Form $Form */
+    public $Form;
+
+    /**
+     * @var array Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
+     * Typically, HTTP headers in the $_SERVER array will be prefixed with
+     * `HTTP_` or `X_`. These are not so we list them here for later reference.
+     */
+    protected static $specialHeaders = array(
+        'CONTENT_TYPE',
+        'CONTENT_LENGTH',
+        'PHP_AUTH_USER',
+        'PHP_AUTH_PW',
+        'PHP_AUTH_DIGEST',
+        'AUTH_TYPE'
+    );
    
    /**
     * Gather all of the global styles together.
@@ -266,74 +283,107 @@ class UtilityController extends DashboardController {
     *
     * @since 2.0.?
     * @access public
-    * @param string $AppName Unique app name or 'all' (default).
-    * @param int $CaptureOnly Whether to list changes rather than execture (0 or 1).
-    * @param int $Drop Whether to drop first (0 or 1).
-    * @param int $Explicit Whether to force to only columns currently listed (0 or 1).
+     * @param string $appName Unique app name or 'all' (default).
+     */
+    public function structure($appName = 'all') {
+        $this->permission('Garden.Settings.Manage');
+
+        if (!$this->Form->authenticatedPostBack()) {
+            // The form requires a postback to do anything.
+            $step = 'start';
+        } else {
+            $step = !empty($this->Form->getFormValue('Scan')) ? 'scan' : (!empty($this->Form->getFormValue('Run')) ? 'run' : 'start');
+        }
+
+        switch ($step) {
+            case 'scan':
+                $this->runStructure($appName, true);
+                break;
+            case 'run':
+                $this->runStructure($appName, false);
+                break;
+            case 'start';
+            default:
+                // Nothing to do here.
+        }
+
+        $this->setData('Step', $step);
+        $this->addSideMenu('dashboard/settings/configure');
+        $this->addCssFile('admin.css');
+        $this->setData('Title', t('Database Structure Upgrades'));
+        $this->render();
+    }
+
+    /**
+     * Run the database structure or /utility/structure.
+     *
+     * Note: Keep this method protected!
+     *
+     * @param string $appName Unique app name or 'all' (default).
+     * @param bool $captureOnly Whether to list changes rather than execute (0 or 1).
+     * @throws Exception
     */
-   public function Structure($AppName = 'all', $CaptureOnly = '1', $Drop = '0', $Explicit = '0') {
-      $this->Permission('Garden.Settings.Manage');
+    protected function runStructure($appName = 'all', $captureOnly = true) {
+        // This permission is run again to be sure someone doesn't accidentally call this method incorrectly.
+        $this->permission('Garden.Settings.Manage');
+
       $Files = array();
-      $AppName = $AppName == '' ? 'all': $AppName;
-      if ($AppName == 'all') {
+        $appName = $appName == '' ? 'all' : $appName;
+        if ($appName == 'all') {
 			// Load all application structure files.
 			$ApplicationManager = new Gdn_ApplicationManager();
-			$Apps = $ApplicationManager->EnabledApplications();
-			$AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
-			foreach ($AppNames as $AppName) {
-				$Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
+            $Apps = $ApplicationManager->enabledApplications();
+            $AppNames = array_column($Apps, 'Folder');
+            foreach ($AppNames as $appName) {
+                $Files[] = combinePaths(array(PATH_APPLICATIONS, $appName, 'settings', 'structure.php'), DS);
 			}
-			$AppName = 'all';
+            $appName = 'all';
       } else {
 			 // Load that specific application structure file.
-         $Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
+            $Files[] = combinePaths(array(PATH_APPLICATIONS, $appName, 'settings', 'structure.php'), DS);
       }
-      $Validation = new Gdn_Validation();
-      $Database = Gdn::Database();
-      $Drop = $Drop == '0' ? FALSE : TRUE;
-      $Explicit = $Explicit == '0' ? FALSE : TRUE;
-      $CaptureOnly = !($CaptureOnly == '0');
-      $Structure = Gdn::Structure();
-      $Structure->CaptureOnly = $CaptureOnly;
-      $SQL = Gdn::SQL();
-      $SQL->CaptureModifications = $CaptureOnly;
-      $this->SetData('CaptureOnly', $Structure->CaptureOnly);
-      $this->SetData('Drop', $Drop);
-      $this->SetData('Explicit', $Explicit);
-      $this->SetData('ApplicationName', $AppName);
-      $this->SetData('Status', '');
-      $FoundStructureFile = FALSE;
+        $Drop = false;
+        $Explicit = false;
+        $captureOnly = !($captureOnly == '0');
+        $Structure = Gdn::structure();
+        $Structure->CaptureOnly = $captureOnly;
+        $SQL = Gdn::sql();
+        $SQL->CaptureModifications = $captureOnly;
+        $this->setData('CaptureOnly', $Structure->CaptureOnly);
+        $this->setData('Drop', $Drop);
+        $this->setData('Explicit', $Explicit);
+        $this->setData('ApplicationName', $appName);
+        $this->setData('Status', '');
+        $FoundStructureFile = false;
       foreach ($Files as $File) {
          if (file_exists($File)) {
-			   $FoundStructureFile = TRUE;
+                $FoundStructureFile = true;
 			   try {
 			      include($File);
 			   } catch (Exception $Ex) {
-			      $this->Form->AddError($Ex);
+                    $this->Form->addError($Ex);
 			   }
 			}
       }
 
       // Run the structure of all of the plugins.
-      $Plugins = Gdn::PluginManager()->EnabledPlugins();
+        $Plugins = Gdn::pluginManager()->enabledPlugins();
       foreach ($Plugins as $PluginKey => $Plugin) {
-         $PluginInstance = Gdn::PluginManager()->GetPluginInstance($PluginKey, Gdn_PluginManager::ACCESS_PLUGINNAME);
-         if (method_exists($PluginInstance, 'Structure'))
-            $PluginInstance->Structure();
+            $PluginInstance = Gdn::pluginManager()->getPluginInstance($PluginKey, Gdn_PluginManager::ACCESS_PLUGINNAME);
+            if (method_exists($PluginInstance, 'Structure')) {
+                $PluginInstance->structure();
+            }
       }
 
-      if (property_exists($Structure->Database, 'CapturedSql'))
-         $this->SetData('CapturedSql', (array)$Structure->Database->CapturedSql);
-      else
-         $this->SetData('CapturedSql', array());
+        if (property_exists($Structure->Database, 'CapturedSql')) {
+            $this->setData('CapturedSql', (array)$Structure->Database->CapturedSql);
+        } else {
+            $this->setData('CapturedSql', array());
+        }
 
-      if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
-         $this->SetData('Status', 'The structure was successfully executed.');
-
-		$this->AddSideMenu('dashboard/settings/configure');
-      $this->AddCssFile('admin.css');
-      $this->SetData('Title', T('Database Structure Upgrades'));
-      $this->Render();
+        if ($this->Form->errorCount() == 0 && !$captureOnly && $FoundStructureFile) {
+            $this->setData('Status', 'The structure was successfully executed.');
+        }
    }
    
    /**

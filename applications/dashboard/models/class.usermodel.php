@@ -2499,6 +2499,7 @@ class UserModel extends Gdn_Model {
             ->from('User')
             ->like('Name', $Search, 'right')
             ->where('Deleted', 0)
+            ->orderBy('CountComments', 'desc')
             ->limit($Limit)
             ->get()
             ->resultArray();

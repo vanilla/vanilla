@@ -116,6 +116,26 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
+     * Get the category specific permissions for a role.
+     *
+     * @param int $roleID The ID of the role to get the permissions for.
+     * @return array Returns an array of permissions.
+     */
+    public function getCategoryPermissions($roleID) {
+        $permissions = Gdn::permissionModel()->getJunctionPermissions(['RoleID' => $roleID], 'Category');
+        $result = [];
+
+        foreach ($permissions as $perm) {
+            $row = ['CategoryID' => $perm['JunctionID']];
+            unset($perm['Name'], $perm['JunctionID'], $perm['JunctionTable'], $perm['JunctionColumn']);
+            $row += $perm;
+            $result[] = $row;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get all of the roles including their ranking permissions.
      *
      * @return Gdn_DataSet Returns all of the roles with the ranking permissions.

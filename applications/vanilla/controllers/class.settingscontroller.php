@@ -317,6 +317,41 @@ class SettingsController extends Gdn_Controller {
     }
 
     /**
+     * Get a single category for administration.
+     *
+     * This endpoint is intended for API access.
+     *
+     * @param int $categoryID The category to find.
+     */
+    public function getCategory($categoryID) {
+        // Check permission
+        $this->permission('Garden.Community.Manage');
+
+        if (!$categoryID) {
+            throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));
+        }
+
+        $categoryModel = new CategoryModel();
+        $category = $categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+//        $category = Gdn::sql()->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+
+        if (!$category) {
+            throw notFoundException('Category');
+        }
+
+        // Add the permissions for the category.
+        if ($category['PermissionCategoryID'] == $category['CategoryID']) {
+            $category['Permissions'] = $categoryModel->getRolePermissions($categoryID);
+        } else {
+            $category['Permissions'] = null;
+        }
+
+        $this->setData('Category', $category);
+        saveToConfig('Api.Clean', false, false);
+        $this->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
      * Deleting a category.
      *
      * @since 2.0.0

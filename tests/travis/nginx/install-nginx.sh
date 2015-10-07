@@ -56,5 +56,8 @@ tpl "$DIR/nginx.tpl.conf" "$DIR/nginx/nginx.conf"
 tpl "$DIR/fastcgi.tpl.conf" "$DIR/nginx/fastcgi.conf"
 tpl "$DIR/default-site.tpl.conf" "$DIR/nginx/sites-enabled/default-site.conf"
 
+# Copy the config changer that will allow Vanilla to use a different config file per host.
+cp "$DIR/boostrap.before.php" "$ROOT/conf"
+
 # Start nginx.
 nginx -c "$DIR/nginx/nginx.conf"

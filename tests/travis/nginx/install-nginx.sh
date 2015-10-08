@@ -38,6 +38,8 @@ then
     hhvm \
         --mode=daemon \
         --config="$HHVM_CONF"
+
+    ps aux | grep "hhvm"
 else
     PHP_FPM_BIN="$HOME/.phpenv/versions/$PHP_VERSION/sbin/php-fpm"
     PHP_FPM_CONF="$DIR/nginx/php-fpm.conf"

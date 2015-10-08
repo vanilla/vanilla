@@ -37,6 +37,7 @@ then
 
     hhvm \
         --mode=daemon \
+        --user="$USER" \
         --config="$HHVM_CONF"
 
     ps aux | grep "hhvm"

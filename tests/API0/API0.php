@@ -85,7 +85,7 @@ class API0 extends HttpClient {
                     $this->val('message', $body, $response->getReasonPhrase())
                 );
             } else {
-                $message = $response->getReasonPhrase();
+                $message = $response->getRawBody();
             }
             throw new \Exception($message, $response->getStatusCode());
         }

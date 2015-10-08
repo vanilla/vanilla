@@ -153,6 +153,10 @@ class API0 extends HttpClient {
         }
 
         $path = $this->getConfigPath();
+
+        $dir = dirname($path);
+        passthru("ls -lah $dir");
+
         $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
             '$Configuration = '.var_export($config, true).";\n";
         $r = file_put_contents($path, $str);

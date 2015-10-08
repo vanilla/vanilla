@@ -921,10 +921,11 @@ class SettingsController extends DashboardController {
             'Garden.Registration.ConfirmEmail'
         );
 
-        if (c('Garden.Registration.ManageCaptcha', true)) {
+        if ($manageCaptcha = c('Garden.Registration.ManageCaptcha', true)) {
             $registrationOptions[] = 'Garden.Registration.CaptchaPrivateKey';
             $registrationOptions[] = 'Garden.Registration.CaptchaPublicKey';
         }
+        $this->setData('_ManageCaptcha', $manageCaptcha);
 
         $ConfigurationModel->setField($registrationOptions);
 

@@ -36,9 +36,8 @@ then
     cat "$HHVM_CONF"
 
     hhvm \
-        --mode=daemon \
-        --user="$USER" \
-        --config="$HHVM_CONF"
+        --mode=server \
+        --config="$HHVM_CONF" &
 
     ps aux | grep "hhvm"
 else

@@ -28,4 +28,5 @@ install:
   - tests/travis/nginx/install-nginx.sh
 
 script:
-  -  phpunit -c phpunit.xml.dist
+  - phpunit -c phpunit.xml.dist
+  - cat /tmp/error.log

@@ -28,4 +28,4 @@ install:
   - tests/travis/nginx/install-nginx.sh
 
 script:
-  -  phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
+  -  phpunit -c phpunit.xml.dist

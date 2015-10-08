@@ -55,6 +55,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 </tbody>
             </table>
         </li>
+        <?php if ($this->Data('_ManageCaptcha')) : ?>
         <li id="CaptchaSettings">
             <div
                 class="Info"><?php echo t('The basic registration form requires new users to copy text from a CAPTCHA image.', '<strong>The basic registration form requires</strong> new users to copy text from a CAPTCHA image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
@@ -77,6 +78,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 </tbody>
             </table>
         </li>
+        <?php endif; ?>
         <li id="InvitationExpiration">
             <?php
             echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration');

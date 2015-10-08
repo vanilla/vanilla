@@ -914,13 +914,20 @@ class SettingsController extends DashboardController {
         // Create a model to save configuration settings
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+
+        $registrationOptions = array(
             'Garden.Registration.Method' => 'Captcha',
-            'Garden.Registration.CaptchaPrivateKey',
-            'Garden.Registration.CaptchaPublicKey',
             'Garden.Registration.InviteExpiration',
             'Garden.Registration.ConfirmEmail'
-        ));
+        );
+
+        if ($manageCaptcha = c('Garden.Registration.ManageCaptcha', true)) {
+            $registrationOptions[] = 'Garden.Registration.CaptchaPrivateKey';
+            $registrationOptions[] = 'Garden.Registration.CaptchaPublicKey';
+        }
+        $this->setData('_ManageCaptcha', $manageCaptcha);
+
+        $ConfigurationModel->setField($registrationOptions);
 
         // Set the model on the forms.
         $this->Form->setModel($ConfigurationModel);

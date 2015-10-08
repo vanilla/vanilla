@@ -106,6 +106,9 @@ class API0 extends HttpClient {
         touch($configPath);
         chmod($configPath, 0777);
 
+        $dir = dirname($configPath);
+        passthru("ls -lah $dir");
+
         // Install Vanilla via cURL.
         $post = [
             'Database-dot-Host' => 'localhost',

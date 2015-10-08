@@ -34,18 +34,6 @@ class UtilityController extends DashboardController {
     );
 
     /**
-     * Serve combined CSS assets
-     *
-     * @param string $themeType Either `desktop` or `mobile`.
-     * @param string $filename The basename of the file to serve
-     * @since 2.1
-     */
-    public function css($themeType, $filename) {
-        $assetModel = new AssetModel();
-        $assetModel->serveCss($themeType, $filename);
-    }
-
-    /**
      * Runs before every call to this controller.
      */
     public function initialize() {

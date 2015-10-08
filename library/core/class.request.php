@@ -501,8 +501,12 @@ class Gdn_Request {
                 safeParseStr($Get, $Get, $Original);
             }
 
-            if (!empty($_SERVER['X_REWRITE'])) {
-                $Path = $_SERVER['PATH_INFO'];
+            $rewrite = val('X_REWRITE', $_SERVER, false);
+
+            if ($rewrite == 1) {
+                $Path = val('PATH_INFO', $_SERVER, '');
+            } elseif ($rewrite == 2) {
+                $Path = val('X_PATH_INFO', $_SERVER, '');
             } elseif (isset($Get['_p'])) {
                 $Path = $Get['_p'];
                 unset($_GET['_p']);

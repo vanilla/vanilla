@@ -30,3 +30,4 @@ install:
 script:
   - phpunit -c phpunit.xml.dist
   - cat /tmp/error.log
+  - cat /tmp/access.log

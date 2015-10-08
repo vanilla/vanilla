@@ -26,7 +26,6 @@ addons:
 install:
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
-  - tests/travis/install-vanilla.sh
 
 script:
-  - echo 'Hello world'
+  -  phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover

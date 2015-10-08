@@ -101,9 +101,10 @@ class API0 extends HttpClient {
         $pdo->query("create database `$dbname`");
         $pdo->query("use `$dbname`");
 
-        if (!$title) {
-            $title = 'Vanilla Tests';
-        }
+        // Touch the config file because hhvm runs as root and we don't want the config file to have those permissions.
+        $configPath = $this->getConfigPath();
+        touch($configPath);
+        chmod($configPath, 0777);
 
         // Install Vanilla via cURL.
         $post = [
@@ -111,7 +112,7 @@ class API0 extends HttpClient {
             'Database-dot-Name' => $this->getDbName(),
             'Database-dot-User' => self::DB_USER,
             'Database-dot-Password' => self::DB_PASSWORD,
-            'Garden-dot-Title' => $title,
+            'Garden-dot-Title' => $title ?: 'Vanilla Tests',
             'Email' => 'travis@example.com',
             'Name' => 'travis',
             'Password' => 'travis',

@@ -166,7 +166,7 @@ class APIv0 extends HttpClient {
 
         $path = $this->getConfigPath();
 
-        echo $r->getRawBody();
+        echo "saveToConfig ".$r->getStatusCode().': '.$r->getRawBody()."\n";
     }
 
     /**

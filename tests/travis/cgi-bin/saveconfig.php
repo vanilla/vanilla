@@ -9,6 +9,7 @@
  */
 
 define('APPLICATION', 'Save Config');
+ob_start();
 
 /**
  * A class to save config values to Vanilla's config for testing purposes.
@@ -139,7 +140,7 @@ set_error_handler(
     E_ALL | ~E_NOTICE
 );
 
-ob_start();
+
 header("Content-Type: application/json;charset=utf8");
 
 try {

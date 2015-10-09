@@ -17,7 +17,7 @@ class SimpleConfig {
     public $pathRoot;
 
     public function __construct() {
-        $this->pathRoot = __DIR__.'/..';
+        $this->pathRoot = realpath(__DIR__.'/..');
     }
 
     public function getConfigPath() {
@@ -150,6 +150,8 @@ try {
 
     $config = new SimpleConfig();
     $config->saveToConfig($data);
+    $data = $config->loadConfig();
+    echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $ex) {
     ob_end_clean();
     http_response_code($ex->getCode());

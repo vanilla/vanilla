@@ -165,7 +165,8 @@ class APIv0 extends HttpClient {
         );
 
         $path = $this->getConfigPath();
-        passthru("cat $path");
+
+        echo $r->getRawBody();
     }
 
     /**

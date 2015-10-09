@@ -145,7 +145,7 @@ set_error_handler(
 );
 
 
-header("Content-Type: application/json;charset=utf8");
+header("Content-Type: application/json;charset=utf-8");
 
 try {
     $input_raw = @file_get_contents('php://input');

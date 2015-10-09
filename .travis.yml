@@ -1,11 +1,11 @@
 language: php
 
 php:
-#    - 5.4
+    - 5.4
     - 5.5
     - 5.6
-#    - 7.0
-#    - hhvm
+    - 7.0
+    - hhvm
 
 sudo: false
 
@@ -26,9 +26,6 @@ addons:
 install:
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
-
-before_script:
-  - phpenv config-add tests/travis/travis.php.ini
 
 script:
   - phpunit -c phpunit.xml.dist

@@ -161,7 +161,7 @@ class APIv0 extends HttpClient {
         $r = $this->post(
             '/cgi-bin/saveconfig.php',
             $values,
-            ['Content-Type: application/json;charset=utf8']
+            ['Content-Type: application/json;charset=utf-8']
         );
 
         $path = $this->getConfigPath();

@@ -466,7 +466,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param $Args array
      */
     public function userModel_afterInsertUser_handler($Sender, $Args) {
-        $this->updateUserFields($Args['InsertUserID'], $Args['User']);
+        $this->updateUserFields($Args['InsertUserID'], $Args['RegisteringUser']);
     }
 
     /**

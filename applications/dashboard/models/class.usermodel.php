@@ -1746,7 +1746,7 @@ class UserModel extends Gdn_Model {
 
         // Throw an event to allow plugins to block the registration.
         unset($this->EventArguments['User']);
-        $this->EventArguments['User'] = $FormPostValues;
+        $this->EventArguments['RegisteringUser'] =& $FormPostValues;
         $this->EventArguments['Valid'] =& $Valid;
         $this->fireEvent('BeforeRegister');
 

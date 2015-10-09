@@ -26,8 +26,6 @@ addons:
 install:
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
-  - cp -r tests/travis/cgi-bin cgi-bin
-  - ls -lah
 
 script:
   - phpunit -c phpunit.xml.dist

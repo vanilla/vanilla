@@ -5,13 +5,13 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\API0;
+namespace VanillaTests\APIv0;
 
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use PDO;
 
-class API0 extends HttpClient {
+class APIv0 extends HttpClient {
     const DB_USER = 'travis';
     const DB_PASSWORD = '';
 

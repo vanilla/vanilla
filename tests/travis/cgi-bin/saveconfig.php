@@ -77,6 +77,9 @@ class SimpleConfig {
         $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
             '$Configuration = '.var_export($config, true).";\n";
         $r = file_put_contents($path, $str);
+        if ($r === false) {
+            throw new Exception("Could not save: $path", 500);
+        }
     }
 
     /**
@@ -129,14 +132,30 @@ class SimpleConfig {
     }
 }
 
-$input_raw = @file_get_contents('php://input');
-$data = @json_decode($input_raw, true);
+set_error_handler(
+    function($errno, $errstr, $errfile, $errline, $errcontext) {
+        throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
+    },
+    E_ALL | ~E_NOTICE
+);
 
-if (!$data) {
-    http_response_code(400);
-    die('There was an error decoding the config data.');
+ob_start();
+try {
+    $input_raw = @file_get_contents('php://input');
+    $data = @json_decode($input_raw, true);
+
+    if (!$data) {
+        throw new Exception('There was an error decoding the config data.', 400);
+    }
+
+    $config = new SimpleConfig();
+    $config->saveToConfig($data);
+} catch (Exception $ex) {
+    ob_end_clean();
+    http_response_code($ex->getCode());
+    die(json_encode([
+        'message' => $ex->getMessage(),
+        'code' => $ex->getCode()
+    ]));
 }
-
-$config = new SimpleConfig();
-$config->saveToConfig($data);
-
+ob_end_flush();

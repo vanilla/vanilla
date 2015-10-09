@@ -8,6 +8,10 @@
  * @license GPLv2
  */
 
+error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+ini_set('display_errors', 'off');
+ini_set('track_errors', 0);
+
 define('APPLICATION', 'Save Config');
 ob_start();
 

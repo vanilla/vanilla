@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\API0;
+namespace VanillaTests\APIv0;
 
 
 class StandardTest extends BaseTest {

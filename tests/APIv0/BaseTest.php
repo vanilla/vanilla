@@ -5,18 +5,18 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\API0;
+namespace VanillaTests\APIv0;
 
 
 abstract class BaseTest extends \PHPUnit_Framework_TestCase {
-    /** @var API0  $api */
+    /** @var APIv0  $api */
     protected $api;
 
     /**
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
     public static function setUpBeforeClass() {
-        $api = new API0();
+        $api = new APIv0();
 
         $api->uninstall();
         $api->install(get_called_class());
@@ -25,11 +25,11 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     /**
      * Get the API to make requests against.
      *
-     * @return API0 Returns the API.
+     * @return APIv0 Returns the API.
      */
     public function api() {
         if (!isset($this->api)) {
-            $this->api = new API0();
+            $this->api = new APIv0();
         }
         return $this->api;
     }

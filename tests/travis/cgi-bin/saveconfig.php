@@ -148,7 +148,6 @@ set_error_handler(
 header("Content-Type: application/json;charset=utf8");
 
 try {
-    throw new Exception("foo", 500);
     $input_raw = @file_get_contents('php://input');
     $data = @json_decode($input_raw, true);
 

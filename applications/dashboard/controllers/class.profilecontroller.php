@@ -357,7 +357,6 @@ class ProfileController extends Gdn_Controller {
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
         $this->Form->setModel(Gdn::userModel());
         $this->Form->setData($User);
-        $this->setData('User', $User);
 
         // Decide if they have ability to edit the username
         $CanEditUsername = (bool)c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission('Garden.Users.Edit');
@@ -1044,8 +1043,6 @@ class ProfileController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($RedirectUrl);
         } else {
-            $this->ControllerName = 'Home';
-            $this->View = 'FileNotFound';
             $this->RedirectUrl = url($RedirectUrl);
             $this->render();
         }

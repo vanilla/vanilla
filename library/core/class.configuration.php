@@ -995,11 +995,6 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             }
         }
 
-        // If we're not loading config from cache, check that the file exists
-        if (!$LoadedFromCache && !file_exists($File)) {
-            return false;
-        }
-
         // Define the variable properly.
         $$Name = null;
 
@@ -1008,10 +1003,10 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $$Name = $CachedConfigData;
         }
 
-        if (is_null($$Name) || !is_array($$Name)) {
+        if ((is_null($$Name) || !is_array($$Name)) && file_exists($File)) {
             $LoadedFromCache = false;
             // Include the file.
-            require($File);
+            require $File;
         }
 
         // Make sure the config variable is here and is an array.

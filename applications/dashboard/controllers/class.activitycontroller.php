@@ -237,13 +237,18 @@ class ActivityController extends Gdn_Controller {
 
         $this->ActivityModel->delete($ActivityID);
 
+
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect(GetIncomingValue('Target', $this->SelfUrl));
+            $target = Gdn::request()->get('Target');
+            if ($target) {
+                // Bail with a redirect if we got one.
+                redirect($target);
+            } else {
+                // We got this as a full page somehow, so send them back to /activity.
+                $this->RedirectUrl = url('activity');
+            }
         }
 
-        // Still here? Getting a 404.
-        $this->ControllerName = 'Home';
-        $this->View = 'FileNotFound';
         $this->render();
     }
 

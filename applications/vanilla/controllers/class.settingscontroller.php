@@ -466,13 +466,16 @@ class SettingsController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($RedirectUrl);
         } else {
-            $this->ControllerName = 'Home';
-            $this->View = 'FileNotFound';
             $this->RedirectUrl = url($RedirectUrl);
             $this->render();
         }
     }
 
+    /**
+     *
+     *
+     * @param $Category
+     */
     protected function setupDiscussionTypes($Category) {
         $DiscussionTypes = DiscussionModel::DiscussionTypes();
         $this->setData('DiscussionTypes', $DiscussionTypes);

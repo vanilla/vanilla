@@ -106,8 +106,8 @@ class API0 extends HttpClient {
         touch($configPath);
         chmod($configPath, 0777);
 
-        $dir = dirname($configPath);
-        passthru("ls -lah $dir");
+//        $dir = dirname($configPath);
+//        passthru("ls -lah $dir");
 
         // Install Vanilla via cURL.
         $post = [
@@ -132,9 +132,11 @@ class API0 extends HttpClient {
     /**
      * Load the site's config and return it.
      *
+     * This loads the config directly via filesystem access.
+     *
      * @return array Returns the site's config.
      */
-    public function loadConfig() {
+    public function loadConfigDirect() {
         $path = $this->getConfigPath();
 
         if (file_exists($path)) {
@@ -147,11 +149,31 @@ class API0 extends HttpClient {
     }
 
     /**
-     * Save some config values.
-     * @param array $values An array of config keys and values where the keys are a dot-seperated array.
+     * Save some config values via API.
+     *
+     * This method saves config values via a back-door endpoint copied to cgi-bin.
+     * This is necessary because HHVM runs as root and takes over the config file and so it can only be edited in an
+     * API context.
+     *
+     * @param array $values The values to save.
      */
     public function saveToConfig(array $values) {
-        $config = $this->loadConfig();
+        $r = $this->post(
+            '/cgi-bin/saveconfig.php',
+            $values,
+            ['Content-Type: application/json;charset=utf8']
+        );
+    }
+
+    /**
+     * Save some config values.
+     *
+     * This saves the values directly via filesystem access.
+     *
+     * @param array $values An array of config keys and values where the keys are a dot-seperated array.
+     */
+    public function saveToConfigDirect(array $values) {
+        $config = $this->loadConfigDirect();
         foreach ($values as $key => $value) {
             setvalr($key, $config, $value);
         }
@@ -159,7 +181,6 @@ class API0 extends HttpClient {
         $path = $this->getConfigPath();
 
         $dir = dirname($path);
-        passthru("ls -lah $dir");
 
         $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
             '$Configuration = '.var_export($config, true).";\n";

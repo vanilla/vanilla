@@ -140,7 +140,10 @@ set_error_handler(
 );
 
 ob_start();
+header("Content-Type: application/json;charset=utf8");
+
 try {
+    throw new Exception("foo", 500);
     $input_raw = @file_get_contents('php://input');
     $data = @json_decode($input_raw, true);
 
@@ -151,6 +154,7 @@ try {
     $config = new SimpleConfig();
     $config->saveToConfig($data);
     $data = $config->loadConfig();
+
     echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $ex) {
     ob_end_clean();

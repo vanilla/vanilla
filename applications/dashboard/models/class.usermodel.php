@@ -641,10 +641,10 @@ class UserModel extends Gdn_Model {
             'client_id' => null), true);
 
         // Remove important missing keys.
-        if (!array_key_exists($Data['photourl'])) {
+        if (!array_key_exists('photourl', $Data)) {
             unset($User['Photo']);
         }
-        if (!array_key_exists($Data['roles'])) {
+        if (!array_key_exists('roles', $Data)) {
             unset($User['Roles']);
         }
 

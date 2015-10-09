@@ -1746,7 +1746,7 @@ class UserModel extends Gdn_Model {
 
         // Throw an event to allow plugins to block the registration.
         unset($this->EventArguments['User']);
-        $this->EventArguments['RegisteringUser'] =& $FormPostValues;
+        $this->EventArguments['User'] = $FormPostValues;
         $this->EventArguments['Valid'] =& $Valid;
         $this->fireEvent('BeforeRegister');
 
@@ -1880,15 +1880,15 @@ class UserModel extends Gdn_Model {
         // Make sure that checkbox vals are saved as the appropriate value
 
         if (array_key_exists('ShowEmail', $FormPostValues)) {
-            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
         }
 
         if (array_key_exists('Banned', $FormPostValues)) {
-            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
         }
 
         if (array_key_exists('Confirmed', $FormPostValues)) {
-            $FormPostValues['Confirmed'] = forceBool($FormPostValues['Confirmed'], '0', '1', '0');
+            $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
         }
 
         unset($FormPostValues['Admin']);
@@ -1962,7 +1962,7 @@ class UserModel extends Gdn_Model {
             $Fields = $this->Validation->schemaValidationFields();
 
             // Remove the primary key from the fields collection before saving
-            unset($Fields[$this->PrimaryKey]);
+            $Fields = removeKeyFromArray($Fields, $this->PrimaryKey);
 
             if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
                 // Encrypt the password for saving only if it won't be hashed in _Insert()
@@ -2644,7 +2644,7 @@ class UserModel extends Gdn_Model {
      * @param array $Options
      * @return int UserID.
      */
-    public function insertForApproval($FormPostValues, $Options = array()) {
+    public function  insertForApproval($FormPostValues, $Options = array()) {
         $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
         if (empty($RoleIDs)) {
             throw new Exception(t('The default role has not been configured.'), 400);
@@ -3744,7 +3744,7 @@ class UserModel extends Gdn_Model {
         // Make sure there is a confirmation code.
         $Code = valr('Attributes.EmailKey', $User);
         if (!$Code) {
-            $Code = randomString(8);
+            $Code = RandomString(8);
             $Attributes = $User['Attributes'];
             if (!is_array($Attributes)) {
                 $Attributes = array('EmailKey' => $Code);

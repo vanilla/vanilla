@@ -237,13 +237,18 @@ class ActivityController extends Gdn_Controller {
 
         $this->ActivityModel->delete($ActivityID);
 
-        $target = Gdn::request()->get('Target');
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL && $target) {
-            redirect($target);
+
+        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
+            $target = Gdn::request()->get('Target');
+            if ($target) {
+                // Bail with a redirect if we got one.
+                redirect($target);
+            } else {
+                // We got this as a full page somehow, so send them back to /activity.
+                $this->RedirectUrl = url('activity');
+            }
         }
 
-        // Still here? Getting a basic view with redirect.
-        $this->RedirectUrl = url('activity');
         $this->render();
     }
 

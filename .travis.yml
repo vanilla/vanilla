@@ -26,6 +26,8 @@ addons:
 install:
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
+
+before_script:
   - phpenv config-add tests/travis/travis.php.ini
 
 script:

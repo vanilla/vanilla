@@ -163,6 +163,9 @@ class APIv0 extends HttpClient {
             $values,
             ['Content-Type: application/json;charset=utf8']
         );
+
+        $path = $this->getConfigPath();
+        passthru("cat $path");
     }
 
     /**

@@ -166,7 +166,7 @@ class Gdn_Request {
      * @return string
      */
     public function __call($method, $args) {
-        $matches = array();
+        $matches = [];
         if (preg_match('/^(Request)(.*)$/i', $method, $matches)) {
             $passedArg = (is_array($args) && sizeof($args)) ? $args[0] : null;
             return $this->_environmentElement(strtoupper($matches[2]), $passedArg);
@@ -329,7 +329,7 @@ class Gdn_Request {
     public function hostAndPort() {
         $host = $this->host();
         $port = $this->port();
-        if (!in_array($port, array(80, 443))) {
+        if (!in_array($port, [80, 443])) {
             return $host.':'.$port;
         } else {
             return $host;
@@ -509,7 +509,7 @@ class Gdn_Request {
                 $get =& $_GET;
             }
             if (!is_array($get)) {
-                $original = array();
+                $original = [];
                 parse_str($get, $original);
                 safeParseStr($get, $get, $original);
             }
@@ -529,7 +529,7 @@ class Gdn_Request {
             $this->requestURI($path);
         }
 
-        $possibleScriptNames = array();
+        $possibleScriptNames = [];
         if (isset($_SERVER['SCRIPT_NAME'])) {
             $possibleScriptNames[] = $_SERVER['SCRIPT_NAME'];
         }
@@ -634,7 +634,7 @@ class Gdn_Request {
         $urlParts = explode('/', $this->path());
         $last = array_slice($urlParts, -1, 1);
         $lastParam = array_pop($last);
-        $match = array();
+        $match = [];
         if (preg_match('/^(.+)\.([^.]{1,4})$/', $lastParam, $match)) {
             $this->outputFormat($match[2]);
             $this->filename($match[0]);
@@ -758,7 +758,7 @@ class Gdn_Request {
             if (strlen($query) > 0) {
                 parse_str($query, $get);
             } else {
-                $get = array();
+                $get = [];
             }
 
             // Set the parts of the query here.
@@ -964,15 +964,15 @@ class Gdn_Request {
         } else {
             $scheme = $this->scheme();
         }
-        if (substr($path, 0, 2) == '//' || in_array(strpos($path, '://'), array(4, 5))) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
+        if (substr($path, 0, 2) == '//' || in_array(strpos($path, '://'), [4, 5])) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
             return $path;
         }
 
-        $parts = array();
+        $parts = [];
 
         $port = $this->port();
         $host = $this->host();
-        if (!in_array($port, array(80, 443)) && (strpos($host, ':'.$port) === false)) {
+        if (!in_array($port, [80, 443]) && (strpos($host, ':'.$port) === false)) {
             $host .= ':'.$port;
         }
 
@@ -1055,15 +1055,15 @@ class Gdn_Request {
         $parts1 = parse_url($this->url($url1));
         $parts2 = parse_url($this->url($url2));
 
-        $defaults = array(
+        $defaults = [
             'scheme' => $this->scheme(),
             'host' => $this->hostAndPort(),
             'path' => '/',
             'query' => ''
-        );
+        ];
 
-        $parts1 = array_replace($defaults, $parts1 ?: array());
-        $parts2 = array_replace($defaults, $parts2 ?: array());
+        $parts1 = array_replace($defaults, $parts1 ?: []);
+        $parts2 = array_replace($defaults, $parts2 ?: []);
 
         if ($parts1['host'] === $parts2['host']
             && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
@@ -1178,16 +1178,16 @@ class Gdn_Request {
      * @flow chain
      * @return Gdn_Request
      */
-    public function withControllerMethod($controller, $method = null, $args = array()) {
+    public function withControllerMethod($controller, $method = null, $args = []) {
         if (is_a($controller, 'Gdn_Controller')) {
             // Convert object to string
-            $matches = array();
+            $matches = [];
             preg_match('/^(.*)Controller$/', get_class($controller), $matches);
             $controller = $matches[1];
         }
 
         $method = is_null($method) ? 'index' : $method;
-        $path = trim(implode('/', array_merge(array($controller, $method), $args)), '/');
+        $path = trim(implode('/', array_merge([$controller, $method], $args)), '/');
         $this->_environmentElement('URI', $path);
         return $this;
     }

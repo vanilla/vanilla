@@ -66,10 +66,6 @@ Vanilla is built to be simple, and its installation is no exception.
 * Navigate to that folder in your web browser.
 * Follow the instructions on screen.
 
-## Buidling with Phing
-
-Vanilla includes a  buildfile for [Phing](https://www.phing.info/), a build system for PHP, in the build directory. Running the `phing` command from the build directory will create a deploy-ready copy of Vanilla.  This process automatically fetches dependencies with Composer, filters out any unnecessary developer files (Git files/directories, .editorconfig, unit tests, etc.) and compresses the result into an archive.
-
 ## Upgrading
 
 Follow these steps to upgrade Vanilla when a new stable release is announced.
@@ -116,6 +112,10 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 * Sign the [Contributors' Agreement](http://vanillaforums.org/contributors) to send us code.
 * Use pull requests against the correct release (currently `stage` for most changes).
 * Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
+
+## Buidling with Phing
+
+Vanilla includes a  buildfile for [Phing](https://www.phing.info/), a build system for PHP, in the build directory. Running the `phing` command from the build directory will create a deploy-ready copy of Vanilla.  This process automatically fetches dependencies with Composer, filters out any unnecessary developer files (Git files/directories, .editorconfig, unit tests, etc.) and compresses the result into an archive.
 
 ## Version Control Strategy
 

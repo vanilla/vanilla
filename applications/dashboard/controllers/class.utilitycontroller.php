@@ -337,8 +337,9 @@ class UtilityController extends DashboardController {
       $Files = array();
         $appName = $appName == '' ? 'all' : $appName;
         if ($appName == 'all') {
-			// Load all application structure files.
-			$ApplicationManager = new Gdn_ApplicationManager();
+            require_once PATH_LIBRARY.'/vendors/misc/functions.arraycolumn.php';
+         // Load all application structure files.
+         $ApplicationManager = new Gdn_ApplicationManager();
             $Apps = $ApplicationManager->enabledApplications();
             $AppNames = array_column($Apps, 'Folder');
             foreach ($AppNames as $appName) {

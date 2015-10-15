@@ -298,7 +298,7 @@ class UtilityController extends DashboardController {
             if(!empty($scan)) {
                 $step = 'scan';
             }
-            else if(!empty($run))
+            else if(!empty($run)) {
                 $step = 'run';
             }
         }

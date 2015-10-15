@@ -295,10 +295,9 @@ class UtilityController extends DashboardController {
             $scan = $this->Form->getFormValue('Scan');
             $run = $this->Form->getFormValue('Run');
             $step = 'start';
-            if(!empty($scan)) {
+            if (!empty($scan)) {
                 $step = 'scan';
-            }
-            else if(!empty($run)) {
+            } else if (!empty($run)) {
                 $step = 'run';
             }
         }

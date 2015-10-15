@@ -504,8 +504,8 @@ if (!function_exists('Img')) {
     * Returns an img tag.
     */
    function Img($Image, $Attributes = '', $WithDomain = FALSE) {
-      if ($Attributes == '')
-         $Attributes = array();
+      if ($Attributes != '')
+         $Attributes = Attribute($Attributes);
 
       if (!IsUrl($Image))
          $Image = SmartAsset($Image, $WithDomain);

@@ -175,12 +175,26 @@ class UserController extends DashboardController {
                 // this themselves
                 $this->Form->setFormValue('RoleID', array_keys($UserNewRoles));
 
+                $noPassword = (bool)$this->Form->GetFormValue('NoPassword');
+                if ($noPassword) {
+                   $this->Form->SetFormValue('Password', BetterRandomString(15, 'Aa0'));
+                   $this->Form->SetFormValue('HashMethod', 'Random');
+                }
+
                 $NewUserID = $this->Form->save(array('SaveRoles' => true, 'NoConfirmEmail' => true));
                 if ($NewUserID !== false) {
-                    $Password = $this->Form->getValue('Password', '');
+                   if ($noPassword) {
+                      $Password = T('No password');
+                   } else {
+                        $Password = $this->Form->getValue('Password', '');
+                   }
+
                     $UserModel->sendWelcomeEmail($NewUserID, $Password, 'Add');
                     $this->informMessage(t('The user has been created successfully'));
                     $this->RedirectUrl = url('dashboard/user');
+                } elseif ($noPassword) {
+                    $this->Form->SetFormValue('Password', '');
+                    $this->Form->SetFormValue('HashMethod', '');
                 }
 
                 $this->UserRoleData = $UserNewRoles;

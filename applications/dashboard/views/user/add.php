@@ -19,9 +19,10 @@ echo $this->Form->errors();
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password');
+            echo $this->Form->Input('Password', 'password', array('class' => 'InputBox js-password '));
+            echo ' '.$this->Form->Checkbox('NoPassword', 'No password', array('class' => 'Inline CheckBoxLabel js-nopassword'));
             ?>
-            <div class="InputButtons">
+            <div class="InputButtons js-password-related">
                 <?php
                 echo anchor(t('Generate Password'), '#', 'GeneratePassword Button SmallButton');
                 echo anchor(t('Reveal Password'), '#', 'RevealPassword Button SmallButton');

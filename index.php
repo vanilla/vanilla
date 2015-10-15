@@ -13,7 +13,7 @@ if (PHP_VERSION_ID < 50300) {
 }
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.2b1');
+define('APPLICATION_VERSION', '2.2rc1');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);

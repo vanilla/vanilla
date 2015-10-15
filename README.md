@@ -113,6 +113,10 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 * Use pull requests against the correct release (currently `stage` for most changes).
 * Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
 
+## Buidling with Phing
+
+Vanilla includes a  buildfile for [Phing](https://www.phing.info/), a build system for PHP, in the build directory. Running the `phing` command from the build directory will create a deploy-ready copy of Vanilla.  This process automatically fetches dependencies with Composer, filters out any unnecessary developer files (Git files/directories, .editorconfig, unit tests, etc.) and compresses the result into an archive.
+
 ## Version Control Strategy
 
 We've adopted the [git flow branching model](http://nvie.com/posts/a-successful-git-branching-model) in our projects.

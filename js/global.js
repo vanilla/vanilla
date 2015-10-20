@@ -1129,7 +1129,9 @@ jQuery(document).ready(function($) {
             var href = $(this).attr('href');
             e.preventDefault();
 
-            stash(stash_name, comment);
+            stash(stash_name, comment, function() {
+                window.top.location = href;
+            });
         }
     });
 

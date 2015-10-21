@@ -472,6 +472,11 @@ class UtilityController extends DashboardController {
      */
     public function fetchPageInfo($Url = '') {
         $PageInfo = fetchPageInfo($Url);
+
+        if (!empty($PageInfo['Exception'])) {
+            throw new Gdn_UserException($PageInfo['Exception'], 400);
+        }
+
         $this->setData('PageInfo', $PageInfo);
         $this->MasterView = 'default';
         $this->removeCssFile('admin.css');

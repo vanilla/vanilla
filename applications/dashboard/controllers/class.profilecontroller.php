@@ -300,8 +300,8 @@ class ProfileController extends Gdn_Controller {
      * @throws Exception
      */
     public function disconnect($UserReference = '', $Username = '', $Provider) {
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            return;
         }
 
         $this->permission('Garden.SignIn.Allow');

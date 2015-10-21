@@ -128,7 +128,6 @@ class DebuggerPlugin extends Gdn_Plugin {
      *
      */
     public function setup() {
-        saveToConfig('Debug', true);
     }
 
     /**

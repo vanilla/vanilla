@@ -790,7 +790,7 @@ class CategoryModel extends Gdn_Model {
                 }
 
                 // Calculate the following field.
-                $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Row, false));
+                $Following = !((bool)val('Archived', $Category) || (bool)val('Unfollow', $Row, false));
                 $Categories[$ID]['Following'] = $Following;
 
                 // Calculate the read field.
@@ -1636,7 +1636,7 @@ class CategoryModel extends Gdn_Model {
             if ($PermissionCategoryID != $CategoryID) {
                 // This category does not have custom permissions so must inherit its parent's permissions.
                 $PermissionCategoryID = valr("$ParentCategoryID.PermissionCategoryID", $PermTree, 0);
-                if ($CategoryID != -1 && !GetValueR("$ParentCategoryID.Touched", $PermTree)) {
+                if ($CategoryID != -1 && !valr("$ParentCategoryID.Touched", $PermTree)) {
                     throw new Exception("Category $ParentCategoryID not touched before touching $CategoryID.");
                 }
                 if ($PermTree[$CategoryID]['PermissionCategoryID'] != $PermissionCategoryID) {
@@ -1708,7 +1708,7 @@ class CategoryModel extends Gdn_Model {
         $NewName = val('Name', $FormPostValues, '');
         $UrlCode = val('UrlCode', $FormPostValues, '');
         $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
-        $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
+        $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues);
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
         if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
@@ -2037,7 +2037,7 @@ class CategoryModel extends Gdn_Model {
             }
 
             // Calculate the following field.
-            $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
+            $Following = !((bool)val('Archived', $Category) || (bool)val('Unfollow', $Category));
             $Category->Following = $Following;
 
             $DateMarkedRead = val('DateMarkedRead', $Category);

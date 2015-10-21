@@ -727,9 +727,10 @@ if (!function_exists('FetchPageInfo')) {
     * Examines the page at $Url for title, description & images. Be sure to check the resultant array for any Exceptions that occurred while retrieving the page.
     * @param string $Url The url to examine.
     * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+     * @param bool $sendCookies Whether or not to send browser cookies with the request.
     * @return array an array containing Url, Title, Description, Images (array) and Exception (if there were problems retrieving the page).
     */
-   function FetchPageInfo($Url, $Timeout = 3) {
+   function FetchPageInfo($Url, $Timeout = 3, $sendCookies = false) {
       $PageInfo = array(
          'Url' => $Url,
          'Title' => '',
@@ -737,6 +738,7 @@ if (!function_exists('FetchPageInfo')) {
          'Images' => array(),
          'Exception' => FALSE
       );
+
       try {
          if (!defined('HDOM_TYPE_ELEMENT'))
             require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
@@ -744,7 +746,8 @@ if (!function_exists('FetchPageInfo')) {
          $Request = new ProxyRequest();
          $PageHtml = $Request->Request(array(
             'URL'       => $Url,
-            'Timeout'   => $Timeout
+                'Timeout' => $timeout,
+                'Cookies' => $sendCookies
          ));
          $Dom = str_get_html($PageHtml);
          if (!$Dom)

@@ -262,6 +262,11 @@ class UserModel extends Gdn_Model {
         $this->mergeCopy($MergeID, 'ConversationMessage', 'InsertUserID', $OldUserID, $NewUserID, 'MessageID');
         $this->mergeCopy($MergeID, 'UserConversation', 'UserID', $OldUserID, $NewUserID, 'ConversationID');
 
+        $this->EventArguments['MergeID'] = $MergeID;
+        $this->EventArguments['OldUser'] = $OldUser;
+        $this->EventArguments['NewUser'] = $NewUser;
+        $this->fireEvent('Merge');
+
         $this->mergeFinish($MergeID);
 
         $OldUser = $this->getID($OldUserID, DATASET_TYPE_ARRAY);

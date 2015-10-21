@@ -31,7 +31,9 @@ class ImportController extends DashboardController {
      */
     public function export() {
         $this->permission('Garden.Export'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            redirect(strtolower($this->Application).'/import');
+        }
         set_time_limit(60 * 2);
         $Ex = new ExportModel();
         $Ex->pdo(Gdn::database()->connection());
@@ -64,7 +66,9 @@ class ImportController extends DashboardController {
      */
     public function go() {
         $this->permission('Garden.Settings.Manage');
-
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            redirect(strtolower($this->Application).'/import');
+        }
         $Imp = new ImportModel();
         $Imp->loadState();
         $this->setData('Steps', $Imp->steps());
@@ -154,7 +158,7 @@ class ImportController extends DashboardController {
             $Validation = new Gdn_Validation();
 
 
-            if (strcasecmp(Gdn::request()->requestMethod(), 'post') == 0) {
+            if ((strcasecmp(Gdn::request()->requestMethod(), 'post') == 0) && (Gdn::request()->isAuthenticatedPostBack(true))) {
                 $Upload = new Gdn_Upload();
                 $Validation = new Gdn_Validation();
                 if (count($ImportPaths) > 0) {
@@ -247,7 +251,9 @@ class ImportController extends DashboardController {
      */
     public function restart() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            redirect(strtolower($this->Application).'/import');
+        }
         // Delete the individual table files.
         $Imp = new ImportModel();
         try {

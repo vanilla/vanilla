@@ -969,10 +969,11 @@ if (!function_exists('fetchPageInfo')) {
      * @param string $url The url to examine.
      * @param integer $timeout How long to allow for this request.
      * Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+     * @param bool $sendCookies Whether or not to send browser cookies with the request.
      * @return array Returns an array containing Url, Title, Description, Images (array) and Exception
      * (if there were problems retrieving the page).
      */
-    function fetchPageInfo($url, $timeout = 3) {
+    function fetchPageInfo($url, $timeout = 3, $sendCookies = false) {
         $PageInfo = array(
             'Url' => $url,
             'Title' => '',
@@ -980,6 +981,7 @@ if (!function_exists('fetchPageInfo')) {
             'Images' => array(),
             'Exception' => false
         );
+
         try {
             // Make sure the URL is valid.
             $urlParts = parse_url($url);
@@ -994,7 +996,8 @@ if (!function_exists('fetchPageInfo')) {
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
-                'Timeout' => $timeout
+                'Timeout' => $timeout,
+                'Cookies' => $sendCookies
             ));
             $Dom = str_get_html($PageHtml);
             if (!$Dom) {

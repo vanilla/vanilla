@@ -282,7 +282,7 @@ class SettingsController extends Gdn_Controller {
         $this->RoleArray = $RoleModel->getArray();
 
         $this->fireEvent('AddEditCategory');
-        $this->SetupDiscussionTypes(array());
+        $this->setupDiscussionTypes(array());
 
         if ($this->Form->authenticatedPostBack()) {
             // Form was validly submitted
@@ -305,8 +305,8 @@ class SettingsController extends Gdn_Controller {
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
-        $Permissions = $PermissionModel->UnpivotPermissions($Permissions, true);
+        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->setData('PermissionData', $Permissions, true);
@@ -571,13 +571,13 @@ class SettingsController extends Gdn_Controller {
             }
         } else {
             $this->Form->setData($this->Category);
-            $this->SetupDiscussionTypes($this->Category);
+            $this->setupDiscussionTypes($this->Category);
             $this->Form->setValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
-        $Permissions = $PermissionModel->UnpivotPermissions($Permissions, true);
+        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
+        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->setData('PermissionData', $Permissions, true);

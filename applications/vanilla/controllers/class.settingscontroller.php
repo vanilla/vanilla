@@ -544,16 +544,16 @@ class SettingsController extends Gdn_Controller {
         $this->fireEvent('AddEditCategory');
 
         if ($this->Form->authenticatedPostBack()) {
-            $this->SetupDiscussionTypes($this->Category);
+            $this->setupDiscussionTypes($this->Category);
             $Upload = new Gdn_Upload();
-            $TmpImage = $Upload->ValidateUpload('PhotoUpload', false);
+            $TmpImage = $Upload->validateUpload('PhotoUpload', false);
             if ($TmpImage) {
                 // Generate the target image name
-                $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+                $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
                 $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
 
                 // Save the uploaded image
-                $Parts = $Upload->SaveAs(
+                $Parts = $Upload->saveAs(
                     $TmpImage,
                     $ImageBaseName
                 );

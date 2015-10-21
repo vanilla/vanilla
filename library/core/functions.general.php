@@ -999,6 +999,11 @@ if (!function_exists('fetchPageInfo')) {
                 'Timeout' => $timeout,
                 'Cookies' => $sendCookies
             ));
+
+            if (!$Request->status()) {
+                throw new Exception('Couldn\'t connect to host.', 400);
+            }
+
             $Dom = str_get_html($PageHtml);
             if (!$Dom) {
                 throw new Exception('Failed to load page for parsing.');

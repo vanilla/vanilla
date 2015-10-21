@@ -621,6 +621,10 @@ class UserModel extends Gdn_Model {
         }
 
         $Secret = $Provider['AssociationSecret'];
+        if (empty(trim($Secret, '.'))) {
+            trace('Missing client secret', TRACE_ERROR);
+            return;
+        }
 
         // Check the signature.
         switch ($HashMethod) {

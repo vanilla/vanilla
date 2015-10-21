@@ -981,6 +981,12 @@ if (!function_exists('fetchPageInfo')) {
             'Exception' => false
         );
         try {
+            // Make sure the URL is valid.
+            $urlParts = parse_url($url);
+            if ($urlParts === false || !in_array(val('scheme', $urlParts), array('http', 'https'))) {
+                throw new Exception('Invalid URL.', 400);
+            }
+
             if (!defined('HDOM_TYPE_ELEMENT')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }

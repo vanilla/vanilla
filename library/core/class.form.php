@@ -289,12 +289,11 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $Permission = GetValue('Permission', $Options, 'add');
         // Extract the category permission (e.g. Discussion.Add) from options passed and pass it to GetByPermission.
-        $categoryPermission = val('categoryPermission', $Options, 'Discussions.View');
 
         // Grab the category data.
         if (!$CategoryData) {
             $CategoryData = CategoryModel::GetByPermission(
-                $categoryPermission,
+                'Discussions.View',
                 $Value,
                 val('Filter', $Options, array('Archived' => 0)),
                 val('PermFilter', $Options, array())

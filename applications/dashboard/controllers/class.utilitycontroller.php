@@ -155,7 +155,14 @@ class UtilityController extends DashboardController {
             // The form requires a postback to do anything.
             $step = 'start';
         } else {
-            $step = !empty($this->Form->getFormValue('Scan')) ? 'scan' : (!empty($this->Form->getFormValue('Run')) ? 'run' : 'start');
+            $scan = $this->Form->getFormValue('Scan');
+            $run = $this->Form->getFormValue('Run');
+            $step = 'start';
+            if (!empty($scan)) {
+                $step = 'scan';
+            } else if (!empty($run)) {
+                $step = 'run';
+            }
         }
 
         switch ($step) {

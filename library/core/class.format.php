@@ -1800,8 +1800,8 @@ EOT;
         if (is_string($Mixed)) {
             if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
                 $Mixed = self::$FormatMethod($Mixed);
-            } elseif (function_exists('format'.$FormatMethod)) {
-                $FormatMethod = 'format'.$FormatMethod;
+            } elseif (function_exists('gdn_formatter_'.$FormatMethod)) {
+                $FormatMethod = 'gdn_formatter_'.$FormatMethod;
                 $Mixed = $FormatMethod($Mixed);
             } elseif ($Formatter = Gdn::factory($FormatMethod.'Formatter')) {
                 $Mixed = $Formatter->format($Mixed);

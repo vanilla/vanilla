@@ -89,19 +89,23 @@ class DraftsController extends VanillaController {
     public function delete($DraftID = '', $TransientKey = '') {
         $Form = Gdn::Factory('Form');
         $Session = Gdn::session();
-        if (is_numeric($DraftID)
-            && $DraftID > 0
-            && $Session->UserID > 0
-            && $Session->validateTransientKey($TransientKey)
-        ) {
-            // Delete the draft
+        if (is_numeric($DraftID) && $DraftID > 0) {
             $Draft = $this->DraftModel->getID($DraftID);
-            if ($Draft && !$this->DraftModel->delete($DraftID)) {
-                $Form->addError('Failed to delete discussion');
+        }
+        if ($Draft) {
+            if ($Session->validateTransientKey($TransientKey)
+                && ((val('InsertUserID', $Draft) === (integer)$Session->UserID) || checkPermission('Garden.Community.Manage'))
+            ) {
+                // Delete the draft
+                if (!$this->DraftModel->delete($DraftID)) {
+                    $Form->addError('Failed to delete draft');
+                }
+            } else {
+                // Log an error
+                $Form->addError('ErrPermission');
             }
         } else {
-            // Log an error
-            $Form->addError('ErrPermission');
+            $Form->addError('Draft does not exist');
         }
 
         // Redirect

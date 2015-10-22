@@ -158,7 +158,7 @@ class ImportController extends DashboardController {
             $Validation = new Gdn_Validation();
 
 
-            if ((strcasecmp(Gdn::request()->requestMethod(), 'post') == 0) && (Gdn::request()->isAuthenticatedPostBack(true))) {
+            if (Gdn::request()->isAuthenticatedPostBack(true)) {
                 $Upload = new Gdn_Upload();
                 $Validation = new Gdn_Validation();
                 if (count($ImportPaths) > 0) {

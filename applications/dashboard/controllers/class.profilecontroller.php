@@ -1550,10 +1550,6 @@ class ProfileController extends Gdn_Controller {
                 $this->Roles = array_column($this->RoleData->resultArray(), 'Name');
             }
 
-            if (Gdn::session()->checkPermission('Garden.Settings.Manage') || Gdn::session()->UserID == $this->User->UserID) {
-                $this->User->Transient = valr('Attributes.TransientKey', $this->User);
-            }
-
             // Hide personal info roles
             if (!checkPermission('Garden.PersonalInfo.View')) {
                 $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');

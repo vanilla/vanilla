@@ -984,7 +984,7 @@ body { background: transparent !important; }
      */
     public function refetchPageInfo($DiscussionID) {
         // Make sure we are posting back.
-        if (!$this->Request->isPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack(true)) {
             throw permissionException('Javascript');
         }
 

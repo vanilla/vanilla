@@ -17,7 +17,7 @@ if (!isset($Drop)) {
 }
 
 if (!isset($Explicit)) {
-    $Explicit = true;
+    $Explicit = false;
 }
 
 $SQL = Gdn::database()->sql();

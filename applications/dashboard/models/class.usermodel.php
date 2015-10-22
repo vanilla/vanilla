@@ -621,7 +621,7 @@ class UserModel extends Gdn_Model {
         }
 
         $Secret = $Provider['AssociationSecret'];
-        if (empty(trim($Secret, '.'))) {
+        if (!trim($Secret, '.')) {
             trace('Missing client secret', TRACE_ERROR);
             return;
         }

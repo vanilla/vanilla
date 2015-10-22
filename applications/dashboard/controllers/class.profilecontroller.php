@@ -301,7 +301,7 @@ class ProfileController extends Gdn_Controller {
      */
     public function disconnect($UserReference = '', $Username = '', $Provider) {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            redirect(userUrl($this->User), '', 'connections');
+            throw new Exception('Requires POST', 405);
         }
 
         $this->permission('Garden.SignIn.Allow');

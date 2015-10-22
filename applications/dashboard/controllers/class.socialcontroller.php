@@ -95,7 +95,7 @@ class SocialController extends DashboardController {
     public function disable($Plugin) {
         $this->permission('Garden.Settings.Manage');
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            redirect('social/manage');
+            throw new Exception('Requires POST', 405);
         }
         $Connections = $this->GetConnections();
         unset($this->Data['Connections']);
@@ -131,7 +131,7 @@ class SocialController extends DashboardController {
     public function enable($Plugin) {
         $this->permission('Garden.Settings.Manage');
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            redirect('social/manage');
+            throw new Exception('Requires POST', 405);
         }
         $Connections = $this->GetConnections();
 

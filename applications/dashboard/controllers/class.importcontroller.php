@@ -32,7 +32,7 @@ class ImportController extends DashboardController {
     public function export() {
         $this->permission('Garden.Export'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            redirect(strtolower($this->Application).'/import');
+            throw new Exception('Requires POST', 405);
         }
         set_time_limit(60 * 2);
         $Ex = new ExportModel();
@@ -67,7 +67,7 @@ class ImportController extends DashboardController {
     public function go() {
         $this->permission('Garden.Settings.Manage');
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            redirect(strtolower($this->Application).'/import');
+            throw new Exception('Requires POST', 405);
         }
         $Imp = new ImportModel();
         $Imp->loadState();
@@ -252,7 +252,7 @@ class ImportController extends DashboardController {
     public function restart() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            redirect(strtolower($this->Application).'/import');
+            throw new Exception('Requires POST', 405);
         }
         // Delete the individual table files.
         $Imp = new ImportModel();

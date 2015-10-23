@@ -424,6 +424,10 @@ class Gdn_Database {
 
         }
 
+        if ($PDOStatement instanceof PDOStatement) {
+            $this->LastInfo['RowCount'] = $PDOStatement->rowCount();
+        }
+
         // Did this query modify data in any way?
         if ($ReturnType == 'ID') {
             $this->_CurrentResultSet = $PDO->lastInsertId();

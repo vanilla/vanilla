@@ -26,7 +26,7 @@ echo $this->Form->errors();
         </li>
         <li>
             <?php
-            echo $this->Form->CheckBox('Garden.Email.ToNoUsername', 'Do not include usernames in the "to" field of outgoing e-mails.');
+            echo $this->Form->CheckBox('Garden.Email.OmitToName', 'Do not include usernames in the "to" field of outgoing e-mails.');
             ?>
         </li>
         <li>

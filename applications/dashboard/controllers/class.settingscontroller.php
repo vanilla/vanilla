@@ -607,7 +607,7 @@ class SettingsController extends DashboardController {
             'Garden.Email.SmtpPassword',
             'Garden.Email.SmtpPort',
             'Garden.Email.SmtpSecurity',
-            'Garden.Email.ToNoUsername'
+            'Garden.Email.OmitToName'
         ));
 
         // Set the model on the form.

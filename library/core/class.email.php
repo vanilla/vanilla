@@ -65,7 +65,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @return Email
      */
     public function bcc($RecipientEmail, $RecipientName = '') {
-        if ($RecipientName != '' && c('Garden.Email.ToNoUsername', false)) {
+        if ($RecipientName != '' && c('Garden.Email.OmitToName', false)) {
             $RecipientName = '';
         }
 
@@ -84,7 +84,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @return Email
      */
     public function cc($RecipientEmail, $RecipientName = '') {
-        if ($RecipientName != '' && c('Garden.Email.ToNoUsername', false)) {
+        if ($RecipientName != '' && c('Garden.Email.OmitToName', false)) {
             $RecipientName = '';
         }
 
@@ -293,7 +293,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
 
     public function addTo($RecipientEmail, $RecipientName = '') {
-        if ($RecipientName != '' && c('Garden.Email.ToNoUsername', false)) {
+        if ($RecipientName != '' && c('Garden.Email.OmitToName', false)) {
             $RecipientName = '';
         }
 
@@ -311,7 +311,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * an array of email addresses, this value will be ignored.
      */
     public function to($RecipientEmail, $RecipientName = '') {
-        if ($RecipientName != '' && c('Garden.Email.ToNoUsername', false)) {
+        if ($RecipientName != '' && c('Garden.Email.OmitToName', false)) {
             $RecipientName = '';
         }
 

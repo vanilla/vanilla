@@ -1086,7 +1086,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 $Count = count($Problems);
                 for ($i = 0; $i < $Count; ++$i) {
                     if (substr($Problems[$i], 0, 1) == '@') {
-                        $Return .= '<li>'.substr($Problems[$i], 1)."</li>\n";
+                        $Return .= "<li>".substr($Problems[$i], 1)."</li>\n";
                     } else {
                         $Return .= '<li>'.sprintf(
                             t($Problems[$i]),
@@ -1735,7 +1735,7 @@ PASSWORDMETER;
         if (is_string($Error)) {
             $ErrorCode = $Error;
         } elseif (is_a($Error, 'Gdn_UserException')) {
-            $ErrorCode = '@'.$Error->getMessage();
+            $ErrorCode = '@'.htmlspecialchars($Error->getMessage());
         } elseif (is_a($Error, 'Exception')) {
             // Strip the extra information out of the exception.
             $Parts = explode('|', $Error->getMessage());

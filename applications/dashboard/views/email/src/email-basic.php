@@ -38,7 +38,10 @@
       margin: 0 auto;
     }
     a {
-      color: [[$email.link.color]];
+      color: [[$email.linkColor]];
+    }
+    a h1 {
+	color: [[$email.linkColor]];
     }
     table.button.button-custom td a {
       color: [[$email.button.color]];
@@ -65,14 +68,14 @@
 		    <td class="wrapper last">
 		      <table class="eight columns">
 			[[if $email.image]]
-			<tr>
+			<tr class="image-row">
 			  <td>
 			    [[if $email.image.link]]
 			    <a href="[[$email.image.link]]">
 			    [[/if]]
-			      [[$email.image.source]]
+			      [[if $email.image.source != '']]
 				<img src="[[$email.image.source]]" alt="[[$email.image.alt]]">
-			      [[elseif $email.image.alt]]
+			      [[elseif $email.image.alt != '']]
 				<h1 class="center">[[$email.image.alt]]</h1>
 			      [[/if]]
 			    [[if $email.image.link]]
@@ -114,7 +117,7 @@
 			<tr>
 			  <td>
 			    <p class="message">[[$email.message]]
-			      [[if $email.link]]<a href="[[$email.link.url]]">[[$email.link.text]]</a>[[/if]]
+			      [[if $email.link]]<a href="[[$email.link.url]]" style="color: [[$email.link.color]]">[[$email.link.text]]</a>[[/if]]
 			    </p>
 			  </td>
 			</tr>

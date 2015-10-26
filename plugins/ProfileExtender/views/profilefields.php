@@ -3,8 +3,13 @@
 if (is_array($this->ProfileFields)) {
     foreach ($this->ProfileFields as $Name => $Field) {
         $Options = array();
-        if ($Field['FormType'] == 'Dropdown')
-            $Options = array_combine($Field['Options'], $Field['Options']);
+        if ($Field['FormType'] == 'Dropdown') {
+            if(is_array($Field['OptionsLabels'])) {
+                $Options = array_combine($Field['Options'], $Field['OptionsLabels']);
+            } else {
+                $Options = array_combine($Field['Options'], $Field['Options']);
+            }
+        }
 
         if ($Field['FormType'] == 'TextBox' && !empty($Field['Options'])) {
             $Options = $Field['Options'];

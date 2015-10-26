@@ -94,18 +94,17 @@ class DraftsController extends VanillaController {
         }
         if ($Draft) {
             if ($Session->validateTransientKey($TransientKey)
-                && ((val('InsertUserID', $Draft) === (integer)$Session->UserID) || checkPermission('Garden.Community.Manage'))
+                && ((val('InsertUserID', $Draft) == $Session->UserID) || checkPermission('Garden.Community.Manage'))
             ) {
                 // Delete the draft
                 if (!$this->DraftModel->delete($DraftID)) {
                     $Form->addError('Failed to delete draft');
                 }
             } else {
-                // Log an error
-                $Form->addError('ErrPermission');
+                throw permissionException('Garden.Community.Manage');
             }
         } else {
-            $Form->addError('Draft does not exist');
+            throw notFoundException('Draft');
         }
 
         // Redirect

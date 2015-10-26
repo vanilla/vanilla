@@ -152,7 +152,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         // Check that the user has permission to edit all discussions
         foreach($Discussions as $discussion) {
             if (!DiscussionModel::canEdit($discussion)) {
-                throw permissionException();
+                throw permissionException('@'.t('You do not have permission to edit all of the discussions you are trying to merge.'));
             }
         }
 

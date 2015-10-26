@@ -571,7 +571,7 @@ class UpdateModel extends Gdn_Model {
             $Entry = $Zip->statIndex($i);
 
             if (preg_match('#(\.\.[\\/])#', $Entry['name'])) {
-                throw new Gdn_UserException("Invalid path in zip file: {$Entry['name']}");
+                throw new Gdn_UserException("Invalid path in zip file: ".htmlspecialchars($Entry['name']));
             }
 
             $Name = '/'.ltrim($Entry['name'], '/');

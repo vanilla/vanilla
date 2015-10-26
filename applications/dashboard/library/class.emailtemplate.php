@@ -45,7 +45,7 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     protected $button;
     /**
-     * @var array An array representing a button with the following keys:
+     * @var array An array representing an image with the following keys:
      * 'source' => The image source url.
      * 'link' => The href value of the image wrapper.
      * 'alt' => The alt value of the image tag.
@@ -63,7 +63,11 @@ class EmailTemplate extends Gdn_Pluggable {
     /**
      * @var string The hex color code of the background, must include the leading '#'.
      */
-    protected $backgroundColor= '#eee';
+    protected $backgroundColor = '#eee';
+    /**
+     * @var string The default hex color code of links, must include the leading '#'.
+     */
+    protected $linkColor = '';
     /**
      * @var string The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
      */
@@ -81,6 +85,7 @@ class EmailTemplate extends Gdn_Pluggable {
 	$this->setMessage($message);
 	$this->setTitle($title);
 	$this->setLead($lead);
+
 	$this->view = Gdn::controller()->fetchViewLocation($view, 'email', 'dashboard');
     }
 
@@ -91,7 +96,9 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The filtered HTML string.
      */
     protected function formatContent($html) {
-	return Gdn_Format::htmlFilter($html);
+	$str = Gdn_Format::htmlFilter($html);
+//        $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
+	return $str;
     }
 
     /**
@@ -187,6 +194,25 @@ class EmailTemplate extends Gdn_Pluggable {
     }
 
     /**
+     * @return string The default hex color code of links, must include the leading '#'.
+     */
+    public function getLinkColor() {
+	return $this->linkColor;
+    }
+
+    /**
+     * Sets the default color for links.
+     * The color of the EmailTemplate's link property can be overridden by setting $link['color']
+     *
+     * @param string $linkColor The default hex color code of links, must include the leading '#'.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function setLinkColor($linkColor) {
+	$this->linkColor = $linkColor;
+	return $this;
+    }
+
+    /**
      * @return string The hex color code of accents (default color value for links and button background-color).
      */
     public function getBrandPrimary() {
@@ -194,6 +220,9 @@ class EmailTemplate extends Gdn_Pluggable {
     }
 
     /**
+     * Sets the brand primary, which is the default color for links and the button.
+     * Colors of specific elements can be overridden by setting $linkColor, $button['color'], or $link['color'].
+     *
      * @param string $brandPrimary The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
      * @return EmailTemplate $this The calling object.
      */
@@ -246,12 +275,25 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     public function setLink($url, $text, $color = '') {
 	if (!$color) {
-	    $color = $this->brandPrimary;
+	    $color = $this->linkColor ? $this->linkColor : $this->brandPrimary;
 	}
-	$this->link = array('url' => htmlspecialchars($url),
-			    'text' => htmlspecialchars($this->formatContent($text)),
-			    'color' => htmlspecialchars($color));
+	// We need both text and a url to have a valid link.
+	if ($url && $text) {
+	    $this->link = array('url' => htmlspecialchars($url),
+		'text' => htmlspecialchars($this->formatContent($text)),
+		'color' => htmlspecialchars($color));
+	}
 	return $this;
+    }
+
+    /**
+     * @return array An array representing an image with the following keys:
+     * 'source' => The image source url.
+     * 'link' => The href value of the image wrapper.
+     * 'alt' => The alt value of the image tag.
+     */
+    public function getImage() {
+	return $this->image;
     }
 
     /**
@@ -262,10 +304,25 @@ class EmailTemplate extends Gdn_Pluggable {
      * @param string $alt The alt value of the img tag.
      * @return EmailTemplate $this The calling object.
      */
-    public function setImage($sourceUrl, $linkUrl = '', $alt = '') {
-	$this->image = array('source' => htmlspecialchars($sourceUrl),
-			     'link' => htmlspecialchars($linkUrl),
-			     'alt' => $alt);
+    public function setImage($sourceUrl = '', $linkUrl = '', $alt = '') {
+	// We need either a source image or an alt to have an img tag.
+	if ($sourceUrl || $alt) {
+	    $this->image = array('source' => htmlspecialchars($sourceUrl),
+		'link' => htmlspecialchars($linkUrl),
+		'alt' => $alt);
+	}
+	return $this;
+    }
+
+    /**
+     * Set the image property using an array with the following keys:
+     * 'source' => The image source url.
+     * 'link' => The href value of the image wrapper.
+     * 'alt' => The alt value of the img tag.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function setImageArray($image) {
+	$this->setImage(val('source', $image), val('link', $image), val('alt', $image));
 	return $this;
     }
 
@@ -315,6 +372,9 @@ class EmailTemplate extends Gdn_Pluggable {
     public function toString() {
 	if ($this->isPlaintext()) {
 	    return $this->plainTextEmail();
+	}
+	if (!$this->getLinkColor()) {
+	    $this->setLinkColor($this->getBrandPrimary());
 	}
 	$controller = new Gdn_Controller();
 	$controller->setData('email', $this->objectToArray($this));

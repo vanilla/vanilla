@@ -69,9 +69,13 @@
 			  <td>
 			    [[if $email.image.link]]
 			    <a href="[[$email.image.link]]">
+			    [[/if]]
+			      [[$email.image.source]]
+				<img src="[[$email.image.source]]" alt="[[$email.image.alt]]">
+			      [[elseif $email.image.alt]]
+				<h1 class="center">[[$email.image.alt]]</h1>
 			      [[/if]]
-			      <img src="[[$email.image.source]]" alt="[[$email.image.alt]]">
-			      [[if $email.image.link]]
+			    [[if $email.image.link]]
 			    </a>
 			    [[/if]]
 			  </td>

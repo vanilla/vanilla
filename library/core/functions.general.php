@@ -797,9 +797,9 @@ if (!function_exists('decho')) {
      * Echo's debug variables if user is root admin.
      */
     function decho($Mixed, $Prefix = 'DEBUG', $Permission = false) {
-        $Prefix = StringEndsWith($Prefix, ': ', true, true).': ';
+        $Prefix = stringEndsWith($Prefix, ': ', true, true).': ';
 
-        if (!$Permission || Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
+        if ($Permission || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
             echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
             if (is_string($Mixed)) {
                 echo $Mixed;

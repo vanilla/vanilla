@@ -2975,14 +2975,15 @@ if (!function_exists('proxyRequest')) {
 }
 
 if (!function_exists('randomString')) {
-    function randomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
-        $CharLen = strlen($Characters);
-        $String = '';
-        for ($i = 0; $i < $Length; ++$i) {
-            $Offset = mt_rand() % $CharLen;
-            $String .= substr($Characters, $Offset, 1);
-        }
-        return $String;
+    /**
+     * Generate a random string of characters.
+     *
+     * @param int $length The length of the string to generate.
+     * @param string $characters The allowed characters in the string. See {@link betterRandomString()} for character options.
+     * @return string Returns a random string of characters.
+     */
+    function randomString($length, $characters = 'A0') {
+        return betterRandomString($length, $characters);
     }
 }
 
@@ -2993,44 +2994,54 @@ if (!function_exists('betterRandomString')) {
      * This function attempts to use {@link openssl_random_pseudo_bytes()} to generate its randomness.
      * If that function does not exists then it just uses mt_rand().
      *
-     * @param int $Length The length of the string.
-     * @param string $CharacterOptions Character sets that are allowed in the string.
+     * @param int $length The length of the string.
+     * @param string $characterOptions Character sets that are allowed in the string.
      * This is a string made up of the following characters.
-     *  - A: uppercase characters
-     *  - a: lowercase characters
-     *  - 0: digits
-     *  - !: basic punctuation (~!@#$^&*_+-)
+     *
+     * - A: uppercase characters
+     * - a: lowercase characters
+     * - 0: digits
+     * - !: basic punctuation (~!@#$^&*_+-)
+     *
+     * You can also pass a string of all allowed characters in the string if you pass a string of more than four characters.
      * @return string Returns the random string for the given arguments.
      */
-    function betterRandomString($Length, $CharacterOptions = 'A0') {
-        $CharacterClasses = array(
+    function betterRandomString($length, $characterOptions = 'A0') {
+        $characterClasses = array(
             'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'a' => 'abcdefghijklmnopqrstuvwxyz',
             '0' => '0123456789',
             '!' => '~!@#$^&*_+-'
         );
 
-        $Characters = '';
-        for ($i = 0; $i < strlen($CharacterOptions); $i++) {
-            $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
-        }
+        if (strlen($characterOptions) > count($characterClasses)) {
+            $characters = $characterOptions;
+        } else {
+            $characterOptionsArray = str_split($characterOptions, 1);
+            $characters = '';
 
-        $CharLen = strlen($Characters);
-        $String = '';
+            foreach ($characterOptionsArray as $char) {
+                if (array_key_exists($char, $characterClasses)) {
+                    $characters .= $characterClasses[$char];
+                }
+            }
+        }
+        $charLen = strlen($characters);
+        $string = '';
 
         if (function_exists('openssl_random_pseudo_bytes')) {
-            $random_chars = unpack('C*', openssl_random_pseudo_bytes($Length));
-            foreach ($random_chars as $c) {
-                $Offset = (int)$c % $CharLen;
-                $String .= substr($Characters, $Offset, 1);
+            $randomChars = unpack('C*', openssl_random_pseudo_bytes($length));
+            foreach ($randomChars as $c) {
+                $offset = (int)$c % $charLen;
+                $string .= substr($characters, $offset, 1);
             }
         } else {
-            for ($i = 0; $i < $Length; ++$i) {
-                $Offset = mt_rand() % $CharLen;
-                $String .= substr($Characters, $Offset, 1);
+            for ($i = 0; $i < $length; ++$i) {
+                $offset = mt_rand() % $charLen;
+                $string .= substr($characters, $offset, 1);
             }
         }
-        return $String;
+        return $string;
     }
 }
 

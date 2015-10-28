@@ -795,6 +795,11 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
 if (!function_exists('decho')) {
     /**
      * Echo's debug variables if user is root admin.
+     * 
+     * @param mixed $Mixed The variable to echo.
+     * @param string $Prefix The text to be used as a prefix for the output.
+     * @param bool $Permission Whether or not output is visible for everyone.
+     * @return string The variable in human-readable format.
      */
     function decho($Mixed, $Prefix = 'DEBUG', $Permission = false) {
         $Prefix = stringEndsWith($Prefix, ': ', true, true).': ';

@@ -2262,23 +2262,13 @@ class UserModel extends Gdn_Model {
 
         $this->clearCache($UserID, array('roles', 'permissions'));
 
-        if ($RecordEvent && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
+        if ($RecordEvent) { //} && (!empty($DeleteRoleIDs) || !empty($InsertRoleIDs))) {
             $User = $this->getID($UserID);
-            $Session = Gdn::session();
 
-            $OldRoles = false;
-            if (is_array($OldRoleData) && !empty($OldRoleData)) {
-                $oldRoleNames = array_map(
-                    function ($row) {
-                        if (empty($row['Name'])) {
-                            $row['Name'] = t('Unknown').' ('.$row['RoleID'].')';
-                        }
-                        return $row;
-                    },
-                    $OldRoleData
-                );
-
-                $OldRoles = array_column($oldRoleNames, 'Name');
+            $OldRoles = [];
+            foreach ($DeleteRoleIDs as $deleteRoleID) {
+                $role = RoleModel::roles($deleteRoleID);
+                $OldRoles[] =  val('Name', $role, t('Unknown').' ('.$deleteRoleID.')');
             }
 
             $NewRoles = [];
@@ -2295,7 +2285,7 @@ class UserModel extends Gdn_Model {
                     'role_remove',
                     Logger::INFO,
                     "{username} removed {toUsername} from the {role} role.",
-                    array('toUsername' => $User->Name, 'role' => $RoleName)
+                    array('touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName)
                 );
             }
 
@@ -2304,7 +2294,7 @@ class UserModel extends Gdn_Model {
                     'role_add',
                     Logger::INFO,
                     "{username} added {toUsername} to the {role} role.",
-                    array('toUsername' => $User->Name, 'role' => $RoleName)
+                    array('touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName)
                 );
             }
         }

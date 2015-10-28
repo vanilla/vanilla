@@ -229,7 +229,7 @@ if (!function_exists('validateUsernameRegex')) {
         if (is_null($ValidateUsernameRegex)) {
             // Set our default ValidationRegex based on Unicode support.
             // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
-            $DefaultPattern = (unicodeRegexSupport()) ? '\pN\pL\pM\pPc' : '\w';
+            $DefaultPattern = (unicodeRegexSupport()) ? '\p{N}\p{L}\p{M}\p{Pc}' : '\w';
 
             $ValidateUsernameRegex = sprintf(
                 "[%s]%s",

@@ -335,19 +335,19 @@ function Gdn_ExceptionHandler($Exception) {
          <li><strong>Operating System:</strong> ', PHP_OS, "</li>\n";
 
                 if (array_key_exists('SERVER_SOFTWARE', $_SERVER)) {
-                    echo '<li><strong>Server Software:</strong> ', $_SERVER['SERVER_SOFTWARE'], "</li>\n";
+                    echo '<li><strong>Server Software:</strong> ', htmlspecialchars($_SERVER['SERVER_SOFTWARE']), "</li>\n";
                 }
 
                 if (array_key_exists('HTTP_REFERER', $_SERVER)) {
-                    echo '<li><strong>Referer:</strong> ', $_SERVER['HTTP_REFERER'], "</li>\n";
+                    echo '<li><strong>Referer:</strong> ', htmlspecialchars($_SERVER['HTTP_REFERER']), "</li>\n";
                 }
 
                 if (array_key_exists('HTTP_USER_AGENT', $_SERVER)) {
-                    echo '<li><strong>User Agent:</strong> ', $_SERVER['HTTP_USER_AGENT'], "</li>\n";
+                    echo '<li><strong>User Agent:</strong> ', htmlspecialchars($_SERVER['HTTP_USER_AGENT']), "</li>\n";
                 }
 
                 if (array_key_exists('REQUEST_URI', $_SERVER)) {
-                    echo '<li><strong>Request Uri:</strong> ', $_SERVER['REQUEST_URI'], "</li>\n";
+                    echo '<li><strong>Request Uri:</strong> ', htmlspecialchars($_SERVER['REQUEST_URI']), "</li>\n";
                 }
                 echo '</ul>
    </body>

@@ -2307,34 +2307,6 @@ class UserModel extends Gdn_Model {
                     array('toUsername' => $User->Name, 'role' => $RoleName)
                 );
             }
-
-            $RemovedCount = count($RemovedRoles);
-            $NewCount = count($NewRoles);
-            $Story = '';
-            if ($RemovedCount > 0 && $NewCount > 0) {
-                $Story = sprintf(
-                    t('%1$s was removed from the %2$s %3$s and added to the %4$s %5$s.'),
-                    $User->Name,
-                    implode(', ', $RemovedRoles),
-                    plural($RemovedCount, 'role', 'roles'),
-                    implode(', ', $NewRoles),
-                    plural($NewCount, 'role', 'roles')
-                );
-            } elseif ($RemovedCount > 0) {
-                $Story = sprintf(
-                    t('%1$s was removed from the %2$s %3$s.'),
-                    $User->Name,
-                    implode(', ', $RemovedRoles),
-                    plural($RemovedCount, 'role', 'roles')
-                );
-            } elseif ($NewCount > 0) {
-                $Story = sprintf(
-                    t('%1$s was added to the %2$s %3$s.'),
-                    $User->Name,
-                    implode(', ', $NewRoles),
-                    plural($NewCount, 'role', 'roles')
-                );
-            }
         }
     }
 

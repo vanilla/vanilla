@@ -26,14 +26,16 @@ class SessionController extends DashboardController {
     * Looks for Name and Value POST/GET variables to pass along to Gdn_Session.
     */
    public function Stash() {
-      $this->DeliveryType(DELIVERY_TYPE_BOOL);
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $Name = TrueStripSlashes(GetValue('Name', $_POST, ''));
-      $Value = TrueStripSlashes(GetValue('Value', $_POST, ''));
-      $Response = Gdn::Session()->Stash($Name, $Value);
-      if ($Name != '' && $Value == '')
-         $this->SetJson('Unstash', $Response);
-
-      $this->Render();
+      $this->deliveryType(DELIVERY_TYPE_BOOL);
+      $this->deliveryMethod(DELIVERY_METHOD_JSON);
+      $name = $this->Request->post('Name', '');
+      $value = $this->Request->post('Value', '');
+      if ($name !== '' && $value === null) {
+         $response = Gdn::session()->getPublicStash($name, true);
+         $this->setJson('Unstash', $response);
+      } else {
+         Gdn::session()->setPublicStash($name, $value);
+      }
+      $this->render();
    }
 }

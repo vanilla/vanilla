@@ -161,6 +161,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         try {
             $BlockExceptions = array(
                 '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
+                '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
                 '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^sso(\/.*)?$/' => self::BLOCK_NEVER,

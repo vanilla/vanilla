@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="vanilla" basedir="." default="dist">
+
+    <!--
+        Grab the absolute path to the Vanilla directory, which should be the
+        parent directory of this file.
+    -->
+    <resolvepath file=".." propertyName="project.dir" />
+
+    <loadfile property="vanilla.index" file="${project.dir}/index.php"/>
+
+    <!-- Take steps to prepare for the build. -->
+    <target name="prepare">
+        <delete
+            file="build.zip" />
+        <propertyregex property="vanilla.version"
+            subject="${vanilla.index}"
+            pattern="define\('APPLICATION_VERSION', '(\d+\.\d+\.\d+)'\)"
+            match="$1"
+            defaultValue="unknown-version" />
+    </target>
+
+    <!-- Perform any steps to build the contents of the package. -->
+    <target name="build" depends="prepare">
+        <composer
+            composer="/usr/local/bin/composer">
+            <arg line="--working-dir=${project.dir} install --no-dev --optimize-autoloader" />
+        </composer>
+    </target>
+
+    <!-- Build the package. -->
+    <target name="dist" depends="build">
+        <if>
+            <equals arg1="${vanilla.version}" arg2="unknown-version" />
+            <then>
+                <property name="project.destfile" value="vanilla.zip" />
+            </then>
+            <else>
+                <property name="project.destfile" value="vanilla-${vanilla.version}.zip" />
+            </else>
+        </if>
+        <zip
+            destfile="${project.destfile}"
+            basedir="${project.dir}">
+            <fileset dir="${project.dir}" includesfile="package-contents.txt" />
+        </zip>
+    </target>
+</project>

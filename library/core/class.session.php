@@ -535,6 +535,34 @@ class Gdn_Session {
     }
 
     /**
+     * Get a public stash value.
+     *
+     * @param string $name The key of the stash.
+     * @param bool $unset Whether or not to unset the stash.
+     * @return mixed Returns the value of the stash.
+     */
+    public function getPublicStash($name, $unset = false) {
+        return $this->stash('@public_'.$name, '', $unset);
+    }
+
+    /**
+     * Sets a public stash value.
+     *
+     * @param string $name The key of the stash value.
+     * @param mixed $value The value of the stash to set. Pass null to clear the key.
+     * @return Gdn_Session $this Returns $this for chaining.
+     */
+    public function setPublicStash($name, $value) {
+        if ($value === null) {
+            $this->stash('@public_'.$name, '', true);
+        } else {
+            $this->stash('@public_'.$name, $value, false);
+        }
+
+        return $this;
+    }
+
+    /**
      * Place a name/value pair into the user's session stash.
      */
     public function stash($Name = '', $Value = '', $UnsetOnRetrieve = true) {

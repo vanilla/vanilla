@@ -126,27 +126,6 @@ class DbaController extends DashboardController {
     }
 
     /**
-     *
-     *
-     * @param $Table
-     * @param $Column
-     */
-    public function htmlEntityDecode($Table, $Column) {
-        $this->permission('Garden.Settings.Manage');
-
-//      die($this->Request->requestMethod());
-        if (strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {
-            $Result = $this->Model->htmlEntityDecode($Table, $Column);
-            $this->setData('Result', $Result);
-        }
-
-        $this->setData('Title', "Decode HTML Entities for $Table.$Column");
-        $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
-        $this->render('Job');
-    }
-
-    /**
      * Scan a table for invalid InsertUserID values and update with SystemUserID
      *
      * @param bool|string $Table The name of the table to fix InsertUserID in.

@@ -606,7 +606,8 @@ class SettingsController extends DashboardController {
             'Garden.Email.SmtpUser',
             'Garden.Email.SmtpPassword',
             'Garden.Email.SmtpPort',
-            'Garden.Email.SmtpSecurity'
+            'Garden.Email.SmtpSecurity',
+            'Garden.Email.OmitToName'
         ));
 
         // Set the model on the form.
@@ -914,13 +915,20 @@ class SettingsController extends DashboardController {
         // Create a model to save configuration settings
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+
+        $registrationOptions = array(
             'Garden.Registration.Method' => 'Captcha',
-            'Garden.Registration.CaptchaPrivateKey',
-            'Garden.Registration.CaptchaPublicKey',
             'Garden.Registration.InviteExpiration',
             'Garden.Registration.ConfirmEmail'
-        ));
+        );
+
+        if ($manageCaptcha = c('Garden.Registration.ManageCaptcha', true)) {
+            $registrationOptions[] = 'Garden.Registration.CaptchaPrivateKey';
+            $registrationOptions[] = 'Garden.Registration.CaptchaPublicKey';
+        }
+        $this->setData('_ManageCaptcha', $manageCaptcha);
+
+        $ConfigurationModel->setField($registrationOptions);
 
         // Set the model on the forms.
         $this->Form->setModel($ConfigurationModel);
@@ -1040,6 +1048,8 @@ class SettingsController extends DashboardController {
      * @param string $TransientKey Security token.
      */
     public function testAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
+        $this->permission('Garden.Settings.Manage');
+
         if (!in_array($AddonType, array('Plugin', 'Application', 'Theme', 'Locale'))) {
             $AddonType = 'Plugin';
         }

@@ -300,8 +300,8 @@ class ProfileController extends Gdn_Controller {
      * @throws Exception
      */
     public function disconnect($UserReference = '', $Username = '', $Provider) {
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $this->permission('Garden.SignIn.Allow');
@@ -357,7 +357,6 @@ class ProfileController extends Gdn_Controller {
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
         $this->Form->setModel(Gdn::userModel());
         $this->Form->setData($User);
-        $this->setData('User', $User);
 
         // Decide if they have ability to edit the username
         $CanEditUsername = (bool)c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission('Garden.Users.Edit');
@@ -1044,8 +1043,6 @@ class ProfileController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($RedirectUrl);
         } else {
-            $this->ControllerName = 'Home';
-            $this->View = 'FileNotFound';
             $this->RedirectUrl = url($RedirectUrl);
             $this->render();
         }
@@ -1551,10 +1548,6 @@ class ProfileController extends Gdn_Controller {
             $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {
                 $this->Roles = array_column($this->RoleData->resultArray(), 'Name');
-            }
-
-            if (Gdn::session()->checkPermission('Garden.Settings.Manage') || Gdn::session()->UserID == $this->User->UserID) {
-                $this->User->Transient = valr('Attributes.TransientKey', $this->User);
             }
 
             // Hide personal info roles

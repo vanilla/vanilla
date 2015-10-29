@@ -24,39 +24,6 @@ class ImportController extends DashboardController {
     }
 
     /**
-     * Export core Vanilla and Conversations tables.
-     *
-     * @since 2.0.0
-     * @access public
-     */
-    public function export() {
-        $this->permission('Garden.Export'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-
-        set_time_limit(60 * 2);
-        $Ex = new ExportModel();
-        $Ex->pdo(Gdn::database()->connection());
-        $Ex->Prefix = Gdn::database()->DatabasePrefix;
-
-        /// 2. Do the export. ///
-        $Ex->UseCompression = true;
-        $Ex->beginExport(PATH_ROOT.DS.'uploads'.DS.'export '.date('Y-m-d His').'.txt.gz', 'Vanilla 2.0');
-
-        $Ex->exportTable('User', 'select * from :_User'); // ":_" will be replace by database prefix
-        $Ex->exportTable('Role', 'select * from :_Role');
-        $Ex->exportTable('UserRole', 'select * from :_UserRole');
-
-        $Ex->exportTable('Category', 'select * from :_Category');
-        $Ex->exportTable('Discussion', 'select * from :_Discussion');
-        $Ex->exportTable('Comment', 'select * from :_Comment');
-
-        $Ex->exportTable('Conversation', 'select * from :_Conversation');
-        $Ex->exportTable('UserConversation', 'select * from :_UserConversation');
-        $Ex->exportTable('ConversationMessage', 'select * from :_ConversationMessage');
-
-        $Ex->endExport();
-    }
-
-    /**
      * Manage importing process.
      *
      * @since 2.0.0
@@ -64,7 +31,9 @@ class ImportController extends DashboardController {
      */
     public function go() {
         $this->permission('Garden.Settings.Manage');
-
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         $Imp = new ImportModel();
         $Imp->loadState();
         $this->setData('Steps', $Imp->steps());
@@ -154,7 +123,7 @@ class ImportController extends DashboardController {
             $Validation = new Gdn_Validation();
 
 
-            if (strcasecmp(Gdn::request()->requestMethod(), 'post') == 0) {
+            if (Gdn::request()->isAuthenticatedPostBack(true)) {
                 $Upload = new Gdn_Upload();
                 $Validation = new Gdn_Validation();
                 if (count($ImportPaths) > 0) {
@@ -247,7 +216,9 @@ class ImportController extends DashboardController {
      */
     public function restart() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         // Delete the individual table files.
         $Imp = new ImportModel();
         try {

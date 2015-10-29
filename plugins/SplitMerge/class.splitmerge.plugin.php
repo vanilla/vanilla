@@ -140,17 +140,25 @@ class SplitMergePlugin extends Gdn_Plugin {
         }
 
         $DiscussionIDs = $CheckedDiscussions;
-        $Sender->setData('DiscussionIDs', $DiscussionIDs);
         $CountCheckedDiscussions = count($DiscussionIDs);
-        $Sender->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
         $Discussions = $DiscussionModel->SQL->whereIn('DiscussionID', $DiscussionIDs)->get('Discussion')->resultArray();
-        $Sender->setData('Discussions', $Discussions);
 
         // Make sure none of the selected discussions are ghost redirects.
         $discussionTypes = array_column($Discussions, 'Type');
         if (in_array('redirect', $discussionTypes)) {
             throw new Gdn_UserException('You cannot merge redirects.', 400);
         }
+
+        // Check that the user has permission to edit all discussions
+        foreach($Discussions as $discussion) {
+            if (!DiscussionModel::canEdit($discussion)) {
+                throw permissionException('@'.t('You do not have permission to edit all of the posts you are trying to merge.'));
+            }
+        }
+
+        $Sender->setData('DiscussionIDs', $DiscussionIDs);
+        $Sender->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
+        $Sender->setData('Discussions', $Discussions);
 
         // Perform the merge
         if ($Sender->Form->authenticatedPostBack()) {

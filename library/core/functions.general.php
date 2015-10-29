@@ -969,10 +969,11 @@ if (!function_exists('fetchPageInfo')) {
      * @param string $url The url to examine.
      * @param integer $timeout How long to allow for this request.
      * Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+     * @param bool $sendCookies Whether or not to send browser cookies with the request.
      * @return array Returns an array containing Url, Title, Description, Images (array) and Exception
      * (if there were problems retrieving the page).
      */
-    function fetchPageInfo($url, $timeout = 3) {
+    function fetchPageInfo($url, $timeout = 3, $sendCookies = false) {
         $PageInfo = array(
             'Url' => $url,
             'Title' => '',
@@ -980,7 +981,14 @@ if (!function_exists('fetchPageInfo')) {
             'Images' => array(),
             'Exception' => false
         );
+
         try {
+            // Make sure the URL is valid.
+            $urlParts = parse_url($url);
+            if ($urlParts === false || !in_array(val('scheme', $urlParts), array('http', 'https'))) {
+                throw new Exception('Invalid URL.', 400);
+            }
+
             if (!defined('HDOM_TYPE_ELEMENT')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
@@ -988,8 +996,14 @@ if (!function_exists('fetchPageInfo')) {
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
-                'Timeout' => $timeout
+                'Timeout' => $timeout,
+                'Cookies' => $sendCookies
             ));
+
+            if (!$Request->status()) {
+                throw new Exception('Couldn\'t connect to host.', 400);
+            }
+
             $Dom = str_get_html($PageHtml);
             if (!$Dom) {
                 throw new Exception('Failed to load page for parsing.');

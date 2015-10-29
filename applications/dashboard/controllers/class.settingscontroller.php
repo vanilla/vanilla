@@ -865,6 +865,8 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function TestAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
+      $this->permission('Garden.Settings.Manage');
+
       if (!in_array($AddonType, array('Plugin', 'Application', 'Theme', 'Locale')))
          $AddonType = 'Plugin';
          

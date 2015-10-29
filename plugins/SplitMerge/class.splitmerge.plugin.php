@@ -130,12 +130,20 @@ class SplitMergePlugin extends Gdn_Plugin {
          $CheckedDiscussions = array();
        
       $DiscussionIDs = $CheckedDiscussions;
-      $Sender->SetData('DiscussionIDs', $DiscussionIDs);
       $CountCheckedDiscussions = count($DiscussionIDs);
-      $Sender->SetData('CountCheckedDiscussions', $CountCheckedDiscussions);
       $Discussions = $DiscussionModel->SQL->WhereIn('DiscussionID', $DiscussionIDs)->Get('Discussion')->ResultArray();
-      $Sender->SetData('Discussions', $Discussions);
-      
+
+      // Check that the user has permission to edit all discussions
+      foreach ($Discussions as $discussion) {
+         if (!DiscussionModel::canEdit($discussion)) {
+            throw permissionException('@'.t('You do not have permission to edit all of the discussions you are trying to merge.'));
+         }
+      }
+
+      $Sender->setData('DiscussionIDs', $DiscussionIDs);
+      $Sender->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
+      $Sender->setData('Discussions', $Discussions);
+
       // Perform the merge
       if ($Sender->Form->AuthenticatedPostBack()) {
          // Create a new discussion record

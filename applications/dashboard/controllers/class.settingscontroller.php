@@ -606,7 +606,8 @@ class SettingsController extends DashboardController {
             'Garden.Email.SmtpUser',
             'Garden.Email.SmtpPassword',
             'Garden.Email.SmtpPort',
-            'Garden.Email.SmtpSecurity'
+            'Garden.Email.SmtpSecurity',
+            'Garden.Email.OmitToName'
         ));
 
         // Set the model on the form.
@@ -1047,6 +1048,8 @@ class SettingsController extends DashboardController {
      * @param string $TransientKey Security token.
      */
     public function testAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
+        $this->permission('Garden.Settings.Manage');
+
         if (!in_array($AddonType, array('Plugin', 'Application', 'Theme', 'Locale'))) {
             $AddonType = 'Plugin';
         }

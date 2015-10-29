@@ -155,7 +155,14 @@ class UtilityController extends DashboardController {
             // The form requires a postback to do anything.
             $step = 'start';
         } else {
-            $step = !empty($this->Form->getFormValue('Scan')) ? 'scan' : (!empty($this->Form->getFormValue('Run')) ? 'run' : 'start');
+            $scan = $this->Form->getFormValue('Scan');
+            $run = $this->Form->getFormValue('Run');
+            $step = 'start';
+            if (!empty($scan)) {
+                $step = 'scan';
+            } else if (!empty($run)) {
+                $step = 'run';
+            }
         }
 
         switch ($step) {
@@ -454,8 +461,29 @@ class UtilityController extends DashboardController {
      * @param int $Length Number of items to get.
      * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
      */
-    public function getFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
-        echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
+    public function getFeed($type = 'news', $length = 5, $feedFormat = 'normal') {
+        $validTypes = array(
+            'releases',
+            'help',
+            'news',
+            'cloud'
+        );
+        $validFormats = array(
+            'extended',
+            'normal'
+        );
+
+        $length = is_numeric($length) && $length <= 50 ? $length : 5;
+
+        if (!in_array($type, $validTypes)) {
+            $type = 'news';
+        }
+
+        if (!in_array($feedFormat, $validFormats)) {
+            $feedFormat = 'normal';
+        }
+
+        echo file_get_contents("http://vanillaforums.org/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
         $this->deliveryType(DELIVERY_TYPE_NONE);
         $this->render();
     }
@@ -465,6 +493,11 @@ class UtilityController extends DashboardController {
      */
     public function fetchPageInfo($Url = '') {
         $PageInfo = fetchPageInfo($Url);
+
+        if (!empty($PageInfo['Exception'])) {
+            throw new Gdn_UserException($PageInfo['Exception'], 400);
+        }
+
         $this->setData('PageInfo', $PageInfo);
         $this->MasterView = 'default';
         $this->removeCssFile('admin.css');

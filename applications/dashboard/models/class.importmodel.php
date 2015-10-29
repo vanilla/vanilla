@@ -1597,7 +1597,8 @@ class ImportModel extends Gdn_Model {
                 }
 
                 $Table = $TableInfo['Table'];
-                $Path = $BasePath.DS.$Table.'.txt';
+                $tableSanitized = preg_replace('#[^A-Z0-9\-_]#i', '_', $Table);
+                $Path = $BasePath.DS.$tableSanitized.'.txt';
                 $fpout = fopen($Path, 'wb');
 
                 $TableInfo['Path'] = $Path;

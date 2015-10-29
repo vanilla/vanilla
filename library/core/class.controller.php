@@ -1295,11 +1295,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             $Json = json_encode($this->_Json);
-            // Check for jsonp call.
-            if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
-                $Json = $Callback.'('.$Json.')';
-            }
-
             $this->_Json['Data'] = $Json;
             exit($this->_Json['Data']);
         } else {

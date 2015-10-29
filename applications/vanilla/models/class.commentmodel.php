@@ -855,7 +855,7 @@ class CommentModel extends VanillaModel {
       $DiscussionModel = new DiscussionModel();
       $DiscussionID = GetValue('DiscussionID', $Fields);
       $Discussion = $DiscussionModel->GetID($DiscussionID);
-      $Session->Stash('CommentForForeignID_'.GetValue('ForeignID', $Discussion));
+      $Session->setPublicStash('CommentForForeignID_'.GetValue('ForeignID', $Discussion), null);
 
       // Make a quick check so that only the user making the comment can make the notification.
       // This check may be used in the future so should not be depended on later in the method.

@@ -75,22 +75,7 @@ class DbaController extends DashboardController {
       $this->AddSideMenu();
       $this->Render('Job');
    }
-   
-   public function HtmlEntityDecode($Table, $Column) {
-      $this->Permission('Garden.Settings.Manage');
-      
-//      die($this->Request->RequestMethod());
-      if (strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
-         $Result = $this->Model->HtmlEntityDecode($Table, $Column);
-         $this->SetData('Result', $Result);
-      }
-      
-      $this->SetData('Title', "Decode Html Entities for $Table.$Column");
-      $this->_SetJob($this->Data('Title'));
-      $this->AddSideMenu();
-      $this->Render('Job');
-   }
-   
+
    protected function _SetJob($Name) {
       $Args = array_change_key_case($this->ReflectArgs);
       $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);

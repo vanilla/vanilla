@@ -52,6 +52,6 @@ class ModuleController extends Gdn_Controller {
             return;
          }
       }
-      throw NotFoundException($Module);
+      throw NotFoundException(htmlspecialchars($Module));
    }
 }

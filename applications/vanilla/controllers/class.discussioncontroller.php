@@ -192,7 +192,7 @@ class DiscussionController extends VanillaController {
       $this->Form->AddHidden('CommentID', '');
 
       // Look in the session stash for a comment
-      $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', FALSE);
+      $StashComment = $Session->getPublicStash('CommentForDiscussionID_'.$this->Discussion->DiscussionID);
       if ($StashComment)
          $this->Form->SetFormValue('Body', $StashComment);
 
@@ -839,7 +839,7 @@ body { background: transparent !important; }
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {
          // Look in the session stash for a comment
-         $StashComment = Gdn::Session()->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
+         $StashComment = Gdn::session()->getPublicStash('CommentForForeignID_'.$ForeignSource['vanilla_identifier']);
          if ($StashComment) {
             $this->Form->SetValue('Body', $StashComment);
             $this->Form->SetFormValue('Body', $StashComment);

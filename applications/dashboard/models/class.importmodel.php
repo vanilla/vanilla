@@ -1297,7 +1297,8 @@ class ImportModel extends Gdn_Model {
                throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
             }
 				$Table = $TableInfo['Table'];
-				$Path = dirname($Path).DS.$Table.'.txt';
+				$tableSanitized = preg_replace('#[^A-Z0-9\-_]#i', '_', $Table);
+				$Path = dirname($Path).DS.$tableSanitized.'.txt';
 				$fpout = fopen($Path, 'wb');
 
 				$TableInfo['Path'] = $Path;

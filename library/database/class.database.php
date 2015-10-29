@@ -419,6 +419,10 @@ class Gdn_Database {
                     continue;
                 }
 
+                if (!$message) {
+                    $message = $ex->getMessage();
+                }
+
                 trigger_error($message, E_USER_ERROR);
             }
 

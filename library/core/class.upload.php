@@ -291,6 +291,7 @@ class Gdn_Upload extends Gdn_Pluggable {
         $Parsed = self::parse($Target);
         $this->EventArguments['Parsed'] =& $Parsed;
         $this->EventArguments['Options'] = $Options;
+        $this->EventArguments['OriginalFilename'] = val('OriginalFilename', $Options);
         $Handled = false;
         $this->EventArguments['Handled'] =& $Handled;
         $this->fireAs('Gdn_Upload')->fireEvent('SaveAs');

@@ -736,7 +736,14 @@ class EditorPlugin extends Gdn_Plugin {
             // Save original file to uploads, then manipulate from this location if
             // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
             if (empty($imageType)) {
-                $filePathParsed = $Upload->saveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
+                $filePathParsed = $Upload->saveAs(
+                    $tmpFilePath,
+                    $absoluteFileDestination,
+                    array(
+                        'OriginalFilename' => $fileName,
+                        'source' => 'content'
+                    )
+                );
             } else {
                 $filePathParsed = Gdn_UploadImage::saveImageAs($tmpFilePath, $absoluteFileDestination, '', '', array('SaveGif' => true));
                 $tmpwidth = $filePathParsed['Width'];

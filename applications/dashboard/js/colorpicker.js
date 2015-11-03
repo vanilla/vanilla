@@ -20,8 +20,9 @@ var ColorPicker = {
      * Starts the color picker javascript
      */
     start: function($input) {
-        if (ColorPicker.isHex($input.find('.js-color-picker-text').val())) {
-            var color = ColorPicker.normalizeHex($input.find('js-color-picker-text').val());
+        if ($input.find('.js-color-picker-value').val()) {
+            var color = $input.find('.js-color-picker-value').val();
+            $input.find('.js-color-picker-text').val(color);
             $input.find('.js-color-picker-preview').css('background-color', color);
         }
 

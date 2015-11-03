@@ -993,7 +993,7 @@ class CommentModel extends VanillaModel {
             $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
             foreach ($BookmarkData->result() as $Bookmark) {
                 // Check user can still see the discussion.
-                if (!$discussionModel->canViewDiscussion($Discussion, $Bookmark->UserID)) {
+                if (!$discussionModel->canView($Discussion, $Bookmark->UserID)) {
                     continue;
                 }
 
@@ -1005,7 +1005,7 @@ class CommentModel extends VanillaModel {
             // Notify users who have participated in the discussion.
             $ParticipatedData = $DiscussionModel->GetParticipatedUsers($DiscussionID);
             foreach ($ParticipatedData->result() as $UserRow) {
-                if (!$discussionModel->canViewDiscussion($Discussion, $UserRow->UserID)) {
+                if (!$discussionModel->canView($Discussion, $UserRow->UserID)) {
                     continue;
                 }
 
@@ -1018,7 +1018,7 @@ class CommentModel extends VanillaModel {
             if ($Discussion != false) {
                 $InsertUserID = val('InsertUserID', $Discussion);
                 // Check user can still see the discussion.
-                if ($discussionModel->canViewDiscussion($Discussion, $InsertUserID)) {
+                if ($discussionModel->canView($Discussion, $InsertUserID)) {
                     $Activity['NotifyUserID'] = $InsertUserID;
                     $Activity['Data']['Reason'] = 'mine';
                     $ActivityModel->Queue($Activity, 'DiscussionComment');
@@ -1042,7 +1042,7 @@ class CommentModel extends VanillaModel {
                 }
 
                 // Check user can still see the discussion.
-                if (!$discussionModel->canViewDiscussion($Discussion, $User->UserID)) {
+                if (!$discussionModel->canView($Discussion, $User->UserID)) {
                     continue;
                 }
 
@@ -1112,7 +1112,7 @@ class CommentModel extends VanillaModel {
             $UserID = $Row['UserID'];
             // Check user can still see the discussion.
             $discussionModel = new DiscussionModel();
-            if (!$discussionModel->canViewDiscussion($Discussion, $UserID)) {
+            if (!$discussionModel->canView($Discussion, $UserID)) {
                 continue;
             }
 

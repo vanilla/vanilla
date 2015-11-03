@@ -1790,7 +1790,7 @@ class DiscussionModel extends VanillaModel {
                         }
 
                         // Check user can still see the discussion.
-                        if (!$this->canViewDiscussion($Fields, $User->UserID)) {
+                        if (!$this->canView($Fields, $User->UserID)) {
                             continue;
                         }
 
@@ -1880,7 +1880,7 @@ class DiscussionModel extends VanillaModel {
 
             $UserID = $Row['UserID'];
             // Check user can still see the discussion.
-            if (!$this->canViewDiscussion($Discussion, $UserID)) {
+            if (!$this->canView($Discussion, $UserID)) {
                 continue;
             }
 
@@ -2470,16 +2470,16 @@ class DiscussionModel extends VanillaModel {
      * Tests whether a user has permission to view a specific discussion by checking category-specific permissions.
      * Fires an event that can override the category view permission.
      *
-     * @param object|integer $discussion The discussion ID or the discussion to test.
-     * @param string|integer $userId The ID of the user to test permission for. If empty, it defaults to Session user.
+     * @param object|array|integer $discussion The discussion ID or the discussion to test.
+     * @param string|integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
      * @param string $categoryPermission The category permission to test against the user.
      * @return bool Whether the user can view the discussion.
      * @throws Exception
      */
-    public function canViewDiscussion($discussion, $userId = '', $categoryPermission = 'Vanilla.Discussions.View') {
+    public function canView($discussion, $userID = '', $categoryPermission = 'Vanilla.Discussions.View') {
         // Default to session user.
-        if (!$userId) {
-            $userId = val('UserID', Gdn::session(), false);
+        if (!$userID) {
+            $userID = val('UserID', Gdn::session(), false);
         }
         // Fetch discussion.
         if (is_numeric($discussion)) {
@@ -2487,13 +2487,13 @@ class DiscussionModel extends VanillaModel {
         }
         $userModel = new UserModel();
         // Get category permission.
-        $canView = $userId && $userModel->getCategoryViewPermission($userId, val('CategoryID', $discussion), $categoryPermission);
+        $canView = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $categoryPermission);
 
         // Fire event to override permission ruling.
-        $this->EventArguments['discussion'] = $discussion;
-        $this->EventArguments['userId'] = $userId;
-        $this->EventArguments['categoryPermission'] = $categoryPermission;
-        $this->EventArguments['canView'] = &$canView;
+        $this->EventArguments['Discussion'] = $discussion;
+        $this->EventArguments['UserID'] = $userID;
+        $this->EventArguments['CategoryPermission'] = $categoryPermission;
+        $this->EventArguments['CanView'] = &$canView;
         $this->fireEvent('viewPermission');
 
         return $canView;

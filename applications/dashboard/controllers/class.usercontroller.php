@@ -177,7 +177,7 @@ class UserController extends DashboardController {
 
                 $noPassword = (bool)$this->Form->getFormValue('NoPassword');
                 if ($noPassword) {
-                    $this->Form->setFormValue('Password', BetterRandomString(15, 'Aa0'));
+                    $this->Form->setFormValue('Password', betterRandomString(15, 'Aa0'));
                     $this->Form->setFormValue('HashMethod', 'Random');
                 }
 

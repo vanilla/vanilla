@@ -60,6 +60,21 @@ class Gdn_Email extends Gdn_Pluggable {
         parent::__construct();
     }
 
+    protected function setDefaultEmailColors() {
+        if ($bg = c('Garden.Email.Styles.BackgroundColor')) {
+            $this->emailTemplate->setBackgroundColor($bg);
+        }
+        if ($brandPrimary = c('Garden.Email.Styles.BrandPrimary')) {
+            $this->emailTemplate->setBrandPrimary($brandPrimary);
+        }
+        if ($linkColor = c('Garden.Email.Styles.LinkColor')) {
+            $this->emailTemplate->setLinkColor($linkColor);
+        }
+        if ($buttonBackgroundColor = c('Garden.Email.Styles.ButtonBackgroundColor')) {
+            $this->emailTemplate->setButtonBackgroundColor($buttonBackgroundColor);
+        }
+    }
+
     /**
      * Sets the default logo for the email template.
      */
@@ -313,6 +328,7 @@ class Gdn_Email extends Gdn_Pluggable {
         if ($this->format == 'html') {
             $this->setDefaultEmailTitle();
             $this->setDefaultEmailLogo();
+            $this->setDefaultEmailColors();
         }
         $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');

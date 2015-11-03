@@ -69,6 +69,10 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     protected $linkColor = '';
     /**
+     * @var string The default hex color code of the button background, must include the leading '#'.
+     */
+    protected $buttonBackgroundColor = '';
+    /**
      * @var string The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
      */
     protected $brandPrimary = '#38abe3'; // Vanilla blue
@@ -213,6 +217,25 @@ class EmailTemplate extends Gdn_Pluggable {
     }
 
     /**
+     * @return string The default hex color code of the button background, must include the leading '#'.
+     */
+    public function getButtonBackgroundColor() {
+	return $this->buttonBackgroundColor;
+    }
+
+    /**
+     * Sets the default color for the button background.
+     * The color of the EmailTemplate's link property can be overridden by setting $button['backgroundColor']
+     *
+     * @param string $buttonBackgroundColor The default hex color code of the button background, must include the leading '#'.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function setButtonBackgroundColor($buttonBackgroundColor) {
+	$this->buttonBackgroundColor = $buttonBackgroundColor;
+	return $this;
+    }
+
+    /**
      * @return string The hex color code of accents (default color value for links and button background-color).
      */
     public function getBrandPrimary() {
@@ -220,8 +243,8 @@ class EmailTemplate extends Gdn_Pluggable {
     }
 
     /**
-     * Sets the brand primary, which is the default color for links and the button.
-     * Colors of specific elements can be overridden by setting $linkColor, $button['color'], or $link['color'].
+     * Sets the brand primary, which is the default color for links and the button if they are not individually set.
+     * Colors of specific elements can be overridden by setting $linkColor, $buttonBackgroundColor, $button['backgroundColor'], or $link['color'].
      *
      * @param string $brandPrimary The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
      * @return EmailTemplate $this The calling object.
@@ -256,7 +279,7 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     public function setButton($url, $text, $color = '#fff', $backgroundColor = '') {
 	if (!$backgroundColor) {
-	    $backgroundColor = $this->brandPrimary;
+	    $backgroundColor = $this->buttonColor ? $this->buttonBackgroundColor : $this->brandPrimary;
 	}
 	$this->button = array('url' => htmlspecialchars($url),
 			      'text' => htmlspecialchars($this->formatContent($text)),

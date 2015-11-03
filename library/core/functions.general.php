@@ -794,22 +794,21 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
 
 if (!function_exists('decho')) {
     /**
-     * Echo's debug variables if user is root admin.
+     * Echo debug messages and variables.
      * 
-     * @param mixed $Mixed The variable to echo.
-     * @param string $Prefix The text to be used as a prefix for the output.
-     * @param bool $Permission Whether or not output is visible for everyone.
-     * @return void
+     * @param mixed $mixed The variable to echo.
+     * @param string $prefix The text to be used as a prefix for the output.
+     * @param bool $public Whether or not output is visible for everyone.
      */
-    function decho($Mixed, $Prefix = 'DEBUG', $Permission = false) {
-        $Prefix = stringEndsWith($Prefix, ': ', true, true).': ';
+    function decho($mixed, $prefix = 'DEBUG', $public = false) {
+        $prefix = stringEndsWith($prefix, ': ', true, true).': ';
 
-        if ($Permission || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
-            echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
-            if (is_string($Mixed)) {
-                echo $Mixed;
+        if ($public || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
+            echo '<pre style="text-align: left; padding: 0 4px;">'.$prefix;
+            if (is_string($mixed)) {
+                echo $mixed;
             } else {
-                echo htmlspecialchars(print_r($Mixed, true));
+                echo htmlspecialchars(print_r($mixed, true));
             }
 
             echo '</pre>';

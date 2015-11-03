@@ -30,6 +30,23 @@ jQuery(document).ready(function($) {
         return false;
     });
 
+    // No password.
+    var checkNoPassword = function() {
+        var checked = $(this).prop('checked');
+
+        if (checked) {
+            $('.js-password').prop('disabled', true);
+            $('.js-password-related').hide();
+        } else {
+            $('.js-password').prop('disabled', false);
+            $('.js-password-related').show();
+        }
+    };
+
+    $(document).on('click', '.js-nopassword input[type=checkbox]', checkNoPassword);
+
+    checkNoPassword.apply($('.js-nopassword input[type=checkbox]'));
+
     // Hide/Reveal reset password input
     var hideNewPassword = function() {
             $('#NewPassword').hide();

@@ -1813,17 +1813,17 @@ PASSWORDMETER;
     }
 
     /**
-     * Returns a boolean value indicating if the current page has an
-     * authenticated postback. It validates the postback by looking at a
-     * transient value that was rendered using $this->Open() and submitted with
-     * the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
+     * Returns a boolean value indicating if the current page has an authenticated postback.
+     *
+     * It validates the postback by looking at a transient value that was rendered using $this->Open()
+     * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
      * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
      * @return bool Returns true if the postback could be authenticated or false otherwise.
      * @throws Gdn_UserException Throws an exception when this is a postback AND the transient key doesn't validate.
      */
     public function authenticatedPostBack($throw = false) {
-        $keyName = $this->escapeFieldName('TransientKey');
+        $keyName = 'TransientKey';
         $postBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $keyName, false);
 
         // If this isn't a postback then return false if there isn't a transient key.
@@ -1873,6 +1873,8 @@ PASSWORDMETER;
     }
 
     /**
+     * Returns the provided fieldname with improper characters stripped.
+     *
      * PHP doesn't allow "." in variable names from external sources such as a
      * HTML form. Some Vanilla components however rely on variable names such
      * as "a.b.c". So we need to escape them for backwards compatibility.
@@ -1891,6 +1893,8 @@ PASSWORDMETER;
     }
 
     /**
+     * Unescape strings that were escaped with {@link Gdn_Form::escapeFieldName()}.
+     *
      * Replaces e.g. "\\" with "\", "\\-dot-" with "-dot-" and "-dot-" with ".".
      *
      * @see Gdn_Form::escapeFieldName()

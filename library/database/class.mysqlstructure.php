@@ -650,10 +650,16 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     /**
      *
      *
-     * @param string $Column
+     * @param stdClass $column
      */
-    protected function _defineColumn($Column) {
-        $ValidColumnTypes = array(
+    protected function _defineColumn($column) {
+        $column = clone $column;
+
+        $typeAliases = [
+            'ipaddress' => ['Type' => 'varchar', 'Length' => 15]
+        ];
+
+        $validColumnTypes = array(
             'tinyint',
             'smallint',
             'mediumint',
@@ -677,42 +683,50 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'blob',
             'mediumblob',
             'longblob',
-            'bit',
+            'bit'
         );
 
-        if (!is_array($Column->Type) && !in_array(strtolower($Column->Type), $ValidColumnTypes)) {
-            throw new Exception(sprintf(t('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
-        }
+        $column->Type = strtolower($column->Type);
 
-        $Return = '`'.$Column->Name.'` '.$Column->Type;
-
-        $LengthTypes = $this->types('length');
-        if ($Column->Length != '' && in_array(strtolower($Column->Type), $LengthTypes)) {
-            if ($Column->Precision != '') {
-                $Return .= '('.$Column->Length.', '.$Column->Precision.')';
-            } else {
-                $Return .= '('.$Column->Length.')';
+        if (array_key_exists($column->Type, $typeAliases)) {
+            foreach ($typeAliases[$column->Type] as $key => $value) {
+                setValue($key, $column, $value);
             }
         }
-        if (property_exists($Column, 'Unsigned') && $Column->Unsigned) {
+
+        if (!in_array($column->Type, $validColumnTypes)) {
+            throw new Exception(sprintf(t('The specified data type (%1$s) is not accepted for the MySQL database.'), $column->Type));
+        }
+
+        $Return = "`{$column->Name}` {$column->Type}";
+
+        $LengthTypes = $this->types('length');
+        if ($column->Length != '' && in_array($column->Type, $LengthTypes)) {
+            if ($column->Precision != '') {
+                $Return .= '('.$column->Length.', '.$column->Precision.')';
+            } else {
+                $Return .= '('.$column->Length.')';
+            }
+        }
+        if (property_exists($column, 'Unsigned') && $column->Unsigned) {
             $Return .= ' unsigned';
         }
 
-        if (is_array($Column->Enum)) {
-            $Return .= "('".implode("','", $Column->Enum)."')";
+        if (is_array($column->Enum)) {
+            $Return .= "('".implode("','", $column->Enum)."')";
         }
 
-        if (!$Column->AllowNull) {
+        if (!$column->AllowNull) {
             $Return .= ' not null';
         } else {
             $Return .= ' null';
         }
 
-        if (!(is_null($Column->Default)) && strcasecmp($Column->Type, 'timestamp') != 0) {
-            $Return .= " default ".self::_quoteValue($Column->Default);
+        if (!is_null($column->Default) && $column->Type !== 'timestamp') {
+            $Return .= " default ".self::_quoteValue($column->Default);
         }
 
-        if ($Column->AutoIncrement) {
+        if ($column->AutoIncrement) {
             $Return .= ' auto_increment';
         }
 

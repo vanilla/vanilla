@@ -15,6 +15,8 @@ class APIv0 extends HttpClient {
     const DB_USER = 'travis';
     const DB_PASSWORD = '';
 
+    protected static $apiKey;
+
     public function __construct() {
         parent::__construct();
         $this
@@ -105,6 +107,10 @@ class APIv0 extends HttpClient {
         $configPath = $this->getConfigPath();
         touch($configPath);
         chmod($configPath, 0777);
+        $apiKey = sha1(openssl_random_pseudo_bytes(16));
+        $this->saveToConfigDirect(['Test.APIKey' => $apiKey]);
+        self::setAPIKey($apiKey);
+
 
 //        $dir = dirname($configPath);
 //        passthru("ls -lah $dir");
@@ -161,7 +167,10 @@ class APIv0 extends HttpClient {
         $r = $this->post(
             '/cgi-bin/saveconfig.php',
             $values,
-            ['Content-Type: application/json;charset=utf-8']
+            [
+                'Content-Type: application/json;charset=utf-8',
+                'Authorization: token '.self::getApiKey()
+            ]
         );
 
         $path = $this->getConfigPath();
@@ -205,5 +214,24 @@ class APIv0 extends HttpClient {
         // Delete the database.
         $dbname = $this->getDbName();
         $pdo->query("drop database if exists `$dbname`");
+    }
+
+    /**
+     * Get the apiKey.
+     *
+     * @return mixed Returns the apiKey.
+     */
+    public static function getApiKey() {
+        return self::$apiKey;
+    }
+
+    /**
+     * Set the apiKey.
+     *
+     * @param mixed $apiKey
+     * @return APIv0 Returns `$this` for fluent calls.
+     */
+    public static function setApiKey($apiKey) {
+        self::$apiKey = $apiKey;
     }
 }

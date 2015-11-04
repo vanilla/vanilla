@@ -25,6 +25,14 @@ class SimpleConfig {
         $this->pathRoot = realpath(__DIR__.'/..');
     }
 
+    public function checkAuthorization($authorization = '') {
+        $config = $this->loadConfig();
+        $token = $this->getvalr('Test.APIKey', $config, '');
+        if (empty($token) || sha1($authorization) !== sha1("token $token")) {
+            throw new \Exception("Invalid access token.", 401);
+        }
+    }
+
     public function getConfigPath() {
         $host = $_SERVER['HTTP_HOST'];
         if (strpos($host, ':') !== false) {
@@ -85,6 +93,35 @@ class SimpleConfig {
         if ($r === false) {
             throw new Exception("Could not save: $path", 500);
         }
+    }
+
+    /**
+     * Return the value from an associative array or an object.
+     *
+     * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used
+     * to recursively traverse the collection.
+     *
+     * @param string $key The key or property name of the value.
+     * @param mixed $collection The array or object to search.
+     * @param mixed $default The value to return if the key does not exist.
+     * @return mixed The value from the array or object.
+     */
+    function getvalr($key, $collection, $default = false) {
+        $path = explode('.', $key);
+
+        $value = $collection;
+        for ($i = 0; $i < count($path); ++$i) {
+            $subKey = $path[$i];
+
+            if (is_array($value) && isset($value[$subKey])) {
+                $value = $value[$subKey];
+            } elseif (is_object($value) && isset($value->$subKey)) {
+                $value = $value->$subKey;
+            } else {
+                return $default;
+            }
+        }
+        return $value;
     }
 
     /**
@@ -151,11 +188,13 @@ try {
     $input_raw = @file_get_contents('php://input');
     $data = @json_decode($input_raw, true);
 
+    $config = new SimpleConfig();
+    $config->checkAuthorization($config->getvalr('HTTP_AUTHORIZATION', $_SERVER));
+
     if (!$data) {
         throw new Exception('There was an error decoding the config data.', 400);
     }
 
-    $config = new SimpleConfig();
     $config->saveToConfig($data);
     $data = $config->loadConfig();
 

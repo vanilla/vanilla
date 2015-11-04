@@ -3,8 +3,19 @@
 if (is_array($Sender->RegistrationFields)) {
     foreach ($Sender->RegistrationFields as $Name => $Field) {
         $Options = array();
-        if ($Field['FormType'] == 'Dropdown')
-            $Options = array_combine($Field['Options'], $Field['Options']);
+        if ($Field['FormType'] == 'Dropdown') {
+            $values = $Field['Options'];
+            $labels = (array_key_exists('OptionsLabels', $Field)) ? $Field['OptionsLabels'] : false;
+
+            // If the config provides an array of labels nested in the profile field ($Field['OptionsLabels']),
+            // combine the arrays to create a drop-down with different values and labels.
+            if(is_array($labels)) {
+                // WARNING: If $values and $labels are of different length, $Options will be null.
+                $Options = array_combine($values, $labels);
+            } else { //
+                $Options = array_combine($values, $values);
+            }
+        }
 
         if ($Field['FormType'] == 'CheckBox') {
             echo wrap($Sender->Form->{$Field['FormType']}($Name, $Field['Label']), 'li');

@@ -45,8 +45,6 @@ class StandardTest extends BaseTest {
 //        $this->assertEquals($user['Gender'], $siteUser['Gender']);
 
         $this->setTestUser($siteUser);
-
-        $r = $this->api()->signInUser($user['Name'], $user['Password']);
     }
 
     /**

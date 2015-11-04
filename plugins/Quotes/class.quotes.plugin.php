@@ -468,11 +468,6 @@ BQ;
                 case 'Display':
                 case 'Text':
                     $QuoteBody = $Data->Body;
-
-                    // Strip inner quotes and mentions...
-                    $QuoteBody = self::_stripMarkdownQuotes($QuoteBody);
-                    $QuoteBody = self::_stripMentions($QuoteBody);
-
                     $Quote = '> '.sprintf(t('%s said:'), '@'.$Data->InsertName)."\n".
                         '> '.str_replace("\n", "\n> ", $QuoteBody)."\n";
 

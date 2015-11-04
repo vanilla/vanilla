@@ -491,16 +491,6 @@
              });
              */
 
-            // Handle quotes plugin using triggered event.
-            $('a.ReactButton.Quote').on('click', function(e) {
-                // Stop animation from other plugin and let this one
-                // handle the scroll, otherwise the scrolling jumps
-                // all over, and really distracts the eyes.
-                $('html, body').stop().animate({
-                    scrollTop: $(editor.textarea.element).parent().parent().offset().top
-                }, 800);
-            });
-
             $(editor.textarea.element).on('appendHtml', function(e, data) {
 
                 // The quotes plugin tends to add line breaks to the end of the

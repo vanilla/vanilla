@@ -1,0 +1,58 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "9649f95dc8d29322bd16140c2ffb3f32",
+    "packages": [],
+    "packages-dev": [
+        {
+            "name": "vanilla/garden-http",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-http.git",
+                "reference": "189e7d09e8acc47f259e4bad78ce3e3a1c8ee5d0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/189e7d09e8acc47f259e4bad78ce3e3a1c8ee5d0",
+                "reference": "189e7d09e8acc47f259e4bad78ce3e3a1c8ee5d0",
+                "shasum": ""
+            },
+            "require": {
+                "lib-curl": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "vanilla/garden": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\Http\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "An HTTP client library for building RESTful API clients.",
+            "time": "2015-02-05 04:31:28"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

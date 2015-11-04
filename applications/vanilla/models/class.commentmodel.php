@@ -1033,7 +1033,7 @@ class CommentModel extends VanillaModel {
 
             // Notify any users who were mentioned in the comment.
             $Usernames = GetMentions($Fields['Body']);
-            $userModel = new UserModel();
+            $userModel = Gdn::userModel();
             foreach ($Usernames as $i => $Username) {
                 $User = $userModel->GetByUsername($Username);
                 if (!$User) {

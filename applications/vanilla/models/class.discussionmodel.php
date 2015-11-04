@@ -2471,12 +2471,12 @@ class DiscussionModel extends VanillaModel {
      * Fires an event that can override the category view permission.
      *
      * @param object|array|integer $discussion The discussion ID or the discussion to test.
-     * @param string|integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
+     * @param integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
      * @param string $categoryPermission The category permission to test against the user.
      * @return bool Whether the user can view the discussion.
      * @throws Exception
      */
-    public function canView($discussion, $userID = '', $categoryPermission = 'Vanilla.Discussions.View') {
+    public function canView($discussion, $userID = 0, $categoryPermission = 'Vanilla.Discussions.View') {
         // Default to session user.
         if (!$userID) {
             $userID = val('UserID', Gdn::session(), false);
@@ -2485,7 +2485,7 @@ class DiscussionModel extends VanillaModel {
         if (is_numeric($discussion)) {
             $discussion = $this->getID($discussion);
         }
-        $userModel = new UserModel();
+        $userModel = Gdn::userModel();
         // Get category permission.
         $canView = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $categoryPermission);
 

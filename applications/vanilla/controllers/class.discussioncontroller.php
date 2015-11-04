@@ -251,6 +251,7 @@ class DiscussionController extends VanillaController {
 
         // Report the discussion id so js can use it.
         $this->addDefinition('DiscussionID', $DiscussionID);
+        $this->addDefinition('Category', $this->data('Category.Name'));
 
         $this->fireEvent('BeforeDiscussionRender');
 

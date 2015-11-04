@@ -1192,7 +1192,7 @@ class Markdown implements MarkdownInterface {
 			array($this, '_doBlockQuotes_callback2'), $bq);
 
 	   # Vanilla: add ` class=\"Quote\"`
-		return "\n". $this->hashBlock("<blockquote class=\"Quote\">\n$bq\n</blockquote>")."\n\n";
+        return "\n". $this->hashBlock("<blockquote class=\"UserQuote\"><div class=\"QuoteText\">\n$bq\n</div></blockquote>")."\n\n";
 	}
 	protected function _doBlockQuotes_callback2($matches) {
 		$pre = $matches[1];

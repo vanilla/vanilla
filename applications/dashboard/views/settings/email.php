@@ -25,6 +25,11 @@ echo $this->Form->errors();
             ?>
         </li>
         <li>
+            <?php
+            echo $this->Form->CheckBox('Garden.Email.OmitToName', 'Do not include usernames in the "to" field of outgoing e-mails.');
+            ?>
+        </li>
+        <li>
             <div
                 class="Info"><?php echo t('We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'); ?></div>
         </li>

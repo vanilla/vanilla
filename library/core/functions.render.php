@@ -33,6 +33,47 @@ if (!function_exists('bigPlural')) {
     }
 }
 
+/**
+ * Outputs standardized HTML for a badge.
+ * A badge generally designates a count, and displays with a contrasting background.
+ *
+ * @param string|int $badge Info to put into a badge, usually a number.
+ * @return string Badge HTML string.
+ */
+if (!function_exists('badge')) {
+    function badge($badge) {
+        return ' <span class="badge">'.$badge.'</span> ';
+    }
+}
+
+/**
+ * Outputs standardized HTML for a popin badge.
+ * A popin contains data that is injected after the page loads.
+ * A badge generally designates a count, and displays with a contrasting background.
+ *
+ * @param string $rel Endpoint for a popin.
+ * @return string Popin HTML string.
+ */
+if (!function_exists('popin')) {
+    function popin($rel) {
+        return ' <span class="badge Popin js-popin" rel="'.$rel.'"></span> ';
+    }
+}
+
+/**
+ * Outputs standardized HTML for an icon.
+ * Uses the same css class naming conventions as font-vanillicon.
+ *
+ * @param string $icon Name of the icon you want to use, excluding the 'icon-' prefix.
+ * @return string Icon HTML string.
+ */
+if (!function_exists('icon')) {
+    function icon($icon) {
+        $icon = strtolower($icon);
+        return ' <span class="icon icon-'.$icon.'"></span> ';
+    }
+}
+
 if (!function_exists('bullet')) {
     /**
      * Return a bullet character in html.

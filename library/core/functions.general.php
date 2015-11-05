@@ -794,17 +794,21 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
 
 if (!function_exists('decho')) {
     /**
-     * Echo's debug variables if user is root admin.
+     * Echo debug messages and variables.
+     * 
+     * @param mixed $mixed The variable to echo.
+     * @param string $prefix The text to be used as a prefix for the output.
+     * @param bool $public Whether or not output is visible for everyone.
      */
-    function decho($Mixed, $Prefix = 'DEBUG', $Permission = false) {
-        $Prefix = StringEndsWith($Prefix, ': ', true, true).': ';
+    function decho($mixed, $prefix = 'DEBUG', $public = false) {
+        $prefix = stringEndsWith($prefix, ': ', true, true).': ';
 
-        if (!$Permission || Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
-            echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
-            if (is_string($Mixed)) {
-                echo $Mixed;
+        if ($public || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
+            echo '<pre style="text-align: left; padding: 0 4px;">'.$prefix;
+            if (is_string($mixed)) {
+                echo $mixed;
             } else {
-                echo htmlspecialchars(print_r($Mixed, true));
+                echo htmlspecialchars(print_r($mixed, true));
             }
 
             echo '</pre>';
@@ -969,10 +973,11 @@ if (!function_exists('fetchPageInfo')) {
      * @param string $url The url to examine.
      * @param integer $timeout How long to allow for this request.
      * Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
+     * @param bool $sendCookies Whether or not to send browser cookies with the request.
      * @return array Returns an array containing Url, Title, Description, Images (array) and Exception
      * (if there were problems retrieving the page).
      */
-    function fetchPageInfo($url, $timeout = 3) {
+    function fetchPageInfo($url, $timeout = 3, $sendCookies = false) {
         $PageInfo = array(
             'Url' => $url,
             'Title' => '',
@@ -980,7 +985,14 @@ if (!function_exists('fetchPageInfo')) {
             'Images' => array(),
             'Exception' => false
         );
+
         try {
+            // Make sure the URL is valid.
+            $urlParts = parse_url($url);
+            if ($urlParts === false || !in_array(val('scheme', $urlParts), array('http', 'https'))) {
+                throw new Exception('Invalid URL.', 400);
+            }
+
             if (!defined('HDOM_TYPE_ELEMENT')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
@@ -988,8 +1000,14 @@ if (!function_exists('fetchPageInfo')) {
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
-                'Timeout' => $timeout
+                'Timeout' => $timeout,
+                'Cookies' => $sendCookies
             ));
+
+            if (!$Request->status()) {
+                throw new Exception('Couldn\'t connect to host.', 400);
+            }
+
             $Dom = str_get_html($PageHtml);
             if (!$Dom) {
                 throw new Exception('Failed to load page for parsing.');
@@ -2975,14 +2993,15 @@ if (!function_exists('proxyRequest')) {
 }
 
 if (!function_exists('randomString')) {
-    function randomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
-        $CharLen = strlen($Characters);
-        $String = '';
-        for ($i = 0; $i < $Length; ++$i) {
-            $Offset = mt_rand() % $CharLen;
-            $String .= substr($Characters, $Offset, 1);
-        }
-        return $String;
+    /**
+     * Generate a random string of characters.
+     *
+     * @param int $length The length of the string to generate.
+     * @param string $characters The allowed characters in the string. See {@link betterRandomString()} for character options.
+     * @return string Returns a random string of characters.
+     */
+    function randomString($length, $characters = 'A0') {
+        return betterRandomString($length, $characters);
     }
 }
 
@@ -2993,44 +3012,54 @@ if (!function_exists('betterRandomString')) {
      * This function attempts to use {@link openssl_random_pseudo_bytes()} to generate its randomness.
      * If that function does not exists then it just uses mt_rand().
      *
-     * @param int $Length The length of the string.
-     * @param string $CharacterOptions Character sets that are allowed in the string.
+     * @param int $length The length of the string.
+     * @param string $characterOptions Character sets that are allowed in the string.
      * This is a string made up of the following characters.
-     *  - A: uppercase characters
-     *  - a: lowercase characters
-     *  - 0: digits
-     *  - !: basic punctuation (~!@#$^&*_+-)
+     *
+     * - A: uppercase characters
+     * - a: lowercase characters
+     * - 0: digits
+     * - !: basic punctuation (~!@#$^&*_+-)
+     *
+     * You can also pass a string of all allowed characters in the string if you pass a string of more than four characters.
      * @return string Returns the random string for the given arguments.
      */
-    function betterRandomString($Length, $CharacterOptions = 'A0') {
-        $CharacterClasses = array(
+    function betterRandomString($length, $characterOptions = 'A0') {
+        $characterClasses = array(
             'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'a' => 'abcdefghijklmnopqrstuvwxyz',
             '0' => '0123456789',
             '!' => '~!@#$^&*_+-'
         );
 
-        $Characters = '';
-        for ($i = 0; $i < strlen($CharacterOptions); $i++) {
-            $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
-        }
+        if (strlen($characterOptions) > count($characterClasses)) {
+            $characters = $characterOptions;
+        } else {
+            $characterOptionsArray = str_split($characterOptions, 1);
+            $characters = '';
 
-        $CharLen = strlen($Characters);
-        $String = '';
+            foreach ($characterOptionsArray as $char) {
+                if (array_key_exists($char, $characterClasses)) {
+                    $characters .= $characterClasses[$char];
+                }
+            }
+        }
+        $charLen = strlen($characters);
+        $string = '';
 
         if (function_exists('openssl_random_pseudo_bytes')) {
-            $random_chars = unpack('C*', openssl_random_pseudo_bytes($Length));
-            foreach ($random_chars as $c) {
-                $Offset = (int)$c % $CharLen;
-                $String .= substr($Characters, $Offset, 1);
+            $randomChars = unpack('C*', openssl_random_pseudo_bytes($length));
+            foreach ($randomChars as $c) {
+                $offset = (int)$c % $charLen;
+                $string .= substr($characters, $offset, 1);
             }
         } else {
-            for ($i = 0; $i < $Length; ++$i) {
-                $Offset = mt_rand() % $CharLen;
-                $String .= substr($Characters, $Offset, 1);
+            for ($i = 0; $i < $length; ++$i) {
+                $offset = mt_rand() % $charLen;
+                $string .= substr($characters, $offset, 1);
             }
         }
-        return $String;
+        return $string;
     }
 }
 

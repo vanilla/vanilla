@@ -2,6 +2,9 @@ _Cloning to your production site? Checkout the 2.1 branch! It's our vetted stabl
 
 ![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.svg)
 
+[![PR Stats](http://issuestats.com/github/vanilla/vanilla/badge/pr?style=flat-square)](http://issuestats.com/github/vanilla/vanilla)
+[![Issue Stats](http://issuestats.com/github/vanilla/vanilla/badge/issue?style=flat-square)](http://issuestats.com/github/vanilla/vanilla)
+
 ## Howdy, Stranger!
 
 Vanilla was born out of the desire to create flexible, customizable, and downright entertaining

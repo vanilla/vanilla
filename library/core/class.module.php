@@ -114,6 +114,11 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         if ($view) {
             $this->view = $view;
         }
+        if (method_exists($this, 'prepare')) {
+            if (!$this->prepare()) {
+                return '';
+            }
+        }
         $viewPath = $this->fetchViewLocation($this->view);
         $String = '';
         ob_start();

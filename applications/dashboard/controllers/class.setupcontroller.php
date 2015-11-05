@@ -134,7 +134,7 @@ class SetupController extends DashboardController {
         // $this->LocaleData = array_combine($AvailableLocales, $AvailableLocales);
 
         // If seeing the form for the first time...
-        if (!$this->Form->IsPostback()) {
+        if (!$this->Form->isPostback()) {
             // Force the webroot using our best guesstimates
             $ConfigurationModel->Data['Database.Host'] = 'localhost';
             $this->Form->setData($ConfigurationModel->Data);
@@ -181,12 +181,12 @@ class SetupController extends DashboardController {
                 // Apply the validation results to the form(s)
                 $this->Form->setValidationResults($ConfigurationModel->validationResults());
             } else {
-                $Host = array_shift(explode(':', Gdn::request()->RequestHost()));
-                $Domain = Gdn::request()->Domain();
+                $Host = array_shift(explode(':', Gdn::request()->requestHost()));
+                $Domain = Gdn::request()->domain();
 
                 // Set up cookies now so that the user can be signed in.
                 $ExistingSalt = c('Garden.Cookie.Salt', false);
-                $ConfigurationFormValues['Garden.Cookie.Salt'] = ($ExistingSalt) ? $ExistingSalt : RandomString(10);
+                $ConfigurationFormValues['Garden.Cookie.Salt'] = ($ExistingSalt) ? $ExistingSalt : betterRandomString(16, 'Aa0');
                 $ConfigurationFormValues['Garden.Cookie.Domain'] = ''; // Don't set this to anything by default. # Tim - 2010-06-23
                 // Additional default setup values.
                 $ConfigurationFormValues['Garden.Registration.ConfirmEmail'] = true;
@@ -199,13 +199,13 @@ class SetupController extends DashboardController {
                 if ($NewLocale !== false && Gdn::config('Garden.Locale') != $NewLocale) {
                     $ApplicationManager = new Gdn_ApplicationManager();
                     $Locale = Gdn::locale();
-                    $Locale->set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::pluginManager()->EnabledPluginFolders(), true);
+                    $Locale->set($NewLocale, $ApplicationManager->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders(), true);
                 }
 
                 // Install db structure & basic data.
                 $Database = Gdn::database();
-                $Database->Init();
-                $Drop = false; // Gdn::config('Garden.Version') === FALSE ? TRUE : FALSE;
+                $Database->init();
+                $Drop = false;
                 $Explicit = false;
                 try {
                     include(PATH_APPLICATIONS.DS.'dashboard'.DS.'settings'.DS.'structure.php');

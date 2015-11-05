@@ -419,9 +419,17 @@ class Gdn_Database {
                     continue;
                 }
 
+                if (!$message) {
+                    $message = $ex->getMessage();
+                }
+
                 trigger_error($message, E_USER_ERROR);
             }
 
+        }
+
+        if ($PDOStatement instanceof PDOStatement) {
+            $this->LastInfo['RowCount'] = $PDOStatement->rowCount();
         }
 
         // Did this query modify data in any way?

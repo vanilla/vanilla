@@ -60,10 +60,6 @@ class UserModel extends Gdn_Model {
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
             'Score', 'Photo'
         ));
-
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
-        }
     }
 
     /**
@@ -261,6 +257,11 @@ class UserModel extends Gdn_Model {
         $this->mergeCopy($MergeID, 'Conversation', 'InsertUserID', $OldUserID, $NewUserID);
         $this->mergeCopy($MergeID, 'ConversationMessage', 'InsertUserID', $OldUserID, $NewUserID, 'MessageID');
         $this->mergeCopy($MergeID, 'UserConversation', 'UserID', $OldUserID, $NewUserID, 'ConversationID');
+
+        $this->EventArguments['MergeID'] = $MergeID;
+        $this->EventArguments['OldUser'] = $OldUser;
+        $this->EventArguments['NewUser'] = $NewUser;
+        $this->fireEvent('Merge');
 
         $this->mergeFinish($MergeID);
 
@@ -616,6 +617,10 @@ class UserModel extends Gdn_Model {
         }
 
         $Secret = $Provider['AssociationSecret'];
+        if (!trim($Secret, '.')) {
+            trace('Missing client secret', TRACE_ERROR);
+            return;
+        }
 
         // Check the signature.
         switch ($HashMethod) {
@@ -815,6 +820,10 @@ class UserModel extends Gdn_Model {
     public function filterForm($data, $register = false) {
         if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
             $this->removeFilterField('Name');
+        }
+
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
         }
 
         $data = parent::FilterForm($data);

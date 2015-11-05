@@ -1369,7 +1369,7 @@ class DiscussionModel extends VanillaModel {
             $this->AddDenormalizedViews($Discussion);
         }
 
-        return $Discussion;
+        return $DataSetType == DATASET_TYPE_ARRAY ? (array)$Discussion : $Discussion;
     }
 
     /**

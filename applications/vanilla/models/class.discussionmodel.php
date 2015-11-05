@@ -1352,7 +1352,7 @@ class DiscussionModel extends VanillaModel {
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
             ->where('d.DiscussionID', $DiscussionID)
             ->get()
-            ->firstRow($DataSetType);
+            ->firstRow();
 
         if (!$Discussion) {
             return $Discussion;

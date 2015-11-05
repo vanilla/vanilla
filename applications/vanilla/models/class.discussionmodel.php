@@ -1369,7 +1369,7 @@ class DiscussionModel extends VanillaModel {
             $this->AddDenormalizedViews($Discussion);
         }
 
-        return $Discussion;
+        return $DataSetType == DATASET_TYPE_ARRAY ? (array)$Discussion : $Discussion;
     }
 
     /**
@@ -1628,6 +1628,12 @@ class DiscussionModel extends VanillaModel {
                 // Get all fields on the form that relate to the schema
                 $Fields = $this->Validation->schemaValidationFields();
 
+                // Check for spam.
+                $spam = SpamModel::isSpam('Discussion', $Fields);
+                if ($spam) {
+                    return SPAM;
+                }
+
                 // Get DiscussionID if one was sent
                 $DiscussionID = intval(val('DiscussionID', $Fields, 0));
 
@@ -1675,12 +1681,6 @@ class DiscussionModel extends VanillaModel {
 
                     if (c('Vanilla.QueueNotifications')) {
                         $Fields['Notified'] = ActivityModel::SENT_PENDING;
-                    }
-
-                    // Check for spam.
-                    $Spam = SpamModel::isSpam('Discussion', $Fields);
-                    if ($Spam) {
-                        return SPAM;
                     }
 
                     // Check for approval

@@ -831,6 +831,12 @@ class CommentModel extends VanillaModel {
                 $Fields = $this->Validation->SchemaValidationFields();
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
+                // Check for spam
+                $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
+                if ($spam) {
+                    return SPAM;
+                }
+
                 if ($Insert === false) {
                     // Log the save.
                     LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
@@ -841,12 +847,6 @@ class CommentModel extends VanillaModel {
                     // Make sure that the comments get formatted in the method defined by Garden.
                     if (!val('Format', $Fields) || c('Garden.ForceInputFormatter')) {
                         $Fields['Format'] = Gdn::config('Garden.InputFormatter', '');
-                    }
-
-                    // Check for spam
-                    $Spam = SpamModel::IsSpam('Comment', $Fields);
-                    if ($Spam) {
-                        return SPAM;
                     }
 
                     // Check for approval

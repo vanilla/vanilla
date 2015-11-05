@@ -6,6 +6,12 @@ jQuery(document).ready(function($) {
         }
     }
 
+    var encodePath = function(path) {
+        var result = encodeURIComponent(path);
+        result = result.replace(/%2F/g, '/');
+        return result;
+    };
+
     var currentHeight = null,
         minHeight = 100,
         remotePostMessage = function(message, target) {
@@ -117,12 +123,12 @@ jQuery(document).ready(function($) {
 
     // If not embedded and we should be, redirect to the embedded version.
     if (!inIframe && !inPopup && !inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
-        document.location = remoteUrl + '#' + path;
+        document.location = remoteUrl + '#' + encodePath(path);
 
     if (inIframe) {
         // DO NOT set the parent location if this is a page of embedded comments!!
         if (path != '~' && !isEmbeddedComments)
-            remotePostMessage('location:' + path, '*');
+            remotePostMessage('location:' + encodePath(path), '*');
 
         // Unembed if in the dashboard, in an iframe, and not forcing dashboard embed
         if (inDashboard && !forceEmbedDashboard)

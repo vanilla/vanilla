@@ -110,9 +110,92 @@ class SpamModel extends Gdn_Pluggable {
                     break;
             }
 
-            LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
+            // If this is a discussion or a comment, it needs some special handling.
+            if ($RecordType == 'Comment' || $RecordType == 'Discussion') {
+                // Grab the record ID, if available.
+                $recordID = intval(val("{$RecordType}ID", $Data));
+
+                /**
+                 * If we have a valid record ID, run it through flagForReview.  This will allow us to purge existing
+                 * discussions and comments that have been flagged as SPAM after being edited.  If there's no valid ID,
+                 * just treat it with regular SPAM logging.
+                 */
+                if ($recordID) {
+                    self::flagForReview($RecordType, $recordID, $Data);
+                } else {
+                    LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
+                }
+            } else {
+                LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
+            }
         }
 
         return $Spam;
+    }
+
+    /**
+     * Insert a SPAM Queue entry for the specified record and delete the record, if possible.
+     *
+     * @param string $recordType The type of record we're flagging: Discussion or Comment.
+     * @param int $id ID of the record we're flagging.
+     * @param object|array $data Properties used for updating/overriding the record's current values.
+     *
+     * @throws Exception If an invalid record type is specified, throw an exception.
+     */
+    protected static function flagForReview($recordType, $id, $data) {
+        // We're planning to purge the spammy record.
+        $deleteRow = true;
+
+        /**
+         * We're only handling two types of content: discussions and comments.  Both need some special setup.
+         * Error out if we're not dealing with a discussion or comment.
+         */
+        switch ($recordType) {
+            case 'Comment':
+                $model = new CommentModel();
+                $row = $model->getID($id, DATASET_TYPE_ARRAY);
+                break;
+            case 'Discussion':
+                $model = new DiscussionModel();
+                $row = $model->getID($id, DATASET_TYPE_ARRAY);
+
+                /**
+                 * If our discussion has more than three comments, it might be worth saving.  Hold off on deleting and
+                 * just flag it.  If we have between 0 and 3 comments, save them along with the discussion.
+                 */
+                if ($row['CountComments'] > 3) {
+                    $deleteRow = false;
+                } elseif ($row['CountComments'] > 0) {
+                    $comments = Gdn::database()->sql()->getWhere(
+                        'Comment',
+                        array('DiscussionID' => $id)
+                    )->resultArray();
+
+                    if (!array_key_exists('_Data', $row)) {
+                        $row['_Data'] = array();
+                    }
+
+                    $row['_Data']['Comment'] = $comments;
+                }
+                break;
+            default:
+                throw notFoundException($recordType);
+        }
+
+        $overrideFields = array('Name', 'Body');
+        foreach ($overrideFields as $fieldName) {
+            if (($fieldValue = val($fieldName, $data, false)) !== false) {
+                $row[$fieldName] = $fieldValue;
+            }
+        }
+
+        $logOptions = array('GroupBy' => array('RecordID'));
+
+        if ($deleteRow) {
+            // Remove the record to the log.
+            $model->delete($id);
+        }
+
+        LogModel::insert('Spam', $recordType, $row, $logOptions);
     }
 }

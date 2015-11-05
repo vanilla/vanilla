@@ -113,14 +113,7 @@ class SpamModel extends Gdn_Pluggable {
             // If this is a discussion or a comment, it needs some special handling.
             if ($RecordType == 'Comment' || $RecordType == 'Discussion') {
                 // Grab the record ID, if available.
-                switch ($RecordType) {
-                    case 'Comment':
-                        $recordID = intval(val('CommentID', $Data, false));
-                        break;
-                    case 'Discussion':
-                        $recordID = intval(val('DiscussionID', $Data, false));
-                        break;
-                }
+                $recordID = intval(val("{$RecordType}ID", $Data));
 
                 /**
                  * If we have a valid record ID, run it through flagForReview.  This will allow us to purge existing
@@ -164,7 +157,7 @@ class SpamModel extends Gdn_Pluggable {
                 break;
             case 'Discussion':
                 $model = new DiscussionModel();
-                $row = (array)$model->getID($id);
+                $row = $model->getID($id, DATASET_TYPE_ARRAY);
 
                 /**
                  * If our discussion has more than three comments, it might be worth saving.  Hold off on deleting and
@@ -173,7 +166,7 @@ class SpamModel extends Gdn_Pluggable {
                 if ($row['CountComments'] > 3) {
                     $deleteRow = false;
                 } elseif ($row['CountComments'] > 0) {
-                    $comments = Gdn::database()->SQL()->getWhere(
+                    $comments = Gdn::database()->sql()->getWhere(
                         'Comment',
                         array('DiscussionID' => $id)
                     )->resultArray();
@@ -186,7 +179,7 @@ class SpamModel extends Gdn_Pluggable {
                 }
                 break;
             default:
-                throw NotFoundException($recordType);
+                throw notFoundException($recordType);
         }
 
         $overrideFields = array('Name', 'Body');

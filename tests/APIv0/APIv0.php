@@ -198,6 +198,21 @@ class APIv0 extends HttpClient {
         $r = file_put_contents($path, $str);
     }
 
+    /**
+     * Sign a user in to the application.
+     *
+     * @param string $username The username or email of the user.
+     * @param string $password The password of the user.
+     */
+    public function signInUser($username, $password) {
+        $r = $this->post(
+            '/entry/password.json',
+            ['Email' => $username, 'Password' => $password]
+        );
+
+        return $r;
+    }
+
 
     public function uninstall() {
         $pdo = $this->getPDO();

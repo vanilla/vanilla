@@ -29,7 +29,7 @@ class DiscussionModel extends VanillaModel {
     protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID');
 
     /** @var array Discussion Permissions */
-    protected static $permissions = array('Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View');
+    protected $permissionTypes = array('Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View');
 
     /**
      * Class constructor. Defines the related database table name.
@@ -2481,7 +2481,6 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * Tests whether a user has permission to view a specific discussion.
-     * Fires an event that can override the permission.
      *
      * @param object|array|integer $discussion The discussion ID or the discussion to test.
      * @param integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
@@ -2489,11 +2488,7 @@ class DiscussionModel extends VanillaModel {
      * @throws Exception
      */
     public function canView($discussion, $userID = 0) {
-        $canView = $this->checkPermission($discussion, $userID);
-        $this->EventArguments['Discussion'] = $discussion;
-        $this->EventArguments['UserID'] = $userID;
-        $this->EventArguments['CanView'] = &$canView;
-        $this->fireEvent('viewPermission');
+        $canView = $this->checkPermission($discussion, 'Vanilla.Discussions.View', $userID);
         return $canView;
     }
 
@@ -2502,17 +2497,17 @@ class DiscussionModel extends VanillaModel {
      * Fires an event that can override the calculated permission.
      *
      * @param object|array|integer $discussion The discussion ID or the discussion to test.
+     * @param string $permission The category permission to test against the user.
      * @param integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
-     * @param string $categoryPermission The category permission to test against the user.
      * @return bool Whether the user has the specified permission privileges to the discussion.
      * @throws Exception
      */
-    public function checkPermission($discussion, $userID = 0, $categoryPermission = 'Vanilla.Discussions.View') {
+    public function checkPermission($discussion, $permission, $userID = 0) {
         // Either the permission string is a full permission, or we prepend 'Vanilla.Discussions.' to the permission.
-        if (strpos($categoryPermission, '.') === false) {
-            $permission = ucfirst(strtolower($categoryPermission));
-            if (in_array($permission, self::permissions)) {
-                $categoryPermission = 'Vanilla.Discussions.'.$permission;
+        if (strpos($permission, '.') === false) {
+            $permission = ucfirst(strtolower($permission));
+            if (in_array($permission, $this->permissionTypes)) {
+                $permission = 'Vanilla.Discussions.'.$permission;
             } else {
                 throw new Exception(t('Unexpected discussion permission.'));
             }
@@ -2527,15 +2522,15 @@ class DiscussionModel extends VanillaModel {
         }
         $userModel = Gdn::userModel();
         // Get category permission.
-        $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $categoryPermission);
+        $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $permission);
         // Check if we've timed out.
-        if (strpos(strtolower($categoryPermission), 'edit' !== false)) {
+        if (strpos(strtolower($permission), 'edit' !== false)) {
             $hasPermission &= self::editContentTimeout($discussion);
         }
         // Fire event to override permission ruling.
         $this->EventArguments['Discussion'] = $discussion;
         $this->EventArguments['UserID'] = $userID;
-        $this->EventArguments['CategoryPermission'] = $categoryPermission;
+        $this->EventArguments['Permission'] = $permission;
         $this->EventArguments['HasPermission'] = &$hasPermission;
         $this->fireEvent('checkPermission');
 

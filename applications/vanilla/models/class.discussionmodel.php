@@ -28,6 +28,9 @@ class DiscussionModel extends VanillaModel {
     /** @var array Column names to allow sorting by. */
     protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID');
 
+    /** @var array Discussion Permissions */
+    protected static $permissions = array('Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View');
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -61,6 +64,17 @@ class DiscussionModel extends VanillaModel {
             return false;
         }
 
+        return self::editContentTimeout($discussion, $timeLeft);
+    }
+
+    /**
+     * Checks whether the time frame when a discussion can be edited has passed.
+     *
+     * @param object|array $discussion The discussion to examine.
+     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
+     * @return bool Whether the time to edit the discussion has passed.
+     */
+    public static function editContentTimeout($discussion, &$timeLeft = 0) {
         // Determine if we still have time to edit.
         $timeInserted = strtotime(val('DateInserted', $discussion));
         $editContentTimeout = c('Garden.EditContentTimeout', -1);
@@ -2465,18 +2479,44 @@ class DiscussionModel extends VanillaModel {
         return self::$AllowedSortFields;
     }
 
+    /**
+     * Tests whether a user has permission to view a specific discussion.
+     * Fires an event that can override the permission.
+     *
+     * @param object|array|integer $discussion The discussion ID or the discussion to test.
+     * @param integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
+     * @return bool Whether the user can view the discussion.
+     * @throws Exception
+     */
+    public function canView($discussion, $userID = 0) {
+        $canView = $this->hasPermission($discussion, $userID);
+        $this->EventArguments['Discussion'] = $discussion;
+        $this->EventArguments['UserID'] = $userID;
+        $this->EventArguments['CanView'] = &$canView;
+        $this->fireEvent('viewPermission');
+        return $canView;
+    }
 
     /**
-     * Tests whether a user has permission to view a specific discussion by checking category-specific permissions.
-     * Fires an event that can override the category view permission.
+     * Tests whether a user has permission for a discussion by checking category-specific permissions.
+     * Fires an event that can override the calculated permission.
      *
      * @param object|array|integer $discussion The discussion ID or the discussion to test.
      * @param integer $userID The ID of the user to test permission for. If empty, it defaults to Session user.
      * @param string $categoryPermission The category permission to test against the user.
-     * @return bool Whether the user can view the discussion.
+     * @return bool Whether the user has the specified permission privileges to the discussion.
      * @throws Exception
      */
-    public function canView($discussion, $userID = 0, $categoryPermission = 'Vanilla.Discussions.View') {
+    public function hasPermission($discussion, $userID = 0, $categoryPermission = 'Vanilla.Discussions.View') {
+        // Either the permission string is a full permission, or we prepend 'Vanilla.Discussions.' to the permission.
+        if (strpos($categoryPermission, '.') === false) {
+            $permission = ucfirst(strtolower($categoryPermission));
+            if (in_array($permission, self::permissions)) {
+                $categoryPermission = 'Vanilla.Discussions.'.$permission;
+            } else {
+                throw new Exception(t('Unexpected discussion permission.'));
+            }
+        }
         // Default to session user.
         if (!$userID) {
             $userID = val('UserID', Gdn::session(), false);
@@ -2487,15 +2527,18 @@ class DiscussionModel extends VanillaModel {
         }
         $userModel = Gdn::userModel();
         // Get category permission.
-        $canView = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $categoryPermission);
-
+        $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $categoryPermission);
+        // Check if we've timed out.
+        if (strpos(strtolower($categoryPermission), 'edit' !== false)) {
+            $hasPermission &= self::editContentTimeout($discussion);
+        }
         // Fire event to override permission ruling.
         $this->EventArguments['Discussion'] = $discussion;
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['CategoryPermission'] = $categoryPermission;
-        $this->EventArguments['CanView'] = &$canView;
-        $this->fireEvent('viewPermission');
+        $this->EventArguments['HasPermission'] = &$hasPermission;
+        $this->fireEvent('checkPermission');
 
-        return $canView;
+        return $hasPermission;
     }
 }

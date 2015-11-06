@@ -2489,7 +2489,7 @@ class DiscussionModel extends VanillaModel {
      * @throws Exception
      */
     public function canView($discussion, $userID = 0) {
-        $canView = $this->hasPermission($discussion, $userID);
+        $canView = $this->checkPermission($discussion, $userID);
         $this->EventArguments['Discussion'] = $discussion;
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['CanView'] = &$canView;
@@ -2507,7 +2507,7 @@ class DiscussionModel extends VanillaModel {
      * @return bool Whether the user has the specified permission privileges to the discussion.
      * @throws Exception
      */
-    public function hasPermission($discussion, $userID = 0, $categoryPermission = 'Vanilla.Discussions.View') {
+    public function checkPermission($discussion, $userID = 0, $categoryPermission = 'Vanilla.Discussions.View') {
         // Either the permission string is a full permission, or we prepend 'Vanilla.Discussions.' to the permission.
         if (strpos($categoryPermission, '.') === false) {
             $permission = ucfirst(strtolower($categoryPermission));
@@ -2519,7 +2519,7 @@ class DiscussionModel extends VanillaModel {
         }
         // Default to session user.
         if (!$userID) {
-            $userID = val('UserID', Gdn::session(), false);
+            $userID = Gdn::session()->UserID;
         }
         // Fetch discussion.
         if (is_numeric($discussion)) {

@@ -107,8 +107,8 @@ Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
 // Load the configurations for enabled Applications
-foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
-    Gdn::config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
+foreach (Gdn::applicationManager()->enabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
+    Gdn::config()->load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
 }
 
 /**
@@ -118,7 +118,7 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
  * begin installation.
  */
 if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
-    safeHeader('Location: '.Gdn::request()->Url('dashboard/setup', true));
+    safeHeader('Location: '.Gdn::request()->url('dashboard/setup', true));
     exit();
 }
 

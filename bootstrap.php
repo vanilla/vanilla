@@ -83,7 +83,7 @@ if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
 
 Gdn::config()->caching(true);
 
-Debug(C('Debug', false));
+Debug(true);
 
 // Default request object
 Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');

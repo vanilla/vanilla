@@ -397,7 +397,7 @@ EOT;
 
         // Filter the form data for users here. SSO plugins must reset validated data each postback.
         $filteredData = Gdn::userModel()->filterForm($currentData, true);
-        $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
+        $filteredData = array_replace($filteredData, arrayTranslate($currentData, array('TransientKey', 'hpt')));
         unset($filteredData['Roles'], $filteredData['RoleID']);
         $this->Form->formValues($filteredData);
 

@@ -247,11 +247,18 @@ class PermissionModel extends Gdn_Model {
         }
         $Structure->set(false, false);
 
+        // Detect an initial permission setup by seeing if our placeholder row exists yet.
+        $DefaultRow = $this->SQL
+            ->select('*')
+            ->from('Permission')
+            ->where('RoleID', 0)
+            ->where('JunctionTable is null')
+            ->orderBy('RoleID')
+            ->limit(1)
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
+
         // If this is our initial setup, map missing permissions to off.
-        try {
-            // This is going to throw an exception if none exists.
-            $this->getRowDefaults();
-        } catch (Exception $Ex) {
+        if (!$DefaultRow) {
             foreach ($DefaultPermissions as $Name => $Value) {
                 if (!is_numeric($Value)) {
                     $DefaultPermissions[$Name] = 2;

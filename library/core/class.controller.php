@@ -15,10 +15,9 @@
 /**
  * Controller base class.
  *
- * A base class that all controllers can inherit for common controller
- * properties and methods.
+ * A base class that all controllers can inherit for common properties and methods.
  *
- * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
+ * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
 class Gdn_Controller extends Gdn_Pluggable {
 

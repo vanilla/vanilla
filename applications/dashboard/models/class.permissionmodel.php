@@ -258,12 +258,15 @@ class PermissionModel extends Gdn_Model {
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         // If this is our initial setup, map missing permissions to off.
+        // Otherwise we'd be left with placeholders in our final query, which would cause a strict mode failure.
         if (!$DefaultRow) {
-            foreach ($DefaultPermissions as $Name => $Value) {
-                if (!is_numeric($Value)) {
-                    $DefaultPermissions[$Name] = 2;
-                }
-            }
+            $DefaultPermissions = array_map(
+                function ($Value) {
+                    // All non-numeric values are converted to "off" flag.
+                    return (is_numeric($Value)) ? $Value : 2;
+                },
+                $DefaultPermissions
+            );
         }
 
         // Set the default permissions on the placeholder.

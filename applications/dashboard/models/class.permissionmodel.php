@@ -247,6 +247,18 @@ class PermissionModel extends Gdn_Model {
         }
         $Structure->set(false, false);
 
+        // If this is our initial setup, map missing permissions to off.
+        try {
+            // This is going to throw an exception if none exists.
+            $this->getRowDefaults();
+        } catch (Exception $Ex) {
+            foreach ($DefaultPermissions as $Name => $Value) {
+                if (!is_numeric($Value)) {
+                    $DefaultPermissions[$Name] = 2;
+                }
+            }
+        }
+
         // Set the default permissions on the placeholder.
         $this->SQL
             ->set($this->_backtick($DefaultPermissions), '', false)

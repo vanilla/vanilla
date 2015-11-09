@@ -4,7 +4,7 @@ echo '<div class="Wrap">';
 echo $this->Form->open();
 echo $this->Form->errors();
 
-echo wrapIf(t($this->data('Status')), 'div', ['class' => 'Info']);
+echo wrapIf(t($this->data('Status')), 'div', array('class' => 'Info'));
 
 switch ($this->data('Step')) {
     case 'scan':
@@ -39,16 +39,16 @@ switch ($this->data('Step')) {
         }
 
         echo '<div class="Buttons">',
-            $this->Form->button('Run', ['value' => t('Run structure & data scripts')]),
+            $this->Form->button('Run', array('value' => t('Run structure & data scripts'))),
             ' ',
-            $this->Form->button('Scan', ['value' => t('Rescan')]),
+            $this->Form->button('Scan', array('value' => t('Rescan'))),
             '</div>';
         break;
     case 'run':
         // Display the status message from running the structure.
 
         echo '<div class="Buttons">',
-            $this->Form->button('Scan', ['value' => t('Rescan')]),
+            $this->Form->button('Scan', array('value' => t('Rescan'))),
             '</div>';
         break;
     case 'start':

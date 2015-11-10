@@ -52,15 +52,16 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->addHeader('X-Auto-Response-Suppress', 'All');
         $this->format = in_array(strtolower($format), $this->allowedFormats) ? strtolower($format) : 'html';
         $this->emailTemplate = new EmailTemplate();
-        if ($this->format === 'html') {
+        if ($this->format === 'html' && !c('Garden.Email.Styles.Plaintext')) {
             $this->mimeType('text/html');
+            $this->setEmailColors();
         } else {
             $this->emailTemplate->setPlaintext(true);
         }
         parent::__construct();
     }
 
-    protected function setDefaultEmailColors() {
+    protected function setEmailColors() {
         if ($bg = c('Garden.Email.Styles.BackgroundColor')) {
             $this->emailTemplate->setBackgroundColor($bg);
         }
@@ -78,9 +79,9 @@ class Gdn_Email extends Gdn_Pluggable {
     /**
      * Sets the default logo for the email template.
      */
-    protected function setDefaultEmailLogo() {
+    protected function setDefaultEmailImage() {
         if (!$this->emailTemplate->getImage()) {
-            $logo = $this->getDefaultEmailLogo();
+            $logo = $this->getDefaultEmailImage();
             $this->emailTemplate->setImageArray($logo);
         }
     }
@@ -90,10 +91,10 @@ class Gdn_Email extends Gdn_Pluggable {
      *
      * @return array An array representing an image.
      */
-    public function getDefaultEmailLogo() {
+    public function getDefaultEmailImage() {
         $logo = array();
-        if ($logo['source'] = c('Garden.Logo', '')) {
-            $logo['source'] = Gdn_Upload::url(c('Garden.Logo', ''));
+        if ($logo['source'] = c('Garden.Email.Styles.Image', '')) {
+            $logo['source'] = Gdn_UploadImage::url(c('Garden.Email.Styles.Image', ''));
         }
         $logo['link'] = url('/', true);
         $logo['alt'] = c('Garden.LogoTitle', c('Garden.Title', ''));
@@ -335,8 +336,7 @@ class Gdn_Email extends Gdn_Pluggable {
     public function send($EventName = '') {
         if ($this->format == 'html') {
             $this->setDefaultEmailTitle();
-            $this->setDefaultEmailLogo();
-            $this->setDefaultEmailColors();
+            $this->setDefaultEmailImage();
         }
         $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');

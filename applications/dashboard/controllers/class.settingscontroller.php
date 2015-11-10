@@ -632,6 +632,133 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Settings page for HTML email styling.
+     *
+     * Exposes config settings:
+     * Garden.Email.Styles.BackgroundColor
+     * Garden.Email.Styles.ButtonBackgroundColor
+     * Garden.Email.Styles.LinkColor
+     *
+     * @throws Gdn_UserException
+     */
+    public function emailStyles() {
+        $this->permission('Garden.Settings.Manage');
+        $this->addSideMenu('dashboard/settings/emailstyles');
+        $this->addJsFile('email.js');
+        // Get the current logo.
+        $image = c('Garden.Email.Styles.Image');
+        if ($image) {
+            $image = ltrim($image, '/');
+            $this->setData('EmailImage', Gdn_UploadImage::url($image));
+        }
+        $this->Form = new Gdn_Form();
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField(array(
+            'Garden.Email.Styles.BackgroundColor',
+            'Garden.Email.Styles.ButtonBackgroundColor',
+            'Garden.Email.Styles.LinkColor'
+        ));
+        // Set the model on the form.
+        $this->Form->setModel($configurationModel);
+        // If seeing the form for the first time...
+        if ($this->Form->authenticatedPostBack() === false) {
+            // Apply the config settings to the form.
+            $this->Form->setData($configurationModel->Data);
+        } else {
+            if ($this->Form->save() !== false) {
+                $this->informMessage(t("Your settings have been saved."));
+            }
+        }
+        $this->render();
+    }
+
+    /**
+     * Remove the email image from config & delete it.
+     *
+     * @param $tk Security token.
+     */
+    public function removeEmailImage($tk) {
+        $session = Gdn::session();
+        if ($session->validateTransientKey($tk) && $session->checkPermission('Garden.Community.Manage')) {
+            $image = c('Garden.Email.Styles.Image', '');
+            RemoveFromConfig('Garden.Email.Styles.Image');
+            $upload = new Gdn_Upload();
+            $upload->delete($image);
+        }
+    }
+
+    /**
+     * JSON Endpoint for retrieving email image url.
+     */
+    public function emailImageUrl() {
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+        $image = c('Garden.Email.Styles.Image');
+        if ($image) {
+            $image = Gdn_UploadImage::url($image);
+        }
+        $this->setData('EmailImage', $image);
+        $this->render();
+    }
+
+    /**
+     * Form for adding an email image.
+     * Exposes the Garden.Email.Styles.Image setting.
+     * Garden.Email.Styles.Image must be an upload.
+     *
+     * Saves the image based on 2 config settings:
+     * Garden.Email.Styles.Image.MaxWidth (default 800px) and
+     * Garden.Email.Styles.Image.MaxHeight (default 400px)
+     *
+     * @param $tk Security token.
+     * @throws Gdn_UserException
+     */
+    public function emailImage($tk) {
+        $this->addJsFile('email.js');
+        $this->addSideMenu('dashboard/settings/email');
+        $session = Gdn::session();
+        if ($session->validateTransientKey($tk) && $session->checkPermission('Garden.Community.Manage')) {
+            $this->permission('Garden.Community.Manage');
+            $upload = new Gdn_UploadImage();
+            $image = c('Garden.Email.Styles.Image');
+            $this->Form = new Gdn_Form();
+            $validation = new Gdn_Validation();
+            $configurationModel = new Gdn_ConfigurationModel($validation);
+            // Set the model on the form.
+            $this->Form->setModel($configurationModel);
+            if ($this->Form->authenticatedPostBack() !== false) {
+                try {
+                    // Validate the upload
+                    $tmpImage = $upload->validateUpload('EmailImage', false);
+                    if ($tmpImage) {
+                        // Generate the target image name
+                        $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                        $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+                        // Delete any previously uploaded images.
+                        if ($image) {
+                            $upload->delete($image);
+                        }
+                        // Save the uploaded image
+                        $parts = $upload->saveImageAs(
+                            $tmpImage,
+                            $imageBaseName,
+                            c('Garden.Email.Styles.Image.MaxWidth', 800),
+                            c('Garden.Email.Styles.Image.MaxHeight', 400)
+                        );
+
+                        $imageBaseName = $parts['SaveName'];
+                        saveToConfig('Garden.Email.Styles.Image', $imageBaseName);
+                        $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
+                    }
+                } catch (Exception $ex) {
+                }
+            }
+            $this->render();
+        }
+    }
+
+    /**
      * Main dashboard.
      *
      * You can override this method with a method in your plugin named

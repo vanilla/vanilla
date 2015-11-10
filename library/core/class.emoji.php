@@ -599,7 +599,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $Text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function ($m) use ($emoji) {
+        $Text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {

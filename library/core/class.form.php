@@ -247,7 +247,7 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     public function captcha() {
         // Stop if captcha isn't configured and CaptchaPassByDefault is true.
-        if (!c('Garden.Registration.CaptchaPrivateKey') && c('Garden.Registration.CaptchaPassByDefault', false)) {
+        if (!c('Garden.Registration.CaptchaPrivateKey') && c('Garden.Registration.CaptchaPassByDefault', true)) {
             return;
         }
         

@@ -5,5 +5,5 @@ $Session = Gdn::session();
 <?php
 echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-email-image-form'));
 echo $this->Form->errors();
-echo $this->Form->input('EmailImage', 'file', array('class' => 'js-new-image-upload'));
-echo $this->Form->close('Save');
+echo $this->Form->input('EmailImage', 'file', array('class' => 'js-new-image-upload', 'onchange' => 'emailStyles.submitImageForm()'));
+echo $this->Form->close('');

@@ -246,6 +246,11 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function captcha() {
+        // Stop if captcha isn't configured and CaptchaPassByDefault is true.
+        if (!c('Garden.Registration.CaptchaPrivateKey') && c('Garden.Registration.CaptchaPassByDefault', false)) {
+            return;
+        }
+        
         // Google whitelist
         $Whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
 

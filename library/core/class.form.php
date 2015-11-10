@@ -250,7 +250,7 @@ class Gdn_Form extends Gdn_Pluggable {
     public function captcha() {
         $handled = false;
         $this->EventArguments['Handled'] =& $handled;
-        $this->fireEvent('BeforeCaptcha');
+        $this->fireEvent('Captcha');
         if ($handled) {
             // A plugin handled the captcha so don't display anything more.
             return;
@@ -277,10 +277,8 @@ class Gdn_Form extends Gdn_Pluggable {
         $language = Gdn::locale()->language();
         if (in_array($language, $whitelist)) {
             $options['lang'] = $language;
-        } else {
-            if (in_array(Gdn::locale()->Locale, $whitelist)) {
-                $options['lang'] = Gdn::locale()->Locale;
-            }            
+        } elseif (in_array(Gdn::locale()->Locale, $whitelist)) {
+            $options['lang'] = Gdn::locale()->Locale;
         }
 
         // Add custom translation strings as JSON.

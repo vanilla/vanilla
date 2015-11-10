@@ -29,7 +29,7 @@ if (!function_exists('validateCaptcha')) {
     function validateCaptcha($value = null) {
         $captchaPrivateKey = c('Garden.Registration.CaptchaPrivateKey', '');
         if ($captchaPrivateKey == '') {
-            return c('Garden.Registration.CaptchaPassByDefault', false);
+            return c('Garden.Registration.CaptchaPassByDefault', true);
         }
         require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 

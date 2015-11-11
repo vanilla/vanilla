@@ -198,12 +198,12 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * Define one or more permissions with default values.
      *
-     *
-     * @param $PermissionNames
+     * @param array $PermissionNames
      * @param string $Type
-     * @param null $JunctionTable
-     * @param null $JunctionColumn
+     * @param string? $JunctionTable
+     * @param string? $JunctionColumn
      * @throws Exception
      */
     public function define($PermissionNames, $Type = 'tinyint', $JunctionTable = null, $JunctionColumn = null) {
@@ -212,28 +212,33 @@ class PermissionModel extends Gdn_Model {
         $Structure = $this->Database->structure();
         $Structure->table('Permission');
         $DefaultPermissions = array();
-
         $NewColumns = array();
 
         foreach ($PermissionNames as $Key => $Value) {
             if (is_numeric($Key)) {
+                // Only got a permissions name with no default.
                 $PermissionName = $Value;
                 $DefaultPermissions[$PermissionName] = 2;
             } else {
                 $PermissionName = $Key;
 
                 if ($Value === 0) {
+                    // "Off for all"
                     $DefaultPermissions[$PermissionName] = 2;
                 } elseif ($Value === 1)
+                    // "On for all"
                     $DefaultPermissions[$PermissionName] = 3;
                 elseif (!$Structure->columnExists($Value) && array_key_exists($Value, $PermissionNames))
+                    // Mapped to an explicitly-defined permission.
                     $DefaultPermissions[$PermissionName] = $PermissionNames[$Value] ? 3 : 2;
                 else {
-                    $DefaultPermissions[$PermissionName] = "`{$Value}`"; // default to another field
+                    // Mapped to another permission for which we don't have the value.
+                    $DefaultPermissions[$PermissionName] = "`{$Value}`";
                 }
             }
             if (!$Structure->columnExists($PermissionName)) {
-                $NewColumns[$PermissionName] = is_numeric($DefaultPermissions[$PermissionName]) ? $DefaultPermissions[$PermissionName] - 2 : $DefaultPermissions[$PermissionName];
+                $Default = $DefaultPermissions[$PermissionName];
+                $NewColumns[$PermissionName] = is_numeric($Default) ? $Default - 2 : $Default;
             }
 
             // Define the column.
@@ -242,9 +247,31 @@ class PermissionModel extends Gdn_Model {
         }
         $Structure->set(false, false);
 
+        // Detect an initial permission setup by seeing if our placeholder row exists yet.
+        $DefaultRow = $this->SQL
+            ->select('*')
+            ->from('Permission')
+            ->where('RoleID', 0)
+            ->where('JunctionTable is null')
+            ->orderBy('RoleID')
+            ->limit(1)
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
+
+        // If this is our initial setup, map missing permissions to off.
+        // Otherwise we'd be left with placeholders in our final query, which would cause a strict mode failure.
+        if (!$DefaultRow) {
+            $DefaultPermissions = array_map(
+                function ($Value) {
+                    // All non-numeric values are converted to "off" flag.
+                    return (is_numeric($Value)) ? $Value : 2;
+                },
+                $DefaultPermissions
+            );
+        }
+
         // Set the default permissions on the placeholder.
         $this->SQL
-            ->set($this->_Backtick($DefaultPermissions), '', false)
+            ->set($this->_backtick($DefaultPermissions), '', false)
             ->replace('Permission', array(), array('RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn), true);
 
         // Set the default permissions for new columns on all roles.
@@ -257,10 +284,12 @@ class PermissionModel extends Gdn_Model {
             }
 
             $this->SQL
-                ->set($this->_Backtick($NewColumns), '', false)
+                ->set($this->_backtick($NewColumns), '', false)
                 ->put('Permission', array(), $Where);
         }
-        $this->ClearPermissions();
+
+        // Flush permissions cache & loaded schema.
+        $this->clearPermissions();
         if ($this->Schema) {
             // Redefine the schema if it has been defined to reflect the permissions that were just added.
             $this->Schema = null;

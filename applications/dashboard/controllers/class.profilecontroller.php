@@ -401,6 +401,13 @@ class ProfileController extends Gdn_Controller {
             // These options become available when POSTing as a user with Garden.Settings.Manage permissions
 
             if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+
+                // Set user's Photo attribute to a URL
+                $userPhoto = $this->Form->getFormValue('Photo', false);
+                if ($userPhoto && isUrl($userPhoto)) {
+                    Gdn::userModel()->removeFilterField('Photo');
+                }
+
                 // Role change
 
                 $RequestedRoles = $this->Form->getFormValue('RoleID', null);

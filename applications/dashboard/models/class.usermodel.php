@@ -579,7 +579,7 @@ class UserModel extends Gdn_Model {
      */
     public function sso($String, $ThrowError = false) {
         if (!$String) {
-            return;
+            return null;
         }
 
         $Parts = explode(' ', $String);
@@ -588,16 +588,19 @@ class UserModel extends Gdn_Model {
         trace($String, "SSO String");
         $Data = json_decode(base64_decode($String), true);
         trace($Data, 'RAW SSO Data');
-        $Errors = array();
 
         if (!isset($Parts[1])) {
-            $Errors[] = 'Missing SSO signature';
+            $this->Validation->addValidationResult('sso', 'Missing SSO signature.');
         }
         if (!isset($Parts[2])) {
-            $Errors[] = 'Missing SSO timestamp';
+            $this->Validation->addValidationResult('sso', 'Missing SSO timestamp.');
         }
-        if (!empty($Errors)) {
-            return;
+        if (count($this->Validation->results()) > 0) {
+            $msg = $this->Validation->resultsText();
+            if ($ThrowError) {
+                throw new Gdn_UserException($msg, 400);
+            }
+            return false;
         }
 
         $Signature = $Parts[1];
@@ -605,21 +608,21 @@ class UserModel extends Gdn_Model {
         $HashMethod = val(3, $Parts, 'hmacsha1');
         $ClientID = val('client_id', $Data);
         if (!$ClientID) {
-            trace('Missing SSO client_id', TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', 'Missing SSO client_id');
+            return false;
         }
 
         $Provider = Gdn_AuthenticationProviderModel::getProviderByKey($ClientID);
 
         if (!$Provider) {
-            trace("Unknown SSO Provider: $ClientID", TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', "Unknown SSO Provider: $ClientID");
+            return false;
         }
 
         $Secret = $Provider['AssociationSecret'];
         if (!trim($Secret, '.')) {
-            trace('Missing client secret', TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', 'Missing client secret');
+            return false;
         }
 
         // Check the signature.
@@ -628,12 +631,12 @@ class UserModel extends Gdn_Model {
                 $CalcSignature = hash_hmac('sha1', "$String $Timestamp", $Secret);
                 break;
             default:
-                trace("Invalid SSO hash method $HashMethod.", TRACE_ERROR);
-                return;
+                $this->Validation->addValidationResult('sso', "Invalid SSO hash method $HashMethod.");
+                return false;
         }
         if ($CalcSignature != $Signature) {
-            trace("Invalid SSO signature: $Signature", TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', "Invalid SSO signature: $Signature");
+            return false;
         }
 
         $UniqueID = $Data['uniqueid'];

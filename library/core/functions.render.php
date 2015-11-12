@@ -8,14 +8,31 @@
  * @since 2.0
  */
 
+/**
+ * Write alternating strings on each call.
+ *
+ * Useful for adding different classes to alternating lines in a list
+ * or table to enhance their readability.
+ *
+ * @param string $odd The text for the first and every further "odd" call.
+ * @param string $even The text for the second and every further "even" call.
+ * @param string $attributeName The html attribute name that should embrace $even/$odd output.
+ * @return string
+ */
 if (!function_exists('alternate')) {
-    function alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class') {
-        static $i = 0;
-        $Value = $i++ % 2 ? $Odd : $Even;
-        if ($Value != '' && $Even == '' && $AttributeName) {
-            $Value = ' '.$AttributeName.'="'.$Value.'"';
+    function alternate($odd = '', $even = 'Alt', $attributeName = 'class') {
+        static $b = false;
+        if ($b = !$b) {
+            $value = $odd;
+        } else {
+            $value = $even;
         }
-        return $Value;
+
+        if ($value != '' && $attributeName != '') {
+            return ' '.$attributeName.'="'.$value.'"';
+        } else {
+            return $value;
+        }
     }
 }
 

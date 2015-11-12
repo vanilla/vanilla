@@ -1803,13 +1803,17 @@ class UserModel extends Gdn_Model {
     public function removePicture($UserID) {
         // Grab the current photo.
         $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
-        if ($Photo = $User['Photo']) {
+        $Photo = $User['Photo'];
+
+        // Only attempt to delete a physical file, not a URL.
+        if (!isUrl($Photo)) {
             $ProfilePhoto = changeBasename($Photo, 'p%s');
             $Upload = new Gdn_Upload();
             $Upload->delete($ProfilePhoto);
-
-            $this->setField($UserID, 'Photo', null);
         }
+
+        // Wipe the Photo field.
+        $this->setField($UserID, 'Photo', null);
     }
 
     /**

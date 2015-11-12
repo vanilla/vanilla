@@ -355,7 +355,8 @@ class ProfileController extends Gdn_Controller {
 
         // Set up form
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-        $this->Form->setModel(Gdn::userModel());
+        $formDataModel = Gdn::userModel();
+        $this->Form->setModel($formDataModel);
         $this->Form->setData($User);
 
         // Decide if they have ability to edit the username
@@ -401,6 +402,13 @@ class ProfileController extends Gdn_Controller {
             // These options become available when POSTing as a user with Garden.Settings.Manage permissions
 
             if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+
+                // Set user's Photo attribute to a URL
+                $userPhoto = $this->Form->getFormValue('Photo', false);
+                if ($userPhoto && isUrl($userPhoto)) {
+                    $formDataModel->removeFilterField('Photo');
+                }
+
                 // Role change
 
                 $RequestedRoles = $this->Form->getFormValue('RoleID', null);

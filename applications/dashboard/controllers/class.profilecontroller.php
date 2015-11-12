@@ -355,8 +355,7 @@ class ProfileController extends Gdn_Controller {
 
         // Set up form
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-        $formDataModel = Gdn::userModel();
-        $this->Form->setModel($formDataModel);
+        $this->Form->setModel(Gdn::userModel());
         $this->Form->setData($User);
 
         // Decide if they have ability to edit the username
@@ -406,7 +405,7 @@ class ProfileController extends Gdn_Controller {
                 // Set user's Photo attribute to a URL
                 $userPhoto = $this->Form->getFormValue('Photo', false);
                 if ($userPhoto && isUrl($userPhoto)) {
-                    $formDataModel->removeFilterField('Photo');
+                    Gdn::userModel()->removeFilterField('Photo');
                 }
 
                 // Role change

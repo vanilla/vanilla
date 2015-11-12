@@ -498,10 +498,10 @@ class Gdn_Database {
      */
     public function slave() {
         if ($this->_Slave === null) {
-            if (empty($this->_SlaveConfig)) {
+            if (empty($this->_SlaveConfig) || empty($this->_SlaveConfig['Dsn'])) {
                 $this->_Slave = $this->connection();
             } else {
-                $this->_Slave = $this->newPDO($this->_SlaveConfig['Dsn'], $this->_SlaveConfig['User'], $this->_SlaveConfig['Password']);
+                $this->_Slave = $this->newPDO($this->_SlaveConfig['Dsn'], val('User', $this->_SlaveConfig), val('Password', $this->_SlaveConfig));
             }
         }
 

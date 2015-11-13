@@ -736,10 +736,12 @@ class ProfileController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack() === true) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
 
-            // Set user's Photo attribute to a URL
-            $photoUrl = $this->Form->getFormValue('Url', false);
-            if ($photoUrl && isUrl($photoUrl)) {
-                $UserPhoto = $photoUrl;
+            // Set user's Photo attribute to a URL, provided the current user has proper permission to do so.
+            if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                $photoUrl = $this->Form->getFormValue('Url', false);
+                if ($photoUrl && isUrl($photoUrl)) {
+                    $UserPhoto = $photoUrl;
+                }
             } else {
                 $UploadImage = new Gdn_UploadImage();
                 try {

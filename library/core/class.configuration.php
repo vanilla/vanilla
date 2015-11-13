@@ -317,16 +317,15 @@ class Gdn_Configuration extends Gdn_Pluggable {
                 $currentPermissionRank = array_search($Value, $permissionRanked);
 
                 /**
-                 * If the current permission is in our ranked list, extract the current permission and any superior
-                 * permissions into a new list.  Iterate through the list, starting from the highest ranked permission,
-                 * and determine if any are applicable to the current user.  This is done so that a user with
-                 * Garden.Settings.Manage can still validate permissions against a Garden.Moderation.Manage permission
-                 * check, without explicitly having it assigned to their role.
+                 * If the current permission is in our ranked list, iterate through the list, starting from the highest
+                 * ranked permission down to our target permission, and determine if any are applicable to the current
+                 * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+                 * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+                 * assigned to their role.
                  */
                 if ($currentPermissionRank !== false) {
-                    $checkPermissions = array_slice($permissionRanked, 0, $currentPermissionRank + 1);
-                    foreach ($checkPermissions as $currentPermission) {
-                        if (Gdn::session()->checkPermission($currentPermission)) {
+                    for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                        if (Gdn::session()->checkPermission($permissionRanked[$i])) {
                             return true;
                         }
                     }

@@ -305,35 +305,6 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if (is_string($Value)) {
-            // Use the config value as a permission?
-            if ($resolvePermission) {
-                // Ordered rank of some permissions, highest to lowest
-                $permissionRanked = array(
-                    'Garden.Settings.Manage',
-                    'Garden.Community.Manage',
-                    'Garden.Moderation.Manage',
-                    'Garden.SignIn.Allow'
-                );
-                $currentPermissionRank = array_search($Value, $permissionRanked);
-
-                /**
-                 * If the current permission is in our ranked list, iterate through the list, starting from the highest
-                 * ranked permission down to our target permission, and determine if any are applicable to the current
-                 * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
-                 * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
-                 * assigned to their role.
-                 */
-                if ($currentPermissionRank !== false) {
-                    for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                        if (Gdn::session()->checkPermission($permissionRanked[$i])) {
-                            return true;
-                        }
-                    }
-                }
-
-                return Gdn::session()->checkPermission($Value);
-            }
-
             $Result = Gdn_Format::unserialize($Value);
         } else {
             $Result = $Value;

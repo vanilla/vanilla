@@ -702,7 +702,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function picture($UserReference = '', $Username = '', $UserID = '') {
-        if (!c('Garden.Profile.EditPhotos', true)) {
+        if (!Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true))) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 

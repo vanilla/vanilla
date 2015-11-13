@@ -56,6 +56,51 @@ class Gdn_Session {
     }
 
     /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param mixed $permission The permission (or array of permissions) to check.
+     * @param bool $fullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
+     * @param string $junctionTable The name of the junction table for a junction permission.
+     * @param in $junctionID The ID of the junction permission.
+     * * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function checkRankedPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
+        $permissionsRanked = array(
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Garden.Moderation.Manage',
+            'Garden.SignIn.Allow'
+        );
+
+        if ($permission === true) {
+            return true;
+        } elseif ($permission === false) {
+            return false;
+        } elseif (in_array($permission, $permissionsRanked)) {
+            // Ordered rank of some permissions, highest to lowest
+            $currentPermissionRank = array_search($permission, $permissionsRanked);
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            if ($currentPermissionRank !== false) {
+                for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                    if ($this->checkPermission($permissionsRanked[$i], $fullMatch, $junctionTable, $junctionID)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Check to see if the user has at least the given permission.
+        return $this->checkPermission($permission, $fullMatch, $junctionTable, $junctionID);
+    }
+
+    /**
      * Checks the currently authenticated user's permissions for the specified
      * permission. Returns a boolean value indicating if the action is
      * permitted.

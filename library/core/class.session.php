@@ -58,13 +58,12 @@ class Gdn_Session {
     /**
      * Check the given permission, but also return true if the user has a higher permission.
      *
-     * @param mixed $permission The permission (or array of permissions) to check.
-     * @param bool $fullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
+     * @param bool|string $permission The permission to check.  Bool to force true/false.
      * @param string $junctionTable The name of the junction table for a junction permission.
-     * @param in $junctionID The ID of the junction permission.
-     * * @return boolean True on valid authorization, false on failure to authorize
+     * @param int $junctionID The ID of the junction permission.
+     * @return boolean True on valid authorization, false on failure to authorize
      */
-    public function checkRankedPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
+    public function checkRankedPermission($permission, $junctionTable = '', $junctionID = '') {
         $permissionsRanked = array(
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
@@ -89,7 +88,7 @@ class Gdn_Session {
              */
             if ($currentPermissionRank !== false) {
                 for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                    if ($this->checkPermission($permissionsRanked[$i], $fullMatch, $junctionTable, $junctionID)) {
+                    if ($this->checkPermission($permissionsRanked[$i], false, $junctionTable, $junctionID)) {
                         return true;
                     }
                 }
@@ -97,7 +96,7 @@ class Gdn_Session {
         }
 
         // Check to see if the user has at least the given permission.
-        return $this->checkPermission($permission, $fullMatch, $junctionTable, $junctionID);
+        return $this->checkPermission($permission, false, $junctionTable, $junctionID);
     }
 
     /**

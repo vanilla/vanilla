@@ -84,14 +84,12 @@ class Gdn_Session {
              * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
              * assigned to their role.
              */
-            if ($currentPermissionRank !== false) {
-                for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                    if ($this->checkPermission($permissionsRanked[$i])) {
-                        return true;
-                    }
+            for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                if ($this->checkPermission($permissionsRanked[$i])) {
+                    return true;
                 }
-                return false;
             }
+            return false;
         }
 
         // Check to see if the user has at least the given permission.

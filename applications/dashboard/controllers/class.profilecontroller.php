@@ -738,8 +738,12 @@ class ProfileController extends Gdn_Controller {
 
             // Set user's Photo attribute to a URL, provided the current user has proper permission to do so.
             $photoUrl = $this->Form->getFormValue('Url', false);
-            if ($photoUrl && isUrl($photoUrl) && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                $UserPhoto = $photoUrl;
+            if ($photoUrl && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                if (isUrl($photoUrl) && filter_var($photoUrl, FILTER_VALIDATE_URL)) {
+                    $UserPhoto = $photoUrl;
+                } else {
+                    $this->Form->addError('Invalid photo URL');
+                }
             } else {
                 $UploadImage = new Gdn_UploadImage();
                 try {

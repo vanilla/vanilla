@@ -59,11 +59,9 @@ class Gdn_Session {
      * Check the given permission, but also return true if the user has a higher permission.
      *
      * @param bool|string $permission The permission to check.  Bool to force true/false.
-     * @param string $junctionTable The name of the junction table for a junction permission.
-     * @param int $junctionID The ID of the junction permission.
      * @return boolean True on valid authorization, false on failure to authorize
      */
-    public function checkRankedPermission($permission, $junctionTable = '', $junctionID = '') {
+    public function checkRankedPermission($permission) {
         $permissionsRanked = array(
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
@@ -88,7 +86,7 @@ class Gdn_Session {
              */
             if ($currentPermissionRank !== false) {
                 for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                    if ($this->checkPermission($permissionsRanked[$i], false, $junctionTable, $junctionID)) {
+                    if ($this->checkPermission($permissionsRanked[$i])) {
                         return true;
                     }
                 }
@@ -97,7 +95,7 @@ class Gdn_Session {
         }
 
         // Check to see if the user has at least the given permission.
-        return $this->checkPermission($permission, false, $junctionTable, $junctionID);
+        return $this->checkPermission($permission);
     }
 
     /**

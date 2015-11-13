@@ -492,14 +492,15 @@ if (!function_exists('c')) {
     /**
      * Retrieves a configuration setting.
      *
-     * @param string|bool $Name The name of the configuration setting.
+     * @param string|bool $name The name of the configuration setting.
      * Settings in different sections are separated by dots.
-     * @param mixed $Default The result to return if the configuration setting is not found.
+     * @param mixed $default The result to return if the configuration setting is not found.
+     * @param bool $resolvePermission If the value is a string, treat it as a permission check
      * @return mixed The configuration setting.
      * @see Gdn::Config()
      */
-    function c($Name = false, $Default = false) {
-        return Gdn::config($Name, $Default);
+    function c($name = false, $default = false, $resolvePermission = false) {
+        return Gdn::config($name, $default, $resolvePermission);
     }
 }
 
@@ -507,14 +508,15 @@ if (!function_exists('config')) {
     /**
      * Retrieves a configuration setting.
      *
-     * @param string|bool $Name The name of the configuration setting.
+     * @param string|bool $name The name of the configuration setting.
      * Settings in different sections are separated by dots.
-     * @param mixed $Default The result to return if the configuration setting is not found.
+     * @param mixed $default The result to return if the configuration setting is not found.
+     * @param bool $resolvePermission If the value is a string, treat it as a permission check
      * @return mixed The configuration setting.
      * @see Gdn::Config()
      */
-    function config($Name = false, $Default = false) {
-        return Gdn::config($Name, $Default);
+    function config($name = false, $default = false, $resolvePermission = false) {
+        return Gdn::config($name, $default, $resolvePermission);
     }
 }
 

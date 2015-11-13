@@ -116,17 +116,18 @@ class Gdn {
      *
      * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
      * @param mixed $Default The result to return if the configuration setting is not found.
+     * @param bool $resolvePermission If the value is a string, treat it as a permission check
      * @return Gdn_Config|mixed The configuration setting.
      */
-    public static function config($Name = false, $Default = false) {
-        $Config = self::$_Config;
-        if ($Name === false) {
-            $Result = $Config;
+    public static function config($name = false, $default = false, $resolvePermission = false) {
+        $config = self::$_Config;
+        if ($name === false) {
+            $result = $config;
         } else {
-            $Result = $Config->get($Name, $Default);
+            $result = $config->get($name, $default, $resolvePermission);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**

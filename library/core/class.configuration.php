@@ -273,9 +273,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * within an associative array, use dot denomination to get the setting. ie.
      * <code>$this->Get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
      * @param mixed $DefaultValue If the parameter is not found in the group, this value will be returned.
+     * @param bool $resolvePermission If the value is a string, treat it as a permission check
      * @return mixed The configuration value.
      */
-    public function get($Name, $DefaultValue = false) {
+    public function get($Name, $DefaultValue = false, $resolvePermission = false) {
         // Shortcut, get the whole config
         if ($Name == '.') {
             return $this->Data;

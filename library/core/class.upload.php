@@ -120,7 +120,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
         if (!$Handled) {
             $Path = PATH_UPLOADS.'/'.ltrim($Name, '/');
-            if ($Path = realpath($Path)) {
+            if ($Path == realpath($Path)) {
                 @unlink($Path);
             }
         }

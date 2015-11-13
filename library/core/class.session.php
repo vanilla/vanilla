@@ -92,6 +92,7 @@ class Gdn_Session {
                         return true;
                     }
                 }
+                return false;
             }
         }
 

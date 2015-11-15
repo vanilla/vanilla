@@ -358,13 +358,20 @@ class ProfileController extends Gdn_Controller {
         $this->Form->setModel(Gdn::userModel());
         $this->Form->setData($User);
 
-        // Decide if they have ability to edit the username
-        $CanEditUsername = (bool)c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission('Garden.Users.Edit');
+        // only allow editing if registration method is not connect
+        if (c('Garden.Registration.Method') != 'Connect') {
+            // Decide if they have ability to edit the username
+            $CanEditUsername = (bool)c("Garden.Profile.EditUsernames") ||Gdn::session()->checkPermission('Garden.Users.Edit');
+            // Decide if they have ability to edit the email
+            $EmailEnabled = (bool)c('Garden.Profile.EditEmails', true) && !UserModel::noEmail();
+            $CanEditEmail = ($EmailEnabled && $UserID == Gdn::session()->UserID) || checkPermission('Garden.Users.Edit');
+        } else {
+            $CanEditUsername = false;
+            $CanEditEmail = false;
+            $this->setData('_WarnConnect', true);
+        }
+        // add results to Data
         $this->setData('_CanEditUsername', $CanEditUsername);
-
-        // Decide if they have ability to edit the email
-        $EmailEnabled = (bool)c('Garden.Profile.EditEmails', true) && !UserModel::noEmail();
-        $CanEditEmail = ($EmailEnabled && $UserID == Gdn::session()->UserID) || checkPermission('Garden.Users.Edit');
         $this->setData('_CanEditEmail', $CanEditEmail);
 
         // Decide if they have ability to confirm users

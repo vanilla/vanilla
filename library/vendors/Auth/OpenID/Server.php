@@ -1097,7 +1097,7 @@ class Auth_OpenID_CheckIDRequest extends Auth_OpenID_Request {
                                   in OpenID 1.x immediate mode.');
                 }
 
-                $setup_request =& new Auth_OpenID_CheckIDRequest(
+                $setup_request = new Auth_OpenID_CheckIDRequest(
                                                 $this->identity,
                                                 $this->return_to,
                                                 $this->trust_root,
@@ -1677,9 +1677,9 @@ class Auth_OpenID_Server {
     function Auth_OpenID_Server(&$store, $op_endpoint=null)
     {
         $this->store =& $store;
-        $this->signatory =& new Auth_OpenID_Signatory($this->store);
-        $this->encoder =& new Auth_OpenID_SigningEncoder($this->signatory);
-        $this->decoder =& new Auth_OpenID_Decoder($this);
+        $this->signatory = new Auth_OpenID_Signatory($this->store);
+        $this->encoder = new Auth_OpenID_SigningEncoder($this->signatory);
+        $this->decoder = new Auth_OpenID_Decoder($this);
         $this->op_endpoint = $op_endpoint;
         $this->negotiator =& Auth_OpenID_getDefaultNegotiator();
     }

@@ -697,7 +697,6 @@ class CategoryModel extends Gdn_Model {
         }
 
         $LastTimestamp = Gdn_Format::toTimestamp($Category['LastDateInserted']);
-        ;
         $LastCategoryID = null;
 
         if ($Category['DisplayAs'] == 'Categories') {
@@ -1725,25 +1724,25 @@ class CategoryModel extends Gdn_Model {
 
         // Add some extra validation to the url code if one is provided.
         if ($Insert || array_key_exists('UrlCode', $FormPostValues)) {
-        $this->Validation->applyRule('UrlCode', 'Required');
-        $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
+            $this->Validation->applyRule('UrlCode', 'Required');
+            $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        // Url slugs cannot be the name of a CategoriesController method or fully numeric.
-        $this->Validation->addRule('CategorySlug', 'regex:/^(?!(all|archives|discussions|index|table|[0-9]+)$).*/');
-        $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric or the name of an internal method.');
+            // Url slugs cannot be the name of a CategoriesController method or fully numeric.
+            $this->Validation->addRule('CategorySlug', 'regex:/^(?!(all|archives|discussions|index|table|[0-9]+)$).*/');
+            $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric or the name of an internal method.');
 
-        // Make sure that the UrlCode is unique among categories.
-        $this->SQL->select('CategoryID')
-            ->from('Category')
-            ->where('UrlCode', $UrlCode);
+            // Make sure that the UrlCode is unique among categories.
+            $this->SQL->select('CategoryID')
+                ->from('Category')
+                ->where('UrlCode', $UrlCode);
 
-        if ($CategoryID) {
-            $this->SQL->where('CategoryID <>', $CategoryID);
-        }
+            if ($CategoryID) {
+                $this->SQL->where('CategoryID <>', $CategoryID);
+            }
 
-        if ($this->SQL->get()->numRows()) {
-            $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
-        }
+            if ($this->SQL->get()->numRows()) {
+                $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            }
         }
 
         //	Prep and fire event.
@@ -1762,7 +1761,8 @@ class CategoryModel extends Gdn_Model {
                 $OldCategory = $this->getID($CategoryID, DATASET_TYPE_ARRAY);
                 if (null === val('AllowDiscussions', $FormPostValues, null)) {
                     $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
-                }                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+                }
+                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
                 // Figure out custom points.
                 if ($CustomPoints !== null) {

@@ -888,7 +888,7 @@ class Auth_OpenID_AX_FetchResponse extends Auth_OpenID_AX_KeyValueMessage {
             $ax_args['update_url'] = $update_url;
         }
 
-        Auth_OpenID::update(&$ax_args, $kv_args);
+        Auth_OpenID::update($ax_args, $kv_args);
 
         return $ax_args;
     }
@@ -960,7 +960,7 @@ class Auth_OpenID_AX_StoreRequest extends Auth_OpenID_AX_KeyValueMessage {
     {
         $ax_args = $this->_newArgs();
         $kv_args = $this->_getExtensionKVArgs($aliases);
-        Auth_OpenID::update(&$ax_args, $kv_args);
+        Auth_OpenID::update($ax_args, $kv_args);
         return $ax_args;
     }
 }

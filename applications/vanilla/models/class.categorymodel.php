@@ -697,7 +697,6 @@ class CategoryModel extends Gdn_Model {
         }
 
         $LastTimestamp = Gdn_Format::toTimestamp($Category['LastDateInserted']);
-        ;
         $LastCategoryID = null;
 
         if ($Category['DisplayAs'] == 'Categories') {
@@ -1708,7 +1707,7 @@ class CategoryModel extends Gdn_Model {
         $NewName = val('Name', $FormPostValues, '');
         $UrlCode = val('UrlCode', $FormPostValues, '');
         $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
-        $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues);
+        $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues) || is_array(val('Permissions', $FormPostValues));
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
         if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
@@ -1722,24 +1721,28 @@ class CategoryModel extends Gdn_Model {
         }
 
         $this->addUpdateFields($FormPostValues);
-        $this->Validation->applyRule('UrlCode', 'Required');
-        $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        // Url slugs cannot be the name of a CategoriesController method or fully numeric.
-        $this->Validation->addRule('CategorySlug', 'regex:/^(?!(all|archives|discussions|index|table|[0-9]+)$).*/');
-        $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric or the name of an internal method.');
+        // Add some extra validation to the url code if one is provided.
+        if ($Insert || array_key_exists('UrlCode', $FormPostValues)) {
+            $this->Validation->applyRule('UrlCode', 'Required');
+            $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
-        // Make sure that the UrlCode is unique among categories.
-        $this->SQL->select('CategoryID')
-            ->from('Category')
-            ->where('UrlCode', $UrlCode);
+            // Url slugs cannot be the name of a CategoriesController method or fully numeric.
+            $this->Validation->addRule('CategorySlug', 'regex:/^(?!(all|archives|discussions|index|table|[0-9]+)$).*/');
+            $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric or the name of an internal method.');
 
-        if ($CategoryID) {
-            $this->SQL->where('CategoryID <>', $CategoryID);
-        }
+            // Make sure that the UrlCode is unique among categories.
+            $this->SQL->select('CategoryID')
+                ->from('Category')
+                ->where('UrlCode', $UrlCode);
 
-        if ($this->SQL->get()->numRows()) {
-            $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            if ($CategoryID) {
+                $this->SQL->where('CategoryID <>', $CategoryID);
+            }
+
+            if ($this->SQL->get()->numRows()) {
+                $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
+            }
         }
 
         //	Prep and fire event.
@@ -1758,7 +1761,8 @@ class CategoryModel extends Gdn_Model {
                 $OldCategory = $this->getID($CategoryID, DATASET_TYPE_ARRAY);
                 if (null === val('AllowDiscussions', $FormPostValues, null)) {
                     $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
-                }                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+                }
+                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
                 // Figure out custom points.
                 if ($CustomPoints !== null) {
@@ -1797,9 +1801,21 @@ class CategoryModel extends Gdn_Model {
             if ($CategoryID) {
                 // Check to see if this category uses custom permissions.
                 if ($CustomPermissions) {
-                    $PermissionModel = Gdn::permissionModel();
-                    $Permissions = $PermissionModel->pivotPermissions(val('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-                    $PermissionModel->saveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
+                    $permissionModel = Gdn::permissionModel();
+
+                    if (is_array(val('Permissions', $FormPostValues))) {
+                        // The permissions were posted in an API format provided by settings/getcategory
+                        $permissions = val('Permissions', $FormPostValues);
+                        foreach ($permissions as &$perm) {
+                            $perm['JunctionTable'] = 'Category';
+                            $perm['JunctionColumn'] = 'PermissionCategoryID';
+                            $perm['JunctionID'] = $CategoryID;
+                        }
+                    } else {
+                        // The permissions were posted in the web format provided by settings/addcategory and settings/editcategory
+                        $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
+                    }
+                    $permissionModel->saveAll($permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                     if (!$Insert) {
                         // Figure out my last permission and tree info.

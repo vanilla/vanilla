@@ -924,9 +924,13 @@ jQuery(document).ready(function($) {
                 message = '<div class="InformMessage">' + message + '</div>';
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
                 message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
-                // Insert the current url as a target for inform anchors
-                message = message.replace(/{SelfUrl}/g, document.URL);
-
+                if (gdn.getMeta('SelfUrl')) {
+                    // If the url is explicitly defined (as in embed), use it.
+                    message = message.replace(/{SelfUrl}/g, gdn.getMeta('SelfUrl'));
+                } else {
+                    // Insert the current url as a target for inform anchors
+                    message = message.replace(/{SelfUrl}/g, document.URL);
+                }
                 var skip = false;
                 for (var j = 0; j < wrappers.length; j++) {
                     if ($(wrappers[j]).text() == $(message).text()) {

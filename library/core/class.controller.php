@@ -579,9 +579,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                     (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                 )
             ) {
-                $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
+                $ReflectArgs = array_slice($this->ReflectArgs, 1);
             } else {
-                $ReflectArgs = json_encode($this->ReflectArgs);
+                $ReflectArgs = $this->ReflectArgs;
             }
 
             $this->_Definitions['ResolvedArgs'] = $ReflectArgs;

@@ -415,22 +415,6 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * Enforces tinyint values on supplied boolean fields to comply with strict mode
-     *
-     * @param array $fields The names of the fields to coerce into boolean tinyint values (1 or 0)
-     */
-    public function boolToTinyInt($fields) {
-        $values = $this->formValues();
-        foreach ($fields as $field) {
-            if (array_key_exists($field, $values)) {
-                $val = val($field, $values, false);
-                $values[$field] = $val ? '1' : '0';
-            }
-        }
-        $this->formValues($values);
-    }
-
-    /**
      * Returns XHTML for a checkbox input element.
      *
      * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)

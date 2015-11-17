@@ -564,7 +564,18 @@ class SettingsController extends Gdn_Controller {
                 $this->Form->setFormValue('Photo', $Parts['SaveName']);
             }
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
-            $this->Form->boolToTinyInt(array('HideAllDiscussions', 'Archived', 'AllowFileUploads'));
+
+            // Enforces tinyint values on boolean fields to comply with strict mode
+            $tinyintFields = array('HideAllDiscussions', 'Archived', 'AllowFileUploads');
+            $values = $this->Form->formValues();
+            foreach ($tinyintFields as $field) {
+                if (array_key_exists($field, $values)) {
+                    $val = val($field, $values, false);
+                    $values[$field] = forceBool($val, false, '1', '0');
+                }
+            }
+            $this->Form->formValues($values);
+
             if ($this->Form->save()) {
                 $Category = CategoryModel::categories($CategoryID);
                 $this->setData('Category', $Category);

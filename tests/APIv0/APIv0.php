@@ -89,7 +89,7 @@ class APIv0 extends HttpClient {
             } else {
                 $message = $response->getRawBody();
             }
-            throw new \Exception($message, $response->getStatusCode());
+            throw new \Exception($message.' ('.$response->getStatusCode().')', $response->getStatusCode());
         }
     }
 

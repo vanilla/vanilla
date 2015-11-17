@@ -46,7 +46,7 @@ class StandardTest extends BaseTest {
 
         $this->setTestUser($siteUser);
 
-        $r = $this->api()->signInUser($user['Name'], $user['Password']);
+//        $r = $this->api()->signInUser($user['Name'], $user['Password']);
     }
 
     /**

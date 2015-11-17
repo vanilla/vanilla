@@ -697,6 +697,7 @@ class PostController extends VanillaController {
                         $this->Comment->InsertPhoto = $Session->User->Photo;
                         $this->Comment->DateInserted = Gdn_Format::date();
                         $this->Comment->Body = val('Body', $FormValues, '');
+                        $this->Comment->Format = val('Format', $FormValues, c('Garden.InputFormatter'));
                         $this->View = 'preview';
                     } elseif (!$Draft) { // If the comment was not a draft
                         // If Editing a comment

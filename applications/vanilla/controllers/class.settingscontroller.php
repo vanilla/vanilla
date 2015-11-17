@@ -564,7 +564,7 @@ class SettingsController extends Gdn_Controller {
                 $this->Form->setFormValue('Photo', $Parts['SaveName']);
             }
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
-
+            $this->Form->boolToTinyInt(array('HideAllDiscussions', 'Archived', 'AllowFileUploads'));
             if ($this->Form->save()) {
                 $Category = CategoryModel::categories($CategoryID);
                 $this->setData('Category', $Category);

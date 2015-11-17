@@ -28,17 +28,27 @@ fi
 
 errored=false
 
-for file in `find $dir -type f -regex ".*\.php" | grep php`
+for file in `find $dir -type f -name "*.php"`
 do
-    out=`php -l $file`
+    haveerror=false
+    out=`php -l $file 2>/dev/null`
+    out=`echo $out | xargs`
     code=$?
 
     if [ ! $code -eq 0 ]; then
-      echo $out;
-      errored=true
-      if [ "$quick" = true ]; then
-          exit 1;
-      fi
+        haveerror=true
+    fi
+
+    if [[ ! $out =~ ^"No syntax errors" ]]; then
+        haveerror=true
+    fi
+
+    if [ "$haveerror" = true ]; then
+        echo $out
+        errored=true
+        if [ "$quick" = true ]; then
+            exit 1;
+        fi
     fi
 done
 

@@ -28,6 +28,7 @@ install:
   - tests/travis/nginx/install-nginx.sh
 
 script:
+  - tests/travis/php-lint.sh .
   - phpunit -c phpunit.xml.dist
   - cat /tmp/error.log
   - cat /tmp/access.log

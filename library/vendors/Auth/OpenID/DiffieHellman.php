@@ -47,7 +47,7 @@ class Auth_OpenID_DiffieHellman {
     var $private;
     var $lib = null;
 
-    function Auth_OpenID_DiffieHellman($mod = null, $gen = null,
+    function __construct($mod = null, $gen = null,
                                        $private = null, $lib = null)
     {
         if ($lib === null) {

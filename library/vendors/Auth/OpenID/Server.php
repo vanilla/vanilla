@@ -463,7 +463,7 @@ class Auth_OpenID_DiffieHellmanSHA1ServerSession {
     var $allowed_assoc_types = array('HMAC-SHA1');
     var $hash_func = 'Auth_OpenID_SHA1';
 
-    function Auth_OpenID_DiffieHellmanSHA1ServerSession($dh, $consumer_pubkey)
+    function __construct($dh, $consumer_pubkey)
     {
         $this->dh = $dh;
         $this->consumer_pubkey = $consumer_pubkey;

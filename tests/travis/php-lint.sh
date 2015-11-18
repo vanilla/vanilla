@@ -31,7 +31,12 @@ errored=false
 for file in `find $dir -type f -name "*.php"`
 do
     haveerror=false
-    out=`php -l $file 2>/dev/null`
+    if [ "$PHP_VERSION" = 'hhvm' ]
+    then
+        out=`hhvm -l $file 2>/dev/null`
+    else
+        out=`php -l $file 2>/dev/null`
+    fi
     out=`echo $out | xargs`
     code=$?
 

@@ -148,7 +148,7 @@ class Auth_OpenID_ServerError {
     /**
      * @access private
      */
-    function Auth_OpenID_ServerError($message = null, $text = null,
+    function __construct($message = null, $text = null,
                                      $reference = null, $contact = null)
     {
         $this->message = $message;
@@ -292,7 +292,7 @@ class Auth_OpenID_ServerError {
  * @package OpenID
  */
 class Auth_OpenID_NoReturnToError extends Auth_OpenID_ServerError {
-    function Auth_OpenID_NoReturnToError($message = null,
+    function __construct($message = null,
                                          $text = "No return_to URL available")
     {
         parent::Auth_OpenID_ServerError($message, $text);
@@ -310,7 +310,7 @@ class Auth_OpenID_NoReturnToError extends Auth_OpenID_ServerError {
  * @package OpenID
  */
 class Auth_OpenID_MalformedReturnURL extends Auth_OpenID_ServerError {
-    function Auth_OpenID_MalformedReturnURL($message, $return_to)
+    function __construct($message, $return_to)
     {
         $this->return_to = $return_to;
         parent::Auth_OpenID_ServerError($message, "malformed return_to URL");
@@ -323,7 +323,7 @@ class Auth_OpenID_MalformedReturnURL extends Auth_OpenID_ServerError {
  * @package OpenID
  */
 class Auth_OpenID_MalformedTrustRoot extends Auth_OpenID_ServerError {
-    function Auth_OpenID_MalformedTrustRoot($message = null,
+    function __construct($message = null,
                                             $text = "Malformed trust root")
     {
         parent::Auth_OpenID_ServerError($message, $text);
@@ -1183,7 +1183,7 @@ class Auth_OpenID_CheckIDRequest extends Auth_OpenID_Request {
  */
 class Auth_OpenID_ServerResponse {
 
-    function Auth_OpenID_ServerResponse(&$request)
+    function __construct(&$request)
     {
         $this->request =& $request;
         $this->fields = new Auth_OpenID_Message($this->request->namespace);
@@ -1270,7 +1270,7 @@ class Auth_OpenID_WebResponse {
     var $code = AUTH_OPENID_HTTP_OK;
     var $body = "";
 
-    function Auth_OpenID_WebResponse($code = null, $headers = null,
+    function __construct($code = null, $headers = null,
                                      $body = null)
     {
         if ($code) {
@@ -1310,7 +1310,7 @@ class Auth_OpenID_Signatory {
     /**
      * Create a new signatory using a given store.
      */
-    function Auth_OpenID_Signatory(&$store)
+    function __construct(&$store)
     {
         // assert store is not None
         $this->store =& $store;
@@ -1478,7 +1478,7 @@ class Auth_OpenID_Encoder {
  */
 class Auth_OpenID_SigningEncoder extends Auth_OpenID_Encoder {
 
-    function Auth_OpenID_SigningEncoder(&$signatory)
+    function __construct(&$signatory)
     {
         $this->signatory =& $signatory;
     }
@@ -1516,7 +1516,7 @@ class Auth_OpenID_SigningEncoder extends Auth_OpenID_Encoder {
  */
 class Auth_OpenID_Decoder {
 
-    function Auth_OpenID_Decoder(&$server)
+    function __construct(&$server)
     {
         $this->server =& $server;
 
@@ -1599,7 +1599,7 @@ class Auth_OpenID_Decoder {
  * @package OpenID
  */
 class Auth_OpenID_EncodingError {
-    function Auth_OpenID_EncodingError(&$response)
+    function __construct(&$response)
     {
         $this->response =& $response;
     }
@@ -1621,7 +1621,7 @@ class Auth_OpenID_AlreadySigned extends Auth_OpenID_EncodingError {
  * @package OpenID
  */
 class Auth_OpenID_UntrustedReturnURL extends Auth_OpenID_ServerError {
-    function Auth_OpenID_UntrustedReturnURL($message, $return_to,
+    function __construct($message, $return_to,
                                             $trust_root)
     {
         parent::Auth_OpenID_ServerError($message, "Untrusted return_to URL");
@@ -1674,7 +1674,7 @@ class Auth_OpenID_UntrustedReturnURL extends Auth_OpenID_ServerError {
  * @package OpenID
  */
 class Auth_OpenID_Server {
-    function Auth_OpenID_Server(&$store, $op_endpoint=null)
+    function __construct(&$store, $op_endpoint=null)
     {
         $this->store =& $store;
         $this->signatory = new Auth_OpenID_Signatory($this->store);

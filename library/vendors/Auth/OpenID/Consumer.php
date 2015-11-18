@@ -611,7 +611,7 @@ class Auth_OpenID_GenericConsumer {
      * in the module description.  The default value is False, which
      * disables immediate mode.
      */
-    function Auth_OpenID_GenericConsumer(&$store)
+    function __construct(&$store)
     {
         $this->store =& $store;
         $this->negotiator =& Auth_OpenID_getDefaultNegotiator();

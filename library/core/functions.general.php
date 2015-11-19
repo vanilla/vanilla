@@ -1261,8 +1261,8 @@ if (!function_exists('_formatStringCallback')) {
             $SubFormat = '';
         }
 
-        $Value = valr($Field, $Args, '');
-        if ($Value == '' && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
+        $Value = valr($Field, $Args, null);
+        if ($Value === null && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
             $Result = '';
         } else {
             switch (strtolower($Format)) {

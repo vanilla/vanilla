@@ -263,30 +263,25 @@ class UtilityController extends DashboardController {
      * @access public
      */
     public function update() {
-        try {
-            // Check for permission or flood control.
-            // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-            $Now = time();
-            $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        // Check for permission or flood control.
+        // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+        $Now = time();
+        $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
 
-            if ($LastTime + (60 * 60 * 24) > $Now) {
-                // Check for flood control.
-                $Count = Gdn::get('Garden.Update.Count', 0) + 1;
-                if ($Count > 5) {
-                    if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                        // We are only allowing an update of 5 times every 24 hours.
-                        throw permissionException();
-                    }
+        if ($LastTime + (60 * 60 * 24) > $Now) {
+            // Check for flood control.
+            $Count = Gdn::get('Garden.Update.Count', 0) + 1;
+            if ($Count > 5) {
+                if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                    // We are only allowing an update of 5 times every 24 hours.
+                    throw permissionException();
                 }
-            } else {
-                $Count = 1;
             }
-            Gdn::set('Garden.Update.LastTimestamp', $Now);
-            Gdn::set('Garden.Update.Count', $Count);
-        } catch (PermissionException $Ex) {
-            return;
-        } catch (Exception $Ex) {
+        } else {
+            $Count = 1;
         }
+        Gdn::set('Garden.Update.LastTimestamp', $Now);
+        Gdn::set('Garden.Update.Count', $Count);
 
         try {
             // Run the structure.

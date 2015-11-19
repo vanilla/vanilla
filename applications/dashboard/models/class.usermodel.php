@@ -2864,6 +2864,7 @@ class UserModel extends Gdn_Model {
 
             if (Gdn::session()->newVisit()) {
                 $Fields['CountVisits'] = val('CountVisits', $User, 0) + 1;
+                $this->fireEvent('Visit');
             }
         }
 

@@ -259,6 +259,10 @@ class UtilityController extends DashboardController {
     /**
      * Run a structure update on the database.
      *
+     * It should always be possible to call this method, even if no database tables exist yet.
+     * A working forum database should be built from scratch where none exists. Therefore,
+     * it can have no reliance on existing data calls, or they must be able to fail gracefully.
+     *
      * @since 2.0.?
      * @access public
      */

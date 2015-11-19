@@ -259,6 +259,10 @@ class UtilityController extends DashboardController {
     /**
      * Run a structure update on the database.
      *
+     * It should always be possible to call this method, even if no database tables exist yet.
+     * A working forum database should be built from scratch where none exists. Therefore,
+     * it can have no reliance on existing data calls, or they must be able to fail gracefully.
+     *
      * @since 2.0.?
      * @access public
      */
@@ -266,11 +270,22 @@ class UtilityController extends DashboardController {
         // Check for permission or flood control.
         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
         $Now = time();
-        $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        $LastTime = 0;
+        $Count = 0;
+
+        try {
+            $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        } catch (Exception $Ex) {
+            // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
+        }
 
         if ($LastTime + (60 * 60 * 24) > $Now) {
             // Check for flood control.
-            $Count = Gdn::get('Garden.Update.Count', 0) + 1;
+            try {
+                $Count = Gdn::get('Garden.Update.Count', 0) + 1;
+            } catch (Exception $Ex) {
+                // Once more we sit, watching the breath.
+            }
             if ($Count > 5) {
                 if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                     // We are only allowing an update of 5 times every 24 hours.
@@ -280,8 +295,13 @@ class UtilityController extends DashboardController {
         } else {
             $Count = 1;
         }
-        Gdn::set('Garden.Update.LastTimestamp', $Now);
-        Gdn::set('Garden.Update.Count', $Count);
+
+        try {
+            Gdn::set('Garden.Update.LastTimestamp', $Now);
+            Gdn::set('Garden.Update.Count', $Count);
+        } catch (Exception $Ex) {
+            // What is a GDN_UserMeta table, really? Suffering.
+        }
 
         try {
             // Run the structure.

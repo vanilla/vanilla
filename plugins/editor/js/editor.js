@@ -1115,7 +1115,7 @@
                                     editorDropdownsClose();
                                 } else {
                                     // File dropped is not allowed!
-                                    var message = '"' + filename + '" ';
+                                    var message = 'File ';
 
                                     if (!validFile) {
                                         message += 'is not allowed';

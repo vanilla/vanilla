@@ -421,17 +421,13 @@
                         return false;
                     }
 
-                    // Make exception for non-wysiwyg, as wysihtml5 has custom
-                    // key handler.
-                    if (!$(this).closest('.editor').hasClass('editor-format-wysiwyg')) {
-                        // Fire event programmatically to do what needs to be done in
-                        // ButtonBar code.
-                        $(this).parent().find('.Button').trigger('click.insertData');
+                    // Fire event programmatically to do what needs to be done in
+                    // ButtonBar code.
+                    $(this).parent().find('.Button').trigger('click.insertData');
 
-                        e.stopPropagation();
-                        e.preventDefault();
-                        return false;
-                    }
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
                 }
             });
 

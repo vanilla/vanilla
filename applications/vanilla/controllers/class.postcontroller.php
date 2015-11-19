@@ -397,6 +397,7 @@ class PostController extends VanillaController {
         $vanilla_category_id = $this->Form->getFormValue('vanilla_category_id', '');
         $Attributes = array('ForeignUrl' => $vanilla_url);
         $vanilla_identifier = $this->Form->getFormValue('vanilla_identifier', '');
+        $isEmbeddedComments = $vanilla_url != '' && $vanilla_identifier != '';
 
         // Only allow vanilla identifiers of 32 chars or less - md5 if larger
         if (strlen($vanilla_identifier) > 32) {
@@ -404,7 +405,7 @@ class PostController extends VanillaController {
             $vanilla_identifier = md5($vanilla_identifier);
         }
 
-        if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
+        if (!$Discussion && $isEmbeddedComments) {
             $Discussion = $Discussion = $this->DiscussionModel->getForeignID($vanilla_identifier, $vanilla_type);
 
             if ($Discussion) {
@@ -414,7 +415,7 @@ class PostController extends VanillaController {
         }
 
         // If so, create it!
-        if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
+        if (!$Discussion && $isEmbeddedComments) {
             // Add these values back to the form if they exist!
             $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
             $this->Form->addHidden('vanilla_type', $vanilla_type);
@@ -527,6 +528,12 @@ class PostController extends VanillaController {
         // If no discussion was found, error out
         if (!$Discussion) {
             $this->Form->addError(t('Failed to find discussion for commenting.'));
+        }
+
+        // Vanilla Comments save as Text, no matter the format.
+        // Kludge to set format to Text if we're Wysiwyg to preserve newlines.
+        if ($isEmbeddedComments && ($this->Form->getFormValue('Format', c('Garden.InputFormatter')) === 'Wysiwyg')) {
+            $this->Form->setFormValue('Format', 'Text');
         }
 
         $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
@@ -860,7 +867,7 @@ class PostController extends VanillaController {
     public function initialize() {
         parent::initialize();
         $this->addModule('NewDiscussionModule');
-        
+
         $this->CssClass = 'NoPanel';
     }
 

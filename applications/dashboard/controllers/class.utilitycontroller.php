@@ -280,8 +280,13 @@ class UtilityController extends DashboardController {
         } else {
             $Count = 1;
         }
-        Gdn::set('Garden.Update.LastTimestamp', $Now);
-        Gdn::set('Garden.Update.Count', $Count);
+
+        try {
+            Gdn::set('Garden.Update.LastTimestamp', $Now);
+            Gdn::set('Garden.Update.Count', $Count);
+        } catch (Exception $Ex) {
+            // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
+        }
 
         try {
             // Run the structure.

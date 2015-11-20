@@ -62,8 +62,8 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
     }
 
     if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
-        if (function_exists('Trace')) {
-            Trace("$Message in $File line $Line", TRACE_NOTICE);
+        if (function_exists('trace')) {
+            trace(new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line), TRACE_NOTICE);
         }
 
         // Ignore errors that are below the current error reporting level.

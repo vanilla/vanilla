@@ -3730,9 +3730,7 @@ if (!function_exists('trace')) {
             return $Traces;
         }
 
-        if ($Value) {
-            $Traces[] = array($Value, $Type);
-        }
+        $Traces[] = array($Value, $Type);
     }
 }
 

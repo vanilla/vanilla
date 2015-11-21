@@ -88,7 +88,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
             <div class="LayoutOptions CategoriesLayout">
                 <p>
                     <?php echo wrap(t('Categories Layout'), 'strong'); ?>
-                    (<?php echo anchor(t("adjust layout"), '/vanilla/settings/managecategories', array('class' => 'AdjustCategories')); ?>
+                    (<?php echo anchor(t("adjust layout"), '/settings/managecategories', array('class' => 'AdjustCategories')); ?>
                     )
                     <br/><?php echo t('Choose the preferred layout for the categories page.'); ?>
                 </p>

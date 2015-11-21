@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
             toleranceElement: '> div',
             update: function() {
                 $.post(
-                    gdn.url('/vanilla/settings/sortcategories.json'),
+                    gdn.url('/settings/sortcategories.json'),
                     {
                         'TreeArray': $('ol.Sortable').nestedSortable('toArray', {startDepthCount: 0}),
                         'TransientKey': gdn.definition('TransientKey')

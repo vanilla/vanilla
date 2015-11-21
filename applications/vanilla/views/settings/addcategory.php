@@ -47,14 +47,14 @@ echo $this->Form->errors();
         if ($Photo = $this->Form->getValue('Photo')) {
             echo img(Gdn_Upload::url($Photo));
             echo '<br />'.anchor(t('Delete Photo'),
-                    CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
+                    combinePaths(array('settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
                     'SmallButton Danger PopConfirm');
         }
         echo $this->Form->Input('PhotoUpload', 'file');
         ?>
     </li>
     <?php
-    echo $this->Form->Simple(
+    echo $this->Form->simple(
         $this->data('_ExtendedFields', array()),
         array('Wrap' => array('', '')));
     ?>
@@ -62,24 +62,24 @@ echo $this->Form->errors();
         <li>
             <?php
             echo $this->Form->label('Display As', 'DisplayAs');
-            echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'));
+            echo $this->Form->dropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'));
             ?>
         </li>
         <li>
             <?php
-            echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
+            echo $this->Form->checkBox('HideAllDiscussions', 'Hide from the recent discussions page.');
             ?>
         </li>
         <li>
             <?php
-            echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');
+            echo $this->Form->checkBox('CustomPoints', 'Track points for this category separately.');
             ?>
         </li>
     <?php endif; ?>
     <?php if (count($this->PermissionData) > 0) { ?>
         <li id="Permissions">
             <?php
-            echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
+            echo $this->Form->checkBox('CustomPermissions', 'This category has custom permissions.');
 
             echo '<div class="CategoryPermissions">';
 
@@ -87,17 +87,17 @@ echo $this->Form->errors();
                 echo '<div class="P DiscussionTypes">';
                 echo $this->Form->label('Discussion Types');
                 foreach ($this->data('DiscussionTypes') as $Type => $Row) {
-                    echo $this->Form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
+                    echo $this->Form->checkBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
                 }
                 echo '</div>';
             }
 
-            echo $this->Form->Simple(
+            echo $this->Form->simple(
                 $this->data('_PermissionFields', array()),
                 array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>')));
 
             echo t('Check all permissions that apply for each role');
-            echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
+            echo $this->Form->checkBoxGridGroups($this->PermissionData, 'Permission');
             echo '</div>';
             ?>
         </li>

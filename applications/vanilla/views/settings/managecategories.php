@@ -13,8 +13,8 @@ $Session = Gdn::session();
         <?php
         echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing categories"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
-        echo wrap(Anchor(t('Managing Categories'), 'http://docs.vanillaforums.com/features/categories/'), 'li');
+        echo wrap(anchor(t("Video tutorial on managing categories"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
+        echo wrap(anchor(t('Managing Categories'), 'http://docs.vanillaforums.com/features/categories/'), 'li');
         echo '</ul>';
         ?>
     </div>
@@ -31,12 +31,12 @@ $Session = Gdn::session();
     </div>
     <div class="FilterMenu"><?php
         if (c('Vanilla.Categories.Use')) {
-            echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
+            echo anchor(t('Add Category'), 'settings/addcategory', 'SmallButton');
             if (checkPermission('Garden.Settings.Manage')) {
-                echo wrap(Anchor(t("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
+                echo wrap(anchor(t("Don't use Categories"), 'settings/enablecategories?enabled=0', 'SmallButton Hijack'));
             }
         } elseif (checkPermission('Garden.Settings.Manage')) {
-            echo anchor(t('Use Categories'), 'vanilla/settings/enablecategories?enabled=1'.Gdn::session()->TransientKey(), 'SmallButton Hijack');
+            echo anchor(t('Use Categories'), 'settings/enablecategories?enabled=1'.Gdn::session()->transientKey(), 'SmallButton Hijack');
         }
         ?></div>
 <?php
@@ -64,10 +64,10 @@ if (c('Vanilla.Categories.Use')) {
         .t('Configure how nested categories are displayed to users.')
         .Wrap(sprintf(
             t('Vanilla.Categories.MaxDisplayDepth', 'Place nested categories in a comma-delimited list when they are %1$s'),
-            $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', val('MaxDepthData', $this->Data))
+            $this->Form->dropDown('Vanilla.Categories.MaxDisplayDepth', val('MaxDepthData', $this->Data))
         ), 'div')
-        .Wrap($this->Form->CheckBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
-        .Wrap($this->Form->CheckBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
+        .wrap($this->Form->checkBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
+        .wrap($this->Form->checkBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
         .'</div>'
         .'<div class="Buttons Wrap">'
         .$this->Form->button('Save')
@@ -130,8 +130,8 @@ if (c('Vanilla.Categories.Use')) {
                 '
                   </td>
                   <td class="Buttons">'
-                .anchor(t('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
-                .(val('CanDelete', $Category) ? anchor(t('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
+                .anchor(t('Edit'), 'settings/editcategory/'.$Category->CategoryID, 'SmallButton')
+                .(val('CanDelete', $Category) ? anchor(t('Delete'), 'settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
                 .'</td>
                </tr>
             </table>'

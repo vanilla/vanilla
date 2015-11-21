@@ -337,7 +337,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 $PermissionCategoryID = -1;
             }
 
-            $Result = $PermissionModel->GetUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+            $Result = $PermissionModel->getUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
             return (val($Permission, val(0, $Result), false)) ? true : false;
         }
         return false;
@@ -470,7 +470,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function siteNavModule_default_handler($sender) {
         // Grab the default route so that we don't add a link to it twice.
-        $home = trim(val('Destination', Gdn::router()->GetRoute('DefaultController')), '/');
+        $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
         // Add the site discussion links.
         if ($home !== 'categories') {
@@ -703,7 +703,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_getAppSettingsMenuItems_Handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
         $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));

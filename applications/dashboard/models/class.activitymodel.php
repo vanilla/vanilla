@@ -780,7 +780,7 @@ class ActivityModel extends Gdn_Model {
         if ((int)$ConfigPreference === 2) {
             $Preference = true; // This preference is forced on.
         }        if ($ConfigPreference !== false) {
-            $Preference = arrayValue($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
+            $Preference = val($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
         } else {
             $Preference = false;
         }
@@ -820,7 +820,7 @@ class ActivityModel extends Gdn_Model {
                 $Preference = $Force;
             } else {
                 $Preferences = $User->Preferences;
-                $Preference = arrayValue('Email.'.$Activity->ActivityType, $Preferences, Gdn::config('Preferences.Email.'.$Activity->ActivityType));
+                $Preference = val('Email.'.$Activity->ActivityType, $Preferences, Gdn::config('Preferences.Email.'.$Activity->ActivityType));
             }
             if ($Preference) {
                 $ActivityHeadline = Gdn_Format::text(Gdn_Format::activityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), false);
@@ -1009,7 +1009,7 @@ class ActivityModel extends Gdn_Model {
         $this->Validation->applyRule('DateInserted', 'Required');
         $this->Validation->applyRule('InsertUserID', 'Required');
 
-        $this->EventArguments['Comment'] = $Comment;
+        $this->EventArguments['Comment'] = &$Comment;
         $this->fireEvent('BeforeSaveComment');
 
         if ($this->validate($Comment)) {
@@ -1296,11 +1296,11 @@ class ActivityModel extends Gdn_Model {
         }
 
         $ActivityType = self::getActivityType($Activity['ActivityType']);
-        $ActivityTypeID = arrayValue('ActivityTypeID', $ActivityType);
+        $ActivityTypeID = val('ActivityTypeID', $ActivityType);
         if (!$ActivityTypeID) {
             trace("There is no $ActivityType activity type.", TRACE_WARNING);
             $ActivityType = self::getActivityType('Default');
-            $ActivityTypeID = arrayValue('ActivityTypeID', $ActivityType);
+            $ActivityTypeID = val('ActivityTypeID', $ActivityType);
         }
 
         $Activity['ActivityTypeID'] = $ActivityTypeID;

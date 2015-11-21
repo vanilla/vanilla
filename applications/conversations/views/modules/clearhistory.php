@@ -1,3 +1,3 @@
 <?php if (!defined('APPLICATION')) exit();
 if ($this->ConversationID > 0)
-    echo anchor(t('Delete Conversation'), '/messages/clear/'.$this->ConversationID.'/'.Gdn::session()->TransientKey(), 'Button Danger BigButton ClearConversation');
+    echo anchor(t('Leave Conversation'), '/messages/leave/'.$this->ConversationID, 'Button Danger BigButton Popup');

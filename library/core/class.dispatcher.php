@@ -146,10 +146,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::request();
 
-        if (Gdn::session()->newVisit()) {
-            Gdn::userModel()->fireEvent('Visit');
-        }
-
         $this->EventArguments['Request'] = &$Request;
 
         // Move this up to allow pre-routing
@@ -161,6 +157,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         try {
             $BlockExceptions = array(
                 '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
+                '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
                 '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^sso(\/.*)?$/' => self::BLOCK_NEVER,

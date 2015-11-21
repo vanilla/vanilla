@@ -377,8 +377,8 @@ class ProxyRequest {
         $this->action(" transfer mode: {$TransferMode}");
 
         $logContext = array(
-            'url' => $Url,
-            'method' => $RequestMethod
+            'requestUrl' => $Url,
+            'requestMethod' => $RequestMethod
         );
 
         /*
@@ -527,8 +527,8 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_URL, $Url);
         curl_setopt($Handler, CURLOPT_PORT, $Port);
 
-        if (val('Log', $Options, false)) {
-            Logger::event('http_request', Logger::DEBUG, '{method} {url}', $logContext);
+        if (val('LogRequest', $Options, false)) {
+            Logger::event('http_request', Logger::INFO, '{requestMethod} {requestUrl}', $logContext);
         }
 
         $this->curlReceive($Handler);
@@ -544,8 +544,13 @@ class ProxyRequest {
         $logContext['responseTime'] = $this->ResponseTime;
 
         // Add the response body to the log entry if it isn't too long or we are debugging.
-        if (debug() || strlen($this->responseBody) < self::MAX_LOG_BODYLENGTH) {
-            if ($this->ContentType == 'application/json') {
+        $logResponseBody = val('LogResponseBody', $Options, null);
+        $logResponseBody = $logResponseBody === null ?
+            !in_array($RequestMethod, ['GET', 'OPTIONS']) && strlen($this->responseBody) < self::MAX_LOG_BODYLENGTH :
+            $logResponseBody;
+
+        if ($logResponseBody || debug() || (!$this->responseClass('2xx') && val('LogResponseErrorBody', $Options, true))) {
+            if (stripos($this->ContentType, 'application/json') !== false) {
                 $body = @json_decode($this->ResponseBody, true);
                 if (!$body) {
                     $body = $this->ResponseBody;
@@ -555,11 +560,12 @@ class ProxyRequest {
                 $logContext['responseBody'] = $this->ResponseBody;
             }
         }
+        $logLevel = val('Log', $Options, true) ? Logger::INFO : Logger::DEBUG;
         if (val('Log', $Options, true)) {
             if ($this->responseClass('2xx')) {
-                Logger::event('http_response', Logger::DEBUG, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+                Logger::event('http_response', $logLevel, '{responseCode} {requestMethod} {requestUrl} in {responseTime}s', $logContext);
             } else {
-                Logger::event('http_response_error', Logger::DEBUG, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+                Logger::event('http_response_error', $logLevel, '{responseCode} {requestMethod} {requestUrl} in {responseTime}s', $logContext);
             }
         }
 

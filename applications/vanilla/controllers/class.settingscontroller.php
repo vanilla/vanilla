@@ -122,7 +122,6 @@ class SettingsController extends Gdn_Controller {
         // Set up head
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -282,7 +281,7 @@ class SettingsController extends Gdn_Controller {
         $this->RoleArray = $RoleModel->getArray();
 
         $this->fireEvent('AddEditCategory');
-        $this->SetupDiscussionTypes(array());
+        $this->setupDiscussionTypes(array());
 
         if ($this->Form->authenticatedPostBack()) {
             // Form was validly submitted
@@ -296,6 +295,10 @@ class SettingsController extends Gdn_Controller {
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirect('vanilla/settings/managecategories');
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
+                    $this->Data = [];
+                    $this->getCategory($CategoryID);
+                    return;
                 }
             } else {
                 unset($CategoryID);
@@ -305,8 +308,8 @@ class SettingsController extends Gdn_Controller {
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
-        $Permissions = $PermissionModel->UnpivotPermissions($Permissions, true);
+        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->setData('PermissionData', $Permissions, true);
@@ -314,6 +317,41 @@ class SettingsController extends Gdn_Controller {
 
         // Render default view
         $this->render();
+    }
+
+    /**
+     * Get a single category for administration.
+     *
+     * This endpoint is intended for API access.
+     *
+     * @param int $categoryID The category to find.
+     */
+    public function getCategory($categoryID) {
+        // Check permission
+        $this->permission('Garden.Community.Manage');
+
+        if (!$categoryID) {
+            throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));
+        }
+
+        $categoryModel = new CategoryModel();
+        $category = $categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+//        $category = Gdn::sql()->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+
+        if (!$category) {
+            throw notFoundException('Category');
+        }
+
+        // Add the permissions for the category.
+        if ($category['PermissionCategoryID'] == $category['CategoryID']) {
+            $category['Permissions'] = $categoryModel->getRolePermissions($categoryID);
+        } else {
+            $category['Permissions'] = null;
+        }
+
+        $this->setData('Category', $category);
+        saveToConfig('Api.Clean', false, false);
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -431,13 +469,16 @@ class SettingsController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($RedirectUrl);
         } else {
-            $this->ControllerName = 'Home';
-            $this->View = 'FileNotFound';
             $this->RedirectUrl = url($RedirectUrl);
             $this->render();
         }
     }
 
+    /**
+     *
+     *
+     * @param $Category
+     */
     protected function setupDiscussionTypes($Category) {
         $DiscussionTypes = DiscussionModel::DiscussionTypes();
         $this->setData('DiscussionTypes', $DiscussionTypes);
@@ -506,16 +547,16 @@ class SettingsController extends Gdn_Controller {
         $this->fireEvent('AddEditCategory');
 
         if ($this->Form->authenticatedPostBack()) {
-            $this->SetupDiscussionTypes($this->Category);
+            $this->setupDiscussionTypes($this->Category);
             $Upload = new Gdn_Upload();
-            $TmpImage = $Upload->ValidateUpload('PhotoUpload', false);
+            $TmpImage = $Upload->validateUpload('PhotoUpload', false);
             if ($TmpImage) {
                 // Generate the target image name
-                $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+                $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
                 $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
 
                 // Save the uploaded image
-                $Parts = $Upload->SaveAs(
+                $Parts = $Upload->saveAs(
                     $TmpImage,
                     $ImageBaseName
                 );
@@ -523,23 +564,32 @@ class SettingsController extends Gdn_Controller {
             }
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 
+            // Enforces tinyint values on boolean fields to comply with strict mode
+            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
+            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+
             if ($this->Form->save()) {
                 $Category = CategoryModel::categories($CategoryID);
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirect('vanilla/settings/managecategories');
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
+                    $this->Data = [];
+                    $this->getCategory($CategoryID);
+                    return;
                 }
             }
         } else {
             $this->Form->setData($this->Category);
-            $this->SetupDiscussionTypes($this->Category);
+            $this->setupDiscussionTypes($this->Category);
             $this->Form->setValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
-        $Permissions = $PermissionModel->UnpivotPermissions($Permissions, true);
+        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
+        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->setData('PermissionData', $Permissions, true);

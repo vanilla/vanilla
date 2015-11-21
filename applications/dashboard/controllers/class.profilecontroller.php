@@ -70,7 +70,6 @@ class ProfileController extends Gdn_Controller {
         $this->ModuleSortContainer = 'Profile';
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -300,8 +299,8 @@ class ProfileController extends Gdn_Controller {
      * @throws Exception
      */
     public function disconnect($UserReference = '', $Username = '', $Provider) {
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $this->permission('Garden.SignIn.Allow');
@@ -357,7 +356,6 @@ class ProfileController extends Gdn_Controller {
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
         $this->Form->setModel(Gdn::userModel());
         $this->Form->setData($User);
-        $this->setData('User', $User);
 
         // Decide if they have ability to edit the username
         $CanEditUsername = (bool)c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission('Garden.Users.Edit');
@@ -402,6 +400,7 @@ class ProfileController extends Gdn_Controller {
             // These options become available when POSTing as a user with Garden.Settings.Manage permissions
 
             if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+
                 // Role change
 
                 $RequestedRoles = $this->Form->getFormValue('RoleID', null);
@@ -702,7 +701,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function picture($UserReference = '', $Username = '', $UserID = '') {
-        if (!c('Garden.Profile.EditPhotos', true)) {
+        if (!Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true))) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -735,28 +734,38 @@ class ProfileController extends Gdn_Controller {
 
         if ($this->Form->authenticatedPostBack() === true) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
-            $UploadImage = new Gdn_UploadImage();
-            try {
-                // Validate the upload
-                $TmpImage = $UploadImage->ValidateUpload('Picture');
 
-                // Generate the target image name.
-                $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
-                $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
-                $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', false, true);
+            // Set user's Photo attribute to a URL, provided the current user has proper permission to do so.
+            $photoUrl = $this->Form->getFormValue('Url', false);
+            if ($photoUrl && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                if (isUrl($photoUrl) && filter_var($photoUrl, FILTER_VALIDATE_URL)) {
+                    $UserPhoto = $photoUrl;
+                } else {
+                    $this->Form->addError('Invalid photo URL');
+                }
+            } else {
+                $UploadImage = new Gdn_UploadImage();
+                try {
+                    // Validate the upload
+                    $TmpImage = $UploadImage->ValidateUpload('Picture');
 
-                // Delete any previously uploaded image.
-                $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
+                    // Generate the target image name.
+                    $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
+                    $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
+                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS . '/', false, true);
 
-                // Save the uploaded image in profile size.
-                $Props = $UploadImage->SaveImageAs(
-                    $TmpImage,
-                    "userpics/$Subdir/p$Basename",
-                    c('Garden.Profile.MaxHeight', 1000),
-                    c('Garden.Profile.MaxWidth', 250),
-                    array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                );
-                $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
+                    // Delete any previously uploaded image.
+                    $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
+
+                    // Save the uploaded image in profile size.
+                    $Props = $UploadImage->SaveImageAs(
+                        $TmpImage,
+                        "userpics/$Subdir/p$Basename",
+                        c('Garden.Profile.MaxHeight', 1000),
+                        c('Garden.Profile.MaxWidth', 250),
+                        array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+                    );
+                    $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
 
 //            // Save the uploaded image in preview size
 //            $UploadImage->SaveImageAs(
@@ -766,22 +775,23 @@ class ProfileController extends Gdn_Controller {
 //               Gdn::config('Garden.Preview.MaxWidth', 75)
 //            );
 
-                // Save the uploaded image in thumbnail size
-                $ThumbSize = Gdn::config('Garden.Thumbnail.Size', 40);
-                $UploadImage->saveImageAs(
-                    $TmpImage,
-                    "userpics/$Subdir/n$Basename",
-                    $ThumbSize,
-                    $ThumbSize,
-                    array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                );
+                    // Save the uploaded image in thumbnail size
+                    $ThumbSize = Gdn::config('Garden.Thumbnail.Size', 40);
+                    $UploadImage->saveImageAs(
+                        $TmpImage,
+                        "userpics/$Subdir/n$Basename",
+                        $ThumbSize,
+                        $ThumbSize,
+                        array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'))
+                    );
 
-            } catch (Exception $Ex) {
-                // Throw the exception on API calls.
-                if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
-                    throw $Ex;
+                } catch (Exception $Ex) {
+                    // Throw the exception on API calls.
+                    if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+                        throw $Ex;
+                    }
+                    $this->Form->addError($Ex);
                 }
-                $this->Form->addError($Ex);
             }
             // If there were no errors, associate the image with the user
             if ($this->Form->errorCount() == 0) {
@@ -1019,19 +1029,20 @@ class ProfileController extends Gdn_Controller {
      * @access public
      * @param mixed $UserReference Unique identifier, possibly username or ID.
      * @param string $Username .
-     * @param string $TransientKey Security token.
+     * @param string $tk Security token.
      */
-    public function removePicture($UserReference = '', $Username = '', $TransientKey = '') {
+    public function removePicture($UserReference = '', $Username = '', $tk = '') {
         $this->permission('Garden.SignIn.Allow');
         $Session = Gdn::session();
         if (!$Session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
         }
 
-        // Get user data & another permission check
+        // Get user data & another permission check.
         $this->getUserInfo($UserReference, $Username, '', true);
+
         $RedirectUrl = userUrl($this->User, '', 'picture');
-        if ($Session->validateTransientKey($TransientKey) && is_object($this->User)) {
+        if ($Session->validateTransientKey($tk) && is_object($this->User)) {
             $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
                 // Do removal, set message, redirect
@@ -1043,8 +1054,6 @@ class ProfileController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirect($RedirectUrl);
         } else {
-            $this->ControllerName = 'Home';
-            $this->View = 'FileNotFound';
             $this->RedirectUrl = url($RedirectUrl);
             $this->render();
         }
@@ -1345,7 +1354,7 @@ class ProfileController extends Gdn_Controller {
             $Module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
 
             if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), combinePaths(array(userUrl($this->User, '', 'removepicture'), $Session->transientKey())), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
+                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
             }
 
             $Module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
@@ -1385,6 +1394,10 @@ class ProfileController extends Gdn_Controller {
 
             if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
                 $Module->addLink('Options', sprite('SpThumbnail').' '.t('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
+            }
+
+            if ($this->User->Photo != '' && $AllowImages) {
+                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
             }
         }
 
@@ -1546,10 +1559,6 @@ class ProfileController extends Gdn_Controller {
             $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {
                 $this->Roles = array_column($this->RoleData->resultArray(), 'Name');
-            }
-
-            if (Gdn::session()->checkPermission('Garden.Settings.Manage') || Gdn::session()->UserID == $this->User->UserID) {
-                $this->User->Transient = valr('Attributes.TransientKey', $this->User);
             }
 
             // Hide personal info roles

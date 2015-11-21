@@ -421,17 +421,13 @@
                         return false;
                     }
 
-                    // Make exception for non-wysiwyg, as wysihtml5 has custom
-                    // key handler.
-                    if (!$(this).closest('.editor').hasClass('editor-format-wysiwyg')) {
-                        // Fire event programmatically to do what needs to be done in
-                        // ButtonBar code.
-                        $(this).parent().find('.Button').trigger('click.insertData');
+                    // Fire event programmatically to do what needs to be done in
+                    // ButtonBar code.
+                    $(this).parent().find('.Button').trigger('click.insertData');
 
-                        e.stopPropagation();
-                        e.preventDefault();
-                        return false;
-                    }
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
                 }
             });
 
@@ -490,16 +486,6 @@
              }, 0);
              });
              */
-
-            // Handle quotes plugin using triggered event.
-            $('a.ReactButton.Quote').on('click', function(e) {
-                // Stop animation from other plugin and let this one
-                // handle the scroll, otherwise the scrolling jumps
-                // all over, and really distracts the eyes.
-                $('html, body').stop().animate({
-                    scrollTop: $(editor.textarea.element).parent().parent().offset().top
-                }, 800);
-            });
 
             $(editor.textarea.element).on('appendHtml', function(e, data) {
 
@@ -869,7 +855,7 @@
                     if (savedContainer.length && savedContainer.html().trim() != '') {
                         savedContainer.hide();
                         // Move existing uploads into preview container for better UX.
-                        var form = $('#Form_' + type + ':input[value="' + id + '"]').parents().find('.bodybox-wrap');
+                        var form = $('#Form_' + type + ':input[value="' + id + '"]').closest('form').find('.bodybox-wrap');
                         form.children('.editor-upload-previews').html(savedContainer.html());
                         savedUploadsContainer = form.children('.editor-upload-previews');
                     }
@@ -984,9 +970,6 @@
                             name: 'RemoveMediaIDs[]',
                             value: mediaId
                         }).appendTo($(editorForm));
-
-                        // Remove element from body.
-                        removeImageFromBody($editorFilePreview);
                     })
                     // This will remove the hidden input
                     .on('click.saved-file-reattach', '.editor-file-reattach', function(e) {
@@ -995,9 +978,6 @@
 
                         // Remove hidden input from form
                         $('#file-remove-' + mediaId).remove();
-
-                        // Re-attach
-                        insertImageIntoBody($editorFilePreview);
                     });
             }
 
@@ -1131,7 +1111,7 @@
                                     editorDropdownsClose();
                                 } else {
                                     // File dropped is not allowed!
-                                    var message = '"' + filename + '" ';
+                                    var message = 'File ';
 
                                     if (!validFile) {
                                         message += 'is not allowed';
@@ -1783,7 +1763,7 @@
                                 }
 
                                 // Enable file uploads
-                                fileUploadsInit($currentEditableTextarea, '');
+                                fileUploadsInit($currentEditableTextarea[0], '');
 
                                 insertImageUrl($currentEditableTextarea);
                             });

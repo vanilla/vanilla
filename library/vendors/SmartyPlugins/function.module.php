@@ -1,13 +1,22 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanilla-smarty
+ * @since 2.0
  */
 
+/**
+ *
+ *
+ * @param array $Params
+ * @param object $Smarty
+ * @return string
+ */
 function smarty_function_module($Params, &$Smarty) {
-   $Name = GetValue('name', $Params);
-   unset($Params['name']);
+    $Name = val('name', $Params);
+    unset($Params['name']);
    
-   $Result = Gdn_Theme::Module($Name, $Params);
+    $Result = Gdn_Theme::module($Name, $Params);
 	return $Result;
 }

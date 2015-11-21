@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.4',
+   'Version' => '1.7.6',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -586,9 +586,9 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('editorVersion', $this->pluginInfo['Version']);
         $c->addDefinition('editorInputFormat', $this->Format);
         $c->addDefinition('editorPluginAssets', $this->AssetPath);
-        $c->addDefinition('wysiwygHelpText', t('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
+        $c->addDefinition('wysiwygHelpText', t('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">WYSIWYG</a> in your post.'));
         $c->addDefinition('bbcodeHelpText', t('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
-        $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
+        $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple HTML</a> in your post.'));
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
@@ -736,7 +736,14 @@ class EditorPlugin extends Gdn_Plugin {
             // Save original file to uploads, then manipulate from this location if
             // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
             if (empty($imageType)) {
-                $filePathParsed = $Upload->saveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
+                $filePathParsed = $Upload->saveAs(
+                    $tmpFilePath,
+                    $absoluteFileDestination,
+                    array(
+                        'OriginalFilename' => $fileName,
+                        'source' => 'content'
+                    )
+                );
             } else {
                 $filePathParsed = Gdn_UploadImage::saveImageAs($tmpFilePath, $absoluteFileDestination, '', '', array('SaveGif' => true));
                 $tmpwidth = $filePathParsed['Width'];

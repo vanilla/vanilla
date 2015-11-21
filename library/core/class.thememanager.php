@@ -567,8 +567,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
         $NewThemeInfo = $this->getThemeInfo($ThemeName);
         $ThemeName = val('Index', $NewThemeInfo, $ThemeName);
-        $RequiredApplications = arrayValue('RequiredApplications', $NewThemeInfo, false);
-        $ThemeFolder = arrayValue('Folder', $NewThemeInfo, '');
+        $RequiredApplications = val('RequiredApplications', $NewThemeInfo, false);
+        $ThemeFolder = val('Folder', $NewThemeInfo, '');
         checkRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
 
         // If there is a hooks file, include it and run the setup method.

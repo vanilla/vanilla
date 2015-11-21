@@ -109,7 +109,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
         // Handle enums and sets as types.
         if (is_array($Type)) {
-            if (count($Type) === 2 && is_array(arrayValue(1, $Type))) {
+            if (count($Type) === 2 && is_array(val(1, $Type))) {
                 // The type is specified as the first element in the array.
                 $Column->Type = $Type[0];
                 $Column->Enum = $Type[1];
@@ -148,8 +148,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             $Null = false;
             $Default = null;
         } elseif (is_array($NullDefault)) {
-            $Null = arrayValue('Null', $NullDefault);
-            $Default = arrayValue('Default', $NullDefault, null);
+            $Null = val('Null', $NullDefault);
+            $Default = val('Default', $NullDefault, null);
         } else {
             $Null = false;
             $Default = $NullDefault;
@@ -471,7 +471,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Gets an arrya of type names allowed in the structure.
+     * Gets an array of type names allowed in the structure.
      *
      * @param string $Class The class of types to get. Valid values are:
      *  - <b>int</b>: Integer types.
@@ -492,7 +492,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
         $String = array('varchar', 'char', 'mediumtext', 'text');
         $Length = array('varbinary');
-        $Other = array('enum', 'tinyblob', 'blob', 'mediumblob', 'longblob');
+        $Other = array('enum', 'tinyblob', 'blob', 'mediumblob', 'longblob', 'ipaddress');
 
         switch (strtolower($Class)) {
             case 'date':

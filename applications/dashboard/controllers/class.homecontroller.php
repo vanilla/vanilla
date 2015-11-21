@@ -22,7 +22,6 @@ class HomeController extends Gdn_Controller {
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -129,6 +128,56 @@ class HomeController extends Gdn_Controller {
      */
     public function termsOfService() {
         $this->render();
+    }
+
+    /**
+     * Sanitize a string according to the filter specified _Filter in the data array.
+     *
+     * The valid values for _Filter are:
+     *
+     * - none: No sanitization.
+     * - filter: Sanitize using {@link Gdn_Format::htmlFilter()}.
+     * - safe: Sanitize using {@link htmlspecialchars()}.
+     *
+     * @param string $string The string to sanitize.
+     * @return string Returns the sanitized string.
+     */
+    protected function sanitize($string) {
+        switch ($this->data('_Filter', 'safe')) {
+            case 'none':
+                return $string;
+            case 'filter':
+                return Gdn_Format::htmlFilter($string);
+            case 'safe':
+            default:
+                return htmlspecialchars($string);
+        }
+    }
+
+    /**
+     * Sanitize the main exception fields in the data array according to the _Filter key.
+     * @see HomeController::sanitize()
+     */
+    protected function sanitizeData() {
+        $fields = array('Exception', 'Message', 'Description');
+
+        $method = $this->data('_Filter', 'safe');
+        switch ($method) {
+            case 'none':
+                return;
+            case 'filter':
+                $callback = array('Gdn_Format', 'htmlFilter');
+                break;
+            case 'safe':
+            default:
+                $callback = 'htmlspecialchars';
+        }
+
+        foreach ($fields as $field) {
+            if (isset($this->Data[$field]) && is_string($this->Data[$field])) {
+                $this->Data[$field] = call_user_func($callback, $this->Data[$field]);
+            }
+        }
     }
 
     /**

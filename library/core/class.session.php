@@ -56,6 +56,47 @@ class Gdn_Session {
     }
 
     /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param bool|string $permission The permission to check.  Bool to force true/false.
+     * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function checkRankedPermission($permission) {
+        $permissionsRanked = array(
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Garden.Moderation.Manage',
+            'Garden.SignIn.Allow'
+        );
+
+        if ($permission === true) {
+            return true;
+        } elseif ($permission === false) {
+            return false;
+        } elseif (in_array($permission, $permissionsRanked)) {
+            // Ordered rank of some permissions, highest to lowest
+            $currentPermissionRank = array_search($permission, $permissionsRanked);
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                if ($this->checkPermission($permissionsRanked[$i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Check to see if the user has at least the given permission.
+        return $this->checkPermission($permission);
+    }
+
+    /**
      * Checks the currently authenticated user's permissions for the specified
      * permission. Returns a boolean value indicating if the action is
      * permitted.
@@ -138,6 +179,7 @@ class Gdn_Session {
         $Authenticator->authenticateWith()->deauthenticate();
         $this->setCookie('-Vv', null, -3600);
         $this->setCookie('-sid', null, -3600);
+        $this->setCookie('-tk', null, -3600);
 
         Gdn::PluginManager()->CallEventHandlers($this, 'Gdn_Session', 'End');
 
@@ -305,7 +347,7 @@ class Gdn_Session {
         // WARNING: THIS DOES NOT CHECK THE DEFAULT CONFIG-DEFINED SETTINGS.
         // IF A USER HAS NEVER SAVED THEIR PREFERENCES, THIS WILL RETURN
         // INCORRECT VALUES.
-        return ArrayValue($PreferenceName, $this->_Preferences, $DefaultValue);
+        return val($PreferenceName, $this->_Preferences, $DefaultValue);
     }
 
     /**
@@ -318,7 +360,7 @@ class Gdn_Session {
      */
     public function getAttribute($AttributeName, $DefaultValue = false) {
         if (is_array($this->_Attributes)) {
-            return ArrayValue($AttributeName, $this->_Attributes, $DefaultValue);
+            return val($AttributeName, $this->_Attributes, $DefaultValue);
         }
         return $DefaultValue;
     }
@@ -365,7 +407,7 @@ class Gdn_Session {
      * @param bool $Persist If setting an identity, should we persist it beyond browser restart?
      */
     public function start($UserID = false, $SetIdentity = true, $Persist = false) {
-        if (!C('Garden.Installed', false)) {
+        if (!c('Garden.Installed', false)) {
             return;
         }
         // Retrieve the authenticated UserID from the Authenticator module.
@@ -390,7 +432,7 @@ class Gdn_Session {
                 $this->_Permissions = Gdn_Format::unserialize($this->User->Permissions);
                 $this->_Preferences = Gdn_Format::unserialize($this->User->Preferences);
                 $this->_Attributes = Gdn_Format::unserialize($this->User->Attributes);
-                $this->_TransientKey = is_array($this->_Attributes) ? arrayValue('TransientKey', $this->_Attributes) : false;
+                $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
 
                 if ($this->_TransientKey === false) {
                     $this->_TransientKey = $UserModel->setTransientKey($this->UserID);
@@ -471,7 +513,7 @@ class Gdn_Session {
     public function ensureTransientKey() {
         if (!$this->_TransientKey) {
             // Generate a transient key in the browser.
-            $tk = substr(md5(microtime()), 0, 16);
+            $tk = betterRandomString(16, 'Aa0');
             setAppCookie('tk', $tk);
             $this->_TransientKey = $tk;
         }
@@ -531,6 +573,34 @@ class Gdn_Session {
             }
         }
         return $Return;
+    }
+
+    /**
+     * Get a public stash value.
+     *
+     * @param string $name The key of the stash.
+     * @param bool $unset Whether or not to unset the stash.
+     * @return mixed Returns the value of the stash.
+     */
+    public function getPublicStash($name, $unset = false) {
+        return $this->stash('@public_'.$name, '', $unset);
+    }
+
+    /**
+     * Sets a public stash value.
+     *
+     * @param string $name The key of the stash value.
+     * @param mixed $value The value of the stash to set. Pass null to clear the key.
+     * @return Gdn_Session $this Returns $this for chaining.
+     */
+    public function setPublicStash($name, $value) {
+        if ($value === null) {
+            $this->stash('@public_'.$name, '', true);
+        } else {
+            $this->stash('@public_'.$name, $value, false);
+        }
+
+        return $this;
     }
 
     /**

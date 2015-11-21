@@ -1478,9 +1478,10 @@ EOT;
      * Format a string using Markdown syntax. Also purifies the output html.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true
      * @return string
      */
-    public static function markdown($Mixed) {
+    public static function markdown($Mixed, $Flavored = true) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Markdown');
         } else {
@@ -1489,7 +1490,14 @@ EOT;
                 return Gdn_Format::display($Mixed);
             } else {
                 require_once(PATH_LIBRARY.'/vendors/markdown/Michelf/MarkdownExtra.inc.php');
-                $Mixed = \Michelf\MarkdownExtra::defaultTransform($Mixed);
+                $Markdown = new MarkdownVanilla;
+
+                // Add Vanilla customizations.
+                if ($Flavored) {
+                    $Markdown->addAllFlavor();
+                }
+
+                $Mixed = $Markdown->transform($Mixed);
                 $Mixed = $Formatter->format($Mixed);
                 $Mixed = Gdn_Format::links($Mixed);
                 $Mixed = Gdn_Format::mentions($Mixed);
@@ -1616,7 +1624,7 @@ EOT;
 
     /**
      * Do a preg_replace, but don't affect things inside <code> tags.
-     * 
+     *
      * The three parameters are identical to the ones you'd pass
      * preg_replace.
      *
@@ -1793,7 +1801,11 @@ EOT;
             if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
                 $Mixed = self::$FormatMethod($Mixed);
             } elseif (function_exists('format'.$FormatMethod)) {
+                deprecated('format'.$FormatMethod, 'gdn_formatter_'.$FormatMethod, '2015-10-26');
                 $FormatMethod = 'format'.$FormatMethod;
+                $Mixed = $FormatMethod($Mixed);
+            } elseif (function_exists('gdn_formatter_'.$FormatMethod)) {
+                $FormatMethod = 'gdn_formatter_'.$FormatMethod;
                 $Mixed = $FormatMethod($Mixed);
             } elseif ($Formatter = Gdn::factory($FormatMethod.'Formatter')) {
                 $Mixed = $Formatter->format($Mixed);
@@ -1856,9 +1868,9 @@ EOT;
             $Year = $Matches[1];
             $Month = $Matches[2];
             $Day = $Matches[3];
-            $Hour = arrayValue(4, $Matches, 0);
-            $Minute = arrayValue(5, $Matches, 0);
-            $Second = arrayValue(6, $Matches, 0);
+            $Hour = val(4, $Matches, 0);
+            $Minute = val(5, $Matches, 0);
+            $Second = val(6, $Matches, 0);
             return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
         } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $DateTime, $Matches)) {
             $Year = $Matches[1];

@@ -61,29 +61,47 @@ class GettingStartedPlugin extends Gdn_Plugin {
                 .anchor('&times;', '/dashboard/plugin/dismissgettingstarted/'.$Session->transientKey(), 'Dismiss')
                 ."<h1>".t("Here's how to get started:")."</h1>"
                 .'<ul>
-      <li class="One'.(c('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">
-	 <strong>'.anchor(t('Welcome to your Dashboard'), 'settings').'</strong>
-         <p>'.t('This is the administrative dashboard for your new community. Check out the configuration options to the left: from here you can configure how your community works. <b>Only users in the "Administrator" role can see this part of your community.</b>').'</p>
-      </li>
-      <li class="Two'.(c('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">
-	 <strong>'.anchor(t("Where is your Community Forum?"), '/').'</strong>
-         <p>'.t('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').anchor(t('clicking here'), '/').t('. The community forum is what all of your users &amp; customers will see when they visit ').anchor(Gdn::request()->Url('/', true), Gdn::request()->Url('/', true)).'.</p>
-      </li>
-      <li class="Three'.(c('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
-         <strong>'.anchor(t('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
-         <p>'.t('Discussion categories are used to help your users organize their discussions in a way that is meaningful for your community.').'</p>
-      </li>
-      <li class="Four'.(c('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">
-         <strong>'.anchor(t('Customize your Public Profile'), 'profile').'</strong>
-         <p>'.t('Everyone who signs up for your community gets a public profile page where they can upload a picture of themselves, manage their profile settings, and track cool things going on in the community. You should ').anchor(t('customize your profile now'), 'profile').'.</p>
-      </li>
-      <li class="Five'.(c('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">
-         <strong>'.anchor(t('Start your First Discussion'), 'post/discussion').'</strong>
-	 <p>'.t('Get the ball rolling in your community by ').anchor(t('starting your first discussion'), 'post/discussion').t(' now.').'</p>
-      </li>
-      <li class="Six'.(c('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">
-         <strong>'.anchor(t('Manage your Plugins'), 'settings/plugins').'</strong>
-         <p>'.t('Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.').'</p>
+        <li class="One'.(c('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">
+	    <strong>'.anchor(t('Welcome to your Dashboard'), 'settings').'</strong>
+        <p>'.t(
+            'This is the administrative dashboard for your new community.',
+            'This is the administrative dashboard for your new community. Check out the configuration options to the side. From there you can configure how your community works. <b>By default, only users in the "Administrator" role can see this part of your community.</b>'
+        ).'</p>
+        </li>
+        <li class="Two'.(c('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">
+	    <strong>'.anchor(t("Where is your Community Forum?"), '/').'</strong>
+        <p>'.formatString(t(
+            'Access your community forum by clicking the "Visit Site" link.',
+            'Access your community forum by clicking the "Visit Site" link at the top of this page, or by <a href={/,url}>clicking here</a>. The community forum is what all of your users &amp; customers will see when they visit <a href="{/,url,domain}">{/,url,domain}</a>.'
+        )).'</p>
+        </li>
+        <li class="Three'.(c('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
+        <strong>'.anchor(t('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
+        <p>'.t(
+            'Categories are used to organize discussions.',
+            'Categories are used to help your users organize their discussions in a way that is meaningful for your community.'
+        ).'</p>
+        </li>
+        <li class="Four'.(c('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">
+        <strong>'.anchor(t('Customize your Public Profile'), 'profile').'</strong>
+        <p>'.formatString(t(
+            'Everyone who signs up gets a profile page.',
+            'Everyone who signs up for your community gets a public profile page where they can upload a picture of themselves, manage their profile settings, and track cool things going on in the community. You should <a href="{/profile,url}">customize your profile now</a>.'
+        )).'</p>
+        </li>
+        <li class="Five'.(c('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">
+            <strong>'.anchor(t('Start your First Discussion'), 'post/discussion').'</strong>
+	    <p>'.formatString(t(
+            'Start the first discussion.',
+            'Get the ball rolling in your community by <a href="{/post/discussion,url}">starting the first discussion</a> now.'
+        )).'</p>
+        </li>
+        <li class="Six'.(c('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">
+        <strong>'.anchor(t('Manage Plugins'), 'settings/plugins').'</strong>
+        <p>'.t(
+            'Change the way your community works with plugins.',
+            'Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.'
+        ).'</p>
       </li>
    </ul>
 </div>';

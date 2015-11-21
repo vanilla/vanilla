@@ -569,12 +569,18 @@ class UpdateModel extends Gdn_Model {
         $Result = array();
         for ($i = 0; $i < $Zip->numFiles; $i++) {
             $Entry = $Zip->statIndex($i);
+
+            if (preg_match('#(\.\.[\\/])#', $Entry['name'])) {
+                throw new Gdn_UserException("Invalid path in zip file: ".htmlspecialchars($Entry['name']));
+            }
+
             $Name = '/'.ltrim($Entry['name'], '/');
 
             foreach ($InfoPaths as $InfoPath) {
                 $Preg = '`('.str_replace(array('.', '*'), array('\.', '.*'), $InfoPath).')$`';
                 if (preg_match($Preg, $Name, $Matches)) {
                     $Base = trim(substr($Name, 0, -strlen($Matches[1])), '/');
+
                     if (strpos($Base, '/') !== false) {
                         continue; // file nested too deep.
                     }

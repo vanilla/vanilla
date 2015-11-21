@@ -100,8 +100,30 @@ class Gdn_Validation {
     }
 
     /**
-     * Examines the current schema and fills {@link Gdn_Validation::$_SchemaRules} with rules based
-     * on the properties of each field in the table schema.
+     * Expand the validation results into a single-dimension array.
+     *
+     * @param array $results The validation results to expand.
+     * @return array Returns an array of error messages.
+     */
+    public static function resultsAsArray($results) {
+        $Errors = array();
+        foreach ($results as $Name => $Value) {
+            if (is_array($Value)) {
+                foreach ($Value as $Code) {
+                    $Errors[] = trim(sprintf(T($Code), T($Name)), '.').'.';
+                }
+            } else {
+                $Errors[] = trim(sprintf(T($Value), T($Name)), '.').'.';
+            }
+        }
+        return $Errors;
+    }
+
+    /**
+     * Examine the current schema and fill {@link Gdn_Validation::$_SchemaRules}.
+     *
+     * The {@link Gdn_Validation::$_SchemaRules} are filled with rules based on the properties of each field in the
+     * table schema.
      */
     protected function applyRulesBySchema() {
         $this->_SchemaRules = array();
@@ -452,7 +474,7 @@ class Gdn_Validation {
             $this->_ValidationFields = array();
         }
 
-        $Value = arrayValue($FieldName, $PostedFields, null);
+        $Value = val($FieldName, $PostedFields, null);
         $this->_ValidationFields[$FieldName] = $Value;
     }
 
@@ -623,7 +645,7 @@ class Gdn_Validation {
                                 // If $ValidationResult is not FALSE, assume it is an error message
                                 $ErrorCode = $ValidationResult === false ? $Function : $ValidationResult;
                                 // If there is a custom error, use it above all else
-                                $ErrorCode = arrayValue($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
+                                $ErrorCode = val($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
                                 // Add the result
                                 $this->addValidationResult($FieldName, $ErrorCode);
                                 // Only add one error per field
@@ -633,7 +655,7 @@ class Gdn_Validation {
                             if (ValidateRegex($FieldValue, $Regex) !== true) {
                                 $ErrorCode = 'Regex';
                                 // If there is a custom error, use it above all else
-                                $ErrorCode = arrayValue($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
+                                $ErrorCode = val($FieldName.'.'.$RuleName, $this->_CustomErrors, $ErrorCode);
                                 // Add the result
                                 $this->addValidationResult($FieldName, $ErrorCode);
                             }
@@ -671,6 +693,13 @@ class Gdn_Validation {
     }
 
     /**
+     * Reset the validation results to an empty array.
+     */
+    public function reset() {
+        $this->_ValidationResults = [];
+    }
+
+    /**
      * Returns the $this->_ValidationResults array. You must use this method
      * because the array is read-only outside this object.
      *
@@ -686,36 +715,33 @@ class Gdn_Validation {
     }
 
     /**
+     * Get the validation results as an array of error messages.
+     *
+     * @return array Returns an array of error messages or an empty array if there are no errors.
+     */
+    public function resultsArray() {
+        return static::resultsAsArray($this->results());
+    }
+
+    /**
      * Get the validation results as a string of text.
      *
      * @return string Returns the validation results.
      */
     public function resultsText() {
-        return self::resultsAsText($this->results());
+        return static::resultsAsText($this->results());
     }
 
     /**
      * Format an array of validation results as a string.
      *
-     * @param array $Results An array of validation results returned from {@link Gdn_Validation::Results()}.
+     * @param array $results An array of validation results returned from {@link Gdn_Validation::Results()}.
      * @return string Returns the validation results as a string.
      */
-    public static function resultsAsText($Results) {
-        $Errors = array();
-        foreach ($Results as $Name => $Value) {
-            if (is_array($Value)) {
-                foreach ($Value as $Code) {
-                    $Errors[] = trim(sprintf(T($Code), T($Name)), '.');
-                }
-            } else {
-                $Errors[] = trim(sprintf(T($Value), T($Name)), '.');
-            }
-        }
+    public static function resultsAsText($results) {
+        $Errors = self::resultsAsArray($results);
 
-        $Result = implode('. ', $Errors);
-        if ($Result) {
-            $Result .= '.';
-        }
+        $Result = implode(' ', $Errors);
         return $Result;
     }
 }

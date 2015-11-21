@@ -810,7 +810,7 @@ class CommentModel extends VanillaModel {
         }
 
         // Validate $CommentID and whether this is an insert
-        $CommentID = arrayValue('CommentID', $FormPostValues);
+        $CommentID = val('CommentID', $FormPostValues);
         $CommentID = is_numeric($CommentID) && $CommentID > 0 ? $CommentID : false;
         $Insert = $CommentID === false;
         if ($Insert) {
@@ -831,6 +831,12 @@ class CommentModel extends VanillaModel {
                 $Fields = $this->Validation->SchemaValidationFields();
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
 
+                // Check for spam
+                $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
+                if ($spam) {
+                    return SPAM;
+                }
+
                 if ($Insert === false) {
                     // Log the save.
                     LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
@@ -841,12 +847,6 @@ class CommentModel extends VanillaModel {
                     // Make sure that the comments get formatted in the method defined by Garden.
                     if (!val('Format', $Fields) || c('Garden.ForceInputFormatter')) {
                         $Fields['Format'] = Gdn::config('Garden.InputFormatter', '');
-                    }
-
-                    // Check for spam
-                    $Spam = SpamModel::IsSpam('Comment', $Fields);
-                    if ($Spam) {
-                        return SPAM;
                     }
 
                     // Check for approval
@@ -896,7 +896,7 @@ class CommentModel extends VanillaModel {
      */
     public function save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
         $Session = Gdn::session();
-        $UserModel = Gdn::userModel();
+        $discussionModel = new DiscussionModel();
 
         // Load comment data
         $Fields = $this->getID($CommentID, DATASET_TYPE_ARRAY);
@@ -905,7 +905,7 @@ class CommentModel extends VanillaModel {
         $DiscussionModel = new DiscussionModel();
         $DiscussionID = val('DiscussionID', $Fields);
         $Discussion = $DiscussionModel->getID($DiscussionID);
-        $Session->Stash('CommentForForeignID_'.GetValue('ForeignID', $Discussion));
+        $Session->setPublicStash('CommentForForeignID_'.GetValue('ForeignID', $Discussion), null);
 
         // Make a quick check so that only the user making the comment can make the notification.
         // This check may be used in the future so should not be depended on later in the method.
@@ -993,7 +993,7 @@ class CommentModel extends VanillaModel {
             $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
             foreach ($BookmarkData->result() as $Bookmark) {
                 // Check user can still see the discussion.
-                if (!$UserModel->GetCategoryViewPermission($Bookmark->UserID, $Discussion->CategoryID)) {
+                if (!$discussionModel->canView($Discussion, $Bookmark->UserID)) {
                     continue;
                 }
 
@@ -1005,7 +1005,7 @@ class CommentModel extends VanillaModel {
             // Notify users who have participated in the discussion.
             $ParticipatedData = $DiscussionModel->GetParticipatedUsers($DiscussionID);
             foreach ($ParticipatedData->result() as $UserRow) {
-                if (!$UserModel->GetCategoryViewPermission($UserRow->UserID, $Discussion->CategoryID)) {
+                if (!$discussionModel->canView($Discussion, $UserRow->UserID)) {
                     continue;
                 }
 
@@ -1018,7 +1018,7 @@ class CommentModel extends VanillaModel {
             if ($Discussion != false) {
                 $InsertUserID = val('InsertUserID', $Discussion);
                 // Check user can still see the discussion.
-                if ($UserModel->GetCategoryViewPermission($InsertUserID, $Discussion->CategoryID)) {
+                if ($discussionModel->canView($Discussion, $InsertUserID)) {
                     $Activity['NotifyUserID'] = $InsertUserID;
                     $Activity['Data']['Reason'] = 'mine';
                     $ActivityModel->Queue($Activity, 'DiscussionComment');
@@ -1033,15 +1033,16 @@ class CommentModel extends VanillaModel {
 
             // Notify any users who were mentioned in the comment.
             $Usernames = GetMentions($Fields['Body']);
+            $userModel = Gdn::userModel();
             foreach ($Usernames as $i => $Username) {
-                $User = $UserModel->GetByUsername($Username);
+                $User = $userModel->GetByUsername($Username);
                 if (!$User) {
                     unset($Usernames[$i]);
                     continue;
                 }
 
                 // Check user can still see the discussion.
-                if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID)) {
+                if (!$discussionModel->canView($Discussion, $User->UserID)) {
                     continue;
                 }
 
@@ -1110,7 +1111,8 @@ class CommentModel extends VanillaModel {
 
             $UserID = $Row['UserID'];
             // Check user can still see the discussion.
-            if (!Gdn::userModel()->GetCategoryViewPermission($UserID, $Category['CategoryID'])) {
+            $discussionModel = new DiscussionModel();
+            if (!$discussionModel->canView($Discussion, $UserID)) {
                 continue;
             }
 

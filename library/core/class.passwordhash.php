@@ -26,7 +26,7 @@ class Gdn_PasswordHash extends PasswordHash {
      */
     function __construct() {
         // 8 iteration to create a Portable hash
-        parent::passwordHash(8, false);
+        parent::__construct(8, false);
     }
 
     /**

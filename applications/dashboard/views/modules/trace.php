@@ -60,6 +60,9 @@
             if (!in_array($Type, array(TRACE_ERROR, TRACE_INFO, TRACE_NOTICE, TRACE_WARNING))) {
                 $Var = $Type;
                 $Type = TRACE_INFO;
+            } elseif (!$Message) {
+                // Don't show empty messages.
+                continue;
             }
             ?>
             <tr>

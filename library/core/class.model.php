@@ -37,6 +37,11 @@ class Gdn_Model extends Gdn_Pluggable {
     public $DateUpdated = 'DateUpdated';
 
     /**
+     * @var array The fields that should be filtered out via {@link Gdn_Model::filterForm()}.
+     */
+    protected $filterFields;
+
+    /**
      * @var string The name of the field that stores the id of the user that inserted it.
      * This field will be automatically filled by the model if it exists and
      * @@Session::UserID is a valid integer.
@@ -96,7 +101,38 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->Validation = new Gdn_Validation();
         $this->Name = $Name;
         $this->PrimaryKey = $Name.'ID';
+        $this->filterFields = array(
+            'Attributes' => 0,
+            'DateInserted' => 0,
+            'InsertUserID' => 0,
+            'InsertIPAddress' => 0,
+            'CheckBoxes' => 0,
+            'DateUpdated' => 0,
+            'UpdateUserID' => 0,
+            'UpdateIPAddress' => 0,
+            'DeliveryMethod' => 0,
+            'DeliveryType' => 0,
+            'OK' => 0,
+            'TransientKey' => 0,
+            'hpt' => 0
+        );
+
         parent::__construct();
+    }
+
+    /**
+     * Add one or more filter field names to the list of fields that will be removed during save.
+     *
+     * @param string|array $field Either a field name or an array of field names to filter.
+     * @return Gdn_Model Returns $this for chaining.
+     */
+    public function addFilterField($field) {
+        if (is_array($field)) {
+            $this->filterFields = array_replace($this->filterFields, array_fill_keys($field, 0));
+        } else {
+            $this->filterFields[$field] = 0;
+        }
+        return $this;
     }
 
     /**
@@ -171,6 +207,29 @@ class Gdn_Model extends Gdn_Pluggable {
         return $this->Schema;
     }
 
+    /**
+     * Get all of the field names that will be filtered out during save.
+     *
+     * @return array Returns an array of field names.
+     */
+    public function getFilterFields() {
+        return array_keys($this->filterFields);
+    }
+
+    /**
+     * Remove one or more fields from the filter field array.
+     *
+     * @param string|array $field One or more field names to remove.
+     * @return Gdn_Model Returns $this for chaining.
+     */
+    public function removeFilterField($field) {
+        if (is_array($field)) {
+            $this->filterFields = array_diff_key($this->filterFields, array_fill_keys($field, 0));
+        } else {
+            unset($this->filterFields[$field]);
+        }
+        return $this;
+    }
 
     /**
      *  Takes a set of form data ($Form->_PostValues), validates them, and
@@ -227,6 +286,17 @@ class Gdn_Model extends Gdn_Pluggable {
         $Set = array_intersect_key($Property, $this->Schema->fields());
         self::serializeRow($Set);
         $this->SQL->put($this->Name, $Set, array($this->PrimaryKey => $RowID));
+    }
+
+    /**
+     * Set the array of filter field names.
+     *
+     * @param array $fields An array of field names.
+     * @return Gdn_Model Returns $this for chaining.
+     */
+    public function setFilterFields(array $fields) {
+        $this->filterFields = array_fill_keys($fields, 0);
+        return $this;
     }
 
     /**
@@ -340,26 +410,12 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Filter out any potentially insecure fields before they go to the database.
      *
-     * @param array $Data
-     * @return array
+     * @param array $data The array of data to filter.
+     * @return array Returns a copy of {@link $data} with fields removed.
      */
-    public function filterForm($Data) {
-        $Data = array_diff_key($Data, array(
-            'Attributes' => 0,
-            'DateInserted' => 0,
-            'InsertUserID' => 0,
-            'InsertIPAddress' => 0,
-            'CheckBoxes' => 0,
-            'DateUpdated' => 0,
-            'UpdateUserID' => 0,
-            'UpdateIPAddress' => 0,
-            'DeliveryMethod' => 0,
-            'DeliveryType' => 0,
-            'OK' => 0,
-            'TransientKey' => 0,
-            'hpt' => 0
-        ));
-        return $Data;
+    public function filterForm($data) {
+        $data = array_diff_key($data, $this->filterFields);
+        return $data;
     }
 
     /**

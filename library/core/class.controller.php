@@ -15,10 +15,9 @@
 /**
  * Controller base class.
  *
- * A base class that all controllers can inherit for common controller
- * properties and methods.
+ * A base class that all controllers can inherit for common properties and methods.
  *
- * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
+ * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
@@ -338,7 +337,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!is_null($Definition)) {
             $this->_Definitions[$Term] = $Definition;
         }
-        return arrayValue($Term, $this->_Definitions);
+        return val($Term, $this->_Definitions);
     }
 
     /**
@@ -580,9 +579,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                     (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                 )
             ) {
-                $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
+                $ReflectArgs = array_slice($this->ReflectArgs, 1);
             } else {
-                $ReflectArgs = json_encode($this->ReflectArgs);
+                $ReflectArgs = $this->ReflectArgs;
             }
 
             $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
@@ -772,10 +771,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $View .= '_rss';
         }
 
-        $ViewPath2 = viewLocation($View, $ControllerName, $ApplicationFolder);
-
         $LocationName = concatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
-        $ViewPath = arrayValue($LocationName, $this->_ViewLocations, false);
+        $ViewPath = val($LocationName, $this->_ViewLocations, false);
         if ($ViewPath === false) {
             // Define the search paths differently depending on whether or not we are in a plugin or application.
             $ApplicationFolder = trim($ApplicationFolder, '/');
@@ -849,10 +846,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             Gdn::dispatcher()->passData('ViewPaths', $ViewPaths);
             throw NotFoundException('View');
 //         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
-        }
-
-        if ($ViewPath2 != $ViewPath) {
-            Trace("View paths do not match: $ViewPath != $ViewPath2", TRACE_WARNING);
         }
 
         return $ViewPath;
@@ -1064,7 +1057,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!is_null($Value)) {
             $this->_Json[$Key] = $Value;
         }
-        return arrayValue($Key, $this->_Json, null);
+        return val($Key, $this->_Json, null);
     }
 
     /**
@@ -1229,21 +1222,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Cross-Origin Resource Sharing (CORS)
-
-            /**
-             * Access-Control-Allow-Origin
-             * If a Origin header is sent by the client, attempt to verify it against the list of
-             * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
-             * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
-             * response using the client's Origin header value.
-             */
-            $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
-            if ($origin) {
-                $originHost = parse_url($origin, PHP_URL_HOST);
-                if ($originHost && isTrustedDomain($originHost)) {
-                    $this->setHeader('Access-Control-Allow-Origin', $origin);
-                }
-            }
+            $this->setAccessControl();
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
@@ -1312,11 +1291,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             $Json = json_encode($this->_Json);
-            // Check for jsonp call.
-            if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
-                $Json = $Callback.'('.$Json.')';
-            }
-
             $this->_Json['Data'] = $Json;
             exit($this->_Json['Data']);
         } else {
@@ -1344,6 +1318,24 @@ class Gdn_Controller extends Gdn_Pluggable {
                 } else {
                     echo $View;
                 }
+            }
+        }
+    }
+
+    /**
+     * Set Access-Control-Allow-Origin header.
+     *
+     * If a Origin header is sent by the client, attempt to verify it against the list of
+     * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
+     * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
+     * response using the client's Origin header value.
+     */
+    protected function setAccessControl() {
+        $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
+        if ($origin) {
+            $originHost = parse_url($origin, PHP_URL_HOST);
+            if ($originHost && isTrustedDomain($originHost)) {
+                $this->setHeader('Access-Control-Allow-Origin', $origin);
             }
         }
     }
@@ -1463,8 +1455,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data['Exception'] = Gdn_Validation::resultsAsText($this->Form->validationResults());
         }
 
-
-        $this->SendHeaders();
+        $this->sendHeaders();
 
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);
@@ -1496,12 +1487,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a jsonp request.
-                    echo $Callback.'('.json_encode($Data).');';
+                    echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
                     return true;
                 } else {
                     safeHeader('Content-Type: application/json; charset='.c('Garden.Charset', 'utf-8'), true);
                     // This is a regular json request.
-                    echo json_encode($Data);
+                    echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                     return true;
                 }
                 break;
@@ -1680,18 +1671,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // Only get css & ui components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
-//            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
-//               $this->AddCssFile('custom.css');
-//
-//               // Add the theme option's css file.
-//               if ($this->Theme && $this->ThemeOptions) {
-//                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
-//                  if (is_string($Filenames) && $Filenames != '%s')
-//                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
-//               }
-//            } elseif (ArrayHasValue($this->_CssFiles, 'admin.css')) {
-//               $this->AddCssFile('customadmin.css');
-//            }
+
+                $CssAnchors = AssetModel::getAnchors();
 
                 $this->EventArguments['CssFiles'] = &$this->_CssFiles;
                 $this->fireEvent('BeforeAddCss');
@@ -1703,13 +1684,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
                     $CssFile = $CssInfo['FileName'];
-                    if (!is_array($CssInfo['Options'])) {
+                    if (!array_key_exists('Options', $CssInfo) || !is_array($CssInfo['Options'])) {
                         $CssInfo['Options'] = array();
                     }
                     $Options = &$CssInfo['Options'];
 
                     // style.css and admin.css deserve some custom processing.
-                    if (in_array($CssFile, array('style.css', 'admin.css'))) {
+                    if (in_array($CssFile, $CssAnchors)) {
                         if (!$CombineAssets) {
                             // Grab all of the css files from the asset model.
                             $AssetModel = new AssetModel();
@@ -1720,7 +1701,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         } else {
                             $Basename = substr($CssFile, 0, -4);
 
-                            $this->Head->addCss(url("/utility/css/$ThemeType/$Basename-$ETag.css", '//'), 'all', false, $CssInfo['Options']);
+                            $this->Head->addCss(url("/asset/css/$ThemeType/$Basename-$ETag.css", '//'), 'all', false, $CssInfo['Options']);
                         }
                         continue;
                     }
@@ -1817,8 +1798,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         // Master views come from one of four places:
         $MasterViewPaths = array();
 
-        $MasterViewPath2 = viewLocation($this->masterView().'.master', '', $this->ApplicationFolder);
-
         if (strpos($this->MasterView, '/') !== false) {
             $MasterViewPaths[] = combinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
         } else {
@@ -1828,9 +1807,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
                 $MasterViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*'));
             }
-            // 3. Application default. eg. root/app_name/views/
+            // 3. Plugin default. eg. root/plugin_name/views/
+            $MasterViewPaths[] = combinePaths(array(PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
+            // 4. Application default. eg. root/app_name/views/
             $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
-            // 4. Garden default. eg. root/dashboard/views/
+            // 5. Garden default. eg. root/dashboard/views/
             $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', $this->MasterView.'.master*'));
         }
 
@@ -1842,10 +1823,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $MasterViewPath = $Paths[0];
                 break;
             }
-        }
-
-        if ($MasterViewPath != $MasterViewPath2) {
-            trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
         }
 
         $this->EventArguments['MasterViewPath'] = &$MasterViewPath;

@@ -17,7 +17,7 @@ if (!isset($Drop)) {
 }
 
 if (!isset($Explicit)) {
-    $Explicit = true;
+    $Explicit = false;
 }
 
 $SQL = Gdn::database()->sql();
@@ -113,8 +113,8 @@ $Construct
     ->column('Sink', 'tinyint(1)', '0')
     ->column('DateInserted', 'datetime', false, array('index', 'index.CategoryInserted'))
     ->column('DateUpdated', 'datetime', true)
-    ->column('InsertIPAddress', 'varchar(15)', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'ipaddress', true)
+    ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('DateLastComment', 'datetime', null, array('index', 'index.CategoryPages'))
     ->column('LastCommentUserID', 'int', true)
     ->column('Score', 'float', null)
@@ -180,8 +180,8 @@ $Construct
     ->column('DateInserted', 'datetime', null, array('index.1', 'index'))
     ->column('DateDeleted', 'datetime', true)
     ->column('DateUpdated', 'datetime', true)
-    ->column('InsertIPAddress', 'varchar(15)', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'ipaddress', true)
+    ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('Flag', 'tinyint', 0)
     ->column('Score', 'float', null)
     ->column('Attributes', 'text', true)
@@ -409,5 +409,5 @@ include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 // Set current Vanilla.Version
 $ApplicationInfo = array();
 include(CombinePaths(array(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'about.php')));
-$Version = arrayValue('Version', arrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');
+$Version = val('Version', val('Vanilla', $ApplicationInfo, array()), 'Undefined');
 saveToConfig('Vanilla.Version', $Version);

@@ -1,3 +1,3 @@
 <?php
-header("Location: entry/signin", TRUE, 301);
+header("Location: entry/signin", true, 301);
 exit();

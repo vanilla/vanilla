@@ -45,13 +45,10 @@ if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding('UTF-8');
 }
 
-// Include the core function definitions
-require_once(PATH_LIBRARY_CORE.'/functions.error.php');
-require_once(PATH_LIBRARY_CORE.'/functions.general.php');
-require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
+// Include the core autoloader.
+require_once __DIR__.'/vendor/autoload.php';
 
-// Include and initialize the autoloader
-require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
+// Initialize the autoloader.
 Gdn_Autoloader::start();
 
 // Guard against broken cache files
@@ -110,8 +107,8 @@ Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
 // Load the configurations for enabled Applications
-foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
-    Gdn::config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
+foreach (Gdn::applicationManager()->enabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
+    Gdn::config()->load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
 }
 
 /**
@@ -121,7 +118,7 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
  * begin installation.
  */
 if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
-    safeHeader('Location: '.Gdn::request()->Url('dashboard/setup', true));
+    safeHeader('Location: '.Gdn::request()->url('dashboard/setup', true));
     exit();
 }
 

@@ -353,7 +353,7 @@ class Auth_OpenID_CheckAuthRequest extends Auth_OpenID_Request {
     var $mode = "check_authentication";
     var $invalidate_handle = null;
 
-    function Auth_OpenID_CheckAuthRequest($assoc_handle, $signed,
+    function __construct($assoc_handle, $signed,
                                           $invalidate_handle = null)
     {
         $this->assoc_handle = $assoc_handle;
@@ -590,7 +590,7 @@ class Auth_OpenID_AssociateRequest extends Auth_OpenID_Request {
           'DH-SHA256' => 'Auth_OpenID_DiffieHellmanSHA256ServerSession');
     }
 
-    function Auth_OpenID_AssociateRequest(&$session, $assoc_type)
+    function __construct(&$session, $assoc_type)
     {
         $this->session =& $session;
         $this->namespace = Auth_OpenID_OPENID2_NS;
@@ -763,7 +763,7 @@ class Auth_OpenID_CheckIDRequest extends Auth_OpenID_Request {
         }
     }
 
-    function Auth_OpenID_CheckIDRequest($identity, $return_to,
+    function __construct($identity, $return_to,
                                         $trust_root = null, $immediate = false,
                                         $assoc_handle = null, $server = null,
                                         $claimed_id = null)
@@ -1097,7 +1097,7 @@ class Auth_OpenID_CheckIDRequest extends Auth_OpenID_Request {
                                   in OpenID 1.x immediate mode.');
                 }
 
-                $setup_request =& new Auth_OpenID_CheckIDRequest(
+                $setup_request = new Auth_OpenID_CheckIDRequest(
                                                 $this->identity,
                                                 $this->return_to,
                                                 $this->trust_root,
@@ -1677,9 +1677,9 @@ class Auth_OpenID_Server {
     function Auth_OpenID_Server(&$store, $op_endpoint=null)
     {
         $this->store =& $store;
-        $this->signatory =& new Auth_OpenID_Signatory($this->store);
-        $this->encoder =& new Auth_OpenID_SigningEncoder($this->signatory);
-        $this->decoder =& new Auth_OpenID_Decoder($this);
+        $this->signatory = new Auth_OpenID_Signatory($this->store);
+        $this->encoder = new Auth_OpenID_SigningEncoder($this->signatory);
+        $this->decoder = new Auth_OpenID_Decoder($this);
         $this->op_endpoint = $op_endpoint;
         $this->negotiator =& Auth_OpenID_getDefaultNegotiator();
     }

@@ -112,7 +112,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         foreach ($ProfileFields as $Name => $Field) {
             // Check both so you can't break register form by requiring omitted field
             if (val('Required', $Field) && val('OnRegister', $Field)) {
-                $Sender->UserModel->Validation->applyRule($Name, 'Required', $Field['Label']." is required.");
+                $Sender->UserModel->Validation->applyRule($Name, 'Required', T('%s is required.', $Field['Label']));
             }
         }
 
@@ -205,14 +205,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Verify field form type
             if (!isset($Field['FormType'])) {
                 $Fields[$Name]['FormType'] = 'TextBox';
-            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes))
+            } elseif (!array_key_exists($Field['FormType'], $this->FormTypes)) {
                 unset($this->ProfileFields[$Name]);
-        }
-
-        // Special case for birthday field
-        if (isset($Fields['DateOfBirth'])) {
-            $Fields['DateOfBirth']['FormType'] = 'Date';
-            $Fields['DateOfBirth']['Label'] = t('Birthday');
+            } elseif ($Fields[$Name]['FormType'] == 'DateOfBirth') {
+                // Special case for birthday field
+                $Fields[$Name]['FormType'] = 'Date';
+                $Fields[$Name]['Label'] = t('Birthday');
+            }
         }
 
         return $Fields;
@@ -242,8 +241,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $this->ProfileFields = $this->getProfileFields();
 
         // Get user-specific data
-        $this->UserFields = Gdn::userModel()->GetMeta($Sender->data("User.UserID"), 'Profile.%', 'Profile.');
-
+        $this->UserFields = Gdn::userModel()->GetMeta($Sender->Form->getValue('UserID'), 'Profile.%', 'Profile.');
         // Fill in user data on form
         foreach ($this->UserFields as $Field => $Value) {
             $Sender->Form->setValue($Field, $Value);
@@ -467,7 +465,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param $Args array
      */
     public function userModel_afterInsertUser_handler($Sender, $Args) {
-        $this->updateUserFields($Args['InsertUserID'], $Args['User']);
+        $this->updateUserFields($Args['InsertUserID'], $Args['RegisteringUser']);
     }
 
     /**

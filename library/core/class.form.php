@@ -183,10 +183,33 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '<input type="'.$Type.'"';
         $Return .= $this->_idAttribute($ButtonCode, $Attributes);
         $Return .= $this->_nameAttribute($ButtonCode, $Attributes);
-        $Return .= ' value="'.t($ButtonCode, arrayValue('value', $Attributes)).'"';
+        $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
         $Return .= $this->_attributesToString($Attributes);
         $Return .= " />\n";
         return $Return;
+    }
+
+    /**
+     * Builds a color-picker form element. Accepts three-character hex values with or without the leading '#',
+     * but the saved value will be coerced into a six-character hex code with the leading '#'.
+     * The hex value to be saved is the value of the input with the color-picker-value class.
+     *
+     * @param string $fieldName Name of the field being posted with this input.
+     * @return string The form element for a color picker.
+     */
+    public function color($fieldName) {
+        Gdn::controller()->addJsFile('colorpicker.js');
+
+        $valueAttributes['class'] = 'js-color-picker-value color-picker-value InputBox Hidden';
+        $textAttributes['class'] = 'js-color-picker-text color-picker-text InputBox';
+        $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
+
+        return '<div id="'.$this->escapeString($fieldName).'" class="js-color-picker color-picker input-group">'
+        .$this->input($fieldName, 'text', $valueAttributes)
+        .$this->input($fieldName.'-text', 'text', $textAttributes)
+        .'<span class="js-color-picker-preview color-picker-preview"></span>'
+        .$this->input($fieldName.'-color', 'color', $colorAttributes)
+        .'</div>';
     }
 
     /**
@@ -368,7 +391,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 if ($Category['AllowDiscussions']) {
-                    $Disabled &= $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
+                    if($Permission == 'add' && !$Category['PermsDiscussionsAdd']) {
+                        $Disabled = true;
+                    }
                 }
 
                 $Return .= '<option value="'.$CategoryID.'"';
@@ -1086,7 +1111,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 $Count = count($Problems);
                 for ($i = 0; $i < $Count; ++$i) {
                     if (substr($Problems[$i], 0, 1) == '@') {
-                        $Return .= '<li>'.substr($Problems[$i], 1)."</li>\n";
+                        $Return .= "<li>".substr($Problems[$i], 1)."</li>\n";
                     } else {
                         $Return .= '<li>'.sprintf(
                             t($Problems[$i]),
@@ -1735,7 +1760,7 @@ PASSWORDMETER;
         if (is_string($Error)) {
             $ErrorCode = $Error;
         } elseif (is_a($Error, 'Gdn_UserException')) {
-            $ErrorCode = '@'.$Error->getMessage();
+            $ErrorCode = '@'.htmlspecialchars($Error->getMessage());
         } elseif (is_a($Error, 'Exception')) {
             // Strip the extra information out of the exception.
             $Parts = explode('|', $Error->getMessage());
@@ -1805,18 +1830,26 @@ PASSWORDMETER;
      * It validates the postback by looking at a transient value that was rendered using $this->Open()
      * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
-     * @return bool
+     * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
+     * @return bool Returns true if the postback could be authenticated or false otherwise.
+     * @throws Gdn_UserException Throws an exception when this is a postback AND the transient key doesn't validate.
      */
-    public function authenticatedPostBack() {
-        $KeyName = $this->escapeFieldName('TransientKey');
-        $PostBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $KeyName, false);
+    public function authenticatedPostBack($throw = false) {
+        $keyName = $this->escapeFieldName('TransientKey');
+        $postBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $keyName, false);
 
         // If this isn't a postback then return false if there isn't a transient key.
-        if (!$PostBackKey && !Gdn::request()->isPostBack()) {
+        if (!$postBackKey && !Gdn::request()->isPostBack()) {
             return false;
         }
 
-        return Gdn::session()->validateTransientKey($PostBackKey);
+        $result = Gdn::session()->validateTransientKey($postBackKey);
+
+        if (!$result && $throw && Gdn::request()->isPostBack()) {
+            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+        }
+
+        return $result;
     }
 
     /**
@@ -2001,20 +2034,20 @@ PASSWORDMETER;
                         ) ===
                             false
                         ) { // Saving dates in the format: YYYY-MM-DD
-                            $Year = arrayValue(
+                            $Year = val(
                                 $DateFields[$i].
                                 '_Year',
                                 $this->_FormValues,
                                 0
                             );
                         }
-                        $Month = arrayValue(
+                        $Month = val(
                             $DateFields[$i].
                             '_Month',
                             $this->_FormValues,
                             0
                         );
-                        $Day = arrayValue(
+                        $Day = val(
                             $DateFields[$i].
                             '_Day',
                             $this->_FormValues,
@@ -2066,7 +2099,7 @@ PASSWORDMETER;
      * @return unknown
      */
     public function getFormValue($FieldName, $Default = '') {
-        return arrayValue($FieldName, $this->formValues(), $Default);
+        return val($FieldName, $this->formValues(), $Default);
     }
 
     /**
@@ -2088,7 +2121,7 @@ PASSWORDMETER;
         if ($this->isMyPostBack()) {
             $Return = $this->getFormValue($FieldName, $Default);
         } else {
-            $Return = arrayValue($FieldName, $this->_DataArray, $Default);
+            $Return = val($FieldName, $this->_DataArray, $Default);
         }
         return $Return;
     }

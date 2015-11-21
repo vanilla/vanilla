@@ -31,3 +31,6 @@ nbproject/project.xml
 /vendor/
 /node_modules/
 /bower_components/
+/build/*
+!/build/build.xml
+!/build/package-contents.txt

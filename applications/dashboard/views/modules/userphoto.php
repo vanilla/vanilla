@@ -8,9 +8,16 @@ if (!$User)
     return;
 
 $Photo = $User->Photo;
+if ($Photo) {
+    if (!IsUrl($Photo)) {
+        $Photo = Gdn_Upload::url(changeBasename($Photo, 'p%s'));
+    }
+} else {
+    $Photo = UserModel::getDefaultAvatarUrl($User, 'profile');
+}
 
 if ($User->Banned) {
-    $BannedPhoto = c('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
+    $BannedPhoto = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
     if ($BannedPhoto)
         $Photo = Gdn_Upload::url($BannedPhoto);
 }
@@ -19,11 +26,7 @@ if ($Photo) {
     ?>
     <div class="Photo PhotoWrap PhotoWrapLarge <?php echo val('_CssClass', $User); ?>">
         <?php
-        if (IsUrl($Photo))
-            $Img = img($Photo, array('class' => 'ProfilePhotoLarge'));
-        else
-            $Img = img(Gdn_Upload::url(changeBasename($Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
-
+        $Img = img($Photo, array('class' => 'ProfilePhotoLarge'));
         if (!$User->Banned && c('Garden.Profile.EditPhotos', true) && (Gdn::session()->UserID == $User->UserID || Gdn::session()->checkPermission('Garden.Users.Edit')))
             echo anchor(Wrap(t('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture');
 

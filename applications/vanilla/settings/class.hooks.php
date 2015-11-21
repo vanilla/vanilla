@@ -527,7 +527,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender ProfileController.
      */
-    public function profileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
+    public function profileController_comments_create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
         $Sender->editMode(false);
         $View = $Sender->View;
 

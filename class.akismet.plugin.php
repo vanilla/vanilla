@@ -151,7 +151,7 @@ class AkismetPlugin extends Gdn_Plugin {
             'Items' => array('' => 'Aksimet', 'api.antispam.typepad.com' => 'TypePad', 'DefaultValue' => ''))
         ));
 
-        $Sender->AddSideMenu('dashboard/settings/plugins');
+        $Sender->AddSideMenu('settings/plugins');
         $Cf->RenderAll();
     }
 }

@@ -60,7 +60,6 @@ class EntryController extends Gdn_Controller {
         $this->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex'));
 
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');

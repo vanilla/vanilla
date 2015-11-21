@@ -70,7 +70,6 @@ class ProfileController extends Gdn_Controller {
         $this->ModuleSortContainer = 'Profile';
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');

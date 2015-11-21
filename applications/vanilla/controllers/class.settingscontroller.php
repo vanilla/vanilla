@@ -177,30 +177,26 @@ class SettingsController extends Gdn_Controller {
         $this->title(t('Flood Control'));
         $this->addSideMenu('vanilla/settings/floodcontrol');
 
-        // Check to see if Conversation is enabled.
-        $IsConversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+        // Define what configuration settings we'll be using.
+        $contexts = ['Vanilla.Discussion', 'Vanilla.Comment'];
+        $settings = ['SpamCount', 'SpamTime', 'SpamLock'];
 
-        $ConfigurationFields = array(
-            'Vanilla.Discussion.SpamCount',
-            'Vanilla.Discussion.SpamTime',
-            'Vanilla.Discussion.SpamLock',
-            'Vanilla.Comment.SpamCount',
-            'Vanilla.Comment.SpamTime',
-            'Vanilla.Comment.SpamLock'
-        );
-        if ($IsConversationsEnabled) {
-            $ConfigurationFields = array_merge(
-                $ConfigurationFields,
-                array(
-                    'Conversations.Conversation.SpamCount',
-                    'Conversations.Conversation.SpamTime',
-                    'Conversations.Conversation.SpamLock',
-                    'Conversations.ConversationMessage.SpamCount',
-                    'Conversations.ConversationMessage.SpamTime',
-                    'Conversations.ConversationMessage.SpamLock'
-                )
-            );
+        // If Conversations is enabled, add its contexts.
+        // Ideally we'd refactor this into an event and hook.
+        $conversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+        if ($conversationsEnabled) {
+            $contexts[] = 'Conversations.Conversation';
+            $contexts[] = 'Conversations.ConversationMessage';
         }
+
+        // Build our list of configuration fields.
+        $ConfigurationFields = array();
+        foreach ($contexts as $context) {
+            foreach ($settings as $setting) {
+                $ConfigurationFields[] = $context.'.'.$setting;
+            }
+        }
+
         // Load up config options we'll be setting
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -209,46 +205,22 @@ class SettingsController extends Gdn_Controller {
         // Set the model on the form.
         $this->Form->setModel($ConfigurationModel);
 
-        // If seeing the form for the first time...
-        if ($this->Form->authenticatedPostBack() === false) {
-            // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
-        } else {
-            // Define some validation rules for the fields being saved
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamCount', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamCount', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamTime', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamTime', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamLock', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamLock', 'Integer');
-
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamCount', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamCount', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamTime', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamTime', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Integer');
-
-
-            if ($IsConversationsEnabled) {
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamTime', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamTime', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamLock', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamLock', 'Integer');
-
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamCount', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamTime', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamLock', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
+        // Submitted form.
+        if ($this->Form->authenticatedPostBack()) {
+            // Apply 'required' and 'integer' validation rules to all our spam settings in all contexts.
+            foreach ($contexts as $context) {
+                foreach ($settings as $setting) {
+                    $ConfigurationModel->Validation->applyRule($context.'.'.$setting, 'Required');
+                    $ConfigurationModel->Validation->applyRule($context.'.'.$setting, 'Integer');
+                }
             }
 
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your changes have been saved."));
             }
+        } else {
+            // Apply the config settings to the form.
+            $this->Form->setData($ConfigurationModel->Data);
         }
 
         // Render default view
@@ -339,7 +311,6 @@ class SettingsController extends Gdn_Controller {
 
         $categoryModel = new CategoryModel();
         $category = $categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-//        $category = Gdn::sql()->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$category) {
             throw notFoundException('Category');
@@ -378,7 +349,6 @@ class SettingsController extends Gdn_Controller {
         $categoryModel = new CategoryModel();
         $this->Category = $categoryModel->getID($CategoryID);
 
-
         if (!$this->Category) {
             $this->Form->addError('The specified category could not be found.');
         } else {
@@ -389,7 +359,8 @@ class SettingsController extends Gdn_Controller {
             $this->OtherCategories = $categoryModel->getWhere(
                 array(
                     'CategoryID <>' => $CategoryID,
-                    'AllowDiscussions' => $this->Category->AllowDiscussions, // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
+                    // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
+                    'AllowDiscussions' => $this->Category->AllowDiscussions,
                     'CategoryID >' => 0
                 ),
                 'Sort'
@@ -399,37 +370,11 @@ class SettingsController extends Gdn_Controller {
                 $this->Form->setFormValue('DeleteDiscussions', '1'); // Checked by default
             } else {
                 $ReplacementCategoryID = $this->Form->getValue('ReplacementCategoryID');
-                $ReplacementCategory = $categoryModel->getID($ReplacementCategoryID);
-                // Error if:
-                // 1. The category being deleted is the last remaining category that
-                // allows discussions.
-                if ($this->Category->AllowDiscussions == '1'
-                    && $this->OtherCategories->numRows() == 0
-                ) {
+
+                // Error if category being deleted is the last remaining category that allows discussions.
+                if ($this->Category->AllowDiscussions == '1' && $this->OtherCategories->numRows() == 0) {
                     $this->Form->addError('You cannot remove the only remaining category that allows discussions');
                 }
-
-                /*
-                // 2. The category being deleted allows discussions, and it contains
-                // discussions, and there is no replacement category specified.
-                if ($this->Form->errorCount() == 0
-                   && $this->Category->AllowDiscussions == '1'
-                   && $this->Category->CountDiscussions > 0
-                   && ($ReplacementCategory == FALSE || $ReplacementCategory->AllowDiscussions != '1'))
-                   $this->Form->addError('You must select a replacement category in order to remove this category.');
-                */
-
-                // 3. The category being deleted does not allow discussions, and it
-                // does contain other categories, and there are replacement parent
-                // categories available, and one is not selected.
-                /*
-                if ($this->Category->AllowDiscussions == '0'
-                   && $this->OtherCategories->numRows() > 0
-                   && !$ReplacementCategory) {
-                   if ($this->CategoryModel->getWhere(array('ParentCategoryID' => $CategoryID))->numRows() > 0)
-                      $this->Form->addError('You must select a replacement category in order to remove this category.');
-                }
-                */
 
                 if ($this->Form->errorCount() == 0) {
                     // Go ahead and delete the category
@@ -620,15 +565,8 @@ class SettingsController extends Gdn_Controller {
         $this->addJsFile('categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
 
-
-        // This now works on latest jQuery version 1.10.2
-        //
-        // Jan29, 2014, upgraded jQuery UI to 1.10.3 from 1.8.11
+        // Upgrading these with jQuery is extremely tricky, beware.
         $this->addJsFile('nestedSortable/jquery-ui.min.js');
-        // Newer nestedSortable, but does not work.
-        //$this->addJsFile('js/library/nestedSortable/jquery.mjs.nestedSortable.js');
-        // old jquery-ui
-        //$this->addJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');
         $this->addJsFile('nestedSortable.1.3.4/jquery.ui.nestedSortable.js');
 
         $this->title(t('Categories'));

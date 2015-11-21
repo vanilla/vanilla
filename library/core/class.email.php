@@ -33,7 +33,7 @@ class Gdn_Email extends Gdn_Pluggable {
      */
     function __construct() {
         $this->PhpMailer = new PHPMailer();
-        $this->PhpMailer->CharSet = c('Garden.Charset', 'utf-8');
+        $this->PhpMailer->CharSet = 'utf-8';
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
         $this->PhpMailer->PluginDir = combinePaths(array(PATH_LIBRARY, 'vendors/phpmailer/'));
         $this->PhpMailer->Hostname = c('Garden.Email.Hostname', '');

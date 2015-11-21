@@ -208,7 +208,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
             if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
-                safeHeader('Content-Type: application/json; charset='.c('Garden.Charset', 'utf-8'), true);
+                safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
             } else {
                 redirect('/entry/signin?Target='.urlencode($this->Request));

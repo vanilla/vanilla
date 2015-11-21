@@ -1093,7 +1093,7 @@ class UserController extends DashboardController {
      */
     public function tagSearch($q, $limit = 10) {
         $data = Gdn::userModel()->tagSearch($q, $limit);
-        $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
+        $this->contentType('application/json; charset=utf-8');
         $this->sendHeaders();
         die(json_encode($data));
     }

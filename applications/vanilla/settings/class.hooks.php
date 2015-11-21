@@ -946,7 +946,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Check permission
         $sender->permission('Garden.Community.Manage');
 
-        $categoryID = val(0, $args);
+        $categoryID = val('CategoryID', Gdn::request()->post(), val(0, $args));
 
         if (!$categoryID) {
             throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));

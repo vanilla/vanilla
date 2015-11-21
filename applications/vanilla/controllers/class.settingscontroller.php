@@ -74,24 +74,24 @@ class SettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
 
             // Grab old config values to check for an update.
-            $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
+            $ArchiveDateBak = c('Vanilla.Archive.Date');
+            $ArchiveExcludeBak = (bool)c('Vanilla.Archive.Exclude');
 
             // Save new settings
             $Saved = $this->Form->save();
             if ($Saved) {
-                $ArchiveDate = Gdn::config('Vanilla.Archive.Date');
-                $ArchiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
+                $ArchiveDate = c('Vanilla.Archive.Date');
+                $ArchiveExclude = (bool)c('Vanilla.Archive.Exclude');
 
                 if ($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
                     $DiscussionModel = new DiscussionModel();
-                    $DiscussionModel->UpdateDiscussionCount('All');
+                    $DiscussionModel->updateDiscussionCount('All');
                 }
                 $this->informMessage(t("Your changes have been saved."));
             }
         }
 
-        $this->addSideMenu('vanilla/settings/advanced');
+        $this->addSideMenu('settings/advanced');
         $this->addJsFile('settings.js');
         $this->title(t('Advanced Forum Settings'));
 
@@ -107,7 +107,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function index() {
         $this->View = 'managecategories';
-        $this->ManageCategories();
+        $this->manageCategories();
     }
 
     /**
@@ -175,7 +175,7 @@ class SettingsController extends Gdn_Controller {
 
         // Display options
         $this->title(t('Flood Control'));
-        $this->addSideMenu('vanilla/settings/floodcontrol');
+        $this->addSideMenu('settings/floodcontrol');
 
         // Define what configuration settings we'll be using.
         $contexts = ['Vanilla.Discussion', 'Vanilla.Comment'];
@@ -244,7 +244,7 @@ class SettingsController extends Gdn_Controller {
         $this->addJsFile('categories.js');
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Add Category'));
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('settings/managecategories');
 
         // Prep models
         $RoleModel = new RoleModel();
@@ -269,7 +269,7 @@ class SettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/managecategories');
+                    redirect('settings/managecategories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -343,7 +343,7 @@ class SettingsController extends Gdn_Controller {
         // Set up head
         $this->addJsFile('categories.js');
         $this->title(t('Delete Category'));
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('settings/managecategories');
 
         // Get category data
         $categoryModel = new CategoryModel();
@@ -384,7 +384,7 @@ class SettingsController extends Gdn_Controller {
                         $this->Form->addError($ex);
                     }
                     if ($this->Form->errorCount() == 0) {
-                        $this->RedirectUrl = url('vanilla/settings/managecategories');
+                        $this->RedirectUrl = url('settings/managecategories');
                         $this->informMessage(t('Deleting category...'));
                     }
                 }
@@ -407,7 +407,7 @@ class SettingsController extends Gdn_Controller {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
-        $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
+        $RedirectUrl = 'settings/editcategory/'.$CategoryID;
 
         if (Gdn::session()->validateTransientKey($TransientKey)) {
             // Do removal, set message, redirect
@@ -487,7 +487,7 @@ class SettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Edit Category'));
 
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('settings/managecategories');
 
         // Make sure the form knows which item we are editing.
         $this->Form->addHidden('CategoryID', $CategoryID);
@@ -526,7 +526,7 @@ class SettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/managecategories');
+                    redirect('settings/managecategories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -560,7 +560,7 @@ class SettingsController extends Gdn_Controller {
     public function manageCategories() {
         // Check permission
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('settings/managecategories');
 
         $this->addJsFile('categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
@@ -633,7 +633,7 @@ class SettingsController extends Gdn_Controller {
             $this->setData('Enabled', $enabled);
 
             if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->RedirectUrl = url('/vanilla/settings/managecategories');
+                $this->RedirectUrl = url('/settings/managecategories');
             }
         } else {
             throw forbiddenException('GET');
@@ -658,7 +658,7 @@ class SettingsController extends Gdn_Controller {
         if (Gdn::request()->isAuthenticatedPostBack()) {
             $TreeArray = val('TreeArray', $_POST);
             $categoryModel = new CategoryModel();
-            $Saves = $categoryModel->SaveTree($TreeArray);
+            $Saves = $categoryModel->saveTree($TreeArray);
             $this->setData('Result', true);
             $this->setData('Saves', $Saves);
         }

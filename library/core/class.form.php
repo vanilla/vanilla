@@ -243,14 +243,23 @@ class Gdn_Form extends Gdn_Pluggable {
     /**
      * Returns Captcha HTML & adds translations to document head.
      *
+     * Events: BeforeCaptcha
+     * 
      * @return string
      */
     public function captcha() {
+        $handled = false;
+        $this->EventArguments['Handled'] =& $handled;
+        $this->fireEvent('Captcha');
+        if ($handled) {
+            // A plugin handled the captcha so don't display anything more.
+            return;
+        }
         // Google whitelist
-        $Whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
+        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
 
         // reCAPTCHA Options
-        $Options = array(
+        $options = array(
             'custom_translations' => array(
                 'instructions_visual' => t("Type the text:"),
                 'instructions_audio' => t("Type what you hear:"),
@@ -265,16 +274,15 @@ class Gdn_Form extends Gdn_Pluggable {
         );
 
         // Use our current locale against the whitelist.
-        $Language = Gdn::locale()->language();
-        if (!in_array($Language, $Whitelist)) {
-            $Language = (in_array(Gdn::locale()->Locale, $Whitelist)) ? Gdn::locale()->Locale : false;
-        }
-        if ($Language) {
-            $Options['lang'] = $Language;
+        $language = Gdn::locale()->language();
+        if (in_array($language, $whitelist)) {
+            $options['lang'] = $language;
+        } elseif (in_array(Gdn::locale()->Locale, $whitelist)) {
+            $options['lang'] = Gdn::locale()->Locale;
         }
 
         // Add custom translation strings as JSON.
-        Gdn::controller()->Head->addString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($Options).';</script>');
+        Gdn::controller()->Head->addString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($options).';</script>');
 
         require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 

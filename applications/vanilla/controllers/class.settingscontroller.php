@@ -424,12 +424,12 @@ class SettingsController extends Gdn_Controller {
     }
 
     /**
-     *
+     * Set allowed discussion types on the form.
      *
      * @param $Category
      */
     protected function setupDiscussionTypes($Category) {
-        $DiscussionTypes = DiscussionModel::DiscussionTypes();
+        $DiscussionTypes = DiscussionModel::discussionTypes();
         $this->setData('DiscussionTypes', $DiscussionTypes);
 
         if (!$this->Form->isPostBack()) {

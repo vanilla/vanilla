@@ -19,7 +19,7 @@
  * @since 2.0
  */
 
-if (!function_exists('ValidateCaptcha')) {
+if (!function_exists('validateCaptcha')) {
     /**
      * Validate the request captcha.
      *
@@ -27,16 +27,23 @@ if (!function_exists('ValidateCaptcha')) {
      * @return bool Returns true if the captcha is valid or an error message otherwise.
      */
     function validateCaptcha($value = null) {
+        $captchaPrivateKey = c('Garden.Registration.CaptchaPrivateKey', '');
+        if ($captchaPrivateKey == '') {
+            return c('Garden.Registration.CaptchaPassByDefault', true);
+        }
         require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 
-        $CaptchaPrivateKey = C('Garden.Registration.CaptchaPrivateKey', '');
-        $Response = recaptcha_check_answer(
-            $CaptchaPrivateKey,
-            Gdn::Request()->IpAddress(),
-            Gdn::Request()->Post('recaptcha_challenge_field', ''),
-            Gdn::Request()->Post('recaptcha_response_field', '')
+        $response = recaptcha_check_answer(
+            $captchaPrivateKey,
+            Gdn::request()->ipAddress(),
+            Gdn::request()->post('recaptcha_challenge_field', ''),
+            Gdn::request()->post('recaptcha_response_field', '')
         );
-        return $Response->is_valid ? true : 'The reCAPTCHA value was not entered correctly. Please try again.';
+        if ($response->is_valid) {
+            return true;
+        } else {
+            return 'The reCAPTCHA value was not entered correctly. Please try again.';
+        }
     }
 }
 

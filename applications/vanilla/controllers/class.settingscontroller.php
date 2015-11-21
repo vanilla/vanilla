@@ -265,6 +265,8 @@ class SettingsController extends Gdn_Controller {
         // Check permission
         $this->permission('Garden.Community.Manage');
 
+        $this->ShowCustomPoints = false;
+
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
         $this->addJsFile('categories.js');
@@ -275,7 +277,8 @@ class SettingsController extends Gdn_Controller {
         // Prep models
         $RoleModel = new RoleModel();
         $PermissionModel = Gdn::permissionModel();
-        $this->Form->setModel($this->CategoryModel);
+        $categoryModel = new CategoryModel();
+        $this->Form->setModel($categoryModel);
 
         // Load all roles with editable permissions.
         $this->RoleArray = $RoleModel->getArray();
@@ -372,7 +375,8 @@ class SettingsController extends Gdn_Controller {
         $this->addSideMenu('vanilla/settings/managecategories');
 
         // Get category data
-        $this->Category = $this->CategoryModel->getID($CategoryID);
+        $categoryModel = new CategoryModel();
+        $this->Category = $categoryModel->getID($CategoryID);
 
 
         if (!$this->Category) {
@@ -382,7 +386,7 @@ class SettingsController extends Gdn_Controller {
             $this->Form->addHidden('CategoryID', $CategoryID);
 
             // Get a list of categories other than this one that can act as a replacement
-            $this->OtherCategories = $this->CategoryModel->getWhere(
+            $this->OtherCategories = $categoryModel->getWhere(
                 array(
                     'CategoryID <>' => $CategoryID,
                     'AllowDiscussions' => $this->Category->AllowDiscussions, // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
@@ -395,7 +399,7 @@ class SettingsController extends Gdn_Controller {
                 $this->Form->setFormValue('DeleteDiscussions', '1'); // Checked by default
             } else {
                 $ReplacementCategoryID = $this->Form->getValue('ReplacementCategoryID');
-                $ReplacementCategory = $this->CategoryModel->getID($ReplacementCategoryID);
+                $ReplacementCategory = $categoryModel->getID($ReplacementCategoryID);
                 // Error if:
                 // 1. The category being deleted is the last remaining category that
                 // allows discussions.
@@ -430,7 +434,7 @@ class SettingsController extends Gdn_Controller {
                 if ($this->Form->errorCount() == 0) {
                     // Go ahead and delete the category
                     try {
-                        $this->CategoryModel->delete($this->Category, $this->Form->getValue('ReplacementCategoryID'));
+                        $categoryModel->delete($this->Category, $this->Form->getValue('ReplacementCategoryID'));
                     } catch (Exception $ex) {
                         $this->Form->addError($ex);
                     }
@@ -511,10 +515,13 @@ class SettingsController extends Gdn_Controller {
         // Check permission
         $this->permission('Garden.Community.Manage');
 
+        $this->ShowCustomPoints = false;
+
         // Set up models
         $RoleModel = new RoleModel();
         $PermissionModel = Gdn::permissionModel();
-        $this->Form->setModel($this->CategoryModel);
+        $categoryModel = new CategoryModel();
+        $this->Form->setModel($categoryModel);
 
         if (!$CategoryID && $this->Form->authenticatedPostBack()) {
             if ($ID = $this->Form->getFormValue('CategoryID')) {
@@ -523,7 +530,7 @@ class SettingsController extends Gdn_Controller {
         }
 
         // Get category data
-        $this->Category = $this->CategoryModel->getID($CategoryID);
+        $this->Category = $categoryModel->getID($CategoryID);
         if (!$this->Category) {
             throw notFoundException('Category');
         }
@@ -627,7 +634,8 @@ class SettingsController extends Gdn_Controller {
         $this->title(t('Categories'));
 
         // Get category data
-        $CategoryData = $this->CategoryModel->getAll('TreeLeft');
+        $categoryModel = new CategoryModel();
+        $CategoryData = $categoryModel->getAll('TreeLeft');
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission('Garden.Settings.Manage');
@@ -711,7 +719,8 @@ class SettingsController extends Gdn_Controller {
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {
             $TreeArray = val('TreeArray', $_POST);
-            $Saves = $this->CategoryModel->SaveTree($TreeArray);
+            $categoryModel = new CategoryModel();
+            $Saves = $categoryModel->SaveTree($TreeArray);
             $this->setData('Result', true);
             $this->setData('Saves', $Saves);
         }

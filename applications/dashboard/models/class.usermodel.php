@@ -1215,7 +1215,7 @@ class UserModel extends Gdn_Model {
             ->from('User')
             ->orderBy('DateLastActive', 'desc')
             ->limit($Limit, 0)
-            ->get();
+            ->get()->resultArray();
         $UserIDs = array_column($UserIDs, 'UserID');
 
         $Data = $this->SQL->getWhere('User', array('UserID' => $UserIDs), 'DateLastActive', 'desc');

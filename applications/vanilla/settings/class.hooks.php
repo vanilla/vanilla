@@ -705,11 +705,635 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function base_getAppSettingsMenuItems_Handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
-        $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));
-        $Menu->addLink('Forum', t('Advanced'), 'vanilla/settings/advanced', 'Garden.Settings.Manage', array('class' => 'nav-forum-advanced'));
+        $Menu->addLink('Moderation', t('Flood Control'), 'settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
+        $Menu->addLink('Forum', t('Categories'), 'settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));
+        $Menu->addLink('Forum', t('Advanced'), 'settings/advanced', 'Garden.Settings.Manage', array('class' => 'nav-forum-advanced'));
         $Menu->addLink('Forum', t('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage', array('class' => 'nav-embed nav-embed-comments'));
         $Menu->addLink('Forum', t('Embed Forum'), 'dashboard/embed/forum', 'Garden.Settings.Manage', array('class' => 'nav-embed nav-embed-site'));
+    }
+
+    /**
+     * Advanced settings.
+     *
+     * Allows setting configuration values via form elements.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     */
+    public function settingsController_advanced_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Settings.Manage');
+
+        // Load up config options we'll be setting
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array(
+            'Vanilla.Discussions.PerPage',
+            'Vanilla.Comments.AutoRefresh',
+            'Vanilla.Comments.PerPage',
+            'Garden.Html.AllowedElements',
+            'Vanilla.Archive.Date',
+            'Vanilla.Archive.Exclude',
+            'Garden.EditContentTimeout',
+            'Vanilla.AdminCheckboxes.Use',
+            'Vanilla.Discussions.SortField' => 'd.DateLastComment',
+            'Vanilla.Discussions.UserSortField',
+            'Vanilla.Comment.MaxLength',
+            'Vanilla.Comment.MinLength'
+        ));
+
+        // Set the model on the form.
+        $sender->Form->setModel($ConfigurationModel);
+
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            // Apply the config settings to the form.
+            $sender->Form->setData($ConfigurationModel->Data);
+        } else {
+            // Define some validation rules for the fields being saved
+            $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Comments.AutoRefresh', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
+            $ConfigurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
+
+            // Grab old config values to check for an update.
+            $ArchiveDateBak = c('Vanilla.Archive.Date');
+            $ArchiveExcludeBak = (bool)c('Vanilla.Archive.Exclude');
+
+            // Save new settings
+            $Saved = $sender->Form->save();
+            if ($Saved) {
+                $ArchiveDate = c('Vanilla.Archive.Date');
+                $ArchiveExclude = (bool)c('Vanilla.Archive.Exclude');
+
+                if ($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
+                    $DiscussionModel = new DiscussionModel();
+                    $DiscussionModel->updateDiscussionCount('All');
+                }
+                $sender->informMessage(t("Your changes have been saved."));
+            }
+        }
+
+        $sender->addSideMenu('settings/advanced');
+        $sender->addJsFile('settings.js', 'vanilla');
+        $sender->title(t('Advanced Forum Settings'));
+
+        // Render view.
+        $sender->render('advanced', 'settings', 'vanilla');
+    }
+
+
+    /**
+     * Display flood control options.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     */
+    public function settingsController_floodControl_create($sender) {
+        // Check permission
+        $sender->permission('Garden.Settings.Manage');
+
+        // Display options
+        $sender->title(t('Flood Control'));
+        $sender->addSideMenu('settings/floodcontrol');
+
+        // Define what configuration settings we'll be using.
+        $contexts = ['Vanilla.Discussion', 'Vanilla.Comment'];
+        $settings = ['SpamCount', 'SpamTime', 'SpamLock'];
+
+        // If Conversations is enabled, add its contexts.
+        // Ideally we'd refactor this into an event and hook.
+        $conversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+        if ($conversationsEnabled) {
+            $contexts[] = 'Conversations.Conversation';
+            $contexts[] = 'Conversations.ConversationMessage';
+        }
+
+        // Build our list of configuration fields.
+        $ConfigurationFields = array();
+        foreach ($contexts as $context) {
+            foreach ($settings as $setting) {
+                $ConfigurationFields[] = $context.'.'.$setting;
+            }
+        }
+
+        // Load up config options we'll be setting
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField($ConfigurationFields);
+
+        // Set the model on the form.
+        $sender->Form->setModel($ConfigurationModel);
+
+        // Submitted form.
+        if ($sender->Form->authenticatedPostBack()) {
+            // Apply 'required' and 'integer' validation rules to all our spam settings in all contexts.
+            foreach ($contexts as $context) {
+                foreach ($settings as $setting) {
+                    $ConfigurationModel->Validation->applyRule($context.'.'.$setting, 'Required');
+                    $ConfigurationModel->Validation->applyRule($context.'.'.$setting, 'Integer');
+                }
+            }
+
+            if ($sender->Form->save() !== false) {
+                $sender->informMessage(t("Your changes have been saved."));
+            }
+        } else {
+            // Apply the config settings to the form.
+            $sender->Form->setData($ConfigurationModel->Data);
+        }
+
+        // Render view.
+        $sender->render('floodcontrol', 'settings', 'vanilla');
+    }
+
+    /**
+     * Adding a new category.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     */
+    public function settingsController_addCategory_create($sender) {
+        // Check permission
+        $sender->permission('Garden.Community.Manage');
+
+        $sender->ShowCustomPoints = false;
+
+        // Set up head
+        $sender->addJsFile('jquery.alphanumeric.js', 'vanilla');
+        $sender->addJsFile('categories.js', 'vanilla');
+        $sender->addJsFile('jquery.gardencheckboxgrid.js', 'vanilla');
+        $sender->title(t('Add Category'));
+        $sender->addSideMenu('settings/managecategories');
+
+        // Prep models
+        $RoleModel = new RoleModel();
+        $PermissionModel = Gdn::permissionModel();
+        $categoryModel = new CategoryModel();
+        $sender->Form->setModel($categoryModel);
+
+        // Load all roles with editable permissions.
+        $sender->RoleArray = $RoleModel->getArray();
+
+        $sender->fireEvent('AddEditCategory');
+        $this->setupDiscussionTypes($sender, array());
+
+        if ($sender->Form->authenticatedPostBack()) {
+            // Form was validly submitted
+            $IsParent = $sender->Form->getFormValue('IsParent', '0');
+            $sender->Form->setFormValue('HideAllDiscussions', forceBool($sender->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            $sender->Form->setFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
+            $sender->Form->setFormValue('AllowFileUploads', forceBool($sender->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+            $sender->Form->setFormValue('CustomPoints', forceBool($sender->Form->getFormValue('CustomPoints'), '0', '1', '0'));
+            $CategoryID = $sender->Form->save();
+            if ($CategoryID) {
+                $Category = CategoryModel::categories($CategoryID);
+                $sender->setData('Category', $Category);
+
+                if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+                    redirect('settings/managecategories');
+                } elseif ($sender->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'settingsController_getCategory_create')) {
+                    $sender->Data = [];
+                    $sender->settingsController_getCategory_create($sender, [$CategoryID]);
+                    return;
+                }
+            } else {
+                unset($CategoryID);
+            }
+        } else {
+            $sender->Form->addHidden('CodeIsDefined', '0');
+        }
+
+        // Get all of the currently selected role/permission combinations for this junction.
+        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
+
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            $sender->setData('PermissionData', $Permissions, true);
+        }
+
+        // Render view.
+        $sender->render('addcategory', 'settings', 'vanilla');
+    }
+
+    /**
+     * Get a single category for administration.
+     *
+     * This endpoint is intended for API access.
+     *
+     * @throws Exception
+     * @throws Gdn_UserException
+     *
+     * @param settingsController $sender
+     * @param array $args
+     *    0: int $categoryID The category to find.
+     */
+    public function settingsController_getCategory_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Community.Manage');
+
+        $categoryID = val(0, $args);
+
+        if (!$categoryID) {
+            throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));
+        }
+
+        $categoryModel = new CategoryModel();
+        $category = $categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+
+        if (!$category) {
+            throw notFoundException('Category');
+        }
+
+        // Add the permissions for the category.
+        if ($category['PermissionCategoryID'] == $category['CategoryID']) {
+            $category['Permissions'] = $categoryModel->getRolePermissions($categoryID);
+        } else {
+            $category['Permissions'] = null;
+        }
+
+        $sender->setData('Category', $category);
+        saveToConfig('Api.Clean', false, false);
+        $sender->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Deleting a category.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     *    0: int $CategoryID Unique ID of the category to be deleted.
+     */
+    public function settingsController_deleteCategory_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Settings.Manage');
+
+        $CategoryID = val(0, $args);
+
+        // Set up head
+        $sender->addJsFile('categories.js', 'vanilla');
+        $sender->title(t('Delete Category'));
+        $sender->addSideMenu('settings/managecategories');
+
+        // Get category data
+        $categoryModel = new CategoryModel();
+        $sender->Category = $categoryModel->getID($CategoryID);
+
+        if (!$sender->Category) {
+            $sender->Form->addError('The specified category could not be found.');
+        } else {
+            // Make sure the form knows which item we are deleting.
+            $sender->Form->addHidden('CategoryID', $CategoryID);
+
+            // Get a list of categories other than this one that can act as a replacement
+            $sender->OtherCategories = $categoryModel->getWhere(
+                array(
+                    'CategoryID <>' => $CategoryID,
+                    // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
+                    'AllowDiscussions' => $sender->Category->AllowDiscussions,
+                    'CategoryID >' => 0
+                ),
+                'Sort'
+            );
+
+            if (!$sender->Form->authenticatedPostBack()) {
+                $sender->Form->setFormValue('DeleteDiscussions', '1'); // Checked by default
+            } else {
+                $ReplacementCategoryID = $sender->Form->getValue('ReplacementCategoryID');
+
+                // Error if category being deleted is the last remaining category that allows discussions.
+                if ($sender->Category->AllowDiscussions == '1' && $sender->OtherCategories->numRows() == 0) {
+                    $sender->Form->addError('You cannot remove the only remaining category that allows discussions');
+                }
+
+                if ($sender->Form->errorCount() == 0) {
+                    // Go ahead and delete the category
+                    try {
+                        $categoryModel->delete($sender->Category, $sender->Form->getValue('ReplacementCategoryID'));
+                    } catch (Exception $ex) {
+                        $sender->Form->addError($ex);
+                    }
+                    if ($sender->Form->errorCount() == 0) {
+                        $sender->RedirectUrl = url('settings/managecategories');
+                        $sender->informMessage(t('Deleting category...'));
+                    }
+                }
+            }
+        }
+
+        // Render default view
+        $sender->render('deletecategory', 'settings', 'vanilla');
+    }
+
+    /**
+     * Deleting a category photo.
+     *
+     * @since 2.1
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     *    0: int $CategoryID Unique ID of the category to have its photo deleted.
+     *    1: string $tk
+     */
+    public function settingsController_deleteCategoryPhoto_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Settings.Manage');
+
+        $CategoryID = val(0, $args);
+        $TransientKey = val(1, $args, '');
+
+        $RedirectUrl = 'settings/editcategory/'.$CategoryID;
+
+        if (Gdn::session()->validateTransientKey($TransientKey)) {
+            // Do removal, set message, redirect
+            $CategoryModel = new CategoryModel();
+            $CategoryModel->setField($CategoryID, 'Photo', null);
+            $sender->informMessage(t('Category photo has been deleted.'));
+        }
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect($RedirectUrl);
+        } else {
+            $sender->RedirectUrl = url($RedirectUrl);
+            $sender->render('deletecategoryphoto', 'settings', 'vanilla');
+        }
+    }
+
+    /**
+     * Set allowed discussion types on the form.
+     *
+     * @param Gdn_Controller $sender
+     * @param $Category
+     */
+    protected function setupDiscussionTypes($sender, $Category) {
+        $DiscussionTypes = DiscussionModel::discussionTypes();
+        $sender->setData('DiscussionTypes', $DiscussionTypes);
+
+        if (!$sender->Form->isPostBack()) {
+            $PCatID = val('PermissionCategoryID', $Category, -1);
+            if ($PCatID == val('CategoryID', $Category)) {
+                $PCat = $Category;
+            } else {
+                $PCat = CategoryModel::categories($PCatID);
+            }
+            $AllowedTypes = val('AllowedDiscussionTypes', $PCat);
+            if (empty($AllowedTypes)) {
+                $AllowedTypes = array_keys($DiscussionTypes);
+            }
+
+            $sender->Form->setValue("AllowedDiscussionTypes", $AllowedTypes);
+        }
+    }
+
+    /**
+     * Editing a category.
+     *
+     * @since 2.0.0
+     * @access public
+     * @throws Gdn_UserException
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     *    0: int $CategoryID Unique ID of the category to be updated. ''
+     */
+    public function settingsController_editCategory_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Community.Manage');
+
+        $CategoryID = val(0, $args);
+
+        $sender->ShowCustomPoints = false;
+
+        // Set up models
+        $RoleModel = new RoleModel();
+        $PermissionModel = Gdn::permissionModel();
+        $categoryModel = new CategoryModel();
+        $sender->Form->setModel($categoryModel);
+
+        if (!$CategoryID && $sender->Form->authenticatedPostBack()) {
+            if ($ID = $sender->Form->getFormValue('CategoryID')) {
+                $CategoryID = $ID;
+            }
+        }
+
+        // Get category data
+        $sender->Category = $categoryModel->getID($CategoryID);
+        if (!$sender->Category) {
+            throw notFoundException('Category');
+        }
+        $sender->Category->CustomPermissions = $sender->Category->CategoryID == $sender->Category->PermissionCategoryID;
+
+        // Set up head
+        $sender->addJsFile('jquery.alphanumeric.js', 'vanilla');
+        $sender->addJsFile('categories.js', 'vanilla');
+        $sender->addJsFile('jquery.gardencheckboxgrid.js', 'vanilla');
+        $sender->title(t('Edit Category'));
+
+        $sender->addSideMenu('settings/managecategories');
+
+        // Make sure the form knows which item we are editing.
+        $sender->Form->addHidden('CategoryID', $CategoryID);
+        $sender->setData('CategoryID', $CategoryID);
+
+        // Load all roles with editable permissions
+        $sender->RoleArray = $RoleModel->getArray();
+
+        $sender->fireEvent('AddEditCategory');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $this->setupDiscussionTypes($sender, $sender->Category);
+            $Upload = new Gdn_Upload();
+            $TmpImage = $Upload->validateUpload('PhotoUpload', false);
+            if ($TmpImage) {
+                // Generate the target image name
+                $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
+                $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+                // Save the uploaded image
+                $Parts = $Upload->saveAs(
+                    $TmpImage,
+                    $ImageBaseName
+                );
+                $sender->Form->setFormValue('Photo', $Parts['SaveName']);
+            }
+            $sender->Form->setFormValue('CustomPoints', (bool)$sender->Form->getFormValue('CustomPoints'));
+
+            // Enforces tinyint values on boolean fields to comply with strict mode
+            $sender->Form->setFormValue('HideAllDiscussions', forceBool($sender->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            $sender->Form->setFormValue('Archived', forceBool($sender->Form->getFormValue('Archived'), '0', '1', '0'));
+            $sender->Form->setFormValue('AllowFileUploads', forceBool($sender->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+
+            if ($sender->Form->save()) {
+                $Category = CategoryModel::categories($CategoryID);
+                $sender->setData('Category', $Category);
+
+                if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+                    redirect('settings/managecategories');
+                } elseif ($sender->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'settingsController_getCategory_create')) {
+                    $sender->Data = [];
+                    $sender->settingsController_getCategory_create($this, [$CategoryID]);
+                    return;
+                }
+            }
+        } else {
+            $sender->Form->setData($sender->Category);
+            $this->setupDiscussionTypes($sender, $sender->Category);
+            $sender->Form->setValue('CustomPoints', $sender->Category->PointsCategoryID == $sender->Category->CategoryID);
+        }
+
+        // Get all of the currently selected role/permission combinations for this junction.
+        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$sender->Category->CustomPermissions));
+        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
+
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            $sender->setData('PermissionData', $Permissions, true);
+        }
+
+        // Render view.
+        $sender->render('editcategory', 'settings', 'vanilla');
+    }
+
+    /**
+     * Enabling and disabling categories from list.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     */
+    public function settingsController_manageCategories_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Community.Manage');
+        $sender->addSideMenu('settings/managecategories');
+
+        $sender->addJsFile('categories.js', 'vanilla');
+        $sender->addJsFile('jquery.alphanumeric.js', 'vanilla');
+
+        // Upgrading these with jQuery is extremely tricky, beware.
+        $sender->addJsFile('nestedSortable/jquery-ui.min.js', 'vanilla');
+        $sender->addJsFile('nestedSortable.1.3.4/jquery.ui.nestedSortable.js', 'vanilla');
+
+        $sender->title(t('Categories'));
+
+        // Get category data
+        $categoryModel = new CategoryModel();
+        $CategoryData = $categoryModel->getAll('TreeLeft');
+
+        // Set CanDelete per-category so we can override later if we want.
+        $canDelete = checkPermission('Garden.Settings.Manage');
+        array_walk($CategoryData->result(), function (&$value) use ($canDelete) {
+            setvalr('CanDelete', $value, $canDelete);
+        });
+
+        $sender->setData('CategoryData', $CategoryData, true);
+
+        // Setup & save forms
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array(
+            'Vanilla.Categories.MaxDisplayDepth',
+            'Vanilla.Categories.DoHeadings',
+            'Vanilla.Categories.HideModule'
+        ));
+
+        // Set the model on the form.
+        $sender->Form->setModel($ConfigurationModel);
+
+        // Define MaxDepthOptions
+        $DepthData = array();
+        $DepthData['2'] = sprintf(t('more than %s deep'), plural(1, '%s level', '%s levels'));
+        $DepthData['3'] = sprintf(t('more than %s deep'), plural(2, '%s level', '%s levels'));
+        $DepthData['4'] = sprintf(t('more than %s deep'), plural(3, '%s level', '%s levels'));
+        $DepthData['0'] = t('never');
+        $sender->setData('MaxDepthData', $DepthData);
+
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            // Apply the config settings to the form.
+            $sender->Form->setData($ConfigurationModel->Data);
+        } else {
+            if ($sender->Form->save() !== false) {
+                $sender->informMessage(t("Your settings have been saved."));
+            }
+        }
+
+        // Render view.
+        $sender->render('managecategories', 'settings', 'vanilla');
+    }
+
+    /**
+     * Enable or disable the use of categories in Vanilla.
+     *
+     * @throws Exception Throws an exception if accessed through an invalid post back.
+     *
+     * @param settingsController $sender
+     * @param array $args
+     *    0: bool $enabled Whether or not to enable/disable categories.
+     */
+    public function settingsController_enableCategories_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+
+        $enabled = val(0, $args);
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $enabled = (bool)$enabled;
+            saveToConfig('Vanilla.Categories.Use', $enabled);
+            $sender->setData('Enabled', $enabled);
+
+            if ($sender->deliveryType() !== DELIVERY_TYPE_DATA) {
+                $sender->RedirectUrl = url('/settings/managecategories');
+            }
+        } else {
+            throw forbiddenException('GET');
+        }
+
+        return $sender->render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     * Sorting display order of categories.
+     *
+     * Accessed by ajax so its default is to only output true/false.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param settingsController $sender
+     * @param array $args
+     */
+    public function settingsController_sortCategories_create($sender, $args) {
+        // Check permission
+        $sender->permission('Garden.Settings.Manage');
+
+        // Set delivery type to true/false
+        if (Gdn::request()->isAuthenticatedPostBack()) {
+            $TreeArray = val('TreeArray', $_POST);
+            $categoryModel = new CategoryModel();
+            $Saves = $categoryModel->saveTree($TreeArray);
+            $sender->setData('Result', true);
+            $sender->setData('Saves', $Saves);
+        }
+
+        // Renders true/false rather than template
+        $sender->render('sortcategories', 'settings', 'vanilla');
     }
 
     /**

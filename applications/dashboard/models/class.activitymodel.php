@@ -1009,7 +1009,7 @@ class ActivityModel extends Gdn_Model {
         $this->Validation->applyRule('DateInserted', 'Required');
         $this->Validation->applyRule('InsertUserID', 'Required');
 
-        $this->EventArguments['Comment'] = $Comment;
+        $this->EventArguments['Comment'] = &$Comment;
         $this->fireEvent('BeforeSaveComment');
 
         if ($this->validate($Comment)) {

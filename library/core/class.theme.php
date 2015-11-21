@@ -226,7 +226,7 @@ class Gdn_Theme {
                 }
                 break;
             case 'dashboard':
-                $Path = 'dashboard/settings';
+                $Path = 'settings';
                 touchValue('Permissions', $Options, array('Garden.Settings.Manage', 'Garden.Settings.View'));
                 if (!$Text) {
                     $Text = t('Dashboard');

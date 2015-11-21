@@ -46,7 +46,7 @@ if (c('Vanilla.Categories.Use')) {
         <?php
         echo '<h2>', t('Did You Know?'), '</h2>';
         echo '<ul>';
-        echo '<li>', sprintf(t('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), url('/dashboard/settings/homepage')), '</li>';
+        echo '<li>', sprintf(t('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), url('/settings/homepage')), '</li>';
         echo '<li>', sprintf(t('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), url('/categories')), '</li>';
         echo '<li>', t('Drag and drop the categories below to sort and nest them.'), '</li>';
         echo '</ul>';

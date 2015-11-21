@@ -32,7 +32,7 @@ jQuery(document).ready(function($) {
             $(this).after('<span class="TinyProgress">&#160;</span>');
         }
         var addonName = urlParts[urlParts.length - 2];
-        var testUrl = gdn.url('/dashboard/settings/testaddon/' + addonType + '/' + addonName + '/' + gdn.definition('TransientKey'));
+        var testUrl = gdn.url('/settings/testaddon/' + addonType + '/' + addonName + '/' + gdn.definition('TransientKey'));
 
         $.ajax({
             type: "GET",
@@ -122,7 +122,7 @@ jQuery(document).ready(function($) {
         var url = $(this).attr('href');
         var urlParts = url.split('/');
         var addonName = urlParts[urlParts.length - 1];
-        var testUrl = gdn.url('/dashboard/settings/testaddon/Theme/' + addonName + '/' + gdn.definition('TransientKey'));
+        var testUrl = gdn.url('/settings/testaddon/Theme/' + addonName + '/' + gdn.definition('TransientKey'));
 
         $.ajax({
             type: "GET",

@@ -667,16 +667,16 @@ class VanillaHooks implements Gdn_IPlugin {
         $DiscussionModel = new DiscussionModel();
 
         // Comment permalink
-        if ($ResolvedPath == 'vanilla/discussion/comment') {
+        if ($ResolvedPath == 'discussion/comment') {
             $CommentID = val('CommentID', $ResolvedArgs);
             $CommentModel = new CommentModel();
             $Comment = $CommentModel->getID($CommentID);
             $DiscussionID = val('DiscussionID', $Comment);
         } // Discussion link
-        elseif ($ResolvedPath == 'vanilla/discussion/index') {
+        elseif ($ResolvedPath == 'discussion/index') {
             $DiscussionID = val('DiscussionID', $ResolvedArgs, null);
         } // Embedded discussion
-        elseif ($ResolvedPath == 'vanilla/discussion/embed') {
+        elseif ($ResolvedPath == 'discussion/embed') {
             $ForeignID = val('vanilla_identifier', $Args);
             if ($ForeignID) {
                 // This will be hit a lot so let's try caching it...

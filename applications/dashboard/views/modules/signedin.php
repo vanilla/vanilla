@@ -22,7 +22,7 @@ if ($Session->isValid() && c('Garden.Modules.ShowSignedInModule')) {
             <li><?php echo anchor(t('Notifications'), '/profile/notifications'); ?><span class="Aside"><span
                         class="Count"><?php echo $CountNotifications; ?></span></span></li>
             <?php if ($Session->checkPermission('Garden.Settings.Manage')) { ?>
-                <li><?php echo anchor(t('Dashboard'), '/dashboard/settings'); ?></li>
+                <li><?php echo anchor(t('Dashboard'), '/settings'); ?></li>
             <?php } ?>
             <li><?php echo anchor(t('Sign Out'), SignOutUrl()); ?></li>
         </ul>

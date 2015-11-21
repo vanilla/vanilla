@@ -51,7 +51,7 @@
         var height = document.body.offsetHeight || document.body.scrollHeight;
 
         // Fix windows that are too small for the popup.
-        if (height < $('div.Popup').outerHeight()) {1
+        if (height < $('div.Popup').outerHeight()) {
             height = minHeight = $('div.Popup').outerHeight();
             Vanilla.parent.setHeight();
         }

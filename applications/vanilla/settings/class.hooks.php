@@ -985,7 +985,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Check permission
         $sender->permission('Garden.Settings.Manage');
 
-        $CategoryID = val(0, $args);
+        $CategoryID = val('CategoryID', Gdn::request()->post(), val(0, $args));
 
         // Set up head
         $sender->addJsFile('categories.js', 'vanilla');
@@ -1057,7 +1057,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Check permission
         $sender->permission('Garden.Settings.Manage');
 
-        $CategoryID = val(0, $args);
+        $CategoryID = val('CategoryID', Gdn::request()->post(), val(0, $args));
         $TransientKey = val(1, $args, '');
 
         $RedirectUrl = 'settings/editcategory/'.$CategoryID;
@@ -1117,7 +1117,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Check permission
         $sender->permission('Garden.Community.Manage');
 
-        $CategoryID = val(0, $args);
+        $CategoryID = val('CategoryID', Gdn::request()->post(), val(0, $args));
 
         $sender->ShowCustomPoints = false;
 
@@ -1219,7 +1219,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param settingsController $sender
      * @param array $args
      */
-    public function settingsController_manageCategories_create($sender, $args) {
+    public function settingsController_manageCategories_create($sender) {
         // Check permission
         $sender->permission('Garden.Community.Manage');
         $sender->addSideMenu('settings/managecategories');
@@ -1291,7 +1291,7 @@ class VanillaHooks implements Gdn_IPlugin {
     public function settingsController_enableCategories_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
 
-        $enabled = val(0, $args);
+        $enabled = val('Enabled', Gdn::request()->post(), val(0, $args));
 
         if ($sender->Form->authenticatedPostBack()) {
             $enabled = (bool)$enabled;
@@ -1319,7 +1319,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param settingsController $sender
      * @param array $args
      */
-    public function settingsController_sortCategories_create($sender, $args) {
+    public function settingsController_sortCategories_create($sender) {
         // Check permission
         $sender->permission('Garden.Settings.Manage');
 

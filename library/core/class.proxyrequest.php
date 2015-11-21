@@ -377,8 +377,8 @@ class ProxyRequest {
         $this->action(" transfer mode: {$TransferMode}");
 
         $logContext = array(
-            'url' => $Url,
-            'method' => $RequestMethod
+            'requestUrl' => $Url,
+            'requestMethod' => $RequestMethod
         );
 
         /*
@@ -528,7 +528,7 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_PORT, $Port);
 
         if (val('LogRequest', $Options, false)) {
-            Logger::event('http_request', Logger::INFO, '{method} {url}', $logContext);
+            Logger::event('http_request', Logger::INFO, '{requestMethod} {requestUrl}', $logContext);
         }
 
         $this->curlReceive($Handler);
@@ -563,9 +563,9 @@ class ProxyRequest {
         $logLevel = val('Log', $Options, true) ? Logger::INFO : Logger::DEBUG;
         if (val('Log', $Options, true)) {
             if ($this->responseClass('2xx')) {
-                Logger::event('http_response', $logLevel, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+                Logger::event('http_response', $logLevel, '{responseCode} {requestMethod} {requestUrl} in {responseTime}s', $logContext);
             } else {
-                Logger::event('http_response_error', $logLevel, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+                Logger::event('http_response_error', $logLevel, '{responseCode} {requestMethod} {requestUrl} in {responseTime}s', $logContext);
             }
         }
 

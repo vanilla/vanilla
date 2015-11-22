@@ -599,7 +599,7 @@ class FacebookPlugin extends Gdn_Plugin {
      * @return mixed
      */
     public function getProfile($AccessToken) {
-        $Url = "https://graph.facebook.com/me?access_token=$AccessToken";
+        $Url = "https://graph.facebook.com/me?access_token=$AccessToken&fields=name,id,email";
 //      $C = curl_init();
 //      curl_setopt($C, CURLOPT_RETURNTRANSFER, true);
 //      curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false);

@@ -481,6 +481,9 @@ class SettingsController extends DashboardController {
                         $this->Form->setFormValue('BanID', $ID);
                     }
 
+                    // Trim the ban value to avoid obvious mismatches.
+                    $this->Form->setFormValue('BanValue', trim($this->Form->getFormValue('BanValue')));
+
                     try {
                         // Save the ban.
                         $NewID = $this->Form->save();

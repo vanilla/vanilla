@@ -337,7 +337,7 @@ class FacebookPlugin extends Gdn_Plugin {
             'ConnectUrl' => $this->authorizeUri(false, self::profileConnecUrl()),
             'Profile' => array(
                 'Name' => val('name', $Profile),
-                'Photo' => "//graph.facebook.com/{$Profile['id']}/picture?type=large"
+                'Photo' => "//graph.facebook.com/{$Profile['id']}/picture?width=100&height=100"
             )
         );
     }
@@ -528,7 +528,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $Form->setFormValue('ProviderName', 'Facebook');
         $Form->setFormValue('FullName', val('name', $Profile));
         $Form->setFormValue('Email', val('email', $Profile));
-        $Form->setFormValue('Photo', "//graph.facebook.com/{$ID}/picture?type=large");
+        $Form->setFormValue('Photo', "//graph.facebook.com/{$ID}/picture?width=100&height=100");
         $Form->addHidden('AccessToken', $AccessToken);
 
         if (c('Plugins.Facebook.UseFacebookNames')) {

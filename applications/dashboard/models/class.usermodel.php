@@ -1896,15 +1896,19 @@ class UserModel extends Gdn_Model {
         // Make sure that checkbox vals are saved as the appropriate value
 
         if (array_key_exists('ShowEmail', $FormPostValues)) {
-            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
         }
 
         if (array_key_exists('Banned', $FormPostValues)) {
-            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
         }
 
         if (array_key_exists('Confirmed', $FormPostValues)) {
-            $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
+            $FormPostValues['Confirmed'] = forceBool($FormPostValues['Confirmed'], '0', '1', '0');
+        }
+
+        if (array_key_exists('Verified', $FormPostValues)) {
+            $FormPostValues['Verified'] = forceBool($FormPostValues['Verified'], '0', '1', '0');
         }
 
         unset($FormPostValues['Admin']);

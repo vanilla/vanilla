@@ -702,7 +702,6 @@ class PermissionModel extends Gdn_Model {
         $Result = array();
 
         $GlobalPermissions = $this->GetGlobalPermissions($RoleID, $LimitToSuffix);
-        print_r($GlobalPermissions);
         $Result[] = $GlobalPermissions;
 
         $JunctionPermissions = $this->GetJunctionPermissions(array('RoleID' => $RoleID), null, $LimitToSuffix);

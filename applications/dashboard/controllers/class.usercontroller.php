@@ -112,25 +112,27 @@ class UserController extends DashboardController {
         // Get user list
         $this->UserData = $UserModel->search($Filter, $Order, $OrderDir, $Limit, $Offset);
         $this->setData('Users', $this->UserData);
-        $userCount = $this->UserData->count();
 
-        // If & how we display a user count depends on how huge our site is & whether we're searching.
-        // On sites past UserThreshold, zero users will be displayed by default.
-        if ($this->pastUserMegaThreshold()) {
-            // Dang, this site is mega-huge yo.
-
-
-        } elseif ($this->pastUserThreshold()) {
-            // Still big enough to choke an unoptimized query so tread lightly.
-            if ($userCount) {
-                $this->setData('_CurrentRecords', $userCount);
-            } else {
-                // No users have been searched for, so give the total users overall.
-                $this->setData('RecordCount', $UserModel->getCount());
-            }
-        } else {
+        // Figure out our number of results and users.
+        $showUserCount = $this->UserData->count();
+        if (!$this->pastUserThreshold()) {
             // Pfft, query that sucker however you want.
             $this->setData('RecordCount', $UserModel->searchCount($Filter));
+        } else {
+            // We have a user search, so at least set enough data for the Next pager.
+            if ($showUserCount) {
+                $this->setData('_CurrentRecords', $showUserCount);
+            } else {
+                // No search was done. Just give the total users overall. First, zero-out our pager.
+                $this->setData('_CurrentRecords', 0);
+                if (!$this->pastUserMegaThreshold()) {
+                    // Restoring this semi-optimized counter is our compromise to let non-mega sites know their exact total users.
+                    $this->setData('UserCount', $UserModel->getCount());
+                } else {
+                    // Dang, yo. Get a table status guess instead of really counting.
+                    $this->setData('UserEstimate', $this->countEstimate());
+                }
+            }
         }
 
         // Add roles to the user data.

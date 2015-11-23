@@ -22,9 +22,11 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         echo '<div>';
         echo $this->Form->textBox('Keywords');
         echo ' ', $this->Form->button(t('Go'));
-        if ($this->data('RecordCount', null) !== null) {
-            $count = $this->data('RecordCount');
+        $count = $this->data('RecordCount', $this->data('UserCount', null));
+        if ($count !== null) {
             echo ' ', sprintf(plural($count, '%s user found.', '%s users found.'), $count);
+        } elseif ($this->data('UserEstimate', null) !== null) {
+            echo ' ', sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
         }
         echo '</div>';
 

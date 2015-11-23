@@ -545,6 +545,10 @@ class RoleModel extends Gdn_Model {
 
         $RoleID = val('RoleID', $FormPostValues);
         $Insert = $RoleID > 0 ? false : true;
+
+        // Strict-mode.
+        setValue('PersonalInfo', $FormPostValues, forceBool(val('PersonalInfo', $FormPostValues), '0', '1', '0'));
+
         if ($Insert) {
             // Figure out the next role ID.
             $MaxRoleID = $this->SQL->select('r.RoleID', 'MAX')->from('Role r')->get()->value('RoleID', 0);

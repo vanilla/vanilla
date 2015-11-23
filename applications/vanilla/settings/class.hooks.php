@@ -18,7 +18,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param DbaController $Sender
      */
-    public function dbaController_CountJobs_Handler($Sender) {
+    public function dbaController_countJobs_handler($Sender) {
         $Counts = array(
             'Discussion' => array('CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'),
             'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted')
@@ -28,7 +28,6 @@ class VanillaHooks implements Gdn_IPlugin {
             foreach ($Columns as $Column) {
                 $Name = "Recalculate $Table.$Column";
                 $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
-
                 $Sender->Data['Jobs'][$Name] = $Url;
             }
         }
@@ -79,7 +78,6 @@ class VanillaHooks implements Gdn_IPlugin {
                 ->groupBy('DiscussionID')
                 ->get()->resultArray();
             $discussionIDs = array_column($discussionIDs, 'DiscussionID');
-
 
             Gdn::userModel()->getDelete('Comment', array('InsertUserID' => $userID), $data);
 
@@ -303,13 +301,13 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param UserModel $Sender UserModel.
      */
-    public function userModel_BeforeDeleteUser_Handler($Sender) {
+    public function userModel_beforeDeleteUser_handler($Sender) {
         $UserID = val('UserID', $Sender->EventArguments);
         $Options = val('Options', $Sender->EventArguments, array());
         $Options = is_array($Options) ? $Options : array();
         $Content =& $Sender->EventArguments['Content'];
 
-        $this->DeleteUserData($UserID, $Options, $Content);
+        $this->deleteUserData($UserID, $Options, $Content);
     }
 
     /**
@@ -321,9 +319,8 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param $Sender UserModel.
      * @return bool Whether user has permission.
      */
-    public function userModel_GetCategoryViewPermission_Create($Sender) {
+    public function userModel_getCategoryViewPermission_create($Sender) {
         static $PermissionModel = null;
-
 
         $UserID = val(0, $Sender->EventArguments, '');
         $CategoryID = val(1, $Sender->EventArguments, '');
@@ -340,7 +337,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 $PermissionCategoryID = -1;
             }
 
-            $Result = $PermissionModel->GetUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+            $Result = $PermissionModel->getUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
             return (val($Permission, val(0, $Result), false)) ? true : false;
         }
         return false;
@@ -357,7 +354,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function base_Render_Before($Sender) {
+    public function base_render_before($Sender) {
         $Session = Gdn::session();
         if ($Sender->Menu) {
             $Sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, array('Standard' => true));
@@ -372,7 +369,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender ProfileController.
      */
-    public function profileController_AddProfileTabs_Handler($Sender) {
+    public function profileController_addProfileTabs_handler($Sender) {
         if (is_object($Sender->User) && $Sender->User->UserID > 0) {
             $UserID = $Sender->User->UserID;
             // Add the discussion tab
@@ -382,8 +379,8 @@ class VanillaHooks implements Gdn_IPlugin {
                 $DiscussionsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountDiscussions', $Sender, null), "/profile/count/discussions?userid=$UserID").'</span>';
                 $CommentsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountComments', $Sender, null), "/profile/count/comments?userid=$UserID").'</span>';
             }
-            $Sender->AddProfileTab(t('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Discussions', $DiscussionsLabel);
-            $Sender->AddProfileTab(t('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', $CommentsLabel);
+            $Sender->addProfileTab(t('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Discussions', $DiscussionsLabel);
+            $Sender->addProfileTab(t('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', $CommentsLabel);
             // Add the discussion tab's CSS and Javascript.
             $Sender->addJsFile('jquery.gardenmorepager.js');
             $Sender->addJsFile('discussions.js', 'vanilla');
@@ -398,23 +395,16 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender
      */
-    public function profileController_AfterPreferencesDefined_Handler($Sender) {
+    public function profileController_afterPreferencesDefined_handler($Sender) {
         $Sender->Preferences['Notifications']['Email.DiscussionComment'] = t('Notify me when people comment on my discussions.');
         $Sender->Preferences['Notifications']['Email.BookmarkComment'] = t('Notify me when people comment on my bookmarked discussions.');
         $Sender->Preferences['Notifications']['Email.Mention'] = t('Notify me when people mention me.');
         $Sender->Preferences['Notifications']['Email.ParticipateComment'] = t('Notify me when people comment on discussions I\'ve participated in.');
 
-
         $Sender->Preferences['Notifications']['Popup.DiscussionComment'] = t('Notify me when people comment on my discussions.');
         $Sender->Preferences['Notifications']['Popup.BookmarkComment'] = t('Notify me when people comment on my bookmarked discussions.');
         $Sender->Preferences['Notifications']['Popup.Mention'] = t('Notify me when people mention me.');
         $Sender->Preferences['Notifications']['Popup.ParticipateComment'] = t('Notify me when people comment on discussions I\'ve participated in.');
-
-//      if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-//         $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(t('Notify me when people start new discussions.'), 'Meta');
-//         $Sender->Preferences['Notifications']['Email.NewComment'] = array(t('Notify me when people comment on a discussion.'), 'Meta');
-////      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = t('Notify me when people start new discussions.');
-//      }
 
         if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             $PostBack = $Sender->Form->authenticatedPostBack();
@@ -446,12 +436,13 @@ class VanillaHooks implements Gdn_IPlugin {
             }
             $Sender->setData('CategoryNotifications', $Categories);
             if ($PostBack) {
-                UserModel::SetMeta($Sender->User->UserID, $Set, 'Preferences.');
+                UserModel::setMeta($Sender->User->UserID, $Set, 'Preferences.');
             }
         }
     }
 
     /**
+     * Add the advanced notifications view to profiles.
      *
      * @param ProfileController $Sender
      */
@@ -471,39 +462,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function searchModel_Search_Handler($Sender) {
         $SearchModel = new VanillaSearchModel();
-        $SearchModel->Search($Sender);
-    }
-
-    /**
-     * Load forum information into the BuzzData collection.
-     *
-     * @since 2.0.0
-     * @package Vanilla
-     *
-     * @param object $Sender SettingsController.
-     */
-    public function settingsController_DashboardData_Handler($Sender) {
-        /*
-        $DiscussionModel = new DiscussionModel();
-        // Number of Discussions
-        $CountDiscussions = $DiscussionModel->getCount();
-        $Sender->addDefinition('CountDiscussions', $CountDiscussions);
-        $Sender->BuzzData[T('Discussions')] = number_format($CountDiscussions);
-        // Number of New Discussions in the last day
-        $Sender->BuzzData[T('New discussions in the last day')] = number_format($DiscussionModel->getCount(array('d.DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 day')))));
-        // Number of New Discussions in the last week
-        $Sender->BuzzData[T('New discussions in the last week')] = number_format($DiscussionModel->getCount(array('d.DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 week')))));
-
-        $CommentModel = new CommentModel();
-        // Number of Comments
-        $CountComments = $CommentModel->getCountWhere();
-        $Sender->addDefinition('CountComments', $CountComments);
-        $Sender->BuzzData[T('Comments')] = number_format($CountComments);
-        // Number of New Comments in the last day
-        $Sender->BuzzData[T('New comments in the last day')] = number_format($CommentModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 day')))));
-        // Number of New Comments in the last week
-        $Sender->BuzzData[T('New comments in the last week')] = number_format($CommentModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 week')))));
-        */
+        $SearchModel->search($Sender);
     }
 
     /**
@@ -511,7 +470,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function siteNavModule_default_handler($sender) {
         // Grab the default route so that we don't add a link to it twice.
-        $home = trim(val('Destination', Gdn::router()->GetRoute('DefaultController')), '/');
+        $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
         // Add the site discussion links.
         if ($home !== 'categories') {
@@ -538,6 +497,8 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Add discussion & comment links to profiles.
+     *
      * @param SiteLinkMenuModule $sender
      */
     public function siteNavModule_profile_handler($sender) {
@@ -566,24 +527,25 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender ProfileController.
      */
-    public function profileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
+    public function profileController_comments_create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
         $Sender->editMode(false);
         $View = $Sender->View;
+
         // Tell the ProfileController what tab to load
         $Sender->getUserInfo($UserReference, $Username, $UserID);
         $Sender->_setBreadcrumbs(t('Comments'), userUrl($Sender->User, '', 'comments'));
         $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
 
-        $PageSize = Gdn::config('Vanilla.Discussions.PerPage', 30);
+        $PageSize = c('Vanilla.Discussions.PerPage', 30);
         list($Offset, $Limit) = offsetLimit($Page, $PageSize);
 
         $CommentModel = new CommentModel();
-        $Comments = $CommentModel->GetByUser2($Sender->User->UserID, $Limit, $Offset, $Sender->Request->get('lid'));
+        $Comments = $CommentModel->getByUser2($Sender->User->UserID, $Limit, $Offset, $Sender->Request->get('lid'));
         $TotalRecords = $Offset + $CommentModel->LastCommentCount + 1;
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
-        $Sender->Pager = $PagerFactory->GetPager('MorePager', $Sender);
+        $Sender->Pager = $PagerFactory->getPager('MorePager', $Sender);
         $Sender->Pager->MoreCode = 'More Comments';
         $Sender->Pager->LessCode = 'Newer Comments';
         $Sender->Pager->ClientID = 'Pager';
@@ -624,25 +586,25 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender ProfileController.
      */
-    public function profileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
+    public function profileController_discussions_create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
         $Sender->editMode(false);
 
         // Tell the ProfileController what tab to load
         $Sender->getUserInfo($UserReference, $Username, $UserID);
         $Sender->_setBreadcrumbs(t('Discussions'), userUrl($Sender->User, '', 'discussions'));
-        $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
+        $Sender->setTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
         $Sender->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
 
-        list($Offset, $Limit) = offsetLimit($Page, Gdn::config('Vanilla.Discussions.PerPage', 30));
+        list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
 
         $DiscussionModel = new DiscussionModel();
-        $Discussions = $DiscussionModel->GetByUser($Sender->User->UserID, $Limit, $Offset, false, Gdn::session()->UserID);
+        $Discussions = $DiscussionModel->getByUser($Sender->User->UserID, $Limit, $Offset, false, Gdn::session()->UserID);
         $CountDiscussions = $Offset + $DiscussionModel->LastDiscussionCount + 1;
         $Sender->DiscussionData = $Sender->setData('Discussions', $Discussions);
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
-        $Sender->Pager = $PagerFactory->GetPager('MorePager', $Sender);
+        $Sender->Pager = $PagerFactory->getPager('MorePager', $Sender);
         $Sender->Pager->MoreCode = 'More Discussions';
         $Sender->Pager->LessCode = 'Newer Discussions';
         $Sender->Pager->ClientID = 'Pager';
@@ -683,25 +645,26 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender SettingsController.
      */
-    public function settingsController_DefineAdminPermissions_Handler($Sender) {
+    public function settingsController_defineAdminPermissions_handler($Sender) {
         if (isset($Sender->RequiredAdminPermissions)) {
             $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
         }
     }
 
-    public function gdn_Statistics_Tick_Handler($Sender, $Args) {
-        $Path = Gdn::request()->Post('Path');
-        $Args = Gdn::request()->Post('Args');
+    /**
+     * Discussion view counter.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function gdn_statistics_tick_handler($Sender, $Args) {
+        $Path = Gdn::request()->post('Path');
+        $Args = Gdn::request()->post('Args');
         parse_str($Args, $Args);
-        $ResolvedPath = trim(Gdn::request()->Post('ResolvedPath'), '/');
-        $ResolvedArgs = Gdn::request()->Post('ResolvedArgs');
+        $ResolvedPath = trim(Gdn::request()->post('ResolvedPath'), '/');
+        $ResolvedArgs = Gdn::request()->post('ResolvedArgs');
         $DiscussionID = null;
         $DiscussionModel = new DiscussionModel();
-
-//      Gdn::controller()->setData('Path', $Path);
-//      Gdn::controller()->setData('Args', $Args);
-//      Gdn::controller()->setData('ResolvedPath', $ResolvedPath);
-//      Gdn::controller()->setData('ResolvedArgs', $ResolvedArgs);
 
         // Comment permalink
         if ($ResolvedPath == 'vanilla/discussion/comment') {
@@ -720,7 +683,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 $Key = "DiscussionID.ForeignID.page.$ForeignID";
                 $DiscussionID = Gdn::cache()->get($Key);
                 if (!$DiscussionID) {
-                    $Discussion = $DiscussionModel->GetForeignID($ForeignID, 'page');
+                    $Discussion = $DiscussionModel->getForeignID($ForeignID, 'page');
                     $DiscussionID = val('DiscussionID', $Discussion);
                     Gdn::cache()->store($Key, $DiscussionID, array(Gdn_Cache::FEATURE_EXPIRY, 1800));
                 }
@@ -728,7 +691,7 @@ class VanillaHooks implements Gdn_IPlugin {
         }
 
         if ($DiscussionID) {
-            $DiscussionModel->AddView($DiscussionID);
+            $DiscussionModel->addView($DiscussionID);
         }
     }
 
@@ -740,7 +703,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
         $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));
@@ -758,7 +721,7 @@ class VanillaHooks implements Gdn_IPlugin {
     public function setup() {
         $Database = Gdn::database();
         $Config = Gdn::factory(Gdn::AliasConfig);
-        $Drop = false; //Gdn::config('Vanilla.Version') === FALSE ? TRUE : FALSE;
+        $Drop = false;
 
         // Call structure.php to update database
         $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names

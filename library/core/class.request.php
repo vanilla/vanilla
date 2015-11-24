@@ -517,9 +517,15 @@ class Gdn_Request {
             $rewrite = val('X_REWRITE', $_SERVER, false);
 
             if ($rewrite == 1) {
+<<<<<<< HEAD
                 $path = val('PATH_INFO', $_SERVER, '');
             } elseif ($rewrite == 2) {
                 $path = val('X_PATH_INFO', $_SERVER, '');
+=======
+                $Path = val('PATH_INFO', $_SERVER, '');
+            } elseif ($rewrite == 2) {
+                $Path = val('X_PATH_INFO', $_SERVER, '');
+>>>>>>> origin/hotfix/x-path-info
             } elseif (isset($Get['_p'])) {
                 $path = $Get['_p'];
                 unset($_GET['_p']);

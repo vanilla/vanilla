@@ -480,7 +480,7 @@ if (!function_exists('anchor')) {
             $Destination = Gdn::request()->url($Destination, $WithDomain, $SSL);
         }
 
-        return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
+        return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.attribute($CssClass).attribute($Attributes).'>'.$Text.'</a>';
     }
 }
 

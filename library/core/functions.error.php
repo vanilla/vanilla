@@ -256,7 +256,7 @@ function Gdn_ExceptionHandler($Exception) {
             // This is an ajax request, so dump an error that is more eye-friendly in the debugger
             echo '<h1>FATAL ERROR IN: ', $SenderObject, '.', $SenderMethod, "();</h1>\n<pre class=\"AjaxError\">\"".$SenderMessage."\"\n";
             if ($SenderCode != '') {
-                echo htmlspecialchars($SenderCode, ENT_COMPAT, C('Garden.Charset', 'UTF-8'))."\n";
+                echo htmlspecialchars($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
             }
 
             if (is_array($ErrorLines) && $Line > -1) {
@@ -271,7 +271,8 @@ function Gdn_ExceptionHandler($Exception) {
                         echo '>>';
                     }
 
-                    echo '> '.str_pad($i + 1, $Padding, " ", STR_PAD_LEFT), ': ', str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])), "\n";
+                    echo '> '.str_pad($i + 1, $Padding, " ", STR_PAD_LEFT), ': ',
+                        str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])), "\n";
                 }
             }
 

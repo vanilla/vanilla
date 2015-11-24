@@ -240,7 +240,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_Json = array();
         $this->_Headers = array(
             'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
-            'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset='.C('Garden.Charset', 'utf-8') // PROPERLY ENCODE THE CONTENT
+            'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset=utf-8' // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
         );
 
@@ -1012,7 +1012,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function initialize() {
         if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
-            $this->_Headers['Content-Type'] = 'text/xml; charset='.c('Garden.Charset', 'utf-8');
+            $this->_Headers['Content-Type'] = 'text/xml; charset=utf-8';
         }
 
         if (is_object($this->Menu)) {
@@ -1218,7 +1218,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (ob_get_level()) {
                 ob_clean();
             }
-            $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
+            $this->contentType('application/json; charset=utf-8');
             $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Cross-Origin Resource Sharing (CORS)
@@ -1485,12 +1485,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             case DELIVERY_METHOD_JSON:
             default:
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
-                    safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
                     echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
                     return true;
                 } else {
-                    safeHeader('Content-Type: application/json; charset='.c('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
                     echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                     return true;
@@ -1638,11 +1638,11 @@ class Gdn_Controller extends Gdn_Pluggable {
         switch ($this->deliveryMethod()) {
             case DELIVERY_METHOD_JSON:
                 if (($Callback = $this->Request->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->allowJSONP()) {
-                    safeHeader('Content-Type: application/javascript; charset='.C('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
                     exit($Callback.'('.json_encode($Data).');');
                 } else {
-                    safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
                     exit(json_encode($Data));
                 }
@@ -1651,12 +1651,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 //            Gdn_ExceptionHandler($Ex);
 //            break;
             case DELIVERY_METHOD_XML:
-                safeHeader('Content-Type: text/xml; charset='.C('Garden.Charset', 'utf-8'), true);
+                safeHeader('Content-Type: text/xml; charset=utf-8', true);
                 array_map('htmlspecialchars', $Data);
                 exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
                 break;
             default:
-                safeHeader('Content-Type: text/plain; charset='.C('Garden.Charset', 'utf-8'), true);
+                safeHeader('Content-Type: text/plain; charset=utf-8', true);
                 exit($Ex->getMessage());
         }
     }

@@ -481,7 +481,7 @@ if (!function_exists('attribute')) {
             }
 
             if ($Val != '' && $Attribute != 'Standard') {
-                $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"';
+                $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
             }
         }
         return $Return;
@@ -3501,11 +3501,7 @@ if (!function_exists('sliceString')) {
         }
 
         if (function_exists('mb_strimwidth')) {
-            static $Charset;
-            if (is_null($Charset)) {
-                $Charset = Gdn::Config('Garden.Charset', 'utf-8');
-            }
-            return mb_strimwidth($String, 0, $Length, $Suffix, $Charset);
+            return mb_strimwidth($String, 0, $Length, $Suffix, 'utf-8');
         } else {
             $Trim = substr($String, 0, $Length);
             return $Trim.((strlen($Trim) != strlen($String)) ? $Suffix : '');

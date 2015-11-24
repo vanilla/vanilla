@@ -682,7 +682,7 @@ class Gdn_Format {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Display');
         } else {
-            $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, c('Garden.Charset', 'UTF-8'));
+            $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
             $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
             $Mixed = self::mentions($Mixed);
             $Mixed = self::links($Mixed);
@@ -729,9 +729,9 @@ class Gdn_Format {
             return self::to($Mixed, 'Form');
         } else {
             if (c('Garden.Format.ReplaceNewlines', true)) {
-                return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, c('Garden.Charset', 'UTF-8')));
+                return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8'));
             } else {
-                return htmlspecialchars($Mixed, ENT_QUOTES, c('Garden.Charset', 'UTF-8'));
+                return htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
             }
         }
     }
@@ -889,7 +889,7 @@ class Gdn_Format {
             } else {
                 // The text does not contain html and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
-                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, C('Garden.Charset', 'UTF-8'));
+                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
                 $Result = Gdn_Format::mentions($Result);
                 $Result = Gdn_Format::links($Result);
                 $Result = Emoji::instance()->translateToHtml($Result);
@@ -1410,7 +1410,7 @@ EOT;
             $Text = $Url;
             if (strpos($Text, '%') !== false) {
                 $Text = rawurldecode($Text);
-                $Text = htmlspecialchars($Text, ENT_QUOTES, c('Garden.Charset', 'UTF-8'));
+                $Text = htmlspecialchars($Text, ENT_QUOTES, 'UTF-8');
             }
 
             $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
@@ -1763,8 +1763,8 @@ EOT;
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Text');
         } else {
-            $Charset = c('Garden.Charset', 'UTF-8');
-            $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n", html_entity_decode($Mixed, ENT_QUOTES, $Charset))), ENT_NOQUOTES, $Charset);
+            $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n",
+                html_entity_decode($Mixed, ENT_QUOTES, 'UTF-8'))), ENT_NOQUOTES, 'UTF-8');
             if ($AddBreaks && c('Garden.Format.ReplaceNewlines', true)) {
                 $Result = nl2br(trim($Result));
             }

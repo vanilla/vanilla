@@ -1778,10 +1778,6 @@
             }
         } //editorInit
 
-        // Initialize new editors.
-        $(document).on('EditCommentFormLoaded popupReveal', function () {
-            editorInit('', $(selector));
-        })
         editorInit('', this);
 
         // jQuery chaining
@@ -1793,6 +1789,10 @@
 // Set all .BodyBox elements as editor, calling plugin above.
 jQuery(document).ready(function($) {
     $('.BodyBox').setAsEditor();
+});
+
+$(document).on('start', function(e, element) {
+    $('.BodyBox', $(element)).setAsEditor();
 });
 
 

@@ -1595,6 +1595,7 @@ PASSWORDMETER;
         if ($Label != '') {
             $LabelElement = '<label for="'.arrayValueI('id', $Attributes, $this->EscapeID($FieldName, false)).'" class="'.val('class', $Attributes, 'RadioLabel').'">';
             if ($Display === 'wrap') {
+                $LabelElement = '<label class="'.val('class', $Attributes, 'RadioLabel').'">';
                 $Input = $LabelElement.$Input.' '.t($Label).'</label>';
             } elseif ($Display === 'before') {
                 $Input = $LabelElement.t($Label).'</label> '.$Input;

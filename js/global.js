@@ -455,19 +455,19 @@ jQuery(document).ready(function($) {
                     });
                     break;
                 case 'Append':
-                    $target.append(item.Data);
+                    $target.append(item.Data).trigger('start');
                     break;
                 case 'Before':
-                    $target.before(item.Data);
+                    $target.before(item.Data).trigger('start');
                     break;
                 case 'After':
-                    $target.after(item.Data);
+                    $target.after(item.Data).trigger('start');
                     break;
                 case 'Highlight':
                     $target.effect("highlight", {}, "slow");
                     break;
                 case 'Prepend':
-                    $target.prepend(item.Data);
+                    $target.prepend(item.Data).trigger('start');
                     break;
                 case 'Redirect':
                     window.location.replace(item.Data);
@@ -491,10 +491,10 @@ jQuery(document).ready(function($) {
                     $target.slideDown('fast');
                     break;
                 case 'Text':
-                    $target.text(item.Data);
+                    $target.text(item.Data).trigger('start');
                     break;
                 case 'Html':
-                    $target.html(item.Data);
+                    gdn.addHtml($target, item.Data);
                     break;
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
@@ -612,7 +612,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.html(data);
+                    gdn.addHtml($elem, data);
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
@@ -785,6 +785,20 @@ jQuery(document).ready(function($) {
             }
         }
     }
+
+
+    /**
+     * Inserts the html in the passed element and triggers an event that can be plugged
+     * into to start javascript when the DOM is updated. The javascript applied on
+     * the 'start' event should optimally target just the $element.
+     *
+     * @param $element The element to insert the html into.
+     * @param html The html to insert into the element.
+     */
+    gdn.addHtml = function($element, html) {
+        $element.html(html).trigger('start', $element);
+    }
+
 
     gdn.stats = function() {
         // Call directly back to the deployment and invoke the stats handler

@@ -175,12 +175,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Trigger an even that plugins can attach to when popups are loading.
       $('body').trigger('popupLoading');
    }
-   
+
    $.popup.load = function(settings) {
        if (!settings.confirm) {
           $.popup.loading(settings);
        }
-       
+
 	   var target = $.popup.findTarget(settings);
        if (settings.confirm) {
           // Bind to the "Okay" button click
@@ -244,8 +244,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       if (json == false) {
          // This is something other than json, so just put it into the popup directly
-         if (data) // Prevent blank popups
-            $('#'+settings.popupId+' .Content').append(data);
+         if (data) { // Prevent blank popups
+            gdn.addHtml($('#' + settings.popupId + ' .Content'), data);
+         }
+
       } else {
          gdn.inform(json);
          formSaved = json['FormSaved'];
@@ -263,8 +265,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          // we need to reload the invitation table. Is there a reason not to reload
          // the content?
          // if (formSaved == false)
-         if (data) // Prevent blank popups
-            $('#'+settings.popupId+' .Content').html(data);
+         if (data) { // Prevent blank popups
+            gdn.addHtml($('#' + settings.popupId + ' .Content'), data);
+         }
       }
 
       $('#'+settings.popupId+' .Loading').remove();

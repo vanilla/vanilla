@@ -795,8 +795,8 @@ jQuery(document).ready(function($) {
      * @param $element The element to insert the html into.
      * @param html The html to insert into the element.
      */
-    gdn.addHtml = function($element, html) {
-        $element.html(html).trigger('start', $element);
+    gdn.addHtml = function(element, html) {
+        $(element).html(html).trigger('start', element);
     }
 
 

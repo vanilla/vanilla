@@ -804,19 +804,29 @@ if (!function_exists('safePrint')) {
 
         $functionName = __FUNCTION__;
 
-        $replaceCastedValues = function(&$value) use ($functionName) {
-            if ($value === true) { $value = $functionName.'{true}'; }
-            elseif ($value === false) { $value = $functionName.'{false}'; }
-            elseif ($value === null) { $value = $functionName.'{null}'; }
-            elseif ($value === '') { $value = $functionName.'{empty string}'; }
-            elseif ($value === 0) { $value = $functionName.'{0}'; }
+        $replaceCastedValues = function(&$value) use (&$replaceCastedValues, $functionName) {
+            if (is_array($value) || is_object($value)) {
+                foreach($value as &$content) {
+                    $replaceCastedValues($content);
+                }
+                unset($content);
+                return;
+            }
+
+            if ($value === '') {
+                $value = $functionName.'{empty string}';
+            } elseif ($value === true) {
+                $value = $functionName.'{true}';
+            } elseif ($value === false) {
+                $value = $functionName.'{false}';
+            } elseif ($value === null) {
+                $value = $functionName.'{null}';
+            } elseif ($value === 0) {
+                $value = $functionName.'{0}';
+            }
         };
 
-        if (is_string($mixed)) {
-            $replaceCastedValues($mixed);
-        } else {
-            array_walk_recursive($mixed, $replaceCastedValues);
-        }
+        $replaceCastedValues($mixed);
 
         return print_r($mixed, $returnData);
     }

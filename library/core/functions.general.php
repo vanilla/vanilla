@@ -792,10 +792,40 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     }
 }
 
+if (!function_exists('safePrint')) {
+    /**
+     * Return/print human-readable and non casted information about a variable".
+     *
+     * @param mixed $mixed The variable to return/echo.
+     * @param bool $returnData Whether or not return the data instead of echoing it.
+     * @return null\mixed
+     */
+    function safePrint($mixed, $returnData = false) {
+
+        $functionName = __FUNCTION__;
+
+        $replaceCastedValues = function(&$value) use ($functionName) {
+            if ($value === true) { $value = $functionName.'{true}'; }
+            elseif ($value === false) { $value = $functionName.'{false}'; }
+            elseif ($value === null) { $value = $functionName.'{null}'; }
+            elseif ($value === '') { $value = $functionName.'{empty string}'; }
+            elseif ($value === 0) { $value = $functionName.'{0}'; }
+        };
+
+        if (is_string($mixed)) {
+            $replaceCastedValues($mixed);
+        } else {
+            array_walk_recursive($mixed, $replaceCastedValues);
+        }
+
+        return print_r($mixed, $returnData);
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.
-     * 
+     *
      * @param mixed $mixed The variable to echo.
      * @param string $prefix The text to be used as a prefix for the output.
      * @param bool $public Whether or not output is visible for everyone.
@@ -804,11 +834,15 @@ if (!function_exists('decho')) {
         $prefix = stringEndsWith($prefix, ': ', true, true).': ';
 
         if ($public || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
-            echo '<pre style="text-align: left; padding: 0 4px;">'.$prefix;
+            $stack = debug_backtrace();
+
+            $backtrace = __FUNCTION__.' called from '.$stack[0]['file'].' line: '.$stack[0]['line']."\n";
+
+            echo '<pre style="text-align: left; padding: 0 4px;">'.$backtrace.$prefix;
             if (is_string($mixed)) {
                 echo $mixed;
             } else {
-                echo htmlspecialchars(print_r($mixed, true));
+                echo htmlspecialchars(safePrint($mixed, true));
             }
 
             echo '</pre>';

@@ -12,6 +12,11 @@
 abstract class SortableModule extends Gdn_Module {
 
     /**
+     *
+     */
+    const ACTIVE_CSS_CLASS = 'Active';
+
+    /**
      * @var array List of items to sort.
      */
     public $items = array();
@@ -242,7 +247,11 @@ abstract class SortableModule extends Gdn_Module {
             $listItemCssClasses[] = 'disabled';
         }
         if ($this->isActive($link)) {
-            $listItemCssClasses[] = 'active';
+	    $listItemCssClasses[] = SortableModule::ACTIVE_CSS_CLASS;
+	    // Add Active class to parent link
+	    if (strpos($link['key'], '.') && $parentKey = substr($link['key'], 0, strpos($link['key'], '.'))) {
+		$this->items[$parentKey]['cssClass'] .= ' '.SortableModule::ACTIVE_CSS_CLASS;
+	    }
         }
         $link['listItemCssClass'] = implode(' ', $listItemCssClasses);
 
@@ -365,7 +374,7 @@ abstract class SortableModule extends Gdn_Module {
     public function isActive($item) {
         $highlightRoute = Gdn_Url::request();
         $highlightUrl = Url($highlightRoute);
-        return (val('linkUrl', $item) && Url(val('linkUrl', $item)) == $highlightUrl);
+	return (val('url', $item) && (url(val('url', $item)) == $highlightUrl));
     }
 
     /**

@@ -52,7 +52,7 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function autorun() {
         $this->addContainer(array(
-            Gdn_Cache::CONTAINER_LOCATION => C('Cache.Filecache.Store')
+            Gdn_Cache::CONTAINER_LOCATION => c('Cache.Filecache.Store')
         ));
     }
 

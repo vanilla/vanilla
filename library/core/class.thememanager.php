@@ -45,7 +45,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      */
     public function start($Force = false) {
 
-        if (function_exists('apc_fetch') && C('Garden.Apc', false)) {
+        if (function_exists('apc_fetch') && c('Garden.Apc', false)) {
             $this->Apc = true;
         }
 
@@ -231,7 +231,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $this->ThemeSearchPaths[rtrim(PATH_THEMES, '/')] = 'core';
 
             // Check for, and load, alternate search paths from config
-            $RawAlternatePaths = C('Garden.PluginManager.Search', null);
+            $RawAlternatePaths = c('Garden.PluginManager.Search', null);
             if (!is_null($RawAlternatePaths)) {
                 /*
                             // Handle serialized and unserialized alternate path arrays
@@ -390,7 +390,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function currentTheme() {
-        return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+        return c(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
     }
 
     /**
@@ -399,7 +399,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function desktopTheme() {
-        return C('Garden.Theme', 'default');
+        return c('Garden.Theme', 'default');
     }
 
     /**
@@ -599,7 +599,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function mobileTheme() {
-        return C('Garden.MobileTheme', 'default');
+        return c('Garden.MobileTheme', 'default');
     }
 
     /**

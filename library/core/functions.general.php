@@ -864,7 +864,7 @@ if (!function_exists('debug')) {
             Logger::logLevel(Logger::DEBUG);
         } else {
             if ($Changed) {
-                Logger::logLevel(C('Garden.LogLevel', Logger::INFO));
+                Logger::logLevel(c('Garden.LogLevel', Logger::INFO));
             }
         }
         return $Debug;
@@ -949,7 +949,7 @@ if (!function_exists('externalUrl')) {
      * @return string Returns the external URL.
      */
     function externalUrl($path) {
-        $urlFormat = C('Garden.ExternalUrlFormat');
+        $urlFormat = c('Garden.ExternalUrlFormat');
 
         if ($urlFormat && !isUrl($path)) {
             $result = sprintf($urlFormat, ltrim($path, '/'));
@@ -1488,7 +1488,7 @@ if (!function_exists('forceSSL')) {
      * @deprecated
      */
     function forceSSL() {
-        if (C('Garden.AllowSSL')) {
+        if (c('Garden.AllowSSL')) {
             if (Gdn::Request()->Scheme() != 'https') {
                 Redirect(Gdn::Request()->Url('', true, true));
             }
@@ -1614,7 +1614,7 @@ if (!function_exists('getAppCookie')) {
      * @return string
      */
     function getAppCookie($Name, $Default = null) {
-        $Px = C('Garden.Cookie.Name');
+        $Px = c('Garden.Cookie.Name');
         return GetValue("$Px-$Name", $_COOKIE, $Default);
     }
 }
@@ -2037,7 +2037,7 @@ if (!function_exists('isMobile')) {
 
         $type = userAgentType();
         // Check the config for an override. (ex. Consider tablets mobile)
-        $type = C('Garden.Devices.'.ucfirst($type), $type);
+        $type = c('Garden.Devices.'.ucfirst($type), $type);
 
         switch ($type) {
             case 'app':
@@ -2463,7 +2463,7 @@ if (!function_exists('touchConfig')) {
 
         $Save = array();
         foreach ($Name as $Key => $Value) {
-            if (!C($Key)) {
+            if (!c($Key)) {
                 $Save[$Key] = $Value;
             }
         }
@@ -2506,7 +2506,7 @@ if (!function_exists('signInPopup')) {
      * @return bool Returns true if signin popups are used.
      */
     function signInPopup() {
-        return C('Garden.SignIn.Popup');
+        return c('Garden.SignIn.Popup');
     }
 }
 
@@ -2677,7 +2677,7 @@ if (!function_exists('proxyHead')) {
         $OriginalHeaders = $Headers;
         $OriginalTimeout = $Timeout;
         if (!$Timeout) {
-            $Timeout = C('Garden.SocketTimeout', 1.0);
+            $Timeout = c('Garden.SocketTimeout', 1.0);
         }
 
         $UrlParts = parse_url($Url);
@@ -2689,7 +2689,7 @@ if (!function_exists('proxyHead')) {
 
         // Get the cookie.
         $Cookie = '';
-        $EncodeCookies = C('Garden.Cookie.Urlencode', true);
+        $EncodeCookies = c('Garden.Cookie.Urlencode', true);
 
         foreach ($_COOKIE as $Key => $Value) {
             if (strncasecmp($Key, 'XDEBUG', 6) == 0) {
@@ -2829,7 +2829,7 @@ if (!function_exists('proxyRequest')) {
     function proxyRequest($Url, $Timeout = false, $FollowRedirects = false) {
         $OriginalTimeout = $Timeout;
         if ($Timeout === false) {
-            $Timeout = C('Garden.SocketTimeout', 1.0);
+            $Timeout = c('Garden.SocketTimeout', 1.0);
         }
 
         $UrlParts = parse_url($Url);
@@ -2840,7 +2840,7 @@ if (!function_exists('proxyRequest')) {
         $Query = GetValue('query', $UrlParts, '');
         // Get the cookie.
         $Cookie = '';
-        $EncodeCookies = C('Garden.Cookie.Urlencode', true);
+        $EncodeCookies = c('Garden.Cookie.Urlencode', true);
 
         foreach ($_COOKIE as $Key => $Value) {
             if (strncasecmp($Key, 'XDEBUG', 6) == 0) {
@@ -3411,7 +3411,7 @@ if (!function_exists('setAppCookie')) {
      * @param bool $Force Whether or not to set the cookie even if already exists.
      */
     function setAppCookie($Name, $Value, $Expire = 0, $Force = false) {
-        $Px = C('Garden.Cookie.Name');
+        $Px = c('Garden.Cookie.Name');
         $Key = "$Px-$Name";
 
         // Check to see if the cookie is already set before setting it again.
@@ -3419,7 +3419,7 @@ if (!function_exists('setAppCookie')) {
             return;
         }
 
-        $Domain = C('Garden.Cookie.Domain', '');
+        $Domain = c('Garden.Cookie.Domain', '');
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $CurrentHost = Gdn::Request()->Host();
@@ -3757,7 +3757,7 @@ if (!function_exists('trustedDomains')) {
      * @return array
      */
     function trustedDomains() {
-        $Result = C('Garden.TrustedDomains', array());
+        $Result = c('Garden.TrustedDomains', array());
         if (!is_array($Result)) {
             $Result = explode("\n", $Result);
         }
@@ -3895,8 +3895,8 @@ if (!function_exists('passwordStrength')) {
         $Length = strlen($Password);
         $Entropy = log(pow($Alphabet, $Length), 2);
 
-        $RequiredLength = C('Garden.Password.MinLength', 6);
-        $RequiredScore = C('Garden.Password.MinScore', 2);
+        $RequiredLength = c('Garden.Password.MinLength', 6);
+        $RequiredScore = c('Garden.Password.MinScore', 2);
         $Response = array(
             'Pass' => false,
             'Symbols' => $Alphabet,

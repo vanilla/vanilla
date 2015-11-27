@@ -191,8 +191,8 @@ function Gdn_ExceptionHandler($Exception) {
 
                 if (class_exists('Gdn', false)) {
                     $CurrentTheme = ''; // The currently selected theme
-                    $CurrentTheme = C('Garden.Theme', '');
-                    $MasterViewName = C('Garden.Errors.MasterView', $MasterViewName);
+                    $CurrentTheme = c('Garden.Theme', '');
+                    $MasterViewName = c('Garden.Errors.MasterView', $MasterViewName);
                     $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
                     if ($MasterViewCss == '') {
                         $MasterViewCss = 'error';

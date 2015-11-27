@@ -173,7 +173,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->Locale = $CurrentLocale;
         $LocaleSources = $this->getLocaleSources($CurrentLocale, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
 
-        $Codeset = C('Garden.LocaleCodeset', 'UTF8');
+        $Codeset = c('Garden.LocaleCodeset', 'UTF8');
 
         $SetLocale = array(
             LC_TIME,
@@ -214,7 +214,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         }
 
         // Prepare developer mode if needed
-        $this->DeveloperMode = C('Garden.Locales.DeveloperMode', false);
+        $this->DeveloperMode = c('Garden.Locales.DeveloperMode', false);
         if ($this->DeveloperMode) {
             $this->DeveloperContainer = new Gdn_Configuration();
             $this->DeveloperContainer->splitting(false);
@@ -292,7 +292,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->crawlAddonLocaleSources(PATH_APPLICATIONS, $applicationWhiteList, $result);
 
         // Get locale-based locale definition files.
-        $enabledLocales = C('EnabledLocales');
+        $enabledLocales = c('EnabledLocales');
         if (is_array($enabledLocales)) {
             foreach ($enabledLocales as $localeKey => $locale) {
                 $locale = self::canonicalize($locale);
@@ -310,7 +310,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->crawlAddonLocaleSources(PATH_PLUGINS, $pluginWhiteList, $result);
 
         // Get theme-based locale definition files.
-        $theme = C('Garden.Theme');
+        $theme = c('Garden.Theme');
         if ($theme) {
             $this->crawlAddonLocaleSources(PATH_THEMES, array($theme), $result);
         }

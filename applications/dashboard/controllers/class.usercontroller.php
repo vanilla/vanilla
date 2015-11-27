@@ -317,7 +317,7 @@ class UserController extends DashboardController {
                 if (val('session', $Args)) {
                     Gdn::session()->start($this->data('User.UserID'));
                     $this->setData('Cookie', array(
-                        c('Garden.Cookie.Name') => $_COOKIE[C('Garden.Cookie.Name')]
+                        c('Garden.Cookie.Name') => $_COOKIE[c('Garden.Cookie.Name')]
                     ));
                 }
             } else {

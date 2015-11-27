@@ -621,9 +621,9 @@ if (!function_exists('hasEditProfile')) {
         $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
 
         $result &= (
-            C('Garden.Profile.Titles') ||
-            C('Garden.Profile.Locations', false) ||
-            C('Garden.Registration.Method') != 'Connect'
+            c('Garden.Profile.Titles') ||
+            c('Garden.Profile.Locations', false) ||
+            c('Garden.Registration.Method') != 'Connect'
         );
 
         return $result;
@@ -1093,7 +1093,7 @@ if (!function_exists('discussionLink')) {
 
 if (!function_exists('registerUrl')) {
     function registerUrl($Target = '', $force = false) {
-        $registrationMethod = strtolower(C('Garden.Registration.Method'));
+        $registrationMethod = strtolower(c('Garden.Registration.Method'));
 
         if ($registrationMethod === 'closed') {
             return '';
@@ -1114,7 +1114,7 @@ if (!function_exists('registerUrl')) {
 if (!function_exists('signInUrl')) {
     function signInUrl($target = '', $force = false) {
         // Check to see if there is even a sign in button.
-        if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
+        if (!$force && strcasecmp(c('Garden.Registration.Method'), 'Connect') !== 0) {
             $defaultProvider = Gdn_AuthenticationProviderModel::getDefault();
             if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
                 return '';

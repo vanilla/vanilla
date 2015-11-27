@@ -89,7 +89,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         // Get custom error class
-        $this->ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
+        $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
 
         parent::__construct();
     }
@@ -380,7 +380,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Return .= '<option value=""></option>';
 
         // Show root categories as headings (ie. you can't post in them)?
-        $DoHeadings = val('Headings', $Options, C('Vanilla.Categories.DoHeadings'));
+        $DoHeadings = val('Headings', $Options, c('Vanilla.Categories.DoHeadings'));
 
         // If making headings disabled and there was no default value for
         // selection, make sure to select the first non-disabled value, or the

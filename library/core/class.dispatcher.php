@@ -205,7 +205,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('AfterAnalyzeRequest');
 
         // If we're in update mode and can block, redirect to signin
-        if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
+        if (c('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
             if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);

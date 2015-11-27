@@ -369,7 +369,7 @@ class Gdn {
         }
 
         if ($InstallationID === false) {
-            $InstallationID = C('Garden.InstallationID', null);
+            $InstallationID = c('Garden.InstallationID', null);
         }
 
         return $InstallationID;
@@ -394,7 +394,7 @@ class Gdn {
         }
 
         if ($InstallationSecret === false) {
-            $InstallationSecret = C('Garden.InstallationSecret', null);
+            $InstallationSecret = c('Garden.InstallationSecret', null);
         }
 
         return $InstallationSecret;

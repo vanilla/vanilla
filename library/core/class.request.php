@@ -925,11 +925,11 @@ class Gdn_Request {
     public function url($path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
         if ($allowSSL === null) {
-            $allowSSL = C('Garden.AllowSSL', false);
+            $allowSSL = c('Garden.AllowSSL', false);
         }
         static $rewrite = null;
         if ($rewrite === null) {
-            $rewrite = val('X_REWRITE', $_SERVER, C('Garden.RewriteUrls', false));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
         }
 
         if (!$allowSSL) {
@@ -1082,7 +1082,7 @@ class Gdn_Request {
         static $allowSSL = null;
 
         if ($allowSSL === null) {
-            $allowSSL = C('Garden.AllowSSL', null);
+            $allowSSL = c('Garden.AllowSSL', null);
         }
 
         if (!$withDomain || $withDomain === '/') {

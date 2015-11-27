@@ -326,7 +326,7 @@ if (!function_exists('requestContext')) {
     function requestContext() {
         static $context = null;
         if (is_null($context)) {
-            $context = C('Garden.RequestContext', null);
+            $context = c('Garden.RequestContext', null);
             if (is_null($context)) {
                 $protocol = val('SERVER_PROTOCOL', $_SERVER);
                 if (preg_match('`^HTTP/`', $protocol)) {

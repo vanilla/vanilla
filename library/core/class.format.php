@@ -241,7 +241,7 @@ class Gdn_Format {
      * @return string
      */
     public static function auto($Mixed) {
-        $Formatter = C('Garden.InputFormatter');
+        $Formatter = c('Garden.InputFormatter');
         if (!method_exists('Gdn_Format', $Formatter)) {
             return $Mixed;
         }
@@ -876,7 +876,7 @@ class Gdn_Format {
                 $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
                 // nl2br
-                if (C('Garden.Format.ReplaceNewlines', true)) {
+                if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                     $Mixed = fixNl2Br($Mixed);
                 }
@@ -893,7 +893,7 @@ class Gdn_Format {
                 $Result = Gdn_Format::mentions($Result);
                 $Result = Gdn_Format::links($Result);
                 $Result = Emoji::instance()->translateToHtml($Result);
-                if (C('Garden.Format.ReplaceNewlines', true)) {
+                if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                     $Result = fixNl2Br($Result);
                 }
@@ -1115,7 +1115,7 @@ class Gdn_Format {
      * @return string
      */
     public static function links($Mixed) {
-        if (!C('Garden.Format.Links', true)) {
+        if (!c('Garden.Format.Links', true)) {
             return $Mixed;
         }
 
@@ -1164,15 +1164,15 @@ class Gdn_Format {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'UnembedContent');
         } else {
-            if (C('Garden.Format.YouTube')) {
+            if (c('Garden.Format.YouTube')) {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*youtube\.com/embed/([a-z0-9_-]*))".*</iframe>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
                 $Mixed = preg_replace('`<object.*value="((https?)://.*youtube\.com/v/([a-z0-9_-]*)[^"]*)".*</object>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
             }
-            if (C('Garden.Format.Vimeo')) {
+            if (c('Garden.Format.Vimeo')) {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $Mixed);
                 $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
             }
-            if (C('Garden.Format.Getty', true)) {
+            if (c('Garden.Format.Getty', true)) {
                 $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
             }
         }
@@ -1301,7 +1301,7 @@ EOT;
 
 
         // Vimeo
-        } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
+        } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && c('Garden.Format.Vimeo', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $ID = $Matches[2];
@@ -1310,7 +1310,7 @@ EOT;
 EOT;
 
         // Imgur GifV
-        } elseif (preg_match("`{$ImgurGifvUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Gifv', true)
+        } elseif (preg_match("`{$ImgurGifvUrlMatch}`i", $Url, $Matches) && c('Garden.Format.Gifv', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $ID = $Matches[1];
@@ -1325,7 +1325,7 @@ EOT;
 EOT;
 
         // Twitter
-        } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && C('Garden.Format.Twitter', true)
+        } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && c('Garden.Format.Twitter', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1333,7 +1333,7 @@ EOT;
 EOT;
 
         // Vine
-        } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)
+        } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && c('Garden.Format.Vine', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1343,7 +1343,7 @@ EOT;
 EOT;
 
         // Instagram
-        } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Instagram', true)
+        } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && c('Garden.Format.Instagram', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1353,7 +1353,7 @@ EOT;
 EOT;
 
         // Pintrest
-        } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)
+        } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && c('Garden.Format.Pintrest', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1361,7 +1361,7 @@ EOT;
 EOT;
 
         // Getty
-        } elseif (preg_match("`({$GettyUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Getty', true)
+        } elseif (preg_match("`({$GettyUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Getty', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1369,7 +1369,7 @@ EOT;
 EOT;
 
         // Twitch
-        } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Twitch', true)
+        } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Twitch', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1377,7 +1377,7 @@ EOT;
 EOT;
 
         // Hitbox
-        } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Hitbox', true)
+        } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Hitbox', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1386,7 +1386,7 @@ EOT;
 EOT;
 
         // Soundcloud
-        } elseif (preg_match("`({$SoundcloudUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Soundcloud', true)
+        } elseif (preg_match("`({$SoundcloudUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Soundcloud', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1595,13 +1595,13 @@ EOT;
             }
 
             // Handle @mentions.
-            if (C('Garden.Format.Mentions')) {
+            if (c('Garden.Format.Mentions')) {
                 // Only format mentions that are not already in anchor tags or code tags.
                 $Mixed = self::tagContent($Mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches
-            if (C('Garden.Format.Hashtags')) {
+            if (c('Garden.Format.Hashtags')) {
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1'.anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
@@ -1610,7 +1610,7 @@ EOT;
             }
 
             // Handle "/me does x" action statements
-            if (C('Garden.Format.MeActions')) {
+            if (c('Garden.Format.MeActions')) {
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1'.wrap(wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),

@@ -241,7 +241,7 @@ class Gdn_Email extends Gdn_Pluggable {
             return;
         }
 
-        if (C('Garden.Email.UseSmtp')) {
+        if (c('Garden.Email.UseSmtp')) {
             $this->PhpMailer->isSMTP();
             $SmtpHost = c('Garden.Email.SmtpHost', '');
             $SmtpPort = c('Garden.Email.SmtpPort', 25);
@@ -251,9 +251,9 @@ class Gdn_Email extends Gdn_Pluggable {
 
             $this->PhpMailer->Host = $SmtpHost;
             $this->PhpMailer->Port = $SmtpPort;
-            $this->PhpMailer->SMTPSecure = C('Garden.Email.SmtpSecurity', '');
-            $this->PhpMailer->Username = $Username = C('Garden.Email.SmtpUser', '');
-            $this->PhpMailer->Password = $Password = C('Garden.Email.SmtpPassword', '');
+            $this->PhpMailer->SMTPSecure = c('Garden.Email.SmtpSecurity', '');
+            $this->PhpMailer->Username = $Username = c('Garden.Email.SmtpUser', '');
+            $this->PhpMailer->Password = $Password = c('Garden.Email.SmtpPassword', '');
             if (!empty($Username)) {
                 $this->PhpMailer->SMTPAuth = true;
             }

@@ -86,7 +86,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public function start($Force = false) {
 
-        if (function_exists('apc_fetch') && C('Garden.Apc', false)) {
+        if (function_exists('apc_fetch') && c('Garden.Apc', false)) {
             $this->Apc = true;
         }
 
@@ -253,7 +253,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $this->availablePlugins($Force);
 
             $this->EnabledPlugins = array();
-            $EnabledPlugins = C('EnabledPlugins', array());
+            $EnabledPlugins = c('EnabledPlugins', array());
 
             foreach ($EnabledPlugins as $PluginName => $PluginStatus) {
                 // Plugins can be explicitly disabled
@@ -1088,7 +1088,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $this->PluginSearchPaths[rtrim(PATH_PLUGINS, '/')] = 'core';
 
             // Check for, and load, alternate search paths from config
-            $RawAlternatePaths = C('Garden.PluginManager.Search', null);
+            $RawAlternatePaths = c('Garden.PluginManager.Search', null);
             if (!is_null($RawAlternatePaths)) {
                 $AlternatePaths = $RawAlternatePaths;
 

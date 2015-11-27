@@ -1410,7 +1410,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $Remove[] = 'LastIPAddress';
                 $Remove[] = 'AllIPAddresses';
                 $Remove[] = 'Fingerprint';
-                if (C('Api.Clean.Email', true)) {
+                if (c('Api.Clean.Email', true)) {
                     $Remove[] = 'Email';
                 }
                 $Remove[] = 'DateOfBirth';
@@ -1786,7 +1786,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             // Add the favicon.
-            $Favicon = C('Garden.FavIcon');
+            $Favicon = c('Garden.FavIcon');
             if ($Favicon) {
                 $this->Head->setFavIcon(Gdn_Upload::url($Favicon));
             }

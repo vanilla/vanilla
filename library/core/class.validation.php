@@ -607,7 +607,7 @@ class Gdn_Validation {
         }
 
         // Check for a honeypot (anti-spam input)
-        $HoneypotName = C('Garden.Forms.HoneypotName', '');
+        $HoneypotName = c('Garden.Forms.HoneypotName', '');
         $HoneypotContents = getPostValue($HoneypotName, '');
         if ($HoneypotContents != '') {
             $this->addValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're not a spammer or a bot, you should contact the application administrator for help.");

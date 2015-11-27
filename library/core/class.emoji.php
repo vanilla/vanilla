@@ -238,7 +238,7 @@ class Emoji {
             '>:)' => 'naughty'
         );
 
-        if (C('Garden.EmojiSet') === 'none') {
+        if (c('Garden.EmojiSet') === 'none') {
             $this->enabled = false;
         }
 

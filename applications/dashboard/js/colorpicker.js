@@ -15,7 +15,7 @@
 /**
  * @type {{start: Function, isHex: Function, normalizeHex: Function}}
  */
-var ColorPicker = {
+var colorPicker = {
     /**
      * Starts the color picker javascript
      */
@@ -36,8 +36,8 @@ var ColorPicker = {
 
         // Selecting based on text
         $input.find('.js-color-picker-text').on('input', function () {
-            if (ColorPicker.isHex($(this).val())) {
-                color = ColorPicker.normalizeHex($(this).val());
+	    if (colorPicker.isHex($(this).val())) {
+		color = colorPicker.normalizeHex($(this).val());
                 $input.find('.js-color-picker-color').val(color);
                 $input.find('.js-color-picker-preview').css('background-color', color);
                 $input.find('.js-color-picker-value').val(color);
@@ -73,7 +73,7 @@ var ColorPicker = {
      * @returns {string} A six-character hex code with the leading hash.
      */
     normalizeHex: function(color) {
-        if (!ColorPicker.isHex(color)) {
+	if (!colorPicker.isHex(color)) {
             return '';
         }
         if (color.substr(0, 1) === '#') {
@@ -91,6 +91,6 @@ var ColorPicker = {
 
 jQuery(document).ready(function($) {
     $('.js-color-picker').each(function() {
-        ColorPicker.start($(this));
+	colorPicker.start($(this));
     });
 });

@@ -1907,7 +1907,7 @@ overflow: hidden;
 }
 
 /* Page Controls (new discussion button, pagers, etc) */
-#Content .BoxNewDiscussion {
+.Section-DiscussionList #Content .BoxNewDiscussion {
     display: none; /* display: block to reveal this */
 }
 
@@ -6286,4 +6286,20 @@ Styleguide Attachments
 
 .highlight-effect{
     animation: highlight .8s;
+}
+
+/* Groups section tweaks */
+.Groups.Section-DiscussionList .Group-Header,
+.Section-Group.Section-Discussion .Group-Header {
+    margin-bottom: 0;
+}
+
+.Groups.Section-DiscussionList #Panel,
+.Section-Group.Section-Discussion #Panel {
+    float: none;
+    position: absolute;
+}
+
+.Groups.Section-DiscussionList .HomepageTitle {
+    display: none;
 }

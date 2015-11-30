@@ -80,6 +80,14 @@ textarea, input[type=text] {
     margin: 0 0 0 230px
 }
 
+/* The group header has a clearfix. The floated panel wreaks havoc in a group discussion
+if the content column isn't floated. */
+.Section-Group .ContentColumn {
+    float: right;
+    margin-left: 0;
+    width: 730px;
+}
+
 /* ==================== Pages that hide the panel and have full-width content */
 body.NoPanel #Panel,
 body.Entry #Panel,
@@ -1907,7 +1915,7 @@ overflow: hidden;
 }
 
 /* Page Controls (new discussion button, pagers, etc) */
-#Content .BoxNewDiscussion {
+.Section-DiscussionList #Content .BoxNewDiscussion {
     display: none; /* display: block to reveal this */
 }
 

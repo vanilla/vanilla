@@ -805,7 +805,14 @@ if (!function_exists('safePrint')) {
         $functionName = __FUNCTION__;
 
         $replaceCastedValues = function(&$value) use (&$replaceCastedValues, $functionName) {
-            if (is_array($value) || is_object($value)) {
+            $isObject = is_object($value);
+
+            // Replace original object by a shallow copy of itself to keep it from being modified.
+            if ($isObject) {
+                $value = clone $value;
+            }
+
+            if ($isObject || is_array($value)) {
                 foreach($value as &$content) {
                     $replaceCastedValues($content);
                 }

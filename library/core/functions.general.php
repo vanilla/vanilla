@@ -853,7 +853,10 @@ if (!function_exists('decho')) {
         if ($public || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
             $stack = debug_backtrace();
 
-            $backtrace = __FUNCTION__.' called from '.$stack[0]['file'].' line: '.$stack[0]['line']."\n";
+            $backtrace = 'Line '.$stack[0]['line'].' in '.$stack[0]['file']."\n";
+            if (defined('PATH_ROOT')) {
+                $backtrace = str_replace(PATH_ROOT, '', $backtrace);
+            }
 
             echo '<pre style="text-align: left; padding: 0 4px;">'.$backtrace.$prefix;
             if (is_string($mixed)) {

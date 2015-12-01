@@ -31,9 +31,15 @@ class LogController extends DashboardController {
      * @param string $Action Type of action.
      * @param array $LogIDs Numeric IDs of items to confirm.
      */
-    public function confirm($Action, $LogIDs = '') {
+    public function confirm() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
+        $Action = Gdn::request()->post('Action', false);
+        $LogIDs = Gdn::request()->post('IDs', false);
 
+        $this->Form->addHidden('LogIDs', $LogIDs);
         $this->Form->InputPrefix = '';
         $this->Form->IDPrefix = 'Confirm_';
 
@@ -57,9 +63,8 @@ class LogController extends DashboardController {
         $this->setData('Users', $Users);
 
         $this->setData('Action', $Action);
-        $this->setData('ActionUrl', url("/log/$Action?logids=".urlencode($LogIDs)));
+        $this->setData('ActionUrl', url('/log/' . $Action));
         $this->setData('ItemCount', count($LogIDArray));
-
         $this->render();
     }
 
@@ -101,9 +106,12 @@ class LogController extends DashboardController {
      *
      * @param array $LogIDs Numeric IDs of logs to delete.
      */
-    public function delete($LogIDs) {
+    public function delete() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         $this->permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false);
-        // Grab the logs.
+        $LogIDs = Gdn::request()->post('LogIDs');
         $this->LogModel->delete($LogIDs);
         $this->render('Blank', 'Utility');
     }
@@ -112,13 +120,12 @@ class LogController extends DashboardController {
      * Delete spam and optionally delete the users.
      * @param type $LogIDs
      */
-    public function deleteSpam($LogIDs) {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
-
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
+    public function deleteSpam() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
-
+        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
+        $LogIDs = Gdn::request()->post('LogIDs');
         $LogIDs = explode(',', $LogIDs);
 
         // Ban the appropriate users.
@@ -306,8 +313,12 @@ class LogController extends DashboardController {
      *
      * @param array $LogIDs List of log IDs.
      */
-    public function restore($LogIDs) {
+    public function restore() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
+        $LogIDs = Gdn::request()->post('LogIDs');
 
         // Grab the logs.
         $Logs = $this->LogModel->getIDs($LogIDs);
@@ -322,12 +333,12 @@ class LogController extends DashboardController {
         $this->render('Blank', 'Utility');
     }
 
-    public function notSpam($LogIDs) {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
-
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
+    public function notSpam() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
+        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
+        $LogIDs = Gdn::request()->post('LogIDs');
 
         $Logs = array();
 

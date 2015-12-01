@@ -1907,8 +1907,12 @@ overflow: hidden;
 }
 
 /* Page Controls (new discussion button, pagers, etc) */
-.Section-DiscussionList #Content .BoxNewDiscussion {
+#Content .BoxNewDiscussion {
     display: none; /* display: block to reveal this */
+}
+
+.Section-Group #Content .BoxNewDiscussion {
+   display: inline-block;
 }
 
 .PageControls {

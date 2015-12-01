@@ -1911,10 +1911,6 @@ overflow: hidden;
     display: none; /* display: block to reveal this */
 }
 
-.Section-Group #Content .BoxNewDiscussion {
-   display: inline-block;
-}
-
 .PageControls {
     margin: 5px 0;
     min-height: 24px;

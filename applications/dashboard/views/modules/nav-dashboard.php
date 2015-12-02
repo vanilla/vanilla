@@ -1,6 +1,6 @@
 <?php
 $items = val('items', $this);
-if (!function_exists('renderNav')) {
+if (!function_exists('renderDashboardNav')) {
     function renderDashboardNav($items)
     {
 	foreach ($items as $item) {

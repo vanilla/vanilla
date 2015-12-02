@@ -1,42 +1,44 @@
 <?php
+echo '<nav class="nav" role="navigation">';
 $items = val('items', $this);
 if (!function_exists('renderNav')) {
-    function renderNav($items)
-    {
-	foreach ($items as $item) {
-	    if (val('type', $item) == 'group') { ?>
-		<div class="Box Group <?php echo val('cssClass', $item); ?>">
-		<h4><?php echo val('text', $item); ?></h4>
-		<ul class="PanelInfo">
-		<?php
-		if (val('items', $item)) {
-		    renderNav(val('items', $item));
+    function renderNav($items) {
+        foreach ($items as $item) {
+	    if (val('type', $item) == 'group') {
+		$heading = val('text', $item);
+		if (!$heading) {
+		    $item['cssClass'] .= ' nav-group-noheading';
+		} ?>
+		<div type="group" class="nav-group <?php echo val('cssClass', $item); ?>">
+		<?php if ($heading) {
+		    echo '<h3>'.val('text', $item).'</h3>';
 		}
-		echo '</ul></div>';
-	    }
-	    if (val('type', $item) == 'link') { ?>
-		<li role="presentation"
-		    <?php if (val('listItemCssClass', $item)) { ?>class="<?php echo val('listItemCssClass', $item); ?>"<?php } ?>>
-		    <?php if (val('icon', $item)) {
-			echo icon(val('icon', $item));
-		    } ?>
-		    <a role="menuitem" class="nav-link <?php echo val('cssClass', $item); ?>" tabindex="-1"
-		       href="<?php echo val('url', $item); ?>"><?php echo val('text', $item); ?></a>
+                if (val('items', $item)) {
+                    renderNav(val('items', $item));
+                }
+		echo '</div>';
+            }
+
+            if (val('type', $item) == 'link') { ?>
+		<a role="menuitem" class="nav-link <?php echo val('cssClass', $item); ?>" tabindex="-1"
+		   href="<?php echo val('url', $item); ?>">
 		    <?php if (val('badge', $item)) {
-			echo badge(val('badge', $item));
+			echo '<span class="Aside"><span class="Count">'.val('badge', $item).'</span></span>';
 		    } ?>
-		</li>
-	    <?php }
-	    if (val('type', $item) == 'dropdown') {
-		echo $item;
+                    <?php if (val('icon', $item)) {
+                        echo icon(val('icon', $item));
+                    } ?>
+		    <?php echo '<span class="text">'.val('text', $item).'</span>'; ?>
+		</a>
+            <?php }
+            if (val('type', $item) == 'dropdown') {
+		echo val('dropdownmenu', $item);
 	    }
-	    if (val('type', $item) == 'divider') { ?>
-	    <li role="presentation" <?php if (val('cssClass', $item)) { ?> class="<?php echo val('cssClass', $item); ?>"<?php } ?>>
-		<hr/>
-	    </li>
-	<?php }
-	}
+	    if (val('type', $item) == 'divider') {
+		echo '<hr/>';
+            }
+        }
     }
 }
-
 renderNav($items);
+echo '</nav>';

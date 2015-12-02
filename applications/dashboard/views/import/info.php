@@ -34,13 +34,13 @@ Please review the information below and click <b>Start Import</b> to begin the i
 include($this->fetchViewLocation('stats', 'import', 'dashboard'));
 
 if ($CurrentStep < 1)
-    echo anchor(t('Start Import'), 'dashboard/import/go', 'Button'),
+    echo anchor(t('Start Import'), 'dashboard/import/go/'.urlencode(Gdn::session()->transientKey()), 'Button'),
     ' ',
-    anchor(t('Restart'), 'dashboard/import/restart', 'Button');
+    anchor(t('Restart'), 'dashboard/import/restart/'.urlencode(Gdn::session()->transientKey()), 'Button');
 elseif (!$Complete)
-    echo anchor(t('Continue Import'), 'dashboard/import/go', 'Button'),
+    echo anchor(t('Continue Import'), 'dashboard/import/go/'.urlencode(Gdn::session()->transientKey()), 'Button'),
     ' ',
-    anchor(t('Restart'), 'dashboard/import/restart', 'Button');
+    anchor(t('Restart'), 'dashboard/import/restart/'.urlencode(Gdn::session()->transientKey()), 'Button');
 else
-    echo anchor(t('Finished'), 'dashboard/import/restart', 'Button');
+    echo anchor(t('Finished'), 'dashboard/import/restart/'.urlencode(Gdn::session()->transientKey()), 'Button');
 

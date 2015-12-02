@@ -476,6 +476,10 @@ if (!function_exists('asset')) {
 if (!function_exists('attribute')) {
     /**
      * Takes an attribute (or array of attributes) and formats them in attribute="value" format.
+     *
+     * @param string|array $Name The attribute array or the name of the attribute.
+     * @param mixed $ValueOrExclude The value of the attribute or a prefix of attribute names to exclude.
+     * @return string Returns a string in attribute="value" format.
      */
     function attribute($Name, $ValueOrExclude = '') {
         $Return = '';
@@ -559,7 +563,10 @@ if (!function_exists('calculateNumberOfPages')) {
      *
      * Based on the total number of items and the number of items per page,
      * this function will calculate how many pages there are.
-     * Returns the number of pages available
+     *
+     * @param int $ItemCount The total number of items.
+     * @param int $ItemsPerPage The number of items per page.
+     * @return int Returns the number of pages available.
      */
     function calculateNumberOfPages($ItemCount, $ItemsPerPage) {
         $TmpCount = ($ItemCount / $ItemsPerPage);
@@ -584,7 +591,7 @@ if (!function_exists('changeBasename')) {
      *
      * @param string $Path The path to alter.
      * @param string $NewBasename The new basename. A %s will be replaced by the old basename.
-     * @return string
+     * @return string Return {@link $Path} with the basename changed.
      */
     function changeBasename($Path, $NewBasename) {
         $NewBasename = str_replace('%s', '$2', $NewBasename);
@@ -1793,6 +1800,10 @@ if (!function_exists('getIncomingValue')) {
      *
      * This function checks $_POST first.
      *
+     * @param string $FieldName The key of the field to get.
+     * @param mixed $Default The value to return if the field is not found.
+     * @return mixed Returns the value of the field or {@link $Default}.
+     *
      * @deprecated Use the various methods on {@link Gdn::Request()}.
      */
     function getIncomingValue($FieldName, $Default = false) {
@@ -1938,6 +1949,9 @@ if (!function_exists('getPostValue')) {
     /**
      * Return the value for $FieldName from the $_POST collection.
      *
+     * @param string $FieldName The key of the field to get.
+     * @param mixed $Default The value to return if the field is not found.
+     * @return mixed Returns the value of the field or {@link $Default}.
      * @deprecated
      */
     function getPostValue($FieldName, $Default = false) {
@@ -2087,7 +2101,11 @@ if (!function_exists('htmlEntityDecode')) {
     }
 
     /**
-     * Callback helper.
+     * A callback helper for {@link htmlEntityDecode()}.
+     *
+     * @param array[string] $matches An array of matches from {@link preg_replace_callback()}.
+     * @return string Returns the match passed through {@link chr_utf8()}.
+     * @access private
      */
     function chr_utf8_callback($matches) {
         return chr_utf8(hexdec($matches[1]));
@@ -2096,8 +2114,8 @@ if (!function_exists('htmlEntityDecode')) {
     /**
      * Multi-byte chr(): Will turn a numeric argument into a UTF-8 string.
      *
-     * @param mixed $num
-     * @return string
+     * @param mixed $num A UTF-8 character code.
+     * @return string Returns a UTF-8 string representation of {@link $num}.
      */
     function chr_utf8($num) {
         if ($num < 128) {
@@ -2219,6 +2237,11 @@ if (!function_exists('isMobile')) {
 }
 
 if (!function_exists('isSearchEngine')) {
+    /**
+     * Determines whether or not the current request is being made by a search engine.
+     *
+     * @return bool Returns true if the current request is a search engine or false otherwise.
+     */
     function isSearchEngine() {
         $Engines = array(
             'googlebot',
@@ -2589,7 +2612,7 @@ if (!function_exists('parse_ini_string')) {
     /**
      * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
      *
-     * @param strign $Ini The INI string to parse.
+     * @param string $Ini The INI string to parse.
      * @return array Returns the array representation of the INI string.
      */
     function parse_ini_string($Ini) {
@@ -3438,11 +3461,10 @@ if (!function_exists('removeKeyFromArray')) {
     /**
      * Remove a value from an array at a certain key.
      *
-     * @param array $Array
-     * @param string|int $Key
-     * @return mixed
+     * @param array $Array The input array.
+     * @param string|int $Key The key to remove.
+     * @return mixed Returns a copy of {@link $Array} with the key removed.
      * @deprecated Use unset() instead.
-     * @todo Remove this function.
      */
     function removeKeyFromArray($Array, $Key) {
         if (!is_array($Key)) {
@@ -3503,6 +3525,10 @@ if (!function_exists('removeKeysFromNestedArray')) {
 
 if (!function_exists('removeQuoteSlashes')) {
     /**
+     * Remove the slashes from escaped quotes in a string.
+     *
+     * @param string $String The input string.
+     * @return string Returns a copy of {@link $String} with the slashes removed.
      * @deprecated
      */
     function removeQuoteSlashes($String) {

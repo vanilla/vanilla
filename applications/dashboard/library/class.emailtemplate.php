@@ -108,7 +108,8 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     protected function formatContent($html) {
 	$str = Gdn_Format::htmlFilter($html);
-//        $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
+	$str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
+	// $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
 	return $str;
     }
 
@@ -381,14 +382,17 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     protected function plainTextEmail() {
 	$email = array(
-	    val('alt', $this->image).' '.val('link', $this->image),
-	    $this->getTitle(),
-	    $this->getLead(),
-	    val('text', $this->button).' '.val('url', $this->button),
-	    $this->getMessage(),
-	    val('text', $this->link).' '.val('url', $this->link),
-	    $this->getFooter()
+	    'banner' => val('alt', $this->image).' '.val('link', $this->image),
+	    'title' => $this->getTitle(),
+	    'lead' => $this->getLead(),
+	    'text' => val('text', $this->button).' '.val('url', $this->button),
+	    'message' => $this->getMessage(),
+	    'text' => val('text', $this->link).' '.val('url', $this->link),
+	    'footer' => $this->getFooter()
 	);
+	if (strpos($this->getMessage, $this->getTitle()) == 0) {
+	    unset($email['title']);
+	}
 	$email = implode('<br><br>', $email);
 	$email = Gdn_Format::plainText($email);
 	return $email;

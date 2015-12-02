@@ -75,6 +75,7 @@ class DashboardController extends Gdn_Controller {
             $SideMenu = new SideMenuModule($this);
 
 	    $nav = new NavModule();
+	    $nav->setView('nav-dashboard');
             $SideMenu->HtmlId = '';
             $SideMenu->highlightRoute($CurrentUrl);
 	    $this->EventArguments['Nav'] = $nav;

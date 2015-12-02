@@ -41,10 +41,10 @@
  * ->addGroup('', 'group1') // creates group with no header
  * ->addGroup('Group 3', 'group3') // creates group with header: 'Group 3', empty so will not display
  * ->addGroup('Group 2', 'group2') // creates group with header: 'Group 2'
- * ->addLink('Link 5', '#', '', '', array('before', 'link2'), false, array('badge' => '4')) // automatically creates key: item5. Inserts before Link 2
+ * ->addLink('Link 5', '#', '', '', array('before', 'link2'), array('badge' => '4')) // automatically creates key: item5. Inserts before Link 2
  * ->addLink('Link 6', '#') // automatically creates key: item6
  * ->addLink('Link 7', '#') // automatically creates key: item7
- * ->addLink('Link 8', '#', 'group2.link8', '', array(), false, array('icon' => 'flame')) // adds to Group 2
+ * ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
  * ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
  * ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
  * echo $dropdown;

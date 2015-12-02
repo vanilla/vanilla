@@ -16,12 +16,16 @@ class SiteNavModule extends NavModule {
     /** @var array  */
     protected $customSections = array('EditProfile', 'Profile');
 
+    public function __construct() {
+	parent::__construct();
+    }
+
     /**
      *
      *
      * @throws Exception
      */
-    public function render() {
+    public function prepare() {
         $section_found = false;
 
         // The module contains different links depending on its section.
@@ -41,6 +45,6 @@ class SiteNavModule extends NavModule {
         // Fire an event for everything.
         $this->fireEvent('all');
 
-        parent::render();
+	return parent::prepare();
     }
 }

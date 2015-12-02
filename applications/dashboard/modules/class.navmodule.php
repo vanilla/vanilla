@@ -15,12 +15,12 @@
 class NavModule extends SortableModule {
 
     /**
-     * @var string A potential CSS class of the dropdown menu wrapper container.
+     * @var string A potential CSS class of the nav wrapper container.
      */
     public $cssClass;
 
     /**
-     * @var string A potential CSS class of the list <ul> block.
+     * @var string A potential CSS class of the nav <ul> block.
      */
     public $listCssClass = '';
 
@@ -43,6 +43,8 @@ class NavModule extends SortableModule {
 	if (!is_a($dropdown, 'DropdownModule')) {
 	    // error
         }
+	$dropdown->tag = 'li';
+	$dropdown->prepare();
 	$dropdownItem['type'] = 'dropdown';
 	if ($key) {
 	    $dropdownItem['key'] = $key;
@@ -50,11 +52,13 @@ class NavModule extends SortableModule {
 	if ($sort) {
 	    $dropdownItem['sort'] = $sort;
         }
-	$dropdown['cssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $dropdown);
+        $dropdownItem['dropdownmenu'] = $dropdown;
+	$dropdownItem['cssClass'] = $cssClass.' '.$this->buildCssClass($this->dropdownCssClassPrefix, $dropdownItem);
 	$dropdown->tag = 'li';
 	$dropdown->prepare();
 	$dropdownItem['dropdownmenu'] = $dropdown;
 	$this->addItem('dropdown', $dropdownItem);
+
 	return $this;
     }
 }

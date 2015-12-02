@@ -308,7 +308,7 @@ class DashboardHooks implements Gdn_IPlugin {
         // Users can edit their own profiles and moderators can edit any profile.
         $sender->addLinkIf(hasEditProfile($user_id), t('Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'))
             ->addLinkIf('Garden.Users.Edit', t('Edit Account'), '/user/edit/'.$user_id, 'main.editaccount', 'Popup', array(), array('icon' => 'cog'))
-            ->addLink(t('Back to Profile'), userUrl('user'), 'main.profile', '', 100, array('icon' => 'arrow-left'));
+            ->addLink(t('Back to Profile'), userUrl($user), 'main.profile', '', 100, array('icon' => 'arrow-left'));
     }
 
     /**

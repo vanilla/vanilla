@@ -2,13 +2,27 @@
 $Session = Gdn::session();
 
 ?>
-    <h1><?php echo t('Email Styles'); ?></h1>
-<?php
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
-echo $this->Form->errors();
+<h1><?php echo t('Email Styles'); ?></h1>
+<div class="Info">
+    <?php
+    echo '<h2>HTML Emails</h2>'; ?>
+    <span id="plaintext-toggle">
+	<?php
+	if (!c('Garden.Email.Styles.Plaintext')) {
+	    echo wrap(anchor(t('Enabled'), '/dashboard/settings/setPlaintextEmail/1', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings()')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
+	} else {
+	    echo wrap(anchor(t('Disabled'), '/dashboard/settings/setPlaintextEmail/0', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings()')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
+	}
+	?>
+    </span>
+</div>
+<div class="html-email-settings js-html-email-settings">
+    <?php
+    echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+    echo $this->Form->errors();
 
-$emailImage = c('Garden.Email.Styles.Image');
-?>
+    $emailImage = c('Garden.Email.Styles.Image');
+    ?>
     <div class="Padded email-image">
 	<?php
 	if ($this->data('EmailImage')) {
@@ -18,13 +32,13 @@ $emailImage = c('Garden.Email.Styles.Image');
 	}
 	?>
     </div>
-<?php
-echo wrap(anchor(t('Upload New Email Banner'), '/dashboard/settings/emailimage/'.Gdn::session()->transientKey(), 'UploadImage Button'), 'div', array('style' => 'margin-bottom: 20px'));
-?>
-<?php
-$hideCssClass = $emailImage ? '' : ' Hidden';
-echo wrap(t('Remove Email Banner'), 'div', array('class' => 'js-remove-email-image-button RemoveButton Button'.$hideCssClass));
-?>
+    <?php
+    echo wrap(anchor(t('Upload New Email Banner'), '/dashboard/settings/emailimage/'.Gdn::session()->transientKey(), 'UploadImage Button'), 'div', array('style' => 'margin-bottom: 20px'));
+    ?>
+    <?php
+    $hideCssClass = $emailImage ? '' : ' Hidden';
+    echo wrap(t('Remove Email Banner'), 'div', array('class' => 'js-remove-email-image-button RemoveButton Button'.$hideCssClass));
+    ?>
     <ul>
 	<li>
 	    <?php
@@ -45,4 +59,5 @@ echo wrap(t('Remove Email Banner'), 'div', array('class' => 'js-remove-email-ima
 	    ?>
 	</li>
     </ul>
-<?php echo $this->Form->close(t('Save Colors'));
+    <?php echo $this->Form->button(t('Save Colors')); ?>
+</div>

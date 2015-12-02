@@ -35,6 +35,10 @@ var emailStyles = {
 
 	// Ajax call to remove banner
 	$('.js-remove-email-image-button').click(emailStyles.removeImage);
+
+	if ($('.ActivateSlider-Inactive').length > 0) {
+	    emailStyles.hideSettings();
+	}
     },
 
     /**
@@ -42,6 +46,15 @@ var emailStyles = {
      */
     submitImageForm: function() {
 	$('.js-email-image-form').submit();
+    },
+
+
+    hideSettings: function() {
+	$('.js-html-email-settings').hide();
+    },
+
+    showSettings: function() {
+	$('.js-html-email-settings').show();
     },
 
     /**

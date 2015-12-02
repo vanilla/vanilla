@@ -1250,7 +1250,8 @@ class Gdn_Format {
         $HitboxUrlMatch = 'http://www.hitbox.tv/([\w]+)';
         $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)';
         $ImgurGifvUrlMatch = 'https?\://i\.imgur\.com/([a-z0-9]+)\.gifv';
-
+        $WistiaUrlMatch = 'https://([\w]+).wistia.com/medias/([\w]+)';
+        
         // YouTube
         if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
             && c('Garden.Format.YouTube', true)
@@ -1392,6 +1393,16 @@ EOT;
             $Result = <<<EOT
 <iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/{$Matches[2]}/{$Matches[3]}&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>
 EOT;
+
+        // Wistia
+        } elseif (preg_match("`({$WistiaUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Wistia', true)
+            && !c('Garden.Format.DisableUrlEmbeds')
+        ) {
+            $Result = <<<EOT
+<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_{$Matches[3]} videoFoam=true" style="height:100%;width:100%">&nbsp;</div></div></div>
+EOT;
+
+
 
         // Unformatted links
         } elseif (!self::$FormatLinks) {

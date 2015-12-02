@@ -696,10 +696,11 @@ class SettingsController extends DashboardController {
             throw new Exception('Requires POST', 405);
         }
         if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
-            saveToConfig('Garden.Email.Styles.Plaintext', forceBool($value));
             if (!$value) {
+                removeFromConfig('Garden.Email.Styles.Plaintext');
                 $newToggle = wrap(anchor(t('Enabled'), '/dashboard/settings/setPlaintextEmail/1', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
             } else {
+                saveToConfig('Garden.Email.Styles.Plaintext', forceBool($value));
                 $newToggle = wrap(anchor(t('Disabled'), '/dashboard/settings/setPlaintextEmail/0', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
             }
             $this->jsonTarget("#plaintext-toggle", $newToggle);

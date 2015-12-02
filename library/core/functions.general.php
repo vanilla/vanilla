@@ -65,7 +65,7 @@ if (!function_exists('addActivity')) {
      * @param string $ActivityType The type of activity.
      * @param string $Story The story section of the activity.
      * @param string $RegardingUserID The user the activity is being performed on.
-     * @param string $Route The path of the the data the activity is for.
+     * @param string $Route The path of the data the activity is for.
      * @param string $SendEmail Whether or not to send an email with the activity.
      * @return int The ID of the new activity or zero on error.
      * @deprecated
@@ -3691,7 +3691,7 @@ if (!function_exists('saveToConfig')) {
 
 if (!function_exists('setAppCookie')) {
     /**
-     * Set a cookie withe the appropriate application cookie prefix and other cookie information.
+     * Set a cookie with the appropriate application cookie prefix and other cookie information.
      *
      * @param string $Name The name of the cookie without a prefix.
      * @param string $Value The value of the cookie.

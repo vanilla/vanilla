@@ -14,6 +14,13 @@ class EmailTemplate extends Gdn_Pluggable {
     const PLAINTEXT_START = '<!-- //TEXT VERSION FOLLOWS//';
 
     /**
+     * Default email colors.
+     */
+    const DEFAULT_BACKGROUND_COLOR = '#eee';
+    const DEFAULT_LINK_COLOR = '#38abe3'; // Vanilla blue
+    const DEFAULT_BUTTON_BACKGROUND_COLOR = '#38abe3'; // Vanilla blue
+
+    /**
      * @var string The HTML formatted email title.
      */
     protected $title;
@@ -63,7 +70,7 @@ class EmailTemplate extends Gdn_Pluggable {
     /**
      * @var string The hex color code of the background, must include the leading '#'.
      */
-    protected $backgroundColor = '#eee';
+    protected $backgroundColor = self::DEFAULT_BACKGROUND_COLOR;
     /**
      * @var string The default hex color code of links, must include the leading '#'.
      */
@@ -75,7 +82,7 @@ class EmailTemplate extends Gdn_Pluggable {
     /**
      * @var string The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
      */
-    protected $brandPrimary = '#38abe3'; // Vanilla blue
+    protected $brandPrimary = self::DEFAULT_LINK_COLOR;
 
 
     /**

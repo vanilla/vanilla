@@ -645,6 +645,11 @@ class SettingsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function emailStyles() {
+	// Set default colors
+	saveToConfig('Garden.Email.Styles.BackgroundColor', c('Garden.Email.Styles.BackgroundColor', EmailTemplate::DEFAULT_BACKGROUND_COLOR), false);
+	saveToConfig('Garden.Email.Styles.ButtonBackgroundColor', c('Garden.Email.Styles.ButtonBackgroundColor', EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR), false);
+	saveToConfig('Garden.Email.Styles.LinkColor', c('Garden.Email.Styles.LinkColor', EmailTemplate::DEFAULT_LINK_COLOR), false);
+
 	$this->permission('Garden.Settings.Manage');
 	$this->addSideMenu('dashboard/settings/emailstyles');
 	$this->addJsFile('email.js');

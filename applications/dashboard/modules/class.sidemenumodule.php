@@ -340,10 +340,7 @@ if (!class_exists('SideMenuModule', false)) {
                     foreach($links as $link) {
                         $url = '/'.trim(val('Url', $link), '/');
                         $slug = array_pop(explode('/', $url));
-                        $navModule->addLinkIf(Gdn::session()->checkPermission(val('Permission', $link)),
-                            val('Text', $link),
-                            $url,
-                            $group.'.'.$slug
+                        $navModule->addLinkIf(Gdn::session()->checkPermission(val('Permission', $link)), val('Text', $link), $url, $group . '.' . $slug
                         );
                     }
                 }

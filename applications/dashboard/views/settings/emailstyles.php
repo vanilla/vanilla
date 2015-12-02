@@ -5,7 +5,13 @@ $Session = Gdn::session();
 <h1><?php echo t('Email Styles'); ?></h1>
 <div class="Info">
     <?php
-    echo '<h2>HTML Emails</h2>'; ?>
+    echo '<h2>'.t('HTML Emails').'</h2>'; ?>
+    <div class="Info" style="margin-left: 0; padding-left: 0;">
+	<?php
+	echo t('Spruce up your emails by adding a banner image and customizing the colors.');
+	echo '<br>'.t('You can also send emails in plain text by disabling the toggle below.');
+	?>
+    </div>
     <span id="plaintext-toggle">
 	<?php
 	if (!c('Garden.Email.Styles.Plaintext')) {

@@ -62,33 +62,26 @@ class DashboardController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param string $CurrentUrl Used to highlight correct route in menu.
      */
-    public function addSideMenu($CurrentUrl = false) {
-        if (!$CurrentUrl) {
-            $CurrentUrl = strtolower($this->SelfUrl);
-        }
-
+    public function addSideMenu() {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            // Configure SideMenu module
-            $SideMenu = new SideMenuModule($this);
-	    $nav = new NavModule();
-	    $nav->setView('nav-dashboard');
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-	    $this->EventArguments['Nav'] = $nav;
-	    $this->EventArguments['SideMenu'] = $SideMenu;
-	    $this->fireEvent('GetAppSettingsMenuItems');
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
+	    // Configure SideMenu module.
+	    // The SideMenuModule is deprecated, the addToNavModule ports the data from the SideMenuModule to the NavModule.
+	    $sideMenu = new SideMenuModule($this);
 
-            // Hook for adding to menu
-//         $this->EventArguments['SideMenu'] = &$SideMenu;
-//         $this->fireEvent('GetAppSettingsMenuItems');
+	    $nav = new NavModule();
+            $nav->setView('nav-dashboard');
+
+            $this->EventArguments['Nav'] = $nav;
+	    $this->EventArguments['SideMenu'] = $sideMenu;
+
+	    $this->fireEvent('GetAppSettingsMenuItems');
+	    $sideMenu->Sort = c('Garden.DashboardMenu.Sort');
 
             // Add the module
-	    $SideMenu->addToNavModule($nav);
-	    $this->addModule($nav, 'Panel');
+	    $sideMenu->addToNavModule($nav);
+            $this->addModule($nav, 'Panel');
         }
     }
 }

@@ -146,44 +146,44 @@ class DashboardHooks implements Gdn_IPlugin {
 	$mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
 
         // SideMenuModule menu
-	$menu = &$Sender->EventArguments['Nav'];
-	$menu->addGroup(t('Dashboard'), 'dashboard')
-	    ->addLinkIf('Garden.Settings.View', t('Dashboard'), '/dashboard/settings', 'dashboard.dashboard')
-	    ->addLinkIf('Garden.Settings.Manage', t('Getting Started'), '/dashboard/settings/gettingstarted', 'dashboard.getting-started')
-	    ->addLinkIf('Garden.Settings.View', t('Help &amp Tutorials'), '/dashboard/settings/tutorials', 'dashboard.tutorials')
-	    ->addGroup(t('Appearance'), 'appearance')
-	    ->addLinkIf('Garden.Settings.Manage', t('Banner'), '/dashboard/settings/banner', 'appearance.banner')
-	    ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage')
-	    ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes')
-	    ->addLinkIf($themeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options')
-	    ->addLinkIf('Garden.Settings.Manage', t('Mobile Theme'), '/dashboard/settings/mobilethemes', 'appearance.mobile-themes')
-	    ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options')
-	    ->addLinkIf('Garden.Community.Manage', t('Messages'), '/dashboard/message', 'appearance.messages')
-	    ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars')
-	    ->addGroup(t('Users'), 'users')
-	    ->addLinkIf(array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), t('Users'), '/dashboard/user', 'users.users')
-	    ->addLinkIf($session->checkPermission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false), t('Roles & Permissions'), '/dashboard/role', 'users.roles')
-	    ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration')
-	    ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/authentication', 'users.authentication')
-	    ->addLinkIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), t('Applicants'), '/dashboard/user/applicants', 'users.applicants', '', array(), false, array('popinRel' => '/dashboard/user/applicantcount'))
-	    ->addGroup(t('Moderation'), 'moderation')
-	    ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false), t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue')
-	    ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false), t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', array(), false, array('popinRel' => '/dashboard/log/count/moderate'))
-	    ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log')
-	    ->addLinkIf('Garden.Community.Manage', t('Banning'), '/dashboard/settings/bans', 'moderation.bans')
-	    ->addGroup(t('Forum Settings'), 'forum')
-	    ->addLinkIf('Garden.Settings.Manage', t('Social'), '/dashboard/social', 'forum.social')
-	    ->addGroup(t('Reputation'), 'reputation')
-	    ->addGroup(t('Addons'), 'add-ons')
-	    ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins')
-	    ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications')
-	    ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales')
-	    ->addGroup(t('Site Settings'), 'site-settings')
-	    ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email')
-	    ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes')
-	    ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics')
-	    ->addGroupIf('Garden.Settings.Manage', t('Import'), 'import')
-	    ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'import.import');
+        $menu = &$Sender->EventArguments['Nav'];
+        $menu->addGroup(t('Dashboard'), 'dashboard')
+            ->addLinkIf('Garden.Settings.View', t('Dashboard'), '/dashboard/settings', 'dashboard.dashboard')
+            ->addLinkIf('Garden.Settings.Manage', t('Getting Started'), '/dashboard/settings/gettingstarted', 'dashboard.getting-started')
+            ->addLinkIf('Garden.Settings.View', t('Help &amp Tutorials'), '/dashboard/settings/tutorials', 'dashboard.tutorials')
+            ->addGroup(t('Appearance'), 'appearance')
+            ->addLinkIf('Garden.Settings.Manage', t('Banner'), '/dashboard/settings/banner', 'appearance.banner')
+            ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage')
+            ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes')
+            ->addLinkIf($themeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options')
+            ->addLinkIf('Garden.Settings.Manage', t('Mobile Theme'), '/dashboard/settings/mobilethemes', 'appearance.mobile-themes')
+            ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options')
+            ->addLinkIf('Garden.Community.Manage', t('Messages'), '/dashboard/message', 'appearance.messages')
+            ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars')
+            ->addGroup(t('Users'), 'users')
+            ->addLinkIf(array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), t('Users'), '/dashboard/user', 'users.users')
+            ->addLinkIf($session->checkPermission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false), t('Roles & Permissions'), '/dashboard/role', 'users.roles')
+            ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration')
+            ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/authentication', 'users.authentication')
+            ->addLinkIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), t('Applicants'), '/dashboard/user/applicants', 'users.applicants', '', array(), false, array('popinRel' => '/dashboard/user/applicantcount'))
+            ->addGroup(t('Moderation'), 'moderation')
+            ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false), t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue')
+            ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false), t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', array(), false, array('popinRel' => '/dashboard/log/count/moderate'))
+            ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log')
+            ->addLinkIf('Garden.Community.Manage', t('Banning'), '/dashboard/settings/bans', 'moderation.bans')
+            ->addGroup(t('Forum Settings'), 'forum')
+	    ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social')
+            ->addGroup(t('Reputation'), 'reputation')
+            ->addGroup(t('Addons'), 'add-ons')
+            ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins')
+            ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications')
+            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales')
+            ->addGroup(t('Site Settings'), 'site-settings')
+            ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email')
+            ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes')
+            ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics')
+            ->addGroupIf('Garden.Settings.Manage', t('Import'), 'import')
+            ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'import.import');
     }
 
     /**
@@ -325,8 +325,8 @@ class DashboardHooks implements Gdn_IPlugin {
     public function siteNavModule_profile_handler($sender) {
         $user = Gdn::controller()->data('Profile');
         $user_id = val('UserID', $user);
-	$sender->addLinkIf(c('Garden.Profile.ShowActivities', true), t('Activity'), userUrl($user, '', 'activity'), 'main.activity', '', array(), array('icon' => 'time'));
 
+        $sender->addLinkIf(c('Garden.Profile.ShowActivities', true), t('Activity'), userUrl($user, '', 'activity'), 'main.activity', '', array(), array('icon' => 'time'));
 	$sender->addLinkIf(Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID, t('Notifications'), userUrl($user, '', 'notifications'), 'main.notifications', '', array(), array('icon' => 'globe', 'badge' => Gdn::controller()->data('Profile.CountNotifications')));
 
         // Show the invitations if we're using the invite registration method.

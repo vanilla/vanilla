@@ -166,7 +166,7 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log')
             ->addLinkIf('Garden.Community.Manage', t('Banning'), '/dashboard/settings/bans', 'moderation.bans')
             ->addGroup(t('Forum Settings'), 'forum')
-            ->addLinkIf('Garden.Settings.Manage', t('Social'), '/dashboard/social', 'forum.social')
+            ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social')
             ->addGroup(t('Reputation'), 'reputation')
             ->addGroup(t('Addons'), 'add-ons')
             ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins')

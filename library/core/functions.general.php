@@ -792,10 +792,57 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     }
 }
 
+if (!function_exists('safePrint')) {
+    /**
+     * Return/print human-readable and non casted information about a variable".
+     *
+     * @param mixed $mixed The variable to return/echo.
+     * @param bool $returnData Whether or not return the data instead of echoing it.
+     * @return null\mixed
+     */
+    function safePrint($mixed, $returnData = false) {
+
+        $functionName = __FUNCTION__;
+
+        $replaceCastedValues = function(&$value) use (&$replaceCastedValues, $functionName) {
+            $isObject = is_object($value);
+
+            // Replace original object by a shallow copy of itself to keep it from being modified.
+            if ($isObject) {
+                $value = clone $value;
+            }
+
+            if ($isObject || is_array($value)) {
+                foreach($value as &$content) {
+                    $replaceCastedValues($content);
+                }
+                unset($content);
+                return;
+            }
+
+            if ($value === '') {
+                $value = $functionName.'{empty string}';
+            } elseif ($value === true) {
+                $value = $functionName.'{true}';
+            } elseif ($value === false) {
+                $value = $functionName.'{false}';
+            } elseif ($value === null) {
+                $value = $functionName.'{null}';
+            } elseif ($value === 0) {
+                $value = $functionName.'{0}';
+            }
+        };
+
+        $replaceCastedValues($mixed);
+
+        return print_r($mixed, $returnData);
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.
-     * 
+     *
      * @param mixed $mixed The variable to echo.
      * @param string $prefix The text to be used as a prefix for the output.
      * @param bool $public Whether or not output is visible for everyone.
@@ -804,11 +851,18 @@ if (!function_exists('decho')) {
         $prefix = stringEndsWith($prefix, ': ', true, true).': ';
 
         if ($public || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
-            echo '<pre style="text-align: left; padding: 0 4px;">'.$prefix;
+            $stack = debug_backtrace();
+
+            $backtrace = 'Line '.$stack[0]['line'].' in '.$stack[0]['file']."\n";
+            if (defined('PATH_ROOT')) {
+                $backtrace = str_replace(PATH_ROOT, '', $backtrace);
+            }
+
+            echo '<pre style="text-align: left; padding: 0 4px;">'.$backtrace.$prefix;
             if (is_string($mixed)) {
                 echo $mixed;
             } else {
-                echo htmlspecialchars(print_r($mixed, true));
+                echo htmlspecialchars(safePrint($mixed, true));
             }
 
             echo '</pre>';

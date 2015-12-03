@@ -1769,7 +1769,7 @@ PASSWORDMETER;
         if (is_string($Error)) {
             $ErrorCode = $Error;
         } elseif (is_a($Error, 'Gdn_UserException')) {
-            $ErrorCode = '@'.htmlspecialchars($Error->getMessage());
+            $ErrorCode = '@'.Gdn_Format::htmlFilter($Error->getMessage());
         } elseif (is_a($Error, 'Exception')) {
             // Strip the extra information out of the exception.
             $Parts = explode('|', $Error->getMessage());

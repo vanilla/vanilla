@@ -685,13 +685,16 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
-        $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));
-        $Menu->addLink('Forum', t('Advanced'), 'vanilla/settings/advanced', 'Garden.Settings.Manage', array('class' => 'nav-forum-advanced'));
-        $Menu->addLink('Forum', t('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage', array('class' => 'nav-embed nav-embed-comments'));
-        $Menu->addLink('Forum', t('Embed Forum'), 'dashboard/embed/forum', 'Garden.Settings.Manage', array('class' => 'nav-embed nav-embed-site'));
+    public function base_getAppSettingsMenuItems_handler($sender) {
+	$menu = &$sender->EventArguments['Nav'];
+//        $menu = new NavModule();
+	$menu->addLinkIf('Garden.Settings.Manage', t('Flood Control'), 'vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control');
+	$menu->addLinkIf('Garden.Community.Manage', t('Categories'), 'vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories');
+	$menu->addLinkIf('Garden.Settings.Manage', t('Advanced'), 'vanilla/settings/advanced', 'forum.advacned', 'nav-forum-advanced');
+	$menu->addLinkIf('Garden.Settings.Manage', t('Blog Comments'), 'dashboard/embed/comments', 'forum.embed-comments', 'nav-embed nav-embed-comments');
+	$menu->addLinkIf('Garden.Settings.Manage', t('Embed Forum'), 'dashboard/embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site');
+//        $menu->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.newavatars');
+
     }
 
     /**

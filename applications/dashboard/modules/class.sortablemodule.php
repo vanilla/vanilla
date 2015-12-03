@@ -157,14 +157,14 @@ abstract class SortableModule extends Gdn_Module {
      * or a permission string or array of permission strings (full match) to check.
      * @return bool Whether the item has permission to be added to the items list.
      */
-    public function isAllowed($isAllowed) {
-	if (is_bool($isAllowed)) {
-	    return $isAllowed;
-	}
-	if (is_string($isAllowed) || is_array($isAllowed)) {
-	    return Gdn::session()->checkPermission($isAllowed);
-	}
-	return false;
+    protected function isAllowed($isAllowed) {
+        if (is_bool($isAllowed)) {
+            return $isAllowed;
+        }
+        if (is_string($isAllowed) || is_array($isAllowed)) {
+            return Gdn::session()->checkPermission($isAllowed);
+        }
+        return false;
     }
 
     /**
@@ -249,7 +249,7 @@ abstract class SortableModule extends Gdn_Module {
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = array(), $modifiers = array(), $disabled = false) {
         $link = array(
             'text' => $text,
-            'url' => $url,
+	    'url' => url($url),
             'key' => $key,
         );
 
@@ -271,12 +271,7 @@ abstract class SortableModule extends Gdn_Module {
         if ($this->isActive($link)) {
 	    $link['isActive'] = true;
             $listItemCssClasses[] = SortableModule::ACTIVE_CSS_CLASS;
-            // Add Active class to parent link
-	    //TODO: The below doesn't work when lazy loading groups. Finding active parents needs to go in prepare()
-//            if (strpos($link['key'], '.') && $parentKey = substr($link['key'], 0, strpos($link['key'], '.'))) {
-//                $this->items[$parentKey]['cssClass'] .= ' '.SortableModule::ACTIVE_CSS_CLASS;
-//            }
-	} else {
+        } else {
 	    $link['isActive'] = false;
         }
 
@@ -305,7 +300,7 @@ abstract class SortableModule extends Gdn_Module {
      *
      * @param array $item The item to generate and add a key for.
      */
-    public function touchKey(&$item) {
+    protected function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
             $this->keyNumber = $this->keyNumber+1;
@@ -398,10 +393,9 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $item The item to check.
      * @return bool Whether the current request url matches an item's link url.
      */
-    public function isActive($item) {
-        $highlightRoute = Gdn_Url::request();
-        $highlightUrl = Url($highlightRoute);
-	return (val('url', $item) && (url(val('url', $item)) == $highlightUrl));
+    protected function isActive($item) {
+	$highlightRoute = Gdn_Url::request(true);
+	return (val('url', $item) && (trim(val('url', $item), '/') == trim($highlightRoute, '/')));
     }
 
     /**
@@ -409,7 +403,7 @@ abstract class SortableModule extends Gdn_Module {
      *
      * @param array $items The items to sort.
      */
-    public function sortItems(&$items) {
+    protected function sortItems(&$items) {
         foreach($items as &$item) {
             if (val('items', $item)) {
                 $this->sortItems($item['items']);
@@ -440,7 +434,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param int $depth The current recursive depth used to prevent infinite recursion.
      * @return number
      */
-    public function sortItemsOrder($item, $items, $depth = 0) {
+    protected function sortItemsOrder($item, $items, $depth = 0) {
         $default_sort = val('_sort', $item, 100);
 
         // Check to see if a custom sort has been specified.
@@ -485,28 +479,38 @@ abstract class SortableModule extends Gdn_Module {
     }
 
     /**
-     * Removes empty groups and removes the '_sort' and 'key' attributes.
+     * Removes empty groups, removes the '_sort' and 'key' attributes,
+     * .
      *
      * @param array $items The item list to clean.
      */
-    public function cleanData(&$items) {
-	foreach($items as $key => $item) {
-	    unset($item['_sort'], $item['key']);
-	    $subitems = false;
+    protected function cleanData(&$items) {
+	foreach($items as $key => &$item) {
+            unset($item['_sort'], $item['key']);
+            $subitems = false;
 
-	    // Group item
-	    if (val('type', $item) == 'group') {
-		// ensure groups have items
-		if (val('items', $item)) {
-		    $subitems = $item['items'];
-		} else {
-		    unset($items[$key]);
+            // Group item
+            if (val('type', $item) == 'group') {
+                // ensure groups have items
+                if (val('items', $item)) {
+                    $subitems = $item['items'];
+                } else {
+                    unset($items[$key]);
+                }
+            }
+            if ($subitems) {
+                $this->cleanData($subitems);
+		// Set active state on parents if child has it
+		if (!$this->flatten) {
+		    foreach ($subitems as $subitem) {
+			if (val('isActive', $subitem)) {
+			    $item['isActive'] = true;
+			    $item['cssClass'] .= ' '.SortableModule::ACTIVE_CSS_CLASS;
+			}
+		    }
 		}
 	    }
-	    if ($subitems) {
-		$this->cleanData($subitems);
 	    }
-	}
     }
 
     /**
@@ -516,7 +520,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $items The item list to flatten.
      * @return array The flattened items list.
      */
-    public function flattenArray($items) {
+    protected function flattenArray($items) {
         $newitems = array();
         $itemslength = sizeof($items);
         $index = 0;

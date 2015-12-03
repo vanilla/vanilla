@@ -148,18 +148,26 @@ class SettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param $CurrentUrl Path to current location in dashboard.
      */
-    public function addSideMenu($CurrentUrl) {
+    public function addSideMenu() {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $SideMenu = new SideMenuModule($this);
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-            $this->EventArguments['SideMenu'] = &$SideMenu;
+	    // Configure SideMenu module.
+	    // The SideMenuModule is deprecated, the addToNavModule ports the data from the SideMenuModule to the NavModule.
+	    $sideMenu = new SideMenuModule($this);
+
+	    $nav = new NavModule();
+	    $nav->setView('nav-dashboard');
+
+	    $this->EventArguments['Nav'] = $nav;
+	    $this->EventArguments['SideMenu'] = $sideMenu;
+
             $this->fireEvent('GetAppSettingsMenuItems');
-            $this->addModule($SideMenu, 'Panel');
+	    $sideMenu->Sort = c('Garden.DashboardMenu.Sort');
+
+	    // Add the module
+	    $sideMenu->addToNavModule($nav);
+	    $this->addModule($nav, 'Panel');
         }
     }
 

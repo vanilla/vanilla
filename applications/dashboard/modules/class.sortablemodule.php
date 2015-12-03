@@ -57,7 +57,7 @@ abstract class SortableModule extends Gdn_Module {
     private $forceDivider = false;
 
     /**
-     * @var bool Whether we have run the prepare method yet.
+     * @var array The allowed keys in the $modifiers array parameter in the 'addItem' methods.
      */
     private $isPrepared = false;
 
@@ -471,7 +471,7 @@ abstract class SortableModule extends Gdn_Module {
         }
         $this->isPrepared = true;
         $this->sortItems($this->items);
-	$this->cleanData($this->items);
+	$this->prepareData($this->items);
         if ($this->flatten) {
             $this->items = $this->flattenArray($this->items);
         }
@@ -479,38 +479,38 @@ abstract class SortableModule extends Gdn_Module {
     }
 
     /**
-     * Removes empty groups, removes the '_sort' and 'key' attributes,
-     * .
+     * Performs post-sort operations to the items array.
+     * Removes empty groups, removes the '_sort' and 'key' attributes and bubbles up the active css class.
      *
-     * @param array $items The item list to clean.
+     * @param array $items The item list to parse.
      */
-    protected function cleanData(&$items) {
-	foreach($items as $key => &$item) {
+    protected function prepareData(&$items) {
+        foreach($items as $key => &$item) {
             unset($item['_sort'], $item['key']);
-            $subitems = false;
+	    $subItems = array();
 
             // Group item
             if (val('type', $item) == 'group') {
                 // ensure groups have items
                 if (val('items', $item)) {
-                    $subitems = $item['items'];
+		    $subItems = $item['items'];
                 } else {
                     unset($items[$key]);
                 }
             }
-            if ($subitems) {
-                $this->cleanData($subitems);
-		// Set active state on parents if child has it
-		if (!$this->flatten) {
-		    foreach ($subitems as $subitem) {
-			if (val('isActive', $subitem)) {
-			    $item['isActive'] = true;
-			    $item['cssClass'] .= ' '.SortableModule::ACTIVE_CSS_CLASS;
-			}
-		    }
-		}
-	    }
-	    }
+	    if ($subItems) {
+		$this->prepareData($subItems);
+                // Set active state on parents if child has it
+                if (!$this->flatten) {
+		    foreach ($subItems as $subItem) {
+			if (val('isActive', $subItem)) {
+                            $item['isActive'] = true;
+                            $item['cssClass'] .= ' '.SortableModule::ACTIVE_CSS_CLASS;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -521,33 +521,33 @@ abstract class SortableModule extends Gdn_Module {
      * @return array The flattened items list.
      */
     protected function flattenArray($items) {
-        $newitems = array();
+	$newItems = array();
         $itemslength = sizeof($items);
         $index = 0;
         foreach($items as $key => $item) {
-            $subitems = false;
+	    $subItems = false;
 
             // Group item
             if (val('type', $item) == 'group') {
                 if (val('items', $item)) {
-                    $subitems = $item['items'];
+		    $subItems = $item['items'];
                     unset($item['items']);
                     if (val('text', $item)) {
-                        $newitems[] = $item;
+			$newItems[] = $item;
                     }
                 }
             }
             if ((val('type', $item) != 'group')) {
-                $newitems[] = $item;
+		$newItems[] = $item;
             }
-            if ($subitems) {
-                $newitems = array_merge($newitems, $this->flattenArray($subitems));
+	    if ($subItems) {
+		$newItems = array_merge($newItems, $this->flattenArray($subItems));
                 if ($this->forceDivider && $index < $itemslength) {
                     // Add hr after group but not the last one
                     $newitems[] = array('type' => 'divider');
                 }
             }
         }
-        return $newitems;
+	return $newItems;
     }
 }

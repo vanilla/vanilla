@@ -52,18 +52,18 @@ $Session = Gdn::session();
 	    echo $this->Form->color('Garden.Email.Styles.BackgroundColor', 'background-color');
 	    ?>
 	</li>
-	<li>
-	    <?php
-	    echo $this->Form->label('Button Background Color', 'Garden.Email.Styles.ButtonBackgroundColor');
-	    echo $this->Form->color('Garden.Email.Styles.ButtonBackgroundColor', 'button-background-color');
-	    ?>
-	</li>
-	<li>
-	    <?php
-	    echo $this->Form->label('Link Color', 'Garden.Email.Styles.LinkColor');
-	    echo $this->Form->color('Garden.Email.Styles.LinkColor', 'link-color');
-	    ?>
-	</li>
+<!--        <li>-->
+<!--            --><?php
+//            echo $this->Form->label('Button Background Color', 'Garden.Email.Styles.ButtonBackgroundColor');
+//            echo $this->Form->color('Garden.Email.Styles.ButtonBackgroundColor', 'button-background-color');
+//            ?>
+<!--        </li>-->
+<!--        <li>-->
+<!--            --><?php
+//            echo $this->Form->label('Link Color', 'Garden.Email.Styles.LinkColor');
+//            echo $this->Form->color('Garden.Email.Styles.LinkColor', 'link-color');
+//            ?>
+<!--        </li>-->
     </ul>
     <?php echo $this->Form->button(t('Save Colors')); ?>
 </div>

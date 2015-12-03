@@ -649,12 +649,12 @@ class SettingsController extends DashboardController {
 	if (!c('Garden.Email.Styles.BackgroundColor')) {
 	    saveToConfig('Garden.Email.Styles.BackgroundColor', EmailTemplate::DEFAULT_BACKGROUND_COLOR, false);
 	}
-	if (!c('Garden.Email.Styles.ButtonBackgroundColor')) {
-	    saveToConfig('Garden.Email.Styles.ButtonBackgroundColor', EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR, false);
-	}
-	if (!c('Garden.Email.Styles.LinkColor')) {
-	    saveToConfig('Garden.Email.Styles.LinkColor', EmailTemplate::DEFAULT_LINK_COLOR, false);
-	}
+//        if (!c('Garden.Email.Styles.ButtonBackgroundColor')) {
+//            saveToConfig('Garden.Email.Styles.ButtonBackgroundColor', EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR, false);
+//        }
+//        if (!c('Garden.Email.Styles.LinkColor')) {
+//            saveToConfig('Garden.Email.Styles.LinkColor', EmailTemplate::DEFAULT_LINK_COLOR, false);
+//        }
 
 	$this->permission('Garden.Settings.Manage');
 	$this->addSideMenu('dashboard/settings/emailstyles');
@@ -670,8 +670,8 @@ class SettingsController extends DashboardController {
 	$configurationModel = new Gdn_ConfigurationModel($validation);
 	$configurationModel->setField(array(
 	    'Garden.Email.Styles.BackgroundColor',
-	    'Garden.Email.Styles.ButtonBackgroundColor',
-	    'Garden.Email.Styles.LinkColor',
+//            'Garden.Email.Styles.ButtonBackgroundColor',
+//            'Garden.Email.Styles.LinkColor',
 	));
 	// Set the model on the form.
 	$this->Form->setModel($configurationModel);
@@ -699,11 +699,10 @@ class SettingsController extends DashboardController {
 	    throw new Exception('Requires POST', 405);
 	}
 	if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
+	    saveToConfig('Garden.Email.Styles.Plaintext', forceBool($value));
 	    if (!$value) {
-		removeFromConfig('Garden.Email.Styles.Plaintext');
 		$newToggle = wrap(anchor(t('Enabled'), '/dashboard/settings/setPlaintextEmail/1', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
 	    } else {
-		saveToConfig('Garden.Email.Styles.Plaintext', forceBool($value));
 		$newToggle = wrap(anchor(t('Disabled'), '/dashboard/settings/setPlaintextEmail/0', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
 	    }
 	    $this->jsonTarget("#plaintext-toggle", $newToggle);

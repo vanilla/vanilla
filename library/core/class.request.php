@@ -14,11 +14,11 @@
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
  * that can be accessed directly by the Dispatcher.
  *
- * @method string RequestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
- * @method string RequestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
- * @method string RequestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
- * @method string RequestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
- * @method string RequestFolder($URI = NULL) Get/Set the Request script's Folder.
+ * @method string requestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
+ * @method string requestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
+ * @method string requestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
+ * @method string requestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
+ * @method string requestFolder($URI = NULL) Get/Set the Request script's Folder.
  */
 class Gdn_Request {
 

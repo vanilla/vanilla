@@ -14,10 +14,10 @@ $Session = Gdn::session();
     </div>
     <span id="plaintext-toggle">
         <?php
-        if (!c('Garden.Email.Styles.Plaintext')) {
-            echo wrap(anchor(t('Enabled'), '/dashboard/settings/setPlaintextEmail/1', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings()')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
+        if (strtolower(c('Garden.Email.Format', 'html') === 'html')) {
+            echo wrap(anchor(t('Enabled'), '/dashboard/settings/setemailformat/text', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
         } else {
-            echo wrap(anchor(t('Disabled'), '/dashboard/settings/setPlaintextEmail/0', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings()')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
+            echo wrap(anchor(t('Disabled'), '/dashboard/settings/setemailformat/html', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
         }
         ?>
     </span>
@@ -27,7 +27,7 @@ $Session = Gdn::session();
     echo $this->Form->open(array('enctype' => 'multipart/form-data'));
     echo $this->Form->errors();
 
-    $emailImage = c('Garden.Email.Styles.Image');
+    $emailImage = c('Garden.EmailTemplate.Image');
     ?>
     <div class="Padded email-image">
         <?php
@@ -48,20 +48,20 @@ $Session = Gdn::session();
     <ul>
         <li>
             <?php
-            echo $this->Form->label('Background Color', 'Garden.Email.Styles.BackgroundColor');
-            echo $this->Form->color('Garden.Email.Styles.BackgroundColor', 'background-color');
+            echo $this->Form->label('Background Color', 'Garden.EmailTemplate.BackgroundColor');
+            echo $this->Form->color('Garden.EmailTemplate.BackgroundColor', 'background-color');
             ?>
         </li>
 <!--        <li>-->
 <!--            --><?php
-//            echo $this->Form->label('Button Background Color', 'Garden.Email.Styles.ButtonBackgroundColor');
-//            echo $this->Form->color('Garden.Email.Styles.ButtonBackgroundColor', 'button-background-color');
+//            echo $this->Form->label('Button Background Color', 'Garden.EmailTemplate.ButtonBackgroundColor');
+//            echo $this->Form->color('Garden.EmailTemplate.ButtonBackgroundColor', 'button-background-color');
 //            ?>
 <!--        </li>-->
 <!--        <li>-->
 <!--            --><?php
-//            echo $this->Form->label('Link Color', 'Garden.Email.Styles.LinkColor');
-//            echo $this->Form->color('Garden.Email.Styles.LinkColor', 'link-color');
+//            echo $this->Form->label('Link Color', 'Garden.EmailTemplate.LinkColor');
+//            echo $this->Form->color('Garden.EmailTemplate.LinkColor', 'link-color');
 //            ?>
 <!--        </li>-->
     </ul>

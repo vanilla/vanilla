@@ -35,12 +35,13 @@ class Gdn_Email extends Gdn_Pluggable {
     protected $format;
 
     /** @var string The supported email formats. */
-    protected $allowedFormats = array('html', 'plaintext');
+    public static $supportedFormats = array('html', 'text');
 
     /**
      * Constructor.
+     * @param string $format The format of the email. Must be in the $supportedFormats array.
      */
-    function __construct($format = 'html') {
+    function __construct($format = '') {
         $this->PhpMailer = new PHPMailer();
         $this->PhpMailer->CharSet = c('Garden.Charset', 'utf-8');
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
@@ -50,9 +51,9 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->clear();
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
-        $this->format = in_array(strtolower($format), $this->allowedFormats) ? strtolower($format) : 'html';
+        $this->resolveFormat($format);
         $this->emailTemplate = new EmailTemplate();
-        if ($this->format === 'html' && !c('Garden.Email.Styles.Plaintext')) {
+        if ($this->format === 'html') {
             $this->mimeType('text/html');
             $this->setEmailColors();
         } else {
@@ -61,17 +62,32 @@ class Gdn_Email extends Gdn_Pluggable {
         parent::__construct();
     }
 
+    /**
+     * Sets the format property based on the passed argument if it exists, then the config variable and defaults to html.
+     *
+     * @param string $format The format of the email. Must be in the $supportedFormats array.
+     */
+    protected function resolveFormat($format) {
+        if ($format && in_array(strtolower($format), self::$supportedFormats)) {
+            $this->format = strtolower($format);
+        } elseif (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
+            $this->format = strtolower(c('Garden.Email.Format'));
+        } else {
+            $this->format = 'html';
+        }
+    }
+
     protected function setEmailColors() {
-        if ($bg = c('Garden.Email.Styles.BackgroundColor')) {
+        if ($bg = c('Garden.EmailTemplate.BackgroundColor')) {
             $this->emailTemplate->setBackgroundColor($bg);
         }
-        if ($brandPrimary = c('Garden.Email.Styles.BrandPrimary')) {
+        if ($brandPrimary = c('Garden.EmailTemplate.BrandPrimary')) {
             $this->emailTemplate->setBrandPrimary($brandPrimary);
         }
-        if ($linkColor = c('Garden.Email.Styles.LinkColor')) {
+        if ($linkColor = c('Garden.EmailTemplate.LinkColor')) {
             $this->emailTemplate->setLinkColor($linkColor);
         }
-        if ($buttonBackgroundColor = c('Garden.Email.Styles.ButtonBackgroundColor')) {
+        if ($buttonBackgroundColor = c('Garden.EmailTemplate.ButtonBackgroundColor')) {
             $this->emailTemplate->setButtonBackgroundColor($buttonBackgroundColor);
         }
     }
@@ -93,8 +109,8 @@ class Gdn_Email extends Gdn_Pluggable {
      */
     public function getDefaultEmailImage() {
         $logo = array();
-        if ($logo['source'] = c('Garden.Email.Styles.Image', '')) {
-            $logo['source'] = Gdn_UploadImage::url(c('Garden.Email.Styles.Image', ''));
+        if ($logo['source'] = c('Garden.EmailTemplate.Image', '')) {
+            $logo['source'] = Gdn_UploadImage::url(c('Garden.EmailTemplate.Image', ''));
         }
         $logo['link'] = url('/', true);
         $logo['alt'] = c('Garden.LogoTitle', c('Garden.Title', ''));

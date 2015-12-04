@@ -1123,7 +1123,7 @@ class SettingsController extends DashboardController {
                 saveToConfig($ConfigSaveData);
 
                 $this->informMessage(t("Your changes have been saved."));
-            } elseif ($Style) {
+            } elseif ($Style && Gdn::request()->isAuthenticatedPostBack()) {
                 saveToConfig(array(
                     'Garden.ThemeOptions.Styles.Key' => $Style,
                     'Garden.ThemeOptions.Styles.Value' => $this->data("ThemeInfo.Options.Styles.$Style.Basename")));
@@ -1194,7 +1194,7 @@ class SettingsController extends DashboardController {
                 saveToConfig($ConfigSaveData);
 
                 $this->informMessage(t("Your changes have been saved."));
-            } elseif ($Style) {
+            } elseif ($Style && Gdn::request()->isAuthenticatedPostBack()) {
                 saveToConfig(array(
                     'Garden.MobileThemeOptions.Styles.Key' => $Style,
                     'Garden.MobileThemeOptions.Styles.Value' => $this->data("ThemeInfo.Options.Styles.$Style.Basename")));

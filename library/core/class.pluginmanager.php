@@ -1047,22 +1047,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $var = ${$VariableName};
         if (isset($var) && is_array($var)) {
             reset($var);
-            $Item = key($var);
+            $name = key($var);
+            $var = current($var);
 
-            $var[$Item]['Index'] = $Item;
-            $var[$Item]['ClassName'] = $ClassName;
-            $var[$Item]['PluginFilePath'] = $PluginFile;
-            $var[$Item]['PluginRoot'] = dirname($PluginFile);
+            $var['Index'] = $name;
+            $var['ClassName'] = $ClassName;
+            $var['PluginFilePath'] = $PluginFile;
+            $var['PluginRoot'] = dirname($PluginFile);
+            touchValue('Name', $var, $name);
+            touchValue('Folder', $var, $name);
 
-            if (!array_key_exists('Name', $var[$Item])) {
-                $var[$Item]['Name'] = $Item;
-            }
-
-            if (!array_key_exists('Folder', $var[$Item])) {
-                $var[$Item]['Folder'] = $Item;
-            }
-
-            return $var[$Item];
+            return $var;
         } elseif ($VariableName !== null) {
             if (isset($var)) {
                 return $var;

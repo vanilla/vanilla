@@ -351,22 +351,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         $var = ${$VariableName};
         if (isset($var) && is_array($var)) {
             reset($var);
-            $Item = key($var);
+            $name = key($var);
+            $var = current($var);
 
-            $var[$Item]['Index'] = $Item;
-            $var[$Item]['AboutFile'] = $ThemeFile;
-            $var[$Item]['RealAboutFile'] = realpath($ThemeFile);
-            $var[$Item]['ThemeRoot'] = dirname($ThemeFile);
+            $var['Index'] = $name;
+            $var['AboutFile'] = $ThemeFile;
+            $var['RealAboutFile'] = realpath($ThemeFile);
+            $var['ThemeRoot'] = dirname($ThemeFile);
+            touchValue('Name', $var, $name);
+            touchValue('Folder', $var, basename(dirname($ThemeFile)));
 
-            if (!array_key_exists('Name', $var[$Item])) {
-                $var[$Item]['Name'] = $Item;
-            }
-
-            if (!array_key_exists('Folder', $var[$Item])) {
-                $var[$Item]['Folder'] = basename(dirname($ThemeFile));
-            }
-
-            return $var[$Item];
+            return $var;
         } elseif ($VariableName !== null) {
             if (isset($var)) {
                 return $var;

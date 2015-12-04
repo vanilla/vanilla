@@ -24,6 +24,9 @@ if (!function_exists('renderDashboardNav')) {
                        href="<?php echo val('url', $item); ?>"><?php echo val('text', $item); ?></a>
                     <?php if (val('badge', $item)) {
                         echo badge(val('badge', $item));
+                    } if (val('popinRel', $item)) {
+                        decho('here');
+                        echo '<span class="Popin" rel="'.val('popinRel', $item).'"></span >';
                     } ?>
                 </li>
             <?php }

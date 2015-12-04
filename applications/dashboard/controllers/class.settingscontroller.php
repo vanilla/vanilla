@@ -1091,10 +1091,9 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $Style Unique ID.
      * @todo Why is this in a giant try/catch block?
      */
-    public function themeOptions($Style = null) {
+    public function themeOptions() {
         $this->permission('Garden.Settings.Manage');
 
         try {
@@ -1123,10 +1122,6 @@ class SettingsController extends DashboardController {
                 saveToConfig($ConfigSaveData);
 
                 $this->informMessage(t("Your changes have been saved."));
-            } elseif ($Style && Gdn::request()->isAuthenticatedPostBack()) {
-                saveToConfig(array(
-                    'Garden.ThemeOptions.Styles.Key' => $Style,
-                    'Garden.ThemeOptions.Styles.Value' => $this->data("ThemeInfo.Options.Styles.$Style.Basename")));
             }
 
             $this->setData('ThemeOptions', c('Garden.ThemeOptions'));
@@ -1159,10 +1154,9 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $Style Unique ID.
      * @todo Why is this in a giant try/catch block?
      */
-    public function mobileThemeOptions($Style = null) {
+    public function mobileThemeOptions() {
         $this->permission('Garden.Settings.Manage');
 
         try {
@@ -1194,10 +1188,6 @@ class SettingsController extends DashboardController {
                 saveToConfig($ConfigSaveData);
 
                 $this->informMessage(t("Your changes have been saved."));
-            } elseif ($Style && Gdn::request()->isAuthenticatedPostBack()) {
-                saveToConfig(array(
-                    'Garden.MobileThemeOptions.Styles.Key' => $Style,
-                    'Garden.MobileThemeOptions.Styles.Value' => $this->data("ThemeInfo.Options.Styles.$Style.Basename")));
             }
 
             $this->setData('ThemeOptions', c('Garden.MobileThemeOptions'));

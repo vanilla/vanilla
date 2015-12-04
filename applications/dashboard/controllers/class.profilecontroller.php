@@ -168,8 +168,8 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $UserID
      */
     public function clear($UserID = '') {
-        if (empty($_POST)) { // TODO: rm global
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $UserID = is_numeric($UserID) ? $UserID : 0;
@@ -188,29 +188,6 @@ class ProfileController extends Gdn_Controller {
             $this->jsonTarget('#Status', '', 'Remove');
             $this->render('Blank', 'Utility');
         }
-    }
-
-    /**
-     *
-     *
-     * @param $Type
-     * @param string $UserReference
-     * @param string $Username
-     * @throws Exception
-     */
-    public function connect($Type, $UserReference = '', $Username = '') {
-        $this->permission('Garden.SignIn.Allow');
-        $this->getUserInfo($UserReference, $Username, '', true);
-
-        // Fire an event and let whatever plugin handle the connection.
-        // This will fire an event in the form ProfileController_FacebookConnect_Handler(...).
-        $Connected = false;
-        $this->EventArguments['Connected'] =& $Connected;
-
-
-        $this->fireEvent(ucfirst($Type).'Connect');
-
-
     }
 
     /**

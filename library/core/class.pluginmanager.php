@@ -1043,27 +1043,29 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             eval($PluginInfoString);
         }
 
-        // Define the folder name and assign the class name for the newly added item
-        if (isset(${$VariableName}) && is_array(${$VariableName})) {
-            $Item = array_pop($Trash = array_keys(${$VariableName}));
+        // Define the folder name and assign the class name for the newly added item.
+        $var = ${$VariableName};
+        if (isset($var) && is_array($var)) {
+            reset($var);
+            $Item = key($var);
 
-            ${$VariableName}[$Item]['Index'] = $Item;
-            ${$VariableName}[$Item]['ClassName'] = $ClassName;
-            ${$VariableName}[$Item]['PluginFilePath'] = $PluginFile;
-            ${$VariableName}[$Item]['PluginRoot'] = dirname($PluginFile);
+            $var[$Item]['Index'] = $Item;
+            $var[$Item]['ClassName'] = $ClassName;
+            $var[$Item]['PluginFilePath'] = $PluginFile;
+            $var[$Item]['PluginRoot'] = dirname($PluginFile);
 
-            if (!array_key_exists('Name', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Name'] = $Item;
+            if (!array_key_exists('Name', $var[$Item])) {
+                $var[$Item]['Name'] = $Item;
             }
 
-            if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Folder'] = $Item;
+            if (!array_key_exists('Folder', $var[$Item])) {
+                $var[$Item]['Folder'] = $Item;
             }
 
-            return ${$VariableName}[$Item];
+            return $var[$Item];
         } elseif ($VariableName !== null) {
-            if (isset(${$VariableName})) {
-                return $$VariableName;
+            if (isset($var)) {
+                return $var;
             }
         }
 

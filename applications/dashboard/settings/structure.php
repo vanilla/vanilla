@@ -758,7 +758,7 @@ $Construct
 // This will allow us to change the default later and grandfather existing forums in.
 saveToConfig('Garden.InputFormatter', c('Garden.InputFormatter'));
 
-touchConfig('Garden.Email.Format', 'html');
+touchConfig('Garden.Email.Format', 'text');
 
 // Make sure the default locale is in its canonical form.
 $currentLocale = c('Garden.Locale');

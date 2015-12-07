@@ -320,7 +320,8 @@ class UtilityController extends DashboardController {
             saveToConfig('Garden.Version', APPLICATION_VERSION);
         }
 
-        if ($Target = $this->Request->get('Target')) {
+        $Target = $this->Request->get('Target');
+        if ($Target && isSafeUrl($Target)) {
             redirect($Target);
         }
 

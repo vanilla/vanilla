@@ -223,7 +223,7 @@ class DiscussionController extends VanillaController {
         // Retrieve & apply the draft if there is one:
         if (Gdn::session()->UserID) {
             $DraftModel = new DraftModel();
-            $Draft = $DraftModel->get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->firstRow();
+            $Draft = $DraftModel->getByUser($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->firstRow();
             $this->Form->addHidden('DraftID', $Draft ? $Draft->DraftID : '');
             if ($Draft && !$this->Form->isPostBack()) {
                 $this->Form->setValue('Body', $Draft->Body);
@@ -932,7 +932,7 @@ body { background: transparent !important; }
         $Draft = false;
         if (Gdn::session()->UserID && $Discussion) {
             $DraftModel = new DraftModel();
-            $Draft = $DraftModel->get(Gdn::session()->UserID, 0, 1, $Discussion->DiscussionID)->firstRow();
+            $Draft = $DraftModel->getByUser(Gdn::session()->UserID, 0, 1, $Discussion->DiscussionID)->firstRow();
             $this->Form->addHidden('DraftID', $Draft ? $Draft->DraftID : '');
         }
 

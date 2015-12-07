@@ -36,10 +36,17 @@ class DraftModel extends VanillaModel {
     }
 
     /**
-     * Gets drafts matching the given criteria.
-     *
-     * @since 2.0.0
-     * @access public
+     * {@inheritdoc}
+     */
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
+        if (is_numeric($OrderFields)) {
+            deprecated('DraftModel->get()', 'DraftModel->getByUser()');
+            return $this->getByUser($OrderFields, $OrderDirection, $Limit, $PageNumber);
+        }
+    }
+
+    /**
+     * Get drafts matching a given criteria.
      *
      * @param int $UserID Unique ID of user that wrote the drafts.
      * @param int $Offset Number of results to skip.
@@ -47,7 +54,7 @@ class DraftModel extends VanillaModel {
      * @param int $DiscussionID Limits drafts returned to a single discussion.
      * @return object Gdn_DataSet SQL results.
      */
-    public function get($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
+    public function getByUser($UserID, $Offset = '0', $Limit = '', $DiscussionID = '') {
         if (!is_numeric($Offset) || $Offset < 0) {
             $Offset = 0;
         }
@@ -74,30 +81,40 @@ class DraftModel extends VanillaModel {
     /**
      * Gets data for a single draft.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $DraftID Unique ID of draft to get data for.
+     * @param int $draftID Unique ID of draft to get data for.
+     * @param string|false $dataSetType The format of the data.
+     * @param array $options Not used.
      * @return object SQL results.
      */
-    public function getID($DraftID) {
+    public function getID($draftID, $dataSetType = false, $options = []) {
+        $dataSetType = $dataSetType ?: DATASET_TYPE_OBJECT;
+
         $this->DraftQuery();
         return $this->SQL
-            ->where('d.DraftID', $DraftID)
+            ->where('d.DraftID', $draftID)
             ->get()
-            ->firstRow();
+            ->firstRow($dataSetType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCount($Wheres = '') {
+        if (is_numeric($Wheres)) {
+            deprecated('DraftModel->getCount(int)', 'DraftModel->getCountByUser()');
+            return $this->getCountByUser($Wheres);
+        }
+
+        return parent::getCount($Wheres);
     }
 
     /**
      * Gets number of drafts a user has.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $UserID Unique ID of user to count drafts for.
      * @return int Total drafts.
      */
-    public function getCount($UserID) {
+    public function getCountByUser($UserID) {
         return $this->SQL
             ->select('DraftID', 'count', 'CountDrafts')
             ->from('Draft')
@@ -110,13 +127,11 @@ class DraftModel extends VanillaModel {
     /**
      * Insert or update a draft from form values.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param array $FormPostValues Form values sent from form model.
+     * @param array $formPostValues Form values sent from form model.
+     * @param array $settings Not used.
      * @return int Unique ID of draft.
      */
-    public function save($FormPostValues) {
+    public function save($formPostValues, $settings = []) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -131,44 +146,44 @@ class DraftModel extends VanillaModel {
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.
-        $DraftID = val('DraftID', $FormPostValues, '');
+        $DraftID = val('DraftID', $formPostValues, '');
         $Insert = $DraftID == '' ? true : false;
 
         if (!$DraftID) {
-            unset($FormPostValues['DraftID']);
+            unset($formPostValues['DraftID']);
         }
 
         // Remove the discussionid from the form value collection if it's empty
-        if (array_key_exists('DiscussionID', $FormPostValues) && $FormPostValues['DiscussionID'] == '') {
-            unset($FormPostValues['DiscussionID']);
+        if (array_key_exists('DiscussionID', $formPostValues) && $formPostValues['DiscussionID'] == '') {
+            unset($formPostValues['DiscussionID']);
         }
 
         if ($Insert) {
             // If no categoryid is defined, grab the first available.
-            if (val('CategoryID', $FormPostValues) === false) {
-                $FormPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
+            if (val('CategoryID', $formPostValues) === false) {
+                $formPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
             }
 
         }
         // Add the update fields because this table's default sort is by DateUpdated (see $this->get()).
-        $this->AddInsertFields($FormPostValues);
-        $this->AddUpdateFields($FormPostValues);
+        $this->AddInsertFields($formPostValues);
+        $this->AddUpdateFields($formPostValues);
 
         // Remove checkboxes from the fields if they were unchecked
-        if (val('Announce', $FormPostValues, '') === false) {
-            unset($FormPostValues['Announce']);
+        if (val('Announce', $formPostValues, '') === false) {
+            unset($formPostValues['Announce']);
         }
 
-        if (val('Closed', $FormPostValues, '') === false) {
-            unset($FormPostValues['Closed']);
+        if (val('Closed', $formPostValues, '') === false) {
+            unset($formPostValues['Closed']);
         }
 
-        if (val('Sink', $FormPostValues, '') === false) {
-            unset($FormPostValues['Sink']);
+        if (val('Sink', $formPostValues, '') === false) {
+            unset($formPostValues['Sink']);
         }
 
         // Validate the form posted values
-        if ($this->validate($FormPostValues, $Insert)) {
+        if ($this->validate($formPostValues, $Insert)) {
             $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
             $DraftID = intval(val('DraftID', $Fields, 0));
 
@@ -189,26 +204,40 @@ class DraftModel extends VanillaModel {
     }
 
     /**
+     * Delete a draft.
+     *
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('DraftModel->delete(int)', 'DraftModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("CommentModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Deletes a specified draft.
      *
      * This is a hard delete that completely removes it.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $DraftID Unique ID of the draft to be deleted.
+     * @param int $draftID Unique ID of the draft to be deleted.
+     * @param array $options Not used.
      * @return bool Always returns TRUE.
      */
-    public function delete($DraftID) {
+    public function deleteID($draftID, $options = []) {
         // Get some information about this draft
         $DraftUser = $this->SQL
             ->select('InsertUserID')
             ->from('Draft')
-            ->where('DraftID', $DraftID)
+            ->where('DraftID', $draftID)
             ->get()
             ->firstRow();
 
-        $this->SQL->delete('Draft', array('DraftID' => $DraftID));
+        $this->SQL->delete('Draft', array('DraftID' => $draftID));
         if (is_object($DraftUser)) {
             $this->UpdateUser($DraftUser->InsertUserID);
         }

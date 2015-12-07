@@ -2363,24 +2363,39 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * Delete a discussion.
+     *
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('DiscussionModel->delete(int)', 'DiscussionModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("DiscussionModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Delete a discussion. Update and/or delete all related data.
      *
      * Events: DeleteDiscussion.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $DiscussionID Unique ID of discussion to delete.
+     * @param int $discussionID Unique ID of discussion to delete.
+     * @param array $options Additional options to control the delete behavior. Not used for discussions.
      * @return bool Always returns TRUE.
+     * @since 2.0.0
      */
-    public function delete($DiscussionID, $Options = array()) {
+    public function deleteID($discussionID, $options = array()) {
         // Retrieve the users who have bookmarked this discussion.
-        $BookmarkData = $this->GetBookmarkUsers($DiscussionID);
+        $BookmarkData = $this->GetBookmarkUsers($discussionID);
 
         $Data = $this->SQL
             ->select('*')
             ->from('Discussion')
-            ->where('DiscussionID', $DiscussionID)
+            ->where('DiscussionID', $discussionID)
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $UserID = false;
@@ -2391,15 +2406,15 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Prep and fire event
-        $this->EventArguments['DiscussionID'] = $DiscussionID;
+        $this->EventArguments['DiscussionID'] = $discussionID;
         $this->EventArguments['Discussion'] = $Data;
         $this->fireEvent('DeleteDiscussion');
 
         // Execute deletion of discussion and related bits
-        $this->SQL->delete('Draft', array('DiscussionID' => $DiscussionID));
+        $this->SQL->delete('Draft', array('DiscussionID' => $discussionID));
 
-        $Log = val('Log', $Options, true);
-        $LogOptions = val('LogOptions', $Options, array());
+        $Log = val('Log', $o, true);
+        $LogOptions = val('LogOptions', $o, array());
         if ($Log === true) {
             $Log = 'Delete';
         }
@@ -2407,7 +2422,7 @@ class DiscussionModel extends VanillaModel {
         LogModel::BeginTransaction();
 
         // Log all of the comment deletes.
-        $Comments = $this->SQL->getWhere('Comment', array('DiscussionID' => $DiscussionID))->resultArray();
+        $Comments = $this->SQL->getWhere('Comment', array('DiscussionID' => $discussionID))->resultArray();
 
         if (count($Comments) > 0 && count($Comments) < 50) {
             // A smaller number of comments should just be stored with the record.
@@ -2422,10 +2437,10 @@ class DiscussionModel extends VanillaModel {
 
         LogModel::EndTransaction();
 
-        $this->SQL->delete('Comment', array('DiscussionID' => $DiscussionID));
-        $this->SQL->delete('Discussion', array('DiscussionID' => $DiscussionID));
+        $this->SQL->delete('Comment', array('DiscussionID' => $discussionID));
+        $this->SQL->delete('Discussion', array('DiscussionID' => $discussionID));
 
-        $this->SQL->delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
+        $this->SQL->delete('UserDiscussion', array('DiscussionID' => $discussionID));
         $this->UpdateDiscussionCount($CategoryID);
 
         // Get the user's discussion count.

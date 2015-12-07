@@ -74,16 +74,11 @@ class EmailTemplate extends Gdn_Pluggable {
     /**
      * @var string The default hex color code of links, must include the leading '#'.
      */
-    protected $linkColor = '';
+    protected $defaultLinkColor = self::DEFAULT_LINK_COLOR;
     /**
      * @var string The default hex color code of the button background, must include the leading '#'.
      */
-    protected $buttonBackgroundColor = '';
-    /**
-     * @var string The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
-     */
-    protected $brandPrimary = self::DEFAULT_LINK_COLOR;
-
+    protected $defaultButtonBackgroundColor = self::DEFAULT_BUTTON_BACKGROUND_COLOR;
 
     /**
      * @param string $message HTML formatted email message (the body of the email).
@@ -120,7 +115,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      * @throws Exception
      */
-    protected function setView($view, $controllerName, $applicationFolder) {
+    public function setView($view, $controllerName = 'email', $applicationFolder = 'dashboard') {
         $this->view = Gdn::controller()->fetchViewLocation($view, $controllerName, $applicationFolder);
         return $this;
     }
@@ -197,68 +192,49 @@ class EmailTemplate extends Gdn_Pluggable {
     }
 
     /**
-     * @param string $backgroundColor The hex color code of the background, must include the leading '#'.
+     * @param string $color The hex color code of the background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setBackgroundColor($backgroundColor) {
-        $this->backgroundColor = htmlspecialchars($backgroundColor);
+    public function setBackgroundColor($color) {
+        $this->backgroundColor = htmlspecialchars($color);
         return $this;
     }
 
     /**
      * @return string The default hex color code of links, must include the leading '#'.
      */
-    public function getLinkColor() {
-        return $this->linkColor;
+    public function getDefaultLinkColor() {
+        return $this->defaultLinkColor;
     }
 
     /**
      * Sets the default color for links.
      * The color of the EmailTemplate's link property can be overridden by setting $link['color']
      *
-     * @param string $linkColor The default hex color code of links, must include the leading '#'.
+     * @param string $color The default hex color code of links, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setLinkColor($linkColor) {
-        $this->linkColor = $linkColor;
+    public function setDefaultLinkColor($color) {
+        $this->defaultLinkColor = $color;
         return $this;
     }
 
     /**
      * @return string The default hex color code of the button background, must include the leading '#'.
      */
-    public function getButtonBackgroundColor() {
-        return $this->buttonBackgroundColor;
+    public function getDefaultButtonBackgroundColor() {
+        return $this->defaultButtonBackgroundColor;
     }
 
     /**
      * Sets the default color for the button background.
      * The color of the EmailTemplate's link property can be overridden by setting $button['backgroundColor']
      *
-     * @param string $buttonBackgroundColor The default hex color code of the button background, must include the leading '#'.
+     * @param string $color The default hex color code of the button background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setButtonBackgroundColor($buttonBackgroundColor) {
-        $this->buttonBackgroundColor = $buttonBackgroundColor;
-        return $this;
-    }
-
-    /**
-     * @return string The hex color code of accents (default color value for links and button background-color).
-     */
-    public function getBrandPrimary() {
-        return $this->brandPrimary;
-    }
-
-    /**
-     * Sets the brand primary, which is the default color for links and the button if they are not individually set.
-     * Colors of specific elements can be overridden by setting $linkColor, $buttonBackgroundColor, $button['backgroundColor'], or $link['color'].
-     *
-     * @param string $brandPrimary The hex color code of accents, must include the leading '#' (default color value for links and button background-color).
-     * @return EmailTemplate $this The calling object.
-     */
-    public function setBrandPrimary($brandPrimary) {
-        $this->brandPrimary = htmlspecialchars($brandPrimary);
+    public function setDefaultButtonBackgroundColor($color) {
+        $this->defaultButtonBackgroundColor = $color;
         return $this;
     }
 
@@ -287,7 +263,7 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     public function setButton($url, $text, $color = '#fff', $backgroundColor = '') {
         if (!$backgroundColor) {
-            $backgroundColor = $this->buttonColor ? $this->buttonBackgroundColor : $this->brandPrimary;
+            $backgroundColor = $this->defaultButtonBackgroundColor;
         }
         $this->button = array('url' => htmlspecialchars($url),
                               'text' => htmlspecialchars($this->formatContent($text)),
@@ -306,7 +282,7 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     public function setLink($url, $text, $color = '') {
         if (!$color) {
-            $color = $this->linkColor ? $this->linkColor : $this->brandPrimary;
+            $color = $this->defaultLinkColor;
         }
         // We need both text and a url to have a valid link.
         if ($url && $text) {
@@ -406,9 +382,6 @@ class EmailTemplate extends Gdn_Pluggable {
     public function toString() {
         if ($this->isPlaintext()) {
             return $this->plainTextEmail();
-        }
-        if (!$this->getLinkColor()) {
-            $this->setLinkColor($this->getBrandPrimary());
         }
         $controller = new Gdn_Controller();
         $controller->setData('email', $this->objectToArray($this));

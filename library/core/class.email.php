@@ -55,7 +55,8 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->emailTemplate = new EmailTemplate();
         if ($this->format === 'html') {
             $this->mimeType('text/html');
-            $this->setEmailColors();
+            $this->setDefaultEmailColors();
+            $this->setDefaultEmailImage();
         } else {
             $this->emailTemplate->setPlaintext(true);
         }
@@ -77,53 +78,55 @@ class Gdn_Email extends Gdn_Pluggable {
         }
     }
 
-    protected function setEmailColors() {
+    /**
+     * Sets the email template default color properties based on config settings.
+     */
+    protected function setDefaultEmailColors() {
         if ($bg = c('Garden.EmailTemplate.BackgroundColor')) {
             $this->emailTemplate->setBackgroundColor($bg);
         }
-        if ($brandPrimary = c('Garden.EmailTemplate.BrandPrimary')) {
-            $this->emailTemplate->setBrandPrimary($brandPrimary);
-        }
         if ($linkColor = c('Garden.EmailTemplate.LinkColor')) {
-            $this->emailTemplate->setLinkColor($linkColor);
+            $this->emailTemplate->setDefaultLinkColor($linkColor);
         }
         if ($buttonBackgroundColor = c('Garden.EmailTemplate.ButtonBackgroundColor')) {
-            $this->emailTemplate->setButtonBackgroundColor($buttonBackgroundColor);
+            $this->emailTemplate->setDefaultButtonBackgroundColor($buttonBackgroundColor);
         }
     }
 
     /**
-     * Sets the default logo for the email template.
+     * Sets the default image for the email template.
      */
     protected function setDefaultEmailImage() {
         if (!$this->emailTemplate->getImage()) {
-            $logo = $this->getDefaultEmailImage();
-            $this->emailTemplate->setImageArray($logo);
+            $image = $this->getDefaultEmailImage();
+            $this->emailTemplate->setImageArray($image);
         }
     }
 
     /**
-     * Retrieves default values for the email logo.
+     * Retrieves default values for the email image.
      *
      * @return array An array representing an image.
      */
     public function getDefaultEmailImage() {
-        $logo = array();
-        if ($logo['source'] = c('Garden.EmailTemplate.Image', '')) {
-            $logo['source'] = Gdn_UploadImage::url(c('Garden.EmailTemplate.Image', ''));
+        $image = array();
+        if (c('Garden.EmailTemplate.Image', '')) {
+            $image['source'] = Gdn_UploadImage::url(c('Garden.EmailTemplate.Image'));
         }
-        $logo['link'] = url('/', true);
-        $logo['alt'] = c('Garden.LogoTitle', c('Garden.Title', ''));
-        return $logo;
+        $image['link'] = url('/', true);
+        $image['alt'] = c('Garden.LogoTitle', c('Garden.Title', ''));
+        return $image;
     }
 
     /**
-     * Sets the default title for the email template.
+     * If the email title is not set, tries to find a title for the email template
+     * by using the email subject.
      */
-    protected function setDefaultEmailTitle() {
-        if ((!$this->emailTemplate->getTitle()) && $this->PhpMailer->Subject) {
-            $title = $this->getDefaultEmailTitle();
-            $this->emailTemplate->setTitle($title);
+    public function resolveEmailTitle() {
+        if ((!$this->emailTemplate->getTitle())) {
+            if ($title = $this->getEmailTitleFromSubject()) {
+                $this->emailTemplate->setTitle($title);
+            }
         }
     }
 
@@ -131,15 +134,17 @@ class Gdn_Email extends Gdn_Pluggable {
      * Returns the default title for an email based on its subject.
      * If the subject is prepended by the forum title, it removes this.
      *
-     * @return string The email title.
+     * @return string The email title or an empty string if the subject is not set.
      */
-    public function getDefaultEmailTitle() {
-        $title = $this->PhpMailer->Subject;
-        $prefix = '['.c('Garden.Title').'] ';
-        if (strpos($title, $prefix) == 0) {
-            $title = substr($title, strlen($prefix));
+    protected function getEmailTitleFromSubject() {
+        if ($title = $this->PhpMailer->Subject) {
+            $prefix = '[' . c('Garden.Title') . '] ';
+            if (strpos($title, $prefix) === 0) {
+                $title = substr($title, strlen($prefix));
+            }
+            return $title;
         }
-        return $title;
+        return '';
     }
 
     /**
@@ -350,10 +355,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @todo add port settings
      */
     public function send($EventName = '') {
-        if ($this->format == 'html') {
-            $this->setDefaultEmailTitle();
-            $this->setDefaultEmailImage();
-        }
+        $this->resolveEmailTitle();
         $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');
 

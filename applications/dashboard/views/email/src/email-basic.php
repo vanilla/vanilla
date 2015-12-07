@@ -38,10 +38,10 @@
       margin: 0 auto;
     }
     a {
-      color: [[$email.linkColor]];
+      color: [[$email.link.color]];
     }
     a h1 {
-	color: [[$email.linkColor]];
+	color: [[$email.link.color]];
     }
     table.button.button-custom td a {
       color: [[$email.button.color]];

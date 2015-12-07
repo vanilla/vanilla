@@ -17,7 +17,7 @@ $PluginInfo['GooglePrettify'] = array(
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/dashboard/settings/googleprettify',
+    'SettingsUrl' => '/settings/googleprettify',
     'SettingsPermission' => 'Garden.Settings.Manage',
 );
 

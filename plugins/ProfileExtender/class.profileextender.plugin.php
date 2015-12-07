@@ -15,7 +15,7 @@ $PluginInfo['ProfileExtender'] = array(
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => true,
     //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
-    'SettingsUrl' => '/dashboard/settings/profileextender',
+    'SettingsUrl' => '/settings/profileextender',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',

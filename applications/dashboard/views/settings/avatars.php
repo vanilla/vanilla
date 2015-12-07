@@ -9,7 +9,7 @@ echo wrap(t('Manage your avatar settings.'), 'div', array('class' => 'Info'));
         <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
     </div>
     <div class="change-avatar">
-        <?php echo anchor('Change', '/dashboard/settings/defaultavatar', 'Button Primary'); ?>
+        <?php echo anchor('Change', '/settings/defaultavatar', 'Button Primary'); ?>
     </div>
     <div class="Padded more-block">
         <a href="" class="more-link js-more-link <?php echo $this->data('moreHidden'); ?>">Show advanced settings</a>

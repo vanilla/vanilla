@@ -32,7 +32,7 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
     public function settingsController_inThisDiscussion_create($Sender) {
         $Sender->permission('Garden.Settings.Manage');
         $Sender->setData('Title', t('In This Discussion Settings'));
-        $Sender->addSideMenu('dashboard/settings/plugins');
+        $Sender->addSideMenu('settings/plugins');
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(

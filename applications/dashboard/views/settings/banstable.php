@@ -34,9 +34,9 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 <td><?php echo htmlspecialchars($Row['Notes']); ?></td>
                 <td>
                     <?php
-                    echo anchor(t('Edit'), '/dashboard/settings/bans/edit?id='.$Row['BanID'], array('class' => 'SmallButton Edit'));
+                    echo anchor(t('Edit'), '/settings/bans/edit?id='.$Row['BanID'], array('class' => 'SmallButton Edit'));
                     echo ' ';
-                    echo anchor(t('Delete'), '/dashboard/settings/bans/delete?id='.$Row['BanID'], array('class' => 'SmallButton Delete'));
+                    echo anchor(t('Delete'), '/settings/bans/delete?id='.$Row['BanID'], array('class' => 'SmallButton Delete'));
                     ?>
                 </td>
             </tr>

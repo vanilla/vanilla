@@ -29,7 +29,7 @@ class RoleController extends DashboardController {
         parent::initialize();
         Gdn_Theme::section('Dashboard');
         if ($this->Menu) {
-            $this->Menu->highlightRoute('/dashboard/settings');
+            $this->Menu->highlightRoute('/settings');
         }
     }
 

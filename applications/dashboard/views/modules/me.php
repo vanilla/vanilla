@@ -92,7 +92,7 @@ if ($Session->isValid()):
         }
 
         if ($Session->checkPermission(array('Garden.Settings.View', 'Garden.Settings.Manage'), false)) {
-            echo wrap(Anchor(sprite('SpDashboard').' '.t('Dashboard'), '/dashboard/settings'), 'li', array('class' => 'link-dashboard'));
+            echo wrap(Anchor(sprite('SpDashboard').' '.t('Dashboard'), '/settings'), 'li', array('class' => 'link-dashboard'));
         }
     }
 

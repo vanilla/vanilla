@@ -105,7 +105,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($Logo)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+                        echo wrap(Anchor(t('Remove Banner Logo'), '/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
                         echo wrap(
                             t('LogoBrowse', 'Browse for a new banner logo if you would like to change it:'),
                             'div',
@@ -131,7 +131,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($MobileLogo)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Mobile Banner Logo'), '/dashboard/settings/removemobilelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+                        echo wrap(anchor(t('Remove Mobile Banner Logo'), '/settings/removemobilelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
                         echo wrap(
                             t('MobileLogoBrowse', 'Browse for a new mobile banner logo if you would like to change it:'),
                             'div',
@@ -156,7 +156,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($Favicon)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+                        echo wrap(anchor(t('Remove Favicon'), '/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
                         echo wrap(
                             t('FaviconBrowse', 'Browse for a new favicon if you would like to change it:'),
                             'div',
@@ -186,14 +186,14 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($ShareImage), array('style' => 'max-width: 300px')),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Image'), '/dashboard/settings/removeshareimage', 'SmallButton Hijack'), 'div', array('style' => 'padding: 10px 0;'));
+                        echo wrap(anchor(t('Remove Image'), '/settings/removeshareimage', 'SmallButton Hijack'), 'div', array('style' => 'padding: 10px 0;'));
                         echo wrap(
                             t('FaviconBrowse', 'Browse for a new favicon if you would like to change it:'),
                             'div',
                             array('class' => 'Info')
                         );
                     }
-                    echo $this->Form->Input('ShareImage', 'file');
+                    echo $this->Form->input('ShareImage', 'file');
                     ?>
                 </li>
             </ul>

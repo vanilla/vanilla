@@ -19,7 +19,7 @@ if ($this->data('crop')) {
 <?php
 echo $this->Form->input('DefaultAvatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));
 if ($defaultAvatar) {
-    echo wrap(anchor(t('Remove Default Avatar'), '/dashboard/settings/removedefaultavatar/'.Gdn::session()->transientKey(), 'Button'), 'div');
+    echo wrap(anchor(t('Remove Default Avatar'), '/settings/removedefaultavatar/'.Gdn::session()->transientKey(), 'Button'), 'div');
 }
 ?>
 <?php echo $this->Form->close(); ?>

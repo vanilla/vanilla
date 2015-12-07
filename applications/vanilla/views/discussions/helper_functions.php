@@ -396,11 +396,11 @@ if (!function_exists('OptionsList')):
 
             // Dismiss an announcement
             if (c('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
-                $Sender->Options .= '<li>'.anchor(t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack').'</li>';
+                $Sender->Options .= '<li>'.anchor(t('Dismiss'), "discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack').'</li>';
 
             // Edit discussion
             if (DiscussionModel::canEdit($Discussion)) {
-                $Sender->Options .= '<li>'.anchor(t('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion').'</li>';
+                $Sender->Options .= '<li>'.anchor(t('Edit'), 'post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion').'</li>';
             }
 
             // Announce discussion
@@ -411,7 +411,7 @@ if (!function_exists('OptionsList')):
             // Sink discussion
             if ($Session->checkPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
                 $NewSink = (int)!$Discussion->Sink;
-                $Sender->Options .= '<li>'.anchor(t($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), "vanilla/discussion/sink?discussionid={$Discussion->DiscussionID}&sink={$NewSink}", 'SinkDiscussion Hijack').'</li>';
+                $Sender->Options .= '<li>'.anchor(t($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink={$NewSink}", 'SinkDiscussion Hijack').'</li>';
             }
 
             // Close discussion

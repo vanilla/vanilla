@@ -8,7 +8,7 @@ echo $this->Form->open();
 ?>
     <div class="Info">
         <?php
-        echo anchor(t('Add Item'), '/dashboard/settings/bans/add', array('class' => 'SmallButton Add'));
+        echo anchor(t('Add Item'), '/settings/bans/add', array('class' => 'SmallButton Add'));
         ?>
     </div>
 <?php

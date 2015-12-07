@@ -34,7 +34,7 @@ class StatisticsController extends DashboardController {
         parent::initialize();
         Gdn_Theme::section('Dashboard');
         if ($this->Menu) {
-            $this->Menu->highlightRoute('/dashboard/settings');
+            $this->Menu->highlightRoute('/settings');
         }
     }
 
@@ -46,7 +46,7 @@ class StatisticsController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/statistics');
+        $this->addSideMenu('statistics');
         //$this->addJsFile('statistics.js');
         $this->title(t('Vanilla Statistics'));
         $this->enableSlicing($this);

@@ -16,7 +16,7 @@ foreach ($this->DraftData->result() as $Draft) {
     ?>
     <li class="Item Draft<?php echo $Alt; ?>">
         <div
-            class="Options"><?php echo anchor(t('Draft.Delete', 'Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?></div>
+            class="Options"><?php echo anchor(t('Draft.Delete', 'Delete'), 'drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?></div>
         <div class="ItemContent">
             <?php echo anchor(Gdn_Format::text($Draft->Name, false), $EditUrl, 'Title DraftLink'); ?>
 

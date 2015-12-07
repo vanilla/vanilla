@@ -41,7 +41,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
         $EnabledThemeName = $this->data('EnabledThemeName');
 
         if ($this->data('EnabledTheme.Options')) {
-            $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'), anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
+            $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'), anchor(t('Theme Options'), '/settings/themeoptions'));
         }
 
         $Cols = 3;
@@ -102,7 +102,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
                     <div class="Buttons">
                         <div class="theme-buttons">
                             <?php
-                            echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
+                            echo anchor(t('Apply'), '/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
                             //echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
                             $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                             $this->fireEvent('AfterThemeButtons');
@@ -123,7 +123,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
                 <?php
                 if ($this->data('EnabledTheme.Options')) {
                     $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
-                        anchor(t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
+                        anchor(t('Mobile Theme Options'), '/settings/mobilethemeoptions'));
 
                     echo '<div class="Options">',
                     $OptionsDescription,

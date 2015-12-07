@@ -200,7 +200,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             'Plugins.StopForumSpam.EmailThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 50, 'Description' => 'Email addresses reported this many times will be completely rejected.'),
         ));
 
-        $Sender->addSideMenu('dashboard/settings/plugins');
+        $Sender->addSideMenu('settings/plugins');
         $Sender->setData('Title', sprintf(t('%s Settings'), 'Stop Forum Spam'));
         $Sender->ConfigurationModule = $Conf;
         $Conf->renderAll();

@@ -141,7 +141,7 @@ class DiscussionsController extends VanillaController {
         $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : array(), true);
 
         // Get Discussions
-        $this->DiscussionData = $DiscussionModel->getWhere($where, $Offset, $Limit);
+        $this->DiscussionData = $DiscussionModel->getWhereRecent($where, $Offset, $Limit);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $Offset.' to '.$Limit);

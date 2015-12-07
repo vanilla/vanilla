@@ -346,9 +346,57 @@ class DiscussionModel extends VanillaModel {
         return $Data;
     }
 
-    public function getWhere($Where = array(), $Offset = 0, $Limit = false) {
-        if (!$Limit) {
+    /**
+     * Get a list of the most recent discussions.
+     *
+     * @param array|false $Where The where condition of the get.
+     * @param int|false $Offset The offset within the total set.
+     * @param int|false $Limit The number of discussion to return.
+     * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
+     */
+    public function getWhereRecent($Where = array(), $Offset = 0, $Limit = false) {
+        $result = $this->getWhere($Where, '', '', $Limit, $Offset);
+        return $result;
+    }
+
+    /**
+     * Get a list of discussions.
+     *
+     * This method call will remove announcements and may not return exactly {@link $Limit} records for optimization.
+     * You can set `$Where['d.Announce'] = 'all'` to return announcements.
+     *
+     * @param array|false $Where The where condition of the get.
+     * @param string $OrderFields The field to order the discussions by.
+     * @param string $OrderDirection The order, either **asc** or **desc**.
+     * @param int|false $Limit The number of discussion to return.
+     * @param int|false $Offset The offset within the total set.
+     * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
+     */
+    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = '', $Limit = false, $Offset = false) {
+        // Add backwards compatibility for the old way getWhere() was called.
+        if (is_numeric($OrderFields)) {
+            deprecated('DiscussionModel->getWhere($where, $limit, ...)', 'DiscussionModel->getWhereRecent()');
+            $Limit = $OrderFields;
+            $OrderFields = '';
+        }
+        if (is_numeric($OrderDirection)) {
+            deprecated('DiscussionModel->getWhere($where, $limit, $offset)', 'DiscussionModel->getWhereRecent()');
+            $Offset = $OrderDirection;
+            $OrderDirection = '';
+        }
+
+        // Set default types.
+        if (empty($OrderFields)) {
+            $OrderFields = self::getSortField();
+        }
+        if (empty($OrderDirection)) {
+            $OrderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
+        }
+        if (empty($Limit)) {
             $Limit = c('Vanilla.Discussions.PerPage', 30);
+        }
+        if (empty($Offset)) {
+            $Offset = 0;
         }
 
         if (!is_array($Where)) {
@@ -365,29 +413,26 @@ class DiscussionModel extends VanillaModel {
             }
         }
 
-        // Get preferred sort order
-        $SortField = self::GetSortField();
-
-        $this->EventArguments['SortField'] = &$SortField;
-        $this->EventArguments['SortDirection'] = c('Vanilla.Discussions.SortDirection', 'desc');
+        $this->EventArguments['SortField'] = &$OrderFields;
+        $this->EventArguments['SortDirection'] = &$OrderDirection;
         $this->EventArguments['Wheres'] =& $Where;
         $this->fireEvent('BeforeGet');
 
         // Whitelist sorting options
-        if (!in_array($SortField, self::AllowedSortFields())) {
-            $SortField = 'd.DateLastComment';
+        if (!in_array($OrderFields, self::AllowedSortFields())) {
+            $OrderFields = 'd.DateLastComment';
         }
 
-        $SortDirection = $this->EventArguments['SortDirection'];
-        if ($SortDirection != 'asc') {
-            $SortDirection = 'desc';
+        $OrderDirection = $this->EventArguments['SortDirection'];
+        if ($OrderDirection != 'asc') {
+            $OrderDirection = 'desc';
         }
 
         // Build up the base query. Self-join for optimization.
         $Sql->select('d2.*')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
-            ->orderBy($SortField, $SortDirection)
+            ->orderBy($OrderFields, $OrderDirection)
             ->limit($Limit, $Offset);
 
         // Verify permissions (restricting by category if necessary)

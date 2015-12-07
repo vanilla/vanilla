@@ -68,7 +68,7 @@ class CategoriesController extends VanillaController {
 
         saveToConfig('Vanilla.Discussions.SortField', 'd.DateInserted', false);
         $DiscussionModel = new DiscussionModel();
-        $Discussions = $DiscussionModel->getWhere($Where, $Offset, $Limit);
+        $Discussions = $DiscussionModel->getWhereRecent($Where, $Offset, $Limit);
         $this->DiscussionData = $this->setData('Discussions', $Discussions);
         $this->setData('_CurrentRecords', count($Discussions));
         $this->setData('_Limit', $Limit);
@@ -277,7 +277,7 @@ class CategoriesController extends VanillaController {
             $this->setData('AnnounceData', $AnnounceData, true);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
-            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhere($Wheres, $Offset, $Limit));
+            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Offset, $Limit));
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();

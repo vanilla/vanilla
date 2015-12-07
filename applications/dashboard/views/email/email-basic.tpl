@@ -18,12 +18,12 @@
                         <tr class="image-row" style="padding: 0;vertical-align: top;text-align: left">
 <td style="font-size: 16px;line-height: 22px;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 10px;margin: 0;text-align: left;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
                             {if $email.image.link}
-                            <a href="{$email.image.link}" style="color: {$email.linkColor};text-decoration: none">
+                            <a href="{$email.image.link}" style="color: {$email.link.color};text-decoration: none">
                             {/if}
                               {if $email.image.source != ''}
                                 <img src="{$email.image.source}" alt="{$email.image.alt}" style="outline:none;text-decoration:none;-ms-interpolation-mode: bicubic;width: auto;max-width: 75%;float: none;clear: both;display: block;margin: 0 auto;border: none">
                               {elseif $email.image.alt != ''}
-                                <h1 class="center" style="font-size: 40px;color: {$email.linkColor};font-family: Helvetica, Arial, sans-serif;font-weight: normal;padding:0;margin: 0;text-align: center;line-height: 1.3;word-break: normal">{$email.image.alt}</h1>
+                                <h1 class="center" style="font-size: 40px;color: {$email.link.color};font-family: Helvetica, Arial, sans-serif;font-weight: normal;padding:0;margin: 0;text-align: center;line-height: 1.3;word-break: normal">{$email.image.alt}</h1>
                               {/if}
                             {if $email.image.link}
                             </a>

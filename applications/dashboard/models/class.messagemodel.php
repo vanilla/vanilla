@@ -29,13 +29,14 @@ class MessageModel extends Gdn_Model {
     /**
      * Delete a message.
      *
-     * @param string $Where
-     * @param bool $Limit
-     * @param bool $ResetData
+     * @param array|int $where The where clause to delete or an integer value.
+     * @param array|true $options An array of options to control the delete.
+     * @return bool Returns **true** on success or **false** on failure.
      */
-    public function delete($Where = '', $Limit = false, $ResetData = false) {
-        parent::delete($Where, $Limit, $ResetData);
+    public function delete($where = [], $options = []) {
+        $result = parent::delete($where, $options);
         self::messages(null);
+        return $result;
     }
 
     /**

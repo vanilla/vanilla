@@ -387,22 +387,31 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
     /**
+     * Delete records from a table.
      *
+     * @param array|int $where The where clause to delete or an integer value.
+     * @param int|false $limit A limit to the number of records to delete.
+     * @param array|true $options An array of options to control the delete.
      *
-     * @param unknown_type $Where
-     * @param unknown_type $Limit
-     * @param unknown_type $ResetData
-     * @return Gdn_Dataset
+     *  - reset: Whether or not to reset this SQL statement after the delete. Defaults to false.
+     * @return Gdn_Dataset Returns the result of the delete.
      */
-    public function delete($Where = '', $Limit = false, $ResetData = false) {
-        if (is_numeric($Where)) {
-            $Where = array($this->PrimaryKey => $Where);
+    public function delete($where = [], $limit = false, $options = []) {
+        if (is_numeric($where)) {
+            deprecated('Gdn_Model->delete(int)', 'Gdn_Model->deleteID()');
+            $where = array($this->PrimaryKey => $where);
+        }
+
+        $ResetData = false;
+        if ($options === true || val('reset', $options)) {
+            deprecated('Gdn_Model->delete() with reset true');
+            $ResetData = true;
         }
 
         if ($ResetData) {
-            $Result = $this->SQL->delete($this->Name, $Where, $Limit);
+            $Result = $this->SQL->delete($this->Name, $where, $limit);
         } else {
-            $Result = $this->SQL->noReset()->delete($this->Name, $Where, $Limit);
+            $Result = $this->SQL->noReset()->delete($this->Name, $where, $limit);
         }
         return $Result;
     }

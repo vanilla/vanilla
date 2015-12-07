@@ -1715,8 +1715,7 @@ EOT;
                 Logger::event(
                     'password_reset',
                     Logger::NOTICE,
-                    '{username} has reset their password.',
-                    array('UserName', $User->Name)
+                    '{username} has reset their password.'
                 );
                 Gdn::session()->start($User->UserID, true);
 //            $Authenticator = Gdn::authenticator()->AuthenticateWith('password');

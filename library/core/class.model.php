@@ -408,6 +408,20 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
+     * Delete a record by primary key.
+     *
+     * @param mixed $id The primary key value of the record to delete.
+     * @param array $options An array of options to affect the delete behaviour. Reserved for future use.
+     * @return bool Returns **true** if the delete was successful or **false** otherwise.
+     */
+    public function deleteID($id, $options = []) {
+        $r = $this->SQL->delete(
+            [$this->PrimaryKey => $id]
+        );
+        return $r;
+    }
+
+    /**
      * Filter out any potentially insecure fields before they go to the database.
      *
      * @param array $data The array of data to filter.

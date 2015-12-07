@@ -11,6 +11,35 @@
  * @since 2.2
  */
 
+if (!function_exists('apc_fetch') && function_exists('apcu_fetch')) {
+    /**
+     * Fetch a stored variable from the cache.
+     *
+     * @param mixed $key The key used to store the value.
+     * @param bool &$success Set to **true** in success and **false** in failure.
+     * @return mixed The stored variable or array of variables on success; **false** on failure
+     * @see http://php.net/manual/en/function.apcu-fetch.php
+     */
+    function apc_fetch($key, &$success = null) {
+        return apcu_fetch($key, $success);
+    }
+}
+
+if (!function_exists('apc_store') && function_exists('apcu_store')) {
+    /**
+     * Cache a variable in the data store.
+     *
+     * @param string $key Store the variable using this name.
+     * @param mixed $var The variable to store.
+     * @param int $ttl The time to live.
+     * @return bool Returns **true** on success or **false** on failure.
+     * @see http://php.net/manual/en/function.apcu-store.php
+     */
+    function apc_store($key, $var = null, $ttl = 0) {
+        return apcu_store($key, $var, $ttl);
+    }
+}
+
 /**
  * Allow gzopen64 to be a fallback for gzopen. Workaround for a PHP bug.
  *

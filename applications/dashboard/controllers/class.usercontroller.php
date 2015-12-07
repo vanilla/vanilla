@@ -16,8 +16,11 @@ class UserController extends DashboardController {
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form');
 
-    /** @var int The number of users when certain optimizations kick in. */
+    /** @var int The number of users when database optimizations kick in. */
     public $UserThreshold = 10000;
+
+    /** @var int The number of users when extreme database optimizations kick in. */
+    public $UserMegaThreshold = 1000000;
 
     /** @var Gdn_Form */
     public $Form;
@@ -85,16 +88,17 @@ class UserController extends DashboardController {
         }
 
         $UserModel = new UserModel();
-        //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+
         list($Offset, $Limit) = offsetLimit($Page, 30);
 
-        $Filter = $this->_GetFilter();
+        // Determine our data filters.
+        $Filter = $this->_getFilter();
         if ($Filter) {
             $Filter['Keywords'] = $Keywords;
         } else {
             $Filter = array('Keywords' => (string)$Keywords);
         }
-        $Filter['Optimize'] = $this->PastUserThreshold();
+        $Filter['Optimize'] = $this->pastUserThreshold();
 
         // Sorting
         if (in_array($Order, array('DateInserted', 'DateFirstVisit', 'DateLastActive'))) {
@@ -106,15 +110,33 @@ class UserController extends DashboardController {
         }
 
         // Get user list
-        $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
+        $this->UserData = $UserModel->search($Filter, $Order, $OrderDir, $Limit, $Offset);
         $this->setData('Users', $this->UserData);
-        if ($this->PastUserThreshold()) {
-            $this->setData('_CurrentRecords', $this->UserData->count());
+
+        // Figure out our number of results and users.
+        $showUserCount = $this->UserData->count();
+        if (!$this->pastUserThreshold()) {
+            // Pfft, query that sucker however you want.
+            $this->setData('RecordCount', $UserModel->searchCount($Filter));
         } else {
-            $this->setData('RecordCount', $UserModel->SearchCount($Filter));
+            // We have a user search, so at least set enough data for the Next pager.
+            if ($showUserCount) {
+                $this->setData('_CurrentRecords', $showUserCount);
+            } else {
+                // No search was done. Just give the total users overall. First, zero-out our pager.
+                $this->setData('_CurrentRecords', 0);
+                if (!$this->pastUserMegaThreshold()) {
+                    // Restoring this semi-optimized counter is our compromise to let non-mega sites know their exact total users.
+                    $this->setData('UserCount', $UserModel->getCount());
+                } else {
+                    // Dang, yo. Get a table status guess instead of really counting.
+                    $this->setData('UserEstimate', $this->countEstimate());
+                }
+            }
         }
 
-        RoleModel::SetUserRoles($this->UserData->result());
+        // Add roles to the user data.
+        RoleModel::setUserRoles($this->UserData->result());
 
         // Deliver json data if necessary
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
@@ -888,11 +910,34 @@ class UserController extends DashboardController {
 
     /**
      * Whether or not we are past the user threshold.
+     *
+     * This is a useful indication that some database operations on the User table will be painfully long.
+     *
+     * @return bool
      */
     protected function pastUserThreshold() {
+        $estimate = $this->countEstimate();
+        return $estimate > $this->UserThreshold;
+    }
+
+    /**
+     * Whether we're wandered into extreme database optimization territory with our user count.
+     *
+     * @return bool
+     */
+    protected function pastUserMegaThreshold() {
+        $estimate = $this->countEstimate();
+        return $estimate > $this->UserMegaThreshold;
+    }
+
+    /**
+     * Approximate the number of users by checking the database table status.
+     *
+     * @return int
+     */
+    protected function countEstimate() {
         $px = Gdn::database()->DatabasePrefix;
-        $countEstimate = Gdn::database()->query("show table status like '{$px}User'")->value('Rows', 0);
-        return $countEstimate > $this->UserThreshold;
+        return Gdn::database()->query("show table status like '{$px}User'")->value('Rows', 0);
     }
 
     /**

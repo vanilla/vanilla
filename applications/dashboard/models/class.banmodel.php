@@ -230,23 +230,22 @@ class BanModel extends Gdn_Model {
     /**
      * Remove a ban.
      *
-     * @since 2.0.18
-     * @access public
-     *
-     * @param array $Where
-     * @param int $Limit
-     * @param bool $ResetData
+     * @param array|int $where The where clause to delete or an integer value.
+     * @param array|true $options An array of options to control the delete.
+     * @return bool Returns **true** on success or **false** on failure.
      */
-    public function delete($Where = '', $Limit = false, $ResetData = false) {
-        if (isset($Where['BanID'])) {
-            $OldBan = $this->getID($Where['BanID'], DATASET_TYPE_ARRAY);
+    public function delete($where = [], $options = []) {
+        if (isset($where['BanID'])) {
+            $OldBan = $this->getID($where['BanID'], DATASET_TYPE_ARRAY);
         }
 
-        parent::Delete($Where, $Limit, $ResetData);
+        $result = parent::delete($where, $options);
 
         if (isset($OldBan)) {
             $this->ApplyBan(null, $OldBan);
         }
+
+        return $result;
     }
 
 //   public function getBanUsers($Ban) {

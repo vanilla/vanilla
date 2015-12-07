@@ -275,7 +275,7 @@ class ModerationController extends VanillaController {
             // Delete the selected comments
             $CommentModel = new CommentModel();
             foreach ($CommentIDs as $CommentID) {
-                $CommentModel->delete($CommentID);
+                $CommentModel->deleteID($CommentID);
             }
 
             // Clear selections

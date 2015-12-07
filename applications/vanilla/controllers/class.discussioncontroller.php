@@ -19,6 +19,9 @@ class DiscussionController extends VanillaController {
     /** @var array Unique identifier. */
     public $CategoryID;
 
+    /**  @var CommentModel */
+    public $CommentModel;
+
     /** @var DiscussionModel */
     public $DiscussionModel;
 
@@ -145,7 +148,7 @@ class DiscussionController extends VanillaController {
 //      url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::session()->UserID != 0)), true), Gdn::session()->UserID == 0);
 
         // Load the comments
-        $this->setData('Comments', $this->CommentModel->get($DiscussionID, $Limit, $this->Offset));
+        $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
 
         $PageNumber = PageNumber($this->Offset, $Limit);
         $this->setData('Page', $PageNumber);
@@ -736,7 +739,7 @@ class DiscussionController extends VanillaController {
                 }
 
                 // Delete the comment
-                if (!$this->CommentModel->delete($CommentID)) {
+                if (!$this->CommentModel->deleteID($CommentID)) {
                     $this->Form->addError('Failed to delete comment');
                 }
             } else {
@@ -875,7 +878,7 @@ body { background: transparent !important; }
             if (stringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted')) {
                 $this->CommentModel->orderBy('c.DateInserted '.$SortComments); // allow custom sort
             }
-            $this->setData('Comments', $this->CommentModel->get($Discussion->DiscussionID, $Limit, $this->Offset), true);
+            $this->setData('Comments', $this->CommentModel->getF($Discussion->DiscussionID, $Limit, $this->Offset), true);
 
             if (count($this->CommentModel->where()) > 0) {
                 $ActualResponses = false;

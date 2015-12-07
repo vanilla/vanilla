@@ -92,7 +92,7 @@ class RoleController extends DashboardController {
             }
             if ($this->Form->errorCount() == 0) {
                 // Go ahead and delete the Role
-                $this->RoleModel->delete($RoleID, $this->Form->getValue('ReplacementRoleID'));
+                $this->RoleModel->deleteAndReplace($RoleID, $this->Form->getValue('ReplacementRoleID'));
                 $this->RedirectUrl = url('dashboard/role');
                 $this->informMessage(t('Deleting role...'));
             }

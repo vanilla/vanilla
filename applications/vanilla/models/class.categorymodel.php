@@ -962,9 +962,11 @@ class CategoryModel extends Gdn_Model {
      * @since 2.0.0
      *
      * @param int $categoryID The unique ID of category we're getting data for.
+     * @param string $datasetType Not used.
+     * @param array $options Not used.
      * @return object|array SQL results.
      */
-    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT) {
+    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $category = $this->SQL->getWhere('Category', array('CategoryID' => $categoryID))->firstRow($datasetType);
         if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
             setValue('AllowedDiscussionTypes', $category, unserialize(val('AllowedDiscussionTypes', $category)));
@@ -1696,9 +1698,10 @@ class CategoryModel extends Gdn_Model {
      * @access public
      *
      * @param array $FormPostValue The values being posted back from the form.
+     * @param array|false $Settings Additional settings to affect saving.
      * @return int ID of the saved category.
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
 

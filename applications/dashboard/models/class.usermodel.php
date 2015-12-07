@@ -1320,14 +1320,16 @@ class UserModel extends Gdn_Model {
      *
      *
      * @param mixed $ID
-     * @param bool|string $DatasetType
+     * @param string|false $DatasetType
+     * @param array $Options Additional options to affect fetching. Currently unused.
      * @return array|bool|null|object|type
      * @throws Exception
      */
-    public function getID($ID, $DatasetType = DATASET_TYPE_OBJECT) {
+    public function getID($ID, $DatasetType = false, $Options = []) {
         if (!$ID) {
             return false;
         }
+        $DatasetType = $DatasetType ?: DATASET_TYPE_OBJECT;
 
         // Check page cache, then memcached
         $User = $this->getUserFromCache($ID, 'userid');

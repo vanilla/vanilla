@@ -347,27 +347,24 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             @eval($ThemeInfoString);
         }
 
-        // Define the folder name and assign the class name for the newly added item
-        if (isset(${$VariableName}) && is_array(${$VariableName})) {
-            $Item = array_pop($Trash = array_keys(${$VariableName}));
+        // Define the folder name and assign the class name for the newly added item.
+        $var = ${$VariableName};
+        if (isset($var) && is_array($var)) {
+            reset($var);
+            $name = key($var);
+            $var = current($var);
 
-            ${$VariableName}[$Item]['Index'] = $Item;
-            ${$VariableName}[$Item]['AboutFile'] = $ThemeFile;
-            ${$VariableName}[$Item]['RealAboutFile'] = realpath($ThemeFile);
-            ${$VariableName}[$Item]['ThemeRoot'] = dirname($ThemeFile);
+            $var['Index'] = $name;
+            $var['AboutFile'] = $ThemeFile;
+            $var['RealAboutFile'] = realpath($ThemeFile);
+            $var['ThemeRoot'] = dirname($ThemeFile);
+            touchValue('Name', $var, $name);
+            touchValue('Folder', $var, basename(dirname($ThemeFile)));
 
-            if (!array_key_exists('Name', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Name'] = $Item;
-            }
-
-            if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Folder'] = basename(dirname($ThemeFile));
-            }
-
-            return ${$VariableName}[$Item];
+            return $var;
         } elseif ($VariableName !== null) {
-            if (isset(${$VariableName})) {
-                return ${$VariableName};
+            if (isset($var)) {
+                return $var;
             }
         }
 

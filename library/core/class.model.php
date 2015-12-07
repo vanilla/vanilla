@@ -390,13 +390,13 @@ class Gdn_Model extends Gdn_Pluggable {
      * Delete records from a table.
      *
      * @param array|int $where The where clause to delete or an integer value.
-     * @param int|false $limit A limit to the number of records to delete.
      * @param array|true $options An array of options to control the delete.
      *
-     *  - reset: Whether or not to reset this SQL statement after the delete. Defaults to false.
+     *  - limit: A limit to the number of records to delete.
+     *  - reset: Deprecated. Whether or not to reset this SQL statement after the delete. Defaults to false.
      * @return Gdn_Dataset Returns the result of the delete.
      */
-    public function delete($where = [], $limit = false, $options = []) {
+    public function delete($where = [], $options = []) {
         if (is_numeric($where)) {
             deprecated('Gdn_Model->delete(int)', 'Gdn_Model->deleteID()');
             $where = array($this->PrimaryKey => $where);
@@ -406,6 +406,11 @@ class Gdn_Model extends Gdn_Pluggable {
         if ($options === true || val('reset', $options)) {
             deprecated('Gdn_Model->delete() with reset true');
             $ResetData = true;
+        } elseif (is_numeric($options)) {
+            deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
+            $limit = $options;
+        } else {
+            $limit = val('limit', $options);
         }
 
         if ($ResetData) {

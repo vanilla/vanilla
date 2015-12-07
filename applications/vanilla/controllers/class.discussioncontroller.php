@@ -673,7 +673,7 @@ class DiscussionController extends VanillaController {
         $this->permission('Vanilla.Discussions.Delete', true, 'Category', $Discussion->PermissionCategoryID);
 
         if ($this->Form->authenticatedPostBack()) {
-            if (!$this->DiscussionModel->delete($DiscussionID)) {
+            if (!$this->DiscussionModel->deleteID($DiscussionID)) {
                 $this->Form->addError('Failed to delete discussion');
             }
 

@@ -224,7 +224,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                             $CommentModel->removePageCache($Discussion['DiscussionID']);
                         } else {
                             // Delete discussion that was merged.
-                            $DiscussionModel->delete($Discussion['DiscussionID']);
+                            $DiscussionModel->deleteID($Discussion['DiscussionID']);
                         }
                     } else {
                         $Sender->informMessage($CommentModel->Validation->resultsText());

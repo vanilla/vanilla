@@ -327,7 +327,7 @@ class ModerationController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Delete the selected discussions (that the user has permission to delete).
             foreach ($AllowedDiscussions as $DiscussionID) {
-                $Deleted = $DiscussionModel->delete($DiscussionID);
+                $Deleted = $DiscussionModel->deleteID($DiscussionID);
                 if ($Deleted) {
                     $this->jsonTarget("#Discussion_$DiscussionID", '', 'SlideUp');
                 }

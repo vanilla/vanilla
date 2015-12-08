@@ -96,19 +96,27 @@ class ConversationModel extends ConversationsModel {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function get($OrderFields = '', $OrderDirection = '', $Limit = false, $PageNumber = false) {
+        if (is_numeric($OrderFields) || is_numeric($OrderDirection)) {
+            deprecated('ConversationModel->get()', 'ConversationModel->getInbox()');
+            return $this->getInbox($OrderFields, $Limit, $OrderDirection);
+        }
+    }
+
+
+    /**
      * Get list of conversations.
      *
      * Events: BeforeGet.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $ViewingUserID Unique ID of current user.
-     * @param int $Offset Number to skip.
-     * @param int $Limit Maximum to return.
+     * @param int|string $Limit Maximum to return.
+     * @param int|string $Offset Number to skip.
      * @return Gdn_DataSet SQL results.
      */
-    public function get($ViewingUserID, $Offset = '0', $Limit = '') {
+    public function getInbox($ViewingUserID, $Limit = '', $Offset = '0') {
         if ($Limit == '') {
             $Limit = Gdn::config('Conversations.Conversations.PerPage', 30);
         }
@@ -189,16 +197,25 @@ class ConversationModel extends ConversationsModel {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCount($wheres = []) {
+        if (is_numeric($wheres)) {
+            deprecated('ConversationModel->getCount(int, array)', 'ConversationModel->getCountInbox()');
+            $args = func_get_args();
+            return $this->getCountInbox($wheres, val(1, $args));
+        }
+        return parent::getCount();
+    }
+
+    /**
      * Get number of conversations involving current user.
-     *
-     * @since 2.0.0
-     * @access public
      *
      * @param int $ViewingUserID Unique ID of current user.
      * @param array $Wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCount($ViewingUserID, $Wheres = '') {
+    public function getCountInbox($ViewingUserID, $Wheres = '') {
         if (is_array($Wheres)) {
             $this->SQL->where($Wheres);
         }
@@ -240,21 +257,28 @@ class ConversationModel extends ConversationsModel {
     /**
      * Get meta data of a single conversation.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $ConversationID Unique ID of conversation.
-     * @param int $ViewingUserID Unique ID of current user.
-     * @return Gdn_DataSet SQL result (single row).
+     * @param string $datasetType The format of the resulting conversation.
+     * @param array $options Options to modify the get. Currently supports `viewingUserID`.
+     * @return array|stdClass Returns a conversation.
      */
-    public function getID($ConversationID, $ViewingUserID = false) {
+    public function getID($ConversationID, $datasetType = false, $options = []) {
+        if (is_numeric($datasetType)) {
+            deprecated('ConversationModel->getID(int, int)', 'ConversationModel->getID(int, string, array)');
+            $viewingUserID = $datasetType;
+            $datasetType = false;
+        } else {
+            $viewingUserID = val('viewingUserID', $options);
+        }
+        $datasetType = $datasetType ?: DATASET_TYPE_OBJECT;
+
         // Get the conversation.
         $Conversation = $this->getWhere(array('ConversationID' => $ConversationID))->firstRow(DATASET_TYPE_ARRAY);
 
-        if ($ViewingUserID) {
+        if ($viewingUserID) {
             $Data = $this->SQL->getWhere(
                 'UserConversation',
-                array('ConversationID' => $ConversationID, 'UserID' => $ViewingUserID)
+                array('ConversationID' => $ConversationID, 'UserID' => $viewingUserID)
             )
                 ->firstRow(DATASET_TYPE_ARRAY);
 
@@ -265,7 +289,10 @@ class ConversationModel extends ConversationsModel {
             $UserConversation = array('CountNewMessages' => 0, 'CountReadMessages' => $Conversation['CountMessages'], 'DateLastViewed' => $Conversation['DateUpdated']);
         }
         $Conversation = array_merge($Conversation, $UserConversation);
-        return (object)$Conversation;
+        if ($datasetType === DATASET_TYPE_OBJECT) {
+            $Conversation = (object)$Conversation;
+        }
+        return $Conversation;
     }
 
     /**
@@ -439,23 +466,26 @@ class ConversationModel extends ConversationsModel {
     /**
      * Save conversation from form submission.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param array $FormPostValues Values submitted via form.
-     * @param ConversationMessageModel $MessageModel Message starting the conversation.
+     * @param array $formPostValues Values submitted via form.
+     * @param array $settings Not used.
      * @return int Unique ID of conversation created or updated.
      */
-    public function save($FormPostValues, $MessageModel) {
+    public function save($formPostValues, $settings = []) {
+        if ($settings instanceof ConversationMessageModel) {
+            deprecated('ConversationModel->save(array, ConversationMessageModel)');
+        } else {
+            $MessageModel = ConversationMessageModel::instance();
+        }
+
         // Define the primary key in this model's table.
         $this->defineSchema();
         $MessageModel->defineSchema();
 
-        $this->EventArguments['FormPostValues'] = $FormPostValues;
+        $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('BeforeSaveValidation');
 
-        if (!val('RecipientUserID', $FormPostValues) && isset($FormPostValues['To'])) {
-            $To = explode(',', $FormPostValues['To']);
+        if (!val('RecipientUserID', $formPostValues) && isset($formPostValues['To'])) {
+            $To = explode(',', $formPostValues['To']);
             $To = array_map('trim', $To);
 
             $RecipientUserIDs = $this->SQL
@@ -464,11 +494,11 @@ class ConversationModel extends ConversationsModel {
                 ->whereIn('Name', $To)
                 ->get()->resultArray();
             $RecipientUserIDs = array_column($RecipientUserIDs, 'UserID');
-            $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
+            $formPostValues['RecipientUserID'] = $RecipientUserIDs;
         }
 
         if (c('Garden.ForceInputFormatter')) {
-            $FormPostValues['Format'] = c('Garden.InputFormatter');
+            $formPostValues['Format'] = c('Garden.InputFormatter');
         }
 
         // Add & apply any extra validation rules:
@@ -479,13 +509,13 @@ class ConversationModel extends ConversationsModel {
         $this->Validation->applyRule('RecipientUserID', 'OneOrMoreArrayItemRequired');
 
         // Add insert/update fields
-        $this->addInsertFields($FormPostValues);
-        $this->addUpdateFields($FormPostValues);
+        $this->addInsertFields($formPostValues);
+        $this->addUpdateFields($formPostValues);
 
         // Validate the form posted values
         $ConversationID = false;
-        if ($this->validate($FormPostValues)
-            && $MessageModel->validate($FormPostValues)
+        if ($this->validate($formPostValues)
+            && $MessageModel->validate($formPostValues)
             && !$this->checkForSpam('Conversation')
         ) {
             $Fields = $this->Validation->validationFields(); // All fields on the form that relate to the schema
@@ -494,8 +524,8 @@ class ConversationModel extends ConversationsModel {
             // Define the recipients, and make sure that the sender is in the list
             $RecipientUserIDs = val('RecipientUserID', $Fields, 0);
 
-            if (!in_array($FormPostValues['InsertUserID'], $RecipientUserIDs)) {
-                $RecipientUserIDs[] = $FormPostValues['InsertUserID'];
+            if (!in_array($formPostValues['InsertUserID'], $RecipientUserIDs)) {
+                $RecipientUserIDs[] = $formPostValues['InsertUserID'];
             }
 
             // Also make sure there are no duplicates in the recipient list
@@ -503,7 +533,7 @@ class ConversationModel extends ConversationsModel {
             sort($RecipientUserIDs);
             $Fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
             $ConversationID = $this->SQL->insert($this->Name, $Fields);
-            $FormPostValues['ConversationID'] = $ConversationID;
+            $formPostValues['ConversationID'] = $ConversationID;
 
             // Notify the message model that it's being called as a direct result
             // of a new conversation being created. As of now, this is being used
@@ -511,7 +541,7 @@ class ConversationModel extends ConversationsModel {
             // messages each have a separate counter. Without this, a new
             // conversation will cause itself AND the message model spam counter
             // to increment by 1.
-            $MessageID = $MessageModel->save($FormPostValues, null, array(
+            $MessageID = $MessageModel->save($formPostValues, null, array(
                 'NewConversation' => true
             ));
 
@@ -523,18 +553,18 @@ class ConversationModel extends ConversationsModel {
 
             // Now that the message & conversation have been inserted, insert all of the recipients
             foreach ($RecipientUserIDs as $UserID) {
-                $CountReadMessages = $UserID == $FormPostValues['InsertUserID'] ? 1 : 0;
+                $CountReadMessages = $UserID == $formPostValues['InsertUserID'] ? 1 : 0;
                 $this->SQL->options('Ignore', true)->insert('UserConversation', array(
                     'UserID' => $UserID,
                     'ConversationID' => $ConversationID,
                     'LastMessageID' => $MessageID,
                     'CountReadMessages' => $CountReadMessages,
-                    'DateConversationUpdated' => $FormPostValues['DateUpdated']
+                    'DateConversationUpdated' => $formPostValues['DateUpdated']
                 ));
             }
 
             // And update the CountUnreadConversations count on each user related to the discussion.
-            $this->updateUserUnreadCount(array_diff($RecipientUserIDs, array($FormPostValues['InsertUserID'])));
+            $this->updateUserUnreadCount(array_diff($RecipientUserIDs, array($formPostValues['InsertUserID'])));
             $this->updateParticipantCount($ConversationID);
 
             $this->EventArguments['Recipients'] = $RecipientUserIDs;
@@ -551,17 +581,17 @@ class ConversationModel extends ConversationsModel {
                 ->select('uc.UserID')
                 ->from('UserConversation uc')
                 ->where('uc.ConversationID', $ConversationID)// hopefully coax this index.
-                ->where('uc.UserID <>', $FormPostValues['InsertUserID'])
+                ->where('uc.UserID <>', $formPostValues['InsertUserID'])
                 ->get();
 
             $Activity = array(
                 'ActivityType' => 'ConversationMessage',
-                'ActivityUserID' => $FormPostValues['InsertUserID'],
+                'ActivityUserID' => $formPostValues['InsertUserID'],
                 'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
                 'RecordType' => 'Conversation',
                 'RecordID' => $ConversationID,
-                'Story' => val('Body', $FormPostValues),
-                'Format' => val('Format', $FormPostValues, c('Garden.InputFormatter')),
+                'Story' => val('Body', $formPostValues),
+                'Format' => val('Format', $formPostValues, c('Garden.InputFormatter')),
                 'Route' => "/messages/$ConversationID#Message_$MessageID"
             );
 

@@ -12,6 +12,10 @@
  * Manages messages in a conversation.
  */
 class ConversationMessageModel extends ConversationsModel {
+    /**
+     * @var ConversationMessageModel The singleton instance of this class.
+     */
+    private static $instance;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -74,9 +78,10 @@ class ConversationMessageModel extends ConversationsModel {
      *
      * @param mixed $ID The value of the primary key in the database.
      * @param string $DatasetType The format of the result dataset.
+     * @param array $options Not used.
      * @return Gdn_DataSet
      */
-    public function getID($ID, $DatasetType = false) {
+    public function getID($ID, $DatasetType = false, $options = []) {
         $Result = $this->getWhere(array("MessageID" => $ID))->firstRow($DatasetType);
         return $Result;
     }
@@ -348,6 +353,16 @@ class ConversationMessageModel extends ConversationsModel {
             $activityModel->saveQueue();
         }
         return $MessageID;
+    }
+
+    /**
+     * Return the singleton instance of this class.
+     */
+    public static function instance() {
+        if (!isset(static::$instance)) {
+            static::$instance = new ConversationMessageModel();
+        }
+        return static::$instance;
     }
 
     /**

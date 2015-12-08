@@ -28,12 +28,7 @@ class InboxModule extends Gdn_Module {
     public function getData() {
         // Fetch from model.
         $Model = new ConversationModel();
-        $Result = $Model->get(
-            $this->UserID,
-            0,
-            $this->Limit,
-            array()
-        );
+        $Result = $Model->getInbox($this->UserID, $this->Limit, 0);
 
         // Join in the participants.
         $Model->joinParticipants($Result);

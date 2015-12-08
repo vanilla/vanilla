@@ -25,7 +25,7 @@ class RecentActivityModule extends Gdn_Module {
         }
 
         $ActivityModel = new ActivityModel();
-        $Data = $ActivityModel->getWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 0, $Limit);
+        $Data = $ActivityModel->getWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), '', '', $Limit, 0);
         $this->ActivityData = $Data;
     }
 

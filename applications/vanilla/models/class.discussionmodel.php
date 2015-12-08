@@ -355,7 +355,7 @@ class DiscussionModel extends VanillaModel {
      * @return Gdn_DataSet Returns a <a href='psi_element://Gdn_DataSet'>Gdn_DataSet</a> of discussions.
      * of discussions.
      */
-    public function getWhereRecent($Where = array(), $Limit = false, $Offset = 0) {
+    public function getWhereRecent($Where = array(), $Limit = false, $Offset = false) {
         $result = $this->getWhere($Where, '', '', $Limit, $Offset);
         return $result;
     }
@@ -392,6 +392,9 @@ class DiscussionModel extends VanillaModel {
         }
         if (empty($OrderDirection)) {
             $OrderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
+        }
+        if ($Limit === 0) {
+            trigger_error("You should not supply 0 to for $Limit in DiscussionModel->getWhere()", E_USER_NOTICE);
         }
         if (empty($Limit)) {
             $Limit = c('Vanilla.Discussions.PerPage', 30);

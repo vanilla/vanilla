@@ -29,6 +29,14 @@ class ConversationMessageModel extends ConversationsModel {
     }
 
     /**
+     * {@inheritdoc}
+     * @deprecated
+     */
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
+        throw new \BadMethodCallException('ConversationMessageModel->get() is not supported.', 500);
+    }
+
+    /**
      * Get messages by conversation.
      *
      * Events: BeforeGet.
@@ -43,7 +51,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $Wheres SQL conditions.
      * @return Gdn_DataSet SQL results.
      */
-    public function get($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
+    public function getRecent($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
         if ($Limit == '') {
             $Limit = Gdn::config('Conversations.Messages.PerPage', 50);
         }
@@ -103,6 +111,20 @@ class ConversationMessageModel extends ConversationsModel {
     }
 
     /**
+     * {@inheritdoc}
+     * @deprecated
+     */
+    public function getCount($wheres = []) {
+        deprecated('ConversationMessageModel->getCount()', 'ConversationMessageModel->getCountByConversation()');
+        $args = func_get_args();
+        return $this->getCountByConversation(
+            val(0, $args, 0),
+            val(1, $args, Gdn::session()->UserID),
+            val(2, $args, '')
+        );
+    }
+
+    /**
      * Get number of messages in a conversation.
      *
      * @since 2.0.0
@@ -113,7 +135,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $Wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCount($ConversationID, $ViewingUserID, $Wheres = '') {
+    public function getCountByConversation($ConversationID, $ViewingUserID, $Wheres = '') {
         if (is_array($Wheres)) {
             $this->SQL->where($Wheres);
         }

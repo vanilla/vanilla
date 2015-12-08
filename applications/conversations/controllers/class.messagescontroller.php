@@ -388,7 +388,7 @@ class MessagesController extends ConversationsController {
         }
 
         // Fetch message data
-        $this->MessageData = $this->ConversationMessageModel->get(
+        $this->MessageData = $this->ConversationMessageModel->getRecent(
             $ConversationID,
             $Session->UserID,
             $this->Offset,
@@ -506,7 +506,7 @@ class MessagesController extends ConversationsController {
         // Fetch message data
         $this->setData(
             'MessageData',
-            $this->ConversationMessageModel->get(
+            $this->ConversationMessageModel->getRecent(
                 $ConversationID,
                 Gdn::session()->UserID,
                 0,

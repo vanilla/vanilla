@@ -350,11 +350,12 @@ class DiscussionModel extends VanillaModel {
      * Get a list of the most recent discussions.
      *
      * @param array|false $Where The where condition of the get.
+     * @param bool|false|int $Limit The number of discussion to return.
      * @param int|false $Offset The offset within the total set.
-     * @param int|false $Limit The number of discussion to return.
-     * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
+     * @return Gdn_DataSet Returns a <a href='psi_element://Gdn_DataSet'>Gdn_DataSet</a> of discussions.
+     * of discussions.
      */
-    public function getWhereRecent($Where = array(), $Offset = 0, $Limit = false) {
+    public function getWhereRecent($Where = array(), $Limit = false, $Offset = 0) {
         $result = $this->getWhere($Where, '', '', $Limit, $Offset);
         return $result;
     }

@@ -545,9 +545,9 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      * @param array|bool $Where A filter suitable for passing to Gdn_SQLDriver::Where().
      * @param string $OrderFields A comma delimited string to order the data.
-     * @param string $OrderDirection One of <b>asc</b> or <b>desc</b>
-     * @param int|bool $Limit
-     * @param int|bool $Offset
+     * @param string $OrderDirection One of **asc** or **desc**.
+     * @param int|false $Limit The database limit.
+     * @param int|false $Offset The database offset.
      * @return Gdn_DataSet
      */
     public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {

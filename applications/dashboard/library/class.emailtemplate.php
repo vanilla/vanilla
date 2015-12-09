@@ -16,9 +16,11 @@ class EmailTemplate extends Gdn_Pluggable {
     /**
      * Default email colors.
      */
-    const DEFAULT_BACKGROUND_COLOR = '#eee';
-    const DEFAULT_LINK_COLOR = '#38abe3'; // Vanilla blue
+    const DEFAULT_TEXT_COLOR = '#333333';
+    const DEFAULT_BACKGROUND_COLOR = '#eeeeee';
+    const DEFAULT_CONTAINER_BACKGROUND_COLOR = '#ffffff';
     const DEFAULT_BUTTON_BACKGROUND_COLOR = '#38abe3'; // Vanilla blue
+    const DEFAULT_BUTTON_TEXT_COLOR = '#ffffff';
 
     /**
      * @var string The HTML formatted email title.
@@ -37,17 +39,10 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     protected $footer;
     /**
-     * @var array An array representing a link with the following keys:
-     * 'url' => The href value of the link.
-     * 'text' => The link text.
-     * 'color' => The hex color code of the link, must include the leading '#'.
-     */
-    protected $link;
-    /**
      * @var array An array representing a button with the following keys:
      * 'url' => The href value of the button.
      * 'text' => The button text.
-     * 'color' => The hex color code of the button text, must include the leading '#'.
+     * 'textColor' => The hex color code of the button text, must include the leading '#'.
      * 'backgroundColor' => The hex color code of the button background, must include the leading '#'.
      */
     protected $button;
@@ -68,13 +63,21 @@ class EmailTemplate extends Gdn_Pluggable {
     protected $plaintext = false;
     // Colors
     /**
-     * @var string The hex color code of the background, must include the leading '#'.
+     * @var string The hex color code of the text, must include the leading '#'.
      */
+    protected $textColor = self::DEFAULT_TEXT_COLOR;
+   /**
+    * @var string The hex color code of the background, must include the leading '#'.
+    */
     protected $backgroundColor = self::DEFAULT_BACKGROUND_COLOR;
     /**
-     * @var string The default hex color code of links, must include the leading '#'.
+     * @var string The hex color code of the container background, must include the leading '#'.
      */
-    protected $defaultLinkColor = self::DEFAULT_LINK_COLOR;
+    protected $containerBackgroundColor = self::DEFAULT_CONTAINER_BACKGROUND_COLOR;
+    /**
+     * @var string The default hex color code of the button text, must include the leading '#'.
+     */
+    protected $defaultButtonTextColor = self::DEFAULT_BUTTON_TEXT_COLOR;
     /**
      * @var string The default hex color code of the button background, must include the leading '#'.
      */
@@ -110,21 +113,21 @@ class EmailTemplate extends Gdn_Pluggable {
 
     /**
      * @param string $view The view name.
-     * @param $controllerName The controller name for the view.
-     * @param $applicationFolder The application forlder for the view.
+     * @param string $controllerName The controller name for the view.
+     * @param string $applicationFolder The application folder for the view.
      * @return EmailTemplate $this The calling object.
      * @throws Exception
      */
     public function setView($view, $controllerName = 'email', $applicationFolder = 'dashboard') {
-	$this->view = Gdn::controller()->fetchViewLocation($view, $controllerName, $applicationFolder);
-	return $this;
+        $this->view = Gdn::controller()->fetchViewLocation($view, $controllerName, $applicationFolder);
+        return $this;
     }
 
     /**
      * @return string The HTML formatted email title.
      */
     public function getTitle() {
-	return $this->title;
+        return $this->title;
     }
 
     /**
@@ -132,15 +135,15 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setTitle($title) {
-	$this->title = $this->formatContent($title);
-	return $this;
+        $this->title = $this->formatContent($title);
+        return $this;
     }
 
     /**
      * @return string The HTML formatted email lead (sub-title, appears under title).
      */
     public function getLead() {
-	return $this->lead;
+        return $this->lead;
     }
 
     /**
@@ -148,15 +151,15 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setLead($lead) {
-	$this->lead = $this->formatContent($lead);
-	return $this;
+        $this->lead = $this->formatContent($lead);
+        return $this;
     }
 
     /**
      * @return string The HTML formatted email message (the body of the email).
      */
     public function getMessage() {
-	return $this->message;
+        return $this->message;
     }
 
     /**
@@ -164,15 +167,15 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setMessage($message){
-	$this->message = $this->formatContent($message);
-	return $this;
+        $this->message = $this->formatContent($message);
+        return $this;
     }
 
     /**
      * @return string The HTML formatted email footer.
      */
     public function getFooter() {
-	return $this->footer;
+        return $this->footer;
     }
 
     /**
@@ -181,6 +184,22 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     public function setFooter($footer) {
 	$this->footer = $this->formatContent($footer);
+        return $this;
+    }
+
+    /**
+     * @return string The hex color code of the text.
+     */
+    public function getTextColor() {
+	return $this->textColor;
+    }
+
+    /**
+     * @param string $color The hex color code of the text, must include the leading '#'.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function setTextColor($color) {
+	$this->textColor = htmlspecialchars($color);
 	return $this;
     }
 
@@ -188,7 +207,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The hex color code of the background.
      */
     public function getBackgroundColor() {
-	return $this->backgroundColor;
+        return $this->backgroundColor;
     }
 
     /**
@@ -196,27 +215,43 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setBackgroundColor($color) {
-	$this->backgroundColor = htmlspecialchars($color);
-	return $this;
+        $this->backgroundColor = htmlspecialchars($color);
+        return $this;
     }
 
     /**
-     * @return string The default hex color code of links, must include the leading '#'.
+     * @return string The hex color code of the container background.
      */
-    public function getDefaultLinkColor() {
-	return $this->defaultLinkColor;
+    public function getContainerBackgroundColor() {
+	return $this->containerBackgroundColor;
     }
 
     /**
-     * Sets the default color for links.
-     * The color of the EmailTemplate's link property can be overridden by setting $link['color']
-     *
-     * @param string $color The default hex color code of links, must include the leading '#'.
+     * @param string $color The hex color code of the container background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setDefaultLinkColor($color) {
-	$this->defaultLinkColor = $color;
+    public function setContainerBackgroundColor($color) {
+	$this->containerBackgroundColor = htmlspecialchars($color);
 	return $this;
+    }
+
+    /**
+     * @return string The default hex color code of the button text, must include the leading '#'.
+     */
+    public function getDefaultButtonTextColor() {
+	return $this->defaultButtonTextColor;
+    }
+
+    /**
+     * Sets the default color for the button text.
+     * The text color of the EmailTemplate's button property can be overridden by setting $button['textColor']
+     *
+     * @param string $color The default hex color code of the button text, must include the leading '#'.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function setDefaultButtonTextColor($color) {
+	$this->defaultButtonTextColor = $color;
+        return $this;
     }
 
     /**
@@ -228,7 +263,7 @@ class EmailTemplate extends Gdn_Pluggable {
 
     /**
      * Sets the default color for the button background.
-     * The color of the EmailTemplate's link property can be overridden by setting $button['backgroundColor']
+     * The background color of the EmailTemplate's button property can be overridden by setting $button['backgroundColor']
      *
      * @param string $color The default hex color code of the button background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
@@ -257,40 +292,22 @@ class EmailTemplate extends Gdn_Pluggable {
      *
      * @param string $url The href value of the button.
      * @param string $text The button text.
-     * @param string $color The hex color code of the button text, must include the leading '#'.
+     * @param string $textColor The hex color code of the button text, must include the leading '#'.
      * @param string $backgroundColor The hex color code of the button background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setButton($url, $text, $color = '#fff', $backgroundColor = '') {
-	if (!$backgroundColor) {
-	    $backgroundColor = $this->defaultButtonBackgroundColor;
+    public function setButton($url, $text, $textColor = '', $backgroundColor = '') {
+	if (!$textColor) {
+	    $textColor = $this->defaultButtonTextColor;
 	}
-	$this->button = array('url' => htmlspecialchars($url),
-			      'text' => htmlspecialchars($this->formatContent($text)),
-			      'color' => htmlspecialchars($color),
-			      'backgroundColor' => htmlspecialchars($backgroundColor));
-	return $this;
-    }
-
-    /**
-     * Set the link property.
-     *
-     * @param string $url The href value of the link.
-     * @param string $text The link text.
-     * @param string $color The hex color code of the link, must include the leading '#'.
-     * @return EmailTemplate $this The calling object.
-     */
-    public function setLink($url, $text, $color = '') {
-	if (!$color) {
-	    $color = $this->defaultLinkColor;
-	}
-	// We need both text and a url to have a valid link.
-	if ($url && $text) {
-	    $this->link = array('url' => htmlspecialchars($url),
-		'text' => htmlspecialchars($this->formatContent($text)),
-		'color' => htmlspecialchars($color));
-	}
-	return $this;
+        if (!$backgroundColor) {
+            $backgroundColor = $this->defaultButtonBackgroundColor;
+        }
+        $this->button = array('url' => htmlspecialchars($url),
+                              'text' => htmlspecialchars($this->formatContent($text)),
+			      'textColor' => htmlspecialchars($textColor),
+                              'backgroundColor' => htmlspecialchars($backgroundColor));
+        return $this;
     }
 
     /**
@@ -300,7 +317,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * 'alt' => The alt value of the image tag.
      */
     public function getImage() {
-	return $this->image;
+        return $this->image;
     }
 
     /**
@@ -312,13 +329,13 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setImage($sourceUrl = '', $linkUrl = '', $alt = '') {
-	// We need either a source image or an alt to have an img tag.
-	if ($sourceUrl || $alt) {
-	    $this->image = array('source' => htmlspecialchars($sourceUrl),
-		'link' => htmlspecialchars($linkUrl),
-		'alt' => $alt);
-	}
-	return $this;
+        // We need either a source image or an alt to have an img tag.
+        if ($sourceUrl || $alt) {
+            $this->image = array('source' => htmlspecialchars($sourceUrl),
+                'link' => htmlspecialchars($linkUrl),
+                'alt' => $alt);
+        }
+        return $this;
     }
 
     /**
@@ -329,8 +346,8 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setImageArray($image) {
-	$this->setImage(val('source', $image), val('link', $image), val('alt', $image));
-	return $this;
+        $this->setImage(val('source', $image), val('link', $image), val('alt', $image));
+        return $this;
     }
 
     /**
@@ -341,14 +358,14 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return array Copy of email object in an array format for output.
      */
     protected function objectToArray($email) {
-	if (is_array($email) || is_object($email)) {
-	    $result = array();
-	    foreach ($email as $key => $value) {
-		$result[$key] = $this->objectToArray($value);
-	    }
-	    return $result;
-	}
-	return $email;
+        if (is_array($email) || is_object($email)) {
+            $result = array();
+            foreach ($email as $key => $value) {
+                $result[$key] = $this->objectToArray($value);
+            }
+            return $result;
+        }
+        return $email;
     }
 
     /**
@@ -357,21 +374,21 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string A plaintext email.
      */
     protected function plainTextEmail() {
-	$email = array(
-	    'banner' => val('alt', $this->image).' '.val('link', $this->image),
-	    'title' => $this->getTitle(),
-	    'lead' => $this->getLead(),
-	    'text' => val('text', $this->button).' '.val('url', $this->button),
-	    'message' => $this->getMessage(),
-	    'text' => val('text', $this->link).' '.val('url', $this->link),
-	    'footer' => $this->getFooter()
-	);
-	if (strpos($this->getMessage, $this->getTitle()) == 0) {
-	    unset($email['title']);
-	}
-	$email = implode('<br><br>', $email);
-	$email = Gdn_Format::plainText($email);
-	return $email;
+        $email = array(
+            'banner' => val('alt', $this->image).' '.val('link', $this->image),
+            'title' => $this->getTitle(),
+            'lead' => $this->getLead(),
+            'message' => $this->getMessage(),
+	    'button' => val('text', $this->button).' '.val('url', $this->button),
+            'footer' => $this->getFooter()
+        );
+	// Don't repeat the title twice.
+        if (strpos($this->getMessage, $this->getTitle()) == 0) {
+            unset($email['title']);
+        }
+        $email = implode('<br><br>', $email);
+        $email = Gdn_Format::plainText($email);
+        return $email;
     }
 
     /**
@@ -380,14 +397,14 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The rendered email.
      */
     public function toString() {
-	if ($this->isPlaintext()) {
-	    return $this->plainTextEmail();
-	}
-	$controller = new Gdn_Controller();
-	$controller->setData('email', $this->objectToArray($this));
-	$email = $controller->fetchView($this->view);
-	// Append plaintext version
-	$email .= self::PLAINTEXT_START.$this->plainTextEmail();
-	return $email;
+        if ($this->isPlaintext()) {
+            return $this->plainTextEmail();
+        }
+        $controller = new Gdn_Controller();
+        $controller->setData('email', $this->objectToArray($this));
+        $email = $controller->fetchView($this->view);
+        // Append plaintext version
+        $email .= self::PLAINTEXT_START.$this->plainTextEmail();
+        return $email;
     }
 }

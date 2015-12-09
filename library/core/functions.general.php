@@ -3274,21 +3274,32 @@ if (!function_exists('betterRandomString')) {
                 }
             }
         }
+
         $charLen = strlen($characters);
-        $string = '';
+        $randomChars = [];
+        $cryptoStrong = false;
 
         if (function_exists('openssl_random_pseudo_bytes')) {
-            $randomChars = unpack('C*', openssl_random_pseudo_bytes($length));
-            foreach ($randomChars as $c) {
-                $offset = (int)$c % $charLen;
-                $string .= substr($characters, $offset, 1);
-            }
+            $randomChars = unpack('C*', openssl_random_pseudo_bytes($length, $cryptoStrong));
+        } elseif (function_exists('mcrypt_create_iv')) {
+            $randomChars = unpack('C*', mcrypt_create_iv($length));
+            $cryptoStrong = true;
         } else {
-            for ($i = 0; $i < $length; ++$i) {
-                $offset = mt_rand() % $charLen;
-                $string .= substr($characters, $offset, 1);
+            for ($i = 0; $i < $length; $i++) {
+                $randomChars[] = mt_rand();
             }
         }
+
+        $string = '';
+        foreach ($randomChars as $c) {
+            $offset = (int)$c % $charLen;
+            $string .= substr($characters, $offset, 1);
+        }
+
+        if (!$cryptoStrong) {
+            Logger::log(Logger::WARNING, 'Random number generation is not cryptographically strong.');
+        }
+
         return $string;
     }
 }

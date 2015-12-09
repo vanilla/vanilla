@@ -1541,9 +1541,10 @@ class DiscussionModel extends VanillaModel {
      * @access public
      *
      * @param array $FormPostValues Data sent from the form model.
+     * @param array $Settings Currently unused.
      * @return int $DiscussionID Unique ID of the discussion.
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.

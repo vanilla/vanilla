@@ -781,13 +781,12 @@ class CommentModel extends VanillaModel {
      *
      * Events: BeforeSaveComment, AfterSaveComment.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param array $FormPostValues Data from the form model.
+     * @param array $Settings Currently unused.
      * @return int $CommentID
+     * @since 2.0.0
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.

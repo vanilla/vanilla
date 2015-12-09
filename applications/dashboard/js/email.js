@@ -29,12 +29,15 @@ var emailStyles = {
         $('.Hidden.Button').hide();
 
         // Get new banner image.
-        $('a.UploadImage').popup({
+        $('.js-upload-email-image-button').popup({
             afterSuccess: emailStyles.reloadImage
         });
 
         // Ajax call to remove banner
         $('.js-remove-email-image-button').click(emailStyles.removeImage);
+
+        // Ajax call for preview popup
+        $('.js-email-preview-button').click(emailStyles.emailPreview);
 
         if ($('.ActivateSlider-Inactive').length > 0) {
             emailStyles.hideSettings();
@@ -78,12 +81,40 @@ var emailStyles = {
      */
     removeImage: function() {
         $.ajax({
-            type: 'GET',
+            type: 'POST',
             url: gdn.url('/dashboard/settings/removeemailimage'),
-            data: {tk: gdn.definition('TransientKey')},
+            data: {TransientKey: gdn.definition('TransientKey')},
             success: function() {
                 $('.js-email-image').hide();
                 $('.js-remove-email-image-button').hide();
+            }
+        });
+    },
+
+    /**
+     * Opens a popup with a email preview showing the current color values in the color pickers.
+     */
+    emailPreview: function() {
+        var textColor = $('#Form_Garden-dot-EmailTemplate-dot-TextColor').val();
+        var backgroundColor = $('#Form_Garden-dot-EmailTemplate-dot-BackgroundColor').val();
+        var containerBackgroundColor = $('#Form_Garden-dot-EmailTemplate-dot-ContainerBackgroundColor').val();
+        var buttonTextColor = $('#Form_Garden-dot-EmailTemplate-dot-ButtonTextColor').val();
+        var buttonBackgroundColor = $('#Form_Garden-dot-EmailTemplate-dot-ButtonBackgroundColor').val();
+
+        $.ajax({
+            type: 'POST',
+            url: gdn.url('/dashboard/settings/emailpreview'),
+            data: {
+                TransientKey: gdn.definition('TransientKey'),
+                textColor: textColor,
+                backgroundColor: backgroundColor,
+                containerBackgroundColor: containerBackgroundColor,
+                buttonTextColor: buttonTextColor,
+                buttonBackgroundColor: buttonBackgroundColor
+            },
+            success: function(data) {
+                var w = window.open('','','width=800, height=900');
+                $(w.document.body).html(data);
             }
         });
     }

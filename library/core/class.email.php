@@ -41,7 +41,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * Constructor.
      * @param string $format The format of the email. Must be in the $supportedFormats array.
      */
-    function __construct($format = '') {
+    function __construct() {
         $this->PhpMailer = new PHPMailer();
         $this->PhpMailer->CharSet = c('Garden.Charset', 'utf-8');
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
@@ -51,7 +51,7 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->clear();
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
-        $this->resolveFormat($format);
+        $this->resolveFormat();
         $this->emailTemplate = new EmailTemplate();
         if ($this->format === 'html') {
             $this->mimeType('text/html');
@@ -65,13 +65,9 @@ class Gdn_Email extends Gdn_Pluggable {
 
     /**
      * Sets the format property based on the passed argument if it exists, then the config variable and defaults to html.
-     *
-     * @param string $format The format of the email. Must be in the $supportedFormats array.
      */
-    protected function resolveFormat($format) {
-        if ($format && in_array(strtolower($format), self::$supportedFormats)) {
-            $this->format = strtolower($format);
-        } elseif (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
+    protected function resolveFormat() {
+        if (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
             $this->format = strtolower(c('Garden.Email.Format'));
         } else {
             $this->format = 'html';
@@ -82,14 +78,20 @@ class Gdn_Email extends Gdn_Pluggable {
      * Sets the email template default color properties based on config settings.
      */
     protected function setDefaultEmailColors() {
-        if ($bg = c('Garden.EmailTemplate.BackgroundColor')) {
-            $this->emailTemplate->setBackgroundColor($bg);
+        if ($textColor = c('Garden.EmailTemplate.TextColor')) {
+            $this->emailTemplate->setTextColor($textColor);
         }
-        if ($linkColor = c('Garden.EmailTemplate.LinkColor')) {
-            $this->emailTemplate->setDefaultLinkColor($linkColor);
+        if ($backgroundColor = c('Garden.EmailTemplate.BackgroundColor')) {
+            $this->emailTemplate->setBackgroundColor($backgroundColor);
+        }
+        if ($containerBackgroundColor = c('Garden.EmailTemplate.ContainerBackgroundColor')) {
+            $this->emailTemplate->setContainerBackgroundColor($containerBackgroundColor);
         }
         if ($buttonBackgroundColor = c('Garden.EmailTemplate.ButtonBackgroundColor')) {
             $this->emailTemplate->setDefaultButtonBackgroundColor($buttonBackgroundColor);
+        }
+        if ($buttonTextColor = c('Garden.EmailTemplate.ButtonTextColor')) {
+            $this->emailTemplate->setDefaultButtonTextColor($buttonTextColor);
         }
     }
 

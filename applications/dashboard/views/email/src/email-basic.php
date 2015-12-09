@@ -8,7 +8,7 @@
     table.container {
       width: 470px !important;
       margin: 20px auto !important;
-      background-color: #fff;
+      background-color: [[$email.containerBackgroundColor]];
     }
     td.wrapper {
       padding: 20px 0px 10px !important;
@@ -20,6 +20,13 @@
       font-size: 16px;
       line-height: 22px;
       font-weight: 300;
+      color: [[$email.textColor]];
+    }
+    h1 {
+      color: [[$email.textColor]];
+    }
+    hr {
+      background-color: [[$email.textColor]];
     }
     table.columns td.button-wrapper {
         padding: 0px 0px 20px !important;
@@ -30,21 +37,15 @@
     table.footer td p {
       font-size: 12px;
       font-weight: 400;
-      color: #333;
+      color: [[$email.textColor]];
     }
     img {
       max-width: 75%;
       float: none;
       margin: 0 auto;
     }
-    a {
-      color: [[$email.link.color]];
-    }
-    a h1 {
-        color: [[$email.link.color]];
-    }
     table.button.button-custom td a {
-      color: [[$email.button.color]];
+      color: [[$email.button.textColor]];
       padding: 15px 0;
     }
     table.columns table.button.button-custom td {
@@ -96,6 +97,13 @@
                           </td>
                         </tr>
                       </table>
+                      <table class="eight columns">
+                        <tr>
+                          <td>
+                            <p class="message">[[$email.message]]</p>
+                          </td>
+                        </tr>
+                      </table>
                       [[if $email.button]]
                       <table class="four columns">
                         <tr>
@@ -113,15 +121,6 @@
                         </tr>
                       </table>
                       [[/if]]
-                      <table class="eight columns">
-                        <tr>
-                          <td>
-                            <p class="message">[[$email.message]]
-                              [[if $email.link]]<a href="[[$email.link.url]]" style="color: [[$email.link.color]]">[[$email.link.text]]</a>[[/if]]
-                            </p>
-                          </td>
-                        </tr>
-                      </table>
                       [[if $email.footer]]
                       <table class="footer eight columns">
                         <tr>

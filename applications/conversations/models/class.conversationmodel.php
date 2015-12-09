@@ -473,6 +473,8 @@ class ConversationModel extends ConversationsModel {
     public function save($formPostValues, $settings = []) {
         if ($settings instanceof ConversationMessageModel) {
             deprecated('ConversationModel->save(array, ConversationMessageModel)');
+            $MessageModel = $settings;
+            $settings = [];
         } else {
             $MessageModel = ConversationMessageModel::instance();
         }

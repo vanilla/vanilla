@@ -269,6 +269,17 @@ class ActivityController extends Gdn_Controller {
             $Body = $this->Form->getValue('Body', '');
             $ActivityID = $this->Form->getValue('ActivityID', '');
             if (is_numeric($ActivityID) && $ActivityID > 0) {
+                $activity = $this->ActivityModel->getID($ActivityID);
+                if ($activity) {
+                    if ($activity['NotifyUserID'] == ActivityModel::NOTIFY_ADMINS) {
+                        $this->permission('Garden.Settings.Manage');
+                    } elseif ($activity['NotifyUserID'] == ActivityModel::NOTIFY_MODS) {
+                        $this->permission('Garden.Moderation.Manage');
+                    }
+                } else {
+                    throw new Exception(t('Invalid activity'));
+                }
+
                 $ActivityComment = array(
                     'ActivityID' => $ActivityID,
                     'Body' => $Body,

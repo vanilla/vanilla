@@ -12,9 +12,11 @@
  * Renders a list of people in the specified conversation.
  */
 class InThisConversationModule extends Gdn_Module {
-
-    public function setData($Data) {
-        $this->Data = $Data;
+    public function setData($name, $value = null) {
+        if (is_array($name)) {
+            $this->Data = $name;
+        }
+        return parent::setData($name, $value);
     }
 
     public function assetTarget() {

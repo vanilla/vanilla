@@ -4,145 +4,238 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width"/>
   <style>
-    <?php include('ink.css'); ?>
-    table.container {
-      width: 470px !important;
-      margin: 20px auto !important;
+    body * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 100%;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: none;
+      width: 100% !important;
+      height: 100%;
+    }
+
+    /* Typography */
+
+    body, table, h1, h2, h3, h4, h5, h6, p, td {
+      font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      word-break: normal;
+    }
+
+    h1 {font-size: 36px;}
+    h2 {font-size: 28px;}
+    h3 {font-size: 24px;}
+    h4 {font-size: 20px;}
+
+    body, table, p, td {
+      font-size: 16px;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    small {
+      font-size: 10px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 5px;
+      line-height: 1.2;
+      font-weight: 200;
+    }
+
+    ul li {
+      margin-left: 5px;
+      list-style-position: inside;
+    }
+
+    img {
+      max-width: 75%;
+    }
+
+    table {
+      border-spacing: 0;
+    }
+
+    /* Grid */
+
+    .body-wrap,
+    .footer-wrap {
+      width: 100%;
+    }
+
+    .body-wrap {
+      padding: 10px 10px 0;
+    }
+
+    .footer-wrap {
+      padding: 0px 10px 10px;
+    }
+
+    .container {
+      display: block !important;
+      max-width: 600px !important;
+      margin: 0 auto !important;
+      clear: both !important;
+    }
+
+    .content {
+      padding: 20px 30px;
+      max-width: 600px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .content table {
+      width: 100%;
+    }
+
+    .button {
+      text-decoration: none;
+      padding: 10px 20px;
+      text-align: center;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .button a {
+    }
+
+    .lead {
+      margin-bottom: 15px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .footer {
+      font-size: 14px;
+    }
+
+    .message {
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+
+    .image-wrap {
+      margin-bottom: 10px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    /* Variable Colors */
+
+    .footer-wrap,
+    .body-wrap {
+      background-color: [[$email.backgroundColor]];
+    }
+
+    .content,
+    .container td {
       background-color: [[$email.containerBackgroundColor]];
     }
-    td.wrapper {
-      padding: 20px 0px 10px !important;
+
+    .footer-wrap .content,
+    .footer-wrap .container td {
+      background-color: [[$email.button.backgroundColor]];
     }
-    body,
-    table.body,
-    p,
-    td {
-      font-size: 16px;
-      line-height: 22px;
-      font-weight: 300;
+
+    body, table, h1, h2, h3, h4, h5, h6, p, td {
       color: [[$email.textColor]];
     }
-    h1 {
-      color: [[$email.textColor]];
+
+    .footer {
+      color: [[$email.button.textColor]];
     }
+
     hr {
       background-color: [[$email.textColor]];
     }
-    table.columns td.button-wrapper {
-        padding: 0px 0px 20px !important;
-    }
-    table.footer.columns td {
-      padding-bottom: 0;
-    }
-    table.footer td p {
-      font-size: 12px;
-      font-weight: 400;
-      color: [[$email.textColor]];
-    }
-    img {
-      max-width: 75%;
-      float: none;
-      margin: 0 auto;
-    }
-    table.button.button-custom td a {
+
+    .button {
       color: [[$email.button.textColor]];
-      padding: 15px 0;
-    }
-    table.columns table.button.button-custom td {
       background-color: [[$email.button.backgroundColor]];
-      padding: 0;
-      border: 0;
     }
   </style>
 </head>
-<body>
-<table class="body" style="background-color: [[$email.backgroundColor]];">
+<body bgcolor="[[$email.backgroundColor]]">
+<!-- start body -->
+<table class="body-wrap">
   <tr>
-    <td class="center" align="center" valign="top">
-      <center>
-        <table class="row">
+    <td class="container">
+      <div class="content">
+        <table>
           <tr>
-            <td class="center" align="center">
-              <center>
-                <table class="container">
-                  <tr>
-                    <td class="wrapper last">
-                      <table class="eight columns">
-                        [[if $email.image]]
-                        <tr class="image-row">
-                          <td>
-                            [[if $email.image.link]]
-                            <a href="[[$email.image.link]]">
-                            [[/if]]
-                              [[if $email.image.source != '']]
-                                <img src="[[$email.image.source]]" alt="[[$email.image.alt]]">
-                              [[elseif $email.image.alt != '']]
-                                <h1 class="center">[[$email.image.alt]]</h1>
-                              [[/if]]
-                            [[if $email.image.link]]
-                            </a>
-                            [[/if]]
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <hr />
-                          </td>
-                        </tr>
-                        [[/if]]
-                        <tr>
-                          <td>
-                            [[if $email.title]]<h1 class="center">[[$email.title]]</h1>[[/if]]
-                            [[if $email.lead]]<p class="lead center">[[$email.lead]]</p>[[/if]]
-                          </td>
-                        </tr>
-                      </table>
-                      <table class="eight columns">
-                        <tr>
-                          <td>
-                            <p class="message">[[$email.message]]</p>
-                          </td>
-                        </tr>
-                      </table>
-                      [[if $email.button]]
-                      <table class="four columns">
-                        <tr>
-                          <td class="center button-wrapper">
-                            <center>
-                              <table class="button button-custom">
-                                <tr>
-                                  <td>
-                                    <a href="[[$email.button.url]]">[[$email.button.text]]</a>
-                                  </td>
-                                </tr>
-                              </table>
-                            </center>
-                          </td>
-                        </tr>
-                      </table>
-                      [[/if]]
-                      [[if $email.footer]]
-                      <table class="footer eight columns">
-                        <tr>
-                          <td class="center">
-                            <center>
-                              <p class="footer center">[[$email.footer]]</p>
-                            </center>
-                          </td>
-                        </tr>
-                      </table>
-                      [[/if]]
-                    </td>
-                  </tr>
-                </table>
-              </center>
-              <!-- container end below -->
+            <td>
+              [[if $email.image]]
+                <div class="image-wrap center">
+                  [[if $email.image.link]]
+                    <a href="[[$email.image.link]]">
+                  [[/if]]
+                  [[if $email.image.source != '']]
+                    <img class="center" src="[[$email.image.source]]" alt="[[$email.image.alt]]">
+                  [[elseif $email.image.alt != '']]
+                    <h1 class="center">[[$email.image.alt]]</h1>
+                  [[/if]]
+                  [[if $email.image.link]]
+                    </a>
+                  [[/if]]
+                </div>
+                <hr />
+              [[/if]]
+              [[if $email.title]]<h1 class="center">[[$email.title]]</h1>[[/if]]
+              [[if $email.lead]]<div class="lead center">[[$email.lead]]</div>[[/if]]
+              <div class="message">[[$email.message]]</div>
+              [[if $email.button]]
+                <div class="button-wrap center">
+                  <a href="[[$email.button.url]]" class="button">[[$email.button.text]]</a>
+                </div>
+              [[/if]]
             </td>
           </tr>
         </table>
-      </center>
+        <!-- content end below -->
+      </div>
+      <!-- container end below -->
     </td>
   </tr>
 </table>
+<!-- end body -->
+<!-- start footer -->
+<table class="footer-wrap">
+  [[if $email.footer]]
+  <tr>
+    <td class="container">
+      <div class="content">
+        <table>
+          <tr>
+            <td>
+              <div class="footer center">[[$email.footer]]</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+  [[/if]]
+</table>
+<!-- end footer -->
 </body>
 </html>

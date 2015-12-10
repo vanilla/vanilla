@@ -245,6 +245,12 @@ class UserModel extends Gdn_Model {
         // Copy all the comments from the old user to the new user.
         $this->mergeCopy($MergeID, 'Comment', 'InsertUserID', $OldUserID, $NewUserID);
 
+        // Update the last comment user ID.
+        $this->SQL->put('Discussion', ['LastCommentUserID' => $NewUserID], ['LastCommentUserID' => $OldUserID]);
+
+        // Clear the categories cache.
+        CategoryModel::clearCache();
+
         // Copy all of the activities.
         $this->mergeCopy($MergeID, 'Activity', 'NotifyUserID', $OldUserID, $NewUserID);
         $this->mergeCopy($MergeID, 'Activity', 'InsertUserID', $OldUserID, $NewUserID);

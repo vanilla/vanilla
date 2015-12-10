@@ -102,11 +102,14 @@ class EmailTemplate extends Gdn_Pluggable {
      * Filters an unsafe HTML string and returns it.
      *
      * @param string $html The HTML to filter.
+     * @param bool $convertNewlines Whether to convert new lines to html br tags.
      * @return string The filtered HTML string.
      */
-    protected function formatContent($html) {
+    protected function formatContent($html, $convertNewlines = false) {
 	$str = Gdn_Format::htmlFilter($html);
-	$str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
+	if ($convertNewlines) {
+	    $str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
+	}
 	// $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
 	return $str;
     }
@@ -164,10 +167,11 @@ class EmailTemplate extends Gdn_Pluggable {
 
     /**
      * @param string $message The HTML formatted email message (the body of the email).
+     * @param bool $convertNewlines Whether to convert new lines to html br tags.
      * @return EmailTemplate $this The calling object.
      */
-    public function setMessage($message){
-        $this->message = $this->formatContent($message);
+    public function setMessage($message, $convertNewlines = false){
+	$this->message = $this->formatContent($message, $convertNewlines);
         return $this;
     }
 

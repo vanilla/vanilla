@@ -723,18 +723,13 @@ class SettingsController extends DashboardController {
 	if ($buttonBackgroundColor) {
 	    $email->setDefaultButtonBackgroundColor($buttonBackgroundColor);
 	}
-	$message = 'In a little district west of Washington Square the streets have run crazy and broken themselves into small strips called "places." These "places" make strange angles and curves. One Street crosses itself a time or two. An artist once discovered a valuable possibility in this street. Suppose a collector with a bill for paints, paper and canvas should, in traversing this route, suddenly meet himself coming back, without a cent having been paid on account!
+	$message = '<p>Danish dragée danish chupa chups. Gingerbread cheesecake dessert. Chocolate cake wafer cheesecake gingerbread pie topping carrot cake tart. Ice cream marzipan wafer halvah tootsie roll.</p>'.
+	    '<ol><li>list item one</li><li>list item two</li></ol>'.
+	    '<p>Candy bonbon pastry jujubes lollipop wafer biscuit biscuit. Topping brownie sesame snaps sweet roll pie. Croissant danish biscuitsoufflé caramels jujubes jelly. Dragée danish caramels lemon drops dragée.</p>';
 
-So, to quaint old Greenwich Village the art people soon came prowling, hunting for north windows and eighteenth-century gables and Dutch attics and low rents. Then they imported some pewter mugs and a chafing dish or two from Sixth Avenue, and became a "colony."
-
-At the top of a squatty, three-story brick Sue and Johnsy had their studio. "Johnsy" was familiar for Joanna. One was from Maine; the other from California. They had met at the table d\'hôte of an Eighth Street "Delmonico\'s," and found their tastes in art, chicory salad and bishop sleeves so congenial that the joint studio resulted...';
-	$title = 'Hello!';
-	$lead = '<em>Excerpt from <strong>The Last Leaf</strong> by O. Henry</em>';
-
-	$email->setMessage($message)
-	    ->setTitle($title)
-	    ->setLead($lead)
-	    ->setButton('https://americanliterature.com/author/o-henry/short-story/the-last-leaf', 'Read more');
+	$email->setMessage($message, false)
+	    ->setTitle(t('Test Email'))
+	    ->setButton(url('/', true), t('Check it out'));
 	$emailer->setEmailTemplate($email);
 	return $emailer;
     }
@@ -747,9 +742,9 @@ At the top of a squatty, three-story brick Sue and Johnsy had their studio. "Joh
      */
     public function emailPreview() {
 	$request = Gdn::request();
-	if (!$request->isAuthenticatedPostBack(true)) {
-	    throw new Exception('Requires POST', 405);
-	}
+//        if (!$request->isAuthenticatedPostBack(true)) {
+//            throw new Exception('Requires POST', 405);
+//        }
 
 	$textColor = $request->post('textColor', '');
 	$backGroundColor = $request->post('backgroundColor', '');
@@ -780,7 +775,7 @@ At the top of a squatty, three-story brick Sue and Johnsy had their studio. "Joh
 	    $addressList = $this->Form->getFormValue('EmailTestAddresses');
 	    $addresses = explode(',', $addressList);
 	    if (sizeof($addresses) > 10) {
-		$this->Form->addError(t('Too many addresses! We\'ll send to maximum 10 addresses at once.'));
+		$this->Form->addError(t('Too many addresses! We\'ll send up to 10 addresses at once.'));
 	    } else {
 		$emailer = $this->getTestEmail();
 		$emailer->to($addresses);

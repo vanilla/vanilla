@@ -4,80 +4,59 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width">
 </head>
-<body style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding:0;margin:0;text-align: left;width:100% !important;min-width: 100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%">
-<table class="body" style="background-color: {$email.backgroundColor};border-spacing: 0;border-collapse: collapse;padding:0;vertical-align: top;text-align: left;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;margin: 0;line-height: 22px;font-size: 16px;height: 100%;width: 100%"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td class="center" align="center" valign="top" style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0;margin: 0;text-align: center;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-      <center style="width: 100%;min-width: 580px">
-        <table class="row" style="border-spacing: 0;border-collapse: collapse;padding: 0px;vertical-align: top;text-align: left;width: 100%;position: relative"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td class="center" align="center" style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0;margin: 0;text-align: center;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-              <center style="width: 100%;min-width: 580px">
-		<table class="container" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: inherit;width: 470px !important;margin: 20px auto !important;background-color: {$email.containerBackgroundColor}"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td class="wrapper last" style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 20px 0px 10px !important;margin: 0;text-align: left;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top;position: relative;padding-right: 0px">
-                      <table class="eight columns" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;width: 380px;margin: 0 auto">
-                        {if $email.image}
-                        <tr class="image-row" style="padding: 0;vertical-align: top;text-align: left">
-<td style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 10px;margin: 0;text-align: left;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-                            {if $email.image.link}
-			    <a href="{$email.image.link}" style="color: #2ba6cb;text-decoration: none">
-                            {/if}
-                              {if $email.image.source != ''}
-                                <img src="{$email.image.source}" alt="{$email.image.alt}" style="outline:none;text-decoration:none;-ms-interpolation-mode: bicubic;width: auto;max-width: 75%;float: none;clear: both;display: block;margin: 0 auto;border: none">
-                              {elseif $email.image.alt != ''}
-				<h1 class="center" style="font-size: 40px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: normal;padding:0;margin: 0;text-align: center;line-height: 1.3;word-break: normal">{$email.image.alt}</h1>
-                              {/if}
-                            {if $email.image.link}
-                            </a>
-                            {/if}
-                          </td>
-                        </tr>
-<tr style="padding: 0;vertical-align: top;text-align: left">
-<td style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 10px;margin: 0;text-align: left;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-			    <hr style="color: #d9d9d9;background-color: {$email.textColor};height: 1px;border: none">
-</td>
-                        </tr>
-                        {/if}
-                        <tr style="padding: 0;vertical-align: top;text-align: left">
-<td style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 10px;margin: 0;text-align: left;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-			    {if $email.title}<h1 class="center" style="font-size: 40px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: normal;padding:0;margin: 0;text-align: center;line-height: 1.3;word-break: normal">{$email.title}</h1>{/if}
-			    {if $email.lead}<p class="lead center" style="font-size: 18px;line-height:21px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding:0;margin: 0 0 0 10px;text-align: center;margin-bottom: 10px">{$email.lead}</p>{/if}
-                          </td>
-                        </tr>
-</table>
-<table class="eight columns" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;width: 380px;margin: 0 auto"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 10px;margin: 0;text-align: left;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-			    <p class="message" style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding:0;margin: 0 0 0 10px;text-align: left;margin-bottom: 10px">{$email.message}</p>
-			  </td>
-			</tr></table>
-                      {if $email.button}
-                      <table class="four columns" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;width: 180px;margin: 0 auto"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td class="center button-wrapper" style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 20px !important;margin: 0;text-align: center;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top">
-                            <center style="width: 100%;min-width: 180px">
-                              <table class="button button-custom" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;width: 100%;overflow: hidden"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td style="font-size: 16px;line-height: initial !important;color: #ffffff;font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0;margin: 0;text-align: center;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top;display: block;width: auto !important;background: #2ba6cb;border: 0;background-color: {$email.button.backgroundColor}">
-				    <a href="{$email.button.url}" style="color: {$email.button.textColor};text-decoration: none;font-weight: bold;font-family: Helvetica, Arial, sans-serif;font-size: 16px;display: block;height: 100%;width: 100%;padding: 15px 0">{$email.button.text}</a>
-                                  </td>
-                                </tr></table>
-</center>
-                          </td>
-                        </tr></table>
-                      {/if}
-                      {if $email.footer}
-                      <table class="footer eight columns" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;width: 380px;margin: 0 auto"><tr style="padding: 0;vertical-align: top;text-align: left">
-<td class="center" style="font-size: 16px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 300;padding: 0px 0px 10px;margin: 0;text-align: center;word-break: break-word;-webkit-hyphens: none;-moz-hyphens: none;hyphens: none;border-collapse: collapse !important;vertical-align: top;padding-bottom: 0">
-                            <center style="width: 100%;min-width: 380px">
-			      <p class="footer center" style="font-size: 12px;line-height: 22px;color: {$email.textColor};font-family: Helvetica, Arial, sans-serif;font-weight: 400;padding:0;margin: 0 0 0 10px;text-align: center;margin-bottom: 10px">{$email.footer}</p>
-                            </center>
-                          </td>
-                        </tr></table>
-                      {/if}
-                    </td>
-                  </tr></table>
-</center>
-              <!-- container end below -->
-            </td>
-          </tr></table>
-</center>
+<body bgcolor="{$email.backgroundColor}" style='color: {$email.textColor};font-size: 16px;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;padding: 0;margin: 0;text-align: left;line-height: 1.4;-webkit-font-smoothing: antialiased;-webkit-text-size-adjust: none;width: 100% !important;height: 100%'>
+<!-- start body -->
+<table class="body-wrap" style='margin: 0;padding: 10px 10px 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;background-color: {$email.backgroundColor};width: 100%'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
+<td class="container" style='margin: 0 auto !important;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;display: block !important;max-width: 600px !important;clear: both !important'>
+      <div class="content" style="margin: 0 auto;padding: 20px 30px;box-sizing: border-box;font-size: 100%;background-color: {$email.containerBackgroundColor};max-width: 600px;display: block">
+	<table style='margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;width: 100%'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
+<td style='margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;background-color: {$email.containerBackgroundColor}'>
+	      {if $email.image}
+		<div class="image-wrap center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;margin-bottom: 10px;text-align: center">
+		  {if $email.image.link}
+		    <a href="{$email.image.link}" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
+		  {/if}
+		  {if $email.image.source != ''}
+		    <img class="center" src="{$email.image.source}" alt="{$email.image.alt}" style="max-width: 75%;margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;text-align: center">
+		  {elseif $email.image.alt != ''}
+		    <h1 class="center" style='margin: 0;padding: 0;box-sizing: border-box;font-size: 36px;margin-top: 20px;margin-bottom: 5px;line-height: 1.4;font-weight: 300;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;text-align: center;word-break: normal'>{$email.image.alt}</h1>
+		  {/if}
+		  {if $email.image.link}
+		    </a>
+		  {/if}
+		</div>
+		<hr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;background-color: {$email.textColor}">
+	      {/if}
+	      {if $email.title}<h1 class="center" style='margin: 0;padding: 0;box-sizing: border-box;font-size: 36px;margin-top: 20px;margin-bottom: 5px;line-height: 1.4;font-weight: 300;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;text-align: center;word-break: normal'>{$email.title}</h1>{/if}
+	      {if $email.lead}<div class="lead center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 20px;margin-bottom: 15px;line-height: 1.2;text-align: center">{$email.lead}</div>{/if}
+	      <div class="message" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;margin-top: 10px;margin-bottom: 15px">{$email.message}</div>
+	      {if $email.button}
+		<div class="button-wrap center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;text-align: center">
+		  <a href="{$email.button.url}" class="button" style="margin: 0;padding: 10px 20px;box-sizing: border-box;font-size: 100%;color: {$email.button.textColor};background-color: {$email.button.backgroundColor};text-decoration: none;text-align: center;font-weight: 700;cursor: pointer;display: inline-block">{$email.button.text}</a>
+		</div>
+	      {/if}
+	    </td>
+	  </tr></table>
+<!-- content end below -->
+</div>
+      <!-- container end below -->
     </td>
   </tr></table>
+<!-- end body --><!-- start footer --><table class="footer-wrap" style='margin: 0;padding: 0px 10px 10px;box-sizing: border-box;font-size: 16px;color: {$email.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;background-color: {$email.backgroundColor};width: 100%'>
+  {if $email.footer}
+  <tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
+<td class="container" style='margin: 0 auto !important;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;display: block !important;max-width: 600px !important;clear: both !important'>
+      <div class="content" style="margin: 0 auto;padding: 20px 30px;box-sizing: border-box;font-size: 100%;background-color: {$email.button.backgroundColor};max-width: 600px;display: block">
+	<table style='margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;width: 100%'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
+<td style='margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;background-color: {$email.button.backgroundColor}'>
+	      <div class="footer center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 14px;color: {$email.button.textColor};text-align: center">{$email.footer}</div>
+	    </td>
+	  </tr></table>
+</div>
+    </td>
+  </tr>
+  {/if}
+</table>
+<!-- end footer -->
 </body>
 </html>

@@ -499,7 +499,7 @@ class SettingsController extends DashboardController {
                 $this->View = 'Ban';
                 break;
             case 'delete':
-                if ($this->Request->isAuthenticatedPostBack()) {
+                if ($this->Form->authenticatedPostBack()) {
                     $BanModel->delete(array('BanID' => $ID));
                     $this->View = 'BanDelete';
                 }

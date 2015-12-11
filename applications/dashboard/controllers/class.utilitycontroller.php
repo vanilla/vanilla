@@ -320,9 +320,8 @@ class UtilityController extends DashboardController {
             saveToConfig('Garden.Version', APPLICATION_VERSION);
         }
 
-        $Target = $this->Request->get('Target');
-        if ($Target && isSafeUrl($Target)) {
-            redirect($Target);
+        if ($Target = $this->Request->get('Target')) {
+            safeRedirect($Target);
         }
 
         $this->fireEvent('AfterUpdate');

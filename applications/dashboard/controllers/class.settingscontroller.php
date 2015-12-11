@@ -499,7 +499,7 @@ class SettingsController extends DashboardController {
                 $this->View = 'Ban';
                 break;
             case 'delete':
-                if (Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey'))) {
+                if ($this->Request->isAuthenticatedPostBack()) {
                     $BanModel->delete(array('BanID' => $ID));
                     $this->View = 'BanDelete';
                 }

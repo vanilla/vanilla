@@ -190,11 +190,16 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                 document.location = target;
              } else {
                 // request the target via ajax
+                var ajaxData = {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'};
+                if (settings.requestMethod.toLowerCase() == 'post') {
+                   ajaxData.TransientKey = gdn.definition('TransientKey');
+                }
                 $.popup.loading(settings);
+
                 $.ajax({
-                   type: "GET",
+                   method: settings.requestMethod,
                    url: target,
-                   data: {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'},
+                   data: ajaxData,
                    dataType: 'json',
                    error: function(xhr) {
                       gdn.informError(xhr);
@@ -213,12 +218,15 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
           });
        } else {
           if (target) {
+             var ajaxData = { 'DeliveryType': settings.deliveryType };
+             if (settings.requestMethod.toLowerCase() == 'post') {
+                ajaxData.TransientKey = gdn.definition('TransientKey');
+             }
+
              $.ajax({
-                type: 'GET',
+                method: settings.requestMethod,
                 url: target,
-                data: {
-                   'DeliveryType': settings.deliveryType
-                },
+                data: ajaxData,
                 error: function(request, textStatus, errorThrown) {
                    $.popup.reveal(settings, request.responseText);
                 },
@@ -340,6 +348,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
    $.popup.settings = {
       targetUrl:        false,        // Use this URL instead of one provided by the matched element?
+      requestMethod:    'GET',        // The HTTP method to use for the request (e.g. "POST", "GET", "PUT")
       confirm:          false,        // Pop up a confirm message?
       followConfirm:    false,        // Follow the confirm url after OK, or request it with ajax?
       afterConfirm:     function(json, sender) {

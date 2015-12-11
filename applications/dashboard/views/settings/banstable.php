@@ -36,7 +36,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                     <?php
                     echo Gdn_Theme::link("/dashboard/settings/bans/edit?id={$Row['BanID']}", t('Edit'), null, array('class' => 'SmallButton Edit'));
                     echo ' ';
-                    echo Gdn_Theme::link("/dashboard/settings/bans/delete?id={$Row['BanID']}", t('Delete'), null, array('class' => 'SmallButton Delete', 'TK' => 'true'));
+                    echo Gdn_Theme::link("/dashboard/settings/bans/delete?id={$Row['BanID']}", t('Delete'), null, array('class' => 'SmallButton Delete'));
                     ?>
                 </td>
             </tr>

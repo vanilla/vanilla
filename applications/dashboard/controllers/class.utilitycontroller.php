@@ -321,8 +321,8 @@ class UtilityController extends DashboardController {
         }
 
         $Target = $this->Request->get('Target');
-        if ($Target && isSafeUrl($Target)) {
-            redirect($Target);
+        if ($Target) {
+            safeRedirect($Target);
         }
 
         $this->fireEvent('AfterUpdate');

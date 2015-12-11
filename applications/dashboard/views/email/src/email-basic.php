@@ -30,7 +30,14 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
+      padding: 0;
+      margin-top: 20px;
+      margin-bottom: 5px;
+      font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+      font-weight: 200;
+      line-height: 1.2;
       word-break: normal;
+
     }
 
     h1 {font-size: 36px;}
@@ -48,15 +55,6 @@
 
     small {
       font-size: 10px;
-    }
-
-    h1,
-    h2,
-    h3 {
-      margin-top: 20px;
-      margin-bottom: 5px;
-      line-height: 1.2;
-      font-weight: 200;
     }
 
     ul li {
@@ -112,9 +110,6 @@
       font-weight: 700;
       cursor: pointer;
       display: inline-block;
-    }
-
-    .button a {
     }
 
     .lead {
@@ -176,7 +171,6 @@
   </style>
 </head>
 <body bgcolor="[[$email.backgroundColor]]">
-<!-- start body -->
 <table class="body-wrap">
   <tr>
     <td class="container">
@@ -201,8 +195,8 @@
 		<hr />
 	      [[/if]]
 	      [[if $email.title]]<h1 class="center">[[$email.title]]</h1>[[/if]]
-	      [[if $email.lead]]<div class="lead center">[[$email.lead]]</div>[[/if]]
-	      <div class="message">[[$email.message]]</div>
+	      [[if $email.lead]]<p class="lead center">[[$email.lead]]</p>[[/if]]
+	      <p class="message">[[$email.message]]</p>
 	      [[if $email.button]]
 		<div class="button-wrap center">
 		  <a href="[[$email.button.url]]" class="button">[[$email.button.text]]</a>
@@ -217,8 +211,6 @@
     </td>
   </tr>
 </table>
-<!-- end body -->
-<!-- start footer -->
 <table class="footer-wrap">
   [[if $email.footer]]
   <tr>
@@ -236,6 +228,5 @@
   </tr>
   [[/if]]
 </table>
-<!-- end footer -->
 </body>
 </html>

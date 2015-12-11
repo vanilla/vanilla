@@ -919,17 +919,15 @@ class ActivityModel extends Gdn_Model {
 
         $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
 
-        if ($Activity['Story']) {
-            $Message = sprintf(
-                t('EmailStoryNotification', "%3\$s\n\n%2\$s"),
-                Gdn_Format::plainText($Activity['Headline']),
-                $Url,
-                Gdn_Format::plainText($Activity['Story'])
-            );
-        } else {
-            $Message = sprintf(t('EmailNotification', "%1\$s\n\n%2\$s"), Gdn_Format::plainText($Activity['Headline']), $Url);
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setButton($Url, t('Check it out'))
+            ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
+
+        if ($message = val('Story', $Activity)) {
+            $emailTemplate->setMessage($message, true);
         }
-        $Email->message($Message);
+
+        $Email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
         $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity);

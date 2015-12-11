@@ -104,7 +104,13 @@ class DashboardHooks implements Gdn_IPlugin {
 
             // Force embedding?
             if (!IsSearchEngine() && strtolower($Sender->ControllerName) != 'entry') {
-                $Sender->addDefinition('ForceEmbedForum', c('Garden.Embed.ForceForum') ? '1' : '0');
+                if (IsMobile()) {
+                    $forceEmbedForum = c('Garden.Embed.ForceMobile') ? '1' : '0';
+                } else {
+                    $forceEmbedForum = c('Garden.Embed.ForceForum') ? '1' : '0';
+                }
+
+                $Sender->addDefinition('ForceEmbedForum', $forceEmbedForum);
                 $Sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
             }
 

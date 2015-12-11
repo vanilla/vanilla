@@ -52,6 +52,32 @@ if (!function_exists('gzopen') && function_exists('gzopen64')) {
     }
 }
 
+if (!function_exists('hash_equals')) {
+    /**
+     * Determine whether or not two strings are equal in a time that is independent of partial matches.
+     *
+     * This snippet prevents HMAC Timing attacks (http://codahale.com/a-lesson-in-timing-attacks/).
+     * Thanks to Eric Karulf (ekarulf @ github) for this fix.
+     *
+     * @param string $known_string The string of known length to compare against.
+     * @param string $user_string The user-supplied string.
+     * @return bool Returns **true** when the two strings are equal, **false** otherwise.
+     * @see hash_equals()
+     */
+    function hash_equals($known_string, $user_string) {
+        if (strlen($known_string) !== strlen($user_string)) {
+            return false;
+        }
+
+        $result = 0;
+        for ($i = strlen($known_string) - 1; $i >= 0; $i--) {
+            $result |= ord($known_string[$i]) ^ ord($user_string[$i]);
+        }
+
+        return 0 === $result;
+    }
+}
+
 if (!function_exists('http_build_url')) {
     define('HTTP_URL_REPLACE', 1);  // Replace every part of the first URL when there's one of the second URL
     define('HTTP_URL_JOIN_PATH', 2); // Join relative paths

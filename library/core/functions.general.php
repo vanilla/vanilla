@@ -765,16 +765,8 @@ if (!function_exists('compareHashDigest')) {
      * @return bool Returns true if the digests match or false otherwise.
      */
     function compareHashDigest($Digest1, $Digest2) {
-        if (strlen($Digest1) !== strlen($Digest2)) {
-            return false;
-        }
-
-        $Result = 0;
-        for ($i = strlen($Digest1) - 1; $i >= 0; $i--) {
-            $Result |= ord($Digest1[$i]) ^ ord($Digest2[$i]);
-        }
-
-        return 0 === $Result;
+        deprecated('compareHashDigest', 'hash_equals');
+        return hash_equals($Digest1, $Digest2);
     }
 }
 

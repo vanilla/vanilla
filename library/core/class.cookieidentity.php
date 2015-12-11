@@ -317,7 +317,7 @@ class Gdn_CookieIdentity {
         $KeyHash = hash_hmac($CookieHashMethod, $HashKey, $CookieSalt);
         $CheckHash = hash_hmac($CookieHashMethod, $HashKey, $KeyHash);
 
-        if (!compareHashDigest($CookieHash, $CheckHash)) {
+        if (!hash_equals($CheckHash, $CookieHash)) {
             self::deleteCookie($CookieName);
             return false;
         }

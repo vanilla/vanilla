@@ -148,18 +148,7 @@ class Gdn_CookieIdentity {
     }
 
     /**
-     * Returns $this->_HashHMAC with the provided data, the default hashing method
-     * (md5), and the server's COOKIE.SALT string as the key.
-     *
-     * @param string $Data The data to place in the hash.
-     */
-    protected static function _hash($Data, $CookieHashMethod, $CookieSalt) {
-        return Gdn_CookieIdentity::_hashHMAC($CookieHashMethod, $Data, $CookieSalt);
-    }
-
-    /**
-     * Returns the provided data hashed with the specified method using the
-     * specified key.
+     * Return the provided data hashed with the specified method using the specified key.
      *
      * @param string $HashMethod The hashing method to use on $Data. Options are MD5 or SHA1.
      * @param string $Data The data to place in the hash.
@@ -289,7 +278,7 @@ class Gdn_CookieIdentity {
         }
 
         // Create the cookie signature
-        $KeyHash = self::_hash($KeyData, $CookieHashMethod, $CookieSalt);
+        $KeyHash = self::_hashHMAC($CookieHashMethod, $KeyData, $CookieSalt);
         $KeyHashHash = self::_hashHMAC($CookieHashMethod, $KeyData, $KeyHash);
         $Cookie = array($KeyData, $KeyHashHash, time());
 
@@ -353,7 +342,7 @@ class Gdn_CookieIdentity {
             self::deleteCookie($CookieName);
             return false;
         }
-        $KeyHash = self::_hash($HashKey, $CookieHashMethod, $CookieSalt);
+        $KeyHash = self::_hashHMAC($CookieHashMethod, $HashKey, $CookieSalt);
         $CheckHash = self::_hashHMAC($CookieHashMethod, $HashKey, $KeyHash);
 
         if (!compareHashDigest($CookieHash, $CheckHash)) {

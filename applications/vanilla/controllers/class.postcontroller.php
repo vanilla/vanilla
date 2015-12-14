@@ -795,17 +795,19 @@ class PostController extends VanillaController {
         $this->fireEvent('BeforeCommentRender');
 
         if ($this->deliveryType() == DELIVERY_TYPE_DATA) {
-            $Comment = $this->data('Comments')->firstRow(DATASET_TYPE_ARRAY);
-            if ($Comment) {
-                $Photo = $Comment['InsertPhoto'];
+            if ($this->data('Comments') instanceof  Gdn_DataSet) {
+                $Comment = $this->data('Comments')->firstRow(DATASET_TYPE_ARRAY);
+                if ($Comment) {
+                    $Photo = $Comment['InsertPhoto'];
 
-                if (strpos($Photo, '//') === false) {
-                    $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
+                    if (strpos($Photo, '//') === false) {
+                        $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
+                    }
+
+                    $Comment['InsertPhoto'] = $Photo;
                 }
-
-                $Comment['InsertPhoto'] = $Photo;
+                $this->Data = array('Comment' => $Comment);
             }
-            $this->Data = array('Comment' => $Comment);
             $this->RenderData($this->Data);
         } else {
             require_once $this->fetchViewLocation('helper_functions', 'Discussion');

@@ -191,13 +191,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
              } else {
                 // request the target via ajax
                 var ajaxData = {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'};
-                if (settings.requestMethod.toLowerCase() == 'post') {
+                if (settings.doPost) {
                    ajaxData.TransientKey = gdn.definition('TransientKey');
                 }
                 $.popup.loading(settings);
 
                 $.ajax({
-                   method: settings.requestMethod,
+                   method: settings.doPost ? 'POST' : 'GET',
                    url: target,
                    data: ajaxData,
                    dataType: 'json',
@@ -219,12 +219,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
        } else {
           if (target) {
              var ajaxData = { 'DeliveryType': settings.deliveryType };
-             if (settings.requestMethod.toLowerCase() == 'post') {
+             if (settings.doPost) {
                 ajaxData.TransientKey = gdn.definition('TransientKey');
              }
 
              $.ajax({
-                method: settings.requestMethod,
+                method: settings.doPost ? 'POST' : 'GET',
                 url: target,
                 data: ajaxData,
                 error: function(request, textStatus, errorThrown) {
@@ -348,7 +348,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
    $.popup.settings = {
       targetUrl:        false,        // Use this URL instead of one provided by the matched element?
-      requestMethod:    'GET',        // The HTTP method to use for the request (e.g. "POST", "GET", "PUT")
+      doPost:           false,        // Use POST, instead of GET, when performing an AJAX request?
       confirm:          false,        // Pop up a confirm message?
       followConfirm:    false,        // Follow the confirm url after OK, or request it with ajax?
       afterConfirm:     function(json, sender) {

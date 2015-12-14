@@ -1806,7 +1806,6 @@ class SettingsController extends DashboardController {
         if ($this->Form->authenticatedPostBack()) {
             // Do invitations to new members.
             $Message = $this->Form->getFormValue('InvitationMessage');
-            $Message .= "\n\n".Gdn::request()->Url('/', true);
             $Message = trim($Message);
             $Recipients = $this->Form->getFormValue('Recipients');
             if ($Recipients == $this->TextEnterEmails) {
@@ -1829,7 +1828,10 @@ class SettingsController extends DashboardController {
             if ($this->Form->errorCount() == 0) {
                 $Email = new Gdn_Email();
                 $Email->subject(t('Check out my new community!'));
-                $Email->message($Message);
+		$emailTemplate = $Email->getEmailTemplate();
+		$emailTemplate->setMessage($Message, true)
+		    ->setButton(externalUrl('/'), t('Check it out'));
+		$Email->setEmailTemplate($emailTemplate);
                 foreach ($Recipients as $Recipient) {
                     if (trim($Recipient) != '') {
                         $Email->to($Recipient);

@@ -1,24 +1,24 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9649f95dc8d29322bd16140c2ffb3f32",
-    "packages": [],
-    "packages-dev": [
+    "hash": "4e41eb4d5db2cb083b415e7a3c1b249a",
+    "content-hash": "56dd9d6065a0c14668b474c4f60b29aa",
+    "packages": [
         {
             "name": "vanilla/garden-http",
-            "version": "v1.0.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-http.git",
-                "reference": "189e7d09e8acc47f259e4bad78ce3e3a1c8ee5d0"
+                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/189e7d09e8acc47f259e4bad78ce3e3a1c8ee5d0",
-                "reference": "189e7d09e8acc47f259e4bad78ce3e3a1c8ee5d0",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/da3b859774613031788eaa148a7e9e8622f6bc2a",
+                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a",
                 "shasum": ""
             },
             "require": {
@@ -44,10 +44,11 @@
                     "email": "todd@vanillaforums.com"
                 }
             ],
-            "description": "An HTTP client library for building RESTful API clients.",
-            "time": "2015-02-05 04:31:28"
+            "description": "An unbloated HTTP client library for building RESTful API clients.",
+            "time": "2015-12-10 21:39:51"
         }
     ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],

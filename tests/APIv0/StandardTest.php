@@ -35,6 +35,8 @@ class StandardTest extends BaseTest {
 
         // Register the user.
         $r = $this->api()->post('/entry/register.json', $user);
+        $body = $r->getBody();
+        $this->assertSame('Basic', $body['Method']);
 
         // Look for the user in the database.
         $dbUser = $this->api()->queryUser($user['Name'], true);

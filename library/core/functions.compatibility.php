@@ -62,7 +62,7 @@ if (!function_exists('hash_equals')) {
      * @param string $known_string The string of known length to compare against.
      * @param string $user_string The user-supplied string.
      * @return bool Returns **true** when the two strings are equal, **false** otherwise.
-     * @see hash_equals()
+     * @see http://php.net/manual/en/function.hash-equals.php
      */
     function hash_equals($known_string, $user_string) {
         if (strlen($known_string) !== strlen($user_string)) {

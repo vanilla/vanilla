@@ -66,7 +66,6 @@ class SimpleConfig {
         $path = $this->getConfigPath();
 
         if (file_exists($path)) {
-            $contents = file_get_contents($path);
             $Configuration = [];
             include $path;
             return $Configuration;
@@ -77,6 +76,7 @@ class SimpleConfig {
 
     /**
      * Save some config values.
+     *
      * @param array $values An array of config keys and values where the keys are a dot-seperated array.
      */
     public function saveToConfig(array $values) {
@@ -87,7 +87,8 @@ class SimpleConfig {
 
         $path = $this->getConfigPath();
 
-        $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
+        $str = "<?php if (!defined('APPLICATION')) exit();\n".
+            '// '.date('r')."\n\n".
             '$Configuration = '.var_export($config, true).";\n";
         $r = file_put_contents($path, $str);
         if ($r === false) {
@@ -175,7 +176,7 @@ class SimpleConfig {
 }
 
 set_error_handler(
-    function($errno, $errstr, $errfile, $errline, $errcontext) {
+    function ($errno, $errstr, $errfile, $errline, $errcontext) {
         throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
     },
     E_ALL | ~E_NOTICE
@@ -191,7 +192,7 @@ try {
     $config = new SimpleConfig();
     $config->checkAuthorization($config->getvalr('HTTP_AUTHORIZATION', $_SERVER));
 
-    if (!$data) {
+    if ($data === false) {
         throw new Exception('There was an error decoding the config data.', 400);
     }
 

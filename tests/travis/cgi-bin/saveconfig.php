@@ -87,8 +87,7 @@ class SimpleConfig {
 
         $path = $this->getConfigPath();
 
-        $str = "<?php if (!defined('APPLICATION')) exit();\n".
-            '// '.date('r')."\n\n".
+        $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
             '$Configuration = '.var_export($config, true).";\n";
         $r = file_put_contents($path, $str);
         if ($r === false) {

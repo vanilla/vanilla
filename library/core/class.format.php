@@ -1318,6 +1318,7 @@ EOT;
             $Result = <<<EOT
 <div class="imgur-gifv VideoWrap">
     <video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
+        <source src="https://i.imgur.com/{$ID}.webm" type="video/webm">
         <source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4">
         <p>{$ModernBrowser} https://i.imgur.com/{$ID}.gifv</p>
     </video>

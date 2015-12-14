@@ -782,7 +782,6 @@ class EditorPlugin extends Gdn_Plugin {
                 'ThumbHeight' => $thumbHeight,
                 'InsertUserID' => Gdn::session()->UserID,
                 'DateInserted' => date('Y-m-d H:i:s'),
-                'StorageMethod' => 'local',
                 'Path' => $filePathParsed['SaveName'],
                 'ThumbPath' => $thumbPathParsed['SaveName']
             );
@@ -1433,7 +1432,6 @@ class EditorPlugin extends Gdn_Plugin {
             // Save thumbnail information to DB.
             $model->save(array(
                 'MediaID' => $media_id,
-                'StorageMethod' => $filepath_parsed['Type'],
                 'ThumbWidth' => $thumb_width,
                 'ThumbHeight' => $thumb_height,
                 'ThumbPath' => $filepath_parsed['SaveName']

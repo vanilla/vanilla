@@ -13,7 +13,7 @@ class StandardTest extends BaseTest {
     /**
      * @var array
      */
-    protected $testUser;
+    protected static $testUser;
 
     /**
      * Test registering a user with the basic method.
@@ -41,12 +41,80 @@ class StandardTest extends BaseTest {
         $siteUser = $siteUser['Profile'];
 
         $this->assertEquals($user['Name'], $siteUser['Name']);
-//        $this->assertEquals($user['Email'], $siteUser['Email']);
-//        $this->assertEquals($user['Gender'], $siteUser['Gender']);
 
+        $siteUser['tk'] = $this->api()->getTK($siteUser['UserID']);
         $this->setTestUser($siteUser);
+    }
 
-//        $r = $this->api()->signInUser($user['Name'], $user['Password']);
+    /**
+     * Test that the APIv0 can actually send a correctly formatted user cookie.
+     *
+     * @depends testRegisterBasic
+     */
+    public function testUserCookie() {
+        $testUser = $this->getTestUser();
+        $this->api()->setUser($testUser);
+        $profile = $this->api()->get('/profile.json');
+
+        $user = $profile['Profile'];
+        $this->assertEquals($testUser['UserID'], $user['UserID']);
+    }
+
+    /**
+     * Test posting a discussion.
+     *
+     * @depends testRegisterBasic
+     */
+    public function testPostDiscussion() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $discussion = [
+            'CategoryID' => 1,
+            'Name' => 'StandardTest::testPostDiscussion()',
+            'Body' => 'Test '.date('r')
+        ];
+
+        $r = $api->post(
+            '/post/discussion.json',
+            $discussion
+        );
+
+        $postedDiscussion = $r->getBody();
+        $postedDiscussion = $postedDiscussion['Discussion'];
+        $this->assertArraySubset($discussion, $postedDiscussion);
+    }
+
+    /**
+     * Test posting a single comment.
+     *
+     * @throws \Exception Throws an exception when there are no discussions.
+     * @depends testPostDiscussion
+     */
+    public function testPostComment() {
+        $this->api()->setUser($this->getTestUser());
+
+        $discussions = $this->api()->get('/discussions.json')->getBody();
+        $discussions = val('Discussions', $discussions);
+        if (empty($discussions)) {
+            throw new \Exception("There are no discussions to post to.");
+        }
+        $discussion = reset($discussions);
+
+
+        $comment = [
+            'DiscussionID' => $discussion['DiscussionID'],
+            'Body' => 'StandardTest->testPostComment() '.date('r')
+        ];
+
+        $r = $this->api()->post(
+            '/post/comment.json',
+            $comment
+        );
+
+        $postedComment = $r->getBody();
+        $postedComment = $postedComment['Comment'];
+        $this->assertArraySubset($comment, $postedComment);
     }
 
     /**
@@ -55,7 +123,7 @@ class StandardTest extends BaseTest {
      * @return array Returns the testUser.
      */
     public function getTestUser() {
-        return $this->testUser;
+        return self::$testUser;
     }
 
     /**
@@ -65,7 +133,7 @@ class StandardTest extends BaseTest {
      * @return StandardTest Returns `$this` for fluent calls.
      */
     public function setTestUser($testUser) {
-        $this->testUser = $testUser;
+        static::$testUser = $testUser;
         return $this;
     }
 }

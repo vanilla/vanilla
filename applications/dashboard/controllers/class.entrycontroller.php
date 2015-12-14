@@ -1440,7 +1440,7 @@ EOT;
                     return;
                 } elseif (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
-                    if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                    if (!in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL, DELIVERY_TYPE_DATA])) {
                         $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
                     }
 

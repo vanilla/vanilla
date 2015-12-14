@@ -380,17 +380,17 @@ class EmailTemplate extends Gdn_Pluggable {
     protected function plainTextEmail() {
         $email = array(
             'banner' => val('alt', $this->image).' '.val('link', $this->image),
-            'title' => $this->getTitle(),
-            'lead' => $this->getLead(),
-            'message' => $this->getMessage(),
-	    'button' => val('text', $this->button).' '.val('url', $this->button),
-            'footer' => $this->getFooter()
-        );
+	    'title' => $this->getTitle(),
+	    'lead' => $this->getLead(),
+	    'message' => $this->getMessage(),
+	    'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
+	    'footer' => $this->getFooter()
+	);
 	// Don't repeat the title twice.
-        if (strpos($this->getMessage, $this->getTitle()) == 0) {
-            unset($email['title']);
-        }
-        $email = implode('<br><br>', $email);
+	if (strpos($this->getMessage, $this->getTitle()) === 0) {
+	    unset($email['title']);
+	}
+	$email = implode('<br><br>', $email);
         $email = Gdn_Format::plainText($email);
         return $email;
     }

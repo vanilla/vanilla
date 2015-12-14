@@ -429,6 +429,33 @@ class APIv0 extends HttpClient {
     }
 
     /**
+     * Query a user in the database.
+     *
+     * @param string|int $userKey The user ID or username of the user.
+     * @param bool $throw Whether or not to throw an exception if the user isn't found.
+     * @return array Returns the found user as an array.
+     */
+    public function queryUser($userKey, $throw = false) {
+        if (is_numeric($userKey)) {
+            $row = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $userKey]);
+        } elseif (is_string($userKey)) {
+            $row = $this->queryOne("select * from GDN_User where Name = :name", [':name' => $userKey]);
+        }
+
+        if (empty($row)) {
+            if ($throw) {
+                throw new \Exception("User $userKey not found.", 404);
+            }
+            return false;
+        }
+        $attributes = @unserialize($row['Attributes']);
+        $row['Attributes'] = $attributes;
+        $row['tk'] = val('TransientKey', $attributes);
+
+        return $row;
+    }
+
+    /**
      * Set the user used to make API calls.
      *
      * @param array|string|int $user Either an array user, an integer user ID, a string username, or null to unset the
@@ -441,22 +468,8 @@ class APIv0 extends HttpClient {
             return $this;
         }
 
-        if (is_numeric($user)) {
-            $row = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $user]);
-            if (empty($row)) {
-                throw new \Exception("User $user not found.", 404);
-            }
-            $attributes = @unserialize($row['Attributes']);
-            $user = $row;
-            $user['tk'] = val('TransientKey', $attributes);
-        } elseif (is_string($user)) {
-            $row = $this->queryOne("select * from GDN_User where Name = :name", [':name' => $user]);
-            if (empty($row)) {
-                throw new \Exception("User $user not found.", 404);
-            }
-            $attributes = @unserialize($row['Attributes']);
-            $user = $row;
-            $user['tk'] = val('TransientKey', $attributes);
+        if (is_scalar($user)) {
+            $user = $this->queryUser($user, true);
         }
 
         if (empty($user['tk'])) {

@@ -36,8 +36,13 @@ class StandardTest extends BaseTest {
         // Register the user.
         $r = $this->api()->post('/entry/register.json', $user);
 
+        // Look for the user in the database.
+        $dbUser = $this->api()->queryUser($user['Name'], true);
+        $this->assertSame($user['Email'], $dbUser['Email']);
+        $this->assertSame($user['Gender'], $dbUser['Gender']);
+
         // Look up the user for confirmation.
-        $siteUser = $this->api()->get('/profile.json', ['username' => 'frank']);
+        $siteUser = $this->api()->get('/profile.json', ['username' => $user['Name']]);
         $siteUser = $siteUser['Profile'];
 
         $this->assertEquals($user['Name'], $siteUser['Name']);

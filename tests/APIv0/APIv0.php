@@ -11,12 +11,28 @@ use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use PDO;
 
+/**
+ * The API client for Vanilla's API version 0.
+ */
 class APIv0 extends HttpClient {
     const DB_USER = 'travis';
     const DB_PASSWORD = '';
 
     protected static $apiKey;
 
+    /**
+     * @var array The current config from the install.
+     */
+    protected static $config;
+
+    /**
+     * @var array The user context to make requests with.
+     */
+    protected $user;
+
+    /**
+     * APIv0 constructor.
+     */
     public function __construct() {
         parent::__construct();
         $this
@@ -36,6 +52,17 @@ class APIv0 extends HttpClient {
     }
 
     /**
+     * Get a config value.
+     *
+     * @param string $key The dot-separated config key.
+     * @param mixed $default The value to return if there is no config setting.
+     * @return mixed Returns the config setting or {@link $default}.
+     */
+    public function getConfig($key, $default = null) {
+        return valr($key, static::$config, $default);
+    }
+
+    /**
      * Get the path to the config file for direct access.
      *
      * @return string Returns the path to the database.
@@ -49,7 +76,7 @@ class APIv0 extends HttpClient {
     /**
      * Get a connection to the database.
      *
-     * $return \PDO Returns a connection to the database.
+     * @return \PDO Returns a connection to the database.
      */
     public function getPDO() {
         static $pdo;
@@ -75,7 +102,22 @@ class APIv0 extends HttpClient {
     }
 
     /**
-     * @inheritdoc
+     * Get the transient key for a user.
+     *
+     * @param int $userID The ID of the user to get the transient key for.
+     * @return string Returns the transient key for the user.
+     */
+    public function getTK($userID) {
+        $user = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $userID]);
+        if (empty($user)) {
+            return '';
+        }
+        $attributes = @unserialize($user['Attributes']);
+        return val('TransientKey', $attributes, '');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function handleErrorResponse(HttpResponse $response, $options = []) {
         if ($this->val('throw', $options, $this->throwExceptions)) {
@@ -94,7 +136,9 @@ class APIv0 extends HttpClient {
     }
 
     /**
-     * Install Vanilla
+     * Install Vanilla.
+     *
+     * @param string $title The title of the app.
      */
     public function install($title = '') {
         // Create the database for Vanilla.
@@ -133,6 +177,80 @@ class APIv0 extends HttpClient {
         if (!$r['Installed']) {
             throw new \Exception("Vanilla did not install");
         }
+
+        // Get some configuration information.
+        $config = $this->saveToConfig([]);
+    }
+
+    /**
+     * Encode an array in a format suitable for a cookie header.
+     *
+     * @param array $array The cookie value array.
+     * @return string Returns a string suitable to be passed to a cookie header.
+     */
+    public static function cookieEncode(array $array) {
+        $pairs = [];
+        foreach ($array as $key => $value) {
+            $pairs[] = "$key=".rawurlencode($value);
+        }
+
+        $result = implode('; ', $pairs);
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createRequest($method, $uri, $body, array $headers = [], array $options = []) {
+        $request = parent::createRequest($method, $uri, $body, $headers, $options);
+
+        // Add the cookie of the calling user.
+        if ($user = $this->getUser()) {
+            $cookieName = $this->getConfig('Garden.Cookie.Name', 'Vanilla');
+            $cookieArray = [$cookieName => $this->vanillaCookieString($user['UserID'])];
+
+            $request->setHeader('Cookie', static::cookieEncode($cookieArray));
+
+            if (!in_array($request->getMethod(), ['GET', 'OPTIONS']) && is_array($request->getBody())) {
+                $body = $request->getBody();
+                if (!isset($body['TransientKey'])) {
+                    $body['TransientKey'] = $user['tk'];
+                    $request->setBody($body);
+                }
+            }
+        }
+
+        return $request;
+    }
+
+    /**
+     * Generate a Vanilla compatible cookie string for a user.
+     *
+     * @param int $userID The ID of the user.
+     * @param string $secret The secret to secure the user. This is the cookie salt. If you pass an empty string then
+     * the current configured salt will be used.
+     * @param string $algo The algorithm used to sign the cookie.
+     * @return string Returns a string that can be used as a Vanilla session cookie.
+     */
+    public function vanillaCookieString($userID, $secret = '', $algo = 'md5') {
+        $expires = strtotime('+2 days');
+        $keyData = "$userID-$expires";
+
+        if (empty($secret)) {
+            $secret = $this->getConfig('Garden.Cookie.Salt');
+            if (empty($secret)) {
+                // Throw a noisy exception because something is wrong.
+                throw new \Exception("The cookie salt is empty.", 500);
+            }
+        }
+
+        $keyHash = hash_hmac($algo, $keyData, $secret);
+        $keyHashHash = hash_hmac($algo, $keyData, $keyHash);
+
+        $cookieArray = [$keyData, $keyHashHash, time(), $userID, $expires];
+        $cookieString = implode('|', $cookieArray);
+
+        return $cookieString;
     }
 
     /**
@@ -155,6 +273,48 @@ class APIv0 extends HttpClient {
     }
 
     /**
+     * Query the application's database.
+     *
+     * @param string $sql The SQL string to send.
+     * @param array $params Any parameters to send with the SQL.
+     * @param bool $returnStatement Whether or not to return the {@link \PDOStatement} associated with the query.
+     * @return array|\PDOStatement
+     */
+    public function query($sql, array $params = [], $returnStatement = false) {
+        $pdo = $this->getPDO();
+        $stmt = $pdo->prepare($sql);
+
+        $r = $stmt->execute($params);
+        if ($r === false) {
+            throw new \Exception($pdo->errorInfo(), $pdo->errorCode());
+        }
+
+        if ($returnStatement) {
+            return $stmt;
+        } else {
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $data;
+        }
+    }
+
+    /**
+     * Query the application's database and return the first row of the result.
+     *
+     * @param string $sql The SQL string to send.
+     * @param array $params Any parameters to send with the SQL.
+     * @return array|null Returns the first row of the query or **null** if there is no data.
+     * @throws \Exception Throws an exception if there was a problem executing the query.
+     */
+    public function queryOne($sql, $params = []) {
+        $data = $this->query($sql, $params);
+        if (empty($data)) {
+            return null;
+        } else {
+            return reset($data);
+        }
+    }
+
+    /**
      * Save some config values via API.
      *
      * This method saves config values via a back-door endpoint copied to cgi-bin.
@@ -172,8 +332,8 @@ class APIv0 extends HttpClient {
                 'Authorization: token '.self::getApiKey()
             ]
         );
-
-        $path = $this->getConfigPath();
+        static::$config = $r->getBody();
+        return static::$config;
     }
 
     /**
@@ -196,6 +356,10 @@ class APIv0 extends HttpClient {
         $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
             '$Configuration = '.var_export($config, true).";\n";
         $r = file_put_contents($path, $str);
+
+        if ($r) {
+            static::$config = $config;
+        }
     }
 
     /**
@@ -214,6 +378,11 @@ class APIv0 extends HttpClient {
     }
 
 
+    /**
+     * Uninstall Vanilla.
+     *
+     * @throws \Exception Throws an exception if the config file cannot be deleted.
+     */
     public function uninstall() {
         $pdo = $this->getPDO();
 
@@ -248,5 +417,55 @@ class APIv0 extends HttpClient {
      */
     public static function setApiKey($apiKey) {
         self::$apiKey = $apiKey;
+    }
+
+    /**
+     * Get the user to make API calls as.
+     *
+     * @return array Returns a user array.
+     */
+    public function getUser() {
+        return $this->user;
+    }
+
+    /**
+     * Set the user used to make API calls.
+     *
+     * @param array|string|int $user Either an array user, an integer user ID, a string username, or null to unset the
+     * current user.
+     * @return APIv0 Returns `$this` for fluent calls.
+     */
+    public function setUser($user) {
+        if ($user === null) {
+            $this->user = null;
+            return $this;
+        }
+
+        if (is_numeric($user)) {
+            $row = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $user]);
+            if (empty($row)) {
+                throw new \Exception("User $user not found.", 404);
+            }
+            $attributes = @unserialize($row['Attributes']);
+            $user = $row;
+            $user['tk'] = val('TransientKey', $attributes);
+        } elseif (is_string($user)) {
+            $row = $this->queryOne("select * from GDN_User where Name = :name", [':name' => $user]);
+            if (empty($row)) {
+                throw new \Exception("User $user not found.", 404);
+            }
+            $attributes = @unserialize($row['Attributes']);
+            $user = $row;
+            $user['tk'] = val('TransientKey', $attributes);
+        }
+
+        if (empty($user['tk'])) {
+            $user['tk'] = $this->getTK($user['UserID']);
+        }
+
+        $partialUser = ['UserID' => $user['UserID'], 'Name' => $user['Name'], 'tk' => $user['tk']];
+
+        $this->user = $partialUser;
+        return $this;
     }
 }

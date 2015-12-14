@@ -383,11 +383,11 @@ class EmailTemplate extends Gdn_Pluggable {
             'title' => $this->getTitle(),
             'lead' => $this->getLead(),
             'message' => $this->getMessage(),
-            'button' => val('text', $this->button).' '.val('url', $this->button),
+            'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
             'footer' => $this->getFooter()
         );
         // Don't repeat the title twice.
-        if (strpos($this->getMessage, $this->getTitle()) == 0) {
+        if (strpos($this->getMessage, $this->getTitle()) === 0) {
             unset($email['title']);
         }
         $email = implode('<br><br>', $email);

@@ -263,7 +263,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @return Email
      */
     public function message($Message) {
-        $this->emailTemplate->setMessage($Message);
+        $this->emailTemplate->setMessage($Message, true);
     }
 
     public function formatMessage($message) {
@@ -357,7 +357,6 @@ class Gdn_Email extends Gdn_Pluggable {
      * @todo add port settings
      */
     public function send($EventName = '') {
-        $this->resolveEmailTitle();
         $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');
 

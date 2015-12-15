@@ -149,7 +149,7 @@
 
     .footer-wrap .content,
     .footer-wrap .container td {
-      background-color: [[$email.button.backgroundColor]];
+      background-color: [[$email.footer.backgroundColor]];
     }
 
     body, table, h1, h2, h3, h4, h5, h6, p, td {
@@ -157,7 +157,7 @@
     }
 
     .footer {
-      color: [[$email.button.textColor]];
+      color: [[$email.footer.textColor]];
     }
 
     hr {
@@ -219,7 +219,7 @@
 	<table>
 	  <tr>
 	    <td>
-	      <div class="footer center">[[$email.footer]]</div>
+	      <div class="footer center">[[$email.footer.text]]</div>
 	    </td>
 	  </tr>
 	</table>

@@ -45,10 +45,10 @@
   {if $email.footer}
   <tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
 <td class="container" style='margin: 0 auto !important;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;display: block !important;max-width: 600px !important;clear: both !important'>
-      <div class="content" style="margin: 0 auto;padding: 20px 30px;box-sizing: border-box;font-size: 100%;background-color: {$email.button.backgroundColor};max-width: 600px;display: block">
+      <div class="content" style="margin: 0 auto;padding: 20px 30px;box-sizing: border-box;font-size: 100%;background-color: {$email.footer.backgroundColor};max-width: 600px;display: block">
 	<table style='border-spacing: 0;margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;width: 100%'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
-<td style='margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;background-color: {$email.button.backgroundColor}'>
-	      <div class="footer center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 14px;color: {$email.button.textColor};text-align: center">{$email.footer}</div>
+<td style='margin: 0;padding: 0;box-sizing: border-box;font-size: 16px;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;background-color: {$email.footer.backgroundColor}'>
+	      <div class="footer center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 14px;color: {$email.footer.textColor};text-align: center">{$email.footer.text}</div>
 	    </td>
 	  </tr></table>
 </div>

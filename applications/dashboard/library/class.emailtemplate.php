@@ -35,7 +35,10 @@ class EmailTemplate extends Gdn_Pluggable {
      */
     protected $message;
     /**
-     * @var string The HTML formatted email footer.
+     * @var array An array representing a footer with the following keys:
+     * 'text' => The HTML-formatted footer text.
+     * 'textColor' => The hex color code of the footer text, must include the leading '#'.
+     * 'backgroundColor' => The hex color code of the footer background, must include the leading '#'.
      */
     protected $footer;
     /**
@@ -183,11 +186,23 @@ class EmailTemplate extends Gdn_Pluggable {
     }
 
     /**
-     * @param string $footer The HTML formatted email footer.
+     * Sets the footer. The footer background and text colors default to the button background and text colors.
+     *
+     * @param string $text The HTML formatted email footer text.
+     * @param string $textColor The hex color code of the footer text, must include the leading '#'.
+     * @param string $backgroundColor The hex color code of the footer background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setFooter($footer) {
-        $this->footer = $this->formatContent($footer);
+    public function setFooter($text, $textColor = '', $backgroundColor = '') {
+        if (!$textColor) {
+            $textColor = $this->defaultButtonTextColor;
+        }
+        if (!$backgroundColor) {
+            $backgroundColor = $this->defaultButtonBackgroundColor;
+        }
+        $this->footer = array('text' => htmlspecialchars($this->formatContent($text)),
+            'textColor' => htmlspecialchars($textColor),
+            'backgroundColor' => htmlspecialchars($backgroundColor));
         return $this;
     }
 

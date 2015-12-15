@@ -386,13 +386,14 @@ class EmailTemplate extends Gdn_Pluggable {
             'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
             'footer' => $this->getFooter()
         );
-        // Don't repeat the title twice.
-        if (strpos($this->getMessage, $this->getTitle()) === 0) {
-            unset($email['title']);
+
+        foreach($email as $key => $val) {
+            if (!$val) {
+                unset($email[$key]);
+            }
         }
-        $email = implode('<br><br>', $email);
-        $email = Gdn_Format::plainText($email);
-        return $email;
+
+        return Gdn_Format::plainText(Gdn_Format::text(implode("<br><br>", $email)));
     }
 
     /**

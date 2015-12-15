@@ -4043,7 +4043,7 @@ class UserModel extends Gdn_Model {
 
             $emailTemplate = $Email->getEmailTemplate()
                 ->setTitle(t('Reset Your Password'))
-                ->setMessage(t('We\'ve received a request to change your password.'))
+                ->setMessage(sprintf(t('We\'ve received a request to change your password.'), $AppTitle))
                 ->setButton(ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
             $Email->setEmailTemplate($emailTemplate);
 

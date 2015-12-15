@@ -39,7 +39,6 @@ class Gdn_Email extends Gdn_Pluggable {
 
     /**
      * Constructor.
-     * @param string $format The format of the email. Must be in the $supportedFormats array.
      */
     function __construct() {
         $this->PhpMailer = new PHPMailer();
@@ -51,14 +50,11 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->clear();
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
-        $this->resolveFormat();
         $this->emailTemplate = new EmailTemplate();
+        $this->resolveFormat();
         if ($this->format === 'html') {
-            $this->mimeType('text/html');
             $this->setDefaultEmailColors();
             $this->setDefaultEmailImage();
-        } else {
-            $this->emailTemplate->setPlaintext(true);
         }
         parent::__construct();
     }
@@ -68,9 +64,26 @@ class Gdn_Email extends Gdn_Pluggable {
      */
     protected function resolveFormat() {
         if (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
-            $this->format = strtolower(c('Garden.Email.Format'));
+            $this->setFormat(c('Garden.Email.Format'));
         } else {
+            $this->setFormat('html');
+        }
+    }
+
+    /**
+     * Sets the format property, the email mime type and the email template format property.
+     *
+     * @param string $format The format of the email. Must be in the $supportedFormats array.
+     */
+    public function setFormat($format) {
+        if (strtolower($format) === 'html') {
             $this->format = 'html';
+            $this->mimeType('text/html');
+            $this->emailTemplate->setPlaintext(false);
+        } else {
+            $this->format = 'text';
+            $this->mimeType('text/plain');
+            $this->emailTemplate->setPlaintext(true);
         }
     }
 

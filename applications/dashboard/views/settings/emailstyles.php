@@ -25,7 +25,7 @@ $Session = Gdn::session();
     <div class="Info" style="margin-left: 0; padding-left: 0;">
         <?php
         echo t('Spruce up your emails by adding a logo and customizing the colors.');
-        echo '<br>'.t('You can also send emails in plain text by disabling the toggle below.');
+        echo '<br>'.t('You can send emails in plain text by disabling the toggle below.');
         ?>
     </div>
     <span id="plaintext-toggle">
@@ -75,7 +75,7 @@ $Session = Gdn::session();
         </li>
         <li>
             <?php
-            echo $this->Form->label('Foreground Color', 'Garden.EmailTemplate.ContainerBackgroundColor');
+            echo $this->Form->label('Page Color', 'Garden.EmailTemplate.ContainerBackgroundColor');
             echo $this->Form->color('Garden.EmailTemplate.ContainerBackgroundColor', 'container-background-color');
             ?>
         </li>

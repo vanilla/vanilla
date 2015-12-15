@@ -3846,22 +3846,22 @@ class UserModel extends Gdn_Model {
 	switch($RegisterType) {
 	    case 'Connect' :
 		$message .= formatString(t('You have successfully connected to {Title}.'), $Data).' '.
-		    t('Here is your information:').'<br></p>'.
+		    t('Find your account information below.').'<br></p>'.
 		    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
 		    formatString(t('Connected With: {ProviderName}'), $Data).'</p>';
 		break;
 	    case 'Register' :
 		$message .= formatString(t('You have successfully registered for an account at {Title}.'), $Data).' '.
-		    t('Here is your information:').'<br></p>'.
+		    t('Find your account information below.').'<br></p>'.
 		    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
 		    sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'</p>';
 		break;
 	    default :
 		$message .= sprintf(t('%s has created an account for you at %s.'), val('Name', $Sender), $AppTitle).' '.
-		    t('Your login credentials are:').'<br></p>'.
+		    t('Find your account information below.').'<br></p>'.
 		    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
 		    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
-        }
+	}
 
         // Add the email confirmation key.
         if ($Data['EmailKey']) {
@@ -3871,12 +3871,13 @@ class UserModel extends Gdn_Model {
 	    $emailTemplate->setButton($url, t('Confirm My Email Address'));
 	} else {
 	    $emailTemplate->setButton(externalUrl('/'), t('Access the Site'));
-        }
+	}
 
 	$emailTemplate->setMessage($message);
+	$emailTemplate->setTitle(t('Welcome Aboard!'));
 
 	$Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+	$Email->send();
     }
 
     /**
@@ -3891,19 +3892,18 @@ class UserModel extends Gdn_Model {
         $Sender = $this->getID($Session->UserID);
         $User = $this->getID($UserID);
         $AppTitle = Gdn::config('Garden.Title');
-        $Email = new Gdn_Email();
+	$Email = new Gdn_Email();
 	$Email->subject('['.$AppTitle.'] '.t('Reset Password'));
-        $Email->to($User->Email);
-	$message = sprintf(t('%s has reset your password at %s.'), val('Name', $Sender), $AppTitle).
-	    t('Your login credentials are:').'<br></p>'.
+	$Email->to($User->Email);
+	$greeting = formatString(t('Hello %s!'), val('Name', $User));
+	$message = '<p>'.$greeting.' '.sprintf(t('%s has reset your password at %s.'), val('Name', $Sender), $AppTitle).' '.
+	    t('Find your account information below.').'<br></p>'.
 	    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
 	    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
 
-	$greeting = formatString(t('Hello %s!'), val('Name', $User));
-
 	$emailTemplate = $Email->getEmailTemplate()
 	    ->setTitle(t('Reset Password'))
-	    ->setMessage($greeting.' '.$message)
+	    ->setMessage($message)
 	    ->setButton(externalUrl('/'), t('Access the Site'));
 
 	$Email->setEmailTemplate($emailTemplate);
@@ -4057,7 +4057,7 @@ class UserModel extends Gdn_Model {
 
 	    $emailTemplate = $Email->getEmailTemplate()
 		->setTitle(t('Reset Your Password'))
-		->setMessage(sprintf(t('We\'ve received a request to change your password. If you didn\'t make this request, please ignore this email.'), $AppTitle))
+		->setMessage(t('We\'ve received a request to change your password.'))
 		->setButton(ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
 	    $Email->setEmailTemplate($emailTemplate);
 

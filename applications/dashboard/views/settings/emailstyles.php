@@ -23,10 +23,10 @@ $Session = Gdn::session();
     <?php
     echo '<h2>'.t('HTML Emails').'</h2>'; ?>
     <div class="Info" style="margin-left: 0; padding-left: 0;">
-        <?php
+	<?php
 	echo t('Spruce up your emails by adding a logo and customizing the colors.');
-        echo '<br>'.t('You can also send emails in plain text by disabling the toggle below.');
-        ?>
+	echo '<br>'.t('You can send emails in plain text by disabling the toggle below.');
+	?>
     </div>
     <span id="plaintext-toggle">
         <?php
@@ -72,10 +72,10 @@ $Session = Gdn::session();
 	    echo $this->Form->label('Background Color', 'Garden.EmailTemplate.BackgroundColor');
 	    echo $this->Form->color('Garden.EmailTemplate.BackgroundColor', 'background-color');
             ?>
-        </li>
+	</li>
 	<li>
 	    <?php
-	    echo $this->Form->label('Foreground Color', 'Garden.EmailTemplate.ContainerBackgroundColor');
+	    echo $this->Form->label('Page Color', 'Garden.EmailTemplate.ContainerBackgroundColor');
 	    echo $this->Form->color('Garden.EmailTemplate.ContainerBackgroundColor', 'container-background-color');
 	    ?>
 	</li>

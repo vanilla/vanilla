@@ -4,7 +4,7 @@
 echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-email-image-form'));
 echo $this->Form->errors();
 echo '<p>'.t('Choose a new email logo.')
-    .sprintf('Large images will be scaled down to a max width of %spx and a max height of %spx',
+    .sprintf(t('Large images will be scaled down.'),
 	c('Garden.EmailTemplate.ImageMaxWidth', 400),
 	c('Garden.EmailTemplate.ImageMaxHeight', 300))
     .'</p>';

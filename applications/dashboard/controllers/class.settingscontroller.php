@@ -723,13 +723,11 @@ class SettingsController extends DashboardController {
 	if ($buttonBackgroundColor) {
 	    $email->setDefaultButtonBackgroundColor($buttonBackgroundColor);
 	}
-	$message = '<p>Danish dragée danish chupa chups. Gingerbread cheesecake dessert. Chocolate cake wafer cheesecake gingerbread pie topping carrot cake tart. Ice cream marzipan wafer halvah tootsie roll.</p>'.
-	    '<ol><li>list item one</li><li>list item two</li></ol>'.
-	    '<p>Candy bonbon pastry jujubes lollipop wafer biscuit biscuit. Topping brownie sesame snaps sweet roll pie. Croissant danish biscuitsoufflé caramels jujubes jelly. Dragée danish caramels lemon drops dragée.</p>';
+	$message = t('Test Email Message');
 
-	$email->setMessage($message, false)
+	$email->setMessage($message)
 	    ->setTitle(t('Test Email'))
-	    ->setButton(url('/', true), t('Check it out'));
+	    ->setButton(externalUrl('/'), t('Check it out'));
 	$emailer->setEmailTemplate($email);
 	return $emailer;
     }
@@ -775,13 +773,13 @@ class SettingsController extends DashboardController {
 	    $addressList = $this->Form->getFormValue('EmailTestAddresses');
 	    $addresses = explode(',', $addressList);
 	    if (sizeof($addresses) > 10) {
-		$this->Form->addError(t('Too many addresses! We\'ll send up to 10 addresses at once.'));
+		$this->Form->addError(sprintf(t('Too many addresses! We\'ll send up to %s addresses at once.'), '10'));
 	    } else {
 		$emailer = $this->getTestEmail();
 		$emailer->to($addresses);
-		$emailer->subject(t('Test email from ' . c('Garden.Title')));
+		$emailer->subject(sprintf(t('Test email from %s'), c('Garden.Title')));
 		if ($emailer->send()) {
-		    $this->informMessage(t("Test email sent."));
+		    $this->informMessage(t("The email has been sent."));
 		} else {
 		    $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
 		}

@@ -91,11 +91,11 @@ class EmailTemplate extends Gdn_Pluggable {
      * @throws Exception
      */
     function __construct($message = '', $title = '', $lead = '', $view = 'email-basic') {
-	$this->setMessage($message);
-	$this->setTitle($title);
-	$this->setLead($lead);
+        $this->setMessage($message);
+        $this->setTitle($title);
+        $this->setLead($lead);
 
-	$this->view = Gdn::controller()->fetchViewLocation($view, 'email', 'dashboard');
+        $this->view = Gdn::controller()->fetchViewLocation($view, 'email', 'dashboard');
     }
 
     /**
@@ -106,12 +106,12 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The filtered HTML string.
      */
     protected function formatContent($html, $convertNewlines = false) {
-	$str = Gdn_Format::htmlFilter($html);
-	if ($convertNewlines) {
-	    $str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
-	}
-	// $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
-	return $str;
+        $str = Gdn_Format::htmlFilter($html);
+        if ($convertNewlines) {
+            $str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
+        }
+        // $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
+        return $str;
     }
 
     /**
@@ -171,7 +171,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setMessage($message, $convertNewlines = false){
-	$this->message = $this->formatContent($message, $convertNewlines);
+        $this->message = $this->formatContent($message, $convertNewlines);
         return $this;
     }
 
@@ -187,7 +187,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setFooter($footer) {
-	$this->footer = $this->formatContent($footer);
+        $this->footer = $this->formatContent($footer);
         return $this;
     }
 
@@ -195,7 +195,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The hex color code of the text.
      */
     public function getTextColor() {
-	return $this->textColor;
+        return $this->textColor;
     }
 
     /**
@@ -203,8 +203,8 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setTextColor($color) {
-	$this->textColor = htmlspecialchars($color);
-	return $this;
+        $this->textColor = htmlspecialchars($color);
+        return $this;
     }
 
     /**
@@ -227,7 +227,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The hex color code of the container background.
      */
     public function getContainerBackgroundColor() {
-	return $this->containerBackgroundColor;
+        return $this->containerBackgroundColor;
     }
 
     /**
@@ -235,15 +235,15 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setContainerBackgroundColor($color) {
-	$this->containerBackgroundColor = htmlspecialchars($color);
-	return $this;
+        $this->containerBackgroundColor = htmlspecialchars($color);
+        return $this;
     }
 
     /**
      * @return string The default hex color code of the button text, must include the leading '#'.
      */
     public function getDefaultButtonTextColor() {
-	return $this->defaultButtonTextColor;
+        return $this->defaultButtonTextColor;
     }
 
     /**
@@ -254,7 +254,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setDefaultButtonTextColor($color) {
-	$this->defaultButtonTextColor = $color;
+        $this->defaultButtonTextColor = $color;
         return $this;
     }
 
@@ -262,7 +262,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return string The default hex color code of the button background, must include the leading '#'.
      */
     public function getDefaultButtonBackgroundColor() {
-	return $this->defaultButtonBackgroundColor;
+        return $this->defaultButtonBackgroundColor;
     }
 
     /**
@@ -273,22 +273,22 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setDefaultButtonBackgroundColor($color) {
-	$this->defaultButtonBackgroundColor = $color;
-	return $this;
+        $this->defaultButtonBackgroundColor = $color;
+        return $this;
     }
 
     /**
      * @return bool Whether to render in plaintext.
      */
     public function isPlaintext() {
-	return $this->plaintext;
+        return $this->plaintext;
     }
 
     /**
      * @param bool $plainText Whether to render in plaintext.
      */
     public function setPlaintext($plainText) {
-	$this->plaintext = $plainText;
+        $this->plaintext = $plainText;
     }
 
     /**
@@ -301,15 +301,15 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setButton($url, $text, $textColor = '', $backgroundColor = '') {
-	if (!$textColor) {
-	    $textColor = $this->defaultButtonTextColor;
-	}
+        if (!$textColor) {
+            $textColor = $this->defaultButtonTextColor;
+        }
         if (!$backgroundColor) {
             $backgroundColor = $this->defaultButtonBackgroundColor;
         }
         $this->button = array('url' => htmlspecialchars($url),
                               'text' => htmlspecialchars($this->formatContent($text)),
-			      'textColor' => htmlspecialchars($textColor),
+                              'textColor' => htmlspecialchars($textColor),
                               'backgroundColor' => htmlspecialchars($backgroundColor));
         return $this;
     }
@@ -380,19 +380,20 @@ class EmailTemplate extends Gdn_Pluggable {
     protected function plainTextEmail() {
         $email = array(
             'banner' => val('alt', $this->image).' '.val('link', $this->image),
-	    'title' => $this->getTitle(),
-	    'lead' => $this->getLead(),
-	    'message' => $this->getMessage(),
-	    'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
-	    'footer' => $this->getFooter()
-	);
-	// Don't repeat the title twice.
-	if (strpos($this->getMessage, $this->getTitle()) === 0) {
-	    unset($email['title']);
-	}
-	$email = implode('<br><br>', $email);
-        $email = Gdn_Format::plainText($email);
-        return $email;
+            'title' => $this->getTitle(),
+            'lead' => $this->getLead(),
+            'message' => $this->getMessage(),
+            'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
+            'footer' => $this->getFooter()
+        );
+
+	foreach($email as $key => $val) {
+	    if (!$val) {
+		unset($email[$key]);
+	    }
+        }
+
+	return Gdn_Format::plainText(Gdn_Format::text(implode("<br><br>", $email)));
     }
 
     /**

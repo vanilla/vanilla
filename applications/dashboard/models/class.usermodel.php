@@ -3143,17 +3143,17 @@ class UserModel extends Gdn_Model {
             // Send out a notification to the user
             $User = $this->getID($UserID);
             if ($User) {
-		$Email = new Gdn_Email();
+                $Email = new Gdn_Email();
                 $Email->subject(sprintf(t('[%1$s] Membership Approved'), c('Garden.Title')));
                 $Email->to($User->Email);
 
-		$message = sprintf(t('Hello %s!'), val('Name', $User)).' '.t('You have been approved for membership.');
-		$emailTemplate = $Email->getEmailTemplate()
-		    ->setMessage($message)
-		    ->setButton(ExternalUrl(SignInUrl()), t('Sign In Now'))
-		    ->setTitle(t('Membership Approved'));
+                $message = sprintf(t('Hello %s!'), val('Name', $User)).' '.t('You have been approved for membership.');
+                $emailTemplate = $Email->getEmailTemplate()
+                    ->setMessage($message)
+                    ->setButton(ExternalUrl(SignInUrl()), t('Sign In Now'))
+                    ->setTitle(t('Membership Approved'));
 
-		$Email->setEmailTemplate($emailTemplate);
+                $Email->setEmailTemplate($emailTemplate);
                 $Email->send();
 
                 // Report that the user was approved.
@@ -3790,20 +3790,20 @@ class UserModel extends Gdn_Model {
         $Email->subject(sprintf(t('[%s] Confirm Your Email Address'), $AppTitle));
         $Email->to($User['Email']);
 
-	$EmailUrlFormat = '{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+        $EmailUrlFormat = '{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
         $Data = array();
         $Data['EmailKey'] = $Code;
         $Data['User'] = arrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
 
-	$url = formatString($EmailUrlFormat, $Data);
-	$message = formatString(t('Hello {User.Name}!'), $Data).' '.t('You need to confirm your email address before you can continue.');
+        $url = formatString($EmailUrlFormat, $Data);
+        $message = formatString(t('Hello {User.Name}!'), $Data).' '.t('You need to confirm your email address before you can continue.');
 
-	$emailTemplate = $Email->getEmailTemplate()
-	    ->setTitle(t('Confirm Your Email Address'))
-	    ->setMessage($message)
-	    ->setButton($url, t('Confirm My Email Address'));
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setTitle(t('Confirm Your Email Address'))
+            ->setMessage($message)
+            ->setButton($url, t('Confirm My Email Address'));
 
-	$Email->setEmailTemplate($emailTemplate);
+        $Email->setEmailTemplate($emailTemplate);
         $Email->send();
     }
 
@@ -3829,7 +3829,7 @@ class UserModel extends Gdn_Model {
         $Email = new Gdn_Email();
         $Email->subject(sprintf(t('[%s] Welcome Aboard!'), $AppTitle));
         $Email->to($User->Email);
-	$emailTemplate = $Email->getEmailTemplate();
+        $emailTemplate = $Email->getEmailTemplate();
 
         $Data = array();
         $Data['User'] = arrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
@@ -3841,43 +3841,43 @@ class UserModel extends Gdn_Model {
 
         $Data['EmailKey'] = valr('Attributes.EmailKey', $User);
 
-	$message = '<p>'.formatString(t('Hello {User.Name}!'), $Data).' ';
+        $message = '<p>'.formatString(t('Hello {User.Name}!'), $Data).' ';
 
-	switch($RegisterType) {
-	    case 'Connect' :
-		$message .= formatString(t('You have successfully connected to {Title}.'), $Data).' '.
-		    t('Find your account information below.').'<br></p>'.
-		    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
-		    formatString(t('Connected With: {ProviderName}'), $Data).'</p>';
-		break;
-	    case 'Register' :
-		$message .= formatString(t('You have successfully registered for an account at {Title}.'), $Data).' '.
-		    t('Find your account information below.').'<br></p>'.
-		    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
-		    sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'</p>';
-		break;
-	    default :
-		$message .= sprintf(t('%s has created an account for you at %s.'), val('Name', $Sender), $AppTitle).' '.
-		    t('Find your account information below.').'<br></p>'.
-		    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
-		    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
-	}
+        switch($RegisterType) {
+            case 'Connect' :
+                $message .= formatString(t('You have successfully connected to {Title}.'), $Data).' '.
+                    t('Find your account information below.').'<br></p>'.
+                    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
+                    formatString(t('Connected With: {ProviderName}'), $Data).'</p>';
+                break;
+            case 'Register' :
+                $message .= formatString(t('You have successfully registered for an account at {Title}.'), $Data).' '.
+                    t('Find your account information below.').'<br></p>'.
+                    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
+                    sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'</p>';
+                break;
+            default :
+                $message .= sprintf(t('%s has created an account for you at %s.'), val('Name', $Sender), $AppTitle).' '.
+                    t('Find your account information below.').'<br></p>'.
+                    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
+                    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
+        }
 
         // Add the email confirmation key.
         if ($Data['EmailKey']) {
-	    $emailUrlFormat = '{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
-	    $url = formatString($emailUrlFormat, $Data);
-	    $message .= '<p>'.t('You need to confirm your email address before you can continue.').'</p>';
-	    $emailTemplate->setButton($url, t('Confirm My Email Address'));
-	} else {
-	    $emailTemplate->setButton(externalUrl('/'), t('Access the Site'));
-	}
+            $emailUrlFormat = '{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+            $url = formatString($emailUrlFormat, $Data);
+            $message .= '<p>'.t('You need to confirm your email address before you can continue.').'</p>';
+            $emailTemplate->setButton($url, t('Confirm My Email Address'));
+        } else {
+            $emailTemplate->setButton(externalUrl('/'), t('Access the Site'));
+        }
 
-	$emailTemplate->setMessage($message);
-	$emailTemplate->setTitle(t('Welcome Aboard!'));
+        $emailTemplate->setMessage($message);
+        $emailTemplate->setTitle(t('Welcome Aboard!'));
 
-	$Email->setEmailTemplate($emailTemplate);
-	$Email->send();
+        $Email->setEmailTemplate($emailTemplate);
+        $Email->send();
     }
 
     /**
@@ -3892,21 +3892,21 @@ class UserModel extends Gdn_Model {
         $Sender = $this->getID($Session->UserID);
         $User = $this->getID($UserID);
         $AppTitle = Gdn::config('Garden.Title');
-	$Email = new Gdn_Email();
-	$Email->subject('['.$AppTitle.'] '.t('Reset Password'));
-	$Email->to($User->Email);
-	$greeting = formatString(t('Hello %s!'), val('Name', $User));
-	$message = '<p>'.$greeting.' '.sprintf(t('%s has reset your password at %s.'), val('Name', $Sender), $AppTitle).' '.
-	    t('Find your account information below.').'<br></p>'.
-	    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
-	    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
+        $Email = new Gdn_Email();
+        $Email->subject('['.$AppTitle.'] '.t('Reset Password'));
+        $Email->to($User->Email);
+        $greeting = formatString(t('Hello %s!'), val('Name', $User));
+        $message = '<p>'.$greeting.' '.sprintf(t('%s has reset your password at %s.'), val('Name', $Sender), $AppTitle).' '.
+            t('Find your account information below.').'<br></p>'.
+            '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
+            sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
 
-	$emailTemplate = $Email->getEmailTemplate()
-	    ->setTitle(t('Reset Password'))
-	    ->setMessage($message)
-	    ->setButton(externalUrl('/'), t('Access the Site'));
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setTitle(t('Reset Password'))
+            ->setMessage($message)
+            ->setButton(externalUrl('/'), t('Access the Site'));
 
-	$Email->setEmailTemplate($emailTemplate);
+        $Email->setEmailTemplate($emailTemplate);
         $Email->send();
     }
 
@@ -4052,14 +4052,14 @@ class UserModel extends Gdn_Model {
             $this->saveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
             $this->saveAttribute($User->UserID, 'PasswordResetExpires', $PasswordResetExpires);
             $AppTitle = c('Garden.Title');
-	    $Email->subject('['.$AppTitle.'] '.t('Reset Your Password'));
+            $Email->subject('['.$AppTitle.'] '.t('Reset Your Password'));
             $Email->to($User->Email);
 
-	    $emailTemplate = $Email->getEmailTemplate()
-		->setTitle(t('Reset Your Password'))
-		->setMessage(t('We\'ve received a request to change your password.'))
-		->setButton(ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
-	    $Email->setEmailTemplate($emailTemplate);
+            $emailTemplate = $Email->getEmailTemplate()
+                ->setTitle(t('Reset Your Password'))
+		->setMessage(sprintf(t('We\'ve received a request to change your password.'), $AppTitle))
+                ->setButton(ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
+            $Email->setEmailTemplate($emailTemplate);
 
             $Email->send();
             $NoEmail = false;

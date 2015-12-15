@@ -39,7 +39,6 @@ class Gdn_Email extends Gdn_Pluggable {
 
     /**
      * Constructor.
-     * @param string $format The format of the email. Must be in the $supportedFormats array.
      */
     function __construct() {
         $this->PhpMailer = new PHPMailer();
@@ -51,14 +50,11 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->clear();
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
-	$this->resolveFormat();
         $this->emailTemplate = new EmailTemplate();
-	if ($this->format === 'html') {
-            $this->mimeType('text/html');
-	    $this->setDefaultEmailColors();
-	    $this->setDefaultEmailImage();
-        } else {
-            $this->emailTemplate->setPlaintext(true);
+	    $this->resolveFormat();
+        if ($this->format === 'html') {
+            $this->setDefaultEmailColors();
+            $this->setDefaultEmailImage();
         }
         parent::__construct();
     }
@@ -67,35 +63,49 @@ class Gdn_Email extends Gdn_Pluggable {
      * Sets the format property based on the passed argument if it exists, then the config variable and defaults to html.
      */
     protected function resolveFormat() {
-	if (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
-	    $this->format = strtolower($format);
-	} elseif (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
-            $this->format = strtolower(c('Garden.Email.Format'));
+        if (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
+	    $this->setFormat(c('Garden.Email.Format'));
         } else {
+	    $this->setFormat('html');
+	}
+    }
+
+    /**
+     * Sets the format property, the email mime type and the email template format property.
+     *
+     * @param string $format The format of the email. Must be in the $supportedFormats array.
+     */
+    public function setFormat($format) {
+	if (strtolower($format) === 'html') {
             $this->format = 'html';
+	    $this->mimeType('text/html');
+	    $this->emailTemplate->setPlaintext(false);
+	} else {
+	    $this->format = 'text';
+	    $this->mimeType('text/plain');
+	    $this->emailTemplate->setPlaintext(true);
         }
-	parent::__construct();
     }
 
     /**
      * Sets the email template default color properties based on config settings.
      */
     protected function setDefaultEmailColors() {
-	if ($textColor = c('Garden.EmailTemplate.TextColor')) {
-	    $this->emailTemplate->setTextColor($textColor);
+        if ($textColor = c('Garden.EmailTemplate.TextColor')) {
+            $this->emailTemplate->setTextColor($textColor);
         }
-	if ($backgroundColor = c('Garden.EmailTemplate.BackgroundColor')) {
-	    $this->emailTemplate->setBackgroundColor($backgroundColor);
-	}
-	if ($containerBackgroundColor = c('Garden.EmailTemplate.ContainerBackgroundColor')) {
-	    $this->emailTemplate->setContainerBackgroundColor($containerBackgroundColor);
+        if ($backgroundColor = c('Garden.EmailTemplate.BackgroundColor')) {
+            $this->emailTemplate->setBackgroundColor($backgroundColor);
+        }
+        if ($containerBackgroundColor = c('Garden.EmailTemplate.ContainerBackgroundColor')) {
+            $this->emailTemplate->setContainerBackgroundColor($containerBackgroundColor);
         }
         if ($buttonBackgroundColor = c('Garden.EmailTemplate.ButtonBackgroundColor')) {
             $this->emailTemplate->setDefaultButtonBackgroundColor($buttonBackgroundColor);
         }
-	if ($buttonTextColor = c('Garden.EmailTemplate.ButtonTextColor')) {
-	    $this->emailTemplate->setDefaultButtonTextColor($buttonTextColor);
-	}
+        if ($buttonTextColor = c('Garden.EmailTemplate.ButtonTextColor')) {
+            $this->emailTemplate->setDefaultButtonTextColor($buttonTextColor);
+        }
     }
 
     /**
@@ -266,7 +276,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @return Email
      */
     public function message($Message) {
-	$this->emailTemplate->setMessage($Message, true);
+        $this->emailTemplate->setMessage($Message, true);
     }
 
     public function formatMessage($message) {

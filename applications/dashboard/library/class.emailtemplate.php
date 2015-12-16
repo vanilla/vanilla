@@ -194,15 +194,15 @@ class EmailTemplate extends Gdn_Pluggable {
      * @return EmailTemplate $this The calling object.
      */
     public function setFooter($text, $textColor = '', $backgroundColor = '') {
-	if (!$textColor) {
-	    $textColor = $this->defaultButtonTextColor;
-	}
-	if (!$backgroundColor) {
-	    $backgroundColor = $this->defaultButtonBackgroundColor;
-	}
-	$this->footer = array('text' => htmlspecialchars($this->formatContent($text)),
-	    'textColor' => htmlspecialchars($textColor),
-	    'backgroundColor' => htmlspecialchars($backgroundColor));
+        if (!$textColor) {
+            $textColor = $this->defaultButtonTextColor;
+        }
+        if (!$backgroundColor) {
+            $backgroundColor = $this->defaultButtonBackgroundColor;
+        }
+        $this->footer = array('text' => htmlspecialchars($this->formatContent($text)),
+            'textColor' => htmlspecialchars($textColor),
+            'backgroundColor' => htmlspecialchars($backgroundColor));
         return $this;
     }
 
@@ -402,13 +402,13 @@ class EmailTemplate extends Gdn_Pluggable {
             'footer' => $this->getFooter()
         );
 
-	foreach($email as $key => $val) {
-	    if (!$val) {
-		unset($email[$key]);
-	    }
+        foreach($email as $key => $val) {
+            if (!$val) {
+                unset($email[$key]);
+            }
         }
 
-	return Gdn_Format::plainText(Gdn_Format::text(implode("<br><br>", $email)));
+        return Gdn_Format::plainText(Gdn_Format::text(implode("<br><br>", $email)));
     }
 
     /**

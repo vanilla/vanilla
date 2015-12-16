@@ -828,16 +828,16 @@ class ActivityModel extends Gdn_Model {
                 $Email->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $ActivityHeadline));
                 $Email->to($User);
 
-		$url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
-		$emailTemplate = $Email->getEmailTemplate()
-		    ->setButton($url, t('Check it out'))
-		    ->setTitle($ActivityHeadline);
+                $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
+                $emailTemplate = $Email->getEmailTemplate()
+                    ->setButton($url, t('Check it out'))
+                    ->setTitle($ActivityHeadline);
 
-		if ($message = val('Story', $Activity)) {
-		    $emailTemplate->setMessage($message, true);
-		}
+                if ($message = val('Story', $Activity)) {
+                    $emailTemplate->setMessage($message, true);
+                }
 
-		$Email->setEmailTemplate($emailTemplate);
+                $Email->setEmailTemplate($emailTemplate);
 
                 $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
                 $this->EventArguments = $Notification;
@@ -916,20 +916,20 @@ class ActivityModel extends Gdn_Model {
 
         // Build the email to send.
         $Email = new Gdn_Email();
-	$Email->subject(sprintf(t('[%1$s] %2$s'), c('Garden.Title'), Gdn_Format::plainText($Activity['Headline'])));
-	$Email->to($User);
+        $Email->subject(sprintf(t('[%1$s] %2$s'), c('Garden.Title'), Gdn_Format::plainText($Activity['Headline'])));
+        $Email->to($User);
 
-	$url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
+        $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
 
-	$emailTemplate = $Email->getEmailTemplate()
-	    ->setButton($url, t('Check it out'))
-	    ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setButton($url, t('Check it out'))
+            ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
-	if ($message = val('Story', $Activity)) {
-	    $emailTemplate->setMessage($message, true);
+        if ($message = val('Story', $Activity)) {
+            $emailTemplate->setMessage($message, true);
         }
 
-	$Email->setEmailTemplate($emailTemplate);
+        $Email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
         $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity);
@@ -1181,15 +1181,15 @@ class ActivityModel extends Gdn_Model {
                 $Email = new Gdn_Email();
                 $Email->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $ActivityHeadline));
                 $Email->to($User);
-		$url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
+                $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
 
-		$emailTemplate = $Email->getEmailTemplate()
-		    ->setButton($url, t('Check it out'))
-		    ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
-		if ($message = val('Story', $Activity)) {
-		    $emailTemplate->setMessage($message, true);
-		}
-		$Email->setEmailTemplate($emailTemplate);
+                $emailTemplate = $Email->getEmailTemplate()
+                    ->setButton($url, t('Check it out'))
+                    ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
+                if ($message = val('Story', $Activity)) {
+                    $emailTemplate->setMessage($message, true);
+                }
+                $Email->setEmailTemplate($emailTemplate);
 
                 if (!array_key_exists($User->UserID, $this->_NotificationQueue)) {
                     $this->_NotificationQueue[$User->UserID] = array();

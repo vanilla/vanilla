@@ -175,37 +175,37 @@
   <tr>
     <td class="container">
       <div class="content">
-	<table>
-	  <tr>
-	    <td>
-	      [[if $email.image]]
-		<div class="image-wrap center">
-		  [[if $email.image.link]]
-		    <a href="[[$email.image.link]]">
-		  [[/if]]
-		  [[if $email.image.source != '']]
-		    <img class="center" src="[[$email.image.source]]" alt="[[$email.image.alt]]">
-		  [[elseif $email.image.alt != '']]
-		    <h1 class="center">[[$email.image.alt]]</h1>
-		  [[/if]]
-		  [[if $email.image.link]]
-		    </a>
-		  [[/if]]
-		</div>
-		<hr />
-	      [[/if]]
-	      [[if $email.title]]<h1 class="center">[[$email.title]]</h1>[[/if]]
-	      [[if $email.lead]]<p class="lead center">[[$email.lead]]</p>[[/if]]
-	      <p class="message">[[$email.message]]</p>
-	      [[if $email.button]]
-		<div class="button-wrap center">
-		  <a href="[[$email.button.url]]" class="button">[[$email.button.text]]</a>
-		</div>
-	      [[/if]]
-	    </td>
-	  </tr>
-	</table>
-	<!-- content end below -->
+        <table>
+          <tr>
+            <td>
+              [[if $email.image]]
+                <div class="image-wrap center">
+                  [[if $email.image.link]]
+                    <a href="[[$email.image.link]]">
+                  [[/if]]
+                  [[if $email.image.source != '']]
+                    <img class="center" src="[[$email.image.source]]" alt="[[$email.image.alt]]">
+                  [[elseif $email.image.alt != '']]
+                    <h1 class="center">[[$email.image.alt]]</h1>
+                  [[/if]]
+                  [[if $email.image.link]]
+                    </a>
+                  [[/if]]
+                </div>
+                <hr />
+              [[/if]]
+              [[if $email.title]]<h1 class="center">[[$email.title]]</h1>[[/if]]
+              [[if $email.lead]]<p class="lead center">[[$email.lead]]</p>[[/if]]
+              <p class="message">[[$email.message]]</p>
+              [[if $email.button]]
+                <div class="button-wrap center">
+                  <a href="[[$email.button.url]]" class="button">[[$email.button.text]]</a>
+                </div>
+              [[/if]]
+            </td>
+          </tr>
+        </table>
+        <!-- content end below -->
       </div>
       <!-- container end below -->
     </td>
@@ -216,13 +216,13 @@
   <tr>
     <td class="container">
       <div class="content">
-	<table>
-	  <tr>
-	    <td>
-	      <div class="footer center">[[$email.footer.text]]</div>
-	    </td>
-	  </tr>
-	</table>
+        <table>
+          <tr>
+            <td>
+              <div class="footer center">[[$email.footer.text]]</div>
+            </td>
+          </tr>
+        </table>
       </div>
     </td>
   </tr>

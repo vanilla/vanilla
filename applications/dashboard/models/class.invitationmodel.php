@@ -185,14 +185,14 @@ class InvitationModel extends Gdn_Model {
             $Email->subject(sprintf(t('[%s] Invitation'), $AppTitle));
             $Email->to($Invitation->Email);
 
-	    $emailTemplate = $Email->getEmailTemplate();
-	    $message = t('Hello!').' '.sprintf(t('%s has invited you to join %s.'), $Invitation->SenderName, $AppTitle);
+            $emailTemplate = $Email->getEmailTemplate();
+            $message = t('Hello!').' '.sprintf(t('%s has invited you to join %s.'), $Invitation->SenderName, $AppTitle);
 
-	    $emailTemplate->setButton($RegistrationUrl, t('Join this Community Now'))
-		->setMessage($message)
-		->setTitle(sprintf(t('Join %s'), $AppTitle));
+            $emailTemplate->setButton($RegistrationUrl, t('Join this Community Now'))
+                ->setMessage($message)
+                ->setTitle(sprintf(t('Join %s'), $AppTitle));
 
-	    $Email->setEmailTemplate($emailTemplate);
+            $Email->setEmailTemplate($emailTemplate);
             $Email->send();
         }
     }

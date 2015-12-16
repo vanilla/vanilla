@@ -646,27 +646,27 @@ class SettingsController extends DashboardController {
      */
     public function emailStyles() {
         // Set default colors
-	if (!c('Garden.EmailTemplate.TextColor')) {
-	    saveToConfig('Garden.EmailTemplate.TextColor', EmailTemplate::DEFAULT_TEXT_COLOR, false);
-	}
-	if (!c('Garden.EmailTemplate.BackgroundColor')) {
-	    saveToConfig('Garden.EmailTemplate.BackgroundColor', EmailTemplate::DEFAULT_BACKGROUND_COLOR, false);
+        if (!c('Garden.EmailTemplate.TextColor')) {
+            saveToConfig('Garden.EmailTemplate.TextColor', EmailTemplate::DEFAULT_TEXT_COLOR, false);
         }
-	if (!c('Garden.EmailTemplate.ContainerBackgroundColor')) {
-	    saveToConfig('Garden.EmailTemplate.ContainerBackgroundColor', EmailTemplate::DEFAULT_CONTAINER_BACKGROUND_COLOR, false);
-	}
-	if (!c('Garden.EmailTemplate.ButtonTextColor')) {
-	    saveToConfig('Garden.EmailTemplate.ButtonTextColor', EmailTemplate::DEFAULT_BUTTON_TEXT_COLOR, false);
-	}
-	if (!c('Garden.EmailTemplate.ButtonBackgroundColor')) {
-	    saveToConfig('Garden.EmailTemplate.ButtonBackgroundColor', EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR, false);
-	}
+        if (!c('Garden.EmailTemplate.BackgroundColor')) {
+            saveToConfig('Garden.EmailTemplate.BackgroundColor', EmailTemplate::DEFAULT_BACKGROUND_COLOR, false);
+        }
+        if (!c('Garden.EmailTemplate.ContainerBackgroundColor')) {
+            saveToConfig('Garden.EmailTemplate.ContainerBackgroundColor', EmailTemplate::DEFAULT_CONTAINER_BACKGROUND_COLOR, false);
+        }
+        if (!c('Garden.EmailTemplate.ButtonTextColor')) {
+            saveToConfig('Garden.EmailTemplate.ButtonTextColor', EmailTemplate::DEFAULT_BUTTON_TEXT_COLOR, false);
+        }
+        if (!c('Garden.EmailTemplate.ButtonBackgroundColor')) {
+            saveToConfig('Garden.EmailTemplate.ButtonBackgroundColor', EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR, false);
+        }
 
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/settings/emailstyles');
         $this->addJsFile('email.js');
         // Get the current logo.
-	$image = c('Garden.EmailTemplate.Image');
+        $image = c('Garden.EmailTemplate.Image');
         if ($image) {
             $image = ltrim($image, '/');
             $this->setData('EmailImage', Gdn_UploadImage::url($image));
@@ -675,11 +675,10 @@ class SettingsController extends DashboardController {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-	    'Garden.EmailTemplate.TextColor',
-            'Garden.EmailTemplate.BackgroundColor',
-	    'Garden.EmailTemplate.ContainerBackgroundColor',
-	    'Garden.EmailTemplate.ButtonTextColor',
-	    'Garden.EmailTemplate.ButtonBackgroundColor'
+            'Garden.EmailTemplate.TextColor',
+            'Garden.EmailTemplate.BackgroundColor'            'Garden.EmailTemplate.ContainerBackgroundColor',
+            'Garden.EmailTemplate.ButtonTextColor',
+            'Garden.EmailTemplate.ButtonBackgroundColor'
         ));
         // Set the model on the form.
         $this->Form->setModel($configurationModel);
@@ -706,30 +705,30 @@ class SettingsController extends DashboardController {
      * @return Gdn_Email The email object with the test colors set.
      */
     public function getTestEmail($textColor = '', $backGroundColor = '', $containerBackgroundColor = '', $buttonTextColor = '', $buttonBackgroundColor = '') {
-	$emailer = new Gdn_Email();
-	$email = $emailer->getEmailTemplate();
-	if ($textColor) {
-	    $email->setTextColor($textColor);
-	}
-	if ($backGroundColor) {
-	    $email->setBackgroundColor($backGroundColor);
-	}
-	if ($backGroundColor) {
-	    $email->setContainerBackgroundColor($containerBackgroundColor);
-	}
-	if ($buttonTextColor) {
-	    $email->setDefaultButtonTextColor($buttonTextColor);
-	}
-	if ($buttonBackgroundColor) {
-	    $email->setDefaultButtonBackgroundColor($buttonBackgroundColor);
-	}
-	$message = t('Test Email Message');
+        $emailer = new Gdn_Email();
+        $email = $emailer->getEmailTemplate();
+        if ($textColor) {
+            $email->setTextColor($textColor);
+        }
+        if ($backGroundColor) {
+            $email->setBackgroundColor($backGroundColor);
+        }
+        if ($backGroundColor) {
+            $email->setContainerBackgroundColor($containerBackgroundColor);
+        }
+        if ($buttonTextColor) {
+            $email->setDefaultButtonTextColor($buttonTextColor);
+        }
+        if ($buttonBackgroundColor) {
+            $email->setDefaultButtonBackgroundColor($buttonBackgroundColor);
+        }
+        $message = t('Test Email Message');
 
-	$email->setMessage($message)
-	    ->setTitle(t('Test Email'))
-	    ->setButton(externalUrl('/'), t('Check it out'));
-	$emailer->setEmailTemplate($email);
-	return $emailer;
+        $email->setMessage($message)
+            ->setTitle(t('Test Email'))
+            ->setButton(externalUrl('/'), t('Check it out'));
+        $emailer->setEmailTemplate($email);
+        return $emailer;
     }
 
     /**
@@ -739,18 +738,18 @@ class SettingsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function emailPreview() {
-	$request = Gdn::request();
+        $request = Gdn::request();
 //        if (!$request->isAuthenticatedPostBack(true)) {
 //            throw new Exception('Requires POST', 405);
 //        }
 
-	$textColor = $request->post('textColor', '');
-	$backGroundColor = $request->post('backgroundColor', '');
-	$containerBackGroundColor = $request->post('containerBackgroundColor', '');
-	$buttonTextColor = $request->post('buttonTextColor', '');
-	$buttonBackgroundColor = $request->post('buttonBackgroundColor', '');
+        $textColor = $request->post('textColor', '');
+        $backGroundColor = $request->post('backgroundColor', '');
+        $containerBackGroundColor = $request->post('containerBackgroundColor', '');
+        $buttonTextColor = $request->post('buttonTextColor', '');
+        $buttonBackgroundColor = $request->post('buttonBackgroundColor', '');
 
-	echo $this->getTestEmail($textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
+        echo $this->getTestEmail($textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
     }
 
     /**
@@ -761,31 +760,31 @@ class SettingsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function emailTest() {
-	if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
-	    throw permissionException();
-	}
-	$this->addSideMenu('dashboard/settings/email');
-	$this->Form = new Gdn_Form();
-	$validation = new Gdn_Validation();
-	$configurationModel = new Gdn_ConfigurationModel($validation);
-	$this->Form->setModel($configurationModel);
-	if ($this->Form->authenticatedPostBack() !== false) {
-	    $addressList = $this->Form->getFormValue('EmailTestAddresses');
-	    $addresses = explode(',', $addressList);
-	    if (sizeof($addresses) > 10) {
-		$this->Form->addError(sprintf(t('Too many addresses! We\'ll send up to %s addresses at once.'), '10'));
-	    } else {
-		$emailer = $this->getTestEmail();
-		$emailer->to($addresses);
-		$emailer->subject(sprintf(t('Test email from %s'), c('Garden.Title')));
-		if ($emailer->send()) {
-		    $this->informMessage(t("The email has been sent."));
-		} else {
-		    $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
-		}
-	    }
-	}
-	$this->render();
+        if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
+            throw permissionException();
+        }
+        $this->addSideMenu('dashboard/settings/email');
+        $this->Form = new Gdn_Form();
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $this->Form->setModel($configurationModel);
+        if ($this->Form->authenticatedPostBack() !== false) {
+            $addressList = $this->Form->getFormValue('EmailTestAddresses');
+            $addresses = explode(',', $addressList);
+            if (sizeof($addresses) > 10) {
+                $this->Form->addError(sprintf(t('Too many addresses! We\'ll send up to %s addresses at once.'), '10'));
+            } else {
+                $emailer = $this->getTestEmail();
+                $emailer->to($addresses);
+                $emailer->subject(sprintf(t('Test email from %s'), c('Garden.Title')));
+                if ($emailer->send()) {
+                    $this->informMessage(t("The email has been sent."));
+                } else {
+                    $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
+                }
+            }
+        }
+        $this->render();
     }
 
     /**
@@ -818,7 +817,7 @@ class SettingsController extends DashboardController {
      * Remove the email image from config & delete it.
      */
     public function removeEmailImage() {
-	if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $image = c('Garden.EmailTemplate.Image', '');
             RemoveFromConfig('Garden.EmailTemplate.Image');
             $upload = new Gdn_Upload();
@@ -852,49 +851,49 @@ class SettingsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function emailImage() {
-	if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
-	    throw permissionException();
-	}
+        if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
+            throw permissionException();
+        }
         $this->addJsFile('email.js');
         $this->addSideMenu('dashboard/settings/email');
-	$image = c('Garden.EmailTemplate.Image');
-	$this->Form = new Gdn_Form();
-	$validation = new Gdn_Validation();
-	$configurationModel = new Gdn_ConfigurationModel($validation);
-	// Set the model on the form.
-	$this->Form->setModel($configurationModel);
-	if ($this->Form->authenticatedPostBack() !== false) {
-	    try {
-		$upload = new Gdn_UploadImage();
-		// Validate the upload
-		$tmpImage = $upload->validateUpload('EmailImage', false);
-		if ($tmpImage) {
-		    // Generate the target image name
-		    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
-		    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
-		    // Delete any previously uploaded images.
-		    if ($image) {
-			$upload->delete($image);
+        $image = c('Garden.EmailTemplate.Image');
+        $this->Form = new Gdn_Form();
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        // Set the model on the form.
+        $this->Form->setModel($configurationModel);
+        if ($this->Form->authenticatedPostBack() !== false) {
+            try {
+                $upload = new Gdn_UploadImage();
+                // Validate the upload
+                $tmpImage = $upload->validateUpload('EmailImage', false);
+                if ($tmpImage) {
+                    // Generate the target image name
+                    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+                    // Delete any previously uploaded images.
+                    if ($image) {
+                        $upload->delete($image);
                     }
-		    // Save the uploaded image
-		    $parts = $upload->saveImageAs(
-			$tmpImage,
-			$imageBaseName,
-			c('Garden.EmailTemplate.ImageMaxWidth', 400),
-			c('Garden.EmailTemplate.ImageMaxHeight', 300)
-		    );
+                    // Save the uploaded image
+                    $parts = $upload->saveImageAs(
+                        $tmpImage,
+                        $imageBaseName,
+                        c('Garden.EmailTemplate.ImageMaxWidth', 400),
+                        c('Garden.EmailTemplate.ImageMaxHeight', 300)
+                    );
 
-		    $imageBaseName = $parts['SaveName'];
-		    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
-		    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
-		} else {
-		    $this->Form->addError(t('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png'));
+                    $imageBaseName = $parts['SaveName'];
+                    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
+                    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
+                } else {
+                    $this->Form->addError(t('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png'));
                 }
-	    } catch (Exception $ex) {
-		$this->Form->addError($ex);
+            } catch (Exception $ex) {
+                $this->Form->addError($ex);
             }
         }
-	$this->render();
+        $this->render();
     }
 
     /**
@@ -1826,10 +1825,10 @@ class SettingsController extends DashboardController {
             if ($this->Form->errorCount() == 0) {
                 $Email = new Gdn_Email();
                 $Email->subject(t('Check out my new community!'));
-		$emailTemplate = $Email->getEmailTemplate();
-		$emailTemplate->setMessage($Message, true)
-		    ->setButton(externalUrl('/'), t('Check it out'));
-		$Email->setEmailTemplate($emailTemplate);
+                $emailTemplate = $Email->getEmailTemplate();
+                $emailTemplate->setMessage($Message, true)
+                    ->setButton(externalUrl('/'), t('Check it out'));
+                $Email->setEmailTemplate($emailTemplate);
                 foreach ($Recipients as $Recipient) {
                     if (trim($Recipient) != '') {
                         $Email->to($Recipient);

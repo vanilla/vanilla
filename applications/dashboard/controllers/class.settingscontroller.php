@@ -676,7 +676,8 @@ class SettingsController extends DashboardController {
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
             'Garden.EmailTemplate.TextColor',
-            'Garden.EmailTemplate.BackgroundColor'            'Garden.EmailTemplate.ContainerBackgroundColor',
+            'Garden.EmailTemplate.BackgroundColor',
+            'Garden.EmailTemplate.ContainerBackgroundColor',
             'Garden.EmailTemplate.ButtonTextColor',
             'Garden.EmailTemplate.ButtonBackgroundColor'
         ));

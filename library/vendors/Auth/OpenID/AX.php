@@ -312,7 +312,7 @@ class Auth_OpenID_AX_FetchRequest extends Auth_OpenID_AX_Message {
      */
     function getExtensionArgs()
     {
-        $aliases =& new Auth_OpenID_NamespaceMap();
+        $aliases = new Auth_OpenID_NamespaceMap();
 
         $required = array();
         $if_available = array();

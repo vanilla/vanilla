@@ -1248,6 +1248,7 @@ EOT;
 
         $RegistrationMethod = $this->_registrationView();
         $this->View = $RegistrationMethod;
+        $this->setData('Method', stringBeginsWith($RegistrationMethod, 'Register', false, true));
         $this->$RegistrationMethod($InvitationCode);
     }
 
@@ -1298,6 +1299,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
                 } else {
@@ -1361,6 +1363,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
                     $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
@@ -1434,13 +1437,14 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
                     $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
                     return;
                 } elseif (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
-                    if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                    if (!in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL, DELIVERY_TYPE_DATA])) {
                         $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
                     }
 
@@ -1544,7 +1548,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values, array('Method' => 'Invitation'));
-
+                $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
                 } else {

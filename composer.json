@@ -34,5 +34,13 @@
 			"library/core/functions.general.php",
 			"library/core/functions.compatibility.php"
 		]
+	},
+  	"require-dev": {
+		"vanilla/garden-http": "~1.0"
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"VanillaTests\\": "tests"
+		}
 	}
 }

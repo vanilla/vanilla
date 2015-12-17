@@ -1,7 +1,7 @@
 # We're excluding the legacy files in the linting, since admin only existed in css.
 # Good practices going forward, though.
 
-exclude: 'dashboard.scss'
+exclude: 'admin.scss'
 
 # List of gem names to load custom linters from (make sure they are already
 # installed)

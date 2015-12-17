@@ -33,4 +33,4 @@ install:
   - tests/travis/nginx/install-nginx.sh
 
 script:
-  - tests/run-tests.php
+  - tests/run-tests.sh

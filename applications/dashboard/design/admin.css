@@ -22,15 +22,16 @@ Welcome to the Admin CSS File! Some things you should know:
    + Themes
    + Footer
 */
+/* line 25, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Buttons-Confirm {
-    text-align: center;
-}
+  text-align: center; }
 
+/* line 29, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Buttons-Confirm .Button {
-    min-width: 65px;
-}
+  min-width: 65px; }
 
 /* ================================================================ Reset CSS */
+/* line 34, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -39,1910 +40,1849 @@ small, strike, strong, sub, sup, tt, var,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    font-weight: inherit;
-    font-style: inherit;
-    font-size: 100%;
-    font-family: inherit;
-    vertical-align: baseline;
-}
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline; }
 
 /* remember to define focus styles! */
+/* line 54, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 :focus {
-    outline: 0;
-}
+  outline: 0; }
 
+/* line 58, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body {
-    line-height: 1;
-    color: black;
-    background: white;
-}
+  line-height: 1;
+  color: black;
+  background: white; }
 
+/* line 64, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ol, ul {
-    list-style: none;
-}
+  list-style: none; }
 
 /* tables still need 'cellspacing="0"' in the markup */
+/* line 69, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table {
-    border-collapse: separate;
-    border-spacing: 0;
-}
+  border-collapse: separate;
+  border-spacing: 0; }
 
+/* line 74, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 caption, th, td {
-    text-align: left;
-    font-weight: normal;
-}
+  text-align: left;
+  font-weight: normal; }
 
+/* line 79, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 blockquote:before, blockquote:after,
 q:before, q:after {
-    content: "";
-}
+  content: ""; }
 
+/* line 84, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 blockquote, q {
-    quotes: "" "";
-}
+  quotes: "" ""; }
 
 /* ============================================== General Styles & Typography */
+/* line 89, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body {
-    color: #000;
-    font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
-    font-size: 75%;
-    line-height: 1.7;
-    margin: 0;
-    padding: 0;
-    font-size: small;
-    background: #dbf3fc;
-}
+  color: #000;
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+  font-size: 75%;
+  font-size: small;
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+  background: #dbf3fc; }
 
+/* line 100, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Body {
-    background: #fff;
-    float: left;
-    width: 100%;
-    zoom: 1; /* hasLayout for IE6/7 */
-}
+  background: #fff;
+  float: left;
+  width: 100%;
+  zoom: 1;
+  /* hasLayout for IE6/7 */ }
 
+/* line 107, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Body:after {
-    /* clearfix */
-    visibility: hidden;
-    display: block;
-    content: "";
-    clear: both;
-    height: 0;
-}
+  /* clearfix */
+  visibility: hidden;
+  display: block;
+  content: "";
+  clear: both;
+  height: 0; }
 
+/* line 116, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content {
-    padding: 0 0 20px;
-    margin: 0 0 0 200px;
-    border-left: 1px solid #82bddd;
-}
+  padding: 0 0 20px;
+  margin: 0 0 0 200px;
+  border-left: 1px solid #82bddd; }
 
+/* line 122, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Hidden {
-    display: none;
-}
+  display: none; }
 
+/* line 126, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .nowrap {
-    white-space: nowrap;
-}
+  white-space: nowrap; }
 
+/* line 130, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Center {
-    text-align: center;
-}
+  text-align: center; }
 
+/* line 134, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Right {
-    text-align: right;
-}
+  text-align: right; }
 
+/* line 138, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Wrap {
-    margin: 20px;
-}
+  margin: 20px; }
 
+/* line 142, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 h1, h2, h3, h4, h5, h6 {
-    color: #000;
-    font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
-    font-weight: normal;
-    margin: 0;
-}
+  color: #000;
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+  font-weight: normal;
+  margin: 0; }
 
+/* line 149, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 hr {
-    border: none;
-    border-top: solid 1px #A5D0E7;
-}
+  border: none;
+  border-top: solid 1px #A5D0E7; }
 
+/* line 154, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
-    font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
-}
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif; }
 
+/* line 158, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content h1,
 #Content h3 {
-    text-shadow: 0 1px 0 #fff;
-    color: #222;
-    background: #dbf3fc;
-    border-top: 1px solid #8bc1de;
-    border-bottom: 1px solid #8bc1de;
-    padding: 10px 20px;
-    font-size: 14px;
-    margin: 0;
-}
+  text-shadow: 0 1px 0 #fff;
+  color: #222;
+  background: #dbf3fc;
+  border-top: 1px solid #8bc1de;
+  border-bottom: 1px solid #8bc1de;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin: 0; }
 
+/* line 170, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content h1 a {
-    text-shadow: none;
-    font-size: 12px;
-    margin-left: 20px;
-}
+  text-shadow: none;
+  font-size: 12px;
+  margin-left: 20px; }
 
+/* line 176, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content h3 {
-    border-top: 1px solid #8bc1de;
-}
+  border-top: 1px solid #8bc1de; }
 
+/* line 180, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content h4 {
-    padding: 20px 20px 0;
-}
+  padding: 20px 20px 0; }
 
+/* line 184, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content table h4 {
-    padding: 0;
-}
+  padding: 0; }
 
+/* line 188, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 p {
-    margin: .5em 0;
-    line-height: 1.4em;
-}
+  margin: .5em 0;
+  line-height: 1.4em; }
 
+/* line 193, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .P {
-    margin: 5px 0;
-}
+  margin: 5px 0; }
 
+/* line 197, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 small {
-    font-size: 12px;
-    color: #555;
-}
+  font-size: 12px;
+  color: #555; }
 
+/* line 202, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 code {
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    background: #ff9;
-    padding: 4px;
-    white-space: pre;
-    font-family: monospace;
-    overflow: auto;
-    box-shadow: 0px 0px 1px #999;
-    -moz-box-shadow: 0px 0px 1px #999;
-    -webkit-box-shadow: 0px 0px 1px #999;
-}
+  border-radius: 2px;
+  background: #ff9;
+  padding: 4px;
+  white-space: pre;
+  font-family: monospace;
+  overflow: auto;
+  box-shadow: 0 0 1px #999; }
 
+/* line 212, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 pre {
-    background: #F0F0F0;
-    border: 1px solid #C0C0C0;
-    color: #333;
-    font-family: 'Inconsolata', Courier, monospace;
-    font-size: 0.8em;
-    line-height: 1.5em;
-    margin: 2em 0;
-    overflow: auto;
-    padding: 0.5em;
-}
+  background: #F0F0F0;
+  border: 1px solid #C0C0C0;
+  color: #333;
+  font-family: 'Inconsolata', Courier, monospace;
+  font-size: 0.8em;
+  line-height: 1.5em;
+  margin: 2em 0;
+  overflow: auto;
+  padding: 0.5em; }
 
+/* line 224, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 h1, h2 {
-    font-size: 140%;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-shadow: #fff 0 1px 0;
-}
+  font-size: 140%;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: #fff 0 1px 0; }
 
+/* line 231, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 h3 {
-    font-size: 120%;
-}
+  font-size: 120%; }
 
+/* line 235, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 h4 {
-    font-size: 110%;
-    font-weight: bold;
-}
+  font-size: 110%;
+  font-weight: bold; }
 
+/* line 240, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 h5 {
-    font-size: 110%;
-}
+  font-size: 110%; }
 
+/* line 244, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Arrow {
-    font-size: 18px;
-}
+  font-size: 18px; }
 
+/* line 248, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 a {
-    text-decoration: none;
-    color: #2786c2;
-}
+  text-decoration: none;
+  color: #2786c2; }
 
+/* line 253, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 a:hover {
-    text-decoration: none;
-    color: #ff0084;
-}
+  text-decoration: none;
+  color: #ff0084; }
 
+/* line 258, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.DateBox,
 input.InputBox,
 input.SmallInput,
 textarea.TextBox {
-    font-family: arial;
-    color: #444;
-    font-size: 16px;
-    padding: 3px;
-    margin: 0;
-    width: 250px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-}
+  font-family: arial;
+  color: #444;
+  font-size: 16px;
+  padding: 3px;
+  margin: 0;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 4px; }
 
+/* line 272, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .color-picker.input-group {
-    position: relative;
-    width: 250px;
-}
+  position: relative;
+  width: 250px; }
 
 /* Hide the html color input */
+/* line 278, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .color-picker-color {
-    position: absolute;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    padding: 0;
-}
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  padding: 0; }
 
+/* line 286, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .color-picker-preview {
-    position: absolute;
-    right: -7px;
-    top: 1px;
-    width: 40px;
-    height: 27px;
-    background: #000;
-    border: 1px solid transparent;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    cursor: pointer;
-}
+  position: absolute;
+  right: -7px;
+  top: 1px;
+  width: 40px;
+  height: 27px;
+  background: #000;
+  border: 1px solid transparent;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  cursor: pointer; }
 
+/* line 299, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 textarea.TextBox {
-    font-size: 14px;
-    width: 600px;
-    height: 100px;
-    min-height: 100px;
-    max-height: 500px;
-}
+  font-size: 14px;
+  width: 600px;
+  height: 100px;
+  min-height: 100px;
+  max-height: 500px; }
 
+/* line 307, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.WideInput {
-    width: 500px;
-}
+  width: 500px; }
 
+/* line 311, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Popup textarea.TextBox {
-    width: 465px;
-}
+  width: 465px; }
 
+/* line 315, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .TextBoxWrapper {
-    width: auto;
-    padding-right: 8px;
-}
+  width: auto;
+  padding-right: 8px; }
 
+/* line 320, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
-    width: 100%;
-}
+  width: 100%; }
 
+/* line 325, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.SmallInput,
 input.InputBox {
-    font-size: 15px;
-    padding: 6px 3px;
-}
+  font-size: 15px;
+  padding: 6px 3px; }
 
+/* line 331, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.SmallInput:focus,
 input.InputBox:focus,
 textarea.TextBox:focus {
-    background: #ffd;
-    color: #333;
-    border: 1px solid #aaa;
-}
+  background: #ffd;
+  color: #333;
+  border: 1px solid #aaa; }
 
+/* line 339, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.BigInput {
-    width: 100%;
-    max-width: 600px;
-}
+  width: 100%;
+  max-width: 600px; }
 
+/* line 344, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 textarea.TextBox {
-    line-height: 128%;
-}
+  line-height: 128%; }
 
+/* line 348, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .textarea-autosize {
-    transition: height 0.1s ease;
-    resize: none !important;
-}
+  -webkit-transition: height 0.1s ease;
+          transition: height 0.1s ease;
+  resize: none !important; }
 
+/* line 353, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 select {
-    font-family: arial;
-    font-size: 14px;
-    margin: 0;
-    padding: 3px;
-}
+  font-family: arial;
+  font-size: 14px;
+  margin: 0;
+  padding: 3px; }
 
+/* line 360, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 select.Day,
 select.Year {
-    margin-left: 4px;
-}
+  margin-left: 4px; }
 
+/* line 365, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SmallButton,
 .Button {
-    margin: 0;
-    border-radius: .5ex;
-    -moz-border-radius: .5ex;
-    -webkit-border-radius: .5ex;
-    background: #3fbcf3;
-    background: -webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
-    background: -moz-linear-gradient(top, #aee7fe, #3fbcf3);
-    -pie-background: linear-gradient(top, #aee7fe, #3fbcf3);
-    background: linear-gradient(top, #aee7fe, #3fbcf3);
-    border: 1px solid #0F7FE6;
-    color: #003673;
-    cursor: pointer;
-    font-size: 12px;
-    padding: 6px 10px;
-    text-decoration: none;
-    text-shadow: 0 1px 0 #B7F5FD;
-    font-weight: normal;
-    display: inline-block;
-}
+  margin: 0;
+  border-radius: .5ex;
+  background: #3fbcf3;
+  background: -webkit-linear-gradient(top, #aee7fe, #3fbcf3);
+  background: linear-gradient(top, #aee7fe, #3fbcf3);
+  border: 1px solid #0F7FE6;
+  color: #003673;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 6px 10px;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #B7F5FD;
+  font-weight: normal;
+  display: inline-block; }
 
+/* line 382, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Button {
-    box-shadow: 0px 0px 2px #999;
-    -moz-box-shadow: 0px 0px 2px #999;
-    -webkit-box-shadow: 0px 0px 2px #999;
-    font-weight: bold;
-    margin: 0 0 0 20px;
-}
+  box-shadow: 0 0 2px #999;
+  font-weight: bold;
+  margin: 0 0 0 20px; }
 
+/* line 388, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 a.Button {
-    padding: 5px 7px;
-}
+  padding: 5px 7px; }
 
+/* line 392, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SmallButton {
-    margin-right: 10px;
-    padding: 4px;
-    font-size: 11px;
-    display: inline-block;
-    text-align: center;
-    line-height: 13px;
-}
+  margin-right: 10px;
+  padding: 4px;
+  font-size: 11px;
+  display: inline-block;
+  text-align: center;
+  line-height: 13px; }
 
+/* line 401, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SmallButton:hover,
 .Button:hover {
-    border-color: #0B64C6;
-    color: #001F44;
-    text-shadow: 0 1px 0 #EEFFFF;
-}
+  border-color: #0B64C6;
+  color: #001F44;
+  text-shadow: 0 1px 0 #EEFFFF; }
 
+/* line 408, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SmallButton:hover {
-    box-shadow: 0 0 2px #999999;
-    -moz-box-shadow: 0 0 2px #999999;
-    -webkit-box-shadow: 0 0 2px #999999;
-}
+  box-shadow: 0 0 2px #999999; }
 
+/* line 412, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Button.Active,
 .Button:active,
 .SmallButton.Active,
 .SmallButton:active {
-    background: #003673;
-    border-color: #000;
-    color: #B7F5FD;
-    text-shadow: 0 1px 0 #001D3F;
-}
+  background: #003673;
+  border-color: #000;
+  color: #B7F5FD;
+  text-shadow: 0 1px 0 #001D3F; }
 
+/* line 422, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ButtonList .SmallButton {
-    margin: 0;
-    border-collapse: collapse;
-    border-radius: 0;
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-left-width: 0;
-    min-width: 40px;
-}
+  margin: 0;
+  border-collapse: collapse;
+  border-radius: 0;
+  border-left-width: 0;
+  min-width: 40px; }
 
+/* line 430, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .InputButtons {
-    margin-top: 8px;
-}
+  margin-top: 8px; }
 
+/* line 434, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ButtonList {
-    margin-right: 20px;
-}
+  margin-right: 20px; }
 
+/* line 438, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ButtonList :first-child {
-    border-radius: .5ex 0 0 .5ex;
-    border-left-width: 1px;
-}
+  border-radius: .5ex 0 0 .5ex;
+  border-left-width: 1px; }
 
+/* line 443, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ButtonList :last-child {
-    border-radius: 0 .5ex .5ex 0;
-}
+  border-radius: 0 .5ex .5ex 0; }
 
+/* line 447, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CancelButton {
-    border-color: #919191;
-    background: -webkit-gradient(linear, center bottom, center top, from(#D1D1D1), to(#F1F1F1));
-    background: -moz-linear-gradient(top, #F1F1F1, #D1D1D1);
-    -pie-background: linear-gradient(top, #F1F1F1, #D1D1D1);
-    background: linear-gradient(top, #F1F1F1, #D1D1D1);
-    color: #414141;
-    text-shadow: 0px 1px 0px #E1E1E1;
-}
+  border-color: #919191;
+  background: -webkit-linear-gradient(top, #F1F1F1, #D1D1D1);
+  background: linear-gradient(top, #F1F1F1, #D1D1D1);
+  color: #414141;
+  text-shadow: 0 1px 0 #E1E1E1; }
 
+/* line 454, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CancelButton:hover {
-    border-color: #616161;
-    color: #212121;
-}
+  border-color: #616161;
+  color: #212121; }
 
+/* line 459, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Loading {
-    height: 100px;
-    padding: 0 20px;
-    background: url('images/progress.gif') center center no-repeat;
-}
+  height: 100px;
+  padding: 0 20px;
+  background: url("images/progress.gif") center center no-repeat; }
 
+/* line 465, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .AfterButtonLoading {
-    background: url('images/progress.gif') center center no-repeat;
-    padding: 0 20px;
-}
+  background: url("images/progress.gif") center center no-repeat;
+  padding: 0 20px; }
 
+/* line 470, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Progress {
-    padding: 10px 40px 10px 0;
-    background: url('images/progress.gif') center center no-repeat;
-}
+  padding: 10px 40px 10px 0;
+  background: url("images/progress.gif") center center no-repeat; }
 
+/* line 475, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .TinyProgress {
-    padding: 10px 40px 10px 0 !important;
-    background: url('images/progress_sm.gif') center center no-repeat;
-    display: inline !Important;
-}
+  padding: 10px 40px 10px 0 !important;
+  background: url("images/progress_sm.gif") center center no-repeat;
+  display: inline !important; }
 
+/* line 481, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .InProgress {
-    color: transparent !Important;
-    background: url('images/progress_sm.gif') center center no-repeat !important;
-    border-color: transparent !important;
-    -moz-box-shadow: none !important;
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
-    color: transparent !important;
-    text-shadow: none !important;
-    cursor: progress;
-    pointer-events: none;
-}
+  color: transparent !important;
+  background: url("images/progress_sm.gif") center center no-repeat !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  text-shadow: none !important;
+  cursor: progress;
+  pointer-events: none; }
 
+/* line 492, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Padded {
-    font-size: 14px;
-    position: relative;
-    margin: 10px;
-    padding: 10px;
-    line-height: 1.4;
-}
+  font-size: 14px;
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  line-height: 1.4; }
 
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
   that it renders in a div with this DismissMessage class. */
+/* line 504, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Info,
 .DismissMessage {
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    font-size: 14px;
-    position: relative;
-    margin: 10px;
-    padding: 10px;
-    line-height: 1.4;
-}
+  border-radius: 2px;
+  font-size: 14px;
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  line-height: 1.4; }
 
+/* line 514, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Info,
 #Panel .DismissMessage {
-    margin: 0;
-    border-width: 1px 0 1px 0;
-    font-size: 13px;
-}
+  margin: 0;
+  border-width: 1px 0 1px 0;
+  font-size: 13px; }
 
+/* line 521, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.DismissMessage p {
-    margin: 2px 0;
-    padding: 4px 0 0;
-}
+  margin: 2px 0;
+  padding: 4px 0 0; }
 
+/* line 526, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.DismissMessage a.Dismiss {
-    position: absolute;
-    top: 3px;
-    right: 5px;
-    font-family: arial;
-    font-size: 22px;
-    font-weight: bold;
-    line-height: 1;
-    color: #999;
-}
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: #999; }
 
+/* line 537, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.DismissMessage a.Dismiss {
-    top: 1px;
-    right: 3px;
-}
+  top: 1px;
+  right: 3px; }
 
+/* line 542, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.DismissMessage a.Dismiss:hover {
-    color: #ff0084;
-}
+  color: #ff0084; }
 
+/* line 546, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Message {
-    padding: 10px;
-}
+  padding: 10px; }
 
+/* line 550, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CasualMessage {
-    background: #CFECFF;
-    border: 1px solid #ABDAFB;
-    color: #1E79A7;
-}
+  background: #CFECFF;
+  border: 1px solid #ABDAFB;
+  color: #1E79A7; }
 
+/* line 556, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .InfoMessage {
-    background: #F6F6F6;
-    border: 1px solid #ddd;
-}
+  background: #F6F6F6;
+  border: 1px solid #ddd; }
 
+/* line 561, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .AlertMessage {
-    background: #fff8ce;
-    border: 1px solid #DEDDAF;
-}
+  background: #fff8ce;
+  border: 1px solid #DEDDAF; }
 
+/* line 566, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .WarningMessage {
-    background: #ffebe9;
-    border: 1px solid #FFCCC9;
-}
+  background: #ffebe9;
+  border: 1px solid #FFCCC9; }
 
+/* line 571, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box {
-    border: 1px solid #a5d0e7;
-    background: #d3f0ff;
-}
+  border: 1px solid #a5d0e7;
+  background: #d3f0ff; }
 
+/* line 576, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Green {
-    color: #24AA09;
-    background-color: #dfffcb;
-    border: 1px solid #AAF091;
-    padding: 5px;
-}
+  color: #24AA09;
+  background-color: #dfffcb;
+  border: 1px solid #AAF091;
+  padding: 5px; }
 
+/* line 583, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Warning {
-    background: #ff9;
-    padding: 10px 20px;
-}
+  background: #ff9;
+  padding: 10px 20px; }
 
+/* line 588, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 strong {
-    font-weight: bold;
-}
+  font-weight: bold; }
 
+/* line 592, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Alert {
-    background: #d00;
-    border: 1px solid #b00;
-    color: #fff;
-    padding: 3px 6px;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    text-shadow: 1px 1px 1px #444;
-}
+  background: #d00;
+  border: 1px solid #b00;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 3px;
+  text-shadow: 1px 1px 1px #444; }
 
+/* line 601, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Alert a {
-    color: #fff;
-}
+  color: #fff; }
 
+/* line 605, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Alert a:hover {
-    text-decoration: underline;
-}
+  text-decoration: underline; }
 
+/* line 609, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel .Alert {
-    font-size: 10px;
-    padding: 0px 5px;
-    /*   -moz-border-radius: 8px;
-       -webkit-border-radius: 8px;*/
-}
+  font-size: 10px;
+  padding: 0 5px; }
 
+/* line 614, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.EmptyInfo {
-    margin: 10px 0;
-}
+  margin: 10px 0; }
 
+/* line 618, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .HoverHelp {
-    position: relative;
-}
+  position: relative; }
 
+/* line 622, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .HoverHelp .Help {
-    display: none;
-    min-width: 200px;
-    background: #333;
-    color: #fff;
-    font-weight: normal;
-    font-size: 11px;
-    position: absolute;
-    left: -5px;
-    bottom: 20px;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    padding: 6px;
-    box-shadow: 0px 0px 2px #777;
-    -moz-box-shadow: 0px 0px 2px #777;
-    -webkit-box-shadow: 0px 0px 2px #777;
-}
+  display: none;
+  min-width: 200px;
+  background: #333;
+  color: #fff;
+  font-weight: normal;
+  font-size: 11px;
+  position: absolute;
+  left: -5px;
+  bottom: 20px;
+  border-radius: 2px;
+  padding: 6px;
+  box-shadow: 0 0 2px #777; }
 
 /* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
+/* line 638, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .MorePager {
-    list-style: none;
-    margin: 1px 0 0;
-    padding: 3px 6px;
-    text-align: right;
-}
+  list-style: none;
+  margin: 1px 0 0;
+  padding: 3px 6px;
+  text-align: right; }
 
+/* line 645, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .MorePager a {
-    font-size: 13px;
-    font-weight: bold;
-    text-align: right;
-}
+  font-size: 13px;
+  font-weight: bold;
+  text-align: right; }
 
+/* line 651, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .MorePager a:hover {
-    color: #2786c2 !important;
-    text-decoration: underline;
-}
+  color: #2786c2 !important;
+  text-decoration: underline; }
 
+/* line 656, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .MorePager a.Loading:hover {
-    text-decoration: none;
-}
+  text-decoration: none; }
 
+/* line 660, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #PagerLess {
-    border-top-right-radius: 2px;
-    border-top-left-radius: 2px;
-    -moz-border-radius-topright: 2px;
-    -moz-border-radius-topleft: 2px;
-    -webkit-border-top-right-radius: 2px;
-    -webkit-border-top-left-radius: 2px;
-    margin-bottom: 1px;
-}
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
+  margin-bottom: 1px; }
 
+/* line 666, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 tr#PagerMore td {
-    border: 0;
-    text-align: right;
-    border-bottom: 1px solid #aedefc;
-}
+  border: 0;
+  text-align: right;
+  border-bottom: 1px solid #aedefc; }
 
+/* line 672, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #PagerMore {
-    margin-bottom: 1px;
-}
+  margin-bottom: 1px; }
 
 /* Note: Tabs are used on administrative dashboard screens to help organize
   information being managed on screen. For example: applications and plugins.
 */
+/* line 679, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FilterMenu {
-    color: #aaa;
-    padding: 0 0 10px;
-    padding: 0 20px 10px;
-    position: relative;
-    top: -10px;
-}
+  color: #aaa;
+  padding: 0 0 10px;
+  padding: 0 20px 10px;
+  position: relative;
+  top: -10px; }
 
+/* line 687, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FilterMenu strong {
-    font-weight: bold;
-    color: #111;
-}
+  font-weight: bold;
+  color: #111; }
 
+/* line 692, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FilterMenu span {
-    color: #999;
-    padding: 0 4px;
-}
+  color: #999;
+  padding: 0 4px; }
 
+/* line 697, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Tabs {
-    display: block;
-    padding: 0 10px;
-    margin: 0;
-}
+  display: block;
+  padding: 0 10px;
+  margin: 0; }
 
+/* line 703, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Tabs li {
-    display: inline;
-    margin: 0;
-}
+  display: inline;
+  margin: 0; }
 
+/* line 708, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Tabs li a,
 div.Tabs li a:link,
 div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
-    position: relative;
-    top: 4px;
-    margin: 0;
-    border: 1px solid #8bc1de;
-    border-bottom: 0;
-    border-radius: 3px 3px 0 0;
-    -moz-border-radius: 3px 3px 0 0;
-    -webkit-border-radius: 3px 3px 0 0;
-    background: #bbe2f7;
-    display: inline;
-    font-weight: bold;
-    color: #1e79a7;
-    text-decoration: none;
-    padding: 5px 10px;
-    line-height: 2.6;
-}
+  position: relative;
+  top: 4px;
+  margin: 0;
+  border: 1px solid #8bc1de;
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background: #bbe2f7;
+  display: inline;
+  font-weight: bold;
+  color: #1e79a7;
+  text-decoration: none;
+  padding: 5px 10px;
+  line-height: 2.6; }
 
+/* line 728, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Tabs li a:hover {
-    background: #f3fcff;
-}
+  background: #f3fcff; }
 
+/* line 732, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Tabs li.Active a {
-    background: #DBF3FC;
-    border-bottom: 1px solid #DBF3FC;
-    color: #222;
-}
+  background: #DBF3FC;
+  border-bottom: 1px solid #DBF3FC;
+  color: #222; }
 
+/* line 738, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Tabs li a span {
-    line-height: 1;
-    font-size: 80%;
-    padding: 0 3px;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    font-weight: normal;
-    background: #1e79a7;
-    color: #eaf4fd;
-    margin: 0 0 0 4px;
-}
+  line-height: 1;
+  font-size: 80%;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-weight: normal;
+  background: #1e79a7;
+  color: #eaf4fd;
+  margin: 0 0 0 4px; }
 
 /* ==================================================================== Forms */
+/* line 750, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul {
-    list-style: none;
-    margin: 0px;
-    padding: 0px;
-}
+  list-style: none;
+  margin: 0;
+  padding: 0; }
 
+/* line 756, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content form ul {
-    padding: 20px 20px 0;
-}
+  padding: 20px 20px 0; }
 
+/* line 760, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li {
-    margin-bottom: 10px;
-    padding: 0;
-    font-size: 12px;
-}
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 12px; }
 
+/* line 766, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li label {
-    color: #000;
-    display: block;
-    font-size: 14px;
-    font-weight: bold;
-}
+  color: #000;
+  display: block;
+  font-size: 14px;
+  font-weight: bold; }
 
+/* line 773, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li span {
-    display: block;
-}
+  display: block; }
 
+/* line 777, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Messages div.Popup form ul li label {
-    width: 100px;
-}
+  width: 100px; }
 
+/* line 781, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li label.RadioLabel {
-    float: none;
-    display: inline;
-    font-weight: normal;
-}
+  float: none;
+  display: inline;
+  font-weight: normal; }
 
+/* line 787, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.Label tbody th {
-    width: 140px;
-}
+  width: 140px; }
 
+/* line 791, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li table label {
-    float: none;
-    display: inline;
-    width: auto;
-}
+  float: none;
+  display: inline;
+  width: auto; }
 
+/* line 797, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Messages div.Popup form ul li label.CheckBoxLabel,
 form ul li label.CheckBoxLabel {
-    float: none;
-    width: auto;
-    display: block;
-    font-size: 13px;
-    cursor: pointer;
-    margin: 0px;
-    padding: 0px;
-    line-height: 27px;
-    font-weight: normal;
-}
+  float: none;
+  width: auto;
+  display: block;
+  font-size: 13px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  line-height: 27px;
+  font-weight: normal; }
 
+/* line 810, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li label.CheckBoxLabel input {
-    margin: 7px 6px 4px 2px;
-    padding: 0px;
-    float: left;
-}
+  margin: 7px 6px 4px 2px;
+  padding: 0;
+  float: left; }
 
+/* line 816, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li label span {
-    font-size: 11px;
-    color: #999;
-    padding-left: 6px;
-}
+  font-size: 11px;
+  color: #999;
+  padding-left: 6px; }
 
+/* line 822, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form li.RadioInput label {
-    display: inline;
-}
+  display: inline; }
 
+/* line 826, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.SmallButton {
-    cursor: pointer;
-    margin: 0px 0px 0px 0px;
-    font-size: 11px;
-}
+  cursor: pointer;
+  margin: 0 0 0 0;
+  font-size: 11px; }
 
+/* line 832, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 input.SmallInput {
-    width: 80px;
-}
+  width: 80px; }
 
+/* line 836, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Inline {
-    display: inline;
-}
+  display: inline; }
+
+/* line 839, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup ul li label.Inline,
 form ul li label.Inline {
-    display: inline-block;
-}
+  display: inline-block; }
 
 /* FormTable */
+/* line 845, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #a5d0e7;
-    border-left: none;
-    border-right: none;
-    margin: 0;
-}
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #a5d0e7;
+  border-left: none;
+  border-right: none;
+  margin: 0; }
 
+/* line 854, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table label {
-    font-size: 12px;
-    padding: 0px;
-}
+  font-size: 12px;
+  padding: 0; }
 
+/* line 859, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tr.Last td,
 table tr.Last th {
-    border-bottom: 0px;
-}
+  border-bottom: 0; }
 
+/* line 864, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table th,
 table td {
-    font-weight: normal;
-    padding: 6px;
-}
+  font-weight: normal;
+  padding: 6px; }
 
+/* line 870, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li table label {
-    font-size: 100%;
-}
+  font-size: 100%; }
 
+/* line 874, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table thead th,
 table thead td {
-    border-bottom: 1px solid #a5d0e7;
-}
+  border-bottom: 1px solid #a5d0e7; }
 
+/* line 879, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody th {
-    font-weight: bold;
-    color: #000;
-}
+  font-weight: bold;
+  color: #000; }
 
+/* line 884, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody th,
 table tbody td {
-    border-bottom: 1px solid #a5d0e7;
-    line-height: 150%;
-}
+  border-bottom: 1px solid #a5d0e7;
+  line-height: 150%; }
 
+/* line 890, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody tr.FootNote td {
-    background: #ff9;
-    color: #454545;
-    border-bottom: 0px;
-}
+  background: #ff9;
+  color: #454545;
+  border-bottom: 0; }
 
+/* line 896, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody tr.More th,
 table tbody tr.More td {
-    border-bottom: 0;
-}
+  border-bottom: 0; }
 
+/* line 901, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltRows tbody tr.Enabled td.Info,
 table.AltColumns tbody tr.Enabled td.Info,
 table.AltRows tbody tr.Disabled td.Info,
 table.AltColumns tbody tr.Disabled td.Info {
-    color: #888;
-}
+  color: #888; }
 
+/* line 908, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody td.Info span {
-    padding: 0 6px;
-}
+  padding: 0 6px; }
 
+/* line 912, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody td.Info strong {
-    margin-right: 10px;
-    font-weight: bold;
-    color: #000;
-}
+  margin-right: 10px;
+  font-weight: bold;
+  color: #000; }
 
+/* line 918, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table thead th {
-    font-weight: bold;
-    font-size: 13px;
-    /* line-height: 100%; This made the headings on checkbox lists highlight incorrectly. */
-    color: #000;
-}
+  font-weight: bold;
+  font-size: 13px;
+  /* line-height: 100%; This made the headings on checkbox lists highlight incorrectly. */
+  color: #000; }
 
+/* line 925, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table input.Button {
-    margin: 0px;
-}
+  margin: 0; }
 
+/* line 929, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltRows tr.Alt th,
 table.AltRows tr.Alt td {
-    background: #d3f0ff;
-}
+  background: #d3f0ff; }
 
+/* line 934, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltColumns th.Alt,
 table.AltColumns td.Alt {
-    background: #d3f0ff;
-}
+  background: #d3f0ff; }
 
+/* line 939, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltColumns tr.Alt {
-    background: none;
-}
+  background: none; }
 
+/* line 943, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltColumns tr.Parent td,
 table tr.Parent td {
-    background: #fff;
-}
+  background: #fff; }
 
+/* line 948, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltColumns tr.Parent td.Alt,
 table tr.Parent td.Alt {
-    background: #fcfcfc;
-}
+  background: #fcfcfc; }
 
+/* line 953, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tr.Child td.First {
-    padding-left: 20px;
-}
+  padding-left: 20px; }
 
+/* line 957, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tr.Highlight th,
 table tr.Highlight td {
-    color: #000;
-}
+  color: #000; }
 
+/* line 962, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody td blockquote {
-    margin: 0px;
-    padding: 2px;
-}
+  margin: 0;
+  padding: 2px; }
 
+/* line 967, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.Sortable tbody td {
-    cursor: move;
-}
+  cursor: move; }
 
 /* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications) that need to override default styles */
+/* line 972, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
 table.AltColumns tr.Enabled td {
-    background: #ffd;
-    color: #000;
-}
+  background: #ffd;
+  color: #000; }
 
+/* line 980, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
 table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td {
-    background: #d3f0ff;
-}
+  background: #d3f0ff; }
 
+/* line 987, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 label.SubLabel {
-    display: inline-block;
-    font-size: 100%;
-    width: 100px;
-}
+  display: inline-block;
+  font-size: 100%;
+  width: 100px; }
 
 /* CheckBoxGrid */
+/* line 994, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid {
-    margin: 10px 0;
-    width: auto;
-}
+  margin: 10px 0;
+  width: auto; }
 
+/* line 999, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid a {
-    display: block !important;
-    padding: 5px;
-}
+  display: block !important;
+  padding: 5px; }
 
+/* line 1004, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid a:hover {
-    background: #ff9;
-    text-decoration: none;
-}
+  background: #ff9;
+  text-decoration: none; }
 
+/* line 1009, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid th a,
 .CheckBoxGrid td a,
 .CheckBoxGrid th a:hover,
 .CheckBoxGrid td a:hover {
-    color: #555 !important;
-}
+  color: #555 !important; }
 
+/* line 1016, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid td {
-    text-align: center;
-}
+  text-align: center; }
 
+/* line 1020, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid tbody th {
-    font-weight: normal;
-    padding: 0;
-}
+  font-weight: normal;
+  padding: 0; }
 
+/* line 1025, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid tbody th,
 .CheckBoxGrid tbody td {
-    vertical-align: middle;
-}
+  vertical-align: middle; }
 
+/* line 1030, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid thead th a,
 .CheckBoxGrid thead th a:hover {
-    color: #333 !important;
-}
+  color: #333 !important; }
 
+/* line 1035, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid thead td {
-    padding: 0;
-}
+  padding: 0; }
 
+/* line 1039, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid tbody th a span.Parent {
-    background: url('images/parent_divider.gif') center right no-repeat;
-    padding: 6px 10px 6px 0;
-    margin: 0 6px 0 0;
-}
+  background: url("images/parent_divider.gif") center right no-repeat;
+  padding: 6px 10px 6px 0;
+  margin: 0 6px 0 0; }
 
+/* line 1045, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid th {
-    width: 150px;
-}
+  width: 150px; }
 
+/* line 1049, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid td {
-    width: 50px;
-}
+  width: 50px; }
 
+/* line 1053, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid th,
 .CheckBoxGrid td {
-    padding: 3px;
-}
+  padding: 3px; }
 
+/* line 1058, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid th.Alt,
 .CheckBoxGrid td.Alt {
-    background: #d3f0ff;
-}
+  background: #d3f0ff; }
 
 /* CheckColumn */
+/* line 1064, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckColumn thead td a {
-    display: block !important;
-    padding: 6px 5px;
-    color: #333333 !important;
-    font-weight: bold;
-}
+  display: block !important;
+  padding: 6px 5px;
+  color: #333333 !important;
+  font-weight: bold; }
 
+/* line 1071, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckColumn thead td a:hover {
-    background: #f9f4c0;
-    text-decoration: none;
-    color: #333333 !important;
-}
+  background: #f9f4c0;
+  text-decoration: none;
+  color: #333333 !important; }
 
 /* CheckBoxList */
+/* line 1078, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxList {
-    padding: 4px 0px 4px 0px;
-}
+  padding: 4px 0 4px 0; }
 
+/* line 1082, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxList li {
-    border: 0px;
-    margin: 0px;
-    padding: 3px 0px 3px 0px;
-    font-size: 11px;
-}
+  border: 0;
+  margin: 0;
+  padding: 3px 0 3px 0;
+  font-size: 11px; }
 
+/* line 1089, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxList li label.CheckBoxLabel {
-    float: none;
-    display: inline;
-    width: auto;
-    font-weight: normal;
-    padding: 0px 0px 0px 0px;
-}
+  float: none;
+  display: inline;
+  width: auto;
+  font-weight: normal;
+  padding: 0 0 0 0; }
 
+/* line 1097, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ColumnCheckBoxList {
-    width: 650px;
-}
+  width: 650px; }
 
+/* line 1101, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ColumnCheckBoxList li {
-    display: inline-block;
-    width: 321px;
-}
+  display: inline-block;
+  width: 321px; }
 
+/* line 1106, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.managecategories div.Info div {
-    padding-top: 16px;
-}
+  padding-top: 16px; }
 
+/* line 1110, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 form ul li.PasswordOptions label.RadioLabel {
-    display: block;
-}
+  display: block; }
 
 /* =================================================================== Header */
+/* line 1115, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head {
-    background: url('images/dashboard-bg.png') top center repeat-x #014687;
-    border-bottom: 1px solid #000;
-    padding: 10px 18px 18px;
-    text-align: right;
-}
+  background: url("images/dashboard-bg.png") top center repeat-x #014687;
+  border-bottom: 1px solid #000;
+  padding: 10px 18px 18px;
+  text-align: right; }
 
+/* line 1122, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head h1 {
-    line-height: 160%;
-    border: 0;
-    float: left;
-    margin: 0;
-    padding: 3px 0 0;
-}
+  line-height: 160%;
+  border: 0;
+  float: left;
+  margin: 0;
+  padding: 3px 0 0; }
 
+/* line 1130, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head h1 a {
-    font-size: 24px;
-    color: #f8fdff;
-    text-shadow: 0 1px 0 #000;
-}
+  font-size: 24px;
+  color: #f8fdff;
+  text-shadow: 0 1px 0 #000; }
 
+/* line 1136, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User {
-    padding: 8px 0 0;
-}
+  padding: 8px 0 0; }
 
+/* line 1140, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head h1 a span {
-    vertical-align: middle;
-}
+  vertical-align: middle; }
 
+/* line 1144, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a,
 #Head h1 a span {
-    font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
-    background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
-    border: 1px solid #002b57;
-    color: #fff;
-    text-shadow: 0 1px 0 #000;
-    padding: 4px 6px;
-    margin: 0 0 0 6px;
-    font-size: 12px;
-    font-weight: normal;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-}
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+  background: url("images/dashboard-bg.png") -480px -191px repeat-x #01518d;
+  border: 1px solid #002b57;
+  color: #fff;
+  text-shadow: 0 1px 0 #000;
+  padding: 4px 6px;
+  margin: 0 0 0 6px;
+  font-size: 12px;
+  font-weight: normal;
+  border-radius: 3px; }
 
+/* line 1158, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a:hover,
 #Head h1 a span:hover {
-    background-position: -480px -191px;
-    box-shadow: 0 0 1px #0066C8;
-    -moz-box-shadow: 0 0 1px #0066C8;
-    -webkit-box-shadow: 0 0 1px #0066C8;
-}
+  background-position: -480px -191px;
+  box-shadow: 0 0 1px #0066C8; }
 
+/* line 1164, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a.Profile,
 #Head div.User a.Profile:hover {
-    background-position: -5px -191px;
-    padding: 4px 6px 4px 24px;
-}
+  background-position: -5px -191px;
+  padding: 4px 6px 4px 24px; }
 
+/* line 1170, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head h1 a span,
 #Head h1 a span:hover {
-    background-position: -454px -191px;
-    padding: 4px 6px 4px 22px;
-}
+  background-position: -454px -191px;
+  padding: 4px 6px 4px 22px; }
 
+/* line 1176, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a:focus {
-    background-position: -480px -294px;
-}
+  background-position: -480px -294px; }
 
+/* line 1180, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a.Profile:focus {
-    background-position: -5px -294px;
-}
+  background-position: -5px -294px; }
 
+/* line 1184, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head h1 a:focus span {
-    background-position: -454px -294px;
-}
+  background-position: -454px -294px; }
 
+/* line 1188, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a:focus,
 #Head h1 a:focus span {
-    box-shadow: 0 0 1px #6fa3c9;
-    -moz-box-shadow: 0 1px 0 #6fa3c9;
-    -webkit-box-shadow: 0 0 1px #6fa3c9;
-}
+  box-shadow: 0 0 1px #6fa3c9; }
 
+/* line 1193, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Head div.User a span {
-    margin: 0 0 0 6px;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    background: #003671;
-    padding: 0 4px;
-}
+  margin: 0 0 0 6px;
+  border-radius: 3px;
+  background: #003671;
+  padding: 0 4px; }
 
 /* ======================================================== Panels / Sidebars */
+/* line 1201, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel {
-    float: left;
-    margin: 0;
-    width: 200px;
-    border-top: 1px solid #82BDDD;
-    border-right: 1px solid #82bddd;
-    background: #dbf3fc;
-}
+  float: left;
+  margin: 0;
+  width: 200px;
+  border-top: 1px solid #82BDDD;
+  border-right: 1px solid #82bddd;
+  background: #dbf3fc; }
 
+/* line 1210, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Box {
-    margin: 0;
-    border: none;
-    border-bottom: 1px solid #8bc1de;
-    background: none;
-}
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #8bc1de;
+  background: none; }
 
+/* line 1217, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Group {
-    padding: 0;
-}
+  padding: 0; }
 
+/* line 1221, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box h4 {
-    font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
-    font-size: 100%;
-    font-weight: bold;
-    margin: 0 0 4px;
-    padding: 0 6px;
-    color: #076C8E;
-    text-shadow: #fff 0 1px 0;
-}
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+  font-size: 100%;
+  font-weight: bold;
+  margin: 0 0 4px;
+  padding: 0 6px;
+  color: #076C8E;
+  text-shadow: #fff 0 1px 0; }
 
+/* line 1231, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box h4 a {
-    display: block;
-    color: #045974;
-    text-shadow: none;
-}
+  display: block;
+  color: #045974;
+  text-shadow: none; }
 
+/* line 1237, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box h4 a:hover {
-    color: #ff0084;
-    text-shadow: none;
-}
+  color: #ff0084;
+  text-shadow: none; }
 
+/* line 1242, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box h4.Active {
-    background: #045974;
-}
+  background: #045974; }
 
+/* line 1246, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box h4.Active a {
-    color: #fff;
-    text-shadow: none;
-}
+  color: #fff;
+  text-shadow: none; }
 
+/* line 1251, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Box h4 {
-    padding: 0;
-    margin: 0;
-}
+  padding: 0;
+  margin: 0; }
 
+/* line 1256, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Box h4 {
-    background: url('images/dashboard-sprites.png') 166px -145px no-repeat;
-}
+  background: url("images/dashboard-sprites.png") 166px -145px no-repeat; }
 
+/* line 1260, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Dashboard h4 {
-    background-position: 166px 7px;
-}
+  background-position: 166px 7px; }
 
+/* line 1264, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Appearance h4 {
-    background-position: 164px -1195px;
-}
+  background-position: 164px -1195px; }
 
+/* line 1268, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Users h4 {
-    background-position: 162px -292px;
-}
+  background-position: 162px -292px; }
 
+/* line 1272, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Moderation h4 {
-    background-position: 167px -742px;
-}
+  background-position: 167px -742px; }
 
+/* line 1276, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Forum h4 {
-    background-position: 167px -442px;
-}
+  background-position: 167px -442px; }
 
+/* line 1280, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Reputation h4 {
-    background-position: 167px -540px;
-}
+  background-position: 167px -540px; }
 
+/* line 1284, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Addons h4 {
-    background-position: 166px -240px;
-}
+  background-position: 166px -240px; }
 
+/* line 1288, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.SiteSettings h4 {
-    background-position: 164px -92px;
-}
+  background-position: 164px -92px; }
 
+/* line 1292, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Import h4 {
-    background-position: 164px -1139px;
-}
+  background-position: 164px -1139px; }
 
+/* line 1296, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Pages h4 {
-    background-position: 166px -1244px;
-}
+  background-position: 166px -1244px; }
 
+/* line 1300, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Support h4 {
-    background-position: 162px -1298px;
-}
+  background-position: 162px -1298px; }
 
+/* line 1304, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box dl {
-    border-bottom: 1px solid #aedefc;
-    background: #f0fbff;
-    padding: 3px;
-    font-size: 90%;
-    overflow: hidden;
-}
+  border-bottom: 1px solid #aedefc;
+  background: #f0fbff;
+  padding: 3px;
+  font-size: 90%;
+  overflow: hidden; }
 
+/* line 1312, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box dl dt {
-    float: left;
-    width: 80px;
-    color: #2786C2;
-}
+  float: left;
+  width: 80px;
+  color: #2786C2; }
 
+/* line 1318, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box dl dd {
-    margin-left: 80px;
-}
+  margin-left: 80px; }
 
+/* line 1322, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Box p {
-    font-size: 100%;
-    padding: 0 0 4px;
-    color: #555;
-}
+  font-size: 100%;
+  padding: 0 0 4px;
+  color: #555; }
 
+/* line 1328, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Active {
-    background: #fff;
-}
+  background: #fff; }
 
+/* line 1332, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo {
-    margin: 0 0 10px;
-}
+  margin: 0 0 10px; }
 
+/* line 1336, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo li {
-    padding: 0;
-    font-size: 80%;
-}
+  padding: 0;
+  font-size: 80%; }
 
+/* line 1341, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo li a {
-    position: relative;
-}
+  position: relative; }
 
+/* line 1345, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Box h4 {
-    font-size: 14px;
-    font-weight: bold;
-    padding: 10px;
-    color: #000;
-}
+  font-size: 14px;
+  font-weight: bold;
+  padding: 10px;
+  color: #000; }
 
+/* line 1352, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo li a {
-    font-size: 13px;
-    color: #000;
-    text-shadow: 0 0 1px #fff;
-    display: block;
-    padding: 2px 10px;
-}
+  font-size: 13px;
+  color: #000;
+  text-shadow: 0 0 1px #fff;
+  display: block;
+  padding: 2px 10px; }
 
+/* line 1360, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Panel div.Box h4 a {
-    color: #000;
-}
+  color: #000; }
 
+/* line 1364, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.New {
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    background: #ff0;
-    color: #000;
-    font-size: 9px;
-    font-weight: bold;
-    box-shadow: 0 1px 2px #333;
-    -moz-box-shadow: 0 1px 2px #333;
-    -webkit-box-shadow: 0 1px 2px #333;
-    padding: 0px 2px;
-    position: relative;
-    top: -4px;
-    right: auto;
-}
+  border-radius: 2px;
+  background: #ff0;
+  color: #000;
+  font-size: 9px;
+  font-weight: bold;
+  box-shadow: 0 1px 2px #333;
+  padding: 0 2px;
+  position: relative;
+  top: -4px;
+  right: auto; }
 
+/* line 1377, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo li.Active {
-    background-image: url('images/arrow.png');
-    background-position: center left;
-    background-repeat: no-repeat;
-    background-color: rgba(0, 0, 0, 0.03);
-    background-color: #F5F9FF;
-}
+  background-image: url("images/arrow.png");
+  background-position: center left;
+  background-repeat: no-repeat;
+  background-color: #f5f9ff;
+  background-color: rgba(0, 0, 0, 0.03); }
 
+/* line 1385, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo li.Active a {
-    text-shadow: 0 1px 0 #fff;
-}
+  text-shadow: 0 1px 0 #fff; }
 
+/* line 1389, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ul.PanelInfo li:hover,
 ul.PanelInfo li.Active:hover {
-    background-color: rgba(0, 0, 0, 0.06);
-}
+  background-color: #f0f4fa;
+  background-color: rgba(0, 0, 0, 0.06); }
 
 /* ================================================= Dashboard Customizations */
+/* line 1396, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Column table {
-    width: 100%;
-    border: none;
-}
+  width: 100%;
+  border: none; }
 
+/* line 1401, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Column table th {
-    width: 160px;
-}
+  width: 160px; }
 
+/* line 1405, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Col {
-    width: 175px;
-    float: left;
-}
+  width: 175px;
+  float: left; }
 
+/* line 1410, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #RecentUsers img {
-    float: left;
-    height: 20px;
-    width: 20px;
-    margin-right: 8px;
-    overflow: hidden;
-}
+  float: left;
+  height: 20px;
+  width: 20px;
+  margin-right: 8px;
+  overflow: hidden; }
 
+/* line 1418, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #UrlCode strong {
-    color: #000000;
-}
+  color: #000000; }
 
+/* line 1422, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #UrlCode span {
-    display: inline;
-    background: #ff8;
-    padding: 2px 4px;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-}
+  display: inline;
+  background: #ff8;
+  padding: 2px 4px;
+  border-radius: 2px; }
 
+/* line 1429, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #UrlCode input.InputBox {
-    width: 200px;
-    padding: 3px;
-    font-size: 12px;
-    font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
-}
+  width: 200px;
+  padding: 3px;
+  font-size: 12px;
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif; }
 
+/* line 1436, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #UrlCode a {
-    margin-left: 10px;
-}
+  margin-left: 10px; }
 
 /* =============================================================== User Pages */
+/* line 1441, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #dashboard_user_index div.Info .InputBox {
-    margin-right: 6px;
-}
+  margin-right: 6px; }
 
+/* line 1445, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #dashboard_user_index div.Info .Button {
-    margin-right: 20px;
-}
+  margin-right: 20px; }
 
 /* ================================================== Splash Information Page */
+/* line 1450, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Home {
-    margin: 0;
-    padding: 80px;
-    background: url('images/eyes.png') 30px 30px no-repeat #fff;
-}
+  margin: 0;
+  padding: 80px;
+  background: url("images/eyes.png") 30px 30px no-repeat #fff; }
 
+/* line 1456, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Home #Content {
-    margin: 0 auto;
-    border: none;
-}
+  margin: 0 auto;
+  border: none; }
 
+/* line 1461, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content .SplashInfo h1 {
-    font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
-    background: transparent;
-    border: none;
-    font-weight: bold;
-    color: #000;
-    font-size: 300%;
-    margin: 20px 0;
-    padding: 0;
-    line-height: 1;
-}
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+  background: transparent;
+  border: none;
+  font-weight: bold;
+  color: #000;
+  font-size: 300%;
+  margin: 20px 0;
+  padding: 0;
+  line-height: 1; }
 
+/* line 1473, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content .SplashInfo p {
-    margin: 10px 0;
-    color: #777;
-    font-size: 16px;
-    line-height: 1.6;
-}
+  margin: 10px 0;
+  color: #777;
+  font-size: 16px;
+  line-height: 1.6; }
 
 /* =================================================================== Popups */
+/* line 1481, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Messages {
-    text-align: left;
-    position: inherit;
-    top: auto;
-    left: auto;
-    z-index: auto;
-    margin: 10px 0 !important;
-}
+  text-align: left;
+  position: inherit;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  margin: 10px 0 !important; }
 
+/* line 1490, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Warning {
-    margin: 10px 0;
-}
+  margin: 10px 0; }
 
+/* line 1494, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Messages ul {
-    display: block;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-}
+  display: block;
+  border-radius: 2px; }
 
+/* line 1499, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Info {
-    border: 0;
-}
+  border: 0; }
 
+/* line 1503, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 * html div.Popup div.Messages {
-    position: inherit;
-    width: auto;
-    top: auto;
-    left: auto;
-    overflow: auto;
-}
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; }
 
+/* line 1511, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup .Loading {
-    display: block;
-}
+  display: block; }
 
+/* line 1515, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.7);
-}
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  background: rgba(255, 255, 255, 0.7); }
 
+/* line 1525, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    z-index: 5000;
-    text-align: center;
-}
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5000;
+  text-align: center; }
 
+/* line 1534, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Body {
-    margin: 0px auto;
-    text-align: left;
-    position: relative;
-    padding: 0 0 8px 0;
-    max-width: 550px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    background: #f1fbfe;
-    border: 1px solid #01416b;
-    box-shadow: 0px 0px 3px #01416b;
-    -moz-box-shadow: 0px 0px 3px #01416b;
-    -webkit-box-shadow: 0px 0px 3px #01416b;
-}
+  margin: 0 auto;
+  text-align: left;
+  position: relative;
+  padding: 0 0 8px 0;
+  max-width: 550px;
+  border-radius: 5px;
+  background: #f1fbfe;
+  border: 1px solid #01416b;
+  box-shadow: 0 0 3px #01416b; }
 
+/* line 1546, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Body div.Body {
-    border: 0;
-}
+  border: 0; }
 
+/* line 1550, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Legal,
 div.Popup .Content form {
-    max-height: 450px;
-    overflow: auto;
-    padding: 0 10px 10px;
-}
+  max-height: 450px;
+  overflow: auto;
+  padding: 0 10px 10px; }
 
+/* line 1557, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup .Loading {
-    text-align: center;
-}
+  text-align: center; }
 
+/* line 1561, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup h1,
 div.Popup h2 {
-    padding: 6px 9px 4px;
-    text-shadow: 0 1px 0 #fff;
-    border-radius: 4px 4px 0 0;
-    -webkit-border-radius: 4px 4px 0 0;
-    -moz-border-radius: 4px 4px 0 0;
-    font-size: 14px;
-    font-weight: bold;
-    margin: 0 0 5px 0;
-    color: #f8fdff;
-    background: url('images/dashboard-bg.png') top center repeat-x #014687;
-    border-bottom: 1px solid #000;
-    text-shadow: 0 1px 0 #000;
-}
+  padding: 6px 9px 4px;
+  text-shadow: 0 1px 0 #fff;
+  border-radius: 4px 4px 0 0;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  color: #f8fdff;
+  background: url("images/dashboard-bg.png") top center repeat-x #014687;
+  border-bottom: 1px solid #000;
+  text-shadow: 0 1px 0 #000; }
 
+/* line 1575, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup h3 {
-    font-size: 13px;
-    font-weight: bold;
-    padding: 20px 0 10px;
-}
+  font-size: 13px;
+  font-weight: bold;
+  padding: 20px 0 10px; }
 
+/* line 1581, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup p {
-    padding: 6px 10px 10px;
-}
+  padding: 6px 10px 10px; }
 
+/* line 1585, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup small {
-    font-size: 80%;
-}
+  font-size: 80%; }
 
+/* line 1589, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup form p {
-    padding: 0;
-}
+  padding: 0; }
 
+/* line 1593, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup form ul li label {
-    color: #222;
-    display: block;
-    font-size: 14px;
-    font-weight: bold;
-    margin: 10px 0 0;
-}
+  color: #222;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 0; }
 
+/* line 1601, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
-    font-weight: normal;
-}
+  font-weight: normal; }
 
+/* line 1606, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup input.Button {
-    margin: 4px 0 2px;
-}
+  margin: 4px 0 2px; }
 
+/* line 1610, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Entry div.Popup p {
-    color: #000;
-}
+  color: #000; }
 
 /* Note: The close class is used on the "close" anchor in popups. */
+/* line 1615, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 a.Close {
-    line-height: 1;
-    color: #555;
-    cursor: pointer;
-    font-family: arial;
-    font-size: 22px;
-    font-weight: bold;
-    padding: 0;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
-    border-bottom: 1px solid #006edf;
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    height: 18px;
-    width: 18px;
-    overflow: hidden;
-}
+  line-height: 1;
+  color: #555;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 0;
+  border-radius: 3px;
+  background: url("images/dashboard-sprites.png") 5px -795px no-repeat #000;
+  border-bottom: 1px solid #006edf;
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  height: 18px;
+  width: 18px;
+  overflow: hidden; }
 
+/* line 1634, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 a.Close span {
-    display: none;
-}
+  display: none; }
 
+/* line 1638, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 a.Close:hover {
-    color: #111;
-}
+  color: #111; }
 
+/* line 1642, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup .Footer {
-    border: none;
-    background: none;
-    padding: 0;
-    margin: 0;
-    text-align: right;
-}
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  text-align: right; }
 
+/* line 1650, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup .Footer input.Button {
-    font-size: 11px;
-    margin-right: 2px;
-}
+  font-size: 11px;
+  margin-right: 2px; }
 
 /* ==================================================================== Legal */
+/* line 1656, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal ol {
-    list-style-position: outside;
-    list-style-type: decimal;
-    margin: 0 30px 10px;
-}
+  list-style-position: outside;
+  list-style-type: decimal;
+  margin: 0 30px 10px; }
 
+/* line 1662, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal ul {
-    list-style-position: outside;
-    list-style-type: disc;
-    margin: 0 30px 10px;
-}
+  list-style-position: outside;
+  list-style-type: disc;
+  margin: 0 30px 10px; }
 
+/* line 1668, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal li {
-    padding: 5px 0;
-}
+  padding: 5px 0; }
 
+/* line 1672, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal strong {
-    font-weight: bold;
-}
+  font-weight: bold; }
 
+/* line 1676, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal em {
-    font-style: italic;
-}
+  font-style: italic; }
 
+/* line 1680, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal p {
-    padding: 6px 0 10px;
-    margin: 0;
-}
+  padding: 6px 0 10px;
+  margin: 0; }
 
+/* line 1685, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal h3 {
-    font-weight: bold;
-    padding: 6px 0 4px !important;
-    margin: 0 !important;
-    border: none !important;
-    background: none !important;
-}
+  font-weight: bold;
+  padding: 6px 0 4px !important;
+  margin: 0 !important;
+  border: none !important;
+  background: none !important; }
 
+/* line 1693, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Legal {
-    margin: 10px;
-    padding: 2px 8px;
-    border: 1px solid #a5d0e7;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    background: #f6ffff;
-}
+  margin: 10px;
+  padding: 2px 8px;
+  border: 1px solid #a5d0e7;
+  border-radius: 3px;
+  background: #f6ffff; }
 
+/* line 1701, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Legal {
-    margin: 0;
-    padding: 0 10px 10px;
-    border: none;
-    background: none;
-    border-radius: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-}
+  margin: 0;
+  padding: 0 10px 10px;
+  border: none;
+  background: none;
+  border-radius: 0; }
 
 /* =================================================================== Themes */
+/* line 1710, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.CurrentTheme img,
 div.BrowseThemes img {
-    border: 1px solid #777;
-}
+  border: 1px solid #777; }
 
+/* line 1715, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.CurrentTheme h3,
 div.BrowseThemes h3 {
-    padding: 0 0 10px;
-}
+  padding: 0 0 10px; }
 
+/* line 1720, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CurrentTheme img {
-    float: left;
-    margin: 20px;
-}
+  float: left;
+  margin: 20px; }
 
+/* line 1725, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CurrentTheme {
-    min-height: 200px;
-    margin: 0;
-}
+  min-height: 200px;
+  margin: 0; }
 
+/* line 1730, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CurrentTheme h4 {
-    padding: 6px 0;
-}
+  padding: 6px 0; }
 
+/* line 1734, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CurrentTheme h4 span {
-    padding-left: 10px;
-}
+  padding-left: 10px; }
 
+/* line 1738, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Description {
-    padding: 0 20px 20px;
-}
+  padding: 0 20px 20px; }
 
+/* line 1742, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Options,
 div.CustomThemeOptions {
-    padding: 0 20px;
-}
+  padding: 0 20px; }
 
+/* line 1747, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid {
-    background: none;
-    margin: 0;
-    border: none;
-}
+  background: none;
+  margin: 0;
+  border: none; }
 
+/* line 1753, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid td {
-    width: 33%;
-    border: 1px solid #a5d0e7;
-    border-width: 0 0 1px;
-    padding: 16px;
-    vertical-align: top;
-}
+  width: 33%;
+  border: 1px solid #a5d0e7;
+  border-width: 0 0 1px;
+  padding: 16px;
+  vertical-align: top; }
 
+/* line 1761, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.Themes td {
-    min-width: 235px;
-}
+  min-width: 235px; }
 
+/* line 1765, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.Themes td h4 {
-    padding: 6px 0;
-}
+  padding: 6px 0; }
 
+/* line 1769, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid td.FirstCol {
-    border-right: 1px solid #a5d0e7;
-}
+  border-right: 1px solid #a5d0e7; }
 
+/* line 1773, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol {
-    border-left: 1px solid #a5d0e7;
-}
+  border-left: 1px solid #a5d0e7; }
 
+/* line 1778, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid td.FirstCol,
 table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol,
 table.SelectionGrid td {
-    border-color: #e0e0e0;
-}
+  border-color: #e0e0e0; }
 
+/* line 1785, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid h4 {
-    color: #02455B;
-    font-size: 16px;
-    margin-bottom: 10px;
-    text-shadow: 0 1px 0 #FFFFFF;
-}
+  color: #02455B;
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 0 #FFFFFF; }
 
+/* line 1792, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid em {
-    display: block;
-    padding: 3px 0 8px;
-    font-style: oblique;
-}
+  display: block;
+  padding: 3px 0 8px;
+  font-style: oblique; }
 
+/* line 1798, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid div.Buttons {
-    float: right;
-    width: 70px;
-    text-align: center;
-}
+  float: right;
+  width: 70px;
+  text-align: center; }
 
+/* line 1804, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid div.Buttons a {
-    display: block;
-    margin: 4px 0;
-}
+  display: block;
+  margin: 4px 0; }
 
+/* line 1809, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.Themes em {
-    padding-top: 13px;
-}
+  padding-top: 13px; }
 
+/* line 1813, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid dl {
-    padding: 0 0 10px;
-}
+  padding: 0 0 10px; }
 
+/* line 1817, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid dl dt {
-    display: inline;
-    color: #000;
-    border-right: 1px solid #e2f4ff;
-    padding: 4px 6px 4px 0;
-    margin: 0 4px 0 0;
-}
+  display: inline;
+  color: #000;
+  border-right: 1px solid #e2f4ff;
+  padding: 4px 6px 4px 0;
+  margin: 0 4px 0 0; }
 
+/* line 1825, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid dl dd {
-    display: inline;
-}
+  display: inline; }
 
+/* line 1829, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.SelectionGrid td.Active {
-    -moz-background-clip: border;
-    -moz-background-inline-policy: continuous;
-    -moz-background-origin: padding;
-    background: #e2f4ff none repeat scroll 0 0;
-}
+  -moz-background-clip: border;
+  -moz-background-inline-policy: continuous;
+  -moz-background-origin: padding;
+  background: #e2f4ff none repeat scroll 0 0; }
 
 /* A general rule to remove padding from info (form adds it) */
+/* line 1837, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content form ul div.Info {
-    padding: 0;
-    margin: 10px 0;
-}
+  padding: 0;
+  margin: 10px 0; }
 
 /* Exceptions to padding rule */
+/* line 1843, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body#dashboard_settings_registration #Content form ul div.Info {
-    padding: 10px;
-    margin: 10px;
-}
+  padding: 10px;
+  margin: 10px; }
 
+/* line 1848, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #dashboard_settings_registration #Content form ul {
-    padding: 0;
-}
+  padding: 0; }
 
+/* line 1852, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Import table {
-    margin-bottom: 20px;
-}
+  margin-bottom: 20px; }
 
+/* line 1856, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 body.Import .Button {
-    margin: 0 0 0 20px;
-}
+  margin: 0 0 0 20px; }
 
+/* line 1860, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #InvitationExpiration {
-    padding: 0 20px;
-}
+  padding: 0 20px; }
 
+/* line 1864, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
 table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td,
 table.AltColumns th.Alt,
 table.AltColumns td.Alt {
-    background: none;
-}
+  background: none; }
 
+/* line 1873, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
 table.AltColumns tr.Enabled td {
-    background: #ff8;
-}
+  background: #ff8; }
 
+/* line 1880, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid tbody th,
 .CheckBoxGrid thead td,
 .CheckBoxGrid thead td.Alt,
@@ -1952,1407 +1892,1381 @@ table thead th,
 table thead td,
 table.AltColumns thead th.Alt,
 table.AltColumns thead td.Alt {
-    background: #dbf3fc;
-    font-size: 13px;
-    color: #222;
-    text-shadow: 0 1px 0 #fff;
-}
+  background: #dbf3fc;
+  font-size: 13px;
+  color: #222;
+  text-shadow: 0 1px 0 #fff; }
 
+/* line 1895, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table th,
 table td {
-    padding: 6px 6px 6px 20px;
-    vertical-align: top;
-}
+  padding: 6px 6px 6px 20px;
+  vertical-align: top; }
 
+/* line 1901, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table th.Less,
 table td.Less {
-    padding: 6px;
-}
+  padding: 6px; }
 
+/* line 1906, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody tr.More th.Less,
 table tbody tr.More td.Less,
 table tbody th,
 table tbody td {
-    border-bottom: 1px solid #e0e0e0;
-}
+  border-bottom: 1px solid #e0e0e0; }
 
+/* line 1913, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 table tbody tr:last-child th,
 table tbody tr:last-child td {
-    border-bottom: none;
-}
+  border-bottom: none; }
 
+/* line 1918, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckBoxGrid td.Alt {
-    background: none;
-}
+  background: none; }
 
+/* line 1922, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 li.RolePermissions table.CheckBoxGrid tbody tr th a {
-    white-space: nowrap;
-}
+  white-space: nowrap; }
 
+/* line 1926, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
-    display: inline;
-}
+  display: inline; }
 
 /* Summary Tables */
+/* line 1931, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Summary {
-    clear: left;
-    margin: 20px 0 20px 20px;
-    width: 46%;
-    display: inline-block;
-    vertical-align: top;
-}
+  clear: left;
+  margin: 20px 0 20px 20px;
+  width: 46%;
+  display: inline-block;
+  vertical-align: top; }
 
+/* line 1939, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Summary table {
-    margin: 0;
-    padding: 0;
-}
+  margin: 0;
+  padding: 0; }
 
+/* line 1944, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Summary table th,
 div.Summary table td {
-    font-size: 11px;
-    padding: 4px 6px;
-}
+  font-size: 11px;
+  padding: 4px 6px; }
 
+/* line 1950, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Summary table tbody th {
-    font-weight: normal;
-}
+  font-weight: normal; }
 
+/* line 1954, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Summary table thead td,
 div.Summary table tbody td {
-    width: 80px;
-    padding: 4px 6px 4px 0;
-}
+  width: 80px;
+  padding: 4px 6px 4px 0; }
 
 /* Mobile themes */
-
-.browser-mobile-themes {
-}
-
+/* line 1965, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock {
-    box-sizing: border-box;
-    margin: 0;
-    width: 33.33%;
-    min-width: 235px;
-    padding: 20px;
-    position: relative;
-    transition: all 0.4s ease;
-}
+  box-sizing: border-box;
+  margin: 0;
+  width: 33.33%;
+  min-width: 235px;
+  padding: 20px;
+  position: relative;
+  -webkit-transition: all 0.4s ease;
+          transition: all 0.4s ease; }
 
+/* line 1975, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock.current-theme {
-    background-color: rgba(0, 0, 0, 0.02);
-}
+  background-color: #f5f9ff;
+  background-color: rgba(0, 0, 0, 0.02); }
 
+/* line 1980, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Content .themeblock h4 {
-    display: block;
-    padding: 0;
-}
+  display: block;
+  padding: 0; }
 
+/* line 1985, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .theme-version {
-    font-size: 14px;
-    color: #aaa;
-    font-weight: normal;
-}
+  font-size: 14px;
+  color: #aaa;
+  font-weight: normal; }
 
+/* line 1991, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .author-name {
-    color: #aaa;
-    padding: 0 0 20px 0;
-}
+  color: #aaa;
+  padding: 0 0 20px 0; }
 
+/* line 1996, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .theme-image {
-    display: block;
-    height: 213px;
-    overflow: hidden;
-    float: left;
-    box-shadow: 0 0 1px 0 #aaa;
-    margin: 10px 16px 5px 0;
-}
+  display: block;
+  height: 213px;
+  overflow: hidden;
+  float: left;
+  box-shadow: 0 0 1px 0 #aaa;
+  margin: 10px 16px 5px 0; }
 
+/* line 2005, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .theme-image img {
-    display: block;
-    width: auto;
-    height: 213px;
-}
+  display: block;
+  width: auto;
+  height: 213px; }
 
+/* line 2011, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .theme-image:empty {
-    width: 120px;
-    border: 1px solid #fff;
-    background-color: rgba(0, 0, 0, 0.02);
-}
+  width: 120px;
+  border: 1px solid #fff;
+  background-color: #f5f9ff;
+  background-color: rgba(0, 0, 0, 0.02); }
 
+/* line 2018, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .theme-description {
-    display: block;
-    margin: -5px 0 0 0;
-    font-style: normal;
-}
+  display: block;
+  margin: -5px 0 0 0;
+  font-style: normal; }
 
+/* line 2024, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock dl {
-    clear: both;
-    float: left;
-    margin-top: 20px;
-}
+  clear: both;
+  float: left;
+  margin-top: 20px; }
 
+/* line 2030, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock dt {
-    font-weight: bold;
-}
+  font-weight: bold; }
 
+/* line 2034, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock dd {
-    color: #aaa;
-}
+  color: #aaa; }
 
+/* line 2038, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .Alert {
-    clear: both;
-    margin: 0 0 20px 0;
-}
+  clear: both;
+  margin: 0 0 20px 0; }
 
+/* line 2043, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .theme-right-column {
-    overflow: hidden;
-}
+  overflow: hidden; }
 
+/* line 2047, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .browser-mobile-themes.SelectionGrid div.Buttons {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    margin: 10px 0 20px 0;
-}
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0 20px 0; }
 
+/* line 2054, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .browser-mobile-themes.SelectionGrid div.Buttons a {
-    display: inline-block;
-    padding: 12px 0;
-}
+  display: inline-block;
+  padding: 12px 0; }
 
+/* line 2059, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .theme-applied {
-    display: none;
-    padding: 10px 0;
-    border-radius: 2px;
-    background-color: #fff;
-    color: #aaa;
-    box-shadow: inset 0 0 2px 0 #ddd;
-}
+  display: none;
+  padding: 10px 0;
+  border-radius: 2px;
+  background-color: #fff;
+  color: #aaa;
+  box-shadow: inset 0 0 2px 0 #ddd; }
 
+/* line 2068, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .browser-mobile-themes.SelectionGrid div.Buttons a,
 .theme-applied {
-    min-width: 62px;
-    width: 50%;
-    margin: auto;
-    float: right;
-}
+  min-width: 62px;
+  width: 50%;
+  margin: auto;
+  float: right; }
 
+/* line 2076, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock.theme-progressing .theme-buttons,
 .themeblock.current-theme .theme-buttons {
-    display: none;
-}
+  display: none; }
 
+/* line 2081, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock.current-theme .theme-applied {
-    display: block;
-}
+  display: block; }
 
+/* line 2085, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock.current-theme .theme-apply-progress {
-    display: none;
-}
+  display: none; }
 
+/* line 2089, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .themeblock .TinyProgress.theme-apply-progress {
-    display: block !important;
-    margin: auto;
-    height: 19px;
-}
+  display: block !important;
+  margin: auto;
+  height: 19px; }
 
 /* =================================================================== Footer */
+/* line 2096, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Foot {
-    clear: both;
-    font-size: 13px;
-    color: #076C8E;
-    font-weight: bold;
-    padding: 4px 18px 2px;
-    position: relative;
-    background: url('images/dashboard-bg.png') center -96px repeat-x #014687;
-    border: none;
-    border-bottom: 1px solid #000204;
-}
+  clear: both;
+  font-size: 13px;
+  color: #076C8E;
+  font-weight: bold;
+  padding: 4px 18px 2px;
+  position: relative;
+  background: url("images/dashboard-bg.png") center -96px repeat-x #014687;
+  border: none;
+  border-bottom: 1px solid #000204; }
 
+/* line 2108, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Foot img {
-    display: none;
-}
+  display: none; }
 
+/* line 2112, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Foot a {
-    color: #076C8E;
-}
+  color: #076C8E; }
 
+/* line 2116, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Foot .Version {
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
-    color: #5F9BBF;
-    font-size: 12px;
-    font-weight: normal;
-    padding-bottom: 5px;
-}
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  color: #5F9BBF;
+  font-size: 12px;
+  font-weight: normal;
+  padding-bottom: 5px; }
 
+/* line 2126, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 #Foot div a {
-    display: block;
-    background: url('images/logo_footer.png') center center no-repeat;
-    height: 32px;
-    width: 72px;
-    margin: 6px 0 10px;
-}
+  display: block;
+  background: url("images/logo_footer.png") center center no-repeat;
+  height: 32px;
+  width: 72px;
+  margin: 6px 0 10px; }
 
+/* line 2134, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Count {
-    background: #02639E;
-    border-radius: 2px;
-    color: #fff;
-    font-size: 11px;
-    padding: 1px 6px !Important;
-}
+  background: #02639E;
+  border-radius: 2px;
+  color: #fff;
+  font-size: 11px;
+  padding: 1px 6px !important; }
 
+/* line 2142, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Tag {
-    background: #555;
-    color: #fff;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
+  background: #555;
+  color: #fff;
+  border-radius: 2px;
+  font-size: 11px;
+  padding: 1px 6px !important; }
 
-    font-size: 11px;
-    padding: 1px 6px !Important;
-}
-
+/* line 2151, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Tag a {
-    color: #fff;
-}
+  color: #fff; }
 
+/* line 2155, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Tag-Spam {
-    background-color: #CF6E65;
-    color: #FFF6BF;
-}
+  background-color: #CF6E65;
+  color: #FFF6BF; }
 
+/* line 2160, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Tag-Edit {
-    background-color: #F27527;
-}
+  background-color: #F27527; }
 
+/* line 2164, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Tag-Delete, .Tag-Ban {
-    background-color: #C70028;
-}
+  background-color: #C70028; }
 
+/* line 2168, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Tag-Moderate {
-    background-color: #ae0076;
-}
+  background-color: #ae0076; }
 
+/* line 2172, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Meta-Container {
-    margin-top: 10px;
-}
+  margin-top: 10px; }
 
+/* line 2176, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Meta-Container .Tags {
-    margin-right: 5px;
-}
+  margin-right: 5px; }
 
+/* line 2180, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Meta {
-    margin: 0 5px;
-    display: inline-block;
-}
+  margin: 0 5px;
+  display: inline-block; }
 
+/* line 2185, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Meta-Label {
-    color: #999;
-}
+  color: #999; }
 
+/* line 2189, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Pager {
-    font-size: 16px;
-    font-weight: bold;
-    padding: 8px 0;
-    text-align: right;
-    line-height: 10px;
-}
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 0;
+  text-align: right;
+  line-height: 10px; }
 
+/* line 2197, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Pager a,
 .Pager span {
-    padding: 0 4px;
-}
+  padding: 0 4px; }
 
+/* line 2202, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Pager span,
 .Pager a.Highlight {
-    color: #777;
-}
+  color: #777; }
 
+/* line 2207, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .NumberedPager a.Next,
 .NumberedPager span.Next {
-    margin-left: 6px;
-}
+  margin-left: 6px; }
 
+/* line 2212, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-    margin-right: 6px;
-}
+  margin-right: 6px; }
 
+/* line 2217, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .NormalList {
-    list-style: disc;
-    list-style-position: inside;
-    margin: 10px 0;
-}
+  list-style: disc;
+  list-style-position: inside;
+  margin: 10px 0; }
 
+/* line 2223, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .NormalList li {
-    margin: 4px 0;
-}
+  margin: 4px 0; }
 
 /* Help Links */
+/* line 2228, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Help {
-    padding: 8px;
-    line-height: 1;
-}
+  padding: 8px;
+  line-height: 1; }
 
+/* line 2233, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Help h2 {
-    font-size: 14px;
-    font-weight: bold;
-    text-shadow: none;
-    margin: 0 0 10px;
-}
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: none;
+  margin: 0 0 10px; }
 
+/* line 2240, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Help ul {
-    list-style: disc;
-    margin-left: 19px;
-}
+  list-style: disc;
+  margin-left: 19px; }
 
+/* line 2245, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Help li {
-    margin-top: 6px;
-    line-height: 1.5;
-}
+  margin-top: 6px;
+  line-height: 1.5; }
 
+/* line 2250, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Aside {
-    border: solid 1px #cc8;
-    border-width: 1px 0 1px 1px;
-    border-top: solid 1px #aa8;
-    background: #ffc;
-    border-radius: 0 0 0 3px;
-    -moz-border-radius: 0 0 0 3px;
-    -webkit-border-radius: 0 0 0 3px;
-    /* width: 220px; */
-    max-width: 500px;
-    float: right;
-    z-index: 200;
-    position: relative;
-    margin: 0;
-    font-size: 12px;
-}
+  border: solid 1px #cc8;
+  border-width: 1px 0 1px 1px;
+  border-top: solid 1px #aa8;
+  background: #ffc;
+  border-radius: 0 0 0 3px;
+  /* width: 220px; */
+  max-width: 500px;
+  float: right;
+  z-index: 200;
+  position: relative;
+  margin: 0;
+  font-size: 12px; }
 
 /* Homepage Admin */
+/* line 2266, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage {
-    padding: 0 20px;
-}
+  padding: 0 20px; }
 
+/* line 2270, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage a.Choice {
-    color: #777;
-    font-weight: bold;
-    font-size: 12px;
-    text-decoration: none;
-    display: inline-block;
-    vertical-align: bottom;
-    margin: 0 10px 10px 0;
-    padding: 0;
-    line-height: 2.6;
-}
+  color: #777;
+  font-weight: bold;
+  font-size: 12px;
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: bottom;
+  margin: 0 10px 10px 0;
+  padding: 0;
+  line-height: 2.6; }
 
+/* line 2282, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .Sprite {
-    display: block;
-    height: 124px;
-    width: 180px;
-    background: url('images/homepage-sprites.png') 0 0 no-repeat;
-    border: 1px solid #888;
-}
+  display: block;
+  height: 124px;
+  width: 180px;
+  background: url("images/homepage-sprites.png") 0 0 no-repeat;
+  border: 1px solid #888; }
 
+/* line 2290, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage a.Choice .Wrap {
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    background: #f5f5f5;
-    border: 2px solid #ccc;
-    padding: 6px;
-    margin: 0;
-    display: block;
-}
+  border-radius: 2px;
+  background: #f5f5f5;
+  border: 2px solid #ccc;
+  padding: 6px;
+  margin: 0;
+  display: block; }
 
+/* line 2299, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpDiscussionsTable {
-    background-position: 0 0;
-}
+  background-position: 0 0; }
 
+/* line 2303, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpDiscussions {
-    background-position: -180px 0;
-}
+  background-position: -180px 0; }
 
+/* line 2307, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpCategories {
-    background-position: -360px 0;
-}
+  background-position: -360px 0; }
 
+/* line 2311, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpCategoriesTable {
-    background-position: 0 -124px;
-}
+  background-position: 0 -124px; }
 
+/* line 2315, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpCategoriesMixed {
-    background-position: -180px -124px;
-}
+  background-position: -180px -124px; }
 
+/* line 2319, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpActivity {
-    background-position: -360px -124px;
-}
+  background-position: -360px -124px; }
 
+/* line 2323, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage .SpBestOf {
-    background-position: -540px 0px;
-}
+  background-position: -540px 0; }
 
+/* line 2327, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage a.Choice:hover {
-    color: #000;
-}
+  color: #000; }
 
+/* line 2331, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage a.Choice:hover .Wrap {
-    background-color: #fafafa;
-    border-color: #aaa;
-}
+  background-color: #fafafa;
+  border-color: #aaa; }
 
+/* line 2336, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage a.Choice.Current {
-    color: #000;
-    background: url('images/check.png') 2px 3px no-repeat;
-    text-indent: 36px;
-}
+  color: #000;
+  background: url("images/check.png") 2px 3px no-repeat;
+  text-indent: 36px; }
 
+/* line 2342, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Homepage a.Current .Wrap {
-    background-color: #D6FFCF;
-    border-color: #06A800;
-}
+  background-color: #D6FFCF;
+  border-color: #06A800; }
 
+/* line 2347, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .LayoutOptions {
-    margin: 20px 0;
-}
+  margin: 20px 0; }
 
+/* line 2351, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ol.Sortable, ol.Sortable ol {
-    margin: 0 0 0 25px;
-    padding: 0;
-    list-style-type: none;
-}
+  margin: 0 0 0 25px;
+  padding: 0;
+  list-style-type: none; }
 
+/* line 2357, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ol.Sortable {
-    margin: 0;
-    background: #f3f3f3;
-}
+  margin: 0;
+  background: #f3f3f3; }
 
+/* line 2362, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sortable li {
-    margin: 0;
-    padding: 0;
-}
+  margin: 0;
+  padding: 0; }
 
+/* line 2367, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sortable li div {
-    padding: 0;
-    margin: 0;
-    cursor: move;
-}
+  padding: 0;
+  margin: 0;
+  cursor: move; }
 
+/* line 2373, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Placeholder {
-    background-color: #cfcfcf;
-}
+  background-color: #cfcfcf; }
 
+/* line 2377, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SortableError {
-    background: #fbe3e4;
-    color: #8a1f11;
-}
+  background: #fbe3e4;
+  color: #8a1f11; }
 
+/* line 2382, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sortable table {
-    border: 1px solid #e0e0e0;
-    border-right: none;
-    margin: -1px 0 0 -1px;
-}
+  border: 1px solid #e0e0e0;
+  border-right: none;
+  margin: -1px 0 0 -1px; }
 
+/* line 2388, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sortable table td {
-    vertical-align: top;
-    padding: 6px;
-    background: #fff;
-    border-bottom: none;
-}
+  vertical-align: top;
+  padding: 6px;
+  background: #fff;
+  border-bottom: none; }
 
+/* line 2395, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sortable table td strong,
 .Sortable table td blockquote {
-    display: block;
-}
+  display: block; }
 
+/* line 2400, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sortable table td.Buttons {
-    text-align: right;
-    padding: 6px 0;
-}
+  text-align: right;
+  padding: 6px 0; }
 
 /* ==================================================================== Feeds */
+/* line 2406, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FeedItem {
-    padding: 6px 10px;
-}
+  padding: 6px 10px; }
 
+/* line 2410, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FeedItem a {
-    font-size: 13px;
-    display: inline;
-    font-weight: bold;
-    margin-right: 12px;
-}
+  font-size: 13px;
+  display: inline;
+  font-weight: bold;
+  margin-right: 12px; }
 
+/* line 2417, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FeedItem .Date {
-    display: inline;
-    font-size: 12px;
-    color: #888;
-}
+  display: inline;
+  font-size: 12px;
+  color: #888; }
 
+/* line 2423, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FeedItem em {
-    color: #333;
-    font-size: 12px;
-    display: block;
-}
+  color: #333;
+  font-size: 12px;
+  display: block; }
 
+/* line 2429, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .FeedItem h2 {
-    margin-bottom: 0;
-}
+  margin-bottom: 0; }
 
+/* line 2433, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Selected {
-    background: #FFFF99 !Important;
-}
+  background: #FFFF99 !important; }
 
+/* line 2437, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CheckboxCell {
-    width: 1em;
-}
+  width: 1em; }
 
+/* line 2441, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .DateCell {
-    text-align: right;
-    width: 7em;
-}
+  text-align: right;
+  width: 7em; }
 
+/* line 2446, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .UsernameCell {
-    width: 8em;
-}
+  width: 8em; }
 
+/* line 2450, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .CenterCell {
-    text-align: center;
-}
+  text-align: center; }
 
+/* line 2454, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 ins {
-    background: #ddffdd;
-    color: #006600;
-    padding: 0 3px;
-}
+  background: #ddffdd;
+  color: #006600;
+  padding: 0 3px; }
 
+/* line 2460, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 del {
-    background: #ffeeee;
-    color: #bb0000;
-    padding: 0 3px;
-}
+  background: #ffeeee;
+  color: #bb0000;
+  padding: 0 3px; }
 
 /* Do not customize these unless you enjoy pain. */
-
 /* Error messages that get displayed on forms throughout the application. */
+/* line 2469, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Errors {
-    text-align: left;
-    position: inherit;
-    top: auto;
-    left: auto;
-    z-index: auto;
-    margin: 0 !important;
-}
+  text-align: left;
+  position: inherit;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  margin: 0 !important; }
 
+/* line 2478, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 * html div.Errors {
-    position: inherit;
-    width: auto;
-    top: auto;
-    left: auto;
-    overflow: auto;
-}
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; }
 
+/* line 2486, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Errors ul {
-    border-bottom: 1px solid #a00 !important;
-    background: #d50a0a !important;
-    padding: 10px 20px !important;
-    display: block;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-}
+  border-bottom: 1px solid #a00 !important;
+  background: #d50a0a !important;
+  padding: 10px 20px !important;
+  display: block;
+  box-shadow: none; }
 
+/* line 2494, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Popup div.Errors ul {
-    border: 1px solid #a00 !important;
-    padding: 6px 10px !important;
-}
+  border: 1px solid #a00 !important;
+  padding: 6px 10px !important; }
 
+/* line 2499, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Errors ul li {
-    color: #fff !important;
-    background: #d50a0a !important;
-    margin: 0;
-}
+  color: #fff !important;
+  background: #d50a0a !important;
+  margin: 0; }
 
+/* line 2505, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Errors pre {
-    margin: 10px 0 5px;
-    padding: 4px 8px;
-    display: block;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    white-space: pre;
-    overflow: auto;
-    box-shadow: 0px 0px 2px #333;
-    -moz-box-shadow: 0px 0px 2px #333;
-    -webkit-box-shadow: 0px 0px 2px #333;
-}
+  margin: 10px 0 5px;
+  padding: 4px 8px;
+  display: block;
+  border-radius: 2px;
+  white-space: pre;
+  overflow: auto;
+  box-shadow: 0 0 2px #333; }
 
+/* line 2515, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Errors pre,
 div.Errors pre * {
-    background: #ffa !important;
-    font-size: 12px !important;
-    font-weight: normal !important;
-    font-family: monospace !important;
-    text-shadow: none !important;
-    color: #333 !important;
-    line-height: 1.4 !important;
-}
+  background: #ffa !important;
+  font-size: 12px !important;
+  font-weight: normal !important;
+  font-family: monospace !important;
+  text-shadow: none !important;
+  color: #333 !important;
+  line-height: 1.4 !important; }
 
+/* line 2526, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.Errors pre * {
-    margin: 0 !important;
-    padding: 0 !important;
-}
+  margin: 0 !important;
+  padding: 0 !important; }
 
+/* line 2531, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .PageInfo {
-    background: #00346d;
-    background: -webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
-    background: -moz-linear-gradient(top, #00346d, #014a8a);
-    -pie-background: linear-gradient(top, #00346d, #014a8a);
-    background: linear-gradient(top, #00346d, #014a8a);
-    padding: 10px;
-    color: #fff;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    margin: 20px;
-}
+  background: #00346d;
+  background: -webkit-linear-gradient(top, #00346d, #014a8a);
+  background: linear-gradient(top, #00346d, #014a8a);
+  padding: 10px;
+  color: #fff;
+  border-radius: 4px;
+  margin: 20px; }
 
+/* line 2540, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .PageInfo h2 {
-    font-family: 'Rokkitt', serif !Important;
-    font-weight: normal;
-    font-size: 24px;
-    color: #fff;
-    text-shadow: 1px 2px 1px #000;
-    margin-bottom: 5px;
-}
+  font-family: 'Rokkitt', serif !important;
+  font-weight: normal;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 1px 2px 1px #000;
+  margin-bottom: 5px; }
 
+/* line 2549, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .PageInfo b {
-    color: #FFF6CD;
-}
+  color: #FFF6CD; }
 
 /* Do not customize these unless you enjoy pain. */
-
 /* Note: InformMessages are "growl" style messages that appear in a fixed
 position on the page to notify users of things like drafts being saved, etc. */
+/* line 2557, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages {
-    text-align: left !important;
-    position: fixed;
-    top: auto;
-    bottom: 20px;
-    left: 20px;
-    z-index: 200;
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none !important;
-    font-size: 12px;
-    display: block;
-    width: auto;
-}
+  text-align: left !important;
+  position: fixed;
+  top: auto;
+  bottom: 20px;
+  left: 20px;
+  z-index: 200;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  font-size: 12px;
+  display: block;
+  width: auto; }
 
+/* line 2572, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 * html div.InformMessages {
-    position: absolute;
-    width: 100%; /*IE5.5*/
-    top: auto;
-    left: 20px;
-    overflow: visible;
-    bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
-}
+  position: absolute;
+  width: 100%;
+  /*IE5.5*/
+  top: auto;
+  left: 20px;
+  overflow: visible; }
 
+/* line 2581, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformWrapper {
-    display: block;
-}
+  display: block; }
 
+/* line 2585, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage {
-    color: #fff !important;
-    text-shadow: 0 1px 1px #000;
-    text-align: left !important;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    background: rgb(0, 0, 0) !important;
-    background: rgba(0, 0, 0, 0.7) !important;
-    border: none !important;
-    width: auto !important;
-    max-width: 400px !important;
-    margin: 10px auto 0 !important;
-    padding: 9px 14px 8px !important;
-    display: -moz-inline-stack;
-    display: inline-block;
-    zoom: 1;
-    *display: inline;
-    position: relative;
-    line-height: 1.6;
-}
+  color: #fff !important;
+  text-shadow: 0 1px 1px #000;
+  text-align: left !important;
+  border-radius: 2px;
+  background: black !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: none !important;
+  width: auto !important;
+  max-width: 400px !important;
+  margin: 10px auto 0 !important;
+  padding: 9px 14px 8px !important;
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  position: relative;
+  line-height: 1.6; }
 
+/* line 2605, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage:hover {
-    background: rgba(0, 0, 0, 0.8) !important;
-}
+  background: rgba(0, 0, 0, 0.8) !important; }
 
+/* line 2609, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a {
-    color: #fff;
-    text-decoration: underline;
-}
+  color: #fff;
+  text-decoration: underline; }
 
+/* line 2614, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a:hover {
-    text-decoration: none;
-}
+  text-decoration: none; }
 
+/* line 2618, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a.Close {
-    border: none;
-    background: transparent;
-    border-top-right-radius: 2px;
-    -webkit-border-top-right-radius: 2px;
-    -moz-border-radius-topright: 2px;
-    color: #ddd;
-    font-size: 14px;
-    text-align: center;
-    display: none;
-    height: 12px;
-    width: 12px;
-    line-height: 1;
-    text-decoration: none;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-}
+  border: none;
+  background: transparent;
+  border-top-right-radius: 2px;
+  color: #ddd;
+  font-size: 14px;
+  text-align: center;
+  display: none;
+  height: 12px;
+  width: 12px;
+  line-height: 1;
+  text-decoration: none;
+  position: absolute;
+  top: 0;
+  right: 0; }
 
+/* line 2635, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a.Close span {
-    display: inline;
-}
+  display: inline; }
 
+/* line 2639, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a.Close:hover {
-    background: #000;
-    color: #fff;
-}
+  background: #000;
+  color: #fff; }
 
+/* line 2644, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage:hover a.Close {
-    display: block;
-}
+  display: block; }
 
 /* Inform Sprites */
+/* line 2649, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformWrapper.HasIcon div.InformMessage {
-    padding-left: 42px !important;
-    min-height: 20px;
-}
+  padding-left: 42px !important;
+  min-height: 20px; }
 
+/* line 2654, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformWrapper.HasSprite div.InformMessage {
-    padding-left: 40px !important;
-}
+  padding-left: 40px !important; }
 
+/* line 2658, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a.Icon {
-    display: block;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    height: 28px;
-    width: 28px;
-}
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: 28px;
+  width: 28px; }
 
+/* line 2667, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 div.InformMessages div.InformMessage a.Icon img {
-    height: 28px;
-    width: 28px;
-}
+  height: 28px;
+  width: 28px; }
 
+/* line 2672, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite {
-    background: url('images/inform-sprites.png') -9px -9px no-repeat;
-    display: block;
-    position: absolute;
-    top: 4px;
-    left: 5px;
-    height: 30px;
-    width: 30px;
-}
+  background: url("images/inform-sprites.png") -9px -9px no-repeat;
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  height: 30px;
+  width: 30px; }
 
+/* line 2682, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Refresh {
-    background-position: -9px -9px;
-}
+  background-position: -9px -9px; }
 
+/* line 2686, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Recycle {
-    background-position: -57px -9px;
-}
+  background-position: -57px -9px; }
 
+/* line 2690, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Infinity {
-    background-position: -105px -9px;
-}
+  background-position: -105px -9px; }
 
+/* line 2694, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Squiggle {
-    background-position: -153px -9px;
-}
+  background-position: -153px -9px; }
 
+/* line 2698, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Random {
-    background-position: -200px -9px;
-}
+  background-position: -200px -9px; }
 
+/* line 2702, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Magnify {
-    background-position: -250px -9px;
-}
+  background-position: -250px -9px; }
 
+/* line 2706, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Location {
-    background-position: -298px -9px;
-}
+  background-position: -298px -9px; }
 
+/* line 2710, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bubble {
-    background-position: -346px -9px;
-}
+  background-position: -346px -9px; }
 
+/* line 2714, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.ElipsisBubble {
-    background-position: -394px -9px;
-}
+  background-position: -394px -9px; }
 
+/* line 2718, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Plus {
-    background-position: -442px -9px;
-}
+  background-position: -442px -9px; }
 
+/* line 2722, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Time {
-    background-position: -9px -57px;
-}
+  background-position: -9px -57px; }
 
+/* line 2726, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Eye {
-    background-position: -57px -57px;
-}
+  background-position: -57px -57px; }
 
+/* line 2730, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Target {
-    background-position: -105px -57px;
-}
+  background-position: -105px -57px; }
 
+/* line 2734, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Redflag {
-    background-position: -153px -57px;
-}
+  background-position: -153px -57px; }
 
+/* line 2738, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Flags {
-    background-position: -200px -57px;
-}
+  background-position: -200px -57px; }
 
+/* line 2742, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Graph {
-    background-position: -250px -57px;
-}
+  background-position: -250px -57px; }
 
+/* line 2746, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Chart {
-    background-position: -298px -57px;
-}
+  background-position: -298px -57px; }
 
+/* line 2750, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Envelope {
-    background-position: -346px -57px;
-}
+  background-position: -346px -57px; }
 
+/* line 2754, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Gear {
-    background-position: -394px -57px;
-}
+  background-position: -394px -57px; }
 
+/* line 2758, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Gears {
-    background-position: -442px -57px;
-}
+  background-position: -442px -57px; }
 
+/* line 2762, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Skull {
-    background-position: -9px -106px;
-}
+  background-position: -9px -106px; }
 
+/* line 2766, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.SkullBones {
-    background-position: -57px -106px;
-}
+  background-position: -57px -106px; }
 
+/* line 2770, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bird {
-    background-position: -105px -106px;
-}
+  background-position: -105px -106px; }
 
+/* line 2774, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Present {
-    background-position: -153px -106px;
-}
+  background-position: -153px -106px; }
 
+/* line 2778, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Thundercloud {
-    background-position: -200px -106px;
-}
+  background-position: -200px -106px; }
 
+/* line 2782, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bandaid {
-    background-position: -250px -106px;
-}
+  background-position: -250px -106px; }
 
+/* line 2786, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Saturn {
-    background-position: -298px -106px;
-}
+  background-position: -298px -106px; }
 
+/* line 2790, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Star {
-    background-position: -346px -106px;
-}
+  background-position: -346px -106px; }
 
+/* line 2794, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Heart {
-    background-position: -394px -106px;
-}
+  background-position: -394px -106px; }
 
+/* line 2798, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Key {
-    background-position: -442px -106px;
-}
+  background-position: -442px -106px; }
 
+/* line 2802, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Ipod {
-    background-position: -9px -152px;
-}
+  background-position: -9px -152px; }
 
+/* line 2806, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Iphone {
-    background-position: -57px -152px;
-}
+  background-position: -57px -152px; }
 
+/* line 2810, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Cabinet {
-    background-position: -105px -152px;
-}
+  background-position: -105px -152px; }
 
+/* line 2814, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Coffee {
-    background-position: -153px -152px;
-}
+  background-position: -153px -152px; }
 
+/* line 2818, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Briefcase {
-    background-position: -200px -152px;
-}
+  background-position: -200px -152px; }
 
+/* line 2822, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Toolcase {
-    background-position: -250px -152px;
-}
+  background-position: -250px -152px; }
 
+/* line 2826, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Suitcase {
-    background-position: -298px -152px;
-}
+  background-position: -298px -152px; }
 
+/* line 2830, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Airplane {
-    background-position: -346px -152px;
-}
+  background-position: -346px -152px; }
 
+/* line 2834, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Spraypaint {
-    background-position: -394px -152px;
-}
+  background-position: -394px -152px; }
 
+/* line 2838, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.MailInbox {
-    background-position: -442px -152px;
-}
+  background-position: -442px -152px; }
 
+/* line 2842, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.WallPicture {
-    background-position: -9px -200px;
-}
+  background-position: -9px -200px; }
 
+/* line 2846, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Photos {
-    background-position: -57px -200px;
-}
+  background-position: -57px -200px; }
 
+/* line 2850, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.FilmRoll {
-    background-position: -105px -200px;
-}
+  background-position: -105px -200px; }
 
+/* line 2854, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Drawer {
-    background-position: -153px -200px;
-}
+  background-position: -153px -200px; }
 
+/* line 2858, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.FilmStrip {
-    background-position: -200px -200px;
-}
+  background-position: -200px -200px; }
 
+/* line 2862, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.FilmStrip2 {
-    background-position: -250px -200px;
-}
+  background-position: -250px -200px; }
 
+/* line 2866, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Gas {
-    background-position: -298px -200px;
-}
+  background-position: -298px -200px; }
 
+/* line 2870, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Cutlery {
-    background-position: -346px -200px;
-}
+  background-position: -346px -200px; }
 
+/* line 2874, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Battery {
-    background-position: -394px -200px;
-}
+  background-position: -394px -200px; }
 
+/* line 2878, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Beaker {
-    background-position: -442px -200px;
-}
+  background-position: -442px -200px; }
 
+/* line 2882, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Outlet {
-    background-position: -9px -250px;
-}
+  background-position: -9px -250px; }
 
+/* line 2886, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Pinetree {
-    background-position: -57px -250px;
-}
+  background-position: -57px -250px; }
 
+/* line 2890, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.House {
-    background-position: -105px -250px;
-}
+  background-position: -105px -250px; }
 
+/* line 2894, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Padlock {
-    background-position: -153px -250px;
-}
+  background-position: -153px -250px; }
 
+/* line 2898, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Network {
-    background-position: -200px -250px;
-}
+  background-position: -200px -250px; }
 
+/* line 2902, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Cloud {
-    background-position: -250px -250px;
-}
+  background-position: -250px -250px; }
 
+/* line 2906, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Download {
-    background-position: -298px -250px;
-}
+  background-position: -298px -250px; }
 
+/* line 2910, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.BookmarkRibbon {
-    background-position: -346px -250px;
-}
+  background-position: -346px -250px; }
 
+/* line 2914, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Flag {
-    background-position: -394px -250px;
-}
+  background-position: -394px -250px; }
 
+/* line 2918, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Signpost {
-    background-position: -442px -250px;
-}
+  background-position: -442px -250px; }
 
+/* line 2922, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Brightness {
-    background-position: -9px -298px;
-}
+  background-position: -9px -298px; }
 
+/* line 2926, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Contrast {
-    background-position: -57px -298px;
-}
+  background-position: -57px -298px; }
 
+/* line 2930, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Runner {
-    background-position: -105px -298px;
-}
+  background-position: -105px -298px; }
 
+/* line 2934, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Zap {
-    background-position: -153px -298px;
-}
+  background-position: -153px -298px; }
 
+/* line 2938, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.MusicNote {
-    background-position: -200px -298px;
-}
+  background-position: -200px -298px; }
 
+/* line 2942, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Microphone {
-    background-position: -250px -298px;
-}
+  background-position: -250px -298px; }
 
+/* line 2946, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Tshirt {
-    background-position: -298px -298px;
-}
+  background-position: -298px -298px; }
 
+/* line 2950, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Paperclip {
-    background-position: -346px -298px;
-}
+  background-position: -346px -298px; }
 
+/* line 2954, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Monitor {
-    background-position: -394px -298px;
-}
+  background-position: -394px -298px; }
 
+/* line 2958, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Tv {
-    background-position: -442px -297px;
-}
+  background-position: -442px -297px; }
 
+/* line 2962, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Compass {
-    background-position: -9px -346px;
-}
+  background-position: -9px -346px; }
 
+/* line 2966, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Pin {
-    background-position: -57px -346px;
-}
+  background-position: -57px -346px; }
 
+/* line 2970, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Radar {
-    background-position: -105px -346px;
-}
+  background-position: -105px -346px; }
 
+/* line 2974, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Location {
-    background-position: -153px -346px;
-}
+  background-position: -153px -346px; }
 
+/* line 2978, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Telephone {
-    background-position: -200px -346px;
-}
+  background-position: -200px -346px; }
 
+/* line 2982, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Baby {
-    background-position: -250px -346px;
-}
+  background-position: -250px -346px; }
 
+/* line 2986, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Ekg {
-    background-position: -298px -346px;
-}
+  background-position: -298px -346px; }
 
+/* line 2990, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Stopwatch {
-    background-position: -346px -346px;
-}
+  background-position: -346px -346px; }
 
+/* line 2994, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.MedicalBag {
-    background-position: -394px -346px;
-}
+  background-position: -394px -346px; }
 
+/* line 2998, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.ShoppingCart {
-    background-position: -442px -346px;
-}
+  background-position: -442px -346px; }
 
+/* line 3002, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Dashboard {
-    background-position: -9px -393px;
-}
+  background-position: -9px -393px; }
 
+/* line 3006, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Dogpaw {
-    background-position: -57px -393px;
-}
+  background-position: -57px -393px; }
 
+/* line 3010, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Calendar {
-    background-position: -105px -393px;
-}
+  background-position: -105px -393px; }
 
+/* line 3014, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Lightbulb {
-    background-position: -153px -393px;
-}
+  background-position: -153px -393px; }
 
+/* line 3018, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Trophy {
-    background-position: -200px -393px;
-}
+  background-position: -200px -393px; }
 
+/* line 3022, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Camera {
-    background-position: -250px -393px;
-}
+  background-position: -250px -393px; }
 
+/* line 3026, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Wineglass {
-    background-position: -298px -393px;
-}
+  background-position: -298px -393px; }
 
+/* line 3030, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Beerglass {
-    background-position: -346px -391px;
-}
+  background-position: -346px -391px; }
 
+/* line 3034, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Dumbbells {
-    background-position: -394px -393px;
-}
+  background-position: -394px -393px; }
 
+/* line 3038, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Buoy {
-    background-position: -442px -393px;
-}
+  background-position: -442px -393px; }
 
+/* line 3042, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Beaker2 {
-    background-position: -9px -440px;
-}
+  background-position: -9px -440px; }
 
+/* line 3046, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Testtube {
-    background-position: -57px -440px;
-}
+  background-position: -57px -440px; }
 
+/* line 3050, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Thermometer {
-    background-position: -105px -440px;
-}
+  background-position: -105px -440px; }
 
+/* line 3054, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Pill {
-    background-position: -153px -440px;
-}
+  background-position: -153px -440px; }
 
+/* line 3058, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Equalizer {
-    background-position: -200px -440px;
-}
+  background-position: -200px -440px; }
 
+/* line 3062, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Book {
-    background-position: -250px -440px;
-}
+  background-position: -250px -440px; }
 
+/* line 3066, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Puzzle {
-    background-position: -298px -440px;
-}
+  background-position: -298px -440px; }
 
+/* line 3070, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Palette {
-    background-position: -346px -440px;
-}
+  background-position: -346px -440px; }
 
+/* line 3074, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Umbrella {
-    background-position: -394px -440px;
-}
+  background-position: -394px -440px; }
 
+/* line 3078, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.CoffeeCup {
-    background-position: -442px -440px;
-}
+  background-position: -442px -440px; }
 
+/* line 3082, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Gameplan {
-    background-position: -9px -490px;
-}
+  background-position: -9px -490px; }
 
+/* line 3086, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Walk {
-    background-position: -57px -490px;
-}
+  background-position: -57px -490px; }
 
+/* line 3090, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Map {
-    background-position: -105px -490px;
-}
+  background-position: -105px -490px; }
 
+/* line 3094, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.IndexCards {
-    background-position: -153px -490px;
-}
+  background-position: -153px -490px; }
 
+/* line 3098, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Piano {
-    background-position: -200px -490px;
-}
+  background-position: -200px -490px; }
 
+/* line 3102, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Sliders {
-    background-position: -250px -490px;
-}
+  background-position: -250px -490px; }
 
+/* line 3106, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Widescreen {
-    background-position: -298px -490px;
-}
+  background-position: -298px -490px; }
 
+/* line 3110, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Badge {
-    background-position: -346px -490px;
-}
+  background-position: -346px -490px; }
 
+/* line 3114, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Chicken {
-    background-position: -394px -490px;
-}
+  background-position: -394px -490px; }
 
+/* line 3118, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bug {
-    background-position: -442px -490px;
-}
+  background-position: -442px -490px; }
 
+/* line 3122, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.SingleUser {
-    background-position: -9px -539px;
-}
+  background-position: -9px -539px; }
 
+/* line 3126, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Group {
-    background-position: -57px -537px;
-}
+  background-position: -57px -537px; }
 
+/* line 3130, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Navigation {
-    background-position: -105px -537px;
-}
+  background-position: -105px -537px; }
 
+/* line 3134, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Balloon {
-    background-position: -153px -537px;
-}
+  background-position: -153px -537px; }
 
+/* line 3138, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bowandarrow {
-    background-position: -200px -537px;
-}
+  background-position: -200px -537px; }
 
+/* line 3142, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Controller {
-    background-position: -250px -537px;
-}
+  background-position: -250px -537px; }
 
+/* line 3146, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Check {
-    background-position: -298px -537px;
-}
+  background-position: -298px -537px; }
 
+/* line 3150, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Hanger {
-    background-position: -346px -537px;
-}
+  background-position: -346px -537px; }
 
+/* line 3154, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Piggybank {
-    background-position: -394px -537px;
-}
+  background-position: -394px -537px; }
 
+/* line 3158, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Headphones {
-    background-position: -442px -537px;
-}
+  background-position: -442px -537px; }
 
+/* line 3162, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Landscape {
-    background-position: -9px -586px;
-}
+  background-position: -9px -586px; }
 
+/* line 3166, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Stats {
-    background-position: -57px -586px;
-}
+  background-position: -57px -586px; }
 
+/* line 3170, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Idcard {
-    background-position: -105px -586px;
-}
+  background-position: -105px -586px; }
 
+/* line 3174, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bullhorn {
-    background-position: -153px -586px;
-}
+  background-position: -153px -586px; }
 
+/* line 3178, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Food {
-    background-position: -200px -586px;
-}
+  background-position: -200px -586px; }
 
+/* line 3182, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Moon {
-    background-position: -250px -586px;
-}
+  background-position: -250px -586px; }
 
+/* line 3186, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Sock {
-    background-position: -298px -586px;
-}
+  background-position: -298px -586px; }
 
+/* line 3190, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Bone {
-    background-position: -346px -586px;
-}
+  background-position: -346px -586px; }
 
+/* line 3194, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Golf {
-    background-position: -394px -586px;
-}
+  background-position: -394px -586px; }
 
+/* line 3198, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 span.InformSprite.Dice {
-    background-position: -442px -586px;
-}
+  background-position: -442px -586px; }
 
 /* Plugins */
+/* line 3203, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .PluginIcon {
-    display: block;
-    height: 50px;
-    width: 50px;
-}
+  display: block;
+  height: 50px;
+  width: 50px; }
 
 /* Getting Started Screen */
+/* line 3210, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Welcome h2 {
-    overflow: hidden;
-    text-indent: -1000px;
-    font-size: 1px;
-    height: 42px;
-    width: 341px;
-    background: url('images/welcome-message.png') top left no-repeat transparent;
-}
+  overflow: hidden;
+  text-indent: -1000px;
+  font-size: 1px;
+  height: 42px;
+  width: 341px;
+  background: url("images/welcome-message.png") top left no-repeat transparent; }
 
+/* line 3219, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Info ul,
 .Info ol {
-    margin: 1em 0 1em 3em;
-}
+  margin: 1em 0 1em 3em; }
 
+/* line 3224, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Info ol li {
-    list-style: decimal !important;
-}
+  list-style: decimal !important; }
 
+/* line 3228, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Info ul li {
-    list-style: disc !important;
-}
+  list-style: disc !important; }
 
+/* line 3232, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ActivateSlider {
-    display: inline-block;
-    background: #bbb;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
-    border: solid 1px #ccc;
-    width: 100px;
-    padding: 1px;
-    border-radius: 2px;
-    position: relative;
-    line-height: 1;
-    vertical-align: middle;
-}
+  display: inline-block;
+  background: #bbb;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+  border: solid 1px #ccc;
+  width: 100px;
+  padding: 1px;
+  border-radius: 2px;
+  position: relative;
+  line-height: 1;
+  vertical-align: middle; }
 
+/* line 3245, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ActivateSlider .SmallButton {
-    line-height: 11px;
-}
+  line-height: 11px; }
 
+/* line 3249, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ActivateSlider-Active {
-    text-align: right;
-    background: #001F44;
-    box-shadow: 0 -5px 10px #0B64C6 inset;
-}
+  text-align: right;
+  background: #001F44;
+  box-shadow: 0 -5px 10px #0B64C6 inset; }
 
+/* line 3255, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .ActivateSlider .SmallButton {
-    margin: 0;
-    min-width: 45px;
+  margin: 0;
+  min-width: 45px; }
 
-}
-
+/* line 3261, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .Sprite {
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-    vertical-align: text-top;
-    border: solid 2px transparent;
-    margin: -2px;
-    background: url('//vanillicon.com/sprites/sprites-14-sweetx-001F44.png') 0 0 no-repeat;
-    display: inline-block;
-}
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  vertical-align: text-top;
+  border: solid 2px transparent;
+  margin: -2px;
+  background: url("//vanillicon.com/sprites/sprites-14-sweetx-001F44.png") 0 0 no-repeat;
+  display: inline-block; }
 
 /* 16px Sprites Black Transparent */
 /*.SpDashboard,
@@ -3384,103 +3298,102 @@ span.InformSprite.Dice {
 .SpRefresh { background-position: -48px -196px; }
 .SpPencil { background-position: -64px -196px; }
 .SpPlus { background-position: -80px -196px; }*/
-
+/* line 3303, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpActivity {
-    background-position: -160px -120px;
-}
+  background-position: -160px -120px; }
 
+/* line 3307, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpAllCategories {
-    background-position: -60px -140px;
-}
+  background-position: -60px -140px; }
 
+/* line 3311, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpApplicants {
-    background-position: -260px -40px;
-}
+  background-position: -260px -40px; }
 
+/* line 3315, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpBadge {
-    background-position: -240px -140px;
-}
+  background-position: -240px -140px; }
 
+/* line 3319, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpBan {
-    background-position: -300px -20px;
-}
+  background-position: -300px -20px; }
 
+/* line 3323, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpBookmarks {
-    background-position: -100px -80px;
-}
+  background-position: -100px -80px; }
 
+/* line 3327, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpComments, .SpComment {
-    background-position: -160px -80px;
-}
+  background-position: -160px -80px; }
 
+/* line 3331, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpConnection {
-    background-position: -320px -20px;
-}
+  background-position: -320px -20px; }
 
+/* line 3335, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpDashboard {
-    background-position: -340px -20px
-}
+  background-position: -340px -20px; }
 
+/* line 3339, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpDelete {
-    background-position: -340px -140px;
-}
+  background-position: -340px -140px; }
 
+/* line 3343, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpDiscussions, .SpMyDiscussions {
-    background-position: -200px -80px;
-}
+  background-position: -200px -80px; }
 
+/* line 3347, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpImage {
-    background-position: -120px -140px;
-}
+  background-position: -120px -140px; }
 
+/* line 3351, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpInbox {
-    background-position: -80px -100px;
-}
+  background-position: -80px -100px; }
 
+/* line 3355, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpMessage {
-    background-position: -100px -100px;
-}
+  background-position: -100px -100px; }
 
+/* line 3359, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpMod {
-    background-position: -260px -60px;
-}
+  background-position: -260px -60px; }
 
+/* line 3363, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpMyDrafts {
-    background-position: -180px -20px;
-}
+  background-position: -180px -20px; }
 
+/* line 3367, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpNotifications {
-    background-position: -160px -100px;
-}
+  background-position: -160px -100px; }
 
+/* line 3371, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpOptions {
-    background-position: -180px -60px;
-}
+  background-position: -180px -60px; }
 
+/* line 3375, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpPhoto {
-    background-position: -160px -60px;
-}
+  background-position: -160px -60px; }
 
+/* line 3379, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpProfile, .SpEditProfile {
-    background-position: -220px -40px;
-}
+  background-position: -220px -40px; }
 
+/* line 3383, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpQuote {
-    background-position: -280px -20px;
-}
+  background-position: -280px -20px; }
 
+/* line 3387, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpSignOut {
-    background-position: -240px -100px;
-}
+  background-position: -240px -100px; }
 
+/* line 3391, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpText {
-    background-position: -160px -80px;
-}
+  background-position: -160px -80px; }
 
+/* line 3395, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpUnansweredQuestions {
-    background-position: -60px -100px;
-}
+  background-position: -60px -100px; }
 
+/* line 3399, /Users/rebecca/Development/phpenvironment/www/vanilla/applications/dashboard/scss/legacy/admin.scss */
 .SpWarn, .SpWarnings {
-    background-position: -200px -20px;
-}
+  background-position: -200px -20px; }

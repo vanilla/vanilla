@@ -30,7 +30,7 @@ addons:
 
 install:
   - composer install -o
-  - tests/travis/nginx/install-nginx.sh
+  - if [ $RUN != 'lint' ]; then tests/travis/nginx/install-nginx.sh; fi
 
 script:
   - tests/run-tests.sh

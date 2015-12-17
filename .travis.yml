@@ -17,8 +17,8 @@ env:
 matrix:
   fast_finish: true
 
-cache:
-  - apt
+#cache:
+#  - apt
 
 addons:
   apt:

@@ -2,8 +2,8 @@
 
 DIR=$(realpath $(dirname "$0"))
 
-if [ "$CI_STEP" = 'lint' ]; then
+if [ "$RUN" = 'lint' ]; then
     $DIR/php-lint.sh $DIR/..
-elif [ "$CI_STEP" = 'test' ]; then
+elif [ "$RUN" = 'test' ]; then
     phpunit -c $DIR/../phpunit.xml.dist
 fi

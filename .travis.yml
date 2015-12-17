@@ -11,8 +11,8 @@ sudo: false
 
 env:
   matrix:
-    - CI_STEP=lint
-    - CI_STEP=test
+    - RUN=lint
+    - RUN=test
 
 matrix:
   fast_finish: true
@@ -33,7 +33,4 @@ install:
   - tests/travis/nginx/install-nginx.sh
 
 script:
-  - tests/travis/php-lint.sh .
-  - phpunit -c phpunit.xml.dist
-  - cat /tmp/error.log
-  - cat /tmp/access.log
+  - tests/run-tests.php

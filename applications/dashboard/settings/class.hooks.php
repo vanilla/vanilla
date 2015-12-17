@@ -19,7 +19,7 @@ class DashboardHooks implements Gdn_IPlugin {
     public function setup() {
     }
 
-   /**
+    /**
      * Fire before every page render.
     *
     * @param Gdn_Controller $Sender
@@ -211,15 +211,15 @@ class DashboardHooks implements Gdn_IPlugin {
         }
     }
 
-   /**
-    * Set P3P header because IE won't allow cookies thru the iFrame without it.
-    *
-    * This must be done in the Dispatcher because of PrivateCommunity.
-    * That precludes using Controller->SetHeader.
-    * This is done so comment & forum embedding can work in old IE.
+    /**
+     * Set P3P header because IE won't allow cookies thru the iFrame without it.
+     *
+     * This must be done in the Dispatcher because of PrivateCommunity.
+     * That precludes using Controller->SetHeader.
+     * This is done so comment & forum embedding can work in old IE.
      *
      * @param Gdn_Dispatcher $Sender
-    */
+     */
     public function gdn_dispatcher_appStartup_handler($Sender) {
         safeHeader('P3P: CP="CAO PSA OUR"', true);
 
@@ -244,11 +244,12 @@ class DashboardHooks implements Gdn_IPlugin {
 
                 if ($UserID != $CurrentUserID) {
                     Gdn::userModel()->fireEvent('AfterSignIn');
-                 }
+                }
             } else {
-               // There was some sort of error. Let's print that out.
+                // There was some sort of error. Let's print that out.
                 foreach (Gdn::userModel()->Validation->resultsArray() as $msg) {
                     trace($msg, TRACE_ERROR);
+                }
                 Gdn::userModel()->Validation->reset();
             }
         }

@@ -9,6 +9,11 @@ php:
 
 sudo: false
 
+env:
+  matrix:
+    - CI_STEP=lint
+    - CI_STEP=test
+
 matrix:
   fast_finish: true
 

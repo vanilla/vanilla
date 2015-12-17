@@ -30,7 +30,6 @@
 			"library/"
 		],
 		"files": [
-			"library/core/functions.error.php",
 			"library/core/functions.general.php",
 			"library/core/functions.compatibility.php"
 		]

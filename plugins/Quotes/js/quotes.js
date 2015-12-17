@@ -124,11 +124,8 @@ Gdn_Quotes.prototype.Quote = function(ObjectID, QuoteLink) {
     // DEPRECATED: cleditor support
     if ($('div.cleditorMain').length) {
         ScrollY = $(this.GetEditor().get(0).editor.$frame).offset().top - 100;
-    } else {
-        ScrollY = this.GetEditor().offset().top - 100;
+        $('html,body').animate({scrollTop: ScrollY}, 800);
     }
-
-    $('html,body').animate({scrollTop: ScrollY}, 800);
 };
 
 

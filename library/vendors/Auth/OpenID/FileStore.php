@@ -46,7 +46,7 @@ class Auth_OpenID_FileStore extends Auth_OpenID_OpenIDStore {
      * @param string $directory This is the directory to put the store
      * directories in.
      */
-    function Auth_OpenID_FileStore($directory)
+    function __construct($directory)
     {
         if (!Auth_OpenID::ensureDir($directory)) {
             trigger_error('Not a directory and failed to create: '

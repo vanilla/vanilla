@@ -13,5 +13,3 @@
 .gitignore export-ignore
 .travis.yml export-ignore
 tests export-ignore
-composer.json export-ignore
-composer.lock export-ignore

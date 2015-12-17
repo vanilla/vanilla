@@ -51,14 +51,17 @@
 */
 function phpbb_check_hash($password, $hash)
 {
+	if (preg_match('#^\$2[axy]\$#', $hash)) {
+		return crypt($password, $hash) === $hash;
+	}
+
 	$itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 	if (strlen($hash) == 34)
 	{
-
 		return (_hash_crypt_private($password, $hash, $itoa64) === $hash) ? true : false;
 	}
 
-	return (md5($password) === $hash) ? true : false;
+	return md5($password) === $hash;
 }
 
 /**

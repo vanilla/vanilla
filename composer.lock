@@ -1,90 +1,59 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
     ],
-    "hash": "76b755bcc1f36cc60aac03a9c99aab72",
-    "packages": [],
-    "packages-dev": [
+    "hash": "4e41eb4d5db2cb083b415e7a3c1b249a",
+    "content-hash": "56dd9d6065a0c14668b474c4f60b29aa",
+    "packages": [
         {
-            "name": "squizlabs/php_codesniffer",
-            "version": "1.5.3",
+            "name": "vanilla/garden-http",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "396178ada8499ec492363587f037125bf7b07fcc"
+                "url": "https://github.com/vanilla/garden-http.git",
+                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/396178ada8499ec492363587f037125bf7b07fcc",
-                "reference": "396178ada8499ec492363587f037125bf7b07fcc",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/da3b859774613031788eaa148a7e9e8622f6bc2a",
+                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a",
                 "shasum": ""
             },
             "require": {
-                "ext-tokenizer": "*",
-                "php": ">=5.1.2"
+                "lib-curl": "*",
+                "php": ">=5.4.0"
             },
-            "suggest": {
-                "phpunit/php-timer": "dev-master"
+            "require-dev": {
+                "vanilla/garden": "dev-master"
             },
-            "bin": [
-                "scripts/phpcs"
-            ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-phpcs-fixer": "2.0.x-dev"
-                }
-            },
             "autoload": {
-                "classmap": [
-                    "CodeSniffer.php",
-                    "CodeSniffer/CLI.php",
-                    "CodeSniffer/Exception.php",
-                    "CodeSniffer/File.php",
-                    "CodeSniffer/Report.php",
-                    "CodeSniffer/Reporting.php",
-                    "CodeSniffer/Sniff.php",
-                    "CodeSniffer/Tokens.php",
-                    "CodeSniffer/Reports/",
-                    "CodeSniffer/CommentParser/",
-                    "CodeSniffer/Tokenizers/",
-                    "CodeSniffer/DocGenerators/",
-                    "CodeSniffer/Standards/AbstractPatternSniff.php",
-                    "CodeSniffer/Standards/AbstractScopeSniff.php",
-                    "CodeSniffer/Standards/AbstractVariableSniff.php",
-                    "CodeSniffer/Standards/IncorrectPatternException.php",
-                    "CodeSniffer/Standards/Generic/Sniffs/",
-                    "CodeSniffer/Standards/MySource/Sniffs/",
-                    "CodeSniffer/Standards/PEAR/Sniffs/",
-                    "CodeSniffer/Standards/PSR1/Sniffs/",
-                    "CodeSniffer/Standards/PSR2/Sniffs/",
-                    "CodeSniffer/Standards/Squiz/Sniffs/",
-                    "CodeSniffer/Standards/Zend/Sniffs/"
-                ]
+                "psr-4": {
+                    "Garden\\Http\\": "src"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause"
+                "MIT"
             ],
             "authors": [
                 {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
                 }
             ],
-            "description": "PHP_CodeSniffer tokenises PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "http://www.squizlabs.com/php-codesniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "time": "2014-05-01 03:07:07"
+            "description": "An unbloated HTTP client library for building RESTful API clients.",
+            "time": "2015-12-10 21:39:51"
         }
     ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
 }

@@ -60,10 +60,6 @@ class UserModel extends Gdn_Model {
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
             'Score', 'Photo'
         ));
-
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
-        }
     }
 
     /**
@@ -583,7 +579,7 @@ class UserModel extends Gdn_Model {
      */
     public function sso($String, $ThrowError = false) {
         if (!$String) {
-            return;
+            return null;
         }
 
         $Parts = explode(' ', $String);
@@ -592,16 +588,19 @@ class UserModel extends Gdn_Model {
         trace($String, "SSO String");
         $Data = json_decode(base64_decode($String), true);
         trace($Data, 'RAW SSO Data');
-        $Errors = array();
 
         if (!isset($Parts[1])) {
-            $Errors[] = 'Missing SSO signature';
+            $this->Validation->addValidationResult('sso', 'Missing SSO signature.');
         }
         if (!isset($Parts[2])) {
-            $Errors[] = 'Missing SSO timestamp';
+            $this->Validation->addValidationResult('sso', 'Missing SSO timestamp.');
         }
-        if (!empty($Errors)) {
-            return;
+        if (count($this->Validation->results()) > 0) {
+            $msg = $this->Validation->resultsText();
+            if ($ThrowError) {
+                throw new Gdn_UserException($msg, 400);
+            }
+            return false;
         }
 
         $Signature = $Parts[1];
@@ -609,21 +608,21 @@ class UserModel extends Gdn_Model {
         $HashMethod = val(3, $Parts, 'hmacsha1');
         $ClientID = val('client_id', $Data);
         if (!$ClientID) {
-            trace('Missing SSO client_id', TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', 'Missing SSO client_id');
+            return false;
         }
 
         $Provider = Gdn_AuthenticationProviderModel::getProviderByKey($ClientID);
 
         if (!$Provider) {
-            trace("Unknown SSO Provider: $ClientID", TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', "Unknown SSO Provider: $ClientID");
+            return false;
         }
 
         $Secret = $Provider['AssociationSecret'];
         if (!trim($Secret, '.')) {
-            trace('Missing client secret', TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', 'Missing client secret');
+            return false;
         }
 
         // Check the signature.
@@ -632,12 +631,12 @@ class UserModel extends Gdn_Model {
                 $CalcSignature = hash_hmac('sha1', "$String $Timestamp", $Secret);
                 break;
             default:
-                trace("Invalid SSO hash method $HashMethod.", TRACE_ERROR);
-                return;
+                $this->Validation->addValidationResult('sso', "Invalid SSO hash method $HashMethod.");
+                return false;
         }
         if ($CalcSignature != $Signature) {
-            trace("Invalid SSO signature: $Signature", TRACE_ERROR);
-            return;
+            $this->Validation->addValidationResult('sso', "Invalid SSO signature: $Signature");
+            return false;
         }
 
         $UniqueID = $Data['uniqueid'];
@@ -824,6 +823,10 @@ class UserModel extends Gdn_Model {
     public function filterForm($data, $register = false) {
         if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
             $this->removeFilterField('Name');
+        }
+
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $this->addFilterField(array('Banned', 'Verified', 'Confirmed', 'RankID'));
         }
 
         $data = parent::FilterForm($data);
@@ -1212,7 +1215,7 @@ class UserModel extends Gdn_Model {
             ->from('User')
             ->orderBy('DateLastActive', 'desc')
             ->limit($Limit, 0)
-            ->get();
+            ->get()->resultArray();
         $UserIDs = array_column($UserIDs, 'UserID');
 
         $Data = $this->SQL->getWhere('User', array('UserID' => $UserIDs), 'DateLastActive', 'desc');
@@ -1317,14 +1320,16 @@ class UserModel extends Gdn_Model {
      *
      *
      * @param mixed $ID
-     * @param bool|string $DatasetType
+     * @param string|false $DatasetType
+     * @param array $Options Additional options to affect fetching. Currently unused.
      * @return array|bool|null|object|type
      * @throws Exception
      */
-    public function getID($ID, $DatasetType = DATASET_TYPE_OBJECT) {
+    public function getID($ID, $DatasetType = false, $Options = []) {
         if (!$ID) {
             return false;
         }
+        $DatasetType = $DatasetType ?: DATASET_TYPE_OBJECT;
 
         // Check page cache, then memcached
         $User = $this->getUserFromCache($ID, 'userid');
@@ -1803,13 +1808,17 @@ class UserModel extends Gdn_Model {
     public function removePicture($UserID) {
         // Grab the current photo.
         $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
-        if ($Photo = $User['Photo']) {
+        $Photo = $User['Photo'];
+
+        // Only attempt to delete a physical file, not a URL.
+        if (!isUrl($Photo)) {
             $ProfilePhoto = changeBasename($Photo, 'p%s');
             $Upload = new Gdn_Upload();
             $Upload->delete($ProfilePhoto);
-
-            $this->setField($UserID, 'Photo', null);
         }
+
+        // Wipe the Photo field.
+        $this->setField($UserID, 'Photo', null);
     }
 
     /**
@@ -1889,15 +1898,19 @@ class UserModel extends Gdn_Model {
         // Make sure that checkbox vals are saved as the appropriate value
 
         if (array_key_exists('ShowEmail', $FormPostValues)) {
-            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
         }
 
         if (array_key_exists('Banned', $FormPostValues)) {
-            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
         }
 
         if (array_key_exists('Confirmed', $FormPostValues)) {
-            $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
+            $FormPostValues['Confirmed'] = forceBool($FormPostValues['Confirmed'], '0', '1', '0');
+        }
+
+        if (array_key_exists('Verified', $FormPostValues)) {
+            $FormPostValues['Verified'] = forceBool($FormPostValues['Verified'], '0', '1', '0');
         }
 
         unset($FormPostValues['Admin']);
@@ -2860,6 +2873,7 @@ class UserModel extends Gdn_Model {
 
             if (Gdn::session()->newVisit()) {
                 $Fields['CountVisits'] = val('CountVisits', $User, 0) + 1;
+                $this->fireEvent('Visit');
             }
         }
 

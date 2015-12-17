@@ -80,7 +80,7 @@ echo $this->Form->close();
     }
 </style>
 
-<h1><?php echo t('Unviersal Forum Embed Code'); ?></h1>
+<h1><?php echo t('Universal Forum Embed Code'); ?></h1>
 <div class="Info">
     <p><?php echo t('To embed your Vanilla forum into your web site, use the following code.'); ?></p>
 

@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
 
     var checkConnectName = function() {
         if (gdn.definition('NoConnectName', false)) {
-            $('#ConectPassword').show();
+            $('#ConnectPassword').show();
             return;
         }
 

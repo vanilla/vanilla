@@ -781,13 +781,12 @@ class CommentModel extends VanillaModel {
     *
     * Events: BeforeSaveComment, AfterSaveComment.
     *
-    * @since 2.0.0
-    * @access public
-    *
     * @param array $FormPostValues Data from the form model.
+     * @param array $Settings Currently unused.
     * @return int $CommentID
+     * @since 2.0.0
     */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         $Session = Gdn::session();
 
        // Define the primary key in this model's table.
@@ -830,6 +829,12 @@ class CommentModel extends VanillaModel {
             if (!$Insert || !$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+
+                // Check for spam
+                $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
+                if ($spam) {
+                    return SPAM;
+                }
 
                 if ($Insert === false) {
                    // Log the save.
@@ -901,7 +906,7 @@ class CommentModel extends VanillaModel {
     */
     public function save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
         $Session = Gdn::session();
-        $UserModel = Gdn::userModel();
+        $discussionModel = new DiscussionModel();
 
        // Load comment data
         $Fields = $this->getID($CommentID, DATASET_TYPE_ARRAY);
@@ -998,7 +1003,7 @@ class CommentModel extends VanillaModel {
             $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
             foreach ($BookmarkData->result() as $Bookmark) {
                // Check user can still see the discussion.
-                if (!$UserModel->GetCategoryViewPermission($Bookmark->UserID, $Discussion->CategoryID)) {
+                if (!$discussionModel->canView($Discussion, $Bookmark->UserID)) {
                     continue;
                 }
 
@@ -1010,7 +1015,7 @@ class CommentModel extends VanillaModel {
            // Notify users who have participated in the discussion.
             $ParticipatedData = $DiscussionModel->GetParticipatedUsers($DiscussionID);
             foreach ($ParticipatedData->result() as $UserRow) {
-                if (!$UserModel->GetCategoryViewPermission($UserRow->UserID, $Discussion->CategoryID)) {
+                if (!$discussionModel->canView($Discussion, $UserRow->UserID)) {
                     continue;
                 }
 
@@ -1023,7 +1028,7 @@ class CommentModel extends VanillaModel {
             if ($Discussion != false) {
                 $InsertUserID = val('InsertUserID', $Discussion);
                // Check user can still see the discussion.
-                if ($UserModel->GetCategoryViewPermission($InsertUserID, $Discussion->CategoryID)) {
+                if ($discussionModel->canView($Discussion, $InsertUserID)) {
                     $Activity['NotifyUserID'] = $InsertUserID;
                     $Activity['Data']['Reason'] = 'mine';
                     $ActivityModel->Queue($Activity, 'DiscussionComment');
@@ -1038,15 +1043,16 @@ class CommentModel extends VanillaModel {
 
            // Notify any users who were mentioned in the comment.
             $Usernames = GetMentions($Fields['Body']);
+            $userModel = Gdn::userModel();
             foreach ($Usernames as $i => $Username) {
-                $User = $UserModel->GetByUsername($Username);
+                $User = $userModel->GetByUsername($Username);
                 if (!$User) {
                     unset($Usernames[$i]);
                     continue;
                 }
 
                // Check user can still see the discussion.
-                if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID)) {
+                if (!$discussionModel->canView($Discussion, $User->UserID)) {
                     continue;
                 }
 
@@ -1115,7 +1121,8 @@ class CommentModel extends VanillaModel {
 
             $UserID = $Row['UserID'];
            // Check user can still see the discussion.
-            if (!Gdn::userModel()->GetCategoryViewPermission($UserID, $Category['CategoryID'])) {
+            $discussionModel = new DiscussionModel();
+            if (!$discussionModel->canView($Discussion, $UserID)) {
                 continue;
             }
 

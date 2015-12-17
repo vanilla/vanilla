@@ -82,15 +82,15 @@ function writeActivity($Activity, &$Sender, &$Session) {
     $AllowComments = $Activity->NotifyUserID < 0 || $SharedString;
 
 
-    if ($AllowComments && $Session->checkPermission('Garden.Profiles.Edit'))
+    if ($AllowComments && $Session->checkPermission('Garden.Profiles.Edit')) {
         echo '<span class="MItem AddComment">'
-            .anchor(t('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption');
+            .anchor(t('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption')
+            .'</span>';
+    }
 
     if ($SharedString) {
         echo ' <span class="MItem"><i>'.$SharedString.'</i></span>';
     }
-
-    echo '</span>';
 
     $Sender->fireEvent('AfterMeta');
     ?>

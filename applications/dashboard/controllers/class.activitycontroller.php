@@ -50,7 +50,6 @@ class ActivityController extends Gdn_Controller {
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -153,7 +152,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         // Which page to load
-        list($Offset, $Limit) = offsetLimit($Page, 30);
+        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Activities.PerPage',30));
         $Offset = is_numeric($Offset) ? $Offset : 0;
         if ($Offset < 0) {
             $Offset = 0;
@@ -270,6 +269,17 @@ class ActivityController extends Gdn_Controller {
             $Body = $this->Form->getValue('Body', '');
             $ActivityID = $this->Form->getValue('ActivityID', '');
             if (is_numeric($ActivityID) && $ActivityID > 0) {
+                $activity = $this->ActivityModel->getID($ActivityID);
+                if ($activity) {
+                    if ($activity['NotifyUserID'] == ActivityModel::NOTIFY_ADMINS) {
+                        $this->permission('Garden.Settings.Manage');
+                    } elseif ($activity['NotifyUserID'] == ActivityModel::NOTIFY_MODS) {
+                        $this->permission('Garden.Moderation.Manage');
+                    }
+                } else {
+                    throw new Exception(t('Invalid activity'));
+                }
+
                 $ActivityComment = array(
                     'ActivityID' => $ActivityID,
                     'Body' => $Body,

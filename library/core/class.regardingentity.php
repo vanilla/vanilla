@@ -336,7 +336,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
         $RegardingModel = new RegardingModel();
 
-        $CollapseMode = C('Garden.Regarding.AutoCollapse', true);
+        $CollapseMode = c('Garden.Regarding.AutoCollapse', true);
         $Collapse = false;
         if ($CollapseMode) {
             // Check for an existing report of this type

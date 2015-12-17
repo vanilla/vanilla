@@ -220,7 +220,7 @@ class PromotedContentModule extends Gdn_Module {
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
-            $this->Prepare($Content);
+            $this->processContent($Content);
 
             // Add result to cache
             Gdn::cache()->store($SelectorRoleCacheKey, $Content, array(
@@ -305,7 +305,7 @@ class PromotedContentModule extends Gdn_Module {
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
-            $this->Prepare($Content);
+            $this->processContent($Content);
 
             // Add result to cache
             Gdn::cache()->store($SelectorRankCacheKey, $Content, array(
@@ -382,7 +382,7 @@ class PromotedContentModule extends Gdn_Module {
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
-            $this->Prepare($Content);
+            $this->processContent($Content);
 
             // Add result to cache
             Gdn::cache()->store($SelectorCategoryCacheKey, $Content, array(
@@ -450,7 +450,7 @@ class PromotedContentModule extends Gdn_Module {
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
             ));
-            $this->Prepare($Content);
+            $this->processContent($Content);
 
             // Add result to cache
             Gdn::cache()->store($SelectorScoreCacheKey, $Content, array(
@@ -493,7 +493,7 @@ class PromotedContentModule extends Gdn_Module {
             $this->Limit
         );
 
-        $this->Prepare($Content);
+        $this->processContent($Content);
 
         return $Content;
     }
@@ -563,7 +563,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @param Array $content By reference
      */
-    protected function prepare(&$content) {
+    protected function processContent(&$content) {
 
         foreach ($content as &$item) {
             $contentType = val('RecordType', $item);

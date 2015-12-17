@@ -29,6 +29,8 @@ class Gdn_Locale extends Gdn_Pluggable {
 
     /** @var array  */
     public static $SetLocales = array(
+        'ar' => 'ar_SA',
+        'az' => 'az_AZ',
         'bg' => 'bg_BG',
         'bs' => 'bs_BA',
         'ca' => 'ca_ES',
@@ -39,27 +41,37 @@ class Gdn_Locale extends Gdn_Pluggable {
         'en' => 'en_US',
         'es' => 'es_ES',
         'fa' => 'fa_IR',
+        'fi' => 'fi_FI',
         'fr' => 'fr_FR',
+        'gd' => 'gd_GB',
+        'gu' => 'gu_IN',
         'he' => 'he_IL',
         'hi' => 'hi_IN',
+        'hr' => 'hr_HR',
         'hu' => 'hu_HU',
         'id' => 'id_ID',
         'it' => 'it_IT',
         'ja' => 'ja_JP',
+        'km' => 'km_KH',
         'ko' => 'ko_KR',
         'lt' => 'lt_LT',
         'my' => 'my_MM',
         'nb' => 'nb_NO',
-        'no' => array('no_NO', 'nn_NO'),
         'nl' => 'nl_NL',
+        'no' => array('no_NO', 'nn_NO'),
         'pl' => 'pl_PL',
         'pt' => 'pt_BR',
         'ro' => 'ro_RO',
         'ru' => 'ru_RU',
+        'sk' => 'sk_SK',
+        'sl' => 'sl_SI',
+        'sr' => 'sr_RS',
         'sv' => 'sv_SE',
         'th' => 'th_TH',
+        'tl' => 'tl_PH',
         'tr' => 'tr_TR',
         'uk' => 'uk_UA',
+        'ur' => 'ur_PL',
         'vi' => 'vi_VN',
         'zh' => 'zh_CN'
     );
@@ -161,7 +173,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->Locale = $CurrentLocale;
         $LocaleSources = $this->getLocaleSources($CurrentLocale, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
 
-        $Codeset = C('Garden.LocaleCodeset', 'UTF8');
+        $Codeset = c('Garden.LocaleCodeset', 'UTF8');
 
         $SetLocale = array(
             LC_TIME,
@@ -202,7 +214,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         }
 
         // Prepare developer mode if needed
-        $this->DeveloperMode = C('Garden.Locales.DeveloperMode', false);
+        $this->DeveloperMode = c('Garden.Locales.DeveloperMode', false);
         if ($this->DeveloperMode) {
             $this->DeveloperContainer = new Gdn_Configuration();
             $this->DeveloperContainer->splitting(false);
@@ -280,7 +292,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->crawlAddonLocaleSources(PATH_APPLICATIONS, $applicationWhiteList, $result);
 
         // Get locale-based locale definition files.
-        $enabledLocales = C('EnabledLocales');
+        $enabledLocales = c('EnabledLocales');
         if (is_array($enabledLocales)) {
             foreach ($enabledLocales as $localeKey => $locale) {
                 $locale = self::canonicalize($locale);
@@ -298,7 +310,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->crawlAddonLocaleSources(PATH_PLUGINS, $pluginWhiteList, $result);
 
         // Get theme-based locale definition files.
-        $theme = C('Garden.Theme');
+        $theme = c('Garden.Theme');
         if ($theme) {
             $this->crawlAddonLocaleSources(PATH_THEMES, array($theme), $result);
         }

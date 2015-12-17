@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.5',
+   'Version' => '1.7.6',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -32,7 +32,7 @@ class EditorPlugin extends Gdn_Plugin {
     const DISCUSSION_MEDIA_CACHE_KEY = 'media.discussion.%d';
 
     /** @var bool  */
-    protected $canUpload = false;
+    protected $canUpload;
 
     /** @var array Give class access to PluginInfo */
     protected $pluginInfo = array();
@@ -80,21 +80,6 @@ class EditorPlugin extends Gdn_Plugin {
         // Check for additional formats
         $this->EventArguments['formats'] =& $this->Formats;
         $this->fireEvent('GetFormats');
-
-        // Check upload permissions
-        $this->canUpload = Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false);
-
-        if ($this->canUpload) {
-            $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
-            if (!val('AllowFileUploads', $PermissionCategory, true)) {
-                $this->canUpload = false;
-            }
-        }
-
-        // Check against config, too
-        if (!c('Garden.AllowFileUploads', false)) {
-            $this->canUpload = false;
-        }
     }
 
     /**
@@ -619,8 +604,6 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('allowedFileExtensions', json_encode(c('Garden.Upload.AllowedFileExtensions')));
         // Get max file uploads, to be used for max drops at once.
         $c->addDefinition('maxFileUploads', ini_get('max_file_uploads'));
-        // Set canUpload definition here, but not Data (set in BeforeBodyBox) because it overwrites.
-        $c->addDefinition('canUpload', $this->canUpload);
     }
 
    /**
@@ -674,8 +657,8 @@ class EditorPlugin extends Gdn_Plugin {
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->addDefinition('canUpload', $this->canUpload);
-            $c->setData('_canUpload', $this->canUpload);
+            $c->addDefinition('canUpload', $this->canUpload());
+            $c->setData('_canUpload', $this->canUpload());
 
             // Determine which controller (post or discussion) is invoking this.
             // At the moment they're both the same, but in future you may want
@@ -736,7 +719,14 @@ class EditorPlugin extends Gdn_Plugin {
             // Save original file to uploads, then manipulate from this location if
             // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
             if (empty($imageType)) {
-                $filePathParsed = $Upload->saveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
+                $filePathParsed = $Upload->saveAs(
+                    $tmpFilePath,
+                    $absoluteFileDestination,
+                    array(
+                        'OriginalFilename' => $fileName,
+                        'source' => 'content'
+                    )
+                );
             } else {
                 $filePathParsed = Gdn_UploadImage::saveImageAs($tmpFilePath, $absoluteFileDestination, '', '', array('SaveGif' => true));
                 $tmpwidth = $filePathParsed['Width'];
@@ -1453,6 +1443,29 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         redirect($url, 301);
+    }
+
+    /**
+     * Checks whether the canUpload property is set and if not, calculates it value.
+     * The calculation is based on config, user permissions, and category permissions.
+     *
+     * @return bool Whether the session user is allowed to upload a file.
+     */
+    protected function canUpload() {
+        // If the property has been set, return it
+        if (isset($this->canUpload)) {
+            return $this->canUpload;
+        } else {
+            // Check config and user role upload permission
+            if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false)) {
+                // Check category-specific permission
+                $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
+                $this->canUpload = val('AllowFileUploads', $PermissionCategory, true);
+            } else {
+                $this->canUpload = false;
+            }
+        }
+        return $this->canUpload;
     }
 
     /**

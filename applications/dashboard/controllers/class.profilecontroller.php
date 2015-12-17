@@ -70,7 +70,6 @@ class ProfileController extends Gdn_Controller {
         $this->ModuleSortContainer = 'Profile';
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -169,8 +168,8 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $UserID
      */
     public function clear($UserID = '') {
-        if (empty($_POST)) { // TODO: rm global
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $UserID = is_numeric($UserID) ? $UserID : 0;
@@ -189,29 +188,6 @@ class ProfileController extends Gdn_Controller {
             $this->jsonTarget('#Status', '', 'Remove');
             $this->render('Blank', 'Utility');
         }
-    }
-
-    /**
-     *
-     *
-     * @param $Type
-     * @param string $UserReference
-     * @param string $Username
-     * @throws Exception
-     */
-    public function connect($Type, $UserReference = '', $Username = '') {
-        $this->permission('Garden.SignIn.Allow');
-        $this->getUserInfo($UserReference, $Username, '', true);
-
-        // Fire an event and let whatever plugin handle the connection.
-        // This will fire an event in the form ProfileController_FacebookConnect_Handler(...).
-        $Connected = false;
-        $this->EventArguments['Connected'] =& $Connected;
-
-
-        $this->fireEvent(ucfirst($Type).'Connect');
-
-
     }
 
     /**
@@ -401,6 +377,7 @@ class ProfileController extends Gdn_Controller {
             // These options become available when POSTing as a user with Garden.Settings.Manage permissions
 
             if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+
                 // Role change
 
                 $RequestedRoles = $this->Form->getFormValue('RoleID', null);
@@ -701,7 +678,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function picture($UserReference = '', $Username = '', $UserID = '') {
-        if (!c('Garden.Profile.EditPhotos', true)) {
+        if (!Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true))) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -734,28 +711,38 @@ class ProfileController extends Gdn_Controller {
 
         if ($this->Form->authenticatedPostBack() === true) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
-            $UploadImage = new Gdn_UploadImage();
-            try {
-                // Validate the upload
-                $TmpImage = $UploadImage->ValidateUpload('Picture');
 
-                // Generate the target image name.
-                $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
-                $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
-                $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', false, true);
+            // Set user's Photo attribute to a URL, provided the current user has proper permission to do so.
+            $photoUrl = $this->Form->getFormValue('Url', false);
+            if ($photoUrl && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                if (isUrl($photoUrl) && filter_var($photoUrl, FILTER_VALIDATE_URL)) {
+                    $UserPhoto = $photoUrl;
+                } else {
+                    $this->Form->addError('Invalid photo URL');
+                }
+            } else {
+                $UploadImage = new Gdn_UploadImage();
+                try {
+                    // Validate the upload
+                    $TmpImage = $UploadImage->ValidateUpload('Picture');
 
-                // Delete any previously uploaded image.
-                $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
+                    // Generate the target image name.
+                    $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
+                    $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
+                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS . '/', false, true);
 
-                // Save the uploaded image in profile size.
-                $Props = $UploadImage->SaveImageAs(
-                    $TmpImage,
-                    "userpics/$Subdir/p$Basename",
-                    c('Garden.Profile.MaxHeight', 1000),
-                    c('Garden.Profile.MaxWidth', 250),
-                    array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                );
-                $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
+                    // Delete any previously uploaded image.
+                    $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
+
+                    // Save the uploaded image in profile size.
+                    $Props = $UploadImage->SaveImageAs(
+                        $TmpImage,
+                        "userpics/$Subdir/p$Basename",
+                        c('Garden.Profile.MaxHeight', 1000),
+                        c('Garden.Profile.MaxWidth', 250),
+                        array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+                    );
+                    $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
 
 //            // Save the uploaded image in preview size
 //            $UploadImage->SaveImageAs(
@@ -765,22 +752,23 @@ class ProfileController extends Gdn_Controller {
 //               Gdn::config('Garden.Preview.MaxWidth', 75)
 //            );
 
-                // Save the uploaded image in thumbnail size
-                $ThumbSize = Gdn::config('Garden.Thumbnail.Size', 40);
-                $UploadImage->saveImageAs(
-                    $TmpImage,
-                    "userpics/$Subdir/n$Basename",
-                    $ThumbSize,
-                    $ThumbSize,
-                    array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                );
+                    // Save the uploaded image in thumbnail size
+                    $ThumbSize = Gdn::config('Garden.Thumbnail.Size', 40);
+                    $UploadImage->saveImageAs(
+                        $TmpImage,
+                        "userpics/$Subdir/n$Basename",
+                        $ThumbSize,
+                        $ThumbSize,
+                        array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'))
+                    );
 
-            } catch (Exception $Ex) {
-                // Throw the exception on API calls.
-                if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
-                    throw $Ex;
+                } catch (Exception $Ex) {
+                    // Throw the exception on API calls.
+                    if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+                        throw $Ex;
+                    }
+                    $this->Form->addError($Ex);
                 }
-                $this->Form->addError($Ex);
             }
             // If there were no errors, associate the image with the user
             if ($this->Form->errorCount() == 0) {

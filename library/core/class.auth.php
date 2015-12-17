@@ -86,7 +86,7 @@ class Gdn_Auth extends Gdn_Pluggable {
 
         if (class_exists($AuthenticatorClass)) {
             $this->_AuthenticationSchemes[$Alias] = array(
-                'Name' => C("Garden.Authenticators.{$Alias}.Name", $Alias),
+                'Name' => c("Garden.Authenticators.{$Alias}.Name", $Alias),
                 'Configure' => false
             );
 
@@ -230,7 +230,7 @@ class Gdn_Auth extends Gdn_Pluggable {
      */
     public function unsetDefaultAuthenticator($AuthenticationSchemeAlias) {
         $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
-        if (C('Garden.Authenticator.DefaultScheme') == $AuthenticationSchemeAlias) {
+        if (c('Garden.Authenticator.DefaultScheme') == $AuthenticationSchemeAlias) {
             removeFromConfig('Garden.Authenticator.DefaultScheme');
             return true;
         }

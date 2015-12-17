@@ -56,6 +56,47 @@ class Gdn_Session {
     }
 
     /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param bool|string $permission The permission to check.  Bool to force true/false.
+     * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function checkRankedPermission($permission) {
+        $permissionsRanked = array(
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Garden.Moderation.Manage',
+            'Garden.SignIn.Allow'
+        );
+
+        if ($permission === true) {
+            return true;
+        } elseif ($permission === false) {
+            return false;
+        } elseif (in_array($permission, $permissionsRanked)) {
+            // Ordered rank of some permissions, highest to lowest
+            $currentPermissionRank = array_search($permission, $permissionsRanked);
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                if ($this->checkPermission($permissionsRanked[$i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Check to see if the user has at least the given permission.
+        return $this->checkPermission($permission);
+    }
+
+    /**
      * Checks the currently authenticated user's permissions for the specified
      * permission. Returns a boolean value indicating if the action is
      * permitted.
@@ -82,7 +123,7 @@ class Gdn_Session {
         }
 
         $Permissions = $this->getPermissions();
-        if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+        if ($JunctionTable && !c('Garden.Permissions.Disabled.'.$JunctionTable)) {
             // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
             if (is_array($Permission)) {
                 $Pass = false;
@@ -168,7 +209,7 @@ class Gdn_Session {
      * @return mixed
      */
     public function getCookie($Suffix, $Default = null) {
-        return GetValue(C('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
+        return GetValue(c('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
     }
 
     /**
@@ -182,7 +223,7 @@ class Gdn_Session {
             return $this->User->HourOffset;
         } else {
             if (!isset($GuestHourOffset)) {
-                $GuestTimeZone = C('Garden.GuestTimeZone');
+                $GuestTimeZone = c('Garden.GuestTimeZone');
                 if ($GuestTimeZone) {
                     try {
                         $TimeZone = new DateTimeZone($GuestTimeZone);
@@ -207,9 +248,9 @@ class Gdn_Session {
      * @param $Expires
      */
     public function setCookie($Suffix, $Value, $Expires) {
-        $Name = C('Garden.Cookie.Name').$Suffix;
-        $Path = C('Garden.Cookie.Path');
-        $Domain = C('Garden.Cookie.Domain');
+        $Name = c('Garden.Cookie.Name').$Suffix;
+        $Path = c('Garden.Cookie.Path');
+        $Domain = c('Garden.Cookie.Domain');
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $CurrentHost = Gdn::request()->host();
@@ -514,7 +555,7 @@ class Gdn_Session {
 
         if (!isset($Return)) {
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-            $Return = ($ForceValid && Gdn::request()->isPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== false);
+            $Return = ($ForceValid && Gdn::request()->isPostBack()) || ($ForeignKey === $this->_TransientKey && $this->_TransientKey !== false);
         }
         if (!$Return) {
             if (Gdn::session()->User) {
@@ -650,8 +691,8 @@ class Gdn_Session {
                 ->firstRow();
 
             // Save a session cookie
-            $Path = C('Garden.Cookie.Path', '/');
-            $Domain = C('Garden.Cookie.Domain', '');
+            $Path = c('Garden.Cookie.Path', '/');
+            $Domain = c('Garden.Cookie.Domain', '');
             $Expire = 0;
 
             // If the domain being set is completely incompatible with the current domain then make the domain work.

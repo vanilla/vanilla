@@ -69,7 +69,7 @@ function Auth_OpenID_AX_checkAlias($alias)
  * @package OpenID
  */
 class Auth_OpenID_AX_Error {
-    function Auth_OpenID_AX_Error($message=null)
+    function __construct($message=null)
     {
         $this->message = $message;
     }
@@ -151,7 +151,7 @@ class Auth_OpenID_AX_AttrInfo {
      * @param string $alias The name that should be given to this
      * attribute in the request.
      */
-    function Auth_OpenID_AX_AttrInfo($type_uri, $count, $required,
+    function __construct($type_uri, $count, $required,
                                      $alias)
     {
         /**
@@ -269,7 +269,7 @@ class Auth_OpenID_AX_FetchRequest extends Auth_OpenID_AX_Message {
 
     var $mode = 'fetch_request';
 
-    function Auth_OpenID_AX_FetchRequest($update_url=null)
+    function __construct($update_url=null)
     {
         /**
          * requested_attributes: The attributes that have been
@@ -540,7 +540,7 @@ class Auth_OpenID_AX_FetchRequest extends Auth_OpenID_AX_Message {
  */
 class Auth_OpenID_AX_KeyValueMessage extends Auth_OpenID_AX_Message {
 
-    function Auth_OpenID_AX_KeyValueMessage()
+    function __construct()
     {
         $this->data = array();
     }
@@ -793,7 +793,7 @@ class Auth_OpenID_AX_KeyValueMessage extends Auth_OpenID_AX_Message {
 class Auth_OpenID_AX_FetchResponse extends Auth_OpenID_AX_KeyValueMessage {
     var $mode = 'fetch_response';
 
-    function Auth_OpenID_AX_FetchResponse($update_url=null)
+    function __construct($update_url=null)
     {
         $this->Auth_OpenID_AX_KeyValueMessage();
         $this->update_url = $update_url;
@@ -888,7 +888,7 @@ class Auth_OpenID_AX_FetchResponse extends Auth_OpenID_AX_KeyValueMessage {
             $ax_args['update_url'] = $update_url;
         }
 
-        Auth_OpenID::update(&$ax_args, $kv_args);
+        Auth_OpenID::update($ax_args, $kv_args);
 
         return $ax_args;
     }
@@ -960,7 +960,7 @@ class Auth_OpenID_AX_StoreRequest extends Auth_OpenID_AX_KeyValueMessage {
     {
         $ax_args = $this->_newArgs();
         $kv_args = $this->_getExtensionKVArgs($aliases);
-        Auth_OpenID::update(&$ax_args, $kv_args);
+        Auth_OpenID::update($ax_args, $kv_args);
         return $ax_args;
     }
 }
@@ -990,7 +990,7 @@ class Auth_OpenID_AX_StoreResponse extends Auth_OpenID_AX_Message {
         return new Auth_OpenID_AX_StoreResponse($succeeded, $error_message);
     }
 
-    function Auth_OpenID_AX_StoreResponse($succeeded=true, $error_message=null)
+    function __construct($succeeded=true, $error_message=null)
     {
         if ($succeeded) {
             $this->mode = $this->SUCCESS_MODE;

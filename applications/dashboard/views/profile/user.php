@@ -23,7 +23,7 @@ $Session = Gdn::session();
     if ($this->User->About != '') {
         echo '<div id="Status" itemprop="description">'.Wrap(Gdn_Format::Display($this->User->About));
         if ($this->User->About != '' && ($Session->UserID == $this->User->UserID || $Session->checkPermission('Garden.Users.Edit')))
-            echo ' - '.anchor(t('clear'), '/profile/clear/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Hijack');
+            echo ' - '.anchor(t('clear'), '/profile/clear/'.$this->User->UserID, 'Hijack');
 
         echo '</div>';
     }

@@ -65,7 +65,7 @@ class Gdn_Memcached extends Gdn_Cache {
         $this->registerFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
         $this->registerFeature(Gdn_Cache::FEATURE_SHARD);
 
-        if (C('Garden.Cache.Local', true)) {
+        if (c('Garden.Cache.Local', true)) {
             $this->registerFeature(Gdn_Cache::FEATURE_LOCAL);
         }
 

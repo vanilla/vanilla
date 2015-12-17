@@ -127,7 +127,7 @@ class Auth_OpenID_Mapping {
      * Initialize a mapping.  If $classic_array is specified, its keys
      * and values are used to populate the mapping.
      */
-    function Auth_OpenID_Mapping($classic_array = null)
+    function __construct($classic_array = null)
     {
         $this->keys = array();
         $this->values = array();
@@ -274,7 +274,7 @@ class Auth_OpenID_Mapping {
  * @package OpenID
  */
 class Auth_OpenID_NamespaceMap {
-    function Auth_OpenID_NamespaceMap()
+    function __construct()
     {
         $this->alias_to_namespace = new Auth_OpenID_Mapping();
         $this->namespace_to_alias = new Auth_OpenID_Mapping();
@@ -414,7 +414,7 @@ class Auth_OpenID_NamespaceMap {
  */
 class Auth_OpenID_Message {
 
-    function Auth_OpenID_Message($openid_namespace = null)
+    function __construct($openid_namespace = null)
     {
         // Create an empty Message
         $this->allowed_openid_namespaces = array(

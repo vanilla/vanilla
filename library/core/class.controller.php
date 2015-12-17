@@ -15,10 +15,9 @@
 /**
  * Controller base class.
  *
- * A base class that all controllers can inherit for common controller
- * properties and methods.
+ * A base class that all controllers can inherit for common properties and methods.
  *
- * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
+ * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
@@ -241,7 +240,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_Json = array();
         $this->_Headers = array(
             'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
-            'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset='.C('Garden.Charset', 'utf-8') // PROPERLY ENCODE THE CONTENT
+            'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset=utf-8' // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
         );
 
@@ -580,9 +579,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                     (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                 )
             ) {
-                $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
+                $ReflectArgs = array_slice($this->ReflectArgs, 1);
             } else {
-                $ReflectArgs = json_encode($this->ReflectArgs);
+                $ReflectArgs = $this->ReflectArgs;
             }
 
             $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
@@ -1013,7 +1012,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function initialize() {
         if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
-            $this->_Headers['Content-Type'] = 'text/xml; charset='.c('Garden.Charset', 'utf-8');
+            $this->_Headers['Content-Type'] = 'text/xml; charset=utf-8';
         }
 
         if (is_object($this->Menu)) {
@@ -1219,25 +1218,11 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (ob_get_level()) {
                 ob_clean();
             }
-            $this->contentType('application/json; charset='.c('Garden.Charset', 'utf-8'));
+            $this->contentType('application/json; charset=utf-8');
             $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Cross-Origin Resource Sharing (CORS)
-
-            /**
-             * Access-Control-Allow-Origin
-             * If a Origin header is sent by the client, attempt to verify it against the list of
-             * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
-             * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
-             * response using the client's Origin header value.
-             */
-            $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
-            if ($origin) {
-                $originHost = parse_url($origin, PHP_URL_HOST);
-                if ($originHost && isTrustedDomain($originHost)) {
-                    $this->setHeader('Access-Control-Allow-Origin', $origin);
-                }
-            }
+            $this->setAccessControl();
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
@@ -1338,6 +1323,24 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Set Access-Control-Allow-Origin header.
+     *
+     * If a Origin header is sent by the client, attempt to verify it against the list of
+     * trusted domains in Garden.TrustedDomains.  If the value of Origin is verified as
+     * being part of a trusted domain, add the Access-Control-Allow-Origin header to the
+     * response using the client's Origin header value.
+     */
+    protected function setAccessControl() {
+        $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_ORIGIN', false);
+        if ($origin) {
+            $originHost = parse_url($origin, PHP_URL_HOST);
+            if ($originHost && isTrustedDomain($originHost)) {
+                $this->setHeader('Access-Control-Allow-Origin', $origin);
+            }
+        }
+    }
+
+    /**
      * Searches $this->Assets for a key with $AssetName and renders all items
      * within that array element to the screen. Note that any element in
      * $this->Assets can contain an array of elements itself. This way numerous
@@ -1407,7 +1410,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $Remove[] = 'LastIPAddress';
                 $Remove[] = 'AllIPAddresses';
                 $Remove[] = 'Fingerprint';
-                if (C('Api.Clean.Email', true)) {
+                if (c('Api.Clean.Email', true)) {
                     $Remove[] = 'Email';
                 }
                 $Remove[] = 'DateOfBirth';
@@ -1452,8 +1455,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data['Exception'] = Gdn_Validation::resultsAsText($this->Form->validationResults());
         }
 
-
-        $this->SendHeaders();
+        $this->sendHeaders();
 
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);
@@ -1483,12 +1485,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             case DELIVERY_METHOD_JSON:
             default:
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
-                    safeHeader('Content-Type: application/javascript; charset='.c('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
                     echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
                     return true;
                 } else {
-                    safeHeader('Content-Type: application/json; charset='.c('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
                     echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                     return true;
@@ -1636,11 +1638,11 @@ class Gdn_Controller extends Gdn_Pluggable {
         switch ($this->deliveryMethod()) {
             case DELIVERY_METHOD_JSON:
                 if (($Callback = $this->Request->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->allowJSONP()) {
-                    safeHeader('Content-Type: application/javascript; charset='.C('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
                     exit($Callback.'('.json_encode($Data).');');
                 } else {
-                    safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), true);
+                    safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
                     exit(json_encode($Data));
                 }
@@ -1649,12 +1651,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 //            Gdn_ExceptionHandler($Ex);
 //            break;
             case DELIVERY_METHOD_XML:
-                safeHeader('Content-Type: text/xml; charset='.C('Garden.Charset', 'utf-8'), true);
+                safeHeader('Content-Type: text/xml; charset=utf-8', true);
                 array_map('htmlspecialchars', $Data);
                 exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
                 break;
             default:
-                safeHeader('Content-Type: text/plain; charset='.C('Garden.Charset', 'utf-8'), true);
+                safeHeader('Content-Type: text/plain; charset=utf-8', true);
                 exit($Ex->getMessage());
         }
     }
@@ -1784,7 +1786,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             // Add the favicon.
-            $Favicon = C('Garden.FavIcon');
+            $Favicon = c('Garden.FavIcon');
             if ($Favicon) {
                 $this->Head->setFavIcon(Gdn_Upload::url($Favicon));
             }

@@ -29,10 +29,10 @@ class ImportController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function go() {
+    public function go($transientKey = '') {
         $this->permission('Garden.Settings.Manage');
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+        if (!Gdn::session()->validateTransientKey($transientKey) && !Gdn::request()->isAuthenticatedPostBack()) {
+            throw new Gdn_UserException('The CSRF token is invalid.', 403);
         }
         $Imp = new ImportModel();
         $Imp->loadState();
@@ -214,11 +214,12 @@ class ImportController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function restart() {
+    public function restart($transientKey = '') {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+        if (!Gdn::session()->validateTransientKey($transientKey) && !Gdn::request()->isAuthenticatedPostBack()) {
+            throw new Gdn_UserException('The CSRF token is invalid.', 403);
         }
+
         // Delete the individual table files.
         $Imp = new ImportModel();
         try {

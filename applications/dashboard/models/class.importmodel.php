@@ -1087,6 +1087,7 @@ class ImportModel extends Gdn_Model {
         $CurrentUser = $this->SQL->getWhere('User', array('UserID' => Gdn::session()->UserID))->firstRow(DATASET_TYPE_ARRAY);
         $CurrentPassword = $CurrentUser['Password'];
         $CurrentHashMethod = $CurrentUser['HashMethod'];
+        $CurrentTransientKey = gdn::session()->transientKey();
 
         // Delete the current user table.
         $this->SQL->Truncate('User');
@@ -1132,6 +1133,7 @@ class ImportModel extends Gdn_Model {
         }
 
         Gdn::session()->start(val('UserID', $User), true);
+        gdn::session()->transientKey($CurrentTransientKey);
 
         return true;
     }

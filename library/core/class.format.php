@@ -241,7 +241,7 @@ class Gdn_Format {
      * @return string
      */
     public static function auto($Mixed) {
-        $Formatter = C('Garden.InputFormatter');
+        $Formatter = c('Garden.InputFormatter');
         if (!method_exists('Gdn_Format', $Formatter)) {
             return $Mixed;
         }
@@ -682,7 +682,7 @@ class Gdn_Format {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Display');
         } else {
-            $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, c('Garden.Charset', 'UTF-8'));
+            $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
             $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
             $Mixed = self::mentions($Mixed);
             $Mixed = self::links($Mixed);
@@ -729,9 +729,9 @@ class Gdn_Format {
             return self::to($Mixed, 'Form');
         } else {
             if (c('Garden.Format.ReplaceNewlines', true)) {
-                return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, c('Garden.Charset', 'UTF-8')));
+                return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8'));
             } else {
-                return htmlspecialchars($Mixed, ENT_QUOTES, c('Garden.Charset', 'UTF-8'));
+                return htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
             }
         }
     }
@@ -876,7 +876,7 @@ class Gdn_Format {
                 $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
                 // nl2br
-                if (C('Garden.Format.ReplaceNewlines', true)) {
+                if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                     $Mixed = fixNl2Br($Mixed);
                 }
@@ -889,11 +889,11 @@ class Gdn_Format {
             } else {
                 // The text does not contain html and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
-                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, C('Garden.Charset', 'UTF-8'));
+                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
                 $Result = Gdn_Format::mentions($Result);
                 $Result = Gdn_Format::links($Result);
                 $Result = Emoji::instance()->translateToHtml($Result);
-                if (C('Garden.Format.ReplaceNewlines', true)) {
+                if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                     $Result = fixNl2Br($Result);
                 }
@@ -1115,7 +1115,7 @@ class Gdn_Format {
      * @return string
      */
     public static function links($Mixed) {
-        if (!C('Garden.Format.Links', true)) {
+        if (!c('Garden.Format.Links', true)) {
             return $Mixed;
         }
 
@@ -1164,15 +1164,15 @@ class Gdn_Format {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'UnembedContent');
         } else {
-            if (C('Garden.Format.YouTube')) {
+            if (c('Garden.Format.YouTube')) {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*youtube\.com/embed/([a-z0-9_-]*))".*</iframe>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
                 $Mixed = preg_replace('`<object.*value="((https?)://.*youtube\.com/v/([a-z0-9_-]*)[^"]*)".*</object>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
             }
-            if (C('Garden.Format.Vimeo')) {
+            if (c('Garden.Format.Vimeo')) {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $Mixed);
                 $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
             }
-            if (C('Garden.Format.Getty', true)) {
+            if (c('Garden.Format.Getty', true)) {
                 $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
             }
         }
@@ -1301,7 +1301,7 @@ EOT;
 
 
         // Vimeo
-        } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
+        } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && c('Garden.Format.Vimeo', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $ID = $Matches[2];
@@ -1310,7 +1310,7 @@ EOT;
 EOT;
 
         // Imgur GifV
-        } elseif (preg_match("`{$ImgurGifvUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Gifv', true)
+        } elseif (preg_match("`{$ImgurGifvUrlMatch}`i", $Url, $Matches) && c('Garden.Format.Gifv', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $ID = $Matches[1];
@@ -1318,6 +1318,7 @@ EOT;
             $Result = <<<EOT
 <div class="imgur-gifv VideoWrap">
     <video poster="https://i.imgur.com/{$ID}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
+        <source src="https://i.imgur.com/{$ID}.webm" type="video/webm">
         <source src="https://i.imgur.com/{$ID}.mp4" type="video/mp4">
         <p>{$ModernBrowser} https://i.imgur.com/{$ID}.gifv</p>
     </video>
@@ -1325,7 +1326,7 @@ EOT;
 EOT;
 
         // Twitter
-        } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && C('Garden.Format.Twitter', true)
+        } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && c('Garden.Format.Twitter', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1333,7 +1334,7 @@ EOT;
 EOT;
 
         // Vine
-        } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)
+        } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && c('Garden.Format.Vine', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1343,7 +1344,7 @@ EOT;
 EOT;
 
         // Instagram
-        } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Instagram', true)
+        } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && c('Garden.Format.Instagram', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1353,7 +1354,7 @@ EOT;
 EOT;
 
         // Pintrest
-        } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)
+        } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && c('Garden.Format.Pintrest', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1361,7 +1362,7 @@ EOT;
 EOT;
 
         // Getty
-        } elseif (preg_match("`({$GettyUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Getty', true)
+        } elseif (preg_match("`({$GettyUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Getty', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1369,7 +1370,7 @@ EOT;
 EOT;
 
         // Twitch
-        } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Twitch', true)
+        } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Twitch', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1377,7 +1378,7 @@ EOT;
 EOT;
 
         // Hitbox
-        } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Hitbox', true)
+        } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Hitbox', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1386,7 +1387,7 @@ EOT;
 EOT;
 
         // Soundcloud
-        } elseif (preg_match("`({$SoundcloudUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Soundcloud', true)
+        } elseif (preg_match("`({$SoundcloudUrlMatch})`i", $Url, $Matches) && c('Garden.Format.Soundcloud', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
@@ -1410,7 +1411,7 @@ EOT;
             $Text = $Url;
             if (strpos($Text, '%') !== false) {
                 $Text = rawurldecode($Text);
-                $Text = htmlspecialchars($Text, ENT_QUOTES, c('Garden.Charset', 'UTF-8'));
+                $Text = htmlspecialchars($Text, ENT_QUOTES, 'UTF-8');
             }
 
             $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
@@ -1595,13 +1596,13 @@ EOT;
             }
 
             // Handle @mentions.
-            if (C('Garden.Format.Mentions')) {
+            if (c('Garden.Format.Mentions')) {
                 // Only format mentions that are not already in anchor tags or code tags.
                 $Mixed = self::tagContent($Mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches
-            if (C('Garden.Format.Hashtags')) {
+            if (c('Garden.Format.Hashtags')) {
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1'.anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
@@ -1610,7 +1611,7 @@ EOT;
             }
 
             // Handle "/me does x" action statements
-            if (C('Garden.Format.MeActions')) {
+            if (c('Garden.Format.MeActions')) {
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1'.wrap(wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),
@@ -1643,7 +1644,7 @@ EOT;
         $CodeBlockContents = array();
         $CodeBlockHashes = array();
         $Subject = preg_replace_callback(
-            '/<code>.*?<\/code>/i',
+            '/<code>.*?<\/code>/is',
             function ($Matches) use (&$CodeBlockContents, &$CodeBlockHashes) {
                 // Surrounded by whitespace to try to prevent the characters
                 // from being picked up by $Pattern.
@@ -1763,8 +1764,8 @@ EOT;
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Text');
         } else {
-            $Charset = c('Garden.Charset', 'UTF-8');
-            $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n", html_entity_decode($Mixed, ENT_QUOTES, $Charset))), ENT_NOQUOTES, $Charset);
+            $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n",
+                html_entity_decode($Mixed, ENT_QUOTES, 'UTF-8'))), ENT_NOQUOTES, 'UTF-8');
             if ($AddBreaks && c('Garden.Format.ReplaceNewlines', true)) {
                 $Result = nl2br(trim($Result));
             }

@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php if (!defined('APPLICATION')) exit();
 /**
  * Vanilla database structure.
  *
@@ -113,8 +111,8 @@ $Construct
     ->column('Sink', 'tinyint(1)', '0')
     ->column('DateInserted', 'datetime', false, array('index', 'index.CategoryInserted'))
     ->column('DateUpdated', 'datetime', true)
-    ->column('InsertIPAddress', 'varchar(15)', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'ipaddress', true)
+    ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('DateLastComment', 'datetime', null, array('index', 'index.CategoryPages'))
     ->column('LastCommentUserID', 'int', true)
     ->column('Score', 'float', null)
@@ -180,8 +178,8 @@ $Construct
     ->column('DateInserted', 'datetime', null, array('index.1', 'index'))
     ->column('DateDeleted', 'datetime', true)
     ->column('DateUpdated', 'datetime', true)
-    ->column('InsertIPAddress', 'varchar(15)', true)
-    ->column('UpdateIPAddress', 'varchar(15)', true)
+    ->column('InsertIPAddress', 'ipaddress', true)
+    ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('Flag', 'tinyint', 0)
     ->column('Score', 'float', null)
     ->column('Attributes', 'text', true)

@@ -46,11 +46,11 @@ switch ($Type) {
 }
 
 if (!is_null($Type)) {
-    header("Location: {$Redirect}", TRUE, 301);
+    header("Location: {$Redirect}", true, 301);
     exit();
 }
 
-header("Location: index.php", TRUE, 301);
+header("Location: index.php", true, 301);
 exit();
 
 //$t = $_GET['t'];

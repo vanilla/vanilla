@@ -47,7 +47,6 @@ class ConversationsController extends Gdn_Controller {
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
             $this->addJsFile('jquery.js');
-            $this->addJsFile('jquery.livequery.js');
             $this->addJsFile('jquery.form.js');
             $this->addJsFile('jquery.popup.js');
             $this->addJsFile('jquery.gardenhandleajaxform.js');

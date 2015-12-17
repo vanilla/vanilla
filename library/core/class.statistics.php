@@ -31,7 +31,7 @@ class Gdn_Statistics extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        $AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
+        $AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
         $AnalyticsServer = str_replace(array('http://', 'https://'), '', $AnalyticsServer);
         $this->AnalyticsServer = $AnalyticsServer;
 
@@ -287,17 +287,17 @@ class Gdn_Statistics extends Gdn_Plugin {
      */
     public static function checkIsEnabled() {
         // Forums that are busy installing should not yet be tracked
-        if (!C('Garden.Installed', false)) {
+        if (!c('Garden.Installed', false)) {
             return false;
         }
 
         // Enabled if not explicitly disabled via config
-        if (!C('Garden.Analytics.Enabled', true)) {
+        if (!c('Garden.Analytics.Enabled', true)) {
             return false;
         }
 
         // Don't track things for local sites (unless overridden in config)
-        if (self::checkIsLocalhost() && !C('Garden.Analytics.AllowLocal', false)) {
+        if (self::checkIsLocalhost() && !c('Garden.Analytics.AllowLocal', false)) {
             return 0;
         }
 
@@ -729,7 +729,7 @@ class Gdn_Statistics extends Gdn_Plugin {
         // Set
         if (!is_null($SetThrottled)) {
             if ($SetThrottled) {
-                $ThrottleDelay = C('Garden.Analytics.ThrottleDelay', 3600);
+                $ThrottleDelay = c('Garden.Analytics.ThrottleDelay', 3600);
                 $ThrottleValue = time() + $ThrottleDelay;
             } else {
                 $ThrottleValue = null;
@@ -833,7 +833,7 @@ class Gdn_Statistics extends Gdn_Plugin {
         $EmbedViews = 0;
 
         try {
-            if (C('Garden.Analytics.Views.Denormalize', false) &&
+            if (c('Garden.Analytics.Views.Denormalize', false) &&
                 Gdn::cache()->activeEnabled() &&
                 Gdn::cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
             ) {
@@ -862,7 +862,7 @@ class Gdn_Statistics extends Gdn_Plugin {
                 }
 
                 // Every X views, writeback to AnalyticsLocal
-                $DenormalizeWriteback = C('Garden.Analytics.Views.DenormalizeWriteback', 10);
+                $DenormalizeWriteback = c('Garden.Analytics.Views.DenormalizeWriteback', 10);
                 if (($Views % $DenormalizeWriteback) == 0) {
                     Gdn::controller()->setData('WritebackViews', $Views);
                     Gdn::controller()->setData('WritebackEmbed', $EmbedViews);
@@ -1129,7 +1129,7 @@ class Gdn_Statistics extends Gdn_Plugin {
         $CurrentGmTime = Gdn_Statistics::time();
         $RequestTime = val('RequestTime', $Request, 0);
         $TimeDiff = abs($CurrentGmTime - $RequestTime);
-        $AllowedTimeDiff = C('Garden.Analytics.RequestTimeout', 1440);
+        $AllowedTimeDiff = c('Garden.Analytics.RequestTimeout', 1440);
 
         // Allow 24* minutes of clock desync, otherwise signature is invalid
         if ($TimeDiff > $AllowedTimeDiff) {

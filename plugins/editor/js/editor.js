@@ -421,17 +421,13 @@
                         return false;
                     }
 
-                    // Make exception for non-wysiwyg, as wysihtml5 has custom
-                    // key handler.
-                    if (!$(this).closest('.editor').hasClass('editor-format-wysiwyg')) {
-                        // Fire event programmatically to do what needs to be done in
-                        // ButtonBar code.
-                        $(this).parent().find('.Button').trigger('click.insertData');
+                    // Fire event programmatically to do what needs to be done in
+                    // ButtonBar code.
+                    $(this).parent().find('.Button').trigger('click.insertData');
 
-                        e.stopPropagation();
-                        e.preventDefault();
-                        return false;
-                    }
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
                 }
             });
 
@@ -490,16 +486,6 @@
              }, 0);
              });
              */
-
-            // Handle quotes plugin using triggered event.
-            $('a.ReactButton.Quote').on('click', function(e) {
-                // Stop animation from other plugin and let this one
-                // handle the scroll, otherwise the scrolling jumps
-                // all over, and really distracts the eyes.
-                $('html, body').stop().animate({
-                    scrollTop: $(editor.textarea.element).parent().parent().offset().top
-                }, 800);
-            });
 
             $(editor.textarea.element).on('appendHtml', function(e, data) {
 
@@ -1125,7 +1111,7 @@
                                     editorDropdownsClose();
                                 } else {
                                     // File dropped is not allowed!
-                                    var message = '"' + filename + '" ';
+                                    var message = 'File ';
 
                                     if (!validFile) {
                                         message += 'is not allowed';

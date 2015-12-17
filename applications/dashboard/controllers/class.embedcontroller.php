@@ -114,7 +114,16 @@ class EmbedController extends DashboardController {
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Garden.TrustedDomains', 'Garden.Embed.RemoteUrl', 'Garden.Embed.ForceDashboard', 'Garden.Embed.ForceForum', 'Garden.SignIn.Popup'));
+        $ConfigurationModel->setField(
+            array(
+                'Garden.TrustedDomains',
+                'Garden.Embed.RemoteUrl',
+                'Garden.Embed.ForceDashboard',
+                'Garden.Embed.ForceForum',
+                'Garden.Embed.ForceMobile',
+                'Garden.SignIn.Popup'
+            )
+        );
 
         $this->Form->setModel($ConfigurationModel);
         if ($this->Form->authenticatedPostBack() === false) {

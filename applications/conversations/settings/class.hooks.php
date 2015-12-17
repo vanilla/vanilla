@@ -209,7 +209,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function setup() {
         $Database = Gdn::database();
         $Config = Gdn::factory(Gdn::AliasConfig);
-        $Drop = false; //C('Conversations.Version') === FALSE ? TRUE : FALSE;
+        $Drop = false; //c('Conversations.Version') === FALSE ? TRUE : FALSE;
         $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'structure.php');
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'stub.php');

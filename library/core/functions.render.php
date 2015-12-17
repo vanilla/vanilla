@@ -8,14 +8,31 @@
  * @since 2.0
  */
 
+/**
+ * Write alternating strings on each call.
+ *
+ * Useful for adding different classes to alternating lines in a list
+ * or table to enhance their readability.
+ *
+ * @param string $odd The text for the first and every further "odd" call.
+ * @param string $even The text for the second and every further "even" call.
+ * @param string $attributeName The html attribute name that should embrace $even/$odd output.
+ * @return string
+ */
 if (!function_exists('alternate')) {
-    function alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class') {
-        static $i = 0;
-        $Value = $i++ % 2 ? $Odd : $Even;
-        if ($Value != '' && $Even == '' && $AttributeName) {
-            $Value = ' '.$AttributeName.'="'.$Value.'"';
+    function alternate($odd = '', $even = 'Alt', $attributeName = 'class') {
+        static $b = false;
+        if ($b = !$b) {
+            $value = $odd;
+        } else {
+            $value = $even;
         }
-        return $Value;
+
+        if ($value != '' && $attributeName != '') {
+            return ' '.$attributeName.'="'.$value.'"';
+        } else {
+            return $value;
+        }
     }
 }
 
@@ -30,6 +47,47 @@ if (!function_exists('bigPlural')) {
         $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
 
         return '<span title="'.$Title.'" class="Number">'.Gdn_Format::bigNumber($Number).'</span>';
+    }
+}
+
+/**
+ * Outputs standardized HTML for a badge.
+ * A badge generally designates a count, and displays with a contrasting background.
+ *
+ * @param string|int $badge Info to put into a badge, usually a number.
+ * @return string Badge HTML string.
+ */
+if (!function_exists('badge')) {
+    function badge($badge) {
+        return ' <span class="badge">'.$badge.'</span> ';
+    }
+}
+
+/**
+ * Outputs standardized HTML for a popin badge.
+ * A popin contains data that is injected after the page loads.
+ * A badge generally designates a count, and displays with a contrasting background.
+ *
+ * @param string $rel Endpoint for a popin.
+ * @return string Popin HTML string.
+ */
+if (!function_exists('popin')) {
+    function popin($rel) {
+        return ' <span class="badge Popin js-popin" rel="'.$rel.'"></span> ';
+    }
+}
+
+/**
+ * Outputs standardized HTML for an icon.
+ * Uses the same css class naming conventions as font-vanillicon.
+ *
+ * @param string $icon Name of the icon you want to use, excluding the 'icon-' prefix.
+ * @return string Icon HTML string.
+ */
+if (!function_exists('icon')) {
+    function icon($icon) {
+        $icon = strtolower($icon);
+        return ' <span class="icon icon-'.$icon.'"></span> ';
     }
 }
 
@@ -422,7 +480,7 @@ if (!function_exists('anchor')) {
             $Destination = Gdn::request()->url($Destination, $WithDomain, $SSL);
         }
 
-        return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, C('Garden.Charset', 'UTF-8')).'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
+        return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.attribute($CssClass).attribute($Attributes).'>'.$Text.'</a>';
     }
 }
 
@@ -563,9 +621,9 @@ if (!function_exists('hasEditProfile')) {
         $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
 
         $result &= (
-            C('Garden.Profile.Titles') ||
-            C('Garden.Profile.Locations', false) ||
-            C('Garden.Registration.Method') != 'Connect'
+            c('Garden.Profile.Titles') ||
+            c('Garden.Profile.Locations', false) ||
+            c('Garden.Registration.Method') != 'Connect'
         );
 
         return $result;
@@ -1035,7 +1093,7 @@ if (!function_exists('discussionLink')) {
 
 if (!function_exists('registerUrl')) {
     function registerUrl($Target = '', $force = false) {
-        $registrationMethod = strtolower(C('Garden.Registration.Method'));
+        $registrationMethod = strtolower(c('Garden.Registration.Method'));
 
         if ($registrationMethod === 'closed') {
             return '';
@@ -1056,7 +1114,7 @@ if (!function_exists('registerUrl')) {
 if (!function_exists('signInUrl')) {
     function signInUrl($target = '', $force = false) {
         // Check to see if there is even a sign in button.
-        if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
+        if (!$force && strcasecmp(c('Garden.Registration.Method'), 'Connect') !== 0) {
             $defaultProvider = Gdn_AuthenticationProviderModel::getDefault();
             if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
                 return '';

@@ -549,7 +549,7 @@ class ProxyRequest {
             !in_array($RequestMethod, ['GET', 'OPTIONS']) && strlen($this->responseBody) < self::MAX_LOG_BODYLENGTH :
             $logResponseBody;
 
-        if ($logResponseBody || debug()) {
+        if ($logResponseBody || debug() || (!$this->responseClass('2xx') && val('LogResponseErrorBody', $Options, true))) {
             if (stripos($this->ContentType, 'application/json') !== false) {
                 $body = @json_decode($this->ResponseBody, true);
                 if (!$body) {

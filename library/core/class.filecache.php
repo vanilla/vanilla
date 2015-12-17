@@ -52,7 +52,7 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function autorun() {
         $this->addContainer(array(
-            Gdn_Cache::CONTAINER_LOCATION => C('Cache.Filecache.Store')
+            Gdn_Cache::CONTAINER_LOCATION => c('Cache.Filecache.Store')
         ));
     }
 
@@ -145,7 +145,7 @@ class Gdn_Filecache extends Gdn_Cache {
 
         $Flags = ($Flags & Gdn_Filecache::O_CREATE) ? Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE : 0;
         $CacheLocationOK = Gdn_FileSystem::checkFolderR($SplitCacheLocation, $Flags);
-        if (!$CacheLocationOK) {
+        if (!$CacheLocationOK && ($Flags & Gdn_Filecache::O_CREATE)) {
             return $this->failure("Computed cache folder '{$SplitCacheLocation}' could not be found, or created.");
         }
 

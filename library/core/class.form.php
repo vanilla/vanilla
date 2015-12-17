@@ -89,7 +89,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         // Get custom error class
-        $this->ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
+        $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
 
         parent::__construct();
     }
@@ -190,6 +190,29 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Builds a color-picker form element. Accepts three-character hex values with or without the leading '#',
+     * but the saved value will be coerced into a six-character hex code with the leading '#'.
+     * The hex value to be saved is the value of the input with the color-picker-value class.
+     *
+     * @param string $fieldName Name of the field being posted with this input.
+     * @return string The form element for a color picker.
+     */
+    public function color($fieldName) {
+        Gdn::controller()->addJsFile('colorpicker.js');
+
+        $valueAttributes['class'] = 'js-color-picker-value color-picker-value InputBox Hidden';
+        $textAttributes['class'] = 'js-color-picker-text color-picker-text InputBox';
+        $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
+
+        return '<div id="'.$this->escapeString($fieldName).'" class="js-color-picker color-picker input-group">'
+        .$this->input($fieldName, 'text', $valueAttributes)
+        .$this->input($fieldName.'-text', 'text', $textAttributes)
+        .'<span class="js-color-picker-preview color-picker-preview"></span>'
+        .$this->input($fieldName.'-color', 'color', $colorAttributes)
+        .'</div>';
+    }
+
+    /**
      * Returns XHTML for a standard calendar input control.
      *
      * @param string $FieldName The name of the field that is being displayed/posted with this input. It
@@ -220,14 +243,23 @@ class Gdn_Form extends Gdn_Pluggable {
     /**
      * Returns Captcha HTML & adds translations to document head.
      *
+     * Events: BeforeCaptcha
+     * 
      * @return string
      */
     public function captcha() {
+        $handled = false;
+        $this->EventArguments['Handled'] =& $handled;
+        $this->fireEvent('Captcha');
+        if ($handled) {
+            // A plugin handled the captcha so don't display anything more.
+            return;
+        }
         // Google whitelist
-        $Whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
+        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
 
         // reCAPTCHA Options
-        $Options = array(
+        $options = array(
             'custom_translations' => array(
                 'instructions_visual' => t("Type the text:"),
                 'instructions_audio' => t("Type what you hear:"),
@@ -242,16 +274,15 @@ class Gdn_Form extends Gdn_Pluggable {
         );
 
         // Use our current locale against the whitelist.
-        $Language = Gdn::locale()->language();
-        if (!in_array($Language, $Whitelist)) {
-            $Language = (in_array(Gdn::locale()->Locale, $Whitelist)) ? Gdn::locale()->Locale : false;
-        }
-        if ($Language) {
-            $Options['lang'] = $Language;
+        $language = Gdn::locale()->language();
+        if (in_array($language, $whitelist)) {
+            $options['lang'] = $language;
+        } elseif (in_array(Gdn::locale()->Locale, $whitelist)) {
+            $options['lang'] = Gdn::locale()->Locale;
         }
 
         // Add custom translation strings as JSON.
-        Gdn::controller()->Head->addString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($Options).';</script>');
+        Gdn::controller()->Head->addString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($options).';</script>');
 
         require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 
@@ -349,7 +380,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Return .= '<option value=""></option>';
 
         // Show root categories as headings (ie. you can't post in them)?
-        $DoHeadings = val('Headings', $Options, C('Vanilla.Categories.DoHeadings'));
+        $DoHeadings = val('Headings', $Options, c('Vanilla.Categories.DoHeadings'));
 
         // If making headings disabled and there was no default value for
         // selection, make sure to select the first non-disabled value, or the
@@ -368,7 +399,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 if ($Category['AllowDiscussions']) {
-                    $Disabled &= $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
+                    if($Permission == 'add' && !$Category['PermsDiscussionsAdd']) {
+                        $Disabled = true;
+                    }
                 }
 
                 $Return .= '<option value="'.$CategoryID.'"';
@@ -1562,6 +1595,7 @@ PASSWORDMETER;
         if ($Label != '') {
             $LabelElement = '<label for="'.arrayValueI('id', $Attributes, $this->EscapeID($FieldName, false)).'" class="'.val('class', $Attributes, 'RadioLabel').'">';
             if ($Display === 'wrap') {
+                $LabelElement = '<label class="'.val('class', $Attributes, 'RadioLabel').'">';
                 $Input = $LabelElement.$Input.' '.t($Label).'</label>';
             } elseif ($Display === 'before') {
                 $Input = $LabelElement.t($Label).'</label> '.$Input;
@@ -1735,7 +1769,7 @@ PASSWORDMETER;
         if (is_string($Error)) {
             $ErrorCode = $Error;
         } elseif (is_a($Error, 'Gdn_UserException')) {
-            $ErrorCode = '@'.htmlspecialchars($Error->getMessage());
+            $ErrorCode = '@'.Gdn_Format::htmlFilter($Error->getMessage());
         } elseif (is_a($Error, 'Exception')) {
             // Strip the extra information out of the exception.
             $Parts = explode('|', $Error->getMessage());

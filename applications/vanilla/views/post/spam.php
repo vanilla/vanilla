@@ -5,10 +5,11 @@ echo $this->Form->close();
 ?>
 <div class="Info">
     <?php
-    if ($this->RequestMethod == 'discussion')
+    if ($this->RequestMethod == 'discussion' || $this->RequestMethod == 'editdiscussion') {
         $Message = t('DiscussionRequiresApproval', "Your discussion will appear after it is approved.");
-    else
+    } else {
         $Message = t('CommentRequiresApproval', "Your comment will appear after it is approved.");
+    }
     echo '<div>', $Message, '</div>';
 
     if ($this->data('DiscussionUrl'))

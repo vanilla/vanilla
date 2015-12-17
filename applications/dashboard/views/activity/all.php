@@ -10,7 +10,7 @@ if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
     echo $this->Form->open(array('action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity'));
     echo $this->Form->errors();
-    echo $this->Form->textBox('Comment', array('MultiLine' => true, 'Wrap' => TRUE));
+    echo $this->Form->bodyBox('Comment', array('Wrap' => true));
 
     echo '<div class="Buttons">';
     echo $this->Form->button('Share', array('class' => 'Button Primary'));

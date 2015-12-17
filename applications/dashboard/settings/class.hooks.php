@@ -57,9 +57,6 @@ class DashboardHooks implements Gdn_IPlugin {
         $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
         $Exceptions = array('[Base]');
 
- //      if ($Sender->MasterView == 'admin')
- //          $Exceptions[] = '[Admin]';
- //      else if (in_array($Sender->MasterView, array('', 'default')))
         if (in_array($Sender->MasterView, array('', 'default'))) {
             $Exceptions[] = '[NonAdmin]';
         }
@@ -106,8 +103,14 @@ class DashboardHooks implements Gdn_IPlugin {
             }
 
            // Force embedding?
-            if (!IsSearchEngine() && !IsMobile() && strtolower($Sender->ControllerName) != 'entry') {
-                $Sender->addDefinition('ForceEmbedForum', c('Garden.Embed.ForceForum') ? '1' : '0');
+            if (!IsSearchEngine() && strtolower($Sender->ControllerName) != 'entry') {
+                if (IsMobile()) {
+                    $forceEmbedForum = c('Garden.Embed.ForceMobile') ? '1' : '0';
+                } else {
+                    $forceEmbedForum = c('Garden.Embed.ForceForum') ? '1' : '0';
+                }
+
+                $Sender->addDefinition('ForceEmbedForum', $forceEmbedForum);
                 $Sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
             }
 
@@ -244,7 +247,9 @@ class DashboardHooks implements Gdn_IPlugin {
                  }
             } else {
                // There was some sort of error. Let's print that out.
-                trace(Gdn::userModel()->Validation->resultsText(), TRACE_WARNING);
+                foreach (Gdn::userModel()->Validation->resultsArray() as $msg) {
+                    trace($msg, TRACE_ERROR);
+                Gdn::userModel()->Validation->reset();
             }
         }
     }

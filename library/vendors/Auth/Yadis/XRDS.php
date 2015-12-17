@@ -85,7 +85,7 @@ class Auth_Yadis_Service {
     /**
      * Creates an empty service object.
      */
-    function Auth_Yadis_Service()
+    function __construct()
     {
         $this->element = null;
         $this->parser = null;
@@ -255,7 +255,7 @@ class Auth_Yadis_XRDS {
      * Instantiate a Auth_Yadis_XRDS object.  Requires an XPath
      * instance which has been used to parse a valid XRDS document.
      */
-    function Auth_Yadis_XRDS(&$xmlParser, &$xrdNodes)
+    function __construct(&$xmlParser, &$xrdNodes)
     {
         $this->parser =& $xmlParser;
         $this->xrdNode = $xrdNodes[count($xrdNodes) - 1];
@@ -352,7 +352,7 @@ class Auth_Yadis_XRDS {
         $services = $this->parser->evalXPath('xrd:Service', $this->xrdNode);
 
         foreach ($services as $node) {
-            $s =& new Auth_Yadis_Service();
+            $s = new Auth_Yadis_Service();
             $s->element = $node;
             $s->parser =& $this->parser;
 

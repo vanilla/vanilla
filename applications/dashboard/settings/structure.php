@@ -707,7 +707,6 @@ $Construct
     ->column('ForeignTable', 'varchar(24)', true, 'index.Foreign')
     ->column('ImageWidth', 'usmallint', null)
     ->column('ImageHeight', 'usmallint', null)
-//   ->column('StorageMethod', 'varchar(24)')
     ->column('ThumbWidth', 'usmallint', null)
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)

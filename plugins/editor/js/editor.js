@@ -1503,6 +1503,7 @@
 
                 switch (format) {
                     case 'wysiwyg':
+                    case 'html':
                     case 'ipb':
                     case 'bbhtml':
                     case 'bbwysiwyg':
@@ -1743,7 +1744,6 @@
                             });
                         break;
 
-                    case 'html':
                     case 'bbcode':
                     case 'markdown':
                     case 'text':

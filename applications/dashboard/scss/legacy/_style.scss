@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -58,7 +57,6 @@ textarea, input[type=text] {
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
   transition: height 0.1s ease;
   resize: none !important;
 }
@@ -70,13 +68,14 @@ textarea, input[type=text] {
 }
 
 /* ===================================================================== Grid */
+
 .Row {
   margin: auto;
   width: 960px;
 }
 
 .ContentColumn {
-  margin: 0 0 0 230px;
+  margin: 0 0 0 230px
 }
 
 /* ==================== Pages that hide the panel and have full-width content */
@@ -121,8 +120,7 @@ body {
 }
 
 #Body {
-  zoom: 1;
-  /* hasLayout for IE6/7 */
+  zoom: 1; /* hasLayout for IE6/7 */
 }
 
 #Body:after {
@@ -519,7 +517,6 @@ select {
   border: 1px solid #999;
   border-radius: 2px;
   white-space: nowrap;
-  background-image: -webkit-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
   background-image: linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
   text-shadow: 0 1px 0 #fff;
   box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
@@ -579,7 +576,6 @@ div.FileUpload .CurrentImage {
   border-width: 0 0 100px 200px;
   opacity: 0;
   filter: alpha(opacity=0);
-  -webkit-transform: translate(-300px, 0) scale(4);
   transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
@@ -624,8 +620,7 @@ div.FileUpload .CurrentImage {
   border-radius: 2px;
   white-space: nowrap;
   background: #fdfdfd;
-  background-image: -webkit-linear-gradient(bottom, #f0f0f0 0%, white 31%);
-  background-image: linear-gradient(bottom, #f0f0f0 0%, white 31%);
+  background-image: linear-gradient(bottom, rgb(240, 240, 240) 0%, rgb(255, 255, 255) 31%);
   box-shadow: 0 1px 1px #ddd;
 }
 
@@ -734,7 +729,7 @@ div.FileUpload .CurrentImage {
   background: #bbb;
   /*background: rgba(0, 0, 0, .2);*/
   box-shadow: 0 10px 30px #333 inset;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
   border: solid 1px #ccc;
   width: 125px;
   border-radius: 4px;
@@ -755,17 +750,17 @@ div.FileUpload .CurrentImage {
 .Loading {
   height: 100px;
   padding: 0 20px;
-  background: url("images/progress.gif") center center no-repeat;
+  background: url('images/progress.gif') center center no-repeat;
 }
 
 .Progress {
   padding: 10px 40px 10px 0;
-  background: url("images/progress.gif") center center no-repeat;
+  background: url('images/progress.gif') center center no-repeat;
 }
 
 .TinyProgress {
   padding: 10px 40px 10px 0;
-  background: url("images/progress_sm.gif") center center no-repeat;
+  background: url('images/progress_sm.gif') center center no-repeat;
 }
 
 .InProgress {
@@ -859,7 +854,7 @@ div.Warning {
 .MorePager a.Loading {
   border: 0 !important;
   padding: 0 20px !important;
-  background: url("images/progress.gif") center center no-repeat !important;
+  background: url('images/progress.gif') center center no-repeat !important;
 }
 
 .Pager {
@@ -957,8 +952,7 @@ a.Small img {
   background: #fff8ce;
   border: 1px solid #c5bea4;
   box-shadow: none;
-  margin: 0 0 10px;
-  /* Make sure that .Box definitions don't override the base DismissMessage margin! */
+  margin: 0 0 10px; /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }
 
 .CasualMessage {
@@ -1033,7 +1027,7 @@ body > #Frame > .Head {
 }
 
 .SiteSearch .Button {
-  background: url("images/sprites.png") 0 -196px no-repeat transparent;
+  background: url('images/sprites.png') 0 -196px no-repeat transparent;
   height: 16px;
   width: 16px;
   overflow: hidden;
@@ -1055,6 +1049,7 @@ body > #Frame > .Head {
 #Head .SiteSearch .InputBox {
   border: none;
   width: 175px;
+
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
@@ -1081,9 +1076,6 @@ body > #Frame > .Head {
 }
 
 .OptionsTitle {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   background: url("images/ui_sprites.png") no-repeat 0 -101px;
   padding: 0;
@@ -1091,12 +1083,9 @@ body > #Frame > .Head {
   height: 18px;
   display: inline-block;
   vertical-align: top;
-  line-height: 999px;
-  /* Set it higher than your image height */
-  overflow: hidden;
-  /* Hide the text */
-  font-size: 0;
-  /* FF2 doesn’t like the above */
+  line-height: 999px; /* Set it higher than your image height */
+  overflow: hidden; /* Hide the text */
+  font-size: 0; /* FF2 doesn’t like the above */
   cursor: pointer;
 }
 
@@ -1192,8 +1181,7 @@ body > #Frame > .Head {
 }
 
 .ToggleFlyout.Open {
-  z-index: 110;
-  /* above Item:hover */
+  z-index: 110; /* above Item:hover */
 }
 
 .ToggleFlyout .Flyout {
@@ -1276,7 +1264,7 @@ a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
   display: inline-block;
-  background: url("images/ui_sprites.png") 0 -2px no-repeat;
+  background: url('images/ui_sprites.png') 0 -2px no-repeat;
   height: 18px;
   width: 18px;
   /*	margin: 0 4px;*/
@@ -1326,6 +1314,7 @@ td.CheckBoxColumn {
 }
 
 /* ======================================================== Full Page Errors */
+
 .SplashMessage #Body h1 {
   font-size: 64px;
   line-height: 1.4;
@@ -1345,6 +1334,7 @@ td.CheckBoxColumn {
 #Panel {
   width: 200px;
   float: left;
+
   /*
 No overflow hidden on main elements. Causes too many bugs!
 overflow: hidden;
@@ -1541,6 +1531,7 @@ margin-top: 0;
 }
 
 /** Make standard items a bit more condensed when in the panel. **/
+
 .PanelColumn .Item {
   padding: 2px;
 }
@@ -1839,8 +1830,7 @@ margin-top: 0;
 
 /* Page Controls (new discussion button, pagers, etc) */
 #Content .BoxNewDiscussion {
-  display: none;
-  /* display: block to reveal this */
+  display: none; /* display: block to reveal this */
 }
 
 .PageControls {
@@ -1850,6 +1840,7 @@ margin-top: 0;
 
 /* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
+
 .SearchForm {
   margin: 20px auto;
 }
@@ -2013,6 +2004,7 @@ margin-top: 0;
     opacity: 1;
 }
 */
+
 .DataList a.Delete {
   border-radius: 0;
   color: #333;
@@ -2137,7 +2129,7 @@ margin-top: 0;
 
 .Hero {
   background: #f7f7f7;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, .03);
   padding: 20px;
   margin: 10px 0 20px;
   border-radius: 6px;
@@ -2230,6 +2222,7 @@ margin-top: 0;
 }
 
 /* ============================================================== MessageList */
+
 .Author .PhotoWrap {
   margin: 0 10px 4px 0;
   float: left;
@@ -2262,8 +2255,7 @@ blockquote {
 
 .emoji {
   margin-top: -2px;
-  margin-bottom: -3px;
-  /* account for image padding */
+  margin-bottom: -3px; /* account for image padding */
 }
 
 blockquote.Quote, blockQuote.UserQuote {
@@ -2407,7 +2399,7 @@ mark {
 a.ChangePicture {
   position: absolute;
   background: #333;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, .7);
   color: #fff;
   font-size: 11px;
   padding: 10px 0;
@@ -2460,6 +2452,7 @@ form.Activity .Button {
    height: 60px;
    min-height: 60px;
 }*/
+
 /* Invitations Form */
 table.PreferenceGroup,
 #Form_Invitation table {
@@ -2506,7 +2499,7 @@ dl.About dd {
 
 dl.About dt {
   color: #666;
-  background: url("images/profile-sprites.png") 2px -139px no-repeat transparent;
+  background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
   padding-left: 14px;
 }
 
@@ -2560,7 +2553,7 @@ dl.About dd {
 }
 
 .InviteForm label {
-  display: block;
+  display: block
 }
 
 /* ======================================================== Thumbnail Cropper */
@@ -2601,7 +2594,7 @@ form.Thumbnail .Warning {
 .jcrop-vline, .jcrop-hline {
   font-size: 0;
   position: absolute;
-  background: white url("images/jcrop.gif") top left repeat;
+  background: white url('images/jcrop.gif') top left repeat;
 }
 
 .jcrop-vline {
@@ -2726,8 +2719,7 @@ div.Popup .Border {
 div.Popup .Body {
   background: #fff;
   padding: 10px;
-  float: left;
-  /* Put this here b/c background of form was not descending to bottom of popup. */
+  float: left; /* Put this here b/c background of form was not descending to bottom of popup. */
 }
 
 div.Popup .Loading {
@@ -2873,8 +2865,8 @@ div.Popup form ul li label.RadioLabel {
   display: inline-block;
   height: 33px;
   width: 70px;
-  background: url("images/vanilla-forums-dark-bg-70x33.png") center center no-repeat;
-  background: url("images/vanilla-forums-light-bg-70x33.png") center center no-repeat;
+  background: url('images/vanilla-forums-dark-bg-70x33.png') center center no-repeat;
+  background: url('images/vanilla-forums-light-bg-70x33.png') center center no-repeat;
   line-height: 999px;
   color: transparent;
   overflow: hidden;
@@ -2882,7 +2874,9 @@ div.Popup form ul li label.RadioLabel {
 }
 
 /* ================================ Vanilla ================================= */
+
 /* ============================================================== Discussions */
+
 /* Note: The Vanilla Discussion List has the following classes applied to
   individual list elements and can be styled:
   + Bookmarked: the user has bookmarked that topic
@@ -2943,8 +2937,7 @@ div.Popup form ul li label.RadioLabel {
 }
 */
 .ItemDiscussion .Message {
-  margin-bottom: 5px;
-  /* Consistency with when only h1 starts page */
+  margin-bottom: 5px; /* Consistency with when only h1 starts page */
   font-size: 110%;
 }
 
@@ -2983,8 +2976,7 @@ div.Popup form ul li label.RadioLabel {
 }
 
 tbody .BlockColumn {
-  padding: 8px 4px;
-  /* compensate for line-height 1 */
+  padding: 8px 4px; /* compensate for line-height 1 */
 }
 
 .DataTable .BlockColumn-User {
@@ -3128,7 +3120,7 @@ tr.CategoryHeading td {
   display: inline-block;
   height: 16px;
   width: 16px;
-  background: url("images/sprites.png") 0 -68px no-repeat;
+  background: url('images/sprites.png') 0 -68px no-repeat;
   margin: 0 5px 2px 0;
   vertical-align: middle;
 }
@@ -3228,7 +3220,7 @@ label.B {
 }
 
 .StructuredForm input.hasDatepicker, .StructuredForm input.hasDatepicker:focus {
-  background-image: url("images/calendar.png");
+  background-image: url('images/calendar.png');
   background-repeat: no-repeat;
   background-position: center right;
   padding-right: 24px;
@@ -3343,7 +3335,7 @@ body.Conversations a.Cancel {
 /* Upload Progress Bar */
 .UploadProgress {
   margin: 10px 0;
-  background: url("images/upload-progress-back.gif") repeat;
+  background: url('images/upload-progress-back.gif') repeat;
   width: 200px;
   z-index: 0;
   color: #fff;
@@ -3367,7 +3359,7 @@ body.Conversations a.Cancel {
 
 .UploadProgress .Background {
   width: 0;
-  background: url("images/upload-bg.gif") repeat;
+  background: url('images/upload-bg.gif') repeat;
   z-index: 1;
 }
 
@@ -3424,7 +3416,7 @@ ul.Tabs li a.Active {
 /* Icons */
 ul.Tabs li a.EntryTabFor_password {
   padding-left: 22px;
-  background-image: url("images/icon.png");
+  background-image: url('images/icon.png');
   background-position: 3px 4px;
   background-repeat: no-repeat;
 }
@@ -3625,7 +3617,7 @@ body#dashboard_entry_handshake ul.LinkAccount {
 ul.NewAccount h2,
 ul.LinkAccount h2 {
   padding-left: 36px !important;
-  background: url("images/dashboard-sprites.png") 0 -542px no-repeat;
+  background: url('images/dashboard-sprites.png') 0 -542px no-repeat;
 }
 
 ul.LinkAccount h2 {
@@ -3656,7 +3648,7 @@ body#dashboard_entry_leave p {
 }
 
 body#dashboard_entry_leave p.Leaving {
-  background: url("images/progress.gif") left center no-repeat;
+  background: url('images/progress.gif') left center no-repeat;
   margin: 0 0 0 14px;
   padding: 20px 0 20px 50px;
 }
@@ -3672,6 +3664,7 @@ body#dashboard_entry_leave p.Leaving {
 }
 
 /* Do not customize these unless you enjoy pain. */
+
 /* Error messages that get displayed on forms throughout the application. */
 .Errors {
   text-align: left;
@@ -3783,7 +3776,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   text-shadow: 0 1px 1px #000;
   text-align: left !important;
   border-radius: 2px;
-  background: black !important;
+  background: rgb(0, 0, 0) !important;
   background: rgba(0, 0, 0, 0.7) !important;
   border: none !important;
   width: auto;
@@ -3850,6 +3843,7 @@ position on the page to notify users of things like drafts being saved, etc. */
     color: #fff;
     display: block;
   }
+
   .Item .OptionsTitle {
     visibility: visible;
   }
@@ -3860,9 +3854,11 @@ position on the page to notify users of things like drafts being saved, etc. */
   .InformMessages {
     width: 100%;
   }
+
   .InformWrapper {
     margin: 5px;
   }
+
   .InformMessages .InformMessage {
     display: block;
     max-width: inherit;
@@ -3906,7 +3902,7 @@ position on the page to notify users of things like drafts being saved, etc. */
 }
 
 span.InformSprite {
-  background: url("images/inform-sprites.png") -9px -9px no-repeat;
+  background: url('images/inform-sprites.png') -9px -9px no-repeat;
   display: block;
   position: absolute;
   top: 4px;
@@ -4436,7 +4432,7 @@ span.InformSprite.Dice {
 }
 
 .Sprite16 {
-  background: url("images/sprites.png") 0 0 no-repeat;
+  background: url('images/sprites.png') 0 0 no-repeat;
   display: inline-block;
   height: 16px;
   width: 16px;
@@ -4928,15 +4924,18 @@ body.embed .InformMessages {
 }
 
 /* ============================================================ Regarding */
+
 .RegardingEvent {
   padding: 10px;
+
   position: relative;
   padding-left: 38px;
+
   color: #fff !important;
   text-shadow: 0 1px 1px #000;
   text-align: left !important;
   border-radius: 4px;
-  background: black !important;
+  background: rgb(0, 0, 0) !important;
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
@@ -4978,7 +4977,7 @@ body.embed .InformMessages {
   text-align: left !important;
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
-  background: black !important;
+  background: rgb(0, 0, 0) !important;
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
@@ -5105,6 +5104,7 @@ body.embed .InformMessages {
   height: 14px;
   line-height: 14px;
   vertical-align: top;
+
 }
 
 /* === Reaction Sprites === */
@@ -5235,12 +5235,12 @@ input + .ReactSprite {
 /* Switch to the white icons when hovering over a menuitem sprite */
 .MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
-  background-image: url("https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-fff.png");
+  background-image: url('https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-fff.png');
 }
 
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
-  background-image: url("https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-000-bordered.png");
+  background-image: url('https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-000-bordered.png');
 }
 
 .ActionBlock {
@@ -5262,7 +5262,7 @@ input + .ReactSprite {
 }
 
 .Video.YouTube .VideoPreview:after {
-  background: url("https://c3409409.ssl.cf0.rackcdn.com/images/youtube-overlay-button.png") 0 -44px no-repeat transparent;
+  background: url('https://c3409409.ssl.cf0.rackcdn.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;
   position: absolute;
   display: block;
   content: '';
@@ -5294,6 +5294,7 @@ input + .ReactSprite {
 }
 
 /* Media */
+
 .Media {
   margin: 5px 0 10px;
 }
@@ -5323,6 +5324,7 @@ input + .ReactSprite {
 }
 
 /* Overrides */
+
 .Hidden {
   display: none;
 }
@@ -5340,6 +5342,7 @@ input + .ReactSprite {
 }
 
 /* Token input */
+
 ul.token-input-list {
   box-sizing: border-box;
   border: 1px solid #aaa;
@@ -5487,8 +5490,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   margin-top: 18px;
   background: #fff;
   min-width: 120px;
-  z-index: 100010;
-  /* So high because a client actually had 99999 in a theme */
+  z-index: 100010; /* So high because a client actually had 99999 in a theme */
   border-radius: 2px;
   overflow: hidden;
   box-shadow: 0 5px 10px #eee;
@@ -5564,6 +5566,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 /**
  * Text formatting alignment
  */
+
 .AlignLeft {
   float: left;
   margin: 0 10px 10px 0;
@@ -5585,6 +5588,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 /**
  * Socialcons
  */
+
 .SocialIcon {
   display: inline-block;
   overflow: hidden;
@@ -5617,7 +5621,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  -webkit-transition: background-color 100ms;
   transition: background-color 100ms;
 }
 
@@ -5629,22 +5632,23 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon .Icon {
-  background-image: url("images/socialcons-small.png");
+  background-image: url('images/socialcons-small.png');
   background-repeat: no-repeat;
   background-size: 24px 168px;
 }
 
 .SocialIcon.HasText .Icon {
   background-size: 32px 224px;
-  background-image: url("images/socialcons.png");
+  background-image: url('images/socialcons.png');
 }
 
 @media (min-device-pixel-ratio: 2) {
   .SocialIcon .Icon {
-    background-image: url("images/socialcons-small@2x.png");
+    background-image: url('images/socialcons-small@2x.png');
   }
+
   .SocialIcon.HasText .Icon {
-    background-image: url("images/socialcons@2x.png");
+    background-image: url('images/socialcons@2x.png');
   }
 }
 
@@ -5764,6 +5768,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 /* Woe unto whoever caused this */
+
 .MeBox-SignIn.Inline .SocialIcon {
   display: inline-block;
 }
@@ -5775,11 +5780,13 @@ Components for Attachments.
 
 Styleguide Attachments
 */
+
 /*
 ## Utilities
 
 Styleguide Attachments.Utilities
 */
+
 .pull-right {
   float: right !important;
 }
@@ -5793,6 +5800,7 @@ Styleguide Attachments.Utilities
 
 Styleguide Definitions
 */
+
 .item-attachment dl {
   margin-top: 0;
   margin-bottom: 20px;
@@ -5812,6 +5820,7 @@ Styleguide Definitions
 }
 
 /* Horizontal layout */
+
 .item-attachment .dl-horizontal dt {
   float: left;
   width: 160px;
@@ -5827,6 +5836,7 @@ Styleguide Definitions
 }
 
 /* Column layout */
+
 .item-attachment .dl-columns {
   overflow: hidden;
   margin-right: -10px;
@@ -5866,6 +5876,7 @@ Styleguide Definitions
 
 Styleguide Media
 */
+
 .item-attachment .media {
   overflow: hidden;
 }
@@ -5898,8 +5909,7 @@ Styleguide Media
 }
 
 .item-attachment .media-heading {
-  margin: 0 0 5px !important;
-  /* Hack */
+  margin: 0 0 5px !important; /* Hack */
 }
 
 .item-attachment .media-list {
@@ -5916,6 +5926,7 @@ Styleguide Media
 
 Styleguide Alerts
 */
+
 .item-attachment .alert {
   padding: 12px;
   margin-bottom: 20px;
@@ -5950,6 +5961,7 @@ Styleguide Alerts
 }
 
 /* Informative alert */
+
 .item-attachment .alert-info {
   color: #222;
   background-color: #f9edbe;
@@ -5965,6 +5977,7 @@ Styleguide Alerts
 }
 
 /* Warning alert */
+
 .item-attachment .alert-warning {
   color: #222222;
   background-color: #ffcc00;
@@ -5980,6 +5993,7 @@ Styleguide Alerts
 }
 
 /* Danger alert */
+
 .item-attachment .alert-danger {
   color: #fff;
   background-color: #b90000;
@@ -5999,9 +6013,9 @@ Styleguide Alerts
 
 Styleguide Item
 */
+
 .item-attachment .item-heading {
-  margin-bottom: 0 !important;
-  /* Hack */
+  margin-bottom: 0 !important; /* Hack */
   font-weight: 500;
 }
 
@@ -6055,6 +6069,7 @@ Styleguide Item
 
 Styleguide Attachments
 */
+
 .item-attachment {
   margin-top: 20px;
 }
@@ -6079,31 +6094,18 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
   opacity: 1;
 }
 
 /* Effects */
-@-webkit-keyframes highlight {
-  0% {
-    background-color: #ff9;
-  }
-  10% {
-    background-color: #ff9;
-  }
-}
+
 @keyframes highlight {
-  0% {
-    background-color: #ff9;
-  }
-  10% {
-    background-color: #ff9;
-  }
+  0% {background-color: #ff9;}
+  10% {background-color: #ff9;}
 }
 
-.highlight-effect {
-  -webkit-animation: highlight .8s;
+.highlight-effect{
   animation: highlight .8s;
 }
 
@@ -6122,4 +6124,3 @@ Styleguide Attachments
 .Groups.Section-DiscussionList .HomepageTitle {
   display: none;
 }
-/*# sourceMappingURL=style.css.map */

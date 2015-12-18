@@ -21,10 +21,9 @@ $ npm install
 ### Tasks
 
 #### Build - `npm run build`
-Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascripts will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
+
+Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascript will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
 
 #### Watch - `npm run watch`
-Watches the assets for changes and runs the appropriate Grunt tasks. Also starts a Livereload server that will push the changes to your Vanilla installation automatically. To make use of this, you may want to install and use [LiveReload's browser extensions](http://livereload.com/extensions/).
 
----
-Copyright &copy; 2015 Vanilla Forums
+Watches the assets for changes and runs the appropriate Grunt tasks. Also starts a LiveReload server that will push the changes to your Vanilla installation automatically. To make use of this, you may want to install and use [LiveReload's browser extensions](http://livereload.com/extensions/).

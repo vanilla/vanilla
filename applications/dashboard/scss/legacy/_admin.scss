@@ -101,8 +101,7 @@ body {
   background: #fff;
   float: left;
   width: 100%;
-  zoom: 1;
-  /* hasLayout for IE6/7 */
+  zoom: 1; /* hasLayout for IE6/7 */
 }
 
 #Body:after {
@@ -347,7 +346,6 @@ textarea.TextBox {
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
   transition: height 0.1s ease;
   resize: none !important;
 }
@@ -369,7 +367,6 @@ select.Year {
   margin: 0;
   border-radius: .5ex;
   background: #3fbcf3;
-  background: -webkit-linear-gradient(top, #aee7fe, #3fbcf3);
   background: linear-gradient(top, #aee7fe, #3fbcf3);
   border: 1px solid #0F7FE6;
   color: #003673;
@@ -449,7 +446,6 @@ a.Button {
 
 .CancelButton {
   border-color: #919191;
-  background: -webkit-linear-gradient(top, #F1F1F1, #D1D1D1);
   background: linear-gradient(top, #F1F1F1, #D1D1D1);
   color: #414141;
   text-shadow: 0 1px 0 #E1E1E1;
@@ -463,27 +459,27 @@ a.Button {
 .Loading {
   height: 100px;
   padding: 0 20px;
-  background: url("images/progress.gif") center center no-repeat;
+  background: url('images/progress.gif') center center no-repeat;
 }
 
 .AfterButtonLoading {
-  background: url("images/progress.gif") center center no-repeat;
+  background: url('images/progress.gif') center center no-repeat;
   padding: 0 20px;
 }
 
 .Progress {
   padding: 10px 40px 10px 0;
-  background: url("images/progress.gif") center center no-repeat;
+  background: url('images/progress.gif') center center no-repeat;
 }
 
 .TinyProgress {
   padding: 10px 40px 10px 0 !important;
-  background: url("images/progress_sm.gif") center center no-repeat;
+  background: url('images/progress_sm.gif') center center no-repeat;
   display: inline !important;
 }
 
 .InProgress {
-  background: url("images/progress_sm.gif") center center no-repeat !important;
+  background: url('images/progress_sm.gif') center center no-repeat !important;
   border-color: transparent !important;
   box-shadow: none !important;
   color: transparent !important;
@@ -839,7 +835,6 @@ input.SmallInput {
 .Inline {
   display: inline;
 }
-
 div.Popup ul li label.Inline,
 form ul li label.Inline {
   display: inline-block;
@@ -1041,7 +1036,7 @@ label.SubLabel {
 }
 
 .CheckBoxGrid tbody th a span.Parent {
-  background: url("images/parent_divider.gif") center right no-repeat;
+  background: url('images/parent_divider.gif') center right no-repeat;
   padding: 6px 10px 6px 0;
   margin: 0 6px 0 0;
 }
@@ -1117,7 +1112,7 @@ form ul li.PasswordOptions label.RadioLabel {
 
 /* =================================================================== Header */
 #Head {
-  background: url("images/dashboard-bg.png") top center repeat-x #014687;
+  background: url('images/dashboard-bg.png') top center repeat-x #014687;
   border-bottom: 1px solid #000;
   padding: 10px 18px 18px;
   text-align: right;
@@ -1148,7 +1143,7 @@ form ul li.PasswordOptions label.RadioLabel {
 #Head div.User a,
 #Head h1 a span {
   font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
-  background: url("images/dashboard-bg.png") -480px -191px repeat-x #01518d;
+  background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
   border: 1px solid #002b57;
   color: #fff;
   text-shadow: 0 1px 0 #000;
@@ -1258,7 +1253,7 @@ div.Box h4.Active a {
 }
 
 #Panel div.Box h4 {
-  background: url("images/dashboard-sprites.png") 166px -145px no-repeat;
+  background: url('images/dashboard-sprites.png') 166px -145px no-repeat;
 }
 
 #Panel div.Dashboard h4 {
@@ -1379,7 +1374,7 @@ span.New {
 }
 
 ul.PanelInfo li.Active {
-  background-image: url("images/arrow.png");
+  background-image: url('images/arrow.png');
   background-position: center left;
   background-repeat: no-repeat;
   background-color: #f5f9ff;
@@ -1454,7 +1449,7 @@ ul.PanelInfo li.Active:hover {
 body.Home {
   margin: 0;
   padding: 80px;
-  background: url("images/eyes.png") 30px 30px no-repeat #fff;
+  background: url('images/eyes.png') 30px 30px no-repeat #fff;
 }
 
 body.Home #Content {
@@ -1570,7 +1565,7 @@ div.Popup h2 {
   font-weight: bold;
   margin: 0 0 5px 0;
   color: #f8fdff;
-  background: url("images/dashboard-bg.png") top center repeat-x #014687;
+  background: url('images/dashboard-bg.png') top center repeat-x #014687;
   border-bottom: 1px solid #000;
   text-shadow: 0 1px 0 #000;
 }
@@ -1624,7 +1619,7 @@ a.Close {
   font-weight: bold;
   padding: 0;
   border-radius: 3px;
-  background: url("images/dashboard-sprites.png") 5px -795px no-repeat #000;
+  background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
   border-bottom: 1px solid #006edf;
   position: absolute;
   right: 10px;
@@ -1958,6 +1953,10 @@ div.Summary table tbody td {
 }
 
 /* Mobile themes */
+
+.browser-mobile-themes {
+}
+
 .themeblock {
   box-sizing: border-box;
   margin: 0;
@@ -1965,7 +1964,6 @@ div.Summary table tbody td {
   min-width: 235px;
   padding: 20px;
   position: relative;
-  -webkit-transition: all 0.4s ease;
   transition: all 0.4s ease;
 }
 
@@ -2097,7 +2095,7 @@ div.Summary table tbody td {
   font-weight: bold;
   padding: 4px 18px 2px;
   position: relative;
-  background: url("images/dashboard-bg.png") center -96px repeat-x #014687;
+  background: url('images/dashboard-bg.png') center -96px repeat-x #014687;
   border: none;
   border-bottom: 1px solid #000204;
 }
@@ -2122,7 +2120,7 @@ div.Summary table tbody td {
 
 #Foot div a {
   display: block;
-  background: url("images/logo_footer.png") center center no-repeat;
+  background: url('images/logo_footer.png') center center no-repeat;
   height: 32px;
   width: 72px;
   margin: 6px 0 10px;
@@ -2140,6 +2138,7 @@ div.Summary table tbody td {
   background: #555;
   color: #fff;
   border-radius: 2px;
+
   font-size: 11px;
   padding: 1px 6px !important;
 }
@@ -2279,7 +2278,7 @@ div.Summary table tbody td {
   display: block;
   height: 124px;
   width: 180px;
-  background: url("images/homepage-sprites.png") 0 0 no-repeat;
+  background: url('images/homepage-sprites.png') 0 0 no-repeat;
   border: 1px solid #888;
 }
 
@@ -2331,7 +2330,7 @@ div.Summary table tbody td {
 
 .Homepage a.Choice.Current {
   color: #000;
-  background: url("images/check.png") 2px 3px no-repeat;
+  background: url('images/check.png') 2px 3px no-repeat;
   text-indent: 36px;
 }
 
@@ -2460,6 +2459,7 @@ del {
 }
 
 /* Do not customize these unless you enjoy pain. */
+
 /* Error messages that get displayed on forms throughout the application. */
 div.Errors {
   text-align: left;
@@ -2525,7 +2525,6 @@ div.Errors pre * {
 
 .PageInfo {
   background: #00346d;
-  background: -webkit-linear-gradient(top, #00346d, #014a8a);
   background: linear-gradient(top, #00346d, #014a8a);
   padding: 10px;
   color: #fff;
@@ -2547,6 +2546,7 @@ div.Errors pre * {
 }
 
 /* Do not customize these unless you enjoy pain. */
+
 /* Note: InformMessages are "growl" style messages that appear in a fixed
 position on the page to notify users of things like drafts being saved, etc. */
 div.InformMessages {
@@ -2566,11 +2566,11 @@ div.InformMessages {
 
 * html div.InformMessages {
   position: absolute;
-  width: 100%;
-  /*IE5.5*/
+  width: 100%; /*IE5.5*/
   top: auto;
   left: 20px;
   overflow: visible;
+//  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 
 div.InformMessages div.InformWrapper {
@@ -2582,7 +2582,7 @@ div.InformMessages div.InformMessage {
   text-shadow: 0 1px 1px #000;
   text-align: left !important;
   border-radius: 2px;
-  background: black !important;
+  background: rgb(0, 0, 0) !important;
   background: rgba(0, 0, 0, 0.7) !important;
   border: none !important;
   width: auto !important;
@@ -2664,7 +2664,7 @@ div.InformMessages div.InformMessage a.Icon img {
 }
 
 span.InformSprite {
-  background: url("images/inform-sprites.png") -9px -9px no-repeat;
+  background: url('images/inform-sprites.png') -9px -9px no-repeat;
   display: block;
   position: absolute;
   top: 4px;
@@ -3207,7 +3207,7 @@ span.InformSprite.Dice {
   font-size: 1px;
   height: 42px;
   width: 341px;
-  background: url("images/welcome-message.png") top left no-repeat transparent;
+  background: url('images/welcome-message.png') top left no-repeat transparent;
 }
 
 .Info ul,
@@ -3226,7 +3226,7 @@ span.InformSprite.Dice {
 .ActivateSlider {
   display: inline-block;
   background: #bbb;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
   border: solid 1px #ccc;
   width: 100px;
   padding: 1px;
@@ -3249,6 +3249,7 @@ span.InformSprite.Dice {
 .ActivateSlider .SmallButton {
   margin: 0;
   min-width: 45px;
+
 }
 
 .Sprite {
@@ -3258,7 +3259,7 @@ span.InformSprite.Dice {
   vertical-align: text-top;
   border: solid 2px transparent;
   margin: -2px;
-  background: url("//vanillicon.com/sprites/sprites-14-sweetx-001F44.png") 0 0 no-repeat;
+  background: url('//vanillicon.com/sprites/sprites-14-sweetx-001F44.png') 0 0 no-repeat;
   display: inline-block;
 }
 
@@ -3292,6 +3293,7 @@ span.InformSprite.Dice {
 .SpRefresh { background-position: -48px -196px; }
 .SpPencil { background-position: -64px -196px; }
 .SpPlus { background-position: -80px -196px; }*/
+
 .SpActivity {
   background-position: -160px -120px;
 }
@@ -3325,7 +3327,7 @@ span.InformSprite.Dice {
 }
 
 .SpDashboard {
-  background-position: -340px -20px;
+  background-position: -340px -20px
 }
 
 .SpDelete {
@@ -3391,4 +3393,3 @@ span.InformSprite.Dice {
 .SpWarn, .SpWarnings {
   background-position: -200px -20px;
 }
-/*# sourceMappingURL=admin.css.map */

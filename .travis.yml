@@ -2,8 +2,8 @@ language: php
 
 php:
     - 5.4
-    - 5.5
-    - 5.6
+#    - 5.5
+#    - 5.6
     - 7.0
     - hhvm
 
@@ -17,8 +17,8 @@ env:
 matrix:
   fast_finish: true
 
-#cache:
-#  - apt
+cache:
+  - apt
 
 addons:
   apt:

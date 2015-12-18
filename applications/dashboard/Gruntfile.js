@@ -48,7 +48,8 @@ module.exports = function (grunt) {
     sass: {
       dist: {
         options: {
-          sourceComments: 'map'
+          sourceMap: true,
+          outFile: 'design/admin.css'
         }
       , files: [{
           expand: true

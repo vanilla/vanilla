@@ -143,7 +143,7 @@ linters:
     max_properties: 10
 
   PropertySortOrder:
-    enabled: true
+    enabled: false
     exclude: legacy/**
     ignore_unspecified: false
     min_properties: 2

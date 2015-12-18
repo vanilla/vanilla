@@ -479,7 +479,6 @@ a.Button {
 }
 
 .InProgress {
-  color: transparent !important;
   background: url('images/progress_sm.gif') center center no-repeat !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -1561,7 +1560,6 @@ div.Popup .Loading {
 div.Popup h1,
 div.Popup h2 {
   padding: 6px 9px 4px;
-  text-shadow: 0 1px 0 #fff;
   border-radius: 4px 4px 0 0;
   font-size: 14px;
   font-weight: bold;
@@ -1827,9 +1825,6 @@ table.SelectionGrid dl dd {
 }
 
 table.SelectionGrid td.Active {
-  -moz-background-clip: border;
-  -moz-background-inline-policy: continuous;
-  -moz-background-origin: padding;
   background: #e2f4ff none repeat scroll 0 0;
 }
 
@@ -2594,15 +2589,14 @@ div.InformMessages div.InformMessage {
   max-width: 400px !important;
   margin: 10px auto 0 !important;
   padding: 9px 14px 8px !important;
-  display: -moz-inline-stack;
   display: inline-block;
   zoom: 1;
-  *display: inline;
   position: relative;
   line-height: 1.6;
 }
 
 div.InformMessages div.InformMessage:hover {
+  background: #111111;
   background: rgba(0, 0, 0, 0.8) !important;
 }
 

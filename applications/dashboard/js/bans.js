@@ -12,6 +12,7 @@ jQuery(document).ready(function($) {
     $('a.Delete').popup({
         confirm: true,
         followConfirm: false,
+        doPost: true,
         afterConfirm: function(json, sender) {
             $(sender).parents('tr').remove();
         }

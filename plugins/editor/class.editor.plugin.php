@@ -632,7 +632,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // If force Wysiwyg enabled in settings
-        $needsConversion = (!in_array($this->Format, array('Html', 'Wysiwyg')));
+        $needsConversion = (!in_array($this->Format, array('Wysiwyg')));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
             $wysiwygBody = Gdn_Format::to($Sender->getValue('Body'), $this->Format);
             $Sender->setValue('Body', $wysiwygBody);

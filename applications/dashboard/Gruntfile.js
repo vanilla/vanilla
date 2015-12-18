@@ -47,7 +47,8 @@ module.exports = function (grunt) {
 
         sass: {
             options: {
-                sourceMap: true
+                sourceMap: true,
+                outputStyle: "expanded"
             },
             dist: {
                 files: [{
@@ -74,7 +75,8 @@ module.exports = function (grunt) {
 
         autoprefixer: {
             options: {
-                map: true
+                map: true,
+                cascade: false
             },
             dist: {
                 src: ['design/**/admin.css']

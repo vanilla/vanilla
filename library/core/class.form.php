@@ -87,6 +87,32 @@ class Gdn_Form extends Gdn_Pluggable {
         parent::__construct();
     }
 
+    /**
+     * Backwards compatibility getter.
+     *
+     * @param strig $name The property to get.
+     * @return mixed Returns the value of the property.
+     */
+    public function __get($name) {
+        if ($name === 'InputPrefix') {
+            trigger_error("Gdn_Form->InputPrefix is deprecated", E_USER_DEPRECATED);
+        }
+        return null;
+    }
+
+    /**
+     * Backwards compatibility setter.
+     *
+     * @param string $name The name of the property to set.
+     * @param mixed $value The new value of the property.
+     */
+    public function __set($name, $value) {
+        if ($name === 'InputPrefix') {
+            trigger_error("Gdn_Form->InputPrefix is deprecated", E_USER_DEPRECATED);
+        }
+        $this->$name = $value;
+    }
+
 
     /// =========================================================================
     /// UI Components: Methods that return XHTML form elements.

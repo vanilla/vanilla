@@ -79,7 +79,8 @@ module.exports = function (grunt) {
                 cascade: false
             },
             dist: {
-                src: ['design/**/admin.css']
+                src: ['design/admin.css'
+                     ,'design/style.css' ]
             }
         },
 
@@ -94,7 +95,8 @@ module.exports = function (grunt) {
             options: {
                 csslintrc: 'design/.csslintrc'
             }
-            , all: ['design/admin.css']
+            , all: ['design/admin.css'
+                   ,'design/style.css']
         },
 
         concat: {

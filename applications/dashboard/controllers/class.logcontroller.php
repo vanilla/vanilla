@@ -40,8 +40,7 @@ class LogController extends DashboardController {
         $LogIDs = Gdn::request()->post('IDs', false);
 
         $this->Form->addHidden('LogIDs', $LogIDs);
-        $this->Form->InputPrefix = '';
-        $this->Form->IDPrefix = 'Confirm_';
+       $this->Form->IDPrefix = 'Confirm_';
 
         if (trim($LogIDs)) {
             $LogIDArray = explode(',', $LogIDs);
@@ -262,7 +261,7 @@ class LogController extends DashboardController {
         Gdn_Theme::section('Dashboard');
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
-        $this->Form->InputPrefix = '';
+        $this->addJsFile('jquery-ui.js');
     }
 
     /**

@@ -803,8 +803,6 @@ class ProfileController extends Gdn_Controller {
     public function preference($Key = false) {
         $this->permission('Garden.SignIn.Allow');
 
-        $this->Form->InputPrefix = '';
-
         if ($this->Form->authenticatedPostBack()) {
             $Data = $this->Form->formValues();
             Gdn::userModel()->SavePreference(Gdn::session()->UserID, $Data);

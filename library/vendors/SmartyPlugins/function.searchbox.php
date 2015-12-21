@@ -16,7 +16,6 @@
 function smarty_function_searchbox($params, &$smarty) {
     $placeholder = array_key_exists('placeholder', $params) ? val('placeholder', $params, '', true) : t('SearchBoxPlaceHolder', 'Search');
     $form = Gdn::factory('Form');
-    $form->InputPrefix = '';
     $result =
         $form->open(array('action' => url('/search'), 'method' => 'get')).
         $form->textBox('Search', array('placeholder' => $placeholder, 'accesskey' => '/')).

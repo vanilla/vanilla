@@ -99,8 +99,8 @@ if (!function_exists('WriteDiscussion')):
         $Sender->EventArguments['Discussion'] = &$Discussion;
         $Sender->EventArguments['CssClass'] = &$CssClass;
 
-        $First = UserBuilder($Discussion, 'First');
-        $Last = UserBuilder($Discussion, 'Last');
+        $First = UserBuilder($Discussion, 'Insert');
+        $Last = UserBuilder($Discussion, 'LastComment');
         $Sender->EventArguments['FirstUser'] = &$First;
         $Sender->EventArguments['LastUser'] = &$Last;
 
@@ -175,7 +175,7 @@ if (!function_exists('WriteDiscussion')):
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($Discussion->LastDate, 'html').'</span>';
                     } else {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($First)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($Discussion->FirstDate, 'html');
+                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($Discussion->DateInserted, 'html');
 
                         if ($Source = val('Source', $Discussion)) {
                             echo ' '.sprintf(t('via %s'), t($Source.' Source', $Source));

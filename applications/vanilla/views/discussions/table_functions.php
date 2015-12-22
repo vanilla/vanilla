@@ -45,9 +45,9 @@ if (!function_exists('WriteDiscussionRow')):
         $Sender->EventArguments['Discussion'] = &$Discussion;
         $Sender->EventArguments['CssClass'] = &$CssClass;
 
-        $First = UserBuilder($Discussion, 'First');
-        if ($Discussion->LastUserID)
-            $Last = UserBuilder($Discussion, 'Last');
+        $First = UserBuilder($Discussion, 'Insert');
+        if ($Discussion->LastCommentUserID)
+            $Last = UserBuilder($Discussion, 'LastComment');
         else {
             $Last = $First;
         }
@@ -104,7 +104,7 @@ if (!function_exists('WriteDiscussionRow')):
                     echo userPhoto($First, array('Size' => 'Small'));
                     echo userAnchor($First, 'UserLink BlockTitle');
                     echo '<div class="Meta">';
-                    echo anchor(Gdn_Format::date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate MItem');
+                    echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $FirstPageUrl, 'CommentDate MItem');
                     echo '</div>';
                     ?>
                 </div>

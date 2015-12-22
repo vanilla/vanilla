@@ -656,6 +656,15 @@ class ProxyRequest {
     }
 
     /**
+     * Get request total time
+     *
+     * @return float
+     */
+    public function time() {
+        return $this->ResponseTime;
+    }
+
+    /**
      *
      *
      * @return mixed

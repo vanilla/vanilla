@@ -736,7 +736,7 @@ class DiscussionModel extends VanillaModel {
             $Discussion->LastDate = $Discussion->DateInserted;
         }
 
-        $this->EventArguments['Discussion'] = $Discussion;
+        $this->EventArguments['Discussion'] = &$Discussion;
         $this->fireEvent('SetCalculatedFields');
     }
 

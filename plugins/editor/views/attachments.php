@@ -39,6 +39,7 @@ $editorkey = $this->data('_editorkey');
             <a class="filename" data-type="<?php echo $attachment['Type']; ?>"
                data-width="<?php echo $attachment['ImageWidth']; ?>"
                data-height="<?php echo $attachment['ImageHeight']; ?>" href="<?php echo $pathParse['Url'] ?>"
+               download="<?php echo htmlspecialchars($attachment['Name']); ?>"
                target="_blank"><?php echo htmlspecialchars($attachment['Name']); ?></a>
             <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
          </div>

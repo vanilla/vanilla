@@ -114,21 +114,14 @@ class UpdateModel extends Gdn_Model {
                     $Info['Name'] = $Key;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
-                    $Valid = false;
-                }
-
-                if (!val('License', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('License'));
-                    $Valid = false;
-                }
-
+                // Validate folder name matches key.
                 if (isset($Entry['Base']) && strcasecmp($Entry['Base'], $Key) != 0 && $Variable != 'ThemeInfo') {
                     $Result[] = "$Name: The addon's key is not the same as its folder name.";
                     $Valid = false;
@@ -234,13 +227,10 @@ class UpdateModel extends Gdn_Model {
                     $NewRoot = $Root;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -291,13 +281,10 @@ class UpdateModel extends Gdn_Model {
                     $NewRoot = $Root;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -309,6 +296,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
@@ -343,13 +331,10 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -361,6 +346,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
@@ -401,13 +387,10 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -419,6 +402,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
@@ -724,6 +708,14 @@ class UpdateModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $MyAddons
+     * @param $LatestAddons
+     * @param bool|true $OnlyUpdates
+     * @return bool
+     */
     public function compareAddons($MyAddons, $LatestAddons, $OnlyUpdates = true) {
         $UpdateAddons = false;
 
@@ -749,6 +741,30 @@ class UpdateModel extends Gdn_Model {
         }
 
         return $UpdateAddons;
+    }
+
+    /**
+     * Check globally required fields in our addon info.
+     *
+     * @param $info
+     * @return array $results
+     */
+    protected static function checkRequiredFields($info) {
+        $results = array();
+
+        if (!val('Description', $info)) {
+            $results[] = sprintf(t('ValidateRequired'), t('Description'));
+        }
+
+        if (!val('Version', $info)) {
+            $results[] = sprintf(t('ValidateRequired'), t('Version'));
+        }
+
+        if (!val('License', $info)) {
+            $results[] = sprintf(t('ValidateRequired'), t('License'));
+        }
+
+        return $results;
     }
 
     /**

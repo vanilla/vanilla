@@ -124,6 +124,11 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
+                if (!val('License', $Info)) {
+                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('License'));
+                    $Valid = false;
+                }
+
                 if (isset($Entry['Base']) && strcasecmp($Entry['Base'], $Key) != 0 && $Variable != 'ThemeInfo') {
                     $Result[] = "$Name: The addon's key is not the same as its folder name.";
                     $Valid = false;
@@ -247,6 +252,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }

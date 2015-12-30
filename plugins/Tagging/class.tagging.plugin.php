@@ -902,7 +902,8 @@ if (!function_exists('TagUrl')) :
      *
      * @param $Row
      * @param string $Page
-     * @param bool $WithDomain
+     * @param mixed $WithDomain
+     * @see url() for $WithDomain docs.
      * @return string
      */
     function tagUrl($Row, $Page = '', $WithDomain = false) {

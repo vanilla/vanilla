@@ -288,6 +288,12 @@ class SettingsController extends Gdn_Controller {
             $IsParent = $this->Form->getFormValue('IsParent', '0');
             $this->Form->setFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
+
+            // Enforces tinyint values on boolean fields to comply with strict mode
+            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
+            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+
             $CategoryID = $this->Form->save();
             if ($CategoryID) {
                 $Category = CategoryModel::categories($CategoryID);

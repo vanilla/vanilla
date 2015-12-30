@@ -181,8 +181,7 @@ class UserController extends DashboardController {
             $this->EventArguments['RoleData'] = &$this->RoleData;
 
             $this->fireEvent("BeforeUserAdd");
-
-            if ($this->Form->authenticatedPostBack()) {
+            if ($this->Form->authenticatedPostBack(true)) {
                 // These are the new roles the creating user wishes to apply to the target
                 // user, adjusted for his ability to affect those roles
                 $RequestedRoles = $this->Form->getFormValue('RoleID');
@@ -260,7 +259,7 @@ class UserController extends DashboardController {
 
         $this->fireEvent('BeforeApplicants');
 
-        if ($this->Form->authenticatedPostBack() === true) {
+        if ($this->Form->authenticatedPostBack(true)) {
             $Action = $this->Form->getValue('Submit');
             $Applicants = $this->Form->getValue('Applicants');
             $ApplicantCount = is_array($Applicants) ? count($Applicants) : 0;
@@ -397,7 +396,7 @@ class UserController extends DashboardController {
         $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_AUTOMATIC));
 
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack(true)) {
             if ($Unban) {
                 $UserModel->unban($UserID, array('RestoreContent' => $this->Form->getFormValue('RestoreContent')));
             } else {
@@ -534,7 +533,7 @@ class UserController extends DashboardController {
                 $this->View = 'deleteconfirm';
             }
 
-            if ($this->Form->authenticatedPostBack() && $Method != '') {
+            if ($this->Form->authenticatedPostBack(true) && $Method != '') {
                 $UserModel->delete($UserID, array('DeleteMethod' => $Method));
                 $this->View = 'deletecomplete';
             }
@@ -593,7 +592,7 @@ class UserController extends DashboardController {
             throw notFoundException('User');
         }
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack(true)) {
             Gdn::userModel()->deleteContent($UserID, array('Log' => true));
 
             if ($this->Request->get('Target')) {
@@ -690,7 +689,7 @@ class UserController extends DashboardController {
             $this->setData('AllowEditing', $AllowEditing);
 
             $this->Form->setData($User);
-            if ($this->Form->authenticatedPostBack()) {
+            if ($this->Form->authenticatedPostBack(true)) {
                 if (!$CanEditUsername) {
                     $this->Form->setFormValue("Name", $User['Name']);
                 }
@@ -875,7 +874,7 @@ class UserController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // This must be a postback.
-        if (!$this->Request->isAuthenticatedPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack(true)) {
             throw forbiddenException('GET');
         }
 
@@ -1054,7 +1053,7 @@ class UserController extends DashboardController {
 
         $Form = new Gdn_Form();
 
-        if ($this->Request->isAuthenticatedPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack(true)) {
             // Make sure everything has been posted.
             $Form->validateRule('ClientID', 'ValidateRequired');
             $Form->validateRule('UniqueID', 'ValidateRequired');

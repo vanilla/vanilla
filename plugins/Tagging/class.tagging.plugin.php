@@ -240,7 +240,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
   */
         // Render the controller.
-        $this->View = c('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'index';
+        $this->View = c('Vanilla.Discussions.Layout') == 'table' && $Sender->SyndicationMethod == SYNDICATION_NONE ? 'table' : 'index';
         $Sender->render($this->View, 'discussions', 'vanilla');
     }
 
@@ -290,11 +290,11 @@ class TaggingPlugin extends Gdn_Plugin {
             $Breadcrumbs = array();
 
             if (is_array($ParentTag) && count(array_filter($ParentTag))) {
-                $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag));
+                $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag, '', '/'));
             }
 
             if (is_array($CurrentTag) && count(array_filter($CurrentTag))) {
-                $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag));
+                $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag, '', '/'));
             }
 
             if (count($Breadcrumbs)) {

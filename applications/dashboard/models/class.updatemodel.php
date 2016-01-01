@@ -28,6 +28,26 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
+     * Find a list of filenames in a folder or zip.
+     *
+     * @param string $path Folder or zip file to look in.
+     * @param array $fileNames List of files to attempt to locate inside $path.
+     * @return array|bool
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public static function findFiles($path, $fileNames) {
+        // Get the list of potential files to analyze.
+        if (is_dir($path)) {
+            $entries = self::_getInfoFiles($path, $fileNames);
+        } else {
+            $entries = self::_getInfoZip($path, $fileNames);
+        }
+
+        return $entries;
+    }
+
+    /**
      * Check an addon's file to extract the addon information out of it.
      *
      * @param string $Path The path to the file.
@@ -522,6 +542,7 @@ class UpdateModel extends Gdn_Model {
      * @throws Exception
      */
     protected static function _getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
+
         // Extract the zip file so we can make sure it has appropriate information.
         $Zip = null;
 

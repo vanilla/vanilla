@@ -328,12 +328,12 @@ class DiscussionModel extends VanillaModel {
             }
         }
 
+        // Change discussions returned based on additional criteria
+        $this->AddDiscussionColumns($Data);
+
         // Join in the users.
         Gdn::userModel()->joinUsers($Data, array('FirstUserID', 'LastUserID'));
         CategoryModel::JoinCategories($Data);
-
-        // Change discussions returned based on additional criteria
-        $this->AddDiscussionColumns($Data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Data);
@@ -1372,12 +1372,12 @@ class DiscussionModel extends VanillaModel {
             return $Discussion;
         }
 
+        $this->Calculate($Discussion);
+
         // Join in the users.
         $Discussion = array($Discussion);
         Gdn::userModel()->joinUsers($Discussion, array('LastUserID', 'InsertUserID'));
         $Discussion = $Discussion[0];
-
-        $this->Calculate($Discussion);
 
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->AddDenormalizedViews($Discussion);

@@ -200,7 +200,7 @@ class PostController extends VanillaController {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
             }
 
-            $Draft = $this->Form->buttonExists('Save Draft') ? true : false;
+            $Draft = $this->Form->buttonExists('Save_Draft') ? true : false;
             $Preview = $this->Form->buttonExists('Preview') ? true : false;
             if (!$Preview) {
                 if (!is_object($this->Category) && is_array($CategoryData) && isset($FormValues['CategoryID'])) {

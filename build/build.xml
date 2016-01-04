@@ -20,7 +20,7 @@
         <!-- Grab the version number from Vanilla's index.php. -->
         <propertyregex property="vanilla.version"
             subject="${vanilla.index}"
-            pattern="define\('APPLICATION_VERSION', '([\d\.?]+)'\)"
+            pattern="define\('APPLICATION_VERSION', '([\d\.]+)'\)"
             match="$1"
             defaultValue="-1" />
 

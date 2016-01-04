@@ -8,20 +8,25 @@
     -->
     <resolvepath file=".." propertyName="project.dir" />
 
-    <resolvepath file="." propertyName="build.dir.base" />
-    <property name="build.dir.contents" value="${build.dir.base}/package-contents" />
-
-    <loadfile property="vanilla.index" file="${project.dir}/index.php"/>
+    <!--
+        Establish the intermediate directory name where our package contents will be placed, prior to being archived.
+    -->
+    <resolvepath file="./package" propertyName="package.dir" />
 
     <!-- Take steps to prepare for the build. -->
     <target name="prepare">
+        <loadfile property="vanilla.index" file="${project.dir}/index.php"/>
+
+        <!-- Grab the version number from Vanilla's index.php. -->
         <propertyregex property="vanilla.version"
             subject="${vanilla.index}"
             pattern="define\('APPLICATION_VERSION', '([\d\.?]+)'\)"
             match="$1"
-            defaultValue="unknown-version" />
+            defaultValue="-1" />
+
+        <!-- If we have a valid version, use it.  If we don't, then skip appending it to our output filename. -->
         <if>
-            <equals arg1="${vanilla.version}" arg2="unknown-version" />
+            <equals arg1="${vanilla.version}" arg2="-1" />
             <then>
                 <property name="project.destfile" value="vanilla.zip" />
             </then>
@@ -33,6 +38,7 @@
 
     <!-- Perform any steps to build the contents of the package. -->
     <target name="build" depends="prepare">
+        <!-- Trigger composer to do it's thing. -->
         <composer
             composer="/usr/local/bin/composer">
             <arg line="--working-dir=${project.dir} install --no-dev --optimize-autoloader" />
@@ -41,22 +47,30 @@
 
     <!-- Build the package. -->
     <target name="dist" depends="build">
+        <!-- Clean up any existing build files, if present. -->
         <delete
             file="${project.destfile}"
             quiet="true" />
         <delete
-            dir="${build.dir.contents}"
+            dir="${package.dir}"
             quiet="true" />
 
 
-        <mkdir dir="${build.dir.contents}" />
+        <!-- Create the directory we'll be dumping our package contents into. -->
+        <mkdir dir="${package.dir}" />
 
-        <copy todir="${build.dir.contents}" >
-            <fileset dir="${project.dir}" includesfile="package-contents.txt" />
+        <!-- Copy the relevant files, determined by the whitelist file, into our newly-made contents directory. -->
+        <copy todir="${package.dir}" >
+            <fileset
+                dir="${project.dir}"
+                excludesfile="package-exclude.txt"
+                includesfile="package-include.txt" />
         </copy>
+
+        <!-- Archive everything in the package contents directory. -->
         <zip
             destfile="${project.destfile}"
-            basedir="${build.dir.contents}">
+            basedir="${package.dir}">
         </zip>
     </target>
 </project>

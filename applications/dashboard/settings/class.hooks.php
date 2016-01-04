@@ -2,7 +2,7 @@
 /**
  * DashboardHooks class.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -103,8 +103,14 @@ class DashboardHooks implements Gdn_IPlugin {
             }
 
             // Force embedding?
-            if (!IsSearchEngine() && !IsMobile() && strtolower($Sender->ControllerName) != 'entry') {
-                $Sender->addDefinition('ForceEmbedForum', c('Garden.Embed.ForceForum') ? '1' : '0');
+            if (!IsSearchEngine() && strtolower($Sender->ControllerName) != 'entry') {
+                if (IsMobile()) {
+                    $forceEmbedForum = c('Garden.Embed.ForceMobile') ? '1' : '0';
+                } else {
+                    $forceEmbedForum = c('Garden.Embed.ForceForum') ? '1' : '0';
+                }
+
+                $Sender->addDefinition('ForceEmbedForum', $forceEmbedForum);
                 $Sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
             }
 
@@ -241,7 +247,10 @@ class DashboardHooks implements Gdn_IPlugin {
                 }
             } else {
                 // There was some sort of error. Let's print that out.
-                trace(Gdn::userModel()->Validation->resultsText(), TRACE_WARNING);
+                foreach (Gdn::userModel()->Validation->resultsArray() as $msg) {
+                    trace($msg, TRACE_ERROR);
+                }
+                Gdn::userModel()->Validation->reset();
             }
         }
     }

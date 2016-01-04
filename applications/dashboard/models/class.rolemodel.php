@@ -2,7 +2,7 @@
 /**
  * A role model you can look up to.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -106,12 +106,14 @@ class RoleModel extends Gdn_Model {
 
     /**
      * Returns a resultset of all roles.
+     *
+     * @inheritdoc
      */
-    public function get() {
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
         return $this->SQL
             ->select()
             ->from('Role')
-            ->orderBy('Sort', 'asc')
+            ->orderBy($OrderFields ?: 'Sort', $OrderDirection)
             ->get();
     }
 
@@ -535,16 +537,20 @@ class RoleModel extends Gdn_Model {
     /**
      * Save role data.
      *
-     * @param array $FormPostValues
-     * @return bool|mixed
-     * @throws Exception
+     * @param array $FormPostValues The role row to save.
+     * @param array|false $Settings Not used.
+     * @return bool|mixed Returns the role ID or false on error.
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
         $RoleID = val('RoleID', $FormPostValues);
         $Insert = $RoleID > 0 ? false : true;
+
+        // Strict-mode.
+        setValue('PersonalInfo', $FormPostValues, forceBool(val('PersonalInfo', $FormPostValues), '0', '1', '0'));
+
         if ($Insert) {
             // Figure out the next role ID.
             $MaxRoleID = $this->SQL->select('r.RoleID', 'MAX')->from('Role r')->get()->value('RoleID', 0);

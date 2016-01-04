@@ -506,7 +506,7 @@ endif;
 
 if (!function_exists('FormatMeAction')):
     function formatMeAction($Comment) {
-        if (!IsMeAction($Comment) || !C('Garden.Format.MeActions'))
+        if (!IsMeAction($Comment) || !c('Garden.Format.MeActions'))
             return;
 
         // Maxlength (don't let people blow up the forum)

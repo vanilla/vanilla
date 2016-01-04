@@ -323,18 +323,6 @@ jQuery(document).ready(function($) {
     if ($.fn.handleAjaxForm)
         $('.AjaxForm').not('.Message .AjaxForm').handleAjaxForm();
 
-    // Make the highlight effect themable.
-    if ($.effects && $.effects.highlight) {
-        $.effects.highlight0 = $.effects.highlight;
-
-        $.effects.highlight = function(opts) {
-            var color = $('#HighlightColor').css('backgroundColor');
-            if (color)
-                opts.options.color = color;
-            return $.effects.highlight0.call(this, opts);
-        };
-    }
-
     // Handle ToggleMenu toggling and set up default state
     $('[class^="Toggle-"]').hide(); // hide all toggle containers
     $('.ToggleMenu a').click(function() {
@@ -924,9 +912,13 @@ jQuery(document).ready(function($) {
                 message = '<div class="InformMessage">' + message + '</div>';
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
                 message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
-                // Insert the current url as a target for inform anchors
-                message = message.replace(/{SelfUrl}/g, document.URL);
-
+                if (gdn.getMeta('SelfUrl')) {
+                    // If the url is explicitly defined (as in embed), use it.
+                    message = message.replace(/{SelfUrl}/g, gdn.getMeta('SelfUrl'));
+                } else {
+                    // Insert the current url as a target for inform anchors
+                    message = message.replace(/{SelfUrl}/g, document.URL);
+                }
                 var skip = false;
                 for (var j = 0; j < wrappers.length; j++) {
                     if ($(wrappers[j]).text() == $(message).text()) {
@@ -1933,3 +1925,15 @@ if (typeof String.prototype.trim !== 'function') {
         return this.replace(/^\s+|\s+$/g, '');
     };
 }
+
+// jQuery UI .effect() replacement using CSS classes.
+jQuery.fn.effect = function(name) {
+    var that = this;
+    name = name + '-effect';
+
+    return this
+        .addClass(name)
+        .one('animationend webkitAnimationEnd', function () {
+            that.removeClass(name);
+        });
+};

@@ -2,7 +2,7 @@
 /**
  * Manages users manually authenticating (signing in).
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -60,7 +60,6 @@ class EntryController extends Gdn_Controller {
         $this->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex'));
 
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -773,7 +772,7 @@ EOT;
 
         if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->deliveryType() != DELIVERY_TYPE_ALL) {
             $this->deliveryMethod(DELIVERY_METHOD_JSON);
-            $this->setHeader('Content-Type', 'application/json; charset='.c('Garden.Charset', 'utf-8'));
+            $this->setHeader('Content-Type', 'application/json; charset=utf-8');
         } elseif ($CheckPopup || $this->data('CheckPopup')) {
             $this->addDefinition('CheckPopup', true);
         } else {
@@ -1249,6 +1248,7 @@ EOT;
 
         $RegistrationMethod = $this->_registrationView();
         $this->View = $RegistrationMethod;
+        $this->setData('Method', stringBeginsWith($RegistrationMethod, 'Register', false, true));
         $this->$RegistrationMethod($InvitationCode);
     }
 
@@ -1299,6 +1299,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
                 } else {
@@ -1362,6 +1363,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
                     $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
@@ -1435,13 +1437,14 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
                     $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
                     return;
                 } elseif (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
-                    if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+                    if (!in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL, DELIVERY_TYPE_DATA])) {
                         $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
                     }
 
@@ -1545,7 +1548,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values, array('Method' => 'Invitation'));
-
+                $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
                 } else {
@@ -1716,8 +1719,7 @@ EOT;
                 Logger::event(
                     'password_reset',
                     Logger::NOTICE,
-                    '{username} has reset their password.',
-                    array('UserName', $User->Name)
+                    '{username} has reset their password.'
                 );
                 Gdn::session()->start($User->UserID, true);
 //            $Authenticator = Gdn::authenticator()->AuthenticateWith('password');

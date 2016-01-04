@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -86,7 +86,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public function start($Force = false) {
 
-        if (function_exists('apc_fetch') && C('Garden.Apc', false)) {
+        if (function_exists('apc_fetch') && c('Garden.Apc', false)) {
             $this->Apc = true;
         }
 
@@ -253,7 +253,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $this->availablePlugins($Force);
 
             $this->EnabledPlugins = array();
-            $EnabledPlugins = C('EnabledPlugins', array());
+            $EnabledPlugins = c('EnabledPlugins', array());
 
             foreach ($EnabledPlugins as $PluginName => $PluginStatus) {
                 // Plugins can be explicitly disabled
@@ -556,8 +556,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         foreach ($this->enabledPlugins() as $PluginName => $Trash) {
             $PluginInfo = $this->getPluginInfo($PluginName);
 
-            // Remove plugin hooks from plugins that dont explicitly claim to be friendly with mobile themes
-            if (!val('MobileFriendly', $PluginInfo)) {
+            // Remove plugin hooks from plugins that explicitly claim to not be mobile friendly
+            if (!val('MobileFriendly', $PluginInfo, true)) {
                 $this->unregisterPlugin(val('ClassName', $PluginInfo));
             }
         }
@@ -1043,27 +1043,24 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             eval($PluginInfoString);
         }
 
-        // Define the folder name and assign the class name for the newly added item
-        if (isset(${$VariableName}) && is_array(${$VariableName})) {
-            $Item = array_pop($Trash = array_keys(${$VariableName}));
+        // Define the folder name and assign the class name for the newly added item.
+        $var = ${$VariableName};
+        if (isset($var) && is_array($var)) {
+            reset($var);
+            $name = key($var);
+            $var = current($var);
 
-            ${$VariableName}[$Item]['Index'] = $Item;
-            ${$VariableName}[$Item]['ClassName'] = $ClassName;
-            ${$VariableName}[$Item]['PluginFilePath'] = $PluginFile;
-            ${$VariableName}[$Item]['PluginRoot'] = dirname($PluginFile);
+            $var['Index'] = $name;
+            $var['ClassName'] = $ClassName;
+            $var['PluginFilePath'] = $PluginFile;
+            $var['PluginRoot'] = dirname($PluginFile);
+            touchValue('Name', $var, $name);
+            touchValue('Folder', $var, $name);
 
-            if (!array_key_exists('Name', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Name'] = $Item;
-            }
-
-            if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Folder'] = $Item;
-            }
-
-            return ${$VariableName}[$Item];
+            return $var;
         } elseif ($VariableName !== null) {
-            if (isset(${$VariableName})) {
-                return $$VariableName;
+            if (isset($var)) {
+                return $var;
             }
         }
 
@@ -1088,7 +1085,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $this->PluginSearchPaths[rtrim(PATH_PLUGINS, '/')] = 'core';
 
             // Check for, and load, alternate search paths from config
-            $RawAlternatePaths = C('Garden.PluginManager.Search', null);
+            $RawAlternatePaths = c('Garden.PluginManager.Search', null);
             if (!is_null($RawAlternatePaths)) {
                 $AlternatePaths = $RawAlternatePaths;
 

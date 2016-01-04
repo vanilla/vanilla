@@ -13,7 +13,7 @@
  * are: (string) Name, (bool) PrimaryKey, (string) Type, (bool) AllowNull,
  * (string) Default, (int) Length, (array) Enum.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -29,7 +29,7 @@ if (!function_exists('ValidateCaptcha')) {
     function validateCaptcha($value = null) {
         require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 
-        $CaptchaPrivateKey = C('Garden.Registration.CaptchaPrivateKey', '');
+        $CaptchaPrivateKey = c('Garden.Registration.CaptchaPrivateKey', '');
         $Response = recaptcha_check_answer(
             $CaptchaPrivateKey,
             Gdn::Request()->IpAddress(),
@@ -233,8 +233,8 @@ if (!function_exists('validateUsernameRegex')) {
 
             $ValidateUsernameRegex = sprintf(
                 "[%s]%s",
-                C("Garden.User.ValidationRegex", $DefaultPattern),
-                C("Garden.User.ValidationLength", "{3,20}")
+                c("Garden.User.ValidationRegex", $DefaultPattern),
+                c("Garden.User.ValidationLength", "{3,20}")
             );
         }
 
@@ -328,7 +328,7 @@ if (!function_exists('validateMinimumAge')) {
      * @return bool|string Returns true if the value is valid or an error message otherwise.
      */
     function validateMinimumAge($value) {
-        $MinimumAge = C('Garden.Validate.MinimumAge', 13);
+        $MinimumAge = c('Garden.Validate.MinimumAge', 13);
         // Dates should be in YYYY-MM-DD format
         if (preg_match("/^[\d]{4}-{1}[\d]{2}-{1}[\d]{2}$/", $value) == 1) {
             $Year = intval(substr($value, 0, 4));

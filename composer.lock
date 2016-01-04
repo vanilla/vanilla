@@ -1,0 +1,59 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "4e41eb4d5db2cb083b415e7a3c1b249a",
+    "content-hash": "56dd9d6065a0c14668b474c4f60b29aa",
+    "packages": [
+        {
+            "name": "vanilla/garden-http",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-http.git",
+                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/da3b859774613031788eaa148a7e9e8622f6bc2a",
+                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a",
+                "shasum": ""
+            },
+            "require": {
+                "lib-curl": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "vanilla/garden": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\Http\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "An unbloated HTTP client library for building RESTful API clients.",
+            "time": "2015-12-10 21:39:51"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

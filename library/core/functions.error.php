@@ -4,7 +4,7 @@
 /**
  * Catch and render errors.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -62,8 +62,8 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
     }
 
     if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
-        if (function_exists('Trace')) {
-            Trace("$Message in $File line $Line", TRACE_NOTICE);
+        if (function_exists('trace')) {
+            trace(new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line), TRACE_NOTICE);
         }
 
         // Ignore errors that are below the current error reporting level.
@@ -191,8 +191,8 @@ function Gdn_ExceptionHandler($Exception) {
 
                 if (class_exists('Gdn', false)) {
                     $CurrentTheme = ''; // The currently selected theme
-                    $CurrentTheme = C('Garden.Theme', '');
-                    $MasterViewName = C('Garden.Errors.MasterView', $MasterViewName);
+                    $CurrentTheme = c('Garden.Theme', '');
+                    $MasterViewName = c('Garden.Errors.MasterView', $MasterViewName);
                     $MasterViewCss = substr($MasterViewName, 0, strpos($MasterViewName, '.'));
                     if ($MasterViewCss == '') {
                         $MasterViewCss = 'error';
@@ -256,7 +256,7 @@ function Gdn_ExceptionHandler($Exception) {
             // This is an ajax request, so dump an error that is more eye-friendly in the debugger
             echo '<h1>FATAL ERROR IN: ', $SenderObject, '.', $SenderMethod, "();</h1>\n<pre class=\"AjaxError\">\"".$SenderMessage."\"\n";
             if ($SenderCode != '') {
-                echo htmlspecialchars($SenderCode, ENT_COMPAT, C('Garden.Charset', 'UTF-8'))."\n";
+                echo htmlspecialchars($SenderCode, ENT_COMPAT, 'UTF-8')."\n";
             }
 
             if (is_array($ErrorLines) && $Line > -1) {
@@ -271,7 +271,8 @@ function Gdn_ExceptionHandler($Exception) {
                         echo '>>';
                     }
 
-                    echo '> '.str_pad($i + 1, $Padding, " ", STR_PAD_LEFT), ': ', str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])), "\n";
+                    echo '> '.str_pad($i + 1, $Padding, " ", STR_PAD_LEFT), ': ',
+                        str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])), "\n";
                 }
             }
 

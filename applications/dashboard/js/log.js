@@ -105,9 +105,14 @@ jQuery(document).ready(function($) {
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess},
             function(settings) {
-                $.get(
-                    gdn.url('/dashboard/log/confirm/restore?logids=' + IDs),
-                    {'DeliveryType': 'VIEW'},
+                $.post(
+                    gdn.url('/dashboard/log/confirm/restore'),
+                    {'DeliveryType': 'VIEW',
+                        'Postback': true,
+                        'IDs': IDs,
+                        'Action': 'Restore',
+                        'TransientKey': gdn.definition('TransientKey', '')
+                    },
                     function(data) {
                         $.popup.reveal(settings, data);
                     })
@@ -122,9 +127,14 @@ jQuery(document).ready(function($) {
 
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess}, function(settings) {
-            $.get(
-                gdn.url('/dashboard/log/confirm/delete?logids=' + IDs),
-                {'DeliveryType': 'VIEW'},
+            $.post(
+                gdn.url('/dashboard/log/confirm/delete'),
+                {'DeliveryType': 'VIEW',
+                    'Postback': true,
+                    'IDs': IDs,
+                    'Action': 'Delete',
+                    'TransientKey': gdn.definition('TransientKey', '')
+                },
                 function(data) {
                     $.popup.reveal(settings, data);
                 })
@@ -139,9 +149,14 @@ jQuery(document).ready(function($) {
 
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess}, function(settings) {
-            $.get(
-                gdn.url('/dashboard/log/confirm/deletespam?logids=' + IDs),
-                {'DeliveryType': 'VIEW'},
+            $.post(
+                gdn.url('/dashboard/log/confirm/deletespam'),
+                {'DeliveryType': 'VIEW',
+                    'Postback': true,
+                    'IDs': IDs,
+                    'Action': 'DeleteSpam',
+                    'TransientKey': gdn.definition('TransientKey', '')
+                },
                 function(data) {
                     $.popup.reveal(settings, data);
                 })
@@ -156,9 +171,14 @@ jQuery(document).ready(function($) {
 
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess}, function(settings) {
-            $.get(
-                gdn.url('/dashboard/log/confirm/notspam?logids=' + IDs),
-                {'DeliveryType': 'VIEW'},
+            $.post(
+                gdn.url('/dashboard/log/confirm/notspam'),
+                {'DeliveryType': 'VIEW',
+                    'Postback': true,
+                    'IDs': IDs,
+                    'Action': 'NotSpam',
+                    'TransientKey': gdn.definition('TransientKey', '')
+                },
                 function(data) {
                     $.popup.reveal(settings, data);
                 })

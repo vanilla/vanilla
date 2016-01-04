@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -70,7 +70,6 @@ class ProfileController extends Gdn_Controller {
         $this->ModuleSortContainer = 'Profile';
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -169,8 +168,8 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $UserID
      */
     public function clear($UserID = '') {
-        if (empty($_POST)) { // TODO: rm global
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $UserID = is_numeric($UserID) ? $UserID : 0;
@@ -189,29 +188,6 @@ class ProfileController extends Gdn_Controller {
             $this->jsonTarget('#Status', '', 'Remove');
             $this->render('Blank', 'Utility');
         }
-    }
-
-    /**
-     *
-     *
-     * @param $Type
-     * @param string $UserReference
-     * @param string $Username
-     * @throws Exception
-     */
-    public function connect($Type, $UserReference = '', $Username = '') {
-        $this->permission('Garden.SignIn.Allow');
-        $this->getUserInfo($UserReference, $Username, '', true);
-
-        // Fire an event and let whatever plugin handle the connection.
-        // This will fire an event in the form ProfileController_FacebookConnect_Handler(...).
-        $Connected = false;
-        $this->EventArguments['Connected'] =& $Connected;
-
-
-        $this->fireEvent(ucfirst($Type).'Connect');
-
-
     }
 
     /**
@@ -827,8 +803,6 @@ class ProfileController extends Gdn_Controller {
     public function preference($Key = false) {
         $this->permission('Garden.SignIn.Allow');
 
-        $this->Form->InputPrefix = '';
-
         if ($this->Form->authenticatedPostBack()) {
             $Data = $this->Form->formValues();
             Gdn::userModel()->SavePreference(Gdn::session()->UserID, $Data);
@@ -1269,10 +1243,6 @@ class ProfileController extends Gdn_Controller {
         if (!is_array($TabName)) {
             if ($TabHtml == '') {
                 $TabHtml = $TabName;
-            }
-
-            if (!$CssClass && $TabUrl == Gdn::request()->path()) {
-                $CssClass = 'Active';
             }
 
             $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));

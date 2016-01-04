@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -33,7 +33,7 @@ class Gdn_Email extends Gdn_Pluggable {
      */
     function __construct() {
         $this->PhpMailer = new PHPMailer();
-        $this->PhpMailer->CharSet = c('Garden.Charset', 'utf-8');
+        $this->PhpMailer->CharSet = 'utf-8';
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
         $this->PhpMailer->PluginDir = combinePaths(array(PATH_LIBRARY, 'vendors/phpmailer/'));
         $this->PhpMailer->Hostname = c('Garden.Email.Hostname', '');
@@ -241,7 +241,7 @@ class Gdn_Email extends Gdn_Pluggable {
             return;
         }
 
-        if (C('Garden.Email.UseSmtp')) {
+        if (c('Garden.Email.UseSmtp')) {
             $this->PhpMailer->isSMTP();
             $SmtpHost = c('Garden.Email.SmtpHost', '');
             $SmtpPort = c('Garden.Email.SmtpPort', 25);
@@ -251,9 +251,9 @@ class Gdn_Email extends Gdn_Pluggable {
 
             $this->PhpMailer->Host = $SmtpHost;
             $this->PhpMailer->Port = $SmtpPort;
-            $this->PhpMailer->SMTPSecure = C('Garden.Email.SmtpSecurity', '');
-            $this->PhpMailer->Username = $Username = C('Garden.Email.SmtpUser', '');
-            $this->PhpMailer->Password = $Password = C('Garden.Email.SmtpPassword', '');
+            $this->PhpMailer->SMTPSecure = c('Garden.Email.SmtpSecurity', '');
+            $this->PhpMailer->Username = $Username = c('Garden.Email.SmtpUser', '');
+            $this->PhpMailer->Password = $Password = c('Garden.Email.SmtpPassword', '');
             if (!empty($Username)) {
                 $this->PhpMailer->SMTPAuth = true;
             }

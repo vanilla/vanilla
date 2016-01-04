@@ -6,7 +6,7 @@
  * database servers.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -187,7 +187,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $Keys = '';
         $Sql = '';
 
-        $ForceDatabaseEngine = C('Database.ForceStorageEngine');
+        $ForceDatabaseEngine = c('Database.ForceStorageEngine');
         if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
             $this->_TableStorageEngine = $ForceDatabaseEngine;
             $AllowFullText = $this->_supportsFulltext();
@@ -264,7 +264,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             if ($HasFulltext) {
                 $this->_TableStorageEngine = 'myisam';
             } else {
-                $this->_TableStorageEngine = C('Database.DefaultStorageEngine', 'innodb');
+                $this->_TableStorageEngine = c('Database.DefaultStorageEngine', 'innodb');
             }
 
             if (!$this->hasEngine($this->_TableStorageEngine)) {

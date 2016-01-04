@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -100,8 +100,30 @@ class Gdn_Validation {
     }
 
     /**
-     * Examines the current schema and fills {@link Gdn_Validation::$_SchemaRules} with rules based
-     * on the properties of each field in the table schema.
+     * Expand the validation results into a single-dimension array.
+     *
+     * @param array $results The validation results to expand.
+     * @return array Returns an array of error messages.
+     */
+    public static function resultsAsArray($results) {
+        $Errors = array();
+        foreach ($results as $Name => $Value) {
+            if (is_array($Value)) {
+                foreach ($Value as $Code) {
+                    $Errors[] = trim(sprintf(T($Code), T($Name)), '.').'.';
+                }
+            } else {
+                $Errors[] = trim(sprintf(T($Value), T($Name)), '.').'.';
+            }
+        }
+        return $Errors;
+    }
+
+    /**
+     * Examine the current schema and fill {@link Gdn_Validation::$_SchemaRules}.
+     *
+     * The {@link Gdn_Validation::$_SchemaRules} are filled with rules based on the properties of each field in the
+     * table schema.
      */
     protected function applyRulesBySchema() {
         $this->_SchemaRules = array();
@@ -585,7 +607,7 @@ class Gdn_Validation {
         }
 
         // Check for a honeypot (anti-spam input)
-        $HoneypotName = C('Garden.Forms.HoneypotName', '');
+        $HoneypotName = c('Garden.Forms.HoneypotName', '');
         $HoneypotContents = getPostValue($HoneypotName, '');
         if ($HoneypotContents != '') {
             $this->addValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're not a spammer or a bot, you should contact the application administrator for help.");
@@ -671,6 +693,13 @@ class Gdn_Validation {
     }
 
     /**
+     * Reset the validation results to an empty array.
+     */
+    public function reset() {
+        $this->_ValidationResults = [];
+    }
+
+    /**
      * Returns the $this->_ValidationResults array. You must use this method
      * because the array is read-only outside this object.
      *
@@ -686,36 +715,33 @@ class Gdn_Validation {
     }
 
     /**
+     * Get the validation results as an array of error messages.
+     *
+     * @return array Returns an array of error messages or an empty array if there are no errors.
+     */
+    public function resultsArray() {
+        return static::resultsAsArray($this->results());
+    }
+
+    /**
      * Get the validation results as a string of text.
      *
      * @return string Returns the validation results.
      */
     public function resultsText() {
-        return self::resultsAsText($this->results());
+        return static::resultsAsText($this->results());
     }
 
     /**
      * Format an array of validation results as a string.
      *
-     * @param array $Results An array of validation results returned from {@link Gdn_Validation::Results()}.
+     * @param array $results An array of validation results returned from {@link Gdn_Validation::Results()}.
      * @return string Returns the validation results as a string.
      */
-    public static function resultsAsText($Results) {
-        $Errors = array();
-        foreach ($Results as $Name => $Value) {
-            if (is_array($Value)) {
-                foreach ($Value as $Code) {
-                    $Errors[] = trim(sprintf(T($Code), T($Name)), '.');
-                }
-            } else {
-                $Errors[] = trim(sprintf(T($Value), T($Name)), '.');
-            }
-        }
+    public static function resultsAsText($results) {
+        $Errors = self::resultsAsArray($results);
 
-        $Result = implode('. ', $Errors);
-        if ($Result) {
-            $Result .= '.';
-        }
+        $Result = implode(' ', $Errors);
         return $Result;
     }
 }

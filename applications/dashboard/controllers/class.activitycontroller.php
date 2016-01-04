@@ -2,7 +2,7 @@
 /**
  * Manages the activity stream.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -50,7 +50,6 @@ class ActivityController extends Gdn_Controller {
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
@@ -270,6 +269,17 @@ class ActivityController extends Gdn_Controller {
             $Body = $this->Form->getValue('Body', '');
             $ActivityID = $this->Form->getValue('ActivityID', '');
             if (is_numeric($ActivityID) && $ActivityID > 0) {
+                $activity = $this->ActivityModel->getID($ActivityID);
+                if ($activity) {
+                    if ($activity['NotifyUserID'] == ActivityModel::NOTIFY_ADMINS) {
+                        $this->permission('Garden.Settings.Manage');
+                    } elseif ($activity['NotifyUserID'] == ActivityModel::NOTIFY_MODS) {
+                        $this->permission('Garden.Moderation.Manage');
+                    }
+                } else {
+                    throw new Exception(t('Invalid activity'));
+                }
+
                 $ActivityComment = array(
                     'ActivityID' => $ActivityID,
                     'Body' => $Body,

@@ -2,7 +2,7 @@
 /**
  * Tagging plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Tagging
  */
@@ -240,7 +240,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
   */
         // Render the controller.
-        $this->View = c('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'index';
+        $this->View = c('Vanilla.Discussions.Layout') == 'table' && $Sender->SyndicationMethod == SYNDICATION_NONE ? 'table' : 'index';
         $Sender->render($this->View, 'discussions', 'vanilla');
     }
 
@@ -290,11 +290,11 @@ class TaggingPlugin extends Gdn_Plugin {
             $Breadcrumbs = array();
 
             if (is_array($ParentTag) && count(array_filter($ParentTag))) {
-                $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag));
+                $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag, '', '/'));
             }
 
             if (is_array($CurrentTag) && count(array_filter($CurrentTag))) {
-                $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag));
+                $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag, '', '/'));
             }
 
             if (count($Breadcrumbs)) {
@@ -646,7 +646,6 @@ class TaggingPlugin extends Gdn_Plugin {
         $TagTypes = $TagModel->getTagTypes();
 
         $Sender->Form->Method = 'get';
-        $Sender->Form->InputPrefix = '';
 
         list($Offset, $Limit) = offsetLimit($Page, 100);
         $Sender->setData('_Limit', $Limit);
@@ -903,7 +902,8 @@ if (!function_exists('TagUrl')) :
      *
      * @param $Row
      * @param string $Page
-     * @param bool $WithDomain
+     * @param mixed $WithDomain
+     * @see url() for $WithDomain docs.
      * @return string
      */
     function tagUrl($Row, $Page = '', $WithDomain = false) {

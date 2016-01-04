@@ -79,10 +79,11 @@ function getTutorials($TutorialCode = '') {
         $Tutorial = val($Index, $Tutorials);
         $VideoID = val('VideoID', $Tutorial);
         try {
-            $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
-
-            $Tutorial['Thumbnail'] = str_replace('http://', '//', valr('0.thumbnail_medium', $Vimeo));
-            $Tutorial['LargeThumbnail'] = str_replace('http://', '//', valr('0.thumbnail_large', $Vimeo));
+            $videoInfo = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$Tutorial['VideoID']}.json"));
+            if ($videoInfo && $vimeo = array_shift($videoInfo)) {
+                $Tutorial['Thumbnail'] = str_replace('http://', '//', val('thumbnail_medium', $vimeo));
+                $Tutorial['LargeThumbnail'] = str_replace('http://', '//', val('thumbnail_large', $vimeo));
+            }
         } catch (Exception $Ex) {
             // Do nothing
         }
@@ -90,10 +91,12 @@ function getTutorials($TutorialCode = '') {
     } else {
         // Loop through each tutorial populating the thumbnail image location
         try {
-            foreach ($Tutorials as $Key => $Tutorial) {
-                $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
-                $Tutorial['Thumbnail'] = str_replace('http://', '//', valr('0.thumbnail_medium', $Vimeo));
-                $Tutorial['LargeThumbnail'] = str_replace('http://', '//', valr('0.thumbnail_large', $Vimeo));
+            foreach ($Tutorials as $Key => &$Tutorial) {
+                $videoInfo = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$Tutorial['VideoID']}.json"));
+                if ($videoInfo && $vimeo = array_shift($videoInfo)) {
+                    $Tutorial['Thumbnail'] = str_replace('http://', '//', val('thumbnail_medium', $vimeo));
+                    $Tutorial['LargeThumbnail'] = str_replace('http://', '//', val('thumbnail_large', $vimeo));
+                }
             }
         } catch (Exception $Ex) {
             // Do nothing

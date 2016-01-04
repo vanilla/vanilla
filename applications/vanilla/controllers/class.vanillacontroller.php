@@ -2,7 +2,7 @@
 /**
  * Vanilla controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -25,8 +25,6 @@ class VanillaController extends Gdn_Controller {
         // Set up head
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery-ui.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');

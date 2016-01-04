@@ -4,6 +4,6 @@
     include($this->fetchViewLocation('user'));
     // include($this->fetchViewLocation('tabs'));
     echo Gdn_Theme::Module('ProfileFilterModule');
-    include($this->fetchViewLocation($this->_TabView, $this->_TabController, $this->_TabApplication));
+    echo $this->fetchView($this->_TabView, $this->_TabController, $this->_TabApplication);
     ?>
 </div>

@@ -2,7 +2,7 @@
 /**
  * Object for importing files created with VanillaPorter.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -1087,6 +1087,7 @@ class ImportModel extends Gdn_Model {
         $CurrentUser = $this->SQL->getWhere('User', array('UserID' => Gdn::session()->UserID))->firstRow(DATASET_TYPE_ARRAY);
         $CurrentPassword = $CurrentUser['Password'];
         $CurrentHashMethod = $CurrentUser['HashMethod'];
+        $CurrentTransientKey = gdn::session()->transientKey();
 
         // Delete the current user table.
         $this->SQL->Truncate('User');
@@ -1132,6 +1133,7 @@ class ImportModel extends Gdn_Model {
         }
 
         Gdn::session()->start(val('UserID', $User), true);
+        gdn::session()->transientKey($CurrentTransientKey);
 
         return true;
     }

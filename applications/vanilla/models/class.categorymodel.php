@@ -2,7 +2,7 @@
 /**
  * Category model
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -697,7 +697,6 @@ class CategoryModel extends Gdn_Model {
         }
 
         $LastTimestamp = Gdn_Format::toTimestamp($Category['LastDateInserted']);
-        ;
         $LastCategoryID = null;
 
         if ($Category['DisplayAs'] == 'Categories') {
@@ -963,9 +962,11 @@ class CategoryModel extends Gdn_Model {
      * @since 2.0.0
      *
      * @param int $categoryID The unique ID of category we're getting data for.
+     * @param string $datasetType Not used.
+     * @param array $options Not used.
      * @return object|array SQL results.
      */
-    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT) {
+    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $category = $this->SQL->getWhere('Category', array('CategoryID' => $categoryID))->firstRow($datasetType);
         if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
             setValue('AllowedDiscussionTypes', $category, unserialize(val('AllowedDiscussionTypes', $category)));
@@ -1697,9 +1698,10 @@ class CategoryModel extends Gdn_Model {
      * @access public
      *
      * @param array $FormPostValue The values being posted back from the form.
+     * @param array|false $Settings Additional settings to affect saving.
      * @return int ID of the saved category.
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -1722,8 +1724,6 @@ class CategoryModel extends Gdn_Model {
         }
 
         $this->addUpdateFields($FormPostValues);
-        $this->Validation->applyRule('UrlCode', 'Required');
-        $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
         // Add some extra validation to the url code if one is provided.
         if ($Insert || array_key_exists('UrlCode', $FormPostValues)) {
@@ -1764,7 +1764,8 @@ class CategoryModel extends Gdn_Model {
                 $OldCategory = $this->getID($CategoryID, DATASET_TYPE_ARRAY);
                 if (null === val('AllowDiscussions', $FormPostValues, null)) {
                     $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
-                }                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+                }
+                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
                 // Figure out custom points.
                 if ($CustomPoints !== null) {

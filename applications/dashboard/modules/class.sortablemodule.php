@@ -362,6 +362,11 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $items The items to sort.
      */
     public function sortItems(&$items) {
+        foreach($items as &$item) {
+            if (val('items', $item)) {
+                $this->sortItems($item['items']);
+            }
+        }
         uasort($items, function($a, $b) use ($items) {
             $sort_a = $this->sortItemsOrder($a, $items);
             $sort_b = $this->sortItemsOrder($b, $items);

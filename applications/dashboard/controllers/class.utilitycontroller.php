@@ -2,7 +2,7 @@
 /**
  * Perform miscellaneous operations for Dashboard.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -259,33 +259,48 @@ class UtilityController extends DashboardController {
     /**
      * Run a structure update on the database.
      *
+     * It should always be possible to call this method, even if no database tables exist yet.
+     * A working forum database should be built from scratch where none exists. Therefore,
+     * it can have no reliance on existing data calls, or they must be able to fail gracefully.
+     *
      * @since 2.0.?
      * @access public
      */
     public function update() {
-        try {
-            // Check for permission or flood control.
-            // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-            $Now = time();
-            $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        // Check for permission or flood control.
+        // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+        $Now = time();
+        $LastTime = 0;
+        $Count = 0;
 
-            if ($LastTime + (60 * 60 * 24) > $Now) {
-                // Check for flood control.
+        try {
+            $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        } catch (Exception $Ex) {
+            // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
+        }
+
+        if ($LastTime + (60 * 60 * 24) > $Now) {
+            // Check for flood control.
+            try {
                 $Count = Gdn::get('Garden.Update.Count', 0) + 1;
-                if ($Count > 5) {
-                    if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                        // We are only allowing an update of 5 times every 24 hours.
-                        throw permissionException();
-                    }
-                }
-            } else {
-                $Count = 1;
+            } catch (Exception $Ex) {
+                // Once more we sit, watching the breath.
             }
+            if ($Count > 5) {
+                if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                    // We are only allowing an update of 5 times every 24 hours.
+                    throw permissionException();
+                }
+            }
+        } else {
+            $Count = 1;
+        }
+
+        try {
             Gdn::set('Garden.Update.LastTimestamp', $Now);
             Gdn::set('Garden.Update.Count', $Count);
-        } catch (PermissionException $Ex) {
-            return;
         } catch (Exception $Ex) {
+            // What is a GDN_UserMeta table, really? Suffering.
         }
 
         try {
@@ -306,7 +321,7 @@ class UtilityController extends DashboardController {
         }
 
         if ($Target = $this->Request->get('Target')) {
-            redirect($Target);
+            safeRedirect($Target);
         }
 
         $this->fireEvent('AfterUpdate');

@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -1009,7 +1009,7 @@ class ActivityModel extends Gdn_Model {
         $this->Validation->applyRule('DateInserted', 'Required');
         $this->Validation->applyRule('InsertUserID', 'Required');
 
-        $this->EventArguments['Comment'] = $Comment;
+        $this->EventArguments['Comment'] = &$Comment;
         $this->fireEvent('BeforeSaveComment');
 
         if ($this->validate($Comment)) {

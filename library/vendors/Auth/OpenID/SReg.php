@@ -418,7 +418,7 @@ class Auth_OpenID_SRegResponse extends Auth_OpenID_SRegBase {
 
     var $ns_alias = 'sreg';
 
-    function Auth_OpenID_SRegResponse($data=null,
+    function __construct($data=null,
                                       $sreg_ns_uri=Auth_OpenID_SREG_NS_URI)
     {
         if ($data === null) {

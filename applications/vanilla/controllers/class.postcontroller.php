@@ -2,7 +2,7 @@
 /**
  * Post controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -200,7 +200,7 @@ class PostController extends VanillaController {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
             }
 
-            $Draft = $this->Form->buttonExists('Save Draft') ? true : false;
+            $Draft = $this->Form->buttonExists('Save_Draft') ? true : false;
             $Preview = $this->Form->buttonExists('Preview') ? true : false;
             if (!$Preview) {
                 if (!is_object($this->Category) && is_array($CategoryData) && isset($FormValues['CategoryID'])) {
@@ -397,6 +397,7 @@ class PostController extends VanillaController {
         $vanilla_category_id = $this->Form->getFormValue('vanilla_category_id', '');
         $Attributes = array('ForeignUrl' => $vanilla_url);
         $vanilla_identifier = $this->Form->getFormValue('vanilla_identifier', '');
+        $isEmbeddedComments = $vanilla_url != '' && $vanilla_identifier != '';
 
         // Only allow vanilla identifiers of 32 chars or less - md5 if larger
         if (strlen($vanilla_identifier) > 32) {
@@ -404,7 +405,7 @@ class PostController extends VanillaController {
             $vanilla_identifier = md5($vanilla_identifier);
         }
 
-        if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
+        if (!$Discussion && $isEmbeddedComments) {
             $Discussion = $Discussion = $this->DiscussionModel->getForeignID($vanilla_identifier, $vanilla_type);
 
             if ($Discussion) {
@@ -414,7 +415,7 @@ class PostController extends VanillaController {
         }
 
         // If so, create it!
-        if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
+        if (!$Discussion && $isEmbeddedComments) {
             // Add these values back to the form if they exist!
             $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
             $this->Form->addHidden('vanilla_type', $vanilla_type);
@@ -527,6 +528,12 @@ class PostController extends VanillaController {
         // If no discussion was found, error out
         if (!$Discussion) {
             $this->Form->addError(t('Failed to find discussion for commenting.'));
+        }
+
+        // Vanilla Comments save as Text, no matter the format.
+        // Kludge to set format to Text if we're Wysiwyg to preserve newlines.
+        if ($isEmbeddedComments && ($this->Form->getFormValue('Format', c('Garden.InputFormatter')) === 'Wysiwyg')) {
+            $this->Form->setFormValue('Format', 'Text');
         }
 
         $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
@@ -697,6 +704,7 @@ class PostController extends VanillaController {
                         $this->Comment->InsertPhoto = $Session->User->Photo;
                         $this->Comment->DateInserted = Gdn_Format::date();
                         $this->Comment->Body = val('Body', $FormValues, '');
+                        $this->Comment->Format = val('Format', $FormValues, c('Garden.InputFormatter'));
                         $this->View = 'preview';
                     } elseif (!$Draft) { // If the comment was not a draft
                         // If Editing a comment
@@ -787,17 +795,19 @@ class PostController extends VanillaController {
         $this->fireEvent('BeforeCommentRender');
 
         if ($this->deliveryType() == DELIVERY_TYPE_DATA) {
-            $Comment = $this->data('Comments')->firstRow(DATASET_TYPE_ARRAY);
-            if ($Comment) {
-                $Photo = $Comment['InsertPhoto'];
+            if ($this->data('Comments') instanceof  Gdn_DataSet) {
+                $Comment = $this->data('Comments')->firstRow(DATASET_TYPE_ARRAY);
+                if ($Comment) {
+                    $Photo = $Comment['InsertPhoto'];
 
-                if (strpos($Photo, '//') === false) {
-                    $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
+                    if (strpos($Photo, '//') === false) {
+                        $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
+                    }
+
+                    $Comment['InsertPhoto'] = $Photo;
                 }
-
-                $Comment['InsertPhoto'] = $Photo;
+                $this->Data = array('Comment' => $Comment);
             }
-            $this->Data = array('Comment' => $Comment);
             $this->RenderData($this->Data);
         } else {
             require_once $this->fetchViewLocation('helper_functions', 'Discussion');
@@ -860,7 +870,7 @@ class PostController extends VanillaController {
     public function initialize() {
         parent::initialize();
         $this->addModule('NewDiscussionModule');
-        
+
         $this->CssClass = 'NoPanel';
     }
 

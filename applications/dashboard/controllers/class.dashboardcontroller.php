@@ -2,7 +2,7 @@
 /**
  * Master application controller for Dashboard, extended by most others.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -34,7 +34,6 @@ class DashboardController extends Gdn_Controller {
     public function initialize() {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.livequery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');

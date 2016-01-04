@@ -5,7 +5,7 @@
  * @author Damien Lebrun
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -26,7 +26,7 @@ class Gdn_PasswordHash extends PasswordHash {
      */
     function __construct() {
         // 8 iteration to create a Portable hash
-        parent::passwordHash(8, false);
+        parent::__construct(8, false);
     }
 
     /**

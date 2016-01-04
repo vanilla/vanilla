@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -112,7 +112,7 @@ class Gdn_UploadImage extends Gdn_Upload {
     public static function saveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
         $Crop = false;
         $OutputType = '';
-        $ImageQuality = C('Garden.UploadImage.Quality', 75);
+        $ImageQuality = c('Garden.UploadImage.Quality', 100);
 
         // Make function work like it used to.
         $Args = func_get_args();

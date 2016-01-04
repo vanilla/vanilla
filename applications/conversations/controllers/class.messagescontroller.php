@@ -2,7 +2,7 @@
 /**
  * Messages controller.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -371,7 +371,7 @@ class MessagesController extends ConversationsController {
             }
 
             // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-            $this->Offset = floor($CountReadMessages / $Limit) * $Limit;
+            $this->Offset = floor(($CountReadMessages - 1) / $Limit) * $Limit;
 
             // Send the hash link in.
             if ($CountReadMessages > 1) {

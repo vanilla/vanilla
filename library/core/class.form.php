@@ -267,6 +267,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function captcha() {
+
         $handled = false;
         $this->EventArguments['Handled'] =& $handled;
         $this->fireEvent('Captcha');
@@ -274,38 +275,29 @@ class Gdn_Form extends Gdn_Pluggable {
             // A plugin handled the captcha so don't display anything more.
             return;
         }
-        // Google whitelist
-        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
+        
+        if (!c('Garden.Registration.CaptchaPublicKey') || !c('Garden.Registration.CaptchaPrivateKey')) {
+            return '<div class="Warning">' . t('Security Check has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
+        }
 
-        // reCAPTCHA Options
-        $options = array(
-            'custom_translations' => array(
-                'instructions_visual' => t("Type the text:"),
-                'instructions_audio' => t("Type what you hear:"),
-                'play_again' => t("Play the sound again"),
-                'cant_hear_this' => t("Download the sounds as MP3"),
-                'visual_challenge' => t("Get a visual challenge"),
-                'audio_challenge' => t("Get an audio challenge"),
-                'refresh_btn' => t("Get a new challenge"),
-                'help_btn' => t("Help"),
-                'incorrect_try_again' => t("Incorrect. Try again.")
-            )
-        );
+        // Google whitelist https://developers.google.com/recaptcha/docs/language
+        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
 
         // Use our current locale against the whitelist.
         $language = Gdn::locale()->language();
-        if (in_array($language, $whitelist)) {
-            $options['lang'] = $language;
-        } elseif (in_array(Gdn::locale()->Locale, $whitelist)) {
-            $options['lang'] = Gdn::locale()->Locale;
+        if (!in_array($language, $whitelist)) {
+            $language = (in_array(Gdn::locale()->Locale, $whitelist)) ? Gdn::locale()->Locale : false;
         }
 
-        // Add custom translation strings as JSON.
-        Gdn::controller()->Head->addString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($options).';</script>');
+        Gdn::controller()->Head->addScript('https://www.google.com/recaptcha/api.js?hl=' . $language);
 
-        require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
+        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => c('Garden.Registration.CaptchaPublicKey'));
 
-        return recaptcha_get_html(c('Garden.Registration.CaptchaPublicKey'), null, Gdn::request()->scheme() == 'https');
+        // see https://developers.google.com/recaptcha/docs/display for details
+        $this->EventArguments['Attributes'] = &$attributes;
+        $this->fireEvent('BeforeCaptcha');
+
+        return '<div '. attribute($attributes) . '></div>';
     }
 
     /**

@@ -532,7 +532,7 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Open a zip archive and inspect its contents for the requested paths.
      *
      * @param $Path
      * @param $InfoPaths
@@ -542,7 +542,6 @@ class UpdateModel extends Gdn_Model {
      * @throws Exception
      */
     protected static function _getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
-
         // Extract the zip file so we can make sure it has appropriate information.
         $Zip = null;
 
@@ -566,7 +565,7 @@ class UpdateModel extends Gdn_Model {
                     ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
                     ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.val($ZipOpened, $Errors, 'Unknown Error').')', 400);
             }
             return false;
         }
@@ -574,11 +573,12 @@ class UpdateModel extends Gdn_Model {
         if ($TmpPath === false) {
             $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
         }
+
         if (file_exists($TmpPath)) {
             Gdn_FileSystem::removeFolder($TmpPath);
         }
 
-        $Result = array();
+        $Result = [];
         for ($i = 0; $i < $Zip->numFiles; $i++) {
             $Entry = $Zip->statIndex($i);
 

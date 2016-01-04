@@ -8,13 +8,16 @@
     -->
     <resolvepath file=".." propertyName="project.dir" />
 
+    <resolvepath file="." propertyName="build.dir.base" />
+    <property name="build.dir.contents" value="${build.dir.base}/package-contents" />
+
     <loadfile property="vanilla.index" file="${project.dir}/index.php"/>
 
     <!-- Take steps to prepare for the build. -->
     <target name="prepare">
         <propertyregex property="vanilla.version"
             subject="${vanilla.index}"
-            pattern="define\('APPLICATION_VERSION', '(\d+\.\d+(\.\d+)?(\.d+)?(\.\d+)?)'\)"
+            pattern="define\('APPLICATION_VERSION', '([\d\.?]+)'\)"
             match="$1"
             defaultValue="unknown-version" />
         <if>
@@ -39,12 +42,21 @@
     <!-- Build the package. -->
     <target name="dist" depends="build">
         <delete
-                file="${project.destfile}"
-                quiet="true" />
+            file="${project.destfile}"
+            quiet="true" />
+        <delete
+            dir="${build.dir.contents}"
+            quiet="true" />
+
+
+        <mkdir dir="${build.dir.contents}" />
+
+        <copy todir="${build.dir.contents}" >
+            <fileset dir="${project.dir}" includesfile="package-contents.txt" />
+        </copy>
         <zip
             destfile="${project.destfile}"
-            basedir="${project.dir}">
-            <fileset dir="${project.dir}" includesfile="package-contents.txt" />
+            basedir="${build.dir.contents}">
         </zip>
     </target>
 </project>

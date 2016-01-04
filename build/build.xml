@@ -54,6 +54,7 @@
         <copy todir="${build.dir.contents}" >
             <fileset dir="${project.dir}" includesfile="package-contents.txt" />
         </copy>
+
         <zip
             destfile="${project.destfile}"
             basedir="${build.dir.contents}">

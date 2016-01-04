@@ -2717,7 +2717,7 @@ class UserModel extends Gdn_Model {
             if (val('CheckCaptcha', $Options, true)) {
                 $CaptchaValid = ValidateCaptcha();
                 if ($CaptchaValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA value was not entered correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The Security Check was not completed correctly. Please try again.');
                     return false;
                 }
             }
@@ -2788,7 +2788,7 @@ class UserModel extends Gdn_Model {
                 $CaptchaPublicKey = val('Garden.Registration.CaptchaPublicKey', $FormPostValues, '');
                 $CaptchaValid = validateCaptcha($CaptchaPublicKey);
                 if ($CaptchaValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA value was not entered correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The Security Check was not completed correctly. Please try again.');
                     return false;
                 }
             }

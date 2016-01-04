@@ -27,16 +27,45 @@ if (!function_exists('ValidateCaptcha')) {
      * @return bool Returns true if the captcha is valid or an error message otherwise.
      */
     function validateCaptcha($value = null) {
-        require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
+        
+        $response = arrayValue('g-recaptcha-response', $_POST, '');
 
-        $CaptchaPrivateKey = c('Garden.Registration.CaptchaPrivateKey', '');
-        $Response = recaptcha_check_answer(
-            $CaptchaPrivateKey,
-            Gdn::Request()->IpAddress(),
-            Gdn::Request()->Post('recaptcha_challenge_field', ''),
-            Gdn::Request()->Post('recaptcha_response_field', '')
+        if (!$response) {
+            return false;
+        }
+
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $data = array(
+            'secret' => c('Garden.Registration.CaptchaPrivateKey'),
+            'response' => $response
         );
-        return $Response->is_valid ? true : 'The reCAPTCHA value was not entered correctly. Please try again.';
+
+        $handler = curl_init();
+        curl_setopt($handler, CURLOPT_URL, $url);
+        curl_setopt($handler, CURLOPT_PORT, '443');
+        curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($handler, CURLOPT_HEADER, false);
+        curl_setopt($handler, CURLOPT_HTTPHEADER, array("Content-Type: application/x-www-form-urlencoded"));
+        curl_setopt($handler, CURLOPT_USERAGENT, arrayValue('HTTP_USER_AGENT', $_SERVER, 'NoCaptchaReCaptcha Vanilla'));
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handler, CURLOPT_POST, true);
+        curl_setopt($handler, CURLOPT_POSTFIELDS, http_build_query($data));
+
+        $response = curl_exec($handler);
+
+        if ($response) {
+            $result = json_decode($response);
+            $errorCodes = val('error_codes', $result);
+            if ($result && val('success', $result)) {
+                return true;
+            } else if (!empty($errorCodes) && $errorCodes != array('invalid-input-response')) {
+                throw new Exception(formatString(t('Could not get check if human! Error codes: {ErrorCodes}'), array('ErrorCodes' => join(', ', $errorCodes))));
+            }
+        } else {
+            throw new Exception(t('Could not get check if human!'));
+        }
+
+        return false;
     }
 }
 

@@ -424,6 +424,7 @@ class Gdn_Session {
                 if ($SetIdentity) {
                     Gdn::authenticator()->setIdentity($this->UserID, $Persist);
                     Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+                    Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
                 }
 
                 $UserModel->EventArguments['User'] =& $this->User;

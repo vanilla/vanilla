@@ -162,6 +162,10 @@ class PostController extends VanillaController {
             $this->title(t('New Discussion'));
         }
 
+        if (isset($this->Draft) && $this->Draft->Type) {
+            $this->setData('Type', $this->Draft->Type);
+        }
+
         touchValue('Type', $this->Data, 'Discussion');
 
         // See if we should hide the category dropdown.

@@ -190,9 +190,8 @@ class DraftModel extends VanillaModel {
             }
 
             // Fire an event that the draft was saved
-            $this->EventArguments['FormPostValues'] = $FormPostValues;
             $this->EventArguments['Fields'] = $Fields;
-            $this->EventArguments['DraftID'] = $DraftID;
+            $this->EventArguments['DraftID'] = $DraftID; // Pass updated draft ID
             $this->fireEvent('AfterSaveDraft');
         }
 

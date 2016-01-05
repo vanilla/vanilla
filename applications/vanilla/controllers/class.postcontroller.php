@@ -162,11 +162,7 @@ class PostController extends VanillaController {
             $this->title(t('New Discussion'));
         }
 
-        if (isset($this->Draft) && $this->Draft->Type) {
-            $this->setData('Type', $this->Draft->Type);
-        }
-
-        touchValue('Type', $this->Data, 'Discussion');
+        touchValue('Type', $this->Data, val('Type', $this->Draft, 'Discussion'));
 
         // See if we should hide the category dropdown.
         $AllowedCategories = CategoryModel::getByPermission('Discussions.Add', $this->Form->getValue('CategoryID', $this->CategoryID), array('Archived' => 0, 'AllowDiscussions' => 1), array('AllowedDiscussionTypes' => $this->Data['Type']));

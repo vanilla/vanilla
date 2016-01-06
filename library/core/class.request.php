@@ -514,7 +514,7 @@ class Gdn_Request {
                 safeParseStr($get, $get, $original);
             }
 
-            if (!empty($_SERVER['X_REWRITE'])) {
+            if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
                 $path = $_SERVER['PATH_INFO'];
                 // Some hosts block PATH_INFO from being passed (or even manually set).
                 // We set X_PATH_INFO in the htaccess as a fallback for those situations.

@@ -346,9 +346,61 @@ class DiscussionModel extends VanillaModel {
         return $Data;
     }
 
-    public function getWhere($Where = array(), $Offset = 0, $Limit = false) {
-        if (!$Limit) {
+    /**
+     * Get a list of the most recent discussions.
+     *
+     * @param array|false $Where The where condition of the get.
+     * @param bool|false|int $Limit The number of discussion to return.
+     * @param int|false $Offset The offset within the total set.
+     * @return Gdn_DataSet Returns a <a href='psi_element://Gdn_DataSet'>Gdn_DataSet</a> of discussions.
+     * of discussions.
+     */
+    public function getWhereRecent($Where = array(), $Limit = false, $Offset = false) {
+        $result = $this->getWhere($Where, '', '', $Limit, $Offset);
+        return $result;
+    }
+
+    /**
+     * Get a list of discussions.
+     *
+     * This method call will remove announcements and may not return exactly {@link $Limit} records for optimization.
+     * You can set `$Where['d.Announce'] = 'all'` to return announcements.
+     *
+     * @param array|false $Where The where condition of the get.
+     * @param string $OrderFields The field to order the discussions by.
+     * @param string $OrderDirection The order, either **asc** or **desc**.
+     * @param int|false $Limit The number of discussion to return.
+     * @param int|false $Offset The offset within the total set.
+     * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
+     */
+    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = '', $Limit = false, $Offset = false) {
+        // Add backwards compatibility for the old way getWhere() was called.
+        if (is_numeric($OrderFields)) {
+            deprecated('DiscussionModel->getWhere($where, $limit, ...)', 'DiscussionModel->getWhereRecent()');
+            $Limit = $OrderFields;
+            $OrderFields = '';
+        }
+        if (is_numeric($OrderDirection)) {
+            deprecated('DiscussionModel->getWhere($where, $limit, $offset)', 'DiscussionModel->getWhereRecent()');
+            $Offset = $OrderDirection;
+            $OrderDirection = '';
+        }
+
+        // Set default types.
+        if (empty($OrderFields)) {
+            $OrderFields = self::getSortField();
+        }
+        if (empty($OrderDirection)) {
+            $OrderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
+        }
+        if ($Limit === 0) {
+            trigger_error("You should not supply 0 to for $Limit in DiscussionModel->getWhere()", E_USER_NOTICE);
+        }
+        if (empty($Limit)) {
             $Limit = c('Vanilla.Discussions.PerPage', 30);
+        }
+        if (empty($Offset)) {
+            $Offset = 0;
         }
 
         if (!is_array($Where)) {
@@ -365,29 +417,26 @@ class DiscussionModel extends VanillaModel {
             }
         }
 
-        // Get preferred sort order
-        $SortField = self::GetSortField();
-
-        $this->EventArguments['SortField'] = &$SortField;
-        $this->EventArguments['SortDirection'] = c('Vanilla.Discussions.SortDirection', 'desc');
+        $this->EventArguments['SortField'] = &$OrderFields;
+        $this->EventArguments['SortDirection'] = &$OrderDirection;
         $this->EventArguments['Wheres'] =& $Where;
         $this->fireEvent('BeforeGet');
 
         // Whitelist sorting options
-        if (!in_array($SortField, self::AllowedSortFields())) {
-            $SortField = 'd.DateLastComment';
+        if (!in_array($OrderFields, self::AllowedSortFields())) {
+            $OrderFields = 'd.DateLastComment';
         }
 
-        $SortDirection = $this->EventArguments['SortDirection'];
-        if ($SortDirection != 'asc') {
-            $SortDirection = 'desc';
+        $OrderDirection = $this->EventArguments['SortDirection'];
+        if ($OrderDirection != 'asc') {
+            $OrderDirection = 'desc';
         }
 
         // Build up the base query. Self-join for optimization.
         $Sql->select('d2.*')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
-            ->orderBy($SortField, $SortDirection)
+            ->orderBy($OrderFields, $OrderDirection)
             ->limit($Limit, $Offset);
 
         // Verify permissions (restricting by category if necessary)
@@ -2363,24 +2412,39 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * Delete a discussion.
+     *
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('DiscussionModel->delete(int)', 'DiscussionModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("DiscussionModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Delete a discussion. Update and/or delete all related data.
      *
      * Events: DeleteDiscussion.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $DiscussionID Unique ID of discussion to delete.
+     * @param int $discussionID Unique ID of discussion to delete.
+     * @param array $options Additional options to control the delete behavior. Not used for discussions.
      * @return bool Always returns TRUE.
+     * @since 2.0.0
      */
-    public function delete($DiscussionID, $Options = array()) {
+    public function deleteID($discussionID, $options = array()) {
         // Retrieve the users who have bookmarked this discussion.
-        $BookmarkData = $this->GetBookmarkUsers($DiscussionID);
+        $BookmarkData = $this->GetBookmarkUsers($discussionID);
 
         $Data = $this->SQL
             ->select('*')
             ->from('Discussion')
-            ->where('DiscussionID', $DiscussionID)
+            ->where('DiscussionID', $discussionID)
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $UserID = false;
@@ -2391,15 +2455,15 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Prep and fire event
-        $this->EventArguments['DiscussionID'] = $DiscussionID;
+        $this->EventArguments['DiscussionID'] = $discussionID;
         $this->EventArguments['Discussion'] = $Data;
         $this->fireEvent('DeleteDiscussion');
 
         // Execute deletion of discussion and related bits
-        $this->SQL->delete('Draft', array('DiscussionID' => $DiscussionID));
+        $this->SQL->delete('Draft', array('DiscussionID' => $discussionID));
 
-        $Log = val('Log', $Options, true);
-        $LogOptions = val('LogOptions', $Options, array());
+        $Log = val('Log', $o, true);
+        $LogOptions = val('LogOptions', $o, array());
         if ($Log === true) {
             $Log = 'Delete';
         }
@@ -2407,7 +2471,7 @@ class DiscussionModel extends VanillaModel {
         LogModel::BeginTransaction();
 
         // Log all of the comment deletes.
-        $Comments = $this->SQL->getWhere('Comment', array('DiscussionID' => $DiscussionID))->resultArray();
+        $Comments = $this->SQL->getWhere('Comment', array('DiscussionID' => $discussionID))->resultArray();
 
         if (count($Comments) > 0 && count($Comments) < 50) {
             // A smaller number of comments should just be stored with the record.
@@ -2422,10 +2486,10 @@ class DiscussionModel extends VanillaModel {
 
         LogModel::EndTransaction();
 
-        $this->SQL->delete('Comment', array('DiscussionID' => $DiscussionID));
-        $this->SQL->delete('Discussion', array('DiscussionID' => $DiscussionID));
+        $this->SQL->delete('Comment', array('DiscussionID' => $discussionID));
+        $this->SQL->delete('Discussion', array('DiscussionID' => $discussionID));
 
-        $this->SQL->delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
+        $this->SQL->delete('UserDiscussion', array('DiscussionID' => $discussionID));
         $this->UpdateDiscussionCount($CategoryID);
 
         // Get the user's discussion count.

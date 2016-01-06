@@ -133,8 +133,10 @@ class ProfileController extends Gdn_Controller {
 
         $Activities = $this->ActivityModel->getWhere(
             array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs),
-            $Offset,
-            $Limit
+            '',
+            '',
+            $Limit,
+            $Offset
         )->resultArray();
         $this->ActivityModel->joinComments($Activities);
         $this->setData('Activities', $Activities);
@@ -595,7 +597,7 @@ class ProfileController extends Gdn_Controller {
         );
 
         $this->ActivityModel = new ActivityModel();
-        $Activities = $this->ActivityModel->getWhere($Where, 0, 5)->resultArray();
+        $Activities = $this->ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
         $this->setData('Activities', $Activities);
         $this->ActivityModel->markRead(Gdn::session()->UserID);
 

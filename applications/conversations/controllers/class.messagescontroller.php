@@ -96,12 +96,16 @@ class MessagesController extends ConversationsController {
             $this->fireEvent('BeforeAddConversation');
 
             $this->Form->setFormValue('RecipientUserID', $RecipientUserIDs);
-            $ConversationID = $this->Form->save($this->ConversationMessageModel);
+            $ConversationID = $this->Form->save();
             if ($ConversationID !== false) {
                 $Target = $this->Form->getFormValue('Target', 'messages/'.$ConversationID);
                 $this->RedirectUrl = url($Target);
 
-                $Conversation = $this->ConversationModel->getID($ConversationID, Gdn::session()->UserID);
+                $Conversation = $this->ConversationModel->getID(
+                    $ConversationID,
+                    false,
+                    ['viewingUserID' => Gdn::session()->UserID]
+                );
                 $NewMessageID = val('FirstMessageID', $Conversation);
                 $this->EventArguments['MessageID'] = $NewMessageID;
                 $this->fireEvent('AfterConversationSave');
@@ -154,7 +158,11 @@ class MessagesController extends ConversationsController {
                 }
             }
 
-            $Conversation = $this->ConversationModel->getID($ConversationID, Gdn::session()->UserID);
+            $Conversation = $this->ConversationModel->getID(
+                $ConversationID,
+                false,
+                ['viewingUserID' => Gdn::session()->UserID]
+            );
 
             $this->EventArguments['Conversation'] = $Conversation;
             $this->EventArguments['ConversationID'] = $ConversationID;
@@ -380,7 +388,7 @@ class MessagesController extends ConversationsController {
         }
 
         // Fetch message data
-        $this->MessageData = $this->ConversationMessageModel->get(
+        $this->MessageData = $this->ConversationMessageModel->getRecent(
             $ConversationID,
             $Session->UserID,
             $this->Offset,
@@ -498,7 +506,7 @@ class MessagesController extends ConversationsController {
         // Fetch message data
         $this->setData(
             'MessageData',
-            $this->ConversationMessageModel->get(
+            $this->ConversationMessageModel->getRecent(
                 $ConversationID,
                 Gdn::session()->UserID,
                 0,

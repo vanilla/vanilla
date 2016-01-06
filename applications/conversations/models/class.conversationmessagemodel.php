@@ -12,6 +12,10 @@
  * Manages messages in a conversation.
  */
 class ConversationMessageModel extends ConversationsModel {
+    /**
+     * @var ConversationMessageModel The singleton instance of this class.
+     */
+    private static $instance;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -22,6 +26,14 @@ class ConversationMessageModel extends ConversationsModel {
     public function __construct() {
         parent::__construct('ConversationMessage');
         $this->PrimaryKey = 'MessageID';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated
+     */
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
+        throw new \BadMethodCallException('ConversationMessageModel->get() is not supported.', 500);
     }
 
     /**
@@ -39,7 +51,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $Wheres SQL conditions.
      * @return Gdn_DataSet SQL results.
      */
-    public function get($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
+    public function getRecent($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
         if ($Limit == '') {
             $Limit = Gdn::config('Conversations.Messages.PerPage', 50);
         }
@@ -74,9 +86,10 @@ class ConversationMessageModel extends ConversationsModel {
      *
      * @param mixed $ID The value of the primary key in the database.
      * @param string $DatasetType The format of the result dataset.
+     * @param array $options Not used.
      * @return Gdn_DataSet
      */
-    public function getID($ID, $DatasetType = false) {
+    public function getID($ID, $DatasetType = false, $options = []) {
         $Result = $this->getWhere(array("MessageID" => $ID))->firstRow($DatasetType);
         return $Result;
     }
@@ -98,6 +111,20 @@ class ConversationMessageModel extends ConversationsModel {
     }
 
     /**
+     * {@inheritdoc}
+     * @deprecated
+     */
+    public function getCount($wheres = []) {
+        deprecated('ConversationMessageModel->getCount()', 'ConversationMessageModel->getCountByConversation()');
+        $args = func_get_args();
+        return $this->getCountByConversation(
+            val(0, $args, 0),
+            val(1, $args, Gdn::session()->UserID),
+            val(2, $args, '')
+        );
+    }
+
+    /**
      * Get number of messages in a conversation.
      *
      * @since 2.0.0
@@ -108,7 +135,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $Wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCount($ConversationID, $ViewingUserID, $Wheres = '') {
+    public function getCountByConversation($ConversationID, $ViewingUserID, $Wheres = '') {
         if (is_array($Wheres)) {
             $this->SQL->where($Wheres);
         }
@@ -348,6 +375,16 @@ class ConversationMessageModel extends ConversationsModel {
             $activityModel->saveQueue();
         }
         return $MessageID;
+    }
+
+    /**
+     * Return the singleton instance of this class.
+     */
+    public static function instance() {
+        if (!isset(static::$instance)) {
+            static::$instance = new ConversationMessageModel();
+        }
+        return static::$instance;
     }
 
     /**

@@ -601,7 +601,7 @@ class TaggingPlugin extends Gdn_Plugin {
         // Make sure that detailed tag data is available to the form.
         $TagModel = TagModel::instance();
 
-        $DiscussionID = val('DiscussionID', $Sender->Data['Discussion']);
+        $DiscussionID = $Sender->data('Discussion.DiscussionID');
 
         if ($DiscussionID) {
             $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);

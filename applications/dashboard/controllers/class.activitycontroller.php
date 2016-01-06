@@ -168,7 +168,7 @@ class ActivityController extends Gdn_Controller {
         // Comment submission
         $Session = Gdn::session();
         $Comment = $this->Form->getFormValue('Comment');
-        $Activities = $this->ActivityModel->getWhere(array('NotifyUserID' => $NotifyUserID), $Offset, $Limit)->resultArray();
+        $Activities = $this->ActivityModel->getWhere(array('NotifyUserID' => $NotifyUserID), '', '', $Limit, $Offset)->resultArray();
         $this->ActivityModel->joinComments($Activities);
 
         $this->setData('Filter', strtolower($Filter));
@@ -234,7 +234,7 @@ class ActivityController extends Gdn_Controller {
             throw permissionException();
         }
 
-        $this->ActivityModel->delete($ActivityID);
+        $this->ActivityModel->deleteID($ActivityID);
 
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {

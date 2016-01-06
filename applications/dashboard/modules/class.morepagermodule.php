@@ -123,9 +123,10 @@ class MorePagerModule extends PagerModule {
    /**
     * Builds a string with information about the page list's current position (ie. "1 to 15 of 56").
     *
+    * @param string $formatString Not used.
     * @return string Built string.
     */
-    public function details() {
+    public function details($formatString = '') {
         if ($this->_PropertiesDefined === false) {
             trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
         }

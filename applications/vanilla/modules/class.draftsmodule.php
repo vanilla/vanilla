@@ -20,7 +20,7 @@ class DraftsModule extends Gdn_Module {
         $Session = Gdn::session();
         if ($Session->isValid()) {
             $DraftModel = new DraftModel();
-            $this->Data = $DraftModel->get($Session->UserID, 0, $Limit, $DiscussionID);
+            $this->Data = $DraftModel->getByUser($Session->UserID, 0, $Limit, $DiscussionID);
         }
         $this->Form = $this->_Sender->Form;
     }

@@ -387,24 +387,52 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
     /**
+     * Delete records from a table.
      *
+     * @param array|int $where The where clause to delete or an integer value.
+     * @param array|true $options An array of options to control the delete.
      *
-     * @param unknown_type $Where
-     * @param unknown_type $Limit
-     * @param unknown_type $ResetData
-     * @return Gdn_Dataset
+     *  - limit: A limit to the number of records to delete.
+     *  - reset: Deprecated. Whether or not to reset this SQL statement after the delete. Defaults to false.
+     * @return Gdn_Dataset Returns the result of the delete.
      */
-    public function delete($Where = '', $Limit = false, $ResetData = false) {
-        if (is_numeric($Where)) {
-            $Where = array($this->PrimaryKey => $Where);
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('Gdn_Model->delete(int)', 'Gdn_Model->deleteID()');
+            $where = array($this->PrimaryKey => $where);
+        }
+
+        $ResetData = false;
+        if ($options === true || val('reset', $options)) {
+            deprecated('Gdn_Model->delete() with reset true');
+            $ResetData = true;
+        } elseif (is_numeric($options)) {
+            deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
+            $limit = $options;
+        } else {
+            $limit = val('limit', $options);
         }
 
         if ($ResetData) {
-            $Result = $this->SQL->delete($this->Name, $Where, $Limit);
+            $Result = $this->SQL->delete($this->Name, $where, $limit);
         } else {
-            $Result = $this->SQL->noReset()->delete($this->Name, $Where, $Limit);
+            $Result = $this->SQL->noReset()->delete($this->Name, $where, $limit);
         }
         return $Result;
+    }
+
+    /**
+     * Delete a record by primary key.
+     *
+     * @param mixed $id The primary key value of the record to delete.
+     * @param array $options An array of options to affect the delete behaviour. Reserved for future use.
+     * @return bool Returns **true** if the delete was successful or **false** otherwise.
+     */
+    public function deleteID($id, $options = []) {
+        $r = $this->SQL->delete(
+            [$this->PrimaryKey => $id]
+        );
+        return $r;
     }
 
     /**
@@ -517,9 +545,9 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      * @param array|bool $Where A filter suitable for passing to Gdn_SQLDriver::Where().
      * @param string $OrderFields A comma delimited string to order the data.
-     * @param string $OrderDirection One of <b>asc</b> or <b>desc</b>
-     * @param int|bool $Limit
-     * @param int|bool $Offset
+     * @param string $OrderDirection One of **asc** or **desc**.
+     * @param int|false $Limit The database limit.
+     * @param int|false $Offset The database offset.
      * @return Gdn_DataSet
      */
     public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {

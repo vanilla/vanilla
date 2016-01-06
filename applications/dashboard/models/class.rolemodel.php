@@ -692,32 +692,62 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where) || is_object($where)) {
+            deprecated('RoleModel->delete()', 'RoleModel->deleteandReplace()');
+
+            $result = $this->deleteAndReplace($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("RoleModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Delete a role.
      *
-     * @param string|unknown_type $RoleID
-     * @param bool|unknown_type $ReplacementRoleID
+     * @param int $roleID The ID of the role to delete.
+     * @param array $options An array of options to affect the behavior of the delete.
+     *
+     * - **newRoleID**: The new role to point users to.
+     * @return bool Returns **true** on success or **false** otherwise.
      */
-    public function delete($RoleID, $ReplacementRoleID) {
+    public function deleteID($roleID, $options = []) {
+        $result = $this->deleteAndReplace($roleID, val('newRoleID', $options));
+        return $result;
+    }
+
+    /**
+     * Delete a role.
+     *
+     * @param int $roleID The ID of the role to delete.
+     * @param int $newRoleID Assign users of the deleted role to this new role.
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    public function deleteAndReplace($roleID, $newRoleID) {
         // First update users that will be orphaned
-        if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {
+        if (is_numeric($newRoleID) && $newRoleID > 0) {
             $this->SQL
                 ->options('Ignore', true)
                 ->update('UserRole')
                 ->join('UserRole urs', 'UserRole.UserID = urs.UserID')
                 ->groupBy('urs.UserID')
                 ->having('count(urs.RoleID) =', '1', true, false)
-                ->set('UserRole.RoleID', $ReplacementRoleID)
-                ->where(array('UserRole.RoleID' => $RoleID))
+                ->set('UserRole.RoleID', $newRoleID)
+                ->where(array('UserRole.RoleID' => $roleID))
                 ->put();
         } else {
-            $this->SQL->delete('UserRole', array('RoleID' => $RoleID));
+            $this->SQL->delete('UserRole', array('RoleID' => $roleID));
         }
 
         // Remove permissions for this role.
         $PermissionModel = Gdn::permissionModel();
-        $PermissionModel->delete($RoleID);
+        $PermissionModel->delete($roleID);
 
         // Remove the role
-        $this->SQL->delete('Role', array('RoleID' => $RoleID));
+        $result = $this->SQL->delete('Role', array('RoleID' => $roleID));
+        return $result;
     }
 }

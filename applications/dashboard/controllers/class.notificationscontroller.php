@@ -72,7 +72,7 @@ class NotificationsController extends Gdn_Controller {
         // If we're in the middle of a visit only get very recent notifications.
         $Where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
 
-        $Activities = $ActivityModel->getWhere($Where, 0, 5)->resultArray();
+        $Activities = $ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
 
         $ActivityIDs = array_column($Activities, 'ActivityID');
         $ActivityModel->setNotified($ActivityIDs);

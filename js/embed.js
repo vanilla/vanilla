@@ -54,7 +54,7 @@ window.vanilla.embed = function(host) {
     if (window.postMessage) {
         onMessage = function(e) {
             // Check that we're getting a vanilla message
-            if ((typeof e.data) === 'string' && e.data.hasOwnProperty('split')) {
+            if ((typeof e.data) === 'string') {
                 var message = e.data.split(':');
                 var frame = document.getElementById('vanilla' + id);
                 if (!frame || frame.contentWindow != e.source) {

@@ -53,16 +53,21 @@ window.vanilla.embed = function(host) {
     window.vanilla.embeds[id] = this;
     if (window.postMessage) {
         onMessage = function(e) {
-            var message = e.data.split(':');
-            var frame = document.getElementById('vanilla' + id);
-            if (!frame || frame.contentWindow != e.source)
-                return;
-            processMessage(message);
-        }
-        if (window.addEventListener)
+            // Check that we're getting a vanilla message
+            if ((typeof e.data) === 'string' && e.data.hasOwnProperty('split')) {
+                var message = e.data.split(':');
+                var frame = document.getElementById('vanilla' + id);
+                if (!frame || frame.contentWindow != e.source) {
+                    return;
+                }
+                processMessage(message);
+            }
+        };
+        if (window.addEventListener) {
             window.addEventListener("message", onMessage, false);
-        else
+        } else {
             window.attachEvent("onmessage", onMessage);
+        }
     } else {
         var messageId = null;
         setInterval(function() {
@@ -76,8 +81,9 @@ window.vanilla.embed = function(host) {
 
             var message = hash.split(':');
             var newMessageId = message[0];
-            if (newMessageId == messageId)
+            if (newMessageId == messageId) {
                 return;
+            }
 
             messageId = newMessageId;
             message.splice(0, 1);

@@ -878,7 +878,7 @@ body { background: transparent !important; }
             if (stringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted')) {
                 $this->CommentModel->orderBy('c.DateInserted '.$SortComments); // allow custom sort
             }
-            $this->setData('Comments', $this->CommentModel->getF($Discussion->DiscussionID, $Limit, $this->Offset), true);
+            $this->setData('Comments', $this->CommentModel->getByDiscussion($Discussion->DiscussionID, $Limit, $this->Offset), true);
 
             if (count($this->CommentModel->where()) > 0) {
                 $ActualResponses = false;

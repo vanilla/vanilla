@@ -169,7 +169,7 @@ Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
 Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
 
 // Smarty Templating Engine
-Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
+Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/smarty/libs/Smarty.class.php');
 Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 
 // Slice handler

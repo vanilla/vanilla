@@ -33,4 +33,5 @@ nbproject/project.xml
 /bower_components/
 /build/*
 !/build/build.xml
-!/build/package-contents.txt
+!/build/package-include.txt
+!/build/package-exclude.txt

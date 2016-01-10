@@ -148,45 +148,6 @@ class Gdn_CookieIdentity {
     }
 
     /**
-     * Returns $this->_HashHMAC with the provided data, the default hashing method
-     * (md5), and the server's COOKIE.SALT string as the key.
-     *
-     * @param string $Data The data to place in the hash.
-     */
-    protected static function _hash($Data, $CookieHashMethod, $CookieSalt) {
-        return Gdn_CookieIdentity::_hashHMAC($CookieHashMethod, $Data, $CookieSalt);
-    }
-
-    /**
-     * Returns the provided data hashed with the specified method using the
-     * specified key.
-     *
-     * @param string $HashMethod The hashing method to use on $Data. Options are MD5 or SHA1.
-     * @param string $Data The data to place in the hash.
-     * @param string $Key The key to use when hashing the data.
-     */
-    protected static function _hashHMAC($HashMethod, $Data, $Key) {
-        $PackFormats = array('md5' => 'H32', 'sha1' => 'H40');
-
-        if (!isset($PackFormats[$HashMethod])) {
-            return false;
-        }
-
-        $PackFormat = $PackFormats[$HashMethod];
-        // this is the equivalent of "strlen($Key) > 64":
-        if (isset($Key[63])) {
-            $Key = pack($PackFormat, $HashMethod($Key));
-        } else {
-            $Key = str_pad($Key, 64, chr(0));
-        }
-
-        $InnerPad = (substr($Key, 0, 64) ^ str_repeat(chr(0x36), 64));
-        $OuterPad = (substr($Key, 0, 64) ^ str_repeat(chr(0x5C), 64));
-
-        return $HashMethod($OuterPad.pack($PackFormat, $HashMethod($InnerPad.$Data)));
-    }
-
-    /**
      * Generates the user's session cookie.
      *
      * @param int $UserID The unique id assigned to the user in the database.
@@ -289,8 +250,8 @@ class Gdn_CookieIdentity {
         }
 
         // Create the cookie signature
-        $KeyHash = self::_hash($KeyData, $CookieHashMethod, $CookieSalt);
-        $KeyHashHash = self::_hashHMAC($CookieHashMethod, $KeyData, $KeyHash);
+        $KeyHash = hash_hmac($CookieHashMethod, $KeyData, $CookieSalt);
+        $KeyHashHash = hash_hmac($CookieHashMethod, $KeyData, $KeyHash);
         $Cookie = array($KeyData, $KeyHashHash, time());
 
         // Attach cookie payload
@@ -353,10 +314,10 @@ class Gdn_CookieIdentity {
             self::deleteCookie($CookieName);
             return false;
         }
-        $KeyHash = self::_hash($HashKey, $CookieHashMethod, $CookieSalt);
-        $CheckHash = self::_hashHMAC($CookieHashMethod, $HashKey, $KeyHash);
+        $KeyHash = hash_hmac($CookieHashMethod, $HashKey, $CookieSalt);
+        $CheckHash = hash_hmac($CookieHashMethod, $HashKey, $KeyHash);
 
-        if (!compareHashDigest($CookieHash, $CheckHash)) {
+        if (!hash_equals($CheckHash, $CookieHash)) {
             self::deleteCookie($CookieName);
             return false;
         }

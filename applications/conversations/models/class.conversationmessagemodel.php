@@ -107,7 +107,7 @@ class ConversationMessageModel extends ConversationsModel {
     public function getNew($ConversationID, $LastMessageID) {
         $Session = Gdn::session();
         $this->SQL->where('MessageID > ', $LastMessageID);
-        return $this->get($ConversationID, $Session->UserID);
+        return $this->getRecent($ConversationID, $Session->UserID);
     }
 
     /**

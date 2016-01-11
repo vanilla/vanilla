@@ -10,16 +10,16 @@
     RewriteBase /
 
     RewriteCond %{QUERY_STRING} ^p=/?([^&]+)(&([^?]+))?$
-    RewriteRule ^index\.php %1?%3 [E=X_REWRITE:2,L]
+    RewriteRule ^index\.php %1?%3 [E=X_REWRITE:1,L]
 
     # The basic rewrite rule.
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ index.php [QSA,E=X_REWRITE:2,E=X_PATH_INFO:/$1,L]
+    RewriteRule ^(.*)$ index.php [QSA,E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
     # Add the proper X_REWRITE server variable for rewritten requests.
     RewriteCond %{ENV:REDIRECT_X_REWRITE} .+
     RewriteCond %{ENV:REDIRECT_X_PATH_INFO} (.+)
-    RewriteRule ^index\.php - [QSA,E=X_REWRITE:2,E=!REDIRECT_X_REWRITE,E=X_PATH_INFO:%1,E=!REDIRECT_X_PATH_INFO,L]
+    RewriteRule ^index\.php - [QSA,E=X_REWRITE:1,E=!REDIRECT_X_REWRITE,E=X_PATH_INFO:%1,E=!REDIRECT_X_PATH_INFO,L]
 
     # 301 redirect urls that start with index.php
     #RewriteCond %{REQUEST_METHOD} GET [NC]

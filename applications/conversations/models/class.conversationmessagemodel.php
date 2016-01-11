@@ -33,7 +33,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @deprecated
      */
     public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
-        throw new \BadMethodCallException('ConversationMessageModel->get() is not supported.', 500);
+        throw new \BadMethodCallException('ConversationMessageModel->get() is not supported.', 400);
     }
 
     /**

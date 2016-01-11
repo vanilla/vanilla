@@ -28,8 +28,6 @@ jQuery(document).ready(function($) {
                gdn.informError(xhr);
             },
             success: function(json) {
-               json = $.postParseJson(json);
-
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 

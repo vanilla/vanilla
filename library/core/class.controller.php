@@ -1278,7 +1278,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->setJson('FormSaved', $this->_FormSaved);
             $this->setJson('DeliveryType', $this->_DeliveryType);
-            $this->setJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->toString() : $View));
+            $this->setJson('Data', ($View instanceof Gdn_IModule) ? $View->toString() : $View);
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             $this->setJson('RedirectUrl', $this->RedirectUrl);
@@ -1295,7 +1295,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             exit($this->_Json['Data']);
         } else {
             if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {
-                $this->addDefinition('InformMessageStack', base64_encode(json_encode($this->_InformMessages)));
+                $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages));
             }
 
             if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE) {

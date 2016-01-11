@@ -296,7 +296,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                settings.onSave(settings); // Notify the user that it is being saved.
             },
             success: function(json) {
-               json = $.postParseJson(json);
                gdn.inform(json);
                gdn.processTargets(json.Targets);
 
@@ -326,8 +325,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                if (typeof(data) == 'object') {
                   if (data.RedirectUrl)
                      setTimeout(function() { document.location.replace(data.RedirectUrl); }, 300);
-
-                  $.postParseJson(data);
                }
                $.popup.reveal(settings, data);
                //$('#'+settings.popupId+' .Content').html(data);

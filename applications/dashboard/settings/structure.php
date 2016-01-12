@@ -766,6 +766,8 @@ if ($currentLocale !== $canonicalLocale) {
     saveToConfig('Garden.Locale', $canonicalLocale);
 }
 
+AssetModel::refreshCacheBuster();
+
 // We need to undo cleditor's bad behavior for our reformed users.
 // If you still need to manipulate this, do it in memory instead (SAVE = false).
 if (!c('Garden.Html.SafeStyles')) {

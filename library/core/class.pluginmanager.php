@@ -1216,6 +1216,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             'The {addonName} plugin was enabled.',
             array('addonName' => $PluginName)
         );
+        AssetModel::refreshCacheBuster();
 
         $this->EnabledPlugins[$PluginName] = true;
 
@@ -1272,6 +1273,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 array('addonName' => $PluginName)
             );
         }
+        AssetModel::refreshCacheBuster();
 
         // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
         Gdn::locale()->refresh();

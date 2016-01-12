@@ -211,6 +211,7 @@ class Gdn_ApplicationManager {
             'The {addonName} application was enabled.',
             array('addonName' => $applicationName)
         );
+        AssetModel::refreshCacheBuster();
 
         // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, true);
         $Locale = Gdn::locale();
@@ -321,6 +322,7 @@ class Gdn_ApplicationManager {
             'The {addonName} application was disabled.',
             array('addonName' => $applicationName)
         );
+        AssetModel::refreshCacheBuster();
 
         // Clear the object caches.
         Gdn_Autoloader::smartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);

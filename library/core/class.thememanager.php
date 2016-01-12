@@ -410,6 +410,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
         $oldTheme = $this->enabledTheme();
         RemoveFromConfig('Garden.Theme');
+        AssetModel::refreshCacheBuster();
         $newTheme = $this->enabledTheme();
 
         if ($oldTheme != $newTheme) {
@@ -525,6 +526,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                     removeFromConfig('Garden.ThemeOptions');
                 }
             }
+            AssetModel::refreshCacheBuster();
         }
 
         if ($oldTheme !== $ThemeName) {

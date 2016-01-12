@@ -44,7 +44,13 @@ class ComposerHelper {
         // Merge repositories.
         $localRepositories = $localComposer->getRepositoryManager()->getRepositories();
         foreach ($localRepositories as $repository) {
-            $config = $repository->getRepoConfig();
+            /* @var \Composer\Repository\RepositoryInterface $repository */
+
+            if (method_exists($repository, 'getRepoConfig')) {
+                $config = $repository->getRepoConfig();
+            } else {
+                $config = ['url' => ''];
+            }
             // Skip the packagist repo.
             if (strpos($config['url'], 'packagist.org') !== false) {
                 continue;

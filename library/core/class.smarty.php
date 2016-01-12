@@ -104,20 +104,26 @@ class Gdn_Smarty {
         // Assign the controller data last so the controllers override any default data.
         $Smarty->assign($Controller->Data);
 
-        $Smarty->Controller = $Controller; // for smarty plugins
-        $Smarty->security = true;
+        $security = new Smarty_Security($Smarty);
 
-        $Smarty->security_settings['IF_FUNCS'] = array_merge(
-            $Smarty->security_settings['IF_FUNCS'],
+        $security->php_handling = Smarty::PHP_REMOVE;
+
+        $security->php_functions =  array_merge(
+            $security->php_functions,
             array('Category', 'CheckPermission', 'InSection', 'InCategory', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url')
         );
 
-        $Smarty->security_settings['MODIFIER_FUNCS'] = array_merge(
-            $Smarty->security_settings['MODIFIER_FUNCS'],
+        $security->php_modifiers = array_merge(
+            $security->php_functions,
             array('sprintf')
         );
 
-        $Smarty->secure_dir = array($Path);
+        $security->allow_constants = false;
+        $security->allow_super_globals = false;
+
+        $security->secure_dir = [$Path];
+        $Smarty->enableSecurity($security);
+
     }
 
     /**
@@ -145,11 +151,11 @@ class Gdn_Smarty {
      */
     public function smarty() {
         if (is_null($this->_Smarty)) {
-            $Smarty = Gdn::factory('Smarty');
+            $Smarty = new Smarty();
 
-            $Smarty->cache_dir = PATH_CACHE.DS.'Smarty'.DS.'cache';
-            $Smarty->compile_dir = PATH_CACHE.DS.'Smarty'.DS.'compile';
-            $Smarty->plugins_dir[] = PATH_LIBRARY.DS.'vendors'.DS.'SmartyPlugins';
+            $Smarty->setCacheDir(PATH_CACHE.'/Smarty/cache');
+            $Smarty->setCompileDir(PATH_CACHE.'/Smarty/compile');
+            $Smarty->addPluginsDir(PATH_LIBRARY.'/vendors/SmartyPlugins');
 
 //         Gdn::PluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($Smarty, 'Gdn_Smarty', 'Init');

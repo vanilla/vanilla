@@ -41,11 +41,15 @@ class ComposerHelper {
             false
         );
 
-
         // Merge repositories.
-        $repositories = array_merge($composer->getPackage()->getRepositories(), $localComposer->getPackage()->getRepositories());
-        if (method_exists($composer->getPackage(), 'setRepositories')) {
-            $composer->getPackage()->setRepositories($repositories);
+        $localRepositories = $localComposer->getRepositoryManager()->getRepositories();
+        foreach ($localRepositories as $repository) {
+            $config = $repository->getRepoConfig();
+            // Skip the packagist repo.
+            if (strpos($config['url'], 'packagist.org') !== false) {
+                continue;
+            }
+            $composer->getRepositoryManager()->addRepository($repository);
         }
 
         // Merge requirements.

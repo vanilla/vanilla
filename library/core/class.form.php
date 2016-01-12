@@ -2618,6 +2618,7 @@ PASSWORDMETER;
             'yearrange',
             'fields',
             'inlineerrors',
+            'wrap',
             'categorydata'
         );
         $Return = '';

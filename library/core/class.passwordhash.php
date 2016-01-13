@@ -11,8 +11,6 @@
  * @since 2.0
  */
 
-include_once PATH_LIBRARY.'/vendors/phpass/PasswordHash.php';
-
 /**
  * Wrapper for the Portable PHP password hashing framework.
  */
@@ -88,7 +86,6 @@ class Gdn_PasswordHash extends PasswordHash {
      */
     public function checkPassword($Password, $StoredHash, $Method = false, $Username = null) {
         $Result = false;
-        $ResetUrl = Url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
         switch (strtolower($Method)) {
             case 'crypt':
                 $Result = (crypt($Password, $StoredHash) === $StoredHash);
@@ -139,9 +136,11 @@ class Gdn_PasswordHash extends PasswordHash {
 
                 break;
             case 'reset':
+                $ResetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
                 throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), $ResetUrl));
                 break;
             case 'random':
+                $ResetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
                 throw new Gdn_UserException(sprintf(T('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $ResetUrl));
                 break;
             case 'smf':
@@ -231,6 +230,17 @@ class Gdn_PasswordHash extends PasswordHash {
     }
 
     /**
+     * Check a password using Phpass' hash.
+     *
+     * @param string $Password The plaintext password to check.
+     * @param string $StoredHash The password hash stored in the database.
+     * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
+     */
+    public function checkPhpass($Password, $StoredHash) {
+        return parent::checkPassword($Password, $StoredHash);
+    }
+
+    /**
      * Check a YAF hash.
      *
      * @param string $Password The plaintext password to check.
@@ -279,5 +289,15 @@ class Gdn_PasswordHash extends PasswordHash {
             $result = parent::HashPassword($password);
         }
         return $result;
+    }
+
+    /**
+     * Create a password hash using Phpass's algorithm.
+     *
+     * @param string $password The plaintext password to hash.
+     * @return string Returns a password hash.
+     */
+    public function hashPasswordPhpass($password) {
+        return parent::HashPassword($password);
     }
 }

@@ -207,7 +207,7 @@ class Gdn_PasswordHash extends PasswordHash {
             // This is a password that uses crypt and can be checked with PHP's built in function.
             $this->Weak = password_needs_rehash($StoredHash, PASSWORD_DEFAULT);
 
-            return password_verify($Password, $StoredHash);
+            return password_verify((string)$Password, $StoredHash);
         }
 
 

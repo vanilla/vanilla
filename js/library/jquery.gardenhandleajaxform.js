@@ -18,8 +18,6 @@
               }
             },
             success: function(json, status, $frm) {
-               json = $.postParseJson(json);
-               
                if (json.FormSaved == true) {
                   gdn.inform(json);
                   if (json.RedirectUrl) {
@@ -46,9 +44,9 @@
                   for(var i = 0; i < json.Targets.length; i++) {
                      var item = json.Targets[i];
                      if(item.Type == 'Text') {
-                        $(item.Target).text($.base64Decode(item.Data));
+                        $(item.Target).text(item.Data);
                      } else {
-                        $(item.Target).html($.base64Decode(item.Data));
+                        $(item.Target).html(item.Data);
                      }
                   }
                }

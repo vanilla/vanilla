@@ -622,7 +622,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Output a JavaScript object with all the definitions.
-        $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions).';';
+        $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).';';
         if ($wrap) {
             $result = "<script>$result</script>";
         }
@@ -1278,7 +1278,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->setJson('FormSaved', $this->_FormSaved);
             $this->setJson('DeliveryType', $this->_DeliveryType);
-            $this->setJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->toString() : $View));
+            $this->setJson('Data', ($View instanceof Gdn_IModule) ? $View->toString() : $View);
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             $this->setJson('RedirectUrl', $this->RedirectUrl);
@@ -1290,12 +1290,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
             }
 
-            $Json = json_encode($this->_Json);
+            $Json = json_encode($this->_Json, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRETTY_PRINT);
             $this->_Json['Data'] = $Json;
             exit($this->_Json['Data']);
         } else {
             if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {
-                $this->addDefinition('InformMessageStack', base64_encode(json_encode($this->_InformMessages)));
+                $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
 
             if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE) {
@@ -1640,11 +1640,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if (($Callback = $this->Request->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
-                    exit($Callback.'('.json_encode($Data).');');
+                    exit($Callback.'('.json_encode($Data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).');');
                 } else {
                     safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
-                    exit(json_encode($Data));
+                    exit(json_encode($Data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 break;
 //         case DELIVERY_METHOD_XHTML:

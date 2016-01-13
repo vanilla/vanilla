@@ -107,10 +107,14 @@ class Gdn_Smarty {
         $security = new Smarty_Security($Smarty);
 
         $security->php_handling = Smarty::PHP_REMOVE;
+        $security->allow_constants = false;
+        $security->allow_super_globals = false;
+        $security->secure_dir = [$Path];
+        $security->streams = null;
 
         $security->php_functions =  array_merge(
             $security->php_functions,
-            array('Category', 'CheckPermission', 'InSection', 'InCategory', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url')
+            array('category', 'checkPermission', 'inSection', 'inCategory', 'multiCheckPermission', 'getValue', 'setValue', 'url')
         );
 
         $security->php_modifiers = array_merge(
@@ -118,10 +122,6 @@ class Gdn_Smarty {
             array('sprintf')
         );
 
-        $security->allow_constants = false;
-        $security->allow_super_globals = false;
-
-        $security->secure_dir = [$Path];
         $Smarty->enableSecurity($security);
 
     }

@@ -1,9 +1,17 @@
-/********* Source File: src/elycharts_defaults.js*********/
+/********* Source File: extra-resources/header.js*********/
 /*!*********************************************************************
- * ELYCHARTS v2.1.4-SNAPSHOT $Id: elycharts.js 52 2011-08-07 19:57:09Z stefano.bagnara@gmail.com $
+ * ELYCHARTS v2.1.6-SNAPSHOT $Id: elycharts.js 101 2014-02-19 10:52:26Z stefano.bagnara@gmail.com $ 
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
+ * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
+ **********************************************************************/
+/********* Source File: src/elycharts_defaults.js*********/
+/**********************************************************************
+ * ELYCHARTS
+ * A Javascript library to generate interactive charts with vectorial graphics.
+ *
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
@@ -20,35 +28,39 @@ $.elycharts.templates = {
   common : {
     // Tipo di grafico
     // type : 'line|pie|funnel|barline'
-
+    
     // Permette di specificare una configurazione di default da utilizzare (definita in $.elycharts.templates.NOME)
-    // La configurazione completa ï¿½ quindi data da tutti i valori della conf di default alla quale viene unita (con sovrascrittura) la conf corrente
-    // Il parametro ï¿½ ricorsivo (la configurazione di default puo' a sua volta avere una configurazione di default)
-    // Se non specificato, la configurazione di default ï¿½ quella con lo stesso nome del tipo di grafico
+    // La configurazione completa � quindi data da tutti i valori della conf di default alla quale viene unita (con sovrascrittura) la conf corrente
+    // Il parametro � ricorsivo (la configurazione di default puo' a sua volta avere una configurazione di default)
+    // Se non specificato, la configurazione di default � quella con lo stesso nome del tipo di grafico
     // template : 'NOME',
-
+    
     /* DATI:
-    // I valori associati a ogni serie del grafico. Ogni serie ï¿½ associata a una chiave dell'oggetto value, il cui
-    // valore ï¿½ l'array di dati relativi
+    // I valori associati a ogni serie del grafico. Ogni serie � associata a una chiave dell'oggetto value, il cui 
+    // valore � l'array di dati relativi
     values : {},
-
+    
     // Label associate ai valori del grafico
-    // Solo in caso di label gestite da labelmanager (quindi per pie e funnel) e per label.html = true e' possibile inserire
+    // Solo in caso di label gestite da labelmanager (quindi per pie e funnel) e per label.html = true e' possibile inserire 
     // degli elementi DOM/JQUERY che verranno presi e posizionati correttament.
     labels : [],
-
+    
     // Anchor per la gestione mediante anchormanager. Possono essere stringhe e oggetti DOM/JQUERY che verranno riposizionati
     anchors : {},
-
+    
     tooltips : {},
-
+    
     legend : [],
     */
-
+    
+    // Autoresize uses jQuery resize event to automatically resize the chart to the container
+    // autoresize makes sense only when width or height is not defined.
+	// autoresize: false,
+	  
     // Per impostare una dimensione diversa da quella del container settare width e height
     //width : x,
     //height : y
-
+    
     // I margini del grafico rispetto al frame complessivo. Da notare che riguardano la posizione del grafico
     // principale, e NON degli elementi aggiuntivi (legenda, label e titoli degli assi...). Quindi i margini devono
     // essere impostati in genere proprio per lasciare lo spazio per questi elementi
@@ -56,9 +68,9 @@ $.elycharts.templates = {
     margins: [10, 10, 10, 10],
 
     // style : {},
-
+    
     // Per gestire al meglio l'interattivita' del grafico (tooltip, highlight, anchor...) viene inserito un secondo
-    // layer per le parti sensibili al mouse. Se si sa che il grafico non avra' alcuna interattivita' si puo' impostare
+    // layer per le parti sensibili al mouse. Se si sa che il grafico non avra' alcuna interattivita' si puo' impostare 
     // questo valore a false per evitare di creare il layer (ottimizzando leggermente la pagina)
     interactive : true,
 
@@ -66,26 +78,26 @@ $.elycharts.templates = {
     defaultSeries : {
       // Impostare a false per disabilitare la visualizzazione della serie
       visible : true,
-
+      
       // Impostare color qui permette di impostare velocemente plotProps.stroke+fill, tooltip.frameProps.stroke, dotProps.stroke e fillProps.fill (se non specificati)
       //color: 'blue',
-
+      
       //plotProps : { },
-
+      
       // Impostazioni dei tooltip
       tooltip : {
         active : true,
         // Se width ed height vengono impostati a 0 o ad "auto" (equivalenti) non vengono fissate dimensioni, quindi il contenuto si autodimensiona in funzione del tooltip
-        // Impostare a 0|auto ï¿½ incompatibile con il frame SVG, quindi viene automaticamente disabilitato (come se frameProps = false)
-        width: 100, height: 50,
-        roundedCorners: 5,
+        // Impostare a 0|auto � incompatibile con il frame SVG, quindi viene automaticamente disabilitato (come se frameProps = false)
+        width: 100, height: 50, 
+        roundedCorners: 5, 
         padding: [6, 6] /* y, x */,
         offset: [20, 0] /* y, x */,
         // Se frameProps = false non disegna la cornice del tooltip (ad es. per permettere di definire la propria cornice HTML)
         frameProps : { fill: "white", "stroke-width": 2 },
         contentStyle : { "font-family": "Arial", "font-size": "12px", "line-height": "16px", color: "black" }
       },
-
+      
       // Highlight feature
       highlight : {
         // Cambia le dimensioni dell'elemento quando deve essere evidenziato
@@ -103,7 +115,7 @@ $.elycharts.templates = {
         // Opzioni di animazione da usare per riportare l'oggetto alle situazione iniziale
         restoreSpeed : 0, restoreEasing : ''
       },
-
+      
       anchor : {
         // Aggiunge alle anchor esterne la classe selezionata quando il mouse passa sull'area
         //addClass : "",
@@ -112,7 +124,7 @@ $.elycharts.templates = {
         // Se impostato a true usa gli eventi mouseenter/mouseleave invece di mouseover/mouseout per l'highlight
         //useMouseEnter : false,
       },
-
+      
       // Opzioni per la generazione animata dei grafici
       startAnimation : {
         //active : true,
@@ -122,23 +134,23 @@ $.elycharts.templates = {
         propsFrom : {}, // applicate a tutte le props di plot
         propsTo : {}, // applicate a tutte le props di plot
         easing : '' // easing raphael: >, <, <>, backIn, backOut, bounce, elastic
-
+        
         // Opzionale per alcune animazioni, permette di specificare un sotto-tipo
         // subType : 0|1|2
       },
-
+      
       // Opzioni per le transizioni dei grafici durante un cambiamento di configurazione
       /* stepAnimation : {
         speed : 600,
         delay : 0,
         easing : '' // easing raphael: >, <, <>, backIn, backOut, bounce, elastic
       },*/
-
+      
       label : {
         // Disegna o meno la label interna al grafico
         active : false,
-        // Imposta un offset [X,Y] per la label (le coordinate sono relative al sistema di assi dello specifico settore disegnato.
-        // Ad es. per il piechart la X ï¿½ la distanza dal centro, la Y lo spostamento ortogonale
+        // Imposta un offset [X,Y] per la label (le coordinate sono relative al sistema di assi dello specifico settore disegnato. 
+        // Ad es. per il piechart la X � la distanza dal centro, la Y lo spostamento ortogonale
         //offset : [x, y],
         html : false,
         // Proprieta' della label (per HTML = false)
@@ -148,7 +160,7 @@ $.elycharts.templates = {
         // Posizionamento della label rispetto al punto centrale (+offset) identificato
         //frameAnchor : ['start|middle|end', 'top|middle|bottom']
       }
-
+      
       /*legend : {
         dotType : 'rect',
         dotWidth : 10, dotHeight : 10, dotR : 4,
@@ -156,7 +168,7 @@ $.elycharts.templates = {
         textProps : { font: '12px Arial', fill: "#000" }
       }*/
     },
-
+    
     series : {
       // Serie specifica usata quando ci sono "dati vuoti" (ad esempio quando un piechart e' a 0)
       empty : {
@@ -168,13 +180,13 @@ $.elycharts.templates = {
         values : []
       }*/
     },
-
+    
     features : {
       tooltip : {
         // Imposta una posizione fissa per tutti i tooltip
         //fixedPos : [ x,  y]
         // Velocita' del fade
-        fadeDelay : 100,
+        fadeDelay : 100, 
         // Velocita' dello spostamento del tip da un'area all'altra
         moveDelay : 300
         // E' possibile specificare una funzione che filtra le coordinate del tooltip prima di mostrarlo, permettendo di modificarle
@@ -226,8 +238,9 @@ $.elycharts.templates = {
         speed : 'slow',
         easing : 'linear' // easing jQuery: 'linear' o 'swing'
       },
+      // used to be true
       pixelWorkAround : {
-        active : true
+        active : Raphael.svg
       },
       label : {},
       shadows : {
@@ -244,19 +257,19 @@ $.elycharts.templates = {
         //height : 50,
         // Lo stile CSS da applicare a ogni balloon
         style : {  },
-        // Padding
+        // Padding 
         padding : [ 5, 5 ],
         // La distanza dal bordo sinistro
         left : 10,
-        // Percorso della linea: [ [ x, y iniziali (rispetto al punto di inizio standard)], ... [x, y intermedi (rispetto al punto di inizio standard)] ..., [x, y finale (rispetto all'angolo del balloon piï¿½ vicino al punto di inizio)] ]
+        // Percorso della linea: [ [ x, y iniziali (rispetto al punto di inizio standard)], ... [x, y intermedi (rispetto al punto di inizio standard)] ..., [x, y finale (rispetto all'angolo del balloon pi� vicino al punto di inizio)] ]
         line : [ [ 0, 0 ], [0, 0] ],
-        // Proprietï¿½ della linea
+        // Propriet� della linea
         lineProps : { }
       },
       legend : {
         horizontal : false,
         x : 'auto', // X | auto, (auto solo per horizontal = true)
-        y : 10,
+        y : 10, 
         width : 'auto', // X | auto, (auto solo per horizontal = true)
         height : 20,
         itemWidth : "fixed", // fixed | auto, solo per horizontal = true
@@ -264,7 +277,9 @@ $.elycharts.templates = {
         dotMargins : [10, 5], // sx, dx
         borderProps : { fill : "white", stroke : "black", "stroke-width" : 1 },
         dotType : 'rect',
-        dotWidth : 10, dotHeight : 10, dotR : 4,
+        dotWidth : 10, dotHeight : 10,
+        // radius for the dots (used to be 4 but there also was a bug preventing radius support, so moved to 0) 
+        dotR : 0,
         dotProps : { type : "rect", width : 10, height : 10 },
         textProps : { font: '12px Arial', fill: "#000" }
       },
@@ -272,19 +287,27 @@ $.elycharts.templates = {
         active : false
       }
     },
-
+    
+    enableInternalCaching : true,
+    
     nop : 0
   },
 
   line : {
     template : 'common',
-
+    
+    // absolute margin left to both sides of each column / column group.
     barMargins : 0,
+    // overlap between additional columns over the previous one (ignored for the first serie)
+    barOverlapPerc : 0,
+    
+    // disable this if you want to use null values and want the lines/area to be broken over null values 
+    avgOverNulls: true,
 
     // Axis
     defaultAxis : {
       // [non per asse x] Normalizza il valore massimo dell'asse in modo che tutte le label abbiamo al massimo N cifre significative
-      // (Es: se il max e' 135 e normalize = 2 verra' impostato il max a 140, ma se il numero di label in y e' 3 verrï¿½ impostato 150)
+      // (Es: se il max e' 135 e normalize = 2 verra' impostato il max a 140, ma se il numero di label in y e' 3 verr� impostato 150)
       normalize: 2,
       // Permette di impostare i valori minimi e massimi di asse (invece di autorilevarli)
       min: 0, //max: x,
@@ -293,27 +316,27 @@ $.elycharts.templates = {
       // Visualizza o meno le label dell'asse
       labels: false,
       // Distanza tra le label e l'asse relativo
-      labelsDistance: 8,
+      labelsDistance: 8, 
       // [solo asse x] Rotazione (in gradi) delle label. Se specificato ignora i valori di labelsAnchor e labelsProps['text-anchor']
-      labelsRotate: 0,
+      labelsRotate: 0, 
       // Proprieta' grafiche delle label
       labelsProps : {font: '10px Arial', fill: "#000"},
       // Compatta il numero mostrato nella label usando i suffissi specificati per migliaia, milioni...
       //labelsCompactUnits : ['k', 'M'],
       // Permette di specificare una funzione esterna che si occupa di formattare (o in generale trasformare) la label
-      //labelsFormatHandler : function (label,i) { return label },
+      //labelsFormatHandler : function (label) { return label },
       // Salta le prime N label
-      //labelsSkip : 0,
+      //labelsSkip : 0, 
       // Force alignment for the label. Auto will automatically center it for x axis (also considering labelsRotate), "end" for l axis, "start" for the right axis.
       //labelsAnchor : "auto"
       // [solo asse x] Force an alternative position for the X axis labels. Auto will automatically choose the right position depending on "labelsCenter", the type of charts (bars vs lines), and labelsRotate.
       //labelsPos : "auto",
       // Automatically hide labels that would overlap previous labels.
-      //labelsHideCovered : true,
+      //labelsHideCovered : true, 
       // Inserisce un margine alla label (a sinistra se in asse x, in alto se in altri assi)
-      //labelsMargin: 10,
-      // [solo asse x] If labelsHideCovered = true, make sure each label have at least this space before the next one.
-      //labelsMarginRight: 0,
+      //labelsMargin: 10,  
+      // [solo asse x] If labelsHideCovered = true, make sure each label have at least this space before the next one. 
+      //labelsMarginRight: 0, 
       // Distanza del titolo dall'asse
       titleDistance : 25, titleDistanceIE : .75,
       // Proprieta' grafiche del titolo
@@ -322,12 +345,12 @@ $.elycharts.templates = {
     axis : {
       x : { titleDistanceIE : 1.2 }
     },
-
+    
     defaultSeries : {
       // Tipo di serie, puo' essere 'line' o 'bar'
-      type : 'line',
-      // L'asse di riferimento della serie. Gli assi "l" ed "r" sono i 2 assi visibili destro e sinistro.
-      // E' possibile inserire anche un asse arbitrario (che non sarï¿½ visibile)
+      type : 'line', 
+      // L'asse di riferimento della serie. Gli assi "l" ed "r" sono i 2 assi visibili destro e sinistro. 
+      // E' possibile inserire anche un asse arbitrario (che non sar� visibile)
       axis : 'l',
       // Specificare cumulative = true se i valori inseriti per la serie sono cumulativi
       cumulative : false,
@@ -340,12 +363,12 @@ $.elycharts.templates = {
       // stacked : false,
 
       plotProps : {"stroke-width": 1, "stroke-linejoin": "round"},
-
+      
       barWidthPerc: 100,
       //DELETED: barProps : {"width-perc" : 100, "stroke-width": 1, "fill-opacity" : .3},
-
+      
       // Attiva o disattiva il riempimento
-      fill : false,
+      fill : false, 
       fillProps : {stroke: "none", "stroke-width" : 0, "stroke-opacity": 0, opacity: .3},
 
       dot : false,
@@ -353,18 +376,18 @@ $.elycharts.templates = {
       dotShowOnNull : false,
 
       mouseareaShowOnNull : false,
-
+      
       startAnimation : {
         plotPropsFrom : false,
         // DELETED linePropsFrom : false,
-        fillPropsFrom : false,
+        fillPropsFrom : false, 
         dotPropsFrom : false,
         //DELETED barPropsFrom : false,
         shadowPropsFrom : false
       }
-
+      
     },
-
+    
     features : {
       grid : {
         // N. di divisioni sull'asse X. Se "auto" si basa sulla label da visualizzare. Se "0" imposta draw[vertical] = false
@@ -374,7 +397,7 @@ $.elycharts.templates = {
         ny : 4,
         // Disegna o meno la griglia. Si puo' specificare un array [horizontal, vertical]
         draw : false,
-        // Forza la visualizzazione dei bordi/assi. Se true disegna comunque i bordi (anche se draw = false o se non ci sono label),
+        // Forza la visualizzazione dei bordi/assi. Se true disegna comunque i bordi (anche se draw = false o se non ci sono label), 
         // altrimenti si basa sulle regole standard di draw e presenza label (per asse x)
         // Puo' essere un booleano singolo o un array di bordi [up, dx, down, sx]
         forceBorder : false,
@@ -408,18 +431,24 @@ $.elycharts.templates = {
 
   pie : {
     template : 'common',
-
+    
     // Coordinate del centro, se non specificate vengono autodeterminate
     //cx : 0, cy : 0,
     // Raggio della torta, se non specificato viene autodeterminato
     //r : 0
+    // Radius in percentage of the available space
+    //rPerc : 80
     // Angolo dal quale iniziare a disegnare le fette, in gradi
     startAngle : 0,
     // Disegna la torta con le fette in senso orario (invece dell'orientamento standard per gradi, in senso antiorario)
     clockwise : false,
     // Soglia (rapporto sul totale) entro la quale una fetta non viene visualizzata
     valueThresold : 0.006,
-
+    
+    // @since elycharts 2.1.5 (previously there was no margins support so when we implemented it we had to add a 0 margin
+    // here to not start adding the common margin to every pie user
+    margins : [0, 0, 0, 0],
+    
     defaultSeries : {
       // r: .5, raggio usato solo per questo spicchio, se <=1 e' in rapporto al raggio generale
       // inside: X, inserisce questo spicchio dentro un altro (funziona solo inside: precedente, e non gestisce + spicchi dentro l'altro)
@@ -428,7 +457,7 @@ $.elycharts.templates = {
 
   funnel : {
     template : 'common',
-
+    
     rh: 0, // height of ellipsis (for top and bottom cuts)
     method: 'width', // width/cutarea
     topSector: 0, // height factor of top cylinder
@@ -439,13 +468,13 @@ $.elycharts.templates = {
 
     nop : 0
   },
-
+  
   barline : {
     template : 'common',
 
     // Imposta il valore massimo per la scala (altrimenti prende il valore + alto)
     // max : X
-
+    
     // Impostare direction = rtl per creare un grafico che va da destra a sinistra
     direction : 'ltr'
   }
@@ -457,7 +486,7 @@ $.elycharts.templates = {
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
@@ -474,7 +503,7 @@ $.elycharts.lastId = 0;
 $.fn.chart = function($options) {
   if (!this.length)
     return this;
-
+  
   var $env = this.data('elycharts_env');
 
   if (typeof $options == "string") {
@@ -482,57 +511,149 @@ $.fn.chart = function($options) {
       return $env ? $env.opt : false;
     if ($options.toLowerCase() == "clear") {
       if ($env) {
-        // TODO Bisogna chiamare il destroy delle feature?
+        if ($.elycharts.featuresmanager) $.elycharts.featuresmanager.clear($env);
         $env.paper.clear();
+        $env.cache = false;
+        if ($env.autoresize) $(window).unbind('resize', $env.autoresize);
         this.html("");
         this.data('elycharts_env', false);
       }
     }
+    return this;
   }
-  else if (!$env) {
+  
+  if (!$env) {
     // First call, initialization
 
     if ($options)
       $options = _extendAndNormalizeOptions($options);
-
+    
     if (!$options || !$options.type || !$.elycharts.templates[$options.type]) {
       alert('ElyCharts ERROR: chart type is not specified');
       return false;
     }
     $env = _initEnv(this, $options);
 
-    _processGenericConfig($env, $options);
-    $env.pieces = $.elycharts[$env.opt.type].draw($env);
-
     this.data('elycharts_env', $env);
-
   } else {
+  	if (!$options) $options = {};
     $options = _normalizeOptions($options, $env.opt);
-
+    
     // Already initialized
     $env.oldopt = common._clone($env.opt);
     $env.opt = $.extend(true, $env.opt, $options);
     $env.newopt = $options;
-
-    _processGenericConfig($env, $options);
-    $env.pieces = $.elycharts[$env.opt.type].draw($env);
+    $env.oldwidth = $env.width;
+    $env.oldheight = $env.height;
+    
   }
+  
+  $env.cache = $options['enableInternalCaching'] ? {} : false;
+  
+  _processGenericConfig($env, $options);
+
+  if ($env.opt.autoresize) {
+  	if (!$env.autoresize) {
+  		var that = this;
+  		$env.autoresize = _debounce(function() {
+  			that.chart();
+  		});
+  		$(window).bind('resize', $env.autoresize);
+  	}
+  } else {
+  	if ($env.autoresize) {
+  		$(window).unbind('resize', $env.autoresize);
+  		$env.autoresize = false;
+  	}
+  }
+  
+  
+  var pieces = $.elycharts[$env.opt.type].draw($env);
+  if ($env.pieces) {
+    pieces = _updatePieces($env, $env.pieces, pieces);
+  }
+  common._show($env, pieces);
+  $env.pieces = pieces;
 
   return this;
+}
+
+function _updatePieces(env, pieces1, pieces2, section, serie, internal) {
+  // Se pieces2 == null deve essere nascosto tutto pieces1
+  var newpieces = [], newpiece;
+  var j = 0;
+  for (var i = 0; i < pieces1.length; i ++) {
+
+    // Se il piece attuale c'e' solo in pieces2 lo riporto nei nuovi, impostando come gia' mostrato
+    // A meno che internal = true (siamo in un multipath, nel caso se una cosa non c'e' va considerata da togliere)
+    if (pieces2 && (j >= pieces2.length || !common.samePiecePath(pieces1[i], pieces2[j]))) {
+      if (!internal) {
+        pieces1[i].show = false;
+        newpieces.push(pieces1[i]);
+      } else {
+        newpiece = { path : false, attr : false };
+        newpiece.show = true;
+        newpiece.animation = {
+          element : pieces1[i].element ? pieces1[i].element : false,
+          speed : 0,
+          easing : '',
+          delay : 0
+        }
+        newpieces.push(newpiece);
+      }
+    }
+    // Bisogna gestire la transizione dal vecchio piece al nuovo
+    else {
+      newpiece = pieces2 ? pieces2[j] : { path : false, attr : false };
+      newpiece.show = true;
+      if (typeof pieces1[i].paths == 'undefined') {
+        newpiece.animation = {
+          element : pieces1[i].element ? pieces1[i].element : false,
+          speed : 0,
+          easing : '',
+          delay : 0
+        }
+      } else {
+        // Multiple path piece
+        newpiece.paths = _updatePieces(env, pieces1[i].paths, pieces2[j].paths, pieces1[i].section, pieces1[i].serie, true);
+      }
+      newpieces.push(newpiece);
+      j++;
+    }
+  }
+  // If there are pieces left in pieces2 i must add them unchanged
+  if (pieces2)
+    for (; j < pieces2.length; j++)
+      newpieces.push(pieces2[j]);
+
+  return newpieces;
+};
+
+
+// http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+function _debounce(func, threshold, execAsap) {
+  var timeout;
+  return function debounced () {
+    var obj = this, args = arguments;
+    function delayed () {
+      if (!execAsap) func.apply(obj, args);
+      timeout = null; 
+    };
+
+    if (timeout) clearTimeout(timeout);
+    else if (execAsap) func.apply(obj, args);
+
+    timeout = setTimeout(delayed, threshold || 100); 
+  };
 }
 
 /**
  * Must be called only in first call to .chart, to initialize elycharts environment.
  */
 function _initEnv($container, $options) {
-  if (!$options.width)
-    $options.width = $container.width();
-  if (!$options.height)
-    $options.height = $container.height();
-
   var $env = {
     id : $.elycharts.lastId ++,
-    paper : common._RaphaelInstance($container.get()[0], $options.width, $options.height),
+    paper : common._RaphaelInstance($container.get()[0], 0, 0),
     container : $container,
     plots : [],
     opt : $options
@@ -549,6 +670,9 @@ function _initEnv($container, $options) {
 function _processGenericConfig($env, $options) {
   if ($options.style)
     $env.container.css($options.style);
+  $env.width = $options.width ? $options.width : $env.container.width();
+  $env.height = $options.height ? $options.height : $env.container.height();
+  $env.paper.setSize($env.width, $env.height);
 }
 
 /**
@@ -566,7 +690,7 @@ function _extendAndNormalizeOptions($options) {
         $.elycharts.templates[k] = $.elysia_charts.templates[k];
   }
 
-  // TODO Optimize extend cicle
+  // TODO Optimize extend cycle
   while ($options.template) {
     var d = $options.template;
     delete $options.template;
@@ -600,36 +724,24 @@ function _normalizeOptions($options, $fullopt) {
     if ($options.legend && $.isArray($options.legend) && !$.isArray($options.legend[0]))
       $options.legend = { root : $options.legend };
   }
-
+  
   if ($options.defaultSeries) {
-    var deftype = $fullopt.type != 'line' ? $fullopt.type : ($options.defaultSeries.type ? $options.defaultSeries.type : ($fullopt.defaultSeries.type ? $fullopt.defaultSeries.type : 'line'));
-    _normalizeOptionsColor($options.defaultSeries, deftype, $fullopt);
-    if ($options.defaultSeries.stackedWith) {
-      $options.defaultSeries.stacked = $options.defaultSeries.stackedWith;
-      delete $options.defaultSeries.stackedWith;
-    }
+    var plotType = $options.defaultSeries.type ? $options.defaultSeries.type : ($fullopt.defaultSeries.type ? $fullopt.defaultSeries.type : $fullopt.type);
+    _normalizeOptionsSerie($options.defaultSeries, $fullopt.type, plotType, $fullopt);
   }
-
+    
   if ($options.series)
     for (var serie in $options.series) {
-      var type = $fullopt.type != 'line' ? $fullopt.type : ($options.series[serie].type ? $options.series[serie].type : ($fullopt.series[serie].type ? $fullopt.series[serie].type : (deftype ? deftype : 'line')));
-      _normalizeOptionsColor($options.series[serie], type, $fullopt);
-      if ($options.series[serie].values)
-        for (var value in $options.series[serie].values)
-          _normalizeOptionsColor($options.series[serie].values[value], type, $fullopt);
-
-      if ($options.series[serie].stackedWith) {
-        $options.series[serie].stacked = $options.series[serie].stackedWith;
-        delete $options.series[serie].stackedWith;
-      }
+      var seriePlotType = $options.series[serie].type ? $options.series[serie].type : ($fullopt.series[serie].type ? $fullopt.series[serie].type : (plotType ? plotType : $fullopt.type));
+      _normalizeOptionsSerie($options.series[serie], $fullopt.type, seriePlotType, $fullopt);
     }
-
+    
   if ($options.type == 'line') {
     if (!$options.features)
       $options.features = {};
     if (!$options.features.grid)
       $options.features.grid = {};
-
+  
     if (typeof $options.gridNX != 'undefined') {
       $options.features.grid.nx = $options.gridNX;
       delete $options.gridNX;
@@ -650,10 +762,10 @@ function _normalizeOptions($options, $fullopt) {
       $options.features.grid.forceBorder = $options.gridForceBorder;
       delete $options.gridForceBorder;
     }
-
+    
     if ($options.defaultAxis && $options.defaultAxis.normalize && ($options.defaultAxis.normalize == 'auto' || $options.defaultAxis.normalize == 'autony'))
       $options.defaultAxis.normalize = 2;
-
+    
     if ($options.axis)
       for (var axis in $options.axis)
         if ($options.axis[axis] && $options.axis[axis].normalize && ($options.axis[axis].normalize == 'auto' || $options.axis[axis].normalize == 'autony'))
@@ -663,52 +775,17 @@ function _normalizeOptions($options, $fullopt) {
   return $options;
 }
 
+
 /**
-* Manage "color" attribute.
+* Manage "color" attribute, the stackedWith legacy and values "color" properties.
 * @param $section Section part of external conf passed
-* @param $type Type of plot (for line chart can be "line" or "bar", for other types is equal to chart type)
+* @param $type Chart type
+* @param $plotType for line chart can be "line" or "bar", for other types is equal to chart type.
 */
-function _normalizeOptionsColor($section, $type, $fullopt) {
-  if ($section.color) {
-    var color = $section.color;
-
-    if (!$section.plotProps)
-      $section.plotProps = {};
-
-    if ($type == 'line') {
-      if ($section.plotProps && !$section.plotProps.stroke && !$fullopt.defaultSeries.plotProps.stroke)
-        $section.plotProps.stroke = color;
-    } else {
-      if ($section.plotProps && !$section.plotProps.fill && !$fullopt.defaultSeries.plotProps.fill)
-        $section.plotProps.fill = color;
-    }
-
-    if (!$section.tooltip)
-      $section.tooltip = {};
-    // Is disabled in defaultSetting i should not set color
-    if (!$section.tooltip.frameProps && $fullopt.defaultSeries.tooltip.frameProps)
-      $section.tooltip.frameProps = {};
-    if ($section.tooltip && $section.tooltip.frameProps && !$section.tooltip.frameProps.stroke && !$fullopt.defaultSeries.tooltip.frameProps.stroke)
-      $section.tooltip.frameProps.stroke = color;
-
-    if (!$section.legend)
-      $section.legend = {};
-    if (!$section.legend.dotProps)
-      $section.legend.dotProps = {};
-    if ($section.legend.dotProps && !$section.legend.dotProps.fill)
-      $section.legend.dotProps.fill = color;
-
-    if ($type == 'line') {
-      if (!$section.dotProps)
-        $section.dotProps = {};
-      if ($section.dotProps && !$section.dotProps.fill && !$fullopt.defaultSeries.dotProps.fill)
-        $section.dotProps.fill = color;
-
-      if (!$section.fillProps)
-        $section.fillProps = {};
-      if ($section.fillProps && !$section.fillProps.fill && !$fullopt.defaultSeries.fillProps.fill)
-        $section.fillProps.fill = color;
-    }
+function _normalizeOptionsSerie($section, $type, $plotType, $fullopt) {
+  if ($section.stackedWith) {
+    $section.stacked = $section.stackedWith;
+    delete $section.stackedWith;
   }
 }
 
@@ -730,22 +807,22 @@ $.elycharts.common = {
       // a1 == a2  (but they where different before) means that there is a complete round (eg: 0-360). This should be shown
       if (a1 == a2 && aa1 != aa2)
         a2 += 359.99 * Math.PI / 180;
-
+      
       return { path : rint ? [
-        ["M", cx + r * Math.cos(a1), cy + r * Math.sin(a1)],
-        ["A", r, r, 0, +flag, 1, cx + r * Math.cos(a2), cy + r * Math.sin(a2)],
-        ["L", cx + rint * Math.cos(a2), cy + rint * Math.sin(a2)],
-        //["L", cx + rint * Math.cos(a1), cy + rint * Math.sin(a1)],
+        ["M", cx + r * Math.cos(a1), cy + r * Math.sin(a1)], 
+        ["A", r, r, 0, +flag, 1, cx + r * Math.cos(a2), cy + r * Math.sin(a2)], 
+        ["L", cx + rint * Math.cos(a2), cy + rint * Math.sin(a2)], 
+        //["L", cx + rint * Math.cos(a1), cy + rint * Math.sin(a1)], 
         ["A", rint, rint, 0, +flag, 0, cx + rint * Math.cos(a1), cy + rint * Math.sin(a1)],
         ["z"]
       ] : [
-        ["M", cx, cy],
-        ["l", r * Math.cos(a1), r * Math.sin(a1)],
-        ["A", r, r, 0, +flag, 1, cx + r * Math.cos(a2), cy + r * Math.sin(a2)],
+        ["M", cx, cy], 
+        ["l", r * Math.cos(a1), r * Math.sin(a1)], 
+        ["A", r, r, 0, +flag, 1, cx + r * Math.cos(a2), cy + r * Math.sin(a2)], 
         ["z"]
       ] };
     };
-
+    
     return r;
   },
 
@@ -759,29 +836,7 @@ $.elycharts.common = {
       temp[key] = this._clone(obj[key]);
     return temp;
   },
-
-  _mergeObjects : function(o1, o2) {
-    return $.extend(true, o1, o2);
-    /*
-    if (typeof o1 == 'undefined')
-      return o2;
-    if (typeof o2 == 'undefined')
-      return o1;
-
-    for (var idx in o2)
-      if (typeof o1[idx] == 'undefined')
-        o1[idx] = this._clone(o2[idx]);
-      else if (typeof o2[idx] == 'object') {
-        if (typeof o1[idx] == 'object')
-          o1[idx] = this._mergeObjects(o1[idx], o2[idx]);
-        else
-          o1[idx] = this._mergeObjects({}, o2[idx]);
-      }
-      else
-        o1[idx] = this._clone(o2[idx]);
-    return o1;*/
-  },
-
+  
   compactUnits : function(val, units) {
     for (var i = units.length - 1; i >= 0; i--) {
       var v = val / Math.pow(1000, i + 1);
@@ -791,7 +846,7 @@ $.elycharts.common = {
     }
     return val;
   },
-
+  
   getElementOriginalAttrs : function(element) {
     var attr = $(element.node).data('original-attr');
     if (!attr) {
@@ -800,7 +855,7 @@ $.elycharts.common = {
     }
     return attr;
   },
-
+  
   findInPieces : function(pieces, section, serie, index, subsection) {
     for (var i = 0; i < pieces.length; i++) {
       if (
@@ -813,18 +868,18 @@ $.elycharts.common = {
     }
     return false;
   },
-
+  
   samePiecePath : function(piece1, piece2) {
-    return (((typeof piece1.section == undefined || piece1.section == -1 || piece1.section == false) && (typeof piece2.section == undefined || piece2.section == -1 || piece2.section == false)) || piece1.section == piece2.section) &&
-      (((typeof piece1.serie == undefined || piece1.serie == -1 || piece1.serie == false) && (typeof piece2.serie == undefined || piece2.serie == -1 || piece2.serie == false)) || piece1.serie == piece2.serie) &&
-      (((typeof piece1.index == undefined || piece1.index == -1 || piece1.index == false) && (typeof piece2.index == undefined || piece2.index == -1 || piece2.index == false)) || piece1.index == piece2.index) &&
+    return (((typeof piece1.section == undefined || piece1.section == -1 || piece1.section == false) && (typeof piece2.section == undefined || piece2.section == -1 || piece2.section == false)) || piece1.section == piece2.section) && 
+      (((typeof piece1.serie == undefined || piece1.serie == -1 || piece1.serie == false) && (typeof piece2.serie == undefined || piece2.serie == -1 || piece2.serie == false)) || piece1.serie == piece2.serie) && 
+      (((typeof piece1.index == undefined || piece1.index == -1 || piece1.index == false) && (typeof piece2.index == undefined || piece2.index == -1 || piece2.index == false)) || piece1.index == piece2.index) && 
       (((typeof piece1.subSection == undefined || piece1.subSection == -1 || piece1.subSection == false) && (typeof piece2.subSection == undefined || piece2.subSection == -1 || piece2.subSection == false)) || piece1.subSection == piece2.subSection);
   },
-
+  
   executeIfChanged : function(env, changes) {
     if (!env.newopt)
       return true;
-
+    
     for (var i = 0; i < changes.length; i++) {
       if (changes[i][changes[i].length - 1] == "*") {
         for (var j in env.newopt)
@@ -835,6 +890,10 @@ $.elycharts.common = {
         return true;
       else if (changes[i] == 'axis' && (env.newopt.axis || env.newopt.defaultAxis))
         return true;
+      else if (changes[i] == 'width' && (env.oldwidth != env.width))
+      	return true;
+      else if (changes[i] == 'height' && (env.oldheight != env.height))
+      	return true;
       else if (changes[i].substring(0, 9) == "features.") {
         changes[i] = changes[i].substring(9);
         if (env.newopt.features && env.newopt.features[changes[i]])
@@ -845,57 +904,115 @@ $.elycharts.common = {
     }
     return false;
   },
-
+  
   /**
-   * Ottiene le proprietÃ  di una "Area" definita nella configurazione (options),
+   * Can be called for a whole serie or for a given index of the serie.
+   * returns the color for that item considering valuesPalette, seriesPalette and inheritance
+   */
+  getItemColor : function(env, serie, index) {
+    var props = this.areaProps(env, 'Series', serie, index);
+    if (props.color) return props.color;
+    if (index !== false && props.valuesPalette) return props.valuesPalette[index % props.valuesPalette.length];
+    if (env.opt.seriesPalette) {
+      var serieIndex = 0;
+      for(seriekey in env.opt.values) {
+        if (serie == seriekey) return env.opt.seriesPalette[serieIndex % env.opt.seriesPalette.length];
+        else serieIndex++;
+      }
+    }
+  },
+  
+  /**
+   * Given an expandKey as array of array it sets the color to the nested tree unless it is already defined.
+   * So [ [ 'parent', 'child' ], [ 'item' ] ] will try to put color in props.parent.child and props.item unless
+   * they already exists.
+   */
+  colorize : function(env, props, expandKeys, color) {
+    if (color) {
+   	  for (k in expandKeys) {
+   	    var p = props;
+   	    var i = 0;
+   	    for (i = 0; i < expandKeys[k].length - 1; i++) {
+   	      if (!p[expandKeys[k][i]]) p[expandKeys[k][i]] = {};
+   	      p = p[expandKeys[k][i]];
+   	    }
+   	    if (!p[expandKeys[k][expandKeys[k].length-1]]) p[expandKeys[k][expandKeys[k].length-1]] = color;
+   	  }
+    }
+  },
+  
+  /**
+   * Ottiene le proprietà di una "Area" definita nella configurazione (options),
    * identificata da section / serie / index / subsection, e facendo il merge
    * di tutti i defaults innestati.
    */
   areaProps : function(env, section, serie, index, subsection) {
     var props;
 
+    var sectionProps = env.opt[section.toLowerCase()];
     // TODO fare una cache e fix del toLowerCase (devono solo fare la prima lettera
     if (!subsection) {
       if (typeof serie == 'undefined' || !serie)
-        props = env.opt[section.toLowerCase()];
+        props = sectionProps;
 
       else {
-        props = this._clone(env.opt['default' + section]);
-        if (env.opt[section .toLowerCase()] && env.opt[section.toLowerCase()][serie])
-          props = this._mergeObjects(props, env.opt[section.toLowerCase()][serie]);
+    	var cacheKey = section+'/'+serie+'/'+index;
+        if (env.cache && env.cache.areaPropsCache && env.cache.areaPropsCache[cacheKey]) {
+          props = env.cache.areaPropsCache[cacheKey];
+        }
+        else {
+          props = this._clone(env.opt['default' + section]);
+          if (sectionProps && sectionProps[serie])
+            props = $.extend(true, props, sectionProps[serie]);
 
-        if ((typeof index != 'undefined') && index >= 0 && props['values'] && props['values'][index])
-          props = this._mergeObjects(props, props['values'][index]);
+          if ((typeof index != 'undefined') && index >= 0 && props['values'] && props['values'][index])
+            props = $.extend(true, props, props['values'][index]);
+
+          if (env.cache) {
+            if (!env.cache.areaPropsCache) env.cache.areaPropsCache = {}; 
+            env.cache.areaPropsCache[cacheKey] = props;
+          }
+        }
       }
 
     } else {
-      props = this._clone(env.opt[subsection.toLowerCase()]);
-
+      var subsectionKey = subsection.toLowerCase();
+      props = this._clone(env.opt[subsectionKey]);
+      
       if (typeof serie == 'undefined' || !serie) {
-        if (env.opt[section.toLowerCase()] && env.opt[section.toLowerCase()][subsection.toLowerCase()])
-          props = this._mergeObjects(props, env.opt[section.toLowerCase()][subsection.toLowerCase()]);
+        if (sectionProps && sectionProps[subsectionKey])
+          props = $.extend(true, props, sectionProps[subsectionKey]);
 
       } else {
-        if (env.opt['default' + section] && env.opt['default' + section][subsection.toLowerCase()])
-          props = this._mergeObjects(props, env.opt['default' + section][subsection.toLowerCase()]);
+        if (env.opt['default' + section] && env.opt['default' + section][subsectionKey])
+          props = $.extend(true, props, env.opt['default' + section][subsectionKey]);
 
-        if (env.opt[section .toLowerCase()] && env.opt[section.toLowerCase()][serie] && env.opt[section.toLowerCase()][serie][subsection.toLowerCase()])
-          props = this._mergeObjects(props, env.opt[section.toLowerCase()][serie][subsection.toLowerCase()]);
-
-        if (props && (typeof index != 'undefined') && index > 0 && props['values'] && props['values'][index])
-          props = this._mergeObjects(props, props['values'][index]);
+        if (sectionProps && sectionProps[serie] && sectionProps[serie][subsectionKey])
+          props = $.extend(true, props, sectionProps[serie][subsectionKey]);
+        
+        if ((typeof index != 'undefined') && index > 0 && props['values'] && props['values'][index])
+          props = $.extend(true, props, props['values'][index]);
       }
     }
-
+    
     return props;
   },
-
-  absrectpath : function(x1, y1, x2, y2, r) {
-    // TODO Supportare r
-    return [['M', x1, y1], ['L', x1, y2], ['L', x2, y2], ['L', x2, y1], ['z']];
+  
+  _absrectpath : function(x1, y1, x2, y2, r) {
+    if (r) {
+      // we can use 'a' or 'Q' for the same result.
+      var res = [
+        ['M',x1,y1+r], ['a', r, r, 0, 0, 1, r, -r], //['Q',x1,y1, x1+r,y1],
+        ['L',x2-r,y1], ['a', r, r, 0, 0, 1, r, r], //['Q',x2,y1, x2,y1+r],
+        ['L',x2,y2-r], ['a', r, r, 0, 0, 1, -r, r], // ['Q',x2,y2, x2-r,y2],
+        ['L',x1+r,y2], ['a', r, r, 0, 0, 1, -r, -r], // ['Q',x1,y2, x1,y2-r],
+        ['z']
+      ];
+      return res;
+    } else return [['M', x1, y1], ['L', x1, y2], ['L', x2, y2], ['L', x2, y1], ['z']];
   },
-
-  linepathAnchors : function(p1x, p1y, p2x, p2y, p3x, p3y, rounded) {
+  
+  _linepathAnchors : function(p1x, p1y, p2x, p2y, p3x, p3y, rounded) {
     var method = 1;
     if (rounded && rounded.length) {
       method = rounded[1];
@@ -905,10 +1022,10 @@ $.elycharts.common = {
       rounded = 1;
     var l1 = (p2x - p1x) / 2,
         l2 = (p3x - p2x) / 2,
-        a = Math.atan((p2x - p1x) / Math.abs(p2y - p1y)),
-        b = Math.atan((p3x - p2x) / Math.abs(p2y - p3y));
-    a = p1y < p2y ? Math.PI - a : a;
-    b = p3y < p2y ? Math.PI - b : b;
+        a = Math.atan(Math.abs(p2x - p1x) / Math.abs(p2y - p1y)),
+        b = Math.atan(Math.abs(p3x - p2x) / Math.abs(p2y - p3y));
+    a = (p1y < p2y && p2x > p1x) || (p1y > p2y && p2x < p1x) ? Math.PI - a : a;
+    b = (p3y < p2y && p3x > p2x) || (p3y > p2y && p3x < p2x) ? Math.PI - b : b;
     if (method == 2) {
       // If added by Bago to avoid curves beyond min or max
       if ((a - Math.PI / 2) * (b - Math.PI / 2) > 0) {
@@ -934,68 +1051,73 @@ $.elycharts.common = {
       y2: p2y + dy2
     };
   },
-
-  linepathRevert : function(path) {
-    var rev = [], anc = false;
-    for (var i = path.length - 1; i >= 0; i--) {
-      switch (path[i][0]) {
-        case "M" : case "L" :
-          if (!anc)
-            rev.push( [ rev.length ? "L" : "M", path[i][1], path[i][2] ] );
-          else
-            rev.push( [ "C", anc[0], anc[1], anc[2], anc[3], path[i][1], path[i][2] ] );
-          anc = false;
-
-          break;
-        case "C" :
-          if (!anc)
-            rev.push( [ rev.length ? "L" : "M", path[i][5], path[i][6] ] );
-          else
-            rev.push( [ "C", anc[0], anc[1], anc[2], anc[3], path[i][5], path[i][6] ] );
-          anc = [ path[i][3], path[i][4], path[i][1], path[i][2] ];
-      }
-    }
-    return rev;
-  },
-
-  linepath : function ( points, rounded ) {
+  
+  _linepath : function ( points, rounded ) {
     var path = [];
     if (rounded) {
       var anc = false;
-      for (var j = 0, jj = points.length - 1; j < jj ; j++) {
-        if (j) {
-          var a = this.linepathAnchors(points[j - 1][0], points[j - 1][1], points[j][0], points[j][1], points[j + 1][0], points[j + 1][1], rounded);
-          path.push([ "C", anc[0], anc[1], a.x1, a.y1, points[j][0], points[j][1] ]);
-          anc = [ a.x2, a.y2 ];
-        } else {
-          path.push([ "M", points[j][0], points[j][1] ]);
-          anc = [ points[j][0], points[j][1] ];
-        }
+      for (var j = 0, jj = points.length; j < jj ; j++) {
+        var x = points[j][0], y = points[j][1];
+        if (x != null && y != null) {
+          if (anc) {
+            if (j + 1 != jj && points[j + 1][0] != null && points[j + 1][1] != null) {
+              var a = this._linepathAnchors(points[j - 1][0], points[j - 1][1], points[j][0], points[j][1], points[j + 1][0], points[j + 1][1], rounded);
+              path.push([ "C", anc[0], anc[1], a.x1, a.y1, points[j][0], points[j][1] ]);
+              // path.push([ "M", anc[0], anc[1] ]);
+              // path.push([ "L", a.x1, a.y1 ]);
+              // path.push([ "M", points[j][0], points[j][1] ]);
+              anc = [ a.x2, a.y2 ];
+            } else {
+              path.push([ "C", anc[0], anc[1], points[j][0], points[j][1], points[j][0], points[j][1] ]);
+              anc = [ points[j][0], points[j][1] ];
+            }
+          } else {
+            path.push([ "M", points[j][0], points[j][1] ]);
+            anc = [ points[j][0], points[j][1] ];
+          }
+        } else anc = false;
       }
-      if (anc)
-        path.push([ "C", anc[0], anc[1], points[jj][0], points[jj][1], points[jj][0], points[jj][1] ]);
-
-    } else
+      
+    } else {
+      var prevx = null;
+      var prevy = null;
       for (var i = 0; i < points.length; i++) {
         var x = points[i][0], y = points[i][1];
-        path.push([i == 0 ? "M" : "L", x, y]);
+        if (x != null && y != null) {
+        	path.push([prevx == null || prevy == null ? "M" : "L", x, y]);
+        }
+        prevx = x;
+        prevy = y;
       }
-
+    }
+    
     return path;
   },
 
-  lineareapath : function (points1, points2, rounded) {
-    var path = this.linepath(points1, rounded), path2 = this.linepathRevert(this.linepath(points2, rounded));
-
-    for (var i = 0; i < path2.length; i++)
-      path.push( !i ? [ "L", path2[0][1], path2[0][2] ] : path2[i] );
-
-    if (path.length)
-      path.push(['z']);
-
-    return path;
+  _lineareapath : function (points1, points2, rounded) {
+    var path = this._linepath(points1, rounded);
+    var path2 = this._linepath(points2.reverse(), rounded);
+    var finalPath = [];
+    var firstPushed = null;
+    for (var i = 0; i <= path.length; i++) {
+      if (i == path.length || path[i][0] == "M") {
+    	  if (firstPushed != null) {
+    		for (var j = path.length - i; j <= path.length - firstPushed; j++) {
+      		  if (path2[j][0] == "M") finalPath.push([ "L", path2[j][1], path2[j][2] ]);
+      		  else finalPath.push(path2[j]);
+    		}
+    		finalPath.push(['z']);
+    	    firstPushed = null;
+    	  }
+    	  if (i != path.length) finalPath.push(path[i]);
+      } else {
+    	  finalPath.push(path[i]);
+    	  if (firstPushed == null) firstPushed = i;
+      }
+    }
+    return finalPath;
   },
-
+  
   /**
    * Prende la coordinata X di un passo di un path
    */
@@ -1027,11 +1149,11 @@ $.elycharts.common = {
         return p[p.length - 1];
     }
   },
-
+  
   /**
    * Prende il centro di un path
-   *
-   * @param offset un offset [x,y] da applicare. Da notare che gli assi potrebbero essere dipendenti dalla figura
+   * 
+   * @param offset un offset [x,y] da applicare. Da notare che gli assi potrebbero essere dipendenti dalla figura 
    *        (ad esempio per lo SLICE x e' l'asse che passa dal centro del cerchio, y l'ortogonale).
    */
   getCenter: function(path, offset) {
@@ -1041,10 +1163,10 @@ $.elycharts.common = {
       return false;
     if (!offset)
       offset = [0, 0];
-
+      
     if (path.center)
       return [path.center[0] + offset[0], path.center[1] + offset[1]];
-
+      
     var p = path.path[0];
     switch (p[0]) {
       case 'CIRCLE':
@@ -1055,22 +1177,22 @@ $.elycharts.common = {
         var popangle = p[5] + (p[6] - p[5]) / 2;
         var rad = Math.PI / 180;
         return [
-          p[1] + (p[4] + ((p[3] - p[4]) / 2) + offset[0]) * Math.cos(-popangle * rad) + offset[1] * Math.cos((-popangle-90) * rad),
+          p[1] + (p[4] + ((p[3] - p[4]) / 2) + offset[0]) * Math.cos(-popangle * rad) + offset[1] * Math.cos((-popangle-90) * rad), 
           p[2] + (p[4] + ((p[3] - p[4]) / 2) + offset[0]) * Math.sin(-popangle * rad) + offset[1] * Math.sin((-popangle-90) * rad)
         ];
     }
-
+    
     // WARN Complex paths not supported
     alert('ElyCharts: getCenter with complex path not supported');
-
+    
     return false;
   },
-
+  
   /**
    * Sposta il path passato di un offset [x,y]
    * Il risultato e' il nuovo path
-   *
-   * @param offset un offset [x,y] da applicare. Da notare che gli assi potrebbero essere dipendenti dalla figura
+   * 
+   * @param offset un offset [x,y] da applicare. Da notare che gli assi potrebbero essere dipendenti dalla figura 
    *        (ad esempio per lo SLICE x e' l'asse che passa dal centro del cerchio, y l'ortogonale).
    * @param marginlimit se true non sposta oltre i margini del grafico (applicabile solo su path standard o RECT)
    * @param simple se true lo spostamento e' sempre fatto sul sistema [x, y] complessivo (altrimenti alcuni elementi, come lo SLICE,
@@ -1079,7 +1201,7 @@ $.elycharts.common = {
   movePath : function(env, path, offset, marginlimit, simple) {
     var p = [], i;
     if (path.length == 1 && path[0][0] == 'RECT')
-      return [ [path[0][0], this._movePathX(env, path[0][1], offset[0], marginlimit), this._movePathY(env, path[0][2], offset[1], marginlimit), this._movePathX(env, path[0][3], offset[0], marginlimit), this._movePathY(env, path[0][4], offset[1], marginlimit)] ];
+      return [ [path[0][0], this._movePathX(env, path[0][1], offset[0], marginlimit), this._movePathY(env, path[0][2], offset[1], marginlimit), this._movePathX(env, path[0][3], offset[0], marginlimit), this._movePathY(env, path[0][4], offset[1], marginlimit), path[0][5]] ];
     if (path.length == 1 && path[0][0] == 'SLICE') {
       if (!simple) {
         var popangle = path[0][5] + (path[0][6] - path[0][5]) / 2;
@@ -1114,6 +1236,9 @@ $.elycharts.common = {
     for (var j = 0; j < path.length; j++) {
       var o = path[j];
       switch (o[0]) {
+        // TODO the translation for lowercase actions are all wrong!
+        // relative movements do not need to be adjusted for moving (or at most, only the first one have to).
+        // TODO relative movements this way cannot be forced to stay in marginlimit!
         case 'M': case 'm': case 'L': case 'l': case 'T': case 't':
           // (x y)+
           newpath.push([o[0], this._movePathX(env, o[1], offset[0], marginlimit), this._movePathY(env, o[2], offset[1], marginlimit)]);
@@ -1123,52 +1248,65 @@ $.elycharts.common = {
           newpath.push([o[0], o[1], o[2], o[3], o[4], o[5], this._movePathX(env, o[6], offset[0], marginlimit), this._movePathY(env, o[7], offset[1], marginlimit)]);
           break;
         case 'C': case 'c':
+          // Fixed for uppercase C in 2.1.5
           // (x1 y1 x2 y2 x y)+
-          newpath.push([o[0], o[1], o[2], o[3], o[4], this._movePathX(env, o[5], offset[0], marginlimit), this._movePathY(env, o[6], offset[1], marginlimit)]);
+          newpath.push([o[0], 
+            this._movePathX(env, o[1], offset[0], marginlimit), this._movePathY(env, o[2], offset[1], marginlimit),
+            this._movePathX(env, o[3], offset[0], marginlimit), this._movePathY(env, o[4], offset[1], marginlimit),
+            this._movePathX(env, o[5], offset[0], marginlimit), this._movePathY(env, o[6], offset[1], marginlimit)
+          ]);
           break;
         case 'S': case 's': case 'Q': case 'q':
+          // Fixed for uppercase Q in 2.1.5
           // (x1 y1 x y)+
-          newpath.push([o[0], o[1], o[2], this._movePathX(env, o[3], offset[0], marginlimit), this._movePathY(env, o[4], offset[1], marginlimit)]);
+          // newpath.push([o[0], o[1], o[2], this._movePathX(env, o[3], offset[0], marginlimit), this._movePathY(env, o[4], offset[1], marginlimit)]);
+          newpath.push([o[0], 
+            this._movePathX(env, o[1], offset[0], marginlimit), this._movePathY(env, o[2], offset[1], marginlimit), 
+            this._movePathX(env, o[3], offset[0], marginlimit), this._movePathY(env, o[4], offset[1], marginlimit)
+          ]);
           break;
         case 'z': case 'Z':
           newpath.push([o[0]]);
           break;
       }
     }
-
+    
     return newpath;
   },
-
+  
   _movePathX : function(env, x, dx, marginlimit) {
+    if (x == null) return null;
     if (!marginlimit)
       return x + dx;
     x = x + dx;
-    return dx > 0 && x > env.opt.width - env.opt.margins[1] ? env.opt.width - env.opt.margins[1] : (dx < 0 && x < env.opt.margins[3] ? env.opt.margins[3] : x);
+    return dx > 0 && x > env.width - env.opt.margins[1] ? env.width - env.opt.margins[1] : (dx < 0 && x < env.opt.margins[3] ? env.opt.margins[3] : x);
   },
-
+  
   _movePathY : function(env, y, dy, marginlimit) {
+    if (y == null) return null;
     if (!marginlimit)
       return y + dy;
     y = y + dy;
-    return dy > 0 && y > env.opt.height - env.opt.margins[2] ? env.opt.height - env.opt.margins[2] : (dy < 0 && y < env.opt.margins[0] ? env.opt.margins[0] : y);
+    return dy > 0 && y > env.height - env.opt.margins[2] ? env.height - env.opt.margins[2] : (dy < 0 && y < env.opt.margins[0] ? env.opt.margins[0] : y);
   },
 
   /**
    * Ritorna le proprieta SVG da impostare per visualizzare il path non SVG passato (se applicabile, per CIRCLE e TEXT non lo e')
    */
-  getSVGProps : function(path, prevprops) {
+  getSVGProps : function(env, origPath, prevprops) {
+    var path = this._preparePathShow(env, origPath);
     var props = prevprops ? prevprops : {};
     var type = 'path', value;
 
     if (path.length == 1 && path[0][0] == 'RECT')
-      value = common.absrectpath(path[0][1], path[0][2], path[0][3], path[0][4], path[0][5]);
+      value = common._absrectpath(path[0][1], path[0][2], path[0][3], path[0][4], path[0][5]);
     else if (path.length == 1 && path[0][0] == 'SLICE') {
       type = 'slice';
       value = [ path[0][1], path[0][2], path[0][3], path[0][4], path[0][5], path[0][6] ];
     } else if (path.length == 1 && path[0][0] == 'LINE')
-      value = common.linepath( path[0][1], path[0][2] );
+      value = common._linepath( path[0][1], path[0][2] );
     else if (path.length == 1 && path[0][0] == 'LINEAREA')
-      value = common.lineareapath( path[0][1], path[0][2], path[0][3] );
+      value = common._lineareapath( path[0][1], path[0][2], path[0][3] );
     else if (path.length == 1 && (path[0][0] == 'CIRCLE' || path[0][0] == 'TEXT' || path[0][0] == 'DOMELEMENT' || path[0][0] == 'RELEMENT'))
       return prevprops ? prevprops : false;
     else
@@ -1180,21 +1318,25 @@ $.elycharts.common = {
       return false;
     return props;
   },
-
+  
   /**
    * Disegna il path passato
    * Gestisce la feature pixelWorkAround
    */
   showPath : function(env, path, paper) {
-    path = this.preparePathShow(env, path);
-
+    
     if (!paper)
       paper = env.paper;
-    if (path.length == 1 && path[0][0] == 'CIRCLE')
+    if (path.length == 1 && path[0][0] == 'CIRCLE') {
+      path = this._preparePathShow(env, path);
       return paper.circle(path[0][1], path[0][2], path[0][3]);
-    if (path.length == 1 && path[0][0] == 'TEXT')
+    }
+    if (path.length == 1 && path[0][0] == 'TEXT') {
+      path = this._preparePathShow(env, path);
       return paper.text(path[0][2], path[0][3], path[0][1]);
-    var props = this.getSVGProps(path);
+    }
+
+    var props = this.getSVGProps(env, path);
 
     // Props must be with some data in it
     var hasdata = false;
@@ -1202,22 +1344,21 @@ $.elycharts.common = {
       hasdata = true;
       break;
     }
-
     return props && hasdata ? paper.path().attr(props) : false;
   },
-
+  
   /**
    * Applica al path le modifiche per poterlo visualizzare
    * Per ora applica solo pixelWorkAround
    */
-  preparePathShow : function(env, path) {
+  _preparePathShow : function(env, path) {
     return env.opt.features.pixelWorkAround.active ? this.movePath(env, this._clone(path), [.5, .5], false, true) : path;
   },
-
+  
   /**
    * Ritorna gli attributi Raphael completi di un piece
-   * Per attributi completi si intende l'insieme di attributi specificato,
-   * assieme a tutti gli attributi calcolati che determinano lo stato
+   * Per attributi completi si intende l'insieme di attributi specificato, 
+   * assieme a tutti gli attributi calcolati che determinano lo stato 
    * iniziale di un piece (e permettono di farlo ritornare a tale stato).
    * In genere viene aggiunto il path SVG, per il circle vengono aggiunti
    * i dati x,y,r
@@ -1228,7 +1369,7 @@ $.elycharts.common = {
       if (piece.path)
         switch (piece.path[0][0]) {
           case 'CIRCLE':
-            var ppath = this.preparePathShow(env, piece.path);
+            var ppath = this._preparePathShow(env, piece.path);
             piece.fullattr.cx = ppath[0][1];
             piece.fullattr.cy = ppath[0][2];
             piece.fullattr.r = ppath[0][3];
@@ -1236,7 +1377,7 @@ $.elycharts.common = {
           case 'TEXT': case 'DOMELEMENT': case 'RELEMENT':
             break;
           default:
-            piece.fullattr = this.getSVGProps(this.preparePathShow(env, piece.path), piece.fullattr);
+            piece.fullattr = this.getSVGProps(env, piece.path, piece.fullattr);
         }
       if (typeof piece.fullattr.opacity == 'undefined')
         piece.fullattr.opacity = 1;
@@ -1245,16 +1386,17 @@ $.elycharts.common = {
   },
 
 
-  show : function(env, pieces) {
-    pieces = this.getSortedPathData(pieces);
+  _show : function(env, origPieces) {
+    if ($.elycharts.featuresmanager) $.elycharts.featuresmanager.beforeShow(env, origPieces);
+    
+    pieces = this._getSortedPathData(origPieces);
 
-    common.animationStackStart(env);
+    this._animationStackStart(env);
 
     var previousElement = false;
     for (var i = 0; i < pieces.length; i++) {
       var piece = pieces[i];
-
-      if (typeof piece.show == 'undefined' || piece.show) {
+      if ((typeof piece.show == 'undefined' || piece.show) && (typeof piece.parent == 'undefined' || typeof piece.parent.show == 'undefined' || piece.parent.show)) {
         // If there is piece.animation.element, this is the old element that must be transformed to the new one
         piece.element = piece.animation && piece.animation.element ? piece.animation.element : false;
         piece.hide = false;
@@ -1333,13 +1475,15 @@ $.elycharts.common = {
       }
     }
 
-    common.animationStackEnd(env);
+    this._animationStackEnd(env);
+    
+    if ($.elycharts.featuresmanager) $.elycharts.featuresmanager.afterShow(env, origPieces);
   },
 
   /**
    * Given an array of pieces, return an array of single pathdata contained in pieces, sorted by zindex
    */
-  getSortedPathData : function(pieces) {
+  _getSortedPathData : function(pieces) {
     res = [];
 
     for (var i = 0; i < pieces.length; i++) {
@@ -1363,7 +1507,7 @@ $.elycharts.common = {
     });
   },
 
-  animationStackStart : function(env) {
+  _animationStackStart : function(env) {
     if (!env.animationStackDepth || env.animationStackDepth == 0) {
       env.animationStackDepth = 0;
       env.animationStack = {};
@@ -1371,7 +1515,7 @@ $.elycharts.common = {
     env.animationStackDepth ++;
   },
 
-  animationStackEnd : function(env) {
+  _animationStackEnd : function(env) {
     env.animationStackDepth --;
     if (env.animationStackDepth == 0) {
       for (var delay in env.animationStack) {
@@ -1385,7 +1529,7 @@ $.elycharts.common = {
   /**
    * Inserisce l'animazione richiesta nello stack di animazioni.
    * Nel caso lo stack non sia inizializzato esegue subito l'animazione.
-   */
+   */ 
   animationStackPush : function(env, piece, element, newattr, speed, easing, delay, force) {
     if (typeof delay == 'undefined')
       delay = 0;
@@ -1396,60 +1540,77 @@ $.elycharts.common = {
     } else {
       if (!env.animationStack[delay])
         env.animationStack[delay] = [];
-
+      
       env.animationStack[delay].push({piece : piece, object : element, props : newattr, speed: speed, easing : easing, force : force});
     }
   },
-
+  
   _animationStackAnimate : function(stack, delay) {
     var caller = this;
     var func = function() {
       var a = stack.pop();
-      caller._animationStackAnimateElement(a);
-
+      var anim = caller._animationStackAnimateElement(a);
+      
       while (stack.length > 0) {
         var b = stack.pop();
-        caller._animationStackAnimateElement(b, a);
+        caller._animationStackAnimateElement(b, a, anim);
       }
     }
-    if (delay > 0)
+    if (delay > 0) 
       setTimeout(func, delay);
     else
       func();
   },
-
-  _animationStackAnimateElement : function (a, awith) {
+  
+  _animationStackAnimateElement : function (a, awith, awithanim) {
     //console.warn('call', a.piece.animationInProgress, a.force, a.piece.path, a.piece);
 
     if (a.force || !a.piece.animationInProgress) {
-
+      
       // Metodo non documentato per bloccare l'animazione corrente
       a.object.stop();
       if (!a.props)
         a.props = { opacity : 0 }; // TODO Sarebbe da rimuovere l'elemento alla fine
-
+        
       if (!a.speed || a.speed <= 0) {
         //console.warn('direct');
         a.object.attr(a.props);
         a.piece.animationInProgress = false;
         return;
       }
-
+        
       a.piece.animationInProgress = true;
       //console.warn('START', a.piece.animationInProgress, a.piece.path, a.piece);
-
+        
       // NOTA onEnd non viene chiamato se l'animazione viene bloccata con stop
-      var onEnd = function() {
-        //console.warn('END', a.piece.animationInProgress, a.piece);
-        a.piece.animationInProgress = false
+      var onEnd = function() { 
+        //console.warn('END', a.piece.animationInProgress, a.piece); 
+        a.piece.animationInProgress = false 
       }
-
-      if (awith)
-        a.object.animateWith(awith, a.props, a.speed, a.easing ? a.easing : 'linear', onEnd);
-      else
-        a.object.animate(a.props, a.speed, a.easing ? a.easing : 'linear', onEnd);
+      
+      if (Raphael.animation) {
+      	var anim = Raphael.animation(a.props, a.speed, a.easing ? a.easing : 'linear', onEnd);
+        if (awith) {
+          // console.warn('animateWith', awith, awithanim, anim);
+          a.object.animateWith(awith, awithanim, anim);
+        } else {
+      	  // console.warn('animate', anim);
+          a.object.animate(anim);
+        }
+      	return anim;
+      } else {
+        if (awith) {
+          // console.warn('animateWith', awith, awithanim, anim);
+          a.object.animateWith(awith, a.props, a.speed, a.easing ? a.easing : 'linear', onEnd);
+        } else {
+      	  // console.warn('animate', anim);
+          a.object.animate(a.props, a.speed, a.easing ? a.easing : 'linear', onEnd);
+        }
+        return null;
+      }
     }
     //else console.warn('SKIP', a.piece.animationInProgress, a.piece.path, a.piece);
+    return null;
   }
 }
 
@@ -1460,20 +1621,29 @@ var common = $.elycharts.common;
  **********************************************************************/
 
 $.elycharts.featuresmanager = {
-
+  
   managers : [],
   initialized : false,
-
+  
   register : function(manager, priority) {
     $.elycharts.featuresmanager.managers.push([priority, manager]);
     $.elycharts.featuresmanager.initialized = false;
   },
-
+  
   init : function() {
     $.elycharts.featuresmanager.managers.sort(function(a, b) { return a[0] < b[0] ? -1 : (a[0] == b[0] ? 0 : 1) });
     $.elycharts.featuresmanager.initialized = true;
   },
-
+  
+  clear : function(env) {
+    if (!$.elycharts.featuresmanager.initialized)
+      this.init();
+    // reverse cycle over manager
+    for (var i = $.elycharts.featuresmanager.managers.length - 1; i >= 0; i--)
+      if ($.elycharts.featuresmanager.managers[i][1].clear)
+        $.elycharts.featuresmanager.managers[i][1].clear(env);
+  },
+  
   beforeShow : function(env, pieces) {
     if (!$.elycharts.featuresmanager.initialized)
       this.init();
@@ -1481,7 +1651,7 @@ $.elycharts.featuresmanager = {
       if ($.elycharts.featuresmanager.managers[i][1].beforeShow)
         $.elycharts.featuresmanager.managers[i][1].beforeShow(env, pieces);
   },
-
+  
   afterShow : function(env, pieces) {
     if (!$.elycharts.featuresmanager.initialized)
       this.init();
@@ -1497,7 +1667,7 @@ $.elycharts.featuresmanager = {
       if ($.elycharts.featuresmanager.managers[i][1].onMouseOver)
         $.elycharts.featuresmanager.managers[i][1].onMouseOver(env, serie, index, mouseAreaData);
   },
-
+  
   onMouseOut : function(env, serie, index, mouseAreaData) {
     if (!$.elycharts.featuresmanager.initialized)
       this.init();
@@ -1505,7 +1675,7 @@ $.elycharts.featuresmanager = {
       if ($.elycharts.featuresmanager.managers[i][1].onMouseOut)
         $.elycharts.featuresmanager.managers[i][1].onMouseOut(env, serie, index, mouseAreaData);
   },
-
+  
   onMouseEnter : function(env, serie, index, mouseAreaData) {
     if (!$.elycharts.featuresmanager.initialized)
       this.init();
@@ -1513,7 +1683,7 @@ $.elycharts.featuresmanager = {
       if ($.elycharts.featuresmanager.managers[i][1].onMouseEnter)
         $.elycharts.featuresmanager.managers[i][1].onMouseEnter(env, serie, index, mouseAreaData);
   },
-
+  
   onMouseChanged : function(env, serie, index, mouseAreaData) {
     if (!$.elycharts.featuresmanager.initialized)
       this.init();
@@ -1521,7 +1691,7 @@ $.elycharts.featuresmanager = {
       if ($.elycharts.featuresmanager.managers[i][1].onMouseChanged)
         $.elycharts.featuresmanager.managers[i][1].onMouseChanged(env, serie, index, mouseAreaData);
   },
-
+  
   onMouseExit : function(env, serie, index, mouseAreaData) {
     if (!$.elycharts.featuresmanager.initialized)
       this.init();
@@ -1538,28 +1708,28 @@ $.elycharts.featuresmanager = {
 * OGGETTI USATI:
 
 PIECE:
-Contiene un elemento da visualizzare nel grafico. E' un oggetto con queste proprietÃ :
+Contiene un elemento da visualizzare nel grafico. E' un oggetto con queste proprietà:
 
 - section,[serie],[index],[subsection]: Dati che permettono di identificare che tipo
-  di elemento Ã¨ e a quale blocco della configurazione appartiene.
+  di elemento è e a quale blocco della configurazione appartiene.
   Ad esempio gli elementi principali del chart hanno
   section="Series", serie=nome della serie, subSection = 'Plot'
-- [paths]: Contiene un array di pathdata, nel caso questo piece Ã¨ costituito da
+- [paths]: Contiene un array di pathdata, nel caso questo piece è costituito da 
   piu' sottoelementi (ad esempio i Dots, o gli elementi di un Pie o Funnel)
 - [PATHDATA.*]: Se questo piece e' costituito da un solo elemento, i suoi dati sono
   memorizzati direttamente nella root di PIECE.
-- show: Proprieta' usata internamente per decidere se questo piece dovrÃ  essere
+- show: Proprieta' usata internamente per decidere se questo piece dovrà essere
   visualizzato o meno (in genere nel caso di una transizione che non ha variato
   questo piece, che quindi puo' essere lasciato allo stato precedente)
 - hide: Proprieta' usata internamente per decidere se l'elemento va nascosto,
-  usato in caso di transizione se l'elemento non Ã¨ piu' presente.
+  usato in caso di transizione se l'elemento non è piu' presente.
 
 PATHDATA:
 I dati utili per visualizzare un path nel canvas:
 
-- PATH: Il path che permette di disegnare l'elemento. Se NULL l'elemento Ã¨ vuoto/ da
+- PATH: Il path che permette di disegnare l'elemento. Se NULL l'elemento è vuoto/ da
   non visualizzare (instanziato solo come placeholder)
-- attr: gli attributi Raphael dell'elemento. NULL se path Ã¨ NULL.
+- attr: gli attributi Raphael dell'elemento. NULL se path è NULL.
 - [center]: centro del path
 - [rect]: rettangolo che include il path
 
@@ -1571,7 +1741,7 @@ E' una astrazione sul PATH SVG effettivo, e puo' avere alcuni valori speciali:
 [ [ 'RECT', x1, y1, x2, y2, rounded ] ] (x1,y1 dovrebbero essere sempre le coordinate in alto a sx)
 [ [ 'SLICE', x, y, raggio, raggio int, angolo1, angolo2 ] ] (gli angoli sono in gradi)
 [ [ 'RELEMENT', element ] ] (elemento Raphael gia' disegnato)
-[ [ 'DOMELEMENT', element ] ] (elemento DOM - in genere un DIV html - giÃ  disegnato)
+[ [ 'DOMELEMENT', element ] ] (elemento DOM - in genere un DIV html - già disegnato)
 [ ... Path SVG ... ]
 
 ------------------------------------------------------------------------
@@ -1603,24 +1773,23 @@ TODO
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
  * FEATURE: ANCHOR
- *
- * Permette di collegare i dati del grafico con delle aree esterne,
+ * 
+ * Permette di collegare i dati del grafico con delle aree esterne, 
  * identificate dal loro selettore CSS, e di interagire con esse.
  **********************************************************************/
 
 $.elycharts.anchormanager = {
-
+  
   afterShow : function(env, pieces) {
     // Prendo le aree gestite da mouseAreas, e metto i miei listener
     // Non c'e' bisogno di gestire il clean per una chiamata successiva, lo fa gia' il mouseareamanager
@@ -1628,15 +1797,15 @@ $.elycharts.anchormanager = {
 
     if (!env.opt.anchors)
       return;
-
+      
     if (!env.anchorBinds)
       env.anchorBinds = [];
-
+    
     while (env.anchorBinds.length) {
       var b = env.anchorBinds.pop();
       $(b[0]).unbind(b[1], b[2]);
     }
-
+    
     for (var i = 0; i < env.mouseAreas.length; i++) {
       var serie = env.mouseAreas[i].piece ? env.mouseAreas[i].piece.serie : false;
       var anc;
@@ -1644,11 +1813,11 @@ $.elycharts.anchormanager = {
         anc = env.opt.anchors[serie][env.mouseAreas[i].index];
       else
         anc = env.opt.anchors[env.mouseAreas[i].index];
-
+        
       if (anc && env.mouseAreas[i].props.anchor && env.mouseAreas[i].props.anchor.highlight) {
-
+        
         (function(env, mouseAreaData, anc, caller) {
-
+          
           var f1 = function() { caller.anchorMouseOver(env, mouseAreaData); };
           var f2 = function() { caller.anchorMouseOut(env, mouseAreaData); };
           if (!env.mouseAreas[i].props.anchor.useMouseEnter) {
@@ -1665,18 +1834,18 @@ $.elycharts.anchormanager = {
         })(env, env.mouseAreas[i], anc, this);
       }
     }
-
+    
     env.onAnchors = [];
   },
-
+  
   anchorMouseOver : function(env, mouseAreaData) {
     $.elycharts.highlightmanager.onMouseOver(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
   },
-
+  
   anchorMouseOut : function(env, mouseAreaData) {
     $.elycharts.highlightmanager.onMouseOut(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
   },
-
+  
   onMouseOver : function(env, serie, index, mouseAreaData) {
     if (!env.opt.anchors)
       return;
@@ -1694,11 +1863,11 @@ $.elycharts.anchormanager = {
       }
     }
   },
-
+  
   onMouseOut : function(env, serie, index, mouseAreaData) {
     if (!env.opt.anchors)
       return;
-
+    
     while (env.onAnchors.length > 0) {
       var o = env.onAnchors.pop();
       $(o[0]).removeClass(o[1]);
@@ -1714,13 +1883,12 @@ $.elycharts.featuresmanager.register($.elycharts.anchormanager, 30);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-//var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
@@ -1728,84 +1896,40 @@ var common = $.elycharts.common;
  **********************************************************************/
 
 $.elycharts.animationmanager = {
-
+  
   beforeShow : function(env, pieces) {
     if (!env.newopt)
       this.startAnimation(env, pieces);
     else
       this.stepAnimation(env, pieces);
   },
-
+  
   stepAnimation : function(env, pieces) {
-    // env.pieces sono i vecchi pieces, ed e' sempre un array completo di tutte le sezioni
-    // pieces sono i nuovi pezzi da mostrare, e potrebbe essere parziale
-    //console.warn('from1', common._clone(env.pieces));
-    //console.warn('from2', common._clone(pieces));
-    pieces = this._stepAnimationInt(env, env.pieces, pieces);
-    //console.warn('to', common._clone(pieces));
+    pieces = this._stepAnimationInt(env, pieces);
   },
-
-  _stepAnimationInt : function(env, pieces1, pieces2, section, serie, internal) {
-    // Se pieces2 == null deve essere nascosto tutto pieces1
-
-    var newpieces = [], newpiece;
-    var j = 0;
-    for (var i = 0; i < pieces1.length; i ++) {
-      var animationProps = common.areaProps(env, section ? section : pieces1[i].section, serie ? serie : pieces1[i].serie);
+  
+  _stepAnimationInt : function(env, pieces, section, serie, internal) {
+    for (var i = 0; i < pieces.length; i++) {
+      var animationProps = common.areaProps(env, section ? section : pieces[i].section, serie ? serie : pieces[i].serie);
       if (animationProps && animationProps.stepAnimation)
         animationProps = animationProps.stepAnimation;
       else
         animationProps = env.opt.features.animation.stepAnimation;
-
-      // Se il piece attuale c'e' solo in pieces2 lo riporto nei nuovi, impostando come gia' mostrato
-      // A meno che internal = true (siamo in un multipath, nel caso se una cosa non c'e' va considerata da togliere)
-      if (pieces2 && (j >= pieces2.length || !common.samePiecePath(pieces1[i], pieces2[j]))) {
-        if (!internal) {
-          pieces1[i].show = false;
-          newpieces.push(pieces1[i]);
-        } else {
-          newpiece = { path : false, attr : false, show : true };
-          newpiece.animation = {
-            element : pieces1[i].element ? pieces1[i].element : false,
-            speed : animationProps && animationProps.speed ? animationProps.speed : 300,
-            easing : animationProps && animationProps.easing ? animationProps.easing : '',
-            delay : animationProps && animationProps.delay ? animationProps.delay : 0
-          }
-          newpieces.push(newpiece);
+      
+      if (typeof pieces[i].paths == 'undefined') {
+        if (animationProps && animationProps.active && pieces[i].animation) {
+          pieces[i].animation.speed = animationProps && animationProps.speed ? animationProps.speed : 300;
+          pieces[i].animation.easing = animationProps && animationProps.easing ? animationProps.easing : '';
+          pieces[i].animation.delay = animationProps && animationProps.delay ? animationProps.delay : 0;
+          if (!pieces[i].animation.element)
+            pieces[i].animation.startAttr = {opacity : 0};
         }
-      }
-      // Bisogna gestire la transizione dal vecchio piece al nuovo
-      else {
-        newpiece = pieces2 ? pieces2[j] : { path : false, attr : false };
-        newpiece.show = true;
-        if (typeof pieces1[i].paths == 'undefined') {
-          // Piece a singolo path
-          newpiece.animation = {
-            element : pieces1[i].element ? pieces1[i].element : false,
-            speed : animationProps && animationProps.speed ? animationProps.speed : 300,
-            easing : animationProps && animationProps.easing ? animationProps.easing : '',
-            delay : animationProps && animationProps.delay ? animationProps.delay : 0
-          }
-          // Se non c'era elemento precedente deve gestire il fadeIn
-          if (!pieces1[i].element)
-            newpiece.animation.startAttr = {opacity : 0};
-
-        } else {
-          // Multiple path piece
-          newpiece.paths = this._stepAnimationInt(env, pieces1[i].paths, pieces2[j].paths, pieces1[i].section, pieces1[i].serie, true);
-        }
-        newpieces.push(newpiece);
-        j++;
+      } else {
+        this._stepAnimationInt(env, pieces[i].paths, pieces[i].section, pieces[i].serie, true);
       }
     }
-    // If there are pieces left in pieces2 i must add them unchanged
-    if (pieces2)
-      for (; j < pieces2.length; j++)
-        newpieces.push(pieces2[j]);
-
-    return newpieces;
   },
-
+  
   startAnimation : function(env, pieces) {
     for (var i = 0; i < pieces.length; i++)
       if (pieces[i].paths || pieces[i].path) {
@@ -1814,8 +1938,8 @@ $.elycharts.animationmanager = {
           props = props.startAnimation;
         else
           props = env.opt.features.animation.startAnimation;
-
-        if (props.active) {
+        
+        if (props && props.active) {
           if (props.type == 'simple' || pieces[i].section != 'Series')
             this.animationSimple(env, props, pieces[i]);
           if (props.type == 'grow')
@@ -1827,7 +1951,7 @@ $.elycharts.animationmanager = {
         }
       }
   },
-
+  
   /**
    * Inserisce i dati base di animazione del piece e la transizione di attributi
    */
@@ -1844,34 +1968,34 @@ $.elycharts.animationmanager = {
         startAttr : common._clone(piece.attr)
       };
       if (animationProps.propsTo)
-        piece.attr = common._mergeObjects(piece.attr, animationProps.propsTo);
+        piece.attr = $.extend(true, piece.attr, animationProps.propsTo);
       if (animationProps.propsFrom)
-        piece.animation.startAttr = common._mergeObjects(piece.animation.startAttr, animationProps.propsFrom);
+        piece.animation.startAttr = $.extend(true, piece.animation.startAttr, animationProps.propsFrom);
       if (subSection && animationProps[subSection.toLowerCase() + 'PropsFrom'])
-        piece.animation.startAttr = common._mergeObjects(piece.animation.startAttr, animationProps[subSection.toLowerCase() + 'PropsFrom']);
-
+        piece.animation.startAttr = $.extend(true, piece.animation.startAttr, animationProps[subSection.toLowerCase() + 'PropsFrom']);
+      
       if (typeof piece.animation.startAttr.opacity != 'undefined' && typeof piece.attr.opacity == 'undefined')
         piece.attr.opacity = 1;
     }
   },
-
+  
   animationSimple : function(env, props, piece) {
     this._animationPiece(piece, props, piece.subSection);
   },
-
+  
   animationGrow : function(env, props, piece) {
     this._animationPiece(piece, props, piece.subSection);
     var i, npath, y;
-
+    
     switch (env.opt.type) {
       case 'line':
-        y = env.opt.height - env.opt.margins[2];
+        y = env.height - env.opt.margins[2];
         switch (piece.subSection) {
           case 'Plot':
             if (!piece.paths) {
                 npath = [ 'LINE', [], piece.path[0][2]];
                 for (i = 0; i < piece.path[0][1].length; i++)
-                  npath[1].push([ piece.path[0][1][i][0], y ]);
+                  npath[1].push([ piece.path[0][1][i][0], piece.path[0][1][i][1] == null ? null : y ]);
                 piece.animation.startPath.push(npath);
 
             } else {
@@ -1883,11 +2007,11 @@ $.elycharts.animationmanager = {
           case 'Fill':
             npath = [ 'LINEAREA', [], [], piece.path[0][3]];
             for (i = 0; i < piece.path[0][1].length; i++) {
-              npath[1].push([ piece.path[0][1][i][0], y ]);
-              npath[2].push([ piece.path[0][2][i][0], y ]);
+              npath[1].push([ piece.path[0][1][i][0], piece.path[0][1][i][1] == null ? null : y ]);
+              npath[2].push([ piece.path[0][2][i][0], piece.path[0][2][i][1] == null ? null : y ]);
             }
             piece.animation.startPath.push(npath);
-
+            
             break;
           case 'Dot':
             for (i = 0; i < piece.paths.length; i++)
@@ -1896,15 +2020,15 @@ $.elycharts.animationmanager = {
             break;
         }
         break;
-
+        
       case 'pie':
         if (piece.subSection == 'Plot')
           for (i = 0; i < piece.paths.length; i++)
             if (piece.paths[i].path && piece.paths[i].path[0][0] == 'SLICE')
               piece.paths[i].animation.startPath.push([ 'SLICE', piece.paths[i].path[0][1], piece.paths[i].path[0][2], piece.paths[i].path[0][4] + piece.paths[i].path[0][3] * 0.1, piece.paths[i].path[0][4], piece.paths[i].path[0][5], piece.paths[i].path[0][6] ]);
-
+            
         break;
-
+      
       case 'funnel':
         alert('Unsupported animation GROW for funnel');
         break;
@@ -1913,9 +2037,9 @@ $.elycharts.animationmanager = {
         var x;
         if (piece.section == 'Series' && piece.subSection == 'Plot') {
           if (!props.subType)
-            x = env.opt.direction != 'rtl' ? env.opt.margins[3] : env.opt.width - env.opt.margins[1];
+            x = env.opt.direction != 'rtl' ? env.opt.margins[3] : env.width - env.opt.margins[1];
           else if (props.subType == 1)
-            x = env.opt.direction != 'rtl' ? env.opt.width - env.opt.margins[1] : env.opt.margins[3];
+            x = env.opt.direction != 'rtl' ? env.width - env.opt.margins[1] : env.opt.margins[3];
           for (i = 0; i < piece.paths.length; i++)
             if (piece.paths[i].path) {
               if (!props.subType || props.subType == 1)
@@ -1926,24 +2050,27 @@ $.elycharts.animationmanager = {
               }
             }
         }
-
+        
         break;
     }
   },
 
   _animationAvgXYArray : function(arr) {
     var res = [], avg = 0, i;
-    for (i = 0; i < arr.length; i++)
+    var count = 0;
+    for (i = 0; i < arr.length; i++) if (arr[i][1] != null) {
       avg += arr[i][1];
-    avg = avg / arr.length;
+      count++;
+    }
+    avg = avg / count;
     for (i = 0; i < arr.length; i++)
-      res.push([ arr[i][0], avg ]);
+      res.push([ arr[i][0], arr[i][1] == null ? null : avg ]);
     return res;
   },
 
   animationAvg : function(env, props, piece) {
     this._animationPiece(piece, props, piece.subSection);
-
+    
     var avg = 0, i, l;
     switch (env.opt.type) {
       case 'line':
@@ -1970,7 +2097,7 @@ $.elycharts.animationmanager = {
 
           case 'Fill':
             piece.animation.startPath.push([ 'LINEAREA', this._animationAvgXYArray(piece.path[0][1]), this._animationAvgXYArray(piece.path[0][2]), piece.path[0][3] ]);
-
+            
             break;
 
           case 'Dot':
@@ -1990,14 +2117,14 @@ $.elycharts.animationmanager = {
 
       case 'pie':
         var delta = 360 / piece.paths.length;
-
+      
         if (piece.subSection == 'Plot')
           for (i = 0; i < piece.paths.length; i++)
             if (piece.paths[i].path && piece.paths[i].path[0][0] == 'SLICE')
               piece.paths[i].animation.startPath.push([ 'SLICE', piece.paths[i].path[0][1], piece.paths[i].path[0][2], piece.paths[i].path[0][3], piece.paths[i].path[0][4], i * delta, (i + 1) * delta ]);
-
+        
         break;
-
+        
       case 'funnel':
         alert('Unsupported animation AVG for funnel');
         break;
@@ -2011,19 +2138,30 @@ $.elycharts.animationmanager = {
   _animationRegXYArray : function(arr) {
     var res = [];
     var c = arr.length;
+    
+    var start = 0;
+    var end = c - 1;
+    
+    while (arr[start][1] == null) start++;
+    while (arr[end][1] == null) end--;
+    
     var y1 = arr[0][1];
     var y2 = arr[c - 1][1];
-
-    for (var i = 0; i < arr.length; i++)
-      res.push([arr[i][0], y1 + (y2 - y1) / (c - 1) * i]);
-
+    
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i][1] == null) res.push([ arr[i][0], null ]);
+      else {
+        res.push([ arr[i][0], arr[start][1] + (arr[end][1] - arr[start][1]) / (end - start) * ( i - start) ]);
+      }
+    }
+    
     return res;
   },
 
   animationReg : function(env, props, piece) {
     this._animationPiece(piece, props, piece.subSection);
     var i, c, y1, y2;
-
+    
     switch (env.opt.type) {
       case 'line':
         switch (piece.subSection) {
@@ -2031,7 +2169,7 @@ $.elycharts.animationmanager = {
             if (!piece.paths) {
               // LINE
               piece.animation.startPath.push([ 'LINE', this._animationRegXYArray(piece.path[0][1]), piece.path[0][2] ]);
-
+              
             } else {
               // BAR
               c = piece.paths.length;
@@ -2071,7 +2209,7 @@ $.elycharts.animationmanager = {
       case 'pie':
         alert('Unsupported animation REG for pie');
         break;
-
+        
       case 'funnel':
         alert('Unsupported animation REG for funnel');
         break;
@@ -2090,7 +2228,7 @@ $.elycharts.featuresmanager.register($.elycharts.animationmanager, 10);
  **********************************************************************/
 
 $.elycharts.frameanimationmanager = {
-
+  
   beforeShow : function(env, pieces) {
     if (env.opt.features.frameAnimation.active)
       $(env.container.get(0)).css(env.opt.features.frameAnimation.cssFrom);
@@ -2110,13 +2248,12 @@ $.elycharts.featuresmanager.register($.elycharts.frameanimationmanager, 90);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-//var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
@@ -2161,7 +2298,7 @@ $.elycharts.highlightmanager = {
         element = piece.element;
         path = piece.path;
         var attr = common.getElementOriginalAttrs(element);
-        var newattr = false; // In caso la geometria dell'oggetto Ã¨ modificata mediante attr (es: per circle) qui memorizza i nuovi attributi
+        var newattr = false; // In caso la geometria dell'oggetto è modificata mediante attr (es: per circle) qui memorizza i nuovi attributi
         var props = serie ? mouseAreaData.props : common.areaProps(env, mouseAreaData.pieces[i].section, mouseAreaData.pieces[i].serie);
         var pelement, ppiece, ppath;
         if (path && props.highlight) {
@@ -2174,7 +2311,7 @@ $.elycharts.highlightmanager = {
               var w = path[0][3] - path[0][1];
               var h = path[0][4] - path[0][2];
               path = [ [ 'RECT', path[0][1], path[0][2] - h * (scale[1] - 1), path[0][3] + w * (scale[0] - 1), path[0][4] ] ];
-              common.animationStackPush(env, piece, element, common.getSVGProps(common.preparePathShow(env, path)), props.highlight.scaleSpeed, props.highlight.scaleEasing);
+              common.animationStackPush(env, piece, element, common.getSVGProps(env, path), props.highlight.scaleSpeed, props.highlight.scaleEasing);
             }
             else if (path[0][0] == 'CIRCLE') {
               // I pass directly new radius
@@ -2186,21 +2323,21 @@ $.elycharts.highlightmanager = {
               var d = (path[0][6] - path[0][5]) * (scale[1] - 1) / 2;
               if (d > 90)
                 d = 90;
-              path = [ [ 'SLICE', path[0][1], path[0][1], path[0][3] * scale[0], path[0][4], path[0][5] - d, path[0][6] + d ] ];
-              common.animationStackPush(env, piece, element, common.getSVGProps(common.preparePathShow(env, path)), props.highlight.scaleSpeed, props.highlight.scaleEasing);
+              path = [ [ 'SLICE', path[0][1], path[0][2], path[0][3] * scale[0], path[0][4], path[0][5] - d, path[0][6] + d ] ];
+              common.animationStackPush(env, piece, element, common.getSVGProps(env, path), props.highlight.scaleSpeed, props.highlight.scaleEasing);
 
             } else if (env.opt.type == 'funnel') {
               var dx = (piece.rect[2] - piece.rect[0]) * (scale[0] - 1) / 2;
               var dy = (piece.rect[3] - piece.rect[1]) * (scale[1] - 1) / 2;
 
               // Specifico di un settore del funnel
-              common.animationStackStart(env);
+              // SHOULD ALREADY BE DONE BY core common.animationStackStart(env);
               path = [ common.movePath(env, [ path[0]], [-dx, -dy])[0],
                 common.movePath(env, [ path[1]], [+dx, -dy])[0],
                 common.movePath(env, [ path[2]], [+dx, +dy])[0],
                 common.movePath(env, [ path[3]], [-dx, +dy])[0],
                 path[4] ];
-              common.animationStackPush(env, piece, element, common.getSVGProps(common.preparePathShow(env, path)), props.highlight.scaleSpeed, props.highlight.scaleEasing, 0, true);
+              common.animationStackPush(env, piece, element, common.getSVGProps(env, path), props.highlight.scaleSpeed, props.highlight.scaleEasing, 0, true);
 
               // Se c'e' un piece precedente lo usa, altrimenti cerca un topSector per la riduzione
               pelement = false;
@@ -2222,7 +2359,7 @@ $.elycharts.highlightmanager = {
                   common.movePath(env, [ ppath[2]], [+dx, -dy])[0],
                   common.movePath(env, [ ppath[3]], [-dx, -dy])[0],
                   ppath[4] ];
-                common.animationStackPush(env, ppiece, pelement, common.getSVGProps(common.preparePathShow(env, ppath)), props.highlight.scaleSpeed, props.highlight.scaleEasing, 0, true);
+                common.animationStackPush(env, ppiece, pelement, common.getSVGProps(env, ppath), props.highlight.scaleSpeed, props.highlight.scaleEasing, 0, true);
                 env.highlighted.push({piece : ppiece, cfg : props.highlight});
               }
 
@@ -2246,11 +2383,10 @@ $.elycharts.highlightmanager = {
                   common.movePath(env, [ ppath[1]], [+dx, +dy])[0],
                   ppath[2], ppath[3],
                   ppath[4] ];
-                common.animationStackPush(env, ppiece, pelement, common.getSVGProps(common.preparePathShow(env, ppath)), props.highlight.scaleSpeed, props.highlight.scaleEasing, 0, true);
+                common.animationStackPush(env, ppiece, pelement, common.getSVGProps(env, ppath), props.highlight.scaleSpeed, props.highlight.scaleEasing, 0, true);
                 env.highlighted.push({piece : ppiece, cfg : props.highlight});
               }
-
-              common.animationStackEnd(env);
+              // SHOULD ALREADY BE DONE BY core: common.animationStackEnd(env);
             }
             /* Con scale non va bene
             if (!attr.scale)
@@ -2266,7 +2402,7 @@ $.elycharts.highlightmanager = {
           if (props.highlight.move) {
             var offset = $.isArray(props.highlight.move) ? props.highlight.move : [props.highlight.move, 0];
             path = common.movePath(env, path, offset);
-            common.animationStackPush(env, piece, element, common.getSVGProps(common.preparePathShow(env, path)), props.highlight.moveSpeed, props.highlight.moveEasing);
+            common.animationStackPush(env, piece, element, common.getSVGProps(env, path), props.highlight.moveSpeed, props.highlight.moveEasing);
           }
 
           //env.highlighted.push({element : element, attr : attr});
@@ -2294,21 +2430,21 @@ $.elycharts.highlightmanager = {
       if (t == 'auto')
         t = (env.indexCenter == 'bar' ? 'bar' : 'line');
 
-      var delta1 = (env.opt.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 0 ? env.opt.labels.length : 1);
-      var delta2 = (env.opt.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 1 ? env.opt.labels.length - 1 : 1);
+      var delta1 = (env.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 0 ? env.opt.labels.length : 1);
+      var delta2 = (env.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 1 ? env.opt.labels.length - 1 : 1);
       var lineCenter = true;
 
       switch (t) {
         case 'bar':
           path = [ ['RECT', env.opt.margins[3] + index * delta1, env.opt.margins[0] ,
-            env.opt.margins[3] + (index + 1) * delta1, env.opt.height - env.opt.margins[2] ] ];
+            env.opt.margins[3] + (index + 1) * delta1, env.height - env.opt.margins[2] ] ];
           break;
 
         case 'line':
           lineCenter = false;
         case 'barline':
           var x = Math.round((lineCenter ? delta1 / 2 : 0) + env.opt.margins[3] + index * (lineCenter ? delta1 : delta2));
-          path = [[ 'M', x, env.opt.margins[0]], ['L', x, env.opt.height - env.opt.margins[2]]];
+          path = [[ 'M', x, env.opt.margins[0]], ['L', x, env.height - env.opt.margins[2]]];
       }
       if (path) {
         //BIND: mouseAreaData.listenerDisabled = true;
@@ -2334,23 +2470,22 @@ $.elycharts.featuresmanager.register($.elycharts.highlightmanager, 21);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-//var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
  * FEATURE: LABELS
- *
+ * 
  * Permette di visualizzare in vari modi le label del grafico.
  * In particolare per pie e funnel permette la visualizzazione all'interno
  * delle fette.
- * Per i line chart le label sono visualizzate giÃ  nella gestione assi.
- *
+ * Per i line chart le label sono visualizzate già nella gestione assi.
+ * 
  * TODO:
  * - Comunque per i line chart si potrebbe gestire la visualizzazione
  *   all'interno delle barre, o sopra i punti.
@@ -2359,14 +2494,14 @@ var common = $.elycharts.common;
 $.elycharts.labelmanager = {
 
   beforeShow : function(env, pieces) {
-
+    
     if (!common.executeIfChanged(env, ['labels', 'values', 'series']))
       return;
-
+    
     if (env.opt.labels && (env.opt.type == 'pie' || env.opt.type == 'funnel')) {
       var /*lastSerie = false, */lastIndex = false;
       var paths;
-
+      
       for (var i = 0; i < pieces.length; i++) {
         if (pieces[i].section == 'Series' && pieces[i].subSection == 'Plot') {
           var props = common.areaProps(env, 'Series', pieces[i].serie);
@@ -2374,7 +2509,7 @@ $.elycharts.labelmanager = {
             props.label = $.extend(true, props.label, env.opt.series.empty.label);
           if (props && props.label && props.label.active) {
             paths = [];
-            for (var index = 0; index < pieces[i].paths.length; index++)
+            for (var index = 0; index < pieces[i].paths.length; index++) 
               if (pieces[i].paths[index].path) {
                 //lastSerie = pieces[i].serie;
                 lastIndex = index;
@@ -2390,10 +2525,10 @@ $.elycharts.labelmanager = {
           pieces.push({ section : pieces[i].section, serie : pieces[i].serie, subSection : 'Label', paths: paths });
         }
       }
-
+      
     }
   },
-
+  
   showLabel : function(env, piece, path, serie, index, pieces) {
     var pp = common.areaProps(env, 'Series', serie, index);
     if (env.opt.labels[index] || pp.label.label) {
@@ -2408,7 +2543,7 @@ $.elycharts.labelmanager = {
           attr['alignment-baseline'] = pp.label.frameAnchor[1];
         }
         /*pieces.push({
-          path : [ [ 'TEXT', label, center[0], center[1] ] ], attr : attr,
+          path : [ [ 'TEXT', label, center[0], center[1] ] ], attr : attr, 
           section: 'Series', serie : serie, index : index, subSection : 'Label'
         });*/
         return { path : [ [ 'TEXT', label, center[0], center[1] ] ], attr : attr };
@@ -2429,7 +2564,7 @@ $.elycharts.labelmanager = {
           el = $('<div>' + label + '</div>').css(style).prependTo(env.container);
         else
           el = $(label).css(style).prependTo(env.container);
-
+          
         // Centramento corretto label
         if (env.opt.features.debug.active && el.height() == 0)
           alert('DEBUG: Al gestore label e\' stata passata una label ancora senza dimensioni, quindi ancora non disegnata. Per questo motivo il posizionamento potrebbe non essere correto.');
@@ -2447,7 +2582,7 @@ $.elycharts.labelmanager = {
           el.css({ margin: posY + 'px 0 0 ' + posX + 'px', opacity : opacity});
         else
           el.css({ margin: posY + 'px 0 0 ' + posX + 'px'});
-
+        
         /*pieces.push({
           path : [ [ 'DOMELEMENT', el ] ], attr : false,
           section: 'Series', serie : serie, index : index, subSection : 'Label'
@@ -2468,13 +2603,12 @@ $.elycharts.featuresmanager.register($.elycharts.labelmanager, 5);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-//var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
@@ -2482,30 +2616,37 @@ var common = $.elycharts.common;
  **********************************************************************/
 
 $.elycharts.legendmanager = {
-
+  
   afterShow : function(env, pieces) {
+	// TODO the whole thing should simply return "pieces" whose visibility is handled by core, so to enable animations and
+    // make things more generic.
+    if (env.legenditems) {
+    	for (item in env.legenditems) {
+    		env.legenditems[item].remove();
+    	}
+    	env.legenditems = false;
+    }
     if (!env.opt.legend || env.opt.legend.length == 0)
       return;
 
     var props = env.opt.features.legend;
+    
+    if (props === false) return;
 
-    if (props.x == 'auto') {
+    var propsx = props.x;
+    if (propsx == 'auto') {
       var autox = 1;
-      props.x = 0;
+      propsx = 0;
     }
-    if (props.width == 'auto') {
+    var propswidth = props.width;
+    if (propswidth == 'auto') {
       var autowidth = 1;
-      props.width = env.opt.width;
+      propswidth = env.width;
     }
-
-    var borderPath = [ [ 'RECT', props.x, props.y, props.x + props.width, props.y + props.height, props.r ] ];
-    var border = common.showPath(env, borderPath).attr(props.borderProps);
-    if (autox || autowidth)
-      border.hide();
-
+    
     var wauto = 0;
     var items = [];
-    // env.opt.legend normalmente Ã¨ { serie : 'Legend', ... }, per i pie invece { serie : ['Legend', ...], ... }
+    // env.opt.legend normalmente è { serie : 'Legend', ... }, per i pie invece { serie : ['Legend', ...], ... }
     var legendCount = 0;
     var serie, data, h, w, x, y, xd;
     for (serie in env.opt.legend) {
@@ -2523,56 +2664,63 @@ $.elycharts.legendmanager = {
 
       for (var j = 0; j < data.length; j++) {
         var sprops = common.areaProps(env, 'Series', serie, env.opt.type == 'pie' ? j : false);
-        var dprops = $.extend(true, {}, props.dotProps);
-        if (sprops.legend && sprops.legend.dotProps)
-          dprops = $.extend(true, dprops, sprops.legend.dotProps);
-        if (!dprops.fill && env.opt.type == 'pie') {
-          if (sprops.color)
-            dprops.fill = sprops.color;
-          if (sprops.plotProps && sprops.plotProps.fill)
-            dprops.fill = sprops.plotProps.fill;
-        }
-        var dtype = sprops.legend && sprops.legend.dotType ? sprops.legend.dotType : props.dotType;
-        var dwidth = sprops.legend && sprops.legend.dotWidth ? sprops.legend.dotWidth : props.dotWidth;
-        var dheight = sprops.legend && sprops.legend.dotHeight ? sprops.legend.dotHeight : props.dotHeight;
-        var dr = sprops.legend && sprops.legend.dotR ? sprops.legend.dotR : props.dotR;
-        var tprops = sprops.legend && sprops.legend.textProps ? sprops.legend.textProps : props.textProps;
+        var computedProps = $.extend(true, {}, props);
 
+        if (sprops.legend)
+            computedProps = $.extend(true, computedProps, sprops.legend);
+        
+        var color = common.getItemColor(env, serie, env.opt.type == 'pie' ? j : false);
+        if (color) {
+          common.colorize(env, computedProps, [['dotProps', 'fill']], color);
+        }
+
+        // legacy support for legend dot color inherited from pie "fill"
+        // TODO maybe we should simply remove this and leave the "color" support only
+        if (!computedProps.dotProps.fill && env.opt.type == 'pie') {
+          if (sprops.plotProps && sprops.plotProps.fill)
+            computedProps.dotProps.fill = sprops.plotProps.fill;
+        }
+        
+        var hMargin = props.margins ? props.margins[0] + props.margins[2] : 0;
+        var wMargin = props.margins ? props.margins[1] + props.margins[3] : 0;
+        var tMargin = props.margins ? props.margins[0] : 0;
+        var lMargin = props.margins ? props.margins[3] : 0;
+        
         if (!props.horizontal) {
           // Posizione dell'angolo in alto a sinistra
-          h = (props.height - props.margins[0] - props.margins[2]) / legendCount;
-          w = props.width - props.margins[1] - props.margins[3];
-          x = Math.floor(props.x + props.margins[3]);
-          y = Math.floor(props.y + props.margins[0] + h * i);
+          h = (props.height - hMargin) / legendCount;
+          w = propswidth - wMargin;
+          x = Math.floor(propsx + lMargin);
+          y = Math.floor(props.y + tMargin + h * i);
         } else {
-          h = props.height - props.margins[0] - props.margins[2];
+          h = props.height - hMargin;
           if (!props.itemWidth || props.itemWidth == 'fixed') {
-            w = (props.width - props.margins[1] - props.margins[3]) / legendCount;
-            x = Math.floor(props.x + props.margins[3] + w * i);
+            w = (propswidth - wMargin) / legendCount;
+            x = Math.floor(propsx + lMargin + w * i);
           } else {
-            w = (props.width - props.margins[1] - props.margins[3]) - wauto;
-            x = props.x + props.margins[3] + wauto;
+            w = (propswidth - wMargin) - wauto;
+            x = propsx + lMargin + wauto;
           }
-          y = Math.floor(props.y + props.margins[0]);
+          y = Math.floor(props.y + tMargin);
         }
-
-        if (dtype == "rect") {
-          items.push(common.showPath(env, [ [ 'RECT', props.dotMargins[0] + x, y + Math.floor((h - dheight) / 2), props.dotMargins[0] + x + dwidth, y + Math.floor((h - dheight) / 2) + dheight, dr ] ]).attr(dprops));
-          xd = props.dotMargins[0] + dwidth + props.dotMargins[1];
-        } else if (dtype == "circle") {
-          items.push(common.showPath(env, [ [ 'CIRCLE', props.dotMargins[0] + x + dr, y + (h / 2), dr ] ]).attr(dprops));
-          xd = props.dotMargins[0] + dr * 2 + props.dotMargins[1];
+        
+        if (computedProps.dotType == "rect") {
+          items.push(common.showPath(env, [ [ 'RECT', props.dotMargins[0] + x, y + Math.floor((h - computedProps.dotHeight) / 2), props.dotMargins[0] + x + computedProps.dotWidth, y + Math.floor((h - computedProps.dotHeight) / 2) + computedProps.dotHeight, computedProps.dotR ] ]).attr(computedProps.dotProps));
+          xd = props.dotMargins[0] + computedProps.dotWidth + props.dotMargins[1];
+        } else if (computedProps.dotType == "circle") {
+          items.push(common.showPath(env, [ [ 'CIRCLE', props.dotMargins[0] + x + computedProps.dotR, y + (h / 2), computedProps.dotR ] ]).attr(computedProps.dotProps));
+          xd = props.dotMargins[0] + computedProps.dotR * 2 + props.dotMargins[1];
         }
-
+        
         var text = data[j];
-        var t = common.showPath(env, [ [ 'TEXT', text, x + xd, y + Math.ceil(h / 2) + (/msie/.test(navigator.userAgent.toLowerCase()) ? 2 : 0) ] ]).attr({"text-anchor" : "start"}).attr(tprops); //.hide();
+        var t = common.showPath(env, [ [ 'TEXT', text, x + xd, y + Math.ceil(h / 2) + (Raphael.VML ? 2 : 0) ] ]).attr({"text-anchor" : "start"}).attr(computedProps.textProps); //.hide();
         items.push(t);
         while (t.getBBox().width > (w - xd) && t.getBBox().width > 10) {
           text = text.substring(0, text.length - 1);
           t.attr({text : text});
         }
         t.show();
-
+        
         if (props.horizontal && props.itemWidth == 'auto')
           wauto += xd + t.getBBox().width + 4;
         else if (!props.horizontal && autowidth)
@@ -2583,24 +2731,28 @@ $.elycharts.legendmanager = {
         i++;
       }
     }
-
+      
     if (autowidth)
-      props.width = wauto + props.margins[3] + props.margins[1] - 1;
+      propswidth = wauto + props.margins[3] + props.margins[1] - 1;
     if (autox) {
-      props.x = Math.floor((env.opt.width - props.width) / 2);
+      propsx = Math.floor((env.width - propswidth) / 2);
       for (i in items) {
         if (items[i].attrs.x)
-          items[i].attr('x', items[i].attrs.x + props.x);
+          items[i].attr('x', items[i].attrs.x + propsx);
         else
-          items[i].attr('path', common.movePath(env, items[i].attrs.path, [props.x, 0]));
+          items[i].attr('path', common.movePath(env, items[i].attrs.path, [propsx, 0]));
       }
     }
-    if (autowidth || autox) {
-      borderPath = [ [ 'RECT', props.x, props.y, props.x + props.width, props.y + props.height, props.r ] ];
-      border.attr(common.getSVGProps(common.preparePathShow(env, borderPath)));
-      //border.attr({path : common.preparePathShow(env, common.getSVGPath(borderPath))});
-      border.show();
-    }
+    var borderPath = [ [ 'RECT', propsx, props.y, propsx + propswidth, props.y + props.height, props.r ] ];
+    var border = common.showPath(env, borderPath).attr(props.borderProps);
+
+    // The legend rectangle is written as the last one because it depends on the sizes of the contents but it should
+    // be drawn behind the others, so at the end we bring to front all items but the border
+    for(i in items) items[i].toFront();
+    
+    items.unshift(border);
+    
+    env.legenditems = items;
   }
 }
 
@@ -2612,7 +2764,7 @@ $.elycharts.featuresmanager.register($.elycharts.legendmanager, 90);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
@@ -2627,27 +2779,32 @@ var common = $.elycharts.common;
 
 $.elycharts.mousemanager = {
 
-  afterShow : function(env, pieces) {
-    if (!env.opt.interactive)
-      return;
-
+  clear : function(env) {
     if (env.mouseLayer) {
       env.mouseLayer.remove();
       env.mouseLayer = null;
+      env.mousePaper.clear();
       env.mousePaper.remove();
       env.mousePaper = null;
       env.mouseTimer = null;
       env.mouseAreas = null;
-      // Meglio fare anche l'unbind???
+      // NOTE: do we also need to unbind mouseover/mouseout from areas or is this handled automatically by Raphael?
     }
+  },
+  
+  afterShow : function(env, pieces) {
+    if (!env.opt.interactive)
+      return;
+      
+    this.clear(env);
 
-    env.mouseLayer = $('<div></div>').css({position : 'absolute', 'z-index' : 20, opacity : 0}).prependTo(env.container);
-    env.mousePaper = common._RaphaelInstance(env.mouseLayer.get(0), env.opt.width, env.opt.height);
+    env.mouseLayer = $('<div></div>').css({position : 'absolute', 'z-index' : 20, opacity : 1}).prependTo(env.container);
+    env.mousePaper = common._RaphaelInstance(env.mouseLayer.get(0), env.width, env.height);
     var paper = env.mousePaper;
 
     if (env.opt.features.debug.active && typeof DP_Debug != 'undefined') {
-      env.paper.text(env.opt.width, env.opt.height - 5, 'DEBUG').attr({ 'text-anchor' : 'end', stroke: 'red', opacity: .1 });
-      paper.text(env.opt.width, env.opt.height - 5, 'DEBUG').attr({ 'text-anchor' : 'end', stroke: 'red', opacity: .1 }).click(function() {
+      env.paper.text(env.width, env.height - 5, 'DEBUG').attr({ 'text-anchor' : 'end', stroke: 'red', opacity: .1 });
+      paper.text(env.width, env.height - 5, 'DEBUG').attr({ 'text-anchor' : 'end', stroke: 'red', opacity: .1 }).click(function() {
         DP_Debug.dump(env.opt, '', false, 4);
       });
     }
@@ -2675,7 +2832,7 @@ $.elycharts.mousemanager = {
                     props : props
                   });
               }
-
+              
             else // Code below is only for standard path - it should be useless now (now there are only LINE and LINEAREA)
               // TODO DELETE
               for (j = 0; j < pieces[i].path.length; j++) {
@@ -2687,7 +2844,7 @@ $.elycharts.mousemanager = {
                   props : common.areaProps(env, pieces[i].section, pieces[i].serie)
                 });
               }
-
+            
           // paths
           } else if (pieces[i].paths) {
             // Set of paths (bar graph?), generating overlapped areas
@@ -2710,16 +2867,18 @@ $.elycharts.mousemanager = {
         indexCenter = env.indexCenter;
       var start, delta;
       if (indexCenter == 'bar') {
-        delta = (env.opt.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 0 ? env.opt.labels.length : 1);
+        delta = (env.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 0 ? env.opt.labels.length : 1);
         start = env.opt.margins[3];
       } else {
-        delta = (env.opt.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 1 ? env.opt.labels.length - 1 : 1);
+        delta = (env.width - env.opt.margins[3] - env.opt.margins[1]) / (env.opt.labels.length > 1 ? env.opt.labels.length - 1 : 1);
         start = env.opt.margins[3] - delta / 2;
       }
 
-      for (var index in env.opt.labels) {
+      for (var idx in env.opt.labels) {
+      	// idx can be a string and concatenation results in bad sums.
+      	var index = parseInt(idx);
         env.mouseAreas.push({
-          path : [ [ 'RECT', start + index * delta, env.opt.margins[0], start + (index + 1) * delta, env.opt.height - env.opt.margins[2] ] ],
+          path : [ [ 'RECT', start + index * delta, env.height - env.opt.margins[2], start + (index + 1) * delta, env.opt.margins[0] ] ],
           piece : false,
           pieces : pieces,
           index : parseInt(index),
@@ -2740,23 +2899,23 @@ $.elycharts.mousemanager = {
       syncenv = $.elycharts.mouseareaenv[env.opt.features.mousearea.syncTag];
     }
     for (i = 0; i < env.mouseAreas.length; i++) {
-      env.mouseAreas[i].area = common.showPath(env, env.mouseAreas[i].path, paper).attr({stroke: "none", fill: "#fff", opacity: 0});
-
+      env.mouseAreas[i].area = common.showPath(env, env.mouseAreas[i].path, paper).attr({stroke: "#000", fill: "#fff", opacity: 0});
+      
       (function(env, obj, objidx, caller, syncenv) {
         var piece = obj.piece;
         var index = obj.index;
-
+        
         obj.mouseover = function(e) {
           //BIND: if (obj.listenerDisabled) return;
           obj.event = e;
           clearTimeout(syncenv.timer);
           caller.onMouseOverArea(env, piece, index, obj);
-
+          
           if (syncenv.chartEnv && syncenv.chartEnv.id != env.id) {
             // Chart changed, removing old one
             syncenv.caller.onMouseExitArea(syncenv.chartEnv, syncenv.mouseObj.piece, syncenv.mouseObj.index, syncenv.mouseObj);
             caller.onMouseEnterArea(env, piece, index, obj);
-          }
+          } 
           else if (syncenv.inArea != objidx) {
             if (syncenv.inArea < 0)
               caller.onMouseEnterArea(env, piece, index, obj);
@@ -2780,13 +2939,13 @@ $.elycharts.mousemanager = {
             syncenv.inArea = -1;
           }, env.opt.features.mousearea.areaMoveDelay);
         };
-
+        
         $(obj.area.node).mouseover(obj.mouseover);
         $(obj.area.node).mouseout(obj.mouseout);
       })(env, env.mouseAreas[i], i, this, syncenv);
     }
   },
-
+  
   // Called when mouse enter an area
   onMouseOverArea : function(env, piece, index, mouseAreaData) {
     //console.warn('over', piece.serie, index);
@@ -2794,7 +2953,7 @@ $.elycharts.mousemanager = {
       env.opt.features.mousearea.onMouseOver(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
     featuresmanager.onMouseOver(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
   },
-
+  
   // Called when mouse exit from an area
   onMouseOutArea : function(env, piece, index, mouseAreaData) {
     //console.warn('out', piece.serie, index);
@@ -2802,7 +2961,7 @@ $.elycharts.mousemanager = {
       env.opt.features.mousearea.onMouseOut(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
     featuresmanager.onMouseOut(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
   },
-
+  
   // Called when mouse enter an area from empty space (= it was in no area before)
   onMouseEnterArea : function(env, piece, index, mouseAreaData) {
     //console.warn('enter', piece.serie, index);
@@ -2818,7 +2977,7 @@ $.elycharts.mousemanager = {
       env.opt.features.mousearea.onMouseChanged(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
     featuresmanager.onMouseChanged(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
   },
-
+  
   // Called when mouse leaves an area and does not enter in another one (timeout check)
   onMouseExitArea : function(env, piece, index, mouseAreaData) {
     //console.warn('exit', piece.serie, index);
@@ -2826,7 +2985,7 @@ $.elycharts.mousemanager = {
       env.opt.features.mousearea.onMouseExit(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
     featuresmanager.onMouseExit(env, mouseAreaData.piece ? mouseAreaData.piece.serie : false, mouseAreaData.index, mouseAreaData);
   }
-
+  
 }
 
 $.elycharts.featuresmanager.register($.elycharts.mousemanager, 0);
@@ -2837,13 +2996,12 @@ $.elycharts.featuresmanager.register($.elycharts.mousemanager, 0);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-//var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
@@ -2852,8 +3010,9 @@ var common = $.elycharts.common;
 
 $.elycharts.tooltipmanager = {
 
-  afterShow : function(env, pieces) {
+  clear : function(env) {
     if (env.tooltipContainer) {
+      env.tooltipFrame.clear();
       env.tooltipFrame.remove();
       env.tooltipFrame = null;
       env.tooltipFrameElement = null;
@@ -2862,27 +3021,45 @@ $.elycharts.tooltipmanager = {
       env.tooltipContainer.remove();
       env.tooltipContainer = null;
     }
-
+  },
+  
+  afterShow : function(env, pieces) {
+  	this.clear(env);
+    
     if (!$.elycharts.tooltipid)
       $.elycharts.tooltipid = 0;
     $.elycharts.tooltipid ++;
-
+    
     // Preparo il tooltip
     env.tooltipContainer = $('<div id="elycharts_tooltip_' + $.elycharts.tooltipid + '" style="position: absolute; top: 100; left: 100; z-index: 10; overflow: hidden; white-space: nowrap; display: none"><div id="elycharts_tooltip_' + $.elycharts.tooltipid + '_frame" style="position: absolute; top: 0; left: 0; z-index: -1"></div><div id="elycharts_tooltip_' + $.elycharts.tooltipid + '_content" style="cursor: default"></div></div>').appendTo(document.body);
     env.tooltipFrame = common._RaphaelInstance('elycharts_tooltip_' + $.elycharts.tooltipid + '_frame', 500, 500);
     env.tooltipContent = $('#elycharts_tooltip_' + $.elycharts.tooltipid + '_content');
   },
-
+  
   _prepareShow : function(env, props, mouseAreaData, tip) {
-    if (env.tooltipFrameElement)
+	    
+    // Il dimensionamento del tooltip e la view del frame SVG, lo fa solo se width ed height sono specificati
+    if (props.width && props.width != 'auto' && props.height && props.height != 'auto') {
+      var delta = props.frameProps && props.frameProps['stroke-width'] ? props.frameProps['stroke-width'] : 0;
+      env.tooltipContainer.width(props.width + delta + 1).height(props.height + delta + 1);
+      if (!env.tooltipFrameElement && props.frameProps) {
+    	var framePath = [ [ 'RECT', delta / 2, delta / 2, props.width, props.height, props.roundedCorners ] ];
+    	env.tooltipFrameElement = common.showPath(env, framePath, env.tooltipFrame).attr(props.frameProps);
+        // env.tooltipFrameElement = env.tooltipFrame.rect(delta / 2, delta / 2, props.width, props.height, props.roundedCorners);
+      }
+    }
+
+    if (env.tooltipFrameElement) {
       env.tooltipFrameElement.attr(props.frameProps);
+    }
+
     if (props.padding)
       env.tooltipContent.css({ padding : props.padding[0] + 'px ' + props.padding[1] + 'px' });
     env.tooltipContent.css(props.contentStyle);
     env.tooltipContent.html(tip);
-
+    
     //BIND: env.tooltipContainer.unbind().mouseover(mouseAreaData.mouseover).mouseout(mouseAreaData.mouseout);
-
+    
     // WARN: Prendendo env.paper.canvas non va bene...
     //var offset = $(env.paper.canvas).offset();
     var offset = $(env.container).offset();
@@ -2903,10 +3080,10 @@ $.elycharts.tooltipmanager = {
         offset.top = coord[1];
       }
     }
-
+    
     return { top : offset.top, left : offset.left };
   },
-
+  
   /**
    * Ritorna [x, y] oppure [x, y, true] se le coordinate sono relative alla pagina (e non al grafico)
    */
@@ -2925,10 +3102,10 @@ $.elycharts.tooltipmanager = {
       y = common.getY(mouseAreaData.path[0]) - props.height - props.offset[0];
     }
     else if (mouseAreaData.path[0][0] == 'SLICE') {
-      // L'area Ã¨ su una fetta di torta (pie)
+      // L'area è su una fetta di torta (pie)
       var path = mouseAreaData.path[0];
-
-      // Genera la posizione del tip considerando che deve stare all'interno di un cerchio che Ã¨ sempre dalla parte opposta dell'area
+      
+      // Genera la posizione del tip considerando che deve stare all'interno di un cerchio che è sempre dalla parte opposta dell'area
       // e deve essere il piu' vicino possibile all'area
       var w = props.width && props.width != 'auto' ? props.width : 100;
       var h = props.height && props.height != 'auto' ? props.height : 100;
@@ -2936,7 +3113,7 @@ $.elycharts.tooltipmanager = {
       var cr = Math.sqrt(Math.pow(w,2) + Math.pow(h,2)) / 2;
       if (cr > env.opt.r)
               cr = env.opt.r;
-
+      
       var tipangle = path[5] + (path[6] - path[5]) / 2 + 180;
       var rad = Math.PI / 180;
       x = path[1] + cr * Math.cos(- tipangle * rad) - w / 2;
@@ -2948,7 +3125,7 @@ $.elycharts.tooltipmanager = {
       x = rect[0] - props.offset[1];
       y = rect[1] - props.height - props.offset[0];
     }
-
+    
     if (env.opt.features.tooltip.positionHandler)
       return env.opt.features.tooltip.positionHandler(env, props, mouseAreaData, x, y);
     else
@@ -2969,66 +3146,77 @@ $.elycharts.tooltipmanager = {
     }
     return tip;
   },
-
-  onMouseEnter : function(env, serie, index, mouseAreaData) {
+  
+  _getProps : function(env, serie, index, mouseAreaData) {
     var props = mouseAreaData.props.tooltip;
     if (env.emptySeries && env.opt.series.empty)
       props = $.extend(true, props, env.opt.series.empty.tooltip);
     if (!props || !props.active)
       return false;
+    
+    if (props.frameProps) {
+      var color = common.getItemColor(env, serie, index);
+      if (color) {
+        props = common._clone(props);
+        common.colorize(env, props, [['frameProps', 'stroke']], color);
+      }
+    }
+    return props;
+  },
+  
+  _fadeOut : function(env) {
+    env.tooltipContainer.fadeOut(env.opt.features.tooltip.fadeDelay);
+  },
+  
+  onMouseEnter : function(env, serie, index, mouseAreaData) {
+    var props = this._getProps(env, serie, index, mouseAreaData);
+    if (!props) return false;
 
     var tip = this.getTip(env, serie, index);
-    if (!tip)
-      return this.onMouseExit(env, serie, index, mouseAreaData);
+    if (!tip) {
+    	this._fadeOut(env);
+    	return true;
+    }
 
     //if (!env.opt.tooltips || (serie && (!env.opt.tooltips[serie] || !env.opt.tooltips[serie][index])) || (!serie && !env.opt.tooltips[index]))
     //  return this.onMouseExit(env, serie, index, mouseAreaData);
     //var tip = serie ? env.opt.tooltips[serie][index] : env.opt.tooltips[index];
 
-    // Il dimensionamento del tooltip e la view del frame SVG, lo fa solo se width ed height sono specificati
-    if (props.width && props.width != 'auto' && props.height && props.height != 'auto') {
-      var delta = props.frameProps && props.frameProps['stroke-width'] ? props.frameProps['stroke-width'] : 0;
-      env.tooltipContainer.width(props.width + delta + 1).height(props.height + delta + 1);
-      if (!env.tooltipFrameElement && props.frameProps)
-        env.tooltipFrameElement = env.tooltipFrame.rect(delta / 2, delta / 2, props.width, props.height, props.roundedCorners);
-    }
-
     env.tooltipContainer.css(this._prepareShow(env, props, mouseAreaData, tip)).fadeIn(env.opt.features.tooltip.fadeDelay);
 
     return true;
   },
-
+  
   onMouseChanged : function(env, serie, index, mouseAreaData) {
-    var props = mouseAreaData.props.tooltip;
-    if (env.emptySeries && env.opt.series.empty)
-      props = $.extend(true, props, env.opt.series.empty.tooltip);
-    if (!props || !props.active)
-      return false;
+    var props = this._getProps(env, serie, index, mouseAreaData);
+    if (!props) return false;
 
     var tip = this.getTip(env, serie, index);
-    if (!tip)
-      return this.onMouseExit(env, serie, index, mouseAreaData);
+    if (!tip) {
+    	this._fadeOut(env);
+    	return true;
+    }
 
     /*if (!env.opt.tooltips || (serie && (!env.opt.tooltips[serie] || !env.opt.tooltips[serie][index])) || (!serie && !env.opt.tooltips[index]))
       return this.onMouseExit(env, serie, index, mouseAreaData);
     var tip = serie ? env.opt.tooltips[serie][index] : env.opt.tooltips[index];*/
-
+    
     env.tooltipContainer.clearQueue();
+    
+    // NOTE: this is needed because sometimes we "fadeOut" during mouseChanged so we also have to fadeIn in that cases.
+    // For simplicity we always fadeIn every time.
+    env.tooltipContainer.fadeIn(env.opt.features.tooltip.fadeDelay);
     // Nota: Non passo da animationStackPush, i tooltip non sono legati a piece
     env.tooltipContainer.animate(this._prepareShow(env, props, mouseAreaData, tip), env.opt.features.tooltip.moveDelay, 'linear' /*swing*/);
 
     return true;
   },
-
+  
   onMouseExit : function(env, serie, index, mouseAreaData) {
-    var props = mouseAreaData.props.tooltip;
-    if (env.emptySeries && env.opt.series.empty)
-      props = $.extend(true, props, env.opt.series.empty.tooltip);
-    if (!props || !props.active)
-      return false;
+    var props = this._getProps(env, serie, index, mouseAreaData);
+    if (!props) return false;
 
-    //env.tooltipContainer.unbind();
-    env.tooltipContainer.fadeOut(env.opt.features.tooltip.fadeDelay);
+    this._fadeOut(env);
 
     return true;
   }
@@ -3042,13 +3230,12 @@ $.elycharts.featuresmanager.register($.elycharts.tooltipmanager, 20);
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
@@ -3058,7 +3245,18 @@ var common = $.elycharts.common;
 $.elycharts.line = {
   init : function($env) {
   },
-
+  
+  _getColorizationKey : function($type) {
+    if ($type == 'line') return [
+      ['plotProps', 'stroke'],
+      ['dotProps', 'fill'],
+      ['fillProps', 'fill']
+    ]; else return [
+      ['plotProps', 'stroke'],
+      ['plotProps', 'fill']
+    ];
+  },
+  
   draw : function(env) {
     if (common.executeIfChanged(env, ['values', 'series'])) {
       env.plots = {};
@@ -3066,16 +3264,16 @@ $.elycharts.line = {
       env.barno = 0;
       env.indexCenter = 'line';
     }
-
+    
     var opt = env.opt;
     var plots = env.plots;
     var axis = env.axis;
     var paper = env.paper;
-
+    
     var values = env.opt.values;
     var labels = env.opt.labels;
     var i, cum, props, serie, plot, labelsCount;
-
+    
     // Valorizzazione di tutte le opzioni utili e le impostazioni interne di ogni grafico e dell'ambiente di lavoro
     if (common.executeIfChanged(env, ['values', 'series'])) {
       var idx = 0;
@@ -3092,18 +3290,18 @@ $.elycharts.line = {
           plot.type = props.type;
           if (props.type == 'bar')
             env.indexCenter = 'bar';
-
+          
           if (props.visible) {
             plot.visible = true;
             if (!labelsCount || labelsCount < values[serie].length)
               labelsCount = values[serie].length;
-
+            
             // Values
             // showValues: manage NULL elements (doing an avg of near points) for line serie
             var showValues = []
             for (i = 0; i < values[serie].length; i++) {
               var val = values[serie][i];
-              if (val == null && !props.hideNulls) {
+              if (props.avgOverNulls && val == null) {
                 if (props.type == 'bar')
                   val = 0;
                 else {
@@ -3119,31 +3317,23 @@ $.elycharts.line = {
 
             if (props.stacked && !(typeof props.stacked == 'string'))
               props.stacked = prevVisibleSerie;
-
+            
             if (typeof props.stacked == 'undefined' || props.stacked == serie || props.stacked < 0 || !plots[props.stacked] || !plots[props.stacked].visible || plots[props.stacked].type != plot.type) {
               // NOT Stacked
               plot.ref = serie;
               if (props.type == 'bar')
                 plot.barno = env.barno ++;
               plot.from = [];
-              if (!props.cumulative) {
-                plot.to = [];
-                for (i = 0; i < showValues.length; i++)
-                  if (showValues[i] != null)
-                     plot.to.push(showValues[i]);
-                  else
-                     plot.to.push(null);
-
-                //plot.to = showValues;
-              } else {
+              if (!props.cumulative)
+                plot.to = showValues;
+              else {
                 plot.to = [];
                 cum = 0;
                 for (i = 0; i < showValues.length; i++)
-                  plot.to.push(cum += showValues[i]);
+                  plot.to.push(cum += showValues[i] != null ? showValues[i] : 0);
               }
               for (i = 0; i < showValues.length; i++)
-                plot.from.push(0);
-
+                plot.from.push(plot.to[i] != null ? 0 : null);
 
             } else {
               // Stacked
@@ -3155,17 +3345,17 @@ $.elycharts.line = {
               cum = 0;
               if (!props.cumulative)
                 for (i = 0; i < showValues.length; i++)
-                  plot.to.push(plot.from[i] + showValues[i]);
+                  plot.to.push(plot.from[i] + (showValues[i] != null ? showValues[i] : 0));
               else
                 for (i = 0; i < showValues.length; i++)
-                  plot.to.push(plot.from[i] + (cum += showValues[i]));
+                  plot.to.push(plot.from[i] + (cum += (showValues[i] != null ? showValues[i] : 0)));
               plots[props.stacked].stack = plot.to;
             }
-
+            
             plot.stack = plot.to;
             plot.max = Math.max.apply(Math, plot.from.concat(plot.to));
             plot.min = Math.min.apply(Math, plot.from.concat(plot.to));
-
+            
             // Assi (DEP: values, series)
             if (props.axis) {
               if (!axis[props.axis])
@@ -3180,7 +3370,7 @@ $.elycharts.line = {
               else
                 axis[props.axis].min = Math.min(axis[props.axis].min, plot.min);
             }
-
+            
             prevVisibleSerie = serie;
           }
         }
@@ -3200,7 +3390,7 @@ $.elycharts.line = {
       for (var lidx in axis) {
         props = common.areaProps(env, 'Axis', lidx);
         axis[lidx].props = props;
-
+        
         if (typeof props.max != 'undefined')
           axis[lidx].max = props.max;
         if (typeof props.min != 'undefined')
@@ -3237,17 +3427,19 @@ $.elycharts.line = {
     }
 
     var pieces = [];
-
+    
     this.grid(env, pieces);
-
+    
     // DEP: *
-    var deltaX = (opt.width - opt.margins[3] - opt.margins[1]) / (labels.length > 1 ? labels.length - 1 : 1);
-    var deltaBarX = (opt.width - opt.margins[3] - opt.margins[1]) / (labels.length > 0 ? labels.length : 1);
+    var deltaX = (env.width - opt.margins[3] - opt.margins[1]) / (labels.length > 1 ? labels.length - 1 : 1);
+    var deltaBarX = (env.width - opt.margins[3] - opt.margins[1]) / (labels.length > 0 ? labels.length : 1);
 
     for (serie in values) {
       props = common.areaProps(env, 'Series', serie);
       plot = plots[serie];
 
+      common.colorize(env, props, this._getColorizationKey(props.type), common.getItemColor(env, serie));
+      
       // TODO Settare una props in questo modo potrebbe incasinare la gestione degli update parziali (se iso "lineCenter: auto" e passo da un grafico con indexCenter = bar a uno con indexCenter = line)
       if (props.lineCenter && props.lineCenter == 'auto')
         props.lineCenter = (env.indexCenter == 'bar');
@@ -3255,77 +3447,86 @@ $.elycharts.line = {
         env.indexCenter = 'bar';
 
       if (values[serie] && props.visible) {
-        var deltaY = (opt.height - opt.margins[2] - opt.margins[0]) / (plot.max - plot.min);
-
+        var deltaY = (env.height - opt.margins[2] - opt.margins[0]) / (plot.max - plot.min);
+        
         if (props.type == 'line') {
           // LINE CHART
           var linePath = [ 'LINE', [], props.rounded ];
           var fillPath = [ 'LINEAREA', [], [], props.rounded ];
           var dotPieces = [];
-
+          
           for (i = 0, ii = labels.length; i < ii; i++)
             if (plot.to.length > i) {
               var indexProps = common.areaProps(env, 'Series', serie, i);
 
-              var d = plot.to[i] > plot.max ? plot.max : (plot.to[i] < plot.min ? plot.min : plot.to[i]);
+              common.colorize(env, indexProps, this._getColorizationKey(props.type), common.getItemColor(env, serie, i));
+
               var x = Math.round((props.lineCenter ? deltaBarX / 2 : 0) + opt.margins[3] + i * (props.lineCenter ? deltaBarX : deltaX));
-              var y = Math.round(opt.height - opt.margins[2] - deltaY * (d - plot.min));
-              var dd = plot.from[i] > plot.max ? plot.max : (plot.from[i] < plot.min ? plot.min : plot.from[i]);
-              var yy = Math.round(opt.height - opt.margins[2] - deltaY * (dd - plot.min)) + (/msie/.test(navigator.userAgent.toLowerCase()) ? 1 : 0);
 
-              if (d != null || !props.hideNulls) {
-                linePath[1].push([x, y]);
+              var y = null;
+              if (plot.to[i] != null) {
+                var d = plot.to[i] > plot.max ? plot.max : (plot.to[i] < plot.min ? plot.min : plot.to[i]);
+                y = Math.round(env.height - opt.margins[2] - deltaY * (d - plot.min));
+              }
+              var yy = null;
+              if (plot.from[i] != null) {
+                var dd = plot.from[i] > plot.max ? plot.max : (plot.from[i] < plot.min ? plot.min : plot.from[i]);
+                yy = Math.round(env.height - opt.margins[2] - deltaY * (dd - plot.min)) + (Raphael.VML ? 1 : 0);
+              }
 
-                if (props.fill) {
-                  fillPath[1].push([x, y]);
-                  fillPath[2].push([x, yy]);
-                }
-                if (indexProps.dot) {
-                  if (values[serie][i] == null && !indexProps.dotShowOnNull)
-                     dotPieces.push({path : false, attr : false});
-                  else
-                     dotPieces.push({path : [ [ 'CIRCLE', x, y, indexProps.dotProps.size ] ], attr : indexProps.dotProps}); // TODO Size should not be in dotProps (not an svg props)
-                }
+              linePath[1].push([x, y]);
+
+              if (props.fill) {
+                fillPath[1].push([x, y]);
+                fillPath[2].push([x, yy]);
+              }
+              if (indexProps.dot) {
+                if (values[serie][i] == null && !indexProps.dotShowOnNull)
+                  dotPieces.push({path : false, attr : false});
+                else
+                  dotPieces.push({path : [ [ 'CIRCLE', x, y, indexProps.dotProps.size ] ], attr : indexProps.dotProps}); // TODO Size should not be in dotProps (not an svg props)
               }
             }
 
           if (props.fill)
             pieces.push({ section : 'Series', serie : serie, subSection : 'Fill', path : [ fillPath ], attr : props.fillProps });
-          else
+          else 
             pieces.push({ section : 'Series', serie : serie, subSection : 'Fill', path : false, attr : false });
           pieces.push({ section : 'Series', serie : serie, subSection : 'Plot', path : [ linePath ], attr : props.plotProps , mousearea : 'pathsteps'});
-
+          
           if (dotPieces.length)
             pieces.push({ section : 'Series', serie : serie, subSection : 'Dot', paths : dotPieces });
           else
             pieces.push({ section : 'Series', serie : serie, subSection : 'Dot', path : false, attr : false });
-
+          
         } else {
           pieceBar = [];
-
           // BAR CHART
           for (i = 0, ii = labels.length; i < ii; i++)
             if (plot.to.length > i) {
               if (plot.from[i] != plot.to[i]) {
-                var bwid = Math.floor((deltaBarX - opt.barMargins) / env.barno);
+                var indexProps = common.areaProps(env, 'Series', serie, i);
+                common.colorize(env, indexProps, this._getColorizationKey(props.type), common.getItemColor(env, serie, i));
+            	  
+            	var bwid = Math.floor((deltaBarX - opt.barMargins) / (1 + (env.barno - 1) * (100 - opt.barOverlapPerc) / 100));
                 var bpad = bwid * (100 - props.barWidthPerc) / 200;
-                var boff = opt.barMargins / 2 + plot.barno * bwid;
+                var boff = opt.barMargins / 2 + plot.barno * (bwid * (100 - opt.barOverlapPerc) / 100);
 
                 var x1 = Math.floor(opt.margins[3] + i * deltaBarX + boff + bpad);
-                var y1 = Math.round(opt.height - opt.margins[2] - deltaY * (plot.to[i] - plot.min));
-                var y2 = Math.round(opt.height - opt.margins[2] - deltaY * (plot.from[i] - plot.min));
+                var y1 = Math.round(env.height - opt.margins[2] - deltaY * (plot.to[i] - plot.min));
+                var y2 = Math.round(env.height - opt.margins[2] - deltaY * (plot.from[i] - plot.min));
 
-                pieceBar.push({path : [ [ 'RECT', x1, y1, x1 + bwid - bpad * 2, y2 ] ], attr : props.plotProps });
+                pieceBar.push({path : [ [ 'RECT', x1, y1, x1 + bwid - bpad * 2, y2 ] ], attr : indexProps.plotProps });
               } else
                 pieceBar.push({path : false, attr : false });
             }
-
+          
           if (pieceBar.length)
             pieces.push({ section : 'Series', serie : serie, subSection : 'Plot', paths: pieceBar, mousearea : 'paths' });
           else
             pieces.push({ section : 'Series', serie : serie, subSection : 'Plot', path: false, attr: false, mousearea : 'paths' });
         }
-
+        
       } else {
         // Grafico non visibile / senza dati, deve comunque inserire i piece vuoti (NELLO STESSO ORDINE SOPRA!)
         if (props.type == 'line')
@@ -3335,12 +3536,9 @@ $.elycharts.line = {
           pieces.push({ section : 'Series', serie : serie, subSection : 'Dot', path : false, attr : false });
       }
     }
-    featuresmanager.beforeShow(env, pieces);
-    common.show(env, pieces);
-    featuresmanager.afterShow(env, pieces);
     return pieces;
-  },
-
+  }, 
+  
   grid : function(env, pieces) {
 
     // DEP: axis, [=> series, values], labels, margins, width, height, grid*
@@ -3350,8 +3548,8 @@ $.elycharts.line = {
       var paper = env.paper;
       var axis = env.axis;
       var labels = env.opt.labels;
-      var deltaX = (opt.width - opt.margins[3] - opt.margins[1]) / (labels.length > 1 ? labels.length - 1 : 1);
-      var deltaBarX = (opt.width - opt.margins[3] - opt.margins[1]) / (labels.length > 0 ? labels.length : 1);
+      var deltaX = (env.width - opt.margins[3] - opt.margins[1]) / (labels.length > 1 ? labels.length - 1 : 1);
+      var deltaBarX = (env.width - opt.margins[3] - opt.margins[1]) / (labels.length > 0 ? labels.length : 1);
       var i, j, x, y, lw, labx, laby, labe, val, txt;
       // Label X axis
       var paths = [];
@@ -3373,38 +3571,37 @@ $.elycharts.line = {
         // in !labelsCenter (line) is is always 'start';
         if (labelsPos == 'auto')
           labelsPos = labelsCenter ? (axis.x.props.labelsRotate == 0 ? labelsAnchor : 'middle') : 'start';
-
-        for (i = 0; i < labels.length; i++)
+              
+        for (i = 0; i < labels.length; i++) 
           if ((typeof labels[i] != 'boolean' && labels[i] != null) || labels[i]) {
-
             if (!axis.x.props.labelsSkip || i >= axis.x.props.labelsSkip) {
               val = labels[i];
-
+              
               if (axis.x.props.labelsFormatHandler)
-                val = axis.x.props.labelsFormatHandler(val, i);
+                val = axis.x.props.labelsFormatHandler(val);
               txt = (axis.x.props.prefix ? axis.x.props.prefix : "") + val + (axis.x.props.suffix ? axis.x.props.suffix : "");
 
               labx = opt.margins[3] + i * (labelsCenter ? deltaBarX : deltaX) + (axis.x.props.labelsMargin ? axis.x.props.labelsMargin : 0);
               if (labelsPos == 'middle') labx += (labelsCenter ? deltaBarX : deltaX) / 2;
               if (labelsPos == 'end') labx += (labelsCenter ? deltaBarX : deltaX);
 
-              laby = opt.height - opt.margins[2] + axis.x.props.labelsDistance;
+              laby = env.height - opt.margins[2] + axis.x.props.labelsDistance;
               labe = paper.text(labx, laby, txt).attr(axis.x.props.labelsProps).toBack();
 
               labe.attr({"text-anchor" : labelsAnchor});
-
+              
               // will contain the boundingbox size, or false if it is hidden.
               var boundingbox = false;
               var bbox = labe.getBBox();
               var p1 = {x: bbox.x, y: bbox.y};
               var p2 = {x: bbox.x+bbox.width, y: bbox.y+bbox.height};
               var o1 = {x: labx, y: laby};
-
+              
               rotate = function (p, rad) {
                 var X = p.x * Math.cos(rad) - p.y * Math.sin(rad),
                     Y = p.x * Math.sin(rad) + p.y * Math.cos(rad);
                 return {x: X, y: Y};
-              };
+              }; 
               // calculate collision between non rotated rects with vertext p1-p2 and t1-t2
               // this algorythm works only for horizontal rects (alpha = 0)
               // "dist" is the length added as a margin to the rects before collision detection
@@ -3463,19 +3660,19 @@ $.elycharts.line = {
               var alpha = Raphael.rad(axis.x.props.labelsRotate);
               // compute used "rect" so to be able to check if there is overlapping with previous ones.
               var rect = rotated({p1: p1, p2: p2, alpha: 0}, o1, alpha);
-
-              //console.log('bbox ',p1, p2, rect, props.nx, val, rect.p1, rect.p2, rect.alpha, boundingbox, opt.width);
+      
+              //console.log('bbox ',p1, p2, rect, props.nx, val, rect.p1, rect.p2, rect.alpha, boundingbox, env.width);
               // se collide con l'ultimo mostrato non lo mostro.
               var dist = axis.x.props.labelsMarginRight ? axis.x.props.labelsMarginRight / 2 : 0;
               if (axis.x.props.labelsHideCovered && lastShownLabelRect && collide(rect, lastShownLabelRect, dist)) {
               	labe.hide();
-              	labels[i] = false;
+              	// labels[i] = false;
               } else {
                 boundingbox = bbox(rect);
                 // Manage label overflow
-                if (props.nx == 'auto' && (boundingbox.x < 0 || boundingbox.x+boundingbox.width > opt.width)) {
+                if (props.nx == 'auto' && (boundingbox.x < 0 || boundingbox.x+boundingbox.width > env.width)) {
                   labe.hide();
-                  labels[i] = false;
+                  // labels[i] = false;
                 } else {
                   lastShownLabelRect = rect;
                 }
@@ -3483,7 +3680,11 @@ $.elycharts.line = {
 
               // Apply rotation to the element.
               if (axis.x.props.labelsRotate) {
-                labe.rotate(axis.x.props.labelsRotate, labx, laby).toBack();
+                if (Raphael.animation) {
+                  labe.transform(Raphael.format('r{0},{1},{2}', axis.x.props.labelsRotate, labx, laby)).toBack();
+                } else {
+                  labe.rotate(axis.x.props.labelsRotate, labx, laby).toBack();
+                }
               }
 
               paths.push({ path : [ [ 'RELEMENT', labe ] ], attr : false });
@@ -3491,11 +3692,11 @@ $.elycharts.line = {
           }
       }
       pieces.push({ section : 'Axis', serie : 'x', subSection : 'Label', paths : paths });
-
+          
       // Title X Axis
       if (axis.x && axis.x.props.title) {
-        x = opt.margins[3] + Math.floor((opt.width - opt.margins[1] - opt.margins[3]) / 2);
-        y = opt.height - opt.margins[2] + axis.x.props.titleDistance * (/msie/.test(navigator.userAgent.toLowerCase()) ? axis.x.props.titleDistanceIE : 1);
+        x = opt.margins[3] + Math.floor((env.width - opt.margins[1] - opt.margins[3]) / 2);
+        y = env.height - opt.margins[2] + axis.x.props.titleDistance * (Raphael.VML ? axis.x.props.titleDistanceIE : 1);
         //paper.text(x, y, axis.x.props.title).attr(axis.x.props.titleProps);
         pieces.push({ section : 'Axis', serie : 'x', subSection : 'Title', path : [ [ 'TEXT', axis.x.props.title, x, y ] ], attr : axis.x.props.titleProps });
       } else
@@ -3507,9 +3708,10 @@ $.elycharts.line = {
         if (axis[j] && axis[j].props.labels && props.ny) {
           paths = [];
           for (i = axis[j].props.labelsSkip ? axis[j].props.labelsSkip : 0; i <= props.ny; i++) {
-            var deltaY = (opt.height - opt.margins[2] - opt.margins[0]) / props.ny;
+            var deltaY = (env.height - opt.margins[2] - opt.margins[0]) / props.ny;
+            // TODO we should never set "props". We should use local variables for derived value (so to correctly deal with updates) 
             if (j == 'r') {
-              labx = opt.width - opt.margins[1] + axis[j].props.labelsDistance;
+              labx = env.width - opt.margins[1] + axis[j].props.labelsDistance;
               if (!axis[j].props.labelsProps["text-anchor"])
                 axis[j].props.labelsProps["text-anchor"] = "start";
             } else {
@@ -3527,11 +3729,11 @@ $.elycharts.line = {
               val = Math.round(val / axis[j].normalizationBase) / ( 1 / axis[j].normalizationBase );
 
             if (axis[j].props.labelsFormatHandler)
-              val = axis[j].props.labelsFormatHandler(val, i);
+              val = axis[j].props.labelsFormatHandler(val);
             if (axis[j].props.labelsCompactUnits)
               val = common.compactUnits(val, axis[j].props.labelsCompactUnits);
             txt = (axis[j].props.prefix ? axis[j].props.prefix : "") + val + (axis[j].props.suffix ? axis[j].props.suffix : "");
-            laby = opt.height - opt.margins[2] - i * deltaY;
+            laby = env.height - opt.margins[2] - i * deltaY;
             //var labe = paper.text(labx, laby + (axis[j].props.labelsMargin ? axis[j].props.labelsMargin : 0), txt).attr(axis[j].props.labelsProps).toBack();
             paths.push( { path : [ [ 'TEXT', txt, labx, laby + (axis[j].props.labelsMargin ? axis[j].props.labelsMargin : 0) ] ], attr : axis[j].props.labelsProps });
           }
@@ -3541,24 +3743,32 @@ $.elycharts.line = {
 
         if (axis[j] && axis[j].props.title) {
           if (j == 'r')
-            x = opt.width - opt.margins[1] + axis[j].props.titleDistance * (/msie/.test(navigator.userAgent.toLowerCase()) ? axis[j].props.titleDistanceIE : 1);
+            x = env.width - opt.margins[1] + axis[j].props.titleDistance * (Raphael.VML ? axis[j].props.titleDistanceIE : 1);
           else
-            x = opt.margins[3] - axis[j].props.titleDistance * (/msie/.test(navigator.userAgent.toLowerCase()) ? axis[j].props.titleDistanceIE : 1);
-          //paper.text(x, opt.margins[0] + Math.floor((opt.height - opt.margins[0] - opt.margins[2]) / 2), axis[j].props.title).attr(axis[j].props.titleProps).attr({rotation : j == 'l' ? 270 : 90});
+            x = opt.margins[3] - axis[j].props.titleDistance * (Raphael.VML ? axis[j].props.titleDistanceIE : 1);
+          //paper.text(x, opt.margins[0] + Math.floor((env.height - opt.margins[0] - opt.margins[2]) / 2), axis[j].props.title).attr(axis[j].props.titleProps).attr({rotation : j == 'l' ? 270 : 90});
           var attr = common._clone(axis[j].props.titleProps);
-          attr.rotation = j == 'l' ? 270 : 90
-          pieces.push({ section : 'Axis', serie : j, subSection : 'Title', path : [ [ 'TEXT', axis[j].props.title, x, opt.margins[0] + Math.floor((opt.height - opt.margins[0] - opt.margins[2]) / 2) ] ], attr : attr });
+          var rotation = j == 'l' ? 270 : 90;
+          var y = opt.margins[0] + Math.floor((env.height - opt.margins[0] - opt.margins[2]) / 2);
+          // Raphael 2 does not support .rotation
+          if (Raphael.animation) {
+            var labe = paper.text(x, y, axis[j].props.title).attr(attr).transform(Raphael.format('r{0}', rotation)).toBack();
+            pieces.push({ section : 'Axis', serie : j, subSection : 'Title', path : [ [ 'RELEMENT', labe ] ], attr : false });
+          } else {
+            attr.rotation = rotation;
+            pieces.push({ section : 'Axis', serie : j, subSection : 'Title', path : [ [ 'TEXT', axis[j].props.title, x, y ] ], attr : attr });
+          }
         } else
           pieces.push({ section : 'Axis', serie : j, subSection : 'Title', path : false, attr : false });
       }
-
+      
       // Grid
       if (props.nx || props.ny) {
         var path = [], bandsH = [], bandsV = [],
           nx = props.nx == 'auto' ? (labelsCenter ? labels.length : labels.length - 1) : props.nx,
           ny = props.ny,
-          rowHeight = (opt.height - opt.margins[2] - opt.margins[0]) / (ny ? ny : 1),
-          columnWidth = (opt.width - opt.margins[1] - opt.margins[3]) / (nx ? nx : 1),
+          rowHeight = (env.height - opt.margins[2] - opt.margins[0]) / (ny ? ny : 1),
+          columnWidth = (env.width - opt.margins[1] - opt.margins[3]) / (nx ? nx : 1),
           forceBorderX1 = typeof props.forceBorder == 'object' ? props.forceBorder[3] : props.forceBorder,
           forceBorderX2 = typeof props.forceBorder == 'object' ? props.forceBorder[1] : props.forceBorder,
           forceBorderY1 = typeof props.forceBorder == 'object' ? props.forceBorder[0] : props.forceBorder,
@@ -3574,13 +3784,13 @@ $.elycharts.line = {
               drawH && i > 0 && i < ny // Show  other lines if draw = true
             ) {
               path.push(["M", opt.margins[3] - props.extra[3], opt.margins[0] + Math.round(i * rowHeight) ]);
-              path.push(["L", opt.width - opt.margins[1] + props.extra[1], opt.margins[0] + Math.round(i * rowHeight)]);
+              path.push(["L", env.width - opt.margins[1] + props.extra[1], opt.margins[0] + Math.round(i * rowHeight)]);
             }
             if (i < ny) {
               if (i % 2 == 0 && props.evenHProps || i % 2 == 1 && props.oddHProps)
                 bandsH.push({path : [ [ 'RECT',
                       opt.margins[3] - props.extra[3], opt.margins[0] + Math.round(i * rowHeight), // x1, y1
-                      opt.width - opt.margins[1] + props.extra[1], opt.margins[0] + Math.round((i + 1) * rowHeight) // x2, y2
+                      env.width - opt.margins[1] + props.extra[1], opt.margins[0] + Math.round((i + 1) * rowHeight) // x2, y2
                   ] ], attr : i % 2 == 0 ? props.evenHProps : props.oddHProps });
               else
                 bandsH.push({ path : false, attr: false})
@@ -3598,31 +3808,31 @@ $.elycharts.line = {
             // Show all lines if props.nx is a number, or if label != false, AND draw must be true
           ) {
             path.push(["M", opt.margins[3] + Math.round(i * columnWidth), opt.margins[0] - props.extra[0] ]); //(t ? props.extra[0] : 0)]);
-            path.push(["L", opt.margins[3] + Math.round(i * columnWidth), opt.height - opt.margins[2] + props.extra[2] ]); //(t ? props.extra[2] : 0)]);
+            path.push(["L", opt.margins[3] + Math.round(i * columnWidth), env.height - opt.margins[2] + props.extra[2] ]); //(t ? props.extra[2] : 0)]);
           }
           if (i < nx) {
             if (i % 2 == 0 && props.evenVProps || i % 2 == 1 && props.oddVProps)
               bandsV.push({path : [ [ 'RECT',
                     opt.margins[3] + Math.round(i * columnWidth), opt.margins[0] - props.extra[0], // x1, y1
-                    opt.margins[3] + Math.round((i + 1) * columnWidth), opt.height - opt.margins[2] + props.extra[2], // x2, y2
+                    opt.margins[3] + Math.round((i + 1) * columnWidth), env.height - opt.margins[2] + props.extra[2], // x2, y2
                 ] ], attr : i % 2 == 0 ? props.evenVProps : props.oddVProps });
             else
               bandsV.push({ path : false, attr: false})
           }
         }
-
+        
         pieces.push({ section : 'Grid', path : path.length ? path : false, attr : path.length ? props.props : false });
         pieces.push({ section : 'GridBandH', paths : bandsH });
         pieces.push({ section : 'GridBandV', paths : bandsV });
 
         var tpath = [];
-
+        
         // Ticks asse X
         if (props.ticks.active && (typeof props.ticks.active != 'object' || props.ticks.active[0])) {
           for (i = 0; i < nx + 1; i++) {
             if (props.nx != 'auto' || typeof labels[i] != 'boolean' || labels[i]) {
-              tpath.push(["M", opt.margins[3] + Math.round(i * columnWidth), opt.height - opt.margins[2] - props.ticks.size[1] ]);
-              tpath.push(["L", opt.margins[3] + Math.round(i * columnWidth), opt.height - opt.margins[2] + props.ticks.size[0] ]);
+              tpath.push(["M", opt.margins[3] + Math.round(i * columnWidth), env.height - opt.margins[2] - props.ticks.size[1] ]);
+              tpath.push(["L", opt.margins[3] + Math.round(i * columnWidth), env.height - opt.margins[2] + props.ticks.size[0] ]);
             }
           }
         }
@@ -3635,10 +3845,10 @@ $.elycharts.line = {
         // Ticks asse R
         if (props.ticks.active && (typeof props.ticks.active != 'object' || props.ticks.active[2]))
           for (i = 0; i < ny + 1; i++) {
-            tpath.push(["M", opt.width - opt.margins[1] - props.ticks.size[1], opt.margins[0] + Math.round(i * rowHeight) ]);
-            tpath.push(["L", opt.width - opt.margins[1] + props.ticks.size[0], opt.margins[0] + Math.round(i * rowHeight)]);
+            tpath.push(["M", env.width - opt.margins[1] - props.ticks.size[1], opt.margins[0] + Math.round(i * rowHeight) ]);
+            tpath.push(["L", env.width - opt.margins[1] + props.ticks.size[0], opt.margins[0] + Math.round(i * rowHeight)]);
           }
-
+        
         pieces.push({ section : 'Ticks', path : tpath.length ? tpath : false, attr : tpath.length ? props.ticks.props : false });
       }
     }
@@ -3651,13 +3861,12 @@ $.elycharts.line = {
  * ELYCHARTS
  * A Javascript library to generate interactive charts with vectorial graphics.
  *
- * Copyright (c) 2010 Void Labs s.n.c. (http://void.it)
+ * Copyright (c) 2010-2014 Void Labs s.n.c. (http://void.it)
  * Licensed under the MIT (http://creativecommons.org/licenses/MIT/) license.
  **********************************************************************/
 
 (function($) {
 
-var featuresmanager = $.elycharts.featuresmanager;
 var common = $.elycharts.common;
 
 /***********************************************************************
@@ -3667,17 +3876,17 @@ var common = $.elycharts.common;
 $.elycharts.pie = {
   init : function($env) {
   },
-
+  
   draw : function(env) {
     //var paper = env.paper;
     var opt = env.opt;
-
-    var w = env.opt.width;
-    var h = env.opt.height;
-    var r = env.opt.r ? env.opt.r : Math.floor((w < h ? w : h) / 2.5);
-    var cx = env.opt.cx ? env.opt.cx : Math.floor(w / 2);
-    var cy = env.opt.cy ? env.opt.cx : Math.floor(h / 2);
-
+    
+    var w = env.width - env.opt.margins[1] - env.opt.margins[3];
+    var h = env.height - env.opt.margins[0] - env.opt.margins[2];
+    var r = env.opt.r ? env.opt.r : Math.floor((w < h ? w : h) / 2 * (env.opt.rPerc ? env.opt.rPerc / 100 : 0.8));
+    var cx = (env.opt.cx ? env.opt.cx : Math.floor(w / 2)) + env.opt.margins[3];
+    var cy = (env.opt.cy ? env.opt.cy : Math.floor(h / 2)) + env.opt.margins[0];
+    
     var cnt = 0, i, ii, serie, plot, props;
     for (serie in opt.values) {
       plot = {
@@ -3687,6 +3896,7 @@ $.elycharts.pie = {
       };
       env.plots[serie] = plot;
       var serieProps = common.areaProps(env, 'Series', serie);
+      common.colorize(env, serieProps, [['plotProps','stroke'],['plotProps','fill']], common.getItemColor(env, serie));
       if (serieProps.visible) {
         plot.visible = true;
         cnt ++;
@@ -3694,6 +3904,7 @@ $.elycharts.pie = {
         for (i = 0, ii = plot.values.length; i < ii; i++)
           if (plot.values[i] > 0) {
             props = common.areaProps(env, 'Series', serie, i);
+            common.colorize(env, props, [['plotProps','stroke'],['plotProps','fill']], common.getItemColor(env, serie, i));
             if (typeof props.inside == 'undefined' || props.inside < 0)
               plot.total += plot.values[i];
           }
@@ -3704,10 +3915,10 @@ $.elycharts.pie = {
           }
       }
     }
-
+    
     var rstep = r / cnt;
     var rstart = -rstep, rend = 0;
-
+      
     var pieces = [];
     for (serie in opt.values) {
       plot = env.plots[serie];
@@ -3716,10 +3927,11 @@ $.elycharts.pie = {
         rstart += rstep;
         rend += rstep;
         var angle = env.opt.startAngle, angleplus = 0, anglelimit = 0;
-
+      
         if (plot.total == 0) {
           env.emptySeries = true;
           props = common.areaProps(env, 'Series', 'empty');
+          common.colorize(env, props, [['plotProps','stroke'],['plotProps','fill']], common.getItemColor(env, serie));
           paths.push({ path : [ [ 'CIRCLE', cx, cy, r ] ], attr : props.plotProps });
 
         } else {
@@ -3728,6 +3940,7 @@ $.elycharts.pie = {
             var value = plot.values[i];
             if (value > 0) {
               props = common.areaProps(env, 'Series', serie, i);
+              common.colorize(env, props, [['plotProps','stroke'],['plotProps','fill']], common.getItemColor(env, serie, i));
               if (typeof props.inside == 'undefined' || props.inside < 0) {
                 angle += anglelimit;
                 angleplus = 360 * value / plot.total;
@@ -3749,7 +3962,6 @@ $.elycharts.pie = {
                     rrstart = rstart - props.r;
                 }
               }
-
               if (!env.opt.clockwise)
                 paths.push({ path : [ [ 'SLICE', cx, cy, rrend, rrstart, angle, angle + angleplus ] ], attr : props.plotProps });
               else
@@ -3767,10 +3979,7 @@ $.elycharts.pie = {
 
       pieces.push({ section : 'Series', serie : serie, subSection : 'Plot', paths : paths , mousearea : 'paths'});
     }
-
-    featuresmanager.beforeShow(env, pieces);
-    common.show(env, pieces);
-    featuresmanager.afterShow(env, pieces);
+    
     return pieces;
   }
 }

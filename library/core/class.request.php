@@ -515,7 +515,7 @@ class Gdn_Request {
             }
 
             if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
-                $path = $this->getValueFrom(self::INPUT_SERVER, 'PATH_INFO');
+                $path = $this->getValueFrom(self::INPUT_SERVER, 'PATH_INFO', '');
 
                 // Some hosts block PATH_INFO from being passed (or even manually set).
                 // We set X_PATH_INFO in the .htaccess as a fallback for those situations.

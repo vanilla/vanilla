@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\Library;
+namespace VanillaTests\Library\Core;
 
 use Gdn_PasswordHash;
 

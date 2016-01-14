@@ -16,6 +16,11 @@
         <ini name="intl.error_level" value="0"/>
         <ini name="memory_limit" value="-1"/>
         <ini name="date.timezone" value="America/Montreal"/>
+
+        <env name="baseurl" value="http://vanilla.test:8080" />
+        <env name="dbname" value="vanilla_test"/>
+        <env name="dbuser" value="travis" />
+        <env name="dbpass" value="" />
     </php>
 
     <testsuites>

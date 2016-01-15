@@ -85,7 +85,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
             ['app name',        'Vanilla',                          ['app name' => 'Vanilla']],
             ['&^^^&*',          new stdClass(),                     ['&^^^&*' => new stdClass()]],
             ['test an array',   ['my' => 'value'],                  ['test an array' => ['my' => 'value']]],
-            [['appName' => 'Vanilla', 'appVersion' => '2'], null,   ['appName' => 'Vanilla', 'appVersion' => '2']]
+            [['appName' => 'Vanilla', 'appVersion' => '2'], null,   ['appName' => 'Vanilla', 'appVersion' => '2']],
+
+            // test $key with dot-notation
+            ['app.name', 'Vanilla', ['app' => ['name' => 'Vanilla']]],
+
+            // dot-notation inside an array of $keys
+            [['app.name' => 'Vanilla', 'app.version' => '2'], null, ['app' => ['name' => 'Vanilla', 'version' => '2']]],
         ];
     }
 

@@ -1271,7 +1271,9 @@ class DiscussionModel extends VanillaModel {
      *
      * @param array $Wheres SQL conditions.
      * @param bool $ForceNoAnnouncements Not used.
-     * @return int Number of discussions.
+     * @return stdObject containing:
+     *           CountDiscussion => Number of unread discussions.
+     *           CountComments => Number of unread comments.
      */
     public function getUnreadCount($Wheres = '', $ForceNoAnnouncements = false) {
         if (is_array($Wheres) && count($Wheres) == 0) {
@@ -1284,35 +1286,7 @@ class DiscussionModel extends VanillaModel {
         } else {
             $Perms = self::CategoryPermissions();
         }
-
-        if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
-            // Grab the counts from the faster category cache.
-            if (isset($Wheres['d.CategoryID'])) {
-                $CategoryIDs = (array)$Wheres['d.CategoryID'];
-                if ($Perms === false) {
-                    $CategoryIDs = array();
-                } elseif (is_array($Perms))
-                    $CategoryIDs = array_intersect($CategoryIDs, $Perms);
-
-                if (count($CategoryIDs) == 0) {
-                    return 0;
-                } else {
-                    $Perms = $CategoryIDs;
-                }
-            }
-
-            $Categories = CategoryModel::categories();
-            $Count = 0;
-
-            foreach ($Categories as $Cat) {
-                if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms)) {
-                    continue;
-                }
-                $Count += (int)$Cat['CountDiscussions'];
-            }
-            return $Count;
-        }
-
+        
         if ($Perms !== true) {
             $this->SQL->whereIn('c.CategoryID', $Perms);
         }
@@ -1321,21 +1295,19 @@ class DiscussionModel extends VanillaModel {
         $this->fireEvent('BeforeGetUnreadCount'); // @see 'BeforeGet' for consistency in count vs. results
 
         $this->SQL
-            ->select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->select('d.DiscussionID', 'count', 'CountTotalDiscussions')
+            ->select('d.CountComments','sum', 'CountTotalComments')
+            ->select('w.CountComments', 'sum', 'CountReadComments')
+            ->select('w.DiscussionID', 'count', 'CountReadDiscussions')
             ->from('Discussion d')
-            ->join('Category c', 'd.CategoryID = c.CategoryID')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.Gdn::session()->UserID, 'left')
-            //->beginWhereGroup()
-            //->where('w.DateLastViewed', null)
-            //->orWhere('d.DateLastComment >', 'w.DateLastViewed')
-            //->endWhereGroup()
-            ->where('d.CountComments >', 'COALESCE(w.CountComments, 0)', true, false)
             ->where($Wheres);
 
-        $Result = $this->SQL
+        $TempResult = $this->SQL
             ->get()
-            ->firstRow()
-            ->CountDiscussions;
+            ->firstRow();
+        $Result->CountDiscussions = (int)$TempResult->CountTotalDiscussions - (int)$TempResult->CountReadDiscussions;
+        $Result->CountComments = (int)$TempResult->CountTotalComments - (int) $TempResult->CountReadComments;
 
         return $Result;
     }

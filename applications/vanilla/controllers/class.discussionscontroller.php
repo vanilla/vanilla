@@ -239,7 +239,7 @@ class DiscussionsController extends VanillaController {
         $DiscussionModel->Watching = true;
 
         // Get Discussion Count
-        $CountDiscussions = $DiscussionModel->GetUnreadCount();
+        $CountDiscussions = $DiscussionModel->GetUnreadCount()->CountDiscussions;
         $this->setData('CountDiscussions', $CountDiscussions);
 
         // Get Discussions

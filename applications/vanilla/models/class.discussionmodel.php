@@ -1272,7 +1272,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $Wheres SQL conditions.
      * @param bool $ForceNoAnnouncements Not used.
      * @return stdObject containing:
-     *           CountDiscussion => Number of unread discussions.
+     *           CountDiscussions => Number of unread discussions.
      *           CountComments => Number of unread comments.
      */
     public function getUnreadCount($Wheres = '', $ForceNoAnnouncements = false) {

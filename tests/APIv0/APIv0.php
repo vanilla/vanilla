@@ -15,9 +15,10 @@ use PDO;
  * The API client for Vanilla's API version 0.
  */
 class APIv0 extends HttpClient {
-    const DB_USER = 'travis';
-    const DB_PASSWORD = '';
 
+    /**
+     * @var string The API key for making calls to the special test helper script.
+     */
     protected static $apiKey;
 
     /**
@@ -36,7 +37,7 @@ class APIv0 extends HttpClient {
     public function __construct() {
         parent::__construct();
         $this
-            ->setBaseUrl('http://vanilla.test:8080')
+            ->setBaseUrl($_ENV['baseurl'])
             ->setThrowExceptions(true);
     }
 
@@ -47,8 +48,31 @@ class APIv0 extends HttpClient {
      */
     public function getDbName() {
         $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
-        $dbname = preg_replace('`[^a-z]`i', '_', $host);
+
+        if (isset($_ENV['dbname'])) {
+            $dbname = $_ENV['dbname'];
+        } else {
+            $dbname = preg_replace('`[^a-z]`i', '_', $host);
+        }
         return $dbname;
+    }
+
+    /**
+     * Get the username used to connect to the test database.
+     *
+     * @return string Returns a username.
+     */
+    public function getDbUser() {
+        return $_ENV['dbuser'];
+    }
+
+    /**
+     * Get the password used to connect to the test database.
+     *
+     * @return string Returns a password.
+     */
+    public function getDbPassword() {
+        return $_ENV['dbpass'];
     }
 
     /**
@@ -87,7 +111,7 @@ class APIv0 extends HttpClient {
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8'"
             ];
-            $pdo = new PDO("mysql:host=localhost", self::DB_USER, self::DB_PASSWORD, $options);
+            $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
 
             $dbname = $this->getDbName();
             $r = $pdo->query("show databases like '$dbname'", PDO::FETCH_COLUMN, 0);
@@ -163,8 +187,8 @@ class APIv0 extends HttpClient {
         $post = [
             'Database-dot-Host' => 'localhost',
             'Database-dot-Name' => $this->getDbName(),
-            'Database-dot-User' => self::DB_USER,
-            'Database-dot-Password' => self::DB_PASSWORD,
+            'Database-dot-User' => $this->getDbUser(),
+            'Database-dot-Password' => $this->getDbPassword(),
             'Garden-dot-Title' => $title ?: 'Vanilla Tests',
             'Email' => 'travis@example.com',
             'Name' => 'travis',

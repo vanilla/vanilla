@@ -539,7 +539,6 @@ class PostController extends VanillaController {
             $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
 
             switch ($inputFormatter) {
-                case 'Html':
                 case 'Wysiwyg':
                     $this->Form->setFormValue(
                         'Body',

@@ -193,7 +193,7 @@ class SpamModel extends Gdn_Pluggable {
 
         if ($deleteRow) {
             // Remove the record to the log.
-            $model->delete($id);
+            $model->deleteID($id);
         }
 
         LogModel::insert('Spam', $recordType, $row, $logOptions);

@@ -30,19 +30,6 @@ class DiscussionsController extends VanillaController {
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
 
-    public function __construct() {
-        parent::__construct();
-
-        /**
-         * The default Cache-Control header does not include no-store, which can cause issues (e.g. inaccurate unread
-         * status or new comment counts) when users visit the discussion list via the browser's back button.  The same
-         * check is performed here as in Gdn_Controller before the Cache-Control header is added, but this value
-         * includes the no-store specifier.
-         */
-        if (Gdn::session()->isValid()) {
-            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
-        }
-    }
 
     /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
@@ -312,6 +299,16 @@ class DiscussionsController extends VanillaController {
         }
 
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
+
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues (e.g. inaccurate unread
+         * status or new comment counts) when users visit the discussion list via the browser's back button.  The same
+         * check is performed here as in Gdn_Controller before the Cache-Control header is added, but this value
+         * includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
 
         $this->fireEvent('AfterInitialize');
     }

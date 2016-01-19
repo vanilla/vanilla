@@ -2462,8 +2462,8 @@ class DiscussionModel extends VanillaModel {
         // Execute deletion of discussion and related bits
         $this->SQL->delete('Draft', array('DiscussionID' => $discussionID));
 
-        $Log = val('Log', $o, true);
-        $LogOptions = val('LogOptions', $o, array());
+        $Log = val('Log', $options, true);
+        $LogOptions = val('LogOptions', $options, array());
         if ($Log === true) {
             $Log = 'Delete';
         }

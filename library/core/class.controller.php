@@ -624,7 +624,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!array_key_exists('Roles', $this->_Definitions)) {
             if (gdn::session()->isValid()) {
                 $roleModel = new RoleModel();
-                $this->_Definitions['Roles'] = $roleModel->getUserRoles(gdn::session()->UserID, "RoleID");
+                $this->_Definitions['Roles'] = $roleModel->getUserRoles(gdn::session()->UserID, "Name");
             }
         }
 

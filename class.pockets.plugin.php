@@ -57,9 +57,9 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function base_render_before($Sender) {
-        if ($this->TestMode === null)
+        if ($this->TestMode === null) {
             $this->TestMode = c('Plugins.Pockets.ShowLocations');
-
+        }
         if ($this->TestMode && checkPermission('Plugins.Pockets.Manage')) {
             // Add the css for the test pockets to the page.
             $Sender->addCSSFile('pockets.css', 'plugins/Pockets');
@@ -71,7 +71,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+    public function base_GetAppSettingsMenuItems_Handler(&$Sender) {
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->addItem('Appearance', t('Appearance'));
         $Menu->addLink('Appearance', t('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');
@@ -104,7 +104,7 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     public function base_betweenRenderAsset_handler($Sender) {
         $AssetName = valr('EventArguments.AssetName', $Sender);
-        $this->ProcessPockets($Sender, $AssetName);
+        $this->processPockets($Sender, $AssetName);
     }
 
     /**
@@ -125,7 +125,7 @@ class PocketsPlugin extends Gdn_Plugin {
         // We don't want pockets to display before the first comment because they are only between comments.
         $Processed = isset($this->_Counters['BeforeCommentDisplay']);
         if (!$Processed) {
-            $this->_Counters['BeforeCommentDisplay'] = TRUE;
+            $this->_Counters['BeforeCommentDisplay'] = true;
             return;
         }
         $this->processPockets($Sender, 'BetweenComments');
@@ -214,7 +214,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @return mixed
      */
     protected function _add($Sender) {
-        $Sender->setData('Title', sprintf(T('Add %s'), T('Pocket')));
+        $Sender->setData('Title', sprintf(t('Add %s'), t('Pocket')));
         return $this->_addEdit($Sender);
     }
 
@@ -222,7 +222,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      *
      * @param $Sender
-     * @param bool|FALSE $PocketID
+     * @param bool|false $PocketID
      * @return mixed
      * @throws Gdn_UserException
      */
@@ -265,7 +265,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Form->setFormValue('Repeat', $Repeat);
             $Form->setFormValue('Sort', 0);
             $Form->setFormValue('Format', 'Raw');
-            $Condition = Gdn_Condition::toString($Sender->ConditionModule->conditions(TRUE));
+            $Condition = Gdn_Condition::toString($Sender->ConditionModule->conditions(true));
             $Form->setFormValue('Condition', $Condition);
             if ($Form->getFormValue('Ad', 0)) {
                 $Form->setFormValue('Type', Pocket::TYPE_AD);
@@ -279,7 +279,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 $Sender->RedirectUrl = url('settings/pockets');
             }
         } else {
-            if ($PocketID !== FALSE) {
+            if ($PocketID !== false) {
                 // Load the pocket.
                 $Pocket = $PocketModel->getWhere(array('PocketID' => $PocketID))->firstRow(DATASET_TYPE_ARRAY);
                 if (!$Pocket) {
@@ -386,7 +386,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param bool|FALSE $Force
+     * @param bool|false $Force
      */
     protected function _loadState($Force = false) {
         if (!$Force && $this->StateLoaded) {
@@ -400,7 +400,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $this->addPocket($Pocket);
         }
 
-        $this->StateLoaded = TRUE;
+        $this->StateLoaded = true;
     }
 
     /**
@@ -410,11 +410,11 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param $Location
      * @param null $CountHint
      */
-    public function processPockets($Sender, $Location, $CountHint = NULL) {
+    public function processPockets($Sender, $Location, $CountHint = null) {
         if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
             return;
         }
-        if (Gdn::Controller()->data('_NoMessages') && $Location != 'Head') {
+        if (Gdn::controller()->data('_NoMessages') && $Location != 'Head') {
             return;
         }
 
@@ -478,7 +478,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @return mixed|string
      * @throws Exception
      */
-    public static function PocketString($Name, $Data = null) {
+    public static function pocketString($Name, $Data = null) {
         $Inst = Gdn::pluginManager()->getPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
         $Pockets = $Inst->getPockets($Name);
 
@@ -514,7 +514,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      *
      * @param null $Match
-     * @param bool|FALSE $SetArgs
+     * @param bool|false $SetArgs
      * @return string
      */
     public static function pocketStringCb($Match = null, $SetArgs = false) {

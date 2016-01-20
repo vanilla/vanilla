@@ -28,6 +28,7 @@ class CategoriesController extends VanillaController {
     /** @var object Category object. */
     public $Category;
 
+
     /**
      *
      *
@@ -478,5 +479,14 @@ class CategoriesController extends VanillaController {
         }
 
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
+
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues with outdated category
+         * information (e.g. counts).  The same check is performed here as in Gdn_Controller before the Cache-Control
+         * header is added, but this value includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
     }
 }

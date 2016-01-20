@@ -33,6 +33,19 @@ class CategoryController extends VanillaController {
         $this->render();
     }
 
+    public function initialize() {
+        parent::initialize();
+
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues with outdated category
+         * information (e.g. counts).  The same check is performed here as in Gdn_Controller before the Cache-Control
+         * header is added, but this value includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
+    }
+
     public function markRead($CategoryID, $TKey) {
         if (Gdn::session()->validateTransientKey($TKey)) {
             $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));

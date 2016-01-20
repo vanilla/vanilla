@@ -68,7 +68,9 @@
  *
  *
  */
-class DropdownModule extends SortableModule {
+class DropdownModule extends Gdn_Module {
+
+    use NestedCollection;
 
     /**
      * @var string The id value of the trigger.
@@ -117,7 +119,10 @@ class DropdownModule extends SortableModule {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
     public function __construct($triggerId = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
-        parent::__construct(true, $useCssPrefix);
+	parent::__construct();
+	$this->flatten = true;
+	$this->useCssPrefix = $useCssPrefix;
+
         $this->triggerId = $triggerId;
         $this->trigger['text'] = $triggerText;
         $this->cssClass = $cssClass;

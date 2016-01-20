@@ -541,28 +541,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $users = Gdn::sql()->get()->resultArray();
 
         // Serve a CSV of the results.
-        self::exportCsv($columnNames, $users);
+        exportCSV($columnNames, $users);
         die();
 
         // Useful for query debug.
         //$sender->render('blank');
-    }
-
-    /**
-     * Create a CSV given a list of column names & rows.
-     *
-     * @param array $columnNames
-     * @param array $data
-     */
-    private static function exportCsv($columnNames, $data = array()) {
-        $output = fopen("php://output",'w');
-        header("Content-Type:application/csv");
-        header("Content-Disposition:attachment;filename=profiles_export.csv");
-        fputcsv($output, $columnNames);
-        foreach($data as $row) {
-            fputcsv($output, $row);
-        }
-        fclose($output);
     }
 
     /**

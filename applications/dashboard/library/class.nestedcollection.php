@@ -1,7 +1,7 @@
 <?php
 
 /**
- * A module for a sortable list.
+ * A trait for a sortable list.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -9,12 +9,12 @@
  * @since 2.3
  */
 
-abstract class SortableModule extends Gdn_Module {
+trait NestedCollection {
 
     /**
      * @var string The css class to add to active items and groups.
      */
-    const ACTIVE_CSS_CLASS = 'Active';
+    public $activeCssClass = 'Active';
 
     /**
      * @var array List of items to sort.
@@ -49,7 +49,7 @@ abstract class SortableModule extends Gdn_Module {
     /**
      * @var bool Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
      */
-    private $flatten;
+    private $flatten = false;
 
     /**
      * @var bool Whether we have run the prepare method yet.
@@ -60,19 +60,6 @@ abstract class SortableModule extends Gdn_Module {
      * @var array The allowed keys in the $modifiers array parameter in the 'addItem' methods.
      */
     private $allowedItemModifiers = array('popinRel', 'icon', 'badge');
-
-    /**
-     * Constructor. Should be called by all extending classes' constructors.
-     *
-     * @param string $view The filename of the view to render, excluding the extension.
-     * @param bool $flatten Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
-     * @param bool $useCssPrefix Whether to use CSS prefixes on the generated CSS classes for the items.
-     */
-    public function __construct($flatten, $useCssPrefix = false) {
-        parent::__construct();
-        $this->flatten = $flatten;
-        $this->useCssPrefix = $useCssPrefix;
-    }
 
     /**
      * Add a divider to the items array if it satisfies the $isAllowed condition.
@@ -261,7 +248,7 @@ abstract class SortableModule extends Gdn_Module {
         }
         if ($this->isActive($link)) {
             $link['isActive'] = true;
-            $listItemCssClasses[] = SortableModule::ACTIVE_CSS_CLASS;
+            $listItemCssClasses[] = $this->activeCssClass;
         } else {
             $link['isActive'] = false;
         }
@@ -496,7 +483,7 @@ abstract class SortableModule extends Gdn_Module {
                     foreach ($subItems as $subItem) {
                         if (val('isActive', $subItem)) {
                             $item['isActive'] = true;
-                            $item['cssClass'] .= ' '.SortableModule::ACTIVE_CSS_CLASS;
+                            $item['cssClass'] .= ' '.$this->activeCssClass;
                         }
                     }
                 }
@@ -514,7 +501,7 @@ abstract class SortableModule extends Gdn_Module {
     protected function flattenArray($items) {
         $newItems = array();
         foreach($items as $key => $item) {
-            $subItems = false;
+            $subItems = array();
 
             // Group item
             if (val('type', $item) == 'group') {

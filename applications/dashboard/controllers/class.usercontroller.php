@@ -914,7 +914,7 @@ class UserController extends DashboardController {
      *
      * @return bool
      */
-    protected function pastUserThreshold() {
+    public function pastUserThreshold() {
         $estimate = $this->countEstimate();
         return $estimate > $this->UserThreshold;
     }
@@ -924,7 +924,7 @@ class UserController extends DashboardController {
      *
      * @return bool
      */
-    protected function pastUserMegaThreshold() {
+    public function pastUserMegaThreshold() {
         $estimate = $this->countEstimate();
         return $estimate > $this->UserMegaThreshold;
     }

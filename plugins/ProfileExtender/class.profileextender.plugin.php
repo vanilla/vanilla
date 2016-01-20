@@ -499,6 +499,73 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         }
     }
 
+
+    /**
+     * Endpoint to export basic user data along with all custom fields into CSV.
+     */
+    public function utilityController_exportProfiles_create($sender) {
+        // Clear our ability to do this.
+        $sender->permission('Garden.Settings.Manage');
+        $userController = new UserController();
+        if ($userController->pastUserMegaThreshold()) {
+            throw new Gdn_UserException('You have too many users to export automatically.');
+        }
+
+        // Determine profile fields we need to add.
+        $fields = $this->getProfileFields();
+        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points');
+
+        // Set up our basic query.
+        Gdn::sql()
+            ->select('u.Name')
+            ->select('u.Email')
+            ->select('u.DateInserted')
+            ->select('u.DateLastActive')
+            ->select('u.CountDiscussions')
+            ->select('u.CountComments')
+            ->select('u.Points')
+            ->from('User u');
+
+        $i = 0;
+        foreach ($fields as $slug => $fieldData) {
+            // Add this field to the output
+            $columnNames[] = val('Label', $fieldData, $slug);
+
+            // Add this field to the query.
+            Gdn::sql()
+                ->join('UserMeta a'.$i, "u.UserID = a$i.UserID and a$i.Name = 'Profile.$slug'", 'left')
+                ->select('a'.$i.'.Value', '', $slug);
+            $i++;
+        }
+
+        // Get our user data.
+        $users = Gdn::sql()->get()->resultArray();
+
+        // Serve a CSV of the results.
+        self::exportCsv($columnNames, $users);
+        die();
+
+        // Useful for query debug.
+        //$sender->render('blank');
+    }
+
+    /**
+     * Create a CSV given a list of column names & rows.
+     *
+     * @param array $columnNames
+     * @param array $data
+     */
+    private static function exportCsv($columnNames, $data = array()) {
+        $output = fopen("php://output",'w');
+        header("Content-Type:application/csv");
+        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        fputcsv($output, $columnNames);
+        foreach($data as $row) {
+            fputcsv($output, $row);
+        }
+        fclose($output);
+    }
+
     /**
      * Import from CustomProfileFields or upgrade from ProfileExtender 2.0.
      */

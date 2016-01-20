@@ -621,6 +621,13 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['Search'] = t('Search');
         }
 
+        if (!array_key_exists('Roles', $this->_Definitions)) {
+            if (gdn::session()->isValid()) {
+                $roleModel = new RoleModel();
+                $this->_Definitions['Roles'] = $roleModel->getUserRoles(gdn::session()->UserID, "RoleID");
+            }
+        }
+
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).';';
         if ($wrap) {

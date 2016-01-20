@@ -750,4 +750,41 @@ class RoleModel extends Gdn_Model {
         $result = $this->SQL->delete('Role', array('RoleID' => $roleID));
         return $result;
     }
+
+    /**
+     * Get a list of a user's roles, optionally return all the role data or just one field name.
+     *
+     * @param $userID
+     * @param string $field optionally the field name from the role table to return.
+     * @return array|null|void
+     */
+    public function getUserRoles($userID, $field="Name") {
+        if (!$userID) {
+            return;
+        }
+
+        $unfilteredRoles = self::getByUserID($userID)->resultArray();
+
+        // Hide personal info roles
+        $unformattedRoles = array();
+        if (!checkPermission('Garden.PersonalInfo.View')) {
+            $unformattedRoles = array_filter($unfilteredRoles, 'self::FilterPersonalInfo');
+        } else {
+            $unformattedRoles = $unfilteredRoles;
+        }
+
+        // If an empty string is passed as the field, return all the data from gdn_role row.
+        if (!$field) {
+            return $unformattedRoles;
+        }
+
+        // If there is a return key, return an array with the field as the key
+        // and the value of the field as the value.
+        $formattedRoles = array();
+        foreach ($unformattedRoles as $role) {
+            $formattedRoles[$field][] = $role[$field];
+        }
+
+        return $formattedRoles;
+    }
 }

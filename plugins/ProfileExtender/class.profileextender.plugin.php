@@ -506,8 +506,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     public function utilityController_exportProfiles_create($sender) {
         // Clear our ability to do this.
         $sender->permission('Garden.Settings.Manage');
-        $userController = new UserController();
-        if ($userController->pastUserMegaThreshold()) {
+        if (Gdn::userModel()->pastUserMegaThreshold()) {
             throw new Gdn_UserException('You have too many users to export automatically.');
         }
 

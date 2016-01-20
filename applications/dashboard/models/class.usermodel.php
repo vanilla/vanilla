@@ -49,6 +49,12 @@ class UserModel extends Gdn_Model {
     /** @var */
     public $SessionColumns;
 
+    /** @var int The number of users when database optimizations kick in. */
+    public $UserThreshold = 10000;
+
+    /** @var int The number of users when extreme database optimizations kick in. */
+    public $UserMegaThreshold = 1000000;
+
     /**
      * Class constructor. Defines the related database table name.
      */
@@ -60,6 +66,38 @@ class UserModel extends Gdn_Model {
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
             'Score', 'Photo'
         ));
+    }
+
+    /**
+     * Whether or not we are past the user threshold.
+     *
+     * This is a useful indication that some database operations on the User table will be painfully long.
+     *
+     * @return bool
+     */
+    public function pastUserThreshold() {
+        $estimate = $this->countEstimate();
+        return $estimate > $this->UserThreshold;
+    }
+
+    /**
+     * Whether we're wandered into extreme database optimization territory with our user count.
+     *
+     * @return bool
+     */
+    public function pastUserMegaThreshold() {
+        $estimate = $this->countEstimate();
+        return $estimate > $this->UserMegaThreshold;
+    }
+
+    /**
+     * Approximate the number of users by checking the database table status.
+     *
+     * @return int
+     */
+    public function countEstimate() {
+        $px = Gdn::database()->DatabasePrefix;
+        return Gdn::database()->query("show table status like '{$px}User'")->value('Rows', 0);
     }
 
     /**

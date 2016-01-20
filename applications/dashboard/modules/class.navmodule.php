@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+use NestedCollection;
 
 /**
  * A nav menu module.
@@ -39,7 +40,9 @@
  *
  *
  */
-class NavModule extends SortableModule {
+class NavModule extends Gdn_Module {
+
+    use NestedCollection;
 
     /**
      * @var string A potential CSS class of the nav wrapper container.
@@ -53,7 +56,9 @@ class NavModule extends SortableModule {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the nav items.
      */
     public function __construct($cssClass = '', $useCssPrefix = true) {
-	parent::__construct(false, $useCssPrefix);
+	parent::__construct();
+	$this->flatten = false;
+	$this->useCssPrefix = $useCssPrefix;
         $this->cssClass = $cssClass;
 
         if ($useCssPrefix) {

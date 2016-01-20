@@ -16,8 +16,27 @@ class SiteNavModule extends NavModule {
     /** @var array  */
     protected $customSections = array('EditProfile', 'Profile');
 
+    /** @var string The section to */
+    protected $section;
+
     public function __construct() {
 	parent::__construct();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSection() {
+	return $this->section;
+    }
+
+    /**
+     * @param string $section
+     * @return $this
+     */
+    public function setSection($section) {
+	$this->section = $section;
+	return $this;
     }
 
     /**

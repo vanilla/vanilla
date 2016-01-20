@@ -1404,7 +1404,7 @@ abstract class Gdn_SQLDriver {
             return $this;
         }
 
-        if ($Direction && $Direction != 'asc') {
+        if ($Direction && strtolower($Direction) != 'asc') {
             $Direction = 'desc';
         } else {
             $Direction = 'asc';

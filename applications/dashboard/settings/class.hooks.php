@@ -136,14 +136,6 @@ class DashboardHooks implements Gdn_IPlugin {
         // Allow global translation of TagHint
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
 
-        // Add user's viewable roles to gdn.meta if user is logged in.
-        // Function addDefinition returns the value of the definition if you pass only one argument.
-        if (!$Sender->addDefinition('Roles')) {
-            if (gdn::session()->isValid()) {
-                $roleModel = new RoleModel();
-                $Sender->addDefinition("Roles", $roleModel->getUsersViewableRoles(gdn::session()->UserID, "Name"));
-            }
-        }
     }
 
     /**
@@ -414,6 +406,17 @@ class DashboardHooks implements Gdn_IPlugin {
         $hasPermissions = Gdn::sql()->getWhere('Permission', array('RoleID >' => 0))->firstRow(DATASET_TYPE_ARRAY);
         if (!$hasPermissions) {
             PermissionModel::resetAllRoles();
+        }
+    }
+
+    public function gdn_dispatcher_afterControllerCreate_handler($sender, $args) {
+        // Add user's viewable roles to gdn.meta if user is logged in.
+        // Function addDefinition returns the value of the definition if you pass only one argument.
+        if (!gdn::controller()->addDefinition('Roles')) {
+            if (Gdn::session()->isValid()) {
+                $roleModel = new RoleModel();
+                gdn::controller()->addDefinition("Roles", $roleModel->getUsersViewableRoles(gdn::session()->UserID, "Name"));
+            }
         }
     }
 }

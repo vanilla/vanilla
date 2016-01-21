@@ -621,13 +621,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['Search'] = t('Search');
         }
 
-        if (!array_key_exists('Roles', $this->_Definitions)) {
-            if (gdn::session()->isValid()) {
-                $roleModel = new RoleModel();
-                $this->_Definitions['Roles'] = $roleModel->getUserRoles(gdn::session()->UserID, "Name");
-            }
-        }
-
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).';';
         if ($wrap) {
@@ -636,6 +629,14 @@ class Gdn_Controller extends Gdn_Pluggable {
         return $result;
     }
 
+    /**
+     * Get the protected _Definitions array
+     * 
+     * @return array
+     */
+    public function getDefinitions() {
+        return $this->_Definitions;
+    }
     /**
      * Returns the requested delivery type of the controller if $Default is not
      * provided. Sets and returns the delivery type otherwise.

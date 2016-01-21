@@ -752,13 +752,14 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
-     * Get a list of a user's roles, optionally return all the role data or just one field name.
+     * Get a list of a user's roles that are permitted to be seen.
+     * Optionally return all the role data or just one field name.
      *
      * @param $userID
      * @param string $field optionally the field name from the role table to return.
      * @return array|null|void
      */
-    public function getUserRoles($userID, $field="Name") {
+    public function getUsersViewableRoles($userID, $field = "Name") {
         if (!$userID) {
             return;
         }
@@ -780,10 +781,7 @@ class RoleModel extends Gdn_Model {
 
         // If there is a return key, return an array with the field as the key
         // and the value of the field as the value.
-        $formattedRoles = array();
-        foreach ($unformattedRoles as $role) {
-            $formattedRoles[$field][] = $role[$field];
-        }
+        $formattedRoles = array_column($unformattedRoles, $field);
 
         return $formattedRoles;
     }

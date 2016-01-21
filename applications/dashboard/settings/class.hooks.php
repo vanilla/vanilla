@@ -135,6 +135,14 @@ class DashboardHooks implements Gdn_IPlugin {
 
         // Allow global translation of TagHint
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
+
+        // Add user's viewable roles to gdn.meta if user is logged in.
+        if (!array_key_exists('Roles', $Sender->getDefinitions())) {
+            if (gdn::session()->isValid()) {
+                $roleModel = new RoleModel();
+                $Sender->addDefinition("Roles", $roleModel->getUsersViewableRoles(gdn::session()->UserID, "Name"));
+            }
+        }
     }
 
     /**

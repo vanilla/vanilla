@@ -521,6 +521,25 @@ if (!function_exists('discussionUrl')) {
     }
 }
 
+if (!function_exists('exportCSV')) {
+    /**
+     * Create a CSV given a list of column names & rows.
+     *
+     * @param array $columnNames
+     * @param array $data
+     */
+    function exportCSV($columnNames, $data = array()) {
+        $output = fopen("php://output",'w');
+        header("Content-Type:application/csv");
+        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        fputcsv($output, $columnNames);
+        foreach($data as $row) {
+            fputcsv($output, $row);
+        }
+        fclose($output);
+    }
+}
+
 if (!function_exists('fixnl2br')) {
     /**
      * Removes the break above and below tags that have a natural margin.

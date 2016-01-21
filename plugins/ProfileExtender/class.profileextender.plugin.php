@@ -523,7 +523,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->select('u.CountDiscussions')
             ->select('u.CountComments')
             ->select('u.Points')
-            ->from('User u');
+            ->from('User u')
+            ->where('u.Deleted', 0)
+            ->where('u.Admin <', 2);
 
         $i = 0;
         foreach ($fields as $slug => $fieldData) {

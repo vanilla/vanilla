@@ -630,14 +630,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Get the protected _Definitions array
-     * 
-     * @return array
-     */
-    public function getDefinitions() {
-        return $this->_Definitions;
-    }
-    /**
      * Returns the requested delivery type of the controller if $Default is not
      * provided. Sets and returns the delivery type otherwise.
      *

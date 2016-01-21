@@ -137,7 +137,8 @@ class DashboardHooks implements Gdn_IPlugin {
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
 
         // Add user's viewable roles to gdn.meta if user is logged in.
-        if (!array_key_exists('Roles', $Sender->getDefinitions())) {
+        // Function addDefinition returns the value of the definition if you pass only one argument.
+        if (!$Sender->addDefinition('Roles')) {
             if (gdn::session()->isValid()) {
                 $roleModel = new RoleModel();
                 $Sender->addDefinition("Roles", $roleModel->getUsersViewableRoles(gdn::session()->UserID, "Name"));

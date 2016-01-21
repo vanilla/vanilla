@@ -316,7 +316,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $Fields = $this->getProfileFields();
             if (!$Name = val('Name', $FormPostValues)) {
                 // Make unique name from label for new fields
-                $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues));
+                $Name = $TestSlug = substr(preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues)), 0, 50);
                 $i = 1;
                 while (array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;

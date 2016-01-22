@@ -3737,9 +3737,10 @@ if (!function_exists('sliceParagraph')) {
      * @param string $String The string to slice.
      * @param int $MaxLength The maximum length of the string.
      * @param string $Suffix The suffix if the string must be sliced mid-sentence.
+     * @param int $MinLength The intended minimum length of the string (slice on sentence if paragraph is too short)
      * @return string
      */
-    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
+    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…', $MinLength = 20) {
         if ($MaxLength >= strlen($String)) {
             return $String;
         }
@@ -3749,7 +3750,7 @@ if (!function_exists('sliceParagraph')) {
         // See if there is a paragraph.
         $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
 
-        if ($Pos === false) {
+        if ($Pos === false || $Pos<$MinLength) {
             // There was no paragraph so try and split on sentences.
             $Sentences = preg_split('`([.!?:]\s+)`', $String, null, PREG_SPLIT_DELIM_CAPTURE);
 

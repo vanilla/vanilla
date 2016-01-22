@@ -294,6 +294,7 @@ class DiscussionModel extends VanillaModel {
         $this->EventArguments['SortField'] = &$SortField;
         $this->EventArguments['SortDirection'] = c('Vanilla.Discussions.SortDirection', 'desc');
         $this->EventArguments['Wheres'] = &$Wheres;
+        $this->EventArguments['Sql'] =& $Sql;
         $this->fireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
         $IncludeAnnouncements = false;

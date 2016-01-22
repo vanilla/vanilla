@@ -1634,6 +1634,15 @@ EOT;
         }
     }
 
+   /**
+    * Reduces multiple whitespaces including line breaks and tabs to one single space character.
+    *
+    * @param string $String The string which should be optimized
+    */
+    public static function reduceWhiteSpaces($String) {
+        return trim(preg_replace('/\s+/', ' ', $String));
+    }
+
     /**
      * Do a preg_replace, but don't affect things inside <code> tags.
      *

@@ -3740,7 +3740,7 @@ if (!function_exists('sliceParagraph')) {
      * @param int $MinLength The intended minimum length of the string (slice on sentence if paragraph is too short)
      * @return string
      */
-    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…', $MinLength = 20) {
+    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…', $MinLength = 50) {
         if ($MaxLength >= strlen($String)) {
             return $String;
         }

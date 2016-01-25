@@ -44,7 +44,7 @@ class LogModel extends Gdn_Pluggable {
             if (in_array($Log['Operation'], array('Spam', 'Moderate')) && array_key_exists($Log['RecordType'], $Models)) {
                 // Also delete the record.
                 $Model = $Models[$Log['RecordType']];
-                $Model->delete($Log['RecordID'], array('Log' => false));
+                $Model->deleteID($Log['RecordID'], array('Log' => false));
             }
         }
 

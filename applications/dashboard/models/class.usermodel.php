@@ -1293,7 +1293,6 @@ class UserModel extends Gdn_Model {
             ->from('User u')
             ->join('UserRole ur', 'u.UserID = ur.UserID')
             ->where('ur.RoleID', $applicantRoleIDs)
-//         ->groupBy('UserID')
             ->orderBy('DateInserted', 'desc')
             ->get();
     }

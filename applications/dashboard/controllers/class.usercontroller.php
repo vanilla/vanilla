@@ -124,7 +124,7 @@ class UserController extends DashboardController {
                     $this->setData('UserCount', $UserModel->getCount());
                 } else {
                     // Dang, yo. Get a table status guess instead of really counting.
-                    $this->setData('UserEstimate', $this->countEstimate());
+                    $this->setData('UserEstimate', Gdn::userModel()->countEstimate());
                 }
             }
         }

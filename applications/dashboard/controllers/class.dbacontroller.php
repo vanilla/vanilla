@@ -43,7 +43,7 @@ class DbaController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function counts($Table = false, $Column = false, $From = false, $To = false, $Max = false) {
-        set_time_limit(300);
+        increaseMaxExecutionTime(300);
         $this->permission('Garden.Settings.Manage');
 
         if ($Table && $Column && strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {

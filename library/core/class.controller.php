@@ -1887,28 +1887,36 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Set data from a method call.
      *
-     * @param string $Key The key that identifies the data.
-     * @param mixed $Value The data.
-     * @param mixed $AddProperty Whether or not to also set the data as a property of this object.
+     * If $key is an array, the behaviour will be the same as calling the method
+     * multiple times for each (key, value) pair in the $key array.
+     * Note that the parameter $value will not be used if $key is an array.
+     *
+     * The $key can also use dot notation in order to set a value deeper inside the Data array.
+     * Works the same way if $addProperty is true, but uses objects instead of arrays.
+     *
+     * @see setvalr
+     *
+     * @param string|array $key The key that identifies the data.
+     * @param mixed $value The data.  Will not be used if $key is an array
+     * @param mixed $addProperty Whether or not to also set the data as a property of this object.
      * @return mixed The $Value that was set.
      */
-    public function setData($Key, $Value = null, $AddProperty = false) {
-        if (is_array($Key)) {
-            $this->Data = array_merge($this->Data, $Key);
-
-            if ($AddProperty === true) {
-                foreach ($Key as $Name => $Value) {
-                    $this->$Name = $Value;
-                }
+    public function setData($key, $value = null, $addProperty = false) {
+        // In the case of $key being an array of (key => value),
+        // it calls itself with each (key => value)
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->setData($k, $v, $addProperty);
             }
             return;
         }
 
-        $this->Data[$Key] = $Value;
-        if ($AddProperty === true) {
-            $this->$Key = $Value;
+        setvalr($key, $this->Data, $value);
+
+        if ($addProperty === true) {
+            setvalr($key, $this, $value);
         }
-        return $Value;
+        return $value;
     }
 
     /**

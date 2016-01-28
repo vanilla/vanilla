@@ -16,6 +16,15 @@ class UserController extends DashboardController {
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form');
 
+<<<<<<< Updated upstream
+=======
+    /** @var int The number of users when database optimizations kick in. */
+    public $UserThreshold = 10;//10000;
+
+    /** @var int The number of users when extreme database optimizations kick in. */
+    public $UserMegaThreshold = 50;//1000000;
+
+>>>>>>> Stashed changes
     /** @var Gdn_Form */
     public $Form;
 
@@ -92,7 +101,13 @@ class UserController extends DashboardController {
         } else {
             $Filter = array('Keywords' => (string)$Keywords);
         }
+<<<<<<< Updated upstream
         $Filter['Optimize'] = Gdn::userModel()->pastUserThreshold();
+=======
+
+        // Detect whether our user table needs some TLC.
+        $Filter['Optimize'] = $this->pastUserThreshold();
+>>>>>>> Stashed changes
 
         // Sorting
         if (in_array($Order, array('DateInserted', 'DateFirstVisit', 'DateLastActive'))) {
@@ -106,6 +121,7 @@ class UserController extends DashboardController {
         // Get user list
         $this->UserData = $UserModel->search($Filter, $Order, $OrderDir, $Limit, $Offset);
         $this->setData('Users', $this->UserData);
+<<<<<<< Updated upstream
 
         // Figure out our number of results and users.
         $showUserCount = $this->UserData->count();
@@ -127,6 +143,28 @@ class UserController extends DashboardController {
                     $this->setData('UserEstimate', Gdn::userModel()->countEstimate());
                 }
             }
+=======
+        $userCount = $this->UserData->count();
+        if ($userCount) {
+            // Set pager data for currently shown users.
+            $this->setData('_CurrentRecords', $userCount);
+        }
+
+        // If & how we display a user count depends on how huge our site is & whether we're searching.
+        // On sites past UserThreshold, zero users will be listed by default.
+        if ($Filter['Optimize'] && $this->pastUserMegaThreshold()) {
+            // Dang, this site is mega-huge yo.
+            $this->setData('RecordCount', $this->countEstimate());
+        } elseif ($Filter['Optimize']) {
+            // Still big enough to choke an unoptimized query so tread lightly.
+            //if (!$userCount) {
+            $this->setData('RecordCount', $UserModel->getCount());
+            //}
+        } else {
+            // Pfft, query that sucker however you want.
+            $searchCount = $UserModel->searchCount($Filter);
+            $this->setData('RecordCount', $searchCount);
+>>>>>>> Stashed changes
         }
 
         // Add roles to the user data.

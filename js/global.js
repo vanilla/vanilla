@@ -809,6 +809,10 @@ jQuery(document).ready(function($) {
             data: SendData,
             success: function(json) {
                 gdn.inform(json);
+            },
+            complete: function(jqXHR, textStatus) {
+                /** @link https://bugs.jquery.com/ticket/7818#comment:26 */
+                jQuery(gdn).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
             }
         });
     };

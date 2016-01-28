@@ -1290,7 +1290,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
             }
 
-            $Json = json_encode($this->_Json, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRETTY_PRINT);
+            $Json = json_encode($this->_Json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
             $this->_Json['Data'] = $Json;
             exit($this->_Json['Data']);
         } else {

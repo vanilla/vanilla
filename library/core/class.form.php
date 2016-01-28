@@ -2618,6 +2618,7 @@ PASSWORDMETER;
             'yearrange',
             'fields',
             'inlineerrors',
+            'wrap',
             'categorydata'
         );
         $Return = '';
@@ -2627,7 +2628,7 @@ PASSWORDMETER;
             foreach ($Attributes as $Attribute => $Value) {
                 // Ignore reserved attributes
                 if (!in_array(strtolower($Attribute), $ReservedAttributes)) {
-                    $Return .= ' '.$Attribute.'="'.htmlspecialchars($Value, ENT_COMPAT, 'UTF-8').'"';
+                    $Return .= ' '.$Attribute.($Value === true ? '' : '="'.htmlspecialchars($Value, ENT_COMPAT, 'UTF-8').'"');
                 }
             }
         }

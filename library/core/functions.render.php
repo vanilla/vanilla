@@ -650,8 +650,35 @@ if (!function_exists('hasEditProfile')) {
 }
 
 if (!function_exists('hoverHelp')) {
+    /**
+     * Add span with hover text to a string.
+     *
+     * @param $String
+     * @param $Help
+     * @return string
+     */
     function hoverHelp($String, $Help) {
         return wrap($String.wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
+    }
+}
+
+if (!function_exists('htmlEsc')) {
+    /**
+     * Abstract htmlspecialchars() and allow it to work recursively.
+     *
+     * @param string|array $mixed
+     * @param int $flags See: htmlspecialchars().
+     * @return string|array Escaped string or array.
+     */
+    function htmlEsc($mixed, $flags = ENT_COMPAT) {
+        if (is_array($mixed)) {
+            foreach ($mixed as &$element) {
+                $element = htmlEsc($element, $flags);
+            }
+            return $mixed;
+        } else {
+            return htmlspecialchars($mixed, $flags, 'UTF-8');
+        }
     }
 }
 

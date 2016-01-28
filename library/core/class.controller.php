@@ -622,6 +622,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Output a JavaScript object with all the definitions.
+        $this->_Definitions = Gdn_Format::html($this->_Definitions);
         $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).';';
         if ($wrap) {
             $result = "<script>$result</script>";

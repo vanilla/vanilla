@@ -114,8 +114,6 @@ class DashboardHooks implements Gdn_IPlugin {
                 $Sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
             }
 
-            $Sender->addDefinition('Path', Gdn::request()->path());
-            // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $Sender->addDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
 
             if ($Embed === 2) {

@@ -561,7 +561,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         if (!array_key_exists('Path', $this->_Definitions)) {
-            $this->_Definitions['Path'] = Gdn::request()->path();
+            $this->_Definitions['Path'] = htmlspecialchars(Gdn::request()->path());
         }
 
         if (!array_key_exists('Args', $this->_Definitions)) {
@@ -569,7 +569,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         if (!array_key_exists('ResolvedPath', $this->_Definitions)) {
-            $this->_Definitions['ResolvedPath'] = $this->ResolvedPath;
+            $this->_Definitions['ResolvedPath'] = htmlspecialchars($this->ResolvedPath);
         }
 
         if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
@@ -584,7 +584,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $ReflectArgs = $this->ReflectArgs;
             }
 
-            $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
+            $this->_Definitions['ResolvedArgs'] = array_map('htmlspecialchars', $ReflectArgs);
         }
 
         if (!array_key_exists('SignedIn', $this->_Definitions)) {

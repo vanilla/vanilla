@@ -811,8 +811,7 @@ jQuery(document).ready(function($) {
                 gdn.inform(json);
             },
             complete: function(jqXHR, textStatus) {
-                /** @link https://bugs.jquery.com/ticket/7818#comment:26 */
-                jQuery(gdn).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
+                jQuery(document).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
             }
         });
     };

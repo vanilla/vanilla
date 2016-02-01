@@ -809,6 +809,9 @@ jQuery(document).ready(function($) {
             data: SendData,
             success: function(json) {
                 gdn.inform(json);
+            },
+            complete: function(jqXHR, textStatus) {
+                jQuery(document).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
             }
         });
     };

@@ -385,7 +385,10 @@ class Gdn_Theme {
         $Logo = c('Garden.Logo');
 
         if ($Logo) {
-            $Logo = ltrim($Logo, '/');
+            // Only trim slash from relative paths.
+            if (!stringBeginsWith($Logo, '//')) {
+                $Logo = ltrim($Logo, '/');
+            }
 
             // Fix the logo path.
             if (stringBeginsWith($Logo, 'uploads/')) {

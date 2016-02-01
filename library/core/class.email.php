@@ -28,12 +28,21 @@ class Gdn_Email extends Gdn_Pluggable {
     /** @var array Recipients that were skipped because they lack permission. */
     public $Skipped = array();
 
+    /** @var EmailTemplate The email body renderer. Use this to edit the email body. */
+    protected $emailTemplate;
+
+    /** @var string The format of the email. */
+    protected $format;
+
+    /** @var string The supported email formats. */
+    public static $supportedFormats = array('html', 'text');
+
     /**
      * Constructor.
      */
     function __construct() {
         $this->PhpMailer = new PHPMailer();
-        $this->PhpMailer->CharSet = 'utf-8';
+        $this->PhpMailer->CharSet = c('Garden.Charset', 'utf-8');
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
         $this->PhpMailer->PluginDir = combinePaths(array(PATH_LIBRARY, 'vendors/phpmailer/'));
         $this->PhpMailer->Hostname = c('Garden.Email.Hostname', '');
@@ -41,7 +50,116 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->clear();
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
+        $this->emailTemplate = new EmailTemplate();
+        $this->resolveFormat();
+        if ($this->format === 'html') {
+            $this->setDefaultEmailColors();
+            $this->setDefaultEmailImage();
+        }
         parent::__construct();
+    }
+
+    /**
+     * Sets the format property based on the passed argument if it exists, then the config variable and defaults to html.
+     */
+    protected function resolveFormat() {
+        if (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
+            $this->setFormat(c('Garden.Email.Format'));
+        } else {
+            $this->setFormat('html');
+        }
+    }
+
+    /**
+     * Sets the format property, the email mime type and the email template format property.
+     *
+     * @param string $format The format of the email. Must be in the $supportedFormats array.
+     */
+    public function setFormat($format) {
+        if (strtolower($format) === 'html') {
+            $this->format = 'html';
+            $this->mimeType('text/html');
+            $this->emailTemplate->setPlaintext(false);
+        } else {
+            $this->format = 'text';
+            $this->mimeType('text/plain');
+            $this->emailTemplate->setPlaintext(true);
+        }
+    }
+
+    /**
+     * Sets the email template default color properties based on config settings.
+     */
+    protected function setDefaultEmailColors() {
+        if ($textColor = c('Garden.EmailTemplate.TextColor')) {
+            $this->emailTemplate->setTextColor($textColor);
+        }
+        if ($backgroundColor = c('Garden.EmailTemplate.BackgroundColor')) {
+            $this->emailTemplate->setBackgroundColor($backgroundColor);
+        }
+        if ($containerBackgroundColor = c('Garden.EmailTemplate.ContainerBackgroundColor')) {
+            $this->emailTemplate->setContainerBackgroundColor($containerBackgroundColor);
+        }
+        if ($buttonBackgroundColor = c('Garden.EmailTemplate.ButtonBackgroundColor')) {
+            $this->emailTemplate->setDefaultButtonBackgroundColor($buttonBackgroundColor);
+        }
+        if ($buttonTextColor = c('Garden.EmailTemplate.ButtonTextColor')) {
+            $this->emailTemplate->setDefaultButtonTextColor($buttonTextColor);
+        }
+    }
+
+    /**
+     * Sets the default image for the email template.
+     */
+    protected function setDefaultEmailImage() {
+        if (!$this->emailTemplate->getImage()) {
+            $image = $this->getDefaultEmailImage();
+            $this->emailTemplate->setImageArray($image);
+        }
+    }
+
+    /**
+     * Retrieves default values for the email image.
+     *
+     * @return array An array representing an image.
+     */
+    public function getDefaultEmailImage() {
+        $image = array();
+        if (c('Garden.EmailTemplate.Image', '')) {
+            $image['source'] = Gdn_UploadImage::url(c('Garden.EmailTemplate.Image'));
+        }
+        $image['link'] = url('/', true);
+        $image['alt'] = c('Garden.LogoTitle', c('Garden.Title', ''));
+        return $image;
+    }
+
+    /**
+     * If the email title is not set, tries to find a title for the email template
+     * by using the email subject.
+     */
+    public function resolveEmailTitle() {
+        if ((!$this->emailTemplate->getTitle())) {
+            if ($title = $this->getEmailTitleFromSubject()) {
+                $this->emailTemplate->setTitle($title);
+            }
+        }
+    }
+
+    /**
+     * Returns the default title for an email based on its subject.
+     * If the subject is prepended by the forum title, it removes this.
+     *
+     * @return string The email title or an empty string if the subject is not set.
+     */
+    protected function getEmailTitleFromSubject() {
+        if ($title = $this->PhpMailer->Subject) {
+            $prefix = '[' . c('Garden.Title') . '] ';
+            if (strpos($title, $prefix) === 0) {
+                $title = substr($title, strlen($prefix));
+            }
+            return $title;
+        }
+        return '';
     }
 
     /**
@@ -54,7 +172,6 @@ class Gdn_Email extends Gdn_Pluggable {
     public function addHeader($Name, $Value) {
         $this->PhpMailer->addCustomHeader("$Name:$Value");
     }
-
 
     /**
      * Adds to the "Bcc" recipient collection.
@@ -155,33 +272,51 @@ class Gdn_Email extends Gdn_Pluggable {
     /**
      * The message to be sent.
      *
-     * @param string $Message The message to be sent.
-     * @param string $TextVersion Optional plaintext version of the message
+     * @param string $Message The body of the message to be sent.
      * @return Email
      */
     public function message($Message) {
+        $this->emailTemplate->setMessage($Message, true);
+    }
 
+    public function formatMessage($message) {
         // htmlspecialchars_decode is being used here to revert any specialchar escaping done by Gdn_Format::Text()
         // which, untreated, would result in &#039; in the message in place of single quotes.
 
         if ($this->PhpMailer->ContentType == 'text/html') {
             $TextVersion = false;
-            if (stristr($Message, '<!-- //TEXT VERSION FOLLOWS//')) {
-                $EmailParts = explode('<!-- //TEXT VERSION FOLLOWS//', $Message);
+            if (stristr($message, '<!-- //TEXT VERSION FOLLOWS//')) {
+                $EmailParts = explode('<!-- //TEXT VERSION FOLLOWS//', $message);
                 $TextVersion = array_pop($EmailParts);
-                $Message = array_shift($EmailParts);
+                $message = array_shift($EmailParts);
                 $TextVersion = trim(strip_tags(preg_replace('/<(head|title|style|script)[^>]*>.*?<\/\\1>/s', '', $TextVersion)));
-                $Message = trim($Message);
+                $message = trim($message);
             }
 
-            $this->PhpMailer->msgHTML(htmlspecialchars_decode($Message, ENT_QUOTES));
+            $this->PhpMailer->msgHTML(htmlspecialchars_decode($message, ENT_QUOTES));
             if ($TextVersion !== false && !empty($TextVersion)) {
                 $TextVersion = html_entity_decode($TextVersion);
                 $this->PhpMailer->AltBody = $TextVersion;
             }
         } else {
-            $this->PhpMailer->Body = htmlspecialchars_decode($Message, ENT_QUOTES);
+            $this->PhpMailer->Body = htmlspecialchars_decode($message, ENT_QUOTES);
         }
+        return $this;
+    }
+
+    /**
+     * @return EmailTemplate The email body renderer.
+     */
+    public function getEmailTemplate() {
+        return $this->emailTemplate;
+    }
+
+    /**
+     * @param EmailTemplate $emailTemplate The email body renderer.
+     * @return Email
+     */
+    public function setEmailTemplate($emailTemplate) {
+        $this->emailTemplate = $emailTemplate;
         return $this;
     }
 
@@ -235,6 +370,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @todo add port settings
      */
     public function send($EventName = '') {
+        $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');
 
         if (c('Garden.Email.Disabled')) {
@@ -290,7 +426,6 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->PhpMailer->Subject = $Subject;
         return $this;
     }
-
 
     public function addTo($RecipientEmail, $RecipientName = '') {
         if ($RecipientName != '' && c('Garden.Email.OmitToName', false)) {

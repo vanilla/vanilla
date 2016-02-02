@@ -30,10 +30,10 @@ $Session = Gdn::session();
     </div>
     <span id="plaintext-toggle">
         <?php
-        if (strtolower(c('Garden.Email.Format', 'html') === 'html')) {
-            echo wrap(anchor(t('Enabled'), '/dashboard/settings/setemailformat/text', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
-        } else {
+        if (strtolower(c('Garden.Email.Format', 'text') === 'text')) {
             echo wrap(anchor(t('Disabled'), '/dashboard/settings/setemailformat/html', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
+        } else {
+            echo wrap(anchor(t('Enabled'), '/dashboard/settings/setemailformat/text', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
         }
         ?>
     </span>

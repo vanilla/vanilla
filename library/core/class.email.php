@@ -66,7 +66,7 @@ class Gdn_Email extends Gdn_Pluggable {
         if (in_array(strtolower(c('Garden.Email.Format')), self::$supportedFormats)) {
             $this->setFormat(c('Garden.Email.Format'));
         } else {
-            $this->setFormat('html');
+            $this->setFormat('text');
         }
     }
 

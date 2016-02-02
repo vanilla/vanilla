@@ -133,6 +133,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       });
       $('#'+settings.popupId).show();
 
+      $('#'+settings.popupId+' .Body').css({
+         'max-height': pagesize[3] * .8,
+         'overflow-y': 'scroll'
+      });
+
       $(document).bind('keydown.popup', function(e) {
          if (e.keyCode == 27)
             $.popup.close(settings);
@@ -175,12 +180,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Trigger an even that plugins can attach to when popups are loading.
       $('body').trigger('popupLoading');
    }
-   
+
    $.popup.load = function(settings) {
        if (!settings.confirm) {
           $.popup.loading(settings);
        }
-       
+
 	   var target = $.popup.findTarget(settings);
        if (settings.confirm) {
           // Bind to the "Okay" button click

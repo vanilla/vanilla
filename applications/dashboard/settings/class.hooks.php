@@ -135,7 +135,6 @@ class DashboardHooks implements Gdn_IPlugin {
 
         // Allow global translation of TagHint
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
-
     }
 
     /**

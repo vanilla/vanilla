@@ -327,7 +327,7 @@ class AttachmentModel extends Gdn_Model {
             $Fields = $this->Validation->validationFields();
 
             if ($Insert === false) {
-                $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
+                unset($Fields[$this->PrimaryKey]); // Don't try to update the primary key
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {
                 $PrimaryKeyVal = $this->insert($Fields);

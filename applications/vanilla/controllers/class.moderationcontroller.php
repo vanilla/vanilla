@@ -2,7 +2,7 @@
 /**
  * Moderation controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -275,7 +275,7 @@ class ModerationController extends VanillaController {
             // Delete the selected comments
             $CommentModel = new CommentModel();
             foreach ($CommentIDs as $CommentID) {
-                $CommentModel->delete($CommentID);
+                $CommentModel->deleteID($CommentID);
             }
 
             // Clear selections
@@ -327,7 +327,7 @@ class ModerationController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Delete the selected discussions (that the user has permission to delete).
             foreach ($AllowedDiscussions as $DiscussionID) {
-                $Deleted = $DiscussionModel->delete($DiscussionID);
+                $Deleted = $DiscussionModel->deleteID($DiscussionID);
                 if ($Deleted) {
                     $this->jsonTarget("#Discussion_$DiscussionID", '', 'SlideUp');
                 }

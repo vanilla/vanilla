@@ -2,7 +2,7 @@
 /**
  * UI functions
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -518,6 +518,25 @@ if (!function_exists('discussionUrl')) {
             }
         }
         return Url($Result, $WithDomain);
+    }
+}
+
+if (!function_exists('exportCSV')) {
+    /**
+     * Create a CSV given a list of column names & rows.
+     *
+     * @param array $columnNames
+     * @param array $data
+     */
+    function exportCSV($columnNames, $data = array()) {
+        $output = fopen("php://output",'w');
+        header("Content-Type:application/csv");
+        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        fputcsv($output, $columnNames);
+        foreach($data as $row) {
+            fputcsv($output, $row);
+        }
+        fclose($output);
     }
 }
 

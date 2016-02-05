@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -765,16 +765,8 @@ if (!function_exists('compareHashDigest')) {
      * @return bool Returns true if the digests match or false otherwise.
      */
     function compareHashDigest($Digest1, $Digest2) {
-        if (strlen($Digest1) !== strlen($Digest2)) {
-            return false;
-        }
-
-        $Result = 0;
-        for ($i = strlen($Digest1) - 1; $i >= 0; $i--) {
-            $Result |= ord($Digest1[$i]) ^ ord($Digest2[$i]);
-        }
-
-        return 0 === $Result;
+        deprecated('compareHashDigest', 'hash_equals');
+        return hash_equals($Digest1, $Digest2);
     }
 }
 
@@ -4439,5 +4431,33 @@ if (!function_exists('userAgentType')) {
 
         // None of the mobile matches work so we must be a desktop browser.
         return $type = 'desktop';
+    }
+}
+
+if (!function_exists('increaseMaxExecutionTime')) {
+    /**
+     * Used to increase php max_execution_time value.
+     *
+     * @param int $maxExecutionTime PHP max execution time in seconds.
+     * @return bool Returns true if max_execution_time was increased (or stayed the same) or false otherwise.
+     */
+    function increaseMaxExecutionTime($maxExecutionTime) {
+
+        $iniMaxExecutionTime = ini_get('max_execution_time');
+
+        // max_execution_time == 0 means no limit.
+        if ($iniMaxExecutionTime === '0') {
+            return true;
+        }
+
+        if (((string)$maxExecutionTime) === '0') {
+            return set_time_limit(0);
+        }
+
+        if (!ctype_digit($iniMaxExecutionTime) || $iniMaxExecutionTime < $maxExecutionTime) {
+            return set_time_limit($maxExecutionTime);
+        }
+
+        return true;
     }
 }

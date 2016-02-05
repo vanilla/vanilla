@@ -2,7 +2,7 @@
 /**
  * Comment model
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -127,17 +127,26 @@ class CommentModel extends VanillaModel {
     }
 
    /**
+     * {@inheritdoc}
+     */
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
+        if (is_numeric($OrderFields)) {
+            deprecated('CommentModel->get($discussionID, ...)', 'CommentModel->getByDiscussion($discussionID, ...)');
+            return $this->getByDiscussion($OrderFields, $OrderDirection, $Limit);
+        }
+
+        throw new \BadMethodCallException('CommentModel->get() is not supported.', 400);
+    }
+
+    /**
     * Get comments for a discussion.
-    *
-    * @since 2.0.0
-    * @access public
     *
     * @param int $DiscussionID Which discussion to get comment from.
     * @param int $Limit Max number to get.
     * @param int $Offset Number to skip.
-    * @return object SQL results.
+     * @return Gdn_DataSet Returns a list of comments.
     */
-    public function get($DiscussionID, $Limit, $Offset = 0) {
+    public function getByDiscussion($DiscussionID, $Limit, $Offset = 0) {
         $this->CommentQuery(true, false);
         $this->EventArguments['DiscussionID'] =& $DiscussionID;
         $this->EventArguments['Limit'] =& $Limit;
@@ -560,17 +569,26 @@ class CommentModel extends VanillaModel {
     }
 
    /**
+     * {@inheritdoc}
+     */
+    public function getCount($Wheres = '') {
+        if (is_numeric($Wheres)) {
+            deprecated('CommentModel->getCount(int)', 'CommentModel->getCountByDiscussion()');
+            return $this->getCountByDiscussion($Wheres);
+        }
+
+        return parent::getCount($Wheres);
+    }
+
+    /**
      * Count total comments in a discussion specified by ID.
      *
      * Events: BeforeGetCount
-     *
-    * @since 2.0.0
-    * @access public
     *
     * @param int $DiscussionID Unique ID of discussion we're counting comments from.
     * @return object SQL result.
      */
-    public function getCount($DiscussionID) {
+    public function getCountByDiscussion($DiscussionID) {
         $this->fireEvent('BeforeGetCount');
 
         if (!empty($this->_Where)) {
@@ -1281,6 +1299,22 @@ class CommentModel extends VanillaModel {
         }
     }
 
+    /**
+     * Delete a comment.
+     *
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('CommentModel->delete(int)', 'CommentModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("CommentModel->delete() is not supported.", 400);
+    }
+
    /**
     * Delete a comment.
     *
@@ -1294,7 +1328,7 @@ class CommentModel extends VanillaModel {
     * @param array $Options Additional options for the delete.
     * @param bool Always returns TRUE.
     */
-    public function delete($CommentID, $Options = array()) {
+    public function deleteID($CommentID, $Options = array()) {
         $this->EventArguments['CommentID'] = $CommentID;
 
         $Comment = $this->getID($CommentID, DATASET_TYPE_ARRAY);

@@ -2,7 +2,7 @@
 /**
  * Update model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -22,9 +22,29 @@ class UpdateModel extends Gdn_Model {
      * @param $Addon
      * @param $Addons
      */
-    protected static function _AddAddon($Addon, &$Addons) {
+    protected static function _addAddon($Addon, &$Addons) {
         $Slug = strtolower($Addon['AddonKey']).'-'.strtolower($Addon['AddonType']);
         $Addons[$Slug] = $Addon;
+    }
+
+    /**
+     * Find a list of filenames in a folder or zip.
+     *
+     * @param string $path Folder or zip file to look in.
+     * @param array $fileNames List of files to attempt to locate inside $path.
+     * @return array|bool
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public static function findFiles($path, $fileNames) {
+        // Get the list of potential files to analyze.
+        if (is_dir($path)) {
+            $entries = self::_getInfoFiles($path, $fileNames);
+        } else {
+            $entries = self::_getInfoZip($path, $fileNames);
+        }
+
+        return $entries;
     }
 
     /**
@@ -42,7 +62,8 @@ class UpdateModel extends Gdn_Model {
             return false;
         }
 
-        $Result = array();
+        $Addon = [];
+        $Result = [];
 
         $InfoPaths = array(
             '/settings/about.php', // application
@@ -56,16 +77,16 @@ class UpdateModel extends Gdn_Model {
 
         // Get the list of potential files to analyze.
         if (is_dir($Path)) {
-            $Entries = self::_GetInfoFiles($Path, $InfoPaths);
+            $Entries = self::_getInfoFiles($Path, $InfoPaths);
         } else {
-            $Entries = self::_GetInfoZip($Path, $InfoPaths, false, $ThrowError);
+            $Entries = self::_getInfoZip($Path, $InfoPaths, false, $ThrowError);
             $DeleteEntries = true;
         }
 
         foreach ($Entries as $Entry) {
             if ($Entry['Name'] == '/index.php') {
                 // This could be the core vanilla package.
-                $Version = self::ParseCoreVersion($Entry['Path']);
+                $Version = self::parseCoreVersion($Entry['Path']);
 
                 if (!$Version) {
                     continue;
@@ -82,7 +103,7 @@ class UpdateModel extends Gdn_Model {
                 break;
             } elseif ($Entry['Name'] == 'vanilla2export.php') {
                 // This could be the vanilla porter.
-                $Version = self::ParseCoreVersion($Entry['Path']);
+                $Version = self::parseCoreVersion($Entry['Path']);
 
                 if (!$Version) {
                     continue;
@@ -98,7 +119,7 @@ class UpdateModel extends Gdn_Model {
                 break;
             } else {
                 // This could be an addon.
-                $Info = self::ParseInfoArray($Entry['Path']);
+                $Info = self::parseInfoArray($Entry['Path']);
                 if (!is_array($Info) && count($Info)) {
                     continue;
                 }
@@ -114,16 +135,14 @@ class UpdateModel extends Gdn_Model {
                     $Info['Name'] = $Key;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
-                    $Valid = false;
-                }
-
+                // Validate folder name matches key.
                 if (isset($Entry['Base']) && strcasecmp($Entry['Base'], $Key) != 0 && $Variable != 'ThemeInfo') {
                     $Result[] = "$Name: The addon's key is not the same as its folder name.";
                     $Valid = false;
@@ -154,7 +173,7 @@ class UpdateModel extends Gdn_Model {
 
         if ($DeleteEntries) {
             $FolderPath = substr($Path, 0, -4);
-            Gdn_FileSystem::RemoveFolder($FolderPath);
+            Gdn_FileSystem::removeFolder($FolderPath);
         }
 
         // Add the addon requirements.
@@ -207,8 +226,8 @@ class UpdateModel extends Gdn_Model {
                 // This could be a plugin file, but we have to examine its info array.
                 $Zip->extractTo($FolderPath, $Entry['name']);
                 $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::ParseInfoArray($FilePath, 'PluginInfo');
-                Gdn_FileSystem::RemoveFolder(dirname($FilePath));
+                $Info = self::parseInfoArray($FilePath, 'PluginInfo');
+                Gdn_FileSystem::removeFolder(dirname($FilePath));
 
                 if (!is_array($Info) || !count($Info)) {
                     continue;
@@ -229,13 +248,10 @@ class UpdateModel extends Gdn_Model {
                     $NewRoot = $Root;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -247,6 +263,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
@@ -264,8 +281,8 @@ class UpdateModel extends Gdn_Model {
                 // This could be a plugin file, but we have to examine its info array.
                 $Zip->extractTo($FolderPath, $Entry['name']);
                 $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::ParseInfoArray($FilePath, 'ApplicationInfo');
-                Gdn_FileSystem::RemoveFolder(dirname($FilePath));
+                $Info = self::parseInfoArray($FilePath, 'ApplicationInfo');
+                Gdn_FileSystem::removeFolder(dirname($FilePath));
 
                 if (!is_array($Info) || !count($Info)) {
                     $Result[] = "$Name: The application's info array could not be parsed.";
@@ -285,13 +302,10 @@ class UpdateModel extends Gdn_Model {
                     $NewRoot = $Root;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -303,6 +317,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
@@ -319,8 +334,8 @@ class UpdateModel extends Gdn_Model {
                 // This could be a theme file, but we have to examine its info array.
                 $Zip->extractTo($FolderPath, $Entry['name']);
                 $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::ParseInfoArray($FilePath, 'ThemeInfo');
-                Gdn_FileSystem::RemoveFolder(dirname($FilePath));
+                $Info = self::parseInfoArray($FilePath, 'ThemeInfo');
+                Gdn_FileSystem::removeFolder(dirname($FilePath));
 
                 if (!is_array($Info) || !count($Info)) {
                     continue;
@@ -337,13 +352,10 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -355,6 +367,7 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
@@ -369,8 +382,8 @@ class UpdateModel extends Gdn_Model {
                 // This could be a locale pack, but we have to examine its info array.
                 $Zip->extractTo($FolderPath, $Entry['name']);
                 $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::ParseInfoArray($FilePath, 'LocaleInfo');
-                Gdn_FileSystem::RemoveFolder(dirname($FilePath));
+                $Info = self::parseInfoArray($FilePath, 'LocaleInfo');
+                Gdn_FileSystem::removeFolder(dirname($FilePath));
 
                 if (!is_array($Info) || !count($Info)) {
                     continue;
@@ -395,13 +408,10 @@ class UpdateModel extends Gdn_Model {
                     $Valid = false;
                 }
 
-                if (!val('Description', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Description'));
-                    $Valid = false;
-                }
-
-                if (!val('Version', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Version'));
+                // Validate basic fields.
+                $checkResult = self::checkRequiredFields($Info);
+                if (count($checkResult)) {
+                    $Result = array_merge($Result, $checkResult);
                     $Valid = false;
                 }
 
@@ -413,13 +423,14 @@ class UpdateModel extends Gdn_Model {
                         'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
                         'Description' => $Info['Description'],
                         'Version' => $Info['Version'],
+                        'License' => $Info['License'],
                         'Path' => $Path);
                     break;
                 }
             }
 
             // Check to see if the entry is a core file.
-            if (StringEndsWith($Name, '/index.php')) {
+            if (stringEndsWith($Name, '/index.php')) {
                 if (count(explode('/', $Folder)) != 3) {
                     // The file is too deep to be the core's index.php
                     continue;
@@ -430,7 +441,7 @@ class UpdateModel extends Gdn_Model {
                 $FilePath = CombinePaths(array($FolderPath, $Name));
 
                 // Get the version number from the core.
-                $Version = self::ParseCoreVersion($FilePath);
+                $Version = self::parseCoreVersion($FilePath);
 
                 if (!$Version) {
                     continue;
@@ -478,7 +489,7 @@ class UpdateModel extends Gdn_Model {
         $Zip->close();
 
         if (file_exists($FolderPath)) {
-            Gdn_FileSystem::RemoveFolder($FolderPath);
+            Gdn_FileSystem::removeFolder($FolderPath);
         }
 
 
@@ -503,7 +514,7 @@ class UpdateModel extends Gdn_Model {
      * @param $InfoPaths
      * @return array
      */
-    protected static function _GetInfoFiles($Path, $InfoPaths) {
+    protected static function _getInfoFiles($Path, $InfoPaths) {
         $Path = str_replace('\\', '/', rtrim($Path));
 
         $Result = array();
@@ -521,7 +532,7 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Open a zip archive and inspect its contents for the requested paths.
      *
      * @param $Path
      * @param $InfoPaths
@@ -530,7 +541,7 @@ class UpdateModel extends Gdn_Model {
      * @return array|bool
      * @throws Exception
      */
-    protected static function _GetInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
+    protected static function _getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
         // Extract the zip file so we can make sure it has appropriate information.
         $Zip = null;
 
@@ -554,7 +565,7 @@ class UpdateModel extends Gdn_Model {
                     ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
                     ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.GetValue($ZipOpened, $Errors, 'Unknown Error').')'.$Worked, 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.val($ZipOpened, $Errors, 'Unknown Error').')', 400);
             }
             return false;
         }
@@ -562,11 +573,12 @@ class UpdateModel extends Gdn_Model {
         if ($TmpPath === false) {
             $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
         }
+
         if (file_exists($TmpPath)) {
-            Gdn_FileSystem::RemoveFolder($TmpPath);
+            Gdn_FileSystem::removeFolder($TmpPath);
         }
 
-        $Result = array();
+        $Result = [];
         for ($i = 0; $i < $Zip->numFiles; $i++) {
             $Entry = $Zip->statIndex($i);
 
@@ -718,6 +730,14 @@ class UpdateModel extends Gdn_Model {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @param $MyAddons
+     * @param $LatestAddons
+     * @param bool|true $OnlyUpdates
+     * @return bool
+     */
     public function compareAddons($MyAddons, $LatestAddons, $OnlyUpdates = true) {
         $UpdateAddons = false;
 
@@ -746,6 +766,30 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
+     * Check globally required fields in our addon info.
+     *
+     * @param $info
+     * @return array $results
+     */
+    protected static function checkRequiredFields($info) {
+        $results = array();
+
+        if (!val('Description', $info)) {
+            $results[] = sprintf(t('ValidateRequired'), t('Description'));
+        }
+
+        if (!val('Version', $info)) {
+            $results[] = sprintf(t('ValidateRequired'), t('Version'));
+        }
+
+        if (!val('License', $info)) {
+            $results[] = sprintf(t('ValidateRequired'), t('License'));
+        }
+
+        return $results;
+    }
+
+    /**
      *
      *
      * @param bool $Enabled
@@ -755,14 +799,14 @@ class UpdateModel extends Gdn_Model {
         $Addons = array();
 
         // Get the core.
-        self::_AddAddon(array('AddonKey' => 'vanilla', 'AddonType' => 'core', 'Version' => APPLICATION_VERSION, 'Folder' => '/'), $Addons);
+        self::_addAddon(array('AddonKey' => 'vanilla', 'AddonType' => 'core', 'Version' => APPLICATION_VERSION, 'Folder' => '/'), $Addons);
 
         // Get a list of all of the applications.
         $ApplicationManager = new Gdn_ApplicationManager();
         if ($Enabled) {
-            $Applications = $ApplicationManager->AvailableApplications();
+            $Applications = $ApplicationManager->availableApplications();
         } else {
-            $Applications = $ApplicationManager->EnabledApplications();
+            $Applications = $ApplicationManager->enabledApplications();
         }
 
         foreach ($Applications as $Key => $Info) {
@@ -778,9 +822,9 @@ class UpdateModel extends Gdn_Model {
         // Get a list of all of the plugins.
         $PluginManager = Gdn::pluginManager();
         if ($Enabled) {
-            $Plugins = $PluginManager->EnabledPlugins();
+            $Plugins = $PluginManager->enabledPlugins();
         } else {
-            $Plugins = $PluginManager->AvailablePlugins();
+            $Plugins = $PluginManager->availablePlugins();
         }
 
         foreach ($Plugins as $Key => $Info) {
@@ -790,15 +834,15 @@ class UpdateModel extends Gdn_Model {
             }
 
             $Addon = array('AddonKey' => $Key, 'AddonType' => 'plugin', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, $Key));
-            self::_AddAddon($Addon, $Addons);
+            self::_addAddon($Addon, $Addons);
         }
 
         // Get a list of all the themes.
         $ThemeManager = new Gdn_ThemeManager();
         if ($Enabled) {
-            $Themes = $ThemeManager->EnabledThemeInfo(true);
+            $Themes = $ThemeManager->enabledThemeInfo(true);
         } else {
-            $Themes = $ThemeManager->AvailableThemes();
+            $Themes = $ThemeManager->availableThemes();
         }
 
         foreach ($Themes as $Key => $Info) {
@@ -808,15 +852,15 @@ class UpdateModel extends Gdn_Model {
             }
 
             $Addon = array('AddonKey' => $Key, 'AddonType' => 'theme', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/themes/'.GetValue('Folder', $Info, $Key));
-            self::_AddAddon($Addon, $Addons);
+            self::_addAddon($Addon, $Addons);
         }
 
         // Get a list of all locales.
         $LocaleModel = new LocaleModel();
         if ($Enabled) {
-            $Locales = $LocaleModel->EnabledLocalePacks(true);
+            $Locales = $LocaleModel->enabledLocalePacks(true);
         } else {
-            $Locales = $LocaleModel->AvailableLocalePacks();
+            $Locales = $LocaleModel->availableLocalePacks();
         }
 
         foreach ($Locales as $Key => $Info) {
@@ -826,7 +870,7 @@ class UpdateModel extends Gdn_Model {
             }
 
             $Addon = array('AddonKey' => $Key, 'AddonType' => 'locale', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/locales/'.GetValue('Folder', $Info, $Key));
-            self::_AddAddon($Addon, $Addons);
+            self::_addAddon($Addon, $Addons);
         }
 
         return $Addons;
@@ -842,7 +886,7 @@ class UpdateModel extends Gdn_Model {
      */
     public function getAddonUpdates($Enabled = false, $OnlyUpdates = true) {
         // Get the addons on this site.
-        $MyAddons = $this->GetAddons($Enabled);
+        $MyAddons = $this->getAddons($Enabled);
 
         // Build the query for them.
         $Slugs = array_keys($MyAddons);
@@ -855,7 +899,7 @@ class UpdateModel extends Gdn_Model {
 
         if ($SiteAddons) {
             $SiteAddons = val('Addons', json_decode($SiteAddons, true));
-            $UpdateAddons = $this->CompareAddons($MyAddons, $SiteAddons);
+            $UpdateAddons = $this->compareAddons($MyAddons, $SiteAddons);
         }
         return $UpdateAddons;
     }
@@ -871,7 +915,7 @@ class UpdateModel extends Gdn_Model {
     public function runStructure($AddonCode = null, $Explicit = false, $Drop = false) {
         // Get the structure files for all of the enabled applications.
         $ApplicationManager = new Gdn_ApplicationManager();
-        $Apps = $ApplicationManager->EnabledApplications();
+        $Apps = $ApplicationManager->enabledApplications();
         $AppNames = consolidateArrayValuesByKey($Apps, 'Folder');
         $Paths = array();
         foreach ($Apps as $Key => $AppInfo) {
@@ -880,7 +924,7 @@ class UpdateModel extends Gdn_Model {
                 $Paths[] = $Path;
             }
 
-            Gdn::ApplicationManager()->RegisterPermissions($Key, $this->Validation);
+            Gdn::applicationManager()->registerPermissions($Key, $this->Validation);
         }
 
         // Execute the structures.
@@ -895,7 +939,7 @@ class UpdateModel extends Gdn_Model {
         // Execute the structures for all of the plugins.
         $PluginManager = Gdn::pluginManager();
 
-        $Registered = $PluginManager->RegisteredPlugins();
+        $Registered = $PluginManager->registeredPlugins();
 
         foreach ($Registered as $ClassName => $Enabled) {
             if (!$Enabled) {
@@ -903,10 +947,10 @@ class UpdateModel extends Gdn_Model {
             }
 
             try {
-                $Plugin = $PluginManager->GetPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
+                $Plugin = $PluginManager->getPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
                 if (method_exists($Plugin, 'Structure')) {
                     trace("{$ClassName}->Structure()");
-                    $Plugin->Structure();
+                    $Plugin->structure();
                 }
             } catch (Exception $Ex) {
                 // Do nothing, plugin wouldn't load/structure.

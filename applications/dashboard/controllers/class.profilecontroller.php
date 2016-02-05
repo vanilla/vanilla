@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -133,8 +133,10 @@ class ProfileController extends Gdn_Controller {
 
         $Activities = $this->ActivityModel->getWhere(
             array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs),
-            $Offset,
-            $Limit
+            '',
+            '',
+            $Limit,
+            $Offset
         )->resultArray();
         $this->ActivityModel->joinComments($Activities);
         $this->setData('Activities', $Activities);
@@ -595,7 +597,7 @@ class ProfileController extends Gdn_Controller {
         );
 
         $this->ActivityModel = new ActivityModel();
-        $Activities = $this->ActivityModel->getWhere($Where, 0, 5)->resultArray();
+        $Activities = $this->ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
         $this->setData('Activities', $Activities);
         $this->ActivityModel->markRead(Gdn::session()->UserID);
 
@@ -802,8 +804,6 @@ class ProfileController extends Gdn_Controller {
      */
     public function preference($Key = false) {
         $this->permission('Garden.SignIn.Allow');
-
-        $this->Form->InputPrefix = '';
 
         if ($this->Form->authenticatedPostBack()) {
             $Data = $this->Form->formValues();
@@ -1245,10 +1245,6 @@ class ProfileController extends Gdn_Controller {
         if (!is_array($TabName)) {
             if ($TabHtml == '') {
                 $TabHtml = $TabName;
-            }
-
-            if (!$CssClass && $TabUrl == Gdn::request()->path()) {
-                $CssClass = 'Active';
             }
 
             $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));

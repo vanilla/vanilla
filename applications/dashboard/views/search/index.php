@@ -2,7 +2,6 @@
     <div class="SearchForm">
         <?php
         $Form = $this->Form;
-        $Form->InputPrefix = '';
         echo $Form->open(array('action' => url('/search'), 'method' => 'get')),
         '<div class="SiteSearch InputAndButton">',
         $Form->textBox('Search'),

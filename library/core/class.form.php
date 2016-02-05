@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -33,13 +33,6 @@ class Gdn_Form extends Gdn_Pluggable {
      *    value will not be used.
      */
     public $IDPrefix = 'Form_';
-
-    /**
-     * @var string All form-related elements (form, input, select, etc) will have
-     *    this value prefixed on their name attribute. Default is "Form".
-     *    If a model is assigned, the model name is used instead.
-     */
-    public $InputPrefix = '';
 
     /** @var string Form submit method. Options are 'post' or 'get'. */
     public $Method = 'post';
@@ -92,6 +85,32 @@ class Gdn_Form extends Gdn_Pluggable {
         $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
 
         parent::__construct();
+    }
+
+    /**
+     * Backwards compatibility getter.
+     *
+     * @param strig $name The property to get.
+     * @return mixed Returns the value of the property.
+     */
+    public function __get($name) {
+        if ($name === 'InputPrefix') {
+            trigger_error("Gdn_Form->InputPrefix is deprecated", E_USER_DEPRECATED);
+        }
+        return null;
+    }
+
+    /**
+     * Backwards compatibility setter.
+     *
+     * @param string $name The name of the property to set.
+     * @param mixed $value The new value of the property.
+     */
+    public function __set($name, $value) {
+        if ($name === 'InputPrefix') {
+            trigger_error("Gdn_Form->InputPrefix is deprecated", E_USER_DEPRECATED);
+        }
+        $this->$name = $value;
     }
 
 
@@ -1154,23 +1173,15 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * Encodes the string in a php-form safe-encoded format.
+     * @see Gdn_Form::escapeFieldName()
+     * @deprecated
      *
-     * @param string $String The string to encode.
+     * @param string $string
      * @return string
      */
-    public function escapeString($String) {
-        $Array = false;
-        if (substr($String, -2) == '[]') {
-            $String = substr($String, 0, -2);
-            $Array = true;
-        }
-        $Return = urlencode(str_replace(' ', '_', $String));
-        if ($Array === true) {
-            $Return .= '[]';
-        }
-
-        return str_replace('.', '-dot-', $Return);
+    public function escapeString($string) {
+        deprecated('Gd_Form::escapeString()');
+        return $this->escapeFieldName($string);
     }
 
     /**
@@ -1482,19 +1493,13 @@ PASSWORDMETER;
      * @todo check that missing DataObject parameter
      */
     public function open($Attributes = array()) {
-//      if ($this->InputPrefix)
-//         Trace($this->InputPrefix, 'InputPrefix');
-
         if (!is_array($Attributes)) {
             $Attributes = array();
         }
 
         $Return = '<form';
-        if ($this->InputPrefix != '' || array_key_exists('id', $Attributes)) {
-            $Return .= $this->_idAttribute(
-                $this->InputPrefix,
-                $Attributes
-            );
+        if (array_key_exists('id', $Attributes)) {
+            $Return .= $this->_idAttribute('', $Attributes);
         }
 
         // Method
@@ -1844,7 +1849,7 @@ PASSWORDMETER;
      * @throws Gdn_UserException Throws an exception when this is a postback AND the transient key doesn't validate.
      */
     public function authenticatedPostBack($throw = false) {
-        $keyName = $this->escapeFieldName('TransientKey');
+        $keyName = 'TransientKey';
         $postBackKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, $keyName, false);
 
         // If this isn't a postback then return false if there isn't a transient key.
@@ -1870,8 +1875,7 @@ PASSWORDMETER;
      * @return boolean
      */
     public function buttonExists($ButtonCode) {
-        $NameKey = $this->escapeString($ButtonCode);
-        return array_key_exists($NameKey, $this->formValues()) ? true : false;
+        return array_key_exists($ButtonCode, $this->formValues()) ? true : false;
     }
 
     /**
@@ -1895,17 +1899,39 @@ PASSWORDMETER;
     }
 
     /**
-     * Returns the provided fieldname with non-alpha-numeric values stripped.
+     * Returns the provided fieldname with improper characters stripped.
      *
-     * @param string $FieldName The field name to escape.
+     * PHP doesn't allow "." in variable names from external sources such as a
+     * HTML form. Some Vanilla components however rely on variable names such
+     * as "a.b.c". So we need to escape them for backwards compatibility.
+     *
+     * Replaces e.g. "\" with "\\", "-dot-" with "\\-dot-" and "." with "-dot-".
+     *
+     * @see Gdn_Form::unescapeFieldName()
+     *
+     * @param string $string
      * @return string
      */
-    public function escapeFieldName($FieldName) {
-        $Return = $this->InputPrefix;
-        if ($Return != '') {
-            $Return .= '/';
-        }
-        return $Return.$this->escapeString($FieldName);
+    public function escapeFieldName($string) {
+        $search = array('\\', '-dot-', '.');
+        $replace = array('\\\\', '\\-dot-', '-dot-');
+        return str_replace($search, $replace, $string);
+    }
+
+    /**
+     * Unescape strings that were escaped with {@link Gdn_Form::escapeFieldName()}.
+     *
+     * Replaces e.g. "\\" with "\", "\\-dot-" with "-dot-" and "-dot-" with ".".
+     *
+     * @see Gdn_Form::escapeFieldName()
+     *
+     * @param string $string
+     * @return string
+     */
+    public function unescapeFieldName($string) {
+        $search = array('/(?<!\\\\)(\\\\\\\\)*-dot-/', '/\\\\-dot-/', '/\\\\\\\\/');
+        $replace = array('$1.', '-dot-', '\\\\');
+        return preg_replace($search, $replace, $string);
     }
 
     /**
@@ -1994,22 +2020,14 @@ PASSWORDMETER;
         }
 
         if (!is_array($this->_FormValues)) {
-            $TableName = $this->InputPrefix;
-            if (strlen($TableName) > 0) {
-                $TableName .= '/';
-            }
-            $TableNameLength = strlen($TableName);
             $this->_FormValues = array();
-            $Collection = $this->Method == 'get' ? $_GET : $_POST; // TODO wtf globals
-            $InputType = $this->Method == 'get' ? INPUT_GET : INPUT_POST;
 
+            $Request = Gdn::request();
+            $Collection = $this->Method == 'get' ? $Request->get() : $Request->post();
 
-            foreach ($Collection as $Field => $Value) {
-                $FieldName = substr($Field, $TableNameLength);
-                $FieldName = $this->_unescapeString($FieldName);
-                if (substr($Field, 0, $TableNameLength) == $TableName) {
-                    $this->_FormValues[$FieldName] = $Value;
-                }
+            foreach ($Collection as $FieldName => $Value) {
+                $FieldName = $this->unescapeFieldName($FieldName);
+                $this->_FormValues[$FieldName] = $Value;
             }
 
             // Make sure that unchecked checkboxes get added to the collection
@@ -2396,9 +2414,6 @@ PASSWORDMETER;
     public function setModel($Model, $DataSet = false) {
         $this->_Model = $Model;
 
-        if ($this->InputPrefix) {
-            $this->InputPrefix = $this->_Model->Name;
-        }
         if ($DataSet !== false) {
             $this->SetData($DataSet);
         }
@@ -2603,6 +2618,7 @@ PASSWORDMETER;
             'yearrange',
             'fields',
             'inlineerrors',
+            'wrap',
             'categorydata'
         );
         $Return = '';
@@ -2612,7 +2628,7 @@ PASSWORDMETER;
             foreach ($Attributes as $Attribute => $Value) {
                 // Ignore reserved attributes
                 if (!in_array(strtolower($Attribute), $ReservedAttributes)) {
-                    $Return .= ' '.$Attribute.'="'.htmlspecialchars($Value, ENT_COMPAT, 'UTF-8').'"';
+                    $Return .= ' '.$Attribute.($Value === true ? '' : '="'.htmlspecialchars($Value, ENT_COMPAT, 'UTF-8').'"');
                 }
             }
         }
@@ -2650,21 +2666,7 @@ PASSWORDMETER;
     protected function _nameAttribute($FieldName, $Attributes) {
         // Name from attributes overrides the default.
         $Name = $this->escapeFieldName(arrayValueI('name', $Attributes, $FieldName));
-        return (empty($Name)) ? '' : ' name="'.$Name.'"';
-    }
-
-    /**
-     * Decodes the encoded string from a php-form safe-encoded format to the
-     * format it was in when presented to the form.
-     *
-     * @param string $EscapedString
-     * @return unknown
-     */
-    protected function _unescapeString(
-        $EscapedString
-    ) {
-        $Return = str_replace('-dot-', '.', $EscapedString);
-        return urldecode($Return);
+        return ' name="'.htmlspecialchars($Name, ENT_COMPAT, c('Garden.Charset', 'UTF-8')).'"';
     }
 
     /**

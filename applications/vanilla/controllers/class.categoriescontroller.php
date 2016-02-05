@@ -2,7 +2,7 @@
 /**
  * Categories controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -27,6 +27,7 @@ class CategoriesController extends VanillaController {
 
     /** @var object Category object. */
     public $Category;
+
 
     /**
      *
@@ -68,7 +69,7 @@ class CategoriesController extends VanillaController {
 
         saveToConfig('Vanilla.Discussions.SortField', 'd.DateInserted', false);
         $DiscussionModel = new DiscussionModel();
-        $Discussions = $DiscussionModel->getWhere($Where, $Offset, $Limit);
+        $Discussions = $DiscussionModel->getWhereRecent($Where, $Limit, $Offset);
         $this->DiscussionData = $this->setData('Discussions', $Discussions);
         $this->setData('_CurrentRecords', count($Discussions));
         $this->setData('_Limit', $Limit);
@@ -277,7 +278,7 @@ class CategoriesController extends VanillaController {
             $this->setData('AnnounceData', $AnnounceData, true);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
-            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhere($Wheres, $Offset, $Limit));
+            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();
@@ -478,5 +479,14 @@ class CategoriesController extends VanillaController {
         }
 
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
+
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues with outdated category
+         * information (e.g. counts).  The same check is performed here as in Gdn_Controller before the Cache-Control
+         * header is added, but this value includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
     }
 }

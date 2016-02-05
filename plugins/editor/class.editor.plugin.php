@@ -3,7 +3,7 @@
  * Editor Plugin
  *
  * @author Dane MacMillan
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package editor
  */
@@ -632,7 +632,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // If force Wysiwyg enabled in settings
-        $needsConversion = (!in_array($this->Format, array('Html', 'Wysiwyg')));
+        $needsConversion = (!in_array($this->Format, array('Wysiwyg')));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
             $wysiwygBody = Gdn_Format::to($Sender->getValue('Body'), $this->Format);
             $Sender->setValue('Body', $wysiwygBody);
@@ -765,7 +765,6 @@ class EditorPlugin extends Gdn_Plugin {
                 'ThumbHeight' => $thumbHeight,
                 'InsertUserID' => Gdn::session()->UserID,
                 'DateInserted' => date('Y-m-d H:i:s'),
-                'StorageMethod' => 'local',
                 'Path' => $filePathParsed['SaveName'],
                 'ThumbPath' => $thumbPathParsed['SaveName']
             );
@@ -1416,7 +1415,6 @@ class EditorPlugin extends Gdn_Plugin {
             // Save thumbnail information to DB.
             $model->save(array(
                 'MediaID' => $media_id,
-                'StorageMethod' => $filepath_parsed['Type'],
                 'ThumbWidth' => $thumb_width,
                 'ThumbHeight' => $thumb_height,
                 'ThumbPath' => $filepath_parsed['SaveName']

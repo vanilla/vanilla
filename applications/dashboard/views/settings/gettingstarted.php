@@ -245,11 +245,7 @@ echo $this->Form->errors();
                 <?php
                 $Attribs = array('Multiline' => true, 'class' => 'Message');
                 if (!$this->Form->authenticatedPostBack())
-                    $Attribs['value'] = t('InvitationMessage', "Hi Pal!
-
-Check out the new community forum I've just set up. It's a great place for us to chat with each other online.
-
-Follow the link below to log in.");
+                    $Attribs['value'] = t('Check out the new community forum I\'ve just set up.');
                 echo $this->Form->textBox('InvitationMessage', $Attribs);
                 echo $this->Form->textBox('Recipients', array('class' => 'RecipientBox'));
                 ?>

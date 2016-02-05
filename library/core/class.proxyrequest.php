@@ -3,7 +3,7 @@
  * ProxyRequest handler class.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.18
@@ -546,7 +546,7 @@ class ProxyRequest {
         // Add the response body to the log entry if it isn't too long or we are debugging.
         $logResponseBody = val('LogResponseBody', $Options, null);
         $logResponseBody = $logResponseBody === null ?
-            !in_array($RequestMethod, ['GET', 'OPTIONS']) && strlen($this->responseBody) < self::MAX_LOG_BODYLENGTH :
+            !in_array($RequestMethod, ['GET', 'OPTIONS']) && strlen($this->ResponseBody) < self::MAX_LOG_BODYLENGTH :
             $logResponseBody;
 
         if ($logResponseBody || debug() || (!$this->responseClass('2xx') && val('LogResponseErrorBody', $Options, true))) {
@@ -653,6 +653,15 @@ class ProxyRequest {
      */
     public function status() {
         return $this->ResponseStatus;
+    }
+
+    /**
+     * Get request total time
+     *
+     * @return float
+     */
+    public function time() {
+        return $this->ResponseTime;
     }
 
     /**

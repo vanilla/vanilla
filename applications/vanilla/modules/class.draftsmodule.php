@@ -2,7 +2,7 @@
 /**
  * Drafts module
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -20,7 +20,7 @@ class DraftsModule extends Gdn_Module {
         $Session = Gdn::session();
         if ($Session->isValid()) {
             $DraftModel = new DraftModel();
-            $this->Data = $DraftModel->get($Session->UserID, 0, $Limit, $DiscussionID);
+            $this->Data = $DraftModel->getByUser($Session->UserID, 0, $Limit, $DiscussionID);
         }
         $this->Form = $this->_Sender->Form;
     }

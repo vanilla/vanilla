@@ -1,0 +1,292 @@
+# We're excluding the legacy files in the linting, since admin only existed in css.
+# Good practices going forward, though.
+
+exclude: 'admin.scss'
+
+# List of gem names to load custom linters from (make sure they are already
+# installed)
+plugin_gems: []
+
+linters:
+  BangFormat:
+    enabled: true
+    exclude: legacy/**
+    space_before_bang: true
+    space_after_bang: false
+
+  BemDepth:
+    enabled: false
+    max_elements: 1
+
+  BorderZero:
+    enabled: true
+    exclude: legacy/**
+    convention: zero # or `none`
+
+  ChainedClasses:
+    enabled: false
+
+  ColorKeyword:
+    enabled: true
+    exclude: legacy/**
+
+  ColorVariable:
+    enabled: true
+    exclude: legacy/**
+
+  Comment:
+    enabled: true
+    exclude: legacy/**
+    style: silent
+
+  DebugStatement:
+    enabled: true
+    exclude: legacy/**
+
+  DeclarationOrder:
+    enabled: true
+    exclude: legacy/**
+
+  DisableLinterReason:
+    enabled: false
+
+  DuplicateProperty:
+    enabled: true
+    exclude: legacy/**
+
+  ElsePlacement:
+    enabled: true
+    exclude: legacy/**
+    style: same_line # or 'new_line'
+
+  EmptyLineBetweenBlocks:
+    enabled: true
+    exclude: legacy/**
+    ignore_single_line_blocks: true
+
+  EmptyRule:
+    enabled: true
+    exclude: legacy/**
+
+  ExtendDirective:
+    enabled: false
+
+  FinalNewline:
+    enabled: true
+    exclude: legacy/**
+    present: true
+
+  HexLength:
+    enabled: true
+    exclude: legacy/**
+    style: short # or 'long'
+
+  HexNotation:
+    enabled: true
+    exclude: legacy/**
+    style: lowercase # or 'uppercase'
+
+  HexValidation:
+    enabled: true
+    exclude: legacy/**
+
+  IdSelector:
+    enabled: true
+    exclude: legacy/**
+
+  ImportantRule:
+    enabled: true
+    exclude: legacy/**
+
+  ImportPath:
+    enabled: true
+    exclude: legacy/**
+    leading_underscore: false
+    filename_extension: false
+
+  Indentation:
+    enabled: true
+    exclude: legacy/**
+    allow_non_nested_indentation: false
+    character: space # or 'tab'
+    width: 2
+
+  LeadingZero:
+    enabled: true
+    exclude: legacy/**
+    style: exclude_zero # or 'include_zero'
+
+  MergeableSelector:
+    enabled: true
+    exclude: legacy/**
+    force_nesting: true
+
+  NameFormat:
+    enabled: true
+    exclude: legacy/**
+    allow_leading_underscore: true
+    convention: hyphenated_lowercase # or 'camel_case', or 'snake_case', or a regex pattern
+
+  NestingDepth:
+    enabled: true
+    exclude: legacy/**
+    max_depth: 3
+    ignore_parent_selectors: false
+
+  PlaceholderInExtend:
+    enabled: true
+    exclude: legacy/**
+
+  PropertyCount:
+    enabled: false
+    include_nested: false
+    max_properties: 10
+
+  PropertySortOrder:
+    enabled: false
+    exclude: legacy/**
+    ignore_unspecified: false
+    min_properties: 2
+    separate_groups: false
+
+  PropertySpelling:
+    enabled: true
+    exclude: legacy/**
+    extra_properties: []
+    disabled_properties: []
+
+  PropertyUnits:
+    enabled: true
+    exclude: legacy/**
+    global: [
+      'ch', 'em', 'ex', 'rem',                 # Font-relative lengths
+      'cm', 'in', 'mm', 'pc', 'pt', 'px', 'q', # Absolute lengths
+      'vh', 'vw', 'vmin', 'vmax',              # Viewport-percentage lengths
+      'deg', 'grad', 'rad', 'turn',            # Angle
+      'ms', 's',                               # Duration
+      'Hz', 'kHz',                             # Frequency
+      'dpi', 'dpcm', 'dppx',                   # Resolution
+      '%']                                     # Other
+    properties: {}
+
+  PseudoElement:
+    enabled: true
+    exclude: legacy/**
+
+  QualifyingElement:
+    enabled: true
+    exclude: legacy/**
+    allow_element_with_attribute: false
+    allow_element_with_class: false
+    allow_element_with_id: false
+
+  SelectorDepth:
+    enabled: true
+    exclude: legacy/**
+    max_depth: 3
+
+  SelectorFormat:
+    enabled: false
+    exclude: legacy/**
+    convention: hyphenated_lowercase # or 'strict_BEM', or 'hyphenated_BEM', or 'snake_case', or 'camel_case', or a regex pattern
+
+  Shorthand:
+    enabled: true
+    exclude: legacy/**
+    allowed_shorthands: [1, 2, 3]
+
+  SingleLinePerProperty:
+    enabled: true
+    exclude: legacy/**
+    allow_single_line_rule_sets: true
+
+  SingleLinePerSelector:
+    enabled: true
+    exclude: legacy/**
+
+  SpaceAfterComma:
+    enabled: true
+    exclude: legacy/**
+    style: one_space # or 'no_space', or 'at_least_one_space'
+
+  SpaceAfterPropertyColon:
+    enabled: true
+    exclude: legacy/**
+    style: one_space # or 'no_space', or 'at_least_one_space', or 'aligned'
+
+  SpaceAfterPropertyName:
+    enabled: true
+    exclude: legacy/**
+
+  SpaceAfterVariableName:
+    enabled: true
+    exclude: legacy/**
+
+  SpaceAroundOperator:
+    enabled: true
+    exclude: legacy/**
+    style: one_space # or 'at_least_one_space', or 'no_space'
+
+  SpaceBeforeBrace:
+    enabled: true
+    exclude: legacy/**
+    style: space # or 'new_line'
+    allow_single_line_padding: false
+
+  SpaceBetweenParens:
+    enabled: true
+    exclude: legacy/**
+    spaces: 0
+
+  StringQuotes:
+    enabled: true
+    exclude: legacy/**
+    style: single_quotes # or double_quotes
+
+  TrailingSemicolon:
+    enabled: true
+    exclude: legacy/**
+
+  TrailingWhitespace:
+    enabled: true
+    exclude: legacy/**
+
+  TrailingZero:
+    enabled: false
+
+  TransitionAll:
+    enabled: false
+
+  UnnecessaryMantissa:
+    enabled: true
+    exclude: legacy/**
+
+  UnnecessaryParentReference:
+    enabled: true
+    exclude: legacy/**
+
+  UrlFormat:
+    enabled: true
+    exclude: legacy/**
+
+  UrlQuotes:
+    enabled: true
+    exclude: legacy/**
+
+  VariableForProperty:
+    enabled: false
+    properties: []
+
+  VendorPrefix:
+    enabled: true
+    exclude: legacy/**
+    identifier_list: base
+    additional_identifiers: []
+    excluded_identifiers: []
+
+  ZeroUnit:
+    enabled: true
+    exclude: legacy/**
+
+  Compass::*:
+    enabled: false

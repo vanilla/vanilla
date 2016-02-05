@@ -101,8 +101,6 @@ jQuery(document).ready(function($) {
                 gdn.informError(xhr, draft);
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 var processedTargets = false;
                 // If there are targets, process them
                 if (json.Targets && json.Targets.length > 0) {
@@ -287,8 +285,6 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    json = $.postParseJson(json);
-
                     $(msg).after(json.Data);
                     $(msg).hide();
                     $(document).trigger('EditCommentFormLoaded', [container]);
@@ -362,8 +358,6 @@ jQuery(document).ready(function($) {
 //            gdn.informError(xhr, true);
 //         },
 //         success: function(json) {
-//            json = $.postParseJson(json);
-//
 //            if(json.Data && json.LastCommentID) {
 //               gdn.definition('LastCommentID', json.LastCommentID, true);
 //               $(json.Data).appendTo("ul.Comments")

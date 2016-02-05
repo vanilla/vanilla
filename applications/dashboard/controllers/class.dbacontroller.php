@@ -2,7 +2,7 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -27,7 +27,6 @@ class DbaController extends DashboardController {
         Gdn_Theme::section('Dashboard');
         $this->Model = new DBAModel();
         $this->Form = new Gdn_Form();
-        $this->Form->InputPrefix = '';
 
         $this->addJsFile('dba.js');
     }
@@ -44,7 +43,7 @@ class DbaController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function counts($Table = false, $Column = false, $From = false, $To = false, $Max = false) {
-        set_time_limit(300);
+        increaseMaxExecutionTime(300);
         $this->permission('Garden.Settings.Manage');
 
         if ($Table && $Column && strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {

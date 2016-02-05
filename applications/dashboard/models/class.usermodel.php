@@ -2,7 +2,7 @@
 /**
  * User model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -49,6 +49,12 @@ class UserModel extends Gdn_Model {
     /** @var */
     public $SessionColumns;
 
+    /** @var int The number of users when database optimizations kick in. */
+    public $UserThreshold = 10000;
+
+    /** @var int The number of users when extreme database optimizations kick in. */
+    public $UserMegaThreshold = 1000000;
+
     /**
      * Class constructor. Defines the related database table name.
      */
@@ -60,6 +66,38 @@ class UserModel extends Gdn_Model {
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
             'Score', 'Photo'
         ));
+    }
+
+    /**
+     * Whether or not we are past the user threshold.
+     *
+     * This is a useful indication that some database operations on the User table will be painfully long.
+     *
+     * @return bool
+     */
+    public function pastUserThreshold() {
+        $estimate = $this->countEstimate();
+        return $estimate > $this->UserThreshold;
+    }
+
+    /**
+     * Whether we're wandered into extreme database optimization territory with our user count.
+     *
+     * @return bool
+     */
+    public function pastUserMegaThreshold() {
+        $estimate = $this->countEstimate();
+        return $estimate > $this->UserMegaThreshold;
+    }
+
+    /**
+     * Approximate the number of users by checking the database table status.
+     *
+     * @return int
+     */
+    public function countEstimate() {
+        $px = Gdn::database()->DatabasePrefix;
+        return Gdn::database()->query("show table status like '{$px}User'")->value('Rows', 0);
     }
 
     /**
@@ -244,6 +282,12 @@ class UserModel extends Gdn_Model {
 
         // Copy all the comments from the old user to the new user.
         $this->mergeCopy($MergeID, 'Comment', 'InsertUserID', $OldUserID, $NewUserID);
+
+        // Update the last comment user ID.
+        $this->SQL->put('Discussion', ['LastCommentUserID' => $NewUserID], ['LastCommentUserID' => $OldUserID]);
+
+        // Clear the categories cache.
+        CategoryModel::clearCache();
 
         // Copy all of the activities.
         $this->mergeCopy($MergeID, 'Activity', 'NotifyUserID', $OldUserID, $NewUserID);
@@ -3143,10 +3187,17 @@ class UserModel extends Gdn_Model {
             // Send out a notification to the user
             $User = $this->getID($UserID);
             if ($User) {
+                $Email = new Gdn_Email();
                 $Email->subject(sprintf(t('[%1$s] Membership Approved'), c('Garden.Title')));
-                $Email->message(sprintf(t('EmailMembershipApproved'), $User->Name, ExternalUrl(SignInUrl())));
                 $Email->to($User->Email);
-                //$Email->from(c('Garden.SupportEmail'), c('Garden.SupportName'));
+
+                $message = sprintf(t('Hello %s!'), val('Name', $User)).' '.t('You have been approved for membership.');
+                $emailTemplate = $Email->getEmailTemplate()
+                    ->setMessage($message)
+                    ->setButton(ExternalUrl(SignInUrl()), t('Sign In Now'))
+                    ->setTitle(t('Membership Approved'));
+
+                $Email->setEmailTemplate($emailTemplate);
                 $Email->send();
 
                 // Report that the user was approved.
@@ -3183,13 +3234,29 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Delete a user.
+     *
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('UserModel->delete(int)', 'UserModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("UserModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Delete a single user.
      *
-     * @param int $UserID
-     * @param array $Options See DeleteContent(), GetDelete()
+     * @param int $userID
+     * @param array $options See {@link UserModel::deleteContent()}, and {@link UserModel::getDelete()}.
      */
-    public function delete($UserID, $Options = array()) {
-        if ($UserID == $this->getSystemUserID()) {
+    public function deleteID($userID, $options = array()) {
+        if ($userID == $this->getSystemUserID()) {
             $this->Validation->addValidationResult('', 'You cannot delete the system user.');
             return false;
         }
@@ -3197,12 +3264,12 @@ class UserModel extends Gdn_Model {
         $Content = array();
 
         // Remove shared authentications.
-        $this->getDelete('UserAuthentication', array('UserID' => $UserID), $Content);
+        $this->getDelete('UserAuthentication', array('UserID' => $userID), $Content);
 
         // Remove role associations.
-        $this->getDelete('UserRole', array('UserID' => $UserID), $Content);
+        $this->getDelete('UserRole', array('UserID' => $userID), $Content);
 
-        $this->deleteContent($UserID, $Options, $Content);
+        $this->deleteContent($userID, $options, $Content);
 
         // Remove the user's information
         $this->SQL->update('User')
@@ -3211,7 +3278,7 @@ class UserModel extends Gdn_Model {
                 'Photo' => null,
                 'Password' => RandomString('10'),
                 'About' => '',
-                'Email' => 'user_'.$UserID.'@deleted.email',
+                'Email' => 'user_'.$userID.'@deleted.email',
                 'ShowEmail' => '0',
                 'Gender' => 'u',
                 'CountVisits' => 0,
@@ -3230,11 +3297,11 @@ class UserModel extends Gdn_Model {
                 'Admin' => 0,
                 'Deleted' => 1
             ))
-            ->where('UserID', $UserID)
+            ->where('UserID', $userID)
             ->put();
 
         // Remove user's cache rows
-        $this->clearCache($UserID);
+        $this->clearCache($userID);
 
         return true;
     }
@@ -3783,16 +3850,20 @@ class UserModel extends Gdn_Model {
         $Email->subject(sprintf(t('[%s] Confirm Your Email Address'), $AppTitle));
         $Email->to($User['Email']);
 
-        $EmailFormat = t('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL);
+        $EmailUrlFormat = '{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
         $Data = array();
         $Data['EmailKey'] = $Code;
         $Data['User'] = arrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
-        $Data['Title'] = $AppTitle;
 
-        $Message = formatString($EmailFormat, $Data);
-        $Message = $this->_addEmailHeaderFooter($Message, $Data);
-        $Email->message($Message);
+        $url = formatString($EmailUrlFormat, $Data);
+        $message = formatString(t('Hello {User.Name}!'), $Data).' '.t('You need to confirm your email address before you can continue.');
 
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setTitle(t('Confirm Your Email Address'))
+            ->setMessage($message)
+            ->setButton($url, t('Confirm My Email Address'));
+
+        $Email->setEmailTemplate($emailTemplate);
         $Email->send();
     }
 
@@ -3818,6 +3889,7 @@ class UserModel extends Gdn_Model {
         $Email = new Gdn_Email();
         $Email->subject(sprintf(t('[%s] Welcome Aboard!'), $AppTitle));
         $Email->to($User->Email);
+        $emailTemplate = $Email->getEmailTemplate();
 
         $Data = array();
         $Data['User'] = arrayTranslate((array)$User, array('UserID', 'Name', 'Email'));
@@ -3829,29 +3901,42 @@ class UserModel extends Gdn_Model {
 
         $Data['EmailKey'] = valr('Attributes.EmailKey', $User);
 
-        // Check for the new email format.
-        if (($EmailFormat = t("EmailWelcome{$RegisterType}", '#')) != '#') {
-            $Message = formatString($EmailFormat, $Data);
-        } else {
-            $Message = sprintf(
-                t('EmailWelcome'),
-                $User->Name,
-                $Sender->Name,
-                $AppTitle,
-                ExternalUrl('/'),
-                $Password,
-                $User->Email
-            );
+        $message = '<p>'.formatString(t('Hello {User.Name}!'), $Data).' ';
+
+        switch($RegisterType) {
+            case 'Connect' :
+                $message .= formatString(t('You have successfully connected to {Title}.'), $Data).' '.
+                    t('Find your account information below.').'<br></p>'.
+                    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
+                    formatString(t('Connected With: {ProviderName}'), $Data).'</p>';
+                break;
+            case 'Register' :
+                $message .= formatString(t('You have successfully registered for an account at {Title}.'), $Data).' '.
+                    t('Find your account information below.').'<br></p>'.
+                    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
+                    sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'</p>';
+                break;
+            default :
+                $message .= sprintf(t('%s has created an account for you at %s.'), val('Name', $Sender), $AppTitle).' '.
+                    t('Find your account information below.').'<br></p>'.
+                    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
+                    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
         }
 
         // Add the email confirmation key.
         if ($Data['EmailKey']) {
-            $Message .= "\n\n".FormatString(t('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
+            $emailUrlFormat = '{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+            $url = formatString($emailUrlFormat, $Data);
+            $message .= '<p>'.t('You need to confirm your email address before you can continue.').'</p>';
+            $emailTemplate->setButton($url, t('Confirm My Email Address'));
+        } else {
+            $emailTemplate->setButton(externalUrl('/'), t('Access the Site'));
         }
-        $Message = $this->_addEmailHeaderFooter($Message, $Data);
 
-        $Email->message($Message);
+        $emailTemplate->setMessage($message);
+        $emailTemplate->setTitle(t('Welcome Aboard!'));
 
+        $Email->setEmailTemplate($emailTemplate);
         $Email->send();
     }
 
@@ -3868,32 +3953,20 @@ class UserModel extends Gdn_Model {
         $User = $this->getID($UserID);
         $AppTitle = Gdn::config('Garden.Title');
         $Email = new Gdn_Email();
-        $Email->subject(sprintf(t('[%s] Password Reset'), $AppTitle));
+        $Email->subject('['.$AppTitle.'] '.t('Reset Password'));
         $Email->to($User->Email);
+        $greeting = formatString(t('Hello %s!'), val('Name', $User));
+        $message = '<p>'.$greeting.' '.sprintf(t('%s has reset your password at %s.'), val('Name', $Sender), $AppTitle).' '.
+            t('Find your account information below.').'<br></p>'.
+            '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
+            sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
 
-        $Data = array();
-        $Data['User'] = arrayTranslate((array)$User, array('Name', 'Email'));
-        $Data['Sender'] = arrayTranslate((array)$Sender, array('Name', 'Email'));
-        $Data['Title'] = $AppTitle;
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setTitle(t('Reset Password'))
+            ->setMessage($message)
+            ->setButton(externalUrl('/'), t('Access the Site'));
 
-        $EmailFormat = t('EmailPassword');
-        if (strpos($EmailFormat, '{') !== false) {
-            $Message = formatString($EmailFormat, $Data);
-        } else {
-            $Message = sprintf(
-                $EmailFormat,
-                $User->Name,
-                $Sender->Name,
-                $AppTitle,
-                ExternalUrl('/'),
-                $Password,
-                $User->Email
-            );
-        }
-
-        $Message = $this->_addEmailHeaderFooter($Message, $Data);
-        $Email->message($Message);
-
+        $Email->setEmailTemplate($emailTemplate);
         $Email->send();
     }
 
@@ -4039,17 +4112,15 @@ class UserModel extends Gdn_Model {
             $this->saveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
             $this->saveAttribute($User->UserID, 'PasswordResetExpires', $PasswordResetExpires);
             $AppTitle = c('Garden.Title');
-            $Email->subject(sprintf(t('[%s] Password Reset Request'), $AppTitle));
+            $Email->subject('['.$AppTitle.'] '.t('Reset Your Password'));
             $Email->to($User->Email);
 
-            $Email->message(
-                sprintf(
-                    t('PasswordRequest'),
-                    $User->Name,
-                    $AppTitle,
-                    ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey)
-                )
-            );
+            $emailTemplate = $Email->getEmailTemplate()
+                ->setTitle(t('Reset Your Password'))
+                ->setMessage(sprintf(t('We\'ve received a request to change your password.'), $AppTitle))
+                ->setButton(ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
+            $Email->setEmailTemplate($emailTemplate);
+
             $Email->send();
             $NoEmail = false;
         }

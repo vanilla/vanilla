@@ -23,7 +23,7 @@ echo '<div class="MainForm">';
         <li>
             <?php
             echo $this->Form->label('Email/Username', 'Email');
-            echo $this->Form->textBox('Email', array('autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE));
+            echo $this->Form->textBox('Email', array('autofocus' => true, 'autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE));
             ?>
         </li>
         <li>

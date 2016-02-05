@@ -4,7 +4,7 @@
 /**
  * Dashboard database structure.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -726,7 +726,6 @@ $Construct
     ->column('ForeignTable', 'varchar(24)', true, 'index.Foreign')
     ->column('ImageWidth', 'usmallint', null)
     ->column('ImageHeight', 'usmallint', null)
-//   ->column('StorageMethod', 'varchar(24)')
     ->column('ThumbWidth', 'usmallint', null)
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)

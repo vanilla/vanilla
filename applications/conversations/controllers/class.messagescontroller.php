@@ -437,7 +437,7 @@ class MessagesController extends ConversationsController {
         $this->addModule($ClearHistoryModule);
 
         $InThisConversationModule = new InThisConversationModule($this);
-        $InThisConversationModule->setData($this->Conversation->Participants);
+        $InThisConversationModule->setData('Participants', $this->Conversation->Participants);
         $this->addModule($InThisConversationModule);
 
         // Doesn't make sense for people who can't even start conversations to be adding people

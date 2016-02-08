@@ -191,7 +191,8 @@ class QueueModel extends Gdn_Model {
         $this->_BeforeGet();
 
         $results = $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
-        foreach ($results->ResultArray(DATASET_TYPE_ARRAY) as &$row) {
+        $resultArray = $results->ResultArray(DATASET_TYPE_ARRAY);
+        foreach ($resultArray as &$row) {
             $row = $this->CalculateRow($row);
         }
         return $results;

@@ -138,6 +138,9 @@ class DiscussionController extends VanillaController {
             $LatestItem = 0;
         } elseif ($LatestItem < $this->Discussion->CountComments) {
             $LatestItem += 1;
+        } elseif ($LatestItem > $this->Discussion->CountComments) {
+            // If ever the CountCommentWatch is greater than the actual number of comments.
+            $LatestItem = $this->Discussion->CountComments;
         }
 
         $this->setData('_LatestItem', $LatestItem);

@@ -480,6 +480,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     safeHeader("HTTP/1.1 404 Not Found");
                     $this->Request = $MatchRoute['FinalDestination'];
                     break;
+
+                case 'Block':
+                    die();
+
                 case 'Test':
                     $Request->pathAndQuery($MatchRoute['FinalDestination']);
                     $this->Request = $Request->path(false);

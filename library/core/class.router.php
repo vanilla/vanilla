@@ -35,7 +35,7 @@ class Gdn_Router extends Gdn_Pluggable {
             'Permanent'     => 'Permanent (301)',
             'NotAuthorized' => 'Not Authorized (401)',
             'NotFound'      => 'Not Found (404)',
-            'Block'         => 'Block Request',
+            'Drop'         => 'Drop Request',
             'Test'          => 'Test'
         );
         $this->ReservedRoutes = array('DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode');

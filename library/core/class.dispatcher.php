@@ -481,7 +481,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     $this->Request = $MatchRoute['FinalDestination'];
                     break;
 
-                case 'Block':
+                case 'Drop':
                     die();
 
                 case 'Test':

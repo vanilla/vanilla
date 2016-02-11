@@ -37,7 +37,7 @@ $Construct
     ->column('Type', 'varchar(10)', true, 'index')
     ->column('ForeignID', 'varchar(40)', true)
     ->column('Subject', 'varchar(255)', null)
-    ->column('Contributors', 'varchar(255)')
+    ->column('Contributors', 'varchar(255)', true)
     ->column('FirstMessageID', 'int', true, 'key')
     ->column('InsertUserID', 'int', false, 'key')
     ->column('DateInserted', 'datetime', null, 'key')

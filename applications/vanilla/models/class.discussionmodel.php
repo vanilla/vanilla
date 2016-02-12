@@ -1584,7 +1584,7 @@ class DiscussionModel extends VanillaModel {
     /**
      * Inserts or updates the discussion via form values.
      *
-     * Events: BeforeSaveDiscussion, AfterSaveDiscussion.
+     * Events: BeforeSaveDiscussion, AfterValidateDiscussion, AfterSaveDiscussion.
      *
      * @since 2.0.0
      * @access public

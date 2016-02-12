@@ -797,7 +797,7 @@ class CommentModel extends VanillaModel {
     /**
      * Insert or update core data about the comment.
      *
-     * Events: BeforeSaveComment, AfterSaveComment.
+     * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $FormPostValues Data from the form model.
      * @param array $Settings Currently unused.

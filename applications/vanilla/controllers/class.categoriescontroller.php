@@ -242,6 +242,18 @@ class CategoriesController extends VanillaController {
             // Check permission
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
 
+            $sort = DiscussionSortFilterModule::getSortFromRequest();
+            $orderBy = val('field', $sort, DiscussionSortFilterModule::getUserSortPreference());
+            $orderDirection = val('direction', $sort, 'desc');
+            $filter = DiscussionSortFilterModule::getFilterFromRequest();
+            if (!$filter) {
+                $filterKey = DiscussionSortFilterModule::getUserFilterPreference($CategoryID);
+                $filter = val($filterKey, DiscussionSortFilterModule::getFilters());
+            }
+            if ($filter) {
+                $Wheres = array_merge(val('wheres', $filter, array()), $Wheres);
+            }
+
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);
             $this->fireEvent('BeforeGetDiscussions');
@@ -278,7 +290,7 @@ class CategoriesController extends VanillaController {
             $this->setData('AnnounceData', $AnnounceData, true);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
-            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
+            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhere($Wheres, $orderBy, $orderDirection, $Limit, $Offset));
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();
@@ -292,6 +304,9 @@ class CategoriesController extends VanillaController {
                 $CountDiscussions,
                 array('CategoryUrl')
             );
+
+            $this->Pager->queryString = DiscussionSortFilterModule::getSortFilterQueryString();
+
             $this->Pager->Record = $Category;
             PagerModule::Current($this->Pager);
             $this->setData('_Page', $Page);

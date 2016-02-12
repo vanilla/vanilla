@@ -854,6 +854,17 @@ class CommentModel extends VanillaModel {
                     return SPAM;
                 }
 
+                $isValid = true;
+                $invalidReturnType = false;
+                $this->EventArguments['CommentData'] = $CommentID ? array_merge($Fields, array('CommentID' => $CommentID)) : $Fields;
+                $this->EventArguments['IsValid'] = &$isValid;
+                $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
+                $this->fireEvent('BeforeCommentSave');
+
+                if (!$isValid) {
+                    return $invalidReturnType;
+                }
+
                 if ($Insert === false) {
                     // Log the save.
                     LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));

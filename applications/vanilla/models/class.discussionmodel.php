@@ -1714,6 +1714,17 @@ class DiscussionModel extends VanillaModel {
                         unset($Fields['Format']);
                     }
 
+                    $isValid = true;
+                    $invalidReturnType = false;
+                    $this->EventArguments['DiscussionData'] = array_merge($Fields, array('DiscussionID' => $DiscussionID));
+                    $this->EventArguments['IsValid'] = &$isValid;
+                    $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
+                    $this->fireEvent('BeforeDiscussionSave');
+
+                    if (!$isValid) {
+                        return $invalidReturnType;
+                    }
+
                     // Clear the cache if necessary.
                     $CacheKeys = array();
                     if (val('Announce', $Stored) != val('Announce', $Fields)) {
@@ -1752,6 +1763,17 @@ class DiscussionModel extends VanillaModel {
                     if ($ApprovalRequired && !val('Verified', Gdn::session()->User)) {
                         LogModel::insert('Pending', 'Discussion', $Fields);
                         return UNAPPROVED;
+                    }
+
+                    $isValid = true;
+                    $invalidReturnType = false;
+                    $this->EventArguments['DiscussionData'] = $Fields;
+                    $this->EventArguments['IsValid'] = &$isValid;
+                    $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
+                    $this->fireEvent('BeforeDiscussionSave');
+
+                    if (!$isValid) {
+                        return $invalidReturnType;
                     }
 
                     // Create discussion

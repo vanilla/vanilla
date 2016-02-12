@@ -275,7 +275,7 @@ if (!function_exists('categoryUrl')) {
      * @param array $Category
      * @return string
      */
-    function categoryUrl($Category, $Page = '', $WithDomain = true) {
+    function categoryUrl($Category, $Page = '', $WithDomain = true, $querystring = '') {
         if (is_string($Category)) {
             $Category = CategoryModel::categories($Category);
         }
@@ -285,7 +285,7 @@ if (!function_exists('categoryUrl')) {
         if ($Page && $Page > 1) {
             $Result .= '/p'.$Page;
         }
-        return Url($Result, $WithDomain);
+        return Url($Result.$querystring, $WithDomain);
     }
 }
 

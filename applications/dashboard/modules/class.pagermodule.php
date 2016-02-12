@@ -81,6 +81,8 @@ class PagerModule extends Gdn_Module {
      */
     private $_Totalled;
 
+    public $queryString = '';
+
     /**
      *
      *
@@ -259,7 +261,7 @@ class PagerModule extends Gdn_Module {
      */
     public function pageUrl($Page) {
         if ($this->UrlCallBack) {
-            return call_user_func($this->UrlCallBack, $this->Record, $Page);
+            return call_user_func($this->UrlCallBack, $this->Record, $Page, true, $this->queryString);
         } else {
             return self::FormatUrl($this->Url, 'p'.$Page);
         }

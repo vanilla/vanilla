@@ -859,7 +859,7 @@ class CommentModel extends VanillaModel {
                 $this->EventArguments['CommentData'] = $CommentID ? array_merge($Fields, array('CommentID' => $CommentID)) : $Fields;
                 $this->EventArguments['IsValid'] = &$isValid;
                 $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
-                $this->fireEvent('BeforeCommentSave');
+                $this->fireEvent('AfterValidateComment');
 
                 if (!$isValid) {
                     return $invalidReturnType;

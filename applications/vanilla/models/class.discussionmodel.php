@@ -1719,7 +1719,7 @@ class DiscussionModel extends VanillaModel {
                     $this->EventArguments['DiscussionData'] = array_merge($Fields, array('DiscussionID' => $DiscussionID));
                     $this->EventArguments['IsValid'] = &$isValid;
                     $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
-                    $this->fireEvent('BeforeDiscussionSave');
+                    $this->fireEvent('AfterValidateDiscussion');
 
                     if (!$isValid) {
                         return $invalidReturnType;
@@ -1770,7 +1770,7 @@ class DiscussionModel extends VanillaModel {
                     $this->EventArguments['DiscussionData'] = $Fields;
                     $this->EventArguments['IsValid'] = &$isValid;
                     $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
-                    $this->fireEvent('BeforeDiscussionSave');
+                    $this->fireEvent('AfterValidateDiscussion');
 
                     if (!$isValid) {
                         return $invalidReturnType;

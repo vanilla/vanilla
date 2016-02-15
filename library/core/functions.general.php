@@ -2382,11 +2382,11 @@ if (!function_exists('joinRecords')) {
      * @param bool $Unset Whether or not to unset rows that don't have a record.
      * @since 2.3
      */
-    function joinRecords(&$Data, $Column = '', $Unset = false) {
+    function joinRecords(&$Data, $Column = '', $Unset = false, $checkCategoryPermission = true) {
         $IDs = array();
         $AllowedCats = DiscussionModel::CategoryPermissions();
 
-        if ($AllowedCats === false) {
+        if ($checkCategoryPermission && $AllowedCats === false) {
             // This user does not have permission to view anything.
             $Data = array();
             return;
@@ -2435,7 +2435,7 @@ if (!function_exists('joinRecords')) {
 
             $Record = $JoinData[$RecordType][$ID];
 
-            if ($AllowedCats !== true) {
+            if ($checkCategoryPermission && $AllowedCats !== true) {
                 // Check to see if the user has permission to view this record.
                 $CategoryID = GetValue('CategoryID', $Record, -1);
                 if (!in_array($CategoryID, $AllowedCats)) {

@@ -797,7 +797,7 @@ class CommentModel extends VanillaModel {
     /**
      * Insert or update core data about the comment.
      *
-     * Events: BeforeSaveComment, AfterSaveComment.
+     * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $FormPostValues Data from the form model.
      * @param array $Settings Currently unused.
@@ -852,6 +852,17 @@ class CommentModel extends VanillaModel {
                 $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                 if ($spam) {
                     return SPAM;
+                }
+
+                $isValid = true;
+                $invalidReturnType = false;
+                $this->EventArguments['CommentData'] = $CommentID ? array_merge($Fields, array('CommentID' => $CommentID)) : $Fields;
+                $this->EventArguments['IsValid'] = &$isValid;
+                $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
+                $this->fireEvent('AfterValidateComment');
+
+                if (!$isValid) {
+                    return $invalidReturnType;
                 }
 
                 if ($Insert === false) {

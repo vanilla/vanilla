@@ -76,6 +76,19 @@ echo $this->Form->errors();
         echo $this->Form->CheckBox('Archived', 'This category is archived.');
         ?>
     </li>
+    <?php echo $this->Form->Simple(
+        $this->data('_PermissionFields', array()),
+        array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>'))
+    );
+    ?>
+    <?php if (count($this->data('DiscussionTypes')) > 1) {
+        echo '<div class="P DiscussionTypes">';
+        echo $this->Form->label('Discussion Types');
+        foreach ($this->data('DiscussionTypes') as $Type => $Row) {
+            echo $this->Form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
+        }
+        echo '</div>';
+    } ?>
     <?php $this->fireEvent('AfterCategorySettings'); ?>
     <li>
         <?php
@@ -83,20 +96,6 @@ echo $this->Form->errors();
             echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
 
             echo '<div class="CategoryPermissions">';
-
-            if (count($this->data('DiscussionTypes')) > 1) {
-                echo '<div class="P DiscussionTypes">';
-                echo $this->Form->label('Discussion Types');
-                foreach ($this->data('DiscussionTypes') as $Type => $Row) {
-                    echo $this->Form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
-                }
-                echo '</div>';
-            }
-
-            echo $this->Form->Simple(
-                $this->data('_PermissionFields', array()),
-                array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>')));
-
             echo t('Check all permissions that apply for each role');
             echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
             echo '</div>';

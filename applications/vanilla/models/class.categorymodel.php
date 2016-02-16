@@ -51,20 +51,20 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Returns an array of discussion types that are allowed for a category.
      *
-     *
-     * @param $Category
+     * @param int $categoryID The ID of the category to check for.
      * @return array
      */
-    public static function allowedDiscussionTypes($Category) {
-        $Category = self::permissionCategory($Category);
-        $Allowed = val('AllowedDiscussionTypes', $Category);
-        $AllTypes = DiscussionModel::discussionTypes();
+    public static function allowedDiscussionTypes($categoryID) {
+        $category = self::categories($categoryID);
+        $allowed = val('AllowedDiscussionTypes', $category);
+        $allTypes = DiscussionModel::discussionTypes();
 
-        if (empty($Allowed) || !is_array($Allowed)) {
-            return $AllTypes;
+        if (empty($allowed) || !is_array($allowed)) {
+            return $allTypes;
         } else {
-            return array_intersect_key($AllTypes, array_flip($Allowed));
+            return array_intersect_key($allTypes, array_flip($allowed));
         }
     }
 

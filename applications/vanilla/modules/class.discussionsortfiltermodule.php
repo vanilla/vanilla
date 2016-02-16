@@ -57,6 +57,7 @@ class DiscussionSortFilterModule extends Gdn_Module {
             $dropdown->setTrigger($selected);
         }
         $dropdown->setView('dropdown-navbutton');
+        $dropdown->setForceDivider(true);
         foreach(self::$filters as $filter) {
             $key = val('group', $filter, '').'.'.val('key', $filter);
             $dropdown->addLink(

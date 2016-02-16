@@ -391,7 +391,7 @@ if (!function_exists('OptionsList')):
         $Sender = Gdn::controller();
         $Session = Gdn::session();
 
-        if ($Session->isValid() && $Sender->ShowOptions) {
+        if ($Session->isValid() && !empty($Sender->ShowOptions)) {
             $Sender->Options = '';
 
             // Dismiss an announcement

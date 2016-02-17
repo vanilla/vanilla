@@ -277,6 +277,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @param string|array $orderBy Either a string indicating the order by field or an array indicating multiple
      *      order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
      * @param string $direction The direction of the order by clause, either 'asc' or 'desc'
+     * @return DiscussionsSortModule To allow for chaining.
      */
     public static function addSort($key, $name, $orderBy, $direction = '') {
         self::$sorts[$key] = array('key' => $key, 'name' => $name, 'orderBy' => $orderBy);
@@ -284,6 +285,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $direction = !empty($direction) ? $direction : 'desc';
             self::$sorts[$key]['direction'] = $direction;
         }
+        return self;
     }
 
     /**
@@ -293,6 +295,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @param string $name The display name of the filter. Appears as an option in the dropdown menu.
      * @param array $wheres The where array query to execute for the filter. Uses
      * @param string $group The dropdown module will group together any items with the same group name.
+     * @return DiscussionsSortModule To allow for chaining.
      */
     public static function addFilter($key, $name, $wheres, $group = '') {
         if (!self::getFilters()) {
@@ -303,6 +306,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         if ($group) {
             self::$filters[$key]['group'] = $group;
         }
+        return self;
     }
 
     /**

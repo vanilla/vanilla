@@ -98,7 +98,7 @@ class EmailTemplate extends Gdn_Pluggable {
         $this->setTitle($title);
         $this->setLead($lead);
 
-        $this->view = Gdn::controller()->fetchViewLocation($view, 'email', 'dashboard');
+        $this->view = AssetModel::viewLocation($view, 'email', 'dashboard');
     }
 
     /**

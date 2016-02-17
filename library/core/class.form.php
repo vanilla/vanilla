@@ -263,7 +263,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * Returns Captcha HTML & adds translations to document head.
      *
      * Events: BeforeCaptcha
-     * 
+     *
      * @return string
      */
     public function captcha() {
@@ -500,7 +500,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Append validation error message
         if ($ShowErrors && arrayValueI('InlineErrors', $Attributes, true)) {
-            $Return .= $this->inlineError($FieldName);
+            $Input .= $this->inlineError($FieldName);
         }
 
         return $Input;
@@ -2505,7 +2505,7 @@ PASSWORDMETER;
                     break;
                 case 'checkbox':
                     $Result .= $Description
-                        .$this->checkBox($Row['Name'], $LabelCode);
+                        .$this->checkBox($Row['Name'], $LabelCode, $Row['Options']);
                     break;
                 case 'dropdown':
                     $Result .= $this->label($LabelCode, $Row['Name'])

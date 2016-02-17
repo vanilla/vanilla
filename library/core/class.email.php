@@ -259,7 +259,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
         // if we change email templates after construct, inform it of the current format
         if ($this->format) {
-            $this->setFormat($format);
+            $this->setFormat($this->format);
         }
         return $this;
     }

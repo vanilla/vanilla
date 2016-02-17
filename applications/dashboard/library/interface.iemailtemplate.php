@@ -30,15 +30,8 @@ interface Gdn_IEmailTemplate {
     public function getMessage();
 
     /**
-     * Returns the formatted text of the email
-     *
-     * @return string
-     */
-    public function toString();
-
-    /**
      * Get plaintext setting
-     * 
+     *
      * @return bool Whether to render in plaintext.
      */
     public function isPlaintext();
@@ -50,5 +43,11 @@ interface Gdn_IEmailTemplate {
      */
     public function setPlaintext($plainText);
 
+    /**
+     * Returns the formatted text of the email
+     *
+     * @return string
+     */
+    public function toString();
 
 }

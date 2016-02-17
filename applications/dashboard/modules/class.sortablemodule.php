@@ -51,6 +51,10 @@ abstract class SortableModule extends Gdn_Module {
      */
     private $isPrepared = false;
 
+    /**
+     * @var array The permitted modifiers on an item.
+     * These strings are the key values of the modifiers array parameter in any of the add* methods.
+     */
     private $allowedItemModifiers = array('popinRel', 'icon', 'badge');
 
     /**

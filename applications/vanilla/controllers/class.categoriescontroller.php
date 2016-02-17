@@ -242,13 +242,18 @@ class CategoriesController extends VanillaController {
             // Check permission
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
 
-            $sort = DiscussionSortFilterModule::getSortFromRequest();
-            $orderBy = val('field', $sort, DiscussionSortFilterModule::getUserSortPreference());
+            $sort = DiscussionsSortFilterModule::getSortFromRequest();
+            if (!$field = val('field', $sort)) {
+                // Try getting from user preferences.
+                $sort = DiscussionsSortFilterModule::getSortFromUserPreference();
+                $field = val('field', $sort, 'd.DateLastComment');
+            }
+
+            $orderBy = $field;
             $orderDirection = val('direction', $sort, 'desc');
-            $filter = DiscussionSortFilterModule::getFilterFromRequest();
+            $filter = DiscussionsSortFilterModule::getFilterFromRequest();
             if (!$filter) {
-                $filterKey = DiscussionSortFilterModule::getUserFilterPreference($CategoryID);
-                $filter = val($filterKey, DiscussionSortFilterModule::getFilters());
+                $filter = DiscussionsSortFilterModule::getFilterFromUserPreference($CategoryID);
             }
             if ($filter) {
                 $Wheres = array_merge(val('wheres', $filter, array()), $Wheres);
@@ -305,7 +310,7 @@ class CategoriesController extends VanillaController {
                 array('CategoryUrl')
             );
 
-            $this->Pager->queryString = DiscussionSortFilterModule::getSortFilterQueryString();
+            $this->Pager->queryString = DiscussionsSortFilterModule::sortFilterQueryString();
 
             $this->Pager->Record = $Category;
             PagerModule::Current($this->Pager);

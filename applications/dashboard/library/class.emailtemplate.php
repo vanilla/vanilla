@@ -98,7 +98,7 @@ class EmailTemplate extends Gdn_Pluggable {
         $this->setTitle($title);
         $this->setLead($lead);
 
-        $this->view = Gdn::controller()->fetchViewLocation($view, 'email', 'dashboard');
+        $this->view = AssetModel::viewLocation($view, 'email', 'dashboard');
     }
 
     /**
@@ -125,7 +125,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @throws Exception
      */
     public function setView($view, $controllerName = 'email', $applicationFolder = 'dashboard') {
-        $this->view = Gdn::controller()->fetchViewLocation($view, $controllerName, $applicationFolder);
+        $this->view = AssetModel::viewLocation($view, $controllerName, $applicationFolder);
         return $this;
     }
 

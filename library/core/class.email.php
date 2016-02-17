@@ -277,6 +277,7 @@ class Gdn_Email extends Gdn_Pluggable {
      */
     public function message($Message) {
         $this->emailTemplate->setMessage($Message, true);
+        return $this;
     }
 
     public function formatMessage($message) {

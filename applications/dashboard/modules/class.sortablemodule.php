@@ -50,7 +50,7 @@ abstract class SortableModule extends Gdn_Module {
      * @var bool Whether we have run the prepare method yet.
      */
     private $isPrepared = false;
-    
+
     private $allowedItemModifiers = array('popinRel', 'icon', 'badge');
 
     /**

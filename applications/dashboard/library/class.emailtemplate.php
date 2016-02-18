@@ -1,10 +1,18 @@
 <?php
 
 /**
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
+/**
  * Class EmailTemplate
  *
  * Compiles the data for an email, applies appropriate content filters and renders the email.
  *
+ * @author Becky Van Bussel <becky@vanillaforums.com>
+ * @package Core
+ * @since 2.2
  */
 class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
 

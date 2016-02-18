@@ -52,6 +52,18 @@ class PocketsPlugin extends Gdn_Plugin {
     public $TestMode = null;
 
     /**
+     * PocketsPlugin constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+
+        // Switch our HTML wrapper when we're in a table view.
+        if (c('Vanilla.Discussions.Layout') == 'table') {
+            $this->Locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="0">', '</td></tr>'];
+        }
+    }
+
+    /**
      * Add test mode to every page.
      *
      * @param $Sender

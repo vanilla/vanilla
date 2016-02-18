@@ -25,14 +25,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * Each sort in the array has the following properties:
      * - **key**: string - The key name of the sort. Appears in the query string, should be url-friendly.
      * - **name**: string - The display name of the sort.
-     * - **orderBy**: string - Either a string indicating the order by field or an array indicating multiple
-     *      order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
-     * - **direction**: string - (optional) The direction of the string-type orderBy param, either 'asc' or 'desc'
+     * - **orderBy**: string - An array indicating order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
      */
     protected static $sorts = array(
-        'hot' => array('key' => 'hot', 'name' => 'Hot', 'orderBy' => 'd.DateLastComment', 'direction' => 'desc'),
+        'hot' => array('key' => 'hot', 'name' => 'Hot', 'orderBy' => array('d.DateLastComment' => 'desc')),
         'top' => array('key' => 'top', 'name' => 'Top', 'orderBy' => array('d.Score' => 'desc', 'd.DateInserted' => 'desc')),
-        'new' => array('key' => 'new', 'name' => 'New', 'orderBy' => 'd.DateInserted', 'direction' => 'desc')
+        'new' => array('key' => 'new', 'name' => 'New', 'orderBy' => array('d.DateInserted' => 'desc'))
     );
 
     /**
@@ -98,7 +96,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $sortData[$key]['url'] = self::getPagelessPath().self::sortFilterQueryString('', $key);
             $sortData[$key]['rel'] = 'nofollow';
             if (self::$sortKeySelected == val('key', $sort)) {
-                $sortData[$key]['cssClass'] .= DiscussionsSortFilterModule::ACTIVE_CSS_CLASS;
+                $sortData[$key]['cssClass'] = DiscussionsSortFilterModule::ACTIVE_CSS_CLASS;
             }
         }
         return $sortData;
@@ -274,16 +272,11 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      *
      * @param string $key The key name of the sort. Appears in the query string, should be url-friendly.
      * @param string $name The display name of the sort.
-     * @param string|array $orderBy Either a string indicating the order by field or an array indicating multiple
-     *      order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
-     * @param string $direction The direction of the order by clause, either 'asc' or 'desc'
+     * @param string|array $orderBy An array indicating order by fields and their directions in the format:
+     *      array('field1' => 'direction', 'field2' => 'direction')
      */
-    public static function addSort($key, $name, $orderBy, $direction = '') {
+    public static function addSort($key, $name, $orderBy) {
         self::$sorts[$key] = array('key' => $key, 'name' => $name, 'orderBy' => $orderBy);
-        if (!is_array($orderBy)) {
-            $direction = !empty($direction) ? $direction : 'desc';
-            self::$sorts[$key]['direction'] = $direction;
-        }
     }
 
     /**

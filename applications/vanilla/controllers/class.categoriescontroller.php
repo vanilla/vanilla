@@ -243,14 +243,12 @@ class CategoriesController extends VanillaController {
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
 
             $sort = DiscussionsSortFilterModule::getSortFromRequest();
-            if (!$field = val('field', $sort)) {
+            if (!$orderBy = val('orderBy', $sort)) {
                 // Try getting from user preferences.
                 $sort = DiscussionsSortFilterModule::getSortFromUserPreference();
-                $field = val('field', $sort, 'd.DateLastComment');
+                $orderBy = val('orderBy', $sort, array('d.DateLastComment' => 'desc'));
             }
 
-            $orderBy = $field;
-            $orderDirection = val('direction', $sort, 'desc');
             $filter = DiscussionsSortFilterModule::getFilterFromRequest();
             if (!$filter) {
                 $filter = DiscussionsSortFilterModule::getFilterFromUserPreference($CategoryID);
@@ -295,7 +293,7 @@ class CategoriesController extends VanillaController {
             $this->setData('AnnounceData', $AnnounceData, true);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
-            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhere($Wheres, $orderBy, $orderDirection, $Limit, $Offset));
+            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhere($Wheres, $orderBy, '', $Limit, $Offset));
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();

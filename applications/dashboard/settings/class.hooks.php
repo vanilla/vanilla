@@ -400,6 +400,10 @@ class DashboardHooks implements Gdn_IPlugin {
         $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
     }
 
+    /**
+     * After executing /settings/utility/update check if any role permissions have been changed, if not reset all the permissions on the roles.
+     * @param $sender
+     */
     public function updateModel_afterStructure_handler($sender) {
         // Only setup default permissions if no role permissions are set.
         $hasPermissions = Gdn::sql()->getWhere('Permission', array('RoleID >' => 0))->firstRow(DATASET_TYPE_ARRAY);
@@ -408,13 +412,17 @@ class DashboardHooks implements Gdn_IPlugin {
         }
     }
 
+    /**
+     * Add user's viewable roles to gdn.meta if user is logged in.
+     * @param $sender
+     * @param $args
+     */
     public function gdn_dispatcher_afterControllerCreate_handler($sender, $args) {
-        // Add user's viewable roles to gdn.meta if user is logged in.
         // Function addDefinition returns the value of the definition if you pass only one argument.
         if (!gdn::controller()->addDefinition('Roles')) {
             if (Gdn::session()->isValid()) {
                 $roleModel = new RoleModel();
-                gdn::controller()->addDefinition("Roles", $roleModel->getUsersViewableRoles(gdn::session()->UserID, "Name"));
+                gdn::controller()->addDefinition("Roles", $roleModel->getPublicUserRoles(gdn::session()->UserID, "Name"));
             }
         }
     }

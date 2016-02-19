@@ -61,6 +61,15 @@ if (!function_exists('WriteDiscussionRow')):
             $DiscussionName = t('Blank Discussion Topic');
 
         $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
+
+        static $FirstDiscussion = true;
+        if (!$FirstDiscussion) {
+            $Sender->fireEvent('BetweenDiscussion');
+        }
+        else {
+            $FirstDiscussion = false;
+        }
+
         $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 
         $FirstPageUrl = DiscussionUrl($Discussion, 1);

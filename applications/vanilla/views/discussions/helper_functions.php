@@ -112,11 +112,13 @@ if (!function_exists('WriteDiscussion')):
 
         $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 
-        static $FirstDiscussion = TRUE;
-        if (!$FirstDiscussion)
+        static $FirstDiscussion = true;
+        if (!$FirstDiscussion) {
             $Sender->fireEvent('BetweenDiscussion');
-        else
-            $FirstDiscussion = FALSE;
+        }
+        else {
+            $FirstDiscussion = false;
+        }
 
         $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
         ?>

@@ -1250,7 +1250,7 @@ class Gdn_Format {
         $HitboxUrlMatch = 'http://www.hitbox.tv/([\w]+)';
         $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)';
         $ImgurGifvUrlMatch = 'https?\://i\.imgur\.com/([a-z0-9]+)\.gifv';
-        $WistiaUrlMatch = 'https://([\w]+).wistia.com/medias/([\w]+)';
+        $WistiaUrlMatch = 'https?:\/\/([A-za-z0-9\-]+\.)?(wistia\.com|wi\.st)\/medias\/(?<videoID>[A-za-z0-9]+)(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?';
         
         // YouTube
         if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
@@ -1399,8 +1399,14 @@ EOT;
         } elseif (preg_match("`({$WistiaUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Wistia', true)
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
+            $wistiaClass = "wistia_embed wistia_async_{$Matches['videoID']} videoFoam=true allowThirdParty=false";
+
+            if (!empty($Matches['time'])) {
+                $wistiaClass .= " time={$Matches['time']}";
+            }
+
             $Result = <<<EOT
-<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_{$Matches[3]}" videoFoam="true" style="height:100%;width:100%">&nbsp;</div></div></div>
+<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
 EOT;
 
 

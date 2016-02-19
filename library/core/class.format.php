@@ -1250,7 +1250,7 @@ class Gdn_Format {
         $HitboxUrlMatch = 'http://www.hitbox.tv/([\w]+)';
         $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)';
         $ImgurGifvUrlMatch = 'https?\://i\.imgur\.com/([a-z0-9]+)\.gifv';
-        $WistiaUrlMatch = 'https?:\/\/([A-za-z0-9\-]+\.)?(wistia\.com|wi\.st)\/(medias|embed)\/(?<videoID>[A-za-z0-9]+)(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?';
+        $WistiaUrlMatch = 'https?:\/\/([A-za-z0-9\-]+\.)?(wistia\.com|wi\.st)\/medias\/(?<videoID>[A-za-z0-9]+)(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?';
         
         // YouTube
         if ((preg_match($YoutubeUrlMatch, $Url, $Matches))

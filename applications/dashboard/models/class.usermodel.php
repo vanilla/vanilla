@@ -2028,7 +2028,7 @@ class UserModel extends Gdn_Model {
             $Fields = $this->Validation->schemaValidationFields();
 
             // Remove the primary key from the fields collection before saving
-            $Fields = removeKeyFromArray($Fields, $this->PrimaryKey);
+            unset($Fields[$this->PrimaryKey]);
 
             if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
                 // Encrypt the password for saving only if it won't be hashed in _Insert()

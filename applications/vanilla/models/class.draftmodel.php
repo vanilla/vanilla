@@ -189,8 +189,8 @@ class DraftModel extends VanillaModel {
 
             // If the post is new and it validates, make sure the user isn't spamming
             if ($DraftID > 0) {
-                // Update the draft
-                $Fields = RemoveKeyFromArray($Fields, 'DraftID'); // Remove the primary key from the fields for saving
+                // Update the draft.
+                unset($Fields['DraftID']); // remove the primary key from the fields for saving
                 $this->SQL->put($this->Name, $Fields, array($this->PrimaryKey => $DraftID));
             } else {
                 // Insert the draft

@@ -554,10 +554,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $TextField = ArrayValueI('TextField', $Attributes, 'text');
             foreach ($DataSet->result() as $Data) {
                 $Instance = $Attributes;
-                $Instance = removeKeyFromArray(
-                    $Instance,
-                    array('TextField', 'ValueField')
-                );
+                unset($Instance['TextField'], $Instance['ValueField']);
                 $Instance['value'] = $Data->$ValueField;
                 $Instance['id'] = $FieldName.$i;
                 if (is_array($CheckedValues) && in_array(
@@ -579,7 +576,7 @@ class Gdn_Form extends Gdn_Pluggable {
             foreach ($DataSet as $Text => $ID) {
                 // Set attributes for this instance
                 $Instance = $Attributes;
-                $Instance = removeKeyFromArray($Instance, array('TextField', 'ValueField'));
+                unset($Instance['TextField'], $Instance['ValueField']);
 
                 $Instance['id'] = $FieldName.$i;
 
@@ -657,7 +654,7 @@ class Gdn_Form extends Gdn_Pluggable {
             foreach ($DataSet->result() as $Data) {
                 // Define the checkbox
                 $Instance = $Attributes;
-                $Instance = removeKeyFromArray($Instance, array('TextField', 'ValueField'));
+                unset($Instance['TextField'], $Instance['ValueField']);
                 $Instance['value'] = $Data->$ValueField;
                 $Instance['id'] = $FieldName.$i;
                 if (is_array($CheckedValues) && in_array(

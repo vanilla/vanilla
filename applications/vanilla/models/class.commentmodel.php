@@ -846,7 +846,7 @@ class CommentModel extends VanillaModel {
             // If the post is new and it validates, check for spam
             if (!$Insert || !$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
-                $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+                unset($Fields[$this->PrimaryKey]);
 
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));

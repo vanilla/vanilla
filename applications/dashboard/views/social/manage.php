@@ -25,7 +25,7 @@
     }
 
     .Connection-Header * {
-        line-height: 48px;
+        line-height: 25px;
         position: relative;
     }
 

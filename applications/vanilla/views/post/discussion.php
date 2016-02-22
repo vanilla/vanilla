@@ -16,14 +16,14 @@ if (!$CancelUrl) {
     echo '<div class="FormWrapper">';
     echo $this->Form->open();
     echo $this->Form->errors();
-    
+
     $this->fireEvent('BeforeFormInputs');
 
     if ($this->ShowCategorySelector === true) {
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => true));
+        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'CategoryData' => $this->data('AllowedCategories'), 'IncludeNull' => true));
         echo '</div>';
         echo '</div>';
     }

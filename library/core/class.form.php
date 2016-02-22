@@ -345,7 +345,8 @@ class Gdn_Form extends Gdn_Pluggable {
                 'Discussions.View',
                 $Value,
                 val('Filter', $Options, array('Archived' => 0)),
-                val('PermFilter', $Options, array())
+                val('PermFilter', $Options, array()),
+                val('AllowedDiscussionTypes', $Options, [])
             );
         }
 

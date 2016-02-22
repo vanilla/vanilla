@@ -111,7 +111,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         if (!self::getFilters()) {
             return '';
         }
-        $dropdown = new DropdownModule('discussions-filter', t('Filter Discussions'), 'discussion-filter');
+        $dropdown = new DropdownModule('discussions-filter', sprintf(t('All %s'), t('Discussions')), 'discussion-filter');
 
         // Override the trigger text?
         if (self::$filterKeySelected && self::$filterKeySelected != 'none') {
@@ -331,6 +331,6 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * Adds an option to the filters array to clear any existing filters on the data.
      */
     protected static function addClearFilter() {
-        self::$filters['none'] = array('key' => 'none', 'name' => t('Clear Filters'), 'wheres' => array(), 'group' => 'default');
+        self::$filters['none'] = array('key' => 'none', 'name' => sprintf(t('All %s'), t('Discussions')), 'wheres' => array(), 'group' => 'default');
     }
 }

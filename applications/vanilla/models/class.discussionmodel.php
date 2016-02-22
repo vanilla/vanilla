@@ -356,10 +356,13 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * Returns an array of 'field' => 'direction', values and ensures the safety of field names and directions.
+     *
      * You can safely use return values from this function in the orderBy() SQL function. Use this return value and orderBy()
      * in a loop to support multiple orderby values.
      *
      * If no values are passed, defaults to the fields from getSortField() and the direction from c('Vanilla.Discussions.SortDirection')
+     *
+     * @since 2.3
      *
      * @param string|array $orderFields
      * @param string $orderDirection
@@ -373,24 +376,28 @@ class DiscussionModel extends VanillaModel {
         if (empty($orderDirection)) {
             $orderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
         }
-        switch(gettype($orderFields)) {
+
+        // Force order to asc or desc.
+        if ($orderDirection !== 'desc') {
+            $orderDirection = 'asc';
+        }
+
+        switch (gettype($orderFields)) {
             case 'string':
-                if (in_array($orderFields, self::AllowedSortFields())) {
-                    $orderFields = array($orderFields => ($orderDirection == 'asc') ? 'asc' : 'desc');
-                    break;
+                if (in_array($orderFields, self::allowedSortFields())) {
+                    $orderFields = [$orderFields => $orderDirection];
                 }
+                break;
             case 'array':
-                foreach($orderFields as $orderField => &$direction) {
+                foreach ($orderFields as $orderField => &$direction) {
                     $direction = ($direction == 'asc') ? 'asc' : 'desc';
-                    if (!in_array($orderField, self::AllowedSortFields())) {
+                    if (!in_array($orderField, self::allowedSortFields())) {
                         unset($orderFields[$orderField]);
                     }
                 }
-                if (!empty($orderFields)) {
-                    break;
-                }
+                break;
             default:
-                $orderFields = array(self::DEFAULT_ORDERBY => ($orderDirection == 'asc') ? 'asc' : 'desc');
+                $orderFields = [self::DEFAULT_ORDERBY => $orderDirection];
 
         }
         return $orderFields;

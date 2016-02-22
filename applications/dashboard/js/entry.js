@@ -76,7 +76,7 @@ jQuery(document).ready(function($) {
                         if (text == 'TRUE') {
                             $('#ConnectPassword').hide();
                             if (fineprint.length) {
-                                fineprint.html(gdn.definition('Choose a name to identify yourself on the site.'));
+                                fineprint.html(gdn.getMeta('entryChooseNameMsg', 'Choose a name to identify yourself on the site.'));
                             }
                         } else {
                             // If the username is not available, and the client does not want users to take over existing accounts, generate an error message and empty the input field.

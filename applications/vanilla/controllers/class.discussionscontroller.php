@@ -589,6 +589,9 @@ class DiscussionsController extends VanillaController {
      * Set user preference for sorting discussions.
      */
     public function sort($Target = '') {
+        deprecated("sort");
+        return;
+
         if (!Gdn::session()->isValid()) {
             throw permissionException();
         }

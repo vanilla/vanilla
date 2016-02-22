@@ -200,6 +200,7 @@ endif;
 if (!function_exists('WriteDiscussionSorter')):
 
     function writeDiscussionSorter($Selected = null, $Options = null) {
+        deprecated('writeDiscussionSorter');
         if ($Selected === null) {
             $Selected = Gdn::session()->GetPreference('Discussions.SortField', 'DateLastComment');
         }

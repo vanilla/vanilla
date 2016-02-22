@@ -368,18 +368,10 @@ class DiscussionModel extends VanillaModel {
      * @param string $orderDirection
      * @return string
      */
-    protected function getOrderFields($orderFields = '', $orderDirection = '') {
-        // Set default types.
-        if (empty($orderFields)) {
-            $orderFields = self::getSortField();
-        }
-        if (empty($orderDirection)) {
-            $orderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
-        }
-
+    protected function getOrderFields($orderFields = 'd.DateLastComment', $orderDirection = 'desc') {
         // Force order to asc or desc.
-        if ($orderDirection !== 'desc') {
-            $orderDirection = 'asc';
+        if ($orderDirection !== 'asc') {
+            $orderDirection = 'desc';
         }
 
         // Force valid $orderFields.
@@ -1513,6 +1505,7 @@ class DiscussionModel extends VanillaModel {
      * @return string Column name.
      */
     public static function getSortField() {
+        deprecated("getSortField", "getOrderFields");
         $SortField = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
         if (c('Vanilla.Discussions.UserSortField')) {
             $SortField = Gdn::session()->GetPreference('Discussions.SortField', $SortField);
@@ -1521,8 +1514,13 @@ class DiscussionModel extends VanillaModel {
         return $SortField;
     }
 
+    /**
+     *
+     *
+     * @param $DiscussionID
+     * @return mixed|null
+     */
     public static function getViewsFallback($DiscussionID) {
-
         // Not found. Check main table.
         $Views = val('CountViews', Gdn::sql()
             ->select('CountViews')

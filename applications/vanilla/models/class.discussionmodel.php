@@ -382,24 +382,20 @@ class DiscussionModel extends VanillaModel {
             $orderDirection = 'asc';
         }
 
-        switch (gettype($orderFields)) {
-            case 'string':
-                if (in_array($orderFields, self::allowedSortFields())) {
-                    $orderFields = [$orderFields => $orderDirection];
+        // Force valid $orderFields.
+        if (is_array($orderFields)) {
+            foreach ($orderFields as $orderField => &$direction) {
+                $direction = ($direction == 'asc') ? 'asc' : 'desc';
+                if (!in_array($orderField, self::allowedSortFields())) {
+                    unset($orderFields[$orderField]);
                 }
-                break;
-            case 'array':
-                foreach ($orderFields as $orderField => &$direction) {
-                    $direction = ($direction == 'asc') ? 'asc' : 'desc';
-                    if (!in_array($orderField, self::allowedSortFields())) {
-                        unset($orderFields[$orderField]);
-                    }
-                }
-                break;
-            default:
-                $orderFields = [self::DEFAULT_ORDERBY => $orderDirection];
-
+            }
+        } elseif (in_array($orderFields, self::allowedSortFields())) {
+            $orderFields = [$orderFields => $orderDirection];
+        } else {
+            $orderFields = [self::DEFAULT_ORDERBY => $orderDirection];
         }
+
         return $orderFields;
     }
 

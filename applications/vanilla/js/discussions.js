@@ -1,43 +1,26 @@
 jQuery(document).ready(function($) {
 
     // Set up paging
-    if ($.morepager)
+    if ($.morepager) {
         $('.MorePager').not('.Message .MorePager').morepager({
             pageContainerSelector: 'ul.Discussions:last, ul.Drafts:last',
             afterPageLoaded: function() {
                 $(document).trigger('DiscussionPagingComplete');
             }
         });
+    }
 
-    if ($('.AdminCheck :checkbox').not(':checked').length == 1)
+    if ($('.AdminCheck :checkbox').not(':checked').length == 1) {
         $('.AdminCheck [name="Toggle"]').prop('checked', true).change();
-
-    // Set up sorting
-    $(document).undelegate('.SortDiscussions', 'click');
-    $(document).delegate('.SortDiscussions', 'click', function() {
-        var SendData = {
-            'TransientKey': gdn.definition('TransientKey'),
-            'DiscussionSort': $(this).attr('data-field')
-        };
-        jQuery.ajax({
-            dataType: 'json',
-            type: 'post',
-            url: gdn.url('discussions/sort'),
-            data: SendData,
-            success: function(json) {
-                location.reload();
-            }
-        });
-
-        return false;
-    });
+    }
 
     /* Discussion Checkboxes */
     $('.AdminCheck [name="Toggle"]').click(function() {
-        if ($(this).prop('checked'))
+        if ($(this).prop('checked')) {
             $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').prop('checked', true).change();
-        else
+        } else {
             $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').prop('checked', false).change();
+        }
     });
     $('.AdminCheck :checkbox').click(function() {
         // retrieve all checked ids

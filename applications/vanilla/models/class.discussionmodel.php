@@ -16,6 +16,9 @@ class DiscussionModel extends VanillaModel {
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
+    /** @var string Default column to order by. */
+    const DEFAULT_ORDERBY = 'd.DateLastComment';
+
     /** @var array */
     protected static $_CategoryPermissions = null;
 
@@ -26,7 +29,7 @@ class DiscussionModel extends VanillaModel {
     public $Watching = false;
 
     /** @var array Column names to allow sorting by. */
-    protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID');
+    protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID', 'd.Score');
 
     /** @var array Discussion Permissions */
     protected $permissionTypes = array('Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View');
@@ -289,10 +292,9 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Get preferred sort order
-        $SortField = self::GetSortField();
+        $orderFields = $this->getOrderFields();
 
-        $this->EventArguments['SortField'] = &$SortField;
-        $this->EventArguments['SortDirection'] = c('Vanilla.Discussions.SortDirection', 'desc');
+        $this->EventArguments['OrderFields'] = &$orderFields;
         $this->EventArguments['Wheres'] = &$Wheres;
         $this->fireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
@@ -306,17 +308,9 @@ class DiscussionModel extends VanillaModel {
             $this->SQL->where($Wheres);
         }
 
-        // Whitelist sorting options
-        if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'))) {
-            trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
+        foreach ($orderFields as $orderField => $direction) {
+            $this->SQL->orderBy($orderField, $direction);
         }
-
-        $SortDirection = $this->EventArguments['SortDirection'];
-        if ($SortDirection != 'asc') {
-            $SortDirection = 'desc';
-        }
-
-        $this->SQL->orderBy($SortField, $SortDirection);
 
         // Set range and fetch
         $Data = $this->SQL->get();
@@ -361,6 +355,43 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * Returns an array of 'field' => 'direction', values and ensures the safety of field names and directions.
+     *
+     * You can safely use return values from this function in the orderBy() SQL function. Use this return value and orderBy()
+     * in a loop to support multiple orderby values.
+     *
+     * If no values are passed, defaults to the fields from getSortField() and the direction from c('Vanilla.Discussions.SortDirection')
+     *
+     * @since 2.3
+     *
+     * @param string|array $orderFields
+     * @param string $orderDirection
+     * @return string
+     */
+    protected function getOrderFields($orderFields = 'd.DateLastComment', $orderDirection = 'desc') {
+        // Force order to asc or desc.
+        if ($orderDirection !== 'asc') {
+            $orderDirection = 'desc';
+        }
+
+        // Force valid $orderFields.
+        if (is_array($orderFields)) {
+            foreach ($orderFields as $orderField => &$direction) {
+                $direction = ($direction == 'asc') ? 'asc' : 'desc';
+                if (!in_array($orderField, self::allowedSortFields())) {
+                    unset($orderFields[$orderField]);
+                }
+            }
+        } elseif (in_array($orderFields, self::allowedSortFields())) {
+            $orderFields = [$orderFields => $orderDirection];
+        } else {
+            $orderFields = [self::DEFAULT_ORDERBY => $orderDirection];
+        }
+
+        return $orderFields;
+    }
+
+    /**
      * Get a list of discussions.
      *
      * This method call will remove announcements and may not return exactly {@link $Limit} records for optimization.
@@ -386,13 +417,6 @@ class DiscussionModel extends VanillaModel {
             $OrderDirection = '';
         }
 
-        // Set default types.
-        if (empty($OrderFields)) {
-            $OrderFields = self::getSortField();
-        }
-        if (empty($OrderDirection)) {
-            $OrderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
-        }
         if ($Limit === 0) {
             trigger_error("You should not supply 0 to for $Limit in DiscussionModel->getWhere()", E_USER_NOTICE);
         }
@@ -417,27 +441,21 @@ class DiscussionModel extends VanillaModel {
             }
         }
 
-        $this->EventArguments['SortField'] = &$OrderFields;
-        $this->EventArguments['SortDirection'] = &$OrderDirection;
+        $OrderFields = $this->getOrderFields($OrderFields, $OrderDirection);
+
+        $this->EventArguments['OrderFields'] = &$OrderFields;
         $this->EventArguments['Wheres'] =& $Where;
         $this->fireEvent('BeforeGet');
-
-        // Whitelist sorting options
-        if (!in_array($OrderFields, self::AllowedSortFields())) {
-            $OrderFields = 'd.DateLastComment';
-        }
-
-        $OrderDirection = $this->EventArguments['SortDirection'];
-        if ($OrderDirection != 'asc') {
-            $OrderDirection = 'desc';
-        }
 
         // Build up the base query. Self-join for optimization.
         $Sql->select('d2.*')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
-            ->orderBy($OrderFields, $OrderDirection)
             ->limit($Limit, $Offset);
+
+        foreach ($OrderFields as $orderField => $direction) {
+            $Sql->orderBy($orderField, $direction);
+        }
 
         // Verify permissions (restricting by category if necessary)
         $Perms = self::CategoryPermissions();
@@ -894,9 +912,13 @@ class DiscussionModel extends VanillaModel {
                 ->where('coalesce(w.Dismissed, \'0\')', '0', false);
         }
 
-        $this->SQL
-            ->orderBy(self::GetSortField(), 'desc')
-            ->limit($Limit, $Offset);
+        $orderFields = $this->getOrderFields();
+
+        $this->SQL->limit($Limit, $Offset);
+
+        foreach ($orderFields as $orderField => $direction) {
+            $this->SQL->orderBy($orderField, $direction);
+        }
 
         $Data = $this->SQL->get();
 
@@ -1483,6 +1505,7 @@ class DiscussionModel extends VanillaModel {
      * @return string Column name.
      */
     public static function getSortField() {
+        deprecated("getSortField", "getOrderFields");
         $SortField = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
         if (c('Vanilla.Discussions.UserSortField')) {
             $SortField = Gdn::session()->GetPreference('Discussions.SortField', $SortField);
@@ -1491,8 +1514,13 @@ class DiscussionModel extends VanillaModel {
         return $SortField;
     }
 
+    /**
+     *
+     *
+     * @param $DiscussionID
+     * @return mixed|null
+     */
     public static function getViewsFallback($DiscussionID) {
-
         // Not found. Check main table.
         $Views = val('CountViews', Gdn::sql()
             ->select('CountViews')

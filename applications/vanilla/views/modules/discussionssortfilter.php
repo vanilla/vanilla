@@ -11,6 +11,8 @@
     ?>
     </span>
     <span class="discussion-filters">
-    <?php echo $this->getFilterDropdown(); ?>
+    <?php foreach ($this->getFilterDropdowns() as $dropdown) {
+        echo $dropdown;
+    } ?>
     </span>
 </div>

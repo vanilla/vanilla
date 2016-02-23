@@ -242,19 +242,22 @@ class CategoriesController extends VanillaController {
             // Check permission
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
 
-            $sort = DiscussionsSortFilterModule::getSortFromRequest();
-            if (!$orderBy = val('orderBy', $sort)) {
-                // Try getting from user preferences.
-                $sort = DiscussionsSortFilterModule::getSortFromUserPreference();
-                $orderBy = val('orderBy', $sort, array('d.DateLastComment' => 'desc'));
+            $filters = DiscussionModel::getFiltersFromRequest();
+            if (!$filters) {
+                $filters = DiscussionModel::getFiltersFromUserPreference($CategoryID);
             }
-
-            $filter = DiscussionsSortFilterModule::getFilterFromRequest();
-            if (!$filter) {
-                $filter = DiscussionsSortFilterModule::getFilterFromUserPreference($CategoryID);
-            }
-            if ($filter) {
-                $Wheres = array_merge(val('wheres', $filter, array()), $Wheres);
+            if ($filters) {
+                foreach($filters as $filter) {
+                    foreach(val('wheres', $filter, array()) as $key => $value) {
+                        if (!array_key_exists($key, $Wheres)) {
+                            $Wheres[$key] = $value;
+                        } elseif (is_array($Wheres[$key])) {
+                            $Wheres[$key][] = $value;
+                        } else {
+                            $Wheres[$key] = [$Wheres[$key], $value];
+                        }
+                    }
+                }
             }
 
             // Set discussion meta data.
@@ -293,7 +296,7 @@ class CategoriesController extends VanillaController {
             $this->setData('AnnounceData', $AnnounceData, true);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
-            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhere($Wheres, $orderBy, '', $Limit, $Offset));
+            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();
@@ -308,7 +311,7 @@ class CategoriesController extends VanillaController {
                 array('CategoryUrl')
             );
 
-            $this->Pager->queryString = DiscussionsSortFilterModule::sortFilterQueryString();
+            $this->Pager->queryString = DiscussionModel::sortFilterQueryString();
 
             $this->Pager->Record = $Category;
             PagerModule::Current($this->Pager);

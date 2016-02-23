@@ -22,7 +22,7 @@ class DiscussionSorterModule extends Gdn_Module {
     public function __construct($Sender) {
         parent::__construct($Sender, 'Vanilla');
 
-        $this->Visible = c('Vanilla.Discussions.UserSortField');
+        $this->Visible = false;
 
         // Default options
         $this->SortOptions = array(

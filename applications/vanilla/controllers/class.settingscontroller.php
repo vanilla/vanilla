@@ -48,8 +48,6 @@ class SettingsController extends Gdn_Controller {
             'Vanilla.Archive.Exclude',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
-            'Vanilla.Discussions.SortField' => 'd.DateLastComment',
-            'Vanilla.Discussions.UserSortField',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength'
         ));

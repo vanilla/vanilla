@@ -15,7 +15,7 @@
             <?php } ?>
             <?php  if (val('type', $item) == 'link') { ?>
                 <li role="presentation" <?php if (val('listItemCssClass', $item)) { ?>class="<?php echo val('listItemCssClass', $item); ?>"<?php } ?>>
-                    <a role="menuitem" class="dropdown-menu-link <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo val('url', $item); ?>"><?php echo val('text', $item); ?></a>
+                    <a role="menuitem" rel="<?php echo val('rel', $item); ?>" class="dropdown-menu-link <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo val('url', $item); ?>"><?php echo val('text', $item); ?></a>
                 </li>
             <?php }
             if (val('type', $item) == 'divider') { ?>

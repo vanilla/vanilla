@@ -51,7 +51,7 @@ abstract class SortableModule extends Gdn_Module {
      */
     private $isPrepared = false;
 
-    private $allowedItemModifiers = array('popinRel', 'icon', 'badge');
+    private $allowedItemModifiers = array('rel', 'popinRel', 'icon', 'badge');
 
     /**
      * Constructor. Should be called by all extending classes' constructors.

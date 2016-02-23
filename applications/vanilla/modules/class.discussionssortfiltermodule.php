@@ -57,13 +57,14 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     }
 
     /**
-     * Returns a dropdown menu with the data from the filters array or an empty string to make it safe for echoing out.
+     * Returns an array of dropdown menus with the data from the filters array or an array containing an empty string
+     * to make it safe for echoing out.
      *
-     * @return DropdownModule|string The filters dropdown menu or an empty string.
+     * @return array An array of dropdown menus or an array containing an empty string.
      */
     protected function getFilterDropdowns() {
         if (!$this->filters) {
-            return '';
+            return [''];
         }
         $dropdowns = [];
         foreach($this->filters as $filterSet) {
@@ -79,7 +80,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             }
 
             $dropdown->setView('dropdown-navbutton'); // TODO make this a property?
-//            $dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
+            $dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
 
             // Add the filters to the dropdown
             foreach (val('filters', $filterSet) as $filter) {
@@ -87,7 +88,9 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 $dropdown->addLink(
                     val('name', $filter),
                     url(DiscussionModel::getPagelessPath().DiscussionModel::sortFilterQueryString([$setKey => val('key', $filter)])),
-                    $key
+                    $key,
+                    '', array(), false,
+                    array('rel' => 'nofollow')
                 );
             }
             $dropdowns[] = $dropdown;

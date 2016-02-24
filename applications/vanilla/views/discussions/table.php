@@ -28,6 +28,7 @@ include $this->fetchViewLocation('Subtree', 'Categories', 'Vanilla');
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
 echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+$this->fireEvent('PageControls');
 echo '</div>';
 
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {

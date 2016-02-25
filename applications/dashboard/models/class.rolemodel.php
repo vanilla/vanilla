@@ -630,7 +630,7 @@ class RoleModel extends Gdn_Model {
      * @param string $RolesColumn
      */
     public static function setUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
-        $UserIDs = array_unique(array_column($Users, $UserIDColumn));
+        $UserIDs = array_unique(ConsolidateArrayValuesByKey($Users, $UserIDColumn));
 
         // Try and get all of the mappings from the cache.
         $Keys = array();

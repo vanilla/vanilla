@@ -8,6 +8,7 @@ if (!$ConnectPhoto) {
     $ConnectPhoto = '/applications/dashboard/design/images/usericon.gif';
 }
 $ConnectSource = $this->Form->getFormValue('ProviderName');
+// By default, clients will try to connect existing users, turn this off and it forces connecting clients to choose unique usernames.
 $connectToExistingUser = $this->data('ConnectToExistingUser');
 ?>
 <div class="Connect">

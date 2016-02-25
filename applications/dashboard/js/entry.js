@@ -48,6 +48,7 @@ jQuery(document).ready(function($) {
     });
 
     var checkConnectName = function() {
+        // If config setting ConnectToExistingUser is set to false, hide the password and return.
         if(!gdn.definition('ConnectToExistingUser', true)) {
             $('#ConnectPassword').hide();
             return;

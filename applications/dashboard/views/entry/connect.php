@@ -8,6 +8,7 @@ if (!$ConnectPhoto) {
     $ConnectPhoto = '/applications/dashboard/design/images/usericon.gif';
 }
 $ConnectSource = $this->Form->getFormValue('ProviderName');
+$connectToExistingUser = $this->data('ConnectToExistingUser');
 ?>
 <div class="Connect">
     <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign In") : sprintf(t('%s Connect'), $ConnectSource); ?></h1>
@@ -71,7 +72,7 @@ $ConnectSource = $this->Form->getFormValue('ProviderName');
                 <?php endif; ?>
                 <li>
                     <?php
-                      if (!$this->Form->getFormValue('ConnectName')) {
+                      if (!$this->Form->getFormValue('ConnectName') || !$connectToExistingUser ) {
                           if (count($ExistingUsers) == 1 && $NoConnectName) {
                               $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                               $Row = reset($ExistingUsers);
@@ -97,6 +98,7 @@ $ConnectSource = $this->Form->getFormValue('ProviderName');
                     ?>
                 </li>
                 <?php $this->fireEvent('RegisterBeforePassword'); ?>
+                <?php if ($connectToExistingUser) : ?>
                 <li id="ConnectPassword">
                     <?php
                     echo $this->Form->label('Password', 'ConnectPassword');
@@ -104,6 +106,7 @@ $ConnectSource = $this->Form->getFormValue('ProviderName');
                     echo $this->Form->Input('ConnectPassword', 'password');
                     ?>
                 </li>
+                <?php endif; ?>
             </ul>
 
             <?php

@@ -380,6 +380,7 @@ EOT;
         $this->View = 'connect';
         $IsPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
         $UserSelect = $this->Form->getFormValue('UserSelect');
+        $connectToExistingUser = c('Garden.SSO.ConnectToExistingUser', true);
 
         if (!$IsPostBack) {
             // Here are the initial data array values. that can be set by a plugin.
@@ -616,6 +617,15 @@ EOT;
                 $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
+            if(!$connectToExistingUser) {
+                $connectName = $this->Form->getFormValue("ConnectName");
+                $this->Form->setFormValue("Name", $connectName);
+                $this->Form->setFormValue("UserSelect", "other");
+                $this->Form->setFormValue("Photo", null);
+                $this->setData('ConnectToExistingUser', false);
+                $ExistingUsers = array();
+            }
+
             $this->setData('ExistingUsers', $ExistingUsers);
 
             if (UserModel::noEmail()) {
@@ -707,7 +717,7 @@ EOT;
 
             if (isset($User) && $User) {
                 // Make sure the user authenticates.
-                if (!$User['UserID'] == Gdn::session()->UserID) {
+                if (!$User['UserID'] == Gdn::session()->UserID && $connectToExistingUser) {
                     if ($this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')))) {
                         try {
                             if (!$PasswordHash->checkPassword($this->Form->getFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'], $this->Form->getFormValue('ConnectName'))) {

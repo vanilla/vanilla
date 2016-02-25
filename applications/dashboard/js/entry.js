@@ -1,8 +1,9 @@
 
 // This file contains javascript that is specific to the dashboard/entry controller.
 jQuery(document).ready(function($) {
-    $(window).keydown(function(event){
-        if(event.keyCode == 13) { // && gdn.definition('ForceCreateConnectName', false)
+    // For the SSO connect user page, do not allow to submit by pressing enter.
+    $("#dashboard_entry_connect").keydown(function(event){
+        if(event.keyCode == 13) {
             event.preventDefault();
             checkConnectName();
             return false;

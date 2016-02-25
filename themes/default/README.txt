@@ -27,8 +27,8 @@ Our pages are made up of two parts:
  1. Master Views - these represent everything that wraps the main content of the
    page. If all you want to do is add a menu or banner above Vanilla, this is
    all you need to alter. To do so, copy the default master view from
-   /applications/dashboard/views/default.master.php to
-   /themes/yourtheme/views/default.master.php and edit it there.
+   /applications/dashboard/views/default.master.tpl to
+   /themes/yourtheme/views/default.master.tpl and edit it there.
    
  2. Views - these represent all of the content in each page. Every application
    has a "views" folder that contains all of the HTML for every page. So, for

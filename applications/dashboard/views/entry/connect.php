@@ -98,7 +98,6 @@ $connectToExistingUser = $this->data('ConnectToExistingUser');
                     ?>
                 </li>
                 <?php $this->fireEvent('RegisterBeforePassword'); ?>
-                <?php if ($connectToExistingUser) : ?>
                 <li id="ConnectPassword">
                     <?php
                     echo $this->Form->label('Password', 'ConnectPassword');
@@ -106,7 +105,6 @@ $connectToExistingUser = $this->data('ConnectToExistingUser');
                     echo $this->Form->Input('ConnectPassword', 'password');
                     ?>
                 </li>
-                <?php endif; ?>
             </ul>
 
             <?php

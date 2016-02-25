@@ -48,6 +48,10 @@ jQuery(document).ready(function($) {
     });
 
     var checkConnectName = function() {
+        if(!gdn.definition('ConnectToExistingUser', true)) {
+            $('#ConnectPassword').hide();
+            return;
+        }
         if (gdn.definition('NoConnectName', false)) {
             $('#ConnectPassword').show();
             return;

@@ -382,6 +382,7 @@ EOT;
         $UserSelect = $this->Form->getFormValue('UserSelect');
         $connectToExistingUser = c('Garden.SSO.ConnectToExistingUser', true);
         $this->setData('ConnectToExistingUser', $connectToExistingUser);
+        $this->addDefinition('ConnectToExistingUser', $connectToExistingUser);
 
         if (!$IsPostBack) {
             // Here are the initial data array values. that can be set by a plugin.

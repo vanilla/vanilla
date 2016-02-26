@@ -188,7 +188,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function button($ButtonCode, $Attributes = false) {
+    public function button($ButtonCode, $Attributes = array()) {
         $Type = arrayValueI('type', $Attributes);
         if ($Type === false) {
             $Type = 'submit';
@@ -240,7 +240,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      * @todo Create calendar helper
      */
-    public function calendar($FieldName, $Attributes = false) {
+    public function calendar($FieldName, $Attributes = array()) {
         // TODO: CREATE A CALENDAR HELPER CLASS AND LOAD/REFERENCE IT HERE.
         // THE CLASS SHOULD BE DECLARED WITH:
         //  if (!class_exists('Calendar') {
@@ -326,7 +326,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function categoryDropDown($FieldName = 'CategoryID', $Options = false) {
+    public function categoryDropDown($FieldName = 'CategoryID', $Options = array()) {
 
         $this->EventArguments['Options'] = &$Options;
         $this->fireEvent('BeforeCategoryDropDown');
@@ -458,7 +458,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function checkBox($FieldName, $Label = '', $Attributes = false) {
+    public function checkBox($FieldName, $Label = '', $Attributes = array()) {
         $Value = arrayValueI('value', $Attributes, true);
         $Attributes['value'] = $Value;
         $Display = val('display', $Attributes, 'wrap');
@@ -534,7 +534,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function checkBoxList($FieldName, $DataSet, $ValueDataSet = null, $Attributes = false) {
+    public function checkBoxList($FieldName, $DataSet, $ValueDataSet = null, $Attributes = array()) {
         // Never display individual inline errors for these CheckBoxes
         $Attributes['InlineErrors'] = false;
 
@@ -814,7 +814,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $Xhtml
      * @return string
      */
-    public function close($ButtonCode = '', $Xhtml = '', $Attributes = false) {
+    public function close($ButtonCode = '', $Xhtml = '', $Attributes = array()) {
         $Return = "</div>\n</form>";
         if ($Xhtml != '') {
             $Return = $Xhtml.$Return;
@@ -858,7 +858,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *       Fields, array of month, day, year. Those are only valid values. Order matters.
      * @return string
      */
-    public function date($FieldName, $Attributes = false) {
+    public function date($FieldName, $Attributes = array()) {
         $Return = '';
         $YearRange = arrayValueI('yearrange', $Attributes, false);
         $StartYear = 0;
@@ -875,18 +875,16 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         $Months = array_map(
-            'T',
+            't',
             explode(',', 'Month,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec')
         );
 
-        $Days = array();
-        $Days[] = T('Day');
+        $Days = array(t('Day'));
         for ($i = 1; $i < 32; ++$i) {
             $Days[] = $i;
         }
 
-        $Years = array();
-        $Years[0] = T('Year');
+        $Years = array(t('Year'));
         foreach (range($StartYear, $EndYear) as $Year) {
             $Years[$Year] = $Year;
         }
@@ -904,7 +902,11 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $CssClass = arrayValueI('class', $Attributes, '');
 
-        $SubmittedTimestamp = ($this->getValue($FieldName) > 0) ? strtotime($this->getValue($FieldName)) : false;
+        if ($this->getValue($FieldName) > 0) {
+            $SubmittedTimestamp = strtotime($this->getValue($FieldName));
+        } else {
+            $SubmittedTimestamp = false;
+        }
 
         // Allow us to specify which fields to show & order
         $Fields = arrayValueI('fields', $Attributes, array('month', 'day', 'year'));
@@ -977,7 +979,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function dropDown($FieldName, $DataSet, $Attributes = false) {
+    public function dropDown($FieldName, $DataSet, $Attributes = array()) {
         // Show inline errors?
         $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
 
@@ -1288,7 +1290,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * class, etc
      * @return string
      */
-    public function hidden($FieldName, $Attributes = false) {
+    public function hidden($FieldName, $Attributes = array()) {
         $Return = '<input type="hidden"';
         $Return .= $this->_idAttribute($FieldName, $Attributes);
         $Return .= $this->_nameAttribute($FieldName, $Attributes);
@@ -1347,7 +1349,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function input($FieldName, $Type = 'text', $Attributes = false) {
+    public function input($FieldName, $Type = 'text', $Attributes = array()) {
         if ($Type == 'text' || $Type == 'password') {
             $CssClass = arrayValueI('class', $Attributes);
             if ($CssClass == false) {
@@ -1436,7 +1438,7 @@ PASSWORDMETER;
      *
      * @return string
      */
-    public function label($TranslationCode, $FieldName = '', $Attributes = false) {
+    public function label($TranslationCode, $FieldName = '', $Attributes = array()) {
         // Assume we always want a 'for' attribute because it's Good & Proper.
         // Precedence: 'for' attribute, 'id' attribute, $FieldName, $TranslationCode
         $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
@@ -1579,7 +1581,7 @@ PASSWORDMETER;
      *    Special values 'Value' and 'Default' (see RadioList).
      * @return string
      */
-    public function radio($FieldName, $Label = '', $Attributes = false) {
+    public function radio($FieldName, $Label = '', $Attributes = array()) {
         $Value = arrayValueI('Value', $Attributes, 'TRUE');
         $Attributes['value'] = $Value;
         $FormValue = $this->getValue($FieldName, arrayValueI('Default', $Attributes));
@@ -1639,7 +1641,7 @@ PASSWORDMETER;
      *
      * @return string
      */
-    public function radioList($FieldName, $DataSet, $Attributes = false) {
+    public function radioList($FieldName, $DataSet, $Attributes = array()) {
         $List = val('list', $Attributes);
         $Return = '';
 
@@ -1703,7 +1705,7 @@ PASSWORDMETER;
      *  class, etc
      * @return string
      */
-    public function textBox($FieldName, $Attributes = false) {
+    public function textBox($FieldName, $Attributes = array()) {
         if (!is_array($Attributes)) {
             $Attributes = array();
         }

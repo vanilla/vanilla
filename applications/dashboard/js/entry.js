@@ -48,6 +48,11 @@ jQuery(document).ready(function($) {
     });
 
     var checkConnectName = function() {
+        // If config setting AllowConnect is set to false, hide the password and return.
+        if(!gdn.definition('AllowConnect', true)) {
+            $('#ConnectPassword').hide();
+            return;
+        }
         if (gdn.definition('NoConnectName', false)) {
             $('#ConnectPassword').show();
             return;

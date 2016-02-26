@@ -310,9 +310,10 @@ if (!function_exists('arrayValueI')) {
      */
     function arrayValueI($Needle, $Haystack, $Default = false) {
         $Return = $Default;
+        $Needle = strtolower($Needle);
         if (is_array($Haystack)) {
             foreach ($Haystack as $Key => $Value) {
-                if (strtolower($Needle) == strtolower($Key)) {
+                if ($Needle == strtolower($Key)) {
                     $Return = $Value;
                     break;
                 }

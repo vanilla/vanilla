@@ -48,8 +48,8 @@ jQuery(document).ready(function($) {
     });
 
     var checkConnectName = function() {
-        // If config setting ConnectToExistingUser is set to false, hide the password and return.
-        if(!gdn.definition('ConnectToExistingUser', true)) {
+        // If config setting AllowConnect is set to false, hide the password and return.
+        if(!gdn.definition('AllowConnect', true)) {
             $('#ConnectPassword').hide();
             return;
         }

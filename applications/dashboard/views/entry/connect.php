@@ -9,7 +9,7 @@ if (!$ConnectPhoto) {
 }
 $ConnectSource = $this->Form->getFormValue('ProviderName');
 // By default, clients will try to connect existing users, turn this off and it forces connecting clients to choose unique usernames.
-$connectToExistingUser = $this->data('ConnectToExistingUser');
+$allowConnect = $this->data('AllowConnect');
 ?>
 <div class="Connect">
     <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign In") : sprintf(t('%s Connect'), $ConnectSource); ?></h1>
@@ -73,7 +73,7 @@ $connectToExistingUser = $this->data('ConnectToExistingUser');
                 <?php endif; ?>
                 <li>
                     <?php
-                      if (!$this->Form->getFormValue('ConnectName') || !$connectToExistingUser ) {
+                      if (!$this->Form->getFormValue('ConnectName') || !$allowConnect ) {
                           if (count($ExistingUsers) == 1 && $NoConnectName) {
                               $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                               $Row = reset($ExistingUsers);

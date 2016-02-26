@@ -384,11 +384,11 @@ EOT;
         /**
          * When a user is connecting through SSO he is prompted to choose a username. If he chooses an existing user name
          * he is then prompted to enter the password for that username 'claiming' it as their own.
-         * By setting ConnectToExistingUser to false, we take away that workflow, forcing the user to choose a unique username.
+         * By setting AllowConnect to false, we take away that workflow, forcing the user to choose a unique username.
          */
-        $connectToExistingUser = c('Garden.SSO.ConnectToExistingUser', true);
-        $this->setData('ConnectToExistingUser', $connectToExistingUser);
-        $this->addDefinition('ConnectToExistingUser', $connectToExistingUser);
+        $allowConnect = c('Garden.Registration.AllowConnect', true);
+        $this->setData('AllowConnect', $allowConnect);
+        $this->addDefinition('AllowConnect', $allowConnect);
 
         if (!$IsPostBack) {
             // Here are the initial data array values. that can be set by a plugin.
@@ -625,14 +625,12 @@ EOT;
                 $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
-            if(!$connectToExistingUser) {
+            if(!$allowConnect) {
                 // Since we are not connecting a joining user to an existing user...
-                // make his name the same as the connect name he chose.
-                $connectName = $this->Form->getFormValue("ConnectName");
-                $this->Form->setFormValue("Name", $connectName);
-                $this->Form->setFormValue("UserSelect", "other");
-                // make sure the photo of the existing user doen't show up on the form.
+
+                // make sure the photo of the existing user doesn't show up on the form.
                 $this->Form->setFormValue("Photo", null);
+
                 // ignore any existing user(s) found.
                 $ExistingUsers = array();
             }
@@ -728,7 +726,7 @@ EOT;
 
             if (isset($User) && $User) {
                 // Make sure the user authenticates.
-                if (!$User['UserID'] == Gdn::session()->UserID && $connectToExistingUser) {
+                if (!$User['UserID'] == Gdn::session()->UserID && $allowConnect) {
                     if ($this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')))) {
                         try {
                             if (!$PasswordHash->checkPassword($this->Form->getFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'], $this->Form->getFormValue('ConnectName'))) {

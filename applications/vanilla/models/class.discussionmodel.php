@@ -19,7 +19,10 @@ class DiscussionModel extends VanillaModel {
     /** @var string Default column to order by. */
     const DEFAULT_ORDER_BY_FIELD = 'd.DateLastComment';
 
+    /** @var string The filter key for discussions in the User table's UserPreferences field. */
     const FILTER_USER_PREFERENCE_KEY = 'Discussions.FilterKeys';
+
+    /** @var string The sort key for discussions in the User table's UserPreferences field. */
     const SORT_USER_PREFERENCE_KEY = 'Discussions.SortKey';
 
     /** @var array */
@@ -30,9 +33,6 @@ class DiscussionModel extends VanillaModel {
 
     /** @var bool */
     public $Watching = false;
-
-    /** @var array Column names to allow sorting by. */
-    protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID', 'd.Score');
 
     /** @var array Discussion Permissions */
     protected $permissionTypes = array('Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View');
@@ -370,9 +370,9 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Get preferred sort order
-        $orderFields = $this->getOrderBy();
+        $orderBy = $this->getOrderBy();
 
-        $this->EventArguments['OrderFields'] = &$orderFields;
+        $this->EventArguments['OrderFields'] = &$orderBy;
         $this->EventArguments['Wheres'] = &$Wheres;
         $this->fireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
@@ -386,7 +386,7 @@ class DiscussionModel extends VanillaModel {
             $this->SQL->where($Wheres);
         }
 
-        foreach ($orderFields as $orderField => $direction) {
+        foreach ($orderBy as $orderField => $direction) {
             $this->SQL->orderBy($orderField, $direction);
         }
 
@@ -443,7 +443,7 @@ class DiscussionModel extends VanillaModel {
      * @return array
      */
     protected function getOrderBy() {
-        $orderFields = [];
+        $orderBy = [];
 
         // Try request
         if (!$sortKey = self::getSortFromRequest()) {
@@ -457,18 +457,18 @@ class DiscussionModel extends VanillaModel {
         if ($sortKey) {
             self::$sortKeySelected = $sortKey;
             $sort = self::getSortFromKey($sortKey);
-            $orderFields = val('orderBy', $sort, []);
+            $orderBy = val('orderBy', $sort, []);
         }
 
-        if (empty($orderFields)) {
+        if (empty($orderBy)) {
             // Try config
             $orderField = c('Vanilla.Discussions.SortField', self::DEFAULT_ORDER_BY_FIELD);
             $orderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
-            $orderFields = [$orderField => $orderDirection];
+            $orderBy = [$orderField => $orderDirection];
         }
 
 
-        return $orderFields;
+        return $orderBy;
     }
 
 
@@ -577,16 +577,16 @@ class DiscussionModel extends VanillaModel {
         $Where = $this->combineWheres($this->getWheres(), $Where);
 
         if (empty($OrderFields)) {
-            $OrderFields = $this->getOrderBy();
+            $orderBy = $this->getOrderBy();
         } elseif (is_string($OrderFields)) {
             if ($OrderDirection != 'asc') {
                 $OrderDirection = 'desc';
             }
-            $OrderFields = [$OrderFields => $OrderDirection];
+            $orderBy = [$OrderFields => $OrderDirection];
         }
 
-        $this->EventArguments['OrderFields'] = &$OrderFields;
-        $this->EventArguments['Wheres'] =& $Where;
+        $this->EventArguments['OrderBy'] = &$orderBy;
+        $this->EventArguments['Wheres'] = &$Where;
         $this->fireEvent('BeforeGet');
 
         // Build up the base query. Self-join for optimization.
@@ -595,8 +595,8 @@ class DiscussionModel extends VanillaModel {
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->limit($Limit, $Offset);
 
-        foreach ($OrderFields as $orderField => $direction) {
-            $Sql->orderBy($orderField, $direction);
+        foreach ($orderBy as $field => $direction) {
+            $Sql->orderBy($field, $direction);
         }
 
         // Verify permissions (restricting by category if necessary)
@@ -1054,12 +1054,12 @@ class DiscussionModel extends VanillaModel {
                 ->where('coalesce(w.Dismissed, \'0\')', '0', false);
         }
 
-        $orderFields = $this->getOrderBy();
+        $orderBy = $this->getOrderBy();
 
         $this->SQL->limit($Limit, $Offset);
 
-        foreach ($orderFields as $orderField => $direction) {
-            $this->SQL->orderBy($orderField, $direction);
+        foreach ($orderBy as $field => $direction) {
+            $this->SQL->orderBy($field, $direction);
         }
 
         $Data = $this->SQL->get();
@@ -1647,7 +1647,7 @@ class DiscussionModel extends VanillaModel {
      * @return string Column name.
      */
     public static function getSortField() {
-        deprecated("getSortField", "getOrderFields");
+        deprecated("getSortField", "getOrderBy");
         $SortField = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
         if (c('Vanilla.Discussions.UserSortField')) {
             $SortField = Gdn::session()->GetPreference('Discussions.SortField', $SortField);
@@ -2701,17 +2701,6 @@ class DiscussionModel extends VanillaModel {
 
         // Send back an comma-separated string
         return (is_array($TagsArray)) ? implode(',', $TagsArray) : '';
-    }
-
-    /**
-     * Getter/setter for protected $AllowedSortFields array.
-     */
-    public static function allowedSortFields($Allowed = null) {
-        if (is_array($Allowed)) {
-            self::$AllowedSortFields = $Allowed;
-        }
-
-        return self::$AllowedSortFields;
     }
 
     /**

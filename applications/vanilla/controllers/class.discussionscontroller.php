@@ -66,6 +66,9 @@ class DiscussionsController extends VanillaController {
         }
         Gdn_Theme::section('DiscussionList');
 
+        // Remove score sort
+        DiscussionModel::removeSort('top');
+
         // Check for the feed keyword.
         if ($Page === 'feed' && $this->SyndicationMethod != SYNDICATION_NONE) {
             $Page = 'p1';
@@ -154,6 +157,7 @@ class DiscussionsController extends VanillaController {
         if (!$this->data('_PagerUrl')) {
             $this->setData('_PagerUrl', 'discussions/{Page}');
         }
+        $this->setData('_PagerUrl', $this->data('_PagerUrl').DiscussionModel::sortFilterQueryString());
         $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(

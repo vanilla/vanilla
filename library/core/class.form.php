@@ -327,6 +327,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function categoryDropDown($FieldName = 'CategoryID', $Options = array()) {
+
+        $this->EventArguments['Options'] = &$Options;
+        $this->fireEvent('BeforeCategoryDropDown');
+
         $Value = arrayValueI('Value', $Options); // The selected category id
         $CategoryData = val('CategoryData', $Options);
 

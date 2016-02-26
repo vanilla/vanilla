@@ -47,7 +47,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         foreach($this->sorts as $sort) {
             $key = val('key', $sort);
             $sortData[$key]['name'] = val('name', $sort);
-            $sortData[$key]['url'] = DiscussionModel::getPagelessPath().DiscussionModel::sortFilterQueryString([], $key);
+            $sortData[$key]['url'] = $this->getPagelessPath().DiscussionModel::sortFilterQueryString([], $key);
             $sortData[$key]['rel'] = 'nofollow';
             if (DiscussionModel::getSortKeySelected() == val('key', $sort)) {
                 $sortData[$key]['cssClass'] = self::ACTIVE_CSS_CLASS;
@@ -87,7 +87,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 $key = val('group', $filter, '') . '.' . val('key', $filter);
                 $dropdown->addLink(
                     val('name', $filter),
-                    url(DiscussionModel::getPagelessPath().DiscussionModel::sortFilterQueryString([$setKey => val('key', $filter)])),
+                    url($this->getPagelessPath().DiscussionModel::sortFilterQueryString([$setKey => val('key', $filter)])),
                     $key,
                     '', array(), false,
                     array('rel' => 'nofollow')
@@ -96,5 +96,16 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $dropdowns[] = $dropdown;
         }
         return $dropdowns;
+    }
+
+    /**
+     * Returns the current path without any page indicator. Useful for resetting sorting/filtering no matter
+     * which page the user is on.
+     *
+     * @return string The path of the request without the page.
+     */
+    protected function getPagelessPath() {
+        // Remove page indicator.
+        return preg_replace('/\/p\d$/i', '', Gdn::request()->path());
     }
 }

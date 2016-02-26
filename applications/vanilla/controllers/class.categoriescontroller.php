@@ -242,24 +242,6 @@ class CategoriesController extends VanillaController {
             // Check permission
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
 
-            $filters = DiscussionModel::getFiltersFromRequest();
-            if (!$filters) {
-                $filters = DiscussionModel::getFiltersFromUserPreference($CategoryID);
-            }
-            if ($filters) {
-                foreach($filters as $filter) {
-                    foreach(val('wheres', $filter, array()) as $key => $value) {
-                        if (!array_key_exists($key, $Wheres)) {
-                            $Wheres[$key] = $value;
-                        } elseif (is_array($Wheres[$key])) {
-                            $Wheres[$key][] = $value;
-                        } else {
-                            $Wheres[$key] = [$Wheres[$key], $value];
-                        }
-                    }
-                }
-            }
-
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);
             $this->fireEvent('BeforeGetDiscussions');

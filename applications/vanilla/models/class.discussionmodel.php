@@ -433,14 +433,14 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * Returns an array of 'field' => 'direction', values. Checks request, then user preferences, then config before
+     * Returns an array of field => direction, values. Checks request, then user preferences, then config before
      * settling on the default ordering fields.
      *
      * You can safely use return values from this function in the orderBy() SQL function.
      *
      * @since 2.3
      *
-     * @return array
+     * @return array An array of field => direction values.
      */
     protected function getOrderBy() {
         $orderBy = [];

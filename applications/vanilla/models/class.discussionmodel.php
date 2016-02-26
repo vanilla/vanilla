@@ -607,6 +607,11 @@ class DiscussionModel extends VanillaModel {
             ->limit($Limit, $Offset);
 
         foreach ($orderBy as $field => $direction) {
+            // Make sure there aren't any ambiguous discussion references.
+            if (strpos($field, '.') === false) {
+                $field = 'd.'.$field;
+            }
+
             $Sql->orderBy($field, $direction);
         }
 

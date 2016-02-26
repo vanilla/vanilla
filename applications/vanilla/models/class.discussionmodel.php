@@ -17,7 +17,7 @@ class DiscussionModel extends VanillaModel {
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
     /** @var string Default column to order by. */
-    const DEFAULT_ORDER_BY_FIELD = 'd.DateLastComment';
+    const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';
 
     /** @var string The filter key for discussions in the User table's UserPreferences field. */
     const FILTER_USER_PREFERENCE_KEY = 'Discussions.FilterKeys';
@@ -46,9 +46,9 @@ class DiscussionModel extends VanillaModel {
      * - **orderBy**: string - An array indicating order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
      */
     protected static $sorts = array(
-        'hot' => array('key' => 'hot', 'name' => 'Hot', 'orderBy' => array('d.DateLastComment' => 'desc')),
-        'top' => array('key' => 'top', 'name' => 'Top', 'orderBy' => array('d.Score' => 'desc', 'd.DateInserted' => 'desc')),
-        'new' => array('key' => 'new', 'name' => 'New', 'orderBy' => array('d.DateInserted' => 'desc'))
+        'hot' => array('key' => 'hot', 'name' => 'Hot', 'orderBy' => array('DateLastComment' => 'desc')),
+        'top' => array('key' => 'top', 'name' => 'Top', 'orderBy' => array('Score' => 'desc', 'DateInserted' => 'desc')),
+        'new' => array('key' => 'new', 'name' => 'New', 'orderBy' => array('DateInserted' => 'desc'))
     );
 
     /**

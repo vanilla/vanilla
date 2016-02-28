@@ -3750,7 +3750,7 @@ if (!function_exists('sliceParagraph')) {
         // See if there is a paragraph.
         $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
 
-        if ($Pos === false || $Pos<$MinLength) {
+        if ($Pos === false || $Pos < $MinLength) {
             // There was no paragraph so try and split on sentences.
             $Sentences = preg_split('`([.!?:]\s+)`', $String, null, PREG_SPLIT_DELIM_CAPTURE);
 

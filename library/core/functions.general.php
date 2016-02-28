@@ -3735,12 +3735,15 @@ if (!function_exists('sliceParagraph')) {
      * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
      *
      * @param string $String The string to slice.
-     * @param int $MaxLength The maximum length of the string.
+     * @param int|array $Limits Either int $MaxLength or array($MaxLength, $MinLength); whereas $MaxLength The maximum length of the string; $MinLength The intended minimum length of the string (slice on sentence if paragraph is too short).
      * @param string $Suffix The suffix if the string must be sliced mid-sentence.
-     * @param int $MinLength The intended minimum length of the string (slice on sentence if paragraph is too short)
      * @return string
      */
-    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…', $MinLength = 50) {
+    function sliceParagraph($String, $Limits = 500, $Suffix = '…') {
+        if(is_int($Limits)) {
+            $Limits = array($Limits, 32);
+        }
+        list($MaxLength, $MinLength) = $Limits;
         if ($MaxLength >= strlen($String)) {
             return $String;
         }

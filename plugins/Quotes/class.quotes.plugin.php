@@ -358,7 +358,7 @@ BLOCKQUOTE;
      * @param $Sender
      */
     public function postController_BeforeCommentRender_handler($Sender) {
-        if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
+        if ($Sender->data('Plugin.Quotes.QuoteSource')) {
             if (sizeof($Sender->RequestArgs) < 2) {
                 return;
             }

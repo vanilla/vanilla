@@ -593,13 +593,14 @@ class ConversationModel extends ConversationsModel {
                 'RecordType' => 'Conversation',
                 'RecordID' => $ConversationID,
                 'Story' => val('Body', $formPostValues),
+                'ActionText' => t('Reply'),
                 'Format' => val('Format', $formPostValues, c('Garden.InputFormatter')),
                 'Route' => "/messages/$ConversationID#Message_$MessageID"
             );
 
             $Subject = val('Subject', $Fields);
             if ($Subject) {
-                $Activity['HeadlineFormat'] = $Subject;
+                $Activity['Story'] = sprintf(t('Re: %s'), $Subject).'<br>'.val('Body', $formPostValues);
             }
 
             $ActivityModel = new ActivityModel();

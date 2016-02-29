@@ -1,12 +1,20 @@
 <?php
 
 /**
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
+/**
  * Class EmailTemplate
  *
  * Compiles the data for an email, applies appropriate content filters and renders the email.
  *
+ * @author Becky Van Bussel <becky@vanillaforums.com>
+ * @package Core
+ * @since 2.2
  */
-class EmailTemplate extends Gdn_Pluggable {
+class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
 
     /**
      * Delimiter for plaintext email.
@@ -26,14 +34,17 @@ class EmailTemplate extends Gdn_Pluggable {
      * @var string The HTML formatted email title.
      */
     protected $title;
+
     /**
      * @var string The HTML formatted email lead (sub-title, appears under title).
      */
     protected $lead;
+
     /**
      * @var string The HTML formatted email message (the body of the email).
      */
     protected $message;
+
     /**
      * @var array An array representing a footer with the following keys:
      * 'text' => The HTML-formatted footer text.
@@ -41,6 +52,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * 'backgroundColor' => The hex color code of the footer background, must include the leading '#'.
      */
     protected $footer;
+
     /**
      * @var array An array representing a button with the following keys:
      * 'url' => The href value of the button.
@@ -49,6 +61,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * 'backgroundColor' => The hex color code of the button background, must include the leading '#'.
      */
     protected $button;
+
     /**
      * @var array An array representing an image with the following keys:
      * 'source' => The image source url.
@@ -56,31 +69,38 @@ class EmailTemplate extends Gdn_Pluggable {
      * 'alt' => The alt value of the image tag.
      */
     protected $image;
+
     /**
      * @var string The path to the email view.
      */
     protected $view;
+
     /**
      * @var bool Whether to render in plaintext.
      */
     protected $plaintext = false;
+
     // Colors
     /**
      * @var string The hex color code of the text, must include the leading '#'.
      */
     protected $textColor = self::DEFAULT_TEXT_COLOR;
-   /**
-    * @var string The hex color code of the background, must include the leading '#'.
-    */
+
+    /**
+     * @var string The hex color code of the background, must include the leading '#'.
+     */
     protected $backgroundColor = self::DEFAULT_BACKGROUND_COLOR;
+
     /**
      * @var string The hex color code of the container background, must include the leading '#'.
      */
     protected $containerBackgroundColor = self::DEFAULT_CONTAINER_BACKGROUND_COLOR;
+
     /**
      * @var string The default hex color code of the button text, must include the leading '#'.
      */
     protected $defaultButtonTextColor = self::DEFAULT_BUTTON_TEXT_COLOR;
+
     /**
      * @var string The default hex color code of the button background, must include the leading '#'.
      */
@@ -94,11 +114,48 @@ class EmailTemplate extends Gdn_Pluggable {
      * @throws Exception
      */
     function __construct($message = '', $title = '', $lead = '', $view = 'email-basic') {
+        parent::__construct();
+
         $this->setMessage($message);
         $this->setTitle($title);
         $this->setLead($lead);
 
-        $this->view = Gdn::controller()->fetchViewLocation($view, 'email', 'dashboard');
+        // Set templating defaults
+        $this->setTextColor(c('Garden.EmailTemplate.TextColor', self::DEFAULT_TEXT_COLOR));
+        $this->setBackgroundColor(c('Garden.EmailTemplate.BackgroundColor', self::DEFAULT_BACKGROUND_COLOR));
+        $this->setContainerBackgroundColor(c('Garden.EmailTemplate.ContainerBackgroundColor', self::DEFAULT_CONTAINER_BACKGROUND_COLOR));
+        $this->setDefaultButtonBackgroundColor(c('Garden.EmailTemplate.ButtonBackgroundColor', self::DEFAULT_BUTTON_BACKGROUND_COLOR));
+        $this->setDefaultButtonTextColor(c('Garden.EmailTemplate.ButtonTextColor', self::DEFAULT_BUTTON_TEXT_COLOR));
+
+        $this->setDefaultEmailImage();
+
+        // Set default view
+        $this->view = AssetModel::viewLocation($view, 'email', 'dashboard');
+    }
+
+    /**
+     * Sets the default image for the email template.
+     */
+    protected function setDefaultEmailImage() {
+        if (!$this->getImage()) {
+            $image = $this->getDefaultEmailImage();
+            $this->setImageArray($image);
+        }
+    }
+
+    /**
+     * Retrieves default values for the email image.
+     *
+     * @return array An array representing an image.
+     */
+    public function getDefaultEmailImage() {
+        $image = array();
+        if (c('Garden.EmailTemplate.Image', '')) {
+            $image['source'] = Gdn_UploadImage::url(c('Garden.EmailTemplate.Image'));
+        }
+        $image['link'] = url('/', true);
+        $image['alt'] = c('Garden.LogoTitle', c('Garden.Title', ''));
+        return $image;
     }
 
     /**
@@ -125,7 +182,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @throws Exception
      */
     public function setView($view, $controllerName = 'email', $applicationFolder = 'dashboard') {
-        $this->view = Gdn::controller()->fetchViewLocation($view, $controllerName, $applicationFolder);
+        $this->view = AssetModel::viewLocation($view, $controllerName, $applicationFolder);
         return $this;
     }
 
@@ -173,7 +230,7 @@ class EmailTemplate extends Gdn_Pluggable {
      * @param bool $convertNewlines Whether to convert new lines to html br tags.
      * @return EmailTemplate $this The calling object.
      */
-    public function setMessage($message, $convertNewlines = false){
+    public function setMessage($message, $convertNewlines = false) {
         $this->message = $this->formatContent($message, $convertNewlines);
         return $this;
     }

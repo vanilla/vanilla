@@ -47,6 +47,11 @@ abstract class SortableModule extends Gdn_Module {
     private $flatten;
 
     /**
+     * @var bool Whether to separate groups with a hr element. Only supported for flattened lists.
+     */
+    private $forceDivider = false;
+
+    /**
      * @var bool Whether we have run the prepare method yet.
      */
     private $isPrepared = false;
@@ -63,6 +68,13 @@ abstract class SortableModule extends Gdn_Module {
     public function __construct($flatten, $useCssPrefix = false) {
         $this->flatten = $flatten;
         $this->useCssPrefix = $useCssPrefix;
+    }
+
+    /**
+     * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
+     */
+    public function setForceDivider($forceDivider) {
+        $this->forceDivider = $forceDivider;
     }
 
     /**
@@ -444,7 +456,10 @@ abstract class SortableModule extends Gdn_Module {
      */
     public function flattenArray($items) {
         $newitems = array();
+        $itemslength = sizeof($items);
+        $index = 0;
         foreach($items as $key => $item) {
+            ++$index;
             unset($item['_sort'], $item['key']);
             $subitems = false;
 
@@ -464,6 +479,10 @@ abstract class SortableModule extends Gdn_Module {
             }
             if ($subitems) {
                 $newitems = array_merge($newitems, $this->flattenArray($subitems));
+                if ($this->forceDivider && $index < $itemslength) {
+                    // Add hr after group but not the last one
+                    $newitems[] = array('type' => 'divider');
+                }
             }
         }
         return $newitems;

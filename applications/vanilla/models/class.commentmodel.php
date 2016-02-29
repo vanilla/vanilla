@@ -797,7 +797,7 @@ class CommentModel extends VanillaModel {
     /**
      * Insert or update core data about the comment.
      *
-     * Events: BeforeSaveComment, AfterSaveComment.
+     * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $FormPostValues Data from the form model.
      * @param array $Settings Currently unused.
@@ -846,12 +846,23 @@ class CommentModel extends VanillaModel {
             // If the post is new and it validates, check for spam
             if (!$Insert || !$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
-                $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+                unset($Fields[$this->PrimaryKey]);
 
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                 if ($spam) {
                     return SPAM;
+                }
+
+                $isValid = true;
+                $invalidReturnType = false;
+                $this->EventArguments['CommentData'] = $CommentID ? array_merge($Fields, array('CommentID' => $CommentID)) : $Fields;
+                $this->EventArguments['IsValid'] = &$isValid;
+                $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
+                $this->fireEvent('AfterValidateComment');
+
+                if (!$isValid) {
+                    return $invalidReturnType;
                 }
 
                 if ($Insert === false) {

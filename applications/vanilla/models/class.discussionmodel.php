@@ -2861,7 +2861,7 @@ class DiscussionModel extends VanillaModel {
     public static function getFiltersFromUserPreferences() {
         $filterKeys = [];
         if (Gdn::session()->isValid()) {
-            $filterKeys = Gdn::session()->getPreference(self::FILTER_USER_PREFERENCE_KEY);
+            $filterKeys = Gdn::session()->getPreference(self::FILTER_USER_PREFERENCE_KEY, []);
         }
         return $filterKeys;
     }

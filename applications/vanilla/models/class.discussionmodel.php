@@ -447,11 +447,11 @@ class DiscussionModel extends VanillaModel {
         $setPreference = false;
 
         // Try request
-        if (!$sortKey = self::getSortFromRequest()) {
+        if ($sortKey = self::getSortFromRequest()) {
+            $setPreference = true;
+        } else {
             // Try user preference
             $sortKey = self::getSortFromUserPreferences();
-        } else {
-            $setPreference = true;
         }
 
         if ($sortKey) {
@@ -487,12 +487,12 @@ class DiscussionModel extends VanillaModel {
         $setPreference = false;
 
         // Try request
-        if (!$filterKeys = self::getFiltersFromRequest()) {
-            // Try user preference
-            $filterKeys = self::getFiltersFromUserPreferences();
-        } else {
+        if ($filterKeys = self::getFiltersFromRequest()) {
             $setPreference = true;
         }
+
+        // Try user preference
+        $filterKeys = array_merge(self::getFiltersFromUserPreferences(), $filterKeys);
 
         if (!$filterKeys) {
             return [];
@@ -2790,10 +2790,11 @@ class DiscussionModel extends VanillaModel {
 
     /** SORT/FILTER */
 
+
     /**
      * Retrieves the sort key from the query.
      *
-     * @return string The sort associated with the sort query string key.
+     * @return string The sort associated with the sort query string value.
      */
     public static function getSortFromRequest() {
         return Gdn::request()->get('sort', '');
@@ -2831,9 +2832,9 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * Retrieves the current user's filtering preferences.
-     * The preference is usually based on the last filter the user made on the category.
+     * The preference is usually based on the last filter the user made.
      *
-     * @return array The filter associated with the preference key stored or an empty array if not found.
+     * @return array Filter key/value pairs or an empty array if not found.
      */
     public static function getFiltersFromUserPreferences() {
         $filterKeys = [];
@@ -2855,8 +2856,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * The user preference for filtering is linked to the category. Saves the category preference for filtering on the user.
-     * The category preference is usually based on the last filter the user made on the category.
+     * Saves the filter preference on the user. The preference is usually based on the last filter the user made.
      *
      * @param array $filterKeyValues An array of filters, where the key is the key of the filterSet
      *      in the filters array and the value is the key of the filter.
@@ -2869,9 +2869,9 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * We're using two different data structures for managing filters. One is an array of filters.
-     * The other is a collection of filter set keys to filter values that we get from the request and
+     * The other is a collection of filter key/value pairs that we get from the request and
      * from user preferences. This takes a collection of filters and returns the corresponding
-     * filter set key => filter key array.
+     * filter setKey => filterKey  array.
      *
      * @param array $filters The filters to get the keys for.
      * @return array The filter key array.
@@ -2890,8 +2890,8 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * We're using two different data structures for managing filters. One is an array of filters.
-     * The other is a collection of filter set keys to filter key that we get from the request and
-     * save to user preferences. This takes an array of filter set key => filter key key-value types
+     * The other is a collection of filter key/value pairs that we get from the request and
+     * save to user preferences. This takes an array of filter setKey => filterKey key-value types
      * and returns a collection of filters.
      *
      * @param array $filterKeyValues The filters key array to get the filter for.

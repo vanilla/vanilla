@@ -876,7 +876,11 @@ class ActivityModel extends Gdn_Model {
                     ->setTitle($ActivityHeadline);
 
                 if ($message = val('Story', $Activity)) {
-                    $emailTemplate->setMessage($message, true);
+                    $prefix = c('Garden.Email.Prefix', '');
+                    if (!empty($prefix)) {
+                        $prefix .= '<br><br>';
+                    }
+                    $emailTemplate->setMessage($prefix.$message, true);
                 }
 
                 $Email->setEmailTemplate($emailTemplate);
@@ -968,7 +972,11 @@ class ActivityModel extends Gdn_Model {
             ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
         if ($message = val('Story', $Activity)) {
-            $emailTemplate->setMessage($message, true);
+            $prefix = c('Garden.Email.Prefix', '');
+            if (!empty($prefix)) {
+                $prefix .= '<br><br>';
+            }
+            $emailTemplate->setMessage($prefix.$message, true);
         }
 
         $Email->setEmailTemplate($emailTemplate);
@@ -1229,7 +1237,11 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
                 if ($message = val('Story', $Activity)) {
-                    $emailTemplate->setMessage($message, true);
+                    $prefix = c('Garden.Email.Prefix', '');
+                    if (!empty($prefix)) {
+                        $prefix .= '<br><br>';
+                    }
+                    $emailTemplate->setMessage($prefix.$message, true);
                 }
                 $Email->setEmailTemplate($emailTemplate);
 

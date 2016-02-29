@@ -2850,7 +2850,7 @@ class DiscussionModel extends VanillaModel {
      */
     public static function setSortUserPreferences($sortKey) {
         if (Gdn::session()->isValid()) {
-//            Gdn::userModel()->savePreference(Gdn::session()->UserID, self::SORT_USER_PREFERENCE_KEY, $sortKey);
+            Gdn::userModel()->savePreference(Gdn::session()->UserID, self::SORT_USER_PREFERENCE_KEY, $sortKey);
         }
     }
 
@@ -2863,7 +2863,7 @@ class DiscussionModel extends VanillaModel {
      */
     public static function setFilterUserPreferences($filterKeyValues) {
         if (Gdn::session()->isValid()) {
-//            Gdn::userModel()->savePreference(Gdn::session()->UserID, self::FILTER_USER_PREFERENCE_KEY, $filterKeyValues);
+            Gdn::userModel()->savePreference(Gdn::session()->UserID, self::FILTER_USER_PREFERENCE_KEY, $filterKeyValues);
         }
     }
 
@@ -2922,7 +2922,7 @@ class DiscussionModel extends VanillaModel {
      * Get the current sort/filter query string by passing no parameters or pass either a new filter key or sort key
      * to build a new query string, leaving the other properties intact.
      *
-     * @param array $filterKeys An array of filters, where the key is the key of the filterSet
+     * @param array $filterKeysToSet An array of filters, where the key is the key of the filterSet
      *      in the filters array and the value is the key of the filter.
      * @param string $sortKey The key name of the sort in the sorts array.
      * @return string The current or amended query string for sort and filter.
@@ -2980,8 +2980,8 @@ class DiscussionModel extends VanillaModel {
      * @param string $key The key name of the filter. Appears in the query string, should be url-friendly.
      * @param string $name The display name of the filter. Usually appears as an option in the UI.
      * @param array $wheres The where array query to execute for the filter. Uses
-     * @param string $group The dropdown module will group together any items with the same group name.
-     * @param string $setKey The name of the
+     * @param string $group (optional) The nav module will group together any items with the same group name.
+     * @param string $setKey The key name of the filter set.
      */
     public static function addFilter($key, $name, $wheres, $group = '', $setKey = 'filter') {
         if (!val($setKey, self::getFilters())) {
@@ -2994,8 +2994,10 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * @param $setKey
-     * @param string $setName
+     * Adds a filter set to the filters array.
+     *
+     * @param string $setKey The key name of the filter set.
+     * @param string $setName The name of the filter set. Appears in the UI.
      */
     public static function addFilterSet($setKey, $setName = '') {
         if (!$setName) {

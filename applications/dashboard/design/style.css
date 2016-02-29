@@ -1,10 +1,4 @@
 @charset "UTF-8";
-.PageControls::after {
-  content: '';
-  display: table;
-  clear: both;
-}
-
 .PageControls .BoxNewDiscussion {
   float: left;
   margin-right: 10px;

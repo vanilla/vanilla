@@ -20,14 +20,14 @@ class SiteNavModule extends NavModule {
     protected $section;
 
     public function __construct() {
-	parent::__construct();
+        parent::__construct();
     }
 
     /**
      * @return string
      */
     public function getSection() {
-	return $this->section;
+        return $this->section;
     }
 
     /**
@@ -35,8 +35,8 @@ class SiteNavModule extends NavModule {
      * @return $this
      */
     public function setSection($section) {
-	$this->section = $section;
-	return $this;
+        $this->section = $section;
+        return $this;
     }
 
     /**
@@ -64,6 +64,6 @@ class SiteNavModule extends NavModule {
         // Fire an event for everything.
         $this->fireEvent('all');
 
-	return parent::prepare();
+        return parent::prepare();
     }
 }

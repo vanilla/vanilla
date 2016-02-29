@@ -56,9 +56,9 @@ class NavModule extends Gdn_Module {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the nav items.
      */
     public function __construct($cssClass = '', $useCssPrefix = true) {
-	parent::__construct();
-	$this->flatten = false;
-	$this->useCssPrefix = $useCssPrefix;
+        parent::__construct();
+        $this->flatten = false;
+        $this->useCssPrefix = $useCssPrefix;
         $this->cssClass = $cssClass;
 
         if ($useCssPrefix) {
@@ -81,10 +81,10 @@ class NavModule extends Gdn_Module {
      * @return NavModule $this The calling object.
      */
     public function addDropdownIf($isAllowed = true, $dropdown, $key = '', $cssClass = '', $sort = array()) {
-	if (!$this->isAllowed($isAllowed)) {
-	    return $this;
-	} else {
-	    return $this->addDropdown($dropdown, $key, $cssClass, $sort);
+        if (!$this->isAllowed($isAllowed)) {
+            return $this;
+        } else {
+            return $this->addDropdown($dropdown, $key, $cssClass, $sort);
         }
     }
 
@@ -99,20 +99,20 @@ class NavModule extends Gdn_Module {
      * @throws Exception
      */
     public function addDropdown($dropdown, $key = '', $cssClass = '', $sort = array()) {
-	if (is_a($dropdown, 'DropdownModule')) {
-	    $dropdown->tag = 'li';
-	    $dropdown->prepare();
-	    $dropdownItem['type'] = 'dropdown';
-	    if ($key) {
-		$dropdownItem['key'] = $key;
-	    }
-	    if ($sort) {
-		$dropdownItem['sort'] = $sort;
-	    }
-	    $dropdownItem['dropdownmenu'] = $dropdown;
-	    $dropdownItem['cssClass'] = $cssClass.' '.$this->buildCssClass($this->dropdownCssClassPrefix, $dropdownItem);
-	    $this->addItem('dropdown', $dropdownItem);
-	}
+        if (is_a($dropdown, 'DropdownModule')) {
+            $dropdown->tag = 'li';
+            $dropdown->prepare();
+            $dropdownItem['type'] = 'dropdown';
+            if ($key) {
+                $dropdownItem['key'] = $key;
+            }
+            if ($sort) {
+                $dropdownItem['sort'] = $sort;
+            }
+            $dropdownItem['dropdownmenu'] = $dropdown;
+            $dropdownItem['cssClass'] = $cssClass.' '.$this->buildCssClass($this->dropdownCssClassPrefix, $dropdownItem);
+            $this->addItem('dropdown', $dropdownItem);
+        }
         return $this;
     }
 }

@@ -14,6 +14,6 @@
 class DashboardNavModule extends NavModule {
 
     public function __construct() {
-	parent::__construct();
+        parent::__construct();
     }
 }

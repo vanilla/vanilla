@@ -2842,12 +2842,12 @@ class DiscussionModel extends VanillaModel {
     /**
      * Retrieves the current user's sorting preference. The preference is usually based on the last sort the user made.
      *
-     * @return string The sort key associated with the preference key stored or an empty array if not found.
+     * @return string The sort key associated with the preference key stored or an empty string if not found.
      */
     public static function getSortFromUserPreferences() {
         $sortKey = '';
         if (Gdn::session()->isValid()) {
-            $sortKey = Gdn::session()->getPreference(self::SORT_USER_PREFERENCE_KEY);
+            $sortKey = Gdn::session()->getPreference(self::SORT_USER_PREFERENCE_KEY, '');
         }
         return $sortKey;
     }

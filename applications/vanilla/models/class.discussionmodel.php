@@ -1093,7 +1093,7 @@ class DiscussionModel extends VanillaModel {
         }
 
         $this->SQL->limit($Limit, $Offset);
-        
+
         $orderBy = $this->getOrderBy();
         foreach ($orderBy as $field => $direction) {
             $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
@@ -3042,9 +3042,10 @@ class DiscussionModel extends VanillaModel {
      * @param string $name The display name of the sort.
      * @param string|array $orderBy An array indicating order by fields and their directions in the format:
      *      array('field1' => 'direction', 'field2' => 'direction')
+     * @param array $categoryIDs The IDs of the categories that this sort will work on. If empty, sort is global.
      */
-    public static function addSort($key, $name, $orderBy) {
-        self::$sorts[$key] = array('key' => $key, 'name' => $name, 'orderBy' => $orderBy);
+    public static function addSort($key, $name, $orderBy, $categoryIDs = []) {
+        self::$sorts[$key] = array('key' => $key, 'name' => $name, 'orderBy' => $orderBy, 'categories' => $categoryIDs);
     }
 
     /**
@@ -3071,6 +3072,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param string $setKey The key name of the filter set.
      * @param string $setName The name of the filter set. Appears in the UI.
+     * @param array $categoryIDs The IDs of the categories that this filter will work on. If empty, filter is global.
      */
     public static function addFilterSet($setKey, $setName = '', $categoryIDs = []) {
         if (!$setName) {

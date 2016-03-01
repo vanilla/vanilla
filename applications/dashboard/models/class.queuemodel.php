@@ -191,7 +191,7 @@ class QueueModel extends Gdn_Model {
         $this->_BeforeGet();
 
         $results = $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
-        $resultArray = $results->ResultArray(DATASET_TYPE_ARRAY);
+        $resultArray =& $results->resultArray(DATASET_TYPE_ARRAY);
         foreach ($resultArray as &$row) {
             $row = $this->CalculateRow($row);
         }
@@ -202,7 +202,7 @@ class QueueModel extends Gdn_Model {
     * Calculate row.
     *
     * @param Array $Row Row from the database.
-    * @return array Modififed Row
+    * @return array Modified Row
     */
     protected function CalculateRow($Row) {
         if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {

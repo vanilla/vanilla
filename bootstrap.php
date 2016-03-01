@@ -184,6 +184,7 @@ Gdn::factoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
 Gdn::regarding();
 
 // Other objects.
+Gdn::FactoryInstall('BBCodeFormatter', 'Nbbc', null, Gdn::FactorySingleton);
 Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
 
 /**

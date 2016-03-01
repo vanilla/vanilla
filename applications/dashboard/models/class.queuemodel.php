@@ -566,6 +566,7 @@ class QueueModel extends Gdn_Model {
         foreach ($queueItems as $item) {
             $valid = $this->{$action}($item);
             if (!$valid) {
+                Gdn::controller()->Data['queueErrorItems'][] = $item;
                 $errors[$whereMsg] = $this->Validation->ResultsText();
             } else {
                 switch ($action) {

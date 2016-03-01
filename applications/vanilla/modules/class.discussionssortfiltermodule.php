@@ -23,7 +23,14 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
     protected $filters;
 
-    public function __construct() {}
+    protected $categoryID;
+
+    public function __construct($categoryID = 0) {
+        parent::__construct();
+        if ($categoryID) {
+            $this->categoryID = $categoryID;
+        }
+    }
 
     /**
      * Checks whether we should even render this whole thing.
@@ -45,6 +52,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     protected function getSortData() {
         $sortData = array();
         foreach($this->sorts as $sort) {
+            // Check to see if there's a category restriction.
+            if ($categories = val('categories', $sort)) {
+                if (!in_array($this->categoryID, $categories)) {
+                    continue;
+                }
+            }
             $key = val('key', $sort);
             $sortData[$key]['name'] = val('name', $sort);
             $sortData[$key]['url'] = $this->getPagelessPath().DiscussionModel::sortFilterQueryString([], $key);
@@ -68,6 +81,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         }
         $dropdowns = [];
         foreach($this->filters as $filterSet) {
+            // Check to see if there's a category restriction.
+            if ($categories = val('categories', $filterSet)) {
+                if (!in_array($this->categoryID, $categories)) {
+                    continue;
+                }
+            }
             $setKey = val('key', $filterSet);
             $dropdown = new DropdownModule('discussions-filter-'.$setKey, val('name', $filterSet), 'discussion-filter');
 

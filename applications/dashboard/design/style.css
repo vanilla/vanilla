@@ -1,7 +1,6 @@
 @charset "UTF-8";
-.PageControls .BoxNewDiscussion {
-  float: left;
-  margin-right: 10px;
+.PageControls .discussion-sort-filter-module {
+  margin-left: 10px;
 }
 
 /* ================================================================ Reset CSS */

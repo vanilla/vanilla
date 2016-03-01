@@ -272,10 +272,16 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param array $Category
-     * @return string
+     * @param string|array $Category
+     * @param string|int $Page The page number.
+     * @param bool $WithDomain Whether to add the domain to the URL
+     * @param string $queryString The query string of the category. Adds sorting/filtering preferences.
+     * @return string The url to a category.
      */
-    function categoryUrl($Category, $Page = '', $WithDomain = true, $querystring = '') {
+    function categoryUrl($Category, $Page = '', $WithDomain = true, $queryString = '') {
+        if (!$queryString) {
+            $queryString = DiscussionModel::sortFilterQueryStringFromUserPreferences();
+        }
         if (is_string($Category)) {
             $Category = CategoryModel::categories($Category);
         }
@@ -285,7 +291,7 @@ if (!function_exists('categoryUrl')) {
         if ($Page && $Page > 1) {
             $Result .= '/p'.$Page;
         }
-        return Url($Result.$querystring, $WithDomain);
+        return Url($Result.$queryString, $WithDomain);
     }
 }
 

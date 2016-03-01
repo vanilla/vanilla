@@ -25,6 +25,9 @@ class DiscussionModel extends VanillaModel {
     /** @var string The sort key for discussions in the User table's UserPreferences field. */
     const SORT_USER_PREFERENCE_KEY = 'Discussions.SortKey';
 
+    /** @var string The filter key for clearing-type filters. */
+    const EMPTY_FILTER_KEY = 'none';
+
     /** @var array */
     protected static $_CategoryPermissions = null;
 
@@ -70,14 +73,12 @@ class DiscussionModel extends VanillaModel {
     protected static $filters;
 
     /**
-     * @var string Stores the value from the last sort retrieval method called
-     *      (either getSortFromRequest or getSortFromUserPreference).
+     * @var string Stores the sort value from the request.
      */
     protected static $sortKeySelected;
 
     /**
-     * @var string Stores the value from the last filter retrieval method called
-     *      (either getFiltersFromRequest or getFiltersFromUserPreference).
+     * @var string Stores the filter values from the request.
      */
     protected static $filterKeysSelected;
 
@@ -448,10 +449,9 @@ class DiscussionModel extends VanillaModel {
 
         // Try request
         if ($sortKey = self::getSortFromRequest()) {
-            $setPreference = true;
-        } else {
-            // Try user preference
-            $sortKey = self::getSortFromUserPreferences();
+            if (self::getSortFromUserPreferences() != $sortKey) {
+                $setPreference = true;
+            }
         }
 
         if ($sortKey) {
@@ -482,23 +482,26 @@ class DiscussionModel extends VanillaModel {
      *
      * @return array The where clauses from the filters.
      */
-    protected function getWheres() {
+    protected function getWheres($categoryIDs = []) {
+        $this->fireEvent('DiscussionFilters');
+
         $wheres = [];
         $setPreference = false;
 
         // Try request
         if ($filterKeys = self::getFiltersFromRequest()) {
-            $setPreference = true;
+            if ($filterKeys != self::getFiltersFromUserPreferences()) {
+                $setPreference = true;
+            }
         }
-
-        // Try user preference
-        $filterKeys = array_merge(self::getFiltersFromUserPreferences(), $filterKeys);
 
         if (!$filterKeys) {
             return [];
         }
 
         $filters = self::getFiltersFromKeys($filterKeys);
+
+
 
         if (!empty($filters)) {
             if ($setPreference) {
@@ -508,9 +511,18 @@ class DiscussionModel extends VanillaModel {
         }
 
         foreach($filters as $filter) {
+
+            if ($categoryIDs) {
+                $setKey = val('setKey', $filter);
+                $filterSetCategories = val('categories', val($setKey, self::getFilters()));
+
+                //
+                if (!empty($filterSetCategories) and array_diff($categoryIDs, $filterSetCategories)) {
+                    $filter['wheres'] = [];
+                }
+            }
             $wheres = $this->combineWheres(val('wheres', $filter, []), $wheres);
         }
-
         return $wheres;
     }
 
@@ -1080,10 +1092,9 @@ class DiscussionModel extends VanillaModel {
                 ->where('coalesce(w.Dismissed, \'0\')', '0', false);
         }
 
-        $orderBy = $this->getOrderBy();
-
         $this->SQL->limit($Limit, $Offset);
-
+        
+        $orderBy = $this->getOrderBy();
         foreach ($orderBy as $field => $direction) {
             $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
         }
@@ -2834,6 +2845,8 @@ class DiscussionModel extends VanillaModel {
             $filterSetKey = val('key', $filterSet);
             if ($filterKey = Gdn::request()->get($filterSetKey)) {
                 $filterKeys[$filterSetKey] = $filterKey;
+            } else {
+                $filterKeys[$filterSetKey] = self::EMPTY_FILTER_KEY;
             }
         }
         return $filterKeys;
@@ -2956,10 +2969,12 @@ class DiscussionModel extends VanillaModel {
 
         // Build the sort query string
         foreach ($filterKeys as $setKey => $filterKey) {
-            if (!empty($filterString)) {
-                $filterString .= '&';
+            if ($filterKey != self::EMPTY_FILTER_KEY) {
+                if (!empty($filterString)) {
+                    $filterString .= '&';
+                }
+                $filterString .= $setKey . '=' . $filterKey;
             }
-            $filterString .= $setKey.'='.$filterKey;
         }
 
         $sortString = '';
@@ -2970,6 +2985,42 @@ class DiscussionModel extends VanillaModel {
             }
         } else {
             $sortString = 'sort='.$sortKey;
+        }
+
+        $queryString = '';
+        if (!empty($sortString) && !empty($filterString)) {
+            $queryString = '?'.$sortString.'&'.$filterString;
+        } elseif (!empty($sortString)) {
+            $queryString = '?'.$sortString;
+        } elseif (!empty($filterString)) {
+            $queryString = '?'.$filterString;
+        }
+
+        return $queryString;
+    }
+
+    /**
+     * Gets the sort/filter query string from a user's preferences.
+     *
+     * @return string The sort/filter query string from a user's preferences.
+     */
+    public static function sortFilterQueryStringFromUserPreferences() {
+        $filterString = '';
+        $filterKeys = self::getFiltersFromUserPreferences();
+
+        // Build the sort query string
+        foreach ($filterKeys as $setKey => $filterKey) {
+            if ($filterKey != self::EMPTY_FILTER_KEY) {
+                if (!empty($filterString)) {
+                    $filterString .= '&';
+                }
+                $filterString .= $setKey . '=' . $filterKey;
+            }
+        }
+
+        $sort = self::getSortFromUserPreferences();
+        if ($sort) {
+            $sortString = 'sort='.$sort;
         }
 
         $queryString = '';
@@ -3021,12 +3072,14 @@ class DiscussionModel extends VanillaModel {
      * @param string $setKey The key name of the filter set.
      * @param string $setName The name of the filter set. Appears in the UI.
      */
-    public static function addFilterSet($setKey, $setName = '') {
+    public static function addFilterSet($setKey, $setName = '', $categoryIDs = []) {
         if (!$setName) {
             $setName = sprintf(t('All %s'), t('Discussions'));
         }
         self::$filters[$setKey]['key'] = $setKey;
         self::$filters[$setKey]['name'] = $setName;
+        self::$filters[$setKey]['categories'] = $categoryIDs;
+
         // Add a way to let users clear any filters they've added.
         self::addClearFilter($setKey, $setName);
     }
@@ -3080,8 +3133,8 @@ class DiscussionModel extends VanillaModel {
      * @param string $setName The display name of the option. Usually the human-readable set name.
      */
     protected static function addClearFilter($setKey, $setName = '') {
-        self::$filters[$setKey]['filters']['none'] = array(
-            'key' => 'none',
+        self::$filters[$setKey]['filters'][self::EMPTY_FILTER_KEY] = array(
+            'key' => self::EMPTY_FILTER_KEY,
             'setKey' => $setKey,
             'name' => sprintf(t('Clear %s'), $setName),
             'wheres' => array(), 'group' => 'default'

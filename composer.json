@@ -23,7 +23,8 @@
 
 	],
 	"require": {
-		"vanilla/garden-http": "~1.0"
+		"vanilla/garden-http": "~1.0",
+		"vanilla/htmlawed": "~1.0"
 	},
 	"autoload": {
 		"classmap": [

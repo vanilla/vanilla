@@ -293,7 +293,7 @@ class CategoriesController extends VanillaController {
                 array('CategoryUrl')
             );
 
-            $this->Pager->queryString = DiscussionModel::sortFilterQueryString();
+            $this->Pager->queryString = DiscussionModel::getSortFilterQueryString();
 
             $this->Pager->Record = $Category;
             PagerModule::Current($this->Pager);

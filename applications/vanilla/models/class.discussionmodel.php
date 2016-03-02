@@ -2837,19 +2837,11 @@ class DiscussionModel extends VanillaModel {
      */
     public static function loadSorts() {
         if (!isset(self::$sortKeySelected)) {
-            if ($sortKey = self::getSortFromRequest()) {
-                $sort = self::getSortFromKey($sortKey);
-                if ($sort) {
-                    if (self::getSortFromUserPreferences() != $sortKey) {
-                        self::setSortUserPreferences($sortKey);
-                    }
-                    self::$sortKeySelected = $sortKey;
-                }
+            $sortKey = self::getSortFromRequest();
+            if (self::getSortFromUserPreferences() != $sortKey) {
+                self::setSortUserPreferences($sortKey);
             }
-
-            if (!isset(self::$sortKeySelected)) {
-                self::$sortKeySelected = '';
-            }
+            self::$sortKeySelected = $sortKey;
         }
     }
 

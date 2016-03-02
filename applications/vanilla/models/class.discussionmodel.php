@@ -497,7 +497,7 @@ class DiscussionModel extends VanillaModel {
         $orderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
 
         // Normalize any prefixed fields
-        if (strpos($orderField, 'd.') == 0) {
+        if (strpos($orderField, 'd.') === 0) {
             $orderField = substr($orderField, 2);
         }
 

@@ -226,16 +226,16 @@ class NavModule extends Gdn_Module {
      * @param int $level
      */
     protected function renderGroup($key, $group, $level = 0) {
+        // Don't render an empty group.
+        if (empty($group['items'])) {
+            return;
+        }
+
         $text = $group['text'];
         $group['class'] = 'nav-group '.($text ? '' : 'nav-group-noheading ').$this->getCssClass($key, $group);
 
         $items = $group['items'];
         unset($group['text'], $group['items']);
-
-        // Don't render an empty group.
-        if (empty($items)) {
-            return;
-        }
 
         echo '<div '.attribute($group).">\n";
 

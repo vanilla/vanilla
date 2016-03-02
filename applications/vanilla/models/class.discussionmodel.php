@@ -70,7 +70,12 @@ class DiscussionModel extends VanillaModel {
      * - **where**: string - The where array query to execute for the filter. Uses
      * - **group**: string - (optional) The dropdown module can group together any items with the same group name.
      */
-    protected static $filters;
+    protected static $filters = [];
+
+    /**
+     * @var boolean tells whether the FiltersFromRequest needs to recompute the filters or not
+     */
+    protected static $isFiltersFromRequestDirty = false;
 
     /**
      * @var string Stores the sort value from the request.
@@ -115,10 +120,8 @@ class DiscussionModel extends VanillaModel {
             Gdn::pluginManager()->fireEvent('DiscussionFilters');
         }
 
-        if (!empty(self::$filters)) {
-            return self::$filters;
-        }
-        return [];
+        
+        return self::$filters;
     }
 
     /**
@@ -2849,14 +2852,19 @@ class DiscussionModel extends VanillaModel {
      * @return array The filters associated with the filter query string values.
      */
     public static function getFiltersFromRequest() {
-        $filterKeys = [];
-        foreach(self::getFilters() as $filterSet) {
-            // Check if any of our filters are in the request
-            $filterSetKey = val('key', $filterSet);
-            if ($filterKey = Gdn::request()->get($filterSetKey)) {
-                $filterKeys[$filterSetKey] = $filterKey;
-            } else {
-                $filterKeys[$filterSetKey] = self::EMPTY_FILTER_KEY;
+        static $filterKeys = [];
+
+        if (self::$isFiltersFromRequestDirty) {
+            self::$isFiltersFromRequestDirty = false;
+
+            foreach (self::getFilters() as $filterSet) {
+                // Check if any of our filters are in the request
+                $filterSetKey = val('key', $filterSet);
+                if ($filterKey = Gdn::request()->get($filterSetKey)) {
+                    $filterKeys[$filterSetKey] = $filterKey;
+                } else {
+                    $filterKeys[$filterSetKey] = self::EMPTY_FILTER_KEY;
+                }
             }
         }
         return $filterKeys;
@@ -3068,6 +3076,8 @@ class DiscussionModel extends VanillaModel {
      * @param string $setKey The key name of the filter set.
      */
     public static function addFilter($key, $name, $wheres, $group = '', $setKey = 'filter') {
+        self::$isFiltersFromRequestDirty = true;
+
         if (!val($setKey, self::getFilters())) {
             self::addFilterSet($setKey);
         }

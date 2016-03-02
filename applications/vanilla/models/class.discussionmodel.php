@@ -100,9 +100,21 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * Get the registered filters.
+     *
+     * This method must never be called before plugins initialisation.
+     *
      * @return array The current filter array.
      */
     public static function getFilters() {
+        static $filterEventFired = false;
+
+        if (!$filterEventFired) {
+            $filterEventFired = true;
+            Gdn::pluginManager()->fireAs(__CLASS__);
+            Gdn::pluginManager()->fireEvent('DiscussionFilters');
+        }
+
         if (!empty(self::$filters)) {
             return self::$filters;
         }
@@ -483,8 +495,6 @@ class DiscussionModel extends VanillaModel {
      * @return array The where clauses from the filters.
      */
     protected function getWheres($categoryIDs = []) {
-        $this->fireEvent('DiscussionFilters');
-
         $wheres = [];
         $setPreference = false;
 

@@ -90,7 +90,7 @@ class NotificationsController extends Gdn_Controller {
             } else {
                 $UserPhoto = '';
             }
-            $Excerpt = Gdn_Format::plainText($Activity['Story']);
+            $Excerpt = htmlspecialchars(Gdn_Format::plainText($Activity['Story']));
             $ActivityClass = ' Activity-'.$Activity['ActivityType'];
 
 

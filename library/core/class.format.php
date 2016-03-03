@@ -1670,7 +1670,7 @@ EOT;
         $CodeBlockContents = array();
         $CodeBlockHashes = array();
         $Subject = preg_replace_callback(
-            '/<code>.*?<\/code>/is',
+            '/<code.*?>.*?<\/code>/is',
             function ($Matches) use (&$CodeBlockContents, &$CodeBlockHashes) {
                 // Surrounded by whitespace to try to prevent the characters
                 // from being picked up by $Pattern.

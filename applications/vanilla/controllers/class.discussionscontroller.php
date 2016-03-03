@@ -121,6 +121,8 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
 
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
@@ -241,6 +243,8 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
         $DiscussionModel->Watching = true;
 
         // Get Discussion Count
@@ -352,6 +356,9 @@ class DiscussionsController extends VanillaController {
         }
 
         $DiscussionModel = new DiscussionModel();
+        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+
         $Wheres = array(
             'w.Bookmarked' => '1',
             'w.UserID' => Gdn::session()->UserID
@@ -448,7 +455,11 @@ class DiscussionsController extends VanillaController {
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
         $Session = Gdn::session();
         $Wheres = array('d.InsertUserID' => $Session->UserID);
+
         $DiscussionModel = new DiscussionModel();
+        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+
         $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, $Wheres);
         $this->setData('Discussions', $this->DiscussionData);
         $CountDiscussions = $this->setData('CountDiscussions', $DiscussionModel->getCount($Wheres));

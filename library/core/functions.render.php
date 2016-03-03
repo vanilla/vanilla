@@ -279,9 +279,6 @@ if (!function_exists('categoryUrl')) {
      * @return string The url to a category.
      */
     function categoryUrl($Category, $Page = '', $WithDomain = true, $queryString = '') {
-        if (!$queryString) {
-            $queryString = DiscussionModel::getSortFilterQueryStringFromUserPreferences();
-        }
         if (is_string($Category)) {
             $Category = CategoryModel::categories($Category);
         }

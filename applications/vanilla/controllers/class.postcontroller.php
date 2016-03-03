@@ -323,9 +323,10 @@ class PostController extends VanillaController {
         } else {
             $Breadcrumbs = array();
         }
+
         $Breadcrumbs[] = array(
             'Name' => $this->data('Title'),
-            'Url' => val('AddUrl', val($this->Discussion->Type, DiscussionModel::discussionTypes()), '/post/discussion')
+            'Url' => val('AddUrl', val($this->data('Type'), DiscussionModel::discussionTypes()), '/post/discussion')
         );
 
         $this->setData('Breadcrumbs', $Breadcrumbs);

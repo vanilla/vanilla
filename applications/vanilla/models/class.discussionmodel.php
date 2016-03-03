@@ -67,14 +67,14 @@ class DiscussionModel extends VanillaModel {
     protected static $filters;
 
     /**
-     * @var string Stores the sort value from the request.
+     * @var string The sort key of the order by we apply in the query.
      */
-    protected static $sortKeySelected = '';
+    protected static $sortKey = '';
 
     /**
-     * @var string Stores the filter values from the request.
+     * @var string The filter keys of the wheres we apply in the query.
      */
-    protected static $filterKeysSelected = [];
+    protected static $filterKeys = [];
 
     /**
      * Class constructor. Defines the related database table name.
@@ -124,29 +124,29 @@ class DiscussionModel extends VanillaModel {
     /**
      * @return string
      */
-    public static function getSortKeySelected() {
-        return self::$sortKeySelected;
+    public static function getSortKey() {
+        return self::$sortKey;
     }
 
     /**
      * @return array
      */
-    public static function getFilterKeysSelected() {
-        return self::$filterKeysSelected;
+    public static function getFilterKeys() {
+        return self::$filterKeys;
     }
 
     /**
      * @param string $sortKey
      */
-    public static function setSortKeySelected($sortKey) {
-        self::$sortKeySelected = $sortKey;
+    public static function setSortKey($sortKey) {
+        self::$sortKey = $sortKey;
     }
 
     /**
      * @param array $filterKeys
      */
-    public static function setFilterKeysSelected($filterKeys) {
-        self::$filterKeysSelected = $filterKeys;
+    public static function setFilterKeys($filterKeys) {
+        self::$filterKeys = $filterKeys;
     }
 
     /**
@@ -475,14 +475,14 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * Returns an array of field => direction. Checks the request and config before resorting to defaults.
-     * You can safely use return values from this function in the orderBy() SQL function.
+     * Returns an array in the format [field => direction]. You can safely use return values from this function
+     * in the orderBy() SQL function.
      *
      * @since 2.3
      * @return array An array of field => direction values.
      */
     protected function getOrderBy() {
-        if ($key = self::getSortKeySelected()) {
+        if ($key = self::getSortKey()) {
             $orderBy = val('orderBy', self::getSortFromKey($key));
         } else {
             $orderBy = self::getDefaultOrderBy();
@@ -520,7 +520,7 @@ class DiscussionModel extends VanillaModel {
         $wheres = [];
         $filters = [];
 
-        if ($filterKeys = self::getFilterKeysSelected()) {
+        if ($filterKeys = self::getFilterKeys()) {
             $filters = $this->getFiltersFromKeys($filterKeys);
         }
 
@@ -2839,22 +2839,27 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * Retrieves valid set key and filter keys pairs from an array, and returns the setKey => filterKey values.
-     * Works real well with unfiltered request arguments. (i.e., Gdn::request()->get()) Will only return a safe sort
-     * key from the sort array or an empty array if not found.
+     * Works real well with unfiltered request arguments. (i.e., Gdn::request()->get()) Will only return safe
+     * set key and filter key pairs from the filters array or an empty array if not found.
      *
      * @param $array The array to get the filters from.
-     * @return array The valid filters from the array or an empty array.
+     * @return array The valid filters from the passed array or an empty array.
      */
     public static function getFiltersFromArray($array) {
         $filterKeys = [];
         foreach(self::getFilters() as $filterSet) {
             $filterSetKey = val('key', $filterSet);
-            // Check if any of our filters are in the request. Filter key value is unsafe.
+            // Check if any of our filters are in the array. Filter key value is unsafe.
             if ($filterKey = val($filterSetKey, $array)) {
                 // Check that value is in filter array to ensure safety.
                 if (val($filterKey, val('filters', $filterSet))) {
                     // Value is safe.
                     $filterKeys[$filterSetKey] = $filterKey;
+                } else {
+                    Logger::log(
+                        Logger::NOTICE, 'Filter: '.$filterSetKey.' => '.htmlentities($filterKey)
+                        .' does not exist in the DiscussionModel\'s filters array.'
+                    );
                 }
             }
         }
@@ -2867,7 +2872,7 @@ class DiscussionModel extends VanillaModel {
      * empty string if not found.
      *
      * @param $array The array to get the sort from.
-     * @return string The valid sort from the array or an empty string.
+     * @return string The valid sort from the passed array or an empty string.
      */
     public static function getSortFromArray($array) {
         $unsafeSortKey = val('sort', $array);
@@ -2876,6 +2881,12 @@ class DiscussionModel extends VanillaModel {
                 // Sort key is valid.
                 return val('key', $sort);
             }
+        }
+        if ($unsafeSortKey) {
+            Logger::log(
+                Logger::NOTICE, 'Sort: '.htmlentities($unsafeSortKey)
+                .' does not exist in the DiscussionModel\'s sorts array.'
+            );
         }
         return '';
     }
@@ -2940,7 +2951,7 @@ class DiscussionModel extends VanillaModel {
      */
     public static function getSortFilterQueryString($filterKeysToSet = [], $sortKey = '') {
         $filterString = '';
-        $filterKeys = self::getFilterKeysSelected();
+        $filterKeys = self::getFilterKeys();
         $filterKeys = array_merge($filterKeys, $filterKeysToSet);
 
         // Build the sort query string
@@ -2956,7 +2967,7 @@ class DiscussionModel extends VanillaModel {
 
         $sortString = '';
         if (!$sortKey) {
-            $sort = self::getSortKeySelected();
+            $sort = self::getSortKey();
             if ($sort) {
                 $sortString = 'sort='.$sort;
             }

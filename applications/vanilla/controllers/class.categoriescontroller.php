@@ -69,8 +69,8 @@ class CategoriesController extends VanillaController {
 
         saveToConfig('Vanilla.Discussions.SortField', 'd.DateInserted', false);
         $DiscussionModel = new DiscussionModel();
-        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+        DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
         $Discussions = $DiscussionModel->getWhereRecent($Where, $Limit, $Offset);
         $this->DiscussionData = $this->setData('Discussions', $Discussions);
         $this->setData('_CurrentRecords', count($Discussions));
@@ -234,8 +234,8 @@ class CategoriesController extends VanillaController {
 
             // Get a DiscussionModel
             $DiscussionModel = new DiscussionModel();
-            DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-            DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+            DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+            DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
             $CategoryIDs = array($CategoryID);
             if (c('Vanilla.ExpandCategories')) {
                 $CategoryIDs = array_merge($CategoryIDs, array_column($this->data('Categories'), 'CategoryID'));
@@ -427,8 +427,8 @@ class CategoriesController extends VanillaController {
         // Get category data and discussions
         $this->DiscussionsPerCategory = c('Vanilla.Discussions.PerCategory', 5);
         $DiscussionModel = new DiscussionModel();
-        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+        DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
         $this->CategoryDiscussionData = array();
         foreach ($this->CategoryData->result() as $Category) {
             if ($Category->CategoryID > 0) {

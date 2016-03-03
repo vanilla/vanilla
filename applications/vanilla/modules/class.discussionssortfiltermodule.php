@@ -71,7 +71,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $sortData[$key]['url'] = $this->getPagelessPath().DiscussionModel::getSortFilterQueryString([], $key);
             $sortData[$key]['rel'] = 'nofollow';
         }
-        $selectedKey = DiscussionModel::getSortKeySelected() ? DiscussionModel::getSortKeySelected() : DiscussionModel::getDefaultSortKey();
+        $selectedKey = DiscussionModel::getSortKey() ? DiscussionModel::getSortKey() : DiscussionModel::getDefaultSortKey();
         if (val($selectedKey, $sortData)) {
             $sortData[$selectedKey]['cssClass'] = self::ACTIVE_CSS_CLASS;
         }
@@ -102,7 +102,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $dropdown = new DropdownModule('discussions-filter-'.$setKey, val('name', $filterSet), 'discussion-filter');
 
             // Override the trigger text?
-            $selectedFilterKeys = DiscussionModel::getFilterKeysSelected();
+            $selectedFilterKeys = DiscussionModel::getFilterKeys();
             $selectedValue = val($setKey, $selectedFilterKeys);
             if ($selectedValue && $selectedValue != 'none') {
                 $selected = val('name', $filterSet['filters'][$selectedValue]);

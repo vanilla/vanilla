@@ -121,8 +121,8 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
-        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+        DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
 
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
@@ -243,8 +243,8 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
-        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+        DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
         $DiscussionModel->Watching = true;
 
         // Get Discussion Count
@@ -356,8 +356,8 @@ class DiscussionsController extends VanillaController {
         }
 
         $DiscussionModel = new DiscussionModel();
-        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+        DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
 
         $Wheres = array(
             'w.Bookmarked' => '1',
@@ -457,8 +457,8 @@ class DiscussionsController extends VanillaController {
         $Wheres = array('d.InsertUserID' => $Session->UserID);
 
         $DiscussionModel = new DiscussionModel();
-        DiscussionModel::setSortKeySelected(DiscussionModel::getSortFromArray(Gdn::request()->get()));
-        DiscussionModel::setFilterKeysSelected(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
+        DiscussionModel::setSortKey(DiscussionModel::getSortFromArray(Gdn::request()->get()));
+        DiscussionModel::setFilterKeys(DiscussionModel::getFiltersFromArray(Gdn::request()->get()));
 
         $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, $Wheres);
         $this->setData('Discussions', $this->DiscussionData);

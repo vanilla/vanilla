@@ -2777,6 +2777,13 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * We don't use this functionality anymore. Previously, you had to register any sorting field before sorting with it.
+     */
+    public static function allowedSortFields($Allowed = null) {
+        deprecated("allowedSortFields");
+    }
+
+    /**
      * Tests whether a user has permission to view a specific discussion.
      *
      * @param object|array|integer $discussion The discussion ID or the discussion to test.

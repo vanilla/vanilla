@@ -1501,6 +1501,14 @@
                 var currentEditableCommentId = (new Date()).getTime();
                 var editorName = 'vanilla-editor-text-' + currentEditableCommentId;
 
+                $(document).on('click', 'a.PreviewButton', function() {
+                    $currentEditorToolbar.hide();
+                });
+
+                $(document).on('click', 'a.WriteButton', function() {
+                    $currentEditorToolbar.show();
+                });
+
                 switch (format) {
                     case 'wysiwyg':
                     case 'ipb':
@@ -1794,7 +1802,6 @@
 jQuery(document).ready(function($) {
     $('.BodyBox').setAsEditor();
 });
-
 
 /*
  * This is an example of hooking into the custom parse event, to enable

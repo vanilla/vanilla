@@ -237,6 +237,6 @@ if (!function_exists('FormatRssCustom')) :
      * @return string Returns the filtered RSS.
      */
     function formatRssHtmlCustom($html) {
-        Htmlawed::filterRSS($html);
+        return Htmlawed::filterRSS($html);
     }
 endif;

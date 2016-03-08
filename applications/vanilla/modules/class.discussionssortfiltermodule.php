@@ -27,17 +27,31 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     /** @var array The filters to render. */
     protected $filters;
 
+    /** @var string The selected sort. */
+    protected $selectedSort;
+
+    /** @var array The selected filters. */
+    protected $selectedFilters;
+
     /** @var int The ID of the category we're in. */
     protected $categoryID;
 
+    /** @var string The view of the dropdown module to render. */
+    protected $dropdownView = 'dropdown-navbutton';
+
     /**
      * @param int $categoryID The ID of the category we're in.
+     * @param string $selectedSort The selected sort.
+     * @param array $selectedFilters The selected filters.
      */
-    public function __construct($categoryID = 0) {
+    public function __construct($categoryID = 0, $selectedSort = '', $selectedFilters = []) {
         parent::__construct();
         if ($categoryID) {
             $this->categoryID = $categoryID;
         }
+
+        $this->selectedSort = $selectedSort;
+        $this->selectedFilters = $selectedFilters;
     }
 
     /**
@@ -46,9 +60,16 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @return bool Whether to render the module.
      */
     public function prepare() {
-        $this->sorts = DiscussionModel::getSorts();
-        $this->filters = DiscussionModel::getFilters();
+        $this->sorts = DiscussionModel::getAllowedSorts();
+        $this->filters = DiscussionModel::getAllowedFilters();
         return !empty($this->sorts) || !empty($this->filters);
+    }
+
+    /**
+     * @param string $dropdownView The view of the dropdown module to render.
+     */
+    public function setDropdownView($dropdownView) {
+        $this->dropdownView = $dropdownView;
     }
 
     /**
@@ -67,13 +88,13 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 }
             }
             $key = val('key', $sort);
+            $queryString = DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key);
             $sortData[$key]['name'] = val('name', $sort);
-            $sortData[$key]['url'] = $this->getPagelessPath().DiscussionModel::getSortFilterQueryString([], $key);
+            $sortData[$key]['url'] = $this->getPagelessPath().$queryString;
             $sortData[$key]['rel'] = 'nofollow';
         }
-        $selectedKey = DiscussionModel::getSortKey() ? DiscussionModel::getSortKey() : DiscussionModel::getDefaultSortKey();
-        if (val($selectedKey, $sortData)) {
-            $sortData[$selectedKey]['cssClass'] = self::ACTIVE_CSS_CLASS;
+        if (val($this->selectedSort, $sortData)) {
+            $sortData[$this->selectedSort]['cssClass'] = self::ACTIVE_CSS_CLASS;
         }
 
 
@@ -102,22 +123,27 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $dropdown = new DropdownModule('discussions-filter-'.$setKey, val('name', $filterSet), 'discussion-filter');
 
             // Override the trigger text?
-            $selectedFilterKeys = DiscussionModel::getFilterKeys();
-            $selectedValue = val($setKey, $selectedFilterKeys);
+            $selectedValue = val($setKey, $this->selectedFilters);
             if ($selectedValue && $selectedValue != 'none') {
                 $selected = val('name', $filterSet['filters'][$selectedValue]);
                 $dropdown->setTrigger($selected);
             }
 
-            $dropdown->setView('dropdown-navbutton'); // TODO make this a property?
+            $dropdown->setView($this->dropdownView);
             $dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
 
             // Add the filters to the dropdown
             foreach (val('filters', $filterSet) as $filter) {
                 $key = val('group', $filter, '') . '.' . val('key', $filter);
+                $queryString = DiscussionModel::getSortFilterQueryString(
+                    $this->selectedSort,
+                    $this->selectedFilters,
+                    '',
+                    [$setKey => val('key', $filter)]
+                );
                 $dropdown->addLink(
                     val('name', $filter),
-                    url($this->getPagelessPath().DiscussionModel::getSortFilterQueryString([$setKey => val('key', $filter)])),
+                    url($this->getPagelessPath().$queryString),
                     $key,
                     '', array(), false,
                     array('rel' => 'nofollow')

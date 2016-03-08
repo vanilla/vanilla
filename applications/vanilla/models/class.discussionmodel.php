@@ -42,7 +42,7 @@ class DiscussionModel extends VanillaModel {
      * - **name**: string - The display name of the sort.
      * - **orderBy**: string - An array indicating order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
      */
-    protected static $sorts = array(
+    protected static $allowedSorts = array(
         'hot' => array('key' => 'hot', 'name' => 'Hot', 'orderBy' => array('DateLastComment' => 'desc')),
         'top' => array('key' => 'top', 'name' => 'Top', 'orderBy' => array('Score' => 'desc', 'DateInserted' => 'desc')),
         'new' => array('key' => 'new', 'name' => 'New', 'orderBy' => array('DateInserted' => 'desc'))
@@ -64,17 +64,17 @@ class DiscussionModel extends VanillaModel {
      * - **where**: string - The where array query to execute for the filter. Uses
      * - **group**: string - (optional) The dropdown module can group together any items with the same group name.
      */
-    protected static $filters;
+    protected static $allowedFilters;
 
     /**
      * @var string The sort key of the order by we apply in the query.
      */
-    protected static $sortKey = '';
+    protected $sort = '';
 
     /**
      * @var string The filter keys of the wheres we apply in the query.
      */
-    protected static $filterKeys = [];
+    protected $filters = [];
 
     /**
      * Class constructor. Defines the related database table name.
@@ -89,7 +89,7 @@ class DiscussionModel extends VanillaModel {
     /**
      * @return array The current sort array.
      */
-    public static function getSorts() {
+    public static function getAllowedSorts() {
         static $sortEventFired = false;
 
         if (!$sortEventFired) {
@@ -97,7 +97,7 @@ class DiscussionModel extends VanillaModel {
             Gdn::pluginManager()->fireAs(__CLASS__);
             Gdn::pluginManager()->fireEvent('DiscussionSorts');
         }
-        return self::$sorts;
+        return self::$allowedSorts;
     }
 
     /**
@@ -107,7 +107,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @return array The current filter array.
      */
-    public static function getFilters() {
+    public static function getAllowedFilters() {
         static $filterEventFired = false;
 
         if (!$filterEventFired) {
@@ -115,8 +115,8 @@ class DiscussionModel extends VanillaModel {
             Gdn::pluginManager()->fireAs(__CLASS__);
             Gdn::pluginManager()->fireEvent('DiscussionFilters');
         }
-        if (!empty(self::$filters)) {
-            return self::$filters;
+        if (!empty(self::$allowedFilters)) {
+            return self::$allowedFilters;
         }
         return [];
     }
@@ -124,40 +124,54 @@ class DiscussionModel extends VanillaModel {
     /**
      * @return string
      */
-    public static function getSortKey() {
-        return self::$sortKey;
+    public function getSort() {
+        return $this->sort;
     }
 
     /**
      * @return array
      */
-    public static function getFilterKeys() {
-        return self::$filterKeys;
+    public function getFilters() {
+        return $this->filters;
     }
 
     /**
-     * @param string $sortKey
+     * The sort property is a string. This setter also accepts an array and checks if the sort key exists
+     * on the array. Will only set the sort property if it exists in the allowed sorts array.
+     *
+     * @param string|array $sort The prospective sort to set.
      */
-    public static function setSortKey($sortKey) {
-        self::$sortKey = $sortKey;
+    public function setSort($sort) {
+        if (is_array($sort)) {
+            $safeSort = $this->getSortFromArray($sort);
+            $this->sort = $safeSort;
+        } elseif (is_string($sort)) {
+            $safeSort = $this->getSortFromString($sort);
+            $this->sort = $safeSort;
+        }
     }
 
     /**
-     * @param array $filterKeys
+     * Will only set the filters property if the passed filters exist in the allowed filters array.
+     *
+     * @param array $filters The prospective filters to set.
      */
-    public static function setFilterKeys($filterKeys) {
-        self::$filterKeys = $filterKeys;
+    public function setFilters($filters) {
+        if (is_array($filters)) {
+            $safeFilters = $this->getFiltersFromArray($filters);
+            $this->filters = $safeFilters;
+        }
     }
 
     /**
      * @return string
      */
-    public static function getDefaultSortKey() {
+    public function getDefaultSortKey() {
         // Try config
-        $orderBy = self::getDefaultOrderBy();
+        $orderBy = $this->getDefaultOrderBy();
 
         // Try to find a matching sort.
-        foreach(self::getSorts() as $sort) {
+        foreach(self::getAllowedSorts() as $sort) {
             if (val('orderBy', $sort, []) == $orderBy) {
                 return val('key', $sort, '');
             }
@@ -482,12 +496,11 @@ class DiscussionModel extends VanillaModel {
      * @return array An array of field => direction values.
      */
     protected function getOrderBy() {
-        if ($key = self::getSortKey()) {
-            $orderBy = val('orderBy', self::getSortFromKey($key));
+        if ($key = self::getSort()) {
+            $orderBy = val('orderBy', $this->getSortFromKey($key));
         } else {
-            $orderBy = self::getDefaultOrderBy();
+            $orderBy = $this->getDefaultOrderBy();
         }
-
         return $orderBy;
     }
 
@@ -497,7 +510,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @return array The default order by fields
      */
-    public static function getDefaultOrderBy() {
+    public function getDefaultOrderBy() {
         $orderField = c('Vanilla.Discussions.SortField', self::DEFAULT_ORDER_BY_FIELD);
         $orderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
 
@@ -520,7 +533,7 @@ class DiscussionModel extends VanillaModel {
         $wheres = [];
         $filters = [];
 
-        if ($filterKeys = self::getFilterKeys()) {
+        if ($filterKeys = $this->getFilters()) {
             $filters = $this->getFiltersFromKeys($filterKeys);
         }
 
@@ -528,7 +541,7 @@ class DiscussionModel extends VanillaModel {
 
             if ($categoryIDs) {
                 $setKey = val('setKey', $filter);
-                $filterSetCategories = val('categories', val($setKey, self::getFilters()));
+                $filterSetCategories = val('categories', val($setKey, self::getAllowedFilters()));
 
                 if (!empty($filterSetCategories) and array_diff($categoryIDs, $filterSetCategories)) {
                     $filter['wheres'] = [];
@@ -2849,12 +2862,12 @@ class DiscussionModel extends VanillaModel {
      * Works real well with unfiltered request arguments. (i.e., Gdn::request()->get()) Will only return safe
      * set key and filter key pairs from the filters array or an empty array if not found.
      *
-     * @param $array The array to get the filters from.
+     * @param array $array The array to get the filters from.
      * @return array The valid filters from the passed array or an empty array.
      */
-    public static function getFiltersFromArray($array) {
+    protected function getFiltersFromArray($array) {
         $filterKeys = [];
-        foreach(self::getFilters() as $filterSet) {
+        foreach(self::getAllowedFilters() as $filterSet) {
             $filterSetKey = val('key', $filterSet);
             // Check if any of our filters are in the array. Filter key value is unsafe.
             if ($filterKey = val($filterSetKey, $array)) {
@@ -2865,7 +2878,7 @@ class DiscussionModel extends VanillaModel {
                 } else {
                     Logger::log(
                         Logger::NOTICE, 'Filter: '.$filterSetKey.' => '.htmlentities($filterKey)
-                        .' does not exist in the DiscussionModel\'s filters array.'
+                        .' does not exist in the DiscussionModel\'s allowed filters array.'
                     );
                 }
             }
@@ -2878,12 +2891,12 @@ class DiscussionModel extends VanillaModel {
      * request arguments. (i.e., Gdn::request()->get()) Will only return a safe sort key from the sort array or an
      * empty string if not found.
      *
-     * @param $array The array to get the sort from.
+     * @param array $array The array to get the sort from.
      * @return string The valid sort from the passed array or an empty string.
      */
-    public static function getSortFromArray($array) {
+    protected function getSortFromArray($array) {
         $unsafeSortKey = val('sort', $array);
-        foreach (self::getSorts() as $sort) {
+        foreach (self::getAllowedSorts() as $sort) {
             if ($unsafeSortKey == val('key', $sort)) {
                 // Sort key is valid.
                 return val('key', $sort);
@@ -2892,7 +2905,28 @@ class DiscussionModel extends VanillaModel {
         if ($unsafeSortKey) {
             Logger::log(
                 Logger::NOTICE, 'Sort: '.htmlentities($unsafeSortKey)
-                .' does not exist in the DiscussionModel\'s sorts array.'
+                .' does not exist in the DiscussionModel\'s allowed sorts array.'
+            );
+        }
+        return '';
+    }
+
+    /**
+     * Checks the allowed sorts array for the string and it is valid, returns it the string. If not, returns an empty
+     * string. Will only return a safe sort key from the sort array or an empty string if not found.
+     *
+     * @param array $string The string to get the sort from.
+     * @return string A valid sort key or an empty string.
+     */
+    protected function getSortFromString($string) {
+        if (val($string, self::$allowedSorts)) {
+            // Sort key is valid.
+            return $string;
+        }
+        else {
+            Logger::log(
+                Logger::NOTICE, 'Sort: '.htmlentities($string)
+                .' does not exist in the DiscussionModel\'s allowed sorts array.'
             );
         }
         return '';
@@ -2914,7 +2948,6 @@ class DiscussionModel extends VanillaModel {
             }
         }
         return $filterKeyValues;
-
     }
 
 
@@ -2929,7 +2962,7 @@ class DiscussionModel extends VanillaModel {
     protected function getFiltersFromKeys($filterKeyValues) {
         $filters = [];
         foreach ($filterKeyValues as $key => $value) {
-            $allFilters = $this->getFilters();
+            $allFilters = self::getAllowedFilters();
             foreach ($filterKeyValues as $key => $value) {
                 if (isset($allFilters[$key]['filters'][$value])) {
                     $filters[] = $allFilters[$key]['filters'][$value];
@@ -2943,23 +2976,24 @@ class DiscussionModel extends VanillaModel {
      * @param $sortKey
      * @return bool|mixed
      */
-    public static function getSortFromKey($sortKey) {
-        return val($sortKey, self::getSorts(), []);
+    protected function getSortFromKey($sortKey) {
+        return val($sortKey, self::getAllowedSorts(), []);
     }
 
     /**
      * Get the current sort/filter query string by passing no parameters or pass either a new filter key or sort key
      * to build a new query string, leaving the other properties intact.
      *
+     * @param string $selectedSort
+     * @param array $selectedFilters
+     * @param string $sortKeyToSet The key name of the sort in the sorts array.
      * @param array $filterKeysToSet An array of filters, where the key is the key of the filterSet
      *      in the filters array and the value is the key of the filter.
-     * @param string $sortKey The key name of the sort in the sorts array.
      * @return string The current or amended query string for sort and filter.
      */
-    public static function getSortFilterQueryString($filterKeysToSet = [], $sortKey = '') {
+    public static function getSortFilterQueryString($selectedSort, $selectedFilters, $sortKeyToSet = '', $filterKeysToSet = []) {
         $filterString = '';
-        $filterKeys = self::getFilterKeys();
-        $filterKeys = array_merge($filterKeys, $filterKeysToSet);
+        $filterKeys = array_merge($selectedFilters, $filterKeysToSet);
 
         // Build the sort query string
         foreach ($filterKeys as $setKey => $filterKey) {
@@ -2973,13 +3007,13 @@ class DiscussionModel extends VanillaModel {
         }
 
         $sortString = '';
-        if (!$sortKey) {
-            $sort = self::getSortKey();
+        if (!$sortKeyToSet) {
+            $sort = $selectedSort;
             if ($sort) {
                 $sortString = 'sort='.$sort;
             }
         } else {
-            $sortString = 'sort='.$sortKey;
+            $sortString = 'sort='.$sortKeyToSet;
         }
 
         $queryString = '';
@@ -2995,7 +3029,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * Add a sort to the sorts array.
+     * Add a sort to the allowed sorts array.
      *
      * @param string $key The key name of the sort. Appears in the query string, should be url-friendly.
      * @param string $name The display name of the sort.
@@ -3004,11 +3038,11 @@ class DiscussionModel extends VanillaModel {
      * @param array $categoryIDs The IDs of the categories that this sort will work on. If empty, sort is global.
      */
     public static function addSort($key, $name, $orderBy, $categoryIDs = []) {
-        self::$sorts[$key] = array('key' => $key, 'name' => $name, 'orderBy' => $orderBy, 'categories' => $categoryIDs);
+        self::$allowedSorts[$key] = array('key' => $key, 'name' => $name, 'orderBy' => $orderBy, 'categories' => $categoryIDs);
     }
 
     /**
-     * Add a filter to the filters array.
+     * Add a filter to the allowed filters array.
      *
      * @param string $key The key name of the filter. Appears in the query string, should be url-friendly.
      * @param string $name The display name of the filter. Usually appears as an option in the UI.
@@ -3017,17 +3051,17 @@ class DiscussionModel extends VanillaModel {
      * @param string $setKey The key name of the filter set.
      */
     public static function addFilter($key, $name, $wheres, $group = '', $setKey = 'filter') {
-        if (!val($setKey, self::getFilters())) {
+        if (!val($setKey, self::getAllowedFilters())) {
             self::addFilterSet($setKey);
         }
-        self::$filters[$setKey]['filters'][$key] = array('key' => $key, 'setKey' => $setKey, 'name' => $name, 'wheres' => $wheres);
+        self::$allowedFilters[$setKey]['filters'][$key] = array('key' => $key, 'setKey' => $setKey, 'name' => $name, 'wheres' => $wheres);
         if ($group) {
-            self::$filters[$setKey]['filters'][$key]['group'] = $group;
+            self::$allowedFilters[$setKey]['filters'][$key]['group'] = $group;
         }
     }
 
     /**
-     * Adds a filter set to the filters array.
+     * Adds a filter set to the allowed filters array.
      *
      * @param string $setKey The key name of the filter set.
      * @param string $setName The name of the filter set. Appears in the UI.
@@ -3037,9 +3071,9 @@ class DiscussionModel extends VanillaModel {
         if (!$setName) {
             $setName = sprintf(t('All %s'), t('Discussions'));
         }
-        self::$filters[$setKey]['key'] = $setKey;
-        self::$filters[$setKey]['name'] = $setName;
-        self::$filters[$setKey]['categories'] = $categoryIDs;
+        self::$allowedFilters[$setKey]['key'] = $setKey;
+        self::$allowedFilters[$setKey]['name'] = $setName;
+        self::$allowedFilters[$setKey]['categories'] = $categoryIDs;
 
         // Add a way to let users clear any filters they've added.
         self::addClearFilter($setKey, $setName);
@@ -3049,41 +3083,41 @@ class DiscussionModel extends VanillaModel {
      * If you don't want to use any of the default sorts, use this little buddy.
      */
     public static function clearSorts() {
-        self::$sorts = array();
+        self::$allowedSorts = array();
     }
 
     /**
-     * Removes a sort from the sort array with the passed key.
+     * Removes a sort from the allowed sort array with the passed key.
      *
      * @param string $key The key of the sort to remove.
      */
     public static function removeSort($key) {
-        if (val($key, self::$sorts)) {
-            unset(self::$sorts[$key]);
+        if (val($key, self::$allowedSorts)) {
+            unset(self::$allowedSorts[$key]);
         }
     }
 
     /**
-     * Removes a filters from the filter array with the passed filter key/values.
+     * Removes a filters from the allowed filter array with the passed filter key/values.
      *
      * @param array $filterKeys The key/value pairs of the filters to remove.
      */
     public static function removeFilter($filterKeys) {
         foreach($filterKeys as $setKey => $filterKey) {
-            if (isset(self::$filters[$setKey]['filters'][$filterKey])) {
-                unset(self::$filters[$setKey]['filters'][$filterKey]);
+            if (isset(self::$allowedFilters[$setKey]['filters'][$filterKey])) {
+                unset(self::$allowedFilters[$setKey]['filters'][$filterKey]);
             }
         }
     }
 
     /**
-     * Removes a filter set from the filter array with the passed set key.
+     * Removes a filter set from the allowed filter array with the passed set key.
      *
      * @param string $setKey The key of the filter to remove.
      */
     public static function removeFilterSet($setKey) {
-        if (val($setKey, self::$filters)) {
-            unset(self::$filters[$setKey]);
+        if (val($setKey, self::$allowedFilters)) {
+            unset(self::$allowedFilters[$setKey]);
         }
     }
 
@@ -3094,7 +3128,7 @@ class DiscussionModel extends VanillaModel {
      * @param string $setName The display name of the option. Usually the human-readable set name.
      */
     protected static function addClearFilter($setKey, $setName = '') {
-        self::$filters[$setKey]['filters'][self::EMPTY_FILTER_KEY] = array(
+        self::$allowedFilters[$setKey]['filters'][self::EMPTY_FILTER_KEY] = array(
             'key' => self::EMPTY_FILTER_KEY,
             'setKey' => $setKey,
             'name' => sprintf(t('Clear %s'), $setName),

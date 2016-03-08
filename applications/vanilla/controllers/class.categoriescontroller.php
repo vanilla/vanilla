@@ -291,18 +291,24 @@ class CategoriesController extends VanillaController {
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();
+            $url = CategoryUrl($CategoryIdentifier);
+
             $this->EventArguments['PagerType'] = 'Pager';
             $this->fireEvent('BeforeBuildPager');
+            if (!$this->data('_PagerUrl')) {
+                $this->setData('_PagerUrl', $url.'/{Page}');
+            }
+            $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
+            $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
+
             $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
             $this->Pager->ClientID = 'Pager';
             $this->Pager->configure(
                 $Offset,
                 $Limit,
                 $CountDiscussions,
-                array('CategoryUrl')
+                $this->data('_PagerUrl')
             );
-
-            $this->Pager->queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
 
             $this->Pager->Record = $Category;
             PagerModule::Current($this->Pager);

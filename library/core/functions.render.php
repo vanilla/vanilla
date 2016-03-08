@@ -278,7 +278,7 @@ if (!function_exists('categoryUrl')) {
      * @param string $queryString The query string of the category. Adds sorting/filtering preferences.
      * @return string The url to a category.
      */
-    function categoryUrl($Category, $Page = '', $WithDomain = true, $queryString = '') {
+    function categoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category)) {
             $Category = CategoryModel::categories($Category);
         }
@@ -288,7 +288,7 @@ if (!function_exists('categoryUrl')) {
         if ($Page && $Page > 1) {
             $Result .= '/p'.$Page;
         }
-        return Url($Result.$queryString, $WithDomain);
+        return Url($Result, $WithDomain);
     }
 }
 

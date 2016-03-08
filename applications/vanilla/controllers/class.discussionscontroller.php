@@ -161,7 +161,8 @@ class DiscussionsController extends VanillaController {
         if (!$this->data('_PagerUrl')) {
             $this->setData('_PagerUrl', 'discussions/{Page}');
         }
-        $this->setData('_PagerUrl', $this->data('_PagerUrl').DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters()));
+        $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
+        $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
         $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(

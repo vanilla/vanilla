@@ -166,9 +166,8 @@ class DiscussionModel extends VanillaModel {
     /**
      * @return string
      */
-    public function getDefaultSortKey() {
-        // Try config
-        $orderBy = $this->getDefaultOrderBy();
+    public static function getDefaultSortKey() {
+        $orderBy = self::getDefaultOrderBy(); // check config
 
         // Try to find a matching sort.
         foreach(self::getAllowedSorts() as $sort) {
@@ -499,7 +498,7 @@ class DiscussionModel extends VanillaModel {
         if ($key = self::getSort()) {
             $orderBy = val('orderBy', $this->getSortFromKey($key));
         } else {
-            $orderBy = $this->getDefaultOrderBy();
+            $orderBy = self::getDefaultOrderBy();
         }
         return $orderBy;
     }
@@ -510,7 +509,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @return array The default order by fields
      */
-    public function getDefaultOrderBy() {
+    public static function getDefaultOrderBy() {
         $orderField = c('Vanilla.Discussions.SortField', self::DEFAULT_ORDER_BY_FIELD);
         $orderDirection = c('Vanilla.Discussions.SortDirection', 'desc');
 
@@ -523,7 +522,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * Checks request for any filters and if they exist, returns the where clauses from the filters.
+     * Checks for any set filters and if they exist, returns the where clauses from the filters.
      *
      * @param array $categoryIDs The category IDs from the where clause.
      * @return array The where clauses from the filters.
@@ -531,11 +530,7 @@ class DiscussionModel extends VanillaModel {
      */
     protected function getWheres($categoryIDs = []) {
         $wheres = [];
-        $filters = [];
-
-        if ($filterKeys = $this->getFilters()) {
-            $filters = $this->getFiltersFromKeys($filterKeys);
-        }
+        $filters = $this->getFiltersFromKeys($this->getFilters());
 
         foreach($filters as $filter) {
 
@@ -2933,9 +2928,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * We're using two different data structures for managing filters. One is an array of filters, the other is a
-     * collection of filter key/value pairs that we get from the request. This takes a collection of filters and
-     * returns the corresponding filter setKey => filterKey  array.
+     * Takes a collection of filters and returns the corresponding filter key/value array [setKey => filterKey].
      *
      * @param array $filters The filters to get the keys for.
      * @return array The filter key array.
@@ -2952,9 +2945,7 @@ class DiscussionModel extends VanillaModel {
 
 
     /**
-     * We're using two different data structures for managing filters. One is an array of filters, the other is a
-     * collection of filter key/value pairs that we get from the request. This takes an array of filter
-     * setKey => filterKey key-value types and returns a collection of filters.
+     * Takes an array of filter key/values [setKey => filterKey] and returns a collection of filters.
      *
      * @param array $filterKeyValues The filters key array to get the filter for.
      * @return array An array of filters.

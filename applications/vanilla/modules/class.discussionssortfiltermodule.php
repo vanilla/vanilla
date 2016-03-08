@@ -95,6 +95,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         }
         if (val($this->selectedSort, $sortData)) {
             $sortData[$this->selectedSort]['cssClass'] = self::ACTIVE_CSS_CLASS;
+        } elseif (val($sortKey = DiscussionModel::getDefaultSortKey(), $sortData)) {
+            $sortData[$sortKey]['cssClass'] = self::ACTIVE_CSS_CLASS;
         }
 
 

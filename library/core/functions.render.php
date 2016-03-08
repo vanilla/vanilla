@@ -275,7 +275,6 @@ if (!function_exists('categoryUrl')) {
      * @param string|array $Category
      * @param string|int $Page The page number.
      * @param bool $WithDomain Whether to add the domain to the URL
-     * @param string $queryString The query string of the category. Adds sorting/filtering preferences.
      * @return string The url to a category.
      */
     function categoryUrl($Category, $Page = '', $WithDomain = true) {

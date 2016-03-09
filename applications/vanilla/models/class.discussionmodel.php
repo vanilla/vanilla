@@ -13,6 +13,8 @@
  */
 class DiscussionModel extends VanillaModel {
 
+    use StaticInitializer;
+
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
@@ -64,7 +66,7 @@ class DiscussionModel extends VanillaModel {
      * - **where**: string - The where array query to execute for the filter. Uses
      * - **group**: string - (optional) The dropdown module can group together any items with the same group name.
      */
-    protected static $allowedFilters;
+    protected static $allowedFilters = [];
 
     /**
      * @var string The sort key of the order by we apply in the query.
@@ -90,13 +92,7 @@ class DiscussionModel extends VanillaModel {
      * @return array The current sort array.
      */
     public static function getAllowedSorts() {
-        static $sortEventFired = false;
-
-        if (!$sortEventFired) {
-            $sortEventFired = true;
-            Gdn::pluginManager()->fireAs(__CLASS__);
-            Gdn::pluginManager()->fireEvent('DiscussionSorts');
-        }
+        self::initStatic();
         return self::$allowedSorts;
     }
 
@@ -108,17 +104,8 @@ class DiscussionModel extends VanillaModel {
      * @return array The current filter array.
      */
     public static function getAllowedFilters() {
-        static $filterEventFired = false;
-
-        if (!$filterEventFired) {
-            $filterEventFired = true;
-            Gdn::pluginManager()->fireAs(__CLASS__);
-            Gdn::pluginManager()->fireEvent('DiscussionFilters');
-        }
-        if (!empty(self::$allowedFilters)) {
-            return self::$allowedFilters;
-        }
-        return [];
+        self::initStatic();
+        return self::$allowedFilters;
     }
 
     /**

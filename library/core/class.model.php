@@ -257,7 +257,7 @@ class Gdn_Model extends Gdn_Pluggable {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert) === true) {
             $Fields = $this->Validation->validationFields();
-            $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to insert or update the primary key
+            unset($Fields[$this->PrimaryKey]); // Don't try to insert or update the primary key
             if ($Insert === false) {
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {

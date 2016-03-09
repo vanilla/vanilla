@@ -1379,7 +1379,7 @@ abstract class Gdn_SQLDriver {
     public function options($Key, $Value = null) {
         if (is_array($Key)) {
             foreach ($Key as $K => $V) {
-                $this->Options[$K] = $V;
+                $this->_Options[$K] = $V;
                 return $this;
             }
         } elseif ($Value !== null) {

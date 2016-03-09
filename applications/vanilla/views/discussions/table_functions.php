@@ -78,7 +78,7 @@ if (!function_exists('WriteDiscussionRow')):
             ?>
          </span>
                     <?php
-
+                    $Sender->fireEvent('BeforeDiscussionTitle');
                     echo anchor($DiscussionName, $DiscussionUrl, 'Title').' ';
                     $Sender->fireEvent('AfterDiscussionTitle');
 

@@ -1,18 +1,22 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php
-$Flag = $this->Data['Plugin.Flagging.Data'];
-$Report = $this->Data['Plugin.Flagging.Report'];
-$DiscussionID = $this->Data['Plugin.Flagging.DiscussionID'];
-$Reason = $this->Data['Plugin.Flagging.Reason'];
+<?php if (!defined('APPLICATION')) exit();
 
-echo t('Discussion'); ?>: <?php if (isset($Report['DiscussionName'])) echo $Report['DiscussionName']; ?>
+$discussionID = $this->data('Plugin.Flagging.DiscussionID');
+$flag         = $this->data('Plugin.Flagging.Data');
+$report       = $this->data('Plugin.Flagging.Report');
+$reason       = $this->data('Plugin.Flagging.Reason');
 
-<?php echo ExternalUrl($Flag['URL']); ?>
+echo t('Discussion'); ?>: <?php echo val('DiscussionName', $report); ?>
 
 
-<?php echo t('Reason').': '.$Reason; ?>
+<?php echo externalUrl($flag['URL']); ?>
 
 
-<?php echo t('FlaggedBy', 'Reported by:').' '.$Flag['UserName']; ?>
+<?php echo t('Reason') . ": {$reason}"; ?>
 
-<?php if ($DiscussionID) echo t('FlagDiscuss', 'Discuss it').': '.ExternalUrl('discussion/'.$DiscussionID); ?>
+
+<?php echo t('FlaggedBy', 'Reported by:') . " {$flag['UserName']}"; ?>
+
+
+<?php if ($discussionID) {
+    echo t('FlagDiscuss', 'Discuss it') . ': ' . externalUrl('discussion/' . $DiscussionID);
+} ?>

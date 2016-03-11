@@ -518,6 +518,12 @@ class ProxyRequest {
             }
         }
 
+        // Allow HEAD
+        if ($RequestMethod == 'HEAD') {
+            curl_setopt($Handler, CURLOPT_HEADER, true);
+            curl_setopt($Handler, CURLOPT_NOBODY, true);
+        }
+
         // Any extra needed headers
         if (sizeof($SendExtraHeaders)) {
             curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);

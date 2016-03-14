@@ -1807,10 +1807,10 @@ class DiscussionModel extends VanillaModel {
                     $InsertUser = Gdn::userModel()->getID($Fields['InsertUserID']);
                     $this->updateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
 
-                    // Mark the user as participated.
+                    // Mark the user as participated and update DateLastViewed.
                     $this->SQL->replace(
                         'UserDiscussion',
-                        array('Participated' => 1),
+                        array('Participated' => 1, 'DateLastViewed' => Gdn_Format::toDateTime()),
                         array('DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields))
                     );
 

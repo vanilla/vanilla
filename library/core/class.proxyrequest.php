@@ -116,10 +116,17 @@ class ProxyRequest {
      * @return int
      */
     public function curlHeader(&$Handler, $HeaderString) {
-        $Line = explode(':', trim($HeaderString));
+        $Line = explode(':', $HeaderString);
         $Key = trim(array_shift($Line));
         $Value = trim(implode(':', $Line));
-        if (!empty($Key)) {
+        // Prevent overwriting existing $this->ResponseHeaders[$Key] entries.
+        if (array_key_exists($Key, $this->ResponseHeaders)) {
+            if (!is_array($this->ResponseHeaders[$Key])) {
+                // Transform ResponseHeader to an array.
+                $this->ResponseHeaders[$Key] = array($this->ResponseHeaders[$Key]);
+            }
+            $this->ResponseHeaders[$Key][] = $Value;
+        } elseif (!empty($Key)) {
             $this->ResponseHeaders[$Key] = $Value;
         }
         return strlen($HeaderString);

@@ -48,7 +48,6 @@ if (function_exists('mb_internal_encoding')) {
 
 // Include the core autoloader.
 require_once __DIR__.'/vendor/autoload.php';
-setHandlers();
 
 // Initialize the autoloader.
 Gdn_Autoloader::start();
@@ -90,6 +89,8 @@ debug(c('Debug', false));
 // Default request object
 Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
 Gdn::request()->fromEnvironment();
+
+setHandlers();
 
 /**
  * Extension Managers

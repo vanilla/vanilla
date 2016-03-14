@@ -577,6 +577,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
+        $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = array();
         $this->EventArguments['definitions'] =& $additionalDefinitions;
@@ -657,7 +658,6 @@ class EditorPlugin extends Gdn_Plugin {
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->addDefinition('canUpload', $this->canUpload());
             $c->setData('_canUpload', $this->canUpload());
 
             // Determine which controller (post or discussion) is invoking this.

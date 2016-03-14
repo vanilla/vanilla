@@ -658,7 +658,6 @@ class EditorPlugin extends Gdn_Plugin {
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->addDefinition('canUpload', $this->canUpload());
             $c->setData('_canUpload', $this->canUpload());
 
             // Determine which controller (post or discussion) is invoking this.

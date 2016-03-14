@@ -37,13 +37,14 @@ $editorkey = $this->data('_editorkey');
          <?php echo $filePreviewCss; ?>
          <div class="file-data">
             <a class="filename" data-type="<?php echo $attachment['Type']; ?>"
-               data-width="<?php echo $attachment['ImageWidth']; ?>"
-               data-height="<?php echo $attachment['ImageHeight']; ?>"
                href="<?php echo $pathParse['Url'] ?>"
                target="_blank"
                 <?php
-                // Only add the download attribute if it's not an image.
-                if (!$attachment['ImageHeight']) {
+                if ($attachment['ImageHeight']) {
+                    echo 'data-width="'.$attachment['ImageWidth'].'"';
+                    echo 'data-height="'.$attachment['ImageHeight'].'"';
+                } else {
+                    // Only add the download attribute if it's not an image.
                     echo 'download="'.htmlspecialchars($attachment['Name']).'"';
                 }
                 ?>

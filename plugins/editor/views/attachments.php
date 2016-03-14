@@ -44,7 +44,7 @@ $editorkey = $this->data('_editorkey');
                 <?php
                 // Only add the download attribute if it's not an image.
                 if (!$attachment['ImageHeight']) {
-                    echo 'download=" '.htmlspecialchars($attachment['Name']).'"';
+                    echo 'download="'.htmlspecialchars($attachment['Name']).'"';
                 }
                 ?>
                 >

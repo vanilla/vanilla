@@ -993,6 +993,20 @@ class Gdn_Format {
     }
 
     /**
+     * Replaces opening html list tags with an asterisk and closing list tags with new lines.
+     * Accepts both encoded and decoded html strings.
+     *
+     * @param  string $html An HTML-formatted string.
+     * @return string Returns the html with all list items removed.
+     */
+    protected static function replaceListItems($html) {
+        $html = str_replace(['<li>', '&lt;li&gt;'], '* ', $html);
+        $items = ['/(<\/?(?:li|ul|ol)([^>]+)?>)/', '/(&lt;\/?(?:li|ul|ol)([^&]+)?&gt;)/'];
+        $html = preg_replace($items, "\n", $html);
+        return $html;
+    }
+
+    /**
      * Format a string as plain text.
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
@@ -1009,8 +1023,7 @@ class Gdn_Format {
             $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
 
             // Fix lists.
-            $Result = str_replace('<li>', '* ', $Result);
-            $Result = preg_replace('`</(?:li|ol|ul)>`', "\n", $Result);
+            $Result = Gdn_Format::replaceListItems($Result);
 
             $Allblocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
             $Result = preg_replace('`</'.$Allblocks.'>`', "\n\n", $Result);
@@ -1251,7 +1264,7 @@ class Gdn_Format {
         $SoundcloudUrlMatch = 'https://soundcloud.com/([\w=?&;+-_]*)/([\w=?&;+-_]*)';
         $ImgurGifvUrlMatch = 'https?\://i\.imgur\.com/([a-z0-9]+)\.gifv';
         $WistiaUrlMatch = 'https?:\/\/([A-za-z0-9\-]+\.)?(wistia\.com|wi\.st)\/medias\/(?<videoID>[A-za-z0-9]+)(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?';
-        
+
         // YouTube
         if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
             && c('Garden.Format.YouTube', true)

@@ -296,7 +296,7 @@ blockquote.Quote {
   margin: 1em;
   padding: 1ex 10px;
   min-width: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 pre.CodeBlock {

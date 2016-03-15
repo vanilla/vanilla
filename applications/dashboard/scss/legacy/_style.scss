@@ -2262,6 +2262,8 @@ blockquote.Quote, blockQuote.UserQuote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid #eee;
   border-left: 4px solid rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  overflow-y: auto;
 }
 
 .Message small {

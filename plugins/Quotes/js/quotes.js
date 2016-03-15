@@ -29,7 +29,7 @@ Gdn_Quotes.prototype.Prepare = function () {
     QuoteFoldingLevel = gdn.definition('QuotesFolding', 1);
 
     function folding() {
-        $('.Comment .Message').each(function () {
+        $('.Discussion .Message, .Comment .Message').each(function () {
             // Find the closest child quote
             var Message = $(this),
                 PetQuote = Message.children('.Quote, .UserQuote');

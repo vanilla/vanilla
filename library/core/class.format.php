@@ -263,9 +263,7 @@ class Gdn_Format {
             $BBCodeFormatter = Gdn::factory('BBCodeFormatter');
             if (is_object($BBCodeFormatter)) {
                 $Result = $BBCodeFormatter->format($Mixed);
-                $Result = Gdn_Format::links($Result);
-                $Result = Gdn_Format::mentions($Result);
-                $Result = Emoji::instance()->translateToHtml($Result);
+                $Result = Gdn_Format::processHTML($Result);
 
                 return $Result;
             }
@@ -684,9 +682,8 @@ class Gdn_Format {
         } else {
             $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
             $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
-            $Mixed = self::mentions($Mixed);
-            $Mixed = self::links($Mixed);
-            $Mixed = Emoji::instance()->translateToHtml($Mixed);
+            $Mixed = Gdn_Format::processHTML($Mixed);
+
 
             return $Mixed;
         }
@@ -868,18 +865,14 @@ class Gdn_Format {
             if (self::isHtml($Mixed)) {
                 // Purify HTML
                 $Mixed = Gdn_Format::htmlFilter($Mixed);
-                // Links
-                $Mixed = Gdn_Format::links($Mixed);
-                // Mentions & Hashes
-                $Mixed = Gdn_Format::mentions($Mixed);
-                // Emoji
-                $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
                 // nl2br
                 if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                     $Mixed = fixNl2Br($Mixed);
                 }
+
+                $Mixed = Gdn_Format::processHTML($Mixed);
 
                 $Result = $Mixed;
 
@@ -890,13 +883,11 @@ class Gdn_Format {
                 // The text does not contain html and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
                 $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
-                $Result = Gdn_Format::mentions($Result);
-                $Result = Gdn_Format::links($Result);
-                $Result = Emoji::instance()->translateToHtml($Result);
                 if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                     $Result = fixNl2Br($Result);
                 }
+                $Result = Gdn_Format::processHTML($Result);
             }
 
             return $Result;
@@ -974,7 +965,8 @@ class Gdn_Format {
     }
 
     /**
-     * Check to see if a string has spoilers and replace them with an innocuous string.
+     * Check to see if a string has spoilers and replace them with an innocuous string. Good for displaying excerpts
+     * from discussions and without showing the spoiler text.
      *
      * @param string $html An HTML-formatted string.
      * @param string $replaceWith The translation code to replace spoilers with.
@@ -988,6 +980,38 @@ class Gdn_Format {
             }
             $html = str_get_html($html);
             $html->find('.Spoiler,.UserSpoiler', 0)->outertext = t($replaceWith);
+        }
+        return $html;
+    }
+
+    /**
+     * Returns spoiler text wrapped in a HTML spoiler wrapper. Parsers for NBBC and Markdown should use this function
+     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. During the post rendering,
+     * we use formatSpoilers to replace this block with the HTML found in the spoilerWrap function in functions.render.php.
+     *
+     * @param string $spoilerText The inner text of the spoiler.
+     * @return string
+     */
+    public static function spoilerHtml($spoilerText) {
+        return '<div class="Spoiler">'.$spoilerText.'</div>';
+    }
+
+    /**
+     * Check to see if a string has spoilers and replace the spoiler HTML block with a more Vanilla-specific
+     * HTML spoiler block.
+     *
+     * @param string $html A HTML-formatted string.
+     * @return string Returns the html spoilers with spoiler styling.
+     */
+    protected static function formatSpoilers($html) {
+        if (preg_match('/class="Spoiler"/i', $html)) {
+            // Transform $html into a dom object and replace the spoiler block.
+            if (!function_exists('str_get_html')) {
+                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
+            }
+            $html = str_get_html($html);
+            $spoiler = $html->find('.Spoiler', 0)->innertext;
+            $html->find('.Spoiler', 0)->outertext = spoilerWrap($spoiler);
         }
         return $html;
     }
@@ -1530,12 +1554,25 @@ EOT;
 
                 $Mixed = $Markdown->transform($Mixed);
                 $Mixed = $Formatter->format($Mixed);
-                $Mixed = Gdn_Format::links($Mixed);
-                $Mixed = Gdn_Format::mentions($Mixed);
-                $Mixed = Emoji::instance()->translateToHtml($Mixed);
+                $Mixed = Gdn_Format::processHTML($Mixed);
                 return $Mixed;
             }
         }
+    }
+
+    /**
+     * Performs replacing operations on a HTML string. Usually for formatting posts.
+     * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
+     *
+     * @param $html An unparsed HTML string.
+     * @return string The formatted HTML string.
+     */
+    protected static function processHTML($html) {
+        $html = Gdn_Format::links($html);
+        $html = Gdn_Format::mentions($html);
+        $html = Emoji::instance()->translateToHtml($html);
+        $html = Gdn_Format::formatSpoilers($html);
+        return $html;
     }
 
     /**
@@ -1821,9 +1858,7 @@ EOT;
      */
     public static function textEx($Str) {
         $Str = self::text($Str);
-        $Str = self::links($Str);
-        $Str = self::mentions($Str);
-        $Str = Emoji::instance()->translateToHtml($Str);
+        $Str = Gdn_Format::processHTML($Str);
         return $Str;
     }
 
@@ -2102,50 +2137,8 @@ EOT;
             // HTML filter first
             $Mixed = $Formatter->format($Mixed);
             // Links
-            $Mixed = Gdn_Format::links($Mixed);
-            // Mentions & Hashes
-            $Mixed = Gdn_Format::mentions($Mixed);
-            $Mixed = Emoji::instance()->translateToHtml($Mixed);
-
-
+            $Mixed = Gdn_Format::processHTML($Mixed);
             return $Mixed;
         }
-    }
-
-
-    /**
-     * Returns spoiler text wrapped in a HTML spoiler wrapper. Used for translating BBCode or Markdown spoilers
-     * into HTML.
-     *
-     * @param $spoilerText
-     * @return string
-     */
-    public static function spoilerHTML($spoilerText) {
-        if (!is_string($spoilerText)) {
-            $spoilerText = '';
-        }
-        if (strtolower(c('Garden.Spoilers.Style', '')) == 'legacy') {
-            return self::legacySpoilerHTML($spoilerText);
-        }
-        return '<div class="Spoiler">'.$spoilerText.'</div>';
-    }
-
-    /**
-     * The deprecated Spoilers plugin stryled Spoilers differently. This replicates the Spoilers plugin HTML.
-     * Only works with BBCode using the NBBC plugin and Markdown because WYSIWYG and HTML insert the HTML into posts
-     * directly and that is what is rendered.
-     *
-     * @param $spoilerText
-     * @return string
-     */
-    public static function legacySpoilerHTML($spoilerText) {
-        Gdn::controller()->addJsFile('spoilers-legacy.js', 'dashboard');
-        Gdn::controller()->addCssFile('spoilers-legacy.css', 'dashboard');
-        $title = T('Spoiler');
-        return '<div class="UserSpoiler">
-                    <div class="SpoilerTitle">'.$title.'</div>
-                    <div class="SpoilerReveal"></div>
-                    <div class="SpoilerText"><span>'.$spoilerText.'</span></div>
-                </div>';
     }
 }

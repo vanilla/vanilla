@@ -384,7 +384,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             }
             $this->Database->CapturedSql[] = $sql;
             return true;
-        } elseif ($checkThreshold && $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
+        } elseif ($checkThreshold && $this->getAlterTableThreshold() && $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
             // Log an event to be captured and analysed later.
             Logger::event(
                 'structure_threshold',

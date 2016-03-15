@@ -2124,7 +2124,7 @@ EOT;
         if (!is_string($spoilerText)) {
             $spoilerText = '';
         }
-        if (strtolower(c('Vanilla.Spoilers.Style', '')) == 'legacy') {
+        if (strtolower(c('Garden.Spoilers.Style', '')) == 'legacy') {
             return self::legacySpoilerHTML($spoilerText);
         }
         return '<div class="Spoiler">'.$spoilerText.'</div>';

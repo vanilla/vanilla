@@ -1,0 +1,44 @@
+div.UserSpoiler {
+   margin:4px 0;
+   padding: 5px 10px;
+   margin-right: 10px;
+   background-color: #CCEBFF;
+   background-color: rgba(0, 153, 255, .2);
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   border-radius: 3px;
+}
+
+div.UserSpoiler div.SpoilerTitle {
+   font-weight: bold;
+}
+
+div.UserSpoiler div.SpoilerTitle span {
+   color: white;
+}
+
+div.UserSpoiler div.SpoilerTitle input {
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   border-radius: 3px;
+   background: white;
+   border: 1px solid #E3F4FF;
+   color: #1E79A7;
+   display: inline;
+   font-weight: bold;
+   margin: 0;
+   margin-left: 10px;
+   padding: 2px 5px;
+   text-decoration: none;
+   cursor: pointer;
+}
+
+div.UserSpoiler div.SpoilerText {
+   display: none;
+   padding: 3px 0px;
+   padding-left: 5px;
+   margin: 3px 0px;
+   border-left: 1px solid #E3F4FF;
+}
+
+

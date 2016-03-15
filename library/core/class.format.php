@@ -2111,4 +2111,41 @@ EOT;
             return $Mixed;
         }
     }
+
+
+    /**
+     * Returns spoiler text wrapped in a HTML spoiler wrapper. Used for translating BBCode or Markdown spoilers
+     * into HTML.
+     *
+     * @param $spoilerText
+     * @return string
+     */
+    public static function spoilerHTML($spoilerText) {
+        if (!is_string($spoilerText)) {
+            $spoilerText = '';
+        }
+        if (strtolower(c('Vanilla.Spoilers.Style', '')) == 'legacy') {
+            return self::legacySpoilerHTML($spoilerText);
+        }
+        return '<div class="Spoiler">'.$spoilerText.'</div>';
+    }
+
+    /**
+     * The deprecated Spoilers plugin stryled Spoilers differently. This replicates the Spoilers plugin HTML.
+     * Only works with BBCode using the NBBC plugin and Markdown because WYSIWYG and HTML insert the HTML into posts
+     * directly and that is what is rendered.
+     *
+     * @param $spoilerText
+     * @return string
+     */
+    public static function legacySpoilerHTML($spoilerText) {
+        Gdn::controller()->addJsFile('spoilers-legacy.js', 'dashboard');
+        Gdn::controller()->addCssFile('spoilers-legacy.css', 'dashboard');
+        $title = T('Spoiler');
+        return '<div class="UserSpoiler">
+                    <div class="SpoilerTitle">'.$title.'</div>
+                    <div class="SpoilerReveal"></div>
+                    <div class="SpoilerText"><span>'.$spoilerText.'</span></div>
+                </div>';
+    }
 }

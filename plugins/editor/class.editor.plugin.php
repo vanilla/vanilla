@@ -1465,39 +1465,4 @@ class EditorPlugin extends Gdn_Plugin {
         }
         return $this->canUpload;
     }
-
-    /**
-     * Copy the Spoilers plugin functionality into the editor.
-     *
-     * Then plugins can be deprecated without introducing compatibility issues on forums
-     * that make heavy use of the spoilers plugin, as well as users who have
-     * become accustom to its [spoiler][/spoiler] syntax. This will also allow
-     * the spoiler styling and experience to standardize, instead of using two distinct styles and experiences.
-     */
-    protected function renderSpoilers(&$Sender) {
-        $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
-        // Fix a wysiwyg but where spoilers
-        $FormatBody = preg_replace('`<.+>\s*(\[/?spoiler\])\s*</.+>`', '$1', $FormatBody);
-
-        $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
-        $FormatBody = str_ireplace('[/spoiler]', '</div>', $FormatBody);
-    }
-
-    /**
-     *
-     *
-     * @param $Matches
-     * @return string
-     */
-    protected function spoilerCallback($Matches) {
-        $SpoilerText = (count($Matches) > 2)
-         ? $Matches[2]
-         : null;
-
-        $SpoilerText = (is_null($SpoilerText))
-         ? ''
-         : $SpoilerText;
-
-        return '<div class="Spoiler">'.$SpoilerText.'</div>';
-    }
 }

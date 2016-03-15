@@ -63,7 +63,7 @@ class DiscussionController extends VanillaController {
         $this->addJsFile('spoilers.js', 'dashboard');
         $this->addCssFile('spoilers.css', 'dashboard');
         $this->addDefinition('show', t('show'));
-        $this->addDefinition('show', t('hide'));
+        $this->addDefinition('hide', t('hide'));
 
         Gdn_Theme::section('Discussion');
 

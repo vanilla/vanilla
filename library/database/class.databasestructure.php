@@ -13,6 +13,15 @@
  * Used by any given database driver to build, modify, and create tables and views.
  */
 abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
+    /**
+     * @var array[int] An array of table names to row count estimates.
+     */
+    protected $rowCountEstimates;
+
+    /**
+     * @var int The maximum number of rows allowed for an alter table.
+     */
+    protected $alterTableThreshold;
 
     /** @var string  */
     protected $_DatabasePrefix = '';
@@ -60,8 +69,31 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
 
         $this->databasePrefix($this->Database->DatabasePrefix);
+        $this->setAlterTableThreshold(c('Database.AlterTableThreshold', 0));
 
         $this->reset();
+    }
+
+    /**
+     * Get the alter table threshold.
+     *
+     * The alter table threshold is the maximum estimated rows a table can have where alter tables are allowed.
+     *
+     * @return int Returns the threshold as an integer. A value of zero means no threshold.
+     */
+    public function getAlterTableThreshold() {
+        return $this->alterTableThreshold;
+    }
+
+    /**
+     * Set the alterTableThreshold.
+     *
+     * @param int $alterTableThreshold
+     * @return Gdn_MySQLStructure Returns `$this` for fluent calls.
+     */
+    public function setAlterTableThreshold($alterTableThreshold) {
+        $this->alterTableThreshold = $alterTableThreshold;
+        return $this;
     }
 
     /**
@@ -313,6 +345,17 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
+     * Get the estimated number of rows in a table.
+     *
+     * @param string $tableName The name of the table to look up, without its prefix.
+     * @return int|null Returns the estimated number of rows or **null** if the information doesn't exist.
+     */
+    public function getRowCountEstimate($tableName) {
+        // This method is basically abstract.
+        return null;
+    }
+
+    /**
      * Defines a primary key column on a table.
      *
      * @param string $Name The name of the column.
@@ -330,18 +373,33 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Send a query to the database and return the result.
      *
-     * @param string $Sql The sql to execute.
-     * @return bool Whethor or not the query succeeded.
+     * @param string $sql The sql to execute.
+     * @param bool $checkThreshold Whether or not to check the alter table threshold before altering the table.
+     * @return bool Whether or not the query succeeded.
      */
-    public function query($Sql) {
+    public function query($sql, $checkThreshold = false) {
         if ($this->CaptureOnly) {
             if (!property_exists($this->Database, 'CapturedSql')) {
                 $this->Database->CapturedSql = array();
             }
-            $this->Database->CapturedSql[] = $Sql;
+            $this->Database->CapturedSql[] = $sql;
+            return true;
+        } elseif ($checkThreshold && $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
+            // Log an event to be captured and analysed later.
+            Logger::event(
+                'structure_threshold',
+                Logger::ALERT,
+                "Cannot alter table {tableName}. Its count of {rowCount,number} is past the {rowThreshold,number} threshold.",
+                [
+                    'tableName' => $this->tableName(),
+                    'rowCount' => $this->getRowCountEstimate($this->tableName()),
+                    'rowThreshold' => $this->getAlterTableThreshold(),
+                    'alterSql' => $sql
+                ]
+            );
             return true;
         } else {
-            $Result = $this->Database->query($Sql);
+            $Result = $this->Database->query($sql);
             return $Result;
         }
     }

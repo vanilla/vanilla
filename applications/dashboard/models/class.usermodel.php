@@ -509,12 +509,12 @@ class UserModel extends Gdn_Model {
         }
 
         $Banned = $User['Banned'];
-        if (!BanModel::isBanned($Banned, BanModel::BAN_MANUAL)) {
+        if (!BanModel::isBanned($Banned, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)) {
             throw new Gdn_UserException(t("The user isn't banned.", "The user isn't banned or is banned by some other function."));
         }
 
         // Unban the user.
-        $NewBanned = BanModel::setBanned($Banned, false, BanModel::BAN_MANUAL);
+        $NewBanned = BanModel::setBanned($Banned, false, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
         $this->setField($UserID, 'Banned', $NewBanned);
 
         // Restore the user's content.
@@ -1946,7 +1946,7 @@ class UserModel extends Gdn_Model {
         }
 
         if (array_key_exists('Banned', $FormPostValues)) {
-            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = intval($FormPostValues['Banned']);
         }
 
         if (array_key_exists('Confirmed', $FormPostValues)) {

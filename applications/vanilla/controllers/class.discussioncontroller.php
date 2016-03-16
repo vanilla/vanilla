@@ -548,16 +548,12 @@ class DiscussionController extends VanillaController {
     /**
      *
      *
-     * @param $Discussion
+     * @param $discussion
      * @throws Exception
      */
-    public function sendOptions($Discussion) {
+    public function sendOptions($discussion) {
         require_once $this->fetchViewLocation('helper_functions', 'Discussion');
-        ob_start();
-        writeDiscussionOptions($Discussion);
-        $Options = ob_get_clean();
-
-        $this->jsonTarget("#Discussion_{$Discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+        $this->jsonTarget("#Discussion_{$discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", getDiscussionDropdownOptions($discussion)->toString(), 'ReplaceWith');
     }
 
     /**

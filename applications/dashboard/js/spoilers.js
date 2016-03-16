@@ -1,63 +1,71 @@
 /**
- *
+ * A utility for attaching listeners and handling events associated with spoiler visibility toggling.
  */
+var spoilersPlugin = {
 
-var SpoilersPlugin = {
-   FindAndReplace: function() {
-      jQuery('div.UserSpoiler').each(function(i, el) {
-         SpoilersPlugin.ReplaceSpoiler(el);
-      });
-   },
+    /**
+     * Gather all UserSpoiler DIVs and attempt to augment them with spoiler capabilities.
+     */
+    findAndReplace: function() {
+        jQuery('div.UserSpoiler').each(function(i, el) {
+            spoilersPlugin.replaceSpoiler(el);
+        });
+    },
 
-   ReplaceComment: function(Comment) {
-      jQuery(Comment).find('div.UserSpoiler').each(function(i,el){
-         SpoilersPlugin.ReplaceSpoiler(el);
-      },this);
-   },
+    /**
+     * Add spoiler capabilities to a specific HTML element.
+     * @param {HTMLElement} spoiler The element we're adding hide/show capabilities to.
+     */
+    replaceSpoiler: function(spoiler) {
+        // Don't re-event spoilers that are already 'on'
+        if (spoiler.spoilerFunctioning === true) {
+            return;
+        }
 
-   /**
-    * ReplaceSpoiler: Add the spoiler label to the comment text.
-    * Add Gdn::Controller()->addDefinition('show', 'display') in the class.themehooks.php file of your theme
-    * This plugin needs to be reworked to avoid needing to do this.
-    */
-   ReplaceSpoiler: function(Spoiler) {
-      // Don't re-event spoilers that are already 'on'
-      if (Spoiler.SpoilerFunctioning) return;
-      Spoiler.SpoilerFunctioning = true;
+        // Extend object with jQuery
+        spoiler = jQuery(spoiler);
 
-      // Extend object with jQuery
-      Spoiler = jQuery(Spoiler);
-      var SpoilerTitle = Spoiler.find('div.SpoilerTitle').first();
-      var SpoilerButton = document.createElement('input');
-      SpoilerButton.type = 'button';
-      SpoilerButton.value = gdn.definition('show', 'show');
-      SpoilerButton.className = 'SpoilerToggle';
-      SpoilerTitle.append(SpoilerButton);
-      Spoiler.on('click', 'input.SpoilerToggle', function(event) {
-         event.stopPropagation();
-         SpoilersPlugin.ToggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
-      });
-   },
+        var spoilerTitle        = spoiler.find('div.SpoilerTitle').first();
+        var spoilerButton       = document.createElement('input');
+        spoilerButton.type      = 'button';
+        spoilerButton.value     = gdn.definition('show', 'show');
+        spoilerButton.className = 'SpoilerToggle';
 
-   ToggleSpoiler: function(Spoiler, SpoilerButton) {
-      var ThisSpoilerText = Spoiler.find('div.SpoilerText').first();
-      var ThisSpoilerStatus = ThisSpoilerText.css('display');
-      var NewSpoilerStatus = (ThisSpoilerStatus == 'none') ? 'block' : 'none';
-      ThisSpoilerText.css('display',NewSpoilerStatus);
+        spoilerTitle.append(spoilerButton);
 
-      if (NewSpoilerStatus == 'none')
-         SpoilerButton.val(gdn.definition('show', 'show'));
-      else
-         SpoilerButton.val(gdn.definition('hide', 'hide'));
-   }
+        spoiler.on('click', 'input.SpoilerToggle', function(event) {
+            event.stopPropagation();
+            spoilersPlugin.toggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
+        });
+
+        spoiler.spoilerFunctioning = true;
+    },
+
+    /**
+     * Toggle a spoiler's visibility on or off.
+     * @param {object} spoiler The primary spoiler HTML element.
+     * @param {object} spoilerButton The button HTML element used to trigger the toggle.
+     */
+    toggleSpoiler: function(spoiler, spoilerButton) {
+        var thisSpoilerText   = spoiler.find('div.SpoilerText').first();
+        var thisSpoilerStatus = thisSpoilerText.css('display');
+        var newSpoilerStatus  = (thisSpoilerStatus === 'none') ? 'block' : 'none';
+
+        thisSpoilerText.css('display', newSpoilerStatus);
+
+        if (newSpoilerStatus === 'none') {
+            spoilerButton.val(gdn.definition('show', 'show'));
+        } else {
+            spoilerButton.val(gdn.definition('hide', 'hide'));
+        }
+    }
 };
 
 // Events!
-
 jQuery(document).ready(function(){
-   SpoilersPlugin.FindAndReplace();
+    spoilersPlugin.findAndReplace();
 });
 
 jQuery(document).on('CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal', function() {
-   SpoilersPlugin.FindAndReplace();
+    spoilersPlugin.findAndReplace();
 });

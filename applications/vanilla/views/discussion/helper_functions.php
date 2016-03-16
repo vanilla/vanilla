@@ -9,7 +9,7 @@ if (!defined('APPLICATION')) {
 }
 
 
-if (!function_exists('FormatBody')) :
+if (!function_exists('formatBody')) :
     /**
      * Format content of comment or discussion.
      *
@@ -28,7 +28,7 @@ if (!function_exists('FormatBody')) :
     }
 endif;
 
-if (!function_exists('WriteBookmarkLink')) :
+if (!function_exists('writeBookmarkLink')) :
     /**
      * Output link to (un)boomark a discussion.
      */
@@ -50,8 +50,7 @@ if (!function_exists('WriteBookmarkLink')) :
     }
 endif;
 
-
-if (!function_exists('WriteComment')) :
+if (!function_exists('writeComment')) :
     /**
      * Outputs a formatted comment.
      *
@@ -75,7 +74,7 @@ if (!function_exists('WriteComment')) :
 
         // Set CanEditComments (whether to show checkboxes)
         if (!property_exists($Sender, 'CanEditComments')) {
-            $Sender->CanEditComments = $Session->checkPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
+            $Sender->CanEditComments = $Session->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
         }
         // Prep event args
         $CssClass = cssClass($Comment, $CurrentOffset);
@@ -145,7 +144,7 @@ if (!function_exists('WriteComment')) :
 
                         // Include IP Address if we have permission
                         if ($Session->checkPermission('Garden.PersonalInfo.View')) {
-                            echo wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+                            echo wrap(ipAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
                         }
                         ?>
                     </div>
@@ -173,7 +172,7 @@ if (!function_exists('WriteComment')) :
     }
 endif;
 
-if (!function_exists('GetDiscussionOptions')) :
+if (!function_exists('getDiscussionOptions')) :
     /**
      * Get options for the current discussion.
      *
@@ -275,7 +274,7 @@ if (!function_exists('GetDiscussionOptions')) :
 endif;
 
 
-if (!function_exists('WriteAdminCheck')) :
+if (!function_exists('writeAdminCheck')) :
     /**
      * Output moderation checkbox.
      *
@@ -289,7 +288,7 @@ if (!function_exists('WriteAdminCheck')) :
     }
 endif;
 
-if (!function_exists('WriteDiscussionOptions')) :
+if (!function_exists('writeDiscussionOptions')) :
     /**
      * Output discussion options.
      *
@@ -314,7 +313,7 @@ if (!function_exists('WriteDiscussionOptions')) :
     }
 endif;
 
-if (!function_exists('GetCommentOptions')) :
+if (!function_exists('getCommentOptions')) :
     /**
      * Get comment options.
      *
@@ -378,7 +377,7 @@ if (!function_exists('GetCommentOptions')) :
     }
 endif;
 
-if (!function_exists('WriteCommentOptions')) :
+if (!function_exists('writeCommentOptions')) :
     /**
      * Output comment options.
      *
@@ -408,7 +407,7 @@ if (!function_exists('WriteCommentOptions')) :
             // Only show the checkbox if the user has permission to affect multiple items
             $Discussion = Gdn::controller()->data('Discussion');
             $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
-            if ($Session->checkPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+            if ($Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', $PermissionCategoryID)) {
                 if (!property_exists($Controller, 'CheckedComments')) {
                     $Controller->CheckedComments = $Session->getAttribute('CheckedComments', array());
                 }
@@ -419,7 +418,7 @@ if (!function_exists('WriteCommentOptions')) :
     }
 endif;
 
-if (!function_exists('WriteCommentForm')) :
+if (!function_exists('writeCommentForm')) :
     /**
      * Output comment form.
      *
@@ -469,7 +468,7 @@ if (!function_exists('WriteCommentForm')) :
     }
 endif;
 
-if (!function_exists('WriteCommentFormHeader')) :
+if (!function_exists('writeCommentFormHeader')) :
     /**
      *
      */
@@ -485,7 +484,7 @@ if (!function_exists('WriteCommentFormHeader')) :
     }
 endif;
 
-if (!function_exists('WriteEmbedCommentForm')) :
+if (!function_exists('writeEmbedCommentForm')) :
     /**
      *
      */
@@ -546,7 +545,7 @@ if (!function_exists('WriteEmbedCommentForm')) :
     }
 endif;
 
-if (!function_exists('IsMeAction')) :
+if (!function_exists('isMeAction')) :
     /**
      *
      *
@@ -566,7 +565,7 @@ if (!function_exists('IsMeAction')) :
     }
 endif;
 
-if (!function_exists('FormatMeAction')) :
+if (!function_exists('formatMeAction')) :
     /**
      *
      *

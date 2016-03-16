@@ -54,46 +54,34 @@ if (!function_exists('CategoryString')):
     }
 endif;
 
-if (!function_exists('GetOptions')):
+if (!function_exists('getOptions')):
     /**
-     * Render options that the user has for this category.
+     * Render options that the user has for this category. Returns an empty string if the session isn't valid.
+     *
+     * @param $category The category to render the options for.
+     * @return DropdownModule|string A dropdown with the category options or an empty string if the session is not valid.
+     * @throws Exception
      */
-    function getOptions($Category) {
-        if (!Gdn::session()->isValid())
-            return;
+    function getOptions($category) {
+        if (!Gdn::session()->isValid()) {
+            return '';
+        }
+        $sender = Gdn::controller();
+        $categoryID = val('CategoryID', $category);
 
-        $Sender = Gdn::controller();
+        $dropdown = new DropdownModule();
+        $tk = urlencode(Gdn::session()->TransientKey());
+        $following = (int)val('Following', $category);
 
-
-        $Result = '';
-        $Options = '';
-        $CategoryID = val('CategoryID', $Category);
-
-        $Result = '<div class="Options">';
-        $TKey = urlencode(Gdn::session()->TransientKey());
-
-        // Mark category read.
-        $Options .= '<li rel="MarkRead">'.anchor(t('Mark Read'), "/category/markread?categoryid=$CategoryID&tkey=$TKey").'</li>';
-
-        // Follow/Unfollow category.
-        if (!val('Following', $Category))
-            $Options .= '<li rel="Hide">'.anchor(t('Unhide'), "/category/follow?categoryid=$CategoryID&value=1&tkey=$TKey").'</li>';
-        else
-            $Options .= '<li rel="Hide">'.anchor(t('Hide'), "/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
+        $dropdown->addLink(t('Mark Read'), '/category/markread?categoryid='.$categoryID.'&tkey='.$tk);
+        $dropdown->addLink(t($following ? 'Hide' : 'Unhide'), '/category/follow?categoryid=$categoryID&value='.$following.'&tkey='.$tk);
 
         // Allow plugins to add options
-        $Sender->EventArguments['Options'] = &$Options;
-        $Sender->fireEvent('CategoryOptions');
+        $sender->EventArguments['CategoryOptionsDropdown'] = &$dropdown;
+        $sender->EventArguments['Category'] = &$category;
+        $sender->fireEvent('CategoryOptionsDropdown');
 
-        if ($Options != '') {
-            $Result .= '<span class="ToggleFlyout OptionsMenu">';
-            $Result .= '<span class="OptionsTitle">'.t('Options').'</span>';
-            $Result .= '<span class="SpFlyoutHandle"></span>';
-            $Result .= '<ul class="Flyout MenuItems">'.$Options.'</ul>';
-            $Result .= '</span>';
-            $Result .= '</div>';
-            return $Result;
-        }
+        return $dropdown;
     }
 endif;
 
@@ -155,7 +143,7 @@ if (!function_exists('WriteListItem')):
         <li id="Category_<?php echo $Row['CategoryID']; ?>" class="<?php echo CssClass($Row); ?>">
             <div class="ItemContent Category">
                 <?php
-                echo GetOptions($Row);
+                echo '<div class="Options">'.getOptions($Row).'</div>';
                 echo '<'.$H.' class="CategoryName TitleWrap">';
                 echo CategoryPhoto($Row);
                 echo anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
@@ -251,7 +239,7 @@ if (!function_exists('WriteTableRow')):
             <td class="CategoryName">
                 <div class="Wrap">
                     <?php
-                    echo GetOptions($Row);
+                    echo '<div class="Options">'.getOptions($Row).'</div>';
 
                     echo CategoryPhoto($Row);
 

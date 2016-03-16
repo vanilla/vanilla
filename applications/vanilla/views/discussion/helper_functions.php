@@ -325,7 +325,7 @@ if (!function_exists('getDiscussionDropdownOptions')):
         $dropdown = discussionOptionsToDropdown($options, $dropdown);
 
         // Allow plugins to edit the dropdown.
-        $sender->EventArguments['DiscussionDropdown'] = &$dropdown;
+        $sender->EventArguments['DiscussionDropdownOptions'] = &$dropdown;
         $sender->EventArguments['Discussion'] = $discussion;
         $sender->fireEvent('DiscussionDropdownOptions');
 

@@ -553,7 +553,7 @@ class DiscussionController extends VanillaController {
      */
     public function sendOptions($discussion) {
         require_once $this->fetchViewLocation('helper_functions', 'Discussion');
-        $this->jsonTarget("#Discussion_{$discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", getDiscussionDropdownOptions($discussion)->toString(), 'ReplaceWith');
+        $this->jsonTarget("#Discussion_{$discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", getDiscussionOptionsDropdown($discussion)->toString(), 'ReplaceWith');
     }
 
     /**

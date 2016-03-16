@@ -296,7 +296,7 @@ if (!function_exists('GetDiscussionOptions')):
 endif;
 
 
-if (!function_exists('getDiscussionDropdownOptions')):
+if (!function_exists('getDiscussionOptionsDropdown')):
     /**
      * Constructs an options dropdown menu for a discussion.
      *
@@ -304,7 +304,7 @@ if (!function_exists('getDiscussionDropdownOptions')):
      * @return DropdownModule A dropdown consisting of discussion options.
      * @throws Exception
      */
-    function getDiscussionDropdownOptions($discussion = null) {
+    function getDiscussionOptionsDropdown($discussion = null) {
         $dropdown = new DropdownModule();
         $sender = Gdn::controller();
         $session = Gdn::session();
@@ -356,9 +356,9 @@ if (!function_exists('getDiscussionDropdownOptions')):
         $dropdown = discussionOptionsToDropdown($options, $dropdown);
 
         // Allow plugins to edit the dropdown.
-        $sender->EventArguments['DiscussionDropdownOptions'] = &$dropdown;
+        $sender->EventArguments['DiscussionOptionsDropdown'] = &$dropdown;
         $sender->EventArguments['Discussion'] = $discussion;
-        $sender->fireEvent('DiscussionDropdownOptions');
+        $sender->fireEvent('DiscussionOptionsDropdown');
 
         return $dropdown;
     }
@@ -385,7 +385,7 @@ endif;
  */
 if (!function_exists('writeDiscussionOptions')):
     function writeDiscussionOptions($Discussion = null) {
-        deprecated('writeDiscussionOptions', 'getDiscussionDropdownOptions', 'March 2016');
+        deprecated('writeDiscussionOptions', 'getDiscussionOptionsDropdown', 'March 2016');
 
         $Options = GetDiscussionOptions($Discussion);
 

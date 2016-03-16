@@ -458,66 +458,14 @@ if (!function_exists('WriteFilterTabs')) :
     }
 endif;
 
-if (!function_exists('OptionsList')):
-    function optionsList($Discussion) {
-        $Sender = Gdn::controller();
-        $Session = Gdn::session();
-
-        if ($Session->isValid() && !empty($Sender->ShowOptions)) {
-            $Sender->Options = '';
-
-            // Dismiss an announcement
-            if (c('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1') {
-                $Sender->Options .= '<li>'.anchor(t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack').'</li>';
-            }
-
-            // Edit discussion
-            if (DiscussionModel::canEdit($Discussion)) {
-                $Sender->Options .= '<li>'.anchor(t('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion').'</li>';
-            }
-
-            // Announce discussion
-            if ($Session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $Discussion->PermissionCategoryID)) {
-                $Sender->Options .= '<li>'.anchor(t('Announce...'), '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl), 'Popup AnnounceDiscussion').'</li>';
-            }
-
-            // Sink discussion
-            if ($Session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $Discussion->PermissionCategoryID)) {
-                $NewSink = (int)!$Discussion->Sink;
-                $Sender->Options .= '<li>'.anchor(t($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), "vanilla/discussion/sink?discussionid={$Discussion->DiscussionID}&sink={$NewSink}", 'SinkDiscussion Hijack').'</li>';
-            }
-
-            // Close discussion
-            if ($Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $Discussion->PermissionCategoryID)) {
-                $NewClosed = (int)!$Discussion->Closed;
-                $Sender->Options .= '<li>'.anchor(t($Discussion->Closed == '1' ? 'Reopen' : 'Close'), "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'CloseDiscussion Hijack').'</li>';
-            }
-
-            // Delete discussion
-            if ($Session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $Discussion->PermissionCategoryID)) {
-                $Sender->Options .= '<li>'.anchor(t('Delete'), '/discussion/delete?discussionid='.$Discussion->DiscussionID, 'DeleteDiscussion Popup').'</li>';
-            }
-
-            // Allow plugins to add options.
-            $Sender->EventArguments['Discussion'] = $Discussion;
-            $Sender->fireEvent('DiscussionOptions');
-
-            if ($Sender->Options != '') {
-                $Result = '<span class="ToggleFlyout OptionsMenu">'.
-                    '<span class="OptionsTitle" title="'.t('Options').'">'.t('Options').'</span>'.
-                    '<span class="SpFlyoutHandle"></span>'.
-                    '<ul class="Flyout MenuItems">'.
-                    $Sender->Options.
-                    '</ul>'.
-                    '</span>';
-
-                return $Result;
-            }
-
+if (!function_exists('optionsList')):
+    function optionsList($discussion) {
+        if (Gdn::session()->isValid() && !empty(Gdn::controller()->ShowOptions)) {
+            include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussion');
+            return getDiscussionOptionsDropdown($discussion);
         }
         return '';
     }
-
 endif;
 
 if (!function_exists('WriteOptions')) :

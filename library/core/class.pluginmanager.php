@@ -570,7 +570,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return bool
      */
     public function checkPlugin($PluginName) {
-        if (array_key_exists(strtolower($PluginName), array_change_key_case($this->enabledPlugins(CASE_LOWER)))) {
+        if (array_key_exists(strtolower($PluginName), array_change_key_case($this->enabledPlugins(), CASE_LOWER))) {
             return true;
         }
         return false;

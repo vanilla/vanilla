@@ -609,9 +609,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * Recursively
      *
      * @param array $Data Reference to the current active state
-     * @param array $Loaded Reference to the new to-merge data
+     * @param array $Loaded Data to merge
      */
-    protected static function mergeConfig(&$Data, &$Loaded) {
+    protected static function mergeConfig(&$Data, $Loaded) {
         foreach ($Loaded as $Key => $Value) {
             if (array_key_exists($Key, $Data) && is_array($Data[$Key]) && is_array($Value) && !self::isList($Value)) {
                 self::mergeConfig($Data[$Key], $Value);

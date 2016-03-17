@@ -61,8 +61,16 @@
   content: $icon-align-right;
 }
 
+.icon-android:before {
+  content: $icon-android;
+}
+
 .icon-angry:before {
   content: $icon-angry;
+}
+
+.icon-apple:before {
+  content: $icon-apple;
 }
 
 .icon-archive:before {
@@ -309,6 +317,10 @@
   content: $icon-facebook-alt;
 }
 
+.icon-facebook-alt-round:before {
+  content: $icon-facebook-alt-round;
+}
+
 .icon-file:before {
   content: $icon-file;
 }
@@ -327,6 +339,10 @@
 
 .icon-flame:before {
   content: $icon-flame;
+}
+
+.icon-flickr:before {
+  content: $icon-flickr;
 }
 
 .icon-folder-close:before {
@@ -353,8 +369,20 @@
   content: $icon-github;
 }
 
+.icon-github-alt:before {
+  content: $icon-github-alt;
+}
+
+.icon-github-octocat:before {
+  content: $icon-github-octocat;
+}
+
 .icon-globe:before {
   content: $icon-globe;
+}
+
+.icon-google:before {
+  content: $icon-google;
 }
 
 .icon-google-plus:before {
@@ -409,6 +437,10 @@
   content: $icon-info-sign;
 }
 
+.icon-instagram:before {
+  content: $icon-instagram;
+}
+
 .icon-italic:before {
   content: $icon-italic;
 }
@@ -437,6 +469,10 @@
   content: $icon-linkedin-alt;
 }
 
+.icon-linux:before {
+  content: $icon-linux;
+}
+
 .icon-list-ol:before {
   content: $icon-list-ol;
 }
@@ -463,6 +499,10 @@
 
 .icon-map-marker:before {
   content: $icon-map-marker;
+}
+
+.icon-medium:before {
+  content: $icon-medium;
 }
 
 .icon-meh:before {
@@ -511,6 +551,10 @@
 
 .icon-paragraph:before {
   content: $icon-paragraph;
+}
+
+.icon-paypal:before {
+  content: $icon-paypal;
 }
 
 .icon-pencil:before {
@@ -563,6 +607,18 @@
 
 .icon-quote:before {
   content: $icon-quote;
+}
+
+.icon-reddit:before {
+  content: $icon-reddit;
+}
+
+.icon-reddit-alien:before {
+  content: $icon-reddit-alien;
+}
+
+.icon-reddit-alt:before {
+  content: $icon-reddit-alt;
 }
 
 .icon-refresh:before {
@@ -629,6 +685,14 @@
   content: $icon-share;
 }
 
+.icon-share-alt:before {
+  content: $icon-share-alt;
+}
+
+.icon-share-alt-square:before {
+  content: $icon-share-alt-square;
+}
+
 .icon-shield:before {
   content: $icon-shield;
 }
@@ -647,6 +711,10 @@
 
 .icon-skull:before {
   content: $icon-skull;
+}
+
+.icon-skype:before {
+  content: $icon-skype;
 }
 
 .icon-smile:before {
@@ -675,6 +743,10 @@
 
 .icon-steam:before {
   content: $icon-steam;
+}
+
+.icon-steam-alt:before {
+  content: $icon-steam-alt;
 }
 
 .icon-strikethrough:before {
@@ -741,6 +813,14 @@
   content: $icon-trophy;
 }
 
+.icon-tumblr:before {
+  content: $icon-tumblr;
+}
+
+.icon-tumblr-alt:before {
+  content: $icon-tumblr-alt;
+}
+
 .icon-twitter:before {
   content: $icon-twitter;
 }
@@ -777,6 +857,18 @@
   content: $icon-video;
 }
 
+.icon-vimeo:before {
+  content: $icon-vimeo;
+}
+
+.icon-vimeo-alt:before {
+  content: $icon-vimeo-alt;
+}
+
+.icon-vine:before {
+  content: $icon-vine;
+}
+
 .icon-warn:before {
   content: $icon-warn;
 }
@@ -785,8 +877,32 @@
   content: $icon-warning-sign;
 }
 
+.icon-windows:before {
+  content: $icon-windows;
+}
+
+.icon-wordpress:before {
+  content: $icon-wordpress;
+}
+
 .icon-wtf:before {
   content: $icon-wtf;
+}
+
+.icon-yahoo:before {
+  content: $icon-yahoo;
+}
+
+.icon-yelp:before {
+  content: $icon-yelp;
+}
+
+.icon-youtube:before {
+  content: $icon-youtube;
+}
+
+.icon-youtube-alt:before {
+  content: $icon-youtube-alt;
 }
 
 .icon-zendesk:before {

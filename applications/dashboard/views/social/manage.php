@@ -24,11 +24,6 @@
         min-width: 700px;
     }
 
-    .Connection-Header * {
-        line-height: 48px;
-        position: relative;
-    }
-
     .Connection-Info {
         display: inline-block;
         padding-right: 150px;

@@ -83,7 +83,7 @@ class SearchController extends Gdn_Controller {
             $this->SearchModel->ForceSearchMode = $Mode;
         }
         try {
-            $ResultSet = $this->SearchModel->Search($Search, $Offset, $Limit);
+            $ResultSet = $this->SearchModel->search($Search, $Offset, $Limit);
         } catch (Gdn_UserException $Ex) {
             $this->Form->addError($Ex);
             $ResultSet = array();
@@ -97,7 +97,7 @@ class SearchController extends Gdn_Controller {
         // Fix up the summaries.
         $SearchTerms = explode(' ', Gdn_Format::text($Search));
         foreach ($ResultSet as &$Row) {
-            $Row['Summary'] = SearchExcerpt(Gdn_Format::plainText($Row['Summary'], $Row['Format']), $SearchTerms);
+            $Row['Summary'] = searchExcerpt(htmlspecialchars(Gdn_Format::plainText($Row['Summary'], $Row['Format'])), $SearchTerms);
             $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
             $Row['Format'] = 'Html';
         }
@@ -115,7 +115,7 @@ class SearchController extends Gdn_Controller {
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+        $this->Pager = $PagerFactory->getPager('MorePager', $this);
         $this->Pager->MoreCode = 'More Results';
         $this->Pager->LessCode = 'Previous Results';
         $this->Pager->ClientID = 'Pager';

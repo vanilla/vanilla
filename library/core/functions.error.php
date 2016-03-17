@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
 /**
  * Catch and render errors.
  *
@@ -519,11 +517,15 @@ if (!function_exists('CleanErrorArguments')) {
     }
 }
 
-// Set up Garden to handle php errors.
-// Remove the "& ~E_STRICT" from time to time to clean up some easy strict errors.
-set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT);
-set_exception_handler('Gdn_ExceptionHandler');
-
+/**
+ * Set up Garden to handle php errors.
+ *
+ * You can remove the "& ~E_STRICT" from time to time to clean up some easy strict errors.
+ */
+function setHandlers() {
+    set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT);
+    set_exception_handler('Gdn_ExceptionHandler');
+}
 
 /**
  * Create a new not found exception. This is a convenience function that will create an exception with a standard message.

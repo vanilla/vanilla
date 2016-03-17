@@ -1,7 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-if (!function_exists('WriteDiscussionHeading')):
-
+if (!function_exists('WriteDiscussionHeading')) :
+    /**
+     * Write the table heading.
+     */
     function writeDiscussionHeading() {
         ?>
         <tr>
@@ -26,29 +28,28 @@ if (!function_exists('WriteDiscussionHeading')):
     }
 endif;
 
-if (!function_exists('WriteDiscussionRow')):
-
+if (!function_exists('WriteDiscussionRow')) :
     /**
      * Writes a discussion in table row format.
      */
     function writeDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
-        if (!property_exists($Sender, 'CanEditDiscussions'))
+        if (!property_exists($Sender, 'CanEditDiscussions')) {
             $Sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($Discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
-
+        }
         $CssClass = CssClass($Discussion);
         $DiscussionUrl = $Discussion->Url;
 
-        if ($Session->UserID)
+        if ($Session->UserID) {
             $DiscussionUrl .= '#latest';
-
+        }
         $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
         $Sender->EventArguments['Discussion'] = &$Discussion;
         $Sender->EventArguments['CssClass'] = &$CssClass;
 
         $First = UserBuilder($Discussion, 'First');
-        if ($Discussion->LastUserID)
+        if ($Discussion->LastUserID) {
             $Last = UserBuilder($Discussion, 'Last');
-        else {
+        } else {
             $Last = $First;
         }
         $Sender->EventArguments['FirstUser'] = &$First;
@@ -57,10 +58,18 @@ if (!function_exists('WriteDiscussionRow')):
         $Sender->fireEvent('BeforeDiscussionName');
 
         $DiscussionName = $Discussion->Name;
-        if ($DiscussionName == '')
+        if ($DiscussionName == '') {
             $DiscussionName = t('Blank Discussion Topic');
-
+        }
         $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
+
+        static $FirstDiscussion = true;
+        if (!$FirstDiscussion) {
+            $Sender->fireEvent('BetweenDiscussion');
+        } else {
+            $FirstDiscussion = false;
+        }
+
         $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 
         $FirstPageUrl = DiscussionUrl($Discussion, 1);
@@ -84,9 +93,9 @@ if (!function_exists('WriteDiscussionRow')):
 
                     WriteMiniPager($Discussion);
                     echo NewComments($Discussion);
-                    if ($Sender->data('_ShowCategoryLink', true))
+                    if ($Sender->data('_ShowCategoryLink', true)) {
                         echo CategoryLink($Discussion, ' '.t('in').' ');
-
+                    }
                     // Other stuff that was in the standard view that you may want to display:
                     echo '<div class="Meta Meta-Discussion">';
                     WriteTags($Discussion);
@@ -153,7 +162,9 @@ if (!function_exists('WriteDiscussionRow')):
 endif;
 
 if (!function_exists('WriteDiscussionTable')) :
-
+    /**
+     * Write the discussion table wrapper.
+     */
     function writeDiscussionTable() {
         $c = Gdn::controller();
         ?>

@@ -578,7 +578,7 @@ class Gdn_Autoloader {
             self::CONTEXT_THEME,
             self::CONTEXT_LOCALE,
             self::CONTEXT_PLUGIN,
-            self::CONTEXT_APPLICATION,
+            self::CONTEXT_APPLICATION
         );
 
         self::$maps = array();

@@ -1004,7 +1004,7 @@ class Gdn_Format {
      * @return string Returns the html spoilers with spoiler styling.
      */
     protected static function formatSpoilers($html) {
-        if (preg_match('/class="Spoiler"/i', $html)) {
+        if (preg_match('/class="Spoiler"/', $html)) {
             // Transform $html into a dom object and replace the spoiler block.
             if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');

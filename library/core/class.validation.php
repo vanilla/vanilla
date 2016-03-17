@@ -83,7 +83,7 @@ class Gdn_Validation {
         $this->addRule('Decimal', 'function:ValidateDecimal');
         $this->addRule('String', 'function:ValidateString');
         $this->addRule('Time', 'function:ValidateTime');
-        $this->addRule('Timestamp', 'function:ValidateTimestamp');
+        $this->addRule('Timestamp', 'function:ValidateDate');
         $this->addRule('Length', 'function:ValidateLength');
         $this->addRule('Enum', 'function:ValidateEnum');
         $this->addRule('MinimumAge', 'function:ValidateMinimumAge');

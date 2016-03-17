@@ -235,6 +235,8 @@ if (!function_exists('WriteDiscussionSorter')) :
      * @param null $Options
      */
     function writeDiscussionSorter($Selected = null, $Options = null) {
+        deprecated('writeDiscussionSorter', 'DiscussionSortFilterModule', 'March 2016');
+
         if ($Selected === null) {
             $Selected = Gdn::session()->getPreference('Discussions.SortField', 'DateLastComment');
         }

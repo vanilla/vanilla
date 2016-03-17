@@ -272,8 +272,10 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param array $Category
-     * @return string
+     * @param string|array $Category
+     * @param string|int $Page The page number.
+     * @param bool $WithDomain Whether to add the domain to the URL
+     * @return string The url to a category.
      */
     function categoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category)) {

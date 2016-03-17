@@ -69,6 +69,10 @@ class CategoriesController extends VanillaController {
 
         saveToConfig('Vanilla.Discussions.SortField', 'd.DateInserted', false);
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
         $Discussions = $DiscussionModel->getWhereRecent($Where, $Limit, $Offset);
         $this->DiscussionData = $this->setData('Discussions', $Discussions);
         $this->setData('_CurrentRecords', count($Discussions));
@@ -232,6 +236,11 @@ class CategoriesController extends VanillaController {
 
             // Get a DiscussionModel
             $DiscussionModel = new DiscussionModel();
+            $DiscussionModel->setSort(Gdn::request()->get());
+            $DiscussionModel->setFilters(Gdn::request()->get());
+            $this->setData('Sort', $DiscussionModel->getSort());
+            $this->setData('Filters', $DiscussionModel->getFilters());
+
             $CategoryIDs = array($CategoryID);
             if (c('Vanilla.ExpandCategories')) {
                 $CategoryIDs = array_merge($CategoryIDs, array_column($this->data('Categories'), 'CategoryID'));
@@ -282,16 +291,25 @@ class CategoriesController extends VanillaController {
 
             // Build a pager
             $PagerFactory = new Gdn_PagerFactory();
+            $url = CategoryUrl($CategoryIdentifier);
+
             $this->EventArguments['PagerType'] = 'Pager';
             $this->fireEvent('BeforeBuildPager');
+            if (!$this->data('_PagerUrl')) {
+                $this->setData('_PagerUrl', $url.'/{Page}');
+            }
+            $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
+            $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
+
             $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
             $this->Pager->ClientID = 'Pager';
             $this->Pager->configure(
                 $Offset,
                 $Limit,
                 $CountDiscussions,
-                array('CategoryUrl')
+                $this->data('_PagerUrl')
             );
+
             $this->Pager->Record = $Category;
             PagerModule::Current($this->Pager);
             $this->setData('_Page', $Page);
@@ -420,6 +438,11 @@ class CategoriesController extends VanillaController {
         // Get category data and discussions
         $this->DiscussionsPerCategory = c('Vanilla.Discussions.PerCategory', 5);
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
+
         $this->CategoryDiscussionData = array();
         foreach ($this->CategoryData->result() as $Category) {
             if ($Category->CategoryID > 0) {

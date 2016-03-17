@@ -1,4 +1,8 @@
 @charset "UTF-8";
+.PageControls .discussion-sort-filter-module {
+  margin-left: 10px;
+}
+
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,

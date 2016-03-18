@@ -133,7 +133,7 @@ class Gdn_Request {
 
             switch ($key) {
                 case 'URI':
-                    $value = !is_null($value) ? urldecode($value) : $value;
+                    $value = !is_null($value) ? rawurldecode($value) : $value;
                     break;
                 case 'SCRIPT':
                     $value = !is_null($value) ? trim($value, '/') : $value;
@@ -722,7 +722,7 @@ class Gdn_Request {
             if ($path === true) {
                 // Encode the path.
                 $parts = explode('/', $result);
-                $parts = array_map('urlencode', $parts);
+                $parts = array_map('rawurlencode', $parts);
                 $result = implode('/', $parts);
             }
         }

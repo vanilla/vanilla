@@ -558,7 +558,7 @@ class Gdn_Session {
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
             $Return = ($ForceValid && Gdn::request()->isPostBack()) || ($ForeignKey === $this->_TransientKey && $this->_TransientKey !== false);
         }
-        if (!$Return) {
+        if (!$Return && $ForceValid !== true) {
             if (Gdn::session()->User) {
                 Logger::event(
                     'csrf_failure',

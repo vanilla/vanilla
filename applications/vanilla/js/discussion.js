@@ -223,8 +223,18 @@ jQuery(document).ready(function($) {
     }
 
     // Utility function to clear out the comment form
-    function clearCommentForm(sender) {
+    function clearCommentForm(sender, deleteDraft) {
         var container = $(sender).parents('.Editing');
+
+        // By default, we delete comment drafts, unless sender was a "Post Comment" button. Can be overriden.
+        if (typeof deleteDraft !== 'undefined') {
+            deleteDraft = !!deleteDraft;
+        } else if ($(sender).hasClass('CommentButton')) {
+            deleteDraft = false;
+        } else {
+            deleteDraft = true
+        }
+
         $(container).removeClass('Editing');
         $('div.Popup,.Overlay').remove();
         var frm = $(sender).parents('div.CommentForm, .EditCommentForm');
@@ -232,13 +242,14 @@ jQuery(document).ready(function($) {
         frm.find('input:hidden[name$=CommentID]').val('');
         // Erase any drafts
         var draftInp = frm.find('input:hidden[name$=DraftID]');
-        if (draftInp.val() != '')
+        if (deleteDraft && draftInp.val() != '') {
             $.ajax({
                 type: "POST",
                 url: gdn.url('/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
                 data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
                 dataType: 'json'
             });
+        }
 
         draftInp.val('');
         frm.find('div.Errors').remove();

@@ -26,6 +26,10 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         $this->addStrikeout();
         $this->addBreaks();
         $this->addSpoilers();
+
+		// Sort gamuts by their priority.
+		asort($this->block_gamut);
+		asort($this->span_gamut);
     }
 
     /**

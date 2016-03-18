@@ -90,6 +90,8 @@ debug(c('Debug', false));
 Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
 Gdn::request()->fromEnvironment();
 
+setHandlers();
+
 /**
  * Extension Managers
  *

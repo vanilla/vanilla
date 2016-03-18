@@ -429,7 +429,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return bool Returns **true** if the delete was successful or **false** otherwise.
      */
     public function deleteID($id, $options = []) {
-        $r = $this->SQL->delete(
+        $r = $this->delete(
             [$this->PrimaryKey => $id]
         );
         return $r;

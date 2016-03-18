@@ -208,47 +208,14 @@ blockquote.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   margin: 1em;
-  padding: 1ex 10px; }
+  padding: 1ex 10px;
+  min-width: 200px;
+  overflow-y: auto; }
 
 pre.CodeBlock {
   background-color: rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.07); }
 
-
-.Spoiler {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  margin: 1em 0;
-  padding: 1ex 16px; }
-
-.Message .Spoiler {
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  height: 0;
-  width: 0;
-  margin: 5px 0;
-  padding: 8px 16px;
-  position: relative;
-  cursor: pointer;
-  font-size: 0; }
-
-.Message .Spoiler:hover {
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  background-color: rgba(0, 0, 0, 0.1) !important; }
-
-.Message .Spoiler:before {
-  content: '...';
-  position: absolute;
-  top: -7px;
-  left: 9px;
-  font-size: 14px; }
-
-.Spoiled {
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  padding: 20px;
-  font-size: inherit;
-  margin: 5px 0;
-  transition: padding 0.1s ease; }
 
 .AlignLeft {
   text-align: left; }

@@ -58,6 +58,13 @@ class DiscussionController extends VanillaController {
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('autosave.js');
         $this->addJsFile('discussion.js');
+
+        // Spoilers assets
+        $this->addJsFile('spoilers.js', 'dashboard');
+        $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('show', t('show'));
+        $this->addDefinition('hide', t('hide'));
+
         Gdn_Theme::section('Discussion');
 
         // Load the discussion record

@@ -146,10 +146,9 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
                 $pathAndQuery = $this->getPagelessPath().$queryString;
                 if (empty($pathAndQuery)) {
-                    $url = url('/');
-                } else {
-                    $url = url($this->getPagelessPath().$queryString);
+                    $pathAndQuery = '/';
                 }
+                $url = url($pathAndQuery);
 
                 $dropdown->addLink(
                     val('name', $filter),

@@ -136,16 +136,23 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
             // Add the filters to the dropdown
             foreach (val('filters', $filterSet) as $filter) {
-                $key = val('group', $filter, '') . '.' . val('key', $filter);
+                $key = val('group', $filter, '').'.'.val('key', $filter);
                 $queryString = DiscussionModel::getSortFilterQueryString(
                     $this->selectedSort,
                     $this->selectedFilters,
                     '',
                     [$setKey => val('key', $filter)]
                 );
+
+                $pathAndQuery = $this->getPagelessPath().$queryString;
+                if (empty($pathAndQuery)) {
+                    $pathAndQuery = '/';
+                }
+                $url = url($pathAndQuery);
+
                 $dropdown->addLink(
                     val('name', $filter),
-                    url($this->getPagelessPath().$queryString),
+                    $url,
                     $key,
                     '', array(), false,
                     array('rel' => 'nofollow')

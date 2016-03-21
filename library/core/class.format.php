@@ -979,7 +979,9 @@ class Gdn_Format {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
             $html = str_get_html($html);
-            $html->find('.Spoiler,.UserSpoiler', 0)->outertext = t($replaceWith);
+            foreach($html->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
+                $spoilerBlock->outertext = t($replaceWith);
+            }
         }
         return $html;
     }
@@ -1010,8 +1012,10 @@ class Gdn_Format {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
             $html = str_get_html($html);
-            $spoiler = $html->find('.Spoiler', 0)->innertext;
-            $html->find('.Spoiler', 0)->outertext = spoilerWrap($spoiler);
+            foreach($html->find('.Spoiler') as $spoilerBlock) {
+                $spoiler = $spoilerBlock->innertext;
+                $spoilerBlock->outertext = spoilerWrap($spoiler);
+            }
         } elseif (strpos($html, '[spoiler') !== false) {
             $html = self::legacySpoilers($html);
         }

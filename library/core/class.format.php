@@ -1012,8 +1012,43 @@ class Gdn_Format {
             $html = str_get_html($html);
             $spoiler = $html->find('.Spoiler', 0)->innertext;
             $html->find('.Spoiler', 0)->outertext = spoilerWrap($spoiler);
+        } elseif (strpos($html, '[spoiler') !== false) {
+            $html = self::legacySpoilers($html);
         }
         return $html;
+    }
+
+    /**
+     * Backwards compatibility. In the Spoilers plugin, we would render BBCode-style spoilers in any format post
+     * and allow a title.
+     *
+     * @param string $html
+     * @return string
+     */
+    protected static function legacySpoilers($html) {
+        $html = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $html);
+        $html = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", ['Gdn_Format', 'legacySpoilerCallback'], $html);
+        $html = str_ireplace('[/spoiler]', '</div></div>', $html);
+        return $html;
+    }
+
+    /**
+     * Callback function replacing opening spoiler tags with an optional title.
+     * Replaces [spoiler] or [spoiler=Title] tags, where Title is the attribution.
+     *
+     * @param array $matches Matches from a regular expression.
+     * @return string The html-formatted opening spoiler tag.
+     */
+    protected static function legacySpoilerCallback($matches) {
+        $attribution = T('Spoiler: %s');
+        $spoilerText = (sizeof($matches) > 2) ? $matches[2] : null;
+        if (is_null($spoilerText)) {
+            $spoilerText = '';
+        } else {
+            $spoilerText = '<span>'.$spoilerText.'</span>';
+        }
+        $attribution = sprintf($attribution, $spoilerText);
+        return '<div class="UserSpoiler"><div class="SpoilerTitle">'.$attribution.'</div><div class="SpoilerReveal"></div><div class="SpoilerText">';
     }
 
     /**

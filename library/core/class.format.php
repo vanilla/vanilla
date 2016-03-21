@@ -1019,7 +1019,7 @@ class Gdn_Format {
     }
 
     /**
-     * Backwards compatibility. In the Spoilers plugin, we would render BBCode-style spoilers in any format post
+     * For backwards compatibility. In the Spoilers plugin, we would render BBCode-style spoilers in any format post
      * and allow a title.
      *
      * @param string $html
@@ -1034,7 +1034,7 @@ class Gdn_Format {
 
     /**
      * Callback function replacing opening spoiler tags with an optional title.
-     * Replaces [spoiler] or [spoiler=Title] tags, where Title is the attribution.
+     * Replaces [spoiler] or [spoiler=Title] tags, where Title is included in the attribution.
      *
      * @param array $matches Matches from a regular expression.
      * @return string The html-formatted opening spoiler tag.

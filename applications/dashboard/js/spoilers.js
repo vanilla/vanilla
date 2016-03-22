@@ -1,14 +1,14 @@
 /**
  * A utility for attaching listeners and handling events associated with spoiler visibility toggling.
  */
-var spoilersPlugin = {
+var spoilers = {
 
     /**
      * Gather all UserSpoiler DIVs and attempt to augment them with spoiler capabilities.
      */
     findAndReplace: function() {
         jQuery('div.UserSpoiler').each(function(i, el) {
-            spoilersPlugin.replaceSpoiler(el);
+            spoilers.replaceSpoiler(el);
         });
     },
 
@@ -23,9 +23,9 @@ var spoilersPlugin = {
         }
 
         // Extend object with jQuery
-        spoiler = jQuery(spoiler);
+        spoilerObject = jQuery(spoiler);
 
-        var spoilerTitle        = spoiler.find('div.SpoilerTitle').first();
+        var spoilerTitle        = spoilerObject.find('div.SpoilerTitle').first();
         var spoilerButton       = document.createElement('input');
         spoilerButton.type      = 'button';
         spoilerButton.value     = gdn.definition('show', 'show');
@@ -33,9 +33,9 @@ var spoilersPlugin = {
 
         spoilerTitle.append(spoilerButton);
 
-        spoiler.on('click', 'input.SpoilerToggle', function(event) {
+        spoilerObject.on('click', 'input.SpoilerToggle', function(event) {
             event.stopPropagation();
-            spoilersPlugin.toggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
+            spoilers.toggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
         });
 
         spoiler.spoilerFunctioning = true;
@@ -63,9 +63,9 @@ var spoilersPlugin = {
 
 // Events!
 jQuery(document).ready(function(){
-    spoilersPlugin.findAndReplace();
+    spoilers.findAndReplace();
 });
 
 jQuery(document).on('CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal', function() {
-    spoilersPlugin.findAndReplace();
+    spoilers.findAndReplace();
 });

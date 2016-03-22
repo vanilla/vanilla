@@ -978,11 +978,13 @@ class Gdn_Format {
             if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
-            $dom = new simple_html_dom();
-            $html = $dom->load($html);
-            foreach($dom->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
-                $spoilerBlock->outertext = t($replaceWith);
+            $htmlDom = str_get_html($html);
+
+            foreach($htmlDom->find('.Spoiler.UserSpoiler') as &$spoilerBlock) {
+                $spoiler = $spoilerBlock->innertext;
+                $spoilerBlock->outertext = spoilerWrap($spoiler);
             }
+            $html = $htmlDom;
         }
 
         return $html;
@@ -1013,12 +1015,13 @@ class Gdn_Format {
             if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
-            $htmlDom = new simple_html_dom();
-            $htmlDom->load($html);
-            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
+            $htmlDom = str_get_html($html);
+
+            foreach($htmlDom->find('.Spoiler') as &$spoilerBlock) {
                 $spoiler = $spoilerBlock->innertext;
                 $spoilerBlock->outertext = spoilerWrap($spoiler);
             }
+            $html = $htmlDom;
         } elseif (strpos($html, '[spoiler') !== false) {
             $html = self::legacySpoilers($html);
         }

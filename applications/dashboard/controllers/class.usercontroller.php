@@ -681,6 +681,7 @@ class UserController extends DashboardController {
 
             $this->fireEvent("BeforeUserEdit");
             $this->setData('AllowEditing', $AllowEditing);
+
             $BanReversible = $User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
             $this->setData('BanFlag', $BanReversible ? $User['Banned'] : 1);
             $this->setData('BannedOtherReasons', $User['Banned'] & ~BanModel::BAN_MANUAL);
@@ -738,16 +739,12 @@ class UserController extends DashboardController {
 
                 $Banned = $this->Form->getFormValue('Banned');
                 if (!$Banned) {
-                    $hasReversibleBans = ($User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL));
-                    if ($hasReversibleBans) {
+                    if ($BanReversible) {
                         $reversedBans = ($User['Banned'] & (~(BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)));
-                        $this->Form->setFormValue( 'Banned', $reversedBans);
+                        $this->Form->setFormValue('Banned', $reversedBans);
                     }
                 } else {
-                    $this->Form->setFormValue(
-                        'Banned',
-                        $User['Banned'] | 0x1
-                    );
+                    $this->Form->setFormValue('Banned', $User['Banned'] | 0x1);
                 }
 
                 if ($this->Form->save(array('SaveRoles' => true)) !== false) {

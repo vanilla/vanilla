@@ -337,7 +337,7 @@ class RoleModel extends Gdn_Model {
      * @param int The UserID to filter to.
      * @return Gdn_DataSet
      */
-    public function  getByUserID($UserID) {
+    public function getByUserID($UserID) {
         return $this->SQL->select()
             ->from('Role')
             ->join('UserRole', 'Role.RoleID = UserRole.RoleID')

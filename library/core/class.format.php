@@ -978,11 +978,13 @@ class Gdn_Format {
             if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
-            $html = str_get_html($html);
-            foreach($html->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
+            $dom = new simple_html_dom();
+            $html = $dom->load($html);
+            foreach($dom->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
                 $spoilerBlock->outertext = t($replaceWith);
             }
         }
+
         return $html;
     }
 
@@ -1011,8 +1013,9 @@ class Gdn_Format {
             if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
-            $html = str_get_html($html);
-            foreach($html->find('.Spoiler') as $spoilerBlock) {
+            $htmlDom = new simple_html_dom();
+            $htmlDom->load($html);
+            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
                 $spoiler = $spoilerBlock->innertext;
                 $spoilerBlock->outertext = spoilerWrap($spoiler);
             }

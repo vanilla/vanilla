@@ -980,7 +980,7 @@ class Gdn_Format {
             }
             $htmlDom = str_get_html($html);
 
-            foreach($htmlDom->find('.Spoiler.UserSpoiler') as $spoilerBlock) {
+            foreach($htmlDom->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
                 $spoiler = $spoilerBlock->innertext;
                 $spoilerBlock->outertext = spoilerWrap($spoiler);
             }

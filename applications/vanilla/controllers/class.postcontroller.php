@@ -277,14 +277,14 @@ class PostController extends VanillaController {
                 $this->fireEvent('BeforeDiscussionPreview');
 
                 if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                    $this->AddAsset('Content', $this->fetchView('preview'));
+                    $this->addAsset('Content', $this->fetchView('preview'));
                 } else {
                     $this->View = 'preview';
                 }
             }
             if ($this->Form->errorCount() > 0) {
                 // Return the form errors
-                $this->ErrorMessage($this->Form->errors());
+                $this->errorMessage($this->Form->errors());
             } elseif ($DiscussionID > 0 || $DraftID > 0) {
                 // Make sure that the ajax request form knows about the newly created discussion or draft id
                 $this->setJson('DiscussionID', $DiscussionID);
@@ -300,9 +300,9 @@ class PostController extends VanillaController {
                         $this->fireEvent('AfterDiscussionSave');
 
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                            redirect(DiscussionUrl($Discussion)).'?new=1';
+                            redirect(discussionUrl($Discussion)).'?new=1';
                         } else {
-                            $this->RedirectUrl = DiscussionUrl($Discussion, '', true).'?new=1';
+                            $this->RedirectUrl = discussionUrl($Discussion, '', true).'?new=1';
                         }
                     } else {
                         // If this was a draft save, notify the user about the save

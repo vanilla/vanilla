@@ -233,9 +233,9 @@ class UserController extends DashboardController {
     public function applicantCount() {
         $this->permission('Garden.Users.Approve');
         $RoleModel = new RoleModel();
-        $Count = $RoleModel->GetApplicantCount();
+        $Count = $RoleModel->getApplicantCount();
         if ($Count > 0) {
-            echo '<span class="Alert">', $Count, '</span>';
+            echo '<span class="Alert">'.$Count.'</span>';
         }
     }
 
@@ -248,25 +248,11 @@ class UserController extends DashboardController {
     public function applicants() {
         $this->permission('Garden.Users.Approve');
         $this->addSideMenu('dashboard/user/applicants');
-        $this->addJsFile('jquery.gardencheckcolumn.js');
+        $this->addJsFile('applicants.js');
         $this->title(t('Applicants'));
-
         $this->fireEvent('BeforeApplicants');
-
-        if ($this->Form->authenticatedPostBack(true)) {
-            $Action = $this->Form->getValue('Submit');
-            $Applicants = $this->Form->getValue('Applicants');
-            $ApplicantCount = is_array($Applicants) ? count($Applicants) : 0;
-            if ($ApplicantCount > 0 && in_array($Action, array('Approve', 'Decline'))) {
-                $Session = Gdn::session();
-                for ($i = 0; $i < $ApplicantCount; ++$i) {
-                    $this->handleApplicant($Action, $Applicants[$i]);
-                }
-            }
-        }
         $UserModel = Gdn::userModel();
-        $this->UserData = $UserModel->GetApplicants();
-        $this->View = 'applicants';
+        $this->UserData = $UserModel->getApplicants();
         $this->render();
     }
 
@@ -278,23 +264,28 @@ class UserController extends DashboardController {
      * @param int $UserID Unique ID.
      * @param string $TransientKey Security token.
      */
-    public function approve($UserID = '', $TransientKey = '') {
-        $this->permission('Garden.Users.Approve');
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey)) {
-            $Approved = $this->HandleApplicant('Approve', $UserID);
-            if ($Approved) {
-                $this->informMessage(t('Your changes have been saved.'));
-            }
+    public function approve($UserID = '') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
+        $this->permission('Garden.Users.Approve');
 
-        if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-            return $this->Form->errorCount() == 0 ? true : $this->Form->errors();
+        $this->handleApplicant('Approve', $UserID);
+
+        // Prevent an error if ajax failed.
+        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            $this->render('blank', 'utility');
         } else {
-            $this->applicants();
+            $this->render();
         }
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function authenticate() {
         if (!$this->Request->isPostBack()) {
             throw forbiddenException($this->Request->requestMethod());
@@ -321,10 +312,10 @@ class UserController extends DashboardController {
         $PasswordHash = new Gdn_PasswordHash();
         $Password = val('password', $Args);
         try {
-            $PasswordChecked = $PasswordHash->CheckPassword($Password, val('Password', $User), val('HashMethod', $User));
+            $PasswordChecked = $PasswordHash->checkPassword($Password, val('Password', $User), val('HashMethod', $User));
 
             // Rate limiting
-            Gdn::userModel()->RateLimit($User, $PasswordChecked);
+            Gdn::userModel()->rateLimit($User, $PasswordChecked);
 
             if ($PasswordChecked) {
                 $this->setData('User', arrayTranslate((array)$User, array('UserID', 'Name', 'Email', 'PhotoUrl')));
@@ -460,19 +451,19 @@ class UserController extends DashboardController {
      * @param int $UserID Unique ID.
      * @param string $TransientKey Security token.
      */
-    public function decline($UserID = '', $TransientKey = '') {
-        $this->permission('Garden.Users.Approve');
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey)) {
-            if ($this->handleApplicant('Decline', $UserID)) {
-                $this->informMessage(t('Your changes have been saved.'));
-            }
+    public function decline($UserID = '') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
+        $this->permission('Garden.Users.Approve');
 
-        if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-            return $this->Form->errorCount() == 0 ? true : $this->Form->errors();
+        $this->handleApplicant('Decline', $UserID);
+
+        // Prevent an error if ajax failed.
+        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            $this->render('blank', 'utility');
         } else {
-            $this->applicants();
+            $this->render();
         }
     }
 

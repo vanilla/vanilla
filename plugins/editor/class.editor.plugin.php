@@ -718,7 +718,14 @@ class EditorPlugin extends Gdn_Plugin {
 
             // Save original file to uploads, then manipulate from this location if
             // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
-            if (empty($imageType)) {
+            $validImageTypes = [
+                IMAGETYPE_GIF,
+                IMAGETYPE_JPEG,
+                IMAGETYPE_PNG
+            ];
+            $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
+
+            if (!$validImage) {
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -745,7 +752,7 @@ class EditorPlugin extends Gdn_Plugin {
             // This is a redundant check, because it's in the thumbnail function,
             // but there's no point calling it blindly on every file, so just check here before calling it.
             $generate_thumbnail = false;
-            if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
+            if ($validImage) {
                 $imageHeight = $tmpheight;
                 $imageWidth = $tmpwidth;
                 $generate_thumbnail = true;

@@ -738,11 +738,10 @@ class UserController extends DashboardController {
 
                 $Banned = $this->Form->getFormValue('Banned');
                 if (!$Banned) {
-                    if ($User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)) {
-                        $this->Form->setFormValue(
-                            'Banned',
-                            ($User['Banned'] & (~(BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)))
-                        );
+                    $hasReversibleBans = ($User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL));
+                    if ($hasReversibleBans) {
+                        $reversedBans = ($User['Banned'] & (~(BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)));
+                        $this->Form->setFormValue( 'Banned', $reversedBans);
                     }
                 } else {
                     $this->Form->setFormValue(

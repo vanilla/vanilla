@@ -984,7 +984,7 @@ class Gdn_Format {
                 $spoiler = $spoilerBlock->innertext;
                 $spoilerBlock->outertext = spoilerWrap($spoiler);
             }
-            $html = $htmlDom;
+            $html = (string)$htmlDom;
         }
 
         return $html;
@@ -1021,7 +1021,7 @@ class Gdn_Format {
                 $spoiler = $spoilerBlock->innertext;
                 $spoilerBlock->outertext = spoilerWrap($spoiler);
             }
-            $html = $htmlDom;
+            $html = (string)$htmlDom;
         } elseif (strpos($html, '[spoiler') !== false) {
             $html = self::legacySpoilers($html);
         }

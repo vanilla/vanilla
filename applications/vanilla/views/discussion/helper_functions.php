@@ -85,7 +85,7 @@ if (!function_exists('writeComment')) :
         $Sender->EventArguments['Permalink'] = $Permalink;
 
         // Needed in writeCommentOptions()
-        if (empty($Sender->data('Discussion'))) {
+        if ($Sender->data('Discussion', null) === null) {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->getID($Comment->DiscussionID);
             $Sender->setData('Discussion', $discussion);

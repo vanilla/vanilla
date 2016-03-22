@@ -98,7 +98,7 @@ class NewDiscussionModule extends Gdn_Module {
         }
 
         // Grab the allowed discussion types.
-        $DiscussionTypes = CategoryModel::allowedDiscussionTypes($PermissionCategory);
+        $DiscussionTypes = CategoryModel::allowedDiscussionTypes($PermissionCategory, isset($Category) ? $Category : []);
 
         foreach ($DiscussionTypes as $Key => $Type) {
             if (isset($Type['AddPermission']) && !Gdn::session()->checkPermission($Type['AddPermission'])) {

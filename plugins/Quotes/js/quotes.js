@@ -105,7 +105,7 @@ Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, T
 // Get the currently active editor (last in focus).
 Gdn_Quotes.prototype.GetEditor = function () {
     var editor = $(this.currentEditor);
-    if (!editor.length) {
+    if (!document.contains(this.currentEditor) || !editor.length) {
         editor = $('textarea.TextBox').first();
     }
 

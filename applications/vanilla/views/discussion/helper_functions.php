@@ -84,6 +84,13 @@ if (!function_exists('writeComment')) :
         $Sender->EventArguments['CurrentOffset'] = $CurrentOffset;
         $Sender->EventArguments['Permalink'] = $Permalink;
 
+        // Needed in writeCommentOptions()
+        if ($Sender->data('Discussion', null) === null) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID($Comment->DiscussionID);
+            $Sender->setData('Discussion', $discussion);
+        }
+
         // DEPRECATED ARGUMENTS (as of 2.1)
         $Sender->EventArguments['Object'] = &$Comment;
         $Sender->EventArguments['Type'] = 'Comment';

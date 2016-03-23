@@ -1002,6 +1002,18 @@ class Gdn_Format {
     }
 
     /**
+     * For backwards compatibility. In the Spoilers plugin, we would render BBCode-style spoilers in any format post
+     * and allow a title.
+     *
+     * @param string $html
+     * @return string
+     */
+    protected static function legacySpoilers($html) {
+        $html = preg_replace('`\[spoiler[^\]]+\](.+)\[\/spoiler\]`siu', '<div class="UserSpoiler">$1</div>', $html);
+        return $html;
+    }
+
+    /**
      * Replaces opening html list tags with an asterisk and closing list tags with new lines.
      * Accepts both encoded and decoded html strings.
      *
@@ -1556,6 +1568,7 @@ EOT;
         $html = Gdn_Format::links($html);
         $html = Gdn_Format::mentions($html);
         $html = Emoji::instance()->translateToHtml($html);
+        $html = Gdn_Format::legacySpoilers($html);
         return $html;
     }
 

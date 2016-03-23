@@ -514,10 +514,14 @@ class Gdn_Request {
                 safeParseStr($get, $get, $original);
             }
 
-            if (!empty($_SERVER['X_REWRITE'])) {
-                $path = $_SERVER['PATH_INFO'];
-            } elseif (isset($get['_p'])) {
-                $path = $get['_p'];
+            $rewrite = val('X_REWRITE', $_SERVER, false);
+
+            if ($rewrite == 1) {
+                $path = val('PATH_INFO', $_SERVER, '');
+            } elseif ($rewrite == 2) {
+                $path = val('X_PATH_INFO', $_SERVER, '');
+            } elseif (isset($Get['_p'])) {
+                $path = $Get['_p'];
                 unset($_GET['_p']);
             } elseif (isset($get['p'])) {
                 $path = $get['p'];

@@ -59,7 +59,10 @@ class PocketsPlugin extends Gdn_Plugin {
 
         // Switch our HTML wrapper when we're in a table view.
         if (c('Vanilla.Discussions.Layout') == 'table') {
-            $this->Locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="0">', '</td></tr>'];
+            // Admin checks add a column.
+            $useAdminChecks = c('Vanilla.AdminCheckboxes.Use') && Gdn::session()->checkPermission('Garden.Moderation.Manage');
+            $colspan = c('Plugins.Pockets.Colspan', ($useAdminChecks) ? 6 : 5);
+            $this->Locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="'.$colspan.'">', '</td></tr>'];
         }
     }
 

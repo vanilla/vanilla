@@ -192,16 +192,14 @@ if (!function_exists('discussionOptionsToDropdown')):
     }
 endif;
 
-
-
-/**
- * Get options for the current discussion.
- *
- * @since 2.1
- * @param DataSet $Discussion .
- * @return array $Options Each element must include keys 'Label' and 'Url'.
- */
-if (!function_exists('GetDiscussionOptions')):
+if (!function_exists('getDiscussionOptions')) :
+    /**
+     * Get options for the current discussion.
+     *
+     * @since 2.1
+     * @param DataSet $Discussion .
+     * @return array $Options Each element must include keys 'Label' and 'Url'.
+     */
     function getDiscussionOptions($Discussion = null) {
         $Options = array();
 
@@ -326,16 +324,16 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $permissionCategoryID = val('PermissionCategoryID', $discussion, val('PermissionCategoryID', $discussion));
 
         // Permissions
-        $canEdit     = DiscussionModel::canEdit($discussion, $timeLeft);
-        $canAnnounce = $session->checkPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $permissionCategoryID);
-        $canSink     = $session->checkPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $permissionCategoryID);
-        $canClose    = $session->checkPermission('Vanilla.Discussions.Close', TRUE, 'Category', $permissionCategoryID);
-        $canDelete   = $session->checkPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $permissionCategoryID);
-        $canMove     = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
-        $canRefetch  = $canEdit && valr('Attributes.ForeignUrl', $discussion);
+        $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
+        $canAnnounce = $session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $permissionCategoryID);
+        $canSink = $session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $permissionCategoryID);
+        $canClose = $session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $permissionCategoryID);
+        $canDelete = $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $permissionCategoryID);
+        $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
+        $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
 
         if ($canEdit && $timeLeft) {
-            $timeLeft = ' ('.Gdn_Format::Seconds($timeLeft).')';
+            $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
         }
 
         $dropdown->addLinkIf($canEdit, t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
@@ -387,7 +385,7 @@ if (!function_exists('writeDiscussionOptions')):
     function writeDiscussionOptions($Discussion = null) {
         deprecated('writeDiscussionOptions', 'getDiscussionOptionsDropdown', 'March 2016');
 
-        $Options = GetDiscussionOptions($Discussion);
+        $Options = getDiscussionOptions($Discussion);
 
         if (empty($Options)) {
             return;

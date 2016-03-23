@@ -335,14 +335,14 @@ if (!function_exists('NewComments')) :
     }
 endif;
 
-if (!function_exists('Tag')) :
+if (!function_exists('tag')) :
     /**
      *
      *
      * @param $Discussion
      * @param $Column
      * @param $Code
-     * @param bool|FALSE $CssClass
+     * @param bool|false $CssClass
      * @return string|void
      */
     function tag($Discussion, $Column, $Code, $CssClass = FALSE) {
@@ -360,7 +360,7 @@ if (!function_exists('Tag')) :
     }
 endif;
 
-if (!function_exists('WriteTags')) :
+if (!function_exists('writeTags')) :
     /**
      *
      *
@@ -377,7 +377,7 @@ if (!function_exists('WriteTags')) :
     }
 endif;
 
-if (!function_exists('WriteFilterTabs')) :
+if (!function_exists('writeFilterTabs')) :
     /**
      *
      *
@@ -458,7 +458,14 @@ if (!function_exists('WriteFilterTabs')) :
     }
 endif;
 
-if (!function_exists('optionsList')):
+if (!function_exists('optionsList')) :
+    /**
+     * Build HTML for discussions options menu.
+     *
+     * @param $discussion
+     * @return DropdownModule|string
+     * @throws Exception
+     */
     function optionsList($discussion) {
         if (Gdn::session()->isValid() && !empty(Gdn::controller()->ShowOptions)) {
             include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussion');
@@ -468,7 +475,7 @@ if (!function_exists('optionsList')):
     }
 endif;
 
-if (!function_exists('WriteOptions')) :
+if (!function_exists('writeOptions')) :
     /**
      * Render options that the user has for this discussion.
      */
@@ -479,13 +486,13 @@ if (!function_exists('WriteOptions')) :
         echo '<span class="Options">';
 
         // Options list.
-        echo OptionsList($Discussion);
+        echo optionsList($Discussion);
 
         // Bookmark button.
-        echo BookmarkButton($Discussion);
+        echo bookmarkButton($Discussion);
 
         // Admin check.
-        echo AdminCheck($Discussion);
+        echo adminCheck($Discussion);
 
         echo '</span>';
     }

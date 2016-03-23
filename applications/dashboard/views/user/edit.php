@@ -53,9 +53,13 @@ if ($this->data('AllowEditing')) { ?>
             ?>
         </li>
         <li>
-            <?php
-            echo $this->Form->CheckBox('Banned', t('Banned'), array('value' => '1'));
-            ?>
+            <?php echo $this->Form->CheckBox('Banned', t('Banned'), array('value' => $this->data('BanFlag'))); ?>
+            <?php if ($this->data('BannedOtherReasons')): ?>
+            <div class="WarningMessage"><?echo t(
+                    'This user is also banned for other reasons and may stay banned.',
+                    'This user is also banned for other reasons and may stay banned or become banned again.'
+                )?></div>
+            <?php endif; ?>
         </li>
         <?php
         $this->fireEvent('CustomUserFields')

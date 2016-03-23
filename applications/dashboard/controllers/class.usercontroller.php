@@ -378,7 +378,7 @@ class UserController extends DashboardController {
         }
 
         // Is the user banned for other reasons?
-        $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_AUTOMATIC));
+        $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_MANUAL));
 
 
         if ($this->Form->authenticatedPostBack(true)) {
@@ -673,6 +673,10 @@ class UserController extends DashboardController {
             $this->fireEvent("BeforeUserEdit");
             $this->setData('AllowEditing', $AllowEditing);
 
+            $BanReversible = $User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
+            $this->setData('BanFlag', $BanReversible ? $User['Banned'] : 1);
+            $this->setData('BannedOtherReasons', $User['Banned'] & ~BanModel::BAN_MANUAL);
+
             $this->Form->setData($User);
             if ($this->Form->authenticatedPostBack(true)) {
                 if (!$CanEditUsername) {
@@ -723,6 +727,18 @@ class UserController extends DashboardController {
                 // Put the data back into the forum object as if the user had submitted
                 // this themselves
                 $this->Form->setFormValue('RoleID', array_keys($UserNewRoles));
+
+                $Banned = $this->Form->getFormValue('Banned');
+                if (!$Banned) {
+                    // Checkbox was unchecked; bitmask to remove any reversible bans.
+                    if ($BanReversible) {
+                        $reversedBans = ($User['Banned'] & (~(BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)));
+                        $this->Form->setFormValue('Banned', $reversedBans);
+                    }
+                } else {
+                    // Bitmask to add a manual ban.
+                    $this->Form->setFormValue('Banned', $User['Banned'] | BanModel::BAN_MANUAL);
+                }
 
                 if ($this->Form->save(array('SaveRoles' => true)) !== false) {
                     if ($this->Form->getValue('ResetPassword', '') == 'Auto') {

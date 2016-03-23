@@ -23,7 +23,8 @@ if (!$CancelUrl) {
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => true));
+        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category),
+			'IncludeNull' => true, 'PermFilter' => array('AllowedDiscussionTypes' => 'Discussion')));
         echo '</div>';
         echo '</div>';
     }

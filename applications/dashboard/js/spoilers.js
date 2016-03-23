@@ -7,7 +7,7 @@ var spoilers = {
      * Gather all UserSpoiler DIVs and attempt to augment them with spoiler capabilities.
      */
     findAndReplace: function() {
-        jQuery("div.UserSpoiler").each(function(i, el) {
+        jQuery("div.Spoiler,div.UserSpoiler").each(function(i, el) {
             spoilers.replaceSpoiler(el);
         });
     },
@@ -22,6 +22,12 @@ var spoilers = {
         // Has this element already been setup as a spoiler? Skip it.
         if (spoilerObject.hasClass("SpoilerConfigured")) {
             return;
+        }
+
+        // Normalize spoiler class name.
+        if (spoilerObject.hasClass("Spoiler")) {
+            spoilerObject.removeClass("Spoiler");
+            spoilerObject.addClass("UserSpoiler");
         }
 
         // Build the individual elements.

@@ -183,18 +183,19 @@ if (!function_exists('discussionOptionsToDropdown')):
     /**
      * @param array $options
      * @param DropdownModule|null $dropdown
-     * @return DropdownModule|null|void
+     * @return DropdownModule
      */
     function discussionOptionsToDropdown($options, $dropdown = null) {
-        if (empty($options)) {
-            return;
-        }
         if (is_null($dropdown)) {
             $dropdown = new DropdownModule();
         }
-        foreach ($options as $option) {
-            $dropdown->addLink(val('Label', $option), val('Url', $option), slugify(val('Label', $option)), val('Class', $option));
+
+        if (!empty($options)) {
+            foreach ($options as $option) {
+                $dropdown->addLink(val('Label', $option), val('Url', $option), slugify(val('Label', $option)), val('Class', $option));
+            }
         }
+
         return $dropdown;
     }
 endif;

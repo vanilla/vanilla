@@ -43,6 +43,12 @@ class MessagesController extends ConversationsController {
 //      $this->addModule('MeModule');
         $this->addModule('SignedInModule');
 
+        // Spoilers assets
+        $this->addJsFile('spoilers.js', 'dashboard');
+        $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('show', t('show'));
+        $this->addDefinition('hide', t('hide'));
+
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');
         }
@@ -125,9 +131,9 @@ class MessagesController extends ConversationsController {
             array('Name' => t('Inbox'), 'Url' => '/messages/inbox'),
             array('Name' => $this->data('Title'), 'Url' => 'messages/add')
         ));
-        
+
         $this->CssClass = 'NoPanel';
-        
+
         $this->render();
     }
 

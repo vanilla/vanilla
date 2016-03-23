@@ -62,6 +62,7 @@ class DiscussionController extends VanillaController {
         // Spoilers assets
         $this->addJsFile('spoilers.js', 'dashboard');
         $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('Spoiler', t('Spoiler'));
         $this->addDefinition('show', t('show'));
         $this->addDefinition('hide', t('hide'));
 

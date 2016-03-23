@@ -652,6 +652,13 @@ if (!function_exists('hasEditProfile')) {
 }
 
 if (!function_exists('hoverHelp')) {
+    /**
+     * Add span with hover text to a string.
+     *
+     * @param $String
+     * @param $Help
+     * @return string
+     */
     function hoverHelp($String, $Help) {
         return wrap($String.wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
     }

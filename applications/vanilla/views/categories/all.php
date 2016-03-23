@@ -49,7 +49,7 @@ foreach ($this->data('Categories') as $CategoryRow) {
             $ChildCategories .= anchor(Gdn_Format::text($Category->Name), CategoryUrl($Category));
         } else if ($Category->DisplayAs === 'Heading') {
             $CatList .= '<li id="Category_'.$CategoryID.'" class="CategoryHeading '.$CssClass.'">
-               <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::text($Category->Name).'</div>
+               <div class="ItemContent Category"><div class="Options">'.getOptions($Category, $this).'</div>'.Gdn_Format::text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;
         } else {
@@ -58,7 +58,9 @@ foreach ($this->data('Categories') as $CategoryRow) {
             $Alt = !$Alt;
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
-                .GetOptions($Category, $this)
+                .'<div class="Options">'
+                .getOptions($Category, $this)
+                .'</div>'
                 .CategoryPhoto($Category)
                 .'<div class="TitleWrap">'
                 .anchor(Gdn_Format::text($Category->Name), CategoryUrl($Category), 'Title')

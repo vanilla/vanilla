@@ -746,7 +746,7 @@ class UserController extends DashboardController {
                     }
                 } else {
                     // Bitmask to add a manual ban.
-                    $this->Form->setFormValue('Banned', $User['Banned'] | 0x1);
+                    $this->Form->setFormValue('Banned', $User['Banned'] | BanModel::BAN_MANUAL);
                 }
 
                 if ($this->Form->save(array('SaveRoles' => true)) !== false) {

@@ -419,7 +419,7 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_HEADER, false);
         curl_setopt($Handler, CURLINFO_HEADER_OUT, true);
         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+        curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
         curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
         curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
 

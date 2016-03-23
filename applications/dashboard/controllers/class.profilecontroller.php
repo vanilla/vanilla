@@ -19,6 +19,9 @@ class ProfileController extends Gdn_Controller {
     /** @var object User data to use in building profile. */
     public $User;
 
+    /** @var bool Can the current user edit the profile user's photo? */
+    public $CanEditPhotos;
+
     /** @var string Name of current tab. */
     public $CurrentTab;
 
@@ -97,7 +100,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         $this->setData('Breadcrumbs', array());
-        $this->CanEditPhotos = c('Garden.Profile.EditPhotos') || Gdn::session()->checkPermission('Garden.Users.Edit');
+        $this->CanEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
     }
 
     /**
@@ -689,7 +692,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function picture($UserReference = '', $Username = '', $UserID = '') {
-        if (!Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true))) {
+        if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -1104,7 +1107,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function thumbnail($UserReference = '', $Username = '') {
-        if (!c('Garden.Profile.EditPhotos', true)) {
+        if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -1320,7 +1323,7 @@ class ProfileController extends Gdn_Controller {
         $Module->addItem('Options', '', false, array('class' => 'SideMenu'));
 
         // Check that we have the necessary tools to allow image uploading
-        $AllowImages = c('Garden.Profile.EditPhotos', true) && Gdn_UploadImage::canUploadImages();
+        $AllowImages = $this->CanEditPhotos && Gdn_UploadImage::canUploadImages();
 
         // Is the photo hosted remotely?
         $RemotePhoto = isUrl($this->User->Photo);

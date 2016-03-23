@@ -350,6 +350,10 @@ class TaggingPlugin extends Gdn_Plugin {
      * Validate tags when saving a discussion.
      */
     public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+        $reservedTags = [];
+        $Sender->EventArguments['ReservedTags'] = &$reservedTags;
+        $Sender->FireEvent('ReservedTags');
+
         $FormPostValues = val('FormPostValues', $Args, array());
         $TagsString = trim(strtolower(val('Tags', $FormPostValues, '')));
         $NumTagsMax = c('Plugin.Tagging.Max', 5);
@@ -358,6 +362,13 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
             $Tags = TagModel::splitTags($TagsString);
+            // Handle upper/lowercase
+            $Tags = array_map('strtolower', $Tags);
+            $reservedTags = array_map('strtolower', $reservedTags);
+            if ($reservedTags = array_intersect($Tags, $reservedTags)) {
+                $names = implode(', ', $reservedTags);
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
+            }
             if (!TagModel::validateTags($Tags)) {
                 $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
             } elseif (count($Tags) > $NumTagsMax) {

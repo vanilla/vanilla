@@ -1728,8 +1728,8 @@ if (!function_exists('htmlEntityDecode')) {
     function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
-        $string = preg_replace_callback('~&#x([0-9a-fA-F]+);~i', "chr_utf8_callback", $string);
-        $string = preg_replace('~&#([0-9]+);~e', 'chr_utf8("\\1")', $string);
+        $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
+        $string = preg_replace('/&#([0-9]+);/e', 'chr_utf8("\\1")', $string);
         return $string;
     }
 
@@ -3786,5 +3786,42 @@ if (!function_exists('increaseMaxExecutionTime')) {
         }
 
         return true;
+    }
+}
+
+if (!function_exists('slugify')) {
+    /**
+     * Converts a string to a slug-type string.
+     *
+     * Based off Symfony's Jobeet tutorial, and found here:
+     * http://stackoverflow.com/questions/2955251/php-function-to-make-slug-url-string
+     *
+     * @param string $text The text to convert.
+     * @return string mixed|string The slugified text.
+     */
+    function slugify($text) {
+        // replace non letter or digits by -
+        $text = preg_replace('/[^\pL\d]+/u', '-', $text);
+
+        // transliterate
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+        $text = preg_replace('/[^-\w]+/', '', $text);
+
+        // trim
+        $text = trim($text, '-');
+
+        // remove duplicate -
+        $text = preg_replace('/-+/', '-', $text);
+
+        // lowercase
+        $text = strtolower($text);
+
+        if (empty($text)) {
+            return 'n-a';
+        }
+
+        return $text;
     }
 }

@@ -179,6 +179,26 @@ if (!function_exists('writeComment')) :
     }
 endif;
 
+if (!function_exists('discussionOptionsToDropdown')):
+    /**
+     * @param array $options
+     * @param DropdownModule|null $dropdown
+     * @return DropdownModule|null|void
+     */
+    function discussionOptionsToDropdown($options, $dropdown = null) {
+        if (empty($options)) {
+            return;
+        }
+        if (is_null($dropdown)) {
+            $dropdown = new DropdownModule();
+        }
+        foreach ($options as $option) {
+            $dropdown->addLink(val('Label', $option), val('Url', $option), slugify(val('Label', $option)), val('Class', $option));
+        }
+        return $dropdown;
+    }
+endif;
+
 if (!function_exists('getDiscussionOptions')) :
     /**
      * Get options for the current discussion.
@@ -281,12 +301,80 @@ if (!function_exists('getDiscussionOptions')) :
 endif;
 
 
-if (!function_exists('writeAdminCheck')) :
+if (!function_exists('getDiscussionOptionsDropdown')):
     /**
-     * Output moderation checkbox.
+     * Constructs an options dropdown menu for a discussion.
      *
-     * @since 2.1
+     * @param object|array|null $discussion The discussion to get the dropdown options for.
+     * @return DropdownModule A dropdown consisting of discussion options.
+     * @throws Exception
      */
+    function getDiscussionOptionsDropdown($discussion = null) {
+        $dropdown = new DropdownModule();
+        $sender = Gdn::controller();
+        $session = Gdn::session();
+
+        if ($discussion == null) {
+            $discussion = $sender->data('Discussion');
+        }
+
+        $categoryID = val('CategoryID', $discussion);
+
+        if (!$categoryID && property_exists($sender, 'Discussion')) {
+            trace('Getting category ID from controller Discussion property.');
+            $categoryID = val('CategoryID', $sender->Discussion);
+        }
+
+        $discussionID = $discussion->DiscussionID;
+        $categoryUrl = urlencode(categoryUrl(CategoryModel::categories($categoryID)));
+
+        $permissionCategoryID = val('PermissionCategoryID', $discussion, val('PermissionCategoryID', $discussion));
+
+        // Permissions
+        $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
+        $canAnnounce = $session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $permissionCategoryID);
+        $canSink = $session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $permissionCategoryID);
+        $canClose = $session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $permissionCategoryID);
+        $canDelete = $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $permissionCategoryID);
+        $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
+        $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
+
+        if ($canEdit && $timeLeft) {
+            $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
+        }
+
+        $dropdown->addLinkIf($canEdit, t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
+            ->addLinkIf($canAnnounce, t('Announce'), '/discussion/announce?discussionid='.$discussionID.'&Target='.urlencode($sender->SelfUrl.'#Head'), 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
+            ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
+            ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
+            ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
+            ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+
+        // DEPRECATED
+        $options = [];
+        $sender->EventArguments['DiscussionOptions'] = &$options;
+        $sender->EventArguments['Discussion'] = $discussion;
+        $sender->fireEvent('DiscussionOptions');
+
+        // Backwards compatability
+        $dropdown = discussionOptionsToDropdown($options, $dropdown);
+
+        // Allow plugins to edit the dropdown.
+        $sender->EventArguments['DiscussionOptionsDropdown'] = &$dropdown;
+        $sender->EventArguments['Discussion'] = $discussion;
+        $sender->fireEvent('DiscussionOptionsDropdown');
+
+        return $dropdown;
+    }
+endif;
+
+/**
+ * Output moderation checkbox.
+ *
+ * @since 2.1
+ */
+if (!function_exists('WriteAdminCheck')):
     function writeAdminCheck($Object = null) {
         if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use')) {
             return;
@@ -295,13 +383,15 @@ if (!function_exists('writeAdminCheck')) :
     }
 endif;
 
-if (!function_exists('writeDiscussionOptions')) :
-    /**
-     * Output discussion options.
-     *
-     * @since 2.1
-     */
+/**
+ * Output discussion options.
+ *
+ * @since 2.1
+ */
+if (!function_exists('writeDiscussionOptions')):
     function writeDiscussionOptions($Discussion = null) {
+        deprecated('writeDiscussionOptions', 'getDiscussionOptionsDropdown', 'March 2016');
+
         $Options = getDiscussionOptions($Discussion);
 
         if (empty($Options)) {

@@ -2128,7 +2128,19 @@ if (!function_exists('htmlEntityDecode')) {
         }
         return '';
     }
+}
 
+if (!function_exists('htmlEsc')) {
+    /**
+     * Alias htmlspecialchars() for code brevity.
+     *
+     * @param string $string
+     * @param int $flags See: htmlspecialchars().
+     * @return string|array Escaped string or array.
+     */
+    function htmlEsc($string, $flags = ENT_COMPAT) {
+        return htmlspecialchars($string, $flags, 'UTF-8');
+    }
 }
 
 if (!function_exists('implodeAssoc')) {

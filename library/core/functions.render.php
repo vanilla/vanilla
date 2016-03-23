@@ -1273,22 +1273,3 @@ if (!function_exists('writeReactions')) {
         Gdn::controller()->fireEvent('Replies');
     }
 }
-
-if (!function_exists('spoilerWrap')) {
-    /**
-     * Returns spoiler text wrapped in a HTML spoiler wrapper.
-     *
-     * @param string $spoilerText
-     * @return string
-     */
-    function spoilerWrap($spoilerText) {
-        if (!is_string($spoilerText) || empty($spoilerText)) {
-            return '';
-        }
-        return '<div class="UserSpoiler">
-                    <div class="SpoilerTitle">'.t('Spoiler').'</div>
-                    <div class="SpoilerReveal"></div>
-                    <div class="SpoilerText"><span>'.$spoilerText.'</span></div>
-                </div>';
-    }
-}

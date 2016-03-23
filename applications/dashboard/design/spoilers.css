@@ -2,8 +2,8 @@ div.UserSpoiler {
    margin:4px 0;
    padding: 5px 10px;
    margin-right: 10px;
-   background-color: #CCEBFF;
-   background-color: rgba(0, 153, 255, .2);
+   background-color: #808080;
+   background-color: rgba(128, 128, 128, .2);
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    border-radius: 3px;

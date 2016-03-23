@@ -22,18 +22,31 @@ var spoilers = {
             return;
         }
 
+        var text = document.createElement("div");
+        text.innerHTML = spoiler.innerHTML;
+        text.className = "SpoilerText";
+        spoiler.innerHTML = '';
+
+        var title = document.createElement("div");
+        title.className = "SpoilerTitle";
+        title.innerHTML = gdn.definition("Spoiler", "Spoiler");
+
+        var reveal = document.createElement("div");
+        reveal.className = "SpoilerReveal";
+
+        spoiler.appendChild(title);
+        spoiler.appendChild(reveal);
+        spoiler.appendChild(text);
+
+        var spoilerButton       = document.createElement("input");
+        spoilerButton.type      = "button";
+        spoilerButton.value     = gdn.definition("show", "show");
+        spoilerButton.className = "SpoilerToggle";
+
+        title.appendChild(spoilerButton);
+
         // Extend object with jQuery
-        spoilerObject = jQuery(spoiler);
-
-        var spoilerTitle        = spoilerObject.find('div.SpoilerTitle').first();
-        var spoilerButton       = document.createElement('input');
-        spoilerButton.type      = 'button';
-        spoilerButton.value     = gdn.definition('show', 'show');
-        spoilerButton.className = 'SpoilerToggle';
-
-        spoilerTitle.append(spoilerButton);
-
-        spoilerObject.on('click', 'input.SpoilerToggle', function(event) {
+        jQuery(spoiler).on("click", "input.SpoilerToggle", function(event) {
             event.stopPropagation();
             spoilers.toggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
         });

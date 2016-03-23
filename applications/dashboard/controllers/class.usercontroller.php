@@ -739,11 +739,13 @@ class UserController extends DashboardController {
 
                 $Banned = $this->Form->getFormValue('Banned');
                 if (!$Banned) {
+                    // Checkbox was unchecked; bitmask to remove any reversible bans.
                     if ($BanReversible) {
                         $reversedBans = ($User['Banned'] & (~(BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)));
                         $this->Form->setFormValue('Banned', $reversedBans);
                     }
                 } else {
+                    // Bitmask to add a manual ban.
                     $this->Form->setFormValue('Banned', $User['Banned'] | 0x1);
                 }
 

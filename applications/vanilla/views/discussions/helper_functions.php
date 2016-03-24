@@ -470,7 +470,7 @@ if (!function_exists('optionsList')) :
      */
     function optionsList($discussion) {
         if (Gdn::session()->isValid() && !empty(Gdn::controller()->ShowOptions)) {
-            include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussion');
+            include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussion', 'vanilla');
             return getDiscussionOptionsDropdown($discussion);
         }
         return '';

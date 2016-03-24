@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5bfacf75337e2738220517ba91a0650b",
-    "content-hash": "dd11ebd646fb813865ca45ed72a0ef81",
+    "hash": "3ee537d97fb5f0f936ce6b950684e363",
+    "content-hash": "69cb83d64874ee8f3e0752e150daf96b",
     "packages": [
         {
             "name": "vanilla/garden-http",
@@ -85,6 +85,42 @@
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
             "time": "2016-01-18 19:42:40"
+        },
+        {
+            "name": "vanilla/nbbc",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/nbbc.git",
+                "reference": "5bfd0be175bfe78219d611419fcff7bf0f7dae25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/5bfd0be175bfe78219d611419fcff7bf0f7dae25",
+                "reference": "5bfd0be175bfe78219d611419fcff7bf0f7dae25",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nbbc\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSDv2"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
+            "time": "2016-01-13 19:06:18"
         }
     ],
     "packages-dev": [],

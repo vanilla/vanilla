@@ -486,7 +486,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *  - <b>all</b>: All recognized types.
      */
     public function types($Class = 'all') {
-        $Date = array('datetime', 'date');
+        $Date = array('datetime', 'date', 'timestamp');
         $Decimal = array('decimal', 'numeric');
         $Float = array('float', 'double');
         $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');

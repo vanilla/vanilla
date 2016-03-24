@@ -29,10 +29,10 @@ Gdn_Quotes.prototype.Prepare = function () {
     QuoteFoldingLevel = gdn.definition('QuotesFolding', 1);
 
     function folding() {
-        $('.Comment .Message').each(function () {
+        $('.Discussion .Message, .Comment .Message').each(function () {
             // Find the closest child quote
             var Message = $(this),
-                PetQuote = Message.children('.UserQuote');
+                PetQuote = Message.children('.Quote, .UserQuote');
 
             if (Message.data('QuoteFolding') || !PetQuote.length) {
                 return;
@@ -54,7 +54,7 @@ Gdn_Quotes.prototype.Prepare = function () {
             var Anchor = $(this),
                 QuoteTarget = Anchor
                     .closest('.QuoteText')
-                    .children('.UserQuote')
+                    .children('.Quote, .UserQuote')
                     .toggle();
 
             if (QuoteTarget.css('display') != 'none') {
@@ -69,7 +69,7 @@ Gdn_Quotes.prototype.Prepare = function () {
 };
 
 
-// Recursively tranform folded quotes.
+// Recursively transform folded quotes.
 Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, TargetLevel) {
     if (FoldingLevel > MaxLevel || FoldingLevel > TargetLevel) {
         return;
@@ -92,7 +92,7 @@ Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, T
             return;
         }
 
-        FoldQuote = ExamineQuote.children('.QuoteText').children('.UserQuote');
+        FoldQuote = ExamineQuote.children('.QuoteText').children('.Quote, .UserQuote');
         if (!FoldQuote.length) {
             return;
         }
@@ -105,7 +105,7 @@ Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, T
 // Get the currently active editor (last in focus).
 Gdn_Quotes.prototype.GetEditor = function () {
     var editor = $(this.currentEditor);
-    if (!editor.length) {
+    if (!document.contains(this.currentEditor) || !editor.length) {
         editor = $('textarea.TextBox').first();
     }
 

@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.6',
+   'Version' => '1.7.7',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -577,6 +577,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
+        $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = array();
         $this->EventArguments['definitions'] =& $additionalDefinitions;
@@ -657,7 +658,6 @@ class EditorPlugin extends Gdn_Plugin {
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->addDefinition('canUpload', $this->canUpload());
             $c->setData('_canUpload', $this->canUpload());
 
             // Determine which controller (post or discussion) is invoking this.
@@ -718,7 +718,14 @@ class EditorPlugin extends Gdn_Plugin {
 
             // Save original file to uploads, then manipulate from this location if
             // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
-            if (empty($imageType)) {
+            $validImageTypes = [
+                IMAGETYPE_GIF,
+                IMAGETYPE_JPEG,
+                IMAGETYPE_PNG
+            ];
+            $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
+
+            if (!$validImage) {
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -745,7 +752,7 @@ class EditorPlugin extends Gdn_Plugin {
             // This is a redundant check, because it's in the thumbnail function,
             // but there's no point calling it blindly on every file, so just check here before calling it.
             $generate_thumbnail = false;
-            if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
+            if ($validImage) {
                 $imageHeight = $tmpheight;
                 $imageWidth = $tmpwidth;
                 $generate_thumbnail = true;
@@ -1464,40 +1471,5 @@ class EditorPlugin extends Gdn_Plugin {
             }
         }
         return $this->canUpload;
-    }
-
-    /**
-     * Copy the Spoilers plugin functionality into the editor.
-     *
-     * Then plugins can be deprecated without introducing compatibility issues on forums
-     * that make heavy use of the spoilers plugin, as well as users who have
-     * become accustom to its [spoiler][/spoiler] syntax. This will also allow
-     * the spoiler styling and experience to standardize, instead of using two distinct styles and experiences.
-     */
-    protected function renderSpoilers(&$Sender) {
-        $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
-        // Fix a wysiwyg but where spoilers
-        $FormatBody = preg_replace('`<.+>\s*(\[/?spoiler\])\s*</.+>`', '$1', $FormatBody);
-
-        $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
-        $FormatBody = str_ireplace('[/spoiler]', '</div>', $FormatBody);
-    }
-
-    /**
-     *
-     *
-     * @param $Matches
-     * @return string
-     */
-    protected function spoilerCallback($Matches) {
-        $SpoilerText = (count($Matches) > 2)
-         ? $Matches[2]
-         : null;
-
-        $SpoilerText = (is_null($SpoilerText))
-         ? ''
-         : $SpoilerText;
-
-        return '<div class="Spoiler">'.$SpoilerText.'</div>';
     }
 }

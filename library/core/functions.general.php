@@ -1728,8 +1728,8 @@ if (!function_exists('htmlEntityDecode')) {
     function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
-        $string = preg_replace_callback('~&#x([0-9a-fA-F]+);~i', "chr_utf8_callback", $string);
-        $string = preg_replace('~&#([0-9]+);~e', 'chr_utf8("\\1")', $string);
+        $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
+        $string = preg_replace('/&#([0-9]+);/e', 'chr_utf8("\\1")', $string);
         return $string;
     }
 
@@ -1769,7 +1769,19 @@ if (!function_exists('htmlEntityDecode')) {
         }
         return '';
     }
+}
 
+if (!function_exists('htmlEsc')) {
+    /**
+     * Alias htmlspecialchars() for code brevity.
+     *
+     * @param string $string
+     * @param int $flags See: htmlspecialchars().
+     * @return string|array Escaped string or array.
+     */
+    function htmlEsc($string, $flags = ENT_COMPAT) {
+        return htmlspecialchars($string, $flags, 'UTF-8');
+    }
 }
 
 if (!function_exists('implodeAssoc')) {
@@ -3152,11 +3164,15 @@ if (!function_exists('sliceParagraph')) {
      * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
      *
      * @param string $String The string to slice.
-     * @param int $MaxLength The maximum length of the string.
+     * @param int|array $Limits Either int $MaxLength or array($MaxLength, $MinLength); whereas $MaxLength The maximum length of the string; $MinLength The intended minimum length of the string (slice on sentence if paragraph is too short).
      * @param string $Suffix The suffix if the string must be sliced mid-sentence.
      * @return string
      */
-    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
+    function sliceParagraph($String, $Limits = 500, $Suffix = '…') {
+        if(is_int($Limits)) {
+            $Limits = array($Limits, 32);
+        }
+        list($MaxLength, $MinLength) = $Limits;
         if ($MaxLength >= strlen($String)) {
             return $String;
         }
@@ -3166,7 +3182,7 @@ if (!function_exists('sliceParagraph')) {
         // See if there is a paragraph.
         $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
 
-        if ($Pos === false) {
+        if ($Pos === false || $Pos < $MinLength) {
             // There was no paragraph so try and split on sentences.
             $Sentences = preg_split('`([.!?:]\s+)`', $String, null, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -3786,5 +3802,42 @@ if (!function_exists('increaseMaxExecutionTime')) {
         }
 
         return true;
+    }
+}
+
+if (!function_exists('slugify')) {
+    /**
+     * Converts a string to a slug-type string.
+     *
+     * Based off Symfony's Jobeet tutorial, and found here:
+     * http://stackoverflow.com/questions/2955251/php-function-to-make-slug-url-string
+     *
+     * @param string $text The text to convert.
+     * @return string mixed|string The slugified text.
+     */
+    function slugify($text) {
+        // replace non letter or digits by -
+        $text = preg_replace('/[^\pL\d]+/u', '-', $text);
+
+        // transliterate
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+        $text = preg_replace('/[^-\w]+/', '', $text);
+
+        // trim
+        $text = trim($text, '-');
+
+        // remove duplicate -
+        $text = preg_replace('/-+/', '-', $text);
+
+        // lowercase
+        $text = strtolower($text);
+
+        if (empty($text)) {
+            return 'n-a';
+        }
+
+        return $text;
     }
 }

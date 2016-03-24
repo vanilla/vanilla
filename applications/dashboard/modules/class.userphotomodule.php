@@ -13,9 +13,15 @@
  */
 class UserPhotoModule extends Gdn_Module {
 
+    /**
+     * @var bool Can the current user edit this user's photo?
+     */
+    public $CanEditPhotos;
+
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'dashboard';
+        $this->CanEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
     }
 
     public function assetTarget() {
@@ -23,7 +29,6 @@ class UserPhotoModule extends Gdn_Module {
     }
 
     public function toString() {
-        $this->CanEditPhotos = c('Garden.Profile.EditPhotos');
         return parent::ToString();
     }
 }

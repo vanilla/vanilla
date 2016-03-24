@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "56184395b4c2c752d2841200810d4f10",
-    "content-hash": "eb9c5630fb0ba793d08bcf0717addcfe",
+    "hash": "bbf7b9c8da9a621d63ade33865071626",
+    "content-hash": "5fbcb0076cb89bb9ba101c8073287d08",
     "packages": [
         {
             "name": "vanilla/garden-http",
@@ -46,6 +46,42 @@
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
             "time": "2015-12-10 21:39:51"
+        },
+        {
+            "name": "vanilla/nbbc",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/nbbc.git",
+                "reference": "5bfd0be175bfe78219d611419fcff7bf0f7dae25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/5bfd0be175bfe78219d611419fcff7bf0f7dae25",
+                "reference": "5bfd0be175bfe78219d611419fcff7bf0f7dae25",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nbbc\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSDv2"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
+            "time": "2016-01-13 19:06:18"
         }
     ],
     "packages-dev": [],

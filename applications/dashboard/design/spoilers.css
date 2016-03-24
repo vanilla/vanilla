@@ -1,29 +1,31 @@
-div.UserSpoiler {
+div.Spoiler {
    margin:4px 0;
    padding: 5px 10px;
    margin-right: 10px;
-   background-color: #CCEBFF;
-   background-color: rgba(0, 153, 255, .2);
+   background-color: #808080;
+   background-color: rgba(128, 128, 128, .2);
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    border-radius: 3px;
 }
 
-div.UserSpoiler div.SpoilerTitle {
+div.Spoiler div.SpoilerTitle {
    font-weight: bold;
 }
 
-div.UserSpoiler div.SpoilerTitle span {
+div.Spoiler div.SpoilerTitle span {
    color: white;
 }
 
-div.UserSpoiler div.SpoilerTitle input {
+div.Spoiler div.SpoilerTitle input {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    border-radius: 3px;
    background: white;
-   border: 1px solid #E3F4FF;
-   color: #1E79A7;
+   border: 1px solid #818181;
+   border: 1px solid rgba(0, 0, 0, .2);
+   color: #1a1a1a;
+   color: rgba(0, 0, 0, .8);
    display: inline;
    font-weight: bold;
    margin: 0;
@@ -33,12 +35,13 @@ div.UserSpoiler div.SpoilerTitle input {
    cursor: pointer;
 }
 
-div.UserSpoiler div.SpoilerText {
+div.Spoiler div.SpoilerText {
    display: none;
    padding: 3px 0px;
    padding-left: 5px;
    margin: 3px 0px;
-   border-left: 1px solid #E3F4FF;
+   border-left: 1px solid #818181;
+   border-left: 1px solid rgba(0, 0, 0, .2);
 }
 
 

@@ -980,7 +980,7 @@ class Gdn_Format {
             }
             $htmlDom = str_get_html($html);
 
-            foreach($htmlDom->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
+            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
                 $spoilerBlock->outertext = t($replaceWith);
             }
             $html = (string)$htmlDom;
@@ -991,40 +991,14 @@ class Gdn_Format {
 
     /**
      * Returns spoiler text wrapped in a HTML spoiler wrapper. Parsers for NBBC and Markdown should use this function
-     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. During the post rendering,
-     * we use formatSpoilers to replace this block with the HTML found in the spoilerWrap function in functions.render.php.
+     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. We use javascript in
+     * spoilers.js to add markup and render Spoilers with the "Spoiler" css class name.
      *
      * @param string $spoilerText The inner text of the spoiler.
      * @return string
      */
     public static function spoilerHtml($spoilerText) {
-        return '<div class="Spoiler">'.$spoilerText.'</div>';
-    }
-
-    /**
-     * Check to see if a string has spoilers and replace the spoiler HTML block with a more Vanilla-specific
-     * HTML spoiler block.
-     *
-     * @param string $html A HTML-formatted string.
-     * @return string Returns the html spoilers with spoiler styling.
-     */
-    protected static function formatSpoilers($html) {
-        if (preg_match('/class="Spoiler"/', $html)) {
-            // Transform $html into a dom object and replace the spoiler block.
-            if (!function_exists('str_get_html')) {
-                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
-            }
-            $htmlDom = str_get_html($html);
-
-            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
-                $spoiler = $spoilerBlock->innertext;
-                $spoilerBlock->outertext = spoilerWrap($spoiler);
-            }
-            $html = (string)$htmlDom;
-        } elseif (strpos($html, '[spoiler') !== false) {
-            $html = self::legacySpoilers($html);
-        }
-        return $html;
+        return "<div class=\"Spoiler\">{$spoilerText}</div>";
     }
 
     /**
@@ -1035,29 +1009,11 @@ class Gdn_Format {
      * @return string
      */
     protected static function legacySpoilers($html) {
-        $html = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $html);
-        $html = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", ['Gdn_Format', 'legacySpoilerCallback'], $html);
-        $html = str_ireplace('[/spoiler]', '</div></div>', $html);
-        return $html;
-    }
-
-    /**
-     * Callback function replacing opening spoiler tags with an optional title.
-     * Replaces [spoiler] or [spoiler=Title] tags, where Title is included in the attribution.
-     *
-     * @param array $matches Matches from a regular expression.
-     * @return string The html-formatted opening spoiler tag.
-     */
-    protected static function legacySpoilerCallback($matches) {
-        $attribution = T('Spoiler: %s');
-        $spoilerText = (sizeof($matches) > 2) ? $matches[2] : null;
-        if (is_null($spoilerText)) {
-            $spoilerText = '';
-        } else {
-            $spoilerText = '<span>'.$spoilerText.'</span>';
+        if (strpos($html, '[/spoiler]') !== false) {
+            $html = preg_replace('`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\]`siu', '<div class="Spoiler">', $html);
+            $html = str_replace('[/spoiler]', '</div>', $html);
         }
-        $attribution = sprintf($attribution, $spoilerText);
-        return '<div class="UserSpoiler"><div class="SpoilerTitle">'.$attribution.'</div><div class="SpoilerReveal"></div><div class="SpoilerText">';
+        return $html;
     }
 
     /**
@@ -1615,7 +1571,7 @@ EOT;
         $html = Gdn_Format::links($html);
         $html = Gdn_Format::mentions($html);
         $html = Emoji::instance()->translateToHtml($html);
-        $html = Gdn_Format::formatSpoilers($html);
+        $html = Gdn_Format::legacySpoilers($html);
         return $html;
     }
 

@@ -46,6 +46,7 @@ class MessagesController extends ConversationsController {
         // Spoilers assets
         $this->addJsFile('spoilers.js', 'dashboard');
         $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('Spoiler', t('Spoiler'));
         $this->addDefinition('show', t('show'));
         $this->addDefinition('hide', t('hide'));
 

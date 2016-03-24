@@ -7,7 +7,7 @@ var spoilers = {
      * Gather all UserSpoiler DIVs and attempt to augment them with spoiler capabilities.
      */
     findAndReplace: function() {
-        jQuery('div.UserSpoiler').each(function(i, el) {
+        jQuery("div.Spoiler").each(function(i, el) {
             spoilers.replaceSpoiler(el);
         });
     },
@@ -17,28 +17,46 @@ var spoilers = {
      * @param {HTMLElement} spoiler The element we're adding hide/show capabilities to.
      */
     replaceSpoiler: function(spoiler) {
-        // Don't re-event spoilers that are already 'on'
-        if (spoiler.spoilerFunctioning === true) {
+        var spoilerObject = jQuery(spoiler);
+
+        // Has this element already been setup as a spoiler? Skip it.
+        if (spoilerObject.hasClass("SpoilerConfigured")) {
             return;
         }
 
-        // Extend object with jQuery
-        spoilerObject = jQuery(spoiler);
+        // Build the individual elements.
+        var text = document.createElement("div");
+        text.className = "SpoilerText";
+        while(spoiler.firstChild) {
+            text.appendChild(spoiler.firstChild);
+        }
 
-        var spoilerTitle        = spoilerObject.find('div.SpoilerTitle').first();
-        var spoilerButton       = document.createElement('input');
-        spoilerButton.type      = 'button';
-        spoilerButton.value     = gdn.definition('show', 'show');
-        spoilerButton.className = 'SpoilerToggle';
+        var title = document.createElement("div");
+        title.className = "SpoilerTitle";
+        title.innerHTML = gdn.definition("Spoiler", "Spoiler");
 
-        spoilerTitle.append(spoilerButton);
+        var reveal = document.createElement("div");
+        reveal.className = "SpoilerReveal";
 
-        spoilerObject.on('click', 'input.SpoilerToggle', function(event) {
+        var spoilerButton       = document.createElement("input");
+        spoilerButton.type      = "button";
+        spoilerButton.value     = gdn.definition("show", "show");
+        spoilerButton.className = "SpoilerToggle";
+
+        // Assemble the elements.
+        spoiler.appendChild(title);
+        spoiler.appendChild(reveal);
+        spoiler.appendChild(text);
+        title.appendChild(spoilerButton);
+
+        // Add an event listener to the toggle button.
+        spoilerObject.on("click", "input.SpoilerToggle", function(event) {
             event.stopPropagation();
             spoilers.toggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
         });
 
-        spoiler.spoilerFunctioning = true;
+        // Flag this spoiler as setup.
+        spoilerObject.addClass("SpoilerConfigured");
     },
 
     /**
@@ -47,16 +65,16 @@ var spoilers = {
      * @param {object} spoilerButton The button HTML element used to trigger the toggle.
      */
     toggleSpoiler: function(spoiler, spoilerButton) {
-        var thisSpoilerText   = spoiler.find('div.SpoilerText').first();
-        var thisSpoilerStatus = thisSpoilerText.css('display');
-        var newSpoilerStatus  = (thisSpoilerStatus === 'none') ? 'block' : 'none';
+        var thisSpoilerText   = spoiler.find("div.SpoilerText").first();
+        var thisSpoilerStatus = thisSpoilerText.css("display");
+        var newSpoilerStatus  = (thisSpoilerStatus === "none") ? "block" : "none";
 
-        thisSpoilerText.css('display', newSpoilerStatus);
+        thisSpoilerText.css("display", newSpoilerStatus);
 
-        if (newSpoilerStatus === 'none') {
-            spoilerButton.val(gdn.definition('show', 'show'));
+        if (newSpoilerStatus === "none") {
+            spoilerButton.val(gdn.definition("show", "show"));
         } else {
-            spoilerButton.val(gdn.definition('hide', 'hide'));
+            spoilerButton.val(gdn.definition("hide", "hide"));
         }
     }
 };
@@ -66,6 +84,6 @@ jQuery(document).ready(function(){
     spoilers.findAndReplace();
 });
 
-jQuery(document).on('CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal', function() {
+jQuery(document).on("CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal", function() {
     spoilers.findAndReplace();
 });

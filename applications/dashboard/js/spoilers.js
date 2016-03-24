@@ -26,9 +26,10 @@ var spoilers = {
 
         // Build the individual elements.
         var text = document.createElement("div");
-        text.innerHTML = spoiler.innerHTML;
         text.className = "SpoilerText";
-        spoiler.innerHTML = "";
+        while(spoiler.firstChild) {
+            text.appendChild(spoiler.firstChild);
+        }
 
         var title = document.createElement("div");
         title.className = "SpoilerTitle";

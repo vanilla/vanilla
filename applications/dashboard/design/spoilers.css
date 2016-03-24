@@ -22,8 +22,10 @@ div.Spoiler div.SpoilerTitle input {
    -webkit-border-radius: 3px;
    border-radius: 3px;
    background: white;
-   border: 1px solid #E3F4FF;
-   color: #1E79A7;
+   border: 1px solid #818181;
+   border: 1px solid rgba(0, 0, 0, .2);
+   color: #1a1a1a;
+   color: rgba(0, 0, 0, .8);
    display: inline;
    font-weight: bold;
    margin: 0;
@@ -38,7 +40,8 @@ div.Spoiler div.SpoilerText {
    padding: 3px 0px;
    padding-left: 5px;
    margin: 3px 0px;
-   border-left: 1px solid #E3F4FF;
+   border-left: 1px solid #818181;
+   border-left: 1px solid rgba(0, 0, 0, .2);
 }
 
 

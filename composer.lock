@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bbf7b9c8da9a621d63ade33865071626",
-    "content-hash": "5fbcb0076cb89bb9ba101c8073287d08",
+    "hash": "3ee537d97fb5f0f936ce6b950684e363",
+    "content-hash": "69cb83d64874ee8f3e0752e150daf96b",
     "packages": [
         {
             "name": "vanilla/garden-http",
@@ -46,6 +46,45 @@
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
             "time": "2015-12-10 21:39:51"
+        },
+        {
+            "name": "vanilla/htmlawed",
+            "version": "v1.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/htmlawed.git",
+                "reference": "7c717dc95b62a69d8c6757ea61410d080891496b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/7c717dc95b62a69d8c6757ea61410d080891496b",
+                "reference": "7c717dc95b62a69d8c6757ea61410d080891496b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "tburry/pquery": "~1.0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/Htmlawed.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
+            "time": "2016-01-18 19:42:40"
         },
         {
             "name": "vanilla/nbbc",

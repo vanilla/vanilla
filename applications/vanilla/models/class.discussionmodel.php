@@ -1342,7 +1342,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     public function fetchPageInfo($Url, $ThrowError = false) {
-        $PageInfo = FetchPageInfo($Url, 3, $ThrowError);
+        $PageInfo = fetchPageInfo($Url, 3, $ThrowError);
 
         $Title = val('Title', $PageInfo, '');
         if ($Title == '') {

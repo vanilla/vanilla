@@ -980,7 +980,7 @@ class Gdn_Format {
             }
             $htmlDom = str_get_html($html);
 
-            foreach($htmlDom->find('.Spoiler,.UserSpoiler') as $spoilerBlock) {
+            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
                 $spoilerBlock->outertext = t($replaceWith);
             }
             $html = (string)$htmlDom;
@@ -998,7 +998,7 @@ class Gdn_Format {
      * @return string
      */
     public static function spoilerHtml($spoilerText) {
-        return "<div class=\"UserSpoiler\">{$spoilerText}</div>";
+        return "<div class=\"Spoiler\">{$spoilerText}</div>";
     }
 
     /**
@@ -1009,7 +1009,7 @@ class Gdn_Format {
      * @return string
      */
     protected static function legacySpoilers($html) {
-        $html = preg_replace('`\[spoiler[^\]]+\](.+)\[\/spoiler\]`siu', '<div class="UserSpoiler">$1</div>', $html);
+        $html = preg_replace('`\[spoiler[^\]]+\](.+)\[\/spoiler\]`siu', '<div class="Spoiler">$1</div>', $html);
         return $html;
     }
 

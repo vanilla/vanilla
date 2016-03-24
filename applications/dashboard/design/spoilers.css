@@ -1,4 +1,4 @@
-div.UserSpoiler {
+div.Spoiler {
    margin:4px 0;
    padding: 5px 10px;
    margin-right: 10px;
@@ -9,15 +9,15 @@ div.UserSpoiler {
    border-radius: 3px;
 }
 
-div.UserSpoiler div.SpoilerTitle {
+div.Spoiler div.SpoilerTitle {
    font-weight: bold;
 }
 
-div.UserSpoiler div.SpoilerTitle span {
+div.Spoiler div.SpoilerTitle span {
    color: white;
 }
 
-div.UserSpoiler div.SpoilerTitle input {
+div.Spoiler div.SpoilerTitle input {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    border-radius: 3px;
@@ -33,7 +33,7 @@ div.UserSpoiler div.SpoilerTitle input {
    cursor: pointer;
 }
 
-div.UserSpoiler div.SpoilerText {
+div.Spoiler div.SpoilerText {
    display: none;
    padding: 3px 0px;
    padding-left: 5px;

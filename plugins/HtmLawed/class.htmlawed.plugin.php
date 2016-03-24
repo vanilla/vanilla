@@ -9,11 +9,11 @@
 
 $PluginInfo['HtmLawed'] = [
     'Description' => 'Adapts HtmLawed to work with Vanilla.',
-    'Version'     => '1.1.1',
-    'Author'      => 'Todd Burry',
+    'Version' => '1.2',
+    'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com/profile/todd',
-    'Hidden'      => true
+    'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
+    'Hidden' => true
 ];
 
 Gdn::factoryInstall('HtmlFormatter', 'HtmLawedPlugin', __FILE__, Gdn::FactorySingleton);
@@ -143,7 +143,6 @@ class HtmLawedPlugin extends Gdn_Plugin {
      */
     public function __construct() {
         $this->safeStyles = c('Garden.Html.SafeStyles');
-
         parent::__construct();
     }
 
@@ -157,18 +156,18 @@ class HtmLawedPlugin extends Gdn_Plugin {
         $attributes = c('Garden.Html.BlockedAttributes', 'on*');
 
         $config = [
-            'anti_link_spam'   => ['`.`', ''],
-            'balance'          => 1,
-            'cdata'            => 3,
-            'comment'          => 1,
-            'css_expression'   => 1,
-            'deny_attribute'   => $attributes,
+            'anti_link_spam' => ['`.`', ''],
+            'balance' => 1,
+            'cdata' => 3,
+            'comment' => 1,
+            'css_expression' => 1,
+            'deny_attribute' => $attributes,
             'direct_list_nest' => 1,
-            'elements'         => '*-applet-form-input-textarea-iframe-script-style-embed-object-select-option-button-fieldset-optgroup-legend',
-            'keep_bad'         => 0,
-            'schemes'          => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
-            'unique_ids'       => 1,
-            'valid_xhtml'      => 0
+            'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object-select-option-button-fieldset-optgroup-legend',
+            'keep_bad' => 0,
+            'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+            'unique_ids' => 1,
+            'valid_xhtml' => 0
         ];
 
         // Turn embedded videos into simple links (legacy workaround)
@@ -195,22 +194,22 @@ class HtmLawedPlugin extends Gdn_Plugin {
 
         // Block some IDs so you can't break Javascript
         $GLOBALS['hl_Ids'] = [
-            'Bookmarks'          => 1,
-            'CommentForm'        => 1,
-            'Content'            => 1,
-            'Definitions'        => 1,
-            'DiscussionForm'     => 1,
-            'Foot'               => 1,
-            'Form_Comment'       => 1,
+            'Bookmarks' => 1,
+            'CommentForm' => 1,
+            'Content' => 1,
+            'Definitions' => 1,
+            'DiscussionForm' => 1,
+            'Foot' => 1,
+            'Form_Comment' => 1,
             'Form_User_Password' => 1,
-            'Form_User_SignIn'   => 1,
-            'Head'               => 1,
-            'HighlightColor'     => 1,
+            'Form_User_SignIn' => 1,
+            'Head' => 1,
+            'HighlightColor' => 1,
             'InformMessageStack' => 1,
-            'Menu'               => 1,
-            'PagerMore'          => 1,
-            'Panel'              => 1,
-            'Status'             => 1
+            'Menu' => 1,
+            'PagerMore' => 1,
+            'Panel' => 1,
+            'Status' => 1
         ];
 
         $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); ';

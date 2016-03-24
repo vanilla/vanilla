@@ -1010,7 +1010,8 @@ class Gdn_Format {
      */
     protected static function legacySpoilers($html) {
         if (strpos($html, '[/spoiler]') !== false) {
-            $html = preg_replace('`\[spoiler[^\]]+\](.+)\[\/spoiler\]`siu', '<div class="Spoiler">$1</div>', $html);
+            $html = preg_replace('`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\]`siu', '<div class="Spoiler">', $html);
+            $html = str_replace('[/spoiler]', '</div>', $html);
         }
         return $html;
     }

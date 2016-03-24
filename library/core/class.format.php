@@ -991,8 +991,8 @@ class Gdn_Format {
 
     /**
      * Returns spoiler text wrapped in a HTML spoiler wrapper. Parsers for NBBC and Markdown should use this function
-     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. During the post rendering,
-     * we use formatSpoilers to replace this block with the HTML found in the spoilerWrap function in functions.render.php.
+     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. We use javascript in
+     * spoilers.js to add markup and render Spoilers with the "Spoiler" css class name.
      *
      * @param string $spoilerText The inner text of the spoiler.
      * @return string
@@ -1009,7 +1009,9 @@ class Gdn_Format {
      * @return string
      */
     protected static function legacySpoilers($html) {
-        $html = preg_replace('`\[spoiler[^\]]+\](.+)\[\/spoiler\]`siu', '<div class="Spoiler">$1</div>', $html);
+        if (strpos($html, '[/spoiler]') !== false) {
+            $html = preg_replace('`\[spoiler[^\]]+\](.+)\[\/spoiler\]`siu', '<div class="Spoiler">$1</div>', $html);
+        }
         return $html;
     }
 

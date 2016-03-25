@@ -16,6 +16,11 @@
 class Gdn_UploadImage extends Gdn_Upload {
 
     /**
+     * Compression level (0-9) for PNGs.
+     */
+    const PNG_COMPRESSION = 9;
+
+    /**
      * Check that we have the necessary tools to allow image uploading.
      *
      * @return bool
@@ -289,7 +294,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             if ($OutputType == 'gif') {
                 imagegif($TargetImage, $TargetPath);
             } elseif ($OutputType == 'png') {
-                imagepng($TargetImage, $TargetPath, 10 - (int)($ImageQuality / 10));
+                imagepng($TargetImage, $TargetPath, Gdn_UploadImage::PNG_COMPRESSION);
             } elseif ($OutputType == 'ico') {
                 self::imageIco($TargetImage, $TargetPath);
             } else {

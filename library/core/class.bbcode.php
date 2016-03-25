@@ -1,5 +1,5 @@
 <?php
-use Nbbc\BBcode as Nbbc;
+use Nbbc\BBCode as Nbbc;
 
 class BBCode extends Gdn_Pluggable {
 

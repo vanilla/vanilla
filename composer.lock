@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3ee537d97fb5f0f936ce6b950684e363",
-    "content-hash": "69cb83d64874ee8f3e0752e150daf96b",
+    "hash": "2c673bdfd531550caee5493ce0859da8",
+    "content-hash": "107049c1fc4107be95224e2829ecf176",
     "packages": [
         {
             "name": "vanilla/garden-http",
@@ -88,16 +88,16 @@
         },
         {
             "name": "vanilla/nbbc",
-            "version": "v2.0.1",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/nbbc.git",
-                "reference": "5bfd0be175bfe78219d611419fcff7bf0f7dae25"
+                "reference": "15af1d533da305afe8b873a98e392b64f3862978"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/5bfd0be175bfe78219d611419fcff7bf0f7dae25",
-                "reference": "5bfd0be175bfe78219d611419fcff7bf0f7dae25",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/15af1d533da305afe8b873a98e392b64f3862978",
+                "reference": "15af1d533da305afe8b873a98e392b64f3862978",
                 "shasum": ""
             },
             "require": {
@@ -120,7 +120,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-01-13 19:06:18"
+            "time": "2016-03-25 15:15:41"
         }
     ],
     "packages-dev": [],

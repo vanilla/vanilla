@@ -494,7 +494,7 @@ class BBCode extends Gdn_Pluggable {
             $nbbc->addRule('tr', []);
             $nbbc->addRule('td', []);
 
-            $this->eventArguments['BBCode'] = $nbbc;
+            $this->EventArguments['BBCode'] = $nbbc;
             $this->fireEvent('AfterBBCodeSetup');
             $this->nbbc = $nbbc;
         }

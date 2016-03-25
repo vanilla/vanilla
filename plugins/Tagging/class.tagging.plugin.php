@@ -254,11 +254,11 @@ class TaggingPlugin extends Gdn_Plugin {
         // Set breadcrumbs, where relevant.
         $this->setTagBreadcrumbs($sender);
 
-        if (isset($sender->data('Announcements'))) {
+        if (null !== $sender->data('Announcements', null)) {
             TagModel::instance()->joinTags($sender->data('Announcements'));
         }
 
-        if (isset($sender->data('Discussions'))) {
+        if (null !== $sender->data('Discussions', null)) {
             TagModel::instance()->joinTags($sender->data('Discussions'));
         }
     }

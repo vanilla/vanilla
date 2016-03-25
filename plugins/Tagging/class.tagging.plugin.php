@@ -270,7 +270,7 @@ class TaggingPlugin extends Gdn_Plugin {
      */
     protected function setTagBreadcrumbs($sender) {
 
-        if (isset($sender->data('Tag')) && isset($sender->data('Tags'))) {
+        if (null !== $sender->data('Tag',null) && null !== $sender->data('Tags')) {
             $ParentTag = array();
             $CurrentTag = $sender->data('Tag');
             $CurrentTags = $sender->data('Tags');

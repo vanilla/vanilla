@@ -248,32 +248,32 @@ class TaggingPlugin extends Gdn_Plugin {
     /**
      * Add tag breadcrumbs and tags data if appropriate.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         // Set breadcrumbs, where relevant.
-        $this->setTagBreadcrumbs($Sender->Data);
+        $this->setTagBreadcrumbs($sender);
 
-        if (isset($Sender->Data['Announcements'])) {
-            TagModel::instance()->joinTags($Sender->Data['Announcements']);
+        if (isset($sender->data('Announcements'))) {
+            TagModel::instance()->joinTags($sender->data('Announcements'));
         }
 
-        if (isset($Sender->Data['Discussions'])) {
-            TagModel::instance()->joinTags($Sender->Data['Discussions']);
+        if (isset($sender->data('Discussions'))) {
+            TagModel::instance()->joinTags($sender->data('Discussions'));
         }
     }
 
     /**
      * Create breadcrumbs for tag listings.
      *
-     * @param object $data Sender->Data object
+     * @param Gdn_Controller $sender Controller object
      */
-    protected function setTagBreadcrumbs($data) {
+    protected function setTagBreadcrumbs($sender) {
 
-        if (isset($data['Tag']) && isset($data['Tags'])) {
+        if (isset($sender->data('Tag')) && isset($sender->data('Tags'))) {
             $ParentTag = array();
-            $CurrentTag = $data['Tag'];
-            $CurrentTags = $data['Tags'];
+            $CurrentTag = $sender->data('Tag');
+            $CurrentTags = $sender->data('Tags');
 
             $ParentTagID = ($CurrentTag['ParentTagID'])
                 ? $CurrentTag['ParentTagID']
@@ -300,7 +300,7 @@ class TaggingPlugin extends Gdn_Plugin {
             if (count($Breadcrumbs)) {
                 // Rebuild breadcrumbs in discussions when there is a child, as the
                 // parent must come before it.
-                Gdn::controller()->setData('Breadcrumbs', $Breadcrumbs);
+                $sender->setData('Breadcrumbs', $Breadcrumbs);
             }
 
         }

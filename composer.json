@@ -29,7 +29,10 @@
 	},
 	"autoload": {
 		"classmap": [
-			"library/"
+			"library/core/",
+			"library/database/",
+			"library/setup/",
+			"library/vendors/"
 		],
 		"files": [
 			"library/core/functions.error.php",

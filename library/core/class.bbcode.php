@@ -234,7 +234,7 @@ class BBCode extends Gdn_Pluggable {
         list($type, $code) = explode(';', $default);
         switch ($type) {
             case 'youtube':
-                return "<div class=\"Video P\"><iframe width=\"{$width}\" height=\"{$height}\" src=\"http://www.youtube.com/embed/{$code}\" frameborder=\"0\" allowfullscreen></iframe></div>";
+                return "<div class=\"Video P\"><iframe width=\"{$width}\" height=\"{$height}\" src=\"https://www.youtube.com/embed/{$code}\" frameborder=\"0\" allowfullscreen></iframe></div>";
             default:
                 return $content;
         }
@@ -258,7 +258,7 @@ class BBCode extends Gdn_Pluggable {
 
         $videoId = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
 
-        return "<div class=\"Video P\"><iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/{$videoId}\" frameborder=\"0\" allowfullscreen></iframe></div>";
+        return "<div class=\"Video P\"><iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/{$videoId}\" frameborder=\"0\" allowfullscreen></iframe></div>";
     }
 
     /**

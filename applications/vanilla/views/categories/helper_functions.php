@@ -73,8 +73,8 @@ if (!function_exists('getOptions')):
         $tk = urlencode(Gdn::session()->TransientKey());
         $hide = (int)!val('Following', $category);
 
-        $dropdown->addLink(t('Mark Read'), '/category/markread?categoryid='.$categoryID.'&tkey='.$tk, 'mark-read');
-        $dropdown->addLink(t($hide ? 'Unhide' : 'Hide'), '/category/follow?categoryid='.$categoryID.'&value='.$hide.'&tkey='.$tk, 'hide');
+        $dropdown->addLink(t('Mark Read'), url('/category/markread?categoryid='.$categoryID.'&tkey='.$tk), 'mark-read');
+        $dropdown->addLink(t($hide ? 'Unhide' : 'Hide'), url('/category/follow?categoryid='.$categoryID.'&value='.$hide.'&tkey='.$tk), 'hide');
 
         // Allow plugins to add options
         $sender->EventArguments['CategoryOptionsDropdown'] = &$dropdown;

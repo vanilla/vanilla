@@ -704,8 +704,8 @@
           range.setStart(range.endContainer, Math.max(pos, 0));
           range.setEnd(range.endContainer, range.endOffset);
           range.deleteContents();
-          range.insertNode(document.createTextNode('\ufeff'));
-          range.insertNode($insert_node[0]);
+          range.insertNode(document.createTextNode(content + " "));
+          //range.insertNode($insert_node[0]);
           range.collapse(false);
 
           ////sel = window.getSelection();

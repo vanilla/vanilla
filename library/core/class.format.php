@@ -1331,8 +1331,8 @@ EOT;
                 $Result = '<span class="VideoWrap">';
                 $Result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
 
-                $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$videoId.$start.'">';
-                $Result .= '<img src="//img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+                $Result .= '<span class="VideoPreview"><a href="https://www.youtube.com/watch?v='.$videoId.$start.'">';
+                $Result .= '<img src="https://img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
                 $Result .= '<span class="VideoPlayer"></span>';
                 $Result .= '</span>';
 

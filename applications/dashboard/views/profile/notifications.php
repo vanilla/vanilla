@@ -10,7 +10,7 @@ if (count($this->data('Activities'))) {
     echo PagerModule::write(array('CurrentRecords' => count($this->data('Activities'))));
 } else {
     ?>
-    <div class="Empty"><?php echo t('You do not have any notifications yet.'); ?></div>
+    <div class="Empty"><?php echo sprintf(t('You do not have any %s yet.'), t('notifications')); ?></div>
 <?php
 }
 echo '</div>';

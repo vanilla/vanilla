@@ -245,8 +245,8 @@
             </tr>
         </table>
         <!--[if (gte mso 9)|(IE)]>
-        </td>
-        </tr>
+                </td>
+            </tr>
         </table>
         <![endif]-->
         [[if $email.footer]]
@@ -277,8 +277,8 @@
             </tr>
         </table>
         <!--[if (gte mso 9)|(IE)]>
-        </td>
-        </tr>
+                </td>
+            </tr>
         </table>
         <![endif]-->
         [[/if]]

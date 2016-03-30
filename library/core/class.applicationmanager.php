@@ -97,7 +97,13 @@ class Gdn_ApplicationManager {
      * @return bool|mixed Returns the application's info, a specific value, or false if the application cannot be found.
      */
     public function getApplicationInfo($applicationName, $key = null) {
-        $ApplicationInfo = val($applicationName, $this->availableApplications(), null);
+        // First check the enabled applications because they don't scan the file system.
+        if (array_key_exists($applicationName, $this->enabledApplications())) {
+            $ApplicationInfo = val($applicationName, $this->enabledApplications());
+        } else {
+            $ApplicationInfo = val($applicationName, $this->availableApplications(), null);
+        }
+
         if (is_null($ApplicationInfo)) {
             return false;
         }

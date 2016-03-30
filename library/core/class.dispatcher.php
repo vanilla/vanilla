@@ -375,7 +375,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             return false;
         } else {
-            foreach (Gdn::applicationManager()->availableApplications() as $ApplicationName => $ApplicationInfo) {
+            foreach (Gdn::applicationManager()->enabledApplications() as $ApplicationName => $ApplicationInfo) {
                 if (val('Folder', $ApplicationInfo, false) === $ApplicationFolder) {
                     $EnabledApplication = $ApplicationName;
                     $this->EventArguments['EnabledApplication'] = $EnabledApplication;

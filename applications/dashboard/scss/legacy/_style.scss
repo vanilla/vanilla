@@ -1,3 +1,5 @@
+@import 'variables';
+
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -25,8 +27,8 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 
 body {
   line-height: 1;
-  color: black;
-  background: white;
+  color: $black;
+  background: $white;
 }
 
 ol, ul {
@@ -109,12 +111,12 @@ body.Entry #Content {
 
 /* ============================================== General Styles & Typography */
 body {
-  color: #000;
+  color: $black;
   font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
   font-size: 75%;
   font-size: small;
   line-height: 1.7em;
-  background: #fff;
+  background: $white;
   margin: 0;
   padding: 0;
 }
@@ -207,17 +209,17 @@ h5 {
 
 a {
   text-decoration: none;
-  color: #1e79a7;
+  color: $vanilla-blue;
 }
 
 a:hover,
 a.TextColor:hover,
 a:hover .TextColor {
-  color: #ff0084;
+  color: $vanilla-pink;
 }
 
 a.TextColor, a .TextColor {
-  color: black;
+  color: $black;
 }
 
 img.Thumbnail {
@@ -232,13 +234,13 @@ input.InputBox,
 input.SmallInput,
 textarea {
   font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
-  color: #333;
+  color: $grey-1;
   font-size: 15px;
   padding: 3px;
   margin: 0;
   width: 250px;
-  background: #fff;
-  border: 1px solid #999;
+  background: $white;
+  border: 1px solid $grey-9;
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
@@ -250,9 +252,9 @@ textarea {
   width: 17em;
   padding: 2px 20px 2px 10px;
   display: none;
-  background: #e6e6e6;
+  background: $grey-o;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #999;
+  border: 1px solid $grey-9;
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
@@ -486,7 +488,7 @@ input.InputBox {
 input.SmallInput:focus,
 input.InputBox:focus,
 textarea:focus {
-  background: #ffe;
+  background: $white-2;
 }
 
 input.BigInput {
@@ -500,7 +502,7 @@ textarea {
 select {
   font-family: arial;
   font-size: 14px;
-  color: #222;
+  color: $grey-k;
   margin: 0;
   padding: 3px;
 }
@@ -513,18 +515,18 @@ select {
   line-height: 1;
   font-weight: bold;
   padding: 4px 6px;
-  background: #f8f8f8;
-  border: 1px solid #999;
+  background: $grey-a;
+  border: 1px solid $grey-9;
   border-radius: 2px;
   white-space: nowrap;
-  box-shadow: inset 0 2px 0 #fff, inset 0 -1px 2px #eee;
-  border-color: #999;
-  color: #333;
+  box-shadow: inset 0 2px 0 $white, inset 0 -1px 2px $grey-5;
+  border-color: $grey-9;
+  color: $grey-1;
 }
 
 .Button:hover {
-  color: #111;
-  border-color: #666;
+  color: $grey-p;
+  border-color: $grey-j;
 }
 
 .Button.Disabled {
@@ -560,9 +562,9 @@ div.FileUpload .CurrentImage {
 .ButtonGroup.Open .Button.Handle,
 .Button:focus,
 .Button:active {
-  border-color: #aaa;
-  color: #333;
-  background: #f7f7f7;
+  border-color: $grey-b;
+  color: $grey-1;
+  background: $grey-g;
   box-shadow: none;
 }
 
@@ -607,22 +609,22 @@ div.FileUpload .CurrentImage {
 }
 
 .NavButton {
-  color: #333;
+  color: $grey-1;
   display: inline-block;
   cursor: pointer;
   font-size: 13px;
   line-height: 16px;
   font-weight: bold;
   padding: 5px 8px;
-  border: 1px solid #999;
+  border: 1px solid $grey-9;
   border-radius: 2px;
   white-space: nowrap;
-  background-color: #fdfdfd;
+  background-color: $grey-c;
 }
 
 .ButtonGroup.Open .NavButton.Handle {
-  color: #333;
-  background: #eee;
+  color: $grey-1;
+  background: $grey-5;
 }
 
 /* Split Button Dropdown */
@@ -657,7 +659,7 @@ div.FileUpload .CurrentImage {
   display: inline-block;
   border-style: solid;
   border-width: 4px;
-  border-color: #000 transparent transparent transparent;
+  border-color: $black transparent transparent transparent;
   position: relative;
   top: 2px;
   margin: 0;
@@ -723,11 +725,10 @@ div.FileUpload .CurrentImage {
 
 .ActivateSlider {
   display: inline-block;
-  background: #bbb;
-  /*background: rgba(0, 0, 0, .2);*/
-  box-shadow: 0 10px 30px #333 inset;
+  background: $grey-d;
+  box-shadow: 0 10px 30px $grey-1 inset;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
-  border: solid 1px #ccc;
+  border: solid 1px $grey-e;
   width: 125px;
   border-radius: 4px;
   padding: 1px;
@@ -741,7 +742,7 @@ div.FileUpload .CurrentImage {
 .Gloss {
   font-size: 80%;
   font-weight: normal;
-  color: #666;
+  color: $grey-j;
 }
 
 .Loading {
@@ -771,8 +772,8 @@ div.FileUpload .CurrentImage {
 }
 
 .Deleted {
-  background: #f5f5f5;
-  border: 1px solid #dddddd;
+  background: $grey-8;
+  border: 1px solid $grey-2;
   margin: 10px 0 0;
   padding: 6px 10px;
   border-radius: 3px;
@@ -782,19 +783,19 @@ div.FileUpload .CurrentImage {
    strings & imply importance. */
 span.Warning,
 div.Warning {
-  background: #fee;
-  border: 2px solid #fbb;
-  color: #d00;
+  background: $white-6;
+  border: 2px solid $red-b;
+  color: $red-c;
   padding: 6px 8px;
   margin: 10px 0;
   border-radius: 2px;
 }
 
 .Count {
-  background-color: #444;
+  background-color: $grey-7;
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 3px;
-  color: #fff;
+  color: $white;
   font-size: 80%;
   font-weight: normal;
   padding: 1px .8ex;
@@ -802,14 +803,14 @@ div.Warning {
 
 .Alert {
   font-size: 80%;
-  background: #d00;
-  color: #fff;
+  background: $red-c;
+  color: $white;
   padding: 1px 3px;
   border-radius: .5ex;
 }
 
 .Alert a {
-  color: #fff;
+  color: $white;
 }
 
 .Alert a:hover {
@@ -818,10 +819,10 @@ div.Warning {
 
 .Info {
   font-size: 13px;
-  background: #fafafa;
-  border: 2px solid #eee;
+  background: $grey-f;
+  border: 2px solid $grey-5;
   border: 2px solid rgba(0, 0, 0, 0.1);
-  color: #888;
+  color: $grey-6;
   border-radius: 2px;
   padding: 6px 8px;
   margin: 10px 0;
@@ -865,11 +866,11 @@ div.Warning {
 }
 
 .Pager span {
-  color: #777;
+  color: $grey-3;
 }
 
 .Pager .Highlight {
-  color: #000;
+  color: $black;
 }
 
 .MoreWrap {
@@ -890,7 +891,7 @@ a.Small:hover {
 
 a.Small img {
   text-indent: -100px;
-  background: #ddd;
+  background: $grey-2;
   display: inline-block;
   height: 24px;
   width: 24px;
@@ -906,7 +907,7 @@ a.Small img {
   font-size: 16px;
   font-weight: bold;
   line-height: 1;
-  color: #777;
+  color: $grey-3;
   top: -1px;
   right: -1px;
   padding: 1px 3px;
@@ -915,8 +916,8 @@ a.Small img {
 
 .DismissMessage a.Dismiss:hover {
   border: none;
-  background: #333;
-  color: #fff;
+  background: $grey-1;
+  color: $white;
 }
 
 .DismissMessage strong,
@@ -928,7 +929,7 @@ a.Small img {
   font-size: 13px;
   text-align: left;
   position: relative;
-  color: #000;
+  color: $black;
   border: none;
   border-radius: 1px;
   margin: 10px 0;
@@ -936,47 +937,47 @@ a.Small img {
 }
 
 .DismissMessage.Info {
-  background: #f3f4f8;
-  border: 1px solid #ddd;
+  background: $white-3;
+  border: 1px solid $grey-2;
 }
 
 .DismissMessage.Warning {
-  background: #ffebe9;
-  border: 1px solid #FFCCC9;
+  background: $white-4;
+  border: 1px solid $red-d;
 }
 
 .DismissMessage.Box {
-  background: #fff8ce;
-  border: 1px solid #c5bea4;
+  background: $yellow-c;
+  border: 1px solid $yellow-d;
   box-shadow: none;
   margin: 0 0 10px; /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }
 
 .CasualMessage {
-  background: #CFECFF;
-  border: 1px solid #ABDAFB;
-  color: #1E79A7;
+  background: $blue-a;
+  border: 1px solid $blue-9;
+  color: $vanilla-blue;
 }
 
 .InfoMessage {
-  background: #F6F6F6;
-  border: 1px solid #ddd;
+  background: $grey-q;
+  border: 1px solid $grey-2;
 }
 
 .AlertMessage {
-  background: #fff8ce;
-  border: 1px solid #DEDDAF;
+  background: $yellow-c;
+  border: 1px solid $yellow-e;
 }
 
 .WarningMessage {
-  background: #ffebe9;
-  border: 1px solid #FFCCC9;
+  background: $white-4;
+  border: 1px solid $red-d;
 }
 
 /* =================================================================== Header */
 #Head {
-  background: #38abe3;
-  color: #fff;
+  background: $blue-8;
+  color: $white;
 }
 
 /* Targetting the padding on head in this way b/c it was causing problems in older themes */
@@ -985,7 +986,7 @@ body > #Frame > .Head {
 }
 
 #Head a {
-  color: #fff;
+  color: $white;
   font-weight: bold;
 }
 
@@ -1058,7 +1059,7 @@ body > #Frame > .Head {
 .CategoryLink {
   padding: 2px 4px;
   font-size: 11px;
-  background: #CFECFF;
+  background: $blue-a;
   border-radius: 1px;
 }
 
@@ -1096,7 +1097,7 @@ body > #Frame > .Head {
 
 .Flyout:before,
 .Flyout:after {
-  border-bottom: 7px solid #444444;
+  border-bottom: 7px solid $grey-7;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   content: "";
@@ -1106,7 +1107,7 @@ body > #Frame > .Head {
 }
 
 .Flyout:after {
-  border-bottom: 7px solid #fff;
+  border-bottom: 7px solid $white;
   top: -6px;
 }
 
@@ -1119,11 +1120,11 @@ body > #Frame > .Head {
 .MenuItems {
   line-height: 100%;
   font-size: 11px;
-  border: 1px solid #999;
+  border: 1px solid $grey-9;
   border-radius: 2px;
-  background: #fff;
+  background: $white;
   padding: 5px 0;
-  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px $grey-5;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -1131,19 +1132,19 @@ body > #Frame > .Head {
   display: block;
   text-decoration: none;
   white-space: nowrap;
-  color: #333 !important;
+  color: $grey-1 !important;
   padding: 3px 15px;
   line-height: 18px;
 }
 
 .MenuItems a:hover {
-  color: #ffffff !important;
+  color: $white !important;
   text-decoration: none;
-  background-color: #004D9F !important;
+  background-color: $blue-e !important;
 }
 
 .MenuItems a:hover .Gloss {
-  color: #ffffff !important;
+  color: $white !important;
 }
 
 .MenuItems li > strong {
@@ -1154,12 +1155,12 @@ body > #Frame > .Head {
 
 .MenuItems hr {
   border: 0;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid $grey-2;
 }
 
 .MenuItems.Up:before,
 .MenuItems.Up:after {
-  border-top: 7px solid #444444;
+  border-top: 7px solid $grey-7;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   content: "";
@@ -1169,7 +1170,7 @@ body > #Frame > .Head {
 }
 
 .MenuItems.Up:after {
-  border-top: 7px solid #fff;
+  border-top: 7px solid $white;
   bottom: -6px;
 }
 
@@ -1199,16 +1200,16 @@ body > #Frame > .Head {
 
 .FlyoutMenu {
   width: 300px;
-  background: #fff;
-  color: #000;
+  background: $white;
+  color: $black;
   border-radius: 2px;
-  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px $grey-5;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  border: solid 1px #999;
+  border: solid 1px $grey-9;
 }
 
 .FlyoutMenu a {
-  color: #00419b;
+  color: $blue-f;
 }
 
 .FlyoutButton {
@@ -1225,7 +1226,7 @@ body > #Frame > .Head {
   width: 0;
   border-style: solid;
   border-width: 4px;
-  border-color: #000 transparent transparent transparent;
+  border-color: $black transparent transparent transparent;
   position: relative;
   bottom: -2px;
 }
@@ -1335,9 +1336,6 @@ td.CheckBoxColumn {
   /*
 No overflow hidden on main elements. Causes too many bugs!
 overflow: hidden;
-}
-#Panel > :first-child {
-margin-top: 0;
 */
 }
 
@@ -1353,7 +1351,7 @@ margin-top: 0;
   font-size: 12px;
   float: left;
   width: 80px;
-  color: #555;
+  color: $grey-4;
   overflow: hidden;
   white-space: nowrap;
 }
@@ -1414,12 +1412,12 @@ margin-top: 0;
 }
 
 .MeButton:hover {
-  background: #eee;
+  background: $grey-5;
   background: rgba(0, 0, 0, 0.07);
 }
 
 .MeButton:hover {
-  background: #eee;
+  background: $grey-5;
   background: rgba(0, 0, 0, 0.07);
 }
 
@@ -1468,15 +1466,15 @@ margin-top: 0;
 }
 
 .PanelActivity {
-  border-top: 1px solid #abdafb;
+  border-top: 1px solid $blue-g;
   border-bottom: 0;
 }
 
 .PanelActivity li {
-  background: #e3f4ff;
-  border-bottom: 1px solid #abdafb;
+  background: $white-7;
+  border-bottom: 1px solid $blue-g;
   padding: 2px 4px;
-  color: #555;
+  color: $grey-4;
   font-size: 11px;
   line-height: 1.6;
 }
@@ -1501,7 +1499,7 @@ margin-top: 0;
 
 .PanelActivity li em {
   padding-left: 5px;
-  color: #777;
+  color: $grey-3;
   font-size: 80%;
 }
 
@@ -1516,14 +1514,14 @@ margin-top: 0;
 
 #Panel .FilterMenu li,
 .PanelInfo li {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid $grey-2;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding: 2px 4px;
 }
 
 #Panel .FilterMenu li:first-child,
 .PanelInfo li:first-child {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid $grey-2;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -1549,7 +1547,6 @@ margin-top: 0;
 }
 
 .PanelInfo .Heading {
-  /*color: #000;*/
   font-weight: bold;
 }
 
@@ -1579,8 +1576,8 @@ margin-top: 0;
 .PanelInfo .Meta strong {
   display: inline;
   border-radius: 2px;
-  background: #FF0;
-  color: #000;
+  background: $yellow-3;
+  color: $black;
   font-size: 9px;
   font-weight: bold;
   padding: 3px;
@@ -1591,13 +1588,13 @@ margin-top: 0;
   text-align: left;
   font-weight: bold;
   background: none;
-  color: #333;
+  color: $grey-1;
   padding: 2px 0;
 }
 
 #Panel .FilterMenu .Active,
 .PanelInfo .Active {
-  background: #f7f7f7;
+  background: $grey-g;
   background: rgba(0, 0, 0, 0.03);
   font-weight: bold;
 }
@@ -1638,7 +1635,7 @@ margin-top: 0;
 }
 
 #Content .FilterMenu li.Active a {
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid $grey-2;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -1649,8 +1646,8 @@ margin-top: 0;
 }
 
 #Content .BoxFilter .Active a {
-  color: #000;
-  border-bottom: 2px solid #ddd;
+  color: $black;
+  border-bottom: 2px solid $grey-2;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -1820,8 +1817,8 @@ margin-top: 0;
   height: 44px;
   width: 44px;
   overflow: hidden;
-  background: #c4cde0;
-  color: #c4cde0;
+  background: $blue-i;
+  color: $blue-i;
   text-indent: 50px;
 }
 
@@ -1848,7 +1845,7 @@ margin-top: 0;
   font-size: 14px;
   padding: 6px 25px 6px 8px;
   border-radius: .35ex;
-  border: solid 1px #bbb;
+  border: solid 1px $grey-d;
 }
 
 .SearchForm .SiteSearch {
@@ -1869,7 +1866,7 @@ margin-top: 0;
 .NarrowList .Item {
   margin: 0;
   padding: 8px;
-  border: 0 solid #ddd;
+  border: 0 solid $grey-2;
   border: 0 solid rgba(0, 0, 0, 0.1);
   border-bottom-width: 1px;
   position: relative;
@@ -1903,7 +1900,7 @@ margin-top: 0;
 .ItemDiscussion .Meta,
 .DataList .Meta {
   font-size: 11px;
-  color: #70727c;
+  color: $blue-j;
 }
 
 .MItem {
@@ -1941,8 +1938,8 @@ margin-top: 0;
 
 .HasNew {
   border-radius: 2px;
-  background: #FF0;
-  color: #000;
+  background: $yellow-3;
+  color: $black;
   font-size: 9px;
   font-weight: bold;
   padding: 3px;
@@ -1955,7 +1952,7 @@ margin-top: 0;
 }
 
 .Item.Read {
-  background: #f3f3f3;
+  background: $grey-h;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
   filter: alpha(opacity=90);
   opacity: .9;
@@ -1972,7 +1969,7 @@ margin-top: 0;
 }
 
 .Item.Checked {
-  background: #ffc;
+  background: $yellow-f;
 }
 
 .Item.Open {
@@ -1982,29 +1979,9 @@ margin-top: 0;
   opacity: 1 !important;
 }
 
-/*
-.Read {
-    background: transparent;
-}
-.Read > * {
-    opacity: 0.4;
-}
-.Read:hover > * {
-    opacity: 1;
-}
-.Checked {
-    background: #ffc;
-    opacity: 1;
-}
-.Checked > *,
-.Read:hover > * {
-    opacity: 1;
-}
-*/
-
 .DataList a.Delete {
   border-radius: 0;
-  color: #333;
+  color: $grey-1;
   display: block;
   height: 14px;
   margin: 0;
@@ -2020,8 +1997,8 @@ margin-top: 0;
 .DataList a.Delete:hover {
   text-decoration: none;
   border: none;
-  background: #333;
-  color: #fff;
+  background: $grey-1;
+  color: $white;
   visibility: visible;
 }
 
@@ -2031,15 +2008,15 @@ margin-top: 0;
 
 /* Condensed datalists make the main link & excerpt inline. */
 .DataList .Unfollow {
-  background: #eee;
+  background: $grey-5;
 }
 
 .DataList .Unfollow a {
-  color: #888;
+  color: $grey-6;
 }
 
 .Item .Inset {
-  border-top: 1px solid #bec8cc;
+  border-top: 1px solid $blue-h;
   padding: 5px 0;
 }
 
@@ -2062,7 +2039,7 @@ margin-top: 0;
   padding: 4px;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid $grey-2;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -2072,7 +2049,7 @@ margin-top: 0;
 }
 
 .PopList .Meta {
-  color: #777;
+  color: $grey-3;
   font-size: 80%;
 }
 
@@ -2086,7 +2063,7 @@ margin-top: 0;
 }
 
 .PopList .Item:hover {
-  background: #eee;
+  background: $grey-5;
   background: rgba(0, 0, 0, 0.03);
 }
 
@@ -2125,7 +2102,7 @@ margin-top: 0;
 }
 
 .Hero {
-  background: #f7f7f7;
+  background: $grey-g;
   background: rgba(0, 0, 0, .03);
   padding: 20px;
   margin: 10px 0 20px;
@@ -2168,7 +2145,7 @@ margin-top: 0;
 }
 
 .Activities li.Condensed .Excerpt {
-  color: #000;
+  color: $black;
   font-size: 13px;
 }
 
@@ -2185,7 +2162,7 @@ margin-top: 0;
 }
 
 .Activities .DataList li {
-  background: #f3f3f3;
+  background: $grey-h;
   background: rgba(0, 0, 0, 0.05);
   margin-bottom: 2px;
   padding: 6px;
@@ -2208,11 +2185,11 @@ margin-top: 0;
 .Activities a.CommentLink:hover {
   font-size: 12px;
   cursor: text;
-  background: #fff;
-  color: #bbb !important;
+  background: $white;
+  color: $grey-d !important;
   padding: 5px;
   text-decoration: none;
-  border: 1px solid #aaa;
+  border: 1px solid $grey-b;
   display: block;
   line-height: 100%;
   font-weight: normal;
@@ -2232,7 +2209,7 @@ margin-top: 0;
 }
 
 body.Post .Popup a.Close {
-  color: #1e79a7;
+  color: $vanilla-blue;
 }
 
 .Message {
@@ -2258,9 +2235,9 @@ blockquote {
 blockquote.Quote, blockquote.UserQuote {
   padding: 1ex 16px;
   margin: 1em 0;
-  background: #f3f3f3;
+  background: $grey-h;
   background: rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #eee;
+  border-left: 4px solid $grey-5;
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   min-width: 200px;
   overflow-y: auto;
@@ -2268,7 +2245,7 @@ blockquote.Quote, blockquote.UserQuote {
 
 .Message small {
   font-size: 11px;
-  color: #777;
+  color: $grey-3;
 }
 
 .EmbeddedContent {
@@ -2305,11 +2282,11 @@ img.LeftAlign {
 
 code, pre {
   border-radius: 2px;
-  background: #ff9;
+  background: $yellow-8;
   padding: 4px 8px;
   font-family: monospace;
   overflow: auto;
-  border: 1px solid #eec;
+  border: 1px solid $yellow-9;
 }
 
 code {
@@ -2331,7 +2308,7 @@ pre code {
 mark {
   padding: 0 2px;
   color: inherit;
-  background: #ff6;
+  background: $yellow-a;
 }
 
 .Message strong, .Message b {
@@ -2362,7 +2339,7 @@ mark {
 
 /* =============================================================== Categories */
 .ChildCategories {
-  border-top: 1px dotted #ddd;
+  border-top: 1px dotted $grey-2;
   display: block;
 }
 
@@ -2397,9 +2374,9 @@ mark {
 /* ============================================================= Profile Page */
 a.ChangePicture {
   position: absolute;
-  background: #333;
+  background: $grey-1;
   background: rgba(0, 0, 0, .7);
-  color: #fff;
+  color: $white;
   font-size: 11px;
   padding: 10px 0;
   width: 100%;
@@ -2412,7 +2389,7 @@ a.ChangePicture {
 }
 
 a.ChangePicuture:hover {
-  color: #fff;
+  color: $white;
   text-decoration: underline;
 }
 
@@ -2429,7 +2406,7 @@ div.Popup .SmallPopup h1 {
 /* BGColor on profile forms */
 body.Profile.EditMode #Content form {
   padding: 10px 20px 20px;
-  background: #f3f3f3;
+  background: $grey-h;
   background: rgba(0, 0, 0, 0.05);
 }
 
@@ -2465,7 +2442,7 @@ table.PreferenceGroup td,
 #Form_Invitation th,
 #Form_Invitation td {
   padding: 2px 6px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid $grey-2;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -2497,7 +2474,7 @@ dl.About dd {
 }
 
 dl.About dt {
-  color: #666;
+  color: $grey-j;
   background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
   padding-left: 14px;
 }
@@ -2538,7 +2515,7 @@ dl.About dd {
 
 .Invitations.DataTable th {
   padding: 4px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid $grey-5;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   vertical-align: top;
 }
@@ -2583,7 +2560,7 @@ form.Thumbnail .Warning {
 }
 
 .jcropper-holder {
-  border: 1px black solid;
+  border: 1px $black solid;
 }
 
 .jcrop-holder {
@@ -2593,7 +2570,7 @@ form.Thumbnail .Warning {
 .jcrop-vline, .jcrop-hline {
   font-size: 0;
   position: absolute;
-  background: white url('images/jcrop.gif') top left repeat;
+  background: $white url('images/jcrop.gif') top left repeat;
 }
 
 .jcrop-vline {
@@ -2610,8 +2587,8 @@ form.Thumbnail .Warning {
   font-size: 1px;
   width: 7px !important;
   height: 7px !important;
-  border: 1px #eee solid;
-  background-color: #333;
+  border: 1px $grey-5 solid;
+  background-color: $grey-1;
 }
 
 .jcrop-tracker {
@@ -2621,19 +2598,19 @@ form.Thumbnail .Warning {
 
 .custom .jcrop-vline,
 .custom .jcrop-hline {
-  background: yellow;
+  background: $yellow-3;
 }
 
 .custom .jcrop-handle {
-  border-color: black;
-  background-color: #C7BB00;
+  border-color: $black;
+  background-color: $yellow-b;
   border-radius: 3px;
 }
 
 /* ================================================= CommentForm */
 .Preview {
-  background: #fff;
-  color: #000;
+  background: $white;
+  color: $black;
   padding: 4px;
   min-height: 100px;
 }
@@ -2715,7 +2692,7 @@ div.Popup .Border {
 }
 
 div.Popup .Body {
-  background: #fff;
+  background: $white;
   padding: 10px;
   float: left; /* Put this here b/c background of form was not descending to bottom of popup. */
 }
@@ -2733,7 +2710,7 @@ a.Close {
   top: 16px;
   right: 20px;
   line-height: 1;
-  color: #000;
+  color: $black;
   cursor: pointer;
   font-family: arial;
   font-size: 22px;
@@ -2847,16 +2824,16 @@ div.Popup form ul li label.RadioLabel {
   margin: 20px 0 0;
   padding: 4px 9px;
   font-size: 13px;
-  color: #ddd;
+  color: $grey-2;
   line-height: 1;
 }
 
 #Foot a {
-  color: #ccc;
+  color: $grey-e;
 }
 
 #Foot a:hover {
-  color: #aaa;
+  color: $grey-b;
 }
 
 .PoweredByVanilla {
@@ -2883,32 +2860,32 @@ div.Popup form ul li label.RadioLabel {
   + New: there are new comments since the last viewed the discussion
 */
 .Tag {
-  background: #777777;
+  background: $grey-3;
   border-radius: 2px;
-  color: #FFFFFF;
+  color: $white;
   padding: 1px 4px;
   line-height: 14px;
 }
 
 .Tag a {
-  color: #FFFFFF;
+  color: $white;
 }
 
 .Tag.Closed {
-  background: #555555;
+  background: $grey-4;
 }
 
 .Tag.Category {
-  background: #f0f0f0;
+  background: $grey-i;
   font-weight: normal;
 }
 
 .Tag.Category a {
-  color: #000;
+  color: $black;
 }
 
 .Tag.Tag-Banned {
-  background-color: #C70028;
+  background-color: $red-a;
 }
 
 .Discussion .PageTitle h1 {
@@ -2955,7 +2932,7 @@ div.Popup form ul li label.RadioLabel {
 
 .DataTable td {
   padding: 4px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid $grey-2;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   vertical-align: top;
 }
@@ -3016,7 +2993,7 @@ td.Opts {
   display: inline-block;
   margin-left: 3px;
   font-size: 11px;
-  color: #333;
+  color: $grey-1;
 }
 
 .MiniPager a,
@@ -3026,7 +3003,7 @@ td.Opts {
 
 tr.CategoryHeading td {
   font-weight: bold;
-  background: #f7f7f7;
+  background: $grey-g;
   background: rgba(0, 0, 0, 0.03);
 }
 
@@ -3043,7 +3020,7 @@ tr.CategoryHeading td {
 
 .DiscussionSorter:hover {
   cursor: pointer;
-  background: #f3f3f3;
+  background: $grey-h;
 }
 
 .DiscussionSorter .MenuItems {
@@ -3062,7 +3039,7 @@ tr.CategoryHeading td {
 }
 
 .DiscussionSorter .Open .Selected {
-  border: 1px solid #999;
+  border: 1px solid $grey-9;
   border-bottom: none;
 }
 
@@ -3146,11 +3123,11 @@ tr.CategoryHeading td {
 .DiscussionForm label {
   font-size: 14px;
   font-weight: bold;
-  color: #666;
+  color: $grey-j;
 }
 
 .FormWrapper {
-  background: #f7f7f7;
+  background: $grey-g;
   background: rgba(0, 0, 0, 0.03);
   margin: 0;
   padding: 20px;
@@ -3251,9 +3228,9 @@ textarea.MultiComplete {
 
 .ac_results {
   padding: 0;
-  border: 1px solid #d7d8da;
+  border: 1px solid $white-1;
   border-top: 0;
-  background-color: white;
+  background-color: $white;
   overflow: hidden;
   z-index: 99999;
 }
@@ -3283,7 +3260,7 @@ textarea.MultiComplete {
  */
   line-height: 16px;
   overflow: hidden;
-  border-bottom: 1px solid #d7d8da;
+  border-bottom: 1px solid $white-1;
   text-align: left;
 }
 
@@ -3293,17 +3270,17 @@ textarea.MultiComplete {
 
 .ac_results strong {
   font-weight: bold;
-  background: #c7e2ff;
+  background: $blue-7;
 }
 
 .ac_over strong {
   font-weight: bold;
-  background: #216ebf;
+  background: $blue-4;
 }
 
 .ac_over {
-  background: #004D9F;
-  color: #fff;
+  background: $blue-4;
+  color: $white;
 }
 
 .AddPeople h4 {
@@ -3314,7 +3291,7 @@ textarea.MultiComplete {
 #ConversationForm label {
   display: block;
   text-align: left;
-  color: #666666;
+  color: $grey-j;
   font-size: 14px;
   font-weight: bold;
 }
@@ -3336,9 +3313,9 @@ body.Conversations a.Cancel {
   background: url('images/upload-progress-back.gif') repeat;
   width: 200px;
   z-index: 0;
-  color: #fff;
-  text-shadow: 0 1px 1px #333;
-  border: 1px solid #0c3c7e;
+  color: $white;
+  text-shadow: 0 1px 1px $grey-1;
+  border: 1px solid $blue-6;
   border-radius: 2px;
 }
 
@@ -3371,14 +3348,14 @@ body.Conversations a.Cancel {
 /* Container */
 .Border {
   border-radius: 8px;
-  background: #ddd;
+  background: $grey-2;
   background: rgba(82, 82, 82, 0.7);
   padding: 10px;
 }
 
 /* Tabs */
 ul.Tabs {
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid $grey-b;
   text-align: left;
   padding-left: 4px;
 }
@@ -3390,25 +3367,25 @@ ul.Tabs li {
 ul.Tabs li a {
   display: inline-block;
   margin-left: 4px;
-  border: 1px solid #aaa;
+  border: 1px solid $grey-b;
   border-width: 1px 1px 0 1px;
   border-radius: 3px 3px 0 0;
-  background: #eee;
-  color: #888;
+  background: $grey-5;
+  color: $grey-6;
   position: relative;
   top: 1px;
   padding: 2px 8px 1px;
 }
 
 ul.Tabs li a:hover {
-  background: #f5f5f5;
-  color: #444;
+  background: $grey-8;
+  color: $grey-7;
 }
 
 ul.Tabs li a.Active {
   padding: 2px 8px;
-  background: #fff;
-  color: #000;
+  background: $white;
+  color: $black;
 }
 
 /* Icons */
@@ -3422,7 +3399,6 @@ ul.Tabs li a.EntryTabFor_password {
 /* ============================================================ Entry Screens */
 body.Entry form ul li label {
   font-size: 14px;
-  /* color: #474747; */
   font-weight: bold;
   padding: 6px 0 0;
   display: block;
@@ -3437,7 +3413,7 @@ body.Entry form ul li label.RadioLabel {
 
 span.Incorrect {
   display: block;
-  color: red;
+  color: $red-1;
 }
 
 .SingleEntryMethod {
@@ -3478,7 +3454,7 @@ body#dashboard_entry_index #Content input.Password,
 
 .PasswordStrength .Background {
   height: 4px;
-  background-color: #e8e8e8;
+  background-color: $grey-l;
   width: 100%;
   position: absolute;
   left: 0;
@@ -3486,7 +3462,7 @@ body#dashboard_entry_index #Content input.Password,
 
 .PasswordStrength .Strength {
   height: 4px;
-  background-color: #c81818;
+  background-color: $red-8;
   width: 0;
   position: absolute;
   left: 0;
@@ -3495,7 +3471,7 @@ body#dashboard_entry_index #Content input.Password,
 .PasswordStrength .Separator {
   height: 4px;
   width: 2px;
-  background-color: #fff;
+  background-color: $white;
   position: absolute;
   left: 0;
 }
@@ -3512,52 +3488,52 @@ body#dashboard_entry_index #Content input.Password,
 }
 
 .PasswordStrength.Score-0 .StrengthText {
-  color: #888888;
+  color: $grey-6;
 }
 
 .PasswordStrength.Score-1 .Strength {
-  background-color: #C81818;
+  background-color: $red-8;
   width: 20%;
 }
 
 .PasswordStrength.Score-1 .StrengthText {
-  color: #C81818;
+  color: $red-8;
 }
 
 .PasswordStrength.Score-2 .Strength {
-  background-color: #FF891D;
+  background-color: $orange-1;
   width: 40%;
 }
 
 .PasswordStrength.Score-2 .StrengthText {
-  color: #FF891D;
+  color: $orange-1;
 }
 
 .PasswordStrength.Score-3 .Strength {
-  background-color: #FFAC1D;
+  background-color: $orange-2;
   width: 60%;
 }
 
 .PasswordStrength.Score-3 .StrengthText {
-  color: #FFAC1D;
+  color: $orange-2;
 }
 
 .PasswordStrength.Score-4 .Strength {
-  background-color: #A6C060;
+  background-color: $green-2;
   width: 80%;
 }
 
 .PasswordStrength.Score-4 .StrengthText {
-  color: #A6C060;
+  color: $green-2;
 }
 
 .PasswordStrength.Score-5 .Strength {
-  background-color: #27B30F;
+  background-color: $green-1;
   width: 100%;
 }
 
 .PasswordStrength.Score-5 .StrengthText {
-  color: #27B30F;
+  color: $green-1;
 }
 
 a.ForgotPassword {
@@ -3605,7 +3581,7 @@ body#dashboard_entry_handshake ul.NewAccount {
   float: left;
   width: 315px;
   margin-right: 44px;
-  border-right: 1px solid #A5D0E7;
+  border-right: 1px solid $blue-2;
 }
 
 body#dashboard_entry_handshake ul.LinkAccount {
@@ -3624,14 +3600,14 @@ ul.LinkAccount h2 {
 }
 
 body#dashboard_entry_handshake .Info {
-  border: 1px solid #A5D0E7;
-  background: #D3F0FF;
-  color: #02475A;
+  border: 1px solid $blue-2;
+  background: $blue-3;
+  color: $blue-1;
 }
 
 body#dashboard_entry_handshake #Content h2 {
   border: none;
-  color: #02475A;
+  color: $blue-1;
   font-size: 140%;
   font-weight: bold;
   padding: 6px 0;
@@ -3658,7 +3634,7 @@ body#dashboard_entry_leave p.Leaving {
 
 .FinePrint {
   font-size: 11px;
-  color: #777;
+  color: $grey-3;
 }
 
 /* Do not customize these unless you enjoy pain. */
@@ -3682,28 +3658,28 @@ body#dashboard_entry_leave p.Leaving {
 }
 
 .Errors ul {
-  border: 1px solid #a00 !important;
-  background: #d50a0a !important;
+  border: 1px solid $red-6 !important;
+  background: $red-7 !important;
   padding: 6px 10px;
   display: block;
   border-radius: 2px;
 }
 
 .Errors a {
-  color: #fff;
+  color: $white;
   text-decoration: underline;
 }
 
 .Errors ul li {
-  color: #fff !important;
-  background: #d50a0a !important;
+  color: $white !important;
+  background: $red-7 !important;
   text-align: left;
 }
 
 div.Popup .Errors ul {
   display: block;
   border-radius: 2px;
-  border: 1px solid #a00 !important;
+  border: 1px solid $red-6 !important;
 }
 
 div.Popup .Errors {
@@ -3726,12 +3702,12 @@ div.Popup .Errors {
 
 .Errors pre,
 .Errors pre * {
-  background: #ffa !important;
+  background: $yellow-1 !important;
   font-size: 12px !important;
   font-weight: normal !important;
   font-family: monospace !important;
   text-shadow: none !important;
-  color: #333 !important;
+  color: $grey-1 !important;
   line-height: 1.4 !important;
 }
 
@@ -3770,11 +3746,11 @@ position on the page to notify users of things like drafts being saved, etc. */
 }
 
 .InformMessages .InformMessage {
-  color: #fff !important;
-  text-shadow: 0 1px 1px #000;
+  color: $white !important;
+  text-shadow: 0 1px 1px $black;
   text-align: left !important;
   border-radius: 2px;
-  background: rgb(0, 0, 0) !important;
+  background: $black !important;
   background: rgba(0, 0, 0, 0.7) !important;
   border: none !important;
   width: auto;
@@ -3788,16 +3764,16 @@ position on the page to notify users of things like drafts being saved, etc. */
 }
 
 .InformMessages .InformMessage:hover {
-  background: #333;
+  background: $grey-1;
   background: rgba(0, 0, 0, 0.8) !important;
 }
 
 .InformMessages .InformMessage a {
-  color: #aff;
+  color: $blue-b;
 }
 
 .InformMessages .InformMessage a:hover {
-  color: #cff;
+  color: $blue-c;
   text-decoration: underline;
 }
 
@@ -3809,7 +3785,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   border: none;
   background: transparent;
   border-top-right-radius: 2px;
-  color: #ddd;
+  color: $grey-2;
   font-size: 14px;
   text-align: center;
   display: none;
@@ -3827,8 +3803,8 @@ position on the page to notify users of things like drafts being saved, etc. */
 }
 
 .InformMessages .InformMessage a.Close:hover {
-  background: #000;
-  color: #fff;
+  background: $black;
+  color: $white;
 }
 
 .InformMessages .InformMessage:hover a.Close {
@@ -3838,7 +3814,7 @@ position on the page to notify users of things like drafts being saved, etc. */
 /* iPad/iPhone */
 @media only screen and (device-width: 768px), only screen and (max-device-width: 480px) {
   .InformMessages .InformMessage a.Close {
-    color: #fff;
+    color: $white;
     display: block;
   }
 
@@ -3872,7 +3848,7 @@ position on the page to notify users of things like drafts being saved, etc. */
 }
 
 .InformMessages .Actions a.CancelAction {
-  color: #aaa;
+  color: $grey-b;
 }
 
 /* Inform Sprites */
@@ -4862,13 +4838,13 @@ body.embed .InformMessages {
 
 /*.Embed a.Button,
 .Embed a.Button:hover {
-	color: #333 !important;
+	color: $grey-1 !important;
 	text-decoration: none !important;
 	font-weight: bold;
 }*/
 .EmbedCommentForm {
   padding: 0;
-  border-top: 1px solid #ffffff;
+  border-top: 1px solid $white;
 }
 
 .EmbedCommentForm .TextBox {
@@ -4888,7 +4864,7 @@ body.embed .InformMessages {
 .EmbedCommentForm .Author {
   display: inline-block;
   font-size: 11px;
-  color: #777;
+  color: $grey-3;
   padding: 0 8px 0 0;
 }
 
@@ -4929,11 +4905,11 @@ body.embed .InformMessages {
   position: relative;
   padding-left: 38px;
 
-  color: #fff !important;
-  text-shadow: 0 1px 1px #000;
+  color: $white !important;
+  text-shadow: 0 1px 1px $black;
   text-align: left !important;
   border-radius: 4px;
-  background: rgb(0, 0, 0) !important;
+  background: $black !important;
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
@@ -4944,7 +4920,7 @@ body.embed .InformMessages {
 
 .RegardingEvent a.ReportedUser,
 .RegardingEvent a.ReportingUser {
-  color: #CFECFF;
+  color: $blue-a;
 }
 
 .RegardingEvent .ReportedReason {
@@ -4955,7 +4931,7 @@ body.embed .InformMessages {
 .RegardingEvent .RegardingTime {
   font-size: 9px;
   text-transform: uppercase;
-  color: #B1B1B1;
+  color: $grey-m;
 }
 
 .RegardingActions {
@@ -4970,17 +4946,17 @@ body.embed .InformMessages {
   padding: 0 5px 2px 5px;
   display: inline-block;
   margin-right: 4px;
-  color: #fff !important;
-  text-shadow: 0 1px 1px #000;
+  color: $white !important;
+  text-shadow: 0 1px 1px $black;
   text-align: left !important;
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
-  background: rgb(0, 0, 0) !important;
+  background: $black !important;
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
 .RegardingActions .ActionButton a {
-  color: #CFECFF;
+  color: $blue-a;
   font-size: 10px;
   text-transform: uppercase;
 }
@@ -5343,8 +5319,8 @@ input + .ReactSprite {
 
 ul.token-input-list {
   box-sizing: border-box;
-  border: 1px solid #aaa;
-  color: #333;
+  border: 1px solid $grey-b;
+  color: $grey-1;
   font-size: 15px;
   margin: 0 !important;
   padding: 3px;
@@ -5355,18 +5331,15 @@ ul.token-input-list {
   cursor: text;
   min-height: 1px;
   z-index: 999;
-  background-color: #fff;
+  background-color: $white;
   list-style-type: none;
 }
 
 ul.token-input-list-focus,
 ul.token-input-list-focus input {
-  background: #ffe;
+  background: $white-2;
 }
 
-/*#DiscussionForm input.Button {
-    margin-top: 20px;
-}*/
 ul.token-input-list li input {
   border: 0;
   width: 100px;
@@ -5382,20 +5355,20 @@ li.token-input-token {
   padding: 1px 5px;
   line-height: 20px;
   cursor: default;
-  border: 1px solid #999;
+  border: 1px solid $grey-9;
   border-radius: 2px;
   float: left;
   font-size: 13px;
 }
 
 li.token-input-token.not-allowed {
-  background-color: #FFC2C2;
-  color: #C91313;
-  border: 1px solid #FF3232;
+  background-color: $red-4;
+  color: $red-2;
+  border: 1px solid $red-3;
 }
 
 li.token-input-token.not-allowed span {
-  color: #C91313;
+  color: $red-2;
 }
 
 li.token-input-token p {
@@ -5416,17 +5389,17 @@ li.token-input-token span {
 }
 
 li.token-input-selected-token {
-  background-color: #eee;
+  background-color: $grey-5;
 }
 
 li.token-input-selected-token.not-allowed {
-  background-color: red;
-  color: #ffffff;
-  border: 1px solid #FF3232;
+  background-color: $red-1;
+  color: $white;
+  border: 1px solid $red-3;
 }
 
 li.token-input-selected-token.not-allowed span {
-  color: #ffffff;
+  color: $white;
 }
 
 li.token-input-input-token {
@@ -5435,9 +5408,9 @@ li.token-input-input-token {
 
 div.token-input-dropdown {
   position: absolute;
-  background-color: #fff;
+  background-color: $white;
   overflow: hidden;
-  border: 1px solid #aaa;
+  border: 1px solid $grey-b;
   border-top-width: 0;
   cursor: default;
   z-index: 1;
@@ -5455,16 +5428,16 @@ div.token-input-dropdown ul {
 }
 
 div.token-input-dropdown ul li {
-  background-color: #fff;
+  background-color: $white;
   padding: 3px 6px;
 }
 
 div.token-input-dropdown ul li.token-input-dropdown-item {
-  background-color: #fff;
+  background-color: $white;
 }
 
 div.token-input-dropdown ul li.token-input-dropdown-item2 {
-  background-color: #fff;
+  background-color: $white;
 }
 
 div.token-input-dropdown ul li em {
@@ -5473,7 +5446,7 @@ div.token-input-dropdown ul li em {
 }
 
 div.token-input-dropdown ul li.token-input-selected-dropdown-item {
-  background-color: #eee;
+  background-color: $grey-5;
 }
 
 /**
@@ -5486,30 +5459,30 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   left: 0;
   display: none;
   margin-top: 18px;
-  background: #fff;
+  background: $white;
   min-width: 120px;
   z-index: 100010; /* So high because a client actually had 99999 in a theme */
   border-radius: 2px;
   overflow: hidden;
-  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px $grey-5;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .atwho-view .cur {
-  background: #1E79A7;
-  color: #fff;
+  background: $vanilla-blue;
+  color: $white;
 }
 
 .atwho-view .cur small {
-  color: #fff;
+  color: $white;
 }
 
 .atwho-view strong {
-  color: #1E79A7;
+  color: $vanilla-blue;
 }
 
 .atwho-view .cur strong {
-  color: #fff;
+  color: $white;
   font-weight: bold;
 }
 
@@ -5521,7 +5494,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .atwho-view ul li {
   display: block;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid $grey-5;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   padding: 0 5px;
@@ -5534,7 +5507,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .atwho-view small {
   font-size: smaller;
-  color: #777;
+  color: $grey-3;
   font-weight: 400;
 }
 
@@ -5545,8 +5518,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   line-height: 34px;
   text-align: center;
   vertical-align: top;
-  /*padding-right: 5px;*/
-  /*background: #ff0;*/
 }
 
 .at-suggest-emoji .emoji-wrap > * {
@@ -5558,7 +5529,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   display: inline-block;
   line-height: 34px;
   vertical-align: top;
-  /*background: #f0f;*/
 }
 
 /**
@@ -5592,7 +5562,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   overflow: hidden;
   font-weight: bold;
   line-height: 24px;
-  color: #fff !important;
+  color: $white !important;
   text-decoration: none;
   vertical-align: middle;
 }
@@ -5614,7 +5584,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon .Text {
   padding: 0 15px 0 10px;
-  border-left: 1px solid #eee;
+  border-left: 1px solid $grey-5;
   border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -5660,11 +5630,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-Facebook,
 .SocialIcon-Facebook.HasText .Icon {
-  background-color: #36609e;
+  background-color: $facebook;
 }
 
 .SocialIcon-Facebook:hover {
-  background-color: #294978;
+  background-color: $facebook-hover;
 }
 
 .SocialIcon-Twitter .Icon {
@@ -5677,11 +5647,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-Twitter,
 .SocialIcon-Twitter.HasText .Icon {
-  background-color: #2aa8df;
+  background-color: $twitter;
 }
 
 .SocialIcon-Twitter:hover {
-  background-color: #1c8aba;
+  background-color: $twitter-hover;
 }
 
 .SocialIcon-Google .Icon {
@@ -5694,11 +5664,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-Google,
 .SocialIcon-Google.HasText .Icon {
-  background-color: #da5442;
+  background-color: $google;
 }
 
 .SocialIcon-Google:hover {
-  background-color: #c33926;
+  background-color: $google-hover;
 }
 
 .SocialIcon-OpenID .Icon {
@@ -5711,11 +5681,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-OpenID,
 .SocialIcon-OpenID.HasText .Icon {
-  background-color: #f7921c;
+  background-color: $openid;
 }
 
 .SocialIcon-OpenID:hover {
-  background-color: #d87808;
+  background-color: $openid-hover;
 }
 
 .SocialIcon-LinkedIn .Icon {
@@ -5728,11 +5698,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-LinkedIn,
 .SocialIcon-LinkedIn.HasText .Icon {
-  background-color: #066c9a;
+  background-color: $linkedin;
 }
 
 .SocialIcon-LinkedIn:hover {
-  background-color: #044a69;
+  background-color: $linkedin-hover;
 }
 
 .SocialIcon-Disqus .Icon {
@@ -5741,11 +5711,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-Disqus,
 .SocialIcon-Disqus.HasText .Icon {
-  background-color: #2e9fff;
+  background-color: $disqus;
 }
 
 .SocialIcon-Disqus:hover {
-  background-color: #0087fa;
+  background-color: $disqus-hover;
 }
 
 .SocialIcon-GitHub .Icon {
@@ -5758,11 +5728,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon-GitHub,
 .SocialIcon-GitHub.HasText .Icon {
-  background-color: #6b9ecf;
+  background-color: $github;
 }
 
 .SocialIcon-GitHub:hover {
-  background-color: #4485c3;
+  background-color: $github-hover;
 }
 
 /* Woe unto whoever caused this */
@@ -5928,20 +5898,20 @@ Styleguide Alerts
 .item-attachment .alert {
   padding: 12px;
   margin-bottom: 20px;
-  color: #222;
-  background-color: #d8ecfc;
-  border-color: #d8ecfc;
+  color: $grey-k;
+  background-color: $white-5;
+  border-color: $white-5;
   border-style: solid;
   border-width: 1px;
   border-radius: 2px;
 }
 
 .item-attachment .alert a {
-  color: #090909;
+  color: $grey-n;
 }
 
 .item-attachment .alert hr {
-  border-top-color: #c0e0fa;
+  border-top-color: $blue-d;
 }
 
 .item-attachment .alert h4 {
@@ -5961,49 +5931,49 @@ Styleguide Alerts
 /* Informative alert */
 
 .item-attachment .alert-info {
-  color: #222;
-  background-color: #f9edbe;
-  border-color: #f9edbe;
+  color: $grey-k;
+  background-color: $yellow-4;
+  border-color: $yellow-4;
 }
 
 .item-attachment .alert-info a {
-  color: #090909;
+  color: $grey-n;
 }
 
 .item-attachment .alert-info hr {
-  border-top-color: #f7e7a7;
+  border-top-color: $yellow-5;
 }
 
 /* Warning alert */
 
 .item-attachment .alert-warning {
-  color: #222222;
-  background-color: #ffcc00;
-  border-color: #ffcc00;
+  color: $grey-k;
+  background-color: $yellow-6;
+  border-color: $yellow-6;
 }
 
 .item-attachment .alert-warning a {
-  color: #090909;
+  color: $grey-n;
 }
 
 .item-attachment .alert-warning hr {
-  border-top-color: #e6b800;
+  border-top-color: $yellow-7;
 }
 
 /* Danger alert */
 
 .item-attachment .alert-danger {
-  color: #fff;
-  background-color: #b90000;
-  border-color: #b90000;
+  color: $white;
+  background-color: $red-5;
+  border-color: $red-5;
 }
 
 .item-attachment .alert-danger a {
-  color: #e6e6e6;
+  color: $grey-o;
 }
 
 .item-attachment .alert-danger hr {
-  border-top-color: #a00000;
+  border-top-color: $red-6;
 }
 
 /*
@@ -6046,7 +6016,7 @@ Styleguide Item
 .item-attachment .item-meta {
   font-size: 12px;
   line-height: 20px;
-  color: #999;
+  color: $grey-9;
 }
 
 .item-attachment .item-meta > span {
@@ -6099,8 +6069,8 @@ Styleguide Attachments
 /* Effects */
 
 @keyframes highlight {
-  0% {background-color: #ff9;}
-  10% {background-color: #ff9;}
+  0% {background-color: $yellow-8;}
+  10% {background-color: $yellow-8;}
 }
 
 .highlight-effect{

@@ -1047,7 +1047,7 @@ jQuery(document).ready(function($) {
 
         $.ajax({
             type: "POST",
-            url: gdn.url('dashboard/notifications/inform'),
+            url: gdn.url('/notifications/inform'),
             data: {
                 'TransientKey': gdn.definition('TransientKey'),
                 'Path': gdn.definition('Path'),

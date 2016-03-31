@@ -1,4 +1,4 @@
-// This file contains javascript that is specific to the dashboard/profile controller.
+// This file contains javascript that is specific to the /profile controller.
 jQuery(document).ready(function($) {
 
     // Reveal password

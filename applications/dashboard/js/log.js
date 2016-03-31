@@ -43,15 +43,15 @@ jQuery(document).ready(function($) {
 
     // Restores the
     var restore = function() {
-        handleAction('/dashboard/log/restore');
+        handleAction('/log/restore');
     };
 
     var deleteForever = function() {
-        handleAction('/dashboard/log/delete');
+        handleAction('/log/delete');
     };
 
     var deleteSpam = function() {
-        handleAction('/dashboard/log/deletespam');
+        handleAction('/log/deletespam');
     };
 
     var setExpander = function() {
@@ -106,7 +106,7 @@ jQuery(document).ready(function($) {
         var bar = $.popup({afterSuccess: afterSuccess},
             function(settings) {
                 $.post(
-                    gdn.url('/dashboard/log/confirm/restore'),
+                    gdn.url('/log/confirm/restore'),
                     {'DeliveryType': 'VIEW',
                         'Postback': true,
                         'IDs': IDs,
@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess}, function(settings) {
             $.post(
-                gdn.url('/dashboard/log/confirm/delete'),
+                gdn.url('/log/confirm/delete'),
                 {'DeliveryType': 'VIEW',
                     'Postback': true,
                     'IDs': IDs,
@@ -150,7 +150,7 @@ jQuery(document).ready(function($) {
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess}, function(settings) {
             $.post(
-                gdn.url('/dashboard/log/confirm/deletespam'),
+                gdn.url('/log/confirm/deletespam'),
                 {'DeliveryType': 'VIEW',
                     'Postback': true,
                     'IDs': IDs,
@@ -172,7 +172,7 @@ jQuery(document).ready(function($) {
         // Popup the confirm.
         var bar = $.popup({afterSuccess: afterSuccess}, function(settings) {
             $.post(
-                gdn.url('/dashboard/log/confirm/notspam'),
+                gdn.url('/log/confirm/notspam'),
                 {'DeliveryType': 'VIEW',
                     'Postback': true,
                     'IDs': IDs,
@@ -203,7 +203,7 @@ jQuery(document).ready(function($) {
         var category = $('#Form_CategoryID').val();
 
         // Ajax us to filtered results
-        $('#LogTable').load(gdn.url('/dashboard/log/moderation?DeliveryType=VIEW&CategoryID=' + category));
+        $('#LogTable').load(gdn.url('/log/moderation?DeliveryType=VIEW&CategoryID=' + category));
 
         return false;
     });

@@ -38,8 +38,9 @@ jQuery(document).ready(function($) {
         if (preview) {
             type = 'Preview';
             // If there is already a preview showing, kill processing.
-            if ($('div.Preview').length > 0 || jQuery.trim($(textbox).val()) == '')
+            if ($('div.Preview').length > 0) {
                 return false;
+            }
         }
         var draft = $(btn).hasClass('DraftButton');
         if (draft) {

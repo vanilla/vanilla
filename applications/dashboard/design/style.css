@@ -3284,7 +3284,7 @@ textarea.MultiComplete {
 
 .ac_over strong {
   font-weight: bold;
-  background: #216ebf;
+  background: #004d9f;
 }
 
 .ac_over {
@@ -4828,9 +4828,6 @@ span.InformSprite.Dice {
 }
 
 /* ============================= Embedded Discussion & Comment Customizations */
-/*body.embed {
-	text-align: left;
-}*/
 body.embed #Content {
   float: none;
   margin: 0;
@@ -4841,12 +4838,6 @@ body.embed .InformMessages {
   display: none;
 }
 
-/*.Embed a.Button,
-.Embed a.Button:hover {
-	color: $grey-1 !important;
-	text-decoration: none !important;
-	font-weight: bold;
-}*/
 .EmbedCommentForm {
   padding: 0;
   border-top: 1px solid #fff;

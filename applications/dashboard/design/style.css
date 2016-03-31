@@ -3284,11 +3284,11 @@ textarea.MultiComplete {
 
 .ac_over strong {
   font-weight: bold;
-  background: #004d9f;
+  background: #216ebf;
 }
 
 .ac_over {
-  background: #216ebf;
+  background: #004d9f;
   color: #fff;
 }
 

@@ -134,7 +134,7 @@ class Pocket {
                     if ($Every < 1)
                         $Every = 1;
                     $Begin = val(1, $Frequency, 1);
-                    if (($Count % $Every) != ($Begin % $Every))
+                    if (($Count % $Every) > 0 || ($Count < $Begin))
                         return false;
                     break;
                 case Pocket::REPEAT_INDEX:

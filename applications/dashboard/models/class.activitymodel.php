@@ -877,9 +877,6 @@ class ActivityModel extends Gdn_Model {
 
                 if ($message = val('Story', $Activity)) {
                     $prefix = c('Garden.Email.Prefix', '');
-                    if (!empty($prefix)) {
-                        $prefix .= '<br><br>';
-                    }
                     $emailTemplate->setMessage($prefix.$message, true);
                 }
 
@@ -973,9 +970,6 @@ class ActivityModel extends Gdn_Model {
 
         if ($message = val('Story', $Activity)) {
             $prefix = c('Garden.Email.Prefix', '');
-            if (!empty($prefix)) {
-                $prefix .= '<br><br>';
-            }
             $emailTemplate->setMessage($prefix.$message, true);
         }
 
@@ -1238,9 +1232,6 @@ class ActivityModel extends Gdn_Model {
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
                 if ($message = val('Story', $Activity)) {
                     $prefix = c('Garden.Email.Prefix', '');
-                    if (!empty($prefix)) {
-                        $prefix .= '<br><br>';
-                    }
                     $emailTemplate->setMessage($prefix.$message, true);
                 }
                 $Email->setEmailTemplate($emailTemplate);

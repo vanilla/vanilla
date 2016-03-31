@@ -3922,12 +3922,23 @@ class UserModel extends Gdn_Model {
         $Email->send();
     }
 
+    /**
+     * Resolves the welcome email format. Maintains backwards compatibility with the 'EmailWelcome*' translations
+     * for overriding.
+     *
+     * @param string $registerType The registration type. One of 'Connect', 'Register' or 'Add'.
+     * @param object|array $user The user to send the email to.
+     * @param array $data The email data.
+     * @param string $password The user's password.
+     * @return string The welcome email for the registration type.
+     */
     protected function getEmailWelcome($registerType, $user, $data, $password = '') {
         $appTitle = c('Garden.Title');
 
         // Backwards compatability. See if anybody has overridden the EmailWelcome string.
-        $emailWelcome = '%2$s has created an account for you at %3$s. Your login credentials are: Email: %6$s Password: %5$s Url: %4$s';
-        if (preg_replace('/\s+/', '', t('EmailWelcome')) != preg_replace('/\s+/', '', $emailWelcome)) {
+        if (($emailFormat = t('EmailWelcome'.$registerType, ''))) {
+            $welcome = formatString($emailFormat, $data);
+        } elseif (t('EmailWelcome', '')) {
             $welcome = sprintf(
                 t('EmailWelcome'),
                 val('Name', $user),

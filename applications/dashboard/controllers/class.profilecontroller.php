@@ -720,7 +720,6 @@ class ProfileController extends Gdn_Controller {
         // Permission checks
         $this->permission(array('Garden.Profiles.Edit', 'Moderation.Profiles.Edit', 'Garden.ProfilePicture.Edit'), false);
         $session = Gdn::session();
-
         if (!$session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
         }
@@ -1319,11 +1318,6 @@ class ProfileController extends Gdn_Controller {
             $Module->addLink('Options', sprite('SpProfile').' '.t('Edit Profile'), userUrl($this->User, '', 'edit'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup EditAccountLink'));
             $Module->addLink('Options', sprite('SpProfile').' '.t('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
             $Module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
-
-            if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
-            }
-
             $Module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
 
             // Add profile options for everyone

@@ -10,7 +10,14 @@ window.vanilla.embed = function(host) {
         embedUrl = window.location.href.split('#')[0],
         jsPath = '/js/embed.js',
         currentPath = window.location.hash.substr(1),
+        currentQuery = "",
         disablePath = (window != top);
+
+    var initialHashQuery = currentPath.match(/(?:\?)(.+)/);
+    if (initialHashQuery) {
+        currentQuery = initialHashQuery[1];
+        currentPath = currentPath.replace("?" + currentQuery, "");
+    }
 
     var optStr = function(name, defaultValue, definedValue) {
         if (window['vanilla_' + name]) {
@@ -93,9 +100,19 @@ window.vanilla.embed = function(host) {
 
     checkHash = function() {
         var path = window.location.hash.substr(1) || "/";
-        if (path != currentPath) {
+        var hashQuery = window.location.hash.match(/(?:\?)(.+)/);
+        var query = "";
+
+        if (hashQuery !== null) {
+            query = hashQuery[1];
+            path = path.replace("?" + query, "");
+        }
+
+        if (path != currentPath || query != currentQuery) {
             currentPath = path;
-            window.frames['vanilla' + id].location.replace(vanillaUrl(path));
+            currentQuery = query;
+
+            window.frames['vanilla' + id].location.replace(vanillaUrl(path, query));
         }
     };
 
@@ -148,12 +165,14 @@ window.vanilla.embed = function(host) {
                 //currentPath = cmd[1];
             } else {
                 currentPath = window.location.hash.substr(1);
+                console.log(message);
                 if (currentPath != message[1]) {
                     currentPath = message[1];
                     // Strip off the values that this script added
                     currentPath = currentPath.replace('/index.php?p=', ''); // 1
                     currentPath = stripParam(currentPath, 'remote='); // 2
                     currentPath = stripParam(currentPath, 'locale='); // 3
+                    console.log(currentPath);
                     window.location.hash = currentPath;
                 }
             }
@@ -200,7 +219,7 @@ window.vanilla.embed = function(host) {
         }
     }
 
-    vanillaUrl = function(path) {
+    vanillaUrl = function(path, query) {
         // What type of embed are we performing?
         var embed_type = typeof(vanilla_embed_type) == 'undefined' ? 'standard' : vanilla_embed_type;
         // Are we loading a particular discussion based on discussion_id?
@@ -260,12 +279,16 @@ window.vanilla.embed = function(host) {
             result += '&sso=' + encodeURIComponent(vanilla_sso);
         }
 
+        if (typeof query === "string") {
+            result += "&" + query;
+        }
+
         return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
     }
     var vanillaIframe = document.createElement('iframe');
     vanillaIframe.id = "vanilla" + id;
     vanillaIframe.name = "vanilla" + id;
-    vanillaIframe.src = vanillaUrl(currentPath);
+    vanillaIframe.src = vanillaUrl(currentPath, currentQuery);
     vanillaIframe.scrolling = "no";
     vanillaIframe.frameBorder = "0";
     vanillaIframe.allowTransparency = true;

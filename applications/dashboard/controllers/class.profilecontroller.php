@@ -1352,10 +1352,6 @@ class ProfileController extends Gdn_Controller {
             if ($AllowImages) {
                 $Module->addLink('Options', sprite('SpPicture').' '.t('Change My Picture'), '/profile/picture', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'PictureLink'));
             }
-
-            if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
-            }
         }
 
         if ($this->User->UserID == $ViewingUserID || $Session->checkPermission('Garden.Users.Edit')) {

@@ -2,7 +2,7 @@
 /**
  * Manage users.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -15,12 +15,6 @@ class UserController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form');
-
-    /** @var int The number of users when database optimizations kick in. */
-    public $UserThreshold = 10000;
-
-    /** @var int The number of users when extreme database optimizations kick in. */
-    public $UserMegaThreshold = 1000000;
 
     /** @var Gdn_Form */
     public $Form;
@@ -98,7 +92,7 @@ class UserController extends DashboardController {
         } else {
             $Filter = array('Keywords' => (string)$Keywords);
         }
-        $Filter['Optimize'] = $this->pastUserThreshold();
+        $Filter['Optimize'] = Gdn::userModel()->pastUserThreshold();
 
         // Sorting
         if (in_array($Order, array('DateInserted', 'DateFirstVisit', 'DateLastActive'))) {
@@ -115,7 +109,7 @@ class UserController extends DashboardController {
 
         // Figure out our number of results and users.
         $showUserCount = $this->UserData->count();
-        if (!$this->pastUserThreshold()) {
+        if (!Gdn::userModel()->pastUserThreshold()) {
             // Pfft, query that sucker however you want.
             $this->setData('RecordCount', $UserModel->searchCount($Filter));
         } else {
@@ -125,12 +119,12 @@ class UserController extends DashboardController {
             } else {
                 // No search was done. Just give the total users overall. First, zero-out our pager.
                 $this->setData('_CurrentRecords', 0);
-                if (!$this->pastUserMegaThreshold()) {
+                if (!Gdn::userModel()->pastUserMegaThreshold()) {
                     // Restoring this semi-optimized counter is our compromise to let non-mega sites know their exact total users.
                     $this->setData('UserCount', $UserModel->getCount());
                 } else {
                     // Dang, yo. Get a table status guess instead of really counting.
-                    $this->setData('UserEstimate', $this->countEstimate());
+                    $this->setData('UserEstimate', Gdn::userModel()->countEstimate());
                 }
             }
         }
@@ -181,8 +175,7 @@ class UserController extends DashboardController {
             $this->EventArguments['RoleData'] = &$this->RoleData;
 
             $this->fireEvent("BeforeUserAdd");
-
-            if ($this->Form->authenticatedPostBack()) {
+            if ($this->Form->authenticatedPostBack(true)) {
                 // These are the new roles the creating user wishes to apply to the target
                 // user, adjusted for his ability to affect those roles
                 $RequestedRoles = $this->Form->getFormValue('RoleID');
@@ -240,9 +233,9 @@ class UserController extends DashboardController {
     public function applicantCount() {
         $this->permission('Garden.Users.Approve');
         $RoleModel = new RoleModel();
-        $Count = $RoleModel->GetApplicantCount();
+        $Count = $RoleModel->getApplicantCount();
         if ($Count > 0) {
-            echo '<span class="Alert">', $Count, '</span>';
+            echo '<span class="Alert">'.$Count.'</span>';
         }
     }
 
@@ -255,25 +248,11 @@ class UserController extends DashboardController {
     public function applicants() {
         $this->permission('Garden.Users.Approve');
         $this->addSideMenu('dashboard/user/applicants');
-        $this->addJsFile('jquery.gardencheckcolumn.js');
+        $this->addJsFile('applicants.js');
         $this->title(t('Applicants'));
-
         $this->fireEvent('BeforeApplicants');
-
-        if ($this->Form->authenticatedPostBack() === true) {
-            $Action = $this->Form->getValue('Submit');
-            $Applicants = $this->Form->getValue('Applicants');
-            $ApplicantCount = is_array($Applicants) ? count($Applicants) : 0;
-            if ($ApplicantCount > 0 && in_array($Action, array('Approve', 'Decline'))) {
-                $Session = Gdn::session();
-                for ($i = 0; $i < $ApplicantCount; ++$i) {
-                    $this->handleApplicant($Action, $Applicants[$i]);
-                }
-            }
-        }
         $UserModel = Gdn::userModel();
-        $this->UserData = $UserModel->GetApplicants();
-        $this->View = 'applicants';
+        $this->UserData = $UserModel->getApplicants();
         $this->render();
     }
 
@@ -285,23 +264,28 @@ class UserController extends DashboardController {
      * @param int $UserID Unique ID.
      * @param string $TransientKey Security token.
      */
-    public function approve($UserID = '', $TransientKey = '') {
-        $this->permission('Garden.Users.Approve');
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey)) {
-            $Approved = $this->HandleApplicant('Approve', $UserID);
-            if ($Approved) {
-                $this->informMessage(t('Your changes have been saved.'));
-            }
+    public function approve($UserID = '') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
+        $this->permission('Garden.Users.Approve');
 
-        if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-            return $this->Form->errorCount() == 0 ? true : $this->Form->errors();
+        $this->handleApplicant('Approve', $UserID);
+
+        // Prevent an error if ajax failed.
+        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            $this->render('blank', 'utility');
         } else {
-            $this->applicants();
+            $this->render();
         }
     }
 
+    /**
+     *
+     *
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function authenticate() {
         if (!$this->Request->isPostBack()) {
             throw forbiddenException($this->Request->requestMethod());
@@ -328,10 +312,10 @@ class UserController extends DashboardController {
         $PasswordHash = new Gdn_PasswordHash();
         $Password = val('password', $Args);
         try {
-            $PasswordChecked = $PasswordHash->CheckPassword($Password, val('Password', $User), val('HashMethod', $User));
+            $PasswordChecked = $PasswordHash->checkPassword($Password, val('Password', $User), val('HashMethod', $User));
 
             // Rate limiting
-            Gdn::userModel()->RateLimit($User, $PasswordChecked);
+            Gdn::userModel()->rateLimit($User, $PasswordChecked);
 
             if ($PasswordChecked) {
                 $this->setData('User', arrayTranslate((array)$User, array('UserID', 'Name', 'Email', 'PhotoUrl')));
@@ -394,10 +378,10 @@ class UserController extends DashboardController {
         }
 
         // Is the user banned for other reasons?
-        $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_AUTOMATIC));
+        $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $User, 0), ~BanModel::BAN_MANUAL));
 
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack(true)) {
             if ($Unban) {
                 $UserModel->unban($UserID, array('RestoreContent' => $this->Form->getFormValue('RestoreContent')));
             } else {
@@ -467,19 +451,19 @@ class UserController extends DashboardController {
      * @param int $UserID Unique ID.
      * @param string $TransientKey Security token.
      */
-    public function decline($UserID = '', $TransientKey = '') {
-        $this->permission('Garden.Users.Approve');
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey)) {
-            if ($this->handleApplicant('Decline', $UserID)) {
-                $this->informMessage(t('Your changes have been saved.'));
-            }
+    public function decline($UserID = '') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
+        $this->permission('Garden.Users.Approve');
 
-        if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-            return $this->Form->errorCount() == 0 ? true : $this->Form->errors();
+        $this->handleApplicant('Decline', $UserID);
+
+        // Prevent an error if ajax failed.
+        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            $this->render('blank', 'utility');
         } else {
-            $this->applicants();
+            $this->render();
         }
     }
 
@@ -534,8 +518,8 @@ class UserController extends DashboardController {
                 $this->View = 'deleteconfirm';
             }
 
-            if ($this->Form->authenticatedPostBack() && $Method != '') {
-                $UserModel->delete($UserID, array('DeleteMethod' => $Method));
+            if ($this->Form->authenticatedPostBack(true) && $Method != '') {
+                $UserModel->deleteID($UserID, array('DeleteMethod' => $Method));
                 $this->View = 'deletecomplete';
             }
 
@@ -593,7 +577,7 @@ class UserController extends DashboardController {
             throw notFoundException('User');
         }
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack(true)) {
             Gdn::userModel()->deleteContent($UserID, array('Log' => true));
 
             if ($this->Request->get('Target')) {
@@ -689,8 +673,12 @@ class UserController extends DashboardController {
             $this->fireEvent("BeforeUserEdit");
             $this->setData('AllowEditing', $AllowEditing);
 
+            $BanReversible = $User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
+            $this->setData('BanFlag', $BanReversible ? $User['Banned'] : 1);
+            $this->setData('BannedOtherReasons', $User['Banned'] & ~BanModel::BAN_MANUAL);
+
             $this->Form->setData($User);
-            if ($this->Form->authenticatedPostBack()) {
+            if ($this->Form->authenticatedPostBack(true)) {
                 if (!$CanEditUsername) {
                     $this->Form->setFormValue("Name", $User['Name']);
                 }
@@ -739,6 +727,18 @@ class UserController extends DashboardController {
                 // Put the data back into the forum object as if the user had submitted
                 // this themselves
                 $this->Form->setFormValue('RoleID', array_keys($UserNewRoles));
+
+                $Banned = $this->Form->getFormValue('Banned');
+                if (!$Banned) {
+                    // Checkbox was unchecked; bitmask to remove any reversible bans.
+                    if ($BanReversible) {
+                        $reversedBans = ($User['Banned'] & (~(BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)));
+                        $this->Form->setFormValue('Banned', $reversedBans);
+                    }
+                } else {
+                    // Bitmask to add a manual ban.
+                    $this->Form->setFormValue('Banned', $User['Banned'] | BanModel::BAN_MANUAL);
+                }
 
                 if ($this->Form->save(array('SaveRoles' => true)) !== false) {
                     if ($this->Form->getValue('ResetPassword', '') == 'Auto') {
@@ -875,7 +875,7 @@ class UserController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // This must be a postback.
-        if (!$this->Request->isAuthenticatedPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack(true)) {
             throw forbiddenException('GET');
         }
 
@@ -908,37 +908,7 @@ class UserController extends DashboardController {
         return '/dashboard/user?'.http_build_query($Get);
     }
 
-    /**
-     * Whether or not we are past the user threshold.
-     *
-     * This is a useful indication that some database operations on the User table will be painfully long.
-     *
-     * @return bool
-     */
-    protected function pastUserThreshold() {
-        $estimate = $this->countEstimate();
-        return $estimate > $this->UserThreshold;
-    }
 
-    /**
-     * Whether we're wandered into extreme database optimization territory with our user count.
-     *
-     * @return bool
-     */
-    protected function pastUserMegaThreshold() {
-        $estimate = $this->countEstimate();
-        return $estimate > $this->UserMegaThreshold;
-    }
-
-    /**
-     * Approximate the number of users by checking the database table status.
-     *
-     * @return int
-     */
-    protected function countEstimate() {
-        $px = Gdn::database()->DatabasePrefix;
-        return Gdn::database()->query("show table status like '{$px}User'")->value('Rows', 0);
-    }
 
     /**
      * Convenience function for listing users. At time of this writing, it is
@@ -1054,7 +1024,7 @@ class UserController extends DashboardController {
 
         $Form = new Gdn_Form();
 
-        if ($this->Request->isAuthenticatedPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack(true)) {
             // Make sure everything has been posted.
             $Form->validateRule('ClientID', 'ValidateRequired');
             $Form->validateRule('UniqueID', 'ValidateRequired');

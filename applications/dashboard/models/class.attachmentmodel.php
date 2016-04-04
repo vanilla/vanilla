@@ -2,7 +2,7 @@
 /**
  * Attachment Model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.2
@@ -327,7 +327,7 @@ class AttachmentModel extends Gdn_Model {
             $Fields = $this->Validation->validationFields();
 
             if ($Insert === false) {
-                $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
+                unset($Fields[$this->PrimaryKey]); // Don't try to update the primary key
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {
                 $PrimaryKeyVal = $this->insert($Fields);

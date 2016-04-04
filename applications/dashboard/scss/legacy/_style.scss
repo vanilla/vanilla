@@ -1,0 +1,6083 @@
+@import 'variables';
+
+/* ================================================================ Reset CSS */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+
+/* remember to define focus styles! */
+:focus {
+  outline: 0;
+}
+
+body {
+  line-height: 1;
+  color: $black;
+  background: $white;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/*caption, th, td {
+   text-align: left;
+   font-weight: normal;
+}*/
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+}
+
+blockquote, q {
+  quotes: "" "";
+}
+
+textarea, input[type=text] {
+  box-sizing: border-box;
+}
+
+.textarea-autosize {
+  transition: height 0.1s ease;
+  resize: none !important;
+}
+
+/* Elements that are disabled, make sure they reflect that with UX feedback. */
+[disabled] {
+  opacity: 0.50;
+  pointer-events: none;
+}
+
+/* ===================================================================== Grid */
+
+.Row {
+  margin: auto;
+  width: 960px;
+}
+
+.ContentColumn {
+  margin: 0 0 0 230px
+}
+
+/* ==================== Pages that hide the panel and have full-width content */
+body.NoPanel #Panel,
+body.Entry #Panel,
+body.Conversations.add #Panel,
+body.Vanilla.Post #Panel {
+  display: none;
+}
+
+body.NoPanel #Content,
+body.Conversations.add #Content,
+body.Vanilla.Post #Content {
+  width: auto;
+  margin: 0;
+}
+
+body.NoPanel #Content {
+  margin: auto;
+}
+
+body.NarrowForm #Content {
+  max-width: 700px;
+}
+
+body.Entry #Content {
+  float: none;
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+/* ============================================== General Styles & Typography */
+body {
+  color: $black;
+  font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
+  font-size: 75%;
+  font-size: small;
+  line-height: 1.7em;
+  background: $white;
+  margin: 0;
+  padding: 0;
+}
+
+#Body {
+  zoom: 1; /* hasLayout for IE6/7 */
+}
+
+#Body:after {
+  /* clearfix */
+  visibility: hidden;
+  display: block;
+  content: "";
+  clear: both;
+  height: 0;
+}
+
+.Invisible {
+  opacity: 0;
+}
+
+.ClearFix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+
+.ClearFix {
+  display: inline-table;
+}
+
+/* Hides from IE-mac \*/
+* html .ClearFix {
+  height: 1%;
+}
+
+.ClearFix {
+  display: block;
+}
+
+/* End hide from IE-mac */
+.nowrap {
+  white-space: nowrap;
+}
+
+.Center {
+  text-align: center;
+}
+
+.Right {
+  text-align: right;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+p {
+  margin: 5px 0;
+}
+
+.P {
+  margin: 5px 0;
+}
+
+h1 {
+  font-size: 140%;
+}
+
+h2 {
+  font-size: 120%;
+}
+
+h3 {
+  font-size: 110%;
+}
+
+h4 {
+  font-size: 110%;
+}
+
+h5 {
+  font-size: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: $vanilla-blue;
+}
+
+a:hover,
+a.TextColor:hover,
+a:hover .TextColor {
+  color: $vanilla-pink;
+}
+
+a.TextColor, a .TextColor {
+  color: $black;
+}
+
+img.Thumbnail {
+  max-height: 300px;
+  max-width: 100px;
+  float: left;
+  margin: 0 16px 0 0;
+}
+
+input.DateBox,
+input.InputBox,
+input.SmallInput,
+textarea {
+  font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
+  color: $grey-1;
+  font-size: 15px;
+  padding: 3px;
+  margin: 0;
+  width: 250px;
+  background: $white;
+  border: 1px solid $grey-9;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.PasswordStrength {
+  width: 250px;
+}
+
+.ui-datepicker {
+  width: 17em;
+  padding: 2px 20px 2px 10px;
+  display: none;
+  background: $grey-o;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid $grey-9;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.ui-datepicker .ui-datepicker-header {
+  position: relative;
+  padding: .2em 0;
+}
+
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+  position: absolute;
+  top: 2px;
+  width: 1.8em;
+  height: 1.8em;
+}
+
+.ui-datepicker .ui-datepicker-prev-hover,
+.ui-datepicker .ui-datepicker-next-hover {
+  top: 1px;
+}
+
+.ui-datepicker .ui-datepicker-prev {
+  left: 2px;
+}
+
+.ui-datepicker .ui-datepicker-next {
+  right: 2px;
+}
+
+.ui-datepicker .ui-datepicker-prev-hover {
+  left: 1px;
+}
+
+.ui-datepicker .ui-datepicker-next-hover {
+  right: 1px;
+}
+
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+  display: block;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  top: 50%;
+  margin-top: -8px;
+}
+
+.ui-datepicker .ui-datepicker-title {
+  margin: 0 2.3em;
+  line-height: 1.8em;
+  text-align: center;
+}
+
+.ui-datepicker .ui-datepicker-title select {
+  font-size: 1em;
+  margin: 1px 0;
+}
+
+.ui-datepicker select.ui-datepicker-month-year {
+  width: 100%;
+}
+
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+  width: 49%;
+}
+
+.ui-datepicker table {
+  width: 100%;
+  font-size: .9em;
+  border-collapse: collapse;
+  margin: 0 0 .4em;
+}
+
+.ui-datepicker th {
+  padding: .7em .3em;
+  text-align: center;
+  font-weight: bold;
+  border: 0;
+}
+
+.ui-datepicker td {
+  border: 0;
+  padding: 1px;
+}
+
+.ui-datepicker td span,
+.ui-datepicker td a {
+  display: block;
+  padding: .2em;
+  text-align: right;
+  text-decoration: none;
+}
+
+.ui-datepicker .ui-datepicker-buttonpane {
+  background-image: none;
+  margin: .7em 0 0 0;
+  padding: 0 .2em;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.ui-datepicker .ui-datepicker-buttonpane button {
+  float: right;
+  margin: .5em .2em .4em;
+  cursor: pointer;
+  padding: .2em .6em .3em .6em;
+  width: auto;
+  overflow: visible;
+}
+
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+  float: left;
+}
+
+/* with multiple calendars */
+.ui-datepicker.ui-datepicker-multi {
+  width: auto;
+}
+
+.ui-datepicker-multi .ui-datepicker-group {
+  float: left;
+}
+
+.ui-datepicker-multi .ui-datepicker-group table {
+  width: 95%;
+  margin: 0 auto .4em;
+}
+
+.ui-datepicker-multi-2 .ui-datepicker-group {
+  width: 50%;
+}
+
+.ui-datepicker-multi-3 .ui-datepicker-group {
+  width: 33.3%;
+}
+
+.ui-datepicker-multi-4 .ui-datepicker-group {
+  width: 25%;
+}
+
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
+  border-left-width: 0;
+}
+
+.ui-datepicker-multi .ui-datepicker-buttonpane {
+  clear: left;
+}
+
+.ui-datepicker-row-break {
+  clear: both;
+  width: 100%;
+  font-size: 0;
+}
+
+/* RTL support */
+.ui-datepicker-rtl {
+  direction: rtl;
+}
+
+.ui-datepicker-rtl .ui-datepicker-prev {
+  right: 2px;
+  left: auto;
+}
+
+.ui-datepicker-rtl .ui-datepicker-next {
+  left: 2px;
+  right: auto;
+}
+
+.ui-datepicker-rtl .ui-datepicker-prev:hover {
+  right: 1px;
+  left: auto;
+}
+
+.ui-datepicker-rtl .ui-datepicker-next:hover {
+  left: 1px;
+  right: auto;
+}
+
+.ui-datepicker-rtl .ui-datepicker-buttonpane {
+  clear: right;
+}
+
+.ui-datepicker-rtl .ui-datepicker-buttonpane button {
+  float: left;
+}
+
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current,
+.ui-datepicker-rtl .ui-datepicker-group {
+  float: right;
+}
+
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
+  border-right-width: 0;
+  border-left-width: 1px;
+}
+
+textarea.TextBox {
+  width: 500px;
+  height: 100px;
+  min-height: 100px;
+}
+
+.TextBoxWrapper {
+  width: auto;
+}
+
+.TextBoxWrapper textarea,
+.TextBoxWrapper input:not([type=radio]):not([type=checkbox]) {
+  width: 100%;
+  display: block;
+}
+
+.TextBoxWrapper .PasswordStrength {
+  width: 100%;
+}
+
+#Popup textarea.TextBox {
+  width: 100%;
+}
+
+input.SmallInput,
+input.InputBox {
+  padding: 6px 3px;
+}
+
+input.SmallInput:focus,
+input.InputBox:focus,
+textarea:focus {
+  background: $white-2;
+}
+
+input.BigInput {
+  width: 100%;
+}
+
+textarea {
+  line-height: 128%;
+}
+
+select {
+  font-family: arial;
+  font-size: 14px;
+  color: $grey-k;
+  margin: 0;
+  padding: 3px;
+}
+
+.Button {
+  display: inline-block;
+  cursor: pointer;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: bold;
+  padding: 4px 6px;
+  background: $grey-a;
+  border: 1px solid $grey-9;
+  border-radius: 2px;
+  white-space: nowrap;
+  border-color: $grey-9;
+  color: $grey-1;
+}
+
+.Button:hover {
+  color: $grey-p;
+  border-color: $grey-j;
+}
+
+.Button.Disabled {
+  opacity: .5;
+}
+
+div.FileUpload .CurrentImage {
+  display: block;
+  margin: 5px 0;
+  max-width: 100%;
+}
+
+.NavLabel {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.NavBar > .Button {
+  border-radius: 0;
+  border-right-width: 0;
+}
+
+.NavBar > .Button:first-child {
+  border-radius: 2px 0 0 2px;
+}
+
+.NavBar > .Button:last-child {
+  border-radius: 0 2px 2px 0;
+  border-right-width: 1px;
+}
+
+.Button.Active,
+.ButtonGroup.Open .Button.Handle,
+.Button:focus,
+.Button:active {
+  border-color: $grey-b;
+  color: $grey-1;
+  background: $grey-g;
+}
+
+.Button.FileInput > input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+  cursor: pointer;
+}
+
+.Button.FileInput {
+  position: relative;
+  overflow: hidden;
+}
+
+.BigButton {
+  display: block;
+  text-align: center;
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 8px 10px;
+}
+
+.Buttons {
+  margin-top: 10px;
+}
+
+.Buttons-Confirm {
+  text-align: center;
+}
+
+.Buttons-Confirm .Button {
+  min-width: 65px;
+}
+
+.NavButton {
+  color: $grey-1;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: bold;
+  padding: 5px 8px;
+  border: 1px solid $grey-9;
+  border-radius: 2px;
+  white-space: nowrap;
+  background-color: $grey-c;
+}
+
+.ButtonGroup.Open .NavButton.Handle {
+  color: $grey-1;
+  background: $grey-5;
+}
+
+/* Split Button Dropdown */
+.ButtonGroup.Multi > .NavButton:first-child,
+.ButtonGroup.Multi > .Button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ButtonGroup.Multi > .NavButton.Handle,
+.ButtonGroup.Multi > .Button.Handle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+}
+
+/*.Multi .Button:last {
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   font-size: 12px;
+   line-height: 1;
+   border-left: 0;
+}
+.Multi .NavButton.Handle {
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   border-left: 0;
+   margin: 0;
+}*/
+.NavButton.Handle .Sprite,
+.Button.Handle .Sprite {
+  display: inline-block;
+  border-style: solid;
+  border-width: 4px;
+  border-color: $black transparent transparent transparent;
+  position: relative;
+  top: 2px;
+  margin: 0;
+  height: initial;
+  width: initial;
+  vertical-align: middle;
+}
+
+.ButtonGroup.Big .NavButton.Handle .Sprite,
+.ButtonGroup.Big .Button.Handle .Sprite {
+  top: 0;
+}
+
+.ButtonGroup {
+  position: relative;
+  display: inline-block;
+}
+
+.ButtonGroup .Dropdown {
+  display: none;
+  font-size: 12px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 1px;
+  z-index: 100;
+}
+
+.ButtonGroup.DropRight .Dropdown {
+  right: 0;
+  left: auto;
+}
+
+#Panel .ButtonGroup .Dropdown {
+  right: 0;
+}
+
+.ProfileOptions .ButtonGroup .Dropdown {
+  left: auto;
+  right: 0;
+}
+
+.ButtonGroup.Open .Dropdown {
+  display: block;
+}
+
+.ButtonGroup.Big .NavButton,
+.ButtonGroup.Big .Button {
+  font-size: 15px;
+  padding: 8px;
+  text-align: center;
+}
+
+.ButtonGroup.Big {
+  display: block;
+  white-space: nowrap;
+}
+
+#Panel .ButtonGroup.Big > .NavButton:first-child,
+#Panel .ButtonGroup.Big > .Button:first-child {
+  width: 78%;
+}
+
+.ActivateSlider {
+  display: inline-block;
+  background: $grey-d;
+  box-shadow: 0 10px 30px $grey-1 inset;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
+  border: solid 1px $grey-e;
+  width: 125px;
+  border-radius: 4px;
+  padding: 1px;
+  position: relative;
+}
+
+.ActivateSlider-Active {
+  text-align: right;
+}
+
+.Gloss {
+  font-size: 80%;
+  font-weight: normal;
+  color: $grey-j;
+}
+
+.Loading {
+  height: 100px;
+  padding: 0 20px;
+  background: url('images/progress.gif') center center no-repeat;
+}
+
+.Progress {
+  padding: 10px 40px 10px 0;
+  background: url('images/progress.gif') center center no-repeat;
+}
+
+.TinyProgress {
+  padding: 10px 40px 10px 0;
+  background: url('images/progress_sm.gif') center center no-repeat;
+}
+
+.InProgress {
+  opacity: .5;
+  cursor: progress;
+  pointer-events: none;
+}
+
+.Conversations .Deleted {
+  text-decoration: line-through;
+}
+
+.Deleted {
+  background: $grey-8;
+  border: 1px solid $grey-2;
+  margin: 10px 0 0;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+/* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
+   strings & imply importance. */
+span.Warning,
+div.Warning {
+  background: $white-6;
+  border: 2px solid $red-b;
+  color: $red-c;
+  padding: 6px 8px;
+  margin: 10px 0;
+  border-radius: 2px;
+}
+
+.Count {
+  background-color: $grey-7;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  color: $white;
+  font-size: 80%;
+  font-weight: normal;
+  padding: 1px .8ex;
+}
+
+.Alert {
+  font-size: 80%;
+  background: $red-c;
+  color: $white;
+  padding: 1px 3px;
+  border-radius: .5ex;
+}
+
+.Alert a {
+  color: $white;
+}
+
+.Alert a:hover {
+  text-decoration: underline;
+}
+
+.Info {
+  font-size: 13px;
+  background: $grey-f;
+  border: 2px solid $grey-5;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  color: $grey-6;
+  border-radius: 2px;
+  padding: 6px 8px;
+  margin: 10px 0;
+}
+
+.Info strong {
+  font-weight: bold;
+}
+
+.BreadcrumbWrap {
+  clear: both;
+  line-height: 2.4;
+  font-size: 12px;
+}
+
+#PagerLess {
+  border-radius-topright: 2px;
+  border-radius-topleft: 2px;
+  margin-bottom: 1px;
+  text-align: left;
+}
+
+.MorePager {
+  text-align: right;
+}
+
+.MorePager a.Loading {
+  border: 0 !important;
+  padding: 0 20px !important;
+  background: url('images/progress.gif') center center no-repeat !important;
+}
+
+.Pager {
+  font-weight: bold;
+  float: right;
+}
+
+.Pager a, .Pager span {
+  display: inline-block;
+  margin: 0 3px;
+}
+
+.Pager span {
+  color: $grey-3;
+}
+
+.Pager .Highlight {
+  color: $black;
+}
+
+.MoreWrap {
+  float: right;
+}
+
+.PagerNub {
+  overflow: hidden;
+  display: inline-block;
+  width: 1px;
+  margin-right: -1px;
+}
+
+/* Small UserPhoto() images */
+a.Small:hover {
+  text-decoration: none;
+}
+
+a.Small img {
+  text-indent: -100px;
+  background: $grey-2;
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  overflow: hidden;
+}
+
+/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+/* Messages */
+.DismissMessage a.Dismiss {
+  font-family: arial;
+  position: absolute;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  color: $grey-3;
+  top: -1px;
+  right: -1px;
+  padding: 1px 3px;
+  text-decoration: none;
+}
+
+.DismissMessage a.Dismiss:hover {
+  border: none;
+  background: $grey-1;
+  color: $white;
+}
+
+.DismissMessage strong,
+.DismissMessage b {
+  font-weight: bold;
+}
+
+.DismissMessage {
+  font-size: 13px;
+  text-align: left;
+  position: relative;
+  color: $black;
+  border: none;
+  border-radius: 1px;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.DismissMessage.Info {
+  background: $white-3;
+  border: 1px solid $grey-2;
+}
+
+.DismissMessage.Warning {
+  background: $white-4;
+  border: 1px solid $red-d;
+}
+
+.DismissMessage.Box {
+  background: $yellow-c;
+  border: 1px solid $yellow-d;
+  box-shadow: none;
+  margin: 0 0 10px; /* Make sure that .Box definitions don't override the base DismissMessage margin! */
+}
+
+.CasualMessage {
+  background: $blue-a;
+  border: 1px solid $blue-9;
+  color: $vanilla-blue;
+}
+
+.InfoMessage {
+  background: $grey-q;
+  border: 1px solid $grey-2;
+}
+
+.AlertMessage {
+  background: $yellow-c;
+  border: 1px solid $yellow-e;
+}
+
+.WarningMessage {
+  background: $white-4;
+  border: 1px solid $red-d;
+}
+
+/* =================================================================== Header */
+#Head {
+  background: $blue-8;
+  color: $white;
+}
+
+/* Targetting the padding on head in this way b/c it was causing problems in older themes */
+body > #Frame > .Head {
+  padding: 16px 3px 3px;
+}
+
+#Head a {
+  color: $white;
+  font-weight: bold;
+}
+
+.SiteTitle {
+  font-family: "helvetica neue", helvetica, arial, sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+  margin-right: 6px;
+}
+
+.SiteMenu {
+  display: inline;
+  white-space: nowrap;
+}
+
+.SiteMenu li {
+  display: inline;
+}
+
+.SiteMenu a {
+  font-size: 11px;
+  padding: 6px;
+}
+
+.SiteMenu a:hover {
+  text-decoration: underline;
+}
+
+.SiteSearch {
+  position: relative;
+}
+
+.SiteSearch .InputBox {
+  padding: 5px 25px 5px 5px;
+  font-size: 11px;
+}
+
+.SiteSearch .Button {
+  background: url('images/sprites.png') 0 -196px no-repeat transparent;
+  height: 16px;
+  width: 16px;
+  overflow: hidden;
+  line-height: 999px;
+  color: transparent;
+  font-size: 0;
+  border: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 0;
+}
+
+#Head .SiteSearch {
+  float: right;
+}
+
+#Head .SiteSearch .InputBox {
+  border: none;
+  width: 175px;
+
+}
+
+/* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
+.ControlOptions,
+.Options {
+  float: right;
+}
+
+.CategoryLink {
+  padding: 2px 4px;
+  font-size: 11px;
+  background: $blue-a;
+  border-radius: 1px;
+}
+
+.PageTitle .Options {
+  height: 10px;
+}
+
+.OptionsMenu {
+  font-size: 10px;
+  font-weight: normal;
+  line-height: 100%;
+}
+
+.OptionsTitle {
+  user-select: none;
+  background: url("images/ui_sprites.png") no-repeat 0 -101px;
+  padding: 0;
+  width: 21px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: top;
+  line-height: 999px; /* Set it higher than your image height */
+  overflow: hidden; /* Hide the text */
+  font-size: 0; /* FF2 doesn’t like the above */
+  cursor: pointer;
+}
+
+.Item .OptionsTitle {
+  visibility: hidden;
+}
+
+.Item:hover .OptionsTitle, .Item.Open .OptionsTitle {
+  visibility: visible;
+}
+
+.Flyout:before,
+.Flyout:after {
+  border-bottom: 7px solid $grey-7;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  content: "";
+  left: 9px;
+  position: absolute;
+  top: -7px;
+}
+
+.Flyout:after {
+  border-bottom: 7px solid $white;
+  top: -6px;
+}
+
+.OptionsMenu .Flyout:before,
+.OptionsMenu .Flyout:after {
+  left: inherit;
+  right: 14px;
+}
+
+.MenuItems {
+  line-height: 100%;
+  font-size: 11px;
+  border: 1px solid $grey-9;
+  border-radius: 2px;
+  background: $white;
+  padding: 5px 0;
+  box-shadow: 0 5px 10px $grey-5;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+  display: block;
+  text-decoration: none;
+  white-space: nowrap;
+  color: $grey-1 !important;
+  padding: 3px 15px;
+  line-height: 18px;
+}
+
+.MenuItems a:hover {
+  color: $white !important;
+  text-decoration: none;
+  background-color: $blue-e !important;
+}
+
+.MenuItems a:hover .Gloss {
+  color: $white !important;
+}
+
+.MenuItems li > strong {
+  font-size: 12px;
+  padding: 3px 10px;
+  line-height: 18px;
+}
+
+.MenuItems hr {
+  border: 0;
+  border-bottom: 1px solid $grey-2;
+}
+
+.MenuItems.Up:before,
+.MenuItems.Up:after {
+  border-top: 7px solid $grey-7;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  content: "";
+  left: 71px;
+  position: absolute;
+  bottom: -7px;
+}
+
+.MenuItems.Up:after {
+  border-top: 7px solid $white;
+  bottom: -6px;
+}
+
+.ToggleFlyout {
+  position: relative;
+}
+
+.ToggleFlyout.Open {
+  z-index: 110; /* above Item:hover */
+}
+
+.ToggleFlyout .Flyout {
+  position: absolute;
+  top: 100%;
+  /* right: -10px; This causes text overflows when flyout items are long */
+  display: none;
+}
+
+.OptionsMenu .Flyout {
+  top: 18px;
+  right: -9px;
+}
+
+.Flyout .Author .PhotoWrap {
+  margin: 0;
+}
+
+.FlyoutMenu {
+  width: 300px;
+  background: $white;
+  color: $black;
+  border-radius: 2px;
+  box-shadow: 0 5px 10px $grey-5;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  border: solid 1px $grey-9;
+}
+
+.FlyoutMenu a {
+  color: $blue-f;
+}
+
+.FlyoutButton {
+  cursor: pointer;
+}
+
+.FlyoutLeft .Flyout {
+  right: inherit;
+}
+
+.DropHandle {
+  display: inline-block;
+  height: 0;
+  width: 0;
+  border-style: solid;
+  border-width: 4px;
+  border-color: $black transparent transparent transparent;
+  position: relative;
+  bottom: -2px;
+}
+
+.SelectFlyout {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.SelectFlyout .Flyout:before,
+.SelectFlyout .Flyout:after {
+  display: none;
+}
+
+.MeBox .Flyout {
+  right: inherit;
+  left: -4px;
+  top: 150%;
+}
+
+.MeBox.FlyoutRight .Flyout {
+  left: inherit;
+  right: -4px;
+}
+
+.MeBox.FlyoutRight .Flyout:before,
+.MeBox.FlyoutRight .Flyout:after {
+  left: auto;
+  right: 9px;
+}
+
+a.Bookmark,
+a.Bookmarked,
+a.Bookmarking {
+  display: inline-block;
+  background: url('images/ui_sprites.png') 0 -2px no-repeat;
+  height: 18px;
+  width: 18px;
+  /*	margin: 0 4px;*/
+  vertical-align: top;
+  overflow: hidden;
+  text-indent: -1000px;
+  font-size: 1px;
+}
+
+a.Bookmark:hover {
+  background-position: 0 -22px;
+}
+
+a.Bookmarked {
+  background-position: 0 -42px;
+}
+
+a.Bookmarked:hover {
+  background-position: 0 -82px;
+}
+
+a.Bookmarking,
+a.Bookmarking:hover {
+  background-position: 0 -62px;
+}
+
+.AdminCheck {
+  vertical-align: top;
+  line-height: 1;
+}
+
+td.CheckBoxColumn {
+  text-align: center;
+}
+
+.HomepageTitle .AdminCheck {
+  padding-left: 8px;
+}
+
+.ControlOptions .AdminCheck {
+  display: block;
+  padding: 6px 8px 0;
+}
+
+.Opts .ControlOptions .AdminCheck {
+  padding: 0;
+}
+
+/* ======================================================== Full Page Errors */
+
+.SplashMessage #Body h1 {
+  font-size: 64px;
+  line-height: 1.4;
+}
+
+.SplashMessage #Message {
+  font-size: 18px;
+  margin-bottom: 3em;
+}
+
+.SplashMessage .SplashInfo {
+  max-width: 640px;
+  margin: auto;
+}
+
+/* ======================================================== Panels / Sidebars */
+#Panel {
+  width: 200px;
+  float: left;
+
+  /*
+No overflow hidden on main elements. Causes too many bugs!
+overflow: hidden;
+*/
+}
+
+.Box {
+  margin: 10px 0;
+}
+
+.Box dl {
+  overflow: hidden;
+}
+
+.Box dl dt {
+  font-size: 12px;
+  float: left;
+  width: 80px;
+  color: $grey-4;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.Box dl dd {
+  font-size: 12px;
+  margin-left: 80px;
+}
+
+/* Hiding until we figure out what to do with GuestWelcomeModule */
+.MeBox-SignIn {
+  display: none;
+}
+
+.Profile .MeBox {
+  display: none;
+}
+
+.UserBox,
+.MeBox {
+  margin: 10px 0;
+}
+
+.UserBox .PhotoWrap,
+.MeBox .PhotoWrap {
+  float: left;
+  margin-right: 5px;
+}
+
+.UserBox .WhoIs,
+.MeBox .WhoIs {
+  min-height: 40px;
+  line-height: 1.3;
+}
+
+.UserBox .Username,
+.MeBox .Username {
+  font-weight: bold;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.UserBox .Email {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.MeMenu {
+  line-height: 24px;
+}
+
+.MeButton {
+  padding: 3px 5px;
+  border: solid 1px transparent;
+  position: relative;
+  line-height: 1;
+  display: inline-block;
+}
+
+.MeButton:hover {
+  background: $grey-5;
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.MeButton:hover {
+  background: $grey-5;
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.MeButton .Alert {
+  position: absolute;
+  top: -2px;
+  right: -1px;
+  font-size: 9px;
+  line-height: 1;
+  padding: 2px;
+}
+
+.MeMenu em {
+  display: none;
+}
+
+.MeBox.Inline,
+.MeBox.Inline .WhoIs,
+.MeBox.Inline .MeMenu {
+  display: inline-block;
+  line-height: 24px;
+  margin: 0;
+  vertical-align: top;
+  min-height: 24px;
+}
+
+.MeBox.Inline > .PhotoWrap {
+  float: none;
+}
+
+.MeBox.Inline > .PhotoWrap .ProfilePhoto {
+  height: 24px;
+  width: 24px;
+}
+
+.MeBox.Inline .Username {
+  margin-right: 4px;
+}
+
+.MeBox-SignIn.Inline * {
+  display: inline;
+}
+
+.MeBox.Inline .SignInIcons img {
+  vertical-align: top;
+}
+
+.PanelActivity {
+  border-top: 1px solid $blue-g;
+  border-bottom: 0;
+}
+
+.PanelActivity li {
+  background: $white-7;
+  border-bottom: 1px solid $blue-g;
+  padding: 2px 4px;
+  color: $grey-4;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.PanelActivity li a {
+  font-size: 13px;
+}
+
+.PanelActivity li a.Name {
+  margin-right: 2px;
+}
+
+.PanelActivity span {
+  padding: 0 4px;
+}
+
+.PanelActivity p {
+  padding: 0 4px;
+  display: inline;
+  font-size: 90%;
+}
+
+.PanelActivity li em {
+  padding-left: 5px;
+  color: $grey-3;
+  font-size: 80%;
+}
+
+.PanelActivity li .Story {
+  font-size: 85%;
+}
+
+/* Compatibility for old custom themes that overrode this value */
+#Panel .PanelInfo li {
+  text-align: left;
+}
+
+#Panel .FilterMenu li,
+.PanelInfo li {
+  border-bottom: 1px solid $grey-2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+}
+
+#Panel .FilterMenu li:first-child,
+.PanelInfo li:first-child {
+  border-top: 1px solid $grey-2;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/** Make standard items a bit more condensed when in the panel. **/
+
+.PanelColumn .Item {
+  padding: 2px;
+}
+
+.PanelColumn .Item .Title {
+  font-size: 13px;
+  font-weight: normal;
+}
+
+.PanelColumn .Options {
+  display: none;
+}
+
+#Panel .FilterMenu .Aside,
+.PanelInfo .Aside,
+.Item .Aside {
+  float: right;
+}
+
+.PanelInfo .Heading {
+  font-weight: bold;
+}
+
+.PanelInfo li strong {
+  font-weight: normal;
+  text-align: left;
+}
+
+.PanelInfo li .LastMessage {
+  float: right;
+}
+
+.PanelInfo .Meta {
+  font-size: 11px;
+}
+
+/*
+.PanelInfo .Meta span,
+.PanelInfo .Meta strong {
+   margin-right: 8px;
+}
+*/
+.PanelInfo .Meta span a {
+  margin-left: 8px;
+}
+
+.PanelInfo .Meta strong {
+  display: inline;
+  border-radius: 2px;
+  background: $yellow-3;
+  color: $black;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 3px;
+  line-height: 1;
+}
+
+.PanelInfo .Parent {
+  text-align: left;
+  font-weight: bold;
+  background: none;
+  color: $grey-1;
+  padding: 2px 0;
+}
+
+#Panel .FilterMenu .Active,
+.PanelInfo .Active {
+  background: $grey-g;
+  background: rgba(0, 0, 0, 0.03);
+  font-weight: bold;
+}
+
+.PanelInfo .Active strong {
+  font-weight: bold;
+}
+
+.PanelActivity .ShowAll,
+.PanelInfo .ShowAll {
+  font-weight: bold;
+  border: 0;
+  text-align: right;
+  background: none;
+}
+
+#Content .BoxFilter {
+  margin: 0 0 6px;
+}
+
+#Panel .BoxFilter {
+  margin: 10px 0;
+}
+
+#Content .FilterMenu {
+  margin: 10px 0;
+}
+
+#Content .FilterMenu li,
+#Content .FilterMenu li.Active {
+  display: inline-block;
+  white-space: nowrap;
+  margin: 0 6px;
+}
+
+#Content .FilterMenu li a {
+  padding: 4px 0;
+}
+
+#Content .FilterMenu li.Active a {
+  border-bottom: 2px solid $grey-2;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+#Content .BoxFilter a {
+  margin: 0 10px 0 0;
+  padding: 4px 0;
+  display: block;
+}
+
+#Content .BoxFilter .Active a {
+  color: $black;
+  border-bottom: 2px solid $grey-2;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+#Content .BoxFilter {
+  display: none;
+}
+
+/* Hide these by default, can be unhidden for backwards compat. */
+/* End BoxFilter in #Content area */
+#UserOptions {
+  margin-bottom: 10px;
+}
+
+/* Category Depths */
+.CategoryFilterOptions .CurrentFilter {
+  font-weight: bold;
+}
+
+.PanelCategories .Depth2 {
+  padding-left: 8px;
+}
+
+.PanelCategories .Depth3 {
+  padding-left: 12px;
+}
+
+.PanelCategories .Depth4 {
+  padding-left: 16px;
+}
+
+.PanelCategories .Depth5 {
+  padding-left: 20px;
+}
+
+.PanelCategories .Depth6 {
+  padding-left: 24px;
+}
+
+.PanelCategories .Depth7 {
+  padding-left: 28px;
+}
+
+.PanelCategories .Depth8 {
+  padding-left: 32px;
+}
+
+.PanelCategories .Depth9 {
+  padding-left: 36px;
+}
+
+.PanelCategories .Depth10 {
+  padding-left: 40px;
+}
+
+.PanelCategories .Depth11 {
+  padding-left: 44px;
+}
+
+.PanelCategories .Depth12 {
+  padding-left: 48px;
+}
+
+.CategoryList .Depth2 {
+  padding-left: 25px !important;
+}
+
+.CategoryList .Depth3 {
+  padding-left: 50px !important;
+}
+
+.CategoryList .Depth4 {
+  padding-left: 75px !important;
+}
+
+.CategoryList .Depth5 {
+  padding-left: 100px !important;
+}
+
+.CategoryList .Depth6 {
+  padding-left: 125px !important;
+}
+
+.CategoryList .Depth7 {
+  padding-left: 150px !important;
+}
+
+.CategoryList .Depth8 {
+  padding-left: 175px !important;
+}
+
+.CategoryList .Depth9 {
+  padding-left: 200px !important;
+}
+
+.CategoryList .Depth10 {
+  padding-left: 225px !important;
+}
+
+.CategoryList .Depth11 {
+  padding-left: 250px !important;
+}
+
+.CategoryList .Depth12 {
+  padding-left: 275px !important;
+}
+
+.CategoryListWithHeadings .Depth1 {
+  padding-left: 0 !important;
+}
+
+.CategoryListWithHeadings .Depth2 {
+  padding-left: 0 !important;
+}
+
+.CategoryListWithHeadings .Depth3 {
+  padding-left: 25px !important;
+}
+
+.CategoryListWithHeadings .Depth4 {
+  padding-left: 50px !important;
+}
+
+.CategoryListWithHeadings .Depth5 {
+  padding-left: 75px !important;
+}
+
+.CategoryListWithHeadings .Depth6 {
+  padding-left: 100px !important;
+}
+
+.CategoryListWithHeadings .Depth7 {
+  padding-left: 125px !important;
+}
+
+.CategoryListWithHeadings .Depth8 {
+  padding-left: 150px !important;
+}
+
+.CategoryListWithHeadings .Depth9 {
+  padding-left: 175px !important;
+}
+
+.CategoryListWithHeadings .Depth10 {
+  padding-left: 200px !important;
+}
+
+.CategoryListWithHeadings .Depth11 {
+  padding-left: 225px !important;
+}
+
+.CategoryListWithHeadings .Depth12 {
+  padding-left: 250px !important;
+}
+
+.Box.RecentUsers {
+  float: left;
+}
+
+.Icons a {
+  display: block;
+  margin: 0 2px 2px 0;
+  float: left;
+}
+
+.Icons img {
+  display: block;
+  height: 44px;
+  width: 44px;
+  overflow: hidden;
+  background: $blue-i;
+  color: $blue-i;
+  text-indent: 50px;
+}
+
+/* Page Controls (new discussion button, pagers, etc) */
+#Content .BoxNewDiscussion {
+  display: none; /* display: block to reveal this */
+}
+
+.PageControls {
+  margin: 5px 0;
+  min-height: 24px;
+}
+
+/* ================================================ DataList */
+/* Note: DataList is used in search results, vanilla discussions & drafts */
+
+.SearchForm {
+  margin: 20px auto;
+}
+
+.SearchForm .InputBox {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+  padding: 6px 25px 6px 8px;
+  border-radius: .35ex;
+  border: solid 1px $grey-d;
+}
+
+.SearchForm .SiteSearch {
+  max-width: 600px;
+  margin: 0;
+}
+
+.SearchForm .SiteSearch .Button {
+  top: 8px;
+  right: 6px;
+}
+
+.Empty {
+  margin: 10px 0;
+}
+
+.DataList .Item,
+.NarrowList .Item {
+  margin: 0;
+  padding: 8px;
+  border: 0 solid $grey-2;
+  border: 0 solid rgba(0, 0, 0, 0.1);
+  border-bottom-width: 1px;
+  position: relative;
+}
+
+.DataList .Item .Item {
+  border: none;
+}
+
+.Item-Icon {
+  float: left;
+  margin: 0 10px 10px 0;
+}
+
+.Item h2, .Item h3, .Item h4, .Item h5 {
+  margin: 0;
+}
+
+#latest {
+  float: left;
+  margin: -10px;
+}
+
+.DataList .Title {
+  font-size: 14px;
+  display: block;
+  font-weight: bold;
+  margin: 0;
+}
+
+.ItemDiscussion .Meta,
+.DataList .Meta {
+  font-size: 11px;
+  color: $blue-j;
+}
+
+.MItem {
+  margin-left: 8px;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.MItem:first-child {
+  margin-left: 0;
+}
+
+.MItem:last-child {
+  margin-right: 0;
+}
+
+.CommentInfo {
+  line-height: 1.5;
+}
+
+.Item .AuthorInfo {
+  font-size: 11px;
+}
+
+.DataList .Excerpt {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 5px 0;
+}
+
+.DataList .Excerpt p {
+  display: inline;
+  padding: 0;
+}
+
+.HasNew {
+  border-radius: 2px;
+  background: $yellow-3;
+  color: $black;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 3px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.JustNew {
+  display: none;
+}
+
+.Item.Read {
+  background: $grey-h;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
+  filter: alpha(opacity=90);
+  opacity: .9;
+}
+
+.Item.Read:hover {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  opacity: 1;
+}
+
+.Item.Read .Title, .Item.Read .BlockTitle {
+  font-weight: normal;
+}
+
+.Item.Checked {
+  background: $yellow-f;
+}
+
+.Item.Open {
+  z-index: 200;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(enabled=false)" !important;
+  filter: alpha(enabled=false) !important;
+  opacity: 1 !important;
+}
+
+.DataList a.Delete {
+  border-radius: 0;
+  color: $grey-1;
+  display: block;
+  height: 14px;
+  margin: 0;
+  padding: 2px 4px;
+  width: auto;
+  font-family: arial;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  visibility: hidden;
+}
+
+.DataList a.Delete:hover {
+  text-decoration: none;
+  border: none;
+  background: $grey-1;
+  color: $white;
+  visibility: visible;
+}
+
+.Item:hover a.Delete {
+  visibility: visible;
+}
+
+/* Condensed datalists make the main link & excerpt inline. */
+.DataList .Unfollow {
+  background: $grey-5;
+}
+
+.DataList .Unfollow a {
+  color: $grey-6;
+}
+
+.Item .Inset {
+  border-top: 1px solid $blue-h;
+  padding: 5px 0;
+}
+
+.Item .Author a {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.Condensed .Title,
+.Condensed a.Title {
+  display: inline;
+  padding: 0;
+}
+
+.Condensed .Excerpt {
+  display: inline;
+}
+
+.PopList .Item {
+  padding: 4px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid $grey-2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.PopList .ItemContent {
+  margin: 0 0 0 48px;
+  line-height: 1.4;
+}
+
+.PopList .Meta {
+  color: $grey-3;
+  font-size: 80%;
+}
+
+.PopList .Center {
+  padding: 0;
+}
+
+.PopList .Center a {
+  display: block;
+  padding: 4px 0;
+}
+
+.PopList .Item:hover {
+  background: $grey-5;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.PopList .Item.Title:hover {
+  background: inherit;
+}
+
+.PopList .Item.Title {
+  font-size: 12px;
+  padding: 2px 4px;
+}
+
+.PopList .Item.Title a {
+  float: right;
+  font-size: 11px;
+}
+
+.PopList .Empty {
+  border: none;
+}
+
+/* /me actions */
+.MeAction .AuthorAction {
+  display: inline;
+  margin: 0 6px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.MeAction .Item-Header {
+  margin-bottom: 8px;
+}
+
+.MeAction .Message {
+  display: none;
+}
+
+.Hero {
+  background: $grey-g;
+  background: rgba(0, 0, 0, .03);
+  padding: 20px;
+  margin: 10px 0 20px;
+  border-radius: 6px;
+}
+
+.Hero h3 {
+  font-size: 24px;
+  font-weight: normal;
+}
+
+.ChildCategoryList {
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.ChildCategoryList .Item {
+  float: left;
+  width: 50%;
+  padding: 0;
+}
+
+.ChildCategoryList .Item:nth-child(odd) {
+  clear: left;
+}
+
+.ChildCategoryList .ItemContent {
+  padding: 8px 0 0;
+}
+
+/* =============================================================== Activities */
+.Activities li.HasPhoto .Title {
+  padding: 0;
+}
+
+.Activities a.Title,
+.Activities .Title,
+.Activities .Title a {
+  font-size: 14px;
+}
+
+.Activities li.Condensed .Excerpt {
+  color: $black;
+  font-size: 13px;
+}
+
+.Activities ul.DataList {
+  margin-left: 50px;
+}
+
+.Activities .ItemContent {
+  margin: 0 0 0 53px;
+}
+
+.Activities .ActivityComments .ItemContent {
+  margin: 0 0 0 42px;
+}
+
+.Activities .DataList li {
+  background: $grey-h;
+  background: rgba(0, 0, 0, 0.05);
+  margin-bottom: 2px;
+  padding: 6px;
+}
+
+.Activities .DataList a.Title,
+.Activities .DataList .Title,
+.Activities .DataList .Title a,
+.Activities .DataList .Excerpt p {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.Activities .DataList .Photo img {
+  height: 32px;
+  width: 32px;
+}
+
+.Activities a.CommentLink,
+.Activities a.CommentLink:hover {
+  font-size: 12px;
+  cursor: text;
+  background: $white;
+  color: $grey-d !important;
+  padding: 5px;
+  text-decoration: none;
+  border: 1px solid $grey-b;
+  display: block;
+  line-height: 100%;
+  font-weight: normal;
+}
+
+/* ============================================================== MessageList */
+
+.Author .PhotoWrap {
+  margin: 0 10px 4px 0;
+  float: left;
+  /*   overflow: hidden;*/
+}
+
+.Popup .Preview {
+  padding: 8px;
+  margin: 0;
+}
+
+body.Post .Popup a.Close {
+  color: $vanilla-blue;
+}
+
+.Message {
+  line-height: 1.7;
+  font-size: 100%;
+  word-wrap: break-word;
+  margin-top: 5px;
+}
+
+.Message h1, .Message h2, .Message h3, .Message p, .Message .P {
+  margin: 10px 0;
+}
+
+blockquote {
+  margin: 1em 0 1em 40px;
+}
+
+.emoji {
+  margin-top: -2px;
+  margin-bottom: -3px; /* account for image padding */
+}
+
+blockquote.Quote, blockquote.UserQuote {
+  padding: 1ex 16px;
+  margin: 1em 0;
+  background: $grey-h;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 4px solid $grey-5;
+  border-left: 4px solid rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  overflow-y: auto;
+}
+
+.Message small {
+  font-size: 11px;
+  color: $grey-3;
+}
+
+.EmbeddedContent {
+  overflow: hidden;
+}
+
+.Message img.LeftAlign,
+img.LeftAlign {
+  float: left;
+  margin: 0 10px 5px 0;
+  max-width: 300px;
+}
+
+.Message dt {
+  font-weight: bold;
+  margin: 10px 0 4px;
+}
+
+.Message dd {
+  margin-left: 30px;
+}
+
+.Message dd > p {
+  margin-top: 4px;
+}
+
+.Message li {
+  margin: 5px 0;
+}
+
+.ClearFix {
+  clear: both;
+}
+
+code, pre {
+  border-radius: 2px;
+  background: $yellow-8;
+  padding: 4px 8px;
+  font-family: monospace;
+  overflow: auto;
+  border: 1px solid $yellow-9;
+}
+
+code {
+  white-space: pre-wrap;
+}
+
+pre {
+  display: block;
+  margin: 1em 0;
+  white-space: pre;
+}
+
+pre code {
+  border: none;
+  padding: 0;
+  white-space: pre;
+}
+
+mark {
+  padding: 0 2px;
+  color: inherit;
+  background: $yellow-a;
+}
+
+.Message strong, .Message b {
+  font-weight: bold;
+}
+
+.Message em,
+.Message i {
+  font-style: oblique;
+}
+
+.Message ul,
+.Message ol {
+  margin: 1em 0 1em 3em;
+}
+
+.Message ol li {
+  list-style: decimal !important;
+}
+
+.Message ul li {
+  list-style: disc !important;
+}
+
+.Message img {
+  max-width: 100%;
+}
+
+/* =============================================================== Categories */
+.ChildCategories {
+  border-top: 1px dotted $grey-2;
+  display: block;
+}
+
+.DataList .Meta .RSS {
+  margin-right: 6px;
+}
+
+.Meta .RSS img {
+  vertical-align: text-bottom;
+}
+
+.CategoryHeading .ItemContent {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.RssButton {
+  display: inline-block;
+  background: url(images/rss.gif) no-repeat center center;
+  height: 16px;
+  width: 16px;
+  vertical-align: bottom;
+  color: transparent;
+  overflow: hidden;
+  text-indent: -100px;
+}
+
+.DataTable .RssButton {
+  float: right;
+}
+
+/* ============================================================= Profile Page */
+a.ChangePicture {
+  position: absolute;
+  background: $grey-1;
+  background: rgba(0, 0, 0, .7);
+  color: $white;
+  font-size: 11px;
+  padding: 10px 0;
+  width: 100%;
+  display: none;
+  text-align: center;
+}
+
+.PhotoWrap:hover a.ChangePicture {
+  display: block;
+}
+
+a.ChangePicuture:hover {
+  color: $white;
+  text-decoration: underline;
+}
+
+.ProfileOptions {
+  float: right;
+  position: relative;
+}
+
+/* Hiding form headings with CSS in case the forms get popped */
+div.Popup .SmallPopup h1 {
+  display: none;
+}
+
+/* BGColor on profile forms */
+body.Profile.EditMode #Content form {
+  padding: 10px 20px 20px;
+  background: $grey-h;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/*form.Activity {
+   display: block;
+   margin: 0 0 10px;
+	overflow: hidden;
+}
+form.Activity textarea {
+   width: 100%;
+   margin-bottom: 2px;
+   height: 60px;
+   min-height: 60px;
+}
+form.Activity .Button {
+   float: right;
+}
+.ActivityComments textarea {
+   height: 60px;
+   min-height: 60px;
+}*/
+
+/* Invitations Form */
+table.PreferenceGroup,
+#Form_Invitation table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+table.PreferenceGroup th,
+table.PreferenceGroup td,
+#Form_Invitation th,
+#Form_Invitation td {
+  padding: 2px 6px;
+  border-bottom: 1px solid $grey-2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+table.PreferenceGroup th,
+#Form_Invitation table th {
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Preferences Form */
+.Preferences h3 {
+  margin: 0;
+  padding: 10px 0 4px !important;
+}
+
+/* About in content area */
+.ContentColumn .About h2 {
+  display: none;
+}
+
+dl.About dt,
+dl.About dd {
+  padding: 0;
+  margin: 0;
+  float: none;
+  font-size: 11px;
+  line-height: 14px;
+  display: inline;
+}
+
+dl.About dt {
+  color: $grey-j;
+  background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
+  padding-left: 14px;
+}
+
+dl.About dt.Name {
+  background-position: 0 -26px;
+}
+
+dl.About dt.Email {
+  background-position: 0 -53px;
+}
+
+dl.About dt.Joined,
+dl.About dt.LastActive {
+  background-position: 0 3px;
+}
+
+dl.About dt.Roles {
+  background-position: 1px -81px;
+}
+
+dl.About dt.Posts {
+  background-position: 0 -113px;
+}
+
+dl.About dd {
+  padding: 0 8px 0 0;
+}
+
+/* Invitations */
+.Invitations.DataTable {
+  margin: 15px 0;
+}
+
+.Invitations.DataTable th {
+  text-align: left;
+}
+
+.Invitations.DataTable th {
+  padding: 4px;
+  border-bottom: 1px solid $grey-5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  vertical-align: top;
+}
+
+.Invitations th.InviteMeta {
+  width: 20%;
+}
+
+.InviteForm {
+  margin: 5px 0;
+}
+
+.InviteForm label {
+  display: block
+}
+
+/* ======================================================== Thumbnail Cropper */
+.Popup .CurrentPicture {
+  display: none;
+}
+
+.CurrentPicture table,
+form.Thumbnail table {
+  width: 100%;
+}
+
+.CurrentPicture table td,
+form.Thumbnail table td {
+  width: 50%;
+  font-weight: normal;
+  vertical-align: top;
+  padding-right: 10px;
+}
+
+.CurrentPicture table thead td,
+form.Thumbnail table thead td {
+  font-weight: bold;
+}
+
+form.Thumbnail .Warning {
+  margin-bottom: 20px;
+}
+
+.jcropper-holder {
+  border: 1px $black solid;
+}
+
+.jcrop-holder {
+  text-align: left;
+}
+
+.jcrop-vline, .jcrop-hline {
+  font-size: 0;
+  position: absolute;
+  background: $white url('images/jcrop.gif') top left repeat;
+}
+
+.jcrop-vline {
+  height: 100%;
+  width: 1px !important;
+}
+
+.jcrop-hline {
+  width: 100%;
+  height: 1px !important;
+}
+
+.jcrop-handle {
+  font-size: 1px;
+  width: 7px !important;
+  height: 7px !important;
+  border: 1px $grey-5 solid;
+  background-color: $grey-1;
+}
+
+.jcrop-tracker {
+  width: 100%;
+  height: 100%;
+}
+
+.custom .jcrop-vline,
+.custom .jcrop-hline {
+  background: $yellow-3;
+}
+
+.custom .jcrop-handle {
+  border-color: $black;
+  background-color: $yellow-b;
+  border-radius: 3px;
+}
+
+/* ================================================= CommentForm */
+.Preview {
+  background: $white;
+  color: $black;
+  padding: 4px;
+  min-height: 100px;
+}
+
+.EditCommentForm .Buttons,
+.CommentForm .Buttons {
+  position: relative;
+  text-align: right;
+  margin: 0;
+  padding: 6px 0;
+}
+
+.CommentForm .WriteButton,
+.CommentForm .PreviewButton,
+.CommentForm .DraftButton {
+  margin: 0 6px;
+}
+
+.Form-Header .Username {
+  display: none;
+}
+
+.Form-Header .Author .PhotoWrap {
+  margin: 10px 0 0 10px;
+}
+
+.EditCommentForm .FormWrapper {
+  padding: 10px;
+}
+
+.CommentForm .FormWrapper {
+  padding: 10px 10px 10px 60px;
+}
+
+.EditCommentForm textarea.TextBox,
+.CommentForm textarea.TextBox {
+  min-height: 50px;
+  height: 50px;
+}
+
+.EditCommentForm {
+  margin: 10px 0;
+}
+
+/* =================================================================== Popups */
+.Popup .Info {
+  margin-top: 10px;
+}
+
+.Overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 998;
+}
+
+.MSIE .Overlay {
+  background: gray;
+  filter: alpha(opacity=0);
+  position: static;
+}
+
+div.Popup {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  text-align: center;
+}
+
+div.Popup .Border {
+  margin: 0 auto;
+  text-align: left;
+  position: relative;
+  max-width: 600px;
+  display: inline-block;
+}
+
+div.Popup .Body {
+  background: $white;
+  padding: 10px;
+  float: left; /* Put this here b/c background of form was not descending to bottom of popup. */
+}
+
+div.Popup .Loading {
+  text-align: center;
+}
+
+div.Popup h1 {
+  margin-top: 0;
+}
+
+a.Close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  line-height: 1;
+  color: $black;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 0;
+}
+
+div.Popup .Footer {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  text-align: right;
+}
+
+div.Popup h3 {
+  font-size: 120%;
+  font-weight: bold;
+  padding: 20px 0 10px;
+}
+
+div.Popup p {
+  padding: 6px 10px 10px;
+}
+
+div.Popup .Legal p {
+  padding: 6px 0 10px;
+}
+
+div.Popup small {
+  font-size: 11px;
+}
+
+div.Popup form p {
+  padding: 0;
+}
+
+body.Profile.EditMode ul li label,
+div.Popup form ul li label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 0;
+}
+
+body.Entry form ul li.Gender label.RadioLabel,
+body.Profile.EditMode ul li.Gender label.RadioLabel,
+div.Popup form ul li.Gender label.RadioLabel {
+  display: inline;
+  padding-right: 20px;
+}
+
+li.Gender {
+  margin-bottom: 10px;
+}
+
+body.Profile.EditMode ul li label.RadioLabel,
+body.Profile.EditMode ul li label.CheckBoxLabel,
+div.Popup form ul li label.RadioLabel,
+div.Popup form ul li label.CheckBoxLabel {
+  font-weight: normal;
+}
+
+body.Profile.EditMode .Warning {
+  margin: 10px 0;
+}
+
+div.Popup form ul li label.RadioLabel {
+  font-size: 12px;
+}
+
+/* Serious Ajax Error Styles */
+.AjaxError {
+  white-space: pre;
+  overflow: auto;
+  padding: 10px;
+}
+
+/* ==================================================================== Legal */
+.Legal h3 {
+  padding: 0;
+  margin: 20px 0 0;
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.Legal ol {
+  list-style-position: outside;
+  list-style-type: decimal;
+  margin: 0 30px 10px;
+}
+
+.Legal ul {
+  list-style-position: outside;
+  list-style-type: disc;
+  margin: 0 30px 10px;
+}
+
+.Legal li {
+  padding: 5px 0;
+}
+
+.Legal strong {
+  font-weight: bold;
+}
+
+/* =================================================================== Footer */
+#Foot {
+  clear: both;
+  text-align: center;
+  margin: 20px 0 0;
+  padding: 4px 9px;
+  font-size: 13px;
+  color: $grey-2;
+  line-height: 1;
+}
+
+#Foot a {
+  color: $grey-e;
+}
+
+#Foot a:hover {
+  color: $grey-b;
+}
+
+.PoweredByVanilla {
+  display: inline-block;
+  height: 33px;
+  width: 70px;
+  background: url('images/vanilla-forums-dark-bg-70x33.png') center center no-repeat;
+  background: url('images/vanilla-forums-light-bg-70x33.png') center center no-repeat;
+  line-height: 999px;
+  color: transparent;
+  overflow: hidden;
+  font-size: 0;
+}
+
+/* ================================ Vanilla ================================= */
+
+/* ============================================================== Discussions */
+
+/* Note: The Vanilla Discussion List has the following classes applied to
+  individual list elements and can be styled:
+  + Bookmarked: the user has bookmarked that topic
+  + Announcement: the discussion has been announced
+  + Mine: the user created the discussion
+  + New: there are new comments since the last viewed the discussion
+*/
+.Tag {
+  background: $grey-3;
+  border-radius: 2px;
+  color: $white;
+  padding: 1px 4px;
+  line-height: 14px;
+}
+
+.Tag a {
+  color: $white;
+}
+
+.Tag.Closed {
+  background: $grey-4;
+}
+
+.Tag.Category {
+  background: $grey-i;
+  font-weight: normal;
+}
+
+.Tag.Category a {
+  color: $black;
+}
+
+.Tag.Tag-Banned {
+  background-color: $red-a;
+}
+
+.Discussion .PageTitle h1 {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.ItemDiscussion {
+  margin-bottom: 12px;
+  padding: 8px;
+}
+
+/*
+.ItemDiscussion .Message {
+   margin-top: 20px;
+}
+.ItemDiscussion .MItem a {
+   font-size: 11px;
+}
+.ItemDiscussion .ProfilePhotoMedium {
+	height: 24px;
+	width: 24px;
+   margin: 0 5px 5px 0;
+}
+*/
+.ItemDiscussion .Message {
+  margin-bottom: 5px; /* Consistency with when only h1 starts page */
+  font-size: 110%;
+}
+
+.DiscussionHeader {
+  margin: 5px 0 10px;
+}
+
+.BeforeCommentHeading {
+  float: right;
+}
+
+/* ======================================= Category & Discussions Table Views */
+.DataTable {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.DataTable td {
+  padding: 4px;
+  border-bottom: 1px solid $grey-2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  vertical-align: top;
+}
+
+.DataTable thead td, .DataTable thead th {
+  font-weight: bold;
+  vertical-align: bottom;
+}
+
+.CheckBoxColumn {
+  width: 24px;
+}
+
+.DataTable .BlockColumn {
+  width: 25%;
+}
+
+tbody .BlockColumn {
+  padding: 8px 4px; /* compensate for line-height 1 */
+}
+
+.DataTable .BlockColumn-User {
+  width: 15%;
+}
+
+td.BigCount {
+  width: 90px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.DiscussionsTable td.BigCount {
+  width: 70px;
+}
+
+tbody td.BigCount {
+  font-size: 16px;
+  padding: 8px 4px;
+}
+
+.DataTable .Meta,
+.DataTable .MItem {
+  font-size: 11px;
+}
+
+.DataTable .Title {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+td.Opts {
+  white-space: nowrap;
+  text-align: right;
+  width: 1px;
+}
+
+.MiniPager {
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 11px;
+  color: $grey-1;
+}
+
+.MiniPager a,
+.MiniPager span {
+  margin: 0 1px;
+}
+
+tr.CategoryHeading td {
+  font-weight: bold;
+  background: $grey-g;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.CategoryTable .ChildCategories {
+  font-size: 11px;
+}
+
+/* Discussion Sorter */
+.DiscussionSorter {
+  float: right;
+  margin-right: 24px;
+  font-size: 11px;
+}
+
+.DiscussionSorter:hover {
+  cursor: pointer;
+  background: $grey-h;
+}
+
+.DiscussionSorter .MenuItems {
+  padding: 0;
+  width: 130px;
+  border-top: none;
+  border-radius: 0;
+}
+
+.DiscussionSorter .Selected {
+  padding: 0 0 0 15px;
+  display: inline-block;
+  width: 115px;
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+.DiscussionSorter .Open .Selected {
+  border: 1px solid $grey-9;
+  border-bottom: none;
+}
+
+.DiscussionSorter .SpMenu {
+  background-position: -32px -20px;
+  height: 8px;
+  width: 12px;
+  margin-top: 8px;
+}
+
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after {
+  border: none;
+}
+
+.DiscussionSorter .ToggleFlyout .Flyout {
+  top: 18px;
+}
+
+/* ======================================= Blocks */
+.Block {
+  line-height: 1;
+}
+
+.BlockTitle {
+  display: block;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-bottom: 3px;
+  font-size: 12px;
+}
+
+.Block .PhotoWrap {
+  float: left;
+  margin: 0 5px 0 0;
+}
+
+/*.Block img {
+   height: 24px;
+	width: 24px;
+}*/
+.Block .MItem {
+  font-size: 10px;
+  margin: 0;
+}
+
+/* ================================= Conversation, Discussion & Comment Forms */
+.SpNewConversation,
+.SpAskQuestion,
+.SpNewPoll,
+.SpNewDiscussion {
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  background: url('images/sprites.png') 0 -68px no-repeat;
+  margin: 0 5px 2px 0;
+  vertical-align: middle;
+}
+
+.SpNewConversation {
+  background-position: -64px -68px;
+}
+
+.SpAskQuestion {
+  background-position: -48px -68px;
+}
+
+.SpNewPoll {
+  background-position: -32px -68px;
+}
+
+.SpRSS {
+  background: url("images/sprites.png") no-repeat -27px -46px transparent;
+  display: inline-block;
+  height: 14px;
+  vertical-align: middle;
+  width: 14px;
+}
+
+.DiscussionForm label {
+  font-size: 14px;
+  font-weight: bold;
+  color: $grey-j;
+}
+
+.FormWrapper {
+  background: $grey-g;
+  background: rgba(0, 0, 0, 0.03);
+  margin: 0;
+  padding: 20px;
+}
+
+.FormWrapper-Condensed {
+  padding: 10px;
+}
+
+.FormWrapper-Condensed .Buttons {
+  text-align: right;
+}
+
+label.B {
+  font-weight: bold;
+}
+
+.DiscussionForm textarea {
+  width: 100%;
+  height: 100px;
+  min-height: 100px;
+  margin: 0 0 6px;
+}
+
+.DiscussionForm .Category,
+.DiscussionForm input.InputBox {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.DiscussionForm .Category label {
+  padding: 0 8px 0 0;
+}
+
+.DiscussionForm .PostOptions li {
+  display: inline;
+  padding: 0 8px 0 0;
+}
+
+.DiscussionForm .PostOptions label {
+  display: inline;
+  font-weight: normal;
+  font-size: 95%;
+}
+
+.FormWrapper.StructuredForm {
+  padding-top: 5px;
+}
+
+.StructuredForm label {
+  font-weight: bold;
+  font-size: 14px;
+  display: block;
+}
+
+.StructuredForm .P {
+  margin: 15px 0;
+}
+
+.StructuredForm label.RadioLabel,
+.StructuredForm label.CheckBoxLabel,
+.StructuredForm label.Unstyled {
+  font-size: 100%;
+  font-weight: normal;
+}
+
+.StructuredForm input.hasDatepicker, .StructuredForm input.hasDatepicker:focus {
+  background-image: url('images/calendar.png');
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 24px;
+}
+
+.List.Inline {
+  display: inline;
+}
+
+.List.Inline * {
+  line-height: 16px;
+}
+
+/* ============================== Conversations ============================= */
+textarea.MultiComplete {
+  width: 100%;
+  height: 20px;
+  text-align: left;
+}
+
+#Panel input.InputBox,
+.AddPeople textarea.MultiComplete {
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.AddPeople form div {
+  text-align: right;
+}
+
+.ac_results {
+  padding: 0;
+  border: 1px solid $white-1;
+  border-top: 0;
+  background-color: $white;
+  overflow: hidden;
+  z-index: 99999;
+}
+
+.ac_results ul {
+  width: 100%;
+  list-style-position: outside;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ac_results li {
+  margin: 0;
+  padding: 5px;
+  cursor: default;
+  display: block;
+  /*
+ if width will be 100% horizontal scrollbar will apear
+ when scroll mode will be used
+ */
+  /*width: 100%;*/
+  font-size: 12px;
+  /*
+ it is very important, if line-height not setted or setted
+ in relative units scroll will be broken in firefox
+ */
+  line-height: 16px;
+  overflow: hidden;
+  border-bottom: 1px solid $white-1;
+  text-align: left;
+}
+
+.ac_lastitem {
+  border-bottom: 0 !important;
+}
+
+.ac_results strong {
+  font-weight: bold;
+  background: $blue-7;
+}
+
+.ac_over strong {
+  font-weight: bold;
+  background: $blue-4;
+}
+
+.ac_over {
+  background: $blue-5;
+  color: $white;
+}
+
+.AddPeople h4 {
+  border-bottom: 0;
+}
+
+/* ==================================================== New Conversation Form */
+#ConversationForm label {
+  display: block;
+  text-align: left;
+  color: $grey-j;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#ConversationForm .TextBox {
+  width: 100%;
+  height: 100px;
+  min-height: 100px;
+  margin: 8px 0 6px;
+}
+
+body.Conversations a.Cancel {
+  margin-left: 20px;
+}
+
+/* Upload Progress Bar */
+.UploadProgress {
+  margin: 10px 0;
+  background: url('images/upload-progress-back.gif') repeat;
+  width: 200px;
+  z-index: 0;
+  color: $white;
+  text-shadow: 0 1px 1px $grey-1;
+  border: 1px solid $blue-6;
+  border-radius: 2px;
+}
+
+.UploadProgress div {
+  padding: 2px 0;
+}
+
+.UploadProgress div strong {
+  font-weight: bold;
+}
+
+.UploadProgress .Foreground,
+.UploadProgress .Background {
+  position: absolute;
+}
+
+.UploadProgress .Background {
+  width: 0;
+  background: url('images/upload-bg.gif') repeat;
+  z-index: 1;
+}
+
+.UploadProgress .Foreground {
+  text-indent: 6px;
+  overflow: visible;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+/* Container */
+.Border {
+  border-radius: 8px;
+  background: $grey-2;
+  background: rgba(82, 82, 82, 0.7);
+  padding: 10px;
+}
+
+/* Tabs */
+ul.Tabs {
+  border-bottom: 1px solid $grey-b;
+  text-align: left;
+  padding-left: 4px;
+}
+
+ul.Tabs li {
+  display: inline-block;
+}
+
+ul.Tabs li a {
+  display: inline-block;
+  margin-left: 4px;
+  border: 1px solid $grey-b;
+  border-width: 1px 1px 0 1px;
+  border-radius: 3px 3px 0 0;
+  background: $grey-5;
+  color: $grey-6;
+  position: relative;
+  top: 1px;
+  padding: 2px 8px 1px;
+}
+
+ul.Tabs li a:hover {
+  background: $grey-8;
+  color: $grey-7;
+}
+
+ul.Tabs li a.Active {
+  padding: 2px 8px;
+  background: $white;
+  color: $black;
+}
+
+/* Icons */
+ul.Tabs li a.EntryTabFor_password {
+  padding-left: 22px;
+  background-image: url('images/icon.png');
+  background-position: 3px 4px;
+  background-repeat: no-repeat;
+}
+
+/* ============================================================ Entry Screens */
+body.Entry form ul li label {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 6px 0 0;
+  display: block;
+}
+
+body.Entry form ul li label.CheckBoxLabel,
+body.Entry form ul li label.RadioLabel {
+  font-size: 12px;
+  font-weight: normal;
+  width: auto;
+}
+
+span.Incorrect {
+  display: block;
+  color: $red-1;
+}
+
+.SingleEntryMethod {
+  margin: 0 auto;
+}
+
+.MultipleEntryMethods {
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.MultipleEntryMethods .MainForm {
+  float: left;
+  /* Fix mainform from shoving the other entry methods down when an error occurs during login */
+  width: 300px;
+}
+
+.MultipleEntryMethods .Methods {
+  padding: 0 15px 5px;
+  line-height: 1;
+  margin-left: 300px;
+}
+
+body#dashboard_entry_password #Content input.Password,
+body#dashboard_entry_signin #Content input.Password,
+body#dashboard_entry_index #Content input.Password,
+.SignInPopup input.Password {
+  width: 180px;
+}
+
+.PasswordStrength {
+  position: relative;
+  margin-top: 2px;
+  padding-right: 8px;
+  margin-bottom: 4px;
+  height: 10px;
+}
+
+.PasswordStrength .Background {
+  height: 4px;
+  background-color: $grey-l;
+  width: 100%;
+  position: absolute;
+  left: 0;
+}
+
+.PasswordStrength .Strength {
+  height: 4px;
+  background-color: $red-8;
+  width: 0;
+  position: absolute;
+  left: 0;
+}
+
+.PasswordStrength .Separator {
+  height: 4px;
+  width: 2px;
+  background-color: $white;
+  position: absolute;
+  left: 0;
+}
+
+.PasswordStrength .StrengthText {
+  padding-top: 2px;
+  text-align: right;
+  font-size: 12px;
+  margin-right: -8px;
+}
+
+.PasswordStrength.Score-0 .Strength {
+  width: 0;
+}
+
+.PasswordStrength.Score-0 .StrengthText {
+  color: $grey-6;
+}
+
+.PasswordStrength.Score-1 .Strength {
+  background-color: $red-8;
+  width: 20%;
+}
+
+.PasswordStrength.Score-1 .StrengthText {
+  color: $red-8;
+}
+
+.PasswordStrength.Score-2 .Strength {
+  background-color: $orange-1;
+  width: 40%;
+}
+
+.PasswordStrength.Score-2 .StrengthText {
+  color: $orange-1;
+}
+
+.PasswordStrength.Score-3 .Strength {
+  background-color: $orange-2;
+  width: 60%;
+}
+
+.PasswordStrength.Score-3 .StrengthText {
+  color: $orange-2;
+}
+
+.PasswordStrength.Score-4 .Strength {
+  background-color: $green-2;
+  width: 80%;
+}
+
+.PasswordStrength.Score-4 .StrengthText {
+  color: $green-2;
+}
+
+.PasswordStrength.Score-5 .Strength {
+  background-color: $green-1;
+  width: 100%;
+}
+
+.PasswordStrength.Score-5 .StrengthText {
+  color: $green-1;
+}
+
+a.ForgotPassword {
+  margin-left: 10px;
+}
+
+li.Buttons div a.ForgotPassword {
+  margin: 0;
+}
+
+body#dashboard_entry_password ul li label.CheckBoxLabel,
+body#dashboard_entry_signin ul li label.CheckBoxLabel,
+body#dashboard_entry_index ul li label.CheckBoxLabel,
+.SignInPopup ul li label.CheckBoxLabel {
+  display: inline;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 10px 0 0 10px;
+}
+
+.SignInPopup li.Buttons,
+body.Entry li.Buttons {
+  text-align: left;
+  padding: 0 0 10px;
+}
+
+.Methods .Method {
+  margin: 5px 0;
+}
+
+.MainForm .InputBox {
+  max-width: 250px;
+}
+
+/* Handshake */
+body#dashboard_entry_handshake #Content {
+  width: 720px;
+}
+
+body#dashboard_entry_handshake #Content form {
+  padding: 20px 30px 26px;
+}
+
+body#dashboard_entry_handshake ul.NewAccount {
+  float: left;
+  width: 315px;
+  margin-right: 44px;
+  border-right: 1px solid $blue-2;
+}
+
+body#dashboard_entry_handshake ul.LinkAccount {
+  margin-left: 315px;
+}
+
+ul.NewAccount h2,
+ul.LinkAccount h2 {
+  padding-left: 36px !important;
+  background: url('images/dashboard-sprites.png') 0 -542px no-repeat;
+}
+
+ul.LinkAccount h2 {
+  padding-left: 84px !important;
+  background-position: 45px -296px;
+}
+
+body#dashboard_entry_handshake .Info {
+  border: 1px solid $blue-2;
+  background: $blue-3;
+  color: $blue-1;
+}
+
+body#dashboard_entry_handshake #Content h2 {
+  border: none;
+  color: $blue-1;
+  font-size: 140%;
+  font-weight: bold;
+  padding: 6px 0;
+  margin: 0;
+  text-align: left;
+}
+
+/* Leaving Page */
+body#dashboard_entry_leave p {
+  margin: 0;
+  padding: 20px 10px;
+}
+
+body#dashboard_entry_leave p.Leaving {
+  background: url('images/progress.gif') left center no-repeat;
+  margin: 0 0 0 14px;
+  padding: 20px 0 20px 50px;
+}
+
+.Connect form ul li#ConnectPassword label,
+.SignInPopup form ul li#ConnectPassword label {
+  padding: 10px 0 0;
+}
+
+.FinePrint {
+  font-size: 11px;
+  color: $grey-3;
+}
+
+/* Do not customize these unless you enjoy pain. */
+
+/* Error messages that get displayed on forms throughout the application. */
+.Errors {
+  text-align: left;
+  position: inherit;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  margin: 0 0 10px !important;
+}
+
+* html .Errors {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto;
+}
+
+.Errors ul {
+  border: 1px solid $red-6 !important;
+  background: $red-7 !important;
+  padding: 6px 10px;
+  display: block;
+  border-radius: 2px;
+}
+
+.Errors a {
+  color: $white;
+  text-decoration: underline;
+}
+
+.Errors ul li {
+  color: $white !important;
+  background: $red-7 !important;
+  text-align: left;
+}
+
+div.Popup .Errors ul {
+  display: block;
+  border-radius: 2px;
+  border: 1px solid $red-6 !important;
+}
+
+div.Popup .Errors {
+  text-align: left;
+  position: inherit;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  margin: 10px 0 !important;
+}
+
+.Errors pre {
+  margin: 10px 0 5px;
+  padding: 4px 8px;
+  display: block;
+  border-radius: 2px;
+  white-space: pre;
+  overflow: auto;
+}
+
+.Errors pre,
+.Errors pre * {
+  background: $yellow-1 !important;
+  font-size: 12px !important;
+  font-weight: normal !important;
+  font-family: monospace !important;
+  text-shadow: none !important;
+  color: $grey-1 !important;
+  line-height: 1.4 !important;
+}
+
+.Errors pre * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+.InformMessages {
+  text-align: left;
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  z-index: 200;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  display: block;
+  width: auto;
+}
+
+* html .InformMessages {
+  position: absolute;
+  top: auto;
+  margin-left: 10px;
+  overflow: visible;
+}
+
+.InformWrapper {
+  display: block;
+  margin: 10px;
+}
+
+.InformMessages .InformMessage {
+  color: $white !important;
+  text-shadow: 0 1px 1px $black;
+  text-align: left !important;
+  border-radius: 2px;
+  background: $black !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: none !important;
+  width: auto;
+  max-width: 400px;
+  padding: 9px 14px 8px;
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  position: relative;
+  line-height: 1.6;
+}
+
+.InformMessages .InformMessage:hover {
+  background: $grey-1;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.InformMessages .InformMessage a {
+  color: $blue-b;
+}
+
+.InformMessages .InformMessage a:hover {
+  color: $blue-c;
+  text-decoration: underline;
+}
+
+.InformMessages .InformMessage strong {
+  font-weight: bold;
+}
+
+.InformMessages .InformMessage a.Close {
+  border: none;
+  background: transparent;
+  border-top-right-radius: 2px;
+  color: $grey-2;
+  font-size: 14px;
+  text-align: center;
+  display: none;
+  height: 12px;
+  width: 12px;
+  line-height: 1;
+  text-decoration: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.InformMessages .InformMessage a.Close span {
+  display: inline;
+}
+
+.InformMessages .InformMessage a.Close:hover {
+  background: $black;
+  color: $white;
+}
+
+.InformMessages .InformMessage:hover a.Close {
+  display: block;
+}
+
+/* iPad/iPhone */
+@media only screen and (device-width: 768px), only screen and (max-device-width: 480px) {
+  .InformMessages .InformMessage a.Close {
+    color: $white;
+    display: block;
+  }
+
+  .Item .OptionsTitle {
+    visibility: visible;
+  }
+}
+
+/* Small screens */
+@media (max-width: 500px) {
+  .InformMessages {
+    width: 100%;
+  }
+
+  .InformWrapper {
+    margin: 5px;
+  }
+
+  .InformMessages .InformMessage {
+    display: block;
+    max-width: inherit;
+  }
+}
+
+.InformMessages .Actions a {
+  margin-right: 4px;
+}
+
+.InformMessages .Actions a:last-child {
+  margin-right: 0;
+}
+
+.InformMessages .Actions a.CancelAction {
+  color: $grey-b;
+}
+
+/* Inform Sprites */
+.InformMessages .InformWrapper.HasIcon .InformMessage {
+  padding-left: 42px !important;
+  min-height: 20px;
+}
+
+.InformMessages .InformWrapper.HasSprite .InformMessage {
+  padding-left: 40px !important;
+}
+
+.InformMessages .InformMessage a.Icon {
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: 28px;
+  width: 28px;
+}
+
+.InformMessages .InformMessage a.Icon img {
+  height: 28px;
+  width: 28px;
+}
+
+span.InformSprite {
+  background: url('images/inform-sprites.png') -9px -9px no-repeat;
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  height: 30px;
+  width: 30px;
+}
+
+span.InformSprite.Refresh {
+  background-position: -9px -9px;
+}
+
+span.InformSprite.Recycle {
+  background-position: -57px -9px;
+}
+
+span.InformSprite.Infinity {
+  background-position: -105px -9px;
+}
+
+span.InformSprite.Squiggle {
+  background-position: -153px -9px;
+}
+
+span.InformSprite.Random {
+  background-position: -200px -9px;
+}
+
+span.InformSprite.Magnify {
+  background-position: -250px -9px;
+}
+
+span.InformSprite.Location {
+  background-position: -298px -9px;
+}
+
+span.InformSprite.Bubble {
+  background-position: -346px -9px;
+}
+
+span.InformSprite.ElipsisBubble {
+  background-position: -394px -9px;
+}
+
+span.InformSprite.Plus {
+  background-position: -442px -9px;
+}
+
+span.InformSprite.Time {
+  background-position: -9px -57px;
+}
+
+span.InformSprite.Eye {
+  background-position: -57px -57px;
+}
+
+span.InformSprite.Target {
+  background-position: -105px -57px;
+}
+
+span.InformSprite.Redflag {
+  background-position: -153px -57px;
+}
+
+span.InformSprite.Flags {
+  background-position: -200px -57px;
+}
+
+span.InformSprite.Graph {
+  background-position: -250px -57px;
+}
+
+span.InformSprite.Chart {
+  background-position: -298px -57px;
+}
+
+span.InformSprite.Envelope {
+  background-position: -346px -57px;
+}
+
+span.InformSprite.Gear {
+  background-position: -394px -57px;
+}
+
+span.InformSprite.Gears {
+  background-position: -442px -57px;
+}
+
+span.InformSprite.Skull {
+  background-position: -9px -106px;
+}
+
+span.InformSprite.SkullBones {
+  background-position: -57px -106px;
+}
+
+span.InformSprite.Bird {
+  background-position: -105px -106px;
+}
+
+span.InformSprite.Present {
+  background-position: -153px -106px;
+}
+
+span.InformSprite.Thundercloud {
+  background-position: -200px -106px;
+}
+
+span.InformSprite.Bandaid {
+  background-position: -250px -106px;
+}
+
+span.InformSprite.Saturn {
+  background-position: -298px -106px;
+}
+
+span.InformSprite.Star {
+  background-position: -346px -106px;
+}
+
+span.InformSprite.Heart {
+  background-position: -394px -106px;
+}
+
+span.InformSprite.Key {
+  background-position: -442px -106px;
+}
+
+span.InformSprite.Ipod {
+  background-position: -9px -152px;
+}
+
+span.InformSprite.Iphone {
+  background-position: -57px -152px;
+}
+
+span.InformSprite.Cabinet {
+  background-position: -105px -152px;
+}
+
+span.InformSprite.Coffee {
+  background-position: -153px -152px;
+}
+
+span.InformSprite.Briefcase {
+  background-position: -200px -152px;
+}
+
+span.InformSprite.Toolcase {
+  background-position: -250px -152px;
+}
+
+span.InformSprite.Suitcase {
+  background-position: -298px -152px;
+}
+
+span.InformSprite.Airplane {
+  background-position: -346px -152px;
+}
+
+span.InformSprite.Spraypaint {
+  background-position: -394px -152px;
+}
+
+span.InformSprite.MailInbox {
+  background-position: -442px -154px;
+}
+
+span.InformSprite.WallPicture {
+  background-position: -9px -200px;
+}
+
+span.InformSprite.Photos {
+  background-position: -57px -200px;
+}
+
+span.InformSprite.FilmRoll {
+  background-position: -105px -200px;
+}
+
+span.InformSprite.Drawer {
+  background-position: -153px -200px;
+}
+
+span.InformSprite.FilmStrip {
+  background-position: -200px -200px;
+}
+
+span.InformSprite.FilmStrip2 {
+  background-position: -250px -200px;
+}
+
+span.InformSprite.Gas {
+  background-position: -298px -200px;
+}
+
+span.InformSprite.Cutlery {
+  background-position: -346px -200px;
+}
+
+span.InformSprite.Battery {
+  background-position: -394px -200px;
+}
+
+span.InformSprite.Beaker {
+  background-position: -442px -200px;
+}
+
+span.InformSprite.Outlet {
+  background-position: -9px -250px;
+}
+
+span.InformSprite.Pinetree {
+  background-position: -57px -250px;
+}
+
+span.InformSprite.House {
+  background-position: -105px -250px;
+}
+
+span.InformSprite.Padlock {
+  background-position: -153px -250px;
+}
+
+span.InformSprite.Network {
+  background-position: -200px -250px;
+}
+
+span.InformSprite.Cloud {
+  background-position: -250px -250px;
+}
+
+span.InformSprite.Download {
+  background-position: -298px -250px;
+}
+
+span.InformSprite.BookmarkRibbon {
+  background-position: -346px -250px;
+}
+
+span.InformSprite.Flag {
+  background-position: -394px -250px;
+}
+
+span.InformSprite.Signpost {
+  background-position: -442px -250px;
+}
+
+span.InformSprite.Brightness {
+  background-position: -9px -298px;
+}
+
+span.InformSprite.Contrast {
+  background-position: -57px -298px;
+}
+
+span.InformSprite.Runner {
+  background-position: -105px -298px;
+}
+
+span.InformSprite.Zap {
+  background-position: -153px -298px;
+}
+
+span.InformSprite.MusicNote {
+  background-position: -200px -298px;
+}
+
+span.InformSprite.Microphone {
+  background-position: -250px -298px;
+}
+
+span.InformSprite.Tshirt {
+  background-position: -298px -298px;
+}
+
+span.InformSprite.Paperclip {
+  background-position: -346px -298px;
+}
+
+span.InformSprite.Monitor {
+  background-position: -394px -298px;
+}
+
+span.InformSprite.Tv {
+  background-position: -442px -297px;
+}
+
+span.InformSprite.Compass {
+  background-position: -9px -346px;
+}
+
+span.InformSprite.Pin {
+  background-position: -57px -346px;
+}
+
+span.InformSprite.Radar {
+  background-position: -105px -346px;
+}
+
+span.InformSprite.Location {
+  background-position: -153px -346px;
+}
+
+span.InformSprite.Telephone {
+  background-position: -200px -346px;
+}
+
+span.InformSprite.Baby {
+  background-position: -250px -346px;
+}
+
+span.InformSprite.Ekg {
+  background-position: -298px -346px;
+}
+
+span.InformSprite.Stopwatch {
+  background-position: -346px -346px;
+}
+
+span.InformSprite.MedicalBag {
+  background-position: -394px -346px;
+}
+
+span.InformSprite.ShoppingCart {
+  background-position: -442px -346px;
+}
+
+span.InformSprite.Dashboard {
+  background-position: -9px -393px;
+}
+
+span.InformSprite.Dogpaw {
+  background-position: -57px -393px;
+}
+
+span.InformSprite.Calendar {
+  background-position: -105px -393px;
+}
+
+span.InformSprite.Lightbulb {
+  background-position: -153px -393px;
+}
+
+span.InformSprite.Trophy {
+  background-position: -200px -393px;
+}
+
+span.InformSprite.Camera {
+  background-position: -250px -393px;
+}
+
+span.InformSprite.Wineglass {
+  background-position: -298px -393px;
+}
+
+span.InformSprite.Beerglass {
+  background-position: -346px -391px;
+}
+
+span.InformSprite.Dumbbells {
+  background-position: -394px -393px;
+}
+
+span.InformSprite.Buoy {
+  background-position: -442px -393px;
+}
+
+span.InformSprite.Beaker2 {
+  background-position: -9px -440px;
+}
+
+span.InformSprite.Testtube {
+  background-position: -57px -440px;
+}
+
+span.InformSprite.Thermometer {
+  background-position: -105px -440px;
+}
+
+span.InformSprite.Pill {
+  background-position: -153px -440px;
+}
+
+span.InformSprite.Equalizer {
+  background-position: -200px -440px;
+}
+
+span.InformSprite.Book {
+  background-position: -250px -440px;
+}
+
+span.InformSprite.Puzzle {
+  background-position: -298px -440px;
+}
+
+span.InformSprite.Palette {
+  background-position: -346px -440px;
+}
+
+span.InformSprite.Umbrella {
+  background-position: -394px -440px;
+}
+
+span.InformSprite.CoffeeCup {
+  background-position: -442px -440px;
+}
+
+span.InformSprite.Gameplan {
+  background-position: -9px -490px;
+}
+
+span.InformSprite.Walk {
+  background-position: -57px -490px;
+}
+
+span.InformSprite.Map {
+  background-position: -105px -490px;
+}
+
+span.InformSprite.IndexCards {
+  background-position: -153px -490px;
+}
+
+span.InformSprite.Piano {
+  background-position: -200px -490px;
+}
+
+span.InformSprite.Sliders {
+  background-position: -250px -490px;
+}
+
+span.InformSprite.Widescreen {
+  background-position: -298px -490px;
+}
+
+span.InformSprite.Badge {
+  background-position: -346px -490px;
+}
+
+span.InformSprite.Chicken {
+  background-position: -394px -490px;
+}
+
+span.InformSprite.Bug {
+  background-position: -442px -490px;
+}
+
+span.InformSprite.SingleUser {
+  background-position: -9px -539px;
+}
+
+span.InformSprite.Group {
+  background-position: -57px -537px;
+}
+
+span.InformSprite.Navigation {
+  background-position: -105px -537px;
+}
+
+span.InformSprite.Balloon {
+  background-position: -153px -537px;
+}
+
+span.InformSprite.Bowandarrow {
+  background-position: -200px -537px;
+}
+
+span.InformSprite.Controller {
+  background-position: -250px -537px;
+}
+
+span.InformSprite.Check {
+  background-position: -298px -537px;
+}
+
+span.InformSprite.Hanger {
+  background-position: -346px -537px;
+}
+
+span.InformSprite.Piggybank {
+  background-position: -394px -537px;
+}
+
+span.InformSprite.Headphones {
+  background-position: -442px -537px;
+}
+
+span.InformSprite.Landscape {
+  background-position: -9px -586px;
+}
+
+span.InformSprite.Stats {
+  background-position: -57px -586px;
+}
+
+span.InformSprite.Idcard {
+  background-position: -105px -586px;
+}
+
+span.InformSprite.Bullhorn {
+  background-position: -153px -586px;
+}
+
+span.InformSprite.Food {
+  background-position: -200px -586px;
+}
+
+span.InformSprite.Moon {
+  background-position: -250px -586px;
+}
+
+span.InformSprite.Sock {
+  background-position: -298px -586px;
+}
+
+span.InformSprite.Bone {
+  background-position: -346px -586px;
+}
+
+span.InformSprite.Golf {
+  background-position: -394px -586px;
+}
+
+span.InformSprite.Dice {
+  background-position: -442px -586px;
+}
+
+.Sprite16 {
+  background: url('images/sprites.png') 0 0 no-repeat;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  vertical-align: top;
+}
+
+/* 16px Sprites White */
+.SpDashboard,
+.SpOptions,
+.SpCog {
+  background-position: 0 -148px;
+}
+
+.SpSettings {
+  background-position: -16px -212px;
+}
+
+.SpNotifications,
+.SpGlobe {
+  background-position: -32px -212px;
+}
+
+.SpSignOut,
+.SpExit {
+  background-position: -48px -212px;
+}
+
+.SpMarker {
+  background-position: -64px -212px;
+}
+
+.SpDocuments {
+  background-position: -80px -212px;
+}
+
+.SpInbox,
+.SpEnvelope {
+  background-position: 0 -228px;
+}
+
+.SpInmail {
+  background-position: -16px -228px;
+}
+
+.SpRoundBubble {
+  background-position: -32px -228px;
+}
+
+.SpSquareBubble {
+  background-position: -48px -228px;
+}
+
+.SpRoundBubbles {
+  background-position: -64px -228px;
+}
+
+.SpSquareBubbles {
+  background-position: -80px -228px;
+}
+
+.SpTag {
+  background-position: 0 -244px;
+}
+
+.SpWrite {
+  background-position: -16px -244px;
+}
+
+.SpLock {
+  background-position: -32px -244px;
+}
+
+.SpRoundAlert {
+  background-position: -48px -244px;
+}
+
+.SpTriangleAlert {
+  background-position: -64px -244px;
+}
+
+.SpBookmarks,
+.SpStar {
+  background-position: -80px -244px;
+}
+
+.SpSearch {
+  background-position: 0 -260px;
+}
+
+.SpTrash {
+  background-position: -16px -260px;
+}
+
+.SpUser {
+  background-position: -32px -260px;
+}
+
+.SpRefresh {
+  background-position: -48px -260px;
+}
+
+.SpPencil {
+  background-position: -64px -260px;
+}
+
+.SpPlus {
+  background-position: -80px -260px;
+}
+
+/* 16px Sprites White Transparent */
+.SpDashboard,
+.SpCog {
+  background-position: 0 -276px;
+}
+
+.SpSettings {
+  background-position: -16px -276px;
+}
+
+.SpNotifications,
+.SpGlobe {
+  background-position: -32px -276px;
+}
+
+.SpSignOut,
+.SpExit {
+  background-position: -48px -276px;
+}
+
+.SpMarker {
+  background-position: -64px -276px;
+}
+
+.SpDocuments {
+  background-position: -80px -276px;
+}
+
+.SpInbox,
+.SpEnvelope {
+  background-position: 0 -292px;
+}
+
+.SpInmail {
+  background-position: -16px -292px;
+}
+
+.SpRoundBubble {
+  background-position: -32px -292px;
+}
+
+.SpSquareBubble {
+  background-position: -48px -292px;
+}
+
+.SpRoundBubbles {
+  background-position: -64px -292px;
+}
+
+.SpSquareBubbles {
+  background-position: -80px -292px;
+}
+
+.SpTag {
+  background-position: 0 -308px;
+}
+
+.SpWrite {
+  background-position: -16px -308px;
+}
+
+.SpLock {
+  background-position: -32px -308px;
+}
+
+.SpRoundAlert {
+  background-position: -48px -308px;
+}
+
+.SpTriangleAlert {
+  background-position: -64px -308px;
+}
+
+.SpBookmarks,
+.SpStar {
+  background-position: -80px -308px;
+}
+
+.SpSearch {
+  background-position: 0 -324px;
+}
+
+.SpTrash {
+  background-position: -16px -324px;
+}
+
+.SpUser {
+  background-position: -32px -324px;
+}
+
+.SpRefresh {
+  background-position: -48px -324px;
+}
+
+.SpPencil {
+  background-position: -64px -324px;
+}
+
+.SpPlus {
+  background-position: -80px -324px;
+}
+
+/* 16px Sprites Black */
+.SpDashboard,
+.SpCog {
+  background-position: 0 -84px;
+}
+
+.SpSettings {
+  background-position: -16px -84px;
+}
+
+.SpNotifications,
+.SpGlobe {
+  background-position: -32px -84px;
+}
+
+.SpSignOut,
+.SpExit {
+  background-position: -48px -84px;
+}
+
+.SpMarker {
+  background-position: -64px -84px;
+}
+
+.SpDocuments {
+  background-position: -80px -84px;
+}
+
+.SpInbox,
+.SpEnvelope {
+  background-position: 0 -100px;
+}
+
+.SpInmail {
+  background-position: -16px -100px;
+}
+
+.SpRoundBubble {
+  background-position: -32px -100px;
+}
+
+.SpSquareBubble {
+  background-position: -48px -100px;
+}
+
+.SpRoundBubbles {
+  background-position: -64px -100px;
+}
+
+.SpSquareBubbles {
+  background-position: -80px -100px;
+}
+
+.SpTag {
+  background-position: 0 -116px;
+}
+
+.SpWrite {
+  background-position: -16px -116px;
+}
+
+.SpLock {
+  background-position: -32px -116px;
+}
+
+.SpRoundAlert {
+  background-position: -48px -116px;
+}
+
+.SpTriangleAlert {
+  background-position: -64px -116px;
+}
+
+.SpBookmarks,
+.SpStar {
+  background-position: -80px -116px;
+}
+
+.SpSearch {
+  background-position: 0 -132px;
+}
+
+.SpTrash {
+  background-position: -16px -132px;
+}
+
+.SpUser {
+  background-position: -32px -132px;
+}
+
+.SpRefresh {
+  background-position: -48px -132px;
+}
+
+.SpPencil {
+  background-position: -64px -132px;
+}
+
+.SpPlus {
+  background-position: -80px -132px;
+}
+
+/* 16px Sprites Black Transparent */
+.SpDashboard,
+.SpCog {
+  background-position: 0 -148px;
+}
+
+.SpSettings {
+  background-position: -16px -148px;
+}
+
+.SpNotifications,
+.SpGlobe {
+  background-position: -32px -148px;
+}
+
+.SpSignOut,
+.SpExit {
+  background-position: -48px -148px;
+}
+
+.SpMarker {
+  background-position: -64px -148px;
+}
+
+.SpDocuments {
+  background-position: -80px -148px;
+}
+
+.SpInbox,
+.SpEnvelope {
+  background-position: 0 -164px;
+}
+
+.SpInmail {
+  background-position: -16px -164px;
+}
+
+.SpRoundBubble {
+  background-position: -32px -164px;
+}
+
+.SpSquareBubble {
+  background-position: -48px -164px;
+}
+
+.SpRoundBubbles {
+  background-position: -64px -164px;
+}
+
+.SpSquareBubbles {
+  background-position: -80px -164px;
+}
+
+.SpTag {
+  background-position: 0 -180px;
+}
+
+.SpWrite {
+  background-position: -16px -180px;
+}
+
+.SpLock {
+  background-position: -32px -180px;
+}
+
+.SpRoundAlert {
+  background-position: -48px -180px;
+}
+
+.SpTriangleAlert {
+  background-position: -64px -180px;
+}
+
+.SpBookmarks,
+.SpStar {
+  background-position: -80px -180px;
+}
+
+.SpSearch {
+  background-position: 0 -196px;
+}
+
+.SpTrash {
+  background-position: -16px -196px;
+}
+
+.SpUser {
+  background-position: -32px -196px;
+}
+
+.SpRefresh {
+  background-position: -48px -196px;
+}
+
+.SpPencil {
+  background-position: -64px -196px;
+}
+
+.SpPlus {
+  background-position: -80px -196px;
+}
+
+/* ============================= Embedded Discussion & Comment Customizations */
+
+body.embed #Content {
+  float: none;
+  margin: 0;
+  width: auto;
+}
+
+body.embed .InformMessages {
+  display: none;
+}
+
+.EmbedCommentForm {
+  padding: 0;
+  border-top: 1px solid $white;
+}
+
+.EmbedCommentForm .TextBox {
+  width: 100%;
+  height: 50px;
+  min-height: 50px;
+  padding: 3px;
+  border-radius: 0;
+  font-size: 12px;
+}
+
+.Embed .Buttons {
+  font-size: 11px;
+  text-align: right;
+}
+
+.EmbedCommentForm .Author {
+  display: inline-block;
+  font-size: 11px;
+  color: $grey-3;
+  padding: 0 8px 0 0;
+}
+
+.Embed .CommentForm input.Button {
+  font-size: 12px;
+}
+
+.Embed .Foot {
+  background: none;
+  border: none;
+  text-align: right;
+}
+
+.Embed .MorePager a {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.Embed .MorePager a.Loading,
+.Embed .MorePager a.Loading:hover {
+  text-decoration: none !important;
+}
+
+.Embed .Administration {
+  display: none;
+}
+
+.Embed .MorePager {
+  padding: 2px 8px 4px;
+}
+
+/* ============================================================ Regarding */
+
+.RegardingEvent {
+  padding: 10px;
+
+  position: relative;
+  padding-left: 38px;
+
+  color: $white !important;
+  text-shadow: 0 1px 1px $black;
+  text-align: left !important;
+  border-radius: 4px;
+  background: $black !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+.RegardingEvent span.InformSprite {
+  top: 5px;
+  left: 5px;
+}
+
+.RegardingEvent a.ReportedUser,
+.RegardingEvent a.ReportingUser {
+  color: $blue-a;
+}
+
+.RegardingEvent .ReportedReason {
+  padding: 5px;
+  font-style: italic;
+}
+
+.RegardingEvent .RegardingTime {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: $grey-m;
+}
+
+.RegardingActions {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.RegardingActions .ActionButton {
+  padding: 0 5px 2px 5px;
+  display: inline-block;
+  margin-right: 4px;
+  color: $white !important;
+  text-shadow: 0 1px 1px $black;
+  text-align: left !important;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  background: $black !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+.RegardingActions .ActionButton a {
+  color: $blue-a;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.PhotoWrap {
+  position: relative;
+  line-height: 1;
+}
+
+.ProfilePhoto {
+  height: 40px;
+  width: 40px;
+  vertical-align: bottom;
+}
+
+.ProfilePhotoSmall {
+  height: 24px;
+  width: 24px;
+  vertical-align: bottom;
+}
+
+.ProfilePhotoMedium {
+  height: 40px;
+  width: 40px;
+}
+
+.ProfilePhotoLarge {
+  width: 200px;
+}
+
+.PhotoGrid {
+  line-height: 32px;
+  margin: 2px -2px;
+}
+
+.PhotoGrid img {
+  margin: 2px;
+  vertical-align: text-bottom;
+  height: 32px;
+  width: 32px;
+}
+
+.PhotoGridSmall {
+  line-height: 24px;
+  margin: 1px -1px;
+}
+
+.PhotoGridSmall img {
+  margin: 1px;
+  vertical-align: text-bottom;
+  height: 24px;
+  width: 24px;
+}
+
+.CategoryPhoto {
+  max-height: 64px;
+}
+
+.PhotoGrid .UserPicture {
+  display: inline-block;
+}
+
+.PhotoGrid .UserPicture * {
+  vertical-align: bottom;
+}
+
+.PhotoGrid .Username {
+  display: inline-block;
+  line-height: 32px;
+}
+
+.PhotoGridSmall .Username {
+  line-height: 24px;
+}
+
+/* Reaction Buttons */
+.Reactions {
+  position: relative;
+  font-size: 11px;
+  line-height: 18px;
+  margin: 15px 0 0;
+}
+
+.ReactButton {
+  display: inline-block;
+  margin: 0 2px;
+  line-height: 18px;
+  vertical-align: top;
+}
+
+.Reactions > a.React {
+  margin: 0 10px;
+  padding: 0;
+}
+
+.Reactions > a.React > .ReactSprite {
+  margin-right: 2px;
+}
+
+.Flyout.Flags {
+  top: 25px;
+  z-index: 997;
+}
+
+.Reactions .FlagMenu .MenuItems .ReactButton {
+  margin: 0;
+  padding: 0 15px;
+}
+
+.SpEditProfile {
+  background-image: url("images/sprites-14-000000.png");
+  background-position: -245px -29px;
+}
+
+.Handle > .SpEditProfile,
+.NavButton > .SpEditProfile {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  vertical-align: top;
+
+}
+
+/* === Reaction Sprites === */
+.ReactSprite {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: .3em;
+  line-height: 18px;
+  vertical-align: top;
+  background-image: url("images/sprites-14-000000.png");
+  background-position: 16px 16px;
+  background-repeat: no-repeat;
+}
+
+input + .ReactSprite {
+  vertical-align: middle;
+}
+
+.ReactEverything {
+  background-position: -197px -53px;
+}
+
+.ReactAwesome {
+  background-position: -269px -6px;
+}
+
+.ReactFeature {
+  background-position: -280px -60px;
+}
+
+.ReactFlag {
+  background-position: -54px -52px;
+}
+
+.ReactInsightful {
+  background-position: -149px -6px;
+}
+
+.ReactOffTopic {
+  background-position: -173px -6px;
+}
+
+.ReactAbuse {
+  background-position: -6px -52px;
+}
+
+.ReactSpam {
+  background-position: -125px -6px;
+}
+
+.ReactTroll {
+  background-position: -101px -6px;
+}
+
+.ReactPromote {
+  background-position: -50px -29px;
+}
+
+.ReactDisagree {
+  background-position: -28px -5px;
+}
+
+.ReactAgree {
+  background-position: -4px -5px;
+}
+
+.ReactDislike {
+  background-position: -28px -28px;
+}
+
+.ReactLike {
+  background-position: -4px -31px;
+}
+
+.ReactDown {
+  background-position: -220px -29px;
+}
+
+.ReactUp {
+  background-position: -195px -30px;
+}
+
+.ReactWTF {
+  background-position: -76px -5px;
+}
+
+.ReactLOL {
+  background-position: -52px -5px;
+}
+
+.ReactQuote {
+  background-position: -316px -6px;
+}
+
+.ReactInfraction {
+  background-position: -100px -53px;
+}
+
+.ReactAccept {
+  background-position: -6px -102px;
+}
+
+.ReactReject {
+  background-position: -342px -6px;
+}
+
+.ReactFacebook {
+  background-position: -29px -124px;
+}
+
+.ReactTwitter {
+  background-position: -53px -124px;
+}
+
+.ReactGooglePlus {
+  background-position: -77px -124px;
+}
+
+.ReactMessage {
+  background-position: -101px -102px;
+}
+
+.ReactWarn {
+  background-position: -222px -6px;
+}
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+  background-image: url('https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-fff.png');
+}
+
+/* Switch to bordered icons for user reaction overlays */
+.UserReactionWrap .ReactSprite {
+  background-image: url('https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-000-bordered.png');
+}
+
+.ActionBlock {
+  margin: 15px 0 5px;
+  font-style: italic;
+}
+
+/* Embedded Video Preview Hide/Reveal */
+.Video.YouTube .VideoPlayer {
+  display: none;
+}
+
+.Video.YouTube .VideoPreview {
+  cursor: pointer;
+  position: relative;
+  max-width: 100%;
+  display: inline-block;
+  height: auto;
+}
+
+.Video.YouTube .VideoPreview:after {
+  background: url('https://c3409409.ssl.cf0.rackcdn.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;
+  position: absolute;
+  display: block;
+  content: '';
+  top: 50%;
+  left: 50%;
+  margin-left: -30px;
+  margin-top: -22px;
+  height: 44px;
+  width: 60px;
+}
+
+.Video.YouTube .VideoPreview:hover:after {
+  background-position: 0 0;
+}
+
+.Video.YouTube .VideoPreview img {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* For vimeo/other embeds */
+.Section-Discussion .Message iframe,
+.Section-BestOf iframe {
+  max-width: 100%;
+}
+
+.Section-BestOf iframe {
+  height: auto;
+}
+
+/* Media */
+
+.Media {
+  margin: 5px 0 10px;
+}
+
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  zoom: 1;
+}
+
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+
+.Media .Img img {
+  display: block;
+}
+
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.Item h2 + .Media,
+.Item h3 + .Media {
+  margin-top: 0;
+}
+
+/* Overrides */
+
+.Hidden {
+  display: none;
+}
+
+/* Screen readers only, as part of Section 508 compliance. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Token input */
+
+ul.token-input-list {
+  box-sizing: border-box;
+  border: 1px solid $grey-b;
+  color: $grey-1;
+  font-size: 15px;
+  margin: 0 !important;
+  padding: 3px;
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  width: 100%;
+  cursor: text;
+  min-height: 1px;
+  z-index: 999;
+  background-color: $white;
+  list-style-type: none;
+}
+
+ul.token-input-list-focus,
+ul.token-input-list-focus input {
+  background: $white-2;
+}
+
+ul.token-input-list li input {
+  border: 0;
+  width: 100px;
+  padding: 3px 3px;
+  margin: 2px 0;
+}
+
+li.token-input-token {
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  margin-right: 3px;
+  padding: 1px 5px;
+  line-height: 20px;
+  cursor: default;
+  border: 1px solid $grey-9;
+  border-radius: 2px;
+  float: left;
+  font-size: 13px;
+}
+
+li.token-input-token.not-allowed {
+  background-color: $red-4;
+  color: $red-2;
+  border: 1px solid $red-3;
+}
+
+li.token-input-token.not-allowed span {
+  color: $red-2;
+}
+
+li.token-input-token p {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+li.token-input-token span {
+  margin-left: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+li.token-input-selected-token {
+  background-color: $grey-5;
+}
+
+li.token-input-selected-token.not-allowed {
+  background-color: $red-1;
+  color: $white;
+  border: 1px solid $red-3;
+}
+
+li.token-input-selected-token.not-allowed span {
+  color: $white;
+}
+
+li.token-input-input-token {
+  float: left;
+}
+
+div.token-input-dropdown {
+  position: absolute;
+  background-color: $white;
+  overflow: hidden;
+  border: 1px solid $grey-b;
+  border-top-width: 0;
+  cursor: default;
+  z-index: 1;
+  padding: 0 3px;
+}
+
+div.token-input-dropdown p {
+  margin: 0;
+  padding: 5px;
+}
+
+div.token-input-dropdown ul {
+  margin: 0 -3px !important;
+  padding: 0;
+}
+
+div.token-input-dropdown ul li {
+  background-color: $white;
+  padding: 3px 6px;
+}
+
+div.token-input-dropdown ul li.token-input-dropdown-item {
+  background-color: $white;
+}
+
+div.token-input-dropdown ul li.token-input-dropdown-item2 {
+  background-color: $white;
+}
+
+div.token-input-dropdown ul li em {
+  font-weight: bold;
+  font-style: none;
+}
+
+div.token-input-dropdown ul li.token-input-selected-dropdown-item {
+  background-color: $grey-5;
+}
+
+/**
+ * At mentions in core, moved from advanced editor.
+ */
+.atwho-view {
+  font: normal 14px/1.7em 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  margin-top: 18px;
+  background: $white;
+  min-width: 120px;
+  z-index: 100010; /* So high because a client actually had 99999 in a theme */
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 5px 10px $grey-5;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.atwho-view .cur {
+  background: $vanilla-blue;
+  color: $white;
+}
+
+.atwho-view .cur small {
+  color: $white;
+}
+
+.atwho-view strong {
+  color: $vanilla-blue;
+}
+
+.atwho-view .cur strong {
+  color: $white;
+  font-weight: bold;
+}
+
+.atwho-view ul {
+  list-style: none;
+  padding: 0;
+  margin: auto;
+}
+
+.atwho-view ul li {
+  display: block;
+  border-bottom: 1px solid $grey-5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 34px;
+}
+
+.atwho-view ul li:last-child {
+  border: 0;
+}
+
+.atwho-view small {
+  font-size: smaller;
+  color: $grey-3;
+  font-weight: 400;
+}
+
+.at-suggest-emoji .emoji-wrap {
+  display: inline-block;
+  width: 34px;
+  overflow: hidden;
+  line-height: 34px;
+  text-align: center;
+  vertical-align: top;
+}
+
+.at-suggest-emoji .emoji-wrap > * {
+  display: inline-block;
+  line-height: 34px;
+}
+
+.at-suggest-emoji .emoji-name {
+  display: inline-block;
+  line-height: 34px;
+  vertical-align: top;
+}
+
+/**
+ * Text formatting alignment
+ */
+
+.AlignLeft {
+  float: left;
+  margin: 0 10px 10px 0;
+  text-align: left;
+}
+
+.AlignCenter {
+  margin: 0 auto;
+  display: block;
+  text-align: center;
+}
+
+.AlignRight {
+  float: right;
+  margin: 0 0 10px 10px;
+  text-align: right;
+}
+
+/**
+ * Socialcons
+ */
+
+.SocialIcon {
+  display: inline-block;
+  overflow: hidden;
+  font-weight: bold;
+  line-height: 24px;
+  color: $white !important;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.SocialIcon.HasText {
+  min-width: 210px;
+  line-height: 32px;
+}
+
+.SocialIcon .Icon {
+  width: 24px;
+  height: 24px;
+}
+
+.SocialIcon.HasText .Icon {
+  width: 32px;
+  height: 32px;
+}
+
+.SocialIcon .Text {
+  padding: 0 15px 0 10px;
+  border-left: 1px solid $grey-5;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.SocialIcon {
+  transition: background-color 100ms;
+}
+
+.SocialIcon .Icon,
+.SocialIcon .Text {
+  display: block;
+  float: left;
+  vertical-align: top;
+}
+
+.SocialIcon .Icon {
+  background-image: url('images/socialcons-small.png');
+  background-repeat: no-repeat;
+  background-size: 24px 168px;
+}
+
+.SocialIcon.HasText .Icon {
+  background-size: 32px 224px;
+  background-image: url('images/socialcons.png');
+}
+
+@media (min-device-pixel-ratio: 2) {
+  .SocialIcon .Icon {
+    background-image: url('images/socialcons-small@2x.png');
+  }
+
+  .SocialIcon.HasText .Icon {
+    background-image: url('images/socialcons@2x.png');
+  }
+}
+
+.SocialIcon-Facebook .Icon {
+  background-position: 0 -24px;
+}
+
+.SocialIcon-Facebook.HasText .Icon {
+  background-position: 0 -32px;
+}
+
+.SocialIcon-Facebook,
+.SocialIcon-Facebook.HasText .Icon {
+  background-color: $facebook;
+}
+
+.SocialIcon-Facebook:hover {
+  background-color: $facebook-hover;
+}
+
+.SocialIcon-Twitter .Icon {
+  background-position: 0 -144px;
+}
+
+.SocialIcon-Twitter.HasText .Icon {
+  background-position: 0 -192px;
+}
+
+.SocialIcon-Twitter,
+.SocialIcon-Twitter.HasText .Icon {
+  background-color: $twitter;
+}
+
+.SocialIcon-Twitter:hover {
+  background-color: $twitter-hover;
+}
+
+.SocialIcon-Google .Icon {
+  background-position: 0 -72px;
+}
+
+.SocialIcon-Google.HasText .Icon {
+  background-position: 0 -96px;
+}
+
+.SocialIcon-Google,
+.SocialIcon-Google.HasText .Icon {
+  background-color: $google;
+}
+
+.SocialIcon-Google:hover {
+  background-color: $google-hover;
+}
+
+.SocialIcon-OpenID .Icon {
+  background-position: 0 -120px;
+}
+
+.SocialIcon-OpenID.HasText .Icon {
+  background-position: 0 -160px;
+}
+
+.SocialIcon-OpenID,
+.SocialIcon-OpenID.HasText .Icon {
+  background-color: $openid;
+}
+
+.SocialIcon-OpenID:hover {
+  background-color: $openid-hover;
+}
+
+.SocialIcon-LinkedIn .Icon {
+  background-position: 0 -96px;
+}
+
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-position: 0 -128px;
+}
+
+.SocialIcon-LinkedIn,
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-color: $linkedin;
+}
+
+.SocialIcon-LinkedIn:hover {
+  background-color: $linkedin-hover;
+}
+
+.SocialIcon-Disqus .Icon {
+  background-position: 0 0;
+}
+
+.SocialIcon-Disqus,
+.SocialIcon-Disqus.HasText .Icon {
+  background-color: $disqus;
+}
+
+.SocialIcon-Disqus:hover {
+  background-color: $disqus-hover;
+}
+
+.SocialIcon-GitHub .Icon {
+  background-position: 0 -48px;
+}
+
+.SocialIcon-GitHub.HasText .Icon {
+  background-position: 0 -64px;
+}
+
+.SocialIcon-GitHub,
+.SocialIcon-GitHub.HasText .Icon {
+  background-color: $github;
+}
+
+.SocialIcon-GitHub:hover {
+  background-color: $github-hover;
+}
+
+/* Woe unto whoever caused this */
+
+.MeBox-SignIn.Inline .SocialIcon {
+  display: inline-block;
+}
+
+/*
+# Attachments
+
+Components for Attachments.
+
+Styleguide Attachments
+*/
+
+/*
+## Utilities
+
+Styleguide Attachments.Utilities
+*/
+
+.pull-right {
+  float: right !important;
+}
+
+.pull-left {
+  float: left !important;
+}
+
+/*
+## Definition lists
+
+Styleguide Definitions
+*/
+
+.item-attachment dl {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.item-attachment dt {
+  font-weight: 700;
+}
+
+.item-attachment dd {
+  margin-left: 0;
+}
+
+.item-attachment dt,
+.item-attachment dd {
+  line-height: 20px;
+}
+
+/* Horizontal layout */
+
+.item-attachment .dl-horizontal dt {
+  float: left;
+  width: 160px;
+  clear: left;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-attachment .dl-horizontal dd {
+  margin-left: 180px;
+}
+
+/* Column layout */
+
+.item-attachment .dl-columns {
+  overflow: hidden;
+  margin-right: -10px;
+  margin-left: -10px;
+}
+
+.item-attachment .dl-columns:before,
+.item-attachment .dl-columns:after {
+  display: table;
+  content: " ";
+}
+
+.item-attachment .dl-columns:after {
+  clear: both;
+}
+
+.item-attachment .dl-columns dt {
+  width: 20%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-attachment .dl-columns dd {
+  width: 30%;
+}
+
+.item-attachment .dl-columns dt,
+.item-attachment .dl-columns dd {
+  float: left;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/*
+## Media objects
+
+Styleguide Media
+*/
+
+.item-attachment .media {
+  overflow: hidden;
+}
+
+.item-attachment .media:before,
+.item-attachment .media:after {
+  display: table;
+  content: " ";
+}
+
+.item-attachment .media:after {
+  clear: both;
+}
+
+.item-attachment .media > .pull-left {
+  margin-right: 10px;
+}
+
+.item-attachment .media > .pull-right {
+  margin-right: 10px;
+}
+
+.item-attachment .media-body {
+  overflow: hidden;
+  zoom: 1;
+}
+
+.item-attachment .media-object {
+  display: block;
+}
+
+.item-attachment .media-heading {
+  margin: 0 0 5px !important; /* Hack */
+}
+
+.item-attachment .media-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+/*
+## Alerts
+
+.alert-info    - Informative alert
+.alert-warning - Warning alert
+.alert-danger  - Danger alert
+
+Styleguide Alerts
+*/
+
+.item-attachment .alert {
+  padding: 12px;
+  margin-bottom: 20px;
+  color: $grey-k;
+  background-color: $white-5;
+  border-color: $white-5;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 2px;
+}
+
+.item-attachment .alert a {
+  color: $grey-n;
+}
+
+.item-attachment .alert hr {
+  border-top-color: $blue-d;
+}
+
+.item-attachment .alert h4 {
+  margin-top: 0;
+  color: inherit;
+}
+
+.item-attachment .alert p,
+.item-attachment .alert ul {
+  margin-bottom: 0;
+}
+
+.item-attachment .alert p + p {
+  margin-top: 5px;
+}
+
+/* Informative alert */
+
+.item-attachment .alert-info {
+  color: $grey-k;
+  background-color: $yellow-4;
+  border-color: $yellow-4;
+}
+
+.item-attachment .alert-info a {
+  color: $grey-n;
+}
+
+.item-attachment .alert-info hr {
+  border-top-color: $yellow-5;
+}
+
+/* Warning alert */
+
+.item-attachment .alert-warning {
+  color: $grey-k;
+  background-color: $yellow-6;
+  border-color: $yellow-6;
+}
+
+.item-attachment .alert-warning a {
+  color: $grey-n;
+}
+
+.item-attachment .alert-warning hr {
+  border-top-color: $yellow-7;
+}
+
+/* Danger alert */
+
+.item-attachment .alert-danger {
+  color: $white;
+  background-color: $red-5;
+  border-color: $red-5;
+}
+
+.item-attachment .alert-danger a {
+  color: $grey-o;
+}
+
+.item-attachment .alert-danger hr {
+  border-top-color: $red-6;
+}
+
+/*
+## Base item
+
+Styleguide Item
+*/
+
+.item-attachment .item-heading {
+  margin-bottom: 0 !important; /* Hack */
+  font-weight: 500;
+}
+
+.item-attachment .item-body {
+  overflow: hidden;
+}
+
+.item-attachment .item-body:before,
+.item-attachment .item-body:after {
+  display: table;
+  content: " ";
+}
+
+.item-attachment .item-body:after {
+  clear: both;
+}
+
+.item-attachment .item-body > *:first-child {
+  margin-top: 0;
+}
+
+.item-attachment .item-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.item-attachment .item-header + .item-body {
+  margin-top: 5px;
+}
+
+.item-attachment .item-meta {
+  font-size: 12px;
+  line-height: 20px;
+  color: $grey-9;
+}
+
+.item-attachment .item-meta > span {
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.item-attachment .item-meta > span:first-child {
+  padding-left: 0;
+}
+
+.item-attachment .item-meta > span:last-child {
+  padding-right: 0;
+}
+
+/*
+## Item attachments
+
+Styleguide Attachments
+*/
+
+.item-attachment {
+  margin-top: 20px;
+}
+
+.item-attachment .alert {
+  margin-bottom: 0;
+}
+
+.item-attachment .media-object .icon {
+  display: block;
+  min-width: 32px;
+  font-size: 32px;
+  text-align: center;
+  line-height: 1;
+}
+
+/**
+ * Twitter card embed.
+ */
+.twitter-card-preload {
+  opacity: 0;
+}
+
+.twitter-card-loaded {
+  transition: all 0.2s ease;
+  opacity: 1;
+}
+
+/* Effects */
+
+@keyframes highlight {
+  0% {background-color: $yellow-8;}
+  10% {background-color: $yellow-8;}
+}
+
+.highlight-effect{
+  animation: highlight .8s;
+}
+
+/* Groups section tweaks */
+.Groups.Section-DiscussionList .Group-Header,
+.Section-Group.Section-Discussion .Group-Header {
+  margin-bottom: 0;
+}
+
+.Groups.Section-DiscussionList #Panel,
+.Section-Group.Section-Discussion #Panel {
+  float: none;
+  position: absolute;
+}
+
+.Groups.Section-DiscussionList .HomepageTitle {
+  display: none;
+}

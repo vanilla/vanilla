@@ -3,7 +3,7 @@
  * Editor Plugin
  *
  * @author Dane MacMillan
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package editor
  */
@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.6',
+   'Version' => '1.7.7',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -32,7 +32,7 @@ class EditorPlugin extends Gdn_Plugin {
     const DISCUSSION_MEDIA_CACHE_KEY = 'media.discussion.%d';
 
     /** @var bool  */
-    protected $canUpload = false;
+    protected $canUpload;
 
     /** @var array Give class access to PluginInfo */
     protected $pluginInfo = array();
@@ -80,21 +80,6 @@ class EditorPlugin extends Gdn_Plugin {
         // Check for additional formats
         $this->EventArguments['formats'] =& $this->Formats;
         $this->fireEvent('GetFormats');
-
-        // Check upload permissions
-        $this->canUpload = Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false);
-
-        if ($this->canUpload) {
-            $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
-            if (!val('AllowFileUploads', $PermissionCategory, true)) {
-                $this->canUpload = false;
-            }
-        }
-
-        // Check against config, too
-        if (!c('Garden.AllowFileUploads', false)) {
-            $this->canUpload = false;
-        }
     }
 
     /**
@@ -592,6 +577,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $CssPath);
+        $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = array();
         $this->EventArguments['definitions'] =& $additionalDefinitions;
@@ -619,8 +605,6 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('allowedFileExtensions', json_encode(c('Garden.Upload.AllowedFileExtensions')));
         // Get max file uploads, to be used for max drops at once.
         $c->addDefinition('maxFileUploads', ini_get('max_file_uploads'));
-        // Set canUpload definition here, but not Data (set in BeforeBodyBox) because it overwrites.
-        $c->addDefinition('canUpload', $this->canUpload);
     }
 
    /**
@@ -649,7 +633,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // If force Wysiwyg enabled in settings
-        $needsConversion = (!in_array($this->Format, array('Html', 'Wysiwyg')));
+        $needsConversion = (!in_array($this->Format, array('Wysiwyg')));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
             $wysiwygBody = Gdn_Format::to($Sender->getValue('Body'), $this->Format);
             $Sender->setValue('Body', $wysiwygBody);
@@ -674,8 +658,7 @@ class EditorPlugin extends Gdn_Plugin {
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->addDefinition('canUpload', $this->canUpload);
-            $c->setData('_canUpload', $this->canUpload);
+            $c->setData('_canUpload', $this->canUpload());
 
             // Determine which controller (post or discussion) is invoking this.
             // At the moment they're both the same, but in future you may want
@@ -735,7 +718,14 @@ class EditorPlugin extends Gdn_Plugin {
 
             // Save original file to uploads, then manipulate from this location if
             // it's a photo. This will also call events in Vanilla so other plugins can tie into this.
-            if (empty($imageType)) {
+            $validImageTypes = [
+                IMAGETYPE_GIF,
+                IMAGETYPE_JPEG,
+                IMAGETYPE_PNG
+            ];
+            $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
+
+            if (!$validImage) {
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -762,7 +752,7 @@ class EditorPlugin extends Gdn_Plugin {
             // This is a redundant check, because it's in the thumbnail function,
             // but there's no point calling it blindly on every file, so just check here before calling it.
             $generate_thumbnail = false;
-            if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
+            if ($validImage) {
                 $imageHeight = $tmpheight;
                 $imageWidth = $tmpwidth;
                 $generate_thumbnail = true;
@@ -782,7 +772,6 @@ class EditorPlugin extends Gdn_Plugin {
                 'ThumbHeight' => $thumbHeight,
                 'InsertUserID' => Gdn::session()->UserID,
                 'DateInserted' => date('Y-m-d H:i:s'),
-                'StorageMethod' => 'local',
                 'Path' => $filePathParsed['SaveName'],
                 'ThumbPath' => $thumbPathParsed['SaveName']
             );
@@ -1433,7 +1422,6 @@ class EditorPlugin extends Gdn_Plugin {
             // Save thumbnail information to DB.
             $model->save(array(
                 'MediaID' => $media_id,
-                'StorageMethod' => $filepath_parsed['Type'],
                 'ThumbWidth' => $thumb_width,
                 'ThumbHeight' => $thumb_height,
                 'ThumbPath' => $filepath_parsed['SaveName']
@@ -1463,37 +1451,25 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Copy the Spoilers plugin functionality into the editor.
+     * Checks whether the canUpload property is set and if not, calculates it value.
+     * The calculation is based on config, user permissions, and category permissions.
      *
-     * Then plugins can be deprecated without introducing compatibility issues on forums
-     * that make heavy use of the spoilers plugin, as well as users who have
-     * become accustom to its [spoiler][/spoiler] syntax. This will also allow
-     * the spoiler styling and experience to standardize, instead of using two distinct styles and experiences.
+     * @return bool Whether the session user is allowed to upload a file.
      */
-    protected function renderSpoilers(&$Sender) {
-        $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
-        // Fix a wysiwyg but where spoilers
-        $FormatBody = preg_replace('`<.+>\s*(\[/?spoiler\])\s*</.+>`', '$1', $FormatBody);
-
-        $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
-        $FormatBody = str_ireplace('[/spoiler]', '</div>', $FormatBody);
-    }
-
-    /**
-     *
-     *
-     * @param $Matches
-     * @return string
-     */
-    protected function spoilerCallback($Matches) {
-        $SpoilerText = (count($Matches) > 2)
-         ? $Matches[2]
-         : null;
-
-        $SpoilerText = (is_null($SpoilerText))
-         ? ''
-         : $SpoilerText;
-
-        return '<div class="Spoiler">'.$SpoilerText.'</div>';
+    protected function canUpload() {
+        // If the property has been set, return it
+        if (isset($this->canUpload)) {
+            return $this->canUpload;
+        } else {
+            // Check config and user role upload permission
+            if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false)) {
+                // Check category-specific permission
+                $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
+                $this->canUpload = val('AllowFileUploads', $PermissionCategory, true);
+            } else {
+                $this->canUpload = false;
+            }
+        }
+        return $this->canUpload;
     }
 }

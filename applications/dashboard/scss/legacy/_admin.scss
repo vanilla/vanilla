@@ -1,0 +1,3395 @@
+/*
+Welcome to the Admin CSS File! Some things you should know:
+
+1. This css file will be included on all "admin" pages. Specifically:
+   + Home/*
+   + Messages/*
+   + Role/*
+   + Routes/*
+   + Settings/*
+   + User/*
+
+2. This file is broken down into the following sections:
+   + General Styles & Typography
+   + Forms
+   + Header
+   + Panels / Sidebars
+   + Dashboard
+   + User Pages
+   + Splash Information Page
+   + Popups
+   + Legal
+   + Themes
+   + Footer
+*/
+.Buttons-Confirm {
+  text-align: center;
+}
+
+.Buttons-Confirm .Button {
+  min-width: 65px;
+}
+
+/* ================================================================ Reset CSS */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+
+/* remember to define focus styles! */
+:focus {
+  outline: 0;
+}
+
+body {
+  line-height: 1;
+  color: black;
+  background: white;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+}
+
+blockquote, q {
+  quotes: "" "";
+}
+
+/* ============================================== General Styles & Typography */
+body {
+  color: #000;
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+  font-size: 75%;
+  font-size: small;
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+  background: #dbf3fc;
+}
+
+#Body {
+  background: #fff;
+  float: left;
+  width: 100%;
+  zoom: 1; /* hasLayout for IE6/7 */
+}
+
+#Body:after {
+  /* clearfix */
+  visibility: hidden;
+  display: block;
+  content: "";
+  clear: both;
+  height: 0;
+}
+
+#Content {
+  padding: 0 0 20px;
+  margin: 0 0 0 200px;
+  border-left: 1px solid #82bddd;
+}
+
+.Hidden {
+  display: none;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.Center {
+  text-align: center;
+}
+
+.Right {
+  text-align: right;
+}
+
+.Wrap {
+  margin: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #000;
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+  font-weight: normal;
+  margin: 0;
+}
+
+hr {
+  border: none;
+  border-top: solid 1px #A5D0E7;
+}
+
+#Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+}
+
+#Content h1,
+#Content h3 {
+  text-shadow: 0 1px 0 #fff;
+  color: #222;
+  background: #dbf3fc;
+  border-top: 1px solid #8bc1de;
+  border-bottom: 1px solid #8bc1de;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin: 0;
+}
+
+#Content h1 a {
+  text-shadow: none;
+  font-size: 12px;
+  margin-left: 20px;
+}
+
+#Content h3 {
+  border-top: 1px solid #8bc1de;
+}
+
+#Content h4 {
+  padding: 20px 20px 0;
+}
+
+#Content table h4 {
+  padding: 0;
+}
+
+p {
+  margin: .5em 0;
+  line-height: 1.4em;
+}
+
+.P {
+  margin: 5px 0;
+}
+
+small {
+  font-size: 12px;
+  color: #555;
+}
+
+code {
+  border-radius: 2px;
+  background: #ff9;
+  padding: 4px;
+  white-space: pre;
+  font-family: monospace;
+  overflow: auto;
+  box-shadow: 0 0 1px #999;
+}
+
+pre {
+  background: #F0F0F0;
+  border: 1px solid #C0C0C0;
+  color: #333;
+  font-family: 'Inconsolata', Courier, monospace;
+  font-size: 0.8em;
+  line-height: 1.5em;
+  margin: 2em 0;
+  overflow: auto;
+  padding: 0.5em;
+}
+
+h1, h2 {
+  font-size: 140%;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: #fff 0 1px 0;
+}
+
+h3 {
+  font-size: 120%;
+}
+
+h4 {
+  font-size: 110%;
+  font-weight: bold;
+}
+
+h5 {
+  font-size: 110%;
+}
+
+.Arrow {
+  font-size: 18px;
+}
+
+a {
+  text-decoration: none;
+  color: #2786c2;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #ff0084;
+}
+
+input.DateBox,
+input.InputBox,
+input.SmallInput,
+textarea.TextBox {
+  font-family: arial;
+  color: #444;
+  font-size: 16px;
+  padding: 3px;
+  margin: 0;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.color-picker.input-group {
+  position: relative;
+  width: 250px;
+}
+
+/* Hide the html color input */
+.color-picker-color {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.color-picker-preview {
+  position: absolute;
+  right: -7px;
+  top: 1px;
+  width: 40px;
+  height: 27px;
+  background: #000;
+  border: 1px solid transparent;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  cursor: pointer;
+}
+
+textarea.TextBox {
+  font-size: 14px;
+  width: 600px;
+  height: 100px;
+  min-height: 100px;
+  max-height: 500px;
+}
+
+input.WideInput {
+  width: 500px;
+}
+
+#Popup textarea.TextBox {
+  width: 465px;
+}
+
+.TextBoxWrapper {
+  width: auto;
+  padding-right: 8px;
+}
+
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
+  width: 100%;
+}
+
+input.SmallInput,
+input.InputBox {
+  font-size: 15px;
+  padding: 6px 3px;
+}
+
+input.SmallInput:focus,
+input.InputBox:focus,
+textarea.TextBox:focus {
+  background: #ffd;
+  color: #333;
+  border: 1px solid #aaa;
+}
+
+input.BigInput {
+  width: 100%;
+  max-width: 600px;
+}
+
+textarea.TextBox {
+  line-height: 128%;
+}
+
+.textarea-autosize {
+  transition: height 0.1s ease;
+  resize: none !important;
+}
+
+select {
+  font-family: arial;
+  font-size: 14px;
+  margin: 0;
+  padding: 3px;
+}
+
+select.Day,
+select.Year {
+  margin-left: 4px;
+}
+
+.SmallButton,
+.Button {
+  margin: 0;
+  border-radius: .5ex;
+  background: #3fbcf3;
+  background: linear-gradient(top, #aee7fe, #3fbcf3);
+  border: 1px solid #0F7FE6;
+  color: #003673;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 6px 10px;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #B7F5FD;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.Button {
+  box-shadow: 0 0 2px #999;
+  font-weight: bold;
+  margin: 0 0 0 20px;
+}
+
+a.Button {
+  padding: 5px 7px;
+}
+
+.SmallButton {
+  margin-right: 10px;
+  padding: 4px;
+  font-size: 11px;
+  display: inline-block;
+  text-align: center;
+  line-height: 13px;
+}
+
+.SmallButton:hover,
+.Button:hover {
+  border-color: #0B64C6;
+  color: #001F44;
+  text-shadow: 0 1px 0 #EEFFFF;
+}
+
+.SmallButton:hover {
+  box-shadow: 0 0 2px #999999;
+}
+
+.Button.Active,
+.Button:active,
+.SmallButton.Active,
+.SmallButton:active {
+  background: #003673;
+  border-color: #000;
+  color: #B7F5FD;
+  text-shadow: 0 1px 0 #001D3F;
+}
+
+.ButtonList .SmallButton {
+  margin: 0;
+  border-collapse: collapse;
+  border-radius: 0;
+  border-left-width: 0;
+  min-width: 40px;
+}
+
+.InputButtons {
+  margin-top: 8px;
+}
+
+.ButtonList {
+  margin-right: 20px;
+}
+
+.ButtonList :first-child {
+  border-radius: .5ex 0 0 .5ex;
+  border-left-width: 1px;
+}
+
+.ButtonList :last-child {
+  border-radius: 0 .5ex .5ex 0;
+}
+
+.CancelButton {
+  border-color: #919191;
+  background: linear-gradient(top, #F1F1F1, #D1D1D1);
+  color: #414141;
+  text-shadow: 0 1px 0 #E1E1E1;
+}
+
+.CancelButton:hover {
+  border-color: #616161;
+  color: #212121;
+}
+
+.Loading {
+  height: 100px;
+  padding: 0 20px;
+  background: url('images/progress.gif') center center no-repeat;
+}
+
+.AfterButtonLoading {
+  background: url('images/progress.gif') center center no-repeat;
+  padding: 0 20px;
+}
+
+.Progress {
+  padding: 10px 40px 10px 0;
+  background: url('images/progress.gif') center center no-repeat;
+}
+
+.TinyProgress {
+  padding: 10px 40px 10px 0 !important;
+  background: url('images/progress_sm.gif') center center no-repeat;
+  display: inline !important;
+}
+
+.InProgress {
+  background: url('images/progress_sm.gif') center center no-repeat !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  text-shadow: none !important;
+  cursor: progress;
+  pointer-events: none;
+}
+
+div.Padded {
+  font-size: 14px;
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  line-height: 1.4;
+}
+
+/* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
+   strings & imply importance. */
+/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
+  that it renders in a div with this DismissMessage class. */
+div.Info,
+.DismissMessage {
+  border-radius: 2px;
+  font-size: 14px;
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  line-height: 1.4;
+}
+
+#Panel div.Info,
+#Panel .DismissMessage {
+  margin: 0;
+  border-width: 1px 0 1px 0;
+  font-size: 13px;
+}
+
+div.DismissMessage p {
+  margin: 2px 0;
+  padding: 4px 0 0;
+}
+
+div.DismissMessage a.Dismiss {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: #999;
+}
+
+#Panel div.DismissMessage a.Dismiss {
+  top: 1px;
+  right: 3px;
+}
+
+div.DismissMessage a.Dismiss:hover {
+  color: #ff0084;
+}
+
+div.Message {
+  padding: 10px;
+}
+
+.CasualMessage {
+  background: #CFECFF;
+  border: 1px solid #ABDAFB;
+  color: #1E79A7;
+}
+
+.InfoMessage {
+  background: #F6F6F6;
+  border: 1px solid #ddd;
+}
+
+.AlertMessage {
+  background: #fff8ce;
+  border: 1px solid #DEDDAF;
+}
+
+.WarningMessage {
+  background: #ffebe9;
+  border: 1px solid #FFCCC9;
+}
+
+div.Box {
+  border: 1px solid #a5d0e7;
+  background: #d3f0ff;
+}
+
+.Green {
+  color: #24AA09;
+  background-color: #dfffcb;
+  border: 1px solid #AAF091;
+  padding: 5px;
+}
+
+.Warning {
+  background: #ff9;
+  padding: 10px 20px;
+}
+
+strong {
+  font-weight: bold;
+}
+
+.Alert {
+  background: #d00;
+  border: 1px solid #b00;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 3px;
+  text-shadow: 1px 1px 1px #444;
+}
+
+.Alert a {
+  color: #fff;
+}
+
+.Alert a:hover {
+  text-decoration: underline;
+}
+
+#Panel .Alert {
+  font-size: 10px;
+  padding: 0 5px;
+}
+
+div.EmptyInfo {
+  margin: 10px 0;
+}
+
+.HoverHelp {
+  position: relative;
+}
+
+.HoverHelp .Help {
+  display: none;
+  min-width: 200px;
+  background: #333;
+  color: #fff;
+  font-weight: normal;
+  font-size: 11px;
+  position: absolute;
+  left: -5px;
+  bottom: 20px;
+  border-radius: 2px;
+  padding: 6px;
+  box-shadow: 0 0 2px #777;
+}
+
+/* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
+.MorePager {
+  list-style: none;
+  margin: 1px 0 0;
+  padding: 3px 6px;
+  text-align: right;
+}
+
+.MorePager a {
+  font-size: 13px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.MorePager a:hover {
+  color: #2786c2 !important;
+  text-decoration: underline;
+}
+
+.MorePager a.Loading:hover {
+  text-decoration: none;
+}
+
+#PagerLess {
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
+  margin-bottom: 1px;
+}
+
+tr#PagerMore td {
+  border: 0;
+  text-align: right;
+  border-bottom: 1px solid #aedefc;
+}
+
+#PagerMore {
+  margin-bottom: 1px;
+}
+
+/* Note: Tabs are used on administrative dashboard screens to help organize
+  information being managed on screen. For example: applications and plugins.
+*/
+.FilterMenu {
+  color: #aaa;
+  padding: 0 0 10px;
+  padding: 0 20px 10px;
+  position: relative;
+  top: -10px;
+}
+
+.FilterMenu strong {
+  font-weight: bold;
+  color: #111;
+}
+
+.FilterMenu span {
+  color: #999;
+  padding: 0 4px;
+}
+
+div.Tabs {
+  display: block;
+  padding: 0 10px;
+  margin: 0;
+}
+
+div.Tabs li {
+  display: inline;
+  margin: 0;
+}
+
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+  position: relative;
+  top: 4px;
+  margin: 0;
+  border: 1px solid #8bc1de;
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background: #bbe2f7;
+  display: inline;
+  font-weight: bold;
+  color: #1e79a7;
+  text-decoration: none;
+  padding: 5px 10px;
+  line-height: 2.6;
+}
+
+div.Tabs li a:hover {
+  background: #f3fcff;
+}
+
+div.Tabs li.Active a {
+  background: #DBF3FC;
+  border-bottom: 1px solid #DBF3FC;
+  color: #222;
+}
+
+div.Tabs li a span {
+  line-height: 1;
+  font-size: 80%;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-weight: normal;
+  background: #1e79a7;
+  color: #eaf4fd;
+  margin: 0 0 0 4px;
+}
+
+/* ==================================================================== Forms */
+form ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#Content form ul {
+  padding: 20px 20px 0;
+}
+
+form ul li {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 12px;
+}
+
+form ul li label {
+  color: #000;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+form ul li span {
+  display: block;
+}
+
+body.Messages div.Popup form ul li label {
+  width: 100px;
+}
+
+form ul li label.RadioLabel {
+  float: none;
+  display: inline;
+  font-weight: normal;
+}
+
+table.Label tbody th {
+  width: 140px;
+}
+
+form ul li table label {
+  float: none;
+  display: inline;
+  width: auto;
+}
+
+body.Messages div.Popup form ul li label.CheckBoxLabel,
+form ul li label.CheckBoxLabel {
+  float: none;
+  width: auto;
+  display: block;
+  font-size: 13px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  line-height: 27px;
+  font-weight: normal;
+}
+
+form ul li label.CheckBoxLabel input {
+  margin: 7px 6px 4px 2px;
+  padding: 0;
+  float: left;
+}
+
+form ul li label span {
+  font-size: 11px;
+  color: #999;
+  padding-left: 6px;
+}
+
+form li.RadioInput label {
+  display: inline;
+}
+
+input.SmallButton {
+  cursor: pointer;
+  margin: 0 0 0 0;
+  font-size: 11px;
+}
+
+input.SmallInput {
+  width: 80px;
+}
+
+.Inline {
+  display: inline;
+}
+div.Popup ul li label.Inline,
+form ul li label.Inline {
+  display: inline-block;
+}
+
+/* FormTable */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #a5d0e7;
+  border-left: none;
+  border-right: none;
+  margin: 0;
+}
+
+table label {
+  font-size: 12px;
+  padding: 0;
+}
+
+table tr.Last td,
+table tr.Last th {
+  border-bottom: 0;
+}
+
+table th,
+table td {
+  font-weight: normal;
+  padding: 6px;
+}
+
+form ul li table label {
+  font-size: 100%;
+}
+
+table thead th,
+table thead td {
+  border-bottom: 1px solid #a5d0e7;
+}
+
+table tbody th {
+  font-weight: bold;
+  color: #000;
+}
+
+table tbody th,
+table tbody td {
+  border-bottom: 1px solid #a5d0e7;
+  line-height: 150%;
+}
+
+table tbody tr.FootNote td {
+  background: #ff9;
+  color: #454545;
+  border-bottom: 0;
+}
+
+table tbody tr.More th,
+table tbody tr.More td {
+  border-bottom: 0;
+}
+
+table.AltRows tbody tr.Enabled td.Info,
+table.AltColumns tbody tr.Enabled td.Info,
+table.AltRows tbody tr.Disabled td.Info,
+table.AltColumns tbody tr.Disabled td.Info {
+  color: #888;
+}
+
+table tbody td.Info span {
+  padding: 0 6px;
+}
+
+table tbody td.Info strong {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #000;
+}
+
+table thead th {
+  font-weight: bold;
+  font-size: 13px;
+  /* line-height: 100%; This made the headings on checkbox lists highlight incorrectly. */
+  color: #000;
+}
+
+table input.Button {
+  margin: 0;
+}
+
+table.AltRows tr.Alt th,
+table.AltRows tr.Alt td {
+  background: #d3f0ff;
+}
+
+table.AltColumns th.Alt,
+table.AltColumns td.Alt {
+  background: #d3f0ff;
+}
+
+table.AltColumns tr.Alt {
+  background: none;
+}
+
+table.AltColumns tr.Parent td,
+table tr.Parent td {
+  background: #fff;
+}
+
+table.AltColumns tr.Parent td.Alt,
+table tr.Parent td.Alt {
+  background: #fcfcfc;
+}
+
+table tr.Child td.First {
+  padding-left: 20px;
+}
+
+table tr.Highlight th,
+table tr.Highlight td {
+  color: #000;
+}
+
+table tbody td blockquote {
+  margin: 0;
+  padding: 2px;
+}
+
+table.Sortable tbody td {
+  cursor: move;
+}
+
+/* Status Rows - Certain tables have "Enabled" and "Disabled" rows (plugins, applications) that need to override default styles */
+table.AltRows tr.Enabled th,
+table.AltRows tr.Enabled td,
+table.AltColumns tr.Enabled th,
+table.AltColumns tr.Enabled td {
+  background: #ffd;
+  color: #000;
+}
+
+table.AltRows tr.Disabled th,
+table.AltRows tr.Disabled td,
+table.AltColumns tr.Disabled th,
+table.AltColumns tr.Disabled td {
+  background: #d3f0ff;
+}
+
+label.SubLabel {
+  display: inline-block;
+  font-size: 100%;
+  width: 100px;
+}
+
+/* CheckBoxGrid */
+.CheckBoxGrid {
+  margin: 10px 0;
+  width: auto;
+}
+
+.CheckBoxGrid a {
+  display: block !important;
+  padding: 5px;
+}
+
+.CheckBoxGrid a:hover {
+  background: #ff9;
+  text-decoration: none;
+}
+
+.CheckBoxGrid th a,
+.CheckBoxGrid td a,
+.CheckBoxGrid th a:hover,
+.CheckBoxGrid td a:hover {
+  color: #555 !important;
+}
+
+.CheckBoxGrid td {
+  text-align: center;
+}
+
+.CheckBoxGrid tbody th {
+  font-weight: normal;
+  padding: 0;
+}
+
+.CheckBoxGrid tbody th,
+.CheckBoxGrid tbody td {
+  vertical-align: middle;
+}
+
+.CheckBoxGrid thead th a,
+.CheckBoxGrid thead th a:hover {
+  color: #333 !important;
+}
+
+.CheckBoxGrid thead td {
+  padding: 0;
+}
+
+.CheckBoxGrid tbody th a span.Parent {
+  background: url('images/parent_divider.gif') center right no-repeat;
+  padding: 6px 10px 6px 0;
+  margin: 0 6px 0 0;
+}
+
+.CheckBoxGrid th {
+  width: 150px;
+}
+
+.CheckBoxGrid td {
+  width: 50px;
+}
+
+.CheckBoxGrid th,
+.CheckBoxGrid td {
+  padding: 3px;
+}
+
+.CheckBoxGrid th.Alt,
+.CheckBoxGrid td.Alt {
+  background: #d3f0ff;
+}
+
+/* CheckColumn */
+.CheckColumn thead td a {
+  display: block !important;
+  padding: 6px 5px;
+  color: #333333 !important;
+  font-weight: bold;
+}
+
+.CheckColumn thead td a:hover {
+  background: #f9f4c0;
+  text-decoration: none;
+  color: #333333 !important;
+}
+
+/* CheckBoxList */
+.CheckBoxList {
+  padding: 4px 0 4px 0;
+}
+
+.CheckBoxList li {
+  border: 0;
+  margin: 0;
+  padding: 3px 0 3px 0;
+  font-size: 11px;
+}
+
+.CheckBoxList li label.CheckBoxLabel {
+  float: none;
+  display: inline;
+  width: auto;
+  font-weight: normal;
+  padding: 0 0 0 0;
+}
+
+.ColumnCheckBoxList {
+  width: 650px;
+}
+
+.ColumnCheckBoxList li {
+  display: inline-block;
+  width: 321px;
+}
+
+body.managecategories div.Info div {
+  padding-top: 16px;
+}
+
+form ul li.PasswordOptions label.RadioLabel {
+  display: block;
+}
+
+/* =================================================================== Header */
+#Head {
+  background: url('images/dashboard-bg.png') top center repeat-x #014687;
+  border-bottom: 1px solid #000;
+  padding: 10px 18px 18px;
+  text-align: right;
+}
+
+#Head h1 {
+  line-height: 160%;
+  border: 0;
+  float: left;
+  margin: 0;
+  padding: 3px 0 0;
+}
+
+#Head h1 a {
+  font-size: 24px;
+  color: #f8fdff;
+  text-shadow: 0 1px 0 #000;
+}
+
+#Head div.User {
+  padding: 8px 0 0;
+}
+
+#Head h1 a span {
+  vertical-align: middle;
+}
+
+#Head div.User a,
+#Head h1 a span {
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+  background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
+  border: 1px solid #002b57;
+  color: #fff;
+  text-shadow: 0 1px 0 #000;
+  padding: 4px 6px;
+  margin: 0 0 0 6px;
+  font-size: 12px;
+  font-weight: normal;
+  border-radius: 3px;
+}
+
+#Head div.User a:hover,
+#Head h1 a span:hover {
+  background-position: -480px -191px;
+  box-shadow: 0 0 1px #0066C8;
+}
+
+#Head div.User a.Profile,
+#Head div.User a.Profile:hover {
+  background-position: -5px -191px;
+  padding: 4px 6px 4px 24px;
+}
+
+#Head h1 a span,
+#Head h1 a span:hover {
+  background-position: -454px -191px;
+  padding: 4px 6px 4px 22px;
+}
+
+#Head div.User a:focus {
+  background-position: -480px -294px;
+}
+
+#Head div.User a.Profile:focus {
+  background-position: -5px -294px;
+}
+
+#Head h1 a:focus span {
+  background-position: -454px -294px;
+}
+
+#Head div.User a:focus,
+#Head h1 a:focus span {
+  box-shadow: 0 0 1px #6fa3c9;
+}
+
+#Head div.User a span {
+  margin: 0 0 0 6px;
+  border-radius: 3px;
+  background: #003671;
+  padding: 0 4px;
+}
+
+/* ======================================================== Panels / Sidebars */
+#Panel {
+  float: left;
+  margin: 0;
+  width: 200px;
+  border-top: 1px solid #82BDDD;
+  border-right: 1px solid #82bddd;
+  background: #dbf3fc;
+}
+
+#Panel div.Box {
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #8bc1de;
+  background: none;
+}
+
+#Panel div.Group {
+  padding: 0;
+}
+
+div.Box h4 {
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+  font-size: 100%;
+  font-weight: bold;
+  margin: 0 0 4px;
+  padding: 0 6px;
+  color: #076C8E;
+  text-shadow: #fff 0 1px 0;
+}
+
+div.Box h4 a {
+  display: block;
+  color: #045974;
+  text-shadow: none;
+}
+
+div.Box h4 a:hover {
+  color: #ff0084;
+  text-shadow: none;
+}
+
+div.Box h4.Active {
+  background: #045974;
+}
+
+div.Box h4.Active a {
+  color: #fff;
+  text-shadow: none;
+}
+
+#Panel div.Box h4 {
+  padding: 0;
+  margin: 0;
+}
+
+#Panel div.Box h4 {
+  background: url('images/dashboard-sprites.png') 166px -145px no-repeat;
+}
+
+#Panel div.Dashboard h4 {
+  background-position: 166px 7px;
+}
+
+#Panel div.Appearance h4 {
+  background-position: 164px -1195px;
+}
+
+#Panel div.Users h4 {
+  background-position: 162px -292px;
+}
+
+#Panel div.Moderation h4 {
+  background-position: 167px -742px;
+}
+
+#Panel div.Forum h4 {
+  background-position: 167px -442px;
+}
+
+#Panel div.Reputation h4 {
+  background-position: 167px -540px;
+}
+
+#Panel div.Addons h4 {
+  background-position: 166px -240px;
+}
+
+#Panel div.SiteSettings h4 {
+  background-position: 164px -92px;
+}
+
+#Panel div.Import h4 {
+  background-position: 164px -1139px;
+}
+
+#Panel div.Pages h4 {
+  background-position: 166px -1244px;
+}
+
+#Panel div.Support h4 {
+  background-position: 162px -1298px;
+}
+
+div.Box dl {
+  border-bottom: 1px solid #aedefc;
+  background: #f0fbff;
+  padding: 3px;
+  font-size: 90%;
+  overflow: hidden;
+}
+
+div.Box dl dt {
+  float: left;
+  width: 80px;
+  color: #2786C2;
+}
+
+div.Box dl dd {
+  margin-left: 80px;
+}
+
+div.Box p {
+  font-size: 100%;
+  padding: 0 0 4px;
+  color: #555;
+}
+
+#Panel div.Active {
+  background: #fff;
+}
+
+ul.PanelInfo {
+  margin: 0 0 10px;
+}
+
+ul.PanelInfo li {
+  padding: 0;
+  font-size: 80%;
+}
+
+ul.PanelInfo li a {
+  position: relative;
+}
+
+#Panel div.Box h4 {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 10px;
+  color: #000;
+}
+
+ul.PanelInfo li a {
+  font-size: 13px;
+  color: #000;
+  text-shadow: 0 0 1px #fff;
+  display: block;
+  padding: 2px 10px;
+}
+
+#Panel div.Box h4 a {
+  color: #000;
+}
+
+span.New {
+  border-radius: 2px;
+  background: #ff0;
+  color: #000;
+  font-size: 9px;
+  font-weight: bold;
+  box-shadow: 0 1px 2px #333;
+  padding: 0 2px;
+  position: relative;
+  top: -4px;
+  right: auto;
+}
+
+ul.PanelInfo li.Active {
+  background-image: url('images/arrow.png');
+  background-position: center left;
+  background-repeat: no-repeat;
+  background-color: #f5f9ff;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+ul.PanelInfo li.Active a {
+  text-shadow: 0 1px 0 #fff;
+}
+
+ul.PanelInfo li:hover,
+ul.PanelInfo li.Active:hover {
+  background-color: #f0f4fa;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* ================================================= Dashboard Customizations */
+.Column table {
+  width: 100%;
+  border: none;
+}
+
+.Column table th {
+  width: 160px;
+}
+
+.Col {
+  width: 175px;
+  float: left;
+}
+
+#RecentUsers img {
+  float: left;
+  height: 20px;
+  width: 20px;
+  margin-right: 8px;
+  overflow: hidden;
+}
+
+#UrlCode strong {
+  color: #000000;
+}
+
+#UrlCode span {
+  display: inline;
+  background: #ff8;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+#UrlCode input.InputBox {
+  width: 200px;
+  padding: 3px;
+  font-size: 12px;
+  font-family: 'lucida grande', 'Lucida Sans Unicode', Tahoma, sans-serif;
+}
+
+#UrlCode a {
+  margin-left: 10px;
+}
+
+/* =============================================================== User Pages */
+#dashboard_user_index div.Info .InputBox {
+  margin-right: 6px;
+}
+
+#dashboard_user_index div.Info .Button {
+  margin-right: 20px;
+}
+
+/* ================================================== Splash Information Page */
+body.Home {
+  margin: 0;
+  padding: 80px;
+  background: url('images/eyes.png') 30px 30px no-repeat #fff;
+}
+
+body.Home #Content {
+  margin: 0 auto;
+  border: none;
+}
+
+#Content .SplashInfo h1 {
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+  background: transparent;
+  border: none;
+  font-weight: bold;
+  color: #000;
+  font-size: 300%;
+  margin: 20px 0;
+  padding: 0;
+  line-height: 1;
+}
+
+#Content .SplashInfo p {
+  margin: 10px 0;
+  color: #777;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* =================================================================== Popups */
+div.Popup div.Messages {
+  text-align: left;
+  position: inherit;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  margin: 10px 0 !important;
+}
+
+div.Popup div.Warning {
+  margin: 10px 0;
+}
+
+div.Popup div.Messages ul {
+  display: block;
+  border-radius: 2px;
+}
+
+div.Popup div.Info {
+  border: 0;
+}
+
+* html div.Popup div.Messages {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto;
+}
+
+div.Popup .Loading {
+  display: block;
+}
+
+.Overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+div.Popup {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5000;
+  text-align: center;
+}
+
+div.Popup div.Body {
+  margin: 0 auto;
+  text-align: left;
+  position: relative;
+  padding: 0 0 8px 0;
+  max-width: 550px;
+  border-radius: 5px;
+  background: #f1fbfe;
+  border: 1px solid #01416b;
+  box-shadow: 0 0 3px #01416b;
+}
+
+div.Popup div.Body div.Body {
+  border: 0;
+}
+
+div.Popup div.Legal,
+div.Popup .Content form {
+  max-height: 450px;
+  overflow: auto;
+  padding: 0 10px 10px;
+}
+
+div.Popup .Loading {
+  text-align: center;
+}
+
+div.Popup h1,
+div.Popup h2 {
+  padding: 6px 9px 4px;
+  border-radius: 4px 4px 0 0;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  color: #f8fdff;
+  background: url('images/dashboard-bg.png') top center repeat-x #014687;
+  border-bottom: 1px solid #000;
+  text-shadow: 0 1px 0 #000;
+}
+
+div.Popup h3 {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 20px 0 10px;
+}
+
+div.Popup p {
+  padding: 6px 10px 10px;
+}
+
+div.Popup small {
+  font-size: 80%;
+}
+
+div.Popup form p {
+  padding: 0;
+}
+
+div.Popup form ul li label {
+  color: #222;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 0;
+}
+
+div.Popup form ul li label.RadioLabel,
+div.Popup form ul li label.CheckBoxLabel {
+  font-weight: normal;
+}
+
+div.Popup input.Button {
+  margin: 4px 0 2px;
+}
+
+body.Entry div.Popup p {
+  color: #000;
+}
+
+/* Note: The close class is used on the "close" anchor in popups. */
+a.Close {
+  line-height: 1;
+  color: #555;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 0;
+  border-radius: 3px;
+  background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
+  border-bottom: 1px solid #006edf;
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  height: 18px;
+  width: 18px;
+  overflow: hidden;
+}
+
+a.Close span {
+  display: none;
+}
+
+a.Close:hover {
+  color: #111;
+}
+
+div.Popup .Footer {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  text-align: right;
+}
+
+div.Popup .Footer input.Button {
+  font-size: 11px;
+  margin-right: 2px;
+}
+
+/* ==================================================================== Legal */
+div.Legal ol {
+  list-style-position: outside;
+  list-style-type: decimal;
+  margin: 0 30px 10px;
+}
+
+div.Legal ul {
+  list-style-position: outside;
+  list-style-type: disc;
+  margin: 0 30px 10px;
+}
+
+div.Legal li {
+  padding: 5px 0;
+}
+
+div.Legal strong {
+  font-weight: bold;
+}
+
+div.Legal em {
+  font-style: italic;
+}
+
+div.Legal p {
+  padding: 6px 0 10px;
+  margin: 0;
+}
+
+div.Legal h3 {
+  font-weight: bold;
+  padding: 6px 0 4px !important;
+  margin: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+div.Legal {
+  margin: 10px;
+  padding: 2px 8px;
+  border: 1px solid #a5d0e7;
+  border-radius: 3px;
+  background: #f6ffff;
+}
+
+div.Popup div.Legal {
+  margin: 0;
+  padding: 0 10px 10px;
+  border: none;
+  background: none;
+  border-radius: 0;
+}
+
+/* =================================================================== Themes */
+div.CurrentTheme img,
+div.BrowseThemes img {
+  border: 1px solid #777;
+}
+
+div.CurrentTheme h3,
+div.BrowseThemes h3 {
+  padding: 0 0 10px;
+}
+
+.CurrentTheme img {
+  float: left;
+  margin: 20px;
+}
+
+.CurrentTheme {
+  min-height: 200px;
+  margin: 0;
+}
+
+.CurrentTheme h4 {
+  padding: 6px 0;
+}
+
+.CurrentTheme h4 span {
+  padding-left: 10px;
+}
+
+div.Description {
+  padding: 0 20px 20px;
+}
+
+div.Options,
+div.CustomThemeOptions {
+  padding: 0 20px;
+}
+
+table.SelectionGrid {
+  background: none;
+  margin: 0;
+  border: none;
+}
+
+table.SelectionGrid td {
+  width: 33%;
+  border: 1px solid #a5d0e7;
+  border-width: 0 0 1px;
+  padding: 16px;
+  vertical-align: top;
+}
+
+table.Themes td {
+  min-width: 235px;
+}
+
+table.Themes td h4 {
+  padding: 6px 0;
+}
+
+table.SelectionGrid td.FirstCol {
+  border-right: 1px solid #a5d0e7;
+}
+
+table.SelectionGrid td.EmptyCol,
+table.SelectionGrid td.LastCol {
+  border-left: 1px solid #a5d0e7;
+}
+
+table.SelectionGrid td.FirstCol,
+table.SelectionGrid td.EmptyCol,
+table.SelectionGrid td.LastCol,
+table.SelectionGrid td {
+  border-color: #e0e0e0;
+}
+
+table.SelectionGrid h4 {
+  color: #02455B;
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 0 #FFFFFF;
+}
+
+table.SelectionGrid em {
+  display: block;
+  padding: 3px 0 8px;
+  font-style: oblique;
+}
+
+table.SelectionGrid div.Buttons {
+  float: right;
+  width: 70px;
+  text-align: center;
+}
+
+table.SelectionGrid div.Buttons a {
+  display: block;
+  margin: 4px 0;
+}
+
+table.Themes em {
+  padding-top: 13px;
+}
+
+table.SelectionGrid dl {
+  padding: 0 0 10px;
+}
+
+table.SelectionGrid dl dt {
+  display: inline;
+  color: #000;
+  border-right: 1px solid #e2f4ff;
+  padding: 4px 6px 4px 0;
+  margin: 0 4px 0 0;
+}
+
+table.SelectionGrid dl dd {
+  display: inline;
+}
+
+table.SelectionGrid td.Active {
+  background: #e2f4ff none repeat scroll 0 0;
+}
+
+/* A general rule to remove padding from info (form adds it) */
+#Content form ul div.Info {
+  padding: 0;
+  margin: 10px 0;
+}
+
+/* Exceptions to padding rule */
+body#dashboard_settings_registration #Content form ul div.Info {
+  padding: 10px;
+  margin: 10px;
+}
+
+#dashboard_settings_registration #Content form ul {
+  padding: 0;
+}
+
+body.Import table {
+  margin-bottom: 20px;
+}
+
+body.Import .Button {
+  margin: 0 0 0 20px;
+}
+
+#InvitationExpiration {
+  padding: 0 20px;
+}
+
+table.AltRows tr.Disabled th,
+table.AltRows tr.Disabled td,
+table.AltColumns tr.Disabled th,
+table.AltColumns tr.Disabled td,
+table.AltColumns th.Alt,
+table.AltColumns td.Alt {
+  background: none;
+}
+
+table.AltRows tr.Enabled th,
+table.AltRows tr.Enabled td,
+table.AltColumns tr.Enabled th,
+table.AltColumns tr.Enabled td {
+  background: #ff8;
+}
+
+.CheckBoxGrid tbody th,
+.CheckBoxGrid thead td,
+.CheckBoxGrid thead td.Alt,
+.CheckBoxGrid thead th,
+.CheckBoxGrid thead th.Alt,
+table thead th,
+table thead td,
+table.AltColumns thead th.Alt,
+table.AltColumns thead td.Alt {
+  background: #dbf3fc;
+  font-size: 13px;
+  color: #222;
+  text-shadow: 0 1px 0 #fff;
+}
+
+table th,
+table td {
+  padding: 6px 6px 6px 20px;
+  vertical-align: top;
+}
+
+table th.Less,
+table td.Less {
+  padding: 6px;
+}
+
+table tbody tr.More th.Less,
+table tbody tr.More td.Less,
+table tbody th,
+table tbody td {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+table tbody tr:last-child th,
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.CheckBoxGrid td.Alt {
+  background: none;
+}
+
+li.RolePermissions table.CheckBoxGrid tbody tr th a {
+  white-space: nowrap;
+}
+
+li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
+  display: inline;
+}
+
+/* Summary Tables */
+div.Summary {
+  clear: left;
+  margin: 20px 0 20px 20px;
+  width: 46%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+div.Summary table {
+  margin: 0;
+  padding: 0;
+}
+
+div.Summary table th,
+div.Summary table td {
+  font-size: 11px;
+  padding: 4px 6px;
+}
+
+div.Summary table tbody th {
+  font-weight: normal;
+}
+
+div.Summary table thead td,
+div.Summary table tbody td {
+  width: 80px;
+  padding: 4px 6px 4px 0;
+}
+
+/* Mobile themes */
+
+.browser-mobile-themes {
+}
+
+.themeblock {
+  box-sizing: border-box;
+  margin: 0;
+  width: 33.33%;
+  min-width: 235px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.themeblock.current-theme {
+  background-color: #f5f9ff;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+#Content .themeblock h4 {
+  display: block;
+  padding: 0;
+}
+
+.themeblock .theme-version {
+  font-size: 14px;
+  color: #aaa;
+  font-weight: normal;
+}
+
+.themeblock .author-name {
+  color: #aaa;
+  padding: 0 0 20px 0;
+}
+
+.themeblock .theme-image {
+  display: block;
+  height: 213px;
+  overflow: hidden;
+  float: left;
+  box-shadow: 0 0 1px 0 #aaa;
+  margin: 10px 16px 5px 0;
+}
+
+.themeblock .theme-image img {
+  display: block;
+  width: auto;
+  height: 213px;
+}
+
+.themeblock .theme-image:empty {
+  width: 120px;
+  border: 1px solid #fff;
+  background-color: #f5f9ff;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.themeblock .theme-description {
+  display: block;
+  margin: -5px 0 0 0;
+  font-style: normal;
+}
+
+.themeblock dl {
+  clear: both;
+  float: left;
+  margin-top: 20px;
+}
+
+.themeblock dt {
+  font-weight: bold;
+}
+
+.themeblock dd {
+  color: #aaa;
+}
+
+.themeblock .Alert {
+  clear: both;
+  margin: 0 0 20px 0;
+}
+
+.theme-right-column {
+  overflow: hidden;
+}
+
+.browser-mobile-themes.SelectionGrid div.Buttons {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0 20px 0;
+}
+
+.browser-mobile-themes.SelectionGrid div.Buttons a {
+  display: inline-block;
+  padding: 12px 0;
+}
+
+.theme-applied {
+  display: none;
+  padding: 10px 0;
+  border-radius: 2px;
+  background-color: #fff;
+  color: #aaa;
+  box-shadow: inset 0 0 2px 0 #ddd;
+}
+
+.browser-mobile-themes.SelectionGrid div.Buttons a,
+.theme-applied {
+  min-width: 62px;
+  width: 50%;
+  margin: auto;
+  float: right;
+}
+
+.themeblock.theme-progressing .theme-buttons,
+.themeblock.current-theme .theme-buttons {
+  display: none;
+}
+
+.themeblock.current-theme .theme-applied {
+  display: block;
+}
+
+.themeblock.current-theme .theme-apply-progress {
+  display: none;
+}
+
+.themeblock .TinyProgress.theme-apply-progress {
+  display: block !important;
+  margin: auto;
+  height: 19px;
+}
+
+/* =================================================================== Footer */
+#Foot {
+  clear: both;
+  font-size: 13px;
+  color: #076C8E;
+  font-weight: bold;
+  padding: 4px 18px 2px;
+  position: relative;
+  background: url('images/dashboard-bg.png') center -96px repeat-x #014687;
+  border: none;
+  border-bottom: 1px solid #000204;
+}
+
+#Foot img {
+  display: none;
+}
+
+#Foot a {
+  color: #076C8E;
+}
+
+#Foot .Version {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  color: #5F9BBF;
+  font-size: 12px;
+  font-weight: normal;
+  padding-bottom: 5px;
+}
+
+#Foot div a {
+  display: block;
+  background: url('images/logo_footer.png') center center no-repeat;
+  height: 32px;
+  width: 72px;
+  margin: 6px 0 10px;
+}
+
+.Count {
+  background: #02639E;
+  border-radius: 2px;
+  color: #fff;
+  font-size: 11px;
+  padding: 1px 6px !important;
+}
+
+.Tag {
+  background: #555;
+  color: #fff;
+  border-radius: 2px;
+
+  font-size: 11px;
+  padding: 1px 6px !important;
+}
+
+.Tag a {
+  color: #fff;
+}
+
+.Tag-Spam {
+  background-color: #CF6E65;
+  color: #FFF6BF;
+}
+
+.Tag-Edit {
+  background-color: #F27527;
+}
+
+.Tag-Delete, .Tag-Ban {
+  background-color: #C70028;
+}
+
+.Tag-Moderate {
+  background-color: #ae0076;
+}
+
+.Meta-Container {
+  margin-top: 10px;
+}
+
+.Meta-Container .Tags {
+  margin-right: 5px;
+}
+
+.Meta {
+  margin: 0 5px;
+  display: inline-block;
+}
+
+.Meta-Label {
+  color: #999;
+}
+
+.Pager {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 0;
+  text-align: right;
+  line-height: 10px;
+}
+
+.Pager a,
+.Pager span {
+  padding: 0 4px;
+}
+
+.Pager span,
+.Pager a.Highlight {
+  color: #777;
+}
+
+.NumberedPager a.Next,
+.NumberedPager span.Next {
+  margin-left: 6px;
+}
+
+.NumberedPager a.Previous,
+.NumberedPager span.Previous {
+  margin-right: 6px;
+}
+
+.NormalList {
+  list-style: disc;
+  list-style-position: inside;
+  margin: 10px 0;
+}
+
+.NormalList li {
+  margin: 4px 0;
+}
+
+/* Help Links */
+.Help {
+  padding: 8px;
+  line-height: 1;
+}
+
+.Help h2 {
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: none;
+  margin: 0 0 10px;
+}
+
+.Help ul {
+  list-style: disc;
+  margin-left: 19px;
+}
+
+.Help li {
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.Aside {
+  border: solid 1px #cc8;
+  border-width: 1px 0 1px 1px;
+  border-top: solid 1px #aa8;
+  background: #ffc;
+  border-radius: 0 0 0 3px;
+  /* width: 220px; */
+  max-width: 500px;
+  float: right;
+  z-index: 200;
+  position: relative;
+  margin: 0;
+  font-size: 12px;
+}
+
+/* Homepage Admin */
+.Homepage {
+  padding: 0 20px;
+}
+
+.Homepage a.Choice {
+  color: #777;
+  font-weight: bold;
+  font-size: 12px;
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: bottom;
+  margin: 0 10px 10px 0;
+  padding: 0;
+  line-height: 2.6;
+}
+
+.Homepage .Sprite {
+  display: block;
+  height: 124px;
+  width: 180px;
+  background: url('images/homepage-sprites.png') 0 0 no-repeat;
+  border: 1px solid #888;
+}
+
+.Homepage a.Choice .Wrap {
+  border-radius: 2px;
+  background: #f5f5f5;
+  border: 2px solid #ccc;
+  padding: 6px;
+  margin: 0;
+  display: block;
+}
+
+.Homepage .SpDiscussionsTable {
+  background-position: 0 0;
+}
+
+.Homepage .SpDiscussions {
+  background-position: -180px 0;
+}
+
+.Homepage .SpCategories {
+  background-position: -360px 0;
+}
+
+.Homepage .SpCategoriesTable {
+  background-position: 0 -124px;
+}
+
+.Homepage .SpCategoriesMixed {
+  background-position: -180px -124px;
+}
+
+.Homepage .SpActivity {
+  background-position: -360px -124px;
+}
+
+.Homepage .SpBestOf {
+  background-position: -540px 0;
+}
+
+.Homepage a.Choice:hover {
+  color: #000;
+}
+
+.Homepage a.Choice:hover .Wrap {
+  background-color: #fafafa;
+  border-color: #aaa;
+}
+
+.Homepage a.Choice.Current {
+  color: #000;
+  background: url('images/check.png') 2px 3px no-repeat;
+  text-indent: 36px;
+}
+
+.Homepage a.Current .Wrap {
+  background-color: #D6FFCF;
+  border-color: #06A800;
+}
+
+.LayoutOptions {
+  margin: 20px 0;
+}
+
+ol.Sortable, ol.Sortable ol {
+  margin: 0 0 0 25px;
+  padding: 0;
+  list-style-type: none;
+}
+
+ol.Sortable {
+  margin: 0;
+  background: #f3f3f3;
+}
+
+.Sortable li {
+  margin: 0;
+  padding: 0;
+}
+
+.Sortable li div {
+  padding: 0;
+  margin: 0;
+  cursor: move;
+}
+
+.Placeholder {
+  background-color: #cfcfcf;
+}
+
+.SortableError {
+  background: #fbe3e4;
+  color: #8a1f11;
+}
+
+.Sortable table {
+  border: 1px solid #e0e0e0;
+  border-right: none;
+  margin: -1px 0 0 -1px;
+}
+
+.Sortable table td {
+  vertical-align: top;
+  padding: 6px;
+  background: #fff;
+  border-bottom: none;
+}
+
+.Sortable table td strong,
+.Sortable table td blockquote {
+  display: block;
+}
+
+.Sortable table td.Buttons {
+  text-align: right;
+  padding: 6px 0;
+}
+
+/* ==================================================================== Feeds */
+.FeedItem {
+  padding: 6px 10px;
+}
+
+.FeedItem a {
+  font-size: 13px;
+  display: inline;
+  font-weight: bold;
+  margin-right: 12px;
+}
+
+.FeedItem .Date {
+  display: inline;
+  font-size: 12px;
+  color: #888;
+}
+
+.FeedItem em {
+  color: #333;
+  font-size: 12px;
+  display: block;
+}
+
+.FeedItem h2 {
+  margin-bottom: 0;
+}
+
+.Selected {
+  background: #FFFF99 !important;
+}
+
+.CheckboxCell {
+  width: 1em;
+}
+
+.DateCell {
+  text-align: right;
+  width: 7em;
+}
+
+.UsernameCell {
+  width: 8em;
+}
+
+.CenterCell {
+  text-align: center;
+}
+
+ins {
+  background: #ddffdd;
+  color: #006600;
+  padding: 0 3px;
+}
+
+del {
+  background: #ffeeee;
+  color: #bb0000;
+  padding: 0 3px;
+}
+
+/* Do not customize these unless you enjoy pain. */
+
+/* Error messages that get displayed on forms throughout the application. */
+div.Errors {
+  text-align: left;
+  position: inherit;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  margin: 0 !important;
+}
+
+* html div.Errors {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto;
+}
+
+div.Errors ul {
+  border-bottom: 1px solid #a00 !important;
+  background: #d50a0a !important;
+  padding: 10px 20px !important;
+  display: block;
+  box-shadow: none;
+}
+
+div.Popup div.Errors ul {
+  border: 1px solid #a00 !important;
+  padding: 6px 10px !important;
+}
+
+div.Errors ul li {
+  color: #fff !important;
+  background: #d50a0a !important;
+  margin: 0;
+}
+
+div.Errors pre {
+  margin: 10px 0 5px;
+  padding: 4px 8px;
+  display: block;
+  border-radius: 2px;
+  white-space: pre;
+  overflow: auto;
+  box-shadow: 0 0 2px #333;
+}
+
+div.Errors pre,
+div.Errors pre * {
+  background: #ffa !important;
+  font-size: 12px !important;
+  font-weight: normal !important;
+  font-family: monospace !important;
+  text-shadow: none !important;
+  color: #333 !important;
+  line-height: 1.4 !important;
+}
+
+div.Errors pre * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.PageInfo {
+  background: #00346d;
+  background: linear-gradient(top, #00346d, #014a8a);
+  padding: 10px;
+  color: #fff;
+  border-radius: 4px;
+  margin: 20px;
+}
+
+.PageInfo h2 {
+  font-family: 'Rokkitt', serif !important;
+  font-weight: normal;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 1px 2px 1px #000;
+  margin-bottom: 5px;
+}
+
+.PageInfo b {
+  color: #FFF6CD;
+}
+
+/* Do not customize these unless you enjoy pain. */
+
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+div.InformMessages {
+  text-align: left !important;
+  position: fixed;
+  top: auto;
+  bottom: 20px;
+  left: 20px;
+  z-index: 200;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  font-size: 12px;
+  display: block;
+  width: auto;
+}
+
+* html div.InformMessages {
+  position: absolute;
+  width: 100%; /*IE5.5*/
+  top: auto;
+  left: 20px;
+  overflow: visible;
+//  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
+}
+
+div.InformMessages div.InformWrapper {
+  display: block;
+}
+
+div.InformMessages div.InformMessage {
+  color: #fff !important;
+  text-shadow: 0 1px 1px #000;
+  text-align: left !important;
+  border-radius: 2px;
+  background: rgb(0, 0, 0) !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: none !important;
+  width: auto !important;
+  max-width: 400px !important;
+  margin: 10px auto 0 !important;
+  padding: 9px 14px 8px !important;
+  display: inline-block;
+  zoom: 1;
+  position: relative;
+  line-height: 1.6;
+}
+
+div.InformMessages div.InformMessage:hover {
+  background: #111111;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+div.InformMessages div.InformMessage a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+div.InformMessages div.InformMessage a:hover {
+  text-decoration: none;
+}
+
+div.InformMessages div.InformMessage a.Close {
+  border: none;
+  background: transparent;
+  border-top-right-radius: 2px;
+  color: #ddd;
+  font-size: 14px;
+  text-align: center;
+  display: none;
+  height: 12px;
+  width: 12px;
+  line-height: 1;
+  text-decoration: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+div.InformMessages div.InformMessage a.Close span {
+  display: inline;
+}
+
+div.InformMessages div.InformMessage a.Close:hover {
+  background: #000;
+  color: #fff;
+}
+
+div.InformMessages div.InformMessage:hover a.Close {
+  display: block;
+}
+
+/* Inform Sprites */
+div.InformMessages div.InformWrapper.HasIcon div.InformMessage {
+  padding-left: 42px !important;
+  min-height: 20px;
+}
+
+div.InformMessages div.InformWrapper.HasSprite div.InformMessage {
+  padding-left: 40px !important;
+}
+
+div.InformMessages div.InformMessage a.Icon {
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: 28px;
+  width: 28px;
+}
+
+div.InformMessages div.InformMessage a.Icon img {
+  height: 28px;
+  width: 28px;
+}
+
+span.InformSprite {
+  background: url('images/inform-sprites.png') -9px -9px no-repeat;
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  height: 30px;
+  width: 30px;
+}
+
+span.InformSprite.Refresh {
+  background-position: -9px -9px;
+}
+
+span.InformSprite.Recycle {
+  background-position: -57px -9px;
+}
+
+span.InformSprite.Infinity {
+  background-position: -105px -9px;
+}
+
+span.InformSprite.Squiggle {
+  background-position: -153px -9px;
+}
+
+span.InformSprite.Random {
+  background-position: -200px -9px;
+}
+
+span.InformSprite.Magnify {
+  background-position: -250px -9px;
+}
+
+span.InformSprite.Location {
+  background-position: -298px -9px;
+}
+
+span.InformSprite.Bubble {
+  background-position: -346px -9px;
+}
+
+span.InformSprite.ElipsisBubble {
+  background-position: -394px -9px;
+}
+
+span.InformSprite.Plus {
+  background-position: -442px -9px;
+}
+
+span.InformSprite.Time {
+  background-position: -9px -57px;
+}
+
+span.InformSprite.Eye {
+  background-position: -57px -57px;
+}
+
+span.InformSprite.Target {
+  background-position: -105px -57px;
+}
+
+span.InformSprite.Redflag {
+  background-position: -153px -57px;
+}
+
+span.InformSprite.Flags {
+  background-position: -200px -57px;
+}
+
+span.InformSprite.Graph {
+  background-position: -250px -57px;
+}
+
+span.InformSprite.Chart {
+  background-position: -298px -57px;
+}
+
+span.InformSprite.Envelope {
+  background-position: -346px -57px;
+}
+
+span.InformSprite.Gear {
+  background-position: -394px -57px;
+}
+
+span.InformSprite.Gears {
+  background-position: -442px -57px;
+}
+
+span.InformSprite.Skull {
+  background-position: -9px -106px;
+}
+
+span.InformSprite.SkullBones {
+  background-position: -57px -106px;
+}
+
+span.InformSprite.Bird {
+  background-position: -105px -106px;
+}
+
+span.InformSprite.Present {
+  background-position: -153px -106px;
+}
+
+span.InformSprite.Thundercloud {
+  background-position: -200px -106px;
+}
+
+span.InformSprite.Bandaid {
+  background-position: -250px -106px;
+}
+
+span.InformSprite.Saturn {
+  background-position: -298px -106px;
+}
+
+span.InformSprite.Star {
+  background-position: -346px -106px;
+}
+
+span.InformSprite.Heart {
+  background-position: -394px -106px;
+}
+
+span.InformSprite.Key {
+  background-position: -442px -106px;
+}
+
+span.InformSprite.Ipod {
+  background-position: -9px -152px;
+}
+
+span.InformSprite.Iphone {
+  background-position: -57px -152px;
+}
+
+span.InformSprite.Cabinet {
+  background-position: -105px -152px;
+}
+
+span.InformSprite.Coffee {
+  background-position: -153px -152px;
+}
+
+span.InformSprite.Briefcase {
+  background-position: -200px -152px;
+}
+
+span.InformSprite.Toolcase {
+  background-position: -250px -152px;
+}
+
+span.InformSprite.Suitcase {
+  background-position: -298px -152px;
+}
+
+span.InformSprite.Airplane {
+  background-position: -346px -152px;
+}
+
+span.InformSprite.Spraypaint {
+  background-position: -394px -152px;
+}
+
+span.InformSprite.MailInbox {
+  background-position: -442px -152px;
+}
+
+span.InformSprite.WallPicture {
+  background-position: -9px -200px;
+}
+
+span.InformSprite.Photos {
+  background-position: -57px -200px;
+}
+
+span.InformSprite.FilmRoll {
+  background-position: -105px -200px;
+}
+
+span.InformSprite.Drawer {
+  background-position: -153px -200px;
+}
+
+span.InformSprite.FilmStrip {
+  background-position: -200px -200px;
+}
+
+span.InformSprite.FilmStrip2 {
+  background-position: -250px -200px;
+}
+
+span.InformSprite.Gas {
+  background-position: -298px -200px;
+}
+
+span.InformSprite.Cutlery {
+  background-position: -346px -200px;
+}
+
+span.InformSprite.Battery {
+  background-position: -394px -200px;
+}
+
+span.InformSprite.Beaker {
+  background-position: -442px -200px;
+}
+
+span.InformSprite.Outlet {
+  background-position: -9px -250px;
+}
+
+span.InformSprite.Pinetree {
+  background-position: -57px -250px;
+}
+
+span.InformSprite.House {
+  background-position: -105px -250px;
+}
+
+span.InformSprite.Padlock {
+  background-position: -153px -250px;
+}
+
+span.InformSprite.Network {
+  background-position: -200px -250px;
+}
+
+span.InformSprite.Cloud {
+  background-position: -250px -250px;
+}
+
+span.InformSprite.Download {
+  background-position: -298px -250px;
+}
+
+span.InformSprite.BookmarkRibbon {
+  background-position: -346px -250px;
+}
+
+span.InformSprite.Flag {
+  background-position: -394px -250px;
+}
+
+span.InformSprite.Signpost {
+  background-position: -442px -250px;
+}
+
+span.InformSprite.Brightness {
+  background-position: -9px -298px;
+}
+
+span.InformSprite.Contrast {
+  background-position: -57px -298px;
+}
+
+span.InformSprite.Runner {
+  background-position: -105px -298px;
+}
+
+span.InformSprite.Zap {
+  background-position: -153px -298px;
+}
+
+span.InformSprite.MusicNote {
+  background-position: -200px -298px;
+}
+
+span.InformSprite.Microphone {
+  background-position: -250px -298px;
+}
+
+span.InformSprite.Tshirt {
+  background-position: -298px -298px;
+}
+
+span.InformSprite.Paperclip {
+  background-position: -346px -298px;
+}
+
+span.InformSprite.Monitor {
+  background-position: -394px -298px;
+}
+
+span.InformSprite.Tv {
+  background-position: -442px -297px;
+}
+
+span.InformSprite.Compass {
+  background-position: -9px -346px;
+}
+
+span.InformSprite.Pin {
+  background-position: -57px -346px;
+}
+
+span.InformSprite.Radar {
+  background-position: -105px -346px;
+}
+
+span.InformSprite.Location {
+  background-position: -153px -346px;
+}
+
+span.InformSprite.Telephone {
+  background-position: -200px -346px;
+}
+
+span.InformSprite.Baby {
+  background-position: -250px -346px;
+}
+
+span.InformSprite.Ekg {
+  background-position: -298px -346px;
+}
+
+span.InformSprite.Stopwatch {
+  background-position: -346px -346px;
+}
+
+span.InformSprite.MedicalBag {
+  background-position: -394px -346px;
+}
+
+span.InformSprite.ShoppingCart {
+  background-position: -442px -346px;
+}
+
+span.InformSprite.Dashboard {
+  background-position: -9px -393px;
+}
+
+span.InformSprite.Dogpaw {
+  background-position: -57px -393px;
+}
+
+span.InformSprite.Calendar {
+  background-position: -105px -393px;
+}
+
+span.InformSprite.Lightbulb {
+  background-position: -153px -393px;
+}
+
+span.InformSprite.Trophy {
+  background-position: -200px -393px;
+}
+
+span.InformSprite.Camera {
+  background-position: -250px -393px;
+}
+
+span.InformSprite.Wineglass {
+  background-position: -298px -393px;
+}
+
+span.InformSprite.Beerglass {
+  background-position: -346px -391px;
+}
+
+span.InformSprite.Dumbbells {
+  background-position: -394px -393px;
+}
+
+span.InformSprite.Buoy {
+  background-position: -442px -393px;
+}
+
+span.InformSprite.Beaker2 {
+  background-position: -9px -440px;
+}
+
+span.InformSprite.Testtube {
+  background-position: -57px -440px;
+}
+
+span.InformSprite.Thermometer {
+  background-position: -105px -440px;
+}
+
+span.InformSprite.Pill {
+  background-position: -153px -440px;
+}
+
+span.InformSprite.Equalizer {
+  background-position: -200px -440px;
+}
+
+span.InformSprite.Book {
+  background-position: -250px -440px;
+}
+
+span.InformSprite.Puzzle {
+  background-position: -298px -440px;
+}
+
+span.InformSprite.Palette {
+  background-position: -346px -440px;
+}
+
+span.InformSprite.Umbrella {
+  background-position: -394px -440px;
+}
+
+span.InformSprite.CoffeeCup {
+  background-position: -442px -440px;
+}
+
+span.InformSprite.Gameplan {
+  background-position: -9px -490px;
+}
+
+span.InformSprite.Walk {
+  background-position: -57px -490px;
+}
+
+span.InformSprite.Map {
+  background-position: -105px -490px;
+}
+
+span.InformSprite.IndexCards {
+  background-position: -153px -490px;
+}
+
+span.InformSprite.Piano {
+  background-position: -200px -490px;
+}
+
+span.InformSprite.Sliders {
+  background-position: -250px -490px;
+}
+
+span.InformSprite.Widescreen {
+  background-position: -298px -490px;
+}
+
+span.InformSprite.Badge {
+  background-position: -346px -490px;
+}
+
+span.InformSprite.Chicken {
+  background-position: -394px -490px;
+}
+
+span.InformSprite.Bug {
+  background-position: -442px -490px;
+}
+
+span.InformSprite.SingleUser {
+  background-position: -9px -539px;
+}
+
+span.InformSprite.Group {
+  background-position: -57px -537px;
+}
+
+span.InformSprite.Navigation {
+  background-position: -105px -537px;
+}
+
+span.InformSprite.Balloon {
+  background-position: -153px -537px;
+}
+
+span.InformSprite.Bowandarrow {
+  background-position: -200px -537px;
+}
+
+span.InformSprite.Controller {
+  background-position: -250px -537px;
+}
+
+span.InformSprite.Check {
+  background-position: -298px -537px;
+}
+
+span.InformSprite.Hanger {
+  background-position: -346px -537px;
+}
+
+span.InformSprite.Piggybank {
+  background-position: -394px -537px;
+}
+
+span.InformSprite.Headphones {
+  background-position: -442px -537px;
+}
+
+span.InformSprite.Landscape {
+  background-position: -9px -586px;
+}
+
+span.InformSprite.Stats {
+  background-position: -57px -586px;
+}
+
+span.InformSprite.Idcard {
+  background-position: -105px -586px;
+}
+
+span.InformSprite.Bullhorn {
+  background-position: -153px -586px;
+}
+
+span.InformSprite.Food {
+  background-position: -200px -586px;
+}
+
+span.InformSprite.Moon {
+  background-position: -250px -586px;
+}
+
+span.InformSprite.Sock {
+  background-position: -298px -586px;
+}
+
+span.InformSprite.Bone {
+  background-position: -346px -586px;
+}
+
+span.InformSprite.Golf {
+  background-position: -394px -586px;
+}
+
+span.InformSprite.Dice {
+  background-position: -442px -586px;
+}
+
+/* Plugins */
+.PluginIcon {
+  display: block;
+  height: 50px;
+  width: 50px;
+}
+
+/* Getting Started Screen */
+.Welcome h2 {
+  overflow: hidden;
+  text-indent: -1000px;
+  font-size: 1px;
+  height: 42px;
+  width: 341px;
+  background: url('images/welcome-message.png') top left no-repeat transparent;
+}
+
+.Info ul,
+.Info ol {
+  margin: 1em 0 1em 3em;
+}
+
+.Info ol li {
+  list-style: decimal !important;
+}
+
+.Info ul li {
+  list-style: disc !important;
+}
+
+.ActivateSlider {
+  display: inline-block;
+  background: #bbb;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
+  border: solid 1px #ccc;
+  width: 100px;
+  padding: 1px;
+  border-radius: 2px;
+  position: relative;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.ActivateSlider .SmallButton {
+  line-height: 11px;
+}
+
+.ActivateSlider-Active {
+  text-align: right;
+  background: #001F44;
+  box-shadow: 0 -5px 10px #0B64C6 inset;
+}
+
+.ActivateSlider .SmallButton {
+  margin: 0;
+  min-width: 45px;
+
+}
+
+.Sprite {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  vertical-align: text-top;
+  border: solid 2px transparent;
+  margin: -2px;
+  background: url('//vanillicon.com/sprites/sprites-14-sweetx-001F44.png') 0 0 no-repeat;
+  display: inline-block;
+}
+
+/* 16px Sprites Black Transparent */
+/*.SpDashboard,
+.SpCog { background-position: 0 -148px; }
+.SpSettings { background-position: -16px -148px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -148px; }
+.SpSignOut,
+.SpExit { background-position: -48px -148px; }
+.SpMarker { background-position: -64px -148px; }
+.SpDocuments { background-position: -80px -148px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -164px; }
+.SpInmail { background-position: -16px -164px; }
+.SpRoundBubble { background-position: -32px -164px; }
+.SpSquareBubble { background-position: -48px -164px; }
+.SpRoundBubbles { background-position: -64px -164px; }
+.SpSquareBubbles { background-position: -80px -164px; }
+.SpTag { background-position: 0 -180px; }
+.SpWrite { background-position: -16px -180px; }
+.SpLock { background-position: -32px -180px; }
+.SpRoundAlert { background-position: -48px -180px; }
+.SpTriangleAlert { background-position: -64px -180px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -180px; }
+.SpSearch { background-position: 0 -196px; }
+.SpTrash { background-position: -16px -196px; }
+.SpUser { background-position: -32px -196px; }
+.SpRefresh { background-position: -48px -196px; }
+.SpPencil { background-position: -64px -196px; }
+.SpPlus { background-position: -80px -196px; }*/
+
+.SpActivity {
+  background-position: -160px -120px;
+}
+
+.SpAllCategories {
+  background-position: -60px -140px;
+}
+
+.SpApplicants {
+  background-position: -260px -40px;
+}
+
+.SpBadge {
+  background-position: -240px -140px;
+}
+
+.SpBan {
+  background-position: -300px -20px;
+}
+
+.SpBookmarks {
+  background-position: -100px -80px;
+}
+
+.SpComments, .SpComment {
+  background-position: -160px -80px;
+}
+
+.SpConnection {
+  background-position: -320px -20px;
+}
+
+.SpDashboard {
+  background-position: -340px -20px
+}
+
+.SpDelete {
+  background-position: -340px -140px;
+}
+
+.SpDiscussions, .SpMyDiscussions {
+  background-position: -200px -80px;
+}
+
+.SpImage {
+  background-position: -120px -140px;
+}
+
+.SpInbox {
+  background-position: -80px -100px;
+}
+
+.SpMessage {
+  background-position: -100px -100px;
+}
+
+.SpMod {
+  background-position: -260px -60px;
+}
+
+.SpMyDrafts {
+  background-position: -180px -20px;
+}
+
+.SpNotifications {
+  background-position: -160px -100px;
+}
+
+.SpOptions {
+  background-position: -180px -60px;
+}
+
+.SpPhoto {
+  background-position: -160px -60px;
+}
+
+.SpProfile, .SpEditProfile {
+  background-position: -220px -40px;
+}
+
+.SpQuote {
+  background-position: -280px -20px;
+}
+
+.SpSignOut {
+  background-position: -240px -100px;
+}
+
+.SpText {
+  background-position: -160px -80px;
+}
+
+.SpUnansweredQuestions {
+  background-position: -60px -100px;
+}
+
+.SpWarn, .SpWarnings {
+  background-position: -200px -20px;
+}

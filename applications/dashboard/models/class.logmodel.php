@@ -2,7 +2,7 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -44,7 +44,7 @@ class LogModel extends Gdn_Pluggable {
             if (in_array($Log['Operation'], array('Spam', 'Moderate')) && array_key_exists($Log['RecordType'], $Models)) {
                 // Also delete the record.
                 $Model = $Models[$Log['RecordType']];
-                $Model->delete($Log['RecordID'], array('Log' => false));
+                $Model->deleteID($Log['RecordID'], array('Log' => false));
             }
         }
 

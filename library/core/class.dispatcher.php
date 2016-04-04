@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -480,6 +480,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     safeHeader("HTTP/1.1 404 Not Found");
                     $this->Request = $MatchRoute['FinalDestination'];
                     break;
+
+                case 'Drop':
+                    die();
+
                 case 'Test':
                     $Request->pathAndQuery($MatchRoute['FinalDestination']);
                     $this->Request = $Request->path(false);

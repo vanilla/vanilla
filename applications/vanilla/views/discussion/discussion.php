@@ -30,50 +30,50 @@ $this->fireEvent('BeforeDiscussionDisplay');
         <div class="Item-Header DiscussionHeader">
             <div class="AuthorWrap">
             <span class="Author">
-               <?php
-               if ($UserPhotoFirst) {
-                   echo userPhoto($Author);
-                   echo userAnchor($Author, 'Username');
-               } else {
-                   echo userAnchor($Author, 'Username');
-                   echo userPhoto($Author);
-               }
-               echo FormatMeAction($Discussion);
-               ?>
+                <?php
+                if ($UserPhotoFirst) {
+                    echo userPhoto($Author);
+                    echo userAnchor($Author, 'Username');
+                } else {
+                    echo userAnchor($Author, 'Username');
+                    echo userPhoto($Author);
+                }
+                echo formatMeAction($Discussion);
+?>
             </span>
             <span class="AuthorInfo">
-               <?php
-               echo WrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-               echo WrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
-               $this->fireEvent('AuthorInfo');
-               ?>
+                <?php
+                echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+                echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+                $this->fireEvent('AuthorInfo');
+                ?>
             </span>
             </div>
             <div class="Meta DiscussionMeta">
             <span class="MItem DateCreated">
-               <?php
-               echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
-               ?>
+                <?php
+                echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
+                ?>
             </span>
                 <?php
-                echo DateUpdated($Discussion, array('<span class="MItem">', '</span>'));
+                echo dateUpdated($Discussion, array('<span class="MItem">', '</span>'));
                 ?>
                 <?php
                 // Include source if one was set
-                if ($Source = val('Source', $Discussion))
-                    echo ' '.Wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem MItem-Source')).' ';
-
+                if ($Source = val('Source', $Discussion)) {
+                    echo ' '.wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem MItem-Source')).' ';
+                }
                 // Category
                 if (c('Vanilla.Categories.Use')) {
                     echo ' <span class="MItem Category">';
                     echo ' '.t('in').' ';
-                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), CategoryUrl($this->data('Discussion.CategoryUrlCode')));
+                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), categoryUrl($this->data('Discussion.CategoryUrlCode')));
                     echo '</span> ';
                 }
 
                 // Include IP Address if we have permission
                 if ($Session->checkPermission('Garden.PersonalInfo.View')) {
-                    echo wrap(IPAnchor($Discussion->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+                    echo wrap(ipAnchor($Discussion->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
                 }
 
                 $this->fireEvent('DiscussionInfo');
@@ -86,14 +86,14 @@ $this->fireEvent('BeforeDiscussionDisplay');
             <div class="Item-Body">
                 <div class="Message">
                     <?php
-                    echo FormatBody($Discussion);
+                    echo formatBody($Discussion);
                     ?>
                 </div>
                 <?php
                 $this->fireEvent('AfterDiscussionBody');
-                WriteReactions($Discussion);
+                writeReactions($Discussion);
                 if (val('Attachments', $Discussion)) {
-                    WriteAttachments($Discussion->Attachments);
+                    writeAttachments($Discussion->Attachments);
                 }
                 ?>
             </div>

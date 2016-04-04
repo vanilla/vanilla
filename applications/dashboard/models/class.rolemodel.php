@@ -2,7 +2,7 @@
 /**
  * A role model you can look up to.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -106,12 +106,14 @@ class RoleModel extends Gdn_Model {
 
     /**
      * Returns a resultset of all roles.
+     *
+     * @inheritdoc
      */
-    public function get() {
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
         return $this->SQL
             ->select()
             ->from('Role')
-            ->orderBy('Sort', 'asc')
+            ->orderBy($OrderFields ?: 'Sort', $OrderDirection)
             ->get();
     }
 
@@ -535,11 +537,11 @@ class RoleModel extends Gdn_Model {
     /**
      * Save role data.
      *
-     * @param array $FormPostValues
-     * @return bool|mixed
-     * @throws Exception
+     * @param array $FormPostValues The role row to save.
+     * @param array|false $Settings Not used.
+     * @return bool|mixed Returns the role ID or false on error.
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -690,32 +692,97 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where) || is_object($where)) {
+            deprecated('RoleModel->delete()', 'RoleModel->deleteandReplace()');
+
+            $result = $this->deleteAndReplace($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("RoleModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Delete a role.
      *
-     * @param string|unknown_type $RoleID
-     * @param bool|unknown_type $ReplacementRoleID
+     * @param int $roleID The ID of the role to delete.
+     * @param array $options An array of options to affect the behavior of the delete.
+     *
+     * - **newRoleID**: The new role to point users to.
+     * @return bool Returns **true** on success or **false** otherwise.
      */
-    public function delete($RoleID, $ReplacementRoleID) {
+    public function deleteID($roleID, $options = []) {
+        $result = $this->deleteAndReplace($roleID, val('newRoleID', $options));
+        return $result;
+    }
+
+    /**
+     * Delete a role.
+     *
+     * @param int $roleID The ID of the role to delete.
+     * @param int $newRoleID Assign users of the deleted role to this new role.
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    public function deleteAndReplace($roleID, $newRoleID) {
         // First update users that will be orphaned
-        if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {
+        if (is_numeric($newRoleID) && $newRoleID > 0) {
             $this->SQL
                 ->options('Ignore', true)
                 ->update('UserRole')
                 ->join('UserRole urs', 'UserRole.UserID = urs.UserID')
                 ->groupBy('urs.UserID')
                 ->having('count(urs.RoleID) =', '1', true, false)
-                ->set('UserRole.RoleID', $ReplacementRoleID)
-                ->where(array('UserRole.RoleID' => $RoleID))
+                ->set('UserRole.RoleID', $newRoleID)
+                ->where(array('UserRole.RoleID' => $roleID))
                 ->put();
         } else {
-            $this->SQL->delete('UserRole', array('RoleID' => $RoleID));
+            $this->SQL->delete('UserRole', array('RoleID' => $roleID));
         }
 
         // Remove permissions for this role.
         $PermissionModel = Gdn::permissionModel();
-        $PermissionModel->delete($RoleID);
+        $PermissionModel->delete($roleID);
 
         // Remove the role
-        $this->SQL->delete('Role', array('RoleID' => $RoleID));
+        $result = $this->SQL->delete('Role', array('RoleID' => $roleID));
+        return $result;
+    }
+
+    /**
+     * Get a list of a user's roles that are permitted to be seen.
+     * Optionally return all the role data or just one field name.
+     *
+     * @param $userID
+     * @param string $field optionally the field name from the role table to return.
+     * @return array|null|void
+     */
+    public function getPublicUserRoles($userID, $field = "Name") {
+        if (!$userID) {
+            return;
+        }
+
+        $unfilteredRoles = self::getByUserID($userID)->resultArray();
+
+        // Hide personal info roles
+        $unformattedRoles = array();
+        if (!checkPermission('Garden.PersonalInfo.View')) {
+            $unformattedRoles = array_filter($unfilteredRoles, 'self::FilterPersonalInfo');
+        } else {
+            $unformattedRoles = $unfilteredRoles;
+        }
+
+        // If an empty string is passed as the field, return all the data from gdn_role row.
+        if (!$field) {
+            return $unformattedRoles;
+        }
+
+        // If there is a return key, return an array with the field as the key
+        // and the value of the field as the value.
+        $formattedRoles = array_column($unformattedRoles, $field);
+
+        return $formattedRoles;
     }
 }

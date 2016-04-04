@@ -2,7 +2,7 @@
 /**
  * Post controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -200,7 +200,7 @@ class PostController extends VanillaController {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
             }
 
-            $Draft = $this->Form->buttonExists('Save Draft') ? true : false;
+            $Draft = $this->Form->buttonExists('Save_Draft') ? true : false;
             $Preview = $this->Form->buttonExists('Preview') ? true : false;
             if (!$Preview) {
                 if (!is_object($this->Category) && is_array($CategoryData) && isset($FormValues['CategoryID'])) {
@@ -277,14 +277,14 @@ class PostController extends VanillaController {
                 $this->fireEvent('BeforeDiscussionPreview');
 
                 if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                    $this->AddAsset('Content', $this->fetchView('preview'));
+                    $this->addAsset('Content', $this->fetchView('preview'));
                 } else {
                     $this->View = 'preview';
                 }
             }
             if ($this->Form->errorCount() > 0) {
                 // Return the form errors
-                $this->ErrorMessage($this->Form->errors());
+                $this->errorMessage($this->Form->errors());
             } elseif ($DiscussionID > 0 || $DraftID > 0) {
                 // Make sure that the ajax request form knows about the newly created discussion or draft id
                 $this->setJson('DiscussionID', $DiscussionID);
@@ -300,9 +300,9 @@ class PostController extends VanillaController {
                         $this->fireEvent('AfterDiscussionSave');
 
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                            redirect(DiscussionUrl($Discussion)).'?new=1';
+                            redirect(discussionUrl($Discussion)).'?new=1';
                         } else {
-                            $this->RedirectUrl = DiscussionUrl($Discussion, '', true).'?new=1';
+                            $this->RedirectUrl = discussionUrl($Discussion, '', true).'?new=1';
                         }
                     } else {
                         // If this was a draft save, notify the user about the save
@@ -323,7 +323,11 @@ class PostController extends VanillaController {
         } else {
             $Breadcrumbs = array();
         }
-        $Breadcrumbs[] = array('Name' => $this->data('Title'), 'Url' => '/post/discussion');
+
+        $Breadcrumbs[] = array(
+            'Name' => $this->data('Title'),
+            'Url' => val('AddUrl', val($this->data('Type'), DiscussionModel::discussionTypes()), '/post/discussion')
+        );
 
         $this->setData('Breadcrumbs', $Breadcrumbs);
 
@@ -422,7 +426,7 @@ class PostController extends VanillaController {
             $this->Form->addHidden('vanilla_url', $vanilla_url);
             $this->Form->addHidden('vanilla_category_id', $vanilla_category_id);
 
-            $PageInfo = FetchPageInfo($vanilla_url);
+            $PageInfo = fetchPageInfo($vanilla_url);
 
             if (!($Title = $this->Form->getFormValue('Name'))) {
                 $Title = val('Title', $PageInfo, '');
@@ -530,10 +534,22 @@ class PostController extends VanillaController {
             $this->Form->addError(t('Failed to find discussion for commenting.'));
         }
 
-        // Vanilla Comments save as Text, no matter the format.
-        // Kludge to set format to Text if we're Wysiwyg to preserve newlines.
-        if ($isEmbeddedComments && ($this->Form->getFormValue('Format', c('Garden.InputFormatter')) === 'Wysiwyg')) {
-            $this->Form->setFormValue('Format', 'Text');
+        /**
+         * Special care is taken for embedded comments.  Since we don't currently use an advanced editor for these
+         * comments, we may need to apply certain filters and fixes to the data to maintain its intended display
+         * with the input format (e.g. maintaining newlines).
+         */
+        if ($isEmbeddedComments) {
+            $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
+
+            switch ($inputFormatter) {
+                case 'Wysiwyg':
+                    $this->Form->setFormValue(
+                        'Body',
+                        nl2br($this->Form->getFormValue('Body'))
+                    );
+                    break;
+            }
         }
 
         $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
@@ -795,17 +811,19 @@ class PostController extends VanillaController {
         $this->fireEvent('BeforeCommentRender');
 
         if ($this->deliveryType() == DELIVERY_TYPE_DATA) {
-            $Comment = $this->data('Comments')->firstRow(DATASET_TYPE_ARRAY);
-            if ($Comment) {
-                $Photo = $Comment['InsertPhoto'];
+            if ($this->data('Comments') instanceof  Gdn_DataSet) {
+                $Comment = $this->data('Comments')->firstRow(DATASET_TYPE_ARRAY);
+                if ($Comment) {
+                    $Photo = $Comment['InsertPhoto'];
 
-                if (strpos($Photo, '//') === false) {
-                    $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
+                    if (strpos($Photo, '//') === false) {
+                        $Photo = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
+                    }
+
+                    $Comment['InsertPhoto'] = $Photo;
                 }
-
-                $Comment['InsertPhoto'] = $Photo;
+                $this->Data = array('Comment' => $Comment);
             }
-            $this->Data = array('Comment' => $Comment);
             $this->RenderData($this->Data);
         } else {
             require_once $this->fetchViewLocation('helper_functions', 'Discussion');

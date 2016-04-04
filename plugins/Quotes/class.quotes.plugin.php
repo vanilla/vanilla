@@ -3,7 +3,7 @@
  * Quotes Plugin.
  *
  *  @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Quotes
  */
@@ -12,7 +12,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.7',
+    'Version' => '1.8',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'HasLocale' => true,
@@ -358,7 +358,7 @@ BLOCKQUOTE;
      * @param $Sender
      */
     public function postController_BeforeCommentRender_handler($Sender) {
-        if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
+        if ($Sender->data('Plugin.Quotes.QuoteSource')) {
             if (sizeof($Sender->RequestArgs) < 2) {
                 return;
             }
@@ -440,6 +440,8 @@ BLOCKQUOTE;
                 }
             }
             $Data->Body = $NewBody;
+            $this->EventArguments['String'] = &$Data->Body;
+            $this->fireEvent('FilterContent');
 
             // Format the quote according to the format.
             switch ($Format) {

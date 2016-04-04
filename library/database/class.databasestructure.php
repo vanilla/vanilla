@@ -3,7 +3,7 @@
  * Database Structure tools
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -486,7 +486,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *  - <b>all</b>: All recognized types.
      */
     public function types($Class = 'all') {
-        $Date = array('datetime', 'date');
+        $Date = array('datetime', 'date', 'timestamp');
         $Decimal = array('decimal', 'numeric');
         $Float = array('float', 'double');
         $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');

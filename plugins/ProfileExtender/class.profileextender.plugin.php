@@ -3,7 +3,7 @@
  * ProfileExtender Plugin.
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package ProfileExtender
  */
@@ -70,7 +70,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add the Dashboard menu item.
      */
-    public function base_GetAppSettingsMenuItems_handler($Sender) {
+    public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Users', t('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
     }
@@ -78,8 +78,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add non-checkbox fields to registration forms.
      */
-    public function entryController_RegisterBeforePassword_handler($Sender) {
-        $ProfileFields = $this->GetProfileFields();
+    public function entryController_registerBeforePassword_handler($Sender) {
+        $ProfileFields = $this->getProfileFields();
         $Sender->RegistrationFields = array();
         foreach ($ProfileFields as $Name => $Field) {
             if (val('OnRegister', $Field) && val('FormType', $Field) != 'CheckBox') {
@@ -92,7 +92,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add checkbox fields to registration forms.
      */
-    public function entryController_RegisterFormBeforeTerms_handler($Sender) {
+    public function entryController_registerFormBeforeTerms_handler($Sender) {
         $ProfileFields = $this->getProfileFields();
         $Sender->RegistrationFields = array();
         foreach ($ProfileFields as $Name => $Field) {
@@ -189,7 +189,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      */
     private function getProfileFields() {
         $Fields = c('ProfileExtender.Fields', array());
-
         if (!is_array($Fields)) {
             $Fields = array();
         }
@@ -241,7 +240,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $this->ProfileFields = $this->getProfileFields();
 
         // Get user-specific data
-        $this->UserFields = Gdn::userModel()->GetMeta($Sender->Form->getValue('UserID'), 'Profile.%', 'Profile.');
+        $this->UserFields = Gdn::userModel()->getMeta($Sender->Form->getValue('UserID'), 'Profile.%', 'Profile.');
         // Fill in user data on form
         foreach ($this->UserFields as $Field => $Value) {
             $Sender->Form->setValue($Field, $Value);
@@ -314,10 +313,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Merge updated data into config
-            $Fields = $this->GetProfileFields();
+            $Fields = $this->getProfileFields();
             if (!$Name = val('Name', $FormPostValues)) {
                 // Make unique name from label for new fields
-                $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues));
+                $Name = $TestSlug = substr(preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues)), 0, 50);
                 $i = 1;
                 while (array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
@@ -333,7 +332,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
         } elseif (isset($Args[0])) {
             // Editing
-            $Data = $this->GetProfileField($Args[0]);
+            $Data = $this->getProfileField($Args[0]);
             if (isset($Data['Options']) && is_array($Data['Options'])) {
                 $Data['Options'] = implode("\n", $Data['Options']);
             }
@@ -498,6 +497,57 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 Gdn::userModel()->setMeta($UserID, $Fields, 'Profile.');
             }
         }
+    }
+
+
+    /**
+     * Endpoint to export basic user data along with all custom fields into CSV.
+     */
+    public function utilityController_exportProfiles_create($sender) {
+        // Clear our ability to do this.
+        $sender->permission('Garden.Settings.Manage');
+        if (Gdn::userModel()->pastUserMegaThreshold()) {
+            throw new Gdn_UserException('You have too many users to export automatically.');
+        }
+
+        // Determine profile fields we need to add.
+        $fields = $this->getProfileFields();
+        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points');
+
+        // Set up our basic query.
+        Gdn::sql()
+            ->select('u.Name')
+            ->select('u.Email')
+            ->select('u.DateInserted')
+            ->select('u.DateLastActive')
+            ->select('u.CountDiscussions')
+            ->select('u.CountComments')
+            ->select('u.Points')
+            ->from('User u')
+            ->where('u.Deleted', 0)
+            ->where('u.Admin <', 2);
+
+        $i = 0;
+        foreach ($fields as $slug => $fieldData) {
+            // Add this field to the output
+            $columnNames[] = val('Label', $fieldData, $slug);
+
+            // Add this field to the query.
+            Gdn::sql()
+                ->join('UserMeta a'.$i, "u.UserID = a$i.UserID and a$i.Name = 'Profile.$slug'", 'left')
+                ->select('a'.$i.'.Value', '', $slug);
+            $i++;
+        }
+
+        // Get our user data.
+        $users = Gdn::sql()->get()->resultArray();
+
+        // Serve a CSV of the results.
+        exportCSV($columnNames, $users);
+        die();
+
+        // Useful for query debug.
+        //$sender->render('blank');
     }
 
     /**

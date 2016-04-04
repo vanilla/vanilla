@@ -2,7 +2,7 @@
 /**
  * Discussion Sort module
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -20,9 +20,11 @@ class DiscussionSorterModule extends Gdn_Module {
     var $SortFieldSelected;
 
     public function __construct($Sender) {
+        deprecated('DiscussionSorterModule', 'DiscussionSortFilterModule', 'March 2016');
+
         parent::__construct($Sender, 'Vanilla');
 
-        $this->Visible = c('Vanilla.Discussions.UserSortField');
+        $this->Visible = false;
 
         // Default options
         $this->SortOptions = array(

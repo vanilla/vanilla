@@ -42,21 +42,12 @@
     gdn.setMeta = function(key, value) {
         gdn.meta[key] = value;
     };
-})(window, jQuery);
-
-// Stuff to fire on document.ready().
-jQuery(document).ready(function($) {
-
-    $.postParseJson = function(json) {
-        if (json.Data) json.Data = $.base64Decode(json.Data);
-        return json;
-    };
 
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
     // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
     var uTF8Encode = function(string) {
-        return unescape(encodeURIComponent(string));
+        return decodeURI(encodeURIComponent(string));
     };
 
     // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
@@ -115,6 +106,17 @@ jQuery(document).ready(function($) {
             return output;
         }
     });
+})(window, jQuery);
+
+// Stuff to fire on document.ready().
+jQuery(document).ready(function($) {
+
+	/**
+	 * @deprecated since Vanilla 2.2
+	 */
+    $.postParseJson = function(json) {
+        return json;
+    };
 
     gdn.focused = true;
     gdn.Libraries = {};
@@ -807,6 +809,9 @@ jQuery(document).ready(function($) {
             data: SendData,
             success: function(json) {
                 gdn.inform(json);
+            },
+            complete: function(jqXHR, textStatus) {
+                jQuery(document).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
             }
         });
     };
@@ -1025,7 +1030,7 @@ jQuery(document).ready(function($) {
     if (informMessageStack) {
         var informMessages;
         try {
-            informMessages = $.parseJSON($.base64Decode(informMessageStack));
+            informMessages = $.parseJSON(informMessageStack);
             informMessageStack = {'InformMessages': informMessages};
             gdn.inform(informMessageStack);
         } catch (e) {
@@ -1042,7 +1047,7 @@ jQuery(document).ready(function($) {
 
         $.ajax({
             type: "POST",
-            url: gdn.url('dashboard/notifications/inform'),
+            url: gdn.url('/notifications/inform'),
             data: {
                 'TransientKey': gdn.definition('TransientKey'),
                 'Path': gdn.definition('Path'),
@@ -1225,7 +1230,7 @@ jQuery(document).ready(function($) {
             return false;
         }
 
-        var html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' + videoid + '" frameborder="0" allowfullscreen></iframe>';
+        var html = '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + videoid + '" frameborder="0" allowfullscreen></iframe>';
         $player.html(html);
 
         $preview.hide();

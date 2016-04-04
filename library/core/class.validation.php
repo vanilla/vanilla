@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -83,7 +83,7 @@ class Gdn_Validation {
         $this->addRule('Decimal', 'function:ValidateDecimal');
         $this->addRule('String', 'function:ValidateString');
         $this->addRule('Time', 'function:ValidateTime');
-        $this->addRule('Timestamp', 'function:ValidateTimestamp');
+        $this->addRule('Timestamp', 'function:ValidateDate');
         $this->addRule('Length', 'function:ValidateLength');
         $this->addRule('Enum', 'function:ValidateEnum');
         $this->addRule('MinimumAge', 'function:ValidateMinimumAge');

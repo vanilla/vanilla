@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -350,6 +350,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $SearchPluginInfo['RealFile'] = $RealPluginFile;
             $SearchPluginInfo['RealRoot'] = dirname($RealPluginFile);
             $SearchPluginInfo['SearchPath'] = $SearchPath;
+            $SearchPluginInfo['Dir'] = "/plugins/$PluginFolderName";
+
+            $iconUrl = $SearchPluginInfo['Dir'].'/'.val('Icon', $SearchPluginInfo, 'icon.png');
+            if (file_exists(PATH_ROOT.$iconUrl)) {
+                $SearchPluginInfo['IconUrl'] = $iconUrl;
+            }
+
             $PluginInfo[$PluginFolderName] = $SearchPluginInfo;
 
             $PluginClassName = val('ClassName', $SearchPluginInfo);
@@ -570,10 +577,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return bool
      */
     public function checkPlugin($PluginName) {
-        if (array_key_exists($PluginName, $this->enabledPlugins())) {
+        if (array_key_exists(strtolower($PluginName), array_change_key_case($this->enabledPlugins(), CASE_LOWER))) {
             return true;
         }
-
         return false;
     }
 
@@ -1043,27 +1049,24 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             eval($PluginInfoString);
         }
 
-        // Define the folder name and assign the class name for the newly added item
-        if (isset(${$VariableName}) && is_array(${$VariableName})) {
-            $Item = array_pop($Trash = array_keys(${$VariableName}));
+        // Define the folder name and assign the class name for the newly added item.
+        $var = ${$VariableName};
+        if (isset($var) && is_array($var)) {
+            reset($var);
+            $name = key($var);
+            $var = current($var);
 
-            ${$VariableName}[$Item]['Index'] = $Item;
-            ${$VariableName}[$Item]['ClassName'] = $ClassName;
-            ${$VariableName}[$Item]['PluginFilePath'] = $PluginFile;
-            ${$VariableName}[$Item]['PluginRoot'] = dirname($PluginFile);
+            $var['Index'] = $name;
+            $var['ClassName'] = $ClassName;
+            $var['PluginFilePath'] = $PluginFile;
+            $var['PluginRoot'] = dirname($PluginFile);
+            touchValue('Name', $var, $name);
+            touchValue('Folder', $var, $name);
 
-            if (!array_key_exists('Name', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Name'] = $Item;
-            }
-
-            if (!array_key_exists('Folder', ${$VariableName}[$Item])) {
-                ${$VariableName}[$Item]['Folder'] = $Item;
-            }
-
-            return ${$VariableName}[$Item];
+            return $var;
         } elseif ($VariableName !== null) {
-            if (isset(${$VariableName})) {
-                return $$VariableName;
+            if (isset($var)) {
+                return $var;
             }
         }
 

@@ -9,7 +9,7 @@
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1379,7 +1379,7 @@ abstract class Gdn_SQLDriver {
     public function options($Key, $Value = null) {
         if (is_array($Key)) {
             foreach ($Key as $K => $V) {
-                $this->Options[$K] = $V;
+                $this->_Options[$K] = $V;
                 return $this;
             }
         } elseif ($Value !== null) {
@@ -1404,7 +1404,7 @@ abstract class Gdn_SQLDriver {
             return $this;
         }
 
-        if ($Direction && $Direction != 'asc') {
+        if ($Direction && strtolower($Direction) != 'asc') {
             $Direction = 'desc';
         } else {
             $Direction = 'asc';

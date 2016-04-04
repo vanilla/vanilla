@@ -2,7 +2,7 @@
 /**
  * New Discussion module
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -98,7 +98,7 @@ class NewDiscussionModule extends Gdn_Module {
         }
 
         // Grab the allowed discussion types.
-        $DiscussionTypes = CategoryModel::allowedDiscussionTypes($PermissionCategory);
+        $DiscussionTypes = CategoryModel::allowedDiscussionTypes($PermissionCategory, isset($Category) ? $Category : []);
 
         foreach ($DiscussionTypes as $Key => $Type) {
             if (isset($Type['AddPermission']) && !Gdn::session()->checkPermission($Type['AddPermission'])) {

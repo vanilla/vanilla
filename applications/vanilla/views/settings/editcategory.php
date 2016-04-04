@@ -3,7 +3,7 @@
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
 ?>
-<h1><?php echo t('Edit Category'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <ul>
     <li>
         <?php

@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -18,6 +18,9 @@ class ProfileController extends Gdn_Controller {
 
     /** @var object User data to use in building profile. */
     public $User;
+
+    /** @var bool Can the current user edit the profile user's photo? */
+    public $CanEditPhotos;
 
     /** @var string Name of current tab. */
     public $CurrentTab;
@@ -87,8 +90,17 @@ class ProfileController extends Gdn_Controller {
             $this->CssClass .= 'EditMode';
         }
 
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues with outdated session
+         * information (e.g. message button missing). The same check is performed here as in Gdn_Controller before the
+         * Cache-Control header is added, but this value includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
+
         $this->setData('Breadcrumbs', array());
-        $this->CanEditPhotos = c('Garden.Profile.EditPhotos') || Gdn::session()->checkPermission('Garden.Users.Edit');
+        $this->CanEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
     }
 
     /**
@@ -133,8 +145,10 @@ class ProfileController extends Gdn_Controller {
 
         $Activities = $this->ActivityModel->getWhere(
             array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs),
-            $Offset,
-            $Limit
+            '',
+            '',
+            $Limit,
+            $Offset
         )->resultArray();
         $this->ActivityModel->joinComments($Activities);
         $this->setData('Activities', $Activities);
@@ -168,8 +182,8 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $UserID
      */
     public function clear($UserID = '') {
-        if (empty($_POST)) { // TODO: rm global
-            throw permissionException('Javascript');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $UserID = is_numeric($UserID) ? $UserID : 0;
@@ -188,29 +202,6 @@ class ProfileController extends Gdn_Controller {
             $this->jsonTarget('#Status', '', 'Remove');
             $this->render('Blank', 'Utility');
         }
-    }
-
-    /**
-     *
-     *
-     * @param $Type
-     * @param string $UserReference
-     * @param string $Username
-     * @throws Exception
-     */
-    public function connect($Type, $UserReference = '', $Username = '') {
-        $this->permission('Garden.SignIn.Allow');
-        $this->getUserInfo($UserReference, $Username, '', true);
-
-        // Fire an event and let whatever plugin handle the connection.
-        // This will fire an event in the form ProfileController_FacebookConnect_Handler(...).
-        $Connected = false;
-        $this->EventArguments['Connected'] =& $Connected;
-
-
-        $this->fireEvent(ucfirst($Type).'Connect');
-
-
     }
 
     /**
@@ -618,7 +609,7 @@ class ProfileController extends Gdn_Controller {
         );
 
         $this->ActivityModel = new ActivityModel();
-        $Activities = $this->ActivityModel->getWhere($Where, 0, 5)->resultArray();
+        $Activities = $this->ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
         $this->setData('Activities', $Activities);
         $this->ActivityModel->markRead(Gdn::session()->UserID);
 
@@ -701,7 +692,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function picture($UserReference = '', $Username = '', $UserID = '') {
-        if (!Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true))) {
+        if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -825,8 +816,6 @@ class ProfileController extends Gdn_Controller {
      */
     public function preference($Key = false) {
         $this->permission('Garden.SignIn.Allow');
-
-        $this->Form->InputPrefix = '';
 
         if ($this->Form->authenticatedPostBack()) {
             $Data = $this->Form->formValues();
@@ -1118,7 +1107,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function thumbnail($UserReference = '', $Username = '') {
-        if (!c('Garden.Profile.EditPhotos', true)) {
+        if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -1270,10 +1259,6 @@ class ProfileController extends Gdn_Controller {
                 $TabHtml = $TabName;
             }
 
-            if (!$CssClass && $TabUrl == Gdn::request()->path()) {
-                $CssClass = 'Active';
-            }
-
             $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));
         }
 
@@ -1338,7 +1323,7 @@ class ProfileController extends Gdn_Controller {
         $Module->addItem('Options', '', false, array('class' => 'SideMenu'));
 
         // Check that we have the necessary tools to allow image uploading
-        $AllowImages = c('Garden.Profile.EditPhotos', true) && Gdn_UploadImage::canUploadImages();
+        $AllowImages = $this->CanEditPhotos && Gdn_UploadImage::canUploadImages();
 
         // Is the photo hosted remotely?
         $RemotePhoto = isUrl($this->User->Photo);

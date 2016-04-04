@@ -2,7 +2,7 @@
 /**
  * Creates and sends notifications to user.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -72,7 +72,7 @@ class NotificationsController extends Gdn_Controller {
         // If we're in the middle of a visit only get very recent notifications.
         $Where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
 
-        $Activities = $ActivityModel->getWhere($Where, 0, 5)->resultArray();
+        $Activities = $ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
 
         $ActivityIDs = array_column($Activities, 'ActivityID');
         $ActivityModel->setNotified($ActivityIDs);
@@ -90,7 +90,7 @@ class NotificationsController extends Gdn_Controller {
             } else {
                 $UserPhoto = '';
             }
-            $Excerpt = Gdn_Format::plainText($Activity['Story']);
+            $Excerpt = htmlspecialchars(Gdn_Format::plainText($Activity['Story']));
             $ActivityClass = ' Activity-'.$Activity['ActivityType'];
 
 

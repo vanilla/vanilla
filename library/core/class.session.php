@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -424,6 +424,7 @@ class Gdn_Session {
                 if ($SetIdentity) {
                     Gdn::authenticator()->setIdentity($this->UserID, $Persist);
                     Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+                    Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
                 }
 
                 $UserModel->EventArguments['User'] =& $this->User;
@@ -557,7 +558,7 @@ class Gdn_Session {
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
             $Return = ($ForceValid && Gdn::request()->isPostBack()) || ($ForeignKey === $this->_TransientKey && $this->_TransientKey !== false);
         }
-        if (!$Return) {
+        if (!$Return && $ForceValid !== true) {
             if (Gdn::session()->User) {
                 Logger::event(
                     'csrf_failure',

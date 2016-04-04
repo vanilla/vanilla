@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -161,13 +161,26 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('ActivityModel->delete(int)', 'ActivityModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("ActivityModel->delete() is not supported.", 400);
+    }
+
+    /**
      * Delete a particular activity item.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $ActivityID Unique ID of acitivity to be deleted.
+     * @param int $ActivityID The unique ID of activity to be deleted.
+     * @param array $Options Not used.
      */
-    public function delete($ActivityID, $Options = array()) {
+    public function deleteID($ActivityID, $Options = array()) {
         // Get the activity first.
         $Activity = $this->getID($ActivityID);
         if ($Activity) {
@@ -198,22 +211,51 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Get the recent activities.
+     *
+     * @param array $where
+     * @param int $limit
+     * @param int $offset
+     * @return DataSet
+     */
+    public function getWhereRecent($where, $limit = 0, $offset = 0) {
+        $result = $this->getWhere($where, '', '', $limit, $offset);
+        return $result;
+    }
+
+    /**
      * Modifies standard Gdn_Model->GetWhere to use AcitivityQuery.
      *
      * Events: AfterGet.
      *
-     * @since 2.0.0
-     * @access public
-     * @param array $Where The where condition.
-     * @param int $Offset The offset of the query.
-     * @param int $Limit the limit of the query.
+     * @param array|bool $Where A filter suitable for passing to Gdn_SQLDriver::Where().
+     * @param string $orderFields A comma delimited string to order the data.
+     * @param string $orderDirection One of **asc** or **desc**.
+     * @param int|false $Limit The database limit.
+     * @param int|false $Offset The database offset.
      * @return DataSet SQL results.
      */
-    public function getWhere($Where, $Offset = 0, $Limit = 30) {
+    public function getWhere($Where = false, $orderFields = '', $orderDirection = '', $Limit = false, $Offset = false) {
         if (is_string($Where)) {
-            $Where = array($Where => $Offset);
-            $Offset = 0;
+            deprecated('ActivityModel->getWhere($key, $value)', 'ActivityModel->getWhere([$key => $value])');
+            $Where = array($Where => $orderFields);
+            $orderFields = '';
         }
+        if (is_numeric($orderFields)) {
+            deprecated('ActivityModel->getWhere($where, $limit)');
+            $Limit = $orderFields;
+            $orderFields = '';
+        }
+        if (is_numeric($orderDirection)) {
+            deprecated('ActivityModel->getWhere($where, $limit, $offset)');
+            $Offset = $orderDirection;
+            $orderDirection = '';
+        }
+        $Limit = $Limit ?: 30;
+        $Offset = $Offset ?: 0;
+
+        $orderFields = $orderFields ?: 'a.DateUpdated';
+        $orderDirection = $orderDirection ?: 'desc';
 
         // Add the basic activity query.
         $this->SQL
@@ -234,7 +276,7 @@ class ActivityModel extends Gdn_Model {
 
         $Result = $this->SQL
             ->where($Where)
-            ->orderBy('a.DateUpdated', 'desc')
+            ->orderBy($orderFields, $orderDirection)
             ->limit($Limit, $Offset)
             ->get();
 
@@ -295,7 +337,7 @@ class ActivityModel extends Gdn_Model {
      * @param int $Limit How many to return.
      * @return DataSet SQL results.
      */
-    public function get($NotifyUserID = false, $Offset = 0, $Limit = 30) {
+    public function getByUser($NotifyUserID = false, $Offset = 0, $Limit = 30) {
         $Offset = is_numeric($Offset) ? $Offset : 0;
         if ($Offset < 0) {
             $Offset = 0;
@@ -485,13 +527,13 @@ class ActivityModel extends Gdn_Model {
     /**
      * Get a particular activity record.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $ActivityID Unique ID of activity item.
+     * @param int $activityID Unique ID of activity item.
+     * @param string $dataSetType The format of the resulting data.
+     * @param array $options Not used.
      * @return array|object A single SQL result.
      */
-    public function getID($ActivityID, $DataType = false) {
-        $Activity = parent::getID($ActivityID, $DataType);
+    public function getID($activityID, $dataSetType = false, $options = []) {
+        $Activity = parent::getID($activityID, $dataSetType);
         if ($Activity) {
             $this->calculateRow($Activity);
             $Activities = array($Activity);
@@ -827,15 +869,17 @@ class ActivityModel extends Gdn_Model {
                 $Email = new Gdn_Email();
                 $Email->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $ActivityHeadline));
                 $Email->to($User);
-                //$Email->from(Gdn::config('Garden.SupportEmail'), Gdn::config('Garden.SupportName'));
 
-                $Message = sprintf(
-                    $Story == '' ? t('EmailNotification', "%1\$s\n\n%2\$s") : t('EmailStoryNotification', "%3\$s\n\n%2\$s"),
-                    $ActivityHeadline,
-                    ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
-                    $Story
-                );
-                $Email->message($Message);
+                $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
+                $emailTemplate = $Email->getEmailTemplate()
+                    ->setButton($url, val('ActionText', $Activity, t('Check it out')))
+                    ->setTitle($ActivityHeadline);
+
+                if ($message = val('Story', $Activity)) {
+                    $emailTemplate->setMessage($message, true);
+                }
+
+                $Email->setEmailTemplate($emailTemplate);
 
                 $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
                 $this->EventArguments = $Notification;
@@ -917,19 +961,17 @@ class ActivityModel extends Gdn_Model {
         $Email->subject(sprintf(t('[%1$s] %2$s'), c('Garden.Title'), Gdn_Format::plainText($Activity['Headline'])));
         $Email->to($User);
 
-        $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
+        $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
 
-        if ($Activity['Story']) {
-            $Message = sprintf(
-                t('EmailStoryNotification', "%3\$s\n\n%2\$s"),
-                Gdn_Format::plainText($Activity['Headline']),
-                $Url,
-                Gdn_Format::plainText($Activity['Story'])
-            );
-        } else {
-            $Message = sprintf(t('EmailNotification', "%1\$s\n\n%2\$s"), Gdn_Format::plainText($Activity['Headline']), $Url);
+        $emailTemplate = $Email->getEmailTemplate()
+            ->setButton($url, val('ActionText', $Activity, t('Check it out')))
+            ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
+
+        if ($message = val('Story', $Activity)) {
+            $emailTemplate->setMessage($message, true);
         }
-        $Email->message($Message);
+
+        $Email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
         $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity);
@@ -1181,13 +1223,16 @@ class ActivityModel extends Gdn_Model {
                 $Email = new Gdn_Email();
                 $Email->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $ActivityHeadline));
                 $Email->to($User);
-                $Message = sprintf(
-                    $Story == '' ? t('EmailNotification', "%1\$s\n\n%2\$s") : t('EmailStoryNotification', "%3\$s\n\n%2\$s"),
-                    $ActivityHeadline,
-                    ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
-                    $Story
-                );
-                $Email->message($Message);
+                $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
+
+                $emailTemplate = $Email->getEmailTemplate()
+                    ->setButton($url, val('ActionText', $Activity, t('Check it out')))
+                    ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
+                if ($message = val('Story', $Activity)) {
+                    $emailTemplate->setMessage($message, true);
+                }
+                $Email->setEmailTemplate($emailTemplate);
+
                 if (!array_key_exists($User->UserID, $this->_NotificationQueue)) {
                     $this->_NotificationQueue[$User->UserID] = array();
                 }

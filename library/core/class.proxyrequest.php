@@ -116,10 +116,17 @@ class ProxyRequest {
      * @return int
      */
     public function curlHeader(&$Handler, $HeaderString) {
-        $Line = explode(':', trim($HeaderString));
+        $Line = explode(':', $HeaderString);
         $Key = trim(array_shift($Line));
         $Value = trim(implode(':', $Line));
-        if (!empty($Key)) {
+        // Prevent overwriting existing $this->ResponseHeaders[$Key] entries.
+        if (array_key_exists($Key, $this->ResponseHeaders)) {
+            if (!is_array($this->ResponseHeaders[$Key])) {
+                // Transform ResponseHeader to an array.
+                $this->ResponseHeaders[$Key] = array($this->ResponseHeaders[$Key]);
+            }
+            $this->ResponseHeaders[$Key][] = $Value;
+        } elseif (!empty($Key)) {
             $this->ResponseHeaders[$Key] = $Value;
         }
         return strlen($HeaderString);
@@ -419,7 +426,7 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_HEADER, false);
         curl_setopt($Handler, CURLINFO_HEADER_OUT, true);
         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+        curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
         curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
         curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
 
@@ -516,6 +523,12 @@ class ProxyRequest {
 
                 $this->RequestBody = $PostData;
             }
+        }
+
+        // Allow HEAD
+        if ($RequestMethod == 'HEAD') {
+            curl_setopt($Handler, CURLOPT_HEADER, true);
+            curl_setopt($Handler, CURLOPT_NOBODY, true);
         }
 
         // Any extra needed headers

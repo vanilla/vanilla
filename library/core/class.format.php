@@ -263,9 +263,7 @@ class Gdn_Format {
             $BBCodeFormatter = Gdn::factory('BBCodeFormatter');
             if (is_object($BBCodeFormatter)) {
                 $Result = $BBCodeFormatter->format($Mixed);
-                $Result = Gdn_Format::links($Result);
-                $Result = Gdn_Format::mentions($Result);
-                $Result = Emoji::instance()->translateToHtml($Result);
+                $Result = Gdn_Format::processHTML($Result);
 
                 return $Result;
             }
@@ -684,9 +682,8 @@ class Gdn_Format {
         } else {
             $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
             $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
-            $Mixed = self::mentions($Mixed);
-            $Mixed = self::links($Mixed);
-            $Mixed = Emoji::instance()->translateToHtml($Mixed);
+            $Mixed = Gdn_Format::processHTML($Mixed);
+
 
             return $Mixed;
         }
@@ -868,18 +865,14 @@ class Gdn_Format {
             if (self::isHtml($Mixed)) {
                 // Purify HTML
                 $Mixed = Gdn_Format::htmlFilter($Mixed);
-                // Links
-                $Mixed = Gdn_Format::links($Mixed);
-                // Mentions & Hashes
-                $Mixed = Gdn_Format::mentions($Mixed);
-                // Emoji
-                $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
                 // nl2br
                 if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                     $Mixed = fixNl2Br($Mixed);
                 }
+
+                $Mixed = Gdn_Format::processHTML($Mixed);
 
                 $Result = $Mixed;
 
@@ -890,13 +883,11 @@ class Gdn_Format {
                 // The text does not contain html and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
                 $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
-                $Result = Gdn_Format::mentions($Result);
-                $Result = Gdn_Format::links($Result);
-                $Result = Emoji::instance()->translateToHtml($Result);
                 if (c('Garden.Format.ReplaceNewlines', true)) {
                     $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                     $Result = fixNl2Br($Result);
                 }
+                $Result = Gdn_Format::processHTML($Result);
             }
 
             return $Result;
@@ -974,7 +965,8 @@ class Gdn_Format {
     }
 
     /**
-     * Check to see if a string has spoilers and replace them with an innocuous string.
+     * Check to see if a string has spoilers and replace them with an innocuous string. Good for displaying excerpts
+     * from discussions and without showing the spoiler text.
      *
      * @param string $html An HTML-formatted string.
      * @param string $replaceWith The translation code to replace spoilers with.
@@ -986,8 +978,42 @@ class Gdn_Format {
             if (!function_exists('str_get_html')) {
                 require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             }
-            $html = str_get_html($html);
-            $html->find('.Spoiler,.UserSpoiler', 0)->outertext = t($replaceWith);
+            $htmlDom = str_get_html($html);
+
+            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
+                $spoilerBlock->outertext = t($replaceWith);
+            }
+            $html = (string)$htmlDom;
+        }
+
+        return $html;
+    }
+
+    /**
+     * Returns spoiler text wrapped in a HTML spoiler wrapper. Parsers for NBBC and Markdown should use this function
+     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. We use javascript in
+     * spoilers.js to add markup and render Spoilers with the "Spoiler" css class name.
+     *
+     * @param string $spoilerText The inner text of the spoiler.
+     * @return string
+     */
+    public static function spoilerHtml($spoilerText) {
+        return "<div class=\"Spoiler\">{$spoilerText}</div>";
+    }
+
+    /**
+     * For backwards compatibility. In the Spoilers plugin, we would render BBCode-style spoilers in any format post
+     * and allow a title.
+     *
+     * @param string $html
+     * @return string
+     */
+    protected static function legacySpoilers($html) {
+        if (strpos($html, '[/spoiler]') !== false) {
+            $count = 0;
+            do {
+                $html = preg_replace('`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\](.*?)\[\/spoiler\]`usi', '<div class="Spoiler">$1</div>', $html, -1, $count);
+            } while ($count > 0);
         }
         return $html;
     }
@@ -1178,8 +1204,8 @@ class Gdn_Format {
             return self::to($Mixed, 'UnembedContent');
         } else {
             if (c('Garden.Format.YouTube')) {
-                $Mixed = preg_replace('`<iframe.*src="((https?)://.*youtube\.com/embed/([a-z0-9_-]*))".*</iframe>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
-                $Mixed = preg_replace('`<object.*value="((https?)://.*youtube\.com/v/([a-z0-9_-]*)[^"]*)".*</object>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
+                $Mixed = preg_replace('`<iframe.*src="https?://.*youtube\.com/embed/([a-z0-9_-]*)".*</iframe>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $Mixed);
+                $Mixed = preg_replace('`<object.*value="https?://.*youtube\.com/v/([a-z0-9_-]*)[^"]*".*</object>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $Mixed);
             }
             if (c('Garden.Format.Vimeo')) {
                 $Mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $Mixed);
@@ -1278,7 +1304,7 @@ class Gdn_Format {
                 if (empty($videoId)) {
                     // Playlist, no video.
                     $Result = <<<EOT
-   <iframe width="{$Width}" height="{$Height}" src="//www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
+   <iframe width="{$Width}" height="{$Height}" src="https://www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
 EOT;
                 } else {
                     // Video in a playlist.
@@ -1305,8 +1331,8 @@ EOT;
                 $Result = '<span class="VideoWrap">';
                 $Result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
 
-                $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$videoId.$start.'">';
-                $Result .= '<img src="//img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+                $Result .= '<span class="VideoPreview"><a href="https://www.youtube.com/watch?v='.$videoId.$start.'">';
+                $Result .= '<img src="https://img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
                 $Result .= '<span class="VideoPlayer"></span>';
                 $Result .= '</span>';
 
@@ -1530,12 +1556,25 @@ EOT;
 
                 $Mixed = $Markdown->transform($Mixed);
                 $Mixed = $Formatter->format($Mixed);
-                $Mixed = Gdn_Format::links($Mixed);
-                $Mixed = Gdn_Format::mentions($Mixed);
-                $Mixed = Emoji::instance()->translateToHtml($Mixed);
+                $Mixed = Gdn_Format::processHTML($Mixed);
                 return $Mixed;
             }
         }
+    }
+
+    /**
+     * Performs replacing operations on a HTML string. Usually for formatting posts.
+     * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
+     *
+     * @param $html An unparsed HTML string.
+     * @return string The formatted HTML string.
+     */
+    protected static function processHTML($html) {
+        $html = Gdn_Format::links($html);
+        $html = Gdn_Format::mentions($html);
+        $html = Emoji::instance()->translateToHtml($html);
+        $html = Gdn_Format::legacySpoilers($html);
+        return $html;
     }
 
     /**
@@ -1821,9 +1860,7 @@ EOT;
      */
     public static function textEx($Str) {
         $Str = self::text($Str);
-        $Str = self::links($Str);
-        $Str = self::mentions($Str);
-        $Str = Emoji::instance()->translateToHtml($Str);
+        $Str = Gdn_Format::processHTML($Str);
         return $Str;
     }
 
@@ -2102,12 +2139,7 @@ EOT;
             // HTML filter first
             $Mixed = $Formatter->format($Mixed);
             // Links
-            $Mixed = Gdn_Format::links($Mixed);
-            // Mentions & Hashes
-            $Mixed = Gdn_Format::mentions($Mixed);
-            $Mixed = Emoji::instance()->translateToHtml($Mixed);
-
-
+            $Mixed = Gdn_Format::processHTML($Mixed);
             return $Mixed;
         }
     }

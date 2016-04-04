@@ -98,7 +98,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
 			array(&$this, '_doSpoilers_callback2'), $bq);
 
-		return "\n". $this->hashBlock("<div class=\"Spoiler\">\n$bq\n</div>")."\n\n";
+		return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
 	}
 	protected function _doSpoilers_callback2($matches) {
 		$pre = $matches[1];

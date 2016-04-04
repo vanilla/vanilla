@@ -1,12 +1,12 @@
 
-// This file contains javascript that is specific to the dashboard/entry controller.
+// This file contains javascript that is specific to the /entry controller.
 jQuery(document).ready(function($) {
 
     // Check to see if the selected email is valid
     $('#Register input[name$=Email], body.register input[name$=Email]').blur(function() {
         var email = $(this).val();
         if (email != '') {
-            var checkUrl = gdn.url('/dashboard/user/emailavailable');
+            var checkUrl = gdn.url('/user/emailavailable');
             $.ajax({
                 type: "GET",
                 url: checkUrl,
@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
     $('#Register input[name$=Name], body.register input[name$=Name]').blur(function() {
         var name = $(this).val();
         if (name != '') {
-            var checkUrl = gdn.url('/dashboard/user/usernameavailable/' + encodeURIComponent(name));
+            var checkUrl = gdn.url('/user/usernameavailable/' + encodeURIComponent(name));
             $.ajax({
                 type: "GET",
                 url: checkUrl,
@@ -62,7 +62,7 @@ jQuery(document).ready(function($) {
         if (!selectedName || selectedName == 'other') {
             var name = $('#Form_ConnectName').val();
             if (typeof(name) == 'string' && name != '') {
-                var checkUrl = gdn.url('/dashboard/user/usernameavailable/' + encodeURIComponent(name));
+                var checkUrl = gdn.url('/user/usernameavailable/' + encodeURIComponent(name));
                 $.ajax({
                     type: "GET",
                     url: checkUrl,

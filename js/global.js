@@ -1047,7 +1047,7 @@ jQuery(document).ready(function($) {
 
         $.ajax({
             type: "POST",
-            url: gdn.url('dashboard/notifications/inform'),
+            url: gdn.url('/notifications/inform'),
             data: {
                 'TransientKey': gdn.definition('TransientKey'),
                 'Path': gdn.definition('Path'),
@@ -1230,7 +1230,7 @@ jQuery(document).ready(function($) {
             return false;
         }
 
-        var html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' + videoid + '" frameborder="0" allowfullscreen></iframe>';
+        var html = '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + videoid + '" frameborder="0" allowfullscreen></iframe>';
         $player.html(html);
 
         $preview.hide();

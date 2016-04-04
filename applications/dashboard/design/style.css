@@ -568,7 +568,6 @@ div.FileUpload .CurrentImage {
   border-color: #aaa;
   color: #333;
   background: #f7f7f7;
-  box-shadow: none;
 }
 
 .Button.FileInput > input {
@@ -1041,7 +1040,6 @@ body > #Frame > .Head {
   position: absolute;
   top: 4px;
   right: 4px;
-  box-shadow: none;
   padding: 0;
 }
 

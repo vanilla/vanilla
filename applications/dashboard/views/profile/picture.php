@@ -15,6 +15,7 @@ if ($this->data('crop') && $allowImages) {
         </div>
     </div>
 <?php } ?>
+<div class="DismissMessage WarningMessage"><?php echo t('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
 <div class="js-new-avatar Button" style="margin-bottom: 20px;"><?php echo t('Upload New Picture'); ?></div>
 <?php
 echo $this->Form->input('Avatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));

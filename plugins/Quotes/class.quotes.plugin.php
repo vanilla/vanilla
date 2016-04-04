@@ -440,6 +440,8 @@ BLOCKQUOTE;
                 }
             }
             $Data->Body = $NewBody;
+            $this->EventArguments['String'] = &$Data->Body;
+            $this->fireEvent('FilterContent');
 
             // Format the quote according to the format.
             switch ($Format) {

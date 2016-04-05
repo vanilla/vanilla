@@ -18,6 +18,7 @@ class Addon {
     const TYPE_LOCALE = 'locale';
     const TYPE_PLUGIN = 'plugin';
     const TYPE_THEME = 'theme';
+    const TYPE_ADDON = 'addon';
 
     /**
      * @var array The addon's info array.

@@ -346,7 +346,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
         }
 
-        $dropdown->addLinkIf($canDismiss, t('Dismiss'), url("vanilla/discussion/dismissannouncement?discussionid={$discussion->DiscussionID}"), 'dismiss', 'DismissAnnouncement Hijack')
+        $dropdown->addLinkIf($canDismiss, t('Dismiss'), url("vanilla/discussion/dismissannouncement?discussionid={$discussionID}"), 'dismiss', 'DismissAnnouncement Hijack')
             ->addLinkIf($canEdit, t('Edit').$timeLeft, url('/post/editdiscussion/'.$discussionID), 'edit')
             ->addLinkIf($canAnnounce, t('Announce'), url('/discussion/announce?discussionid='.$discussionID.'&Target='.urlencode($sender->SelfUrl.'#Head')), 'announce', 'AnnounceDiscussion Popup')
             ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), url('/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink), 'sink', 'SinkDiscussion Hijack')

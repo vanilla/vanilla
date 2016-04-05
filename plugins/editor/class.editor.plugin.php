@@ -725,6 +725,12 @@ class EditorPlugin extends Gdn_Plugin {
             ];
             $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
 
+            $this->EventArguments['CategoryID'] = Gdn::request()->post('CategoryID');
+            $this->EventArguments['TmpFilePath'] =& $tmpFilePath;
+            $this->EventArguments['FileExtension'] = $fileExtension;
+            $this->EventArguments['ValidImage'] = $validImage;
+            $this->fireEvent("BeforeSaveUploads");
+
             if (!$validImage) {
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,

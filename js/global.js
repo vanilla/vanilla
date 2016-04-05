@@ -1872,7 +1872,14 @@ jQuery(document).ready(function($) {
         }
     }());
 
-
+    // A kludge to dodge Safari's back-forward cache (bfcache).
+    if (/Apple Computer/.test(navigator.vendor) && /Safari/.test(navigator.userAgent)) {
+        jQuery(window).on("pageshow", function(event) {
+            if (event.originalEvent.persisted) {
+                window.location.reload();
+            }
+        });
+    }
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

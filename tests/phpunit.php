@@ -4,6 +4,11 @@
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
 
+define('PATH_CACHE', __DIR__.'/cache');
+if (!file_exists(PATH_CACHE)) {
+    $r = mkdir(PATH_CACHE, 0777, true);
+}
+
 // Autoload all of the classes.
 require PATH_ROOT.'/vendor/autoload.php';
 

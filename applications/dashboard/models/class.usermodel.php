@@ -3902,25 +3902,7 @@ class UserModel extends Gdn_Model {
 
         $message = '<p>'.formatString(t('Hello {User.Name}!'), $Data).' ';
 
-        switch($RegisterType) {
-            case 'Connect' :
-                $message .= formatString(t('You have successfully connected to {Title}.'), $Data).' '.
-                    t('Find your account information below.').'<br></p>'.
-                    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
-                    formatString(t('Connected With: {ProviderName}'), $Data).'</p>';
-                break;
-            case 'Register' :
-                $message .= formatString(t('You have successfully registered for an account at {Title}.'), $Data).' '.
-                    t('Find your account information below.').'<br></p>'.
-                    '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $User)).'<br>'.
-                    sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'</p>';
-                break;
-            default :
-                $message .= sprintf(t('%s has created an account for you at %s.'), val('Name', $Sender), $AppTitle).' '.
-                    t('Find your account information below.').'<br></p>'.
-                    '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $User)).'<br>'.
-                    sprintf(t('%s: %s'), t('Password'), $Password).'</p>';
-        }
+        $message .= $this->getEmailWelcome($RegisterType, $User, $Data, $Password);
 
         // Add the email confirmation key.
         if ($Data['EmailKey']) {
@@ -3937,6 +3919,56 @@ class UserModel extends Gdn_Model {
 
         $Email->setEmailTemplate($emailTemplate);
         $Email->send();
+    }
+
+    /**
+     * Resolves the welcome email format. Maintains backwards compatibility with the 'EmailWelcome*' translations
+     * for overriding.
+     *
+     * @param string $registerType The registration type. One of 'Connect', 'Register' or 'Add'.
+     * @param object|array $user The user to send the email to.
+     * @param array $data The email data.
+     * @param string $password The user's password.
+     * @return string The welcome email for the registration type.
+     */
+    protected function getEmailWelcome($registerType, $user, $data, $password = '') {
+        $appTitle = c('Garden.Title');
+
+        // Backwards compatability. See if anybody has overridden the EmailWelcome string.
+        if (($emailFormat = t('EmailWelcome'.$registerType, ''))) {
+            $welcome = formatString($emailFormat, $data);
+        } elseif (t('EmailWelcome', '')) {
+            $welcome = sprintf(
+                t('EmailWelcome'),
+                val('Name', $user),
+                val('Name', val('Sender', $data)),
+                $appTitle,
+                externalUrl('/'),
+                $password,
+                val('Email', $user)
+            );
+        } else {
+            switch ($registerType) {
+                case 'Connect' :
+                    $welcome = formatString(t('You have successfully connected to {Title}.'), $data) . ' ' .
+                        t('Find your account information below.') . '<br></p>' .
+                        '<p>' . sprintf(t('%s: %s'), t('Username'), val('Name', $user)) . '<br>' .
+                        formatString(t('Connected With: {ProviderName}'), $data) . '</p>';
+                    break;
+                case 'Register' :
+                    $welcome = formatString(t('You have successfully registered for an account at {Title}.'), $data) . ' ' .
+                        t('Find your account information below.') . '<br></p>' .
+                        '<p>' . sprintf(t('%s: %s'), t('Username'), val('Name', $user)) . '<br>' .
+                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)) . '</p>';
+                    break;
+                default :
+                    $welcome = sprintf(t('%s has created an account for you at %s.'), val('Name', val('Sender', $data)), $appTitle) . ' ' .
+                        t('Find your account information below.') . '<br></p>' .
+                        '<p>' . sprintf(t('%s: %s'), t('Email'), val('Email', $user)) . '<br>' .
+                        sprintf(t('%s: %s'), t('Password'), $password) . '</p>';
+            }
+        }
+        return $welcome;
     }
 
     /**

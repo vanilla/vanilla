@@ -11,49 +11,101 @@ namespace Vanilla;
 class AddonManager {
     /// Properties ///
 
+    /**
+     * @var string The full path to the addon cache.
+     */
     private $cacheDir;
+    /**
+     * @var array An array of addon scan directories indexed by addon type. Each type can be an array of directories.
+     */
     private $scanDirs = [];
-    private $classCache;
-    private $addonCache;
+    /**
+     * @var array The cache of addons.
+     */
+    private $multiCache;
+    /**
+     * @var array The cache of themes and locales.
+     */
     private $singleCache = [];
-
+    /**
+     * @var array The index of themes and locales.
+     */
+    private $singleIndex = [];
+    /**
+     * @var array An array of enabled addons, indexed by type/key.
+     */
     private $enabled = [];
+    /**
+     * @var bool Whether or not the enabled addons needs to be sorted.
+     */
+    private $enabledSorted = true;
+
+    /**
+     * @var array The currently enabled theme.
+     */
     private $theme;
+    /**
+     * @var array A cache of theme lookup directories starting at the current theme and working up parent themes.
+     */
     private $themeSubdirs;
+
+    /**
+     * @var array A list of autoload classes based on enabled addons.
+     */
+    private $autoloadClasses = [];
+
+    /**
+     * @var array A backup of same-named classes from the autoloader.
+     */
+    private $autoloadClassesBak = [];
 
     /// Methods ///
 
     /**
      * Initialize a new instance of the {@link AddonManager} class.
      *
-     * @param array $scanDirs An array of root-relative directories to scan indexed by **Addon::TYPE_** constant.
+     * @param array $scanDirs An array of root-relative directories to scan indexed by **Addon::TYPE_*** constant.
      * Applications and plugins are treated as the same so pass their directories as an array with the
      * **Addon::TYPE_ADDON** key.
      *
      * @param string $cacheDir The path to the cache.
      */
     public function __construct(array $scanDirs, $cacheDir) {
-        if (strpos($cacheDir, PATH_ROOT) !== 0) {
-            $cacheDir = PATH_ROOT.$cacheDir;
-        }
+        $this->setCacheDir($cacheDir);
 
         // Make sure the cache directories exist.
+        $r = true;
         if (!file_exists($cacheDir)) {
-            $r = mkdir($cacheDir, 0755, true);
-        }
-        foreach ([Addon::TYPE_LOCALE, Addon::TYPE_THEME] as $type) {
-            $dir = "$cacheDir/$type";
-            if (!file_exists($dir)) {
-                $r = mkdir($dir, 0755);
-            }
+            $r &= mkdir($cacheDir, 0755, true);
         }
 
-        $scanDirs += array_fill_keys([Addon::TYPE_ADDON, Addon::TYPE_LOCALE, Addon::TYPE_THEME], []);
-        foreach ($scanDirs as &$dir) {
-            $dir = (array)$dir;
+        $types = [Addon::TYPE_ADDON, Addon::TYPE_LOCALE, Addon::TYPE_THEME];
+        $scanDirs += array_fill_keys($types, []);
+
+        foreach ($types as $type) {
+            if ($this->typeUsesMultiCaching($type)) {
+                $dir = "$cacheDir/$type";
+                if (!file_exists($dir)) {
+                    $r &= mkdir($dir, 0755);
+                }
+            }
+
+            $this->scanDirs[$type] = (array)$scanDirs[$type];
         }
-        $this->scanDirs = $scanDirs;
-        $this->cacheDir = $cacheDir;
+
+        if (!$r) {
+            trigger_error('Could not create necessary addon cache directories.', E_USER_WARNING);
+        }
+    }
+
+    /**
+     * Test whether an addon type uses multi-caching.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constatns.
+     * @return bool Returns **true** if the addon type uses multi caching or **false** if it uses single caching.
+     */
+    private function typeUsesMultiCaching($type) {
+        return $type === Addon::TYPE_ADDON;
     }
 
     /**
@@ -62,24 +114,26 @@ class AddonManager {
      * @param string $class The name of the class to load.
      */
     public function autoload($class) {
+        $classKey = strtolower($class);
 
+        if (isset($this->autoloadClasses[$classKey])) {
+            list($path, $_) = $this->autoloadClasses[$classKey];
+            include_once $path;
+        }
     }
 
     /**
      * Lookup an {@link Addon} by its type.
      *
      * @param string $key The addon's key.
-     * @param string $type One of the **Addon::TYPE_** constants.
+     * @param string $type One of the **Addon::TYPE_*** constants.
      * @return null|Addon Returns the addon or **null** if one isn't found.
      */
     public function lookupByType($key, $type) {
-        switch ($type) {
-            case Addon::TYPE_ADDON:
-            case Addon::TYPE_APPLICATION:
-            case Addon::TYPE_THEME:
-                return $this->lookupAddon($key);
-            default:
-                return $this->lookupSingleCachedAddon($key, $type);
+        if ($this->typeUsesMultiCaching($type)) {
+            return $this->lookupAddon($key);
+        } else {
+            return $this->lookupSingleCachedAddon($key, $type);
         }
     }
 
@@ -90,11 +144,11 @@ class AddonManager {
      * @return Addon|null
      */
     public function lookupAddon($key) {
-        $this->ensureAddonCache();
+        $this->ensureMultiCache();
 
         $realKey = strtolower($key);
-        if (array_key_exists($realKey, $this->addonCache)) {
-            return $this->addonCache[$realKey];
+        if (array_key_exists($realKey, $this->multiCache)) {
+            return $this->multiCache[$realKey];
         } else {
             return null;
         }
@@ -106,17 +160,17 @@ class AddonManager {
      * This method checks if the addon cache property is initialized. If it isn't it first looks for an addon cache and
      * then scans the addon directories.
      */
-    private function ensureAddonCache() {
-        if (!isset($this->addonCache)) {
+    private function ensureMultiCache() {
+        if (!isset($this->multiCache)) {
             if (!empty($this->cacheDir)) {
                 $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
                 if (file_exists($cachePath)) {
-                    $this->addonCache = require $cachePath;
+                    $this->multiCache = require $cachePath;
                 } else {
-                    $this->addonCache = $this->scan(Addon::TYPE_ADDON, true);
+                    $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);
                 }
             } else {
-                $this->addonCache = [];
+                $this->multiCache = [];
             }
         }
     }
@@ -124,7 +178,7 @@ class AddonManager {
     /**
      * Scan the directories of all of the addons of a given type.
      *
-     * @param string $type One of the **Addon::TYPE_** constants.
+     * @param string $type One of the **Addon::TYPE_*** constants.
      * @param bool $saveCache Whether or not to save the found addons to the cache.
      * @return array Returns an array of {@link Addon} objects.
      */
@@ -137,17 +191,15 @@ class AddonManager {
         $addons = [];
 
         // Scan all of the addon directories.
-        foreach ($this->scanDirs[$type] as $subdir) {
-            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
-            foreach ($paths as $path) {
-                $addon = new Addon("$subdir/".basename($path));
-                $addons[$addon->getKey()] = $addon;
-            }
+        $addonDirs = $this->scanAddonDirs($type);
+        foreach ($addonDirs as $subdir) {
+            $addon = new Addon($subdir);
+            $addons[$addon->getKey()] = $addon;
         }
-        $this->addonCache = $addons;
+        $this->multiCache = $addons;
 
         if ($saveCache) {
-            if ($type === Addon::TYPE_ADDON) {
+            if ($this->typeUsesMultiCaching($type)) {
                 $varString = '<?php return '.var_export($addons, true).";\n";
                 static::filePutContents("{$this->cacheDir}/$type.php", $varString);
             } else {
@@ -157,9 +209,32 @@ class AddonManager {
                     $varString = '<?php return '.var_export($addon, true).";\n";
                     static::filePutContents("{$this->cacheDir}/$type/$key.php", $varString);
                 }
+                // Save a index of the addon names.
+                $indexString = '<?php return '.var_export($addonDirs, true).";\n";
+                static::filePutContents("{$this->cacheDir}/$type-index.php", $indexString);
             }
         }
         return $addons;
+    }
+
+    /**
+     * Get a list of addon directories for a given type.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return array Returns an array of root-relative addon directories.
+     */
+    private function scanAddonDirs($type) {
+        $strlen = strlen(PATH_ROOT);
+        $result = [];
+
+        foreach ($this->scanDirs[$type] as $subdir) {
+            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
+            foreach ($paths as $path) {
+                $result[basename($path)] = substr($path, $strlen);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -205,7 +280,7 @@ class AddonManager {
      * Lookup an addon that is cached on a per-addon basis.
      *
      * @param string $key The key of the addon.
-     * @param string $type One of the **Addon::TYPE_** constants.
+     * @param string $type One of the **Addon::TYPE_*** constants.
      * @return Addon|null Returns an addon object or null if one isn't found.
      */
     private function lookupSingleCachedAddon($key, $type) {
@@ -302,8 +377,8 @@ class AddonManager {
             $subdirs[$theme->getKey] = $theme->getSubdir();
 
             // Look for this theme's base theme.
-            if ($baseTheme = $theme->getInfoValue('baseTheme')) {
-                $theme = $this->lookupTheme($baseTheme);
+            if ($parentTheme = $theme->getInfoValue('parentTheme')) {
+                $theme = $this->lookupTheme($parentTheme);
             } else {
                 break;
             }
@@ -328,8 +403,12 @@ class AddonManager {
      * @return AddonManager Returns `$this` for fluent calls.
      */
     public function setTheme(Addon $theme) {
-        $this->theme = $theme;
-        $this->themeSubdirs = null;
+        if ($theme !== null) {
+            $this->startAddon($theme);
+        } elseif ($this->theme !== null) {
+            $this->stopAddon($this->theme);
+            $this->theme = null;
+        }
 
         return $this;
     }
@@ -345,6 +424,115 @@ class AddonManager {
     public function lookupTheme($key) {
         $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_THEME);
         return $result;
+    }
+
+    /**
+     * Start an addon and make it available.
+     *
+     * @param Addon $addon The addon to start.
+     */
+    public function startAddon(Addon $addon) {
+        $this->enabled[$addon->getType().'/'.$addon->getKey()] = $addon;
+        $this->enabledSorted = count($this->enabled) <= 1;
+
+        if ($addon->getType() === Addon::TYPE_THEME) {
+            if (isset($this->theme)) {
+                $this->stopAddon($this->theme);
+            }
+
+            $this->theme = $addon;
+            $this->themeSubdirs = null;
+        }
+
+        // Add the addon's classes to the autoload list.
+        foreach ($addon->getClasses() as $classKey => $row) {
+            list($class, $subpath) = $row;
+
+            if (!isset($this->autoloadClasses[$classKey])) {
+                // There is already a class registered here. Only override if higher priority.
+                if ($this->autoloadClasses[$classKey][1]->getPriority() < $addon->getPriority()) {
+                    $bak = $this->autoloadClasses[$classKey];
+                    $this->autoloadClasses[$classKey] = [$addon->path($subpath), $addon];
+                } else {
+                    $bak = [$addon->path($subpath), $addon];
+                }
+                $this->autoloadClassesBak[$classKey][] = $bak;
+            } else {
+                $this->autoloadClasses[$classKey] = [$addon->path($subpath), $addon];
+            }
+        }
+    }
+
+    /**
+     * Stop an addon and make it unavailable.
+     *
+     * @param Addon $addon The addon to stop.
+     */
+    public function stopAddon(Addon $addon) {
+        unset($this->enabled[$addon->getType().'/'.$addon->getKey()]);
+
+        // Remove all of the addon's classes from the autoloader.
+        foreach ($addon->getClasses() as $classKey => $row) {
+//            list($class, $subpath) = $row;
+            unset($this->autoloadClasses[$classKey]);
+
+            // See if there is another class that can be registered in place.
+            if (!empty($this->autoloadClassesBak[$classKey])) {
+                foreach ($this->autoloadClassesBak[$classKey] as $i => $row) {
+                    list($path, $addon) = $row;
+                    if (!isset($maxAddon) || $maxAddon->getPriority() < $addon->getPriority()) {
+                        $maxAddon = $addon;
+                        $maxIndex = $i;
+                    }
+                }
+                if (isset($maxIndex)) {
+                    $this->autoloadClasses[$classKey] = $this->autoloadClassesBak[$classKey][$maxIndex];
+                    unset($this->autoloadClassesBak[$classKey][$maxIndex]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get all of the addons of a certain type.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     */
+    public function lookupAllByType($type) {
+        if ($this->typeUsesMultiCaching($type)) {
+            $this->ensureMultiCache();
+            return $this->multiCache;
+        } else {
+            $index = $this->getSingleIndex($type);
+            foreach ($index as $key => $subdir) {
+                $caseKey = basename($subdir);
+                $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
+            }
+            return $addons;
+        }
+    }
+
+    /**
+     * Get the index for an addon type that is cached by single addon.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return array Returns the index mapping lowercase addon name to directory.
+     */
+    private function getSingleIndex($type) {
+        if (!isset($this->singleIndex[$type])) {
+            $cachePath = $this->cacheDir."/$type-index.php";
+
+            if (file_exists($cachePath)) {
+                $this->singleIndex[$type] = require $cachePath;
+            } else {
+                $addonDirs = $this->scanAddonDirs($type);
+                $indexString = '<?php return '.var_export($addonDirs, true).";\n";
+                static::filePutContents($cachePath, $indexString);
+
+                $this->singleIndex[$type] = $indexString;
+            }
+        }
+        return $this->singleIndex[$type];
     }
 
     /**
@@ -379,10 +567,15 @@ class AddonManager {
     /**
      * Set the cacheDir.
      *
-     * @param string $cacheDir
+     * @param string $cacheDir The cache directory to set. If this doesn't include **PATH_ROOT** then it will be
+     * prepended.
      * @return AddonManager Returns `$this` for fluent calls.
      */
     public function setCacheDir($cacheDir) {
+        if (strpos($cacheDir, PATH_ROOT) !== 0) {
+            $cacheDir = PATH_ROOT.$cacheDir;
+        }
+
         $this->cacheDir = $cacheDir;
         return $this;
     }

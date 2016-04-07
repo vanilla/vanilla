@@ -18,13 +18,13 @@ class Addon {
     const TYPE_LOCALE = 'locale';
     const TYPE_THEME = 'theme';
 
-    const PRIORITY_LOW = 10000;
+    const PRIORITY_LOW = 100;
     const PRIORITY_NORMAL = 1000;
-    const PRIORITY_HIGH = 100;
+    const PRIORITY_HIGH = 10000;
 
     const PRIORITY_THEME = Addon::PRIORITY_HIGH;
     const PRIORITY_PLUGIN = Addon::PRIORITY_NORMAL;
-    const PRIORITY_LOCALE = Addon::PRIORITY_LOW - 10;
+    const PRIORITY_LOCALE = Addon::PRIORITY_LOW + 10;
     const PRIORITY_APPLICATION = Addon::PRIORITY_LOW;
 
     /**
@@ -358,7 +358,7 @@ class Addon {
     /**
      * Get the type of addon.
      *
-     * @return string Returns one of the **Addon::TYPE_** constants.
+     * @return string Returns one of the **Addon::TYPE_*** constants.
      */
     public function getType() {
         return empty($this->info['type']) ? '' : $this->info['type'];
@@ -393,7 +393,11 @@ class Addon {
                         || strcasecmp(substr($className, -5), 'hooks') === 0
                     ) {
 
-                        $this->special['plugins'][] = $className;
+                        if (empty($this->special['plugin'])) {
+                            $this->special['plugin'] = $className;
+                        } else {
+                            $this->special['otherPlugins'][] = $className;
+                        }
                     }
                 }
             }
@@ -622,6 +626,11 @@ class Addon {
             }
         }
 
+        if (!empty($this->special['otherPlugins'])) {
+            $plugins = implode(', ', array_merge([$this->special['plugin']], $this->special['otherPlugins']));
+            $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
+        }
+
         if ($trigger && $count = count($issues)) {
             $subdir = $this->getSubdir();
 
@@ -653,7 +662,7 @@ class Addon {
             ->setInfo($array['info'])
             ->setClasses($array['classes'])
             ->setTranslations($array['translations'])
-            ->setSpecial(empty($array['specialFiles']) ? [] : $array['specialFiles']);
+            ->setSpecial(empty($array['special']) ? [] : $array['special']);
 
         return $addon;
     }
@@ -674,6 +683,15 @@ class Addon {
      */
     public function getInfo() {
         return $this->info;
+    }
+
+    /**
+     * Get the name of the plugin class for this addon, if any.
+     *
+     * @return string Returns the name of the class or an empty string if it doesn't have one.
+     */
+    public function getPluginClass() {
+        return isset($this->special['plugin']) ? $this->special['plugin'] : '';
     }
 
     /**

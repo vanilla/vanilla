@@ -123,14 +123,14 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         }
 
         $locale = $manager->lookupLocale('test-locale');
-        $this->assertNotNull($locale);
-        $this->assertInstanceOf('\\Vanilla\\Addon', $locale);
+        $this->assertNotEmpty($locale);
+        $this->assertTrue($locale instanceof Addon);
         $this->assertSame('test-locale', $locale->getKey());
         $this->assertSame(Addon::TYPE_LOCALE, $locale->getType());
 
         $theme = $manager->lookupTheme('test-old-theme');
-        $this->assertNotNull($theme);
-        $this->assertInstanceOf('\\Vanilla\\Addon', $theme);
+        $this->assertNotEmpty($theme);
+        $this->assertTrue($theme instanceof Addon);
         $this->assertSame('test-old-theme', $theme->getKey());
         $this->assertSame(Addon::TYPE_THEME, $theme->getType());
     }
@@ -147,7 +147,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 Addon::TYPE_THEME => '/themes',
                 Addon::TYPE_LOCALE => '/locales'
             ],
-            PATH_CACHE.'/vanilla-manager'
+            PATH_ROOT.'/tests/cache/vanilla-manager'
         );
         return $manager;
     }
@@ -166,7 +166,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 Addon::TYPE_THEME => "$root/themes",
                 Addon::TYPE_LOCALE => "$root/locales"
             ],
-            PATH_CACHE.'/test-manager'
+            PATH_ROOT.'/tests/cache/test-manager'
         );
         return $manager;
     }

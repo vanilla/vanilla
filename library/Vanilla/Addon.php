@@ -24,7 +24,7 @@ class Addon {
 
     const PRIORITY_THEME = Addon::PRIORITY_HIGH;
     const PRIORITY_PLUGIN = Addon::PRIORITY_NORMAL;
-    const PRIORITY_LOCALE = Addon::PRIORITY_LOW + 10;
+    const PRIORITY_LOCALE = 110;
     const PRIORITY_APPLICATION = Addon::PRIORITY_LOW;
 
     /**

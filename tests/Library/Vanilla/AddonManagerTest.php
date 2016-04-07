@@ -66,7 +66,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         foreach ($keys as $key => $type) {
             $addon = $tm->lookupByType($key, $type);
             $this->assertNotNull($addon);
-            $this->assertInstanceOf(Addon::class, $addon);
+            $this->assertInstanceOf('\Vanilla\Addon', $addon);
             $this->assertNotEmpty($addon->getPluginClass());
         }
     }
@@ -99,7 +99,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         require_once $addon->path($subpath);
 
         $this->assertTrue(class_exists($className, false), "The $className class is not in the $subpath file.");
-        $this->assertTrue(is_a($className, \Gdn_IPlugin::class, true), "The $className doesn't implement \Gdn_IPlugin.");
+        $this->assertTrue(is_a($className, '\Gdn_IPlugin', true), "The $className doesn't implement \Gdn_IPlugin.");
     }
 
     /**

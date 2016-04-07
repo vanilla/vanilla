@@ -2026,7 +2026,7 @@ class UserModel extends Gdn_Model {
             // Only fields that are present in the schema
             $Fields = $this->Validation->schemaValidationFields();
 
-            // Remove the primary key from the fields collection before saving
+            // Remove the primary key from the fields collection before saving.
             unset($Fields[$this->PrimaryKey]);
 
             if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
@@ -2272,8 +2272,8 @@ class UserModel extends Gdn_Model {
         $OldRoleIDs = array();
         $OldRoleData = $this->SQL
             ->select('ur.RoleID, r.Name')
-            ->from('Role r')
-            ->join('UserRole ur', 'r.RoleID = ur.RoleID')
+            ->from('UserRole ur')
+            ->join('Role r', 'r.RoleID = ur.RoleID', 'left')
             ->where('ur.UserID', $UserID)
             ->get()
             ->resultArray();
@@ -2283,9 +2283,16 @@ class UserModel extends Gdn_Model {
         }
 
         // 1a) Figure out which roles to delete.
-        $DeleteRoleIDs = array_diff($OldRoleIDs, $RoleIDs);
+        $DeleteRoleIDs = [];
+        foreach ($OldRoleData as $row) {
+            // The role should be deleted if it is an orphan or the user has not been assigned the role.
+            if ($row['Name'] === null || !in_array($row['RoleID'], $RoleIDs)) {
+                $DeleteRoleIDs[] = $row['RoleID'];
+            }
+        }
+
         // 1b) Remove old role associations for this user.
-        if (count($DeleteRoleIDs) > 0) {
+        if (!empty($DeleteRoleIDs)) {
             $this->SQL->whereIn('RoleID', $DeleteRoleIDs)->delete('UserRole', array('UserID' => $UserID));
         }
 
@@ -2300,27 +2307,20 @@ class UserModel extends Gdn_Model {
 
         $this->clearCache($UserID, array('roles', 'permissions'));
 
-        if ($RecordEvent && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
+        if ($RecordEvent) { //} && (!empty($DeleteRoleIDs) || !empty($InsertRoleIDs))) {
             $User = $this->getID($UserID);
-            $Session = Gdn::session();
 
-            $OldRoles = false;
-            if ($OldRoleData !== false) {
-                $OldRoles = array_column($OldRoleData, 'Name');
+            $OldRoles = [];
+            foreach ($DeleteRoleIDs as $deleteRoleID) {
+                $role = RoleModel::roles($deleteRoleID);
+                $OldRoles[] =  val('Name', $role, t('Unknown').' ('.$deleteRoleID.')');
             }
 
-            $NewRoles = false;
-            $NewRoleData = $this->SQL
-                ->select('r.RoleID, r.Name')
-                ->from('Role r')
-                ->join('UserRole ur', 'r.RoleID = ur.RoleID')
-                ->where('ur.UserID', $UserID)
-                ->get()
-                ->resultArray();
-            if ($NewRoleData !== false) {
-                $NewRoles = array_column($NewRoleData, 'Name');
+            $NewRoles = [];
+            foreach ($InsertRoleIDs as $insertRoleID) {
+                $role = RoleModel::roles($insertRoleID);
+                $NewRoles[] = val('Name', $role, t('Unknown').' ('.$insertRoleID.')');
             }
-
 
             $RemovedRoles = array_diff($OldRoles, $NewRoles);
             $NewRoles = array_diff($NewRoles, $OldRoles);
@@ -2330,7 +2330,7 @@ class UserModel extends Gdn_Model {
                     'role_remove',
                     Logger::INFO,
                     "{username} removed {toUsername} from the {role} role.",
-                    array('toUsername' => $User->Name, 'role' => $RoleName)
+                    array('touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName)
                 );
             }
 
@@ -2339,35 +2339,7 @@ class UserModel extends Gdn_Model {
                     'role_add',
                     Logger::INFO,
                     "{username} added {toUsername} to the {role} role.",
-                    array('toUsername' => $User->Name, 'role' => $RoleName)
-                );
-            }
-
-            $RemovedCount = count($RemovedRoles);
-            $NewCount = count($NewRoles);
-            $Story = '';
-            if ($RemovedCount > 0 && $NewCount > 0) {
-                $Story = sprintf(
-                    t('%1$s was removed from the %2$s %3$s and added to the %4$s %5$s.'),
-                    $User->Name,
-                    implode(', ', $RemovedRoles),
-                    plural($RemovedCount, 'role', 'roles'),
-                    implode(', ', $NewRoles),
-                    plural($NewCount, 'role', 'roles')
-                );
-            } elseif ($RemovedCount > 0) {
-                $Story = sprintf(
-                    t('%1$s was removed from the %2$s %3$s.'),
-                    $User->Name,
-                    implode(', ', $RemovedRoles),
-                    plural($RemovedCount, 'role', 'roles')
-                );
-            } elseif ($NewCount > 0) {
-                $Story = sprintf(
-                    t('%1$s was added to the %2$s %3$s.'),
-                    $User->Name,
-                    implode(', ', $NewRoles),
-                    plural($NewCount, 'role', 'roles')
+                    array('touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName)
                 );
             }
         }

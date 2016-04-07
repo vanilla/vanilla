@@ -183,8 +183,9 @@ class Addon {
      * @see glob()
      */
     private function glob($pattern) {
-        $fullPattern = PATH_ROOT.$this->subdir.$pattern;
-        $strlen = strlen(PATH_ROOT.$this->subdir);
+        $px = $this->path();
+        $fullPattern = $px.$pattern;
+        $strlen = strlen($px);
         $paths = glob($fullPattern, GLOB_NOSORT);
         if (!is_array($paths)) {
             return [];

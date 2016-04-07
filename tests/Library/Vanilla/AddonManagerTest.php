@@ -12,24 +12,31 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
 
     private static $broadTypes = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
 
-    private static $cachePath;
-
     /**
      * Clear the cache before doing tests.
      */
     public static function setUpBeforeClass() {
-        static::$cachePath = PATH_CACHE.'/addon-manager';
-        \Gdn_FileSystem::removeFolder(static::$cachePath);
+        $tm = static::createTestManager();
+        $r = $tm->clearCache();
+        if (!$r) {
+            throw new \Exception("Could not clear the test manager cache.");
+        }
+
+        $vm = static::createVanillaManager();
+        $r = $vm->clearCache();
+        if (!$r) {
+            throw new \Exception("Could not clear the vanilla manager cache.");
+        }
     }
 
     /**
      * Test basic addon scanning and caching.
      */
     public function testScanAndCache() {
-        $manager = $this->createAddonManager();
+        $manager = $this->createTestManager();
 
         foreach (static::$broadTypes as $type) {
-            $addons = $manager->scanAddons($type, true);
+            $addons = $manager->scan($type, true);
         }
     }
 
@@ -39,17 +46,18 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      * @depends testScanAndCache
      */
     public function testLookupCache() {
+        $managerBase = static::createTestManager();
+
         // Create a manager that doesn't have the ability to scan.
-        $manager = new AddonManager([], static::$cachePath);
+        $manager = new AddonManager([], $managerBase->getCacheDir());
 
-
-        $coreAddonKeys = ['dashboard', 'Vanilla', 'facebook'];
+        $coreAddonKeys = ['test-old-application', 'test-old-plugin'];
         foreach ($coreAddonKeys as $addonKey) {
             $addon = $manager->lookupAddon($addonKey);
             $this->assertNotNull($addon);
             $this->assertInstanceOf('\\Vanilla\\Addon', $addon);
             $this->assertSame(strtolower($addonKey), strtolower($addon->getKey()));
-            $this->assertTrue(in_array($addon->getType(), [Addon::TYPE_APPLICATION, Addon::TYPE_PLUGIN]));
+            $this->assertTrue(in_array($addon->getType(), [Addon::TYPE_ADDON]));
         }
 
         $locale = $manager->lookupLocale('test-locale');
@@ -58,21 +66,35 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('test-locale', $locale->getKey());
         $this->assertSame(Addon::TYPE_LOCALE, $locale->getType());
 
-        $theme = $manager->lookupTheme('2011Compatibility');
+        $theme = $manager->lookupTheme('test-old-theme');
         $this->assertNotNull($theme);
         $this->assertInstanceOf('\\Vanilla\\Addon', $theme);
-        $this->assertSame('2011Compatibility', $theme->getKey());
+        $this->assertSame('test-old-theme', $theme->getKey());
         $this->assertSame(Addon::TYPE_THEME, $theme->getType());
     }
 
-    private function createAddonManager() {
+    private static function createVanillaManager() {
         $manager = new AddonManager(
             [
                 Addon::TYPE_ADDON => ['/applications', '/plugins'],
                 Addon::TYPE_THEME => '/themes',
-                Addon::TYPE_LOCALE => '/tests/Library/Vanilla/fixtures/locales'
+                Addon::TYPE_LOCALE => '/locales'
             ],
-            static::$cachePath
+            PATH_CACHE.'/vanilla-manager'
+        );
+        return $manager;
+    }
+
+    private static function createTestManager() {
+        $root = '/tests/Library/Vanilla/fixtures';
+
+        $manager = new AddonManager(
+            [
+                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
+                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_LOCALE => "$root/locales"
+            ],
+            PATH_CACHE.'/test-manager'
         );
         return $manager;
     }

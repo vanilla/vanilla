@@ -20,7 +20,7 @@ class AddonManager {
     private $enabled = [];
     private $theme;
     private $themeSubdirs;
-    
+
     /// Methods ///
 
     /**
@@ -66,23 +66,6 @@ class AddonManager {
     }
 
     /**
-     * Lookup the addon with a given key.
-     *
-     * @param string $key The key of the addon.
-     * @return Addon|null
-     */
-    public function lookupAddon($key) {
-        $this->ensureAddonCache();
-
-        $realKey = strtolower($key);
-        if (array_key_exists($realKey, $this->addonCache)) {
-            return $this->addonCache[$realKey];
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Lookup an {@link Addon} by its type.
      *
      * @param string $key The addon's key.
@@ -101,6 +84,23 @@ class AddonManager {
     }
 
     /**
+     * Lookup the addon with a given key.
+     *
+     * @param string $key The key of the addon.
+     * @return Addon|null
+     */
+    public function lookupAddon($key) {
+        $this->ensureAddonCache();
+
+        $realKey = strtolower($key);
+        if (array_key_exists($realKey, $this->addonCache)) {
+            return $this->addonCache[$realKey];
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Ensure that the addon cache has all of the addons.
      *
      * This method checks if the addon cache property is initialized. If it isn't it first looks for an addon cache and
@@ -113,7 +113,7 @@ class AddonManager {
                 if (file_exists($cachePath)) {
                     $this->addonCache = require $cachePath;
                 } else {
-                    $this->addonCache = $this->scanAddons(Addon::TYPE_ADDON, true);
+                    $this->addonCache = $this->scan(Addon::TYPE_ADDON, true);
                 }
             } else {
                 $this->addonCache = [];
@@ -122,29 +122,83 @@ class AddonManager {
     }
 
     /**
-     * Lookup a locale pack based on its key.
+     * Scan the directories of all of the addons of a given type.
      *
-     * The local pack's key MUST be the same as the folder it's in.
-     *
-     * @param string $key The key of the locale pack.
-     * @return null|Addon Returns an {@link Addon} object for the locale pack or **null** if it can't be found.
+     * @param string $type One of the **Addon::TYPE_** constants.
+     * @param bool $saveCache Whether or not to save the found addons to the cache.
+     * @return array Returns an array of {@link Addon} objects.
      */
-    public function lookupLocale($key) {
-        $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_LOCALE);
-        return $result;
+    public function scan($type, $saveCache = false) {
+        if ($saveCache && empty($this->cacheDir)) {
+            throw new \InvalidArgumentException("Cannot save the addon cache when the cache directory is empty.", 500);
+        }
+
+        /* @var array[Addon] $addons */
+        $addons = [];
+
+        // Scan all of the addon directories.
+        foreach ($this->scanDirs[$type] as $subdir) {
+            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
+            foreach ($paths as $path) {
+                $addon = new Addon("$subdir/".basename($path));
+                $addons[$addon->getKey()] = $addon;
+            }
+        }
+        $this->addonCache = $addons;
+
+        if ($saveCache) {
+            if ($type === Addon::TYPE_ADDON) {
+                $varString = '<?php return '.var_export($addons, true).";\n";
+                static::filePutContents("{$this->cacheDir}/$type.php", $varString);
+            } else {
+                // Each of these addons must be cached separately.
+                foreach ($addons as $addon) {
+                    $key = $addon->getKey();
+                    $varString = '<?php return '.var_export($addon, true).";\n";
+                    static::filePutContents("{$this->cacheDir}/$type/$key.php", $varString);
+                }
+            }
+        }
+        return $addons;
     }
 
     /**
-     * Lookup a theme based on its key.
+     * A version of file_put_contents() that is multi-thread safe.
      *
-     * The theme's key MUST be the same as the folder it's in.
-     *
-     * @param string $key The key of the theme.
-     * @return null|Addon Returns an {@link Addon} object for the theme or **null** if it can't be found.
+     * @param string $filename Path to the file where to write the data.
+     * @param mixed $data The data to write. Can be either a string, an array or a stream resource.
+     * @param int $mode The permissions to set on a new file.
+     * @return boolean
+     * @category Filesystem Functions
+     * @see http://php.net/file_put_contents
      */
-    public function lookupTheme($key) {
-        $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_THEME);
-        return $result;
+    private function filePutContents($filename, $data, $mode = 0644) {
+        $temp = tempnam(dirname($filename), 'atomic');
+
+        if (!($fp = @fopen($temp, 'wb'))) {
+            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
+            if (!($fp = @fopen($temp, 'wb'))) {
+                trigger_error("file_put_contents_safe() : error writing temporary file '$temp'", E_USER_WARNING);
+                return false;
+            }
+        }
+
+        fwrite($fp, $data);
+        fclose($fp);
+
+        if (!@rename($temp, $filename)) {
+            @unlink($filename);
+            @rename($temp, $filename);
+        }
+        if (function_exists('apc_delete_file')) {
+            // This fixes a bug with some configurations of apc.
+            @apc_delete_file($filename);
+        } elseif (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($filename);
+        }
+
+        @chmod($filename, $mode);
+        return true;
     }
 
     /**
@@ -189,6 +243,19 @@ class AddonManager {
     }
 
     /**
+     * Lookup a locale pack based on its key.
+     *
+     * The local pack's key MUST be the same as the folder it's in.
+     *
+     * @param string $key The key of the locale pack.
+     * @return null|Addon Returns an {@link Addon} object for the locale pack or **null** if it can't be found.
+     */
+    public function lookupLocale($key) {
+        $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_LOCALE);
+        return $result;
+    }
+
+    /**
      * Lookup the path of an asset.
      *
      * @param string $subpath The subpath of the asset, relative an addon root.
@@ -217,47 +284,6 @@ class AddonManager {
         } else {
             return '';
         }
-    }
-
-    /**
-     * Scan the directories of all of the addons of a given type.
-     *
-     * @param string $type One of the **Addon::TYPE_** constants.
-     * @param bool $saveCache Whether or not to save the found addons to the cache.
-     * @return array Returns an array of {@link Addon} objects.
-     */
-    public function scanAddons($type, $saveCache = false) {
-        if ($saveCache && empty($this->cacheDir)) {
-            throw new \InvalidArgumentException("Cannot save the addon cache when the cache directory is empty.", 500);
-        }
-
-        /* @var array[Addon] $addons */
-        $addons = [];
-
-        // Scan all of the addon directories.
-        foreach ($this->scanDirs[$type] as $subdir) {
-            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR);
-            foreach ($paths as $path) {
-                $addon = new Addon("$subdir/".basename($path));
-                $addons[$addon->getKey()] = $addon;
-            }
-        }
-        $this->addonCache = $addons;
-
-        if ($saveCache) {
-            if ($type === Addon::TYPE_ADDON) {
-                $varString = '<?php return '.var_export($addons, true).";\n";
-                static::filePutContents("{$this->cacheDir}/$type.php", $varString);
-            } else {
-                // Each of these addons must be cached separately.
-                foreach ($addons as $addon) {
-                    $key = $addon->getKey();
-                    $varString = '<?php return '.var_export($addon, true).";\n";
-                    static::filePutContents("{$this->cacheDir}/$type/$key.php", $varString);
-                }
-            }
-        }
-        return $addons;
     }
 
     /**
@@ -309,41 +335,55 @@ class AddonManager {
     }
 
     /**
-     * A version of file_put_contents() that is multi-thread safe.
+     * Lookup a theme based on its key.
      *
-     * @param string $filename Path to the file where to write the data.
-     * @param mixed $data The data to write. Can be either a string, an array or a stream resource.
-     * @param int $mode The permissions to set on a new file.
-     * @return boolean
-     * @category Filesystem Functions
-     * @see http://php.net/file_put_contents
+     * The theme's key MUST be the same as the folder it's in.
+     *
+     * @param string $key The key of the theme.
+     * @return null|Addon Returns an {@link Addon} object for the theme or **null** if it can't be found.
      */
-    private function filePutContents($filename, $data, $mode = 0644) {
-        $temp = tempnam(dirname($filename), 'atomic');
+    public function lookupTheme($key) {
+        $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_THEME);
+        return $result;
+    }
 
-        if (!($fp = @fopen($temp, 'wb'))) {
-            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
-            if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("file_put_contents_safe() : error writing temporary file '$temp'", E_USER_WARNING);
-                return false;
-            }
+    /**
+     * Remove all of the cached files.
+     *
+     * @return bool Returns **true** if the files were removed or **false** otherwise.
+     */
+    public function clearCache() {
+        $r = true;
+
+        if (file_exists($this->cacheDir.'/addon.php')) {
+            $r = unlink($this->cacheDir.'/addon.php');
         }
 
-        fwrite($fp, $data);
-        fclose($fp);
-
-        if (!@rename($temp, $filename)) {
-            @unlink($filename);
-            @rename($temp, $filename);
-        }
-        if (function_exists('apc_delete_file')) {
-            // This fixes a bug with some configurations of apc.
-            @apc_delete_file($filename);
-        } elseif (function_exists('opcache_invalidate')) {
-            @opcache_invalidate($filename);
+        $paths = glob("{$this->cacheDir}/*/*.php", GLOB_NOSORT);
+        foreach ($paths as $path) {
+            $r &= unlink($path);
         }
 
-        @chmod($filename, $mode);
-        return true;
+        return $r;
+    }
+
+    /**
+     * Get the cacheDir.
+     *
+     * @return string Returns the cacheDir.
+     */
+    public function getCacheDir() {
+        return $this->cacheDir;
+    }
+
+    /**
+     * Set the cacheDir.
+     *
+     * @param string $cacheDir
+     * @return AddonManager Returns `$this` for fluent calls.
+     */
+    public function setCacheDir($cacheDir) {
+        $this->cacheDir = $cacheDir;
+        return $this;
     }
 }

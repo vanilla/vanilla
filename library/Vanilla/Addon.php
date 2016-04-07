@@ -14,31 +14,43 @@ use Vanilla\Utility\CamelCaseScheme;
  * Contains the information for a single addon.
  */
 class Addon {
-    const TYPE_APPLICATION = 'application';
-    const TYPE_LOCALE = 'locale';
-    const TYPE_PLUGIN = 'plugin';
-    const TYPE_THEME = 'theme';
     const TYPE_ADDON = 'addon';
+    const TYPE_LOCALE = 'locale';
+    const TYPE_THEME = 'theme';
+
+    const PRIORITY_LOW = 10000;
+    const PRIORITY_NORMAL = 1000;
+    const PRIORITY_HIGH = 100;
+
+    const PRIORITY_THEME = Addon::PRIORITY_HIGH;
+    const PRIORITY_PLUGIN = Addon::PRIORITY_NORMAL;
+    const PRIORITY_LOCALE = Addon::PRIORITY_LOW - 10;
+    const PRIORITY_APPLICATION = Addon::PRIORITY_LOW;
 
     /**
      * @var array The addon's info array.
      */
-    private $info;
+    private $info = [];
 
     /**
      * @var array An array of classes.
      */
-    private $classes;
+    private $classes = [];
 
     /**
      * @var string The root-relative directory of the addon.
      */
-    private $subdir;
+    private $subdir = '';
 
     /**
      * @var array An array of translation files indexed by locale.
      */
-    private $translations;
+    private $translations = [];
+
+    /**
+     * @var array An array of special classes and files.
+     */
+    private $special = [];
 
     /**
      * Addon constructor.
@@ -57,11 +69,10 @@ class Addon {
      * @param string $subdir The root-relative subdirectory to scan.
      */
     public function scan($subdir) {
-        $dir = PATH_ROOT.$subdir;
         $this->setSubdir($subdir);
 
         // Look for the addon info.
-        $info = $this->scanInfo($dir);
+        $info = $this->scanInfo();
         $this->setInfo($info);
 
         // Scan for classes.
@@ -72,12 +83,23 @@ class Addon {
         }
         $this->setClasses($classes);
 
+        // Scan for a structure file.
+        if ($this->getType() === static::TYPE_ADDON) {
+            if (file_exists($this->path('/settings/structure.php'))) {
+                $this->special['structure'] = '/settings/structure.php';
+            }
+
+            if (file_exists($this->path('/settings/configuration.php'))) {
+                $this->special['config'] = '/settings/configuration.php';
+            }
+        }
+
         // Scan for translations.
         $translations = $this->scanTranslations();
         $this->setTranslations($translations);
 
         // Fix issues with the plugin that can be fixed.
-        $this->check();
+        $this->check(true);
 
     }
 
@@ -95,26 +117,34 @@ class Addon {
     /**
      * Get an addon's meta info.
      *
-     * @param string $dir The full base path of the addon.
      * @return array|null Return the addon's info array or **null** if one could not be found.
      */
-    private function scanInfo($dir) {
+    private function scanInfo() {
+        $subdir = $this->getSubdir();
+        $dir = $this->path();
+
         // Look for an addon.json file.
         if (file_exists("$dir/addon.json")) {
             $info = json_decode(file_get_contents("$dir/addon.json"), true);
+
+            if (empty($info)) {
+                throw new \Exception("The addon at $subdir has an empty info array.");
+            }
             return $info;
         }
 
         // Make a list of info array paths to scan.
         $slug = strtolower(basename($dir));
 
-        $infoArrayPaths = [
-            "$dir/class.$slug.plugin.php", // plugin
-            "$dir/default.php", // old plugin
-            "$dir/settings/about.php", // application
-            "$dir/about.php", // theme
-            "$dir/definitions.php", // locale
-        ];
+        $infoArrayPaths = array_merge(
+            $this->glob('/*plugin.php'),
+            [
+                "/default.php", // old plugin
+                "/settings/about.php", // application
+                "/about.php", // theme
+                "/definitions.php", // locale
+            ]
+        );
 
         foreach ($infoArrayPaths as $path) {
             if ($info = $this->scanInfoArray($path)) {
@@ -122,16 +152,57 @@ class Addon {
             }
         }
 
+        throw new \Exception("The addon at $subdir doesn't have any info.", 500);
         return null;
+    }
+
+    /**
+     * Get the subdir.
+     *
+     * @return string Returns the subdir.
+     */
+    public function getSubdir() {
+        return $this->subdir;
+    }
+
+    /**
+     * Make a full path from an addon-relative path.
+     *
+     * @param string $subpath The subpath to base the path on, starting with a "/".
+     * @return string Returns a full path.
+     */
+    public function path($subpath = '') {
+        return PATH_ROOT.$this->subdir.$subpath;
+    }
+
+    /**
+     * Perform a glob from this addon's subdirectory.
+     *
+     * @param string $pattern The pattern to glob.
+     * @return array Returns an array of root-relative paths.
+     * @see glob()
+     */
+    private function glob($pattern) {
+        $fullPattern = PATH_ROOT.$this->subdir.$pattern;
+        $strlen = strlen(PATH_ROOT.$this->subdir);
+        $paths = glob($fullPattern, GLOB_NOSORT);
+        if (!is_array($paths)) {
+            return [];
+        }
+        foreach ($paths as &$path) {
+            $path = substr($path, $strlen);
+        }
+        return $paths;
     }
 
     /**
      * Scan an addon's info array.
      *
-     * @param string $path The path to the PHP file containing the info array.
+     * @param string $subpath The addon-relative path to the PHP file containing the info array.
      * @return array|null Returns the info array or **null** if there isn't one.
      */
-    private function scanInfoArray($path) {
+    private function scanInfoArray($subpath) {
+        $path = $this->path($subpath);
         if (!file_exists($path)) {
             return null;
         }
@@ -161,16 +232,20 @@ class Addon {
         // See which info array is defined.
         if (!empty($PluginInfo) && is_array($PluginInfo)) {
             $array = $PluginInfo;
-            $type = static::TYPE_PLUGIN;
+            $type = static::TYPE_ADDON;
+            $priority = static::PRIORITY_PLUGIN;
         } elseif (!empty($ApplicationInfo) && is_array($ApplicationInfo)) {
             $array = $ApplicationInfo;
-            $type = static::TYPE_APPLICATION;
+            $type = static::TYPE_ADDON;
+            $priority = static::PRIORITY_APPLICATION;
         } elseif (!empty($ThemeInfo) && is_array($ThemeInfo)) {
             $array = $ThemeInfo;
             $type = static::TYPE_THEME;
+            $priority = static::PRIORITY_THEME;
         } elseif (!empty($LocaleInfo) && is_array($LocaleInfo)) {
             $array = $LocaleInfo;
             $type = static::TYPE_LOCALE;
+            $priority = static::PRIORITY_LOCALE;
         } else {
             return null;
         }
@@ -184,6 +259,9 @@ class Addon {
 
         $info['key'] = $key;
         $info['type'] = $type;
+        if (empty($info['priority'])) {
+            $info['priority'] = $priority;
+        }
 
         // Convert the author.
         if (!empty($info['author'])) {
@@ -238,35 +316,6 @@ class Addon {
         }
 
         return $authors;
-    }
-
-    public function check() {
-        $issues = [];
-
-        $rawKey = $this->getKey();
-        $subdir = basename($this->getSubdir());
-
-        // Themes and locales must have a key that matches their subdirectories.
-        if ($rawKey !==  $subdir
-            && in_array($this->getType(), [static::TYPE_LOCALE, static::TYPE_THEME])) {
-
-            $issues['key-subdir-mismatch'] = "The addon key must match it's subdirectory name ($rawKey vs. $subdir).";
-        }
-
-        if (in_array($this->getType(), [static::TYPE_APPLICATION, static::TYPE_PLUGIN])) {
-            // Lowercase the keys of the other types.
-            $key = strtolower($rawKey);
-            if ($key !== $rawKey) {
-                $this->info['key'] = $key;
-                $this->info['keyRaw'] = $rawKey;
-            }
-
-            if (strcasecmp($key, basename($this->getSubdir())) !== 0) {
-                $issues['key-subdir-mismatch-case'] = "The addon key must match it's subdirectory name ($key vs. $subdir).";
-            }
-        }
-
-        return $issues;
     }
 
     /**
@@ -335,10 +384,18 @@ class Addon {
                 }
 
                 foreach ($namespaceClasses as $classRow) {
-                    $classes[strtolower($namespace.$classRow['name'])] = [$namespace.$classRow['name'], $path];
+                    $className = $namespace.$classRow['name'];
+                    $classes[strtolower($className)] = [$className, $path];
+
+                    // Check to see if the class is a plugin or a hook.
+                    if (strcasecmp(substr($className, -6), 'plugin') === 0
+                        || strcasecmp(substr($className, -5), 'hooks') === 0
+                    ) {
+
+                        $this->special['plugins'][] = $className;
+                    }
                 }
             }
-
         }
         return $classes;
     }
@@ -436,22 +493,35 @@ class Addon {
     }
 
     /**
-     * Support {@link var_export()} for caching.
-     *
-     * @param array $array The array to load.
-     * @return Addon Returns a new addon with the properties from {@link $array}.
+     * Scan the addon for translation files.
      */
-    public static function __set_state(array $array) {
-        $array += ['subdir' => '', 'info' => [], 'classes' => [], 'translations' => []];
+    private function scanTranslations() {
+        $result = [];
 
-        $addon = new Addon();
-        $addon
-            ->setSubdir($array['subdir'])
-            ->setInfo($array['info'])
-            ->setClasses($array['classes'])
-            ->setTranslations($array['translations']);
+        if ($this->getType() === static::TYPE_LOCALE) {
+            // Locale files are a little different. Their translations are in the root.
+            $locale = self::canonicalizeLocale($this->getInfoValue('locale', 'en'));
+            $result[$locale] = $this->glob('/*.php', GLOB_NOSORT);
+        } else {
+            // Look for individual locale files.
+            $localePaths = $this->glob('/locale/*.php', GLOB_NOSORT);
+            foreach ($localePaths as $localePath) {
+                $locale = self::canonicalizeLocale(basename($localePath, '.php'));
+                $result[$locale][] = $localePath;
+            }
 
-        return $addon;
+            // Look for locale files in a directory. This scan method is deprecated, but still supported.
+            $localePaths = $this->glob('/locale/*/definitions.php', GLOB_NOSORT);
+            foreach ($localePaths as $localePath) {
+                $locale = self::canonicalizeLocale(basename(dirname($localePath)));
+                $result[$locale][] = $localePath;
+
+                $properPath = "/locale/$locale.php";
+                trigger_error("Locales in $localePath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -478,19 +548,6 @@ class Addon {
         return $result;
     }
 
-    public function getKey() {
-        return empty($this->info['key']) ? '' : $this->info['key'];
-    }
-
-    /**
-     * Get the info.
-     *
-     * @return array Returns the info.
-     */
-    public function getInfo() {
-        return $this->info;
-    }
-
     /**
      * Get a single value from the info array.
      *
@@ -503,12 +560,119 @@ class Addon {
     }
 
     /**
-     * Get the subdir.
+     * Set the translations.
      *
-     * @return string Returns the subdir.
+     * @param array $translations
+     * @return Addon Returns `$this` for fluent calls.
      */
-    public function getSubdir() {
-        return $this->subdir;
+    private function setTranslations($translations) {
+        $this->translations = $translations;
+        return $this;
+    }
+
+    public function check($trigger = false) {
+        $issues = [];
+
+        $rawKey = $this->getKey();
+        $subdir = basename($this->getSubdir());
+
+        // Check for missing fields.
+        $required = ['key', 'type'];
+        foreach ($required as $fieldName) {
+            if (empty($this->info[$fieldName])) {
+                $issues["required-$fieldName"] = "The $fieldName info field is required.";
+            }
+        }
+
+        // Make sure the addon has a correct type.
+        if ($this->getType()) {
+            if (!in_array($this->getType(), [static::TYPE_ADDON, static::TYPE_THEME, static::TYPE_LOCALE])) {
+                $type = $this->getType();
+                $issues['type-invalid'] = "The addon has an invalid type ($type).";
+            } elseif (empty($this->info['priority'])) {
+                // Add a missing priority.
+                $priorities = [
+                    static::TYPE_ADDON => static::PRIORITY_NORMAL,
+                    static::TYPE_LOCALE => static::PRIORITY_LOCALE,
+                    static::TYPE_THEME => static::PRIORITY_THEME
+                ];
+                $this->info['priority'] = $priorities[$this->getType()];
+            }
+        }
+
+        // Themes and locales must have a key that matches their subdirectories.
+        if ($rawKey !== $subdir
+            && in_array($this->getType(), [static::TYPE_LOCALE, static::TYPE_THEME])
+        ) {
+
+            $issues['key-subdir-mismatch'] = "The addon key must match it's subdirectory name ($rawKey vs. $subdir).";
+        }
+
+        if ($this->getType() === static::TYPE_ADDON) {
+            // Lowercase the keys of the other types.
+            $key = strtolower($rawKey);
+            if ($key !== $rawKey) {
+                $this->info['key'] = $key;
+                $this->info['keyRaw'] = $rawKey;
+            }
+
+            if (strcasecmp($key, basename($this->getSubdir())) !== 0) {
+                $issues['key-subdir-mismatch-case'] = "The addon key must match it's subdirectory name ($key vs. $subdir).";
+            }
+        }
+
+        if ($trigger && $count = count($issues)) {
+            $subdir = $this->getSubdir();
+
+            trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
+            foreach ($issues as $issue) {
+                trigger_error($issue, E_USER_NOTICE);
+            }
+        }
+
+        return $issues;
+    }
+
+    public function getKey() {
+        return empty($this->info['key']) ? '' : $this->info['key'];
+    }
+
+    /**
+     * Support {@link var_export()} for caching.
+     *
+     * @param array $array The array to load.
+     * @return Addon Returns a new addon with the properties from {@link $array}.
+     */
+    public static function __set_state(array $array) {
+        $array += ['subdir' => '', 'info' => [], 'classes' => [], 'translations' => []];
+
+        $addon = new Addon();
+        $addon
+            ->setSubdir($array['subdir'])
+            ->setInfo($array['info'])
+            ->setClasses($array['classes'])
+            ->setTranslations($array['translations'])
+            ->setSpecial(empty($array['specialFiles']) ? [] : $array['specialFiles']);
+
+        return $addon;
+    }
+
+    /**
+     * @param array $special
+     * @return Addon
+     */
+    private function setSpecial(array $special) {
+        $this->special = $special;
+        return $this;
+    }
+
+    /**
+     * Get the info.
+     *
+     * @return array Returns the info.
+     */
+    public function getInfo() {
+        return $this->info;
     }
 
     /**
@@ -527,78 +691,5 @@ class Addon {
      */
     public function getTranslations() {
         return $this->translations;
-    }
-
-    /**
-     * Scan the addon for translation files.
-     */
-    private function scanTranslations() {
-        $result = [];
-
-        if ($this->getType() === static::TYPE_LOCALE) {
-            // Locale files are a little different. Their translations are in the root.
-            $locale = self::canonicalizeLocale($this->getInfoValue('locale', 'en'));
-            $result[$locale] = $this->glob('/*.php');
-        } else {
-            // Look for individual locale files.
-            $localePaths = $this->glob('/locale/*.php');
-            foreach ($localePaths as $localePath) {
-                $locale = self::canonicalizeLocale(basename($localePath, '.php'));
-                $result[$locale][] = $localePath;
-            }
-
-            // Look for locale files in a directory. This scan method is deprecated, but still supported.
-            $localePaths = $this->glob('/locale/*/definitions.php');
-            foreach ($localePaths as $localePath) {
-                $locale = self::canonicalizeLocale(basename(dirname($localePath)));
-                $result[$locale][] = $localePath;
-
-                $properPath = "/locale/$locale.php";
-                trigger_error("Locales in $localePath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Perform a glob from this addon's subdirectory.
-     *
-     * @param string $pattern The pattern to glob.
-     * @return array Returns an array of root-relative paths.
-     * @see glob()
-     */
-    private function glob($pattern) {
-        $fullPattern = PATH_ROOT.$this->subdir.$pattern;
-        $strlen = strlen(PATH_ROOT.$this->subdir);
-        $paths = glob($fullPattern);
-        if (!is_array($paths)) {
-            return [];
-        }
-        foreach ($paths as &$path) {
-            $path = substr($path, $strlen);
-        }
-        return $paths;
-    }
-
-    /**
-     * Make a full path from an addon-relative path.
-     *
-     * @param string $subpath The subpath to base the path on, starting with a "/".
-     * @return string Returns a full path.
-     */
-    public function path($subpath) {
-        return PATH_ROOT.$this->subdir.$subpath;
-    }
-
-    /**
-     * Set the translations.
-     *
-     * @param array $translations
-     * @return Addon Returns `$this` for fluent calls.
-     */
-    private function setTranslations($translations) {
-        $this->translations = $translations;
-        return $this;
     }
 }

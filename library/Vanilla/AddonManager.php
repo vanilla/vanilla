@@ -83,7 +83,7 @@ class AddonManager {
         $scanDirs += array_fill_keys($types, []);
 
         foreach ($types as $type) {
-            if ($this->typeUsesMultiCaching($type)) {
+            if (!$this->typeUsesMultiCaching($type)) {
                 $dir = "$cacheDir/$type";
                 if (!file_exists($dir)) {
                     $r &= mkdir($dir, 0755);
@@ -314,7 +314,7 @@ class AddonManager {
             static::filePutContents($cachePath, $addonString);
         }
         $this->singleCache[$type][$key] = $addon;
-        return $addon;
+        return $addon === false ? null : $addon;
     }
 
     /**
@@ -504,6 +504,7 @@ class AddonManager {
             return $this->multiCache;
         } else {
             $index = $this->getSingleIndex($type);
+            $addons = [];
             foreach ($index as $key => $subdir) {
                 $caseKey = basename($subdir);
                 $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
@@ -543,11 +544,10 @@ class AddonManager {
     public function clearCache() {
         $r = true;
 
-        if (file_exists($this->cacheDir.'/addon.php')) {
-            $r = unlink($this->cacheDir.'/addon.php');
-        }
-
-        $paths = glob("{$this->cacheDir}/*/*.php", GLOB_NOSORT);
+        $paths = array_merge(
+            glob("{$this->cacheDir}/*.php", GLOB_NOSORT),
+            glob("{$this->cacheDir}/*/*.php", GLOB_NOSORT)
+        );
         foreach ($paths as $path) {
             $r &= unlink($path);
         }

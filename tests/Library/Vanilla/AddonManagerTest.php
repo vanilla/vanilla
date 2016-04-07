@@ -136,6 +136,28 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test that addon directories with no addons works okay.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @dataProvider provideAddonTypes
+     */
+    public function testEmptyScans($type) {
+        $root = '/tests/fixtures';
+        $em = new AddonManager(
+            [
+                Addon::TYPE_ADDON => "$root/empty",
+                Addon::TYPE_THEME => "$root/empty",
+                Addon::TYPE_LOCALE => "$root/empty"
+            ],
+            PATH_ROOT.'/tests/cache/empty-manager'
+        );
+
+        $addons = $em->lookupAllByType($type);
+        $this->assertTrue(is_array($addons));
+        $this->assertEmpty($addons);
+    }
+
+    /**
      * Creates an {@link AddonManager} against Vanilla.
      *
      * @return AddonManager Returns the manager.
@@ -186,6 +208,19 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 /* @var Addon $addon */
                 $result[$addon->getSubdir()] = [$addon];
             }
+        }
+        return $result;
+    }
+
+    /**
+     * Provide the addon types for tests that rely on them.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideAddonTypes() {
+        $result = [];
+        foreach (static::$types as $type) {
+            $result[$type] = [$type];
         }
         return $result;
     }

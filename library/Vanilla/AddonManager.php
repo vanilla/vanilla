@@ -41,7 +41,7 @@ class AddonManager {
     private $enabledSorted = true;
 
     /**
-     * @var array The currently enabled theme.
+     * @var Addon The currently enabled theme.
      */
     private $theme;
     /**
@@ -342,7 +342,6 @@ class AddonManager {
         $subpath = '/'.ltrim($subpath, '\\/');
 
         // First lookup the asset on the theme.
-        $themes = $this->themeSubdirs();
         foreach ($this->themeSubdirs() as $subdir) {
             if (file_exists(PATH_ROOT.$subdir.$subpath)) {
                 return $subdir.$subpath;
@@ -374,7 +373,7 @@ class AddonManager {
             if (array_key_exists($theme->getKey(), $subdirs)) {
                 break;
             }
-            $subdirs[$theme->getKey] = $theme->getSubdir();
+            $subdirs[$theme->getKey()] = $theme->getSubdir();
 
             // Look for this theme's base theme.
             if ($parentTheme = $theme->getInfoValue('parentTheme')) {
@@ -446,7 +445,7 @@ class AddonManager {
 
         // Add the addon's classes to the autoload list.
         foreach ($addon->getClasses() as $classKey => $row) {
-            list($class, $subpath) = $row;
+            list($_, $subpath) = $row;
 
             if (!isset($this->autoloadClasses[$classKey])) {
                 // There is already a class registered here. Only override if higher priority.

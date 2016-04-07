@@ -134,8 +134,6 @@ class Addon {
         }
 
         // Make a list of info array paths to scan.
-        $slug = strtolower(basename($dir));
-
         $infoArrayPaths = array_merge(
             $this->glob('/*plugin.php'),
             [
@@ -153,7 +151,6 @@ class Addon {
         }
 
         throw new \Exception("The addon at $subdir doesn't have any info.", 500);
-        return null;
     }
 
     /**
@@ -506,17 +503,17 @@ class Addon {
         if ($this->getType() === static::TYPE_LOCALE) {
             // Locale files are a little different. Their translations are in the root.
             $locale = self::canonicalizeLocale($this->getInfoValue('locale', 'en'));
-            $result[$locale] = $this->glob('/*.php', GLOB_NOSORT);
+            $result[$locale] = $this->glob('/*.php');
         } else {
             // Look for individual locale files.
-            $localePaths = $this->glob('/locale/*.php', GLOB_NOSORT);
+            $localePaths = $this->glob('/locale/*.php');
             foreach ($localePaths as $localePath) {
                 $locale = self::canonicalizeLocale(basename($localePath, '.php'));
                 $result[$locale][] = $localePath;
             }
 
             // Look for locale files in a directory. This scan method is deprecated, but still supported.
-            $localePaths = $this->glob('/locale/*/definitions.php', GLOB_NOSORT);
+            $localePaths = $this->glob('/locale/*/definitions.php');
             foreach ($localePaths as $localePath) {
                 $locale = self::canonicalizeLocale(basename(dirname($localePath)));
                 $result[$locale][] = $localePath;
@@ -575,6 +572,12 @@ class Addon {
         return $this;
     }
 
+    /**
+     * Check the addon for data issues.
+     *
+     * @param bool $trigger Whether or not to trigger a notice if there are issues.
+     * @return array Returns an array of issues with the addon.
+     */
     public function check($trigger = false) {
         $issues = [];
 
@@ -643,6 +646,11 @@ class Addon {
         return $issues;
     }
 
+    /**
+     * Get this addon's key.
+     *
+     * @return string Returns the key as a string.
+     */
     public function getKey() {
         return empty($this->info['key']) ? '' : $this->info['key'];
     }
@@ -668,8 +676,10 @@ class Addon {
     }
 
     /**
-     * @param array $special
-     * @return Addon
+     * Set the special array.
+     *
+     * @param array $special The new special array.
+     * @return Addon Returns $this for fluent calls.
      */
     private function setSpecial(array $special) {
         $this->special = $special;
@@ -692,6 +702,18 @@ class Addon {
      */
     public function getPluginClass() {
         return isset($this->special['plugin']) ? $this->special['plugin'] : '';
+    }
+
+    /**
+     * Get the priority of this addon.
+     *
+     * An addon's priority determines the order of things like translations, autoloading, and event firing.
+     * Addons with higher priorities will generally override addons with lower priority.
+     *
+     * @return int Returns the priority.
+     */
+    public function getPriority() {
+        return (int)$this->getInfoValue('priority', Addon::PRIORITY_NORMAL);
     }
 
     /**

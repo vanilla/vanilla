@@ -16,17 +16,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      * Clear the cache before doing tests.
      */
     public static function setUpBeforeClass() {
-        $tm = static::createTestManager();
-        $r = $tm->clearCache();
-        if (!$r) {
-            throw new \Exception("Could not clear the test manager cache.");
-        }
-
-        $vm = static::createVanillaManager();
-        $r = $vm->clearCache();
-        if (!$r) {
-            throw new \Exception("Could not clear the vanilla manager cache.");
-        }
+        \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache/am');
     }
 
     /**
@@ -142,6 +132,32 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideAddonTypes
      */
     public function testEmptyScans($type) {
+        $em = static::createEmptyManager();
+
+        $addons = $em->lookupAllByType($type);
+        $this->assertTrue(is_array($addons));
+        $this->assertEmpty($addons);
+
+        $em2 = new AddonManager([], $em->getCacheDir());
+        $addons2 = $em2->lookupAllByType($type);
+        $this->assertTrue(is_array($addons2));
+        $this->assertEmpty($addons2);
+    }
+
+    /**
+     * Test that addon directories with no addons works okay.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @dataProvider provideAddonTypes
+     */
+    public function testNoScans($type) {
+        $em = new AddonManager([], PATH_ROOT.'/tests/cache/am/no-scans');
+        $addons = $em->lookupAllByType($type);
+        $this->assertTrue(is_array($addons));
+        $this->assertEmpty($addons);
+    }
+
+    private static function createEmptyManager() {
         $root = '/tests/fixtures';
         $em = new AddonManager(
             [
@@ -149,12 +165,10 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 Addon::TYPE_THEME => "$root/empty",
                 Addon::TYPE_LOCALE => "$root/empty"
             ],
-            PATH_ROOT.'/tests/cache/empty-manager'
+            PATH_ROOT.'/tests/cache/am/empty-manager'
         );
 
-        $addons = $em->lookupAllByType($type);
-        $this->assertTrue(is_array($addons));
-        $this->assertEmpty($addons);
+        return $em;
     }
 
     /**
@@ -169,7 +183,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 Addon::TYPE_THEME => '/themes',
                 Addon::TYPE_LOCALE => '/locales'
             ],
-            PATH_ROOT.'/tests/cache/vanilla-manager'
+            PATH_ROOT.'/tests/cache/am/vanilla-manager'
         );
         return $manager;
     }
@@ -188,7 +202,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 Addon::TYPE_THEME => "$root/themes",
                 Addon::TYPE_LOCALE => "$root/locales"
             ],
-            PATH_ROOT.'/tests/cache/test-manager'
+            PATH_ROOT.'/tests/cache/am/test-manager'
         );
         return $manager;
     }

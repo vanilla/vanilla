@@ -530,7 +530,7 @@ class AddonManager {
                 $indexString = '<?php return '.var_export($addonDirs, true).";\n";
                 static::filePutContents($cachePath, $indexString);
 
-                $this->singleIndex[$type] = $indexString;
+                $this->singleIndex[$type] = $addonDirs;
             }
         }
         return $this->singleIndex[$type];

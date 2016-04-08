@@ -630,20 +630,21 @@ class AddonManager {
     }
 
     /**
-     * Get the translations for the enabled addons.
+     * Get the paths to the current translation files.
      *
-     * @param string $locale The locale to get the translations for.
+     * @param string $locale The locale to get the translation paths for.
+     * @return array Returns an array of paths.
      */
-    public function getEnabledTranslations($locale) {
+    public function getEnabledTranslationSources($locale) {
         $addons = array_reverse($this->getEnabled(), true);
 
-        $Definition = [];
+        $result = [];
         foreach ($addons as $addon) {
             /* @var Addon $addon */
-            foreach ($addon->getTranslations() as $path) {
-                include $addon->path($path);
+            foreach ($addon->getTranslations($locale) as $path) {
+                $result[] = $addon->path($path);
             }
         }
-        return $Definition;
+        return $result;
     }
 }

@@ -8,6 +8,7 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\AddonManager;
 
 /**
  * The Locale class is used to load, define, change, and render translations
@@ -26,6 +27,11 @@ class Gdn_Locale extends Gdn_Pluggable {
 
     /** @var Gdn_Configuration Core translations, and untranslated codes. */
     public $DeveloperContainer = null;
+
+    /**
+     * @var AddonManager
+     */
+    private $addonManager = null;
 
     /** @var array  */
     public static $SetLocales = array(
@@ -87,11 +93,15 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @param $PluginWhiteList
      * @param bool $ForceRemapping
      */
-    public function __construct($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = false) {
+    public function __construct($LocaleName, $addonManager = null) {
         parent::__construct();
-        $this->ClassName = 'Gdn_Locale';
+        $this->ClassName = __CLASS__;
 
-        $this->set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+        if ($addonManager instanceof AddonManager) {
+            $this->addonManager = $addonManager;
+        }
+
+        $this->set($LocaleName);
     }
 
     /**
@@ -124,17 +134,11 @@ class Gdn_Locale extends Gdn_Pluggable {
     }
 
     /**
-     * Reload the locale system.
+     * Reload the locale and its translations.
      */
     public function refresh() {
-        $LocalName = $this->current();
-
-        $ApplicationWhiteList = Gdn::applicationManager()->enabledApplicationFolders();
-        $PluginWhiteList = Gdn::pluginManager()->enabledPluginFolders();
-
-        $ForceRemapping = true;
-
-        $this->set($LocalName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+        $locale = $this->current();
+        $this->set($locale);
     }
 
     /**
@@ -151,27 +155,25 @@ class Gdn_Locale extends Gdn_Pluggable {
     /**
      * Defines and loads the locale.
      *
-     * @param string $LocaleName The name of the locale to load. Locale definitions are kept in each
-     * application's locale folder. For example:
-     *  /dashboard/locale/$LocaleName.php
-     *  /vanilla/locale/$LocaleName.php
-     * @param array $ApplicationWhiteList An array of application folders that are safe to examine for locale
-     *  definitions.
-     * @param array $PluginWhiteList An array of plugin folders that are safe to examine for locale
-     *  definitions.
-     * @param bool $ForceRemapping For speed purposes, the application folders are crawled for locale
-     *  sources. Once sources are found, they are saved in the
-     *  cache/locale_mapppings.php file. If ForceRemapping is true, this file will
-     *  be ignored and the folders will be recrawled and the mapping file will be
-     *  re-generated. You can also simply delete the file and it will
-     *  automatically force a remapping.
+     * Locale definitions are kept in each addon's locale folder. For example:
+     *
+     * ```
+     * /dashboard/locale/$LocaleName.php
+     * /vanilla/locale/$LocaleName.php
+     * ```
+     *
+     * @param string $LocaleName The name of the locale to load.
      */
-    public function set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = false) {
+    public function set($LocaleName) {
         $CurrentLocale = self::canonicalize($LocaleName);
 
         // Get locale sources
         $this->Locale = $CurrentLocale;
-        $LocaleSources = $this->getLocaleSources($CurrentLocale, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+        if ($this->addonManager !== null) {
+            $LocaleSources = $this->addonManager->getEnabledTranslationSources($CurrentLocale);
+        } else {
+            $LocaleSources = [];
+        }
 
         $Codeset = c('Garden.LocaleCodeset', 'UTF8');
 
@@ -201,10 +203,9 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->unload();
 
         $ConfLocaleOverride = PATH_CONF.'/locale.php';
-        $Count = count($LocaleSources);
-        for ($i = 0; $i < $Count; ++$i) {
-            if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) { // Don't double include the conf override file... and make sure it comes last
-                $this->load($LocaleSources[$i], false);
+        foreach ($LocaleSources as $localeSource) {
+            if ($ConfLocaleOverride != $localeSource && file_exists($localeSource)) { // Don't double include the conf override file... and make sure it comes last
+                $this->load($localeSource, false);
             }
         }
 

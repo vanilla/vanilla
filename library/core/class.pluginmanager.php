@@ -1228,7 +1228,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $PluginClassName = GetValue('ClassName', $PluginInfo);
         $this->registerPlugin($PluginClassName);
 
-        Gdn::locale()->set(Gdn::locale()->current(), Gdn::applicationManager()->enabledApplicationFolders(), $this->enabledPluginFolders(), true);
+        // Refresh the locale just in case there are some translations needed this request.
+        Gdn::locale()->refresh();
 
         $this->EventArguments['AddonName'] = $PluginName;
         $this->fireEvent('AddonEnabled');

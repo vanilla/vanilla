@@ -140,7 +140,7 @@ Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 // Start all of the addons.
 Gdn::addonManager()->startAddonsByKey([c('Garden.Theme')], Addon::TYPE_THEME);
 Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
-Gdn::addonManager()->startAddonsByKey(c('EnabledLocales'), Addon::TYPE_LOCALE);
+Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
 
 // Load the configurations for enabled Applications.
@@ -251,7 +251,7 @@ Gdn::pluginManager()->start();
  */
 
 // Load the Garden locale system
-$gdnLocale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
+$gdnLocale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::addonManager());
 Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $gdnLocale);
 unset($gdnLocale);
 

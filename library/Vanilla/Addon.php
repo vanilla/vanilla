@@ -748,11 +748,16 @@ class Addon {
     }
 
     /**
-     * Get the translations.
+     * Get translation paths.
      *
-     * @return array Returns the translations.
+     * @param string $locale If passed then only the translation paths for this locale will be returned.
+     * @return array Returns an array of translation paths or an array of locale codes pointing to translation paths.
      */
-    public function getTranslations() {
-        return $this->translations;
+    public function getTranslations($locale = '') {
+        if (empty($locale)) {
+            return $this->translations;
+        } else {
+            return isset($this->translations[$locale]) ? $this->translations[$locale] : [];
+        }
     }
 }

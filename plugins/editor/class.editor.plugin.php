@@ -730,7 +730,7 @@ class EditorPlugin extends Gdn_Plugin {
             $this->EventArguments['FileExtension'] = $fileExtension;
             $this->EventArguments['ValidImage'] = $validImage;
             $this->EventArguments['AbsoluteFileDestination'] =& $absoluteFileDestination;
-            $this->EventArguments['DiscussionID'] =& $discussionID;
+            $this->EventArguments['DiscussionID'] = $discussionID;
             $this->fireEvent('BeforeSaveUploads');
 
             if (!$validImage) {

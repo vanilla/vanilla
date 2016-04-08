@@ -93,6 +93,17 @@ Gdn::request()->fromEnvironment();
 setHandlers();
 
 /**
+ * Installer Redirect
+ *
+ * If Garden is not yet installed, force the request to /dashboard/setup and
+ * begin installation.
+ */
+if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
+    safeHeader('Location: '.Gdn::request()->url('dashboard/setup', true));
+    exit();
+}
+
+/**
  * Extension Managers
  *
  * Now load the Application, Theme and Plugin managers into the Factory, and
@@ -112,17 +123,6 @@ Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 // Load the configurations for enabled Applications.
 foreach (Gdn::applicationManager()->enabledApplicationFolders() as $applicationName => $applicationFolder) {
     Gdn::config()->load(PATH_APPLICATIONS."/{$applicationFolder}/settings/configuration.php");
-}
-
-/**
- * Installer Redirect
- *
- * If Garden is not yet installed, force the request to /dashboard/setup and
- * begin installation.
- */
-if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
-    safeHeader('Location: '.Gdn::request()->url('dashboard/setup', true));
-    exit();
 }
 
 // Re-apply loaded user settings.

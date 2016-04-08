@@ -461,6 +461,8 @@ class Addon {
                 }
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_INTERFACE && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
                 $classes[$ii][] = array('name' => $token[1], 'type' => 'INTERFACE');
+            } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_TRAIT && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
+                $classes[$ii][] = array('name' => $token[1], 'type' => 'TRAIT');
             }
         }
         error_reporting($er);

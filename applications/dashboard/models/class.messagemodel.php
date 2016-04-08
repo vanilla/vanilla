@@ -142,7 +142,7 @@ class MessageModel extends Gdn_Model {
         }
 
         $category = null;
-        if ($CategoryID !== null) {
+        if (!empty($CategoryID)) {
             $categoryModel = new CategoryModel();
             $category = $categoryModel->getID($CategoryID, DATASET_TYPE_ARRAY);
         }
@@ -173,7 +173,9 @@ class MessageModel extends Gdn_Model {
                 }
 
                 $Visible = $Visible && self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
-                $Visible = $Visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+                if ($category !== null) {
+                    $Visible = $Visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+                }
 
                 if ($Visible) {
                     $Result[] = $Message;
@@ -200,9 +202,10 @@ class MessageModel extends Gdn_Model {
             ->get()->resultArray();
 
         $Result = array_filter($Result, function ($Message) use ($Session, $category) {
-            $isInCategory = MessageModel::inCategory(val('CategoryID', $category, null), val('CategoryID', $Message), val('IncludeSubcategories', $Message));
-            $visible = $isInCategory && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
-
+            $visible = MessageModel::inCategory(val('CategoryID', $category, null), val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+            if ($category !== null) {
+                $visible = $visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+            }
             return $visible;
         });
 

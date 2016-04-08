@@ -447,7 +447,7 @@ class AddonManager {
         foreach ($addon->getClasses() as $classKey => $row) {
             list($_, $subpath) = $row;
 
-            if (!isset($this->autoloadClasses[$classKey])) {
+            if (isset($this->autoloadClasses[$classKey])) {
                 // There is already a class registered here. Only override if higher priority.
                 if ($this->autoloadClasses[$classKey][1]->getPriority() < $addon->getPriority()) {
                     $bak = $this->autoloadClasses[$classKey];
@@ -460,6 +460,38 @@ class AddonManager {
                 $this->autoloadClasses[$classKey] = [$addon->path($subpath), $addon];
             }
         }
+    }
+
+    /**
+     * Start one or more addons by specifying their keys.
+     *
+     * This method is useful for starting the addons that are stored in a configuration file.
+     *
+     * @param array $keys The keys of the addons. The addon keys can be the keys of the array or the values.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return int Returns the number of addons that were started.
+     */
+    public function startAddonsByKey($keys, $type) {
+        // Filter out false keys.
+        $keys = array_filter((array)$keys);
+
+        $count = 0;
+        foreach ($keys as $key => $value) {
+            if (in_array($value, [true, 1, '1'], true)) {
+                // This addon key is represented as addon => true.
+                $addon = $this->lookupByType($key, $type);
+            } else {
+                // This addon is represented as addon => folder.
+                $addon = $this->lookupByType($value, $type);
+            }
+            if (empty($addon)) {
+                trigger_error("The $type with key $key could not be found and will not be started.");
+            } else {
+                $this->startAddon($addon);
+                $count++;
+            }
+        }
+        return $count;
     }
 
     /**
@@ -577,5 +609,16 @@ class AddonManager {
 
         $this->cacheDir = $cacheDir;
         return $this;
+    }
+
+    /**
+     * Get the enabled addons, sorted by priority with the highest priority first.
+     */
+    public function getEnabled() {
+        if (!$this->enabledSorted) {
+            uasort($this->enabled, ['\Vanilla\Addon', 'comparePriority']);
+            $this->enabledSorted = true;
+        }
+        return $this->enabledSorted;
     }
 }

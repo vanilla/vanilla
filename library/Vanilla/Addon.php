@@ -98,6 +98,9 @@ class Addon {
         $translations = $this->scanTranslations();
         $this->setTranslations($translations);
 
+        // Look for an icon.
+        
+
         // Fix issues with the plugin that can be fixed.
         $this->check(true);
 
@@ -689,6 +692,35 @@ class Addon {
     }
 
     /**
+     * Compare two addon's by priority so that they can be sorted.
+     *
+     * @param Addon $a The first addon to compare.
+     * @param Addon $b The second addon to compare.
+     * @return int Returns -1, 0, or 1.
+     */
+    public static function comparePriority(Addon $a, Addon $b) {
+        if ($a->getPriority() > $b->getPriority()) {
+            return -1;
+        } elseif ($a->getPriority() < $b->getPriority()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Get the priority of this addon.
+     *
+     * An addon's priority determines the order of things like translations, autoloading, and event firing.
+     * Addons with higher priorities will generally override addons with lower priority.
+     *
+     * @return int Returns the priority.
+     */
+    public function getPriority() {
+        return (int)$this->getInfoValue('priority', Addon::PRIORITY_NORMAL);
+    }
+
+    /**
      * Get the info.
      *
      * @return array Returns the info.
@@ -704,18 +736,6 @@ class Addon {
      */
     public function getPluginClass() {
         return isset($this->special['plugin']) ? $this->special['plugin'] : '';
-    }
-
-    /**
-     * Get the priority of this addon.
-     *
-     * An addon's priority determines the order of things like translations, autoloading, and event firing.
-     * Addons with higher priorities will generally override addons with lower priority.
-     *
-     * @return int Returns the priority.
-     */
-    public function getPriority() {
-        return (int)$this->getInfoValue('priority', Addon::PRIORITY_NORMAL);
     }
 
     /**

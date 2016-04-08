@@ -1619,11 +1619,20 @@ EOT;
             $mention = false;
             $suffix = '';
 
-            $quote = '&quot;';
+            // Quoted mention.
+            $hasQuote = false;
+            $quote = '"';
             $quoteLength = strlen($quote);
 
-            // Quoted mention.
-            if (strpos($str, $quote) === 0) {
+            if (strpos($str, '"') === 0) {
+                $hasQuote = true;
+            } else if (strpos($str, '&quot;') === 0) {
+                $hasQuote = true;
+                $quote = '&quot;';
+                $quoteLength = strlen($quote);
+            }
+
+            if ($hasQuote) {
                 $pos = strpos($str, $quote, $quoteLength);
 
                 if ($pos === false) {

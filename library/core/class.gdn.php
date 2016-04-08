@@ -21,6 +21,8 @@ class Gdn {
 
     const AliasAuthenticator = 'Authenticator';
 
+    const AliasAddonManager = 'AddonManager';
+
     const AliasCache = 'Cache';
 
     const AliasConfig = 'Config';
@@ -83,6 +85,15 @@ class Gdn {
 
     /** @var object  */
     protected static $_Session = null;
+
+    /**
+     * Get the addon manager.
+     *
+     * @return \Vanilla\AddonManager
+     */
+    public static function addonManager() {
+        return self::factory(self::AliasAddonManager);
+    }
 
     /**
      * Get the application manager

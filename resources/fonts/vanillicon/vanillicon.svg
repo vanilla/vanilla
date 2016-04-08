@@ -1,11 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2016-3-11: Created with FontForge (http://fontforge.org)
+2016-4-7: Created with FontForge (http://fontforge.org)
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20141127 at Fri Mar 11 14:22:19 2016
+Created by FontForge 20141127 at Thu Apr  7 11:26:43 2016
  By Rebecca Van Bussel
 Copyright (c) 2016, Rebecca Van Bussel
 </metadata>
@@ -22,7 +22,7 @@ Copyright (c) 2016, Rebecca Van Bussel
     bbox="-0.5 -91 658 457"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+F100-F1DA"
+    unicode-range="U+F100-F1DB"
   />
     <missing-glyph />
     <glyph glyph-name="uniF160" unicode="&#xf160;" horiz-adv-x="293" 
@@ -116,6 +116,10 @@ s6 9 15 10l143 21l65 130c4 8 8 12 14 12c5 0 10 -4 14 -12l64 -130l143 -21c9 -1 14
 d="M101 210c0 -3 -1 -4 -3 -6l-82 -83c-2 -2 -4 -2 -7 -2c-2 0 -4 1 -6 3s-3 4 -3 6v165c0 2 1 4 3 6s4 3 6 3c3 0 5 -1 7 -3l82 -82c2 -2 3 -4 3 -7zM512 73v-55c0 -2 -1 -4 -3 -6s-4 -3 -6 -3h-494c-2 0 -4 1 -6 3s-3 4 -3 6v55c0 2 1 5 3 7s4 2 6 2h494c2 0 4 0 6 -2
 s3 -5 3 -7zM512 183v-55c0 -2 -1 -4 -3 -6s-4 -3 -6 -3h-311c-2 0 -4 1 -6 3s-3 4 -3 6v55c0 2 1 4 3 6s4 3 6 3h311c2 0 4 -1 6 -3s3 -4 3 -6zM512 293v-55c0 -2 -1 -5 -3 -7s-4 -2 -6 -2h-311c-2 0 -4 0 -6 2s-3 5 -3 7v55c0 2 1 4 3 6s4 3 6 3h311c2 0 4 -1 6 -3
 s3 -4 3 -6zM512 402v-55c0 -2 -1 -4 -3 -6s-4 -3 -6 -3h-494c-2 0 -4 1 -6 3s-3 4 -3 6v55c0 2 1 5 3 7s4 2 6 2h494c2 0 4 0 6 -2s3 -5 3 -7z" />
+    <glyph glyph-name="uniF1DB" unicode="&#xf1db;" horiz-adv-x="512" 
+d="M512 192c0 -5 -1 -9 -5 -13l-74 -73c-4 -4 -7 -5 -12 -5s-9 1 -13 5s-6 8 -6 13v36h-109v-109h36c5 0 9 -2 13 -6s5 -8 5 -13s-1 -8 -5 -12l-73 -74c-4 -4 -8 -5 -13 -5s-9 1 -13 5l-73 74c-4 4 -5 7 -5 12s1 9 5 13s8 6 13 6h36v109h-109v-36c0 -5 -2 -9 -6 -13
+s-8 -5 -13 -5s-8 1 -12 5l-74 73c-4 4 -5 8 -5 13s1 9 5 13l74 73c4 4 7 5 12 5s9 -1 13 -5s6 -8 6 -13v-36h109v109h-36c-5 0 -9 2 -13 6s-5 8 -5 13s1 8 5 12l73 74c4 4 8 5 13 5s9 -1 13 -5l73 -74c4 -4 5 -7 5 -12s-1 -9 -5 -13s-8 -6 -13 -6h-36v-109h109v36
+c0 5 2 9 6 13s8 5 13 5s8 -1 12 -5l74 -73c4 -4 5 -8 5 -13z" />
     <glyph glyph-name="uniF156" unicode="&#xf156;" 
 d="M366 -9c0 5 -2 9 -6 13s-8 5 -13 5s-8 -1 -12 -5s-6 -8 -6 -13s2 -9 6 -13s7 -5 12 -5s9 1 13 5s6 8 6 13zM402 209c0 36 -15 54 -47 54c-5 0 -10 0 -16 -1c-3 6 -8 10 -15 13s-14 5 -21 5s-14 -2 -20 -5c-10 10 -21 15 -34 15c-5 0 -10 -1 -16 -3s-11 -4 -14 -7v95
 c0 10 -3 19 -10 26s-16 10 -26 10s-19 -4 -26 -11s-11 -15 -11 -25v-165c-4 0 -9 2 -14 5l-15 9s-12 6 -20 9s-16 5 -24 5c-13 0 -22 -5 -28 -13s-8 -19 -8 -33c0 -5 13 -13 39 -26c8 -5 15 -8 19 -10c12 -8 26 -18 41 -32s26 -23 31 -29c11 -13 16 -26 16 -40v-9h183v9

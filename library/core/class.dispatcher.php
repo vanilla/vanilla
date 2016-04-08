@@ -590,23 +590,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Check for a file extension on the controller.
         list($Controller, $this->_DeliveryMethod) = $this->_splitDeliveryMethod($Controller, false);
 
-        // If we're loading from a fully qualified path, prioritize this app's library
-        if (!is_null($Application)) {
-            Gdn_Autoloader::priority(
-                Gdn_Autoloader::CONTEXT_APPLICATION,
-                $Application,
-                Gdn_Autoloader::MAP_CONTROLLER,
-                Gdn_Autoloader::PRIORITY_TYPE_RESTRICT,
-                Gdn_Autoloader::PRIORITY_ONCE
-            );
+        // This is a kludge until we can refactor settings controllers better.
+        if (strcasecmp($Controller, 'settings') === 0 && strcasecmp($Application, 'dashboard') !== 0) {
+            $Controller = $Application.$Controller;
         }
 
         $ControllerName = $Controller.'Controller';
-        $ControllerPath = Gdn_Autoloader::lookup($ControllerName, array('MapType' => null));
 
         try {
             // If the lookup succeeded, good to go
-            if (class_exists($ControllerName, false)) {
+            if (class_exists($ControllerName, true)) {
                 throw new GdnDispatcherControllerFoundException();
             }
 
@@ -614,7 +607,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // This was a guess search with no specified application. Look up
             // the application folder from the controller path.
             if (is_null($Application)) {
-                if (!$ControllerPath && class_exists($ControllerName, false)) {
+                if (class_exists($ControllerName, false)) {
                     $Reflect = new ReflectionClass($ControllerName);
                     $Found = false;
                     do {
@@ -655,19 +648,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 } else {
                     return false;
                 }
-            }
-
-            // If we need to autoload the class, do it here
-            if (!class_exists($ControllerName, false)) {
-                Gdn_Autoloader::priority(
-                    Gdn_Autoloader::CONTEXT_APPLICATION,
-                    $Application,
-                    Gdn_Autoloader::MAP_CONTROLLER,
-                    Gdn_Autoloader::PRIORITY_TYPE_PREFER,
-                    Gdn_Autoloader::PRIORITY_PERSIST
-                );
-
-                require_once($ControllerPath);
             }
 
             $this->ControllerName = $Controller;

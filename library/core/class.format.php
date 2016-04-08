@@ -1620,14 +1620,26 @@ EOT;
             $suffix = '';
 
             // Quoted mention.
-            if ($str[0] == '"') {
-                $pos = strpos($str, '"', 1);
+            $hasQuote = false;
+            $quote = '"';
+            $quoteLength = strlen($quote);
+
+            if (strpos($str, '"') === 0) {
+                $hasQuote = true;
+            } else if (strpos($str, '&quot;') === 0) {
+                $hasQuote = true;
+                $quote = '&quot;';
+                $quoteLength = strlen($quote);
+            }
+
+            if ($hasQuote) {
+                $pos = strpos($str, $quote, $quoteLength);
 
                 if ($pos === false) {
-                    $str = substr($str, 1);
+                    $str = substr($str, $quoteLength);
                 } else {
-                    $mention = substr($str, 1, $pos - 1);
-                    $suffix = substr($str, $pos + 1);
+                    $mention = substr($str, $quoteLength, $pos - $quoteLength);
+                    $suffix = substr($str, $pos + $quoteLength);
                 }
             }
 

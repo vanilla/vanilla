@@ -1619,15 +1619,18 @@ EOT;
             $mention = false;
             $suffix = '';
 
+            $quote = '&quot;';
+            $quoteLength = strlen($quote);
+
             // Quoted mention.
-            if ($str[0] == '"') {
-                $pos = strpos($str, '"', 1);
+            if (strpos($str, $quote) === 0) {
+                $pos = strpos($str, $quote, $quoteLength);
 
                 if ($pos === false) {
-                    $str = substr($str, 1);
+                    $str = substr($str, $quoteLength);
                 } else {
-                    $mention = substr($str, 1, $pos - 1);
-                    $suffix = substr($str, $pos + 1);
+                    $mention = substr($str, $quoteLength, $pos - $quoteLength);
+                    $suffix = substr($str, $pos + $quoteLength);
                 }
             }
 

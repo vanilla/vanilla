@@ -500,6 +500,11 @@ class AddonManager {
      * @param Addon $addon The addon to stop.
      */
     public function stopAddon(Addon $addon) {
+        if (empty($addon)) {
+            trigger_error("Null addon supplied to AddonManager->stopAddon().", E_USER_NOTICE);
+            return;
+        }
+
         unset($this->enabled[$addon->getType().'/'.$addon->getKey()]);
 
         // Remove all of the addon's classes from the autoloader.
@@ -613,12 +618,32 @@ class AddonManager {
 
     /**
      * Get the enabled addons, sorted by priority with the highest priority first.
+     *
+     * @return array[Addon] Returns an array of {@link Addon} objects.
      */
     public function getEnabled() {
         if (!$this->enabledSorted) {
             uasort($this->enabled, ['\Vanilla\Addon', 'comparePriority']);
             $this->enabledSorted = true;
         }
-        return $this->enabledSorted;
+        return $this->enabled;
+    }
+
+    /**
+     * Get the translations for the enabled addons.
+     *
+     * @param string $locale The locale to get the translations for.
+     */
+    public function getEnabledTranslations($locale) {
+        $addons = array_reverse($this->getEnabled(), true);
+
+        $Definition = [];
+        foreach ($addons as $addon) {
+            /* @var Addon $addon */
+            foreach ($addon->getTranslations() as $path) {
+                include $addon->path($path);
+            }
+        }
+        return $Definition;
     }
 }

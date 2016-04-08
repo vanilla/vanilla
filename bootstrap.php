@@ -1,4 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+use Vanilla\Addon;
+
+if (!defined('APPLICATION')) exit();
 /**
  * Bootstrap.
  *
@@ -49,9 +53,6 @@ if (function_exists('mb_internal_encoding')) {
 // Include the core autoloader.
 require_once __DIR__.'/vendor/autoload.php';
 
-// Initialize the autoloader.
-Gdn_Autoloader::start();
-
 // Guard against broken cache files.
 if (!class_exists('Gdn')) {
     // Throwing an exception here would result in a white screen for the user.
@@ -74,7 +75,7 @@ Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
 /**
  * Bootstrap Early
  *
- * A lot of the framework is loaded now, most importantly the autoloader,
+ * A lot of the framework is loaded now, most importantly the core autoloader,
  * default config and the general and error functions. More control is possible
  * here, but some things have already been loaded and are immutable.
  */
@@ -106,19 +107,41 @@ if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(
 /**
  * Extension Managers
  *
- * Now load the Application, Theme and Plugin managers into the Factory, and
- * process the Application-specific configuration defaults.
+ * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
+ * process the application-specific configuration defaults.
  */
+
+// AddonManager
+Gdn::factoryInstall(
+    Gdn::AliasAddonManager,
+    '\\Vanilla\\AddonManager',
+    '',
+    Gdn::FactorySingleton,
+    [
+        [
+            Addon::TYPE_ADDON => ['/applications', '/plugins'],
+            Addon::TYPE_THEME => '/themes',
+            Addon::TYPE_LOCALE => '/locales'
+        ],
+        PATH_CACHE
+    ]
+);
+spl_autoload_register([Gdn::addonManager(), 'autoload']);
 
 // ApplicationManager
 Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_APPLICATION);
 
 // ThemeManager
 Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 
 // PluginManager
 Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
+
+// Start all of the addons.
+Gdn::addonManager()->startAddonsByKey([c('Garden.Theme')], Addon::TYPE_THEME);
+Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
+Gdn::addonManager()->startAddonsByKey(c('EnabledLocales'), Addon::TYPE_LOCALE);
+Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
 
 // Load the configurations for enabled Applications.
 foreach (Gdn::applicationManager()->enabledApplicationFolders() as $applicationName => $applicationFolder) {
@@ -216,11 +239,9 @@ unset($hooksPath);
 
 // Themes startup
 Gdn::themeManager()->start();
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_THEME);
 
 // Plugins startup
 Gdn::pluginManager()->start();
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 /**
  * Locales

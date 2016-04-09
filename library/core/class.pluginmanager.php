@@ -104,95 +104,24 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Get a list of available plugins.
      *
-     *
-     * @param bool $Force
-     * @return array|null
+     * @deprecated Use {@link AddonManager::lookupAllByType()}.
      */
-    public function availablePlugins($Force = false) {
+    public function availablePlugins() {
         $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
-        $plugins = array_filter($addons, function(Addon $addon) {
-            return $addon->getSpecial('oldType') === 'plugin';
-        });
 
-
-        if (is_null($this->pluginCache) || is_null($this->pluginsByClass) || $Force) {
-            $this->pluginCache = array();
-            $this->pluginsByClass = array();
-            $this->pluginFoldersByPath = array();
-
-            // Check cache freshness
-            foreach ($this->searchPaths() as $SearchPath => $Trash) {
-                unset($SearchPathCache);
-
-                // Check Cache
-                $SearchPathCacheKey = 'Garden.Plugins.PathCache.'.$SearchPath;
-                if ($this->apc) {
-                    $SearchPathCache = apc_fetch($SearchPathCacheKey);
-                } else {
-                    $SearchPathCache = Gdn::cache()->get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
-                }
-
-                $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
-                $CacheIntegrityCheck = false;
-                if ($CacheHit && is_array($SearchPathCache)) {
-                    $CacheIntegrityCheck = (sizeof(array_intersect(array_keys($SearchPathCache), array('CacheIntegrityHash', 'PluginInfo', 'ClassInfo'))) == 3);
-                }
-
-                if (!$CacheIntegrityCheck) {
-                    $SearchPathCache = array(
-                        'CacheIntegrityHash' => null,
-                        'PluginInfo' => array(),
-                        'ClassInfo' => array()
-                    );
-                }
-
-                $CachePluginInfo = &$SearchPathCache['PluginInfo'];
-                if (!is_array($CachePluginInfo)) {
-                    $CachePluginInfo = array();
-                }
-
-                $CacheClassInfo = &$SearchPathCache['ClassInfo'];
-                if (!is_array($CacheClassInfo)) {
-                    $CacheClassInfo = array();
-                }
-
-                $PathListing = scandir($SearchPath, 0);
-                sort($PathListing);
-
-                $PathIntegrityHash = md5(serialize($PathListing));
-                $CacheIntegrityHash = GetValue('CacheIntegrityHash', $SearchPathCache);
-                if ($CacheIntegrityHash != $PathIntegrityHash) {
-                    // Trace('Need to re-index plugin cache');
-                    // Need to re-index this folder
-
-                    // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for
-                    // so that the merge below does what was intended
-                    $this->pluginCache = array_diff_key($this->pluginCache, $CachePluginInfo);
-                    $this->pluginsByClass = array_diff_key($this->pluginsByClass, $CacheClassInfo);
-
-                    $CachePluginInfo = array();
-                    $CacheClassInfo = array();
-                    $PathIntegrityHash = $this->indexSearchPath($SearchPath, $CachePluginInfo, $CacheClassInfo, $PathListing);
-                    if ($PathIntegrityHash === false) {
-                        continue;
-                    }
-
-                    $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-                    if ($this->apc) {
-                        apc_store($SearchPathCacheKey, $SearchPathCache);
-                    } else {
-                        Gdn::cache()->store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => true));
-                    }
-                }
-
-                $this->pluginCache = array_merge($this->pluginCache, $CachePluginInfo);
-                $this->pluginsByClass = array_merge($this->pluginsByClass, $CacheClassInfo);
-                $this->pluginFoldersByPath[$SearchPath] = array_keys($CachePluginInfo);
+        $result = [];
+        foreach ($addons as $addon) {
+            /* @var Addon $addon */
+            if ($addon->getSpecial('oldType') !== 'plugin') {
+                continue;
             }
-        }
 
-        return $this->pluginCache;
+            $infoArray  = $this->calcOldInfoArray($addon);
+            $result[$infoArray['Index']] = $infoArray;
+        }
+        return $result;
     }
 
     /**
@@ -390,7 +319,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         touchValue('Folder', $info, $name);
 
         // This is some additional information from indexSearchPath().
-        if($info['PluginFilePath']) {
+        if ($info['PluginFilePath']) {
             $info['RealFile'] = realpath($info['PluginFilePath']);
         }
         $info['RealRoot'] = realpath($info['PluginRoot']);

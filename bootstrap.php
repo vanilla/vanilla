@@ -143,9 +143,12 @@ Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
 Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
 
-// Load the configurations for enabled Applications.
-foreach (Gdn::applicationManager()->enabledApplicationFolders() as $applicationName => $applicationFolder) {
-    Gdn::config()->load(PATH_APPLICATIONS."/{$applicationFolder}/settings/configuration.php");
+// Load the configurations for enabled addons.
+foreach (Gdn::addonManager()->getEnabled() as $addon) {
+    /* @var Addon $addon */
+    if ($configPath = $addon->getSpecial('config')) {
+        Gdn::config()->load($addon->path($configPath));
+    }
 }
 
 // Re-apply loaded user settings.

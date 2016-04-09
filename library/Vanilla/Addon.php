@@ -99,7 +99,7 @@ class Addon {
         $this->setTranslations($translations);
 
         // Look for an icon.
-        
+
 
         // Fix issues with the plugin that can be fixed.
         $this->check(true);
@@ -370,7 +370,7 @@ class Addon {
      * @return array Returns an array of subpaths.
      */
     private function scanClasses() {
-        $paths = $this->getClassPaths();
+        $paths = $this->scanClassPaths();
 
         $classes = [];
         foreach ($paths as $path) {
@@ -405,7 +405,7 @@ class Addon {
         return $classes;
     }
 
-    private function getClassPaths() {
+    private function scanClassPaths() {
         $globs = [
             '/*.php',
             '/controllers/*.php',
@@ -675,7 +675,7 @@ class Addon {
             ->setInfo($array['info'])
             ->setClasses($array['classes'])
             ->setTranslations($array['translations'])
-            ->setSpecial(empty($array['special']) ? [] : $array['special']);
+            ->setSpecialArray(empty($array['special']) ? [] : $array['special']);
 
         return $addon;
     }
@@ -686,7 +686,7 @@ class Addon {
      * @param array $special The new special array.
      * @return Addon Returns $this for fluent calls.
      */
-    private function setSpecial(array $special) {
+    private function setSpecialArray(array $special) {
         $this->special = $special;
         return $this;
     }
@@ -721,6 +721,17 @@ class Addon {
     }
 
     /**
+     * Get an item from the special array.
+     *
+     * @param string $key The key in the special array.
+     * @param mixed $default The default if the key isn't set.
+     * @return mixed Returns the special item or {@link $default}.
+     */
+    public function getSpecial($key, $default = null) {
+        return isset($this->special[$key]) ? $this->special[$key] : $default;
+    }
+
+    /**
      * Get the info.
      *
      * @return array Returns the info.
@@ -730,21 +741,44 @@ class Addon {
     }
 
     /**
-     * Get the name of the plugin class for this addon, if any.
-     *
-     * @return string Returns the name of the class or an empty string if it doesn't have one.
-     */
-    public function getPluginClass() {
-        return isset($this->special['plugin']) ? $this->special['plugin'] : '';
-    }
-
-    /**
      * Get the classes.
      *
      * @return array Returns the classes.
      */
     public function getClasses() {
         return $this->classes;
+    }
+
+    /**
+     * Do a very basic test of this addon.
+     *
+     * The test includes some of the files on this addon which will throw an exception if there are any major issues.
+     */
+    public function test() {
+        // Include the plugin file.
+        if ($className = $this->getPluginClass()) {
+            list($_, $path) = $this->classes[$className];
+            include $this->path($path);
+        }
+
+        // Include the configuration file.
+        if ($configPath = $this->getSpecial('config')) {
+            include $this->path($configPath);
+        }
+
+        // Include locale files.
+        foreach ($this->getTranslations() as $path) {
+            include $this->path($path);
+        }
+    }
+
+    /**
+     * Get the name of the plugin class for this addon, if any.
+     *
+     * @return string Returns the name of the class or an empty string if it doesn't have one.
+     */
+    public function getPluginClass() {
+        return isset($this->special['plugin']) ? $this->special['plugin'] : '';
     }
 
     /**

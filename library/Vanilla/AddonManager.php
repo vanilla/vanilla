@@ -530,6 +530,36 @@ class AddonManager {
     }
 
     /**
+     * Stop one or more addons by specifying their keys.
+     *
+     * @param array $keys The keys of the addons. The addon keys can be the keys of the array or the values.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return int Returns the number of addons that were stopped.
+     */
+    public function stopAddonsByKey($keys, $type) {
+        // Filter out false keys.
+        $keys = array_filter((array)$keys);
+
+        $count = 0;
+        foreach ($keys as $key => $value) {
+            if (in_array($value, [true, 1, '1'], true)) {
+                // This addon key is represented as addon => true.
+                $addon = $this->lookupByType($key, $type);
+            } else {
+                // This addon is represented as addon => folder.
+                $addon = $this->lookupByType($value, $type);
+            }
+            if (empty($addon)) {
+                trigger_error("The $type with key $key could not be found and will not be stopped.");
+            } else {
+                $this->stopAddon($addon);
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
      * Get all of the addons of a certain type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.

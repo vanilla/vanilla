@@ -18,6 +18,11 @@ class Addon {
     const TYPE_LOCALE = 'locale';
     const TYPE_THEME = 'theme';
 
+    const PATH_FULL = 'full'; // full path
+    const PATH_ROOT = 'root'; // path relative to PATH_ROOT
+    const PATH_LOCAL = 'local'; // path relative to the addon's subdirectory
+    const PATH_REAL = 'real'; // realpath()
+
     const PRIORITY_LOW = 100;
     const PRIORITY_NORMAL = 1000;
     const PRIORITY_HIGH = 10000;
@@ -175,10 +180,23 @@ class Addon {
      * Make a full path from an addon-relative path.
      *
      * @param string $subpath The subpath to base the path on, starting with a "/".
+     * @param string $relative One of the **Addon::PATH_*** constants.
      * @return string Returns a full path.
      */
-    public function path($subpath = '') {
-        return PATH_ROOT.$this->subdir.$subpath;
+    public function path($subpath = '', $relative = self::PATH_FULL) {
+        switch ($relative) {
+            case self::PATH_FULL:
+                return PATH_ROOT.$this->subdir.$subpath;
+            case self::PATH_ROOT:
+                return $this->subdir.$subpath;
+            case self::PATH_REAL:
+                return realpath(PATH_ROOT.$this->subdir.$subpath);
+            case self::PATH_LOCAL:
+            case null:
+                return $subpath;
+            default:
+                throw new \InvalidArgumentException("Invalid path relation: $relative.", 500);
+        }
     }
 
     /**
@@ -785,6 +803,24 @@ class Addon {
      */
     public function getPluginClass() {
         return isset($this->special['plugin']) ? $this->special['plugin'] : '';
+    }
+
+    /**
+     * Get the path of a class within this addon.
+     *
+     * This is a case insensitive lookup.
+     *
+     * @param string $classname The name of the class.
+     * @param string $relative One of the **Addon::PATH*** constants.
+     * @return string Returns the path or an empty string of the class isn't found.
+     */
+    public function getClassPath($classname, $relative = self::PATH_FULL) {
+        $key = strtolower($classname);
+        if (array_key_exists($this->classes[$key])) {
+            $path = $this->path($this->classes[$key][1], $relative);
+            return $path;
+        }
+        return '';
     }
 
     /**

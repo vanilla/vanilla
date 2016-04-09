@@ -138,6 +138,32 @@ class AddonManager {
     }
 
     /**
+     * Lookup an addon by class name.
+     *
+     * This method should only be used with enabled addons as searching through all addons takes a performance hit.
+     *
+     * @param string $class The class name.
+     * @param bool $searchAll Whether or not to search all addons or just the enabled ones.
+     * @return Addon|null Returns an {@link Addon} object or **null** if one isn't found.
+     */
+    public function lookupByClassname($class, $searchAll = false) {
+        $classKey = strtolower($class);
+
+        if (isset($this->autoloadClasses[$classKey])) {
+            list($_, $addon) = $this->autoloadClasses[$classKey];
+            return $addon;
+        } elseif ($searchAll) {
+            foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
+                /* @var Addon $addon */
+                if (array_key_exists($classKey, $addon->getClasses())) {
+                    return $addon;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Lookup the addon with a given key.
      *
      * @param string $key The key of the addon.

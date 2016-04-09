@@ -118,7 +118,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 continue;
             }
 
-            $infoArray  = $this->calcOldInfoArray($addon);
+            $infoArray  = static::calcOldInfoArray($addon);
             $result[$infoArray['Index']] = $infoArray;
         }
         return $result;
@@ -579,27 +579,33 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Get the information array for a plugin.
      *
-     *
-     * @param $AccessName
-     * @param string $AccessType
-     * @return bool|mixed
+     * @param $name The name of the plugin to access.
+     * @param string $accessType Either **Gdn_PluginManager::ACCESS_CLASSNAME** or
+     * Gdn_PluginManager::ACCESS_PLUGINNAME** (default).
+     * @return bool|array Returns an info array or **false** if the plugin isn't found.
+     * @deprecated
      */
-    public function getPluginInfo($AccessName, $AccessType = self::ACCESS_PLUGINNAME) {
-        $PluginName = false;
-
-        switch ($AccessType) {
+    public function getPluginInfo($name, $accessType = self::ACCESS_PLUGINNAME) {
+        switch ($accessType) {
             case self::ACCESS_PLUGINNAME:
-                $PluginName = $AccessName;
+                $addon = $this->addonManager->lookupAddon($name);
                 break;
 
             case self::ACCESS_CLASSNAME:
             default:
-                $PluginName = GetValue($AccessName, $this->pluginsByClass, false);
+                trigger_error("Gdn_PluginManager->getPluginInfo() with ACCESS_CLASSNAME should not be called.");
+                $addon = $this->addonManager->lookupByClassname($name, true);
                 break;
         }
-        $Available = $this->availablePlugins();
-        return ($PluginName !== false) ? GetValue($PluginName, $Available, false) : false;
+
+        if ($addon instanceof Addon) {
+            $info = static::calcOldInfoArray($addon);
+            return $info;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -62,7 +62,7 @@ class SetupController extends DashboardController {
                 $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
             }
 
-            $ApplicationManager = new Gdn_ApplicationManager();
+            $ApplicationManager = new Gdn_ApplicationManager(Gdn::addonManager());
 
             // Need to go through all of the setups for each application. Garden,
             if ($this->configure() && $this->Form->isPostBack()) {

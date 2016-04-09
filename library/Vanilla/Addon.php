@@ -19,7 +19,7 @@ class Addon {
     const TYPE_THEME = 'theme';
 
     const PATH_FULL = 'full'; // full path
-    const PATH_ROOT = 'root'; // path relative to PATH_ROOT
+    const PATH_ADDON = 'addon'; // path relative to PATH_ROOT
     const PATH_LOCAL = 'local'; // path relative to the addon's subdirectory
     const PATH_REAL = 'real'; // realpath()
 
@@ -187,7 +187,7 @@ class Addon {
         switch ($relative) {
             case self::PATH_FULL:
                 return PATH_ROOT.$this->subdir.$subpath;
-            case self::PATH_ROOT:
+            case self::PATH_ADDON:
                 return $this->subdir.$subpath;
             case self::PATH_REAL:
                 return realpath(PATH_ROOT.$this->subdir.$subpath);

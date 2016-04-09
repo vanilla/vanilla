@@ -255,11 +255,11 @@ class TaggingPlugin extends Gdn_Plugin {
         $this->setTagBreadcrumbs($sender);
 
         if (null !== $sender->data('Announcements', null)) {
-            TagModel::instance()->joinTags($sender->data('Announcements'));
+            TagModel::instance()->joinTags($sender->Data['Announcements']);
         }
 
         if (null !== $sender->data('Discussions', null)) {
-            TagModel::instance()->joinTags($sender->data('Discussions'));
+            TagModel::instance()->joinTags($sender->Data['Discussions']);
         }
     }
 

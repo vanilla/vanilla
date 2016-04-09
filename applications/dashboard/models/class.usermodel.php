@@ -1043,7 +1043,7 @@ class UserModel extends Gdn_Model {
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
             if (strpos($avatar, 'defaultavatar/') !== false) {
-                if($size == 'thumbnail') {
+                if ($size == 'thumbnail') {
                     return Gdn_UploadImage::url(changeBasename($avatar, 'n%s'));
                 } elseif ($size == 'profile') {
                     return Gdn_UploadImage::url(changeBasename($avatar, 'p%s'));
@@ -1666,7 +1666,7 @@ class UserModel extends Gdn_Model {
             ->get();
 
         // Set corrected PhotoUrls.
-        $Result =& $Data->result();
+        $Result = & $Data->result();
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
                 $Row->Photo = Gdn_Upload::url($Row->Photo);
@@ -2313,7 +2313,7 @@ class UserModel extends Gdn_Model {
             $OldRoles = [];
             foreach ($DeleteRoleIDs as $deleteRoleID) {
                 $role = RoleModel::roles($deleteRoleID);
-                $OldRoles[] =  val('Name', $role, t('Unknown').' ('.$deleteRoleID.')');
+                $OldRoles[] = val('Name', $role, t('Unknown').' ('.$deleteRoleID.')');
             }
 
             $NewRoles = [];
@@ -2437,7 +2437,7 @@ class UserModel extends Gdn_Model {
             ->limit($Limit, $Offset)
             ->get();
 
-        $Result =& $Data->result();
+        $Result = & $Data->result();
 
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
@@ -2926,7 +2926,7 @@ class UserModel extends Gdn_Model {
         }
 
         if (!empty($Set)) {
-            $this->EventArguments['Fields'] =& $Set;
+            $this->EventArguments['Fields'] = & $Set;
             $this->fireEvent('UpdateVisit');
 
             $this->setField($UserID, $Set);
@@ -3297,7 +3297,7 @@ class UserModel extends Gdn_Model {
         // Fire an event so applications can remove their associated user data.
         $this->EventArguments['UserID'] = $UserID;
         $this->EventArguments['Options'] = $Options;
-        $this->EventArguments['Content'] =& $Content;
+        $this->EventArguments['Content'] = & $Content;
         $this->fireEvent('BeforeDeleteUser');
 
         $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
@@ -3706,7 +3706,7 @@ class UserModel extends Gdn_Model {
             setValue('_CssClass', $User, 'Banned');
         }
 
-        $this->EventArguments['User'] =& $User;
+        $this->EventArguments['User'] = & $User;
         $this->fireEvent('SetCalculatedFields');
     }
 
@@ -3922,22 +3922,22 @@ class UserModel extends Gdn_Model {
         } else {
             switch ($registerType) {
                 case 'Connect' :
-                    $welcome = formatString(t('You have successfully connected to {Title}.'), $data) . ' ' .
-                        t('Find your account information below.') . '<br></p>' .
-                        '<p>' . sprintf(t('%s: %s'), t('Username'), val('Name', $user)) . '<br>' .
-                        formatString(t('Connected With: {ProviderName}'), $data) . '</p>';
+                    $welcome = formatString(t('You have successfully connected to {Title}.'), $data).' '.
+                        t('Find your account information below.').'<br></p>'.
+                        '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
+                        formatString(t('Connected With: {ProviderName}'), $data).'</p>';
                     break;
                 case 'Register' :
-                    $welcome = formatString(t('You have successfully registered for an account at {Title}.'), $data) . ' ' .
-                        t('Find your account information below.') . '<br></p>' .
-                        '<p>' . sprintf(t('%s: %s'), t('Username'), val('Name', $user)) . '<br>' .
-                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)) . '</p>';
+                    $welcome = formatString(t('You have successfully registered for an account at {Title}.'), $data).' '.
+                        t('Find your account information below.').'<br></p>'.
+                        '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
+                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'</p>';
                     break;
                 default :
-                    $welcome = sprintf(t('%s has created an account for you at %s.'), val('Name', val('Sender', $data)), $appTitle) . ' ' .
-                        t('Find your account information below.') . '<br></p>' .
-                        '<p>' . sprintf(t('%s: %s'), t('Email'), val('Email', $user)) . '<br>' .
-                        sprintf(t('%s: %s'), t('Password'), $password) . '</p>';
+                    $welcome = sprintf(t('%s has created an account for you at %s.'), val('Name', val('Sender', $data)), $appTitle).' '.
+                        t('Find your account information below.').'<br></p>'.
+                        '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br>'.
+                        sprintf(t('%s: %s'), t('Password'), $password).'</p>';
             }
         }
         return $welcome;

@@ -800,7 +800,7 @@ class SettingsController extends DashboardController {
             throw new Exception('Requires POST', 405);
         }
         $value = strtolower($value);
-        if (in_array($value, Gdn_Email::$supportedFormats)){
+        if (in_array($value, Gdn_Email::$supportedFormats)) {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {

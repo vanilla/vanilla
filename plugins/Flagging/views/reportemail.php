@@ -11,12 +11,12 @@ echo t('Discussion'); ?>: <?php echo val('DiscussionName', $report); ?>
 <?php echo externalUrl($flag['URL']); ?>
 
 
-<?php echo t('Reason') . ": {$reason}"; ?>
+<?php echo t('Reason').": {$reason}"; ?>
 
 
-<?php echo t('FlaggedBy', 'Reported by:') . " {$flag['UserName']}"; ?>
+<?php echo t('FlaggedBy', 'Reported by:')." {$flag['UserName']}"; ?>
 
 
 <?php if ($discussionID) {
-    echo t('FlagDiscuss', 'Discuss it') . ': ' . externalUrl('discussion/' . $DiscussionID);
+    echo t('FlagDiscuss', 'Discuss it').': '.externalUrl('discussion/'.$DiscussionID);
 } ?>

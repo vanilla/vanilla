@@ -157,7 +157,7 @@ class DiscussionModel extends VanillaModel {
         $orderBy = self::getDefaultOrderBy(); // check config
 
         // Try to find a matching sort.
-        foreach(self::getAllowedSorts() as $sort) {
+        foreach (self::getAllowedSorts() as $sort) {
             if (val('orderBy', $sort, []) == $orderBy) {
                 return val('key', $sort, '');
             }
@@ -351,7 +351,7 @@ class DiscussionModel extends VanillaModel {
             ));
 
 
-            Gdn::pluginManager()->EventArguments['Types'] =& $DiscussionTypes;
+            Gdn::pluginManager()->EventArguments['Types'] = & $DiscussionTypes;
             Gdn::pluginManager()->FireAs('DiscussionModel')->fireEvent('DiscussionTypes');
             self::$_DiscussionTypes = $DiscussionTypes;
             unset(Gdn::pluginManager()->EventArguments['Types']);
@@ -519,7 +519,7 @@ class DiscussionModel extends VanillaModel {
         $wheres = [];
         $filters = $this->getFiltersFromKeys($this->getFilters());
 
-        foreach($filters as $filter) {
+        foreach ($filters as $filter) {
 
             if ($categoryIDs) {
                 $setKey = val('setKey', $filter);
@@ -542,7 +542,7 @@ class DiscussionModel extends VanillaModel {
      * @return array A set of where clauses, array form.
      */
     protected function combineWheres($newWheres, $wheres) {
-        foreach($newWheres as $field => $value) {
+        foreach ($newWheres as $field => $value) {
             // Combine all our where clauses.
             if (!array_key_exists($field, $wheres)) {
                 // Add a new where field to the list.
@@ -2849,7 +2849,7 @@ class DiscussionModel extends VanillaModel {
      */
     protected function getFiltersFromArray($array) {
         $filterKeys = [];
-        foreach(self::getAllowedFilters() as $filterSet) {
+        foreach (self::getAllowedFilters() as $filterSet) {
             $filterSetKey = val('key', $filterSet);
             // Check if any of our filters are in the array. Filter key value is unsafe.
             if ($filterKey = val($filterSetKey, $array)) {
@@ -2980,7 +2980,7 @@ class DiscussionModel extends VanillaModel {
                 if (!empty($filterString)) {
                     $filterString .= '&';
                 }
-                $filterString .= $setKey . '=' . $filterKey;
+                $filterString .= $setKey.'='.$filterKey;
             }
         }
 
@@ -3081,7 +3081,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $filterKeys The key/value pairs of the filters to remove.
      */
     public static function removeFilter($filterKeys) {
-        foreach($filterKeys as $setKey => $filterKey) {
+        foreach ($filterKeys as $setKey => $filterKey) {
             if (isset(self::$allowedFilters[$setKey]['filters'][$filterKey])) {
                 unset(self::$allowedFilters[$setKey]['filters'][$filterKey]);
             }

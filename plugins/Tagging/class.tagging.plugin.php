@@ -270,7 +270,7 @@ class TaggingPlugin extends Gdn_Plugin {
      */
     protected function setTagBreadcrumbs($sender) {
 
-        if (null !== $sender->data('Tag',null) && null !== $sender->data('Tags')) {
+        if (null !== $sender->data('Tag', null) && null !== $sender->data('Tags')) {
             $ParentTag = array();
             $CurrentTag = $sender->data('Tag');
             $CurrentTags = $sender->data('Tags');
@@ -326,8 +326,8 @@ class TaggingPlugin extends Gdn_Plugin {
         // Let plugins add their information getting saved.
         $Types = array('');
         $this->EventArguments['Data'] = $FormPostValues;
-        $this->EventArguments['Tags'] =& $FormTags;
-        $this->EventArguments['Types'] =& $Types;
+        $this->EventArguments['Tags'] = & $FormTags;
+        $this->EventArguments['Types'] = & $Types;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('SaveDiscussion');
 

@@ -10,6 +10,7 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\Addon;
 use Vanilla\AddonManager;
 
 /**
@@ -372,6 +373,66 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $this->AlternateSearchPaths[$SearchPath] = $SearchPathName;
         SaveToConfig('Garden.PluginManager.Search', $this->AlternateSearchPaths);
         return true;
+    }
+
+    /**
+     * Calculate an old info array from a new {@link Addon}.
+     *
+     * @param Addon $addon The addon to calculate.
+     * @return array
+     */
+    public static function calcOldInfoArray(Addon $addon) {
+        $info = $addon->getInfo();
+        $permissions = isset($info['registerPermissions']) ? $info['registerPermissions'] : null;
+        $capitalize = new \Vanilla\Utility\CapitalCaseScheme();
+        $info = $capitalize->convertArrayKeys($info);
+        if (isset($permissions)) {
+            $info['RegisterPermissions'] = $permissions;
+        }
+
+        // This is the basic information from scanPluginFile().
+        $name = $addon->getInfoValue('keyRaw', $addon->getKey());
+        $info['Index'] = $name;
+        $info['ClassName'] = $addon->getPluginClass();
+        $info['PluginFilePath'] = $addon->getClassPath($addon->getPluginClass(), Addon::PATH_FULL);
+        $info['PluginRoot'] = $addon->path();
+        touchValue('Name', $info, $name);
+        touchValue('Folder', $info, $name);
+
+        // This is some additional information from indexSearchPath().
+        if($info['PluginFilePath']) {
+            $info['RealFile'] = realpath($info['PluginFilePath']);
+        }
+        $info['RealRoot'] = realpath($info['PluginRoot']);
+        $info['SearchPath'] = dirname($addon->path());
+
+        // Rejoin the authors.
+        $names = [];
+        $emails = [];
+        $homepages = [];
+        foreach ($addon->getInfoValue('authors', []) as $author) {
+            if (isset($author['name'])) {
+                $names[] = $author['name'];
+            }
+            if (isset($author['email'])) {
+                $emails[] = $author['email'];
+            }
+            if (isset($author['homepage'])) {
+                $homepages[] = $author['homepage'];
+            }
+        }
+        if (!empty($names)) {
+            $info['Author'] = implode(', ', $names);
+        }
+        if (!empty($emails)) {
+            $info['AuthorEmail'] = implode(', ', $emails);
+        }
+        if (!empty($homepages)) {
+            $info['AuthorUrl'] = implode(', ', $homepages);
+        }
+        unset($info['Authors']);
+
+        return $info;
     }
 
     /**

@@ -282,7 +282,11 @@ class Addon {
 
         // Convert the info array to the new syntax.
         $nameScheme = new CamelCaseScheme();
+        $oldPermissions = isset($oldInfo['RegisterPermissions']) ? $oldInfo['RegisterPermissions'] : null;
         $info = $nameScheme->convertArrayKeys($oldInfo);
+        if (isset($oldPermissions)) {
+            $info['registerPermissions'] = $oldPermissions;
+        }
 
         $info['key'] = $key;
         $info['type'] = $type;
@@ -818,7 +822,7 @@ class Addon {
      */
     public function getClassPath($classname, $relative = self::PATH_FULL) {
         $key = strtolower($classname);
-        if (array_key_exists($this->classes[$key])) {
+        if (array_key_exists($key, $this->classes)) {
             $path = $this->path($this->classes[$key][1], $relative);
             return $path;
         }

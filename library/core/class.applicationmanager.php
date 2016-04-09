@@ -212,15 +212,6 @@ class Gdn_ApplicationManager {
             array('addonName' => $applicationName)
         );
 
-        // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, true);
-        $Locale = Gdn::locale();
-        $Locale->set(
-            $Locale->current(),
-            $this->enabledApplicationFolders(),
-            Gdn::pluginManager()->enabledPluginFolders(),
-            true
-        );
-
         $this->EventArguments['AddonName'] = $applicationName;
         Gdn::pluginManager()->callEventHandlers($this, 'ApplicationManager', 'AddonEnabled');
 
@@ -244,7 +235,7 @@ class Gdn_ApplicationManager {
         }
 
         // Hook directly into the autoloader and force it to load the newly tested application
-        Gdn_Autoloader::attachApplication($ApplicationFolder);
+        Gdn::addonManager()->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
 
         // Call the application's setup method
         $hooks = $applicationName.'Hooks';
@@ -323,16 +314,7 @@ class Gdn_ApplicationManager {
         );
 
         // Clear the object caches.
-        Gdn_Autoloader::smartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);
-
-        // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, true);
-        $Locale = Gdn::locale();
-        $Locale->set(
-            $Locale->current(),
-            $this->enabledApplicationFolders(),
-            Gdn::pluginManager()->enabledPluginFolders(),
-            true
-        );
+        Gdn::addonManager()->stopAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
 
         $this->EventArguments['AddonName'] = $applicationName;
         Gdn::pluginManager()->callEventHandlers($this, 'ApplicationManager', 'AddonDisabled');

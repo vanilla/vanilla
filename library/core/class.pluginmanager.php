@@ -611,36 +611,51 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /**
      * Gets an instance of a given plugin.
      *
-     * @param string $AccessName The key of the plugin.
-     * @param string $AccessType The type of key for the plugin which must be one of the following:
+     * @param string $name The key of the plugin.
+     * @param string $accessType The type of key for the plugin which must be one of the following:
+     *
      *  - Gdn_PluginManager::ACCESS_PLUGINNAME
      *  - Gdn_PluginManager::ACCESS_CLASSNAME
-     * @param mixed $Sender An object to pass to a new plugin instantiation.
+     * @param mixed $sender An object to pass to a new plugin instantiation.
      * @return Gdn_IPlugin The plugin instance.
      */
-    public function getPluginInstance($AccessName, $AccessType = self::ACCESS_CLASSNAME, $Sender = null) {
-        $ClassName = null;
-        switch ($AccessType) {
+    public function getPluginInstance($name, $accessType = self::ACCESS_CLASSNAME, $sender = null) {
+        $className = null;
+        switch ($accessType) {
             case self::ACCESS_PLUGINNAME:
-                $ClassName = val('ClassName', $this->getPluginInfo($AccessName), false);
-                break;
+                $addon = $this->addonManager->lookupAddon($name);
 
+                if ($addon === null || $addon->getPluginClass() == '') {
+                    throw new InvalidArgumentException("The $name plugin doesn't have a plugin class.", 500);
+                }
+                $className = $addon->getPluginClass();
+                break;
             case self::ACCESS_CLASSNAME:
             default:
-                $ClassName = $AccessName;
+                $className = $name;
+                $addon = $this->addonManager->lookupByClassname($className);
                 break;
         }
 
-        if (!class_exists($ClassName)) {
-            throw new Exception("Tried to load plugin '{$ClassName}' from access name '{$AccessName}:{$AccessType}', but it doesn't exist.");
+        if (!class_exists($className)) {
+            throw new Exception("Tried to load plugin '{$className}' from access name '{$name}:{$accessType}', but it doesn't exist.");
         }
 
-        if (!array_key_exists($ClassName, $this->instances)) {
-            $this->instances[$ClassName] = (is_null($Sender)) ? new $ClassName() : new $ClassName($Sender);
-            $this->instances[$ClassName]->PluginInfo = $this->getPluginInfo($AccessName, $AccessType);
+        if (!isset($this->instances[$className])) {
+            if ($sender === null) {
+                $object = new $className();
+            } else {
+                $object = new $className($sender);
+            }
+            $object->PluginInfo = static::calcOldInfoArray($addon);
+            if (method_exists($object, 'setAddon')) {
+                $object->setAddon($addon);
+            }
+
+            $this->instances[$className] = $object;
         }
 
-        return $this->instances[$ClassName];
+        return $this->instances[$className];
     }
 
     /**

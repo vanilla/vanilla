@@ -660,6 +660,21 @@ class AddonManager {
     }
 
     /**
+     * Check whether or not an addon is enabled.
+     *
+     * @param string $key The addon key.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return bool Returns
+     */
+    public function isEnabled($key, $type) {
+        if ($type === Addon::TYPE_ADDON) {
+            $key = strtolower($key);
+        }
+        $enabled = array_key_exists($key, $this->enabled);
+        return $enabled;
+    }
+
+    /**
      * Get the paths to the current translation files.
      *
      * @param string $locale The locale to get the translation paths for.

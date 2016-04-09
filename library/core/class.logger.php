@@ -8,6 +8,8 @@
  * @since 2.2
  */
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Global event logging object.
  *
@@ -48,20 +50,19 @@ class Logger {
     protected static $logLevel;
 
     /**
-     *
+     * Set the logger.
      *
      * @param LoggerInterface $value Specify a new value to set the logger to.
      */
-    public static function setLogger(LoggerInterface $value = null) {
+    public static function setLogger($value = null) {
         if ($value !== null) {
             self::$instance = $value;
         } else {
-            self::$instance = new BaseLogger();
+            self::$instance = new \Vanilla\Logger();
         }
     }
 
     /**
-     *
      *
      * @return LoggerInterface
      */

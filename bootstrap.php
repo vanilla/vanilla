@@ -137,11 +137,13 @@ Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::Factory
 // PluginManager
 Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
-// Start all of the addons.
-Gdn::addonManager()->startAddonsByKey([c('Garden.Theme')], Addon::TYPE_THEME);
+// Start the addons, plugins, and applications.
 Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
-Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
+Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
+
+$currentTheme = c(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+Gdn::addonManager()->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
 // Load the configurations for enabled addons.
 foreach (Gdn::addonManager()->getEnabled() as $addon) {

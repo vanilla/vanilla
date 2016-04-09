@@ -51,21 +51,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * methods.
      */
     public function start($Force = false) {
-
-        if (function_exists('apc_fetch') && c('Garden.Apc', false)) {
-            $this->Apc = true;
-        }
-
-        // Build list of all available themes
-        $this->availableThemes($Force);
-
-        // If there is a hooks file in the theme folder, include it.
-        $ThemeName = $this->currentTheme();
-        $ThemeInfo = $this->getThemeInfo($ThemeName);
-        $ThemeHooks = val('RealHooksFile', $ThemeInfo, null);
-        if (file_exists($ThemeHooks)) {
-            include_once($ThemeHooks);
-        }
+        // Do nothing. The plugin manager handles the theme hooks.
     }
 
     /**

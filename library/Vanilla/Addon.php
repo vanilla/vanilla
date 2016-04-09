@@ -94,7 +94,7 @@ class Addon {
             }
 
             if (file_exists($this->path('/settings/bootstrap.php'))) {
-                $this->special['bootstrap'] = '/settings/configuration.php';
+                $this->special['bootstrap'] = '/settings/bootstrap.php';
             } elseif (file_exists($this->path('/bootstrap.php'))) {
                 $this->special['bootstrap'] = '/bootstrap.php';
             }

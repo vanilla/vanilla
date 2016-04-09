@@ -10,6 +10,7 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\AddonManager;
 
 /**
  * Plugin Manager.
@@ -70,10 +71,16 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     protected $Apc = false;
 
     /**
+     * @var AddonManager
+     */
+    private $addonManager;
+
+    /**
      *
      */
-    public function __construct() {
+    public function __construct(AddonManager $addonManager = null) {
         parent::__construct();
+        $this->addonManager = $addonManager;
     }
 
     /**

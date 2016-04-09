@@ -9,6 +9,7 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\AddonManager;
 
 /**
  * Manages available applications, enabling and disabling them.
@@ -23,6 +24,18 @@ class Gdn_ApplicationManager {
 
     /** @var array The valid paths to search for applications. */
     public $Paths = array(PATH_APPLICATIONS);
+
+    /**
+     * @var AddonManager
+     */
+    private $addonManager;
+
+    /**
+     *
+     */
+    public function __construct(AddonManager $addonManager = null) {
+        $this->addonManager = $addonManager;
+    }
 
     /**
      * Get a list of the available applications.
@@ -235,7 +248,7 @@ class Gdn_ApplicationManager {
         }
 
         // Hook directly into the autoloader and force it to load the newly tested application
-        Gdn::addonManager()->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
+        $this->addonManager->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
 
         // Call the application's setup method
         $hooks = $applicationName.'Hooks';
@@ -314,7 +327,7 @@ class Gdn_ApplicationManager {
         );
 
         // Clear the object caches.
-        Gdn::addonManager()->stopAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
+        $this->addonManager->stopAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
 
         $this->EventArguments['AddonName'] = $applicationName;
         Gdn::pluginManager()->callEventHandlers($this, 'ApplicationManager', 'AddonDisabled');

@@ -129,13 +129,13 @@ Gdn::factoryInstall(
 spl_autoload_register([Gdn::addonManager(), 'autoload']);
 
 // ApplicationManager
-Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager');
+Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
 // ThemeManager
-Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
+Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
 // PluginManager
-Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
+Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
 // Start all of the addons.
 Gdn::addonManager()->startAddonsByKey([c('Garden.Theme')], Addon::TYPE_THEME);
@@ -218,27 +218,17 @@ Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
 /**
  * Extension Startup
  *
- * Allow installed Extensions (Applications, Themes, Plugins) to execute startup
- * and bootstrap procedures that they may have, here.
+ * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
  */
 
-// Applications startup
-foreach (Gdn::applicationManager()->enabledApplicationFolders() as $applicationName => $applicationFolder) {
-    // Include the application's bootstrap.
-    $gdnPath = PATH_APPLICATIONS."/{$applicationFolder}/settings/bootstrap.php";
-    if (file_exists($gdnPath)) {
-        include_once($gdnPath);
-    }
-
-    // Include the application's hooks.
-    $hooksPath = PATH_APPLICATIONS."/{$applicationFolder}/settings/class.hooks.php";
-    if (file_exists($hooksPath)) {
-        include_once($hooksPath);
+// Bootstrapping.
+foreach (Gdn::addonManager()->getEnabled() as $addon) {
+    /* @var Addon $addon */
+    if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
+        $bootstrapPath = $addon->path($bootstrapPath);
+        include $bootstrapPath;
     }
 }
-
-unset($gdnPath);
-unset($hooksPath);
 
 // Themes startup
 Gdn::themeManager()->start();

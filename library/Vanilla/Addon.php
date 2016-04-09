@@ -184,6 +184,8 @@ class Addon {
      * @return string Returns a full path.
      */
     public function path($subpath = '', $relative = self::PATH_FULL) {
+        $subpath = $subpath ? '/'.ltrim($subpath, '\\/') : '';
+
         switch ($relative) {
             case self::PATH_FULL:
                 return PATH_ROOT.$this->subdir.$subpath;

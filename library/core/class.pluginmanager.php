@@ -68,16 +68,15 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /** @var bool Whether or not to trace some event information. */
     public $Trace = false;
 
-    /** @var bool Whether to use APC for plugin cache storage. */
-    private $apc = false;
-
     /**
      * @var AddonManager
      */
     private $addonManager;
 
     /**
+     * Initialize a new instance of the {@link Gdn_PluginManager} class.
      *
+     * @param AddonManager $addonManager The addon manager that manages all of the addons.
      */
     public function __construct(AddonManager $addonManager = null) {
         parent::__construct();
@@ -96,8 +95,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Is the plugin manager started?
      *
-     * @return bool
+     * @return bool Returns **true** if the plugin manager is started or **false** otherwise.
      */
     public function started() {
         return $this->started;
@@ -125,48 +125,21 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * The {@link AddonManager} does all this now.
      *
+     * @deprecated
      */
     public function forceAutoloaderIndex() {
-        $AutoloaderMap = Gdn_Autoloader::getMap(Gdn_Autoloader::MAP_LIBRARY, Gdn_Autoloader::CONTEXT_PLUGIN);
-        if (!$AutoloaderMap) {
-            return;
-        }
-
-        $ExtraPaths = array();
-        foreach ($this->availablePlugins() as $AvailablePlugin) {
-            $ExtraPaths[] = array(
-                'path' => val('RealRoot', $AvailablePlugin),
-                'topic' => strtolower(val('Folder', $AvailablePlugin))
-            );
-        }
-
-
-        $AutoloaderMap->index($ExtraPaths);
+        deprecated('Gdn_PuginManager->forceAutoloaderIndex()');
     }
 
     /**
+     * The {@link AddonManager} does all this now.
      *
-     *
-     * @param null $SearchPaths
+     * @deprecated
      */
-    public function clearPluginCache($SearchPaths = null) {
-        if (!is_null($SearchPaths)) {
-            if (!is_array($SearchPaths)) {
-                $SearchPaths = array($SearchPaths);
-            }
-        } else {
-            $SearchPaths = $this->searchPaths();
-        }
-
-        foreach ($SearchPaths as $SearchPath => $SearchPathName) {
-            $SearchPathCacheKey = "Garden.Plugins.PathCache.{$SearchPath}";
-            if ($this->apc) {
-                apc_delete($SearchPathCacheKey);
-            } else {
-                Gdn::cache()->remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
-            }
-        }
+    public function clearPluginCache() {
+        deprecated('Gdn_PluginManager->clearPluginCache()');
     }
 
     public function enabledPlugins($Force = false) {

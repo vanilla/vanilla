@@ -48,7 +48,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     protected $AlternatePluginSearchPaths = null;
 
     /** @var array A simple list of plugins that have already been registered. */
-    protected $RegisteredPlugins = array();
+    private $registeredPlugins = array();
 
     /** @var array  An associative array of EventHandlerName => PluginName pairs. */
     private $_EventHandlerCollection = array();
@@ -84,29 +84,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
-     * Sets up the plugin framework
+     * Set up the plugin framework.
      *
-     * This method indexes all available plugins and extracts their information.
-     * It then determines which plugins have been enabled, and includes them.
-     * Finally, it parses all plugin files and extracts their events and plugged
-     * methods.
      */
     public function start($Force = false) {
-
-        if (function_exists('apc_fetch') && c('Garden.Apc', false)) {
-            $this->Apc = true;
-        }
-
-        // Build list of all available plugins
-        $this->availablePlugins($Force);
-
-        // Build list of all enabled plugins
-        $this->enabledPlugins($Force);
-
-        // Include enabled plugin source files
-        $this->includePlugins();
-
-        // Register hooked methods
+        // Register hooked methods.
         $this->registerPlugins();
 
         $this->Started = true;
@@ -457,25 +439,21 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      *  }
      */
     public function registerPlugins() {
+        $addonPlugins  = [];
+        foreach ($this->addonManager->getEnabled() as $addon) {
+            /* @var \Vanilla\Addon $addon */
+            if (!($pluginClass = $addon->getPluginClass()) ||
+                array_key_exists($pluginClass, $this->registeredPlugins)) {
 
-        // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
-        foreach (get_declared_classes() as $ClassName) {
-            if ($ClassName == 'Gdn_Plugin') {
                 continue;
             }
-
-            // Only register the plugin if it implements the Gdn_IPlugin interface
-            if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
-                // If this plugin was already indexed, skip it.
-                if (array_key_exists($ClassName, $this->RegisteredPlugins)) {
-                    continue;
-                }
-
-                // Register this plugin's methods
-                $this->registerPlugin($ClassName);
-
+            if (is_a($pluginClass, '\Gdn_IPlugin', true)) {
+                $this->registerPlugin($pluginClass);
             }
+
+            $addonPlugins[] = $pluginClass;
         }
+        return $addonPlugins;
     }
 
     /**
@@ -484,7 +462,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return array
      */
     public function registeredPlugins() {
-        return $this->RegisteredPlugins;
+        return $this->registeredPlugins;
     }
 
     /**
@@ -521,7 +499,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             }
         }
 
-        $this->RegisteredPlugins[$ClassName] = true;
+        $this->registeredPlugins[$ClassName] = true;
     }
 
     /**
@@ -534,8 +512,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $this->removeFromCollectionByPrefix($PluginClassName, $this->_EventHandlerCollection);
         $this->removeFromCollectionByPrefix($PluginClassName, $this->_MethodOverrideCollection);
         $this->removeFromCollectionByPrefix($PluginClassName, $this->_NewMethodCollection);
-        if (array_key_exists($PluginClassName, $this->RegisteredPlugins)) {
-            unset($this->RegisteredPlugins[$PluginClassName]);
+        if (array_key_exists($PluginClassName, $this->registeredPlugins)) {
+            unset($this->registeredPlugins[$PluginClassName]);
         }
 
         return true;

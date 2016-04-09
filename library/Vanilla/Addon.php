@@ -92,6 +92,12 @@ class Addon {
             if (file_exists($this->path('/settings/configuration.php'))) {
                 $this->special['config'] = '/settings/configuration.php';
             }
+
+            if (file_exists($this->path('/settings/bootstrap.php'))) {
+                $this->special['bootstrap'] = '/settings/configuration.php';
+            } elseif (file_exists($this->path('/bootstrap.php'))) {
+                $this->special['bootstrap'] = '/bootstrap.php';
+            }
         }
 
         // Scan for translations.

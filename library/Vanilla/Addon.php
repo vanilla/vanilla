@@ -259,10 +259,12 @@ class Addon {
             $array = $PluginInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_PLUGIN;
+            $this->special['oldType'] = 'plugin';
         } elseif (!empty($ApplicationInfo) && is_array($ApplicationInfo)) {
             $array = $ApplicationInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_APPLICATION;
+            $this->special['oldType'] = 'application';
         } elseif (!empty($ThemeInfo) && is_array($ThemeInfo)) {
             $array = $ThemeInfo;
             $type = static::TYPE_THEME;

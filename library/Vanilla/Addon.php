@@ -693,6 +693,17 @@ class Addon {
     }
 
     /**
+     * Get this addon's raw case-sensitive key.
+     *
+     * Addon's have a lowercase key, but some places still require the uppercase one.
+     *
+     * @return string Returns the key as a string.
+     */
+    public function getRawKey() {
+        return $this->getInfoValue('keyRaw', $this->getKey());
+    }
+
+    /**
      * Support {@link var_export()} for caching.
      *
      * @param array $array The array to load.
@@ -787,20 +798,25 @@ class Addon {
      * The test includes some of the files on this addon which will throw an exception if there are any major issues.
      */
     public function test() {
-        // Include the plugin file.
-        if ($className = $this->getPluginClass()) {
-            list($_, $path) = $this->classes[$className];
-            include $this->path($path);
-        }
+        try {
+            // Include the plugin file.
+            if ($className = $this->getPluginClass()) {
+                list($_, $path) = $this->classes[$className];
+                include $this->path($path);
+            }
 
-        // Include the configuration file.
-        if ($configPath = $this->getSpecial('config')) {
-            include $this->path($configPath);
-        }
+            // Include the configuration file.
+            if ($configPath = $this->getSpecial('config')) {
+                include $this->path($configPath);
+            }
 
-        // Include locale files.
-        foreach ($this->getTranslations() as $path) {
-            include $this->path($path);
+            // Include locale files.
+            foreach ($this->getTranslations() as $path) {
+                include $this->path($path);
+            }
+        } catch (\Throwable $ex) {
+            // PHP 7 can trap more errors, so cast it into a PHP 5.x compatible exception.
+            throw new \Exception($ex->getMessage(), $ex->getCode());
         }
     }
 

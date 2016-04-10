@@ -762,29 +762,14 @@ class Addon {
         // Split the version up on operator boundaries.
         $final = self::splitRequirement($requirement);
 
-        // Walk through all of the requirements to make sure they are met.
-        $lastValid = true;
-        foreach ($final as $req) {
-            $req += ['op' => '==', 'v' => '0.0', 'logic' => ',', 'v2' => '999999'];
-            $op = $req['op'];
-
-            if ($op === '-') {
-                $valid = version_compare($version, $req['v'], '>=') && version_compare($version, $req['v2'], '<=');
-            } else {
-                $valid = version_compare($version, $req['v'], $op);
-            }
-
-            if (!$valid && ($req['logic'] === ',' || !$lastValid)) {
-                return false;
-            }
-
-            $lastValid = $valid;
-        }
-        return true;
+        $valid = self::testRequirement($version, $final);
+        return $valid;
     }
 
     /**
-     * @param $requirement
+     * Split a requirements string into comparisons.
+     *
+     * @param string $requirement The requirement to split.
      * @return array
      */
     private static function splitRequirement($requirement) {
@@ -794,7 +779,7 @@ class Addon {
             -1,
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );
-        $final = [];
+        $working = [];
         $j = -1;
         foreach ($parts as $i => $part) {
             if ($part !== ' ') {
@@ -807,36 +792,106 @@ class Addon {
                 case '>=':
                 case '<=':
                 case '!=':
-                    $j = count($final);
-                    $final[$j] = ['op' => $part];
+                    $j = count($working);
+                    $working[$j] = ['op' => $part];
                     break;
                 case '-':
                     // The last version can't have an operator already.
-                    if (!empty($final[$j]['v']) && empty($final[$j]['op'])) {
-                        $final[$j]['op'] = $part;
+                    if (!empty($working[$j]['v']) && empty($working[$j]['op'])) {
+                        $working[$j]['op'] = $part;
                     }
                     break;
                 case ',':
                 case ' ':
                 case '||':
-                    $part = $part === ' ' ? ',' : $part;
-                    if (!empty($final[$j]['v'])) {
-                        $final[$j]['logic'] = $part;
+                    $logic = [',' => 'and', ' ' => 'and', '||' => 'or'][$part];
+                    if (!empty($working[$j]['v'])) {
+                        $working[$j]['logic'] = $logic;
                     }
                     break;
                 default:
                     // This is a version.
-                    if (isset($final[$j]['op']) && $final[$j]['op'] === '-') {
-                        $final[$j]['v2'] = $part;
-                    } elseif (!isset($final[$j]) || !empty($final[$j]['v'])) {
-                        $j = count($final);
-                        $final[$j]['v'] = $part;
+                    if (isset($working[$j]['op']) && $working[$j]['op'] === '-') {
+                        $working[$j]['v2'] = $part;
+                    } elseif (!isset($working[$j]) || !empty($working[$j]['v'])) {
+                        $j = count($working);
+                        $working[$j]['v'] = $part;
                     } else {
-                        $final[$j]['v'] = $part;
+                        $working[$j]['v'] = $part;
                     }
             }
         }
+
+        $andGroups = [];
+        $andStart = 0;
+        foreach ($working as $i => $row) {
+            $logic = isset($row['logic']) ? $row['logic'] : 'and';
+
+            if ($logic === 'or') {
+                // Split off the last and group.
+                $andGroups[] = array_slice($working, $andStart, $i - $andStart + 1);
+                $andStart = $i + 1;
+            }
+        }
+        if ($andStart <= count($working)) {
+            $andGroups[] = array_slice($working, $andStart);
+        }
+
+        if (count($andGroups) === 1) {
+            $andGroup = reset($andGroups);
+            if (count($andGroup) == 1) {
+                $final = reset($andGroup);
+            } else {
+                $final = ['and', $andGroup];
+            }
+        } else {
+            $items = [];
+            foreach ($andGroups as $andGroup) {
+                if (count($andGroup) === 1) {
+                    $items[] = reset($andGroup);
+                } else {
+                    $items[] = ['and', $andGroup];
+                }
+            }
+
+            $final = ['or', $items];
+        }
+
         return $final;
+    }
+
+    /**
+     * @param $version
+     * @param $req
+     * @return bool
+     */
+    private static function testRequirement($version, $req) {
+        if (isset($req[0])) {
+            // This is a boolean group.
+            $logic = $req[0];
+            foreach ($req[1] as $part) {
+                $valid = self::testRequirement($version, $part);
+
+                if ($valid && $logic === 'or') {
+                    return true;
+                } elseif (!$valid && $logic === 'and') {
+                    return false;
+                }
+            }
+
+            return $logic === 'or' ? false : true;
+        } else {
+            // This is an individual requirement.
+            $req += ['op' => '==', 'v' => '0.0', 'logic' => ',', 'v2' => '999999'];
+            $op = $req['op'];
+
+            if ($op === '-') {
+                $valid = version_compare($version, $req['v'], '>=') && version_compare($version, $req['v2'], '<=');
+            } else {
+                $valid = version_compare($version, $req['v'], $op);
+            }
+            return $valid;
+        }
     }
 
     /**

@@ -704,6 +704,19 @@ class Addon {
     }
 
     /**
+     * Get the required addons for this addon.
+     *
+     * @return array Returns an array in the form addonKey => version.
+     */
+    public function getRequirements() {
+        $result = $this->getInfoValue('require', []);
+        if (!is_array($result)) {
+            return [];
+        }
+        return $result;
+    }
+
+    /**
      * Support {@link var_export()} for caching.
      *
      * @param array $array The array to load.

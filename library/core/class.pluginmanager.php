@@ -180,9 +180,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @param array $EnabledPlugins An array of plugins that should be included.
      * If this argument is null then all enabled plugins will be included.
      * @return array The plugin info array for all included plugins.
+     * @deprecated
+     * @todo Remove this
      */
     public function includePlugins($EnabledPlugins = null) {
-
+        deprecated('Gdn_PluginManager->includePlugins()');
         // Include all of the plugins.
         if (is_null($EnabledPlugins)) {
             $EnabledPlugins = $this->enabledPlugins();
@@ -1268,14 +1270,15 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Split a string containing several authors.
      *
-     *
-     * @param $AuthorsString
-     * @param string $Format
-     * @return array|string
+     * @param string $authorsString The author string.
+     * @param string $format What format to return the result in.
+     * @return array|string Returns the authors as an array or string if HTML is requested.
+     * @deprecated The authors array is already properly split in the {@link Addon}.
      */
-    public static function splitAuthors($AuthorsString, $Format = 'html') {
-        $Authors = explode(';', $AuthorsString);
+    public static function splitAuthors($authorsString, $format = 'html') {
+        $Authors = explode(';', $authorsString);
         $Result = array();
         foreach ($Authors as $AuthorString) {
             $Parts = explode(',', $AuthorString, 3);
@@ -1290,7 +1293,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $Result[] = $Author;
         }
 
-        if (strtolower($Format) == 'html') {
+        if (strtolower($format) == 'html') {
             // Build the html for the authors.
             $Htmls = array();
             foreach ($Result as $Author) {
@@ -1311,55 +1314,37 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
-     * Hooks to the various actions, i.e. enable, disable and remove.
+     * Hooks to the various actions, i.e. enable, disable and load.
      *
-     * @param string $PluginName
-     * @param string $ForAction which action to hook it to, i.e. enable, disable or remove
-     * @param boolean $Callback whether to perform the hook method
+     * @param string $pluginName The name of the plugin.
+     * @param string $forAction Which action to hook it to, i.e. enable, disable or load.
+     * @param boolean $callback whether to perform the hook method.
      * @return void
      */
-    private function pluginHook($PluginName, $ForAction, $Callback = false) {
-
-        switch ($ForAction) {
+    private function pluginHook($pluginName, $forAction, $callback = false) {
+        switch ($forAction) {
             case self::ACTION_ENABLE:
-                $HookMethod = 'Setup';
+                $methodName = 'setup';
                 break;
             case self::ACTION_DISABLE:
-                $HookMethod = 'OnDisable';
+                $methodName = 'onDisable';
                 break;
-            //case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
             case self::ACTION_ONLOAD:
-                $HookMethod = 'OnLoad';
+                $methodName = 'onLoad';
                 break;
         }
 
-        $PluginInfo = val($PluginName, $this->availablePlugins(), false);
-        $PluginFolder = val('Folder', $PluginInfo, false);
-        $PluginClassName = val('ClassName', $PluginInfo, false);
-
-        if ($PluginFolder !== false && $PluginClassName !== false && class_exists($PluginClassName) === false) {
-            if ($ForAction !== self::ACTION_DISABLE) {
-                $this->includePlugins(array($PluginName => true));
-            }
-
-            $this->pluginCallbackExecution($PluginClassName, $HookMethod);
-        } elseif ($Callback === true) {
-            $this->pluginCallbackExecution($PluginClassName, $HookMethod);
+        $addon = $this->addonManager->lookupAddon($pluginName);
+        if (!$addon || !$addon->getPluginClass()) {
+            return false;
         }
-    }
 
-    /**
-     * Executes the plugin hook action if it exists.
-     *
-     * @param string $PluginClassName
-     * @param string $HookMethod
-     * @return void
-     */
-    private function pluginCallbackExecution($PluginClassName, $HookMethod) {
-        if (class_exists($PluginClassName)) {
-            $Plugin = new $PluginClassName();
-            if (method_exists($PluginClassName, $HookMethod)) {
-                $Plugin->$HookMethod();
+        $pluginClass = $addon->getPluginClass();
+
+        if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
+            $plugin = new $pluginClass();
+            if (method_exists($pluginClass, $methodName)) {
+                $plugin->$methodName();
             }
         }
     }

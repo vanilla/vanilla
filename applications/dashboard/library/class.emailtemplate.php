@@ -459,7 +459,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
             'footer' => $this->getFooter()
         );
 
-        foreach($email as $key => $val) {
+        foreach ($email as $key => $val) {
             if (!$val) {
                 unset($email[$key]);
             }

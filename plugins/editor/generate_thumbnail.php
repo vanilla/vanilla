@@ -62,7 +62,7 @@ if (!function_exists('generate_thumbnail')):
       // 1GB = 1024b * 1024b * 1024b
       // This switch statement will trickle down from its proper unit,
       // as no breaks.
-      $bytes_from = function ($human_readable_size) {
+      $bytes_from = function($human_readable_size) {
          $size = trim($human_readable_size);
          switch (strtolower(substr($size, -1))) {
             case 'g':
@@ -79,7 +79,7 @@ if (!function_exists('generate_thumbnail')):
       // Notice: Undefined offset: -9223372036854775808 in /var/www/frontend/plugins/editor/generate_thumbnail.php on line 85
       // Translate bytes to human readable format. Use for php.ini values.
       // Based off of Chris Jester-Young's implementation.
-      $bytes_to = function ($byte_size, $precision = 0) {
+      $bytes_to = function($byte_size, $precision = 0) {
          $base = log($byte_size) / log(1024);
          $suffixes = array('B', 'k', 'M', 'G', 'T');
          $floorbase = (floor($base) >= 0)

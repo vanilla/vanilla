@@ -625,7 +625,7 @@ EOT;
                 $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
-            if(!$allowConnect) {
+            if (!$allowConnect) {
                 // Since we are not connecting a joining user to an existing user...
 
                 // make sure the photo of the existing user doesn't show up on the form.
@@ -1086,7 +1086,7 @@ EOT;
 
                         // This resets vanilla's internal "where am I" to the homepage. Needed.
                         Gdn::request()->withRoute('DefaultController');
-                        $this->SelfUrl = url('');//Gdn::request()->Path();
+                        $this->SelfUrl = url(''); //Gdn::request()->Path();
 
                         $this->View = 'syncfailed';
                         $this->ProviderSite = $Authenticator->getProviderUrl();

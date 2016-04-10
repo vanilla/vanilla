@@ -62,7 +62,7 @@ class LogController extends DashboardController {
         $this->setData('Users', $Users);
 
         $this->setData('Action', $Action);
-        $this->setData('ActionUrl', url('/log/' . $Action));
+        $this->setData('ActionUrl', url('/log/'.$Action));
         $this->setData('ItemCount', count($LogIDArray));
         $this->render();
     }

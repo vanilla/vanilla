@@ -99,7 +99,7 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
-        Gdn::pluginManager()->EventArguments['CategoryIDs'] =& $Watch;
+        Gdn::pluginManager()->EventArguments['CategoryIDs'] = & $Watch;
         Gdn::pluginManager()->fireEvent('CategoryWatch');
 
         if ($AllCount == count($Watch)) {

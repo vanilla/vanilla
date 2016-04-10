@@ -78,7 +78,7 @@ class EditorPlugin extends Gdn_Plugin {
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
 
         // Check for additional formats
-        $this->EventArguments['formats'] =& $this->Formats;
+        $this->EventArguments['formats'] = & $this->Formats;
         $this->fireEvent('GetFormats');
     }
 
@@ -318,7 +318,7 @@ class EditorPlugin extends Gdn_Plugin {
      */
     public function sortWeightedOptions(&$options) {
         if (is_array($options)) {
-            uasort($options, function ($a, $b) {
+            uasort($options, function($a, $b) {
                 if (!empty($a['sort']) && !empty($b['sort'])) {
                     return ($a['sort'] < $b['sort']);
                 }
@@ -348,10 +348,10 @@ class EditorPlugin extends Gdn_Plugin {
         $fontFamilyOptions = $this->getFontFamilyOptions();
 
         // Let plugins and themes override the defaults.
-        $this->EventArguments['actions'] =& $allowedEditorActions;
-        $this->EventArguments['colors'] =& $fontColorList;
-        $this->EventArguments['format'] =& $fontFormatOptions;
-        $this->EventArguments['font'] =& $fontFamilyOptions;
+        $this->EventArguments['actions'] = & $allowedEditorActions;
+        $this->EventArguments['colors'] = & $fontColorList;
+        $this->EventArguments['format'] = & $fontFormatOptions;
+        $this->EventArguments['font'] = & $fontFamilyOptions;
         $this->fireEvent('toolbarConfig');
 
         // Order the specified dropdowns.
@@ -580,7 +580,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = array();
-        $this->EventArguments['definitions'] =& $additionalDefinitions;
+        $this->EventArguments['definitions'] = & $additionalDefinitions;
         $this->fireEvent('GetJSDefinitions');
 
         // Make sure we still have an array after all event handlers have had their turn and iterate through the result.
@@ -651,7 +651,7 @@ class EditorPlugin extends Gdn_Plugin {
             // Get the generated editor toolbar from getEditorToolbar, and assign it data object for view.
             if (!isset($c->Data['_EditorToolbar'])) {
                 $editorToolbar = $this->getEditorToolbar($attributes);
-                $this->EventArguments['EditorToolbar'] =& $editorToolbar;
+                $this->EventArguments['EditorToolbar'] = & $editorToolbar;
                 $this->fireEvent('InitEditorToolbar');
 
                 // Set data for view
@@ -726,10 +726,10 @@ class EditorPlugin extends Gdn_Plugin {
             $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
 
             $this->EventArguments['CategoryID'] = Gdn::request()->post('CategoryID');
-            $this->EventArguments['TmpFilePath'] =& $tmpFilePath;
+            $this->EventArguments['TmpFilePath'] = & $tmpFilePath;
             $this->EventArguments['FileExtension'] = $fileExtension;
             $this->EventArguments['ValidImage'] = $validImage;
-            $this->EventArguments['AbsoluteFileDestination'] =& $absoluteFileDestination;
+            $this->EventArguments['AbsoluteFileDestination'] = & $absoluteFileDestination;
             $this->EventArguments['DiscussionID'] = $discussionID;
             $this->fireEvent('BeforeSaveUploads');
 
@@ -1017,7 +1017,7 @@ class EditorPlugin extends Gdn_Plugin {
 
         if (is_array($mediaList)) {
             // Filter out the ones that don't match.
-            $attachments = array_filter($mediaList, function ($attachment) use ($foreignId, $Type) {
+            $attachments = array_filter($mediaList, function($attachment) use ($foreignId, $Type) {
                 if (isset($attachment['ForeignID'])
                 && $attachment['ForeignID'] == $foreignId
                 && $attachment['ForeignTable'] == $Type

@@ -804,7 +804,7 @@ class Addon {
                 case ',':
                 case ' ':
                 case '||':
-                    $logic = [',' => 'and', ' ' => 'and', '||' => 'or'][$part];
+                    $logic = $part === '||' ? 'or' : 'and';
                     if (!empty($working[$j]['v'])) {
                         $working[$j]['logic'] = $logic;
                     }

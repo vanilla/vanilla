@@ -244,6 +244,26 @@ class AddonManager {
     }
 
     /**
+     * Test that an addon can be enabled.
+     * 
+     * @param Addon $addon The addon to test.
+     * @param bool $throw Whether to throw an exception with som error information.
+     */
+    public function testAddon(Addon $addon, $throw = false) {
+        // TODO: Test requirements.
+
+
+        try {
+            return $addon->test();
+        } catch (\Exception $ex) {
+            if ($throw) {
+                throw $ex;
+            }
+            return false;
+        }
+    }
+
+    /**
      * Get a list of addon directories for a given type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.

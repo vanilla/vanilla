@@ -1166,52 +1166,65 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $PluginName
-     * @param $Validation
-     * @param bool $Setup
-     * @param string $EnabledPluginValueIndex
+     * @param $pluginName
+     * @param Gdn_Validation $validation
+     * @param bool $setup
      * @return bool
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function enablePlugin($PluginName, $Validation, $Setup = false, $EnabledPluginValueIndex = 'Folder') {
-        // Check that the plugin is in AvailablePlugins...
-        $PluginInfo = $this->getPluginInfo($PluginName);
-
-        // Couldn't load the plugin info.
-        if (!$PluginInfo) {
-            return false;
-        }
-
+    public function enablePlugin($pluginName, $validation, $setup = true) {
         // Check to see if the plugin is already enabled.
-        if (array_key_exists($PluginName, $this->enabledPlugins())) {
+        if ($this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON)) {
             throw new Gdn_UserException(T('The plugin is already enabled.'));
         }
 
-        $this->testPlugin($PluginName, $Validation, $Setup);
-
-        if (is_object($Validation) && count($Validation->results()) > 0) {
+        $addon = $this->addonManager->lookupAddon($pluginName, Addon::TYPE_ADDON);
+        if (!$addon) {
             return false;
         }
 
-        // Write enabled state to config
-        SaveToConfig("EnabledPlugins.{$PluginName}", true);
-        Logger::event(
-            'addon_enabled',
-            LogLevel::NOTICE,
-            'The {addonName} plugin was enabled.',
-            array('addonName' => $PluginName)
-        );
+        if (!$validation instanceof Gdn_Validation) {
+            $validation = new Gdn_Validation();
+        }
 
-        $this->enabledPlugins[$PluginName] = true;
+        try {
+            $this->addonManager->testAddon($addon, true);
+        } catch (\Exception $ex) {
+            $validation->addValidationResult('addon', '@'.$ex->getMessage());
+            return false;
+        }
+        
+        $rawKey = $addon->getRawKey();
 
-        $PluginClassName = GetValue('ClassName', $PluginInfo);
-        $this->registerPlugin($PluginClassName);
+        if ($setup) {
+            $this->addonManager->startAddon($addon);
+            $this->pluginHook($rawKey, self::ACTION_ENABLE, true);
+
+            // If setup succeeded, register any specified permissions
+            $permissions = val('registerPermissions', $addon->getInfo(), false);
+            if ($permissions != false) {
+                $PermissionModel = Gdn::permissionModel();
+                $PermissionModel->define($permissions);
+            }
+
+            // Write enabled state to config.
+            saveToConfig("EnabledPlugins.$rawKey", true);
+            Logger::event(
+                'addon_enabled',
+                Logger::INFO,
+                'The {addonName} plugin was enabled.',
+                array('addonName' => $rawKey)
+            );
+        }
+
+        $pluginClassName = $addon->getPluginClass();
+        $this->registerPlugin($pluginClassName);
 
         // Refresh the locale just in case there are some translations needed this request.
         Gdn::locale()->refresh();
 
-        $this->EventArguments['AddonName'] = $PluginName;
+        $this->EventArguments['AddonName'] = $rawKey;
         $this->fireEvent('AddonEnabled');
 
         return true;

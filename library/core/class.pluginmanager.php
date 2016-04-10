@@ -1278,7 +1278,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         if ($enabled) {
             Logger::event(
                 'addon_disabled',
-                LogLevel::NOTICE,
+                Logger::INFO,
                 'The {addonName} plugin was disabled.',
                 array('addonName' => $pluginName)
             );

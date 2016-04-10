@@ -23,13 +23,13 @@ class Addon {
     const PATH_LOCAL = 'local'; // path relative to the addon's subdirectory
     const PATH_REAL = 'real'; // realpath()
 
-    const PRIORITY_LOW = 100;
-    const PRIORITY_NORMAL = 1000;
-    const PRIORITY_HIGH = 10000;
+    const PRIORITY_LOW = 10;
+    const PRIORITY_NORMAL = 100;
+    const PRIORITY_HIGH = 1000;
 
     const PRIORITY_THEME = Addon::PRIORITY_HIGH;
     const PRIORITY_PLUGIN = Addon::PRIORITY_NORMAL;
-    const PRIORITY_LOCALE = 110;
+    const PRIORITY_LOCALE = 11;
     const PRIORITY_APPLICATION = Addon::PRIORITY_LOW;
 
     /**

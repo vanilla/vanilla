@@ -750,7 +750,7 @@ class AddonManager {
         $result = [];
         foreach ($addons as $addon) {
             /* @var Addon $addon */
-            foreach ($addon->getTranslations($locale) as $path) {
+            foreach ($addon->getTranslationPaths($locale) as $path) {
                 $result[] = $addon->path($path);
             }
         }

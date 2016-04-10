@@ -107,7 +107,7 @@ class Addon {
 
         // Scan for translations.
         $translations = $this->scanTranslations();
-        $this->setTranslations($translations);
+        $this->setTranslationPaths($translations);
 
         // Look for an icon.
 
@@ -464,7 +464,7 @@ class Addon {
      * classes found in the file.
      * @see http://stackoverflow.com/a/11114724/1984219
      */
-    public static function scanFile($path) {
+    private static function scanFile($path) {
         $classes = $nsPos = $final = [];
         $foundNamespace = false;
         $ii = 0;
@@ -599,12 +599,12 @@ class Addon {
     }
 
     /**
-     * Set the translations.
+     * Set the translation paths.
      *
-     * @param array $translations
+     * @param array $translations The new translation paths.
      * @return Addon Returns `$this` for fluent calls.
      */
-    private function setTranslations($translations) {
+    private function setTranslationPaths($translations) {
         $this->translations = $translations;
         return $this;
     }
@@ -730,7 +730,7 @@ class Addon {
             ->setSubdir($array['subdir'])
             ->setInfo($array['info'])
             ->setClasses($array['classes'])
-            ->setTranslations($array['translations'])
+            ->setTranslationPaths($array['translations'])
             ->setSpecialArray(empty($array['special']) ? [] : $array['special']);
 
         return $addon;
@@ -824,7 +824,7 @@ class Addon {
             }
 
             // Include locale files.
-            foreach ($this->getTranslations() as $path) {
+            foreach ($this->getTranslationPaths() as $path) {
                 include $this->path($path);
             }
         } catch (\Throwable $ex) {
@@ -866,7 +866,7 @@ class Addon {
      * @param string $locale If passed then only the translation paths for this locale will be returned.
      * @return array Returns an array of translation paths or an array of locale codes pointing to translation paths.
      */
-    public function getTranslations($locale = '') {
+    public function getTranslationPaths($locale = '') {
         if (empty($locale)) {
             return $this->translations;
         } else {

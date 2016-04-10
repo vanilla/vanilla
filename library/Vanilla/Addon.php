@@ -693,30 +693,6 @@ class Addon {
     }
 
     /**
-     * Get this addon's raw case-sensitive key.
-     *
-     * Addon's have a lowercase key, but some places still require the uppercase one.
-     *
-     * @return string Returns the key as a string.
-     */
-    public function getRawKey() {
-        return $this->getInfoValue('keyRaw', $this->getKey());
-    }
-
-    /**
-     * Get the required addons for this addon.
-     *
-     * @return array Returns an array in the form addonKey => version.
-     */
-    public function getRequirements() {
-        $result = $this->getInfoValue('require', []);
-        if (!is_array($result)) {
-            return [];
-        }
-        return $result;
-    }
-
-    /**
      * Support {@link var_export()} for caching.
      *
      * @param array $array The array to load.
@@ -777,14 +753,114 @@ class Addon {
     }
 
     /**
-     * Get an item from the special array.
+     * Check a version against a version requirement.
      *
-     * @param string $key The key in the special array.
-     * @param mixed $default The default if the key isn't set.
-     * @return mixed Returns the special item or {@link $default}.
+     * @param string $version The version to check.
+     * @param string $requirement The version requirement.
      */
-    public function getSpecial($key, $default = null) {
-        return isset($this->special[$key]) ? $this->special[$key] : $default;
+    public static function checkVersion($version, $requirement) {
+        // Split the version up on operator boundaries.
+        $final = self::splitRequirement($requirement);
+
+        // Walk through all of the requirements to make sure they are met.
+        $lastValid = true;
+        foreach ($final as $req) {
+            $req += ['op' => '==', 'v' => '0.0', 'logic' => ',', 'v2' => '999999'];
+            $op = $req['op'];
+
+            if ($op === '-') {
+                $valid = version_compare($version, $req['v'], '>=') && version_compare($version, $req['v2'], '<=');
+            } else {
+                $valid = version_compare($version, $req['v'], $op);
+            }
+
+            if (!$valid && ($req['logic'] === ',' || !$lastValid)) {
+                return false;
+            }
+
+            $lastValid = $valid;
+        }
+        return true;
+    }
+
+    /**
+     * @param $requirement
+     * @return array
+     */
+    private static function splitRequirement($requirement) {
+        $parts = preg_split(
+            '`( - |\s*>=\s*|\s*<=\s*|\s*>\s*|\s*<\s*|\s*!=\s*|\s*,\s*|\|\|| )`',
+            $requirement,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+        );
+        $final = [];
+        $j = -1;
+        foreach ($parts as $i => $part) {
+            if ($part !== ' ') {
+                $part = trim($part);
+            }
+
+            switch ($part) {
+                case '>':
+                case '<':
+                case '>=':
+                case '<=':
+                case '!=':
+                    $j = count($final);
+                    $final[$j] = ['op' => $part];
+                    break;
+                case '-':
+                    // The last version can't have an operator already.
+                    if (!empty($final[$j]['v']) && empty($final[$j]['op'])) {
+                        $final[$j]['op'] = $part;
+                    }
+                    break;
+                case ',':
+                case ' ':
+                case '||':
+                    $part = $part === ' ' ? ',' : $part;
+                    if (!empty($final[$j]['v'])) {
+                        $final[$j]['logic'] = $part;
+                    }
+                    break;
+                default:
+                    // This is a version.
+                    if (isset($final[$j]['op']) && $final[$j]['op'] === '-') {
+                        $final[$j]['v2'] = $part;
+                    } elseif (!isset($final[$j]) || !empty($final[$j]['v'])) {
+                        $j = count($final);
+                        $final[$j]['v'] = $part;
+                    } else {
+                        $final[$j]['v'] = $part;
+                    }
+            }
+        }
+        return $final;
+    }
+
+    /**
+     * Get this addon's raw case-sensitive key.
+     *
+     * Addon's have a lowercase key, but some places still require the uppercase one.
+     *
+     * @return string Returns the key as a string.
+     */
+    public function getRawKey() {
+        return $this->getInfoValue('keyRaw', $this->getKey());
+    }
+
+    /**
+     * Get the required addons for this addon.
+     *
+     * @return array Returns an array in the form addonKey => version.
+     */
+    public function getRequirements() {
+        $result = $this->getInfoValue('require', []);
+        if (!is_array($result)) {
+            return [];
+        }
+        return $result;
     }
 
     /**
@@ -843,6 +919,31 @@ class Addon {
     }
 
     /**
+     * Get an item from the special array.
+     *
+     * @param string $key The key in the special array.
+     * @param mixed $default The default if the key isn't set.
+     * @return mixed Returns the special item or {@link $default}.
+     */
+    public function getSpecial($key, $default = null) {
+        return isset($this->special[$key]) ? $this->special[$key] : $default;
+    }
+
+    /**
+     * Get translation paths.
+     *
+     * @param string $locale If passed then only the translation paths for this locale will be returned.
+     * @return array Returns an array of translation paths or an array of locale codes pointing to translation paths.
+     */
+    public function getTranslationPaths($locale = '') {
+        if (empty($locale)) {
+            return $this->translations;
+        } else {
+            return isset($this->translations[$locale]) ? $this->translations[$locale] : [];
+        }
+    }
+
+    /**
      * Get the path of a class within this addon.
      *
      * This is a case insensitive lookup.
@@ -858,19 +959,5 @@ class Addon {
             return $path;
         }
         return '';
-    }
-
-    /**
-     * Get translation paths.
-     *
-     * @param string $locale If passed then only the translation paths for this locale will be returned.
-     * @return array Returns an array of translation paths or an array of locale codes pointing to translation paths.
-     */
-    public function getTranslationPaths($locale = '') {
-        if (empty($locale)) {
-            return $this->translations;
-        } else {
-            return isset($this->translations[$locale]) ? $this->translations[$locale] : [];
-        }
     }
 }

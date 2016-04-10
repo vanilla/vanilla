@@ -1231,52 +1231,63 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Disable a plugin.
      *
-     *
-     * @param $PluginName
+     * @param string $pluginName The name of the plugin.
      * @return bool
      * @throws Exception
      */
-    public function disablePlugin($PluginName) {
-        // Get the plugin and make sure its name is the correct case.
-        $Plugin = $this->getPluginInfo($PluginName);
-        if ($Plugin) {
-            $PluginName = $Plugin['Index'];
+    public function disablePlugin($pluginName) {
+        $addon = $this->addonManager->lookupAddon($pluginName);
+
+        if (!$addon) {
+            return false;
         }
 
-        Gdn_Autoloader::smartFree(Gdn_Autoloader::CONTEXT_PLUGIN, $Plugin);
+        $pluginName = $addon->getRawKey();
+        $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
 
-        $enabled = $this->isEnabled($PluginName);
 
         // 1. Check to make sure that no other enabled plugins rely on this one
-        // Get all available plugins and compile their requirements
-        foreach ($this->enabledPlugins() as $CheckingName => $Trash) {
-            $CheckingInfo = $this->getPluginInfo($CheckingName);
-            $RequiredPlugins = val('RequiredPlugins', $CheckingInfo, false);
-            if (is_array($RequiredPlugins) && array_key_exists($PluginName, $RequiredPlugins) === true) {
-                throw new Exception(sprintf(T('You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'), $PluginName, $CheckingName));
+        // Get all available plugins and compile their requirements.
+        $dependants = $this->addonManager->getEnabledDependants($addon);
+        if (!empty($dependants)) {
+            $name = $addon->getInfoValue('name');
+
+            foreach ($dependants as $dependant) {
+                $dependantNames[] = $dependant->getInfoValue('name');
             }
+            $dependantNames = implode(', ', $dependantNames);
+
+            $msg = sprintf(t(
+                'Can\'t disable %1$s because %2$s depends on it.',
+                'You cannot disable the %1$s  addon because the following addons depend on it: %2$s.'
+            ), $name, $dependantNames);
+
+            throw new Gdn_UserException($msg, 400);
         }
 
         // 2. Perform necessary hook action
-        $this->pluginHook($PluginName, self::ACTION_DISABLE, true);
+        $this->pluginHook($pluginName, self::ACTION_DISABLE, true);
 
         // 3. Disable it.
-        SaveToConfig("EnabledPlugins.{$PluginName}", false);
-        unset($this->enabledPlugins[$PluginName]);
+        saveToConfig("EnabledPlugins.{$pluginName}", false);
+
+        $this->addonManager->stopAddon($addon);
+
         if ($enabled) {
             Logger::event(
                 'addon_disabled',
                 LogLevel::NOTICE,
                 'The {addonName} plugin was disabled.',
-                array('addonName' => $PluginName)
+                array('addonName' => $pluginName)
             );
         }
 
         // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
         Gdn::locale()->refresh();
 
-        $this->EventArguments['AddonName'] = $PluginName;
+        $this->EventArguments['AddonName'] = $pluginName;
         $this->fireEvent('AddonDisabled');
 
         return true;

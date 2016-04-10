@@ -244,6 +244,24 @@ class AddonManager {
     }
 
     /**
+     * Get all of the addons that depend on a given addon.
+     *
+     * @param Addon $addon The addon to check the requirements.
+     * @return array Returns an array of {@link Addon} objects.
+     */
+    public function getEnabledDependants(Addon $addon) {
+        $result = [];
+        foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
+            /* @var Addon $enabledAddon */
+            $requirements = array_change_key_case($enabledAddon->getRequirements());
+            if (array_key_exists($addon->getKey(), $requirements)) {
+                $result[$enabledKey] = $enabledAddon;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Test that an addon can be enabled.
      * 
      * @param Addon $addon The addon to test.

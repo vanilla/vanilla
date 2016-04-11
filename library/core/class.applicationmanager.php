@@ -36,7 +36,6 @@ class Gdn_ApplicationManager {
      */
     public function __construct(AddonManager $addonManager = null) {
         $this->addonManager = $addonManager;
-        Logger::log(Logger::DEBUG, 'Gdn_ApplicationManager constructed.');
     }
 
     /**

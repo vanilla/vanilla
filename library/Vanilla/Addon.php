@@ -861,9 +861,18 @@ class Addon {
     }
 
     /**
-     * @param $version
-     * @param $req
-     * @return bool
+     * Test an individual requirement.
+     *
+     * Requirements are arrays in the following form:
+     *
+     * - `['and', [requirements]]`: All requirements mast be valid.
+     * - `['or', [requirements]]`: One of the requirements must be valid.
+     * - `['op' => '<comparison>', 'v' => '<version>']`: An operator and version to compare.
+     * - `['op' => '-', 'v' => '<version>', 'v2' => '<version>']`: Compare a range of versions.
+     *
+     * @param string $version The version to test.
+     * @param array $req The requirement to test.
+     * @return bool Returns **true** if the test passes or **false** otherwise.
      */
     private static function testRequirement($version, $req) {
         if (isset($req[0])) {
@@ -940,8 +949,11 @@ class Addon {
      * Do a very basic test of this addon.
      *
      * The test includes some of the files on this addon which will throw an exception if there are any major issues.
+     *
+     * @param bool $throw Whether or not to throw an exception.
+     * @return bool Returns **true** if the addon was successfully tested or **false** otherwise.
      */
-    public function test() {
+    public function test($throw = true) {
         try {
             // Include the plugin file.
             if ($className = $this->getPluginClass()) {
@@ -958,9 +970,18 @@ class Addon {
             foreach ($this->getTranslationPaths() as $path) {
                 include $this->path($path);
             }
+            return true;
         } catch (\Throwable $ex) {
             // PHP 7 can trap more errors, so cast it into a PHP 5.x compatible exception.
-            throw new \Exception($ex->getMessage(), $ex->getCode());
+            $ex2 = new \Exception($ex->getMessage(), $ex->getCode());
+        } catch (\Exception $ex) {
+            $ex2 = $ex;
+        }
+
+        if ($throw) {
+            throw $ex2;
+        } else {
+            return false;
         }
     }
 

@@ -271,14 +271,8 @@ class AddonManager {
         // TODO: Test requirements.
 
 
-        try {
-            return $addon->test();
-        } catch (\Exception $ex) {
-            if ($throw) {
-                throw $ex;
-            }
-            return false;
-        }
+
+        return $addon->test($throw);
     }
 
     /**
@@ -331,9 +325,9 @@ class AddonManager {
         }
         if (function_exists('apc_delete_file')) {
             // This fixes a bug with some configurations of apc.
-            @apc_delete_file($filename);
+            apc_delete_file($filename);
         } elseif (function_exists('opcache_invalidate')) {
-            @opcache_invalidate($filename);
+            opcache_invalidate($filename);
         }
 
         @chmod($filename, $mode);
@@ -578,8 +572,9 @@ class AddonManager {
 
             // See if there is another class that can be registered in place.
             if (!empty($this->autoloadClassesBak[$classKey])) {
-                foreach ($this->autoloadClassesBak[$classKey] as $i => $row) {
-                    list($path, $addon) = $row;
+                foreach ($this->autoloadClassesBak[$classKey] as $i => $rowBak) {
+                    list($path, $addon) = $rowBak;
+                    /* @var Addon $maxAddon */
                     if (!isset($maxAddon) || $maxAddon->getPriority() < $addon->getPriority()) {
                         $maxAddon = $addon;
                         $maxIndex = $i;

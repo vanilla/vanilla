@@ -7,6 +7,7 @@
  * @package Dashboard
  * @since 2.0
  */
+use Vanilla\Addon;
 
 /**
  * Handles /settings endpoint.
@@ -970,53 +971,21 @@ class SettingsController extends DashboardController {
         ) {
             $UpdateData = array();
 
-            // Grab all of the plugins & versions
-            $Plugins = Gdn::pluginManager()->availablePlugins();
-            foreach ($Plugins as $Plugin => $Info) {
-                $Name = val('Name', $Info, $Plugin);
-                $Version = val('Version', $Info, '');
-                if ($Version != '') {
-                    $UpdateData[] = array(
-                        'Name' => $Name,
-                        'Version' => $Version,
-                        'Type' => 'Plugin'
-                    );
+            // Grab all of the available addons & versions.
+            foreach ([Addon::TYPE_ADDON, Addon::TYPE_THEME] as $type) {
+                $addons = Gdn::addonManager()->lookupAllByType($type);
+                /* @var Addon $addon */
+                foreach ($addons as $addon) {
+                    $UpdateData[] = [
+                        'Name' => $addon->getRawKey(),
+                        'Version' => $addon->getVersion(),
+                        'Type' => $addon->getSpecial('oldType', $type)
+                    ];
                 }
             }
 
-            // Grab all of the applications & versions
-            $ApplicationManager = Gdn::factory('ApplicationManager');
-            $Applications = $ApplicationManager->availableApplications();
-            foreach ($Applications as $Application => $Info) {
-                $Name = val('Name', $Info, $Application);
-                $Version = val('Version', $Info, '');
-                if ($Version != '') {
-                    $UpdateData[] = array(
-                        'Name' => $Name,
-                        'Version' => $Version,
-                        'Type' => 'Application'
-                    );
-                }
-            }
-
-            // Grab all of the themes & versions
-            $ThemeManager = new Gdn_ThemeManager;
-            $Themes = $ThemeManager->availableThemes();
-            foreach ($Themes as $Theme => $Info) {
-                $Name = val('Name', $Info, $Theme);
-                $Version = val('Version', $Info, '');
-                if ($Version != '') {
-                    $UpdateData[] = array(
-                        'Name' => $Name,
-                        'Version' => $Version,
-                        'Type' => 'Theme'
-                    );
-                }
-            }
-
-            // Dump the entire set of information into the definition list (jQuery
-            // will pick it up and ping the VanillaForums.org server with this info).
-            $this->addDefinition('UpdateChecks', Gdn_Format::serialize($UpdateData));
+            // Dump the entire set of information into the definition list. The client will ping the server for updates.
+            $this->addDefinition('UpdateChecks', $UpdateData);
         }
     }
 

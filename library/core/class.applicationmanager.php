@@ -34,35 +34,20 @@ class Gdn_ApplicationManager {
      */
     public function availableApplications() {
         if (!is_array($this->availableApplications)) {
-            $ApplicationInfo = array();
+            Logger::event('addon_scan', Logger::DEBUG, "Scan available applications.", ['addonType' => 'application']);
+            $applications = [];
 
-            $AppFolders = Gdn_FileSystem::folders(PATH_APPLICATIONS); // Get an array of all application folders
-            // Now look for about files within them.
-            $ApplicationAboutFiles = Gdn_FileSystem::findAll(PATH_APPLICATIONS, 'settings'.DS.'about.php', $AppFolders);
-            // Include them all right here and fill the application info array
-            $ApplicationCount = count($ApplicationAboutFiles);
-            for ($i = 0; $i < $ApplicationCount; ++$i) {
-                include($ApplicationAboutFiles[$i]);
+            $folders = Gdn_FileSystem::folders(PATH_APPLICATIONS); // Get an array of all application folders
 
-                // Define the folder name for the newly added item
-                foreach ($ApplicationInfo as $ApplicationName => $Info) {
-                    if (array_key_exists('Folder', $ApplicationInfo[$ApplicationName]) === false) {
-                        $Folder = substr($ApplicationAboutFiles[$i], strlen(PATH_APPLICATIONS));
-                        if (substr($Folder, 0, 1) == DS) {
-                            $Folder = substr($Folder, 1);
-                        }
+            // Loop through the application folders and fetch the about files.
+            foreach ($folders as $folder) {
+                $info = $this->loadApplicationInfo($folder);
 
-                        $Folder = substr($Folder, 0, strpos($Folder, DS));
-                        $ApplicationInfo[$ApplicationName]['Folder'] = $Folder;
-                    }
+                if (!empty($info)) {
+                    $applications[$info['Index']] = $info;
                 }
             }
-            // Add all of the indexes to the applications.
-            foreach ($ApplicationInfo as $Index => &$Info) {
-                $Info['Index'] = $Index;
-            }
-
-            $this->availableApplications = $ApplicationInfo;
+            $this->availableApplications = $applications;
         }
 
         return $this->availableApplications;
@@ -78,16 +63,10 @@ class Gdn_ApplicationManager {
             $EnabledApplications = Gdn::config('EnabledApplications', array('Dashboard' => 'dashboard'));
             // Add some information about the applications to the array.
             foreach ($EnabledApplications as $Name => $Folder) {
-                $EnabledApplications[$Name] = array('Folder' => $Folder);
-                //$EnabledApplications[$Name]['Version'] = Gdn::Config($Name.'.Version', '');
-                $EnabledApplications[$Name]['Version'] = '';
-                $EnabledApplications[$Name]['Index'] = $Name;
-                // Get the application version from it's about file.
-                $AboutPath = PATH_APPLICATIONS.'/'.strtolower($Name).'/settings/about.php';
-                if (file_exists($AboutPath)) {
-                    $ApplicationInfo = array();
-                    include $AboutPath;
-                    $EnabledApplications[$Name]['Version'] = GetValueR("$Name.Version", $ApplicationInfo, '');
+                $info = $this->loadApplicationInfo($Folder);
+
+                if (!empty($info)) {
+                    $EnabledApplications[$Name] = $info;
                 }
             }
             $this->enabledApplications = $EnabledApplications;
@@ -118,7 +97,13 @@ class Gdn_ApplicationManager {
      * @return bool|mixed Returns the application's info, a specific value, or false if the application cannot be found.
      */
     public function getApplicationInfo($applicationName, $key = null) {
-        $ApplicationInfo = val($applicationName, $this->availableApplications(), null);
+        // First check the enabled applications because they don't scan the file system.
+        if (array_key_exists($applicationName, $this->enabledApplications())) {
+            $ApplicationInfo = val($applicationName, $this->enabledApplications());
+        } else {
+            $ApplicationInfo = val($applicationName, $this->availableApplications(), null);
+        }
+
         if (is_null($ApplicationInfo)) {
             return false;
         }
@@ -362,5 +347,36 @@ class Gdn_ApplicationManager {
             $PermissionModel = Gdn::permissionModel();
             $PermissionModel->define($PermissionName);
         }
+    }
+
+    /**
+     * Load an applications info array and return it.
+     *
+     * @param string $folder The application's folder.
+     * @return array|null Returns the application's info array or **null** if one isn't found.
+     */
+    private function loadApplicationInfo($folder) {
+        $aboutPath = PATH_APPLICATIONS."/$folder/settings/about.php";
+        if (!file_exists($aboutPath)) {
+            return null;
+        }
+
+        // Include the application info array.
+        $ApplicationInfo = [];
+        require $aboutPath;
+
+        $info = reset($ApplicationInfo);
+        $info['Index'] = $index = key($ApplicationInfo);
+
+        touchValue('Folder', $info, $folder);
+        touchValue('Dir', $info, "/applications/$folder");
+
+        $iconUrl = $info['Dir'].'/'.val('Icon', $info, 'icon.png');
+        if (file_exists(PATH_ROOT.$iconUrl)) {
+            $info['IconUrl'] = $iconUrl;
+            return $info;
+        }
+
+        return $info;
     }
 }

@@ -25,71 +25,72 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** Block condition. */
     const BLOCK_ANY = 2;
 
+    /** @var string The currently requested url (defined in _AnalyzeRequest). */
+    public $Request;
+    /** @var string The name of the controller to be dispatched. */
+    public $ControllerName;
+    /** @var stringThe method of the controller to be called. */
+    public $ControllerMethod;
+
     /**
      * @var array An array of folders within the application that are OK to search through
      * for controllers. This property is filled by the applications array
      * located in /conf/applications.php and included in /bootstrap.php
      */
-    private $_EnabledApplicationFolders;
+    private $enabledApplicationFolders;
 
     /**
      * @var array An associative array of ApplicationName => ApplicationFolder. This
      * property is filled by the applications array located in
      * /conf/applications.php and included in /bootstrap.php
      */
-    private $_EnabledApplications;
-
-    /** @var string The currently requested url (defined in _AnalyzeRequest). */
-    public $Request;
+    private $enabledApplications;
 
     /** @var string The name of the application folder that contains the controller that has been requested. */
-    private $_ApplicationFolder;
-
+    private $applicationFolder;
     /**
      * @var array An associative collection of AssetName => Strings that will get passed
      * into the controller once it has been instantiated.
      */
-    private $_AssetCollection;
+    private $controllerAssets;
 
-    /** @var string The name of the controller to be dispatched. */
-    public $ControllerName;
-
-    /** @var stringThe method of the controller to be called. */
-    public $ControllerMethod;
+    /**
+     * @var array Data to pass along to the controller.
+     */
+    private $controllerData;
 
     /** @var stringAny query string arguments supplied to the controller method. */
-    private $_ControllerMethodArgs = array();
+    private $controllerMethodArgs = [];
 
     /** @var string|FALSE The delivery method to set on the controller. */
-    private $_DeliveryMethod = false;
-
+    private $deliveryMethod = false;
 
     /** @var string|FALSE The delivery type to set on the controller. */
-    private $_DeliveryType = false;
+    private $deliveryType = false;
 
     /**
      * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
      */
-    private $_PropertyCollection;
+    private $controllerProperties;
 
     /** @var string Defined by the url of the request: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
-    private $_SyndicationMethod;
+    private $syndicationMethod;
 
     /**
      * Class constructor.
      */
     public function __construct() {
         parent::__construct();
-        $this->_EnabledApplicationFolders = array();
+        $this->enabledApplicationFolders = [];
         $this->Request = '';
-        $this->_ApplicationFolder = '';
-        $this->_AssetCollection = array();
+        $this->applicationFolder = '';
+        $this->controllerAssets = [];
         $this->ControllerName = '';
         $this->ControllerMethod = '';
-        $this->_ControllerMethodArgs = array();
-        $this->_PropertyCollection = array();
-        $this->_Data = array();
+        $this->controllerMethodArgs = [];
+        $this->controllerProperties = [];
+        $this->controllerData = [];
     }
 
     /**
@@ -101,15 +102,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('Cleanup');
     }
 
-    /**
-     * Return the properly formatted controller class name.
-     */
-    public function controllerName() {
-        return $this->ControllerName.'Controller';
-    }
-
     public function application() {
-        return $this->_ApplicationFolder;
+        return $this->applicationFolder;
     }
 
     public function controller() {
@@ -122,9 +116,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     public function controllerArguments($Value = null) {
         if ($Value !== null) {
-            $this->_ControllerMethodArgs = $Value;
+            $this->controllerMethodArgs = $Value;
         }
-        return $this->_ControllerMethodArgs;
+        return $this->controllerMethodArgs;
     }
 
     public function start() {
@@ -207,7 +201,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // If we're in update mode and can block, redirect to signin
         if (c('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
-            if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
+            if ($this->deliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
@@ -228,8 +222,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->fireEvent('AfterControllerCreate');
 
             // Pass along any assets
-            if (is_array($this->_AssetCollection)) {
-                foreach ($this->_AssetCollection as $AssetName => $Assets) {
+            if (is_array($this->controllerAssets)) {
+                foreach ($this->controllerAssets as $AssetName => $Assets) {
                     foreach ($Assets as $Asset) {
                         $Controller->addAsset($AssetName, $Asset);
                     }
@@ -240,19 +234,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Controller->getImports();
 
             // Pass in the syndication method
-            $Controller->SyndicationMethod = $this->_SyndicationMethod;
+            $Controller->SyndicationMethod = $this->syndicationMethod;
 
             // Pass along the request
             $Controller->SelfUrl = $this->Request;
 
             // Pass along any objects
-            foreach ($this->_PropertyCollection as $Name => $Mixed) {
+            foreach ($this->controllerProperties as $Name => $Mixed) {
                 $Controller->$Name = $Mixed;
             }
 
             // Pass along any data.
-            if (is_array($this->_Data)) {
-                $Controller->Data = $this->_Data;
+            if (is_array($this->controllerData)) {
+                $Controller->Data = $this->controllerData;
             }
 
             // Set up a default controller method in case one isn't defined.
@@ -269,7 +263,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     $ControllerMethod = 'x'.$ControllerMethod;
                 } else {
                     if ($this->ControllerMethod != '') {
-                        array_unshift($this->_ControllerMethodArgs, $this->ControllerMethod);
+                        array_unshift($this->controllerMethodArgs, $this->ControllerMethod);
                     }
 
                     $this->ControllerMethod = 'Index';
@@ -280,13 +274,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
 
             // Pass in the querystring values
-            $Controller->ApplicationFolder = $this->_ApplicationFolder;
+            $Controller->ApplicationFolder = $this->applicationFolder;
             $Controller->Application = $this->enabledApplication();
             $Controller->RequestMethod = $this->ControllerMethod;
-            $Controller->RequestArgs = $this->_ControllerMethodArgs;
+            $Controller->RequestArgs = $this->controllerMethodArgs;
             $Controller->Request = $Request;
-            $Controller->deliveryType($Request->getValue('DeliveryType', $this->_DeliveryType));
-            $Controller->deliveryMethod($Request->getValue('DeliveryMethod', $this->_DeliveryMethod));
+            $Controller->deliveryType($Request->getValue('DeliveryType', $this->deliveryType));
+            $Controller->deliveryMethod($Request->getValue('DeliveryMethod', $this->deliveryMethod));
 
             // Set special controller method options for REST APIs.
             $Controller->initialize();
@@ -303,7 +297,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 // Reflect the args for the method.
                 $Callback = Gdn::pluginManager()->getCallback($Controller->ControllerName, $ControllerMethod);
                 // Augment the arguments to the plugin with the sender and these arguments.
-                $InputArgs = array_merge(array($Controller), $this->_ControllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->_ControllerMethodArgs));
+                $InputArgs = array_merge(array($Controller), $this->controllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->controllerMethodArgs));
                 $Args = reflectArgs($Callback, $InputArgs, $ReflectionArguments);
                 $Controller->ReflectArgs = $Args;
 
@@ -316,8 +310,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     $Controller->renderException($Ex);
                 }
             } elseif (method_exists($Controller, $ControllerMethod) && !$Controller->isInternal($ControllerMethod)) {
-                $Args = reflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $ReflectionArguments);
-                $this->_ControllerMethodArgs = $Args;
+                $Args = reflectArgs(array($Controller, $ControllerMethod), $this->controllerMethodArgs, $ReflectionArguments);
+                $this->controllerMethodArgs = $Args;
                 $Controller->ReflectArgs = $Args;
 
                 try {
@@ -345,86 +339,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     *
-     *
-     * @param string $EnabledApplications
-     */
-    public function enabledApplicationFolders($EnabledApplications = '') {
-        if ($EnabledApplications != '' && count($this->_EnabledApplicationFolders) == 0) {
-            $this->_EnabledApplications = $EnabledApplications;
-            $this->_EnabledApplicationFolders = array_values($EnabledApplications);
-        }
-        return $this->_EnabledApplicationFolders;
-    }
-
-    /**
-     * Returns the name of the enabled application based on $ApplicationFolder.
-     *
-     * @param string The application folder related to the application name you want to return.
-     */
-    public function enabledApplication($ApplicationFolder = '') {
-        if ($ApplicationFolder == '') {
-            $ApplicationFolder = $this->_ApplicationFolder;
-        }
-
-        if (strpos($ApplicationFolder, 'plugins/') === 0) {
-            $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', false, true);
-
-            if (array_key_exists($Plugin, Gdn::pluginManager()->availablePlugins())) {
-                return $Plugin;
-            }
-
-            return false;
-        } else {
-            foreach (Gdn::applicationManager()->availableApplications() as $ApplicationName => $ApplicationInfo) {
-                if (val('Folder', $ApplicationInfo, false) === $ApplicationFolder) {
-                    $EnabledApplication = $ApplicationName;
-                    $this->EventArguments['EnabledApplication'] = $EnabledApplication;
-                    $this->fireEvent('AfterEnabledApplication');
-                    return $EnabledApplication;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Allows the passing of a string to the controller's asset collection.
-     *
-     * @param string $AssetName The name of the asset collection to add the string to.
-     * @param mixed $Asset The string asset to be added. The asset can be one of two things.
-     * - <b>string</b>: The string will be rendered to the page.
-     * - <b>Gdn_IModule</b>: The Gdn_IModule::Render() method will be called when the asset is rendered.
-     */
-    public function passAsset($AssetName, $Asset) {
-        $this->_AssetCollection[$AssetName][] = $Asset;
-        return $this;
-    }
-
-    /**
-     *
-     *
-     * @param $Name
-     * @param $Value
-     * @return $this
-     */
-    public function passData($Name, $Value) {
-        $this->_Data[$Name] = $Value;
-        return $this;
-    }
-
-    /**
-     * Allows the passing of any variable to the controller as a property.
-     *
-     * @param string $Name The name of the property to assign the variable to.
-     * @param mixed $Mixed The variable to be passed as a property of the controller.
-     */
-    public function passProperty($Name, $Mixed) {
-        $this->_PropertyCollection[$Name] = $Mixed;
-        return $this;
-    }
-
-    /**
      * Parses the query string looking for supplied request parameters. Places
      * anything useful into this object's Controller properties.
      *
@@ -443,10 +357,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // /controller
 
         // Clear the slate
-        $this->_ApplicationFolder = '';
+        $this->applicationFolder = '';
         $this->ControllerName = '';
         $this->ControllerMethod = 'index';
-        $this->_ControllerMethodArgs = array();
+        $this->controllerMethodArgs = array();
         $this->Request = $Request->path(false);
 
         $PathAndQuery = $Request->PathAndQuery();
@@ -499,16 +413,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         switch ($Request->outputFormat()) {
             case 'rss':
-                $this->_SyndicationMethod = SYNDICATION_RSS;
-                $this->_DeliveryMethod = DELIVERY_METHOD_RSS;
+                $this->syndicationMethod = SYNDICATION_RSS;
+                $this->deliveryMethod = DELIVERY_METHOD_RSS;
                 break;
             case 'atom':
-                $this->_SyndicationMethod = SYNDICATION_ATOM;
-                $this->_DeliveryMethod = DELIVERY_METHOD_RSS;
+                $this->syndicationMethod = SYNDICATION_ATOM;
+                $this->deliveryMethod = DELIVERY_METHOD_RSS;
                 break;
             case 'default':
             default:
-                $this->_SyndicationMethod = SYNDICATION_NONE;
+                $this->syndicationMethod = SYNDICATION_NONE;
                 break;
         }
 
@@ -535,7 +449,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // 3] See if there is a plugin trying to create a root method.
             list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(GetValue(0, $Parts), true);
             if ($MethodName && Gdn::pluginManager()->hasNewMethod('RootController', $MethodName, true)) {
-                $this->_DeliveryMethod = $DeliveryMethod;
+                $this->deliveryMethod = $DeliveryMethod;
                 $Parts[0] = $MethodName;
                 $Parts = array_merge(array('root'), $Parts);
                 $this->findController(0, $Parts);
@@ -543,19 +457,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             throw new GdnDispatcherControllerNotFoundException();
         } catch (GdnDispatcherControllerFoundException $e) {
-            switch ($this->_DeliveryMethod) {
+            switch ($this->deliveryMethod) {
                 case DELIVERY_METHOD_JSON:
                 case DELIVERY_METHOD_XML:
-                    $this->_DeliveryType = DELIVERY_TYPE_DATA;
+                    $this->deliveryType = DELIVERY_TYPE_DATA;
                     break;
                 case DELIVERY_METHOD_TEXT:
-                    $this->_DeliveryType = DELIVERY_TYPE_VIEW;
+                    $this->deliveryType = DELIVERY_TYPE_VIEW;
                     break;
                 case DELIVERY_METHOD_XHTML:
                 case DELIVERY_METHOD_RSS:
                     break;
                 default:
-                    $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
+                    $this->deliveryMethod = DELIVERY_METHOD_XHTML;
                     break;
             }
 
@@ -576,6 +490,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      *
      *
+     * @param string $EnabledApplications
+     */
+    public function enabledApplicationFolders($EnabledApplications = '') {
+        if ($EnabledApplications != '' && count($this->enabledApplicationFolders) == 0) {
+            $this->enabledApplications = $EnabledApplications;
+            $this->enabledApplicationFolders = array_values($EnabledApplications);
+        }
+        return $this->enabledApplicationFolders;
+    }
+
+    /**
+     *
+     *
      * @param $ControllerKey
      * @param $Parts
      * @return bool
@@ -588,7 +515,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $Application = val($ControllerKey - 1, $Parts, null);
 
         // Check for a file extension on the controller.
-        list($Controller, $this->_DeliveryMethod) = $this->_splitDeliveryMethod($Controller, false);
+        list($Controller, $this->deliveryMethod) = $this->_splitDeliveryMethod($Controller, false);
 
         // This is a kludge until we can refactor settings controllers better.
         if (strcasecmp($Controller, 'settings') === 0 && strcasecmp($Application, 'dashboard') !== 0) {
@@ -651,17 +578,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
 
             $this->ControllerName = $Controller;
-            $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
+            $this->applicationFolder = (is_null($Application) ? '' : $Application);
 
             $Length = sizeof($Parts);
             if ($Length > $ControllerKey + 1) {
-                list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_splitDeliveryMethod($Parts[$ControllerKey + 1], false);
+                list($this->ControllerMethod, $this->deliveryMethod) = $this->_splitDeliveryMethod($Parts[$ControllerKey + 1], false);
             }
 
             if ($Length > $ControllerKey + 2) {
                 for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
                     if ($Parts[$i] != '') {
-                        $this->_ControllerMethodArgs[] = $Parts[$i];
+                        $this->controllerMethodArgs[] = $Parts[$i];
                     }
                 }
             }
@@ -673,30 +600,103 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     * An internal method used to map parts of the request to various properties
-     * of this object that represent the controller, controller method, and
-     * controller method arguments.
+     * Parses methods that may be using dot-syntax to express a delivery type
      *
-     * @param array $Parts An array of parts of the request.
-     * @param int $ControllerKey An integer representing the key of the controller in the $Parts array.
+     * For example, /controller/method.json
+     * method.json should be split up and return array('method', 'JSON')
+     *
+     * @param type $Name Name of method to search for forced delivery types
+     * @param type $AllowAll Whether to allow delivery types that don't exist
+     * @return type
      */
-    private function _mapParts($Parts, $ControllerKey) {
-        $Length = count($Parts);
-        if ($Length > $ControllerKey) {
-            $this->ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
+    protected function _splitDeliveryMethod($Name, $AllowAll = false) {
+        $Parts = explode('.', $Name);
+        if (count($Parts) >= 2) {
+            $DeliveryPart = array_pop($Parts);
+            $MethodPart = implode('.', $Parts);
+
+            if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS))) {
+                return array($MethodPart, strtoupper($DeliveryPart));
+            } else {
+                return array($Name, $this->deliveryMethod);
+            }
+        } else {
+            return array($Name, $this->deliveryMethod);
+        }
+    }
+
+    /**
+     * Return the properly formatted controller class name.
+     */
+    public function controllerName() {
+        return $this->ControllerName.'Controller';
+    }
+
+    /**
+     * Returns the name of the enabled application based on $ApplicationFolder.
+     *
+     * @param string The application folder related to the application name you want to return.
+     */
+    public function enabledApplication($ApplicationFolder = '') {
+        if ($ApplicationFolder == '') {
+            $ApplicationFolder = $this->applicationFolder;
         }
 
-        if ($Length > $ControllerKey + 1) {
-            list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_splitDeliveryMethod($Parts[$ControllerKey + 1]);
-        }
+        if (strpos($ApplicationFolder, 'plugins/') === 0) {
+            $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', false, true);
 
-        if ($Length > $ControllerKey + 2) {
-            for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
-                if ($Parts[$i] != '') {
-                    $this->_ControllerMethodArgs[] = $Parts[$i];
+            if (array_key_exists($Plugin, Gdn::pluginManager()->availablePlugins())) {
+                return $Plugin;
+            }
+
+            return false;
+        } else {
+            foreach (Gdn::applicationManager()->availableApplications() as $ApplicationName => $ApplicationInfo) {
+                if (val('Folder', $ApplicationInfo, false) === $ApplicationFolder) {
+                    $EnabledApplication = $ApplicationName;
+                    $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+                    $this->fireEvent('AfterEnabledApplication');
+                    return $EnabledApplication;
                 }
             }
         }
+        return false;
+    }
+
+    /**
+     * Allows the passing of a string to the controller's asset collection.
+     *
+     * @param string $AssetName The name of the asset collection to add the string to.
+     * @param mixed $Asset The string asset to be added. The asset can be one of two things.
+     * - <b>string</b>: The string will be rendered to the page.
+     * - <b>Gdn_IModule</b>: The Gdn_IModule::Render() method will be called when the asset is rendered.
+     */
+    public function passAsset($AssetName, $Asset) {
+        $this->controllerAssets[$AssetName][] = $Asset;
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param $Name
+     * @param $Value
+     * @return $this
+     */
+    public function passData($Name, $Value) {
+        $this->controllerData[$Name] = $Value;
+        return $this;
+    }
+
+    /**
+     * Allows the passing of any variable to the controller as a property.
+     *
+     * @param string $Name The name of the property to assign the variable to.
+     * @param mixed $Mixed The variable to be passed as a property of the controller.
+     */
+    public function passProperty($Name, $Mixed) {
+        $this->controllerProperties[$Name] = $Mixed;
+        return $this;
     }
 
     protected function _reflectControllerArgs($Controller) {
@@ -724,8 +724,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         foreach ($MethArgs as $Index => $MethParam) {
             $ParamName = strtolower($MethParam->getName());
 
-            if (isset($this->_ControllerMethodArgs[$Index])) {
-                $Args[] = $this->_ControllerMethodArgs[$Index];
+            if (isset($this->controllerMethodArgs[$Index])) {
+                $Args[] = $this->controllerMethodArgs[$Index];
             } elseif (isset($Get[$ParamName]))
                 $Args[] = $Get[$ParamName];
             elseif ($MethParam->isDefaultValueAvailable())
@@ -736,33 +736,34 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         }
 
-        $this->_ControllerMethodArgs = $Args;
+        $this->controllerMethodArgs = $Args;
 
     }
 
     /**
-     * Parses methods that may be using dot-syntax to express a delivery type
+     * An internal method used to map parts of the request to various properties
+     * of this object that represent the controller, controller method, and
+     * controller method arguments.
      *
-     * For example, /controller/method.json
-     * method.json should be split up and return array('method', 'JSON')
-     *
-     * @param type $Name Name of method to search for forced delivery types
-     * @param type $AllowAll Whether to allow delivery types that don't exist
-     * @return type
+     * @param array $Parts An array of parts of the request.
+     * @param int $ControllerKey An integer representing the key of the controller in the $Parts array.
      */
-    protected function _splitDeliveryMethod($Name, $AllowAll = false) {
-        $Parts = explode('.', $Name);
-        if (count($Parts) >= 2) {
-            $DeliveryPart = array_pop($Parts);
-            $MethodPart = implode('.', $Parts);
+    private function _mapParts($Parts, $ControllerKey) {
+        $Length = count($Parts);
+        if ($Length > $ControllerKey) {
+            $this->ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
+        }
 
-            if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS))) {
-                return array($MethodPart, strtoupper($DeliveryPart));
-            } else {
-                return array($Name, $this->_DeliveryMethod);
+        if ($Length > $ControllerKey + 1) {
+            list($this->ControllerMethod, $this->deliveryMethod) = $this->_splitDeliveryMethod($Parts[$ControllerKey + 1]);
+        }
+
+        if ($Length > $ControllerKey + 2) {
+            for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
+                if ($Parts[$i] != '') {
+                    $this->controllerMethodArgs[] = $Parts[$i];
+                }
             }
-        } else {
-            return array($Name, $this->_DeliveryMethod);
         }
     }
 }

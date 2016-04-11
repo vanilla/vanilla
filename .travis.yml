@@ -1,19 +1,19 @@
 language: php
 
 php:
-    - 5.4
-    - 5.5
-    - 5.6
-    - 7.0
-    - hhvm
+  - 5.4
+  - 7.0
+  - hhvm
 
-sudo: false
+env:
+  matrix:
+    - RUN=lint
+    - RUN=test
 
 matrix:
   fast_finish: true
 
-cache:
-  - apt
+sudo: false
 
 addons:
   apt:
@@ -23,12 +23,12 @@ addons:
   hosts:
     - vanilla.test
 
+cache:
+  - apt
+
 install:
   - composer install -o
-  - tests/travis/nginx/install-nginx.sh
+  - if [ $RUN != 'lint' ]; then tests/travis/nginx/install-nginx.sh; fi
 
 script:
-  - tests/travis/php-lint.sh .
-  - phpunit -c phpunit.xml.dist
-  - cat /tmp/error.log
-  - cat /tmp/access.log
+  - tests/run-tests.sh

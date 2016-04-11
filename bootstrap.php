@@ -48,6 +48,7 @@ if (function_exists('mb_internal_encoding')) {
 
 // Include the core autoloader.
 require_once __DIR__.'/vendor/autoload.php';
+require_once PATH_LIBRARY_CORE.'/functions.error.php';
 
 // Initialize the autoloader.
 Gdn_Autoloader::start();

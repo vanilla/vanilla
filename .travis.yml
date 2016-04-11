@@ -25,7 +25,7 @@ addons:
 
 install:
   - composer self-update
-  - composer install --no-dev --prefer-dist --optimize-autoloader
+  - composer install -o
   - tests/travis/nginx/install-nginx.sh
 
 script:

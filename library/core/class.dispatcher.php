@@ -687,9 +687,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         } else {
             $addon = $this->addonManager->lookupAddon($folder);
             if ($addon) {
-                // TODO: Remove this event.
-                $this->EventArguments['EnabledApplication'] = $addon->getRawKey();
-                $this->fireEvent('AfterEnabledApplication');
                 return $addon->getRawKey();
             }
         }

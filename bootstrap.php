@@ -196,7 +196,7 @@ Gdn::factoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
 
 // Dispatcher.
 Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
-Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
+Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
 // Smarty Templating Engine
 Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/smarty/libs/Smarty.class.php');

@@ -10,6 +10,8 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 
 /**
  * Handles all requests and routing.
@@ -59,13 +61,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private $controllerData;
 
-    /** @var stringAny query string arguments supplied to the controller method. */
+    /** @var array Any query string arguments supplied to the controller method. */
     private $controllerMethodArgs = [];
 
-    /** @var string|FALSE The delivery method to set on the controller. */
+    /** @var string|false The delivery method to set on the controller. */
     private $deliveryMethod = false;
 
-    /** @var string|FALSE The delivery type to set on the controller. */
+    /** @var string|false The delivery type to set on the controller. */
     private $deliveryType = false;
 
     /**
@@ -78,11 +80,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private $syndicationMethod;
 
     /**
+     * @var AddonManager $addonManager The addon manager that manages all of the addons.
+     */
+    private $addonManager;
+
+    /**
      * Class constructor.
      */
-    public function __construct() {
+    public function __construct(AddonManager $addonManager = null) {
         parent::__construct();
-        $this->enabledApplicationFolders = [];
+        $this->enabledApplicationFolders = null;
         $this->Request = '';
         $this->applicationFolder = '';
         $this->controllerAssets = [];
@@ -91,6 +98,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->controllerMethodArgs = [];
         $this->controllerProperties = [];
         $this->controllerData = [];
+        $this->addonManager = $addonManager;
     }
 
     /**
@@ -439,7 +447,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          */
         try {
             // if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
-            if (in_array($Parts[0], $this->enabledApplicationFolders())) {
+            if (in_array($Parts[0], $this->getEnabledApplicationFolders())) {
                 $this->findController(1, $Parts);
             }
 
@@ -491,11 +499,37 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      *
      * @param string $EnabledApplications
+     * @deprecated
      */
     public function enabledApplicationFolders($EnabledApplications = '') {
+        deprecated('Gdn_Dispatcher->enabledApplicationFolders()');
         if ($EnabledApplications != '' && count($this->enabledApplicationFolders) == 0) {
             $this->enabledApplications = $EnabledApplications;
             $this->enabledApplicationFolders = array_values($EnabledApplications);
+        }
+        return $this->enabledApplicationFolders ?: [];
+    }
+
+    /**
+     * Get the enabled application folders.
+     *
+     * This is a temporary refactor of the the {@link enabledApplicationFolders()} method and will be removed once
+     * support for application prefixes has been removed from the site. Please leave this method as private and don't
+     * call it unless you know what you're doing.
+     *
+     * @return array An array of application folders.
+     */
+    private function getEnabledApplicationFolders() {
+        if (!isset($this->enabledApplicationFolders)) {
+            $addons = $this->addonManager->getEnabled();
+            $applications = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'application']));
+
+            $result = ['dashboard'];
+            /* @var Addon $application */
+            foreach ($applications as $application) {
+                $result[] = $application->getKey();
+            }
+            $this->enabledApplicationFolders = array_unique($result);
         }
         return $this->enabledApplicationFolders;
     }
@@ -563,7 +597,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                             $Application = 'plugins/'.$Application;
                             break;
                         case 'applications':
-                            if (!in_array($Application, $this->enabledApplicationFolders())) {
+                            if (!in_array($Application, $this->getEnabledApplicationFolders())) {
                                 return false;
                             }
                             break;

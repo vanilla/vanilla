@@ -177,6 +177,17 @@ class Addon {
     }
 
     /**
+     * Get the version number of the addon.
+     *
+     * This is just a convenience method for grabbing the version number from the info array.
+     *
+     * @return string Returns a version number or an empty string if there isn't one.
+     */
+    public function getVersion() {
+        return (string)$this->getInfoValue('version', '');
+    }
+
+    /**
      * Make a full path from an addon-relative path.
      *
      * @param string $subpath The subpath to base the path on, starting with a "/".

@@ -128,11 +128,6 @@ class SetupController extends DashboardController {
         // Set the models on the forms.
         $this->Form->setModel($ConfigurationModel);
 
-        // Load the locales for the locale dropdown
-        // $Locale = Gdn::locale();
-        // $AvailableLocales = $Locale->GetAvailableLocaleSources();
-        // $this->LocaleData = array_combine($AvailableLocales, $AvailableLocales);
-
         // If seeing the form for the first time...
         if (!$this->Form->isPostback()) {
             // Force the webroot using our best guesstimates

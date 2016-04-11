@@ -395,17 +395,7 @@ class Gdn_Locale extends Gdn_Pluggable {
             return false;
         } else {
             return $this->Locale;
-    }
-    }
-
-    /**
-     * Search the garden/locale folder for other locale sources that are
-     * available. Returns an array of locale names.
-     *
-     * @return array
-     */
-    public function getAvailableLocaleSources() {
-        return Gdn_FileSystem::Folders(PATH_APPLICATIONS.'/dashboard/locale');
+        }
     }
 
     /**

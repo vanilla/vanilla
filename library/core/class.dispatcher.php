@@ -671,27 +671,26 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param string The application folder related to the application name you want to return.
      */
-    public function enabledApplication($ApplicationFolder = '') {
-        if ($ApplicationFolder == '') {
-            $ApplicationFolder = $this->applicationFolder;
+    public function enabledApplication($folder = '') {
+        if ($folder == '') {
+            $folder = $this->applicationFolder;
         }
 
-        if (strpos($ApplicationFolder, 'plugins/') === 0) {
-            $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', false, true);
+        if (strpos($folder, 'plugins/') === 0) {
+            $plugin = StringBeginsWith($folder, 'plugins/', false, true);
 
-            if (array_key_exists($Plugin, Gdn::pluginManager()->availablePlugins())) {
-                return $Plugin;
+            if (array_key_exists($plugin, $this->addonManager->getEnabled())) {
+                return $plugin;
             }
 
             return false;
         } else {
-            foreach (Gdn::applicationManager()->availableApplications() as $ApplicationName => $ApplicationInfo) {
-                if (val('Folder', $ApplicationInfo, false) === $ApplicationFolder) {
-                    $EnabledApplication = $ApplicationName;
-                    $this->EventArguments['EnabledApplication'] = $EnabledApplication;
-                    $this->fireEvent('AfterEnabledApplication');
-                    return $EnabledApplication;
-                }
+            $addon = $this->addonManager->lookupAddon($folder);
+            if ($addon) {
+                // TODO: Remove this event.
+                $this->EventArguments['EnabledApplication'] = $addon->getRawKey();
+                $this->fireEvent('AfterEnabledApplication');
+                return $addon->getRawKey();
             }
         }
         return false;

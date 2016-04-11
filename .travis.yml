@@ -24,6 +24,7 @@ addons:
     - vanilla.test
 
 install:
+  - composer self-update
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
 

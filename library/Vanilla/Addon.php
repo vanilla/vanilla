@@ -1036,4 +1036,19 @@ class Addon {
         }
         return '';
     }
+
+    /**
+     * Get the path to the icon for this addon.
+     *
+     * @param string $relative One of the **Addon::PATH_*** constants.
+     * @return string Returns the path of the icon relative to {@link $relative} or an empty string if there is no icon.
+     */
+    public function getIcon($relative = self::PATH_ADDON) {
+        if ($icon = $this->getInfoValue('icon')) {
+            return $this->path('/'.ltrim($icon, '\\/'), $relative);
+        } elseif (file_exists($this->path('\icon.png', self::PATH_FULL))) {
+            return $this->path('\icon.png', $relative);
+        }
+        return '';
+    }
 }

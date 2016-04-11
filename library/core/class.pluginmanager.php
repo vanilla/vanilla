@@ -292,6 +292,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $info['PluginRoot'] = $addon->path();
         touchValue('Name', $info, $name);
         touchValue('Folder', $info, $name);
+        $info['Dir'] = $addon->path('', Addon::PATH_ADDON);
+
+        if ($icon = $addon->getIcon(Addon::PATH_ADDON)) {
+            $info['IconUrl'] = $icon;
+        }
+
 
         // This is some additional information from indexSearchPath().
         if ($info['PluginFilePath']) {

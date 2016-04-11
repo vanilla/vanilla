@@ -62,6 +62,22 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test {@link AddonManager::isEnabled()}.
+     */
+    public function testIsEnabled() {
+        $tm = $this->createTestManager();
+        $addons = $tm->lookupAllByType(Addon::TYPE_ADDON);
+
+        $this->assertNotEmpty($addons);
+        /* @var Addon $addon */
+        foreach ($addons as $addon) {
+            $this->assertFalse($tm->isEnabled($addon->getKey(), $addon->getType()));
+            $tm->startAddon($addon);
+            $this->assertTrue($tm->isEnabled($addon->getKey(), $addon->getType()));
+        }
+    }
+
+    /**
      * Test that all reported plugins implement Gdn_IPlugin.
      *
      * The new addon manager just looks at class name so this test just makes sure we stick to our convention.

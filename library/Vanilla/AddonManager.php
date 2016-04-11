@@ -729,7 +729,7 @@ class AddonManager {
         if ($type === Addon::TYPE_ADDON) {
             $key = strtolower($key);
         }
-        $enabled = array_key_exists($key, $this->enabled);
+        $enabled = array_key_exists("$type/$key", $this->enabled);
         return $enabled;
     }
 

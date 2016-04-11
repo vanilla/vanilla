@@ -1015,7 +1015,8 @@ class Addon {
         if (empty($locale)) {
             return $this->translations;
         } else {
-            return isset($this->translations[$locale]) ? $this->translations[$locale] : [];
+            $safeLocale = self::canonicalizeLocale($locale);
+            return isset($this->translations[$safeLocale]) ? $this->translations[$safeLocale] : [];
         }
     }
 

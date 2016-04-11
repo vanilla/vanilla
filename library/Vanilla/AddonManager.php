@@ -739,7 +739,7 @@ class AddonManager {
      * @param string $locale The locale to get the translation paths for.
      * @return array Returns an array of paths.
      */
-    public function getEnabledTranslationSources($locale) {
+    public function getEnabledTranslationPaths($locale) {
         $addons = array_reverse($this->getEnabled(), true);
 
         $result = [];

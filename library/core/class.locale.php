@@ -170,7 +170,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         // Get locale sources
         $this->Locale = $CurrentLocale;
         if ($this->addonManager !== null) {
-            $LocaleSources = $this->addonManager->getEnabledTranslationSources($CurrentLocale);
+            $LocaleSources = $this->addonManager->getEnabledTranslationPaths($CurrentLocale);
         } else {
             $LocaleSources = [];
         }
@@ -266,26 +266,13 @@ class Gdn_Locale extends Gdn_Pluggable {
      * Gets the locale sources for a given locale.
      *
      * @param string $locale The name of the locale.
-     * @param string[] $applicationWhiteList An array of enabled application folders.
-     * @param string[] $pluginWhiteList An array of enabled plugin folders.
-     * @param bool $forceRemapping Whether or not to force a rebuild of the cache.
      * @return array Returns an array of paths to the translations for the locale.
+     * @deprecated Use the {@link AddonManager} for this.
      */
-    public function getLocaleSources($locale, $applicationWhiteList, $pluginWhiteList, $forceRemapping = false) {
-        $safeLocale = static::canonicalize($locale);
-
-        // First try and grab the locale sources from the cache.
-        Gdn_LibraryMap::prepareCache('locale', null, 'tree');
-        $allLocaleSources = Gdn_LibraryMap::getCache('locale');
-
-        if ($forceRemapping || !Gdn_LibraryMap::cacheReady('locale') || $allLocaleSources === null) {
-            // Build the entire locale sources array and cache it.
-            $allLocaleSources = $this->crawlAllLocaleSources($applicationWhiteList, $pluginWhiteList);
-            Gdn_LibraryMap::prepareCache('locale', $allLocaleSources);
-        }
-
-        $localeSources = val($safeLocale, $allLocaleSources, array());
-        return $localeSources;
+    public function getLocaleSources($locale) {
+        deprecated('Gdn_PluginManager->getLocaleSources()', 'AddonManager->getEnabledLocaleSources()');
+        $result = $this->addonManager->getEnabledTranslationPaths($locale);
+        return $result;
     }
 
     /**

@@ -245,7 +245,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @deprecated This methods was added to help debug locale canonicalization so should be able to be removed.
      */
     public function crawlAllLocaleSources() {
-        deprecated('Gdn_PluginManager->crawlAllLocaleSources()');
+        deprecated('Gdn_Locale->crawlAllLocaleSources()');
 
         $addons = array_reverse($this->getEnabled(), true);
 
@@ -330,7 +330,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * Translates a code into the selected locale's definition.
      *
      * @param string $Code The code related to the language-specific definition.
-     *   Codes thst begin with an '@' symbol are treated as literals and not translated.
+     * Codes that begin with an '@' symbol are treated as literals and not translated.
      * @param string $Default The default value to be displayed if the translation code is not found.
      * @return string
      */

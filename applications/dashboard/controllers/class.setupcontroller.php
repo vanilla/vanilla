@@ -192,9 +192,8 @@ class SetupController extends DashboardController {
                 // If changing locale, redefine locale sources:
                 $NewLocale = 'en-CA'; // $this->Form->getFormValue('Garden.Locale', false);
                 if ($NewLocale !== false && Gdn::config('Garden.Locale') != $NewLocale) {
-                    $ApplicationManager = new Gdn_ApplicationManager();
                     $Locale = Gdn::locale();
-                    $Locale->set($NewLocale, $ApplicationManager->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders(), true);
+                    $Locale->set($NewLocale);
                 }
 
                 // Install db structure & basic data.

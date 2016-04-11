@@ -9,6 +9,7 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\Addon;
 use Vanilla\AddonManager;
 
 /**
@@ -35,6 +36,7 @@ class Gdn_ApplicationManager {
      */
     public function __construct(AddonManager $addonManager = null) {
         $this->addonManager = $addonManager;
+        Logger::log(Logger::DEBUG, 'Gdn_ApplicationManager constructed.');
     }
 
     /**
@@ -182,11 +184,20 @@ class Gdn_ApplicationManager {
      * Get an list of enabled application folders.
      *
      * @return array Returns an array of all of the enabled application folders.
+     * @deprecated
      */
     public function enabledApplicationFolders() {
-        $EnabledApplications = c('EnabledApplications', array());
-        $EnabledApplications['Dashboard'] = 'dashboard';
-        return array_values($EnabledApplications);
+        deprecated('Gdn_ApplicationManager->enabledApplicationFolders()');
+
+        $addons = $this->addonManager->getEnabled();
+        $applications = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'application']));
+
+        $result = ['dashboard'];
+        /* @var Addon $application */
+        foreach ($applications as $application) {
+            $result[] = $application->getKey();
+        }
+        return array_unique($result);
     }
 
     /**

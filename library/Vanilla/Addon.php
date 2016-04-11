@@ -1052,4 +1052,28 @@ class Addon {
         }
         return '';
     }
+
+    /**
+     * Return a function that can be used as a callback to filter arrays of {@link Addon} objects.
+     *
+     * @param array $where A where array that filters the info array.
+     * @return \Closure Returns a new closure.
+     */
+    public static function makeFilterCallback($where) {
+        return function (Addon $addon) use ($where) {
+            foreach ($where as $key => $value) {
+                if ($key === 'oldType') {
+                    $valid = isset($addon->special['oldType']) && $addon->special['oldType'] === $value;
+                } elseif ($value === null) {
+                    $valid = !isset($addon->info[$key]);
+                } else {
+                    $valid = $addon->getInfoValue($key) == $value;
+                }
+                if (!$valid) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
 }

@@ -239,100 +239,26 @@ class Gdn_Locale extends Gdn_Pluggable {
     }
 
     /**
-     * Crawl applications or plugins for its locale files.
-     *
-     * @param string $basePath The base path. Either the plugins or applications path.
-     * @param string[] $folders The folders to crawl within the base path.
-     * @param array $result The result array to put all the translation paths.
-     */
-    protected function crawlAddonLocaleSources($basePath, $folders, &$result) {
-        if (!is_array($folders)) {
-            return;
-        }
-
-        $paths = array();
-        foreach ($folders as $folder) {
-            $paths[] = $basePath."/$folder/locale";
-        }
-
-        // Get all of the locale files for the addons.
-        foreach ($paths as $path) {
-            // Look for individual locale files.
-            $localePaths = safeGlob($path.'/*.php');
-            foreach ($localePaths as $localePath) {
-                $locale = self::canonicalize(basename($localePath, '.php'));
-                $result[$locale][] = $localePath;
-            }
-
-            // Look for locale files in a directory.
-            // This should be deprecated very soon.
-            $localePaths = safeGlob($path.'/*/definitions.php');
-            foreach ($localePaths as $localePath) {
-                $locale = self::canonicalize(basename(dirname($localePath)));
-                $result[$locale][] = $localePath;
-
-                $subPath = stringBeginsWith($localePath, PATH_ROOT, true, true);
-                $properPath = dirname($subPath).'.php';
-
-                trigger_error("Locales in $subPath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
-            }
-        }
-    }
-
-    /**
      * Crawl the various addons and locales for all of the applicable translation files.
      *
-     * @param string[] $applicationWhiteList An array of enabled application folders.
-     * @param string[] $pluginWhiteList An array of enabled plugin folders.
      * @return array Returns an array keyed by locale names where each value is an array of translation paths for that locale.
+     * @deprecated This methods was added to help debug locale canonicalization so should be able to be removed.
      */
-    public function crawlAllLocaleSources($applicationWhiteList, $pluginWhiteList) {
-        $result = array();
+    public function crawlAllLocaleSources() {
+        deprecated('Gdn_PluginManager->crawlAllLocaleSources()');
 
-        // Get all of the locale files for the applications.
-        $this->crawlAddonLocaleSources(PATH_APPLICATIONS, $applicationWhiteList, $result);
+        $addons = array_reverse($this->getEnabled(), true);
 
-        // Get locale-based locale definition files.
-        $enabledLocales = c('EnabledLocales');
-        if (is_array($enabledLocales)) {
-            foreach ($enabledLocales as $localeKey => $locale) {
-                $locale = self::canonicalize($locale);
-
-                // Grab all of the files in the locale's folder.
-                $translationPaths = safeGlob(PATH_ROOT."/locales/{$localeKey}/*.php");
-                foreach ($translationPaths as $translationPath) {
-                    $result[$locale][] = $translationPath;
+        $result = [];
+        /* @var \Vanilla\Addon $addon */
+        foreach ($addons as $addon) {
+            foreach ($addon->getTranslationPaths() as $locale => $paths) {
+                foreach ($paths as $path) {
+                    $result[$locale][] = $addon->path($path);
                 }
+                $result[] = $addon->path($path);
             }
         }
-
-        // Get all of the locale files for plugins.
-        // Notice that the plugins are processed here so that they have overriding power.
-        $this->crawlAddonLocaleSources(PATH_PLUGINS, $pluginWhiteList, $result);
-
-        // Get theme-based locale definition files.
-        $theme = c('Garden.Theme');
-        if ($theme) {
-            $this->crawlAddonLocaleSources(PATH_THEMES, array($theme), $result);
-        }
-
-        // Look for a global locale.
-        $configLocale = PATH_CONF.'/locale.php';
-        if (file_exists($configLocale)) {
-            foreach (array_keys($result) as $locale) {
-                $result[$locale][] = $configLocale;
-            }
-        }
-
-        // Look for locale specific config locales.
-        $paths = SafeGlob(PATH_CONF.'/locale-*.php');
-        foreach ($paths as $path) {
-            if (preg_match('`^locale-([\w-]+)$`i', basename($path, '.php'), $matches)) {
-                $locale = self::canonicalize($matches[1]);
-                $result[$locale][] = $path;
-            }
-        }
-
         return $result;
     }
 

@@ -2219,12 +2219,13 @@ class ImportModel extends Gdn_Model {
 
         // Any users without roles?
         $UsersWithoutRoles = $this->SQL
+            ->select('*', 'count', 'RowCount')
             ->from('User u')
             ->leftJoin('UserRole ur', 'u.UserID = ur.UserID')
             ->leftJoin('Role r', 'ur.RoleID = r.RoleID')
             ->where('r.Name', null)
             ->get()
-            ->count();
+            ->firstRow()->RowCount;
         $this->stat(
             'Users Without a Valid Role',
             $UsersWithoutRoles

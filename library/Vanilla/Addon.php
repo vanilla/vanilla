@@ -177,17 +177,6 @@ class Addon {
     }
 
     /**
-     * Get the version number of the addon.
-     *
-     * This is just a convenience method for grabbing the version number from the info array.
-     *
-     * @return string Returns a version number or an empty string if there isn't one.
-     */
-    public function getVersion() {
-        return (string)$this->getInfoValue('version', '');
-    }
-
-    /**
      * Make a full path from an addon-relative path.
      *
      * @param string $subpath The subpath to base the path on, starting with a "/".
@@ -703,15 +692,6 @@ class Addon {
     }
 
     /**
-     * Get this addon's human-readable name.
-     *
-     * @return string Returns the name of the addon or its key if it has no name.
-     */
-    public function getName() {
-        return $this->getInfoValue('name', $this->getRawKey());
-    }
-
-    /**
      * Support {@link var_export()} for caching.
      *
      * @param array $array The array to load.
@@ -923,6 +903,50 @@ class Addon {
     }
 
     /**
+     * Return a function that can be used as a callback to filter arrays of {@link Addon} objects.
+     *
+     * @param array $where A where array that filters the info array.
+     * @return \Closure Returns a new closure.
+     */
+    public static function makeFilterCallback($where) {
+        return function (Addon $addon) use ($where) {
+            foreach ($where as $key => $value) {
+                if ($key === 'oldType') {
+                    $valid = isset($addon->special['oldType']) && $addon->special['oldType'] === $value;
+                } elseif ($value === null) {
+                    $valid = !isset($addon->info[$key]);
+                } else {
+                    $valid = $addon->getInfoValue($key) == $value;
+                }
+                if (!$valid) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    /**
+     * Get the version number of the addon.
+     *
+     * This is just a convenience method for grabbing the version number from the info array.
+     *
+     * @return string Returns a version number or an empty string if there isn't one.
+     */
+    public function getVersion() {
+        return (string)$this->getInfoValue('version', '');
+    }
+
+    /**
+     * Get this addon's human-readable name.
+     *
+     * @return string Returns the name of the addon or its key if it has no name.
+     */
+    public function getName() {
+        return $this->getInfoValue('name', $this->getRawKey());
+    }
+
+    /**
      * Get this addon's raw case-sensitive key.
      *
      * Addon's have a lowercase key, but some places still require the uppercase one.
@@ -1070,29 +1094,5 @@ class Addon {
             return $this->path('\icon.png', $relative);
         }
         return '';
-    }
-
-    /**
-     * Return a function that can be used as a callback to filter arrays of {@link Addon} objects.
-     *
-     * @param array $where A where array that filters the info array.
-     * @return \Closure Returns a new closure.
-     */
-    public static function makeFilterCallback($where) {
-        return function (Addon $addon) use ($where) {
-            foreach ($where as $key => $value) {
-                if ($key === 'oldType') {
-                    $valid = isset($addon->special['oldType']) && $addon->special['oldType'] === $value;
-                } elseif ($value === null) {
-                    $valid = !isset($addon->info[$key]);
-                } else {
-                    $valid = $addon->getInfoValue($key) == $value;
-                }
-                if (!$valid) {
-                    return false;
-                }
-            }
-            return true;
-        };
     }
 }

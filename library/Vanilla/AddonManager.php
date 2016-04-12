@@ -260,12 +260,12 @@ class AddonManager {
     }
 
     /**
-     * Get all of the addons that depend on a given addon.
+     * Get all of the enabled addons that depend on a given addon.
      *
      * @param Addon $addon The addon to check the requirements.
      * @return array Returns an array of {@link Addon} objects.
      */
-    public function getEnabledDependants(Addon $addon) {
+    public function lookupDependants(Addon $addon) {
         $result = [];
         foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
             /* @var Addon $enabledAddon */
@@ -278,12 +278,16 @@ class AddonManager {
     }
 
     /**
-     * Test that an addon can be enabled.
-     * 
-     * @param Addon $addon The addon to test.
-     * @param bool $throw Whether to throw an exception with som error information.
+     * Check an addon's requirements.
+     *
+     * An addon cannot be enabled if it has missing or invalid requirements. If an addon has requirements that are
+     * simply disabled it will pass this test as long as it's requirements also meet *their* requirements.
+     *
+     * @param Addon $addon The addon to check.
+     * @param bool $throw Whether or not to throw an exception if the requirements are not met.
+     * @return bool Returns **true** if the requirements are met or **false** otherwise.
      */
-    public function testAddon(Addon $addon, $throw = false) {
+    public function checkRequirements(Addon $addon, $throw = false) {
         // Get all of the addon requirements.
         $requirements = $this->lookupRequirements($addon, self::REQ_MISSING | self::REQ_VERSION);
         $missing = [];
@@ -293,7 +297,8 @@ class AddonManager {
                     $missing[] = $addonKey;
                     break;
                 case self::REQ_VERSION:
-                    $missing[] = "$addonKey {$requirement['req']}";
+                    $checkAddon = $this->lookupAddon($addonKey);
+                    $missing[] = $checkAddon->getName()." {$requirement['req']}";
                     break;
             }
         }
@@ -302,8 +307,8 @@ class AddonManager {
             if ($throw) {
                 // TODO: Localize after dependency injection can be done.
                 $msg = sprintf(
-                    'Cannot enable %1$s because it is missing %2$s.',
-                    $addon->getKey(),
+                    '%1$s requires: %2$s.',
+                    $addon->getName(),
                     implode(', ', $missing)
                 );
                 throw new \Exception($msg, 400);
@@ -311,8 +316,40 @@ class AddonManager {
                 return false;
             }
         }
+        return true;
+    }
 
-        return $addon->test($throw);
+    /**
+     * Check the enabled dependants of an addon.
+     *
+     * Addons should always check their dependants before being disabled. This check does not consider dependants that
+     * are not enabled.
+     *
+     * @param Addon $addon The addon to check.
+     * @param bool $throw Whether or not to throw an exception or just return **false** if the check fails.
+     * @return bool Returns **true** if the addon a
+     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependants.
+     */
+    public function checkDependants(Addon $addon, $throw = false) {
+        $dependants = $this->lookupDependants($addon);
+
+        if (empty($dependants)) {
+            return true;
+        } elseif (!$throw) {
+            return false;
+        } else {
+            $names = [];
+            /* @var Addon $dependant */
+            foreach ($dependants as $dependant) {
+                $names[] = $dependant->getName();
+            }
+            $msg = sprintf(
+                'The following addons depend on %1$s: %2$s.',
+                $addon->getName(),
+                implode(', ', $names)
+            );
+            throw new \Exception($msg, 400);
+        }
     }
 
     /**
@@ -567,7 +604,7 @@ class AddonManager {
      *
      * @param array $keys The keys of the addons. The addon keys can be the keys of the array or the values.
      * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return int Returns the number of addons that were started.
+     * @return int Returns the number of addons that were enabled.
      */
     public function startAddonsByKey($keys, $type) {
         // Filter out false keys.

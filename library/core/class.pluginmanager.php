@@ -1256,7 +1256,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         // 1. Check to make sure that no other enabled plugins rely on this one
         // Get all available plugins and compile their requirements.
-        $dependants = $this->addonManager->getEnabledDependants($addon);
+        $dependants = $this->addonManager->lookupDependants($addon);
         if (!empty($dependants)) {
             $name = $addon->getInfoValue('name');
 

@@ -25,7 +25,6 @@ $Definition['BanReason.1'] = 'Banned by a community manager.';
 $Definition['BanReason.2'] = 'Banned by IP address, email, or name.';
 $Definition['BanReason.4'] = 'Temporarily banned by a community manager.';
 $Definition['BanReason.8'] = 'Banned by warnings.';
-$Definition['Cannot enable %1$s because it is missing %2$s.'] = 'You cannot enable the %1$s addon because the it depends on the following addons: %2$s.';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';

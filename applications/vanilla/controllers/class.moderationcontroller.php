@@ -111,14 +111,14 @@ class ModerationController extends VanillaController {
             $Discussion = $DiscussionModel->getID($DiscussionID);
             $PermissionCategory = CategoryModel::categories(val('CategoryID', $Discussion));
             if ($Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', val('PermissionCategoryID', $PermissionCategory))) {
-                $ActionMessage .= ' '.anchor(t('Delete'), 'vanilla/moderation/confirmcommentdeletes/'.$DiscussionID, 'Delete Popup');
+                $ActionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmcommentdeletes/'.$DiscussionID, 'Delete Popup');
             }
 
             $Sender->EventArguments['SelectionMessage'] = &$SelectionMessage;
             $Sender->EventArguments['ActionMessage'] = &$ActionMessage;
             $Sender->EventArguments['Discussion'] = $Discussion;
             $Sender->fireEvent('BeforeCheckComments');
-            $ActionMessage .= ' '.anchor(t('Cancel'), 'vanilla/moderation/clearcommentselections/'.$DiscussionID.'/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
+            $ActionMessage .= ' '.anchor(t('Cancel'), 'moderation/clearcommentselections/'.$DiscussionID.'/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
 
             $Sender->informMessage(
                 $SelectionMessage
@@ -186,13 +186,13 @@ class ModerationController extends VanillaController {
                 plural($CountDiscussions, '%s discussion', '%s discussions')
             ), 'div');
             $ActionMessage = t('Take Action:');
-            $ActionMessage .= ' '.anchor(t('Delete'), 'vanilla/moderation/confirmdiscussiondeletes/', 'Delete Popup');
-            $ActionMessage .= ' '.anchor(t('Move'), 'vanilla/moderation/confirmdiscussionmoves/', 'Move Popup');
+            $ActionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmdiscussiondeletes/', 'Delete Popup');
+            $ActionMessage .= ' '.anchor(t('Move'), 'moderation/confirmdiscussionmoves/', 'Move Popup');
 
             $Sender->EventArguments['SelectionMessage'] = &$SelectionMessage;
             $Sender->EventArguments['ActionMessage'] = &$ActionMessage;
             $Sender->fireEvent('BeforeCheckDiscussions');
-            $ActionMessage .= ' '.anchor(t('Cancel'), 'vanilla/moderation/cleardiscussionselections/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
+            $ActionMessage .= ' '.anchor(t('Cancel'), 'moderation/cleardiscussionselections/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
 
             $Sender->informMessage(
                 $SelectionMessage

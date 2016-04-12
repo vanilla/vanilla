@@ -66,7 +66,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     private $started = false;
 
     /** @var bool Whether or not to trace some event information. */
-    public $Trace = false;
+    public $trace = false;
 
     /**
      * @var AddonManager
@@ -142,32 +142,21 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         deprecated('Gdn_PluginManager->clearPluginCache()');
     }
 
-    public function enabledPlugins($Force = false) {
+    /**
+     * Get a list of all of the enabled plugins.
+     *
+     * @return array
+     */
+    public function enabledPlugins($force = false) {
+        $addons = $this->addonManager->getEnabled();
+        $plugins = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'plugin']));
 
-        if (!is_array($this->enabledPlugins) || $Force) {
-            // Make sure all known plugins are cached
-            $this->availablePlugins($Force);
-
-            $this->enabledPlugins = array();
-            $EnabledPlugins = c('EnabledPlugins', array());
-
-            foreach ($EnabledPlugins as $PluginName => $PluginStatus) {
-                // Plugins can be explicitly disabled
-                if ($PluginStatus === false) {
-                    continue;
-                }
-
-                // Check that the plugin is in AvailablePlugins...
-                $Plugin = $this->getPluginInfo($PluginName);
-                if ($Plugin === false) {
-                    continue;
-                }
-
-                $this->enabledPlugins[$PluginName] = true;
-            }
+        $result = [];
+        /* @var Addon $plugin */
+        foreach ($plugins as $key => $plugin) {
+            $result[$plugin->getRawKey()] = $this->calcOldInfoArray($plugin);
         }
-
-        return array_intersect_key($this->availablePlugins(), $this->enabledPlugins);
+        return $result;
     }
 
     /**
@@ -185,36 +174,18 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public function includePlugins($EnabledPlugins = null) {
         deprecated('Gdn_PluginManager->includePlugins()');
-        // Include all of the plugins.
-        if (is_null($EnabledPlugins)) {
-            $EnabledPlugins = $this->enabledPlugins();
-        }
-
-        $PluginManager = &$this;
-        // Get a list of files to include.
-        foreach ($EnabledPlugins as $PluginName => $Trash) {
-            $PluginInfo = $this->getPluginInfo($PluginName);
-
-            $ClassName = val('ClassName', $PluginInfo, false);
-            $ClassFile = val('RealFile', $PluginInfo, false);
-
-            if ($ClassName !== false && !class_exists($ClassName, false)) {
-                if (file_exists($ClassFile)) {
-                    include_once($ClassFile);
-                }
-            }
-
-        }
+        return [];
     }
 
     /**
+     * TODO: Remove this method.
      *
-     *
-     * @param $SearchPath
-     * @param $PluginInfo
-     * @param $ClassInfo
-     * @param null $PathListing
-     * @return bool|string
+     * @param string $SearchPath Deprecated.
+     * @param array &$PluginInfo Deprecated.
+     * @param array &$ClassInfo Deprecated.
+     * @param array|null $PathListing Deprecated.
+     * @return bool|string Deprecated.
+     * @deprecated
      */
     public function indexSearchPath($SearchPath, &$PluginInfo, &$ClassInfo, $PathListing = null) {
         if (is_null($PathListing) || !is_array($PathListing)) {
@@ -232,7 +203,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             }
 
             $PluginPath = CombinePaths(array($SearchPath, $PluginFolderName));
-            $PluginFile = $this->findPluginFile($PluginPath);
+            $PluginFile = $this->findPluginFileOld($PluginPath);
 
             if ($PluginFile === false) {
                 continue;
@@ -336,60 +307,43 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * TODO: Remove this.
      *
-     *
-     * @param $SearchPath
-     * @param null $SearchPathName
-     * @return bool
+     * @return bool Deprecated.
      */
-    public function addSearchPath($SearchPath, $SearchPathName = null) {
-        $AlternateSearchPaths = $this->searchPaths(true);
-        $SearchPath = rtrim($SearchPath, '/');
-        if (array_key_exists($SearchPath, $AlternateSearchPaths)) {
-            return true;
-        }
-
-        $this->AlternateSearchPaths[$SearchPath] = $SearchPathName;
-        SaveToConfig('Garden.PluginManager.Search', $this->AlternateSearchPaths);
+    public function addSearchPath() {
+        deprecated('Gdn_PluginManager->addSearchPath()');
         return true;
     }
 
     /**
+     * TODO: Remove this.
      *
-     *
-     * @param $SearchPath
-     * @return bool
+     * @return bool Deprecated.
      */
-    public function removeSearchPath($SearchPath) {
-        $AlternateSearchPaths = $this->searchPaths(true);
-        $SearchPath = rtrim($SearchPath, '/');
-        if (!array_key_exists($SearchPath, $AlternateSearchPaths)) {
-            return true;
-        }
-
-        unset($this->AlternateSearchPaths[$SearchPath]);
-        SaveToConfig('Garden.PluginManager.Search', $this->AlternateSearchPaths);
+    public function removeSearchPath() {
+        deprecated('Gdn_PluginManager->removeSearchPath()');
         return true;
     }
 
     /**
+     * Find a plugin file using the old plugin manager method.
      *
-     *
-     * @param $PluginPath
-     * @return bool|The
+     * @param string $path The root path of the plugin.
+     * @return string|false Returns the path to the plugin class or **false** if one isn't found.
      */
-    public function findPluginFile($PluginPath) {
-        if (!is_dir($PluginPath)) {
+    private function findPluginFileOld($path) {
+        if (!is_dir($path)) {
             return false;
         }
-        $PluginFiles = scandir($PluginPath);
+        $PluginFiles = scandir($path);
         $TestPatterns = array(
             'default.php', '*plugin.php'
         );
         foreach ($PluginFiles as $PluginFile) {
             foreach ($TestPatterns as $Test) {
                 if (fnmatch($Test, $PluginFile)) {
-                    return CombinePaths(array($PluginPath, $PluginFile));
+                    return CombinePaths(array($path, $PluginFile));
                 }
             }
         }
@@ -398,7 +352,26 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
-     * Register all enabled plugins' event handlers and overrides
+     * Deprecated.
+     *
+     * @param string $path Deprecated.
+     * @return string|false Deprecated.
+     */
+    public function findPluginFile($path) {
+        deprecated('Gdn_PluginManager->findPluginFile()');
+        try {
+            $addon = new Addon($path);
+            if ($pluginClass = $addon->getPluginClass()) {
+                return $addon->getClassPath($pluginClass, Addon::PATH_FULL);
+            }
+            return false;
+        } catch (\Exception $ex) {
+            return false;
+        }
+    }
+
+    /**
+     * Register all enabled plugins' event handlers and overrides.
      *
      * Examines all declared classes, identifying which ones implement
      * Gdn_IPlugin and registers all of their event handlers and method
@@ -522,7 +495,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
-     *
+     * Removes all plugins that are marked as mobile unfriendly.
      */
     public function removeMobileUnfriendlyPlugins() {
         foreach ($this->enabledPlugins() as $PluginName => $Trash) {
@@ -536,15 +509,15 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
-     * Check whether a plugin is enabled
+     * Check whether a plugin is enabled.
      *
-     * @param string $PluginName
-     * @return bool
+     * @param string $pluginName The name of the plugin.
+     * @return bool Returns **true** if the plugin is enabled or **false** otherwise.
+     * @deprecated Use {@link Gdn_PluginManager::isEnabled()} instead.
      */
-    public function checkPlugin($PluginName) {
-        if (array_key_exists(strtolower($PluginName), array_change_key_case($this->enabledPlugins(), CASE_LOWER))) {
-            return true;
-        }
+    public function checkPlugin($pluginName) {
+        deprecated('Gdn_PluginManager->checkPlugin()', 'Gdn_PluginManager->isEnabled()');
+        $result = $this->isEnabled($pluginName);
         return false;
     }
 
@@ -792,7 +765,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @param string $Type
      */
     public function trace($Message, $Type = TRACE_INFO) {
-        if ($this->Trace) {
+        if ($this->trace) {
             trace($Message, $Type);
         }
     }
@@ -1330,6 +1303,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             case self::ACTION_DISABLE:
                 $methodName = 'onDisable';
                 break;
+            default:
+                $methodName = '';
         }
 
         $addon = $this->addonManager->lookupAddon($pluginName);

@@ -503,132 +503,26 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
+     * Deprecated.
      *
-     *
-     * @param bool $Enabled
-     * @return array
+     * @param bool $Enabled Deprecated.
+     * @return array Deprecated.
      */
     public function getAddons($Enabled = false) {
-        $Addons = array();
-
-        // Get the core.
-        self::addAddon(array('AddonKey' => 'vanilla', 'AddonType' => 'core', 'Version' => APPLICATION_VERSION, 'Folder' => '/'), $Addons);
-
-        // Get a list of all of the applications.
-        $ApplicationManager = new Gdn_ApplicationManager();
-        if ($Enabled) {
-            $Applications = $ApplicationManager->availableApplications();
-        } else {
-            $Applications = $ApplicationManager->enabledApplications();
+        deprecated('UpdateModel->getAddons()');
+        return [];
         }
-
-        foreach ($Applications as $Key => $Info) {
-            // Exclude core applications.
-            if (in_array(strtolower($Key), array('conversations', 'dashboard', 'skeleton', 'vanilla'))) {
-                continue;
-            }
-
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'application', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, strtolower($Key)));
-            self::addAddon($Addon, $Addons);
-        }
-
-        // Get a list of all of the plugins.
-        $PluginManager = Gdn::pluginManager();
-        if ($Enabled) {
-            $Plugins = $PluginManager->enabledPlugins();
-        } else {
-            $Plugins = $PluginManager->availablePlugins();
-        }
-
-        foreach ($Plugins as $Key => $Info) {
-            // Exclude core plugins.
-            if (in_array(strtolower($Key), array())) {
-                continue;
-            }
-
-            $Addon = [
-                'AddonKey' => $Key,
-                'AddonType' => 'plugin',
-                'Version' => val('Version', $Info, '0.0'),
-                'Folder' => '/applications/'.GetValue('Folder', $Info, $Key)
-            ];
-            self::addAddon($Addon, $Addons);
-        }
-
-        // Get a list of all the themes.
-        $ThemeManager = new Gdn_ThemeManager();
-        if ($Enabled) {
-            $Themes = $ThemeManager->enabledThemeInfo(true);
-        } else {
-            $Themes = $ThemeManager->availableThemes();
-        }
-
-        foreach ($Themes as $Key => $Info) {
-            // Exclude core themes.
-            if (in_array(strtolower($Key), array('default'))) {
-                continue;
-            }
-
-            $Addon = [
-                'AddonKey' => $Key,
-                'AddonType' => 'theme',
-                'Version' => val('Version', $Info, '0.0'),
-                'Folder' => '/themes/'.GetValue('Folder', $Info, $Key)
-            ];
-            self::addAddon($Addon, $Addons);
-        }
-
-        // Get a list of all locales.
-        $LocaleModel = new LocaleModel();
-        if ($Enabled) {
-            $Locales = $LocaleModel->enabledLocalePacks(true);
-        } else {
-            $Locales = $LocaleModel->availableLocalePacks();
-        }
-
-        foreach ($Locales as $Key => $Info) {
-            // Exclude core themes.
-            if (in_array(strtolower($Key), array('skeleton'))) {
-                continue;
-            }
-
-            $Addon = [
-                'AddonKey' => $Key,
-                'AddonType' => 'locale',
-                'Version' => val('Version', $Info, '0.0'),
-                'Folder' => '/locales/'.GetValue('Folder', $Info, $Key)
-            ];
-            self::addAddon($Addon, $Addons);
-        }
-
-        return $Addons;
-    }
 
     /**
+     * Deprecated.
+     * @param bool $Enabled Deprecated.
      *
-     *
-     * @param bool $Enabled
-     * @return array|bool
-     * @throws Exception
+     * @param bool $OnlyUpdates Deprecated.
+     * @return array|bool Deprecated.
+     * @throws Exception Deprecated.
      */
     public function getAddonUpdates($Enabled = false) {
-        // Get the addons on this site.
-        $MyAddons = $this->getAddons($Enabled);
-
-        // Build the query for them.
-        $Slugs = array_keys($MyAddons);
-        array_map('urlencode', $Slugs);
-        $SlugsString = implode(',', $Slugs);
-
-        $Url = $this->AddonSiteUrl.'/addon/getlist.json?ids='.$SlugsString;
-        $SiteAddons = proxyRequest($Url);
-        $UpdateAddons = array();
-
-        if ($SiteAddons) {
-            $SiteAddons = val('Addons', json_decode($SiteAddons, true));
-            $UpdateAddons = $this->compareAddons($MyAddons, $SiteAddons);
-        }
-        return $UpdateAddons;
+        deprecated('UpdateModel->getAddonUpdates()');
     }
 
     /**

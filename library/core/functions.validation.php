@@ -27,9 +27,7 @@ if (!function_exists('ValidateCaptcha')) {
      * @return bool Returns true if the captcha is valid or an error message otherwise.
      */
     function validateCaptcha($value = null) {
-        
-        $response = arrayValue('g-recaptcha-response', $_POST, '');
-
+        $response = Gdn::request()->post('g-recaptcha-response');
         if (!$response) {
             return false;
         }
@@ -46,7 +44,7 @@ if (!function_exists('ValidateCaptcha')) {
         curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($handler, CURLOPT_HEADER, false);
         curl_setopt($handler, CURLOPT_HTTPHEADER, array("Content-Type: application/x-www-form-urlencoded"));
-        curl_setopt($handler, CURLOPT_USERAGENT, arrayValue('HTTP_USER_AGENT', $_SERVER, 'NoCaptchaReCaptcha Vanilla'));
+        curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'NoCaptchaReCaptcha Vanilla'));
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handler, CURLOPT_POST, true);
         curl_setopt($handler, CURLOPT_POSTFIELDS, http_build_query($data));
@@ -59,10 +57,10 @@ if (!function_exists('ValidateCaptcha')) {
             if ($result && val('success', $result)) {
                 return true;
             } else if (!empty($errorCodes) && $errorCodes != array('invalid-input-response')) {
-                throw new Exception(formatString(t('Could not get check if human! Error codes: {ErrorCodes}'), array('ErrorCodes' => join(', ', $errorCodes))));
+                throw new Exception(formatString(t('No response from reCAPTCHA.').' {ErrorCodes}', array('ErrorCodes' => join(', ', $errorCodes))));
             }
         } else {
-            throw new Exception(t('Could not get check if human!'));
+            throw new Exception(t('No response from reCAPTCHA.'));
         }
 
         return false;

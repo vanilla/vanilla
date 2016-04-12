@@ -267,7 +267,6 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function captcha() {
-
         $handled = false;
         $this->EventArguments['Handled'] =& $handled;
         $this->fireEvent('Captcha');
@@ -277,7 +276,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
         
         if (!c('Garden.Registration.CaptchaPublicKey') || !c('Garden.Registration.CaptchaPrivateKey')) {
-            return '<div class="Warning">' . t('Security Check has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
+            return '<div class="Warning">' . t('reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
         }
 
         // Google whitelist https://developers.google.com/recaptcha/docs/language

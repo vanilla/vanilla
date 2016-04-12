@@ -1107,38 +1107,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * Test to see if a plugin throws fatal errors.
      */
     public function testPlugin($PluginName, &$Validation, $Setup = false) {
-        // Make sure that the plugin's requirements are met
-        // Required Plugins
-        $PluginInfo = $this->getPluginInfo($PluginName);
-        $RequiredPlugins = val('RequiredPlugins', $PluginInfo, false);
-        CheckRequirements($PluginName, $RequiredPlugins, $this->enabledPlugins(), 'plugin');
-
-        // Required Themes
-        $EnabledThemes = Gdn::themeManager()->enabledThemeInfo();
-        $RequiredThemes = val('RequiredTheme', $PluginInfo, false);
-        CheckRequirements($PluginName, $RequiredThemes, $EnabledThemes, 'theme');
-
-        // Required Applications
-        $EnabledApplications = Gdn::applicationManager()->enabledApplications();
-        $RequiredApplications = val('RequiredApplications', $PluginInfo, false);
-        CheckRequirements($PluginName, $RequiredApplications, $EnabledApplications, 'application');
-
-        // Include the plugin, instantiate it, and call its setup method
-        $PluginClassName = val('ClassName', $PluginInfo, false);
-        $PluginFolder = val('Folder', $PluginInfo, false);
-        if ($PluginFolder == '') {
-            throw new Exception(T('The plugin folder was not properly defined.'));
+        $addon = $this->addonManager->lookupAddon($PluginName);
+        if (!$addon) {
+            throw notFoundException('Plugin');
         }
 
-        $this->pluginHook($PluginName, self::ACTION_ENABLE, $Setup);
-
-        // If setup succeeded, register any specified permissions
-        $PermissionName = val('RegisterPermissions', $PluginInfo, false);
-        if ($PermissionName != false) {
-            $PermissionModel = Gdn::permissionModel();
-            $PermissionModel->define($PermissionName);
+        try {
+            $this->addonManager->checkRequirements($addon, true);
+            $addon->test(true);
+        } catch (\Exception $ex) {
+            throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }
-
         return true;
     }
 
@@ -1323,10 +1302,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
-     * @param Addon $addon
-     * @param $setup
-     * @throws Exception
-     * @internal param $rawKey
+     * Enable an addon and do all the stuff that's entailed there.
+     *
+     * @param Addon $addon The addon to enable.
+     * @param $setup Whether or not to set the plugin up.
+     * @throws Exception Throws an exception if something goes bonkers during the process.
      */
     private function enableAddon(Addon $addon, $setup) {
         if ($setup) {
@@ -1334,8 +1314,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $this->pluginHook($addon->getRawKey(), self::ACTION_ENABLE, true);
 
             // If setup succeeded, register any specified permissions
-            $permissions = val('registerPermissions', $addon->getInfo(), false);
-            if ($permissions != false) {
+            $permissions = $addon->getInfoValue('registerPermissions');
+            if (!empty($permissions)) {
                 $PermissionModel = Gdn::permissionModel();
                 $PermissionModel->define($permissions);
             }

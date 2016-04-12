@@ -1187,7 +1187,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         $addon = $this->addonManager->lookupAddon($pluginName, Addon::TYPE_ADDON);
         if (!$addon) {
-            return false;
+            throw notFoundException('Plugin');
         }
 
         if (!$validation instanceof Gdn_Validation) {
@@ -1195,42 +1195,27 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
 
         try {
-            $this->addonManager->testAddon($addon, true);
+            $this->addonManager->checkRequirements($addon, true);
+            $addon->test(true);
         } catch (\Exception $ex) {
             $validation->addValidationResult('addon', '@'.$ex->getMessage());
             return false;
         }
-        
-        $rawKey = $addon->getRawKey();
 
-        if ($setup) {
-            $this->addonManager->startAddon($addon);
-            $this->pluginHook($rawKey, self::ACTION_ENABLE, true);
-
-            // If setup succeeded, register any specified permissions
-            $permissions = val('registerPermissions', $addon->getInfo(), false);
-            if ($permissions != false) {
-                $PermissionModel = Gdn::permissionModel();
-                $PermissionModel->define($permissions);
-            }
-
-            // Write enabled state to config.
-            saveToConfig("EnabledPlugins.$rawKey", true);
-            Logger::event(
-                'addon_enabled',
-                Logger::INFO,
-                'The {addonName} plugin was enabled.',
-                array('addonName' => $rawKey)
-            );
+        // Enable this addon's requirements.
+        $requirements = $this->addonManager->lookupRequirements($addon, AddonManager::REQ_DISABLED);
+        foreach ($requirements as $addonKey => $row) {
+            $requiredAddon = $this->addonManager->lookupAddon($addonKey);
+            $this->enableAddon($requiredAddon, $setup);
         }
 
-        $pluginClassName = $addon->getPluginClass();
-        $this->registerPlugin($pluginClassName);
+        // Enable the addon.
+        $this->enableAddon($addon, $setup);
 
         // Refresh the locale just in case there are some translations needed this request.
         Gdn::locale()->refresh();
 
-        $this->EventArguments['AddonName'] = $rawKey;
+        $this->EventArguments['AddonName'] = $addon->getRawKey();
         $this->fireEvent('AddonEnabled');
 
         return true;
@@ -1253,24 +1238,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $pluginName = $addon->getRawKey();
         $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
 
-
-        // 1. Check to make sure that no other enabled plugins rely on this one
-        // Get all available plugins and compile their requirements.
-        $dependants = $this->addonManager->lookupDependants($addon);
-        if (!empty($dependants)) {
-            $name = $addon->getInfoValue('name');
-
-            foreach ($dependants as $dependant) {
-                $dependantNames[] = $dependant->getInfoValue('name');
-            }
-            $dependantNames = implode(', ', $dependantNames);
-
-            $msg = sprintf(t(
-                'Cannot disable %1$s because %2$s depends on it.',
-                'You cannot disable the %1$s addon because the following addons depend on it: %2$s.'
-            ), $name, $dependantNames);
-
-            throw new Gdn_UserException($msg, 400);
+        try {
+            $this->addonManager->checkDependants($addon, true);
+        } catch (\Exception $ex) {
+            throw new Gdn_UserException($ex->getMessage(), 400);
         }
 
         // 2. Perform necessary hook action
@@ -1359,14 +1330,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             case self::ACTION_DISABLE:
                 $methodName = 'onDisable';
                 break;
-            case self::ACTION_ONLOAD:
-                $methodName = 'onLoad';
-                break;
         }
 
         $addon = $this->addonManager->lookupAddon($pluginName);
         if (!$addon || !$addon->getPluginClass()) {
-            return false;
+            return;
         }
 
         $pluginClass = $addon->getPluginClass();
@@ -1377,5 +1345,37 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 $plugin->$methodName();
             }
         }
+    }
+
+    /**
+     * @param Addon $addon
+     * @param $setup
+     * @throws Exception
+     * @internal param $rawKey
+     */
+    private function enableAddon(Addon $addon, $setup) {
+        if ($setup) {
+            $this->addonManager->startAddon($addon);
+            $this->pluginHook($addon->getRawKey(), self::ACTION_ENABLE, true);
+
+            // If setup succeeded, register any specified permissions
+            $permissions = val('registerPermissions', $addon->getInfo(), false);
+            if ($permissions != false) {
+                $PermissionModel = Gdn::permissionModel();
+                $PermissionModel->define($permissions);
+            }
+
+            // Write enabled state to config.
+            saveToConfig("EnabledPlugins.".$addon->getRawKey(), true);
+            Logger::event(
+                'addon_enabled',
+                Logger::INFO,
+                'The {addonName} plugin was enabled.',
+                array('addonName' => $addon->getRawKey())
+            );
+        }
+
+        $pluginClassName = $addon->getPluginClass();
+        $this->registerPlugin($pluginClassName);
     }
 }

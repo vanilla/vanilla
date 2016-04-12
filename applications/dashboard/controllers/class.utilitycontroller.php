@@ -144,11 +144,9 @@ class UtilityController extends DashboardController {
     /**
      * Update database structure based on current definitions in each app's structure.php file.
      *
-     * @since 2.0.?
-     * @access public
      * @param string $appName Unique app name or 'all' (default).
      */
-    public function structure($appName = 'all') {
+    public function structure() {
         $this->permission('Garden.Settings.Manage');
 
         if (!$this->Form->authenticatedPostBack()) {
@@ -167,12 +165,12 @@ class UtilityController extends DashboardController {
 
         switch ($step) {
             case 'scan':
-                $this->runStructure($appName, true);
+                $this->runStructure(true);
                 break;
             case 'run':
-                $this->runStructure($appName, false);
+                $this->runStructure(false);
                 break;
-            case 'start';
+            case 'start':
             default:
                 // Nothing to do here.
         }
@@ -187,73 +185,21 @@ class UtilityController extends DashboardController {
     /**
      * Run the database structure or /utility/structure.
      *
-     * Note: Keep this method protected!
+     * Note: Keep this method private!
      *
-     * @param string $appName Unique app name or 'all' (default).
-     * @param bool $captureOnly Whether to list changes rather than execute (0 or 1).
-     * @throws Exception
+     * @param bool $captureOnly Whether to list changes rather than execute.
+     * @throws Exception Throws an exception if there was an error in the structure process.
      */
-    protected function runStructure($appName = 'all', $captureOnly = true) {
+    private function runStructure($captureOnly = true) {
         // This permission is run again to be sure someone doesn't accidentally call this method incorrectly.
         $this->permission('Garden.Settings.Manage');
 
-        $Files = array();
-        $appName = $appName == '' ? 'all' : $appName;
-        if ($appName == 'all') {
-            // Load all application structure files.
-            $ApplicationManager = new Gdn_ApplicationManager();
-            $Apps = $ApplicationManager->enabledApplications();
-            $AppNames = array_column($Apps, 'Folder');
-            foreach ($AppNames as $appName) {
-                $Files[] = combinePaths(array(PATH_APPLICATIONS, $appName, 'settings', 'structure.php'), DS);
-            }
-            $appName = 'all';
-        } else {
-            // Load that specific application structure file.
-            $Files[] = combinePaths(array(PATH_APPLICATIONS, $appName, 'settings', 'structure.php'), DS);
-        }
-        $Drop = false;
-        $Explicit = false;
-        $captureOnly = !($captureOnly == '0');
-        $Structure = Gdn::structure();
-        $Structure->CaptureOnly = $captureOnly;
-        $SQL = Gdn::sql();
-        $SQL->CaptureModifications = $captureOnly;
-        $this->setData('CaptureOnly', $Structure->CaptureOnly);
-        $this->setData('Drop', $Drop);
-        $this->setData('Explicit', $Explicit);
-        $this->setData('ApplicationName', $appName);
-        $this->setData('Status', '');
-        $FoundStructureFile = false;
-        foreach ($Files as $File) {
-            if (file_exists($File)) {
-                $FoundStructureFile = true;
-                try {
-                    include($File);
-                } catch (Exception $Ex) {
-                    $this->Form->addError($Ex);
-                }
-            }
-        }
+        $updateModel = new UpdateModel();
+        $capturedSql = $updateModel->runStructure(null, $captureOnly);
+        $this->setData('CapturedSql', $capturedSql);
 
-        // Run the structure of all of the plugins.
-        $Plugins = Gdn::pluginManager()->enabledPlugins();
-        foreach ($Plugins as $PluginKey => $Plugin) {
-            $PluginInstance = Gdn::pluginManager()->getPluginInstance($PluginKey, Gdn_PluginManager::ACCESS_PLUGINNAME);
-            if (method_exists($PluginInstance, 'Structure')) {
-                $PluginInstance->structure();
-            }
-        }
-
-        if (property_exists($Structure->Database, 'CapturedSql')) {
-            $this->setData('CapturedSql', (array)$Structure->Database->CapturedSql);
-        } else {
-            $this->setData('CapturedSql', array());
-        }
-
-        $issues = Gdn::structure()->getIssues();
-
-        if ($this->Form->errorCount() == 0 && !$captureOnly && $FoundStructureFile) {
+        $addons = array_reverse(Gdn::addonManager()->getEnabled());
+        if ($this->Form->errorCount() == 0 && !$captureOnly) {
             if (empty($issues)) {
                 $this->setData('Status', 'The structure was successfully executed.');
             } else {

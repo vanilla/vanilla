@@ -1348,7 +1348,7 @@ class SettingsController extends DashboardController {
             $this->addJsFile('addons.js');
             $this->addSideMenu('dashboard/settings/themeoptions');
 
-            $ThemeManager = new Gdn_ThemeManager();
+            $ThemeManager = Gdn::themeManager();
             $this->setData('ThemeInfo', $ThemeManager->enabledThemeInfo());
 
             if ($this->Form->authenticatedPostBack()) {

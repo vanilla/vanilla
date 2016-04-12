@@ -1092,6 +1092,8 @@ class Addon {
             return $this->path('/'.ltrim($icon, '\\/'), $relative);
         } elseif (file_exists($this->path('\icon.png', self::PATH_FULL))) {
             return $this->path('\icon.png', $relative);
+        } elseif ($this->getType() === self::TYPE_THEME && file_exists($this->path('\screenshot.png', self::PATH_FULL))) {
+            return $this->path('\screenshot.png', $relative);
         }
         return '';
     }

@@ -43,7 +43,7 @@ if ($AddonUrl != '')
         $NewVersion = $this->data('EnabledTheme.NewVersion');
         $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
 
-        $PreviewUrl = $this->data('EnabledTheme.ScreenshotUrl', false);
+        $PreviewUrl = $this->data('EnabledTheme.IconUrl', false);
         if ($PreviewUrl !== FALSE)
             echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
 
@@ -56,7 +56,7 @@ if ($AddonUrl != '')
             echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author).'</span>';
 
         echo '</h4>';
-        echo '<div class="Description">'.GetValue('Description', $this->data('EnabledTheme'), '').'</div>';
+        echo '<div class="Description">'.$this->data('EnabledTheme.Description', '').'</div>';
         if ($this->data('EnabledTheme.Options')) {
             $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
                 anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
@@ -115,7 +115,7 @@ if ($AddonUrl != '')
                     $AuthorUrl = val('AuthorUrl', $ThemeInfo, '');
                     $NewVersion = val('NewVersion', $ThemeInfo, '');
                     $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-                    $PreviewUrl = val('ScreenshotUrl', $ThemeInfo, false);
+                    $PreviewUrl = val('IconUrl', $ThemeInfo, false);
 
                     $Col++;
                     if ($Col == 1) {

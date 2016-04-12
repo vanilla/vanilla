@@ -10,6 +10,7 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\Addon;
 use Vanilla\AddonManager;
 
 /**
@@ -55,67 +56,21 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
-     * Looks through the themes directory for valid themes and returns them as
-     * an associative array of "Theme Name" => "Theme Info Array". It also adds
-     * a "Folder" definition to the Theme Info Array for each.
+     * Looks through the themes directory for valid themes.
+     *
+     * The themes are returned as an associative array of "Theme Name" => "Theme Info Array".
+     *
+     * @param bool $force Deprecated.
+     * @return array Returns the available themes in an array.
      */
-    public function availableThemes($Force = false) {
-        if (is_null($this->themeCache) || $Force) {
-            $this->themeCache = array();
-
-            // Check cache freshness
-            foreach ($this->searchPaths() as $SearchPath => $Trash) {
-                unset($SearchPathCache);
-
-                // Check Cache
-                $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
-                if ($this->apc) {
-                    $SearchPathCache = apc_fetch($SearchPathCacheKey);
-                } else {
-                    $SearchPathCache = Gdn::cache()->get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
-                }
-
-                $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
-                if ($CacheHit && is_array($SearchPathCache)) {
-                    $CacheIntegrityCheck = (sizeof(array_intersect(array_keys($SearchPathCache), array('CacheIntegrityHash', 'ThemeInfo'))) == 2);
-                    if (!$CacheIntegrityCheck) {
-                        $SearchPathCache = array(
-                            'CacheIntegrityHash' => null,
-                            'ThemeInfo' => array()
-                        );
-                    }
-                }
-
-                $CacheThemeInfo = &$SearchPathCache['ThemeInfo'];
-                if (!is_array($CacheThemeInfo)) {
-                    $CacheThemeInfo = array();
-                }
-
-                $PathListing = scandir($SearchPath, 0);
-                sort($PathListing);
-
-                $PathIntegrityHash = md5(serialize($PathListing));
-                if (val('CacheIntegrityHash', $SearchPathCache) != $PathIntegrityHash) {
-                    // Trace('Need to re-index theme cache');
-                    // Need to re-index this folder
-                    $PathIntegrityHash = $this->indexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
-                    if ($PathIntegrityHash === false) {
-                        continue;
-                    }
-
-                    $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-                    if ($this->apc) {
-                        apc_store($SearchPathCacheKey, $SearchPathCache);
-                    } else {
-                        Gdn::cache()->store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => true));
-                    }
-                }
-
-                $this->themeCache = array_merge($this->themeCache, $CacheThemeInfo);
-            }
+    public function availableThemes($force = false) {
+        $addons = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
+        $result = [];
+        /* @var Addon $addon */
+        foreach ($addons as $addon) {
+            $result[$addon->getRawKey()] = Gdn::pluginManager()->calcOldInfoArray($addon);
         }
-
-        return $this->themeCache;
+        return $result;
     }
 
     /**
@@ -539,47 +494,24 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Test a theme for dependencies and parse errors.
      *
-     *
-     * @param $ThemeName
-     * @return bool
-     * @throws Gdn_UserException
+     * @param string $themeName The case-sensitive theme name.
+     * @return bool Returns
+     * @throws Gdn_UserException Throws an exception when there was an issue testing the theme.
      */
-    public function testTheme($ThemeName) {
-        // Get some info about the currently enabled theme.
-        $EnabledTheme = $this->enabledThemeInfo();
-        $EnabledThemeFolder = val('Folder', $EnabledTheme, '');
-        $OldClassName = $EnabledThemeFolder.'ThemeHooks';
-
-        // Make sure that the theme's requirements are met
-        $ApplicationManager = new Gdn_ApplicationManager();
-        $EnabledApplications = $ApplicationManager->enabledApplications();
-
-        $NewThemeInfo = $this->getThemeInfo($ThemeName);
-        $ThemeName = val('Index', $NewThemeInfo, $ThemeName);
-        $RequiredApplications = val('RequiredApplications', $NewThemeInfo, false);
-        $ThemeFolder = val('Folder', $NewThemeInfo, '');
-        checkRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
-
-        // If there is a hooks file, include it and run the setup method.
-        $ClassName = "{$ThemeFolder}ThemeHooks";
-        $HooksFile = val("HooksFile", $NewThemeInfo, null);
-        if (!is_null($HooksFile) && file_exists($HooksFile)) {
-            include_once($HooksFile);
-            if (class_exists($ClassName)) {
-                $ThemeHooks = new $ClassName();
-                $ThemeHooks->Setup();
-            }
+    public function testTheme($themeName) {
+        $addon = $this->addonManager->lookupTheme($themeName);
+        if (!$addon) {
+            throw notFoundException('Plugin');
         }
 
-        // If there is a hooks in the old theme, include it and run the ondisable method.
-        if (class_exists($OldClassName)) {
-            $ThemeHooks = new $OldClassName();
-            if (method_exists($ThemeHooks, 'OnDisable')) {
-                $ThemeHooks->OnDisable();
-            }
+        try {
+            $this->addonManager->checkRequirements($addon, true);
+            $addon->test(true);
+        } catch (\Exception $ex) {
+            throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }
-
         return true;
     }
 

@@ -18,16 +18,16 @@ use Vanilla\AddonManager;
 class Gdn_ThemeManager extends Gdn_Pluggable {
 
     /** @var array An array of search paths for themes and their files. */
-    protected $ThemeSearchPaths = null;
+    private $themeSearchPaths = null;
 
     /** @var array */
-    protected $AlternateThemeSearchPaths = null;
+    private $alternateThemeSearchPaths = null;
 
     /** @var array An array of available plugins. Never access this directly, instead use $this->AvailablePlugins(); */
-    protected $ThemeCache = null;
+    private $themeCache = null;
 
     /** @var bool Whether to use APC for theme cache storage. */
-    protected $Apc = false;
+    private $apc = false;
 
     /**
      * @var AddonManager
@@ -60,8 +60,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * a "Folder" definition to the Theme Info Array for each.
      */
     public function availableThemes($Force = false) {
-        if (is_null($this->ThemeCache) || $Force) {
-            $this->ThemeCache = array();
+        if (is_null($this->themeCache) || $Force) {
+            $this->themeCache = array();
 
             // Check cache freshness
             foreach ($this->searchPaths() as $SearchPath => $Trash) {
@@ -69,7 +69,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
                 // Check Cache
                 $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
-                if ($this->Apc) {
+                if ($this->apc) {
                     $SearchPathCache = apc_fetch($SearchPathCacheKey);
                 } else {
                     $SearchPathCache = Gdn::cache()->get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
@@ -104,18 +104,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                     }
 
                     $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-                    if ($this->Apc) {
+                    if ($this->apc) {
                         apc_store($SearchPathCacheKey, $SearchPathCache);
                     } else {
                         Gdn::cache()->store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => true));
                     }
                 }
 
-                $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);
+                $this->themeCache = array_merge($this->themeCache, $CacheThemeInfo);
             }
         }
 
-        return $this->ThemeCache;
+        return $this->themeCache;
     }
 
     /**
@@ -198,7 +198,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
         foreach ($SearchPaths as $SearchPath => $SearchPathName) {
             $SearchPathCacheKey = "Garden.Themes.PathCache.{$SearchPath}";
-            if ($this->Apc) {
+            if ($this->apc) {
                 apc_delete($SearchPathCacheKey);
             } else {
                 Gdn::cache()->remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
@@ -216,12 +216,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return array Search paths
      */
     public function searchPaths($OnlyCustom = false) {
-        if (is_null($this->ThemeSearchPaths) || is_null($this->AlternateThemeSearchPaths)) {
-            $this->ThemeSearchPaths = array();
-            $this->AlternateThemeSearchPaths = array();
+        if (is_null($this->themeSearchPaths) || is_null($this->alternateThemeSearchPaths)) {
+            $this->themeSearchPaths = array();
+            $this->alternateThemeSearchPaths = array();
 
             // Add default search path(s) to list
-            $this->ThemeSearchPaths[rtrim(PATH_THEMES, '/')] = 'core';
+            $this->themeSearchPaths[rtrim(PATH_THEMES, '/')] = 'core';
 
             // Check for, and load, alternate search paths from config
             $RawAlternatePaths = c('Garden.PluginManager.Search', null);
@@ -238,19 +238,19 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 }
 
                 foreach ($AlternatePaths as $AltPath => $AltName) {
-                    $this->AlternateThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+                    $this->alternateThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
                     if (is_dir($AltPath)) {
-                        $this->ThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
+                        $this->themeSearchPaths[rtrim($AltPath, '/')] = $AltName;
                     }
                 }
             }
         }
 
         if (!$OnlyCustom) {
-            return $this->ThemeSearchPaths;
+            return $this->themeSearchPaths;
         }
 
-        return $this->AlternateThemeSearchPaths;
+        return $this->alternateThemeSearchPaths;
     }
 
     /**

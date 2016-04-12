@@ -703,6 +703,15 @@ class Addon {
     }
 
     /**
+     * Get this addon's human-readable name.
+     *
+     * @return string Returns the name of the addon or its key if it has no name.
+     */
+    public function getName() {
+        return $this->getInfoValue('name', $this->getRawKey());
+    }
+
+    /**
      * Support {@link var_export()} for caching.
      *
      * @param array $array The array to load.

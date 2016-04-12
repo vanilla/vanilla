@@ -25,6 +25,7 @@ $Definition['BanReason.1'] = 'Banned by a community manager.';
 $Definition['BanReason.2'] = 'Banned by IP address, email, or name.';
 $Definition['BanReason.4'] = 'Temporarily banned by a community manager.';
 $Definition['BanReason.8'] = 'Banned by warnings.';
+$Definition['Cannot enable %1$s because it is missing %2$s.'] = 'You cannot enable the %1$s addon because the it depends on the following addons: %2$s.';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
@@ -61,9 +62,6 @@ $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['User not found.'] = 'Sorry, no account could be found related to the %s you entered.';
 $Definition['Invalid password.'] = 'The password you entered was incorrect. Remember that passwords are case-sensitive.';
-$Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
-$Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
-$Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
 //$Definition['ErrorTermsOfService'] = 'You must agree to the terms of service.';
 $Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
 

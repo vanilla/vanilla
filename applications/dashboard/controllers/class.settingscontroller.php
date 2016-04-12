@@ -82,17 +82,19 @@ class SettingsController extends DashboardController {
         }
         $this->Filter = $Filter;
 
-        $ApplicationManager = new Gdn_ApplicationManager();
+        $ApplicationManager = Gdn::applicationManager();
         $this->AvailableApplications = $ApplicationManager->availableVisibleApplications();
         $this->EnabledApplications = $ApplicationManager->enabledVisibleApplications();
 
         if ($ApplicationName != '') {
-            $this->EventArguments['ApplicationName'] = $ApplicationName;
-            if (array_key_exists($ApplicationName, $this->EnabledApplications) === true) {
+            $addon = Gdn::addonManager()->lookupAddon($ApplicationName);
+            if (!$addon) {
+                throw notFoundException('Application');
+            }
+
+            if (Gdn::addonManager()->isEnabled($ApplicationName, Addon::TYPE_ADDON)) {
                 try {
                     $ApplicationManager->disableApplication($ApplicationName);
-                    Gdn_LibraryMap::clearCache();
-                    $this->fireEvent('AfterDisableApplication');
                 } catch (Exception $e) {
                     $this->Form->addError(strip_tags($e->getMessage()));
                 }
@@ -106,11 +108,7 @@ class SettingsController extends DashboardController {
                     $Validation = new Gdn_Validation();
                     $ApplicationManager->registerPermissions($ApplicationName, $Validation);
                     $ApplicationManager->enableApplication($ApplicationName, $Validation);
-                    Gdn_LibraryMap::clearCache();
                     $this->Form->setValidationResults($Validation->results());
-
-                    $this->EventArguments['Validation'] = $Validation;
-                    $this->fireEvent('AfterEnableApplication');
                 }
 
             }

@@ -148,7 +148,7 @@ class EmbedController extends DashboardController {
      */
     private function toggle($Toggle = '', $TransientKey = '') {
         if (in_array($Toggle, array('enable', 'disable')) && Gdn::session()->validateTransientKey($TransientKey)) {
-            if ($Toggle == 'enable' && array_key_exists('embedvanilla', Gdn::pluginManager()->enabledPlugins())) {
+            if ($Toggle == 'enable' && Gdn::addonManager()->isEnabled('embedvanilla', \Vanilla\Addon::TYPE_ADDON)) {
                 throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
             }
 

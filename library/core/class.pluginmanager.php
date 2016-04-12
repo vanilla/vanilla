@@ -1266,8 +1266,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $dependantNames = implode(', ', $dependantNames);
 
             $msg = sprintf(t(
-                'Can\'t disable %1$s because %2$s depends on it.',
-                'You cannot disable the %1$s  addon because the following addons depend on it: %2$s.'
+                'Cannot disable %1$s because %2$s depends on it.',
+                'You cannot disable the %1$s addon because the following addons depend on it: %2$s.'
             ), $name, $dependantNames);
 
             throw new Gdn_UserException($msg, 400);

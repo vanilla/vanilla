@@ -78,6 +78,23 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test {@link AddonManager::lookupRequirements()}
+     */
+    public function testLookupRequirements() {
+        $tm = $this->createTestManager();
+
+        // Tet a requirement with transitive requirements.
+        $addon = $tm->lookupTheme('test-old-theme');
+        $reqs = $tm->lookupRequirements($addon);
+        $this->assertArrayHasKey('test-old-plugin', $reqs);
+        $this->assertArrayHasKey('test-old-application', $reqs);
+
+        foreach ($reqs as $req) {
+            $this->assertSame('disabled', $req['status']);
+        }
+    }
+
+    /**
      * Test that all reported plugins implement Gdn_IPlugin.
      *
      * The new addon manager just looks at class name so this test just makes sure we stick to our convention.

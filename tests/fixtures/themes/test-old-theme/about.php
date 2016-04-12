@@ -6,5 +6,8 @@ $ThemeInfo['test-old-theme'] = array(
     'Version'     => '1.0.0',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'License'     => 'GPLv2'
+    'License'     => 'GPLv2',
+    'RequiredPlugins' => [
+        'test-old-plugin' => '1.0'
+    ]
 );

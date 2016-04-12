@@ -268,9 +268,33 @@ class AddonManager {
      * @param bool $throw Whether to throw an exception with som error information.
      */
     public function testAddon(Addon $addon, $throw = false) {
-        // TODO: Test requirements.
+        // Get all of the addon requirements.
+        $requirements = $this->lookupRequirements($addon);
+        $missing = [];
+        foreach ($requirements as $addonKey => $requirement) {
+            switch ($requirement['status']) {
+                case 'missing':
+                    $missing[] = $addonKey;
+                    break;
+                case 'bad-version':
+                    $missing[] = "$addonKey {$requirement['req']}";
+                    break;
+            }
+        }
 
-
+        if (!empty($missing)) {
+            if ($throw) {
+                // TODO: Localize after dependency injection can be done.
+                $msg = sprintf(
+                    'Cannot enable %1$s because it is missing %2$s.',
+                    $addon->getKey(),
+                    implode(', ', $missing)
+                );
+                throw new \Exception($msg, 400);
+            } else {
+                return false;
+            }
+        }
 
         return $addon->test($throw);
     }
@@ -635,6 +659,59 @@ class AddonManager {
                 $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
             }
             return $addons;
+        }
+    }
+
+    /**
+     * Get all of the requirements for an addon.
+     *
+     * This method returns an array of all of the addon requirements for a given addon. The return is an array of
+     * requirements in the following form:
+     *
+     * ```
+     * 'addonKey' => ['req' => 'versionRequirement', 'status' => 'enabled', 'disabled', 'bad-version', 'missing']
+     * ```
+     *
+     * @param Addon $addon The addon to check.
+     * @return Returns the requirements array. An empty array represents an addon with no requirements.
+     */
+    public function lookupRequirements(Addon $addon) {
+        $reqs = [];
+        $this->lookupRequirementsRecursive($addon, $reqs);
+
+        return $reqs;
+    }
+
+    /**
+     * The implementation of {@link lookupRequirements()}.
+     *
+     * @param Addon $addon The addon to lookup.
+     * @param array &$reqs The current requirements list.
+     * @see AddonManager::lookupRequirements()
+     */
+    private function lookupRequirementsRecursive(Addon $addon, array &$reqs) {
+        $addonReqs = $addon->getRequirements();
+        foreach ($addonReqs as $addonKey => $versionReq) {
+            $addonKey = strtolower($addonKey);
+            if (array_key_exists($addonKey, $reqs)) {
+                continue;
+            }
+            $addonReq = $this->lookupAddon($addonKey);
+            if (!$addonReq) {
+                $status = 'missing';
+            } elseif ($this->isEnabled($addonReq->getKey(), $addonReq->getType())) {
+                $status = 'enabled';
+            } elseif (Addon::checkVersion($addonReq->getVersion(), $versionReq)) {
+                $status = 'disabled';
+            } else {
+                $status = 'bad-version';
+            }
+            $reqs[$addonKey] = ['req' => $versionReq, 'status' => $status];
+
+            // Check the required addon's requirements.
+            if (in_array($status, ['disabled', 'bad-version'], true)) {
+                $this->lookupRequirementsRecursive($addonReq, $reqs);
+            }
         }
     }
 

@@ -295,10 +295,9 @@ class Addon {
 
         // Convert the info array to the new syntax.
         $nameScheme = new CamelCaseScheme();
-        $oldPermissions = isset($oldInfo['RegisterPermissions']) ? $oldInfo['RegisterPermissions'] : null;
         $info = $nameScheme->convertArrayKeys($oldInfo);
-        if (isset($oldPermissions)) {
-            $info['registerPermissions'] = $oldPermissions;
+        if (isset($oldInfo['RegisterPermissions'])) {
+            $info['registerPermissions'] = $oldInfo['RegisterPermissions'];
         }
 
         $info['key'] = $key;
@@ -331,7 +330,7 @@ class Addon {
         }
 
         // Convert the requires.
-        $require = $this->convertRequire($info, ['requiredPlugins', 'requiredApplications']);
+        $require = $this->convertRequire($oldInfo, ['RequiredPlugins', 'RequiredApplications']);
         if (!empty($require)) {
             $info['require'] = $require;
         }

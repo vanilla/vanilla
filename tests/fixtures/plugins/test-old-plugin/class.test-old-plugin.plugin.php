@@ -6,25 +6,13 @@ $PluginInfo['test-old-plugin'] = array(
     'Version'     => '1.0.0',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'License'     => 'GPLv2'
+    'License'     => 'GPLv2',
+    'RequiredApplications' => [
+        'test-old-application' => '1.0'
+    ]
 );
 
-/**
- * test-old-plugin Plugin
- *
- * @author    Todd Burry <todd@vanillaforums.com>
- * @copyright 2016 (c) Todd Burry
- * @license   GPLv2
- * @since     1.0.0
- */
 class TestOldPluginPlugin extends Gdn_Plugin {
-    /**
-     * This will run when you "Enable" the plugin
-     *
-     * @since  1.0.0
-     * @access public
-     * @return bool
-     */
     public function setup() {
         return true;
     }

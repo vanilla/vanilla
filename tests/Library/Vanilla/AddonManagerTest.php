@@ -78,20 +78,35 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Test {@link AddonManager::lookupRequirements()}
+     * Test {@link AddonManager::lookupRequirements()}.
      */
     public function testLookupRequirements() {
         $tm = $this->createTestManager();
 
-        // Tet a requirement with transitive requirements.
+        // Test a requirement with transitive requirements.
         $addon = $tm->lookupTheme('test-old-theme');
         $reqs = $tm->lookupRequirements($addon);
         $this->assertArrayHasKey('test-old-plugin', $reqs);
         $this->assertArrayHasKey('test-old-application', $reqs);
 
         foreach ($reqs as $req) {
-            $this->assertSame('disabled', $req['status']);
+            $this->assertSame(AddonManager::REQ_DISABLED, $req['status']);
         }
+    }
+
+    /**
+     * Test looking up requirements when one of the requirements is enabled.
+     */
+    public function testLookupRequirementsEnabledOne() {
+        $tm = $this->createTestManager();
+
+        $tm->startAddonsByKey(['test-old-application'], Addon::TYPE_ADDON);
+
+        // Test a requirement with transitive requirements.
+        $addon = $tm->lookupTheme('test-old-theme');
+        $reqs = $tm->lookupRequirements($addon, AddonManager::REQ_DISABLED);
+        $this->assertArrayHasKey('test-old-plugin', $reqs);
+        $this->assertArrayNotHasKey('test-old-application', $reqs);
     }
 
     /**

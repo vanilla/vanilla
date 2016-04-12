@@ -7,8 +7,24 @@
 
 namespace Vanilla;
 
-
+/**
+ * A class to manage all of the addons in the application.
+ *
+ * The {@link AddonManager} scans directories for addon folders and then maintains them in a catalogue. Addons can then
+ * be started which makes them available to the application. When an addon is started it can do the following:
+ *
+ * - Any classes the addon has declared are available via the {@link AddonManager::autoload()} method.
+ * - The addon can declare a class ending in "Plugin" and its events will be registered (TODO).
+ * - Any translations the addon has declared will be loaded for the currently enabled locale.
+ */
 class AddonManager {
+    /// Constants ///
+
+    const REQ_ENABLED = 0x01; // addon enabled, yay!
+    const REQ_DISABLED = 0x02; // addon disabled
+    const REQ_MISSING = 0x04; // addon missing from the manager
+    const REQ_VERSION = 0x08; // addon isn't the correct version
+
     /// Properties ///
 
     /**
@@ -269,14 +285,14 @@ class AddonManager {
      */
     public function testAddon(Addon $addon, $throw = false) {
         // Get all of the addon requirements.
-        $requirements = $this->lookupRequirements($addon);
+        $requirements = $this->lookupRequirements($addon, self::REQ_MISSING | self::REQ_VERSION);
         $missing = [];
         foreach ($requirements as $addonKey => $requirement) {
             switch ($requirement['status']) {
-                case 'missing':
+                case self::REQ_MISSING:
                     $missing[] = $addonKey;
                     break;
-                case 'bad-version':
+                case self::REQ_VERSION:
                     $missing[] = "$addonKey {$requirement['req']}";
                     break;
             }
@@ -669,48 +685,57 @@ class AddonManager {
      * requirements in the following form:
      *
      * ```
-     * 'addonKey' => ['req' => 'versionRequirement', 'status' => 'enabled', 'disabled', 'bad-version', 'missing']
+     * 'addonKey' => ['req' => 'versionRequirement', 'status' => AddonManager::REQ_*]
      * ```
      *
      * @param Addon $addon The addon to check.
+     * @param int $filter One or more of the **AddonManager::REQ_*** constants concatenated by `|`.
+     *
      * @return Returns the requirements array. An empty array represents an addon with no requirements.
      */
-    public function lookupRequirements(Addon $addon) {
-        $reqs = [];
-        $this->lookupRequirementsRecursive($addon, $reqs);
+    public function lookupRequirements(Addon $addon, $filter = null) {
+        $array = [];
+        $this->lookupRequirementsRecursive($addon, $array);
 
-        return $reqs;
+        // Filter the list.
+        if ($filter) {
+            $array = array_filter($array, function ($row) use ($filter) {
+                return ($row['status'] & $filter) === $filter;
+            });
+        }
+
+        return $array;
     }
 
     /**
      * The implementation of {@link lookupRequirements()}.
      *
      * @param Addon $addon The addon to lookup.
-     * @param array &$reqs The current requirements list.
+     * @param array &$array The current requirements list.
      * @see AddonManager::lookupRequirements()
      */
-    private function lookupRequirementsRecursive(Addon $addon, array &$reqs) {
+    private function lookupRequirementsRecursive(Addon $addon, array &$array) {
         $addonReqs = $addon->getRequirements();
         foreach ($addonReqs as $addonKey => $versionReq) {
             $addonKey = strtolower($addonKey);
-            if (array_key_exists($addonKey, $reqs)) {
+            if (array_key_exists($addonKey, $array)) {
                 continue;
             }
             $addonReq = $this->lookupAddon($addonKey);
             if (!$addonReq) {
-                $status = 'missing';
+                $status = self::REQ_MISSING;
             } elseif ($this->isEnabled($addonReq->getKey(), $addonReq->getType())) {
-                $status = 'enabled';
+                $status = self::REQ_ENABLED;
             } elseif (Addon::checkVersion($addonReq->getVersion(), $versionReq)) {
-                $status = 'disabled';
+                $status = self::REQ_DISABLED;
             } else {
-                $status = 'bad-version';
+                $status = self::REQ_VERSION;
             }
-            $reqs[$addonKey] = ['req' => $versionReq, 'status' => $status];
+            $array[$addonKey] = ['req' => $versionReq, 'status' => $status];
 
             // Check the required addon's requirements.
-            if (in_array($status, ['disabled', 'bad-version'], true)) {
-                $this->lookupRequirementsRecursive($addonReq, $reqs);
+            if ($addonReq && $status !== self::REQ_ENABLED) {
+                $this->lookupRequirementsRecursive($addonReq, $array);
             }
         }
     }

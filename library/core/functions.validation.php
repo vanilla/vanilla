@@ -27,15 +27,15 @@ if (!function_exists('ValidateCaptcha')) {
      * @return bool Returns true if the captcha is valid or an error message otherwise.
      */
     function validateCaptcha($value = null) {
-        $response = Gdn::request()->post('g-recaptcha-response');
-        if (!$response) {
+        $recaptchaResponse = Gdn::request()->post('g-recaptcha-response');
+        if (!$recaptchaResponse) {
             return false;
         }
 
         $api = new Garden\Http\HttpClient('https://www.google.com/recaptcha/api');
         $data = array(
             'secret' => c('Garden.Registration.CaptchaPrivateKey'),
-            'response' => $response
+            'response' => $recaptchaResponse
         );
         $response = $api->get('/siteverify', $data);
 

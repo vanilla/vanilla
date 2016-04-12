@@ -32,27 +32,15 @@ if (!function_exists('ValidateCaptcha')) {
             return false;
         }
 
-        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $api = new Garden\Http\HttpClient('https://www.google.com/recaptcha/api');
         $data = array(
             'secret' => c('Garden.Registration.CaptchaPrivateKey'),
             'response' => $response
         );
+        $response = $api->get('/siteverify', $data);
 
-        $handler = curl_init();
-        curl_setopt($handler, CURLOPT_URL, $url);
-        curl_setopt($handler, CURLOPT_PORT, '443');
-        curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($handler, CURLOPT_HEADER, false);
-        curl_setopt($handler, CURLOPT_HTTPHEADER, array("Content-Type: application/x-www-form-urlencoded"));
-        curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'NoCaptchaReCaptcha Vanilla'));
-        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handler, CURLOPT_POST, true);
-        curl_setopt($handler, CURLOPT_POSTFIELDS, http_build_query($data));
-
-        $response = curl_exec($handler);
-
-        if ($response) {
-            $result = json_decode($response);
+        if ($response->isSuccessful()) {
+            $result = $response->getBody();
             $errorCodes = val('error_codes', $result);
             if ($result && val('success', $result)) {
                 return true;

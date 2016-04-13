@@ -1872,7 +1872,11 @@ jQuery(document).ready(function($) {
         }
     }());
 
-    // A kludge to dodge Safari's back-forward cache (bfcache).
+    /**
+     * A kludge to dodge Safari's back-forward cache (bfcache).  Without this, Safari maintains
+     * the a page's DOM during back/forward navigation and hinders our ability to invalidate
+     * the cached state of content.
+     */
     if (/Apple Computer/.test(navigator.vendor) && /Safari/.test(navigator.userAgent)) {
         jQuery(window).on("pageshow", function(event) {
             if (event.originalEvent.persisted) {

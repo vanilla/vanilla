@@ -1090,10 +1090,13 @@ class Addon {
     public function getIcon($relative = self::PATH_ADDON) {
         if ($icon = $this->getInfoValue('icon')) {
             return $this->path('/'.ltrim($icon, '\\/'), $relative);
-        } elseif (file_exists($this->path('\icon.png', self::PATH_FULL))) {
-            return $this->path('\icon.png', $relative);
-        } elseif ($this->getType() === self::TYPE_THEME && file_exists($this->path('\screenshot.png', self::PATH_FULL))) {
-            return $this->path('\screenshot.png', $relative);
+        } else {
+            $files = ['icon.png', 'screenshot.png', 'mobile.png'];
+            foreach ($files as $file) {
+                if (file_exists($this->path($file))) {
+                    return $this->path($file, $relative);
+                }
+            }
         }
         return '';
     }

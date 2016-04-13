@@ -221,6 +221,25 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         // Can't test requirements so just unset them.
         unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
 
+        $this->assertArraySubsetRecursive($oldInfoArray, $info);
+    }
+
+    /**
+     * Test that {@link Gdn_PluginManager::calcOldInfoArray()} works for themes.
+     *
+     * @param array $oldInfoArray The old info array.
+     * @dataProvider provideVanillaThemeInfo
+     */
+    public function testCalcOldThemeInfoArray(array $oldInfoArray) {
+        $vm = self::createVanillaManager(true);
+        $addon = $vm->lookupTheme($oldInfoArray['Index']);
+        $this->assertNotNull($addon);
+        $info = \Gdn_PluginManager::calcOldInfoArray($addon);
+        $this->assertTrue(is_array($info));
+
+        // Can't test requirements so just unset them.
+        unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
+
         if ($oldInfoArray['Index'] === 'easso') {
             $foo = 'bar';
         }
@@ -228,6 +247,11 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertArraySubsetRecursive($oldInfoArray, $info);
     }
 
+    /**
+     * Create an addon manager that won't have any addons.
+     *
+     * @return AddonManager Returns the empty addon manager.
+     */
     private static function createEmptyManager() {
         $root = '/tests/fixtures';
         $em = new AddonManager(
@@ -307,6 +331,19 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         $infoArrays = [];
         $classInfo = [];
         $pm->indexSearchPath(PATH_PLUGINS, $infoArrays, $classInfo);
+
+        return $this->makeProvider($infoArrays);
+    }
+
+    /**
+     * Provide all of the theme info currently in Vanilla.
+     *
+     * @return \Gdn_ThemeManager Returns a data provider array.
+     */
+    public function provideVanillaThemeInfo() {
+        $tm = new \Gdn_ThemeManager(static::createVanillaManager(), false);
+        $infoArrays = [];
+        $tm->indexSearchPath(PATH_THEMES, $infoArrays);
 
         return $this->makeProvider($infoArrays);
     }

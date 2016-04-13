@@ -303,6 +303,28 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
         unset($info['Authors']);
 
+        // Themes have their own particular fields.
+        if ($addon->getType() === Addon::TYPE_THEME) {
+            $info['ThemeRoot'] = $addon->path('');
+            if (file_exists($addon->path('about.php'))) {
+                $info['AboutFile'] = $addon->path('about.php');
+                $info['RealAboutFile'] = realpath($info['AboutFile']);
+            }
+
+            if ($hooksClass = $addon->getPluginClass()) {
+                $info['HooksFile'] = $addon->getClassPath($hooksClass);
+                $info['RealHooksFile'] = realpath($info['HooksFile']);
+            }
+
+            if ($screenshot = $addon->getIcon(Addon::PATH_ADDON)) {
+                if (basename($screenshot) === 'mobile.png') {
+                    $info['MobileScreenshotUrl'] = $screenshot;
+                } else {
+                    $info['ScreenshotUrl'] = $screenshot;
+                }
+            }
+        }
+
         return $info;
     }
 

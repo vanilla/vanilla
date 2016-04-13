@@ -31,6 +31,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     private $apc = false;
 
     /**
+     * @var bool Whether or not the request object can be accessed.
+     */
+    private $hasRequest = true;
+
+    /**
      * @var AddonManager
      */
     private $addonManager;
@@ -38,9 +43,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     /**
      *
      */
-    public function __construct(AddonManager $addonManager = null) {
+    public function __construct(AddonManager $addonManager = null, $hasRequest = null) {
         parent::__construct();
         $this->addonManager = $addonManager;
+        $this->hasRequest = !($hasRequest === false);
     }
 
     /**
@@ -97,14 +103,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             }
 
             $ThemePath = CombinePaths(array($SearchPath, $ThemeFolderName));
-            $ThemeFiles = $this->findThemeFiles($ThemePath);
+            $ThemeFiles = $this->findThemeFilesOld($ThemePath);
 
             if (val('about', $ThemeFiles) === false) {
                 continue;
             }
 
             $ThemeAboutFile = val('about', $ThemeFiles);
-            $SearchThemeInfo = $this->scanThemeFile($ThemeAboutFile);
+            $SearchThemeInfo = $this->scanThemeFileOld($ThemeAboutFile);
 
             // Don't index archived themes.
 //         if (val('Archived', $SearchThemeInfo, FALSE))
@@ -113,13 +119,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             // Add the screenshot.
             if (array_key_exists('screenshot', $ThemeFiles)) {
                 $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('screenshot', $ThemeFiles)), '/');
-                $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, true);
+                $SearchThemeInfo['ScreenshotUrl'] = $this->asset($RelativeScreenshot, true);
             }
 
             // Add the mobile screenshot.
             if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
                 $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('mobilescreenshot', $ThemeFiles)), '/');
-                $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, true);
+                $SearchThemeInfo['MobileScreenshotUrl'] = $this->asset($RelativeScreenshot, true);
             }
 
             if (array_key_exists('hooks', $ThemeFiles)) {
@@ -138,88 +144,63 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Clear the dependencies on {@link asset()} for unit testing.
      *
-     *
-     * @param null $SearchPaths
+     * @param string $path The relative path of the asset.
+     * @param string $withDomain Whether or not to include the domain.
+     * @return string Returns the asset URL.
      */
-    public function clearThemeCache($SearchPaths = null) {
-        if (!is_null($SearchPaths)) {
-            if (!is_array($SearchPaths)) {
-                $SearchPaths = array($SearchPaths);
-            }
+    private function asset($path, $withDomain) {
+        if ($this->hasRequest) {
+            return asset($path, $withDomain);
         } else {
-            $SearchPaths = $this->searchPaths();
-        }
-
-        foreach ($SearchPaths as $SearchPath => $SearchPathName) {
-            $SearchPathCacheKey = "Garden.Themes.PathCache.{$SearchPath}";
-            if ($this->apc) {
-                apc_delete($SearchPathCacheKey);
-            } else {
-                Gdn::cache()->remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => true));
-            }
+            return '/'.ltrim($path);
         }
     }
 
     /**
-     * Get the current search paths
+     * Deprecated.
      *
-     * By default, get all the paths as built by the constructor. Includes the two (or one) default plugin paths
-     * of PATH_PLUGINS and PATH_LOCAL_PLUGINS, as well as any extra paths defined in the config variable.
-     *
-     * @param boolean $OnlyCustom whether or not to exclude the two default paths and return only config paths
-     * @return array Search paths
+     * @deprecated
      */
-    public function searchPaths($OnlyCustom = false) {
-        if (is_null($this->themeSearchPaths) || is_null($this->alternateThemeSearchPaths)) {
-            $this->themeSearchPaths = array();
-            $this->alternateThemeSearchPaths = array();
-
-            // Add default search path(s) to list
-            $this->themeSearchPaths[rtrim(PATH_THEMES, '/')] = 'core';
-
-            // Check for, and load, alternate search paths from config
-            $RawAlternatePaths = c('Garden.PluginManager.Search', null);
-            if (!is_null($RawAlternatePaths)) {
-                /*
-                            // Handle serialized and unserialized alternate path arrays
-                            $AlternatePaths = unserialize($RawAlternatePaths);
-                            if ($AlternatePaths === FALSE && is_array($RawAlternatePaths))
-                */
-                $AlternatePaths = $RawAlternatePaths;
-
-                if (!is_array($AlternatePaths)) {
-                    $AlternatePaths = array($AlternatePaths => 'alternate');
-                }
-
-                foreach ($AlternatePaths as $AltPath => $AltName) {
-                    $this->alternateThemeSearchPaths[rtrim($AltPath, '/')] = $AltName;
-                    if (is_dir($AltPath)) {
-                        $this->themeSearchPaths[rtrim($AltPath, '/')] = $AltName;
-                    }
-                }
-            }
-        }
-
-        if (!$OnlyCustom) {
-            return $this->themeSearchPaths;
-        }
-
-        return $this->alternateThemeSearchPaths;
+    public function clearThemeCache() {
+        deprecated('Gdn_PluginManager->clearThemeCache()');
     }
 
     /**
+     * Deprecated.
      *
-     *
-     * @param $ThemePath
-     * @return array|bool
+     * @deprecated
      */
-    public function findThemeFiles($ThemePath) {
-        if (!is_dir($ThemePath)) {
+    public function searchPaths() {
+        return [];
+    }
+
+    /**
+     * Deprecated.
+     *
+     * @return array Deprecated.
+     */
+    public function findThemeFiles() {
+        deprecated('Gdn_ThemeManager->findThemeFiles');
+        return [];
+    }
+
+    /**
+     * Find the files associated with the theme.
+     *
+     * Please don't use this method.
+     *
+     * @param string $themePath The theme's path.
+     * @return array|false Returns an array of paths or false if the {@link $themePath} is invalid.
+     * @deprecated
+     */
+    private function findThemeFilesOld($themePath) {
+        if (!is_dir($themePath)) {
             return false;
         }
 
-        $ThemeFiles = scandir($ThemePath);
+        $ThemeFiles = scandir($themePath);
         $TestPatterns = array(
             'about\.php' => 'about',
             '.*\.theme\.php' => 'about',
@@ -232,7 +213,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         foreach ($ThemeFiles as $ThemeFile) {
             foreach ($TestPatterns as $TestPattern => $FileType) {
                 if (preg_match('!'.$TestPattern.'!', $ThemeFile)) {
-                    $MatchedThemeFiles[$FileType] = combinePaths(array($ThemePath, $ThemeFile));
+                    $MatchedThemeFiles[$FileType] = combinePaths(array($themePath, $ThemeFile));
                 }
             }
         }
@@ -241,16 +222,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Deprecated.
      *
-     *
-     * @param $ThemeFile
-     * @param null $VariableName
-     * @return null|void
+     * @param string $ThemeFile The path to the theme file.
+     * @param string $VariableName The name of the theme info variable name.
+     * @return null|array Returns the theme info.
+     * @deprecated
      */
-    public function scanThemeFile($ThemeFile, $VariableName = null) {
+    private function scanThemeFileOld($ThemeFile, $VariableName = '') {
         // Find the $PluginInfo array
         if (!file_exists($ThemeFile)) {
-            return;
+            return null;
         }
         $Lines = file($ThemeFile);
 

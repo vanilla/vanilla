@@ -60,10 +60,10 @@
                 </li>
             <?php endif; ?>
 
-            <?php $this->fireAs('captcha')->fireEvent('render'); ?>
+            <?php Captcha::render(); ?>
 
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
-                
+
             <li>
                 <?php
                 echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, array('value' => '1'));

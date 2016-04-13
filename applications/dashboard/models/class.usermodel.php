@@ -2723,7 +2723,7 @@ class UserModel extends Gdn_Model {
             }
 
             // If in Captcha registration mode, check the captcha value.
-            if (val('CheckCaptcha', $Options, true)) {
+            if (val('CheckCaptcha', $Options, true) && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
                     $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
@@ -2793,7 +2793,7 @@ class UserModel extends Gdn_Model {
             unset($Fields[$this->PrimaryKey]);
 
             // If in Captcha registration mode, check the captcha value.
-            if ($CheckCaptcha) {
+            if ($CheckCaptcha && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
                     $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');

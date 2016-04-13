@@ -1269,10 +1269,10 @@ EOT;
 
         $this->setData('NoEmail', UserModel::noEmail());
 
-        $RegistrationMethod = $this->_registrationView();
-        $this->View = $RegistrationMethod;
-        $this->setData('Method', stringBeginsWith($RegistrationMethod, 'Register', false, true));
-        $this->$RegistrationMethod($InvitationCode);
+        // Sub-dispatch to a specific handler for each registration method
+        $registrationHandler = $this->getRegistrationhandler();
+        $this->setData('Method', stringBeginsWith($registrationHandler, 'Register', false, true));
+        $this->$registrationHandler($InvitationCode);
     }
 
     /**
@@ -1280,16 +1280,30 @@ EOT;
      *
      * @access protected
      * @since 2.0.0
-     *
      * @return string Method name.
      */
-    protected function _registrationView() {
-        $RegistrationMethod = Gdn::config('Garden.Registration.Method');
-        if (!in_array($RegistrationMethod, array('Closed', 'Basic', 'Captcha', 'Approval', 'Invitation', 'Connect'))) {
-            $RegistrationMethod = 'Basic';
+    protected function getRegistrationhandler() {
+        $registrationMethod = Gdn::config('Garden.Registration.Method');
+        if (!in_array($registrationMethod, array('Closed', 'Basic', 'Captcha', 'Approval', 'Invitation', 'Connect'))) {
+            $registrationMethod = 'Basic';
         }
 
-        return 'Register'.$RegistrationMethod;
+        // We no longer support captcha-less registration, both Basic and Captcha require a captcha
+        if ($registrationMethod == 'Captcha') {
+            $registrationMethod = 'Basic';
+        }
+
+        return "register{$registrationMethod}";
+    }
+
+    /**
+     * Alias of EntryController::getRegistrationHandler
+     *
+     * @deprecated since v2.2.106
+     * @return string
+     */
+    protected function _registrationView() {
+        return $this->getRegistrationHandler();
     }
 
     /**
@@ -1301,6 +1315,7 @@ EOT;
      * @since 2.0.0
      */
     private function registerApproval() {
+        $this->View = 'registerapproval';
         Gdn::userModel()->addPasswordStrength($this);
 
         // If the form has been posted back...
@@ -1359,7 +1374,10 @@ EOT;
     }
 
     /**
-     * Basic/simple registration. Allows immediate access.
+     * Captcha-authenticated registration. Used by default.
+     *
+     * Allows immediate access upon successful registration, and optionally requires
+     * email address confirmation.
      *
      * Events: RegistrationSuccessful
      *
@@ -1367,6 +1385,7 @@ EOT;
      * @since 2.0.0
      */
     private function registerBasic() {
+        $this->View = 'registerbasic';
         Gdn::userModel()->addPasswordStrength($this);
 
         if ($this->Form->isPostBack() === true) {
@@ -1426,79 +1445,29 @@ EOT;
     }
 
     /**
-     * Deprecated since 2.0.18.
-     */
-    private function registerConnect() {
-        throw notFoundException();
-    }
-
-    /**
-     * Captcha-authenticated registration. Used by default.
+     * Captcha-authenticated registration.
+     *
+     * Deprecated in favor of 'basic' registration which now also requires
+     * captcha authentication.
      *
      * Events: RegistrationSuccessful
      *
+     * @deprecated since v2.2.106
+     * @see registerBasic
      * @access private
      * @since 2.0.0
      */
     private function registerCaptcha() {
-        Gdn::userModel()->addPasswordStrength($this);
+        $this->registerBasic();
+    }
 
-        if ($this->Form->isPostBack() === true) {
-            // Add validation rules that are not enforced by the model
-            $this->UserModel->defineSchema();
-            $this->UserModel->Validation->applyRule('Name', 'Username', $this->UsernameError);
-            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
-            $this->UserModel->Validation->applyRule('Password', 'Required');
-            $this->UserModel->Validation->applyRule('Password', 'Strength');
-            $this->UserModel->Validation->applyRule('Password', 'Match');
-            // $this->UserModel->Validation->applyRule('DateOfBirth', 'MinimumAge');
-
-            $this->fireEvent('RegisterValidation');
-
-            try {
-                $Values = $this->Form->formValues();
-                $Values = $this->UserModel->filterForm($Values, true);
-                unset($Values['Roles']);
-                $AuthUserID = $this->UserModel->register($Values);
-                $this->setData('UserID', $AuthUserID);
-                if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
-                    $this->Form->setFormValue('Target', '/entry/registerthanks');
-                    $this->_setRedirect();
-                    return;
-                } elseif (!$AuthUserID) {
-                    $this->Form->setValidationResults($this->UserModel->validationResults());
-                    if (!in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL, DELIVERY_TYPE_DATA])) {
-                        $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
-                    }
-
-                } else {
-                    // The user has been created successfully, so sign in now.
-                    if (!Gdn::session()->isValid()) {
-                        Gdn::session()->start($AuthUserID, true, (bool)$this->Form->getFormValue('RememberMe'));
-                    }
-
-                    try {
-                        $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
-                    } catch (Exception $Ex) {
-                    }
-
-                    $this->fireEvent('RegistrationSuccessful');
-
-                    // ... and redirect them appropriately
-                    $Route = $this->RedirectTo();
-                    if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->RedirectUrl = url($Route);
-                    } else {
-                        if ($Route !== false) {
-                            redirect($Route);
-                        }
-                    }
-                }
-            } catch (Exception $Ex) {
-                $this->Form->addError($Ex);
-            }
-        }
-        $this->render();
+    /**
+     * Connect registration
+     *
+     * @deprecated since 2.0.18.
+     */
+    private function registerConnect() {
+        throw notFoundException();
     }
 
     /**
@@ -1508,6 +1477,7 @@ EOT;
      * @since 2.0.0
      */
     private function registerClosed() {
+        $this->View = 'registerclosed';
         $this->render();
     }
 
@@ -1518,6 +1488,7 @@ EOT;
      * @since 2.0.0
      */
     public function registerInvitation($InvitationCode = 0) {
+        $this->View = 'registerinvitation';
         $this->Form->setModel($this->UserModel);
 
         // Define gender dropdown options
@@ -1611,6 +1582,8 @@ EOT;
     }
 
     /**
+     * Display registration thank-you message
+     *
      * @since 2.1
      */
     public function registerThanks() {

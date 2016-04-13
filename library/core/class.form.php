@@ -274,29 +274,6 @@ class Gdn_Form extends Gdn_Pluggable {
             // A plugin handled the captcha so don't display anything more.
             return;
         }
-        
-        if (!c('Garden.Registration.CaptchaPublicKey') || !c('Garden.Registration.CaptchaPrivateKey')) {
-            return '<div class="Warning">' . t('reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
-        }
-
-        // Google whitelist https://developers.google.com/recaptcha/docs/language
-        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
-
-        // Use our current locale against the whitelist.
-        $language = Gdn::locale()->language();
-        if (!in_array($language, $whitelist)) {
-            $language = (in_array(Gdn::locale()->Locale, $whitelist)) ? Gdn::locale()->Locale : false;
-        }
-
-        Gdn::controller()->Head->addScript('https://www.google.com/recaptcha/api.js?hl=' . $language);
-
-        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => c('Garden.Registration.CaptchaPublicKey'));
-
-        // see https://developers.google.com/recaptcha/docs/display for details
-        $this->EventArguments['Attributes'] = &$attributes;
-        $this->fireEvent('BeforeCaptcha');
-
-        return '<div '. attribute($attributes) . '></div>';
     }
 
     /**

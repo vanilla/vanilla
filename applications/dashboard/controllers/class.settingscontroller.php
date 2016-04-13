@@ -1178,27 +1178,6 @@ class SettingsController extends DashboardController {
         $this->addJsFile('registration.js');
         $this->title(t('Registration'));
 
-        // Create a model to save configuration settings
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-
-        $registrationOptions = array(
-            'Garden.Registration.Method' => 'Captcha',
-            'Garden.Registration.InviteExpiration',
-            'Garden.Registration.ConfirmEmail'
-        );
-
-        if ($manageCaptcha = c('Garden.Registration.ManageCaptcha', true)) {
-            $registrationOptions[] = 'Garden.Registration.CaptchaPrivateKey';
-            $registrationOptions[] = 'Garden.Registration.CaptchaPublicKey';
-        }
-        $this->setData('_ManageCaptcha', $manageCaptcha);
-
-        $ConfigurationModel->setField($registrationOptions);
-
-        // Set the model on the forms.
-        $this->Form->setModel($ConfigurationModel);
-
         // Load roles with sign-in permission
         $RoleModel = new RoleModel();
         $this->RoleData = $RoleModel->getByPermission('Garden.SignIn.Allow');
@@ -1216,8 +1195,7 @@ class SettingsController extends DashboardController {
         // Registration methods.
         $this->RegistrationMethods = array(
             // 'Closed' => "Registration is closed.",
-            // 'Basic' => "The applicants are granted access immediately.",
-            'Captcha' => "New users fill out a simple form and are granted access immediately.",
+            'Basic' => "New users fill out a simple form and are granted access immediately.",
             'Approval' => "New users are reviewed and approved by an administrator (that's you!).",
             'Invitation' => "Existing members send invitations to new members.",
             'Connect' => "New users are only registered through SSO plugins."
@@ -1239,6 +1217,29 @@ class SettingsController extends DashboardController {
             '1 month' => t('1 month after being sent'),
             'FALSE' => t('never')
         );
+
+        // Replace 'Captcha' with 'Basic' if needed
+        if (c('Garden.Registration.Method') == 'Captcha') {
+            saveToConfig('Garden.Registration.Method', 'Basic');
+        }
+
+        // Create a model to save configuration settings
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+
+        $registrationOptions = array(
+            'Garden.Registration.Method' => 'Basic',
+            'Garden.Registration.InviteExpiration',
+            'Garden.Registration.ConfirmEmail'
+        );
+        $ConfigurationModel->setField($registrationOptions);
+
+        $this->EventArguments['Validation'] = &$Validation;
+        $this->EventArguments['Configuration'] = &$ConfigurationModel;
+        $this->fireEvent('Registration');
+
+        // Set the model on the forms.
+        $this->Form->setModel($ConfigurationModel);
 
         if ($this->Form->authenticatedPostBack() === false) {
             $this->Form->setData($ConfigurationModel->Data);

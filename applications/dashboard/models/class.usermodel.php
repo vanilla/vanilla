@@ -1817,7 +1817,8 @@ class UserModel extends Gdn_Model {
         $Method = strtolower(val('Method', $Options, c('Garden.Registration.Method')));
 
         switch ($Method) {
-            case 'captcha':
+            case 'basic':
+            case 'captcha': // deprecated
                 $UserID = $this->insertForBasic($FormPostValues, val('CheckCaptcha', $Options, true), $Options);
                 break;
             case 'approval':
@@ -1830,7 +1831,6 @@ class UserModel extends Gdn_Model {
                 $UserID = false;
                 $this->Validation->addValidationResult('Registration', 'Registration is closed.');
                 break;
-            case 'basic':
             default:
                 $UserID = $this->insertForBasic($FormPostValues, val('CheckCaptcha', $Options, false), $Options);
                 break;
@@ -2681,7 +2681,7 @@ class UserModel extends Gdn_Model {
      * @param array $Options
      * @return int UserID.
      */
-    public function  insertForApproval($FormPostValues, $Options = array()) {
+    public function insertForApproval($FormPostValues, $Options = array()) {
         $RoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
         if (empty($RoleIDs)) {
             throw new Exception(t('The default role has not been configured.'), 400);
@@ -2724,9 +2724,9 @@ class UserModel extends Gdn_Model {
 
             // If in Captcha registration mode, check the captcha value.
             if (val('CheckCaptcha', $Options, true)) {
-                $CaptchaValid = ValidateCaptcha();
-                if ($CaptchaValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA was not completed correctly. Please try again.');
+                $captchaIsValid = Captcha::validate();
+                if ($captchaIsValid !== true) {
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
                     return false;
                 }
             }
@@ -2792,12 +2792,11 @@ class UserModel extends Gdn_Model {
             $Fields['Roles'] = $RoleIDs;
             unset($Fields[$this->PrimaryKey]);
 
-            // If in Captcha registration mode, check the captcha value
-            if ($CheckCaptcha && Gdn::config('Garden.Registration.Method') == 'Captcha') {
-                $CaptchaPublicKey = val('Garden.Registration.CaptchaPublicKey', $FormPostValues, '');
-                $CaptchaValid = validateCaptcha($CaptchaPublicKey);
-                if ($CaptchaValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA was not completed correctly. Please try again.');
+            // If in Captcha registration mode, check the captcha value.
+            if ($CheckCaptcha) {
+                $captchaIsValid = Captcha::validate();
+                if ($captchaIsValid !== true) {
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
                     return false;
                 }
             }
@@ -4051,7 +4050,7 @@ class UserModel extends Gdn_Model {
      */
     public function newUserRoleIDs() {
         // Registration method
-        $RegistrationMethod = c('Garden.Registration.Method', 'Captcha');
+        $RegistrationMethod = c('Garden.Registration.Method', 'Basic');
         $DefaultRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         switch ($RegistrationMethod) {
 

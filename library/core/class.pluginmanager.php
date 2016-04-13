@@ -243,17 +243,15 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /**
      * Calculate an old info array from a new {@link Addon}.
      *
+     * This is a backwards compatibility function only and should not be used for new code.
+     *
      * @param Addon $addon The addon to calculate.
-     * @return array
+     * @return array Returns an info array.
+     * @deprecated
      */
     public static function calcOldInfoArray(Addon $addon) {
         $info = $addon->getInfo();
-        $permissions = isset($info['registerPermissions']) ? $info['registerPermissions'] : null;
-        $capitalize = new \Vanilla\Utility\CapitalCaseScheme();
-        $info = $capitalize->convertArrayKeys($info);
-        if (isset($permissions)) {
-            $info['RegisterPermissions'] = $permissions;
-        }
+        $info = self::convertArrayKeys($info);
 
         // This is the basic information from scanPluginFile().
         $name = $addon->getInfoValue('keyRaw', $addon->getKey());
@@ -326,6 +324,24 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
 
         return $info;
+    }
+
+    /**
+     * Uppercase the first letters of an info array recursively.
+     *
+     * @param array $array The array to change.
+     * @return array Returns a new changed array.
+     */
+    private static function convertArrayKeys(array $array) {
+        $result = [];
+        foreach ($array as $key => $value) {
+            $key = ucfirst($key);
+            if (is_array($value) && !in_array($key, ['RegisterPermissions'])) {
+                $value = self::convertArrayKeys($value);
+            }
+            $result[$key] = $value;
+        }
+        return $result;
     }
 
     /**

@@ -151,6 +151,15 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     *
+     *
+     * @param $sender
+     */
+    public function discussionController_beforeCommentBody_handler($sender) {
+        Gdn::regarding()->beforeCommentBody($sender);
+    }
+
+    /**
      * Provide default permissions for roles, based on the value in their Type column.
      *
      * @param PermissionModel $Sender Instance of permission model that fired the event

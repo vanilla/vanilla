@@ -42,6 +42,18 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Handle the tracking of a page tick.
+     */
+    public function analyticsTick() {
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+
+        Gdn::statistics()->tick();
+        Gdn::statistics()->fireEvent("AnalyticsTick");
+        $this->render();
+    }
+
+    /**
      * Application management screen.
      *
      * @since 2.0.0

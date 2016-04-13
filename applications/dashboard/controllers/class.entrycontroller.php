@@ -1271,7 +1271,7 @@ EOT;
 
         // Sub-dispatch to a specific handler for each registration method
         $registrationHandler = $this->getRegistrationhandler();
-        $this->setData('Method', stringBeginsWith($registrationHandler, 'Register', false, true));
+        $this->setData('Method', stringBeginsWith($registrationHandler, 'register', true, true));
         $this->$registrationHandler($InvitationCode);
     }
 

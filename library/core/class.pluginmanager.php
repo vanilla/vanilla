@@ -666,7 +666,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             } else {
                 $object = new $className($sender);
             }
-            $object->PluginInfo = static::calcOldInfoArray($addon);
             if (method_exists($object, 'setAddon')) {
                 $object->setAddon($addon);
             }

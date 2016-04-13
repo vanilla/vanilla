@@ -1590,6 +1590,14 @@
                                     if (!singleInstance) {
                                         //scrollToEditorContainer(editor.textarea.element);
                                         editor.focus();
+                                    } else {
+                                        // Bug in IE 7,11 where the form wrapper div receive the focus for some unknown reason
+                                        // and we can write inside it.
+                                        var formWrapper = $('div.FormWrapper');
+                                        if (formWrapper.is(document.activeElement)) {
+                                            alert('focus out')
+                                            //formWrapper.blur();
+                                        }
                                     }
 
                                     if (debug) {

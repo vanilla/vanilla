@@ -52,7 +52,7 @@
                 ?>
             </li>
 
-            <?php Captcha::render(); ?>
+            <?php Captcha::render($this); ?>
 
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
 

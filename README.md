@@ -66,7 +66,7 @@ by default for all smartphones & tablets. Heck, it even works on the PlayStation
 
 Vanilla is built to be simple, and its installation is no exception.
 
-* Upload this entire file structure up to your web server.
+* Upload Vanilla's [pre-built version](https://vanillaforums.org/addon/vanilla-core) to your server.
 * Confirm the cache, conf, and uploads folders are writable by PHP.
 * Navigate to that folder in your web browser.
 * Follow the instructions on screen.

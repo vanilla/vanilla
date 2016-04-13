@@ -30,14 +30,16 @@ class Captcha {
      * Wrapper for captcha rendering
      *
      * Allows conditional ignoring of captcha rendering if skipped in the config.
+     *
+     * @param Gdn_Controller $controller
      */
-    public static function render() {
+    public static function render($controller) {
         if (!Captcha::enabled()) {
             return;
         }
 
         // Hook to allow rendering of captcha form
-        Gdn::pluginManager()->fireAs('captcha')->fireEvent('render');
+        $controller->fireAs('captcha')->fireEvent('render');
     }
 
     /**

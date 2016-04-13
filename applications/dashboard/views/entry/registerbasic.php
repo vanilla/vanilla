@@ -60,7 +60,7 @@
                 </li>
             <?php endif; ?>
 
-            <?php Captcha::render(); ?>
+            <?php Captcha::render($this); ?>
 
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
 

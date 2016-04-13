@@ -2394,7 +2394,7 @@ a.ChangePicture {
   display: block;
 }
 
-a.ChangePicuture:hover {
+a.ChangePicture:hover {
   color: #fff;
   text-decoration: underline;
 }

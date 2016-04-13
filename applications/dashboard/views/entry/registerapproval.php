@@ -51,8 +51,8 @@
                 echo $this->Form->textBox('DiscoveryText', array('MultiLine' => true, 'Wrap' => TRUE));
                 ?>
             </li>
-            
-            <?php $this->fireAs('captcha')->fireEvent('render'); ?>
+
+            <?php Captcha::render(); ?>
 
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
 

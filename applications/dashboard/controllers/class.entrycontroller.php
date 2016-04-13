@@ -1279,8 +1279,8 @@ EOT;
      * Select view/method to be used for registration (from config).
      *
      * @access protected
-     * @since 2.0.0
-     * @return string Method name.
+     * @since 2.2.106
+     * @return string Method name to invoke for registration
      */
     protected function getRegistrationhandler() {
         $registrationMethod = Gdn::config('Garden.Registration.Method');

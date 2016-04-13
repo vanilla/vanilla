@@ -18,6 +18,29 @@
 class Captcha {
 
     /**
+     * Should we expect captcha submissions?
+     *
+     * @return boolean
+     */
+    public static function enabled() {
+        return !c('Garden.Registration.SkipCaptcha', false);
+    }
+
+    /**
+     * Wrapper for captcha rendering
+     *
+     * Allows conditional ignoring of captcha rendering if skipped in the config.
+     */
+    public static function render() {
+        if (!Captcha::enabled()) {
+            return;
+        }
+
+        // Hook to allow rendering of captcha form
+        Gdn::pluginManager()->fireAs('captcha')->fireEvent('render');
+    }
+
+    /**
      * Validate captcha
      *
      * @param mixed $value
@@ -42,7 +65,7 @@ class Captcha {
 
         // Assume invalid submission
         $valid = false;
-        
+
         Gdn::pluginManager()->EventArguments['captchavalid'] = &$valid;
         Gdn::pluginManager()->fireAs('captcha')->fireEvent('validate', [
             'captcha' => $value

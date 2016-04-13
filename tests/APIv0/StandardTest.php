@@ -42,7 +42,8 @@ class StandardTest extends BaseTest {
     public function testRegisterBasic() {
         $this->api()->saveToConfig([
             'Garden.Registration.Method' => 'Basic',
-            'Garden.Registration.ConfirmEmail' => false
+            'Garden.Registration.ConfirmEmail' => false,
+            'Garden.Registration.SkipCaptcha' => true
         ]);
 
         $user = [

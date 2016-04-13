@@ -49,7 +49,7 @@ class SettingsController extends DashboardController {
         $this->deliveryType(DELIVERY_TYPE_DATA);
 
         Gdn::statistics()->tick();
-        $this->fireEvent("AnalyticsTick");
+        Gdn::statistics()->fireEvent("AnalyticsTick");
         $this->render();
     }
 

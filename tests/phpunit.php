@@ -47,3 +47,6 @@ Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 
 // Session
 Gdn::factoryInstall(Gdn::AliasSession, 'Gdn_Session');
+
+// Clear the test cache.
+\Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');

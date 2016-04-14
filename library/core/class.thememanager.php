@@ -308,7 +308,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function getThemeInfo($ThemeName) {
-        return val($ThemeName, $this->availableThemes(), false);
+        $theme = $this->addonManager->lookupTheme($ThemeName);
+        if ($theme) {
+            return Gdn_PluginManager::calcOldInfoArray($theme);
+        } else {
+            return false;
+        }
     }
 
     /**

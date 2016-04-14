@@ -1734,7 +1734,7 @@ class SettingsController extends DashboardController {
         if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
             $Logo = c('Garden.Logo', '');
             RemoveFromConfig('Garden.Logo');
-            @unlink(PATH_ROOT.DS.$Logo);
+            safeUnlink(PATH_ROOT."/$Logo");
         }
 
         redirect('/settings/banner');
@@ -1752,7 +1752,7 @@ class SettingsController extends DashboardController {
         if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
             $MobileLogo = c('Garden.MobileLogo', '');
             RemoveFromConfig('Garden.MobileLogo');
-            @unlink(PATH_ROOT.DS.$MobileLogo);
+            safeUnlink(PATH_ROOT."/$MobileLogo");
         }
 
         redirect('/settings/banner');

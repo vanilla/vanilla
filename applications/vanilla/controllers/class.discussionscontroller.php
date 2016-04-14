@@ -332,7 +332,6 @@ class DiscussionsController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number of discussions to skip.
      */
     public function bookmarked($Page = '0') {
         $this->permission('Garden.SignIn.Allow');
@@ -452,7 +451,6 @@ class DiscussionsController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number of discussions to skip.
      */
     public function mine($Page = 'p1') {
         $this->permission('Garden.SignIn.Allow');

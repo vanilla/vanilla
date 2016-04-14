@@ -58,8 +58,8 @@ if (!class_exists('SideMenuModule', false)) {
         /**
          *
          *
-         * @param $Group
-         * @param $Text
+         * @param string $Group
+         * @param string $Text
          * @param $Url
          * @param bool $Permission
          * @param array $Attributes

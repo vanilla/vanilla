@@ -120,7 +120,6 @@ class CategoriesController extends VanillaController {
      * @access public
      *
      * @param string $CategoryIdentifier Unique category slug or ID.
-     * @param int $Offset Number of discussions to skip.
      */
     public function index($CategoryIdentifier = '', $Page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).

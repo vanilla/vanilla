@@ -102,6 +102,8 @@ if (!class_exists('HeadModule', false)) {
          * @param string The type of tag to add to the head. ie. "link", "script", "base", "meta".
          * @param array An associative array of property => value pairs to be placed in the tag.
          * @param string an index to give the tag for later manipulation.
+         * @param string $Tag
+         * @param string $Index
          */
         public function addTag($Tag, $Properties, $Content = null, $Index = null) {
             $Tag = array_merge(array(self::TAG_KEY => strtolower($Tag)), array_change_key_case($Properties));
@@ -205,6 +207,7 @@ if (!class_exists('HeadModule', false)) {
          * @param string Any property to search for in the tag.
          *    - If this is an array then it will be treated as a query of attribute/value pairs to match against.
          * @param string Any value to search for in the specified property.
+         * @param string $Tag
          */
         public function clearTag($Tag, $Property = '', $Value = '') {
             $Tag = strtolower($Tag);

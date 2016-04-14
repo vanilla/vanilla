@@ -419,7 +419,6 @@ class UtilityController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $ClientDate Client-reported datetime.
      * @param string $TransientKey Security token.
      */
     public function setClientHour($ClientHour = '', $TransientKey = '') {
@@ -472,9 +471,9 @@ class UtilityController extends DashboardController {
      *
      * @since 2.0.?
      * @access public
-     * @param string $Type Type of feed.
-     * @param int $Length Number of items to get.
-     * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
+     * @param string $type Type of feed.
+     * @param int $length Number of items to get.
+     * @param string $feedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
      */
     public function getFeed($type = 'news', $length = 5, $feedFormat = 'normal') {
         $validTypes = array(

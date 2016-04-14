@@ -261,7 +261,7 @@ class PermissionModel extends Gdn_Model {
         // Otherwise we'd be left with placeholders in our final query, which would cause a strict mode failure.
         if (!$DefaultRow) {
             $DefaultPermissions = array_map(
-                function ($Value) {
+                function($Value) {
                     // All non-numeric values are converted to "off" flag.
                     return (is_numeric($Value)) ? $Value : 2;
                 },
@@ -843,7 +843,7 @@ class PermissionModel extends Gdn_Model {
      *
      * @param $Value
      * @param $PermissionName
-     * @param $LimitToSuffix
+     * @param string $LimitToSuffix
      * @param $Namespaces
      * @return bool
      */
@@ -1268,7 +1268,7 @@ class PermissionModel extends Gdn_Model {
      * Split a permission name into its constituant parts.
      *
      * @param string $PermissionName The name of the permission.
-     * @return array The split permission in the form array(Namespace, Permission,Suffix).
+     * @return string[] The split permission in the form array(Namespace, Permission,Suffix).
      */
     public static function splitPermission($PermissionName) {
         $i = strpos($PermissionName, '.');

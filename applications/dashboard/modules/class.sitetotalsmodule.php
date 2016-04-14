@@ -33,6 +33,9 @@ class SiteTotalsModule extends Gdn_Module {
         $this->setData('Totals', $Result);
     }
 
+    /**
+     * @param string $Table
+     */
     protected function getCount($Table) {
         // Try and get the count from the cache.
         $Key = "$Table.CountRows";

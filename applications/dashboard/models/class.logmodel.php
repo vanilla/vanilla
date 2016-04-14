@@ -139,7 +139,7 @@ class LogModel extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $Key
+     * @param string $Key
      * @param $Data
      * @return string
      */
@@ -160,9 +160,9 @@ class LogModel extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $Keys
+     * @param string[] $Keys
      * @param $Data
-     * @return array|string
+     * @return string
      */
     public function formatRecord($Keys, $Data) {
         $Result = array();
@@ -502,8 +502,8 @@ class LogModel extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $Operation
-     * @param $RecordType
+     * @param string $Operation
+     * @param string $RecordType
      * @param $NewData
      * @param null $OldData
      */
@@ -531,7 +531,7 @@ class LogModel extends Gdn_Pluggable {
      *
      *
      * @param $Data
-     * @param $LogKey
+     * @param string $LogKey
      * @param string $BakKey1
      * @param string $BakKey2
      * @return null

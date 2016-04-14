@@ -374,7 +374,6 @@ class DiscussionController extends VanillaController {
      * @access public
      *
      * @param int $DiscussionID Unique discussion ID.
-     * @param string $TransientKey Single-use hash to prove intent.
      */
     public function dismissAnnouncement($DiscussionID = '') {
         // Confirm announcements may be dismissed
@@ -515,7 +514,6 @@ class DiscussionController extends VanillaController {
      * @access public
      *
      * @param int $DiscussionID Unique discussion ID.
-     * @param string $TransientKey Single-use hash to prove intent.
      */
     public function announce($DiscussionID = '', $Target = '') {
         $Discussion = $this->DiscussionModel->getID($DiscussionID);

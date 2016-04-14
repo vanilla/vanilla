@@ -608,8 +608,6 @@ class MessagesController extends ConversationsController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number to skip.
-     * @param string $Limit Number to show.
      */
     public function inbox($Page = '') {
         $this->View = 'All';

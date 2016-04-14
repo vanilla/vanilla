@@ -199,9 +199,9 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @param $TableName
-     * @param null $PrimaryKey
-     * @param null $SecondaryKey
+     * @param string $TableName
+     * @param string $PrimaryKey
+     * @param string $SecondaryKey
      * @return bool|void
      */
     protected function _assignIDs($TableName, $PrimaryKey = null, $SecondaryKey = null) {
@@ -286,8 +286,8 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Key
-     * @param null $Value
+     * @param string $Key
+     * @param null|string $Value
      * @return mixed
      */
     public function data($Key, $Value = null) {
@@ -620,7 +620,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @param $fp
+     * @param resource $fp
      * @param string $Delim
      * @param string $Quote
      * @param string $Escape
@@ -693,7 +693,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @param null $fpin
+     * @param resource $fpin
      * @return array|mixed|string
      * @throws Gdn_UserException
      */
@@ -735,7 +735,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @return mixed|string
+     * @return string
      * @throws Gdn_UserException
      */
     public function getPasswordHashMethod() {
@@ -1470,7 +1470,7 @@ class ImportModel extends Gdn_Model {
      * @param string $Overwrite
      * @param string $Email
      * @param string $Password
-     * @return mixed
+     * @return string
      */
     public function overwrite($Overwrite = '', $Email = '', $Password = '') {
         if ($Overwrite == '') {
@@ -1493,7 +1493,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Line
+     * @param string $Line
      * @return array
      */
     public function parseInfoLine($Line) {
@@ -1866,7 +1866,7 @@ class ImportModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Key
+     * @param string $Key
      * @param null $Value
      * @param string $Op
      * @return mixed

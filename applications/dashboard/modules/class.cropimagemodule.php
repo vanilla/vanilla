@@ -49,7 +49,7 @@ class CropImageModule extends Gdn_Module {
      *
      * Adds assets to the sender object and adds the required hidden fields to the form.
      *
-     * @param object $sender The sending controller object.
+     * @param SettingsController $sender The sending controller object.
      * @param bool $form The form to insert the crop module into.
      * @param int $width The width of the final cropped image.
      * @param int $height The height of the final cropped image.
@@ -200,7 +200,7 @@ class CropImageModule extends Gdn_Module {
     /**
      * Adds the necessary fields to the form for jcrop.
      *
-     * @param Form $form The form the crop module is inserted into.
+     * @param boolean $form The form the crop module is inserted into.
      * @param int $width The width of the final cropped image.
      * @param int $height The height of the final cropped image.
      * @param string $source The path to the local copy of the image.
@@ -236,7 +236,7 @@ class CropImageModule extends Gdn_Module {
      * Updates the form's hidden source width and source height fields.
      *
      * @param $form The form the crop module is inserted into.
-     * @param $source The path to the local copy of the image.
+     * @param string $source The path to the local copy of the image.
      */
     private function updateHiddenSource($form, $source) {
         $sourceSize = getimagesize($source);

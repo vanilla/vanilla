@@ -263,7 +263,6 @@ class UserController extends DashboardController {
      * @since 2.0.0
      * @access public
      * @param int $UserID Unique ID.
-     * @param string $TransientKey Security token.
      */
     public function approve($UserID = '') {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -450,7 +449,6 @@ class UserController extends DashboardController {
      * @since 2.0.0
      * @access public
      * @param int $UserID Unique ID.
-     * @param string $TransientKey Security token.
      */
     public function decline($UserID = '') {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -1104,7 +1102,6 @@ class UserController extends DashboardController {
     /**
      * JSON output of a username search.
      *
-     * @param string $query
      * @param int $limit
      */
     public function tagSearch($q, $limit = 10) {

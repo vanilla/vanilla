@@ -129,7 +129,7 @@ class MessageModel extends Gdn_Model {
     /**
      * Get what messages are active for a template location.
      *
-     * @param $Location
+     * @param string $Location
      * @param array $Exceptions
      * @param null $CategoryID
      * @return array|null
@@ -246,7 +246,7 @@ class MessageModel extends Gdn_Model {
     /**
      * Get all messages or one message.
      *
-     * @param int|bool $ID ID of message to get.
+     * @param null|integer $ID ID of message to get.
      * @return array|null
      */
     public static function messages($ID = false) {

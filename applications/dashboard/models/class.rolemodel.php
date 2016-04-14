@@ -236,6 +236,8 @@ class RoleModel extends Gdn_Model {
             case self::TYPE_UNCONFIRMED:
                 $backRoleIDs = (array)c('Garden.Registration.ConfirmEmailRole', null);
                 break;
+            default:
+                $backRoleIDs = array();
         }
         $roleIDs = array_merge($roleIDs, $backRoleIDs);
         $roleIDs = array_unique($roleIDs);

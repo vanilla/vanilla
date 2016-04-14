@@ -1792,6 +1792,7 @@ jQuery(document).ready(function($) {
             .atwho({
                 at: ':',
                 tpl: emojiTemplate,
+                insert_tpl: "${atwho-data-value}",
                 callbacks: {
                     tplEval: function(tpl, map) {
                         console.log(map);

@@ -139,21 +139,6 @@ class AddonManager {
     }
 
     /**
-     * Lookup an {@link Addon} by its type.
-     *
-     * @param string $key The addon's key.
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return null|Addon Returns the addon or **null** if one isn't found.
-     */
-    public function lookupByType($key, $type) {
-        if ($this->typeUsesMultiCaching($type)) {
-            return $this->lookupAddon($key);
-        } else {
-            return $this->lookupSingleCachedAddon($key, $type);
-        }
-    }
-
-    /**
      * Lookup an addon by class name.
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.
@@ -180,19 +165,22 @@ class AddonManager {
     }
 
     /**
-     * Lookup the addon with a given key.
+     * Get all of the addons of a certain type.
      *
-     * @param string $key The key of the addon.
-     * @return Addon|null
+     * @param string $type One of the **Addon::TYPE_*** constants.
      */
-    public function lookupAddon($key) {
-        $this->ensureMultiCache();
-
-        $realKey = strtolower($key);
-        if (isset($this->multiCache[$realKey])) {
-            return $this->multiCache[$realKey];
+    public function lookupAllByType($type) {
+        if ($this->typeUsesMultiCaching($type)) {
+            $this->ensureMultiCache();
+            return $this->multiCache;
         } else {
-            return null;
+            $index = $this->getSingleIndex($type);
+            $addons = [];
+            foreach ($index as $key => $subdir) {
+                $caseKey = basename($subdir);
+                $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
+            }
+            return $addons;
         }
     }
 
@@ -242,39 +230,149 @@ class AddonManager {
 
         if ($saveCache) {
             if ($this->typeUsesMultiCaching($type)) {
-                $varString = '<?php return '.var_export($addons, true).";\n";
-                static::filePutContents("{$this->cacheDir}/$type.php", $varString);
+                static::saveArrayCache($path = "{$this->cacheDir}/$type.php", $addons);
             } else {
                 // Each of these addons must be cached separately.
                 foreach ($addons as $addon) {
                     $key = $addon->getKey();
-                    $varString = '<?php return '.var_export($addon, true).";\n";
-                    static::filePutContents("{$this->cacheDir}/$type/$key.php", $varString);
+                    static::saveArrayCache("{$this->cacheDir}/$type/$key.php", $addon);
                 }
                 // Save a index of the addon names.
-                $indexString = '<?php return '.var_export($addonDirs, true).";\n";
-                static::filePutContents("{$this->cacheDir}/$type-index.php", $indexString);
+                static::saveArrayCache("{$this->cacheDir}/$type-index.php", $addonDirs);
             }
         }
         return $addons;
     }
 
     /**
-     * Get all of the enabled addons that depend on a given addon.
+     * Get a list of addon directories for a given type.
      *
-     * @param Addon $addon The addon to check the requirements.
-     * @return array Returns an array of {@link Addon} objects.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return array Returns an array of root-relative addon directories.
      */
-    public function lookupDependants(Addon $addon) {
+    private function scanAddonDirs($type) {
+        $strlen = strlen(PATH_ROOT);
         $result = [];
-        foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
-            /* @var Addon $enabledAddon */
-            $requirements = array_change_key_case($enabledAddon->getRequirements());
-            if (isset($requirements[$addon->getKey()])) {
-                $result[$enabledKey] = $enabledAddon;
+
+        foreach ($this->scanDirs[$type] as $subdir) {
+            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
+            foreach ($paths as $path) {
+                $result[basename($path)] = substr($path, $strlen);
             }
         }
+
         return $result;
+    }
+
+    /**
+     * Cache an array.
+     *
+     * @param string $path The path to save the array to.
+     * @param string $array The array to save.
+     */
+    private static function saveArrayCache($path, $array) {
+        $varString = '<?php return '.var_export($array, true).";\n";
+        static::filePutContents($path, $varString);
+    }
+
+    /**
+     * A version of file_put_contents() that is multi-thread safe.
+     *
+     * @param string $filename Path to the file where to write the data.
+     * @param mixed $data The data to write. Can be either a string, an array or a stream resource.
+     * @param int $mode The permissions to set on a new file.
+     * @return boolean
+     * @category Filesystem Functions
+     * @see http://php.net/file_put_contents
+     */
+    private static function filePutContents($filename, $data, $mode = 0644) {
+        $temp = tempnam(dirname($filename), 'atomic');
+
+        if (!($fp = @fopen($temp, 'wb'))) {
+            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
+            if (!($fp = @fopen($temp, 'wb'))) {
+                trigger_error("file_put_contents_safe() : error writing temporary file '$temp'", E_USER_WARNING);
+                return false;
+            }
+        }
+
+        fwrite($fp, $data);
+        fclose($fp);
+
+        if (!@rename($temp, $filename)) {
+            @unlink($filename);
+            @rename($temp, $filename);
+        }
+        if (function_exists('apc_delete_file')) {
+            // This fixes a bug with some configurations of apc.
+            apc_delete_file($filename);
+        } elseif (function_exists('opcache_invalidate')) {
+            opcache_invalidate($filename);
+        }
+
+        @chmod($filename, $mode);
+        return true;
+    }
+
+    /**
+     * Get the index for an addon type that is cached by single addon.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return array Returns the index mapping lowercase addon name to directory.
+     */
+    private function getSingleIndex($type) {
+        if (!isset($this->singleIndex[$type])) {
+            $cachePath = $this->cacheDir."/$type-index.php";
+
+            if (file_exists($cachePath)) {
+                $this->singleIndex[$type] = require $cachePath;
+            } else {
+                $addonDirs = $this->scanAddonDirs($type);
+                static::saveArrayCache($cachePath, $addonDirs);
+
+                $this->singleIndex[$type] = $addonDirs;
+            }
+        }
+        return $this->singleIndex[$type];
+    }
+
+    /**
+     * Lookup an addon that is cached on a per-addon basis.
+     *
+     * @param string $key The key of the addon.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return Addon|null Returns an addon object or null if one isn't found.
+     */
+    private function lookupSingleCachedAddon($key, $type) {
+        // Look at our in-request cache.
+        if (isset($this->singleCache[$type][$key])) {
+            $result = $this->singleCache[$type][$key];
+            return $result === false ? null : $result;
+        }
+        // Look at the file cache.
+        if (!empty($this->cacheDir)) {
+            $cachePath = "{$this->cacheDir}/$type/$key.php";
+            if (file_exists($cachePath)) {
+                $addon = require $cachePath;
+                $this->singleCache[$type][$key] = $addon;
+                return $addon;
+            }
+        }
+        // Look for the addon itself.
+        $addon = false;
+        foreach ($this->scanDirs[$type] as $scanDir) {
+            $addonDir = PATH_ROOT."$scanDir/$key";
+            if (file_exists($addonDir)) {
+                $addon = new Addon("$scanDir/$key");
+                break;
+            }
+        }
+        // Cache the addon's information.
+        if (!empty($this->cacheDir)) {
+            static::saveArrayCache("{$this->cacheDir}/$type/$key.php", $addon);
+        }
+        $this->singleCache[$type][$key] = $addon;
+        return $addon === false ? null : $addon;
     }
 
     /**
@@ -320,6 +418,100 @@ class AddonManager {
     }
 
     /**
+     * Get all of the requirements for an addon.
+     *
+     * This method returns an array of all of the addon requirements for a given addon. The return is an array of
+     * requirements in the following form:
+     *
+     * ```
+     * 'addonKey' => ['req' => 'versionRequirement', 'status' => AddonManager::REQ_*]
+     * ```
+     *
+     * @param Addon $addon The addon to check.
+     * @param int $filter One or more of the **AddonManager::REQ_*** constants concatenated by `|`.
+     *
+     * @return Returns the requirements array. An empty array represents an addon with no requirements.
+     */
+    public function lookupRequirements(Addon $addon, $filter = null) {
+        $array = [];
+        $this->lookupRequirementsRecursive($addon, $array);
+
+        // Filter the list.
+        if ($filter) {
+            $array = array_filter($array, function ($row) use ($filter) {
+                return ($row['status'] & $filter) === $filter;
+            });
+        }
+
+        return $array;
+    }
+
+    /**
+     * The implementation of {@link lookupRequirements()}.
+     *
+     * @param Addon $addon The addon to lookup.
+     * @param array &$array The current requirements list.
+     * @see AddonManager::lookupRequirements()
+     */
+    private function lookupRequirementsRecursive(Addon $addon, array &$array) {
+        $addonReqs = $addon->getRequirements();
+        foreach ($addonReqs as $addonKey => $versionReq) {
+            $addonKey = strtolower($addonKey);
+            if (isset($array[$addonKey])) {
+                continue;
+            }
+            $addonReq = $this->lookupAddon($addonKey);
+            if (!$addonReq) {
+                $status = self::REQ_MISSING;
+            } elseif ($this->isEnabled($addonReq->getKey(), $addonReq->getType())) {
+                $status = self::REQ_ENABLED;
+            } elseif (Addon::checkVersion($addonReq->getVersion(), $versionReq)) {
+                $status = self::REQ_DISABLED;
+            } else {
+                $status = self::REQ_VERSION;
+            }
+            $array[$addonKey] = ['req' => $versionReq, 'status' => $status];
+
+            // Check the required addon's requirements.
+            if ($addonReq && $status !== self::REQ_ENABLED) {
+                $this->lookupRequirementsRecursive($addonReq, $array);
+            }
+        }
+    }
+
+    /**
+     * Lookup the addon with a given key.
+     *
+     * @param string $key The key of the addon.
+     * @return Addon|null
+     */
+    public function lookupAddon($key) {
+        $this->ensureMultiCache();
+
+        $realKey = strtolower($key);
+        if (isset($this->multiCache[$realKey])) {
+            return $this->multiCache[$realKey];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Check whether or not an addon is enabled.
+     *
+     * @param string $key The addon key.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return bool Returns
+     */
+    public function isEnabled($key, $type) {
+        if ($type === Addon::TYPE_ADDON) {
+            $key = strtolower($key);
+        }
+        $enabled = isset($this->enabled["$type/$key"]);
+        return $enabled;
+    }
+
+    /**
      * Check the enabled dependants of an addon.
      *
      * Addons should always check their dependants before being disabled. This check does not consider dependants that
@@ -353,103 +545,34 @@ class AddonManager {
     }
 
     /**
-     * Get a list of addon directories for a given type.
+     * Get all of the enabled addons that depend on a given addon.
      *
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return array Returns an array of root-relative addon directories.
+     * @param Addon $addon The addon to check the requirements.
+     * @return array Returns an array of {@link Addon} objects.
      */
-    private function scanAddonDirs($type) {
-        $strlen = strlen(PATH_ROOT);
+    public function lookupDependants(Addon $addon) {
         $result = [];
-
-        foreach ($this->scanDirs[$type] as $subdir) {
-            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
-            foreach ($paths as $path) {
-                $result[basename($path)] = substr($path, $strlen);
+        foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
+            /* @var Addon $enabledAddon */
+            $requirements = array_change_key_case($enabledAddon->getRequirements());
+            if (isset($requirements[$addon->getKey()])) {
+                $result[$enabledKey] = $enabledAddon;
             }
         }
-
         return $result;
     }
 
     /**
-     * A version of file_put_contents() that is multi-thread safe.
+     * Get the enabled addons, sorted by priority with the highest priority first.
      *
-     * @param string $filename Path to the file where to write the data.
-     * @param mixed $data The data to write. Can be either a string, an array or a stream resource.
-     * @param int $mode The permissions to set on a new file.
-     * @return boolean
-     * @category Filesystem Functions
-     * @see http://php.net/file_put_contents
+     * @return array[Addon] Returns an array of {@link Addon} objects.
      */
-    private function filePutContents($filename, $data, $mode = 0644) {
-        $temp = tempnam(dirname($filename), 'atomic');
-
-        if (!($fp = @fopen($temp, 'wb'))) {
-            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
-            if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("file_put_contents_safe() : error writing temporary file '$temp'", E_USER_WARNING);
-                return false;
-            }
+    public function getEnabled() {
+        if (!$this->enabledSorted) {
+            uasort($this->enabled, ['\Vanilla\Addon', 'comparePriority']);
+            $this->enabledSorted = true;
         }
-
-        fwrite($fp, $data);
-        fclose($fp);
-
-        if (!@rename($temp, $filename)) {
-            @unlink($filename);
-            @rename($temp, $filename);
-        }
-        if (function_exists('apc_delete_file')) {
-            // This fixes a bug with some configurations of apc.
-            apc_delete_file($filename);
-        } elseif (function_exists('opcache_invalidate')) {
-            opcache_invalidate($filename);
-        }
-
-        @chmod($filename, $mode);
-        return true;
-    }
-
-    /**
-     * Lookup an addon that is cached on a per-addon basis.
-     *
-     * @param string $key The key of the addon.
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return Addon|null Returns an addon object or null if one isn't found.
-     */
-    private function lookupSingleCachedAddon($key, $type) {
-        // Look at our in-request cache.
-        if (isset($this->singleCache[$type][$key])) {
-            $result = $this->singleCache[$type][$key];
-            return $result === false ? null : $result;
-        }
-        // Look at the file cache.
-        if (!empty($this->cacheDir)) {
-            $cachePath = "{$this->cacheDir}/$type/$key.php";
-            if (file_exists($cachePath)) {
-                $addon = require $cachePath;
-                $this->singleCache[$type][$key] = $addon;
-                return $addon;
-            }
-        }
-        // Look for the addon itself.
-        $addon = false;
-        foreach ($this->scanDirs[$type] as $scanDir) {
-            $addonDir = PATH_ROOT."$scanDir/$key";
-            if (file_exists($addonDir)) {
-                $addon = new Addon("$scanDir/$key");
-                break;
-            }
-        }
-        // Cache the addon's information.
-        if (!empty($this->cacheDir)) {
-            $cachePath = "{$this->cacheDir}/$type/$key.php";
-            $addonString = "<?php return ".var_export($addon, true).";\n";
-            static::filePutContents($cachePath, $addonString);
-        }
-        $this->singleCache[$type][$key] = $addon;
-        return $addon === false ? null : $addon;
+        return $this->enabled;
     }
 
     /**
@@ -598,38 +721,6 @@ class AddonManager {
     }
 
     /**
-     * Start one or more addons by specifying their keys.
-     *
-     * This method is useful for starting the addons that are stored in a configuration file.
-     *
-     * @param array $keys The keys of the addons. The addon keys can be the keys of the array or the values.
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return int Returns the number of addons that were enabled.
-     */
-    public function startAddonsByKey($keys, $type) {
-        // Filter out false keys.
-        $keys = array_filter((array)$keys);
-
-        $count = 0;
-        foreach ($keys as $key => $value) {
-            if (in_array($value, [true, 1, '1'], true)) {
-                // This addon key is represented as addon => true.
-                $addon = $this->lookupByType($key, $type);
-            } else {
-                // This addon is represented as addon => folder.
-                $addon = $this->lookupByType($value, $type);
-            }
-            if (empty($addon)) {
-                trigger_error("The $type with key $key could not be found and will not be started.");
-            } else {
-                $this->startAddon($addon);
-                $count++;
-            }
-        }
-        return $count;
-    }
-
-    /**
      * Stop an addon and make it unavailable.
      *
      * @param Addon $addon The addon to stop.
@@ -666,6 +757,53 @@ class AddonManager {
     }
 
     /**
+     * Start one or more addons by specifying their keys.
+     *
+     * This method is useful for starting the addons that are stored in a configuration file.
+     *
+     * @param array $keys The keys of the addons. The addon keys can be the keys of the array or the values.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return int Returns the number of addons that were enabled.
+     */
+    public function startAddonsByKey($keys, $type) {
+        // Filter out false keys.
+        $keys = array_filter((array)$keys);
+
+        $count = 0;
+        foreach ($keys as $key => $value) {
+            if (in_array($value, [true, 1, '1'], true)) {
+                // This addon key is represented as addon => true.
+                $addon = $this->lookupByType($key, $type);
+            } else {
+                // This addon is represented as addon => folder.
+                $addon = $this->lookupByType($value, $type);
+            }
+            if (empty($addon)) {
+                trigger_error("The $type with key $key could not be found and will not be started.");
+            } else {
+                $this->startAddon($addon);
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Lookup an {@link Addon} by its type.
+     *
+     * @param string $key The addon's key.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return null|Addon Returns the addon or **null** if one isn't found.
+     */
+    public function lookupByType($key, $type) {
+        if ($this->typeUsesMultiCaching($type)) {
+            return $this->lookupAddon($key);
+        } else {
+            return $this->lookupSingleCachedAddon($key, $type);
+        }
+    }
+
+    /**
      * Stop one or more addons by specifying their keys.
      *
      * @param array $keys The keys of the addons. The addon keys can be the keys of the array or the values.
@@ -693,111 +831,6 @@ class AddonManager {
             }
         }
         return $count;
-    }
-
-    /**
-     * Get all of the addons of a certain type.
-     *
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     */
-    public function lookupAllByType($type) {
-        if ($this->typeUsesMultiCaching($type)) {
-            $this->ensureMultiCache();
-            return $this->multiCache;
-        } else {
-            $index = $this->getSingleIndex($type);
-            $addons = [];
-            foreach ($index as $key => $subdir) {
-                $caseKey = basename($subdir);
-                $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
-            }
-            return $addons;
-        }
-    }
-
-    /**
-     * Get all of the requirements for an addon.
-     *
-     * This method returns an array of all of the addon requirements for a given addon. The return is an array of
-     * requirements in the following form:
-     *
-     * ```
-     * 'addonKey' => ['req' => 'versionRequirement', 'status' => AddonManager::REQ_*]
-     * ```
-     *
-     * @param Addon $addon The addon to check.
-     * @param int $filter One or more of the **AddonManager::REQ_*** constants concatenated by `|`.
-     *
-     * @return Returns the requirements array. An empty array represents an addon with no requirements.
-     */
-    public function lookupRequirements(Addon $addon, $filter = null) {
-        $array = [];
-        $this->lookupRequirementsRecursive($addon, $array);
-
-        // Filter the list.
-        if ($filter) {
-            $array = array_filter($array, function ($row) use ($filter) {
-                return ($row['status'] & $filter) === $filter;
-            });
-        }
-
-        return $array;
-    }
-
-    /**
-     * The implementation of {@link lookupRequirements()}.
-     *
-     * @param Addon $addon The addon to lookup.
-     * @param array &$array The current requirements list.
-     * @see AddonManager::lookupRequirements()
-     */
-    private function lookupRequirementsRecursive(Addon $addon, array &$array) {
-        $addonReqs = $addon->getRequirements();
-        foreach ($addonReqs as $addonKey => $versionReq) {
-            $addonKey = strtolower($addonKey);
-            if (isset($array[$addonKey])) {
-                continue;
-            }
-            $addonReq = $this->lookupAddon($addonKey);
-            if (!$addonReq) {
-                $status = self::REQ_MISSING;
-            } elseif ($this->isEnabled($addonReq->getKey(), $addonReq->getType())) {
-                $status = self::REQ_ENABLED;
-            } elseif (Addon::checkVersion($addonReq->getVersion(), $versionReq)) {
-                $status = self::REQ_DISABLED;
-            } else {
-                $status = self::REQ_VERSION;
-            }
-            $array[$addonKey] = ['req' => $versionReq, 'status' => $status];
-
-            // Check the required addon's requirements.
-            if ($addonReq && $status !== self::REQ_ENABLED) {
-                $this->lookupRequirementsRecursive($addonReq, $array);
-            }
-        }
-    }
-
-    /**
-     * Get the index for an addon type that is cached by single addon.
-     *
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return array Returns the index mapping lowercase addon name to directory.
-     */
-    private function getSingleIndex($type) {
-        if (!isset($this->singleIndex[$type])) {
-            $cachePath = $this->cacheDir."/$type-index.php";
-
-            if (file_exists($cachePath)) {
-                $this->singleIndex[$type] = require $cachePath;
-            } else {
-                $addonDirs = $this->scanAddonDirs($type);
-                $indexString = '<?php return '.var_export($addonDirs, true).";\n";
-                static::filePutContents($cachePath, $indexString);
-
-                $this->singleIndex[$type] = $addonDirs;
-            }
-        }
-        return $this->singleIndex[$type];
     }
 
     /**
@@ -842,34 +875,6 @@ class AddonManager {
 
         $this->cacheDir = $cacheDir;
         return $this;
-    }
-
-    /**
-     * Get the enabled addons, sorted by priority with the highest priority first.
-     *
-     * @return array[Addon] Returns an array of {@link Addon} objects.
-     */
-    public function getEnabled() {
-        if (!$this->enabledSorted) {
-            uasort($this->enabled, ['\Vanilla\Addon', 'comparePriority']);
-            $this->enabledSorted = true;
-        }
-        return $this->enabled;
-    }
-
-    /**
-     * Check whether or not an addon is enabled.
-     *
-     * @param string $key The addon key.
-     * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return bool Returns
-     */
-    public function isEnabled($key, $type) {
-        if ($type === Addon::TYPE_ADDON) {
-            $key = strtolower($key);
-        }
-        $enabled = isset($this->enabled["$type/$key"]);
-        return $enabled;
     }
 
     /**

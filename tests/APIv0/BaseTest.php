@@ -12,7 +12,7 @@ use Garden\Http\HttpResponse;
 
 abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     /** @var APIv0  $api */
-    protected $api;
+    protected static $api;
 
     /**
      * Make sure there is a fresh copy of Vanilla for the class' tests.
@@ -22,6 +22,13 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
 
         $api->uninstall();
         $api->install(get_called_class());
+        self::$api = $api;
+
+        $r = $api->get('/discussions.json');
+        $data = $r->getBody();
+        if (empty($data['Discussions'])) {
+            throw new \Exception("The discussion stub content is missing.", 500);
+        }
     }
 
     /**
@@ -30,10 +37,7 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
      * @return APIv0 Returns the API.
      */
     public function api() {
-        if (!isset($this->api)) {
-            $this->api = new APIv0();
-        }
-        return $this->api;
+        return self::$api;
     }
 
     /**

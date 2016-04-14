@@ -772,6 +772,10 @@ if (!c('Garden.Html.SafeStyles')) {
     removeFromConfig('Garden.Html.SafeStyles');
 }
 
+// We need to ensure that recaptcha is enabled if this site is upgrading from
+// 2.2.106 and has never had a captcha plugin
+touchConfig('Garden.EnabledPlugins.recaptcha', true);
+
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) {
     @mkdir(PATH_CACHE.'/Smarty');

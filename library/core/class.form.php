@@ -267,13 +267,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function captcha() {
-        $handled = false;
-        $this->EventArguments['Handled'] =& $handled;
         $this->fireEvent('Captcha');
-        if ($handled) {
-            // A plugin handled the captcha so don't display anything more.
-            return;
-        }
     }
 
     /**

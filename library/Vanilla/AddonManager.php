@@ -171,7 +171,7 @@ class AddonManager {
         } elseif ($searchAll) {
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
                 /* @var Addon $addon */
-                if (array_key_exists($classKey, $addon->getClasses())) {
+                if (isset($addon->getClasses()[$classKey])) {
                     return $addon;
                 }
             }
@@ -189,7 +189,7 @@ class AddonManager {
         $this->ensureMultiCache();
 
         $realKey = strtolower($key);
-        if (array_key_exists($realKey, $this->multiCache)) {
+        if (isset($this->multiCache[$realKey])) {
             return $this->multiCache[$realKey];
         } else {
             return null;
@@ -270,7 +270,7 @@ class AddonManager {
         foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
             /* @var Addon $enabledAddon */
             $requirements = array_change_key_case($enabledAddon->getRequirements());
-            if (array_key_exists($addon->getKey(), $requirements)) {
+            if (isset($requirements[$addon->getKey()])) {
                 $result[$enabledKey] = $enabledAddon;
             }
         }
@@ -505,7 +505,7 @@ class AddonManager {
         /* @var Addon $theme */
         $theme = $this->getTheme();
         while (isset($theme)) {
-            if (array_key_exists($theme->getKey(), $subdirs)) {
+            if (isset($subdirs[$theme->getKey()])) {
                 break;
             }
             $subdirs[$theme->getKey()] = $theme->getSubdir();
@@ -755,7 +755,7 @@ class AddonManager {
         $addonReqs = $addon->getRequirements();
         foreach ($addonReqs as $addonKey => $versionReq) {
             $addonKey = strtolower($addonKey);
-            if (array_key_exists($addonKey, $array)) {
+            if (isset($array[$addonKey])) {
                 continue;
             }
             $addonReq = $this->lookupAddon($addonKey);
@@ -868,7 +868,7 @@ class AddonManager {
         if ($type === Addon::TYPE_ADDON) {
             $key = strtolower($key);
         }
-        $enabled = array_key_exists("$type/$key", $this->enabled);
+        $enabled = isset($this->enabled["$type/$key"]);
         return $enabled;
     }
 

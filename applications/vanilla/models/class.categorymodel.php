@@ -1494,7 +1494,7 @@ class CategoryModel extends Gdn_Model {
             if (!isset($Categories[$ID])) {
                 continue;
             }
-            $Row = $Categories[$ID];
+            $Row = (array)$Categories[$ID];
             $Row['Depth'] += $DepthAdj;
             $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
             $Result[] = $Row;

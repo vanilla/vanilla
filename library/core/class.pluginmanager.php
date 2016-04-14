@@ -173,8 +173,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @todo Remove this
      */
     public function includePlugins($EnabledPlugins = null) {
-        deprecated('Gdn_PluginManager->includePlugins()');
-        return [];
+        $enabled = $this->addonManager->getEnabled();
+        foreach ($enabled as $addon) {
+            /* @var \Vanilla\Addon $addon */
+            if ($pluginClass = $addon->getPluginClass()) {
+                include $addon->getClassPath($pluginClass);
+            }
+        }
     }
 
     /**
@@ -430,21 +435,23 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      *  }
      */
     public function registerPlugins() {
-        $addonPlugins  = [];
-        foreach ($this->addonManager->getEnabled() as $addon) {
+        $enabled = $this->addonManager->getEnabled();
+        foreach ($enabled as $addon) {
             /* @var \Vanilla\Addon $addon */
-            if (!($pluginClass = $addon->getPluginClass()) ||
-                array_key_exists($pluginClass, $this->registeredPlugins)) {
+            if ($pluginClass = $addon->getPluginClass()) {
+                // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
+                include_once $addon->getClassPath($pluginClass);
 
-                continue;
-            }
-            if (is_a($pluginClass, '\Gdn_IPlugin', true)) {
-                $this->registerPlugin($pluginClass);
-            }
+                // Only register the plugin if it implements the Gdn_IPlugin interface.
+                if (is_a($pluginClass, 'Gdn_IPlugin', true) &&
+                    !isset($this->registeredPlugins[$pluginClass])
+                ) {
 
-            $addonPlugins[] = $pluginClass;
+                    // Register this plugin's methods
+                    $this->registerPlugin($pluginClass);
+                }
+            }
         }
-        return $addonPlugins;
     }
 
     /**

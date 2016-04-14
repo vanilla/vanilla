@@ -216,7 +216,8 @@ unset($hooksPath);
 
 // Themes startup
 Gdn::themeManager()->start();
-Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_THEME);
+// No actions are connected to this call, so it could be commeted out for now.
+// Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_THEME);
 
 // Plugins startup
 Gdn::pluginManager()->start();

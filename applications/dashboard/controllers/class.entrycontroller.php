@@ -1279,7 +1279,7 @@ EOT;
      * Select view/method to be used for registration (from config).
      *
      * @access protected
-     * @since 2.2.106
+     * @since 2.3
      * @return string Method name to invoke for registration
      */
     protected function getRegistrationhandler() {
@@ -1299,7 +1299,7 @@ EOT;
     /**
      * Alias of EntryController::getRegistrationHandler
      *
-     * @deprecated since v2.2.106
+     * @deprecated since 2.3
      * @return string
      */
     protected function _registrationView() {

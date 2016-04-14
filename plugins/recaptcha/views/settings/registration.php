@@ -11,11 +11,11 @@
         <tbody>
         <tr class="Alt">
             <th><?php echo t('Public Key'); ?></th>
-            <td class="Alt"><?php echo $this->Form->textBox('Plugins.Recaptcha.PublicKey'); ?></td>
+            <td class="Alt"><?php echo $this->Form->textBox('Recaptcha.PublicKey'); ?></td>
         </tr>
         <tr>
             <th><?php echo t('Private Key'); ?></th>
-            <td class="Alt"><?php echo $this->Form->textBox('Plugins.Recaptcha.PrivateKey'); ?></td>
+            <td class="Alt"><?php echo $this->Form->textBox('Recaptcha.PrivateKey'); ?></td>
         </tr>
         </tbody>
     </table>

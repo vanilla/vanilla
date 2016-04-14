@@ -1593,6 +1593,8 @@ class UserModel extends Gdn_Model {
         if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
             $RolesDataArray = $this->SQL->getWhere('UserRole', array('UserID' => $UserID))->resultArray();
             $RolesDataArray = array_column($RolesDataArray, 'RoleID');
+            // Add result to cache
+            $this->userCacheRoles($UserID, $RolesDataArray);
         }
 
         $Result = array();

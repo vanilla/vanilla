@@ -6,7 +6,7 @@
  */
 
 $PluginInfo['recaptcha'] = array(
-    'Name' => 'Recaptcha Support',
+    'Name' => 'reCAPTCHA Support',
     'Description' => "Add recaptcha validation to signups.",
     'Version' => '0.1',
     'MobileFriendly' => true,
@@ -41,19 +41,19 @@ class RecaptchaPlugin extends Gdn_Plugin {
     protected $publicKey;
 
     /**
-     * Plugin initialization
+     * Plugin initialization.
      *
      */
     public function __construct() {
         parent::__construct();
 
         // Get keys from config
-        $this->privateKey = c('Plugins.Recaptcha.PrivateKey');
-        $this->publicKey = c('Plugins.Recaptcha.PublicKey');
+        $this->privateKey = c('Recaptcha.PrivateKey');
+        $this->publicKey = c('Recaptcha.PublicKey');
     }
 
     /**
-     * Override private key in memory
+     * Override private key in memory.
      *
      * @param string $key
      */
@@ -62,7 +62,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get private key from memory
+     * Get private key from memory.
      *
      * @return string
      */
@@ -71,7 +71,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Override public key in memory
+     * Override public key in memory.
      *
      * @param string $key
      */
@@ -80,7 +80,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get public key from memory
+     * Get public key from memory.
      *
      * @return string
      */
@@ -89,7 +89,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Validate a reCAPTCHA submission
+     * Validate a reCAPTCHA submission.
      *
      * @param string $captchaText
      * @return boolean
@@ -119,7 +119,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook (controller) to manage captcha config
+     * Hook (controller) to manage captcha config.
      *
      * @param SettingsController $sender
      */
@@ -130,13 +130,13 @@ class RecaptchaPlugin extends Gdn_Plugin {
         $sender->setData('_ManageCaptcha', $manageCaptcha);
 
         if ($manageCaptcha) {
-            $configurationModel->setField('Plugins.Recaptcha.PrivateKey');
-            $configurationModel->setField('Plugins.Recaptcha.PublicKey');
+            $configurationModel->setField('Recaptcha.PrivateKey');
+            $configurationModel->setField('Recaptcha.PublicKey');
         }
     }
 
     /**
-     * Hook (view) to manage captcha config
+     * Hook (view) to manage captcha config.
      *
      * THIS METHOD ECHOS DATA
      *
@@ -147,7 +147,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook to render a captcha
+     * Hook (view) to render a captcha.
      *
      * THIS METHOD ECHOS DATA
      *
@@ -158,7 +158,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook to validate captchas
+     * Hook to validate captchas.
      *
      * @param Gdn_PluginManager $sender
      * @return boolean
@@ -176,7 +176,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook to return captcha submission
+     * Hook to return captcha submission data.
      *
      * @param Gdn_PluginManager $sender
      */
@@ -188,7 +188,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Display reCAPTCHA entry field
+     * Display reCAPTCHA entry field.
      *
      * THIS METHOD ECHOS DATA
      *
@@ -196,10 +196,6 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @return string
      */
     public function gdn_form_captcha_handler($sender) {
-
-        // Tell the form that we've got this
-        $sender->EventArguments['Handled'] = true;
-
         if (!$this->getPrivateKey() || !$this->getPublicKey()) {
             echo '<div class="Warning">' . t('reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
         }
@@ -225,22 +221,28 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook plugin enabled
+     * Hook utility/structure.
      *
      * Move old keys to new location.
      */
-    public function setup() {
+    public function structure() {
         // Move private key
         if (c('Garden.Registration.CaptchaPrivateKey')) {
-            saveToConfig('Plugins.Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
+            saveToConfig('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
             removeFromConfig('Garden.Registration.CaptchaPrivateKey');
         }
 
         // Move public key
         if (c('Garden.Registration.CaptchaPublicKey')) {
-            saveToConfig('Plugins.Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
+            saveToConfig('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
             removeFromConfig('Garden.Registration.CaptchaPublicKey');
         }
     }
+
+    /**
+     * On plugin enable.
+     *
+     */
+    public function setup() {}
 
 }

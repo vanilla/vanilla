@@ -27,7 +27,7 @@ class Captcha {
     }
 
     /**
-     * Wrapper for captcha rendering
+     * Wrapper for captcha rendering.
      *
      * Allows conditional ignoring of captcha rendering if skipped in the config.
      *
@@ -43,12 +43,11 @@ class Captcha {
     }
 
     /**
-     * Validate captcha
+     * Validate captcha.
      *
      * @param mixed $value
      */
     public static function validate($value = null) {
-
         if (is_null($value)) {
             // Get captcha text
             $captchaText = null;

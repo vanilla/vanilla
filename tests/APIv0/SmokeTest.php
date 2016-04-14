@@ -1,15 +1,14 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 namespace VanillaTests\APIv0;
 
-
 /**
- * Test some basic Vanilla
+ * Test some basic Vanilla functionality to make sure nothing is horribly broken.
  */
 class SmokeTest extends BaseTest {
 

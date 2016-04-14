@@ -4372,22 +4372,24 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * Cache user's roles
+     * Cache a user's roles.
      *
-     * @param type $UserID
-     * @param type $RoleIDs
-     * @return type
+     * @param int $userID The ID of a user to cache roles for.
+     * @param array $roles A collection of role records associated with the user.
+     * @return bool Was the caching operation successful?
      */
-    public function userCacheRoles($UserID, $RoleIDs) {
-        if (is_null($UserID) || !$UserID) {
+    public function userCacheRoles($userID, $roles) {
+        if (is_null($userID) || !$userID) {
             return false;
         }
 
-        $Cached = true;
-
-        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
-        $Cached = $Cached & Gdn::cache()->store($UserRolesKey, $RoleIDs);
-        return $Cached;
+        $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
+        $cached = Gdn::cache()->store(
+            $userRolesKey,
+            $roles,
+            [Gdn_Cache::FEATURE_EXPIRY => 3600]
+        );
+        return $cached;
     }
 
     /**

@@ -198,6 +198,7 @@ class UserController extends DashboardController {
 
                 $NewUserID = $this->Form->save(array('SaveRoles' => true, 'NoConfirmEmail' => true));
                 if ($NewUserID !== false) {
+                    $this->setData('UserID', $NewUserID);
                     if ($noPassword) {
                         $password = T('No password');
                     } else {

@@ -39,7 +39,10 @@
 			"library/core/functions.general.php",
 			"library/core/functions.compatibility.php",
 			"library/core/functions.deprecated.php"
-		]
+		],
+		"psr-4": {
+			"Vanilla\\": "library/Vanilla"
+		}
 	},
 	"scripts": {
 		"pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",

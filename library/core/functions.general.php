@@ -730,7 +730,7 @@ if (!function_exists('dbdecode')) {
      * @return mixed
      */
     function dbdecode($value) {
-        return unserialize($value);
+        return Gdn_Format::unserialize($value);
     }
 }
 

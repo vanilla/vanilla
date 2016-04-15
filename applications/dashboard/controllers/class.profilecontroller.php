@@ -846,7 +846,7 @@ class ProfileController extends Gdn_Controller {
 
         // Get user data
         $this->getUserInfo($UserReference, $Username, $UserID, true);
-        $UserPrefs = Gdn_Format::unserialize($this->User->Preferences);
+        $UserPrefs = dbdecode($this->User->Preferences);
         if ($this->User->UserID != $Session->UserID) {
             $this->permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), false);
         }

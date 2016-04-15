@@ -773,8 +773,20 @@ if (!c('Garden.Html.SafeStyles')) {
 }
 
 // We need to ensure that recaptcha is enabled if this site is upgrading from
-// 2.2.106 and has never had a captcha plugin
+// 2.2 and has never had a captcha plugin
 touchConfig('EnabledPlugins.recaptcha', true);
+
+// Move recaptcha private key to plugin namespace.
+if (c('Garden.Registration.CaptchaPrivateKey')) {
+    touchConfig('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
+    removeFromConfig('Garden.Registration.CaptchaPrivateKey');
+}
+
+// Move recaptcha public key to plugin namespace.
+if (c('Garden.Registration.CaptchaPublicKey')) {
+    touchConfig('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
+    removeFromConfig('Garden.Registration.CaptchaPublicKey');
+}
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) {

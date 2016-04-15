@@ -1106,6 +1106,11 @@ class SettingsController extends DashboardController {
             $this->setData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
         }
 
+        // Remove all hidden locales, unless they are enabled.
+        $AvailableLocales = array_filter($AvailableLocales, function ($locale) use ($EnabledLocales) {
+            return !val('Hidden', $locale) || isset($EnabledLocales[val('Index', $locale)]);
+        });
+
         $this->setData('AvailableLocales', $AvailableLocales);
         $this->setData('EnabledLocales', $EnabledLocales);
         $this->setData('Locales', $LocaleModel->availableLocales());

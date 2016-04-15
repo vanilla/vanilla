@@ -1833,18 +1833,9 @@ EOT;
      * @return string The serialized version of the string.
      */
     public static function serialize($Mixed) {
-        if (
-            is_array($Mixed)
-            || is_object($Mixed)
-            || (
-                is_string($Mixed)
-                && !( // Prevent double encoding
-                    substr_compare('a:', $Mixed, 0, 2) === 0
-                    || substr_compare('O:', $Mixed, 0, 2) === 0
-                    || substr_compare('arr:', $Mixed, 0, 4) === 0
-                    || substr_compare('obj:', $Mixed, 0, 4) === 0
-                )
-            )
+        if (is_array($Mixed) || is_object($Mixed)
+            || (is_string($Mixed) && !(substr_compare('a:', $Mixed, 0, 2) === 0  || substr_compare('O:', $Mixed, 0, 2) === 0
+                    || substr_compare('arr:', $Mixed, 0, 4) === 0 || substr_compare('obj:', $Mixed, 0, 4) === 0))
         ) {
             $Result = serialize($Mixed);
         } else {

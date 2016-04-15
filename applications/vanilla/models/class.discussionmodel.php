@@ -1054,10 +1054,11 @@ class DiscussionModel extends VanillaModel {
         }
 
         $AnnouncementIDs = $this->SQL->get()->resultArray();
-        $AnnouncementIDs = consolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
+        $AnnouncementIDs = array_column($AnnouncementIDs, 'DiscussionID');
 
         // Short circuit querying when there are no announcements.
         if (count($AnnouncementIDs) == 0) {
+            $this->_AnnouncementIDs = $AnnouncementIDs;
             return new Gdn_DataSet();
         }
 
@@ -1079,12 +1080,6 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Add conditions passed.
-//      if (is_array($Wheres))
-//         $this->SQL->where($Wheres);
-//
-//      $this->SQL
-//         ->where('d.Announce', '1');
-
         $this->SQL->whereIn('d.DiscussionID', $AnnouncementIDs);
 
         // If we aren't viewing announcements in a category then only show global announcements.

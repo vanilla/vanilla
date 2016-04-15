@@ -430,9 +430,9 @@ class Gdn_Session {
                 $UserModel->EventArguments['User'] =& $this->User;
                 $UserModel->fireEvent('AfterGetSession');
 
-                $this->_Permissions = dbdecode($this->User->Permissions);
-                $this->_Preferences = dbdecode($this->User->Preferences);
-                $this->_Attributes = dbdecode($this->User->Attributes);
+                $this->_Permissions = $this->User->Permissions;
+                $this->_Preferences = $this->User->Preferences;
+                $this->_Attributes = $this->User->Attributes;
                 $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
 
                 if ($this->_TransientKey === false) {
@@ -459,7 +459,7 @@ class Gdn_Session {
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
-            $this->_Permissions = dbdecode($UserModel->definePermissions(0));
+            $this->_Permissions = $UserModel->definePermissions(0);
         }
     }
 

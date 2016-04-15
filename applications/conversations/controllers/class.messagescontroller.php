@@ -40,7 +40,6 @@ class MessagesController extends ConversationsController {
         parent::initialize();
         $this->Menu->highlightRoute('/messages/inbox');
         $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
-//      $this->addModule('MeModule');
         $this->addModule('SignedInModule');
 
         // Spoilers assets
@@ -194,7 +193,6 @@ class MessagesController extends ConversationsController {
                     $LastMessageID = $NewMessageID - 1;
                 }
 
-                $Session = Gdn::session();
                 $MessageData = $this->ConversationMessageModel->getNew($ConversationID, $LastMessageID);
                 $this->Conversation = $Conversation;
                 $this->MessageData = $MessageData;
@@ -217,10 +215,9 @@ class MessagesController extends ConversationsController {
      * @since 2.0.0
      * @access public
      *
-     * @param string $Page
+     * @param string $Page The page number argument.
      */
     public function all($Page = '') {
-        $Session = Gdn::session();
         $this->title(t('Inbox'));
         Gdn_Theme::section('ConversationList');
 
@@ -244,10 +241,6 @@ class MessagesController extends ConversationsController {
 
         $this->setData('Conversations', $conversations);
 
-        // Get Conversations Count
-        //$CountConversations = $this->ConversationModel->getCount($UserID);
-        //$this->setData('CountConversations', $CountConversations);
-
         // Build the pager
         if (!$this->data('_PagerUrl')) {
             $this->setData('_PagerUrl', 'messages/all/{Page}');
@@ -270,10 +263,8 @@ class MessagesController extends ConversationsController {
     /**
      * Clear the message history for a specific conversation & user.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $ConversationID Unique ID of conversation to clear.
+     * @param string $TransientKey The CSRF token.
      */
     public function clear($ConversationID = false, $TransientKey = '') {
         deprecated('/messages/clear', '/messages/leave');
@@ -386,7 +377,7 @@ class MessagesController extends ConversationsController {
             }
 
             // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-            $this->Offset = floor(($CountReadMessages - 1) / $Limit) * $Limit;
+            $this->Offset = intval(($CountReadMessages - 1) / $Limit) * $Limit;
 
             // Send the hash link in.
             if ($CountReadMessages > 1) {
@@ -412,8 +403,6 @@ class MessagesController extends ConversationsController {
         $this->Participants = $ParticipantTitle;
 
         $this->title(strip_tags($this->Participants));
-
-        // $CountMessages = $this->ConversationMessageModel->getCount($ConversationID, $Session->UserID);
 
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
@@ -503,8 +492,8 @@ class MessagesController extends ConversationsController {
 
         $Where = array();
         if ($LastMessageID) {
-            if (strpos($LastMessageID, '_') !== false) {
-                $LastMessageID = array_pop(explode('_', $LastMessageID));
+            if (strrpos($LastMessageID, '_') !== false) {
+                $LastMessageID = trim(strrchr($LastMessageID, '_'), '_');
             }
 
             $Where['MessageID >='] = $LastMessageID;
@@ -553,18 +542,14 @@ class MessagesController extends ConversationsController {
     /**
      * Allows users to bookmark conversations.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $ConversationID Unique ID of conversation to view.
      * @param string $TransientKey Single-use hash to prove intent.
      */
     public function bookmark($ConversationID = '', $TransientKey = '') {
         $Session = Gdn::session();
-        $Success = false;
-        $Star = false;
+        $Bookmark = null;
 
-        // Validate & do bookmarking
+        // Validate & do bookmarking.
         if (is_numeric($ConversationID)
             && $ConversationID > 0
             && $Session->UserID > 0
@@ -591,25 +576,7 @@ class MessagesController extends ConversationsController {
     /**
      * Show bookmarked conversations for the current user.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $Offset Number to skip.
-     * @param string $Limit Number to show.
-     */
-//   public function bookmarked($Offset = 0, $Limit = '') {
-//      $this->View = 'All';
-//      $this->All($Offset, $Limit, true);
-//   }
-
-    /**
-     * Show bookmarked conversations for the current user.
-     *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $Offset Number to skip.
-     * @param string $Limit Number to show.
+     * @param string $Page The page number string.
      */
     public function inbox($Page = '') {
         $this->View = 'All';

@@ -221,25 +221,6 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook utility/structure.
-     *
-     * Move old keys to new location.
-     */
-    public function structure() {
-        // Move private key
-        if (c('Garden.Registration.CaptchaPrivateKey')) {
-            touchConfig('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
-            removeFromConfig('Garden.Registration.CaptchaPrivateKey');
-        }
-
-        // Move public key
-        if (c('Garden.Registration.CaptchaPublicKey')) {
-            touchConfig('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
-            removeFromConfig('Garden.Registration.CaptchaPublicKey');
-        }
-    }
-
-    /**
      * On plugin enable.
      *
      */

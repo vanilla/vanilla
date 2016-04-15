@@ -24,12 +24,10 @@ class AddPeopleModule extends Gdn_Module {
 
     /**
      *
-     *
-     * @param string $Sender
+     * @param Gdn_Controller $Sender
      * @throws Exception
      */
-    public function __construct($Sender = '') {
-        $Session = Gdn::session();
+    public function __construct($Sender = null) {
         if (property_exists($Sender, 'Conversation')) {
             $this->Conversation = $Sender->Conversation;
         }
@@ -38,7 +36,6 @@ class AddPeopleModule extends Gdn_Module {
         $this->AddUserAllowed = $Sender->ConversationModel->addUserAllowed($this->Conversation->ConversationID);
 
         $this->Form = Gdn::factory('Form', 'AddPeople');
-        // $this->Form->Action = $Sender->SelfUrl;
         // If the form was posted back, check for people to add to the conversation
         if ($this->Form->authenticatedPostBack()) {
             // Defer exceptions until they try to use the form so we don't fill our logs
@@ -58,8 +55,6 @@ class AddPeopleModule extends Gdn_Module {
                 }
             }
             $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
-            // if ($Sender->deliveryType() == DELIVERY_TYPE_ALL)
-            //    redirect('/messages/'.$this->Conversation->ConversationID);
 
             $Sender->informMessage(t('Your changes were saved.'));
             $Sender->RedirectUrl = url('/messages/'.$this->Conversation->ConversationID);

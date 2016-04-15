@@ -361,8 +361,9 @@ class MessagesController extends ConversationsController {
 
         // Get limit
         if ($Limit == '' || !is_numeric($Limit) || $Limit < 0) {
-            $Limit = Gdn::config('Conversations.Messages.PerPage', 50);
+            $Limit = c('Conversations.Messages.PerPage', 50);
         }
+        $Limit = (int)$Limit;
 
         // Calculate counts
         if (!is_numeric($this->Offset) || $this->Offset < 0) {
@@ -377,7 +378,7 @@ class MessagesController extends ConversationsController {
             }
 
             // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-            $this->Offset = intval(($CountReadMessages - 1) / $Limit) * $Limit;
+            $this->Offset = (int)(($CountReadMessages - 1) / $Limit) * $Limit;
 
             // Send the hash link in.
             if ($CountReadMessages > 1) {

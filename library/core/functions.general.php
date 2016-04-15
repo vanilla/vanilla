@@ -722,18 +722,6 @@ if (!function_exists('safePrint')) {
     }
 }
 
-if (!function_exists('dbencode')) {
-    /**
-     * Encode a value in preparation for database storage.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    function dbencode($value) {
-        return serialize($value);
-    }
-}
-
 if (!function_exists('dbdecode')) {
     /**
      * Decode a value retrieved from database storage.
@@ -743,6 +731,18 @@ if (!function_exists('dbdecode')) {
      */
     function dbdecode($value) {
         return unserialize($value);
+    }
+}
+
+if (!function_exists('dbencode')) {
+    /**
+     * Encode a value in preparation for database storage.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    function dbencode($value) {
+        return Gdn_Format::serialize($value);
     }
 }
 

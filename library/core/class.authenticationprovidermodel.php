@@ -41,7 +41,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             return;
         }
 
-        $Attributes = @dbdecode($Row['Attributes']);
+        $Attributes = dbdecode($Row['Attributes']);
         if (is_array($Attributes)) {
             $Row = array_merge($Attributes, $Row);
         }

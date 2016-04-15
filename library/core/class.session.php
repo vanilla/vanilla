@@ -705,7 +705,7 @@ class Gdn_Session {
             safeCookie($Name, $SessionID, $Expire, $Path, $Domain);
             $_COOKIE[$Name] = $SessionID;
         }
-        $Session->Attributes = @dbdecode($Session->Attributes);
+        $Session->Attributes = dbdecode($Session->Attributes);
         if (!$Session->Attributes) {
             $Session->Attributes = array();
         }

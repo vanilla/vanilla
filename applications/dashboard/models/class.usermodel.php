@@ -2051,7 +2051,7 @@ class UserModel extends Gdn_Model {
                 ) {
                     $Attributes = val('Attributes', Gdn::session()->User);
                     if (is_string($Attributes)) {
-                        $Attributes = @dbdecode($Attributes);
+                        $Attributes = dbdecode($Attributes);
                     }
 
                     $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
@@ -2444,8 +2444,8 @@ class UserModel extends Gdn_Model {
                 $Row->Photo = Gdn_Upload::url($Row->Photo);
             }
 
-            $Row->Attributes = @dbdecode($Row->Attributes);
-            $Row->Preferences = @dbdecode($Row->Preferences);
+            $Row->Attributes = dbdecode($Row->Attributes);
+            $Row->Preferences = dbdecode($Row->Preferences);
         }
 
         return $Data;
@@ -3560,7 +3560,7 @@ class UserModel extends Gdn_Model {
         $Values = val($Column, $UserData);
 
         if (!is_array($Values) && !is_object($Values)) {
-            $Values = @dbdecode($UserData->$Column);
+            $Values = dbdecode($UserData->$Column);
         }
 
         // Throw an exception if the field was not empty but is also not an object or array
@@ -3669,17 +3669,17 @@ class UserModel extends Gdn_Model {
     public function setCalculatedFields(&$User) {
         if ($v = val('Attributes', $User)) {
             if (is_string($v)) {
-                setValue('Attributes', $User, @dbdecode($v));
+                setValue('Attributes', $User, dbdecode($v));
             }
         }
         if ($v = val('Permissions', $User)) {
             if (is_string($v)) {
-                setValue('Permissions', $User, @dbdecode($v));
+                setValue('Permissions', $User, dbdecode($v));
             }
         }
         if ($v = val('Preferences', $User)) {
             if (is_string($v)) {
-                setValue('Preferences', $User, @dbdecode($v));
+                setValue('Preferences', $User, dbdecode($v));
             }
         }
         if ($v = val('Photo', $User)) {
@@ -3786,7 +3786,7 @@ class UserModel extends Gdn_Model {
         $User = (array)$User;
 
         if (is_string($User['Attributes'])) {
-            $User['Attributes'] = @dbdecode($User['Attributes']);
+            $User['Attributes'] = dbdecode($User['Attributes']);
         }
 
         // Make sure the user needs email confirmation.
@@ -3985,7 +3985,7 @@ class UserModel extends Gdn_Model {
 
         $Attributes = val('Attributes', $Data);
         if (is_string($Attributes)) {
-            $Attributes = @dbdecode($Attributes);
+            $Attributes = dbdecode($Attributes);
         }
 
         if (!is_array($Attributes)) {

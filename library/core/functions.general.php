@@ -730,7 +730,13 @@ if (!function_exists('dbdecode')) {
      * @return mixed
      */
     function dbdecode($value) {
-        return Gdn_Format::unserialize($value);
+        try {
+            $decodedValue = unserialize($value);
+        } catch (Exception $e) {
+            $decodedValue = false;
+        }
+
+        return $decodedValue;
     }
 }
 
@@ -742,7 +748,13 @@ if (!function_exists('dbencode')) {
      * @return string
      */
     function dbencode($value) {
-        return Gdn_Format::serialize($value);
+        try {
+            $encodedValue = serialize($value);
+        } catch (Exception $e) {
+            $encodedValue = false;
+        }
+
+        return $encodedValue;
     }
 }
 

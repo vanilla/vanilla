@@ -177,7 +177,7 @@ class Gdn_Model extends Gdn_Pluggable {
             unset($Row[$Name]);
 
             if (is_string($Attributes)) {
-                $Attributes = @dbdecode($Attributes);
+                $Attributes = dbdecode($Attributes);
             }
 
             if (is_array($Attributes)) {

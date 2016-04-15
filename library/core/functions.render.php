@@ -1215,7 +1215,7 @@ if (!function_exists('writeReactions')) {
     function writeReactions($Row) {
         $Attributes = GetValue('Attributes', $Row);
         if (is_string($Attributes)) {
-            $Attributes = @dbdecode($Attributes);
+            $Attributes = dbdecode($Attributes);
             SetValue('Attributes', $Row, $Attributes);
         }
 

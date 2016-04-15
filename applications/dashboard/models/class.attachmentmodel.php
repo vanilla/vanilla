@@ -283,7 +283,7 @@ class AttachmentModel extends Gdn_Model {
             $PrimaryKeyVal = $Data['AttachmentID'];
             $CurrentAttachment = $this->SQL->getWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
             if ($CurrentAttachment) {
-                $Attributes = @dbdecode($CurrentAttachment['Attributes']);
+                $Attributes = dbdecode($CurrentAttachment['Attributes']);
                 if (!$Attributes) {
                     $Attributes = array();
                 }

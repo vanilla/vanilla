@@ -910,7 +910,7 @@ class DiscussionModel extends VanillaModel {
 
         // Fix up output
         $Discussion->Name = Gdn_Format::text($Discussion->Name);
-        $Discussion->Attributes = @dbdecode($Discussion->Attributes);
+        $Discussion->Attributes = dbdecode($Discussion->Attributes);
         $Discussion->Url = DiscussionUrl($Discussion);
         $Discussion->Tags = $this->FormatTags($Discussion->Tags);
 

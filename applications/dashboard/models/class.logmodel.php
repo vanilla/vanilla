@@ -217,7 +217,7 @@ class LogModel extends Gdn_Pluggable {
             ->whereIn('LogID', $IDs)
             ->get()->resultArray();
         foreach ($Logs as &$Log) {
-            $Log['Data'] = @dbdecode($Log['Data']);
+            $Log['Data'] = dbdecode($Log['Data']);
             if (!is_array($Log['Data'])) {
                 $Log['Data'] = array();
             }
@@ -260,7 +260,7 @@ class LogModel extends Gdn_Pluggable {
 
         // Deserialize the data.
         foreach ($Result as &$Row) {
-            $Row['Data'] = @dbdecode($Row['Data']);
+            $Row['Data'] = dbdecode($Row['Data']);
             if (!$Row['Data']) {
                 $Row['Data'] = array();
             }
@@ -722,7 +722,7 @@ class LogModel extends Gdn_Pluggable {
 
         if ($Attr) {
             if (is_string($Data[$Attr])) {
-                $Data[$Attr] = @dbdecode($Data[$Attr]);
+                $Data[$Attr] = dbdecode($Data[$Attr]);
             }
 
             // Record a bit of information about the restoration.

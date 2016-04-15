@@ -303,7 +303,7 @@ class DBAModel extends Gdn_Model {
         $Key = "DBA.Range.$Key";
 
         // See if there is already a range.
-        $Current = @dbdecode(Gdn::get($Key, ''));
+        $Current = dbdecode(Gdn::get($Key, ''));
         if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
             list($Current['Min'], $Current['Max']) = $this->primaryKeyRange($Table);
 

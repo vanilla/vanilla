@@ -722,6 +722,30 @@ if (!function_exists('safePrint')) {
     }
 }
 
+if (!function_exists('dbencode')) {
+    /**
+     * Encode a value in preparation for database storage.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    function dbencode($value) {
+        return serialize($value);
+    }
+}
+
+if (!function_exists('dbdecode')) {
+    /**
+     * Decode a value retrieved from database storage.
+     *
+     * @param string $value
+     * @return mixed
+     */
+    function dbdecode($value) {
+        return unserialize($value);
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.

@@ -459,7 +459,7 @@ class Gdn_Session {
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
-            $this->_Permissions = $UserModel->definePermissions(0);
+            $this->_Permissions = $UserModel->definePermissions(0, false);
         }
     }
 

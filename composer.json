@@ -24,7 +24,7 @@
 	],
 	"require": {
 		"vanilla/garden-http": "~1.0",
-		"vanilla/htmlawed": "~1.0",
+		"vanilla/htmlawed": "~2.0",
 		"vanilla/nbbc": "~2.1"
 	},
 	"autoload": {

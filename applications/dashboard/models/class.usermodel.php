@@ -1086,26 +1086,25 @@ class UserModel extends Gdn_Model {
 
             $CachePermissions = Gdn::cache()->get($UserPermissionsKey);
             if ($CachePermissions !== Gdn_Cache::CACHEOP_FAILURE) {
-                return $CachePermissions;
+                if ($Serialize) {
+                    return dbencode($CachePermissions);
+                } else {
+                    return $CachePermissions;
+                }
             }
         }
 
         $Data = Gdn::permissionModel()->cachePermissions($UserID);
         $Permissions = UserModel::compilePermissions($Data);
 
-        $PermissionsSerialized = null;
+        $PermissionsSerialized = dbencode($Permissions);
         if (Gdn::cache()->activeEnabled()) {
             Gdn::cache()->store($UserPermissionsKey, $Permissions);
         } else {
             // Save the permissions to the user table
-            $PermissionsSerialized = dbencode($Permissions);
             if ($UserID > 0) {
                 $this->SQL->put('User', array('Permissions' => $PermissionsSerialized), array('UserID' => $UserID));
             }
-        }
-
-        if ($Serialize && is_null($PermissionsSerialized)) {
-            $PermissionsSerialized = dbencode($Permissions);
         }
 
         return $Serialize ? $PermissionsSerialized : $Permissions;

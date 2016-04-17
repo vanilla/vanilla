@@ -1188,7 +1188,7 @@ class ProfileController extends Gdn_Controller {
                 Gdn::userModel()->setField($this->User->UserID, 'Photo', $UserPhoto);
 
                 // Remove the old profile picture.
-                @$Upload->delete($Basename);
+                $Upload->delete($Basename);
             } catch (Exception $Ex) {
                 $this->Form->addError($Ex);
             }
@@ -1200,7 +1200,7 @@ class ProfileController extends Gdn_Controller {
         }
         // Delete the source image if it is externally hosted.
         if ($PhotoParsed['Type']) {
-            @unlink($Source);
+            safeUnlink($Source);
         }
 
         $this->title(t('Edit My Thumbnail'));

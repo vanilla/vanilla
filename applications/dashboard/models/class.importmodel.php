@@ -448,7 +448,7 @@ class ImportModel extends Gdn_Model {
         // Delete the uploaded files.
         $UploadedFiles = val('UploadedFiles', $this->Data, array());
         foreach ($UploadedFiles as $Path => $Name) {
-            @unlink($Path);
+            safeUnlink($Path);
         }
     }
 
@@ -1440,7 +1440,7 @@ class ImportModel extends Gdn_Model {
         }
 
         // Cleanup.
-        @unlink($TestPath);
+        safeUnlink($TestPath);
         $St->table(self::TABLE_PREFIX.'Test')->Drop();
 
         if ($Save) {

@@ -1636,7 +1636,7 @@ class UserModel extends Gdn_Model {
             // Otherwise normal loadings!
         } else {
             if ($User && ($User->Permissions == '' || Gdn::cache()->activeEnabled())) {
-                $User->Permissions = $this->definePermissions($UserID);
+                $User->Permissions = $this->definePermissions($UserID, false);
             }
         }
 

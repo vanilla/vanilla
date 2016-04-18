@@ -22,15 +22,39 @@ class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test the basic encoding/decoding of data.
      *
+     * @param mixed $data The data to test.
+     * @dataProvider provideDbEncodeValues
      */
-    public function testDbEncodeObject() {
-        $data = new \stdClass();
-        $data->Forum = 'Vanilla';
+    public function testDbEncodeDecode($data) {
+        $this->assertNotNull($data);
+
         $encoded = dbencode($data);
+        $this->assertNotFalse($encoded);
+        $this->assertTrue(is_string($encoded));
+
         $decoded = dbdecode($encoded);
 
-        $this->assertTrue(is_object($decoded) && $decoded->Forum === 'Vanilla');
+        $this->assertSame($data, $decoded);
+    }
+
+    /**
+     * Provide some values for {@link testDbEncodeDecode()}.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideDbEncodeValues() {
+        $r = [
+            'string' => ['Hello world!'],
+            'int' => [123],
+            'true' => [true],
+            'false' => [false],
+            'array' => [['Forum' => 'Vanilla']],
+            'array-nested' => [['userID' => 123, 'prefs' => ['foo' => true, 'bar' => [1, 2, 3]]]]
+        ];
+
+        return $r;
     }
 
     /**

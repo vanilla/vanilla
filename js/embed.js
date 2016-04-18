@@ -92,12 +92,12 @@ window.vanilla.embed = function(host) {
     }
 
     checkHash = function() {
-        var path = window.location.hash.substr(1);
+        var path = window.location.hash.substr(1) || "/";
         if (path != currentPath) {
             currentPath = path;
             window.frames['vanilla' + id].location.replace(vanillaUrl(path));
         }
-    }
+    };
 
     if (!window.gadgets) {
         if (!disablePath) {

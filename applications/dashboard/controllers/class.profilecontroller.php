@@ -19,6 +19,9 @@ class ProfileController extends Gdn_Controller {
     /** @var object User data to use in building profile. */
     public $User;
 
+    /** @var bool Can the current user edit the profile user's photo? */
+    public $CanEditPhotos;
+
     /** @var string Name of current tab. */
     public $CurrentTab;
 
@@ -87,8 +90,17 @@ class ProfileController extends Gdn_Controller {
             $this->CssClass .= 'EditMode';
         }
 
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues with outdated session
+         * information (e.g. message button missing). The same check is performed here as in Gdn_Controller before the
+         * Cache-Control header is added, but this value includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
+
         $this->setData('Breadcrumbs', array());
-        $this->CanEditPhotos = c('Garden.Profile.EditPhotos') || Gdn::session()->checkPermission('Garden.Users.Edit');
+        $this->CanEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
     }
 
     /**
@@ -680,7 +692,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function picture($UserReference = '', $Username = '', $UserID = '') {
-        if (!Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true))) {
+        if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -731,7 +743,7 @@ class ProfileController extends Gdn_Controller {
                     // Generate the target image name.
                     $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
                     $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
-                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS . '/', false, true);
+                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', false, true);
 
                     // Delete any previously uploaded image.
                     $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
@@ -834,7 +846,7 @@ class ProfileController extends Gdn_Controller {
 
         // Get user data
         $this->getUserInfo($UserReference, $Username, $UserID, true);
-        $UserPrefs = Gdn_Format::unserialize($this->User->Preferences);
+        $UserPrefs = dbdecode($this->User->Preferences);
         if ($this->User->UserID != $Session->UserID) {
             $this->permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), false);
         }
@@ -1095,7 +1107,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function thumbnail($UserReference = '', $Username = '') {
-        if (!c('Garden.Profile.EditPhotos', true)) {
+        if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
@@ -1176,7 +1188,7 @@ class ProfileController extends Gdn_Controller {
                 Gdn::userModel()->setField($this->User->UserID, 'Photo', $UserPhoto);
 
                 // Remove the old profile picture.
-                @$Upload->delete($Basename);
+                $Upload->delete($Basename);
             } catch (Exception $Ex) {
                 $this->Form->addError($Ex);
             }
@@ -1188,7 +1200,7 @@ class ProfileController extends Gdn_Controller {
         }
         // Delete the source image if it is externally hosted.
         if ($PhotoParsed['Type']) {
-            @unlink($Source);
+            safeUnlink($Source);
         }
 
         $this->title(t('Edit My Thumbnail'));
@@ -1311,7 +1323,7 @@ class ProfileController extends Gdn_Controller {
         $Module->addItem('Options', '', false, array('class' => 'SideMenu'));
 
         // Check that we have the necessary tools to allow image uploading
-        $AllowImages = c('Garden.Profile.EditPhotos', true) && Gdn_UploadImage::canUploadImages();
+        $AllowImages = $this->CanEditPhotos && Gdn_UploadImage::canUploadImages();
 
         // Is the photo hosted remotely?
         $RemotePhoto = isUrl($this->User->Photo);

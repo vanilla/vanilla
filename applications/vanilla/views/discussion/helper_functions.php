@@ -8,16 +8,17 @@ if (!defined('APPLICATION')) {
     exit();
 }
 
-/**
- * Format content of comment or discussion.
- *
- * Event argument for $Object will be 'Comment' or 'Discussion'.
- *
- * @since 2.1
- * @param DataSet $Object Comment or discussion.
- * @return string Parsed body.
- */
-if (!function_exists('FormatBody')):
+
+if (!function_exists('formatBody')) :
+    /**
+     * Format content of comment or discussion.
+     *
+     * Event argument for $Object will be 'Comment' or 'Discussion'.
+     *
+     * @since 2.1
+     * @param DataSet $Object Comment or discussion.
+     * @return string Parsed body.
+     */
     function formatBody($Object) {
         Gdn::controller()->fireEvent('BeforeCommentBody');
         $Object->FormatBody = Gdn_Format::to($Object->Body, $Object->Format);
@@ -27,13 +28,14 @@ if (!function_exists('FormatBody')):
     }
 endif;
 
-/**
- * Output link to (un)boomark a discussion.
- */
-if (!function_exists('WriteBookmarkLink')):
+if (!function_exists('writeBookmarkLink')) :
+    /**
+     * Output link to (un)boomark a discussion.
+     */
     function writeBookmarkLink() {
-        if (!Gdn::session()->isValid())
+        if (!Gdn::session()->isValid()) {
             return '';
+        }
 
         $Discussion = Gdn::controller()->data('Discussion');
 
@@ -41,43 +43,53 @@ if (!function_exists('WriteBookmarkLink')):
         $Title = t($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
         echo anchor(
             $Title,
-            '/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::session()->TransientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),
+            '/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::session()->transientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),
             'Hijack Bookmark'.($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            array('title' => $Title)
+            ['title' => $Title]
         );
     }
 endif;
 
-/**
- * Outputs a formatted comment.
- *
- * Prior to 2.1, this also output the discussion ("FirstComment") to the browser.
- * That has moved to the discussion.php view.
- *
- * @param DataSet $Comment .
- * @param Gdn_Controller $Sender .
- * @param Gdn_Session $Session .
- * @param int $CurrentOffet How many comments into the discussion we are (for anchors).
- */
-if (!function_exists('WriteComment')):
+if (!function_exists('writeComment')) :
+    /**
+     * Outputs a formatted comment.
+     *
+     * Prior to 2.1, this also output the discussion ("FirstComment") to the browser.
+     * That has moved to the discussion.php view.
+     *
+     * @param DataSet $Comment .
+     * @param Gdn_Controller $Sender .
+     * @param Gdn_Session $Session .
+     * @param int $CurrentOffet How many comments into the discussion we are (for anchors).
+     */
     function writeComment($Comment, $Sender, $Session, $CurrentOffset) {
-        static $UserPhotoFirst = NULL;
-        if ($UserPhotoFirst === null)
+        // Whether to order the name & photo with the latter first.
+        static $UserPhotoFirst = null;
+
+        if ($UserPhotoFirst === null) {
             $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
+        }
         $Author = Gdn::userModel()->getID($Comment->InsertUserID); //UserBuilder($Comment, 'Insert');
         $Permalink = val('Url', $Comment, '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID);
 
         // Set CanEditComments (whether to show checkboxes)
-        if (!property_exists($Sender, 'CanEditComments'))
-            $Sender->CanEditComments = $Session->checkPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
-
+        if (!property_exists($Sender, 'CanEditComments')) {
+            $Sender->CanEditComments = $Session->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
+        }
         // Prep event args
-        $CssClass = CssClass($Comment, $CurrentOffset);
+        $CssClass = cssClass($Comment, $CurrentOffset);
         $Sender->EventArguments['Comment'] = &$Comment;
         $Sender->EventArguments['Author'] = &$Author;
         $Sender->EventArguments['CssClass'] = &$CssClass;
         $Sender->EventArguments['CurrentOffset'] = $CurrentOffset;
         $Sender->EventArguments['Permalink'] = $Permalink;
+
+        // Needed in writeCommentOptions()
+        if ($Sender->data('Discussion', null) === null) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID($Comment->DiscussionID);
+            $Sender->setData('Discussion', $discussion);
+        }
 
         // DEPRECATED ARGUMENTS (as of 2.1)
         $Sender->EventArguments['Object'] = &$Comment;
@@ -95,7 +107,7 @@ if (!function_exists('WriteComment')):
                 }
                 ?>
                 <div class="Options">
-                    <?php WriteCommentOptions($Comment); ?>
+                    <?php writeCommentOptions($Comment); ?>
                 </div>
                 <?php $Sender->fireEvent('BeforeCommentMeta'); ?>
                 <div class="Item-Header CommentHeader">
@@ -115,8 +127,8 @@ if (!function_exists('WriteComment')):
             </span>
             <span class="AuthorInfo">
                <?php
-               echo ' '.WrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-               echo ' '.WrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+               echo ' '.wrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+               echo ' '.wrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
                $Sender->fireEvent('AuthorInfo');
                ?>
             </span>
@@ -130,17 +142,17 @@ if (!function_exists('WriteComment')):
                         ?>
                         <?php
                         // Include source if one was set
-                        if ($Source = val('Source', $Comment))
+                        if ($Source = val('Source', $Comment)) {
                             echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
-
+                        }
                         $Sender->fireEvent('CommentInfo');
                         $Sender->fireEvent('InsideCommentMeta'); // DEPRECATED
                         $Sender->fireEvent('AfterCommentMeta'); // DEPRECATED
 
                         // Include IP Address if we have permission
-                        if ($Session->checkPermission('Garden.PersonalInfo.View'))
-                            echo wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
-
+                        if ($Session->checkPermission('Garden.PersonalInfo.View')) {
+                            echo wrap(ipAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+                        }
                         ?>
                     </div>
                 </div>
@@ -148,14 +160,14 @@ if (!function_exists('WriteComment')):
                     <div class="Item-Body">
                         <div class="Message">
                             <?php
-                            echo FormatBody($Comment);
+                            echo formatBody($Comment);
                             ?>
                         </div>
                         <?php
                         $Sender->fireEvent('AfterCommentBody');
-                        WriteReactions($Comment);
+                        writeReactions($Comment);
                         if (val('Attachments', $Comment)) {
-                            WriteAttachments($Comment->Attachments);
+                            writeAttachments($Comment->Attachments);
                         }
                         ?>
                     </div>
@@ -167,26 +179,48 @@ if (!function_exists('WriteComment')):
     }
 endif;
 
-/**
- * Get options for the current discussion.
- *
- * @since 2.1
- * @param DataSet $Discussion .
- * @return array $Options Each element must include keys 'Label' and 'Url'.
- */
-if (!function_exists('GetDiscussionOptions')):
+if (!function_exists('discussionOptionsToDropdown')):
+    /**
+     * @param array $options
+     * @param DropdownModule|null $dropdown
+     * @return DropdownModule
+     */
+    function discussionOptionsToDropdown($options, $dropdown = null) {
+        if (is_null($dropdown)) {
+            $dropdown = new DropdownModule();
+        }
+
+        if (!empty($options)) {
+            foreach ($options as $option) {
+                $dropdown->addLink(val('Label', $option), val('Url', $option), slugify(val('Label', $option)), val('Class', $option));
+            }
+        }
+
+        return $dropdown;
+    }
+endif;
+
+if (!function_exists('getDiscussionOptions')) :
+    /**
+     * Get options for the current discussion.
+     *
+     * @since 2.1
+     * @param DataSet $Discussion .
+     * @return array $Options Each element must include keys 'Label' and 'Url'.
+     */
     function getDiscussionOptions($Discussion = null) {
         $Options = array();
 
         $Sender = Gdn::controller();
         $Session = Gdn::session();
 
-        if ($Discussion == null)
+        if ($Discussion == null) {
             $Discussion = $Sender->data('Discussion');
-
+        }
         $CategoryID = val('CategoryID', $Discussion);
-        if (!$CategoryID && property_exists($Sender, 'Discussion'))
+        if (!$CategoryID && property_exists($Sender, 'Discussion')) {
             $CategoryID = val('CategoryID', $Sender->Discussion);
+        }
         $PermissionCategoryID = val('PermissionCategoryID', $Discussion, val('PermissionCategoryID', $Discussion));
 
         // Build the $Options array based on current user's permission.
@@ -194,41 +228,65 @@ if (!function_exists('GetDiscussionOptions')):
         $CanEdit = DiscussionModel::canEdit($Discussion, $TimeLeft);
         if ($CanEdit) {
             if ($TimeLeft) {
-                $TimeLeft = ' ('.Gdn_Format::Seconds($TimeLeft).')';
+                $TimeLeft = ' ('.Gdn_Format::seconds($TimeLeft).')';
             }
             $Options['EditDiscussion'] = array('Label' => t('Edit').$TimeLeft, 'Url' => '/post/editdiscussion/'.$Discussion->DiscussionID);
         }
 
         // Can the user announce?
-        if ($Session->checkPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-            $Options['AnnounceDiscussion'] = array('Label' => t('Announce'), 'Url' => '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'AnnounceDiscussion Popup');
+        if ($Session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $PermissionCategoryID)) {
+            $Options['AnnounceDiscussion'] = [
+                'Label' => t('Announce'),
+                'Url' => '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'),
+                'Class' => 'AnnounceDiscussion Popup'
+            ];
+        }
 
         // Can the user sink?
-        if ($Session->checkPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID)) {
+        if ($Session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $PermissionCategoryID)) {
             $NewSink = (int)!$Discussion->Sink;
-            $Options['SinkDiscussion'] = array('Label' => t($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink=$NewSink", 'Class' => 'SinkDiscussion Hijack');
+            $Options['SinkDiscussion'] = [
+                'Label' => t($Discussion->Sink ? 'Unsink' : 'Sink'),
+                'Url' => "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink=$NewSink",
+                'Class' => 'SinkDiscussion Hijack'
+            ];
         }
 
         // Can the user close?
-        if ($Session->checkPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID)) {
+        if ($Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $PermissionCategoryID)) {
             $NewClosed = (int)!$Discussion->Closed;
-            $Options['CloseDiscussion'] = array('Label' => t($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'Class' => 'CloseDiscussion Hijack');
+            $Options['CloseDiscussion'] = [
+                'Label' => t($Discussion->Closed ? 'Reopen' : 'Close'),
+                'Url' => "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed",
+                'Class' => 'CloseDiscussion Hijack'
+            ];
         }
 
         if ($CanEdit && valr('Attributes.ForeignUrl', $Discussion)) {
-            $Options['RefetchPage'] = array('Label' => t('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'RefetchPage Hijack');
+            $Options['RefetchPage'] = [
+                'Label' => t('Refetch Page'),
+                'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID,
+                'Class' => 'RefetchPage Hijack'
+            ];
         }
 
         // Can the user move?
         if ($CanEdit && $Session->checkPermission('Garden.Moderation.Manage')) {
-            $Options['MoveDiscussion'] = array('Label' => t('Move'), 'Url' => '/moderation/confirmdiscussionmoves?discussionid='.$Discussion->DiscussionID, 'Class' => 'MoveDiscussion Popup');
+            $Options['MoveDiscussion'] = [
+                'Label' => t('Move'),
+                'Url' => '/moderation/confirmdiscussionmoves?discussionid='.$Discussion->DiscussionID,
+                'Class' => 'MoveDiscussion Popup'
+            ];
         }
 
         // Can the user delete?
-        if ($Session->checkPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+        if ($Session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $PermissionCategoryID)) {
             $Category = CategoryModel::categories($CategoryID);
-
-            $Options['DeleteDiscussion'] = array('Label' => t('Delete Discussion'), 'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(CategoryUrl($Category)), 'Class' => 'DeleteDiscussion Popup');
+            $Options['DeleteDiscussion'] = [
+                'Label' => t('Delete Discussion'),
+                'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(categoryUrl($Category)),
+                'Class' => 'DeleteDiscussion Popup'
+            ];
         }
 
         // DEPRECATED (as of 2.1)
@@ -243,6 +301,78 @@ if (!function_exists('GetDiscussionOptions')):
     }
 endif;
 
+
+if (!function_exists('getDiscussionOptionsDropdown')):
+    /**
+     * Constructs an options dropdown menu for a discussion.
+     *
+     * @param object|array|null $discussion The discussion to get the dropdown options for.
+     * @return DropdownModule A dropdown consisting of discussion options.
+     * @throws Exception
+     */
+    function getDiscussionOptionsDropdown($discussion = null) {
+        $dropdown = new DropdownModule();
+        $sender = Gdn::controller();
+        $session = Gdn::session();
+
+        if ($discussion == null) {
+            $discussion = $sender->data('Discussion');
+        }
+
+        $categoryID = val('CategoryID', $discussion);
+
+        if (!$categoryID && property_exists($sender, 'Discussion')) {
+            trace('Getting category ID from controller Discussion property.');
+            $categoryID = val('CategoryID', $sender->Discussion);
+        }
+
+        $discussionID = $discussion->DiscussionID;
+        $categoryUrl = urlencode(categoryUrl(CategoryModel::categories($categoryID)));
+
+        $permissionCategoryID = val('PermissionCategoryID', $discussion, val('PermissionCategoryID', $discussion));
+
+        // Permissions
+        $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
+        $canAnnounce = $session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $permissionCategoryID);
+        $canSink = $session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $permissionCategoryID);
+        $canClose = $session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $permissionCategoryID);
+        $canDelete = $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $permissionCategoryID);
+        $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
+        $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
+        $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1';
+
+
+        if ($canEdit && $timeLeft) {
+            $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
+        }
+
+        $dropdown->addLinkIf($canDismiss, t('Dismiss'), url("vanilla/discussion/dismissannouncement?discussionid={$discussionID}"), 'dismiss', 'DismissAnnouncement Hijack')
+            ->addLinkIf($canEdit, t('Edit').$timeLeft, url('/post/editdiscussion/'.$discussionID), 'edit')
+            ->addLinkIf($canAnnounce, t('Announce'), url('/discussion/announce?discussionid='.$discussionID.'&Target='.urlencode($sender->SelfUrl.'#Head')), 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), url('/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink), 'sink', 'SinkDiscussion Hijack')
+            ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), url('/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed), 'close', 'CloseDiscussion Hijack')
+            ->addLinkIf($canRefetch, t('Refetch Page'), url('/discussion/refetchpageinfo.json?discussionid='.$discussionID), 'refetch', 'RefetchPage Hijack')
+            ->addLinkIf($canMove, t('Move'), url('/moderation/confirmdiscussionmoves?discussionid='.$discussionID), 'move', 'MoveDiscussion Popup')
+            ->addLinkIf($canDelete, t('Delete Discussion'), url('/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl), 'delete', 'DeleteDiscussion Popup');
+
+        // DEPRECATED
+        $options = [];
+        $sender->EventArguments['DiscussionOptions'] = &$options;
+        $sender->EventArguments['Discussion'] = $discussion;
+        $sender->fireEvent('DiscussionOptions');
+
+        // Backwards compatability
+        $dropdown = discussionOptionsToDropdown($options, $dropdown);
+
+        // Allow plugins to edit the dropdown.
+        $sender->EventArguments['DiscussionOptionsDropdown'] = &$dropdown;
+        $sender->EventArguments['Discussion'] = $discussion;
+        $sender->fireEvent('DiscussionOptionsDropdown');
+
+        return $dropdown;
+    }
+endif;
+
 /**
  * Output moderation checkbox.
  *
@@ -250,9 +380,9 @@ endif;
  */
 if (!function_exists('WriteAdminCheck')):
     function writeAdminCheck($Object = null) {
-        if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use'))
+        if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use')) {
             return;
-
+        }
         echo '<span class="AdminCheck"><input type="checkbox" name="Toggle"></span>';
     }
 endif;
@@ -262,38 +392,42 @@ endif;
  *
  * @since 2.1
  */
-if (!function_exists('WriteDiscussionOptions')):
+if (!function_exists('writeDiscussionOptions')):
     function writeDiscussionOptions($Discussion = null) {
-        $Options = GetDiscussionOptions($Discussion);
+        deprecated('writeDiscussionOptions', 'getDiscussionOptionsDropdown', 'March 2016');
 
-        if (empty($Options))
+        $Options = getDiscussionOptions($Discussion);
+
+        if (empty($Options)) {
             return;
+        }
 
         echo ' <span class="ToggleFlyout OptionsMenu">';
         echo '<span class="OptionsTitle" title="'.t('Options').'">'.t('Options').'</span>';
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<ul class="Flyout MenuItems" style="display: none;">';
-        foreach ($Options as $Code => $Option):
-            echo wrap(Anchor($Option['Label'], $Option['Url'], val('Class', $Option, $Code)), 'li');
-        endforeach;
+        foreach ($Options as $Code => $Option) {
+            echo wrap(anchor($Option['Label'], $Option['Url'], val('Class', $Option, $Code)), 'li');
+        }
         echo '</ul>';
         echo '</span>';
     }
 endif;
 
-/**
- * Get comment options.
- *
- * @since 2.1
- * @param DataSet $Comment .
- * @return array $Options Each element must include keys 'Label' and 'Url'.
- */
-if (!function_exists('GetCommentOptions')):
+if (!function_exists('getCommentOptions')) :
+    /**
+     * Get comment options.
+     *
+     * @since 2.1
+     * @param DataSet $Comment .
+     * @return array $Options Each element must include keys 'Label' and 'Url'.
+     */
     function getCommentOptions($Comment) {
         $Options = array();
 
-        if (!is_numeric(val('CommentID', $Comment)))
+        if (!is_numeric(val('CommentID', $Comment))) {
             return $Options;
+        }
 
         $Sender = Gdn::controller();
         $Session = Gdn::session();
@@ -306,19 +440,31 @@ if (!function_exists('GetCommentOptions')):
         $EditContentTimeout = c('Garden.EditContentTimeout', -1);
         $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
         $TimeLeft = '';
-        if ($CanEdit && $EditContentTimeout > 0 && !$Session->checkPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
+        $canEditDiscussions = $Session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $PermissionCategoryID);
+        if ($CanEdit && $EditContentTimeout > 0 && !$canEditDiscussions) {
             $TimeLeft = strtotime($Comment->DateInserted) + $EditContentTimeout - time();
-            $TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
+            $TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::seconds($TimeLeft).')' : '';
         }
 
         // Can the user edit the comment?
-        if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->checkPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
-            $Options['EditComment'] = array('Label' => t('Edit').$TimeLeft, 'Url' => '/post/editcomment/'.$Comment->CommentID, 'EditComment');
+        $canEditComments = $Session->checkPermission('Vanilla.Comments.Edit', true, 'Category', $PermissionCategoryID);
+        if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $canEditComments) {
+            $Options['EditComment'] = [
+                'Label' => t('Edit').$TimeLeft,
+                'Url' => '/post/editcomment/'.$Comment->CommentID,
+                'EditComment'
+            ];
+        }
 
         // Can the user delete the comment?
         $SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && c('Vanilla.Comments.AllowSelfDelete'));
-        if ($SelfDeleting || $Session->checkPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-            $Options['DeleteComment'] = array('Label' => t('Delete'), 'Url' => '/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
+        if ($SelfDeleting || $Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', $PermissionCategoryID)) {
+            $Options['DeleteComment'] = [
+                'Label' => t('Delete'),
+                'Url' => '/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->transientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"),
+                'Class' => 'DeleteComment'
+            ];
+        }
 
         // DEPRECATED (as of 2.1)
         $Sender->EventArguments['Type'] = 'Comment';
@@ -331,81 +477,82 @@ if (!function_exists('GetCommentOptions')):
         return $Options;
     }
 endif;
-/**
- * Output comment options.
- *
- * @since 2.1
- * @param DataSet $Comment .
- */
-if (!function_exists('WriteCommentOptions')):
+
+if (!function_exists('writeCommentOptions')) :
+    /**
+     * Output comment options.
+     *
+     * @since 2.1
+     * @param DataSet $Comment
+     */
     function writeCommentOptions($Comment) {
         $Controller = Gdn::controller();
         $Session = Gdn::session();
 
         $Id = $Comment->CommentID;
-        $Options = GetCommentOptions($Comment);
-        if (empty($Options))
+        $Options = getCommentOptions($Comment);
+        if (empty($Options)) {
             return;
+        }
 
         echo '<span class="ToggleFlyout OptionsMenu">';
         echo '<span class="OptionsTitle" title="'.t('Options').'">'.t('Options').'</span>';
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<ul class="Flyout MenuItems">';
-        foreach ($Options as $Code => $Option):
-            echo wrap(Anchor($Option['Label'], $Option['Url'], val('Class', $Option, $Code)), 'li');
-        endforeach;
+        foreach ($Options as $Code => $Option) {
+            echo wrap(anchor($Option['Label'], $Option['Url'], val('Class', $Option, $Code)), 'li');
+        }
         echo '</ul>';
         echo '</span>';
         if (c('Vanilla.AdminCheckboxes.Use')) {
             // Only show the checkbox if the user has permission to affect multiple items
             $Discussion = Gdn::controller()->data('Discussion');
             $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
-            if ($Session->checkPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID)) {
-                if (!property_exists($Controller, 'CheckedComments'))
+            if ($Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', $PermissionCategoryID)) {
+                if (!property_exists($Controller, 'CheckedComments')) {
                     $Controller->CheckedComments = $Session->getAttribute('CheckedComments', array());
-
-                $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
+                }
+                $ItemSelected = inSubArray($Id, $Controller->CheckedComments);
                 echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected ? ' checked="checked"' : '').' /></span>';
             }
         }
     }
 endif;
 
-/**
- * Output comment form.
- *
- * @since 2.1
- */
-if (!function_exists('WriteCommentForm')):
+if (!function_exists('writeCommentForm')) :
+    /**
+     * Output comment form.
+     *
+     * @since 2.1
+     */
     function writeCommentForm() {
         $Session = Gdn::session();
         $Controller = Gdn::controller();
 
         $Discussion = $Controller->data('Discussion');
         $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
-        $UserCanClose = $Session->checkPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID);
-        $UserCanComment = $Session->checkPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID);
+        $UserCanClose = $Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $PermissionCategoryID);
+        $UserCanComment = $Session->checkPermission('Vanilla.Comments.Add', true, 'Category', $PermissionCategoryID);
 
         // Closed notification
         if ($Discussion->Closed == '1') {
             ?>
             <div class="Foot Closed">
                 <div class="Note Closed"><?php echo t('This discussion has been closed.'); ?></div>
-                <?php //echo anchor(t('All Discussions'), 'discussions', 'TabLink'); ?>
             </div>
         <?php
-        } else if (!$UserCanComment) {
+        } elseif (!$UserCanComment) {
             if (!Gdn::session()->isValid()) {
                 ?>
                 <div class="Foot Closed">
                     <div class="Note Closed SignInOrRegister"><?php
                         $Popup = (c('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
-                        $ReturnUrl = Gdn::request()->PathAndQuery();
+                        $ReturnUrl = Gdn::request()->pathAndQuery();
                         echo formatString(
                             t('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'),
                             array(
-                                'SignInUrl' => url(SignInUrl($ReturnUrl)),
-                                'RegisterUrl' => url(RegisterUrl($ReturnUrl)),
+                                'SignInUrl' => url(signInUrl($ReturnUrl)),
+                                'RegisterUrl' => url(registerUrl($ReturnUrl)),
                                 'Popup' => $Popup
                             )
                         ); ?>
@@ -416,12 +563,16 @@ if (!function_exists('WriteCommentForm')):
             }
         }
 
-        if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
+        if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment)) {
             echo $Controller->fetchView('comment', 'post', 'vanilla');
+        }
     }
 endif;
 
-if (!function_exists('WriteCommentFormHeader')):
+if (!function_exists('writeCommentFormHeader')) :
+    /**
+     *
+     */
     function writeCommentFormHeader() {
         $Session = Gdn::session();
         if (c('Vanilla.Comment.UserPhotoFirst', true)) {
@@ -434,7 +585,10 @@ if (!function_exists('WriteCommentFormHeader')):
     }
 endif;
 
-if (!function_exists('WriteEmbedCommentForm')):
+if (!function_exists('writeEmbedCommentForm')) :
+    /**
+     *
+     */
     function writeEmbedCommentForm() {
         $Session = Gdn::session();
         $Controller = Gdn::controller();
@@ -451,18 +605,18 @@ if (!function_exists('WriteEmbedCommentForm')):
                 <?php
                 echo $Controller->Form->open(array('id' => 'Form_Comment'));
                 echo $Controller->Form->errors();
-                echo $Controller->Form->Hidden('Name');
-                echo wrap($Controller->Form->textBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
+                echo $Controller->Form->hidden('Name');
+                echo wrap($Controller->Form->textBox('Body', array('MultiLine' => true)), 'div', array('class' => 'TextBoxWrapper'));
                 echo "<div class=\"Buttons\">\n";
 
                 $AllowSigninPopup = c('Garden.SignIn.Popup');
                 $Attributes = array('tabindex' => '-1', 'target' => '_top');
 
                 // If we aren't ajaxing this call then we need to target the url of the parent frame.
-                $ReturnUrl = $Controller->data('ForeignSource.vanilla_url', Gdn::request()->PathAndQuery());
+                $ReturnUrl = $Controller->data('ForeignSource.vanilla_url', Gdn::request()->pathAndQuery());
 
                 if ($Session->isValid()) {
-                    $AuthenticationUrl = Gdn::authenticator()->SignOutUrl($ReturnUrl);
+                    $AuthenticationUrl = Gdn::authenticator()->signOutUrl($ReturnUrl);
                     echo wrap(
                         sprintf(
                             t('Commenting as %1$s (%2$s)', 'Commenting as %1$s <span class="SignOutWrap">(%2$s)</span>'),
@@ -470,11 +624,11 @@ if (!function_exists('WriteEmbedCommentForm')):
                             anchor(t('Sign Out'), $AuthenticationUrl, 'SignOut', $Attributes)
                         ),
                         'div',
-                        array('class' => 'Author')
+                        ['class' => 'Author']
                     );
                     echo $Controller->Form->button('Post Comment', array('class' => 'Button CommentButton'));
                 } else {
-                    $AuthenticationUrl = url(SignInUrl($ReturnUrl), true);
+                    $AuthenticationUrl = url(signInUrl($ReturnUrl), true);
                     if ($AllowSigninPopup) {
                         $CssClass = 'SignInPopup Button Stash';
                     } else {
@@ -492,29 +646,45 @@ if (!function_exists('WriteEmbedCommentForm')):
     }
 endif;
 
-if (!function_exists('IsMeAction')):
+if (!function_exists('isMeAction')) :
+    /**
+     *
+     *
+     * @param $Row
+     * @return bool|void
+     */
     function isMeAction($Row) {
-        if (!c('Garden.Format.MeActions'))
+        if (!c('Garden.Format.MeActions')) {
             return;
+        }
         $Row = (array)$Row;
-        if (!array_key_exists('Body', $Row))
-            return FALSE;
+        if (!array_key_exists('Body', $Row)) {
+            return false;
+        }
 
         return strpos(trim($Row['Body']), '/me ') === 0;
     }
 endif;
 
-if (!function_exists('FormatMeAction')):
+if (!function_exists('formatMeAction')) :
+    /**
+     *
+     *
+     * @param $Comment
+     * @return string|void
+     */
     function formatMeAction($Comment) {
-        if (!IsMeAction($Comment) || !c('Garden.Format.MeActions'))
+        if (!isMeAction($Comment) || !c('Garden.Format.MeActions')) {
             return;
+        }
 
         // Maxlength (don't let people blow up the forum)
         $Comment->Body = substr($Comment->Body, 4);
         $Maxlength = c('Vanilla.MeAction.MaxLength', 100);
-        $Body = FormatBody($Comment);
-        if (strlen($Body) > $Maxlength)
+        $Body = formatBody($Comment);
+        if (strlen($Body) > $Maxlength) {
             $Body = substr($Body, 0, $Maxlength).'...';
+        }
 
         return '<div class="AuthorAction">'.$Body.'</div>';
     }

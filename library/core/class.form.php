@@ -188,7 +188,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function button($ButtonCode, $Attributes = false) {
+    public function button($ButtonCode, $Attributes = array()) {
         $Type = arrayValueI('type', $Attributes);
         if ($Type === false) {
             $Type = 'submit';
@@ -240,7 +240,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      * @todo Create calendar helper
      */
-    public function calendar($FieldName, $Attributes = false) {
+    public function calendar($FieldName, $Attributes = array()) {
         // TODO: CREATE A CALENDAR HELPER CLASS AND LOAD/REFERENCE IT HERE.
         // THE CLASS SHOULD BE DECLARED WITH:
         //  if (!class_exists('Calendar') {
@@ -263,7 +263,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * Returns Captcha HTML & adds translations to document head.
      *
      * Events: BeforeCaptcha
-     * 
+     *
      * @return string
      */
     public function captcha() {
@@ -274,38 +274,29 @@ class Gdn_Form extends Gdn_Pluggable {
             // A plugin handled the captcha so don't display anything more.
             return;
         }
-        // Google whitelist
-        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
+        
+        if (!c('Garden.Registration.CaptchaPublicKey') || !c('Garden.Registration.CaptchaPrivateKey')) {
+            return '<div class="Warning">' . t('reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
+        }
 
-        // reCAPTCHA Options
-        $options = array(
-            'custom_translations' => array(
-                'instructions_visual' => t("Type the text:"),
-                'instructions_audio' => t("Type what you hear:"),
-                'play_again' => t("Play the sound again"),
-                'cant_hear_this' => t("Download the sounds as MP3"),
-                'visual_challenge' => t("Get a visual challenge"),
-                'audio_challenge' => t("Get an audio challenge"),
-                'refresh_btn' => t("Get a new challenge"),
-                'help_btn' => t("Help"),
-                'incorrect_try_again' => t("Incorrect. Try again.")
-            )
-        );
+        // Google whitelist https://developers.google.com/recaptcha/docs/language
+        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
 
         // Use our current locale against the whitelist.
         $language = Gdn::locale()->language();
-        if (in_array($language, $whitelist)) {
-            $options['lang'] = $language;
-        } elseif (in_array(Gdn::locale()->Locale, $whitelist)) {
-            $options['lang'] = Gdn::locale()->Locale;
+        if (!in_array($language, $whitelist)) {
+            $language = (in_array(Gdn::locale()->Locale, $whitelist)) ? Gdn::locale()->Locale : false;
         }
 
-        // Add custom translation strings as JSON.
-        Gdn::controller()->Head->addString('<script type="text/javascript">var RecaptchaOptions = '.json_encode($options).';</script>');
+        Gdn::controller()->Head->addScript('https://www.google.com/recaptcha/api.js?hl=' . $language);
 
-        require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
+        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => c('Garden.Registration.CaptchaPublicKey'));
 
-        return recaptcha_get_html(c('Garden.Registration.CaptchaPublicKey'), null, Gdn::request()->scheme() == 'https');
+        // see https://developers.google.com/recaptcha/docs/display for details
+        $this->EventArguments['Attributes'] = &$attributes;
+        $this->fireEvent('BeforeCaptcha');
+
+        return '<div '. attribute($attributes) . '></div>';
     }
 
     /**
@@ -326,7 +317,11 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function categoryDropDown($FieldName = 'CategoryID', $Options = false) {
+    public function categoryDropDown($FieldName = 'CategoryID', $Options = array()) {
+
+        $this->EventArguments['Options'] = &$Options;
+        $this->fireEvent('BeforeCategoryDropDown');
+
         $Value = arrayValueI('Value', $Options); // The selected category id
         $CategoryData = val('CategoryData', $Options);
 
@@ -454,7 +449,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function checkBox($FieldName, $Label = '', $Attributes = false) {
+    public function checkBox($FieldName, $Label = '', $Attributes = array()) {
         $Value = arrayValueI('value', $Attributes, true);
         $Attributes['value'] = $Value;
         $Display = val('display', $Attributes, 'wrap');
@@ -500,7 +495,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Append validation error message
         if ($ShowErrors && arrayValueI('InlineErrors', $Attributes, true)) {
-            $Return .= $this->inlineError($FieldName);
+            $Input .= $this->inlineError($FieldName);
         }
 
         return $Input;
@@ -530,7 +525,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function checkBoxList($FieldName, $DataSet, $ValueDataSet = null, $Attributes = false) {
+    public function checkBoxList($FieldName, $DataSet, $ValueDataSet = null, $Attributes = array()) {
         // Never display individual inline errors for these CheckBoxes
         $Attributes['InlineErrors'] = false;
 
@@ -554,10 +549,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $TextField = ArrayValueI('TextField', $Attributes, 'text');
             foreach ($DataSet->result() as $Data) {
                 $Instance = $Attributes;
-                $Instance = removeKeyFromArray(
-                    $Instance,
-                    array('TextField', 'ValueField')
-                );
+                unset($Instance['TextField'], $Instance['ValueField']);
                 $Instance['value'] = $Data->$ValueField;
                 $Instance['id'] = $FieldName.$i;
                 if (is_array($CheckedValues) && in_array(
@@ -579,7 +571,7 @@ class Gdn_Form extends Gdn_Pluggable {
             foreach ($DataSet as $Text => $ID) {
                 // Set attributes for this instance
                 $Instance = $Attributes;
-                $Instance = removeKeyFromArray($Instance, array('TextField', 'ValueField'));
+                unset($Instance['TextField'], $Instance['ValueField']);
 
                 $Instance['id'] = $FieldName.$i;
 
@@ -657,7 +649,7 @@ class Gdn_Form extends Gdn_Pluggable {
             foreach ($DataSet->result() as $Data) {
                 // Define the checkbox
                 $Instance = $Attributes;
-                $Instance = removeKeyFromArray($Instance, array('TextField', 'ValueField'));
+                unset($Instance['TextField'], $Instance['ValueField']);
                 $Instance['value'] = $Data->$ValueField;
                 $Instance['id'] = $FieldName.$i;
                 if (is_array($CheckedValues) && in_array(
@@ -813,7 +805,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $Xhtml
      * @return string
      */
-    public function close($ButtonCode = '', $Xhtml = '', $Attributes = false) {
+    public function close($ButtonCode = '', $Xhtml = '', $Attributes = array()) {
         $Return = "</div>\n</form>";
         if ($Xhtml != '') {
             $Return = $Xhtml.$Return;
@@ -857,7 +849,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *       Fields, array of month, day, year. Those are only valid values. Order matters.
      * @return string
      */
-    public function date($FieldName, $Attributes = false) {
+    public function date($FieldName, $Attributes = array()) {
         $Return = '';
         $YearRange = arrayValueI('yearrange', $Attributes, false);
         $StartYear = 0;
@@ -874,18 +866,16 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         $Months = array_map(
-            'T',
+            't',
             explode(',', 'Month,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec')
         );
 
-        $Days = array();
-        $Days[] = T('Day');
+        $Days = array(t('Day'));
         for ($i = 1; $i < 32; ++$i) {
             $Days[] = $i;
         }
 
-        $Years = array();
-        $Years[0] = T('Year');
+        $Years = array(t('Year'));
         foreach (range($StartYear, $EndYear) as $Year) {
             $Years[$Year] = $Year;
         }
@@ -903,7 +893,11 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $CssClass = arrayValueI('class', $Attributes, '');
 
-        $SubmittedTimestamp = ($this->getValue($FieldName) > 0) ? strtotime($this->getValue($FieldName)) : false;
+        if ($this->getValue($FieldName) > 0) {
+            $SubmittedTimestamp = strtotime($this->getValue($FieldName));
+        } else {
+            $SubmittedTimestamp = false;
+        }
 
         // Allow us to specify which fields to show & order
         $Fields = arrayValueI('fields', $Attributes, array('month', 'day', 'year'));
@@ -976,7 +970,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function dropDown($FieldName, $DataSet, $Attributes = false) {
+    public function dropDown($FieldName, $DataSet, $Attributes = array()) {
         // Show inline errors?
         $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
 
@@ -1287,7 +1281,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * class, etc
      * @return string
      */
-    public function hidden($FieldName, $Attributes = false) {
+    public function hidden($FieldName, $Attributes = array()) {
         $Return = '<input type="hidden"';
         $Return .= $this->_idAttribute($FieldName, $Attributes);
         $Return .= $this->_nameAttribute($FieldName, $Attributes);
@@ -1346,7 +1340,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function input($FieldName, $Type = 'text', $Attributes = false) {
+    public function input($FieldName, $Type = 'text', $Attributes = array()) {
         if ($Type == 'text' || $Type == 'password') {
             $CssClass = arrayValueI('class', $Attributes);
             if ($CssClass == false) {
@@ -1435,7 +1429,7 @@ PASSWORDMETER;
      *
      * @return string
      */
-    public function label($TranslationCode, $FieldName = '', $Attributes = false) {
+    public function label($TranslationCode, $FieldName = '', $Attributes = array()) {
         // Assume we always want a 'for' attribute because it's Good & Proper.
         // Precedence: 'for' attribute, 'id' attribute, $FieldName, $TranslationCode
         $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
@@ -1578,7 +1572,7 @@ PASSWORDMETER;
      *    Special values 'Value' and 'Default' (see RadioList).
      * @return string
      */
-    public function radio($FieldName, $Label = '', $Attributes = false) {
+    public function radio($FieldName, $Label = '', $Attributes = array()) {
         $Value = arrayValueI('Value', $Attributes, 'TRUE');
         $Attributes['value'] = $Value;
         $FormValue = $this->getValue($FieldName, arrayValueI('Default', $Attributes));
@@ -1638,7 +1632,7 @@ PASSWORDMETER;
      *
      * @return string
      */
-    public function radioList($FieldName, $DataSet, $Attributes = false) {
+    public function radioList($FieldName, $DataSet, $Attributes = array()) {
         $List = val('list', $Attributes);
         $Return = '';
 
@@ -1702,7 +1696,7 @@ PASSWORDMETER;
      *  class, etc
      * @return string
      */
-    public function textBox($FieldName, $Attributes = false) {
+    public function textBox($FieldName, $Attributes = array()) {
         if (!is_array($Attributes)) {
             $Attributes = array();
         }
@@ -2505,7 +2499,7 @@ PASSWORDMETER;
                     break;
                 case 'checkbox':
                     $Result .= $Description
-                        .$this->checkBox($Row['Name'], $LabelCode);
+                        .$this->checkBox($Row['Name'], $LabelCode, $Row['Options']);
                     break;
                 case 'dropdown':
                     $Result .= $this->label($LabelCode, $Row['Name'])

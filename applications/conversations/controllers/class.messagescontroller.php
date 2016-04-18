@@ -43,6 +43,13 @@ class MessagesController extends ConversationsController {
 //      $this->addModule('MeModule');
         $this->addModule('SignedInModule');
 
+        // Spoilers assets
+        $this->addJsFile('spoilers.js', 'dashboard');
+        $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('Spoiler', t('Spoiler'));
+        $this->addDefinition('show', t('show'));
+        $this->addDefinition('hide', t('hide'));
+
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');
         }
@@ -125,9 +132,9 @@ class MessagesController extends ConversationsController {
             array('Name' => t('Inbox'), 'Url' => '/messages/inbox'),
             array('Name' => $this->data('Title'), 'Url' => 'messages/add')
         ));
-        
+
         $this->CssClass = 'NoPanel';
-        
+
         $this->render();
     }
 
@@ -437,7 +444,7 @@ class MessagesController extends ConversationsController {
         $this->addModule($ClearHistoryModule);
 
         $InThisConversationModule = new InThisConversationModule($this);
-        $InThisConversationModule->setData($this->Conversation->Participants);
+        $InThisConversationModule->setData('Participants', $this->Conversation->Participants);
         $this->addModule($InThisConversationModule);
 
         // Doesn't make sense for people who can't even start conversations to be adding people

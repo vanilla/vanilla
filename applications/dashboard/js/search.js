@@ -1,4 +1,4 @@
-// This file contains javascript that is specific to the dashboard/entry controller.
+// This file contains javascript that is specific to the /entry controller.
 jQuery(document).ready(function($) {
     // Set up paging
     if ($.morepager)

@@ -23,7 +23,8 @@ $PluginInfo['Facebook'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'Hidden' => true,
     'SocialConnect' => true,
-    'RequiresRegistration' => true
+    'RequiresRegistration' => true,
+    'Icon' => 'facebook.svg'
 );
 
 /**

@@ -107,7 +107,7 @@ class ActivityModel extends Gdn_Model {
         $ActivityType = self::GetActivityType($Row['ActivityTypeID']);
         $Row['ActivityType'] = val('Name', $ActivityType);
         if (is_string($Row['Data'])) {
-            $Row['Data'] = @unserialize($Row['Data']);
+            $Row['Data'] = dbdecode($Row['Data']);
         }
 
         $Row['PhotoUrl'] = url($Row['Route'], true);
@@ -379,7 +379,7 @@ class ActivityModel extends Gdn_Model {
 
         foreach ($Data as &$Row) {
             if (is_string($Row['Data'])) {
-                $Row['Data'] = @unserialize($Row['Data']);
+                $Row['Data'] = dbdecode($Row['Data']);
             }
 
             $UserIDs[$Row['ActivityUserID']] = 1;
@@ -872,11 +872,12 @@ class ActivityModel extends Gdn_Model {
 
                 $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
                 $emailTemplate = $Email->getEmailTemplate()
-                    ->setButton($url, t('Check it out'))
+                    ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle($ActivityHeadline);
 
                 if ($message = val('Story', $Activity)) {
-                    $emailTemplate->setMessage($message, true);
+                    $prefix = c('Garden.Email.Prefix', '');
+                    $emailTemplate->setMessage($prefix.$message, true);
                 }
 
                 $Email->setEmailTemplate($emailTemplate);
@@ -964,11 +965,12 @@ class ActivityModel extends Gdn_Model {
         $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
 
         $emailTemplate = $Email->getEmailTemplate()
-            ->setButton($url, t('Check it out'))
+            ->setButton($url, val('ActionText', $Activity, t('Check it out')))
             ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
         if ($message = val('Story', $Activity)) {
-            $emailTemplate->setMessage($message, true);
+            $prefix = c('Garden.Email.Prefix', '');
+            $emailTemplate->setMessage($prefix.$message, true);
         }
 
         $Email->setEmailTemplate($emailTemplate);
@@ -1230,10 +1232,11 @@ class ActivityModel extends Gdn_Model {
                 $url = externalUrl(val('Route', $Activity) == '' ? '/' : val('Route', $Activity));
 
                 $emailTemplate = $Email->getEmailTemplate()
-                    ->setButton($url, t('Check it out'))
+                    ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
                 if ($message = val('Story', $Activity)) {
-                    $emailTemplate->setMessage($message, true);
+                    $prefix = c('Garden.Email.Prefix', '');
+                    $emailTemplate->setMessage($prefix.$message, true);
                 }
                 $Email->setEmailTemplate($emailTemplate);
 
@@ -1404,7 +1407,7 @@ class ActivityModel extends Gdn_Model {
             )->firstRow(DATASET_TYPE_ARRAY);
 
             if ($GroupActivity) {
-                $GroupActivity['Data'] = @unserialize($GroupActivity['Data']);
+                $GroupActivity['Data'] = dbdecode($GroupActivity['Data']);
                 $Activity = $this->mergeActivities($GroupActivity, $Activity);
                 $NotificationInc = 0;
             }
@@ -1418,7 +1421,7 @@ class ActivityModel extends Gdn_Model {
 
         $ActivityData = $Activity['Data'];
         if (isset($Activity['Data']) && is_array($Activity['Data'])) {
-            $Activity['Data'] = serialize($Activity['Data']);
+            $Activity['Data'] = dbencode($Activity['Data']);
         }
 
         $this->defineSchema();

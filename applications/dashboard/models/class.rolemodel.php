@@ -236,6 +236,8 @@ class RoleModel extends Gdn_Model {
             case self::TYPE_UNCONFIRMED:
                 $backRoleIDs = (array)c('Garden.Registration.ConfirmEmailRole', null);
                 break;
+            default:
+                $backRoleIDs = array();
         }
         $roleIDs = array_merge($roleIDs, $backRoleIDs);
         $roleIDs = array_unique($roleIDs);
@@ -332,17 +334,15 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
-     * Returns a resultset of role data related to the specified UserID.
+     * Get the roles for a user.
      *
-     * @param int The UserID to filter to.
-     * @return Gdn_DataSet
+     * @param int $userID The user to get the roles for.
+     * @return Gdn_DataSet Returns the roles as a dataset (with array values).
+     * @see UserModel::getRoles()
      */
-    public function getByUserID($UserID) {
-        return $this->SQL->select()
-            ->from('Role')
-            ->join('UserRole', 'Role.RoleID = UserRole.RoleID')
-            ->where('UserRole.UserID', $UserID)
-            ->get();
+    public function getByUserID($userID) {
+        $result = Gdn::userModel()->getRoles($userID);
+        return $result;
     }
 
     /**
@@ -749,5 +749,40 @@ class RoleModel extends Gdn_Model {
         // Remove the role
         $result = $this->SQL->delete('Role', array('RoleID' => $roleID));
         return $result;
+    }
+
+    /**
+     * Get a list of a user's roles that are permitted to be seen.
+     * Optionally return all the role data or just one field name.
+     *
+     * @param $userID
+     * @param string $field optionally the field name from the role table to return.
+     * @return array|null|void
+     */
+    public function getPublicUserRoles($userID, $field = "Name") {
+        if (!$userID) {
+            return;
+        }
+
+        $unfilteredRoles = self::getByUserID($userID)->resultArray();
+
+        // Hide personal info roles
+        $unformattedRoles = array();
+        if (!checkPermission('Garden.PersonalInfo.View')) {
+            $unformattedRoles = array_filter($unfilteredRoles, 'self::FilterPersonalInfo');
+        } else {
+            $unformattedRoles = $unfilteredRoles;
+        }
+
+        // If an empty string is passed as the field, return all the data from gdn_role row.
+        if (!$field) {
+            return $unformattedRoles;
+        }
+
+        // If there is a return key, return an array with the field as the key
+        // and the value of the field as the value.
+        $formattedRoles = array_column($unformattedRoles, $field);
+
+        return $formattedRoles;
     }
 }

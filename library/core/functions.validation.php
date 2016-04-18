@@ -27,16 +27,31 @@ if (!function_exists('ValidateCaptcha')) {
      * @return bool Returns true if the captcha is valid or an error message otherwise.
      */
     function validateCaptcha($value = null) {
-        require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
+        $recaptchaResponse = Gdn::request()->post('g-recaptcha-response');
+        if (!$recaptchaResponse) {
+            return false;
+        }
 
-        $CaptchaPrivateKey = c('Garden.Registration.CaptchaPrivateKey', '');
-        $Response = recaptcha_check_answer(
-            $CaptchaPrivateKey,
-            Gdn::Request()->IpAddress(),
-            Gdn::Request()->Post('recaptcha_challenge_field', ''),
-            Gdn::Request()->Post('recaptcha_response_field', '')
+        $api = new Garden\Http\HttpClient('https://www.google.com/recaptcha/api');
+        $data = array(
+            'secret' => c('Garden.Registration.CaptchaPrivateKey'),
+            'response' => $recaptchaResponse
         );
-        return $Response->is_valid ? true : 'The reCAPTCHA value was not entered correctly. Please try again.';
+        $response = $api->get('/siteverify', $data);
+
+        if ($response->isSuccessful()) {
+            $result = $response->getBody();
+            $errorCodes = val('error_codes', $result);
+            if ($result && val('success', $result)) {
+                return true;
+            } else if (!empty($errorCodes) && $errorCodes != array('invalid-input-response')) {
+                throw new Exception(formatString(t('No response from reCAPTCHA.').' {ErrorCodes}', array('ErrorCodes' => join(', ', $errorCodes))));
+            }
+        } else {
+            throw new Exception(t('No response from reCAPTCHA.'));
+        }
+
+        return false;
     }
 }
 

@@ -272,8 +272,10 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param array $Category
-     * @return string
+     * @param string|array $Category
+     * @param string|int $Page The page number.
+     * @param bool $WithDomain Whether to add the domain to the URL
+     * @return string The url to a category.
      */
     function categoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category)) {
@@ -650,6 +652,13 @@ if (!function_exists('hasEditProfile')) {
 }
 
 if (!function_exists('hoverHelp')) {
+    /**
+     * Add span with hover text to a string.
+     *
+     * @param $String
+     * @param $Help
+     * @return string
+     */
     function hoverHelp($String, $Help) {
         return wrap($String.wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
     }
@@ -1206,7 +1215,7 @@ if (!function_exists('writeReactions')) {
     function writeReactions($Row) {
         $Attributes = GetValue('Attributes', $Row);
         if (is_string($Attributes)) {
-            $Attributes = @unserialize($Attributes);
+            $Attributes = dbdecode($Attributes);
             SetValue('Attributes', $Row, $Attributes);
         }
 

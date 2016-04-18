@@ -99,6 +99,7 @@ class UpdateModel extends Gdn_Model {
                     'Name' => 'Vanilla',
                     'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
                     'Version' => $Version,
+                    'License' => 'GPLv2',
                     'Path' => $Entry['Path']);
                 break;
             } elseif ($Entry['Name'] == 'vanilla2export.php') {
@@ -115,6 +116,7 @@ class UpdateModel extends Gdn_Model {
                     'Name' => 'Vanilla Porter',
                     'Description' => 'Drop this script in your existing site and navigate to it in your web browser to export your existing forum data to the Vanilla 2 import format.',
                     'Version' => $Version,
+                    'License' => 'GPLv2',
                     'Path' => $Entry['Path']);
                 break;
             } else {

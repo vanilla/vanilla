@@ -363,11 +363,23 @@ class Gdn_Locale extends Gdn_Pluggable {
 
     /**
      * Return the first 2 letters of the current locale (the language code).
+     *
+     * @param bool $iso6391 Attempt to use ISO 639-1 language codes.
+     * @return bool|string Language code on success, false on failure.
      */
-    public function language() {
+    public function language($iso6391 = false) {
         if ($this->Locale == '') {
             return false;
         } else {
+            if ($iso6391) {
+                // ISO 639-1 has some special exceptions for language codes.
+                $locale = strtolower($this->Locale);
+                switch ($locale) {
+                    case 'zh_tw':
+                        return 'zh-Hant';
+                }
+            }
+
             return substr($this->Locale, 0, 2);
         }
     }

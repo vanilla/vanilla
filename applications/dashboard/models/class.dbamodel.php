@@ -303,7 +303,7 @@ class DBAModel extends Gdn_Model {
         $Key = "DBA.Range.$Key";
 
         // See if there is already a range.
-        $Current = @unserialize(Gdn::get($Key, ''));
+        $Current = dbdecode(Gdn::get($Key, ''));
         if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
             list($Current['Min'], $Current['Max']) = $this->primaryKeyRange($Table);
 
@@ -318,7 +318,7 @@ class DBAModel extends Gdn_Model {
             $Current['To'] -= $Limit - 1;
         }
         $Current['From'] = $Current['To'] - $Limit;
-        Gdn::set($Key, serialize($Current));
+        Gdn::set($Key, dbencode($Current));
         $Current['Complete'] = $Current['To'] < $Current['Min'];
 
         $Total = $Current['Max'] - $Current['Min'];

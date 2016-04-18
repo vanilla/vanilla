@@ -23,27 +23,27 @@ if (array_key_exists('p', $_GET) && $index = $_GET['p']) {
 }
 
 switch ($type) {
-    case 'user':
-    case 'category':
-    case 'post':
-        $redirect = sprintf($redirects[$type], $index);
-        break;
-    case 'thread':
-        $hasPage = array_key_exists('page', $_GET);
-        $pageNumber = 1;
-        if ($hasPage) {
-            $oldPageNumber = $_GET['page'];
-            $comments = 25 * $oldPageNumber;
-            $pageNumber = ceil($comments / 40);
-        }
+        case 'user':
+        case 'category':
+        case 'post':
+            $redirect = sprintf($redirects[$type], $index);
+            break;
+        case 'thread':
+            $hasPage = array_key_exists('page', $_GET);
+            $pageNumber = 1;
+            if ($hasPage) {
+                $oldPageNumber = $_GET['page'];
+                $comments = 25 * $oldPageNumber;
+                $pageNumber = ceil($comments / 40);
+            }
 
-        $pageKey = "p{$pageNumber}";
-        $redirect = sprintf($redirects[$type], $index, $pageKey);
-        break;
-    default:
-        $type = 'home';
-        $redirect = '/';
-        break;
+            $pageKey = "p{$pageNumber}";
+            $redirect = sprintf($redirects[$type], $index, $pageKey);
+            break;
+        default:
+            $type = 'home';
+            $redirect = '/';
+            break;
 }
 
 if (!is_null($type)) {

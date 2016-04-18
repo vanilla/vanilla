@@ -12,19 +12,24 @@
  * Renders a list of people in the specified conversation.
  */
 class InThisConversationModule extends Gdn_Module {
-    public function setData($name, $value = null) {
-        if (is_array($name)) {
-            $this->Data = $name;
-        }
-        return parent::setData($name, $value);
-    }
 
+    /**
+     * Where to render by default.
+     *
+     * @return string
+     */
     public function assetTarget() {
         return 'Panel';
     }
 
+    /**
+     * Render the module.
+     *
+     * @return string HTML.
+     */
     public function toString() {
-        if (is_object($this->Data) && $this->Data->numRows() > 0) {
+        // Verify any participants exist before outputting anything.
+        if (count($this->data('Participants'))) {
             return parent::toString();
         }
 

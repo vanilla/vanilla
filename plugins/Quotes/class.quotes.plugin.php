@@ -12,7 +12,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.7',
+    'Version' => '1.8',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'HasLocale' => true,
@@ -93,7 +93,7 @@ class QuotesPlugin extends Gdn_Plugin {
         list($UserReference, $Username) = $Args;
 
         $Sender->getUserInfo($UserReference, $Username);
-        $UserPrefs = Gdn_Format::unserialize($Sender->User->Preferences);
+        $UserPrefs = dbdecode($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
@@ -143,7 +143,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $UserPrefs = Gdn_Format::unserialize(Gdn::session()->User->Preferences);
+        $UserPrefs = dbdecode(Gdn::session()->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
@@ -358,7 +358,7 @@ BLOCKQUOTE;
      * @param $Sender
      */
     public function postController_BeforeCommentRender_handler($Sender) {
-        if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
+        if ($Sender->data('Plugin.Quotes.QuoteSource')) {
             if (sizeof($Sender->RequestArgs) < 2) {
                 return;
             }
@@ -440,6 +440,8 @@ BLOCKQUOTE;
                 }
             }
             $Data->Body = $NewBody;
+            $this->EventArguments['String'] = &$Data->Body;
+            $this->fireEvent('FilterContent');
 
             // Format the quote according to the format.
             switch ($Format) {

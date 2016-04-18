@@ -103,7 +103,10 @@ class ConversationsHooks implements Gdn_IPlugin {
      * Add "Message" option to profile options.
      */
     public function profileController_beforeProfileOptions_handler($Sender, $Args) {
-        if (!$Sender->EditMode && Gdn::session()->isValid() && Gdn::session()->UserID != $Sender->User->UserID) {
+        if (!$Sender->EditMode &&
+            Gdn::session()->UserID != $Sender->User->UserID &&
+            Gdn::session()->checkPermission('Conversations.Add')
+        ) {
             $Sender->EventArguments['MemberOptions'][] = array(
                 'Text' => sprite('SpMessage').' '.t('Message'),
                 'Url' => '/messages/add/'.$Sender->User->Name,

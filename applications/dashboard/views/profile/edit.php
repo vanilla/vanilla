@@ -63,13 +63,6 @@
             </li>
         <?php endif ?>
 
-        <li class="Gender User-Gender">
-            <?php
-            echo $this->Form->label('Gender', 'Gender');
-            echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
-            ?>
-        </li>
-
         <?php if (c('Garden.Profile.Titles', false)): ?>
             <li class="User-Title">
                 <?php

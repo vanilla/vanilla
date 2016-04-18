@@ -70,4 +70,43 @@ class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
     public function testDbDecodeNull() {
         $this->assertNull(dbdecode(null));
     }
+
+    /**
+     * Make sure we have a bad string for {@link dbdecode()}.
+     *
+     * @param string $str The bad string to decode.
+     * @expectedException \PHPUnit_Framework_Error
+     * @dataProvider provideBadDbDecodeStrings
+     */
+    public function testBadDbDecodeString($str) {
+        $decoded = unserialize($str);
+    }
+
+    /**
+     * Test {@link dbdecode()} with a bogus string.
+     *
+     * The trick here is that {@link dbdecode()} should not raise an exception or throw an error.
+     *
+     * @see testBadDbDecodeString()
+     */
+    public function testDbDecodeError() {
+        $str = 'a:3:{i:0;i:1;i:';
+        $decoded = dbdecode($str);
+        $this->assertFalse($decoded);
+    }
+
+    /**
+     * Provide some strings that would normally cause a deserialization error.
+     *
+     * @return array Returns a data provider string.
+     */
+    public function provideBadDbDecodeStrings() {
+        $r = [
+            ['a:3:{i:0;i:1;i:'],
+            ['{"foo": "bar"'],
+            [[1, 2, 3]]
+        ];
+
+        return $r;
+    }
 }

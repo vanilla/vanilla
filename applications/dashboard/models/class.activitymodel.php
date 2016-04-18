@@ -1528,6 +1528,11 @@ class ActivityModel extends Gdn_Model {
      * @return array
      */
     public function mergeActivities($OldActivity, $NewActivity, $Options = array()) {
+        $GroupHeadlineFormat = val('GroupHeadlineFormat', $Options, $NewActivity['HeadlineFormat']);
+        $GroupStory = val('GroupStory', $Options, $NewActivity['Story']);
+
+//      decho($OldActivity, 'OldAct');
+
         // Group the two activities together.
         $ActivityUserIDs = val('ActivityUserIDs', $OldActivity['Data'], array());
         $ActivityUserCount = val('ActivityUserID_Count', $OldActivity['Data'], 0);
@@ -1541,6 +1546,8 @@ class ActivityModel extends Gdn_Model {
             array_pop($ActivityUserIDs);
             $ActivityUserCount++;
         }
+
+//      decho($ActivityUserIDs, 'AIDs');
 
         if (val('RegardingUserID', $NewActivity)) {
             $RegardingUserIDs = val('RegardingUserIDs', $OldActivity['Data'], array());
@@ -1556,7 +1563,7 @@ class ActivityModel extends Gdn_Model {
             }
         }
 
-        $RecordIDs = [];
+        $RecordIDs = val('RecordIDs', $GroupData, array());
         if ($OldActivity['RecordID']) {
             $RecordIDs[] = $OldActivity['RecordID'];
         }

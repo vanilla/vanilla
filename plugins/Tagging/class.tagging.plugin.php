@@ -326,8 +326,8 @@ class TaggingPlugin extends Gdn_Plugin {
         // Let plugins add their information getting saved.
         $Types = array('');
         $this->EventArguments['Data'] = $FormPostValues;
-        $this->EventArguments['Tags'] = & $FormTags;
-        $this->EventArguments['Types'] = & $Types;
+        $this->EventArguments['Tags'] = &$FormTags;
+        $this->EventArguments['Types'] = &$Types;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('SaveDiscussion');
 

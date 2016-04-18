@@ -351,7 +351,7 @@ class DiscussionModel extends VanillaModel {
             ));
 
 
-            Gdn::pluginManager()->EventArguments['Types'] = & $DiscussionTypes;
+            Gdn::pluginManager()->EventArguments['Types'] = &$DiscussionTypes;
             Gdn::pluginManager()->FireAs('DiscussionModel')->fireEvent('DiscussionTypes');
             self::$_DiscussionTypes = $DiscussionTypes;
             unset(Gdn::pluginManager()->EventArguments['Types']);

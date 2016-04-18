@@ -1982,7 +1982,7 @@ if (!function_exists('isWritable')) {
         fclose($File);
 
         if (!$KeepPath) {
-            unlink($Path);
+            safeUnlink($Path);
         }
 
         return true;
@@ -3104,7 +3104,7 @@ if (!function_exists('safeRedirect')) {
 
 if (!function_exists('safeUnlink')) {
     /**
-     * A version of {@link unlinl()} that won't raise a warning.
+     * A version of {@link unlink()} that won't raise a warning.
      * 
      * @param string $filename Path to the file.
      * @return Returns TRUE on success or FALSE on failure.

@@ -100,7 +100,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         Gdn::pluginManager()->EventArguments['CategoryIDs'] = & $Watch;
-        Gdn::pluginManager()->fireEvent('CategoryWatch');
+        Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('CategoryWatch');
 
         if ($AllCount == count($Watch)) {
             return true;
@@ -1494,7 +1494,7 @@ class CategoryModel extends Gdn_Model {
             if (!isset($Categories[$ID])) {
                 continue;
             }
-            $Row = $Categories[$ID];
+            $Row = (array)$Categories[$ID];
             $Row['Depth'] += $DepthAdj;
             $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
             $Result[] = $Row;

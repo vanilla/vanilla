@@ -298,7 +298,7 @@ function Gdn_ExceptionHandler($Exception) {
             // If the master view wasn't found, assume a panic state and dump the error.
             if ($Master === false) {
                 echo '<!DOCTYPE html>
-   <html>
+   <html lang="'.Gdn::locale()->language(true).'">
    <head>
       <title>Fatal Error</title>
    </head>

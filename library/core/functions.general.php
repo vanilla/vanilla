@@ -3102,6 +3102,23 @@ if (!function_exists('safeRedirect')) {
     }
 }
 
+if (!function_exists('safeUnlink')) {
+    /**
+     * A version of {@link unlinl()} that won't raise a warning.
+     * 
+     * @param string $filename Path to the file.
+     * @return Returns TRUE on success or FALSE on failure.
+     */
+    function safeUnlink($filename) {
+        try {
+            $r = unlink($filename);
+            return $r;
+        } catch (\Exception $ex) {
+            return false;
+        }
+    }
+}
+
 if (!function_exists('saveToConfig')) {
     /**
      * Save values to the application's configuration file.

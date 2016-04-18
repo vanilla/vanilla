@@ -87,8 +87,7 @@ endforeach; ?>
             </ul>
         </div>
         <?php
-        $String = ob_get_contents();
-        @ob_end_clean();
+        $String = ob_get_clean();
         return $String;
     }
 }

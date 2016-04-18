@@ -1581,10 +1581,10 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * Fetch a list of a user's role IDs.
+     * Get the roles for a user.
      *
-     * @param int $userID The ID of the user we're querying roles for.
-     * @return Gdn_DataSet A collection of the user's role IDs.
+     * @param int $userID The user to get the roles for.
+     * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      */
     public function getRoles($userID) {
         $userRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $userID));
@@ -1602,7 +1602,7 @@ class UserModel extends Gdn_Model {
             $result[] = RoleModel::roles($roleID, true);
         }
 
-        return new Gdn_DataSet($result);
+        return new Gdn_DataSet($result, DATASET_TYPE_ARRAY);
     }
 
     /**

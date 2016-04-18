@@ -24,8 +24,11 @@
     </php>
 
     <testsuites>
-        <testsuite name="Vanilla Test Suite">
-            <directory suffix="Test.php">./tests/</directory>
+        <testsuite name="Library">
+            <directory suffix="Test.php">./tests/Library/</directory>
+        </testsuite>
+        <testsuite name="APIv0">
+            <directory suffix="Test.php">./tests/APIv0</directory>
         </testsuite>
     </testsuites>
 

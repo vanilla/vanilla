@@ -4380,7 +4380,7 @@ class UserModel extends Gdn_Model {
      * @return bool Was the caching operation successful?
      */
     public function userCacheRoles($userID, $roleIDs) {
-        if (!$userID) {
+        if ($userID !== 0 && !$userID) {
             return false;
         }
 

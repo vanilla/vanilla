@@ -977,7 +977,7 @@ class UserModel extends Gdn_Model {
         if ($Data instanceof Gdn_DataSet) {
             $Data2 = $Data->result();
         } else {
-            $Data2 =& $Data;
+            $Data2 = &$Data;
         }
 
         // Grab all of the user fields that need to be joined.
@@ -1665,7 +1665,7 @@ class UserModel extends Gdn_Model {
             ->get();
 
         // Set corrected PhotoUrls.
-        $Result = & $Data->result();
+        $Result = &$Data->result();
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
                 $Row->Photo = Gdn_Upload::url($Row->Photo);
@@ -2436,7 +2436,7 @@ class UserModel extends Gdn_Model {
             ->limit($Limit, $Offset)
             ->get();
 
-        $Result = & $Data->result();
+        $Result = &$Data->result();
 
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
@@ -2925,7 +2925,7 @@ class UserModel extends Gdn_Model {
         }
 
         if (!empty($Set)) {
-            $this->EventArguments['Fields'] = & $Set;
+            $this->EventArguments['Fields'] = &$Set;
             $this->fireEvent('UpdateVisit');
 
             $this->setField($UserID, $Set);
@@ -3296,7 +3296,7 @@ class UserModel extends Gdn_Model {
         // Fire an event so applications can remove their associated user data.
         $this->EventArguments['UserID'] = $UserID;
         $this->EventArguments['Options'] = $Options;
-        $this->EventArguments['Content'] = & $Content;
+        $this->EventArguments['Content'] = &$Content;
         $this->fireEvent('BeforeDeleteUser');
 
         $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
@@ -3705,7 +3705,7 @@ class UserModel extends Gdn_Model {
             setValue('_CssClass', $User, 'Banned');
         }
 
-        $this->EventArguments['User'] = & $User;
+        $this->EventArguments['User'] = &$User;
         $this->fireEvent('SetCalculatedFields');
     }
 

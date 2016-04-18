@@ -314,7 +314,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $UserID = val('UserID', $Sender->EventArguments);
         $Options = val('Options', $Sender->EventArguments, array());
         $Options = is_array($Options) ? $Options : array();
-        $Content = & $Sender->EventArguments['Content'];
+        $Content = &$Sender->EventArguments['Content'];
 
         $this->deleteUserData($UserID, $Options, $Content);
     }

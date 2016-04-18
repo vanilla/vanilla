@@ -734,11 +734,7 @@ if (!function_exists('dbdecode')) {
             return null;
         }
 
-        try {
-            $decodedValue = unserialize($value);
-        } catch (Exception $e) {
-            $decodedValue = false;
-        }
+        $decodedValue = @unserialize($value);
 
         return $decodedValue;
     }
@@ -756,11 +752,7 @@ if (!function_exists('dbencode')) {
             return null;
         }
 
-        try {
-            $encodedValue = serialize($value);
-        } catch (Exception $e) {
-            $encodedValue = false;
-        }
+        $encodedValue = serialize($value);
 
         return $encodedValue;
     }

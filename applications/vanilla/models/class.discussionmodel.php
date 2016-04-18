@@ -1049,7 +1049,9 @@ class DiscussionModel extends VanillaModel {
         }
         if ($GroupID > 0) {
             $this->SQL->where('d.GroupID', $GroupID);
-        } elseif (is_array($CategoryID) || $CategoryID > 0) {
+        } elseif (is_array($CategoryID)) {
+            $this->SQL->whereIn('d.CategoryID', $CategoryID);
+        } elseif ($CategoryID > 0) {
             $this->SQL->where('d.CategoryID', $CategoryID);
         }
 

@@ -93,7 +93,7 @@ class QuotesPlugin extends Gdn_Plugin {
         list($UserReference, $Username) = $Args;
 
         $Sender->getUserInfo($UserReference, $Username);
-        $UserPrefs = Gdn_Format::unserialize($Sender->User->Preferences);
+        $UserPrefs = dbdecode($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
@@ -143,7 +143,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $UserPrefs = Gdn_Format::unserialize(Gdn::session()->User->Preferences);
+        $UserPrefs = dbdecode(Gdn::session()->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }

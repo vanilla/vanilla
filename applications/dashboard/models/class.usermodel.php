@@ -152,7 +152,7 @@ class UserModel extends Gdn_Model {
         $user = (array)$user;
         $attributes = $user['Attributes'];
         if (is_string($attributes)) {
-            $attributes = unserialize($attributes);
+            $attributes = dbdecode($attributes);
         }
         if (!is_array($attributes)) {
             $attributes = array();
@@ -375,7 +375,7 @@ class UserModel extends Gdn_Model {
 
             // Save this merge in the log.
             if ($Row['Attributes']) {
-                $Attributes = unserialize($Row['Attributes']);
+                $Attributes = dbdecode($Row['Attributes']);
             } else {
                 $Attributes = array();
             }
@@ -436,7 +436,7 @@ class UserModel extends Gdn_Model {
         $Row = Gdn::sql()->getWhere('UserMerge', array('MergeID' => $MergeID))->firstRow(DATASET_TYPE_ARRAY);
 
         if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {
-            trace(unserialize($Row['Attributes']), 'Merge Attributes');
+            trace(dbdecode($Row['Attributes']), 'Merge Attributes');
         }
 
         $UserIDs = array(
@@ -944,7 +944,7 @@ class UserModel extends Gdn_Model {
         unset($Fields['Roles']);
 
         if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
-            $Fields['Attributes'] = serialize($Fields['Attributes']);
+            $Fields['Attributes'] = dbencode($Fields['Attributes']);
         }
 
         $UserID = $this->SQL->insert($this->Name, $Fields);
@@ -1086,26 +1086,25 @@ class UserModel extends Gdn_Model {
 
             $CachePermissions = Gdn::cache()->get($UserPermissionsKey);
             if ($CachePermissions !== Gdn_Cache::CACHEOP_FAILURE) {
-                return $CachePermissions;
+                if ($Serialize) {
+                    return dbencode($CachePermissions);
+                } else {
+                    return $CachePermissions;
+                }
             }
         }
 
         $Data = Gdn::permissionModel()->cachePermissions($UserID);
         $Permissions = UserModel::compilePermissions($Data);
 
-        $PermissionsSerialized = null;
+        $PermissionsSerialized = dbencode($Permissions);
         if (Gdn::cache()->activeEnabled()) {
             Gdn::cache()->store($UserPermissionsKey, $Permissions);
         } else {
             // Save the permissions to the user table
-            $PermissionsSerialized = Gdn_Format::serialize($Permissions);
             if ($UserID > 0) {
                 $this->SQL->put('User', array('Permissions' => $PermissionsSerialized), array('UserID' => $UserID));
             }
-        }
-
-        if ($Serialize && is_null($PermissionsSerialized)) {
-            $PermissionsSerialized = Gdn_Format::serialize($Permissions);
         }
 
         return $Serialize ? $PermissionsSerialized : $Permissions;
@@ -2051,7 +2050,7 @@ class UserModel extends Gdn_Model {
                 ) {
                     $Attributes = val('Attributes', Gdn::session()->User);
                     if (is_string($Attributes)) {
-                        $Attributes = @unserialize($Attributes);
+                        $Attributes = dbdecode($Attributes);
                     }
 
                     $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
@@ -2059,7 +2058,7 @@ class UserModel extends Gdn_Model {
                         // The confirm email role is set and it exists so go ahead with the email confirmation.
                         $NewKey = randomString(8);
                         $EmailKey = touchValue('EmailKey', $Attributes, $NewKey);
-                        $Fields['Attributes'] = serialize($Attributes);
+                        $Fields['Attributes'] = dbencode($Attributes);
                         $Fields['Confirmed'] = 0;
                     }
                 }
@@ -2085,7 +2084,7 @@ class UserModel extends Gdn_Model {
                     }
 
                     if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
-                        $Fields['Attributes'] = serialize($Fields['Attributes']);
+                        $Fields['Attributes'] = dbencode($Fields['Attributes']);
                     }
 
                     // Perform save DB operation
@@ -2444,8 +2443,8 @@ class UserModel extends Gdn_Model {
                 $Row->Photo = Gdn_Upload::url($Row->Photo);
             }
 
-            $Row->Attributes = @unserialize($Row->Attributes);
-            $Row->Preferences = @unserialize($Row->Preferences);
+            $Row->Attributes = dbdecode($Row->Attributes);
+            $Row->Preferences = dbdecode($Row->Preferences);
         }
 
         return $Data;
@@ -2636,7 +2635,7 @@ class UserModel extends Gdn_Model {
             // serialized array of the Role IDs.
             $InvitationRoleIDs = $Invitation->RoleIDs;
             if (strlen($InvitationRoleIDs)) {
-                $InvitationRoleIDs = unserialize($InvitationRoleIDs);
+                $InvitationRoleIDs = dbdecode($InvitationRoleIDs);
 
                 if (is_array($InvitationRoleIDs)
                     && count(array_filter($InvitationRoleIDs))
@@ -3044,7 +3043,7 @@ class UserModel extends Gdn_Model {
                 ->put();
         }
 
-        $UserData->Attributes = Gdn_Format::unserialize($UserData->Attributes);
+        $UserData->Attributes = dbdecode($UserData->Attributes);
         return $UserData;
     }
 
@@ -3259,7 +3258,7 @@ class UserModel extends Gdn_Model {
                 'DiscoveryText' => '',
                 'Preferences' => null,
                 'Permissions' => null,
-                'Attributes' => Gdn_Format::serialize(array('State' => 'Deleted')),
+                'Attributes' => dbencode(['State' => 'Deleted']),
                 'DateSetInvitations' => null,
                 'DateOfBirth' => null,
                 'DateUpdated' => Gdn_Format::toDateTime(),
@@ -3560,7 +3559,7 @@ class UserModel extends Gdn_Model {
         $Values = val($Column, $UserData);
 
         if (!is_array($Values) && !is_object($Values)) {
-            $Values = @unserialize($UserData->$Column);
+            $Values = dbdecode($UserData->$Column);
         }
 
         // Throw an exception if the field was not empty but is also not an object or array
@@ -3594,7 +3593,7 @@ class UserModel extends Gdn_Model {
             }
         }
 
-        $Values = Gdn_Format::serialize($Values);
+        $Values = dbencode($Values);
 
         // Save the values back to the db
         $SaveResult = $this->SQL->put('User', array($Column => $Values), array('UserID' => $UserID));
@@ -3669,17 +3668,17 @@ class UserModel extends Gdn_Model {
     public function setCalculatedFields(&$User) {
         if ($v = val('Attributes', $User)) {
             if (is_string($v)) {
-                setValue('Attributes', $User, @unserialize($v));
+                setValue('Attributes', $User, dbdecode($v));
             }
         }
         if ($v = val('Permissions', $User)) {
             if (is_string($v)) {
-                setValue('Permissions', $User, @unserialize($v));
+                setValue('Permissions', $User, dbdecode($v));
             }
         }
         if ($v = val('Preferences', $User)) {
             if (is_string($v)) {
-                setValue('Preferences', $User, @unserialize($v));
+                setValue('Preferences', $User, dbdecode($v));
             }
         }
         if ($v = val('Photo', $User)) {
@@ -3786,7 +3785,7 @@ class UserModel extends Gdn_Model {
         $User = (array)$User;
 
         if (is_string($User['Attributes'])) {
-            $User['Attributes'] = @unserialize($User['Attributes']);
+            $User['Attributes'] = dbdecode($User['Attributes']);
         }
 
         // Make sure the user needs email confirmation.
@@ -3985,7 +3984,7 @@ class UserModel extends Gdn_Model {
 
         $Attributes = val('Attributes', $Data);
         if (is_string($Attributes)) {
-            $Attributes = @unserialize($Attributes);
+            $Attributes = dbdecode($Attributes);
         }
 
         if (!is_array($Attributes)) {

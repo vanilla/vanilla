@@ -430,9 +430,9 @@ class Gdn_Session {
                 $UserModel->EventArguments['User'] =& $this->User;
                 $UserModel->fireEvent('AfterGetSession');
 
-                $this->_Permissions = Gdn_Format::unserialize($this->User->Permissions);
-                $this->_Preferences = Gdn_Format::unserialize($this->User->Preferences);
-                $this->_Attributes = Gdn_Format::unserialize($this->User->Attributes);
+                $this->_Permissions = $this->User->Permissions;
+                $this->_Preferences = $this->User->Preferences;
+                $this->_Attributes = $this->User->Attributes;
                 $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
 
                 if ($this->_TransientKey === false) {
@@ -459,7 +459,7 @@ class Gdn_Session {
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
-            $this->_Permissions = Gdn_Format::unserialize($UserModel->definePermissions(0));
+            $this->_Permissions = $UserModel->definePermissions(0, false);
         }
     }
 
@@ -633,7 +633,7 @@ class Gdn_Session {
                 'Session',
                 array(
                     'DateUpdated' => Gdn_Format::toDateTime(),
-                    'Attributes' => serialize($Session->Attributes)
+                    'Attributes' => dbencode($Session->Attributes)
                 ),
                 array(
                     'SessionID' => $Session->SessionID
@@ -705,7 +705,7 @@ class Gdn_Session {
             safeCookie($Name, $SessionID, $Expire, $Path, $Domain);
             $_COOKIE[$Name] = $SessionID;
         }
-        $Session->Attributes = @unserialize($Session->Attributes);
+        $Session->Attributes = dbdecode($Session->Attributes);
         if (!$Session->Attributes) {
             $Session->Attributes = array();
         }

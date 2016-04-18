@@ -272,7 +272,7 @@ class CategoryModel extends Gdn_Model {
             }
 
             if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes'])) {
-                $Category['AllowedDiscussionTypes'] = unserialize($Category['AllowedDiscussionTypes']);
+                $Category['AllowedDiscussionTypes'] = dbdecode($Category['AllowedDiscussionTypes']);
             }
         }
 
@@ -1015,7 +1015,7 @@ class CategoryModel extends Gdn_Model {
     public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $category = $this->SQL->getWhere('Category', array('CategoryID' => $categoryID))->firstRow($datasetType);
         if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
-            setValue('AllowedDiscussionTypes', $category, unserialize(val('AllowedDiscussionTypes', $category)));
+            setValue('AllowedDiscussionTypes', $category, dbdecode(val('AllowedDiscussionTypes', $category)));
         }
 
         return $category;
@@ -1760,7 +1760,7 @@ class CategoryModel extends Gdn_Model {
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
         if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
-            $FormPostValues['AllowedDiscussionTypes'] = serialize($FormPostValues['AllowedDiscussionTypes']);
+            $FormPostValues['AllowedDiscussionTypes'] = dbencode($FormPostValues['AllowedDiscussionTypes']);
         }
 
         // Is this a new category?
@@ -1997,7 +1997,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         if (isset($Property['AllowedDiscussionTypes']) && is_array($Property['AllowedDiscussionTypes'])) {
-            $Property['AllowedDiscussionTypes'] = serialize($Property['AllowedDiscussionTypes']);
+            $Property['AllowedDiscussionTypes'] = dbencode($Property['AllowedDiscussionTypes']);
         }
 
         $this->SQL->put($this->Name, $Property, array('CategoryID' => $ID));

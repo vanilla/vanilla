@@ -910,7 +910,7 @@ class DiscussionModel extends VanillaModel {
 
         // Fix up output
         $Discussion->Name = Gdn_Format::text($Discussion->Name);
-        $Discussion->Attributes = @unserialize($Discussion->Attributes);
+        $Discussion->Attributes = dbdecode($Discussion->Attributes);
         $Discussion->Url = DiscussionUrl($Discussion);
         $Discussion->Tags = $this->FormatTags($Discussion->Tags);
 
@@ -2757,7 +2757,7 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Get the array
-        $TagsArray = Gdn_Format::Unserialize($Tags);
+        $TagsArray = dbdecode($Tags);
 
         // Compensate for deprecated space-separated format
         if (is_string($TagsArray) && $TagsArray == $Tags) {

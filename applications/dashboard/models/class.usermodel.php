@@ -1078,8 +1078,12 @@ class UserModel extends Gdn_Model {
      * @param boolean $Serialize
      * @return array
      */
-    public function definePermissions($UserID, $Serialize = true) {
+    public function definePermissions($UserID, $Serialize = false) {
         $UserPermissionsKey = '';
+        if ($Serialize) {
+            trigger_error("UserModel->definePermissions(id, true)", "UserModel->definePermissions(id)");
+        }
+
         if (Gdn::cache()->activeEnabled()) {
             $PermissionsIncrement = $this->getPermissionsIncrement();
             $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, [

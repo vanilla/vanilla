@@ -726,10 +726,14 @@ if (!function_exists('dbdecode')) {
     /**
      * Decode a value retrieved from database storage.
      *
-     * @param string $value
-     * @return mixed
+     * @param string $value An encoded string representation of a value to be decoded.
+     * @return mixed A decoded value on success or false on failure.
      */
     function dbdecode($value) {
+        if ($value === null) {
+            return null;
+        }
+
         try {
             $decodedValue = unserialize($value);
         } catch (Exception $e) {
@@ -744,10 +748,14 @@ if (!function_exists('dbencode')) {
     /**
      * Encode a value in preparation for database storage.
      *
-     * @param mixed $value
-     * @return string
+     * @param mixed $value A value to be encoded.
+     * @return mixed An encoded string representation of the provided value or false on failure.
      */
     function dbencode($value) {
+        if ($value === null) {
+            return null;
+        }
+
         try {
             $encodedValue = serialize($value);
         } catch (Exception $e) {

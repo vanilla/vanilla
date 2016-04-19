@@ -1582,23 +1582,26 @@ class UserModel extends Gdn_Model {
     /**
      * Get the roles for a user.
      *
-     * @param int $UserID The user to get the roles for.
+     * @param int $userID The user to get the roles for.
      * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      */
-    public function getRoles($UserID) {
-        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
-        $RolesDataArray = Gdn::cache()->get($UserRolesKey);
+    public function getRoles($userID) {
+        $userRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $userID));
+        $rolesDataArray = Gdn::cache()->get($userRolesKey);
 
-        if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
-            $RolesDataArray = $this->SQL->getWhere('UserRole', array('UserID' => $UserID))->resultArray();
-            $RolesDataArray = array_column($RolesDataArray, 'RoleID');
+        if ($rolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
+            $rolesDataArray = $this->SQL->getWhere('UserRole', array('UserID' => $userID))->resultArray();
+            $rolesDataArray = array_column($rolesDataArray, 'RoleID');
+            // Add result to cache
+            $this->userCacheRoles($userID, $rolesDataArray);
         }
 
-        $Result = array();
-        foreach ($RolesDataArray as $RoleID) {
-            $Result[] = RoleModel::roles($RoleID, true);
+        $result = array();
+        foreach ($rolesDataArray as $roleID) {
+            $result[] = RoleModel::roles($roleID, true);
         }
-        return new Gdn_DataSet($Result, DATASET_TYPE_ARRAY);
+
+        return new Gdn_DataSet($result, DATASET_TYPE_ARRAY);
     }
 
     /**
@@ -4369,22 +4372,24 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * Cache user's roles
+     * Cache a user's roles.
      *
-     * @param type $UserID
-     * @param type $RoleIDs
-     * @return type
+     * @param int $userID The ID of a user to cache roles for.
+     * @param array $roleIDs A collection of role IDs with the specified user.
+     * @return bool Was the caching operation successful?
      */
-    public function userCacheRoles($UserID, $RoleIDs) {
-        if (is_null($UserID) || !$UserID) {
+    public function userCacheRoles($userID, $roleIDs) {
+        if ($userID !== 0 && !$userID) {
             return false;
         }
 
-        $Cached = true;
-
-        $UserRolesKey = formatString(self::USERROLES_KEY, array('UserID' => $UserID));
-        $Cached = $Cached & Gdn::cache()->store($UserRolesKey, $RoleIDs);
-        return $Cached;
+        $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
+        $cached = Gdn::cache()->store(
+            $userRolesKey,
+            $roleIDs,
+            [Gdn_Cache::FEATURE_EXPIRY => 3600]
+        );
+        return $cached;
     }
 
     /**

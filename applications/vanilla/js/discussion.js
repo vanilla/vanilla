@@ -297,7 +297,7 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-		        $(msg).after(json.Data).trigger('start');
+                    $(msg).after(json.Data).trigger('start');
                     $(msg).hide();
                 },
                 complete: function() {

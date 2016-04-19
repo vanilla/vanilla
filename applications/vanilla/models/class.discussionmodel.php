@@ -2758,8 +2758,12 @@ class DiscussionModel extends VanillaModel {
             return '';
         }
 
-        // Get the array
-        $TagsArray = dbdecode($Tags);
+        // Get the array.
+        if (preg_match('`^(a:)|{|\[`', $Tags)) {
+            $TagsArray = dbdecode($Tags);
+        } else {
+            $TagsArray = $Tags;
+        }
 
         // Compensate for deprecated space-separated format
         if (is_string($TagsArray) && $TagsArray == $Tags) {

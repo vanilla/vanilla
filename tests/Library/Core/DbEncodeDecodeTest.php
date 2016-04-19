@@ -10,10 +10,10 @@ namespace VanillaTests\Library\Core;
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
+class DbEncodeDecodeTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     *
+     * Test encoding/decoding an array.
      */
     public function testDbEncodeArray() {
         $data = ['Forum' => 'Vanilla'];
@@ -62,6 +62,7 @@ class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDbEncodeNull() {
         $this->assertNull(dbencode(null));
+        $this->assertNull(dbencode(''));
     }
 
     /**
@@ -69,6 +70,19 @@ class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDbDecodeNull() {
         $this->assertNull(dbdecode(null));
+        $this->assertNull(dbdecode(''));
+    }
+
+    /**
+     * You should be able to call {@link dbdecode()} on an array and have it just pass through.
+     */
+    public function testDoubleDecodeArray() {
+        $arr = [1, 2, 'foo' => [3, 4]];
+        $encoded = dbencode($arr);
+        $decoded = dbdecode($encoded);
+        $decoded2 = dbdecode($decoded);
+
+        $this->assertSame($arr, $decoded2);
     }
 
     /**
@@ -87,10 +101,11 @@ class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
      *
      * The trick here is that {@link dbdecode()} should not raise an exception or throw an error.
      *
+     * @param mixed $str The bad string to decode.
+     * @dataProvider  provideBadDbDecodeStrings
      * @see testBadDbDecodeString()
      */
-    public function testDbDecodeError() {
-        $str = 'a:3:{i:0;i:1;i:';
+    public function testDbDecodeError($str) {
         $decoded = dbdecode($str);
         $this->assertFalse($decoded);
     }
@@ -104,7 +119,6 @@ class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
         $r = [
             ['a:3:{i:0;i:1;i:'],
             ['{"foo": "bar"'],
-            [[1, 2, 3]]
         ];
 
         return $r;

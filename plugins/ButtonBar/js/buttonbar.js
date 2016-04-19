@@ -682,7 +682,10 @@ jQuery(document).ready(function($) {
 
     }
 
-    $(document).on('EditCommentFormLoaded popupReveal', ButtonBar.init);
     ButtonBar.init();
-
 });
+
+$(document).on('start', function(e, element) {
+    ButtonBar.init();
+});
+

@@ -50,7 +50,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         function init() {
             $("textarea").not(".Tabby").addClass("Tabby").tabby();
         }
-        $(document).on("start", init)
+        $(document).on("EditCommentFormLoaded", init)
         init();
 });');
         }

@@ -3,9 +3,9 @@ $Session = Gdn::session();
 ?>
 <h1><?php echo t('Manage Routes'); ?></h1>
 <div class="Info"><?php
-    echo t('Routes can be used to redirect users to various parts of your site depending on the url.'),
+    echo t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.'),
     ' ',
-    anchor(t('Get more information on creating custom routes'), 'http://vanillaforums.org/page/routes');
+    anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
     ?></div>
 <div class="FilterMenu"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'AddRoute SmallButton'); ?></div>
 <table class="AltColumns" id="RouteTable">

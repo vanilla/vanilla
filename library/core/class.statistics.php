@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.17
@@ -14,8 +14,7 @@
 /**
  * Handles install-side analytics gathering and sending.
  */
-class Gdn_Statistics extends Gdn_Plugin {
-
+class Gdn_Statistics extends Gdn_Pluggable {
     /** @var mixed  */
     protected $AnalyticsServer;
 
@@ -31,7 +30,7 @@ class Gdn_Statistics extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        $AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
+        $AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
         $AnalyticsServer = str_replace(array('http://', 'https://'), '', $AnalyticsServer);
         $this->AnalyticsServer = $AnalyticsServer;
 
@@ -137,18 +136,6 @@ class Gdn_Statistics extends Gdn_Plugin {
         $Reason = val('Reason', $JsonResponse, null);
         if (!is_null($Reason)) {
             Gdn::controller()->informMessage("Analytics: {$Reason}");
-        }
-    }
-
-    /**
-     *
-     *
-     * @param $Sender
-     */
-    public function base_render_before($Sender) {
-        // If this is a full page request, trigger stats environment check
-        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            $this->check();
         }
     }
 
@@ -287,17 +274,17 @@ class Gdn_Statistics extends Gdn_Plugin {
      */
     public static function checkIsEnabled() {
         // Forums that are busy installing should not yet be tracked
-        if (!C('Garden.Installed', false)) {
+        if (!c('Garden.Installed', false)) {
             return false;
         }
 
         // Enabled if not explicitly disabled via config
-        if (!C('Garden.Analytics.Enabled', true)) {
+        if (!c('Garden.Analytics.Enabled', true)) {
             return false;
         }
 
         // Don't track things for local sites (unless overridden in config)
-        if (self::checkIsLocalhost() && !C('Garden.Analytics.AllowLocal', false)) {
+        if (self::checkIsLocalhost() && !c('Garden.Analytics.AllowLocal', false)) {
             return 0;
         }
 
@@ -504,19 +491,6 @@ class Gdn_Statistics extends Gdn_Plugin {
             'Success' => 'DoneRegister',
             'Failure' => 'AnalyticsFailed'
         ));
-    }
-
-    /**
-     *
-     * @param Gdn_Controller $Sender
-     */
-    public function settingsController_analyticsTick_create($Sender) {
-        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->deliveryType(DELIVERY_TYPE_DATA);
-
-        Gdn::statistics()->tick();
-        $this->fireEvent("AnalyticsTick");
-        $Sender->render();
     }
 
     /**
@@ -729,7 +703,7 @@ class Gdn_Statistics extends Gdn_Plugin {
         // Set
         if (!is_null($SetThrottled)) {
             if ($SetThrottled) {
-                $ThrottleDelay = C('Garden.Analytics.ThrottleDelay', 3600);
+                $ThrottleDelay = c('Garden.Analytics.ThrottleDelay', 3600);
                 $ThrottleValue = time() + $ThrottleDelay;
             } else {
                 $ThrottleValue = null;
@@ -833,7 +807,7 @@ class Gdn_Statistics extends Gdn_Plugin {
         $EmbedViews = 0;
 
         try {
-            if (C('Garden.Analytics.Views.Denormalize', false) &&
+            if (c('Garden.Analytics.Views.Denormalize', false) &&
                 Gdn::cache()->activeEnabled() &&
                 Gdn::cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
             ) {
@@ -862,7 +836,7 @@ class Gdn_Statistics extends Gdn_Plugin {
                 }
 
                 // Every X views, writeback to AnalyticsLocal
-                $DenormalizeWriteback = C('Garden.Analytics.Views.DenormalizeWriteback', 10);
+                $DenormalizeWriteback = c('Garden.Analytics.Views.DenormalizeWriteback', 10);
                 if (($Views % $DenormalizeWriteback) == 0) {
                     Gdn::controller()->setData('WritebackViews', $Views);
                     Gdn::controller()->setData('WritebackEmbed', $EmbedViews);
@@ -1129,7 +1103,7 @@ class Gdn_Statistics extends Gdn_Plugin {
         $CurrentGmTime = Gdn_Statistics::time();
         $RequestTime = val('RequestTime', $Request, 0);
         $TimeDiff = abs($CurrentGmTime - $RequestTime);
-        $AllowedTimeDiff = C('Garden.Analytics.RequestTimeout', 1440);
+        $AllowedTimeDiff = c('Garden.Analytics.RequestTimeout', 1440);
 
         // Allow 24* minutes of clock desync, otherwise signature is invalid
         if ($TimeDiff > $AllowedTimeDiff) {

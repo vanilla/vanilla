@@ -68,7 +68,7 @@ class Auth_Yadis_DiscoveryResult {
     // Did the discovery fail miserably?
     var $failed = false;
 
-    function Auth_Yadis_DiscoveryResult($request_uri)
+    function __construct($request_uri)
     {
         // Initialize the state of the object
         // sets all attributes to None except the request_uri

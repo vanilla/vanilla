@@ -5,11 +5,40 @@
  * These functions are copies of existing functions but with new and improved
  * names. Parent functions will be deprecated in a future release.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.2
  */
+
+if (!function_exists('apc_fetch') && function_exists('apcu_fetch')) {
+    /**
+     * Fetch a stored variable from the cache.
+     *
+     * @param mixed $key The key used to store the value.
+     * @param bool &$success Set to **true** in success and **false** in failure.
+     * @return mixed The stored variable or array of variables on success; **false** on failure
+     * @see http://php.net/manual/en/function.apcu-fetch.php
+     */
+    function apc_fetch($key, &$success = null) {
+        return apcu_fetch($key, $success);
+    }
+}
+
+if (!function_exists('apc_store') && function_exists('apcu_store')) {
+    /**
+     * Cache a variable in the data store.
+     *
+     * @param string $key Store the variable using this name.
+     * @param mixed $var The variable to store.
+     * @param int $ttl The time to live.
+     * @return bool Returns **true** on success or **false** on failure.
+     * @see http://php.net/manual/en/function.apcu-store.php
+     */
+    function apc_store($key, $var = null, $ttl = 0) {
+        return apcu_store($key, $var, $ttl);
+    }
+}
 
 /**
  * Allow gzopen64 to be a fallback for gzopen. Workaround for a PHP bug.
@@ -20,6 +49,32 @@
 if (!function_exists('gzopen') && function_exists('gzopen64')) {
     function gzopen($filename, $mode, $use_include_path = 0) {
         return gzopen64($filename, $mode, $use_include_path);
+    }
+}
+
+if (!function_exists('hash_equals')) {
+    /**
+     * Determine whether or not two strings are equal in a time that is independent of partial matches.
+     *
+     * This snippet prevents HMAC Timing attacks (http://codahale.com/a-lesson-in-timing-attacks/).
+     * Thanks to Eric Karulf (ekarulf @ github) for this fix.
+     *
+     * @param string $known_string The string of known length to compare against.
+     * @param string $user_string The user-supplied string.
+     * @return bool Returns **true** when the two strings are equal, **false** otherwise.
+     * @see http://php.net/manual/en/function.hash-equals.php
+     */
+    function hash_equals($known_string, $user_string) {
+        if (strlen($known_string) !== strlen($user_string)) {
+            return false;
+        }
+
+        $result = 0;
+        for ($i = strlen($known_string) - 1; $i >= 0; $i--) {
+            $result |= ord($known_string[$i]) ^ ord($user_string[$i]);
+        }
+
+        return 0 === $result;
     }
 }
 
@@ -326,7 +381,7 @@ if (!function_exists('requestContext')) {
     function requestContext() {
         static $context = null;
         if (is_null($context)) {
-            $context = C('Garden.RequestContext', null);
+            $context = c('Garden.RequestContext', null);
             if (is_null($context)) {
                 $protocol = val('SERVER_PROTOCOL', $_SERVER);
                 if (preg_match('`^HTTP/`', $protocol)) {

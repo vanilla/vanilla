@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1278,7 +1278,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->setJson('FormSaved', $this->_FormSaved);
             $this->setJson('DeliveryType', $this->_DeliveryType);
-            $this->setJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->toString() : $View));
+            $this->setJson('Data', ($View instanceof Gdn_IModule) ? $View->toString() : $View);
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             $this->setJson('RedirectUrl', $this->RedirectUrl);
@@ -1290,12 +1290,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
             }
 
-            $Json = json_encode($this->_Json);
+            $Json = json_encode($this->_Json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
             $this->_Json['Data'] = $Json;
             exit($this->_Json['Data']);
         } else {
             if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {
-                $this->addDefinition('InformMessageStack', base64_encode(json_encode($this->_InformMessages)));
+                $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
 
             if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE) {
@@ -1410,7 +1410,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $Remove[] = 'LastIPAddress';
                 $Remove[] = 'AllIPAddresses';
                 $Remove[] = 'Fingerprint';
-                if (C('Api.Clean.Email', true)) {
+                if (c('Api.Clean.Email', true)) {
                     $Remove[] = 'Email';
                 }
                 $Remove[] = 'DateOfBirth';
@@ -1640,11 +1640,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if (($Callback = $this->Request->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
-                    exit($Callback.'('.json_encode($Data).');');
+                    exit($Callback.'('.json_encode($Data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).');');
                 } else {
                     safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
-                    exit(json_encode($Data));
+                    exit(json_encode($Data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 break;
 //         case DELIVERY_METHOD_XHTML:
@@ -1786,7 +1786,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             // Add the favicon.
-            $Favicon = C('Garden.FavIcon');
+            $Favicon = c('Garden.FavIcon');
             if ($Favicon) {
                 $this->Head->setFavIcon(Gdn_Upload::url($Favicon));
             }
@@ -1887,28 +1887,36 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Set data from a method call.
      *
-     * @param string $Key The key that identifies the data.
-     * @param mixed $Value The data.
-     * @param mixed $AddProperty Whether or not to also set the data as a property of this object.
+     * If $key is an array, the behaviour will be the same as calling the method
+     * multiple times for each (key, value) pair in the $key array.
+     * Note that the parameter $value will not be used if $key is an array.
+     *
+     * The $key can also use dot notation in order to set a value deeper inside the Data array.
+     * Works the same way if $addProperty is true, but uses objects instead of arrays.
+     *
+     * @see setvalr
+     *
+     * @param string|array $key The key that identifies the data.
+     * @param mixed $value The data.  Will not be used if $key is an array
+     * @param mixed $addProperty Whether or not to also set the data as a property of this object.
      * @return mixed The $Value that was set.
      */
-    public function setData($Key, $Value = null, $AddProperty = false) {
-        if (is_array($Key)) {
-            $this->Data = array_merge($this->Data, $Key);
-
-            if ($AddProperty === true) {
-                foreach ($Key as $Name => $Value) {
-                    $this->$Name = $Value;
-                }
+    public function setData($key, $value = null, $addProperty = false) {
+        // In the case of $key being an array of (key => value),
+        // it calls itself with each (key => value)
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->setData($k, $v, $addProperty);
             }
             return;
         }
 
-        $this->Data[$Key] = $Value;
-        if ($AddProperty === true) {
-            $this->$Key = $Value;
+        setvalr($key, $this->Data, $value);
+
+        if ($addProperty === true) {
+            setvalr($key, $this, $value);
         }
-        return $Value;
+        return $value;
     }
 
     /**

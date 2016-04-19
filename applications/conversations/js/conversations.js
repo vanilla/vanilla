@@ -1,4 +1,4 @@
-// This file contains javascript that is specific to the dashboard/profile controller.
+// This file contains javascript that is specific to the /profile controller.
 jQuery(document).ready(function($) {
 
    // Hijack "add message" clicks and handle via ajax...
@@ -28,8 +28,6 @@ jQuery(document).ready(function($) {
                gdn.informError(xhr);
             },
             success: function(json) {
-               json = $.postParseJson(json);
-
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 

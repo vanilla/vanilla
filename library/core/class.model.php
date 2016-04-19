@@ -3,7 +3,7 @@
  * Gdn_Model.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -177,7 +177,7 @@ class Gdn_Model extends Gdn_Pluggable {
             unset($Row[$Name]);
 
             if (is_string($Attributes)) {
-                $Attributes = @unserialize($Attributes);
+                $Attributes = dbdecode($Attributes);
             }
 
             if (is_array($Attributes)) {
@@ -257,7 +257,7 @@ class Gdn_Model extends Gdn_Pluggable {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert) === true) {
             $Fields = $this->Validation->validationFields();
-            $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to insert or update the primary key
+            unset($Fields[$this->PrimaryKey]); // Don't try to insert or update the primary key
             if ($Insert === false) {
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {
@@ -308,7 +308,7 @@ class Gdn_Model extends Gdn_Pluggable {
     public static function serializeRow(&$Row) {
         foreach ($Row as $Name => &$Value) {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
-                $Value = empty($Value) ? null : serialize($Value);
+                $Value = empty($Value) ? null : dbencode($Value);
             }
         }
     }
@@ -333,7 +333,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $QuotedFields = array();
             foreach ($Fields as $Name => $Value) {
                 if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
-                    $Value = empty($Value) ? null : serialize($Value);
+                    $Value = empty($Value) ? null : dbencode($Value);
                 }
 
                 $QuotedFields[$this->SQL->quoteIdentifier(trim($Name, '`'))] = $Value;
@@ -374,7 +374,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $QuotedFields = array();
             foreach ($Fields as $Name => $Value) {
                 if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
-                    $Value = empty($Value) ? null : serialize($Value);
+                    $Value = empty($Value) ? null : dbencode($Value);
                 }
 
                 $QuotedFields[$this->SQL->quoteIdentifier(trim($Name, '`'))] = $Value;
@@ -387,24 +387,52 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
     /**
+     * Delete records from a table.
      *
+     * @param array|int $where The where clause to delete or an integer value.
+     * @param array|true $options An array of options to control the delete.
      *
-     * @param unknown_type $Where
-     * @param unknown_type $Limit
-     * @param unknown_type $ResetData
-     * @return Gdn_Dataset
+     *  - limit: A limit to the number of records to delete.
+     *  - reset: Deprecated. Whether or not to reset this SQL statement after the delete. Defaults to false.
+     * @return Gdn_Dataset Returns the result of the delete.
      */
-    public function delete($Where = '', $Limit = false, $ResetData = false) {
-        if (is_numeric($Where)) {
-            $Where = array($this->PrimaryKey => $Where);
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('Gdn_Model->delete(int)', 'Gdn_Model->deleteID()');
+            $where = array($this->PrimaryKey => $where);
+        }
+
+        $ResetData = false;
+        if ($options === true || val('reset', $options)) {
+            deprecated('Gdn_Model->delete() with reset true');
+            $ResetData = true;
+        } elseif (is_numeric($options)) {
+            deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
+            $limit = $options;
+        } else {
+            $limit = val('limit', $options);
         }
 
         if ($ResetData) {
-            $Result = $this->SQL->delete($this->Name, $Where, $Limit);
+            $Result = $this->SQL->delete($this->Name, $where, $limit);
         } else {
-            $Result = $this->SQL->noReset()->delete($this->Name, $Where, $Limit);
+            $Result = $this->SQL->noReset()->delete($this->Name, $where, $limit);
         }
         return $Result;
+    }
+
+    /**
+     * Delete a record by primary key.
+     *
+     * @param mixed $id The primary key value of the record to delete.
+     * @param array $options An array of options to affect the delete behaviour. Reserved for future use.
+     * @return bool Returns **true** if the delete was successful or **false** otherwise.
+     */
+    public function deleteID($id, $options = []) {
+        $r = $this->delete(
+            [$this->PrimaryKey => $id]
+        );
+        return $r;
     }
 
     /**
@@ -490,7 +518,7 @@ class Gdn_Model extends Gdn_Pluggable {
         foreach ($Fields as $Field) {
             if (is_array($Result)) {
                 if (isset($Result[$Field]) && is_string($Result[$Field])) {
-                    $Val = unserialize($Result[$Field]);
+                    $Val = dbdecode($Result[$Field]);
                     if ($Val) {
                         $Result[$Field] = $Val;
                     } else {
@@ -499,7 +527,7 @@ class Gdn_Model extends Gdn_Pluggable {
                 }
             } elseif (is_object($Result)) {
                 if (isset($Result->$Field) && is_string($Result->$Field)) {
-                    $Val = unserialize($Result->$Field);
+                    $Val = dbdecode($Result->$Field);
                     if ($Val) {
                         $Result->$Field = $Val;
                     } else {
@@ -517,9 +545,9 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      * @param array|bool $Where A filter suitable for passing to Gdn_SQLDriver::Where().
      * @param string $OrderFields A comma delimited string to order the data.
-     * @param string $OrderDirection One of <b>asc</b> or <b>desc</b>
-     * @param int|bool $Limit
-     * @param int|bool $Offset
+     * @param string $OrderDirection One of **asc** or **desc**.
+     * @param int|false $Limit The database limit.
+     * @param int|false $Offset The database offset.
      * @return Gdn_DataSet
      */
     public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
@@ -650,7 +678,7 @@ class Gdn_Model extends Gdn_Pluggable {
         if (!$Row) {
             throw new Exception(T('ErrorRecordNotFound'));
         }
-        $Values = Gdn_Format::unserialize($Row->$Column);
+        $Values = dbdecode($Row->$Column);
 
         if (is_string($Values) && $Values != '') {
             throw new Exception(T('Serialized column failed to be unserialized.'));
@@ -664,7 +692,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $Name = array($Name => $Value);
         }
 
-        $Values = Gdn_Format::serialize(array_merge($Values, $Name));
+        $Values = dbencode(array_merge($Values, $Name));
 
         // Save the values back to the db
         return $this->SQL

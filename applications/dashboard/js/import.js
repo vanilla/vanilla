@@ -9,8 +9,6 @@ jQuery(document).ready(function($) {
             url: url,
             dataType: 'json',
             success: function(json) {
-                json = $.postParseJson(json);
-
                 // Refresh the view.
                 $('#Content').html(json.Data);
                 bindAjaxForm();
@@ -35,8 +33,6 @@ jQuery(document).ready(function($) {
         $('form').ajaxForm({
             dataType: 'json',
             success: function(json) {
-                json = $.postParseJson(json);
-
                 $('#Content').html(json.Data);
                 bindAjaxForm();
 

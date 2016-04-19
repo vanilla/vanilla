@@ -49,7 +49,7 @@ foreach ($this->data('Categories') as $CategoryRow) {
             $ChildCategories .= anchor(Gdn_Format::text($Category->Name), CategoryUrl($Category));
         } else if ($Category->DisplayAs === 'Heading') {
             $CatList .= '<li id="Category_'.$CategoryID.'" class="CategoryHeading '.$CssClass.'">
-               <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::text($Category->Name).'</div>
+               <div class="ItemContent Category"><div class="Options">'.getOptions($Category, $this).'</div>'.Gdn_Format::text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;
         } else {
@@ -58,7 +58,9 @@ foreach ($this->data('Categories') as $CategoryRow) {
             $Alt = !$Alt;
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
-                .GetOptions($Category, $this)
+                .'<div class="Options">'
+                .getOptions($Category, $this)
+                .'</div>'
                 .CategoryPhoto($Category)
                 .'<div class="TitleWrap">'
                 .anchor(Gdn_Format::text($Category->Name), CategoryUrl($Category), 'Title')
@@ -68,8 +70,12 @@ foreach ($this->data('Categories') as $CategoryRow) {
                 .'</div>
                   <div class="Meta">
                      <span class="MItem RSS">'.anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => T('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => T('RSS Feed'))).'</span>
-                     <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
-                     <span class="MItem CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
+                     <span class="MItem DiscussionCount">'.
+                     sprintf(PluralTranslate($Category->CountDiscussions, '%s discussion html', '%s discussions html', t('%s discussion'), t('%s discussions')), BigPlural($Category->CountDiscussions, '%s discussion'))
+                     .'</span>
+                     <span class="MItem CommentCount">'.
+                     sprintf(PluralTranslate($Category->CountComments, '%s comment html', '%s comments html', t('%s comment'), t('%s comments')), BigPlural($Category->CountComments, '%s comment'))
+                     .'</span>';
             if ($Category->LastTitle != '') {
                 $CatList .= '<span class="MItem LastDiscussionTitle">'.sprintf(
                         t('Most recent: %1$s by %2$s'),

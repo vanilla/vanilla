@@ -2,7 +2,7 @@
 /**
  * Comment model
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -127,17 +127,26 @@ class CommentModel extends VanillaModel {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
+        if (is_numeric($OrderFields)) {
+            deprecated('CommentModel->get($discussionID, ...)', 'CommentModel->getByDiscussion($discussionID, ...)');
+            return $this->getByDiscussion($OrderFields, $OrderDirection, $Limit);
+        }
+
+        throw new \BadMethodCallException('CommentModel->get() is not supported.', 400);
+    }
+
+    /**
      * Get comments for a discussion.
-     *
-     * @since 2.0.0
-     * @access public
      *
      * @param int $DiscussionID Which discussion to get comment from.
      * @param int $Limit Max number to get.
      * @param int $Offset Number to skip.
-     * @return object SQL results.
+     * @return Gdn_DataSet Returns a list of comments.
      */
-    public function get($DiscussionID, $Limit, $Offset = 0) {
+    public function getByDiscussion($DiscussionID, $Limit, $Offset = 0) {
         $this->CommentQuery(true, false);
         $this->EventArguments['DiscussionID'] =& $DiscussionID;
         $this->EventArguments['Limit'] =& $Limit;
@@ -560,17 +569,26 @@ class CommentModel extends VanillaModel {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCount($Wheres = '') {
+        if (is_numeric($Wheres)) {
+            deprecated('CommentModel->getCount(int)', 'CommentModel->getCountByDiscussion()');
+            return $this->getCountByDiscussion($Wheres);
+        }
+
+        return parent::getCount($Wheres);
+    }
+
+    /**
      * Count total comments in a discussion specified by ID.
      *
      * Events: BeforeGetCount
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $DiscussionID Unique ID of discussion we're counting comments from.
      * @return object SQL result.
      */
-    public function getCount($DiscussionID) {
+    public function getCountByDiscussion($DiscussionID) {
         $this->fireEvent('BeforeGetCount');
 
         if (!empty($this->_Where)) {
@@ -779,15 +797,14 @@ class CommentModel extends VanillaModel {
     /**
      * Insert or update core data about the comment.
      *
-     * Events: BeforeSaveComment, AfterSaveComment.
-     *
-     * @since 2.0.0
-     * @access public
+     * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $FormPostValues Data from the form model.
+     * @param array $Settings Currently unused.
      * @return int $CommentID
+     * @since 2.0.0
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = false) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -829,12 +846,23 @@ class CommentModel extends VanillaModel {
             // If the post is new and it validates, check for spam
             if (!$Insert || !$this->CheckForSpam('Comment')) {
                 $Fields = $this->Validation->SchemaValidationFields();
-                $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+                unset($Fields[$this->PrimaryKey]);
 
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                 if ($spam) {
                     return SPAM;
+                }
+
+                $isValid = true;
+                $invalidReturnType = false;
+                $this->EventArguments['CommentData'] = $CommentID ? array_merge($Fields, array('CommentID' => $CommentID)) : $Fields;
+                $this->EventArguments['IsValid'] = &$isValid;
+                $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
+                $this->fireEvent('AfterValidateComment');
+
+                if (!$isValid) {
+                    return $invalidReturnType;
                 }
 
                 if ($Insert === false) {
@@ -1274,6 +1302,22 @@ class CommentModel extends VanillaModel {
     /**
      * Delete a comment.
      *
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('CommentModel->delete(int)', 'CommentModel->deleteID(int)');
+
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        throw new \BadMethodCallException("CommentModel->delete() is not supported.", 400);
+    }
+
+    /**
+     * Delete a comment.
+     *
      * This is a hard delete that completely removes it from the database.
      * Events: DeleteComment, BeforeDeleteComment.
      *
@@ -1284,7 +1328,7 @@ class CommentModel extends VanillaModel {
      * @param array $Options Additional options for the delete.
      * @param bool Always returns TRUE.
      */
-    public function delete($CommentID, $Options = array()) {
+    public function deleteID($CommentID, $Options = array()) {
         $this->EventArguments['CommentID'] = $CommentID;
 
         $Comment = $this->getID($CommentID, DATASET_TYPE_ARRAY);
@@ -1357,7 +1401,7 @@ class CommentModel extends VanillaModel {
 
         // Do nothing yet.
         if ($Attributes = val('Attributes', $Comment)) {
-            setValue('Attributes', $Comment, unserialize($Attributes));
+            setValue('Attributes', $Comment, dbdecode($Attributes));
         }
 
         $this->EventArguments['Comment'] = $Comment;

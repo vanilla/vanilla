@@ -1,4 +1,4 @@
-// This file contains javascript that is specific to the dashboard/routes controller.
+// This file contains javascript that is specific to the /routes controller.
 jQuery(document).ready(function($) {
 
     // Pop add/edit route clicks and reload the page contents when finished.
@@ -12,6 +12,7 @@ jQuery(document).ready(function($) {
     $('a.Delete').popup({
         confirm: true,
         followConfirm: false,
+        doPost: true,
         afterConfirm: function(json, sender) {
             $(sender).parents('tr').remove();
         }

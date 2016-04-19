@@ -1,22 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-if (!function_exists('DiscussionSortText')) {
-    function discussionSortText($Field) {
-        $Text = FALSE;
-        switch ($Field) {
-            case 'd.DiscussionID' :
-                $Text = t('SortDiscussionsByID', 'ID number (like support tickets)');
-                break;
-            case 'd.DateLastComment' :
-                $Text = t('SortDiscussionsByLastComment', 'Most recent comment (like a forum)');
-                break;
-            case 'd.DateInserted' :
-                $Text = t('SortDiscussionsByDateInserted', 'Start time (like a blog)');
-                break;
-        }
-        return ($Text) ? $Text : $Field;
-    }
-}
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
     <div class="Help Aside">
         <?php
         echo wrap(t('Need More Help?'), 'h2');
@@ -43,17 +25,6 @@ echo $this->Form->errors();
             <?php
             echo $this->Form->label('Comments per Page', 'Vanilla.Comments.PerPage');
             echo $this->Form->DropDown('Vanilla.Comments.PerPage', $Options, $Fields);
-            ?>
-        </li>
-        <li>
-            <?php
-            $AllowedSortFields = DiscussionModel::AllowedSortFields();
-            $SortFields = array();
-            foreach ($AllowedSortFields as $Field) {
-                $SortFields[$Field] = DiscussionSortText($Field);
-            }
-            echo $this->Form->label('Sort discussions by', 'Vanilla.Discussions.SortField');
-            echo $this->Form->DropDown('Vanilla.Discussions.SortField', $SortFields, $Fields);
             ?>
         </li>
         <li>

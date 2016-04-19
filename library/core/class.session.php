@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -123,7 +123,7 @@ class Gdn_Session {
         }
 
         $Permissions = $this->getPermissions();
-        if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
+        if ($JunctionTable && !c('Garden.Permissions.Disabled.'.$JunctionTable)) {
             // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
             if (is_array($Permission)) {
                 $Pass = false;
@@ -209,7 +209,7 @@ class Gdn_Session {
      * @return mixed
      */
     public function getCookie($Suffix, $Default = null) {
-        return GetValue(C('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
+        return GetValue(c('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
     }
 
     /**
@@ -223,7 +223,7 @@ class Gdn_Session {
             return $this->User->HourOffset;
         } else {
             if (!isset($GuestHourOffset)) {
-                $GuestTimeZone = C('Garden.GuestTimeZone');
+                $GuestTimeZone = c('Garden.GuestTimeZone');
                 if ($GuestTimeZone) {
                     try {
                         $TimeZone = new DateTimeZone($GuestTimeZone);
@@ -248,9 +248,9 @@ class Gdn_Session {
      * @param $Expires
      */
     public function setCookie($Suffix, $Value, $Expires) {
-        $Name = C('Garden.Cookie.Name').$Suffix;
-        $Path = C('Garden.Cookie.Path');
-        $Domain = C('Garden.Cookie.Domain');
+        $Name = c('Garden.Cookie.Name').$Suffix;
+        $Path = c('Garden.Cookie.Path');
+        $Domain = c('Garden.Cookie.Domain');
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $CurrentHost = Gdn::request()->host();
@@ -424,14 +424,15 @@ class Gdn_Session {
                 if ($SetIdentity) {
                     Gdn::authenticator()->setIdentity($this->UserID, $Persist);
                     Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+                    Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
                 }
 
                 $UserModel->EventArguments['User'] =& $this->User;
                 $UserModel->fireEvent('AfterGetSession');
 
-                $this->_Permissions = Gdn_Format::unserialize($this->User->Permissions);
-                $this->_Preferences = Gdn_Format::unserialize($this->User->Preferences);
-                $this->_Attributes = Gdn_Format::unserialize($this->User->Attributes);
+                $this->_Permissions = $this->User->Permissions;
+                $this->_Preferences = $this->User->Preferences;
+                $this->_Attributes = $this->User->Attributes;
                 $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
 
                 if ($this->_TransientKey === false) {
@@ -458,7 +459,7 @@ class Gdn_Session {
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
-            $this->_Permissions = Gdn_Format::unserialize($UserModel->definePermissions(0));
+            $this->_Permissions = $UserModel->definePermissions(0, false);
         }
     }
 
@@ -555,9 +556,9 @@ class Gdn_Session {
 
         if (!isset($Return)) {
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-            $Return = ($ForceValid && Gdn::request()->isPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== false);
+            $Return = ($ForceValid && Gdn::request()->isPostBack()) || ($ForeignKey === $this->_TransientKey && $this->_TransientKey !== false);
         }
-        if (!$Return) {
+        if (!$Return && $ForceValid !== true) {
             if (Gdn::session()->User) {
                 Logger::event(
                     'csrf_failure',
@@ -632,7 +633,7 @@ class Gdn_Session {
                 'Session',
                 array(
                     'DateUpdated' => Gdn_Format::toDateTime(),
-                    'Attributes' => serialize($Session->Attributes)
+                    'Attributes' => dbencode($Session->Attributes)
                 ),
                 array(
                     'SessionID' => $Session->SessionID
@@ -691,8 +692,8 @@ class Gdn_Session {
                 ->firstRow();
 
             // Save a session cookie
-            $Path = C('Garden.Cookie.Path', '/');
-            $Domain = C('Garden.Cookie.Domain', '');
+            $Path = c('Garden.Cookie.Path', '/');
+            $Domain = c('Garden.Cookie.Domain', '');
             $Expire = 0;
 
             // If the domain being set is completely incompatible with the current domain then make the domain work.
@@ -704,7 +705,7 @@ class Gdn_Session {
             safeCookie($Name, $SessionID, $Expire, $Path, $Domain);
             $_COOKIE[$Name] = $SessionID;
         }
-        $Session->Attributes = @unserialize($Session->Attributes);
+        $Session->Attributes = dbdecode($Session->Attributes);
         if (!$Session->Attributes) {
             $Session->Attributes = array();
         }

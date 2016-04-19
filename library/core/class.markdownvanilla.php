@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -26,6 +26,10 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         $this->addStrikeout();
         $this->addBreaks();
         $this->addSpoilers();
+
+		// Sort gamuts by their priority.
+		asort($this->block_gamut);
+		asort($this->span_gamut);
     }
 
     /**
@@ -94,7 +98,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
 			array(&$this, '_doSpoilers_callback2'), $bq);
 
-		return "\n". $this->hashBlock("<div class=\"Spoiler\">\n$bq\n</div>")."\n\n";
+		return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
 	}
 	protected function _doSpoilers_callback2($matches) {
 		$pre = $matches[1];

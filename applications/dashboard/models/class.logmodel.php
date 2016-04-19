@@ -2,7 +2,7 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -44,7 +44,7 @@ class LogModel extends Gdn_Pluggable {
             if (in_array($Log['Operation'], array('Spam', 'Moderate')) && array_key_exists($Log['RecordType'], $Models)) {
                 // Also delete the record.
                 $Model = $Models[$Log['RecordType']];
-                $Model->delete($Log['RecordID'], array('Log' => false));
+                $Model->deleteID($Log['RecordID'], array('Log' => false));
             }
         }
 
@@ -217,7 +217,7 @@ class LogModel extends Gdn_Pluggable {
             ->whereIn('LogID', $IDs)
             ->get()->resultArray();
         foreach ($Logs as &$Log) {
-            $Log['Data'] = @unserialize($Log['Data']);
+            $Log['Data'] = dbdecode($Log['Data']);
             if (!is_array($Log['Data'])) {
                 $Log['Data'] = array();
             }
@@ -260,7 +260,7 @@ class LogModel extends Gdn_Pluggable {
 
         // Deserialize the data.
         foreach ($Result as &$Row) {
-            $Row['Data'] = @unserialize($Row['Data']);
+            $Row['Data'] = dbdecode($Row['Data']);
             if (!$Row['Data']) {
                 $Row['Data'] = array();
             }
@@ -337,6 +337,10 @@ class LogModel extends Gdn_Pluggable {
             return;
         }
 
+        if (!is_array($Data)) {
+            $Data = [$Data];
+        }
+
         // Check to see if we are storing two versions of the data.
         if (($InsertUserID = self::_LogValue($Data, 'Log_InsertUserID')) === null) {
             $InsertUserID = Gdn::session()->UserID;
@@ -370,7 +374,7 @@ class LogModel extends Gdn_Pluggable {
             'ParentRecordID' => $ParentRecordID,
             'CategoryID' => self::_LogValue($Data, 'CategoryID'),
             'OtherUserIDs' => implode(',', val('OtherUserIDs', $Options, array())),
-            'Data' => serialize($Data)
+            'Data' => dbencode($Data)
         );
         if ($LogRow['RecordDate'] == null) {
             $LogRow['RecordDate'] = Gdn_Format::toDateTime();
@@ -399,7 +403,7 @@ class LogModel extends Gdn_Pluggable {
                 $LogID = $LogRow2['LogID'];
                 $Set = array();
 
-                $Data = array_merge(unserialize($LogRow2['Data']), $Data);
+                $Data = array_merge(dbdecode($LogRow2['Data']), $Data);
 
                 $OtherUserIDs = explode(',', $LogRow2['OtherUserIDs']);
                 if (!is_array($OtherUserIDs)) {
@@ -423,7 +427,7 @@ class LogModel extends Gdn_Pluggable {
                 }
                 $Set['OtherUserIDs'] = implode(',', $OtherUserIDs);
                 $Set['CountGroup'] = $Count;
-                $Set['Data'] = serialize($Data);
+                $Set['Data'] = dbencode($Data);
                 $Set['DateUpdated'] = Gdn_Format::toDateTime();
 
                 if (self::$_TransactionID > 0) {
@@ -718,7 +722,7 @@ class LogModel extends Gdn_Pluggable {
 
         if ($Attr) {
             if (is_string($Data[$Attr])) {
-                $Data[$Attr] = @unserialize($Data[$Attr]);
+                $Data[$Attr] = dbdecode($Data[$Attr]);
             }
 
             // Record a bit of information about the restoration.
@@ -741,7 +745,7 @@ class LogModel extends Gdn_Pluggable {
             if (isset($Data[$Key])) {
                 $Value = $Data[$Key];
                 if (is_array($Value)) {
-                    $Value = serialize($Value);
+                    $Value = dbencode($Value);
                 }
                 $Set[$Key] = $Value;
             } else {

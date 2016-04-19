@@ -3,7 +3,7 @@
  * Smart abstraction layer.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -87,7 +87,7 @@ class Gdn_Smarty {
         $Locale = Gdn::locale()->Locale;
         $CurrentLocale = array(
             'Key' => $Locale,
-            'Lang' => str_replace('_', '-', $Locale) // mirrors html5 lang attribute
+            'Lang' => str_replace('_', '-', Gdn::locale()->language(true)) // mirrors html5 lang attribute
         );
         if (class_exists('Locale')) {
             $CurrentLocale['Language'] = Locale::getPrimaryLanguage($Locale);

@@ -2,7 +2,7 @@
 /**
  * Tagging plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Tagging
  */
@@ -44,7 +44,7 @@ class TagModel extends Gdn_Model {
      * @return array
      */
     public function defaultTypes() {
-        $types = array_filter($this->types(), function ($val) {
+        $types = array_filter($this->types(), function($val) {
             if (val('default', $val)) {
                 return true;
             }
@@ -336,7 +336,7 @@ class TagModel extends Gdn_Model {
         }
 
         // Remove the types from the current tags that we don't need anymore.
-        $current_tags = array_filter($current_tags, function ($row) use ($types) {
+        $current_tags = array_filter($current_tags, function($row) use ($types) {
             if (in_array($row['Type'], $types)) {
                 return true;
             }

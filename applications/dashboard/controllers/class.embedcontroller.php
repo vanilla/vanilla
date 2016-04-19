@@ -2,7 +2,7 @@
 /**
  * Manages the embedding of a forum on a foreign page.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0.18
@@ -114,7 +114,16 @@ class EmbedController extends DashboardController {
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Garden.TrustedDomains', 'Garden.Embed.RemoteUrl', 'Garden.Embed.ForceDashboard', 'Garden.Embed.ForceForum', 'Garden.SignIn.Popup'));
+        $ConfigurationModel->setField(
+            array(
+                'Garden.TrustedDomains',
+                'Garden.Embed.RemoteUrl',
+                'Garden.Embed.ForceDashboard',
+                'Garden.Embed.ForceForum',
+                'Garden.Embed.ForceMobile',
+                'Garden.SignIn.Popup'
+            )
+        );
 
         $this->Form->setModel($ConfigurationModel);
         if ($this->Form->authenticatedPostBack() === false) {

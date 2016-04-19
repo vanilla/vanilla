@@ -2,7 +2,7 @@
 /**
  * UI functions
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -272,8 +272,10 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param array $Category
-     * @return string
+     * @param string|array $Category
+     * @param string|int $Page The page number.
+     * @param bool $WithDomain Whether to add the domain to the URL
+     * @return string The url to a category.
      */
     function categoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category)) {
@@ -521,6 +523,25 @@ if (!function_exists('discussionUrl')) {
     }
 }
 
+if (!function_exists('exportCSV')) {
+    /**
+     * Create a CSV given a list of column names & rows.
+     *
+     * @param array $columnNames
+     * @param array $data
+     */
+    function exportCSV($columnNames, $data = array()) {
+        $output = fopen("php://output",'w');
+        header("Content-Type:application/csv");
+        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        fputcsv($output, $columnNames);
+        foreach($data as $row) {
+            fputcsv($output, $row);
+        }
+        fclose($output);
+    }
+}
+
 if (!function_exists('fixnl2br')) {
     /**
      * Removes the break above and below tags that have a natural margin.
@@ -621,9 +642,9 @@ if (!function_exists('hasEditProfile')) {
         $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
 
         $result &= (
-            C('Garden.Profile.Titles') ||
-            C('Garden.Profile.Locations', false) ||
-            C('Garden.Registration.Method') != 'Connect'
+            c('Garden.Profile.Titles') ||
+            c('Garden.Profile.Locations', false) ||
+            c('Garden.Registration.Method') != 'Connect'
         );
 
         return $result;
@@ -631,6 +652,13 @@ if (!function_exists('hasEditProfile')) {
 }
 
 if (!function_exists('hoverHelp')) {
+    /**
+     * Add span with hover text to a string.
+     *
+     * @param $String
+     * @param $Help
+     * @return string
+     */
     function hoverHelp($String, $Help) {
         return wrap($String.wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
     }
@@ -1093,7 +1121,7 @@ if (!function_exists('discussionLink')) {
 
 if (!function_exists('registerUrl')) {
     function registerUrl($Target = '', $force = false) {
-        $registrationMethod = strtolower(C('Garden.Registration.Method'));
+        $registrationMethod = strtolower(c('Garden.Registration.Method'));
 
         if ($registrationMethod === 'closed') {
             return '';
@@ -1114,7 +1142,7 @@ if (!function_exists('registerUrl')) {
 if (!function_exists('signInUrl')) {
     function signInUrl($target = '', $force = false) {
         // Check to see if there is even a sign in button.
-        if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
+        if (!$force && strcasecmp(c('Garden.Registration.Method'), 'Connect') !== 0) {
             $defaultProvider = Gdn_AuthenticationProviderModel::getDefault();
             if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
                 return '';
@@ -1187,7 +1215,7 @@ if (!function_exists('writeReactions')) {
     function writeReactions($Row) {
         $Attributes = GetValue('Attributes', $Row);
         if (is_string($Attributes)) {
-            $Attributes = @unserialize($Attributes);
+            $Attributes = dbdecode($Attributes);
             SetValue('Attributes', $Row, $Attributes);
         }
 

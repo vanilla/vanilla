@@ -2,7 +2,7 @@
 /**
  * DashboardHooks class.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -26,6 +26,11 @@ class DashboardHooks implements Gdn_IPlugin {
      */
     public function base_render_before($Sender) {
         $Session = Gdn::session();
+
+        // Check the statistics.
+        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            Gdn::statistics()->check();
+        }
 
         // Enable theme previewing
         if ($Session->isValid()) {
@@ -103,8 +108,14 @@ class DashboardHooks implements Gdn_IPlugin {
             }
 
             // Force embedding?
-            if (!IsSearchEngine() && !IsMobile() && strtolower($Sender->ControllerName) != 'entry') {
-                $Sender->addDefinition('ForceEmbedForum', c('Garden.Embed.ForceForum') ? '1' : '0');
+            if (!IsSearchEngine() && strtolower($Sender->ControllerName) != 'entry') {
+                if (IsMobile()) {
+                    $forceEmbedForum = c('Garden.Embed.ForceMobile') ? '1' : '0';
+                } else {
+                    $forceEmbedForum = c('Garden.Embed.ForceForum') ? '1' : '0';
+                }
+
+                $Sender->addDefinition('ForceEmbedForum', $forceEmbedForum);
                 $Sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
             }
 
@@ -158,6 +169,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
         $Menu->addLink('Appearance', t('Messages'), '/dashboard/message', 'Garden.Community.Manage', array('class' => 'nav-messages'));
         $Menu->addLink('Appearance', t('Avatars'), '/dashboard/settings/avatars', 'Garden.Community.Manage', array('class' => 'nav-avatars'));
+        $Menu->addLink('Appearance', t('Email'), '/dashboard/settings/emailstyles', 'Garden.Community.Manage', array('class' => 'nav-email-styles'));
 
         $Menu->addItem('Users', t('Users'), false, array('class' => 'Users'));
         $Menu->addLink('Users', t('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), array('class' => 'nav-users'));
@@ -394,11 +406,30 @@ class DashboardHooks implements Gdn_IPlugin {
         $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
     }
 
+    /**
+     * After executing /settings/utility/update check if any role permissions have been changed, if not reset all the permissions on the roles.
+     * @param $sender
+     */
     public function updateModel_afterStructure_handler($sender) {
         // Only setup default permissions if no role permissions are set.
         $hasPermissions = Gdn::sql()->getWhere('Permission', array('RoleID >' => 0))->firstRow(DATASET_TYPE_ARRAY);
         if (!$hasPermissions) {
             PermissionModel::resetAllRoles();
+        }
+    }
+
+    /**
+     * Add user's viewable roles to gdn.meta if user is logged in.
+     * @param $sender
+     * @param $args
+     */
+    public function gdn_dispatcher_afterControllerCreate_handler($sender, $args) {
+        // Function addDefinition returns the value of the definition if you pass only one argument.
+        if (!gdn::controller()->addDefinition('Roles')) {
+            if (Gdn::session()->isValid()) {
+                $roleModel = new RoleModel();
+                gdn::controller()->addDefinition("Roles", $roleModel->getPublicUserRoles(gdn::session()->UserID, "Name"));
+            }
         }
     }
 }

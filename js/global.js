@@ -42,21 +42,12 @@
     gdn.setMeta = function(key, value) {
         gdn.meta[key] = value;
     };
-})(window, jQuery);
-
-// Stuff to fire on document.ready().
-jQuery(document).ready(function($) {
-
-    $.postParseJson = function(json) {
-        if (json.Data) json.Data = $.base64Decode(json.Data);
-        return json;
-    };
 
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
     // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
     var uTF8Encode = function(string) {
-        return unescape(encodeURIComponent(string));
+        return decodeURI(encodeURIComponent(string));
     };
 
     // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
@@ -115,6 +106,17 @@ jQuery(document).ready(function($) {
             return output;
         }
     });
+})(window, jQuery);
+
+// Stuff to fire on document.ready().
+jQuery(document).ready(function($) {
+
+	/**
+	 * @deprecated since Vanilla 2.2
+	 */
+    $.postParseJson = function(json) {
+        return json;
+    };
 
     gdn.focused = true;
     gdn.Libraries = {};
@@ -821,6 +823,9 @@ jQuery(document).ready(function($) {
             data: SendData,
             success: function(json) {
                 gdn.inform(json);
+            },
+            complete: function(jqXHR, textStatus) {
+                jQuery(document).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
             }
         });
     };
@@ -1039,7 +1044,7 @@ jQuery(document).ready(function($) {
     if (informMessageStack) {
         var informMessages;
         try {
-            informMessages = $.parseJSON($.base64Decode(informMessageStack));
+            informMessages = $.parseJSON(informMessageStack);
             informMessageStack = {'InformMessages': informMessages};
             gdn.inform(informMessageStack);
         } catch (e) {
@@ -1056,7 +1061,7 @@ jQuery(document).ready(function($) {
 
         $.ajax({
             type: "POST",
-            url: gdn.url('dashboard/notifications/inform'),
+            url: gdn.url('/notifications/inform'),
             data: {
                 'TransientKey': gdn.definition('TransientKey'),
                 'Path': gdn.definition('Path'),
@@ -1239,7 +1244,7 @@ jQuery(document).ready(function($) {
             return false;
         }
 
-        var html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' + videoid + '" frameborder="0" allowfullscreen></iframe>';
+        var html = '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + videoid + '" frameborder="0" allowfullscreen></iframe>';
         $player.html(html);
 
         $preview.hide();
@@ -1718,7 +1723,10 @@ jQuery(document).ready(function($) {
                         // but it's the only way, as spaces make searching
                         // more ambiguous.
                         // \xA0 non-breaking space
-                        regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+                        // Skip \n which is \x0A and threat is as EOL
+                        //https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#character-classes
+                        var whiteSpaceNoLineFeed = '\\f\\r\\t\\v\​\u00a0\\u1680​\\u180e'; //\u2000​-\u200a​\u2028\u2029\u202f\u205f​\u3000\ufeff  <- was throwing error.
+                        regexp = new RegExp(flag + '\"?(['+whiteSpaceNoLineFeed+'A-Za-z0-9_\+\-]*)\"?(?:\\n|$)|' + flag + '\"?([^\\x00-\\x09\\x0B-\\xff]*)\"?(?:\\n|$)', 'gi');
 
                         match = regexp.exec(subtext);
                         if (match) {
@@ -1881,7 +1889,18 @@ jQuery(document).ready(function($) {
         }
     }());
 
-
+    /**
+     * A kludge to dodge Safari's back-forward cache (bfcache).  Without this, Safari maintains
+     * the a page's DOM during back/forward navigation and hinders our ability to invalidate
+     * the cached state of content.
+     */
+    if (/Apple Computer/.test(navigator.vendor) && /Safari/.test(navigator.userAgent)) {
+        jQuery(window).on("pageshow", function(event) {
+            if (event.originalEvent.persisted) {
+                window.location.reload();
+            }
+        });
+    }
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

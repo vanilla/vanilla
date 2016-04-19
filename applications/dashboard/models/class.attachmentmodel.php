@@ -2,7 +2,7 @@
 /**
  * Attachment Model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.2
@@ -81,7 +81,7 @@ class AttachmentModel extends Gdn_Model {
             if (is_array($Row['Attributes'])) {
                 $Attributes = $Row['Attributes'];
             } else {
-                $Attributes = unserialize($Row['Attributes']);
+                $Attributes = dbdecode($Row['Attributes']);
             }
             if (is_array($Attributes)) {
                 $Row = array_replace($Row, $Attributes);
@@ -283,7 +283,7 @@ class AttachmentModel extends Gdn_Model {
             $PrimaryKeyVal = $Data['AttachmentID'];
             $CurrentAttachment = $this->SQL->getWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
             if ($CurrentAttachment) {
-                $Attributes = @unserialize($CurrentAttachment['Attributes']);
+                $Attributes = dbdecode($CurrentAttachment['Attributes']);
                 if (!$Attributes) {
                     $Attributes = array();
                 }
@@ -327,7 +327,7 @@ class AttachmentModel extends Gdn_Model {
             $Fields = $this->Validation->validationFields();
 
             if ($Insert === false) {
-                $Fields = removeKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
+                unset($Fields[$this->PrimaryKey]); // Don't try to update the primary key
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
             } else {
                 $PrimaryKeyVal = $this->insert($Fields);

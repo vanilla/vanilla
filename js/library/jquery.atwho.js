@@ -559,19 +559,31 @@
       };
 
       Controller.prototype.content = function() {
+        var result = {
+          content: null,
+          offset: 0
+        };
+
         if (this.$inputor.is('textarea, input')) {
-          return this.$inputor.val();
+          result.content = this.$inputor.val();
         } else {
-          return this.$inputor.text();
+          var textNode = $(document.createElement('div'));
+          var html = this.$inputor.html();
+          var breaks = /<br(\s+)?(\/)?>/g;
+          result.offset = html.match(breaks) ? html.match(breaks).length : 0;
+          textNode.html(html.replace(breaks, "\n"));
+          result.content = textNode.text();
         }
+
+        return result;
       };
 
       Controller.prototype.catch_query = function() {
-        var caret_pos, content, end, query, start, subtext;
-        content = this.content();
+        var caret_pos, contents, end, query, start, subtext;
+        contents = this.content();
         ////caret_pos = this.$inputor.caret('pos');
-        caret_pos = this.$inputor.caret('pos', this.setting.cWindow);
-        subtext = content.slice(0, caret_pos);
+        caret_pos = this.$inputor.caret('pos', this.setting.cWindow) + contents.offset;
+        subtext = contents.content.slice(0, caret_pos);
         query = this.callbacks("matcher").call(this, this.at, subtext, this.get_opt('start_with_space'));
         if (typeof query === "string" && query.length <= this.get_opt('max_len', 20)) {
           start = caret_pos - query.length;
@@ -692,7 +704,8 @@
           range.setStart(range.endContainer, Math.max(pos, 0));
           range.setEnd(range.endContainer, range.endOffset);
           range.deleteContents();
-          range.insertNode($insert_node[0]);
+          range.insertNode(document.createTextNode(content + " "));
+          //range.insertNode($insert_node[0]);
           range.collapse(false);
 
           ////sel = window.getSelection();

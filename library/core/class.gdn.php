@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -369,7 +369,7 @@ class Gdn {
         }
 
         if ($InstallationID === false) {
-            $InstallationID = C('Garden.InstallationID', null);
+            $InstallationID = c('Garden.InstallationID', null);
         }
 
         return $InstallationID;
@@ -394,7 +394,7 @@ class Gdn {
         }
 
         if ($InstallationSecret === false) {
-            $InstallationSecret = C('Garden.InstallationSecret', null);
+            $InstallationSecret = c('Garden.InstallationSecret', null);
         }
 
         return $InstallationSecret;
@@ -431,6 +431,9 @@ class Gdn {
         return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
     }
 
+    /**
+     * @return Gdn_Regarding
+     */
     public static function regarding() {
         return self::factory('Regarding');
     }

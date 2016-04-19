@@ -2,7 +2,7 @@
 /**
  * VanillaHooks Plugin
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @since 2.0
  * @package Vanilla
@@ -148,6 +148,15 @@ class VanillaHooks implements Gdn_IPlugin {
             ))
             ->where('UserID', $userID)
             ->put();
+    }
+
+    /**
+     *
+     *
+     * @param $sender
+     */
+    public function discussionController_beforeCommentBody_handler($sender) {
+        Gdn::regarding()->beforeCommentBody($sender);
     }
 
     /**
@@ -305,7 +314,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $UserID = val('UserID', $Sender->EventArguments);
         $Options = val('Options', $Sender->EventArguments, array());
         $Options = is_array($Options) ? $Options : array();
-        $Content =& $Sender->EventArguments['Content'];
+        $Content = &$Sender->EventArguments['Content'];
 
         $this->deleteUserData($UserID, $Options, $Content);
     }

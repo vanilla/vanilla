@@ -3,7 +3,7 @@
  * Theme system.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -382,10 +382,13 @@ class Gdn_Theme {
      * @param array $Properties
      */
     public static function logo($Properties = array()) {
-        $Logo = C('Garden.Logo');
+        $Logo = c('Garden.Logo');
 
         if ($Logo) {
-            $Logo = ltrim($Logo, '/');
+            // Only trim slash from relative paths.
+            if (!stringBeginsWith($Logo, '//')) {
+                $Logo = ltrim($Logo, '/');
+            }
 
             // Fix the logo path.
             if (stringBeginsWith($Logo, 'uploads/')) {
@@ -393,13 +396,13 @@ class Gdn_Theme {
             }
 
             // Set optional title text.
-            if (empty($Properties['title']) && C('Garden.LogoTitle')) {
-                $Properties['title'] = C('Garden.LogoTitle');
+            if (empty($Properties['title']) && c('Garden.LogoTitle')) {
+                $Properties['title'] = c('Garden.LogoTitle');
             }
         }
 
         // Use the site title as alt if none was given.
-        $Title = C('Garden.Title', 'Title');
+        $Title = c('Garden.Title', 'Title');
         if (empty($Properties['alt'])) {
             $Properties['alt'] = $Title;
         }
@@ -414,8 +417,8 @@ class Gdn_Theme {
      * @return string
      */
     public static function mobileLogo() {
-        $Logo = C('Garden.MobileLogo', C('Garden.Logo'));
-        $Title = C('Garden.MobileTitle', C('Garden.Title', 'Title'));
+        $Logo = c('Garden.MobileLogo', c('Garden.Logo'));
+        $Title = c('Garden.MobileTitle', c('Garden.Title', 'Title'));
 
         if ($Logo) {
             return Img(Gdn_Upload::url($Logo), array('alt' => $Title));
@@ -551,6 +554,6 @@ class Gdn_Theme {
      * @return mixed
      */
     public static function text($Code, $Default) {
-        return C("ThemeOption.{$Code}", t('Theme_'.$Code, $Default));
+        return c("ThemeOption.{$Code}", t('Theme_'.$Code, $Default));
     }
 }

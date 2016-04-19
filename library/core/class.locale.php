@@ -3,7 +3,7 @@
  * Gdn_Locale.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -173,7 +173,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->Locale = $CurrentLocale;
         $LocaleSources = $this->getLocaleSources($CurrentLocale, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
 
-        $Codeset = C('Garden.LocaleCodeset', 'UTF8');
+        $Codeset = c('Garden.LocaleCodeset', 'UTF8');
 
         $SetLocale = array(
             LC_TIME,
@@ -214,7 +214,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         }
 
         // Prepare developer mode if needed
-        $this->DeveloperMode = C('Garden.Locales.DeveloperMode', false);
+        $this->DeveloperMode = c('Garden.Locales.DeveloperMode', false);
         if ($this->DeveloperMode) {
             $this->DeveloperContainer = new Gdn_Configuration();
             $this->DeveloperContainer->splitting(false);
@@ -292,7 +292,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->crawlAddonLocaleSources(PATH_APPLICATIONS, $applicationWhiteList, $result);
 
         // Get locale-based locale definition files.
-        $enabledLocales = C('EnabledLocales');
+        $enabledLocales = c('EnabledLocales');
         if (is_array($enabledLocales)) {
             foreach ($enabledLocales as $localeKey => $locale) {
                 $locale = self::canonicalize($locale);
@@ -310,7 +310,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $this->crawlAddonLocaleSources(PATH_PLUGINS, $pluginWhiteList, $result);
 
         // Get theme-based locale definition files.
-        $theme = C('Garden.Theme');
+        $theme = c('Garden.Theme');
         if ($theme) {
             $this->crawlAddonLocaleSources(PATH_THEMES, array($theme), $result);
         }
@@ -363,11 +363,23 @@ class Gdn_Locale extends Gdn_Pluggable {
 
     /**
      * Return the first 2 letters of the current locale (the language code).
+     *
+     * @param bool $iso6391 Attempt to use ISO 639-1 language codes.
+     * @return bool|string Language code on success, false on failure.
      */
-    public function language() {
+    public function language($iso6391 = false) {
         if ($this->Locale == '') {
             return false;
         } else {
+            if ($iso6391) {
+                // ISO 639-1 has some special exceptions for language codes.
+                $locale = strtolower($this->Locale);
+                switch ($locale) {
+                    case 'zh_tw':
+                        return 'zh-Hant';
+                }
+            }
+
             return substr($this->Locale, 0, 2);
         }
     }

@@ -6,7 +6,7 @@
  * My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -147,7 +147,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         foreach ($Result as &$Row) {
             if (is_object($Row)) {
                 if (is_string($Row->$Name)) {
-                    $Attributes = @unserialize($Row->$Name);
+                    $Attributes = dbdecode($Row->$Name);
 
                     if (is_array($Attributes)) {
                         foreach ($Attributes as $N => $V) {
@@ -158,7 +158,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
                 }
             } else {
                 if (is_string($Row[$Name])) {
-                    $Attributes = @unserialize($Row[$Name]);
+                    $Attributes = dbdecode($Row[$Name]);
 
                     if (is_array($Attributes)) {
                         $Row = array_merge($Row, $Attributes);
@@ -635,11 +635,11 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
             foreach ($Fields as $Field) {
                 if (is_object($Row)) {
                     if (is_string($Row->$Field)) {
-                        $Row->$Field = @unserialize($Row->$Field);
+                        $Row->$Field = dbdecode($Row->$Field);
                     }
                 } else {
                     if (is_string($Row[$Field])) {
-                        $Row[$Field] = @unserialize($Row[$Field]);
+                        $Row[$Field] = dbdecode($Row[$Field]);
                     }
                 }
             }

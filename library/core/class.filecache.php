@@ -3,7 +3,7 @@
  * Gdn_Filecache.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -52,7 +52,7 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function autorun() {
         $this->addContainer(array(
-            Gdn_Cache::CONTAINER_LOCATION => C('Cache.Filecache.Store')
+            Gdn_Cache::CONTAINER_LOCATION => c('Cache.Filecache.Store')
         ));
     }
 

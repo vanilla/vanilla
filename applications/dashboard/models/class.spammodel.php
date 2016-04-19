@@ -2,7 +2,7 @@
 /**
  * Spam model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -193,7 +193,7 @@ class SpamModel extends Gdn_Pluggable {
 
         if ($deleteRow) {
             // Remove the record to the log.
-            $model->delete($id);
+            $model->deleteID($id);
         }
 
         LogModel::insert('Spam', $recordType, $row, $logOptions);

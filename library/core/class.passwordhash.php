@@ -199,19 +199,21 @@ class Gdn_PasswordHash extends PasswordHash {
     protected function checkVanilla($Password, $StoredHash) {
         $this->Weak = false;
 
-        if (empty($StoredHash)) {
+        if (empty($Password) || empty($StoredHash)) {
+            // We don't care if there is a strong password hash. Empty passwords are not cool
             return false;
-        }
-
-        if (substr($StoredHash, 0, 3) !== '$P$' && function_exists('password_verify')) {
+        } elseif ($StoredHash && $StoredHash !== '*'
+            && !in_array(substr($StoredHash, 0, 1), ['_', '$'], true)
+            && ($Password === $StoredHash || md5($Password) === $StoredHash)
+        ) {
+            $this->Weak = true;
+            return true;
+        } elseif (substr($StoredHash, 0, 3) !== '$P$' && function_exists('password_verify')) {
             // This is a password that uses crypt and can be checked with PHP's built in function.
             $this->Weak = password_needs_rehash($StoredHash, PASSWORD_DEFAULT);
 
             return password_verify((string)$Password, $StoredHash);
-        }
-
-
-        if ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
+        } elseif ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
             $Result = parent::checkPassword($Password, $StoredHash);
 
             // Check to see if this password should be rehashed to crypt-blowfish.
@@ -220,11 +222,6 @@ class Gdn_PasswordHash extends PasswordHash {
             }
 
             return $Result;
-        } elseif ($Password && $StoredHash !== '*'
-            && ($Password === $StoredHash || md5($Password) === $StoredHash)
-        ) {
-            $this->Weak = true;
-            return true;
         }
         return false;
     }

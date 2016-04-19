@@ -42,6 +42,51 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * An empty password should always fail.
+     */
+    public function testEmptyPassword() {
+        $pw = new Gdn_PasswordHash();
+
+        $hash = $pw->hashPassword('');
+        $this->assertFalse($pw->checkPassword('', $hash, 'Vanilla'));
+    }
+
+    /**
+     * A plaintext password will verify, but be marked as weak.
+     */
+    public function testPlainTextPassword() {
+        $pw = new Gdn_PasswordHash();
+
+        $password = 'password123';
+        $this->assertTrue($pw->checkPassword($password, $password, 'Vanilla'));
+        $this->assertTrue($pw->Weak);
+    }
+
+    /**
+     * A hashed password should not verify if it looks like a crypt password.
+     */
+    public function testNoPlaintextHash() {
+        $pw = new Gdn_PasswordHash();
+
+        $password = 'letmeinPLEASE!!!!';
+        $hash = $pw->hashPassword($password);
+        $this->assertTrue($pw->checkPassword($password, $hash, 'Vanilla'));
+        $this->assertFalse($pw->checkPassword($hash, $hash, 'Vanilla'));
+    }
+
+    /**
+     * Vanilla 1 used MD5 so we should support that, but mark them as weak.
+     */
+    public function testOldMd5Passwords() {
+        $pw = new Gdn_PasswordHash();
+
+        $password = 'don\'tkickmeout';
+        $hash = md5($password);
+        $this->assertTrue($pw->checkPassword($password, $hash, 'Vanilla'));
+        $this->assertTrue($pw->Weak);
+    }
+
+    /**
      * Make sure that the **password_** functions are backwards compatible.
      */
     public function testDifferentHashVerifys() {

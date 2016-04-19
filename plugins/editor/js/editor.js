@@ -1769,6 +1769,11 @@
             }
         } //editorInit
 
+
+        // Initialize new editors.
+        $(document).on('EditCommentFormLoaded popupReveal', function () {
+            editorInit('', $(selector));
+        });
         editorInit('', this);
 
         // jQuery chaining

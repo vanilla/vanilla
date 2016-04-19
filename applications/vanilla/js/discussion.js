@@ -288,10 +288,8 @@ jQuery(document).ready(function($) {
                 },
                 success: function(json) {
                     json = $.postParseJson(json);
-
-                    $(msg).after(json.Data);
+                    $(msg).after(json.Data).trigger('start');
                     $(msg).hide();
-                    $(document).trigger('EditCommentFormLoaded', [container]);
                 },
                 complete: function() {
                     $(parent).find('span.TinyProgress').remove();

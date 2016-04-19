@@ -62,6 +62,7 @@ class DbEncodeDecodeTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDbEncodeNull() {
         $this->assertNull(dbencode(null));
+        $this->assertNull(dbencode(''));
     }
 
     /**
@@ -69,6 +70,7 @@ class DbEncodeDecodeTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDbDecodeNull() {
         $this->assertNull(dbdecode(null));
+        $this->assertNull(dbdecode(''));
     }
 
     /**

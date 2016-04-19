@@ -51,7 +51,6 @@ class UpdateModel extends Gdn_Model {
      * Check an addon's file to extract the addon information out of it.
      *
      * @param string $Path The path to the file.
-     * @param bool $Fix Whether or not to fix files that have been zipped incorrectly.
      * @return array An array of addon information.
      */
     public static function analyzeAddon($Path, $ThrowError = true) {
@@ -512,7 +511,7 @@ class UpdateModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Path
+     * @param string $Path
      * @param $InfoPaths
      * @return array
      */
@@ -536,7 +535,7 @@ class UpdateModel extends Gdn_Model {
     /**
      * Open a zip archive and inspect its contents for the requested paths.
      *
-     * @param $Path
+     * @param string $Path
      * @param $InfoPaths
      * @param bool $TmpPath
      * @param bool $ThrowError

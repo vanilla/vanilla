@@ -126,7 +126,6 @@ class ActivityController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number of activity items to skip.
      */
     public function index($Filter = false, $Page = false) {
         switch (strtolower($Filter)) {
@@ -152,7 +151,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         // Which page to load
-        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Activities.PerPage',30));
+        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Activities.PerPage', 30));
         $Offset = is_numeric($Offset) ? $Offset : 0;
         if ($Offset < 0) {
             $Offset = 0;

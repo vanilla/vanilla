@@ -28,8 +28,6 @@ class LogController extends DashboardController {
      * @since 2.0.?
      * @access public
      *
-     * @param string $Action Type of action.
-     * @param array $LogIDs Numeric IDs of items to confirm.
      */
     public function confirm() {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -40,7 +38,7 @@ class LogController extends DashboardController {
         $LogIDs = Gdn::request()->post('IDs', false);
 
         $this->Form->addHidden('LogIDs', $LogIDs);
-       $this->Form->IDPrefix = 'Confirm_';
+        $this->Form->IDPrefix = 'Confirm_';
 
         if (trim($LogIDs)) {
             $LogIDArray = explode(',', $LogIDs);
@@ -103,7 +101,6 @@ class LogController extends DashboardController {
      * @since 2.0.?
      * @access public
      *
-     * @param array $LogIDs Numeric IDs of logs to delete.
      */
     public function delete() {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -117,7 +114,6 @@ class LogController extends DashboardController {
 
     /**
      * Delete spam and optionally delete the users.
-     * @param type $LogIDs
      */
     public function deleteSpam() {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -270,7 +266,6 @@ class LogController extends DashboardController {
      * @since 2.0.?
      * @access public
      *
-     * @param mixed $CategoryUrl Slug.
      * @param int $Page Page number.
      */
     public function moderation($Page = '') {
@@ -310,7 +305,6 @@ class LogController extends DashboardController {
      * @since 2.0.?
      * @access public
      *
-     * @param array $LogIDs List of log IDs.
      */
     public function restore() {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {

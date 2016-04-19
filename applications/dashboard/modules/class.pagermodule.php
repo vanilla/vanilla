@@ -212,8 +212,8 @@ class PagerModule extends Gdn_Module {
     /**
      *
      *
-     * @param $Url
-     * @param $Page
+     * @param string $Url
+     * @param string $Page
      * @param string $Limit
      * @return mixed|string
      */

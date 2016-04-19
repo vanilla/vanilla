@@ -30,6 +30,7 @@ abstract class ConversationsModel extends Gdn_Model {
      * seconds or their account will be locked for $SpamLock seconds.
      *
      * @since 2.2
+     * @param string $Type
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
     public function checkForSpam($Type, $SkipSpamCheck = false) {

@@ -712,7 +712,7 @@ class ActivityModel extends Gdn_Model {
      * @param int $RegardingUserID
      * @param int $CommentActivityID
      * @param string $Route
-     * @param mixed $SendEmail
+     * @param string $SendEmail
      * @return int ActivityID of item created.
      */
     public function add($ActivityUserID, $ActivityType, $Story = null, $RegardingUserID = null, $CommentActivityID = null, $Route = null, $SendEmail = '') {

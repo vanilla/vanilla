@@ -404,7 +404,6 @@ class ConversationModel extends ConversationsModel {
      * Gets a nice title to represent the participants in a conversation.
      *
      * @param array|object $Conversation
-     * @param array|object $Participants
      * @return string Returns a title for the conversation.
      */
     public static function participantTitle($Conversation, $Html = true, $Max = 3) {
@@ -709,7 +708,7 @@ class ConversationModel extends ConversationsModel {
      *
      * @param int $ConversationID Unique ID of conversation effected.
      * @param int $UserID Unique ID of current user.
-     * @return bool Whether it is currently bookmarked.
+     * @return string|false Whether it is currently bookmarked.
      */
     public function bookmark($ConversationID, $UserID) {
         $Bookmark = false;

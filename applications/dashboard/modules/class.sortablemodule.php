@@ -61,7 +61,6 @@ abstract class SortableModule extends Gdn_Module {
     /**
      * Constructor. Should be called by all extending classes' constructors.
      *
-     * @param string $view The filename of the view to render, excluding the extension.
      * @param bool $flatten Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
      * @param bool $useCssPrefix Whether to use CSS prefixes on the generated CSS classes for the items.
      */
@@ -84,7 +83,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @param string $cssClass The divider's CSS class.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addDividerIf($isAllowed = true, $key = '', $cssClass = '', $sort = array()) {
@@ -101,7 +100,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @param string $cssClass The divider's CSS class.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addDivider($key = '', $cssClass = '', $sort = array()) {
@@ -129,7 +128,7 @@ abstract class SortableModule extends Gdn_Module {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
@@ -151,7 +150,7 @@ abstract class SortableModule extends Gdn_Module {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addGroup($text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
@@ -192,7 +191,7 @@ abstract class SortableModule extends Gdn_Module {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = array(), $disabled = false, $modifiers = array()) {
@@ -216,7 +215,7 @@ abstract class SortableModule extends Gdn_Module {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = array(), $disabled = false, $modifiers = array()) {
@@ -246,7 +245,7 @@ abstract class SortableModule extends Gdn_Module {
         }
         $link['listItemCssClass'] = implode(' ', $listItemCssClasses);
 
-	    $this->addItem('link', $link);
+        $this->addItem('link', $link);
         return $this;
     }
 

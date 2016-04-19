@@ -111,7 +111,6 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $UserReference Unique identifier, possible ID or username.
      * @param string $Username Username.
      * @param int $UserID Unique ID.
-     * @param int $Offset How many to skip (for paging).
      */
     public function activity($UserReference = '', $Username = '', $UserID = '', $Page = '') {
         $this->permission('Garden.Profiles.View');
@@ -1500,11 +1499,9 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $User Unique identifier, possibly username or ID.
      * @param string $Username .
-     * @param int $UserID Unique ID.
      * @param bool $CheckPermissions Whether or not to check user permissions.
-     * @return bool Always true.
+     * @return null|boolean Always true.
      */
     public function getUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = false) {
         if ($this->_UserInfoRetrieved) {
@@ -1655,6 +1652,9 @@ class ProfileController extends Gdn_Controller {
         $this->_CurrentTab = $this->CurrentTab; // Backwards Compat
     }
 
+    /**
+     * @param boolean $Switch
+     */
     public function editMode($Switch) {
 
         $this->EditMode = $Switch;

@@ -123,7 +123,7 @@ class LocaleModel {
      *
      *
      * @param $Path
-     * @param null $Skip
+     * @param string|null $Skip
      * @return array
      */
     public function loadDefinitions($Path, $Skip = null) {
@@ -192,6 +192,9 @@ class LocaleModel {
         return $DestPath;
     }
 
+    /**
+     * @return string
+     */
     protected function getFileHeader() {
         $Now = Gdn_Format::toDateTime();
 

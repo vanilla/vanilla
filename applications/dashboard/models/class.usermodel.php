@@ -222,8 +222,7 @@ class UserModel extends Gdn_Model {
      * value indicating if the action is permitted.
      *
      * @param mixed $User The user to check
-     * @param mixed $Permission The permission (or array of permissions) to check.
-     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+     * @param string $Permission The permission (or array of permissions) to check.
      * @return boolean
      */
     public function checkPermission($User, $Permission, $Options = array()) {
@@ -324,11 +323,11 @@ class UserModel extends Gdn_Model {
      * Backup user before merging.
      *
      * @param $MergeID
-     * @param $Table
-     * @param $Column
-     * @param $OldUserID
-     * @param $NewUserID
-     * @param null $PK
+     * @param string $Table
+     * @param string $Column
+     * @param integer $OldUserID
+     * @param integer $NewUserID
+     * @param string $PK
      */
     protected function mergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID, $PK = null) {
         if (!$PK) {
@@ -356,8 +355,8 @@ class UserModel extends Gdn_Model {
     /**
      * Start merging user accounts.
      *
-     * @param $OldUserID
-     * @param $NewUserID
+     * @param integer $OldUserID
+     * @param integer $NewUserID
      * @return unknown
      * @throws Gdn_UserException
      */
@@ -452,7 +451,7 @@ class UserModel extends Gdn_Model {
     /**
      * User counts.
      *
-     * @param $Column
+     * @param string $Column
      * @param null $UserID
      */
     public function counts($Column, $UserID = null) {
@@ -570,7 +569,7 @@ class UserModel extends Gdn_Model {
      * Users respond to confirmation emails by clicking a link that takes them here.
      *
      * @param $User
-     * @param $EmailKey
+     * @param string $EmailKey
      * @return bool
      * @throws Exception
      */
@@ -1534,7 +1533,7 @@ class UserModel extends Gdn_Model {
      * pairs.
      *
      * @param $UserID integer UserID or array of UserIDs.
-     * @param $Key string relative user meta key.
+     * @param string $Key string relative user meta key.
      * @return array results or $Default
      */
     public static function getMeta($UserID, $Key, $Prefix = '', $Default = '') {
@@ -1708,6 +1707,8 @@ class UserModel extends Gdn_Model {
      *
      * @since 2.1.0
      * @access public
+     * @param integer $UserID
+     * @param integer $Points
      */
     public static function givePoints($UserID, $Points, $Source = 'Other', $Timestamp = false) {
         if (!$Timestamp) {
@@ -1759,6 +1760,7 @@ class UserModel extends Gdn_Model {
      * @since 2.1.0
      * @access protected
      * @see self::GivePoints
+     * @param string $SlotType
      */
     protected static function _givePoints($UserID, $Points, $SlotType, $Source = 'Total', $CategoryID = 0, $Timestamp = false) {
         $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::timeSlotStamp($SlotType, $Timestamp));
@@ -2249,7 +2251,7 @@ class UserModel extends Gdn_Model {
      *
      * @param $UserID
      * @param $RoleIDs
-     * @param $RecordEvent
+     * @param boolean $RecordEvent
      */
     public function saveRoles($UserID, $RoleIDs, $RecordEvent) {
         if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
@@ -3279,7 +3281,7 @@ class UserModel extends Gdn_Model {
     /**
      * Delete a user's content across many contexts.
      *
-     * @param $UserID
+     * @param integer $UserID
      * @param array $Options
      * @param array $Content
      * @return bool|int
@@ -3547,6 +3549,7 @@ class UserModel extends Gdn_Model {
      * @param int The UserID to save.
      * @param mixed The name of the value being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
      * @param mixed The value being saved.
+     * @param string $Column
      */
     public function saveToSerializedColumn($Column, $UserID, $Name, $Value = '') {
         // Load the existing values
@@ -3751,7 +3754,7 @@ class UserModel extends Gdn_Model {
      * Get an Attribute from a single user.
      *
      * @param $UserID
-     * @param $Attribute
+     * @param string $Attribute
      * @param bool $DefaultValue
      * @return mixed
      */
@@ -4317,9 +4320,9 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $UserID
+     * @param integer $UserID
      * @param $Field
-     * @param null $Value
+     * @param boolean $Value
      */
     public function updateUserCache($UserID, $Field, $Value = null) {
         // Try and get the user from the cache.
@@ -4391,7 +4394,8 @@ class UserModel extends Gdn_Model {
      * Delete cached data for user
      *
      * @param type $UserID
-     * @return type
+     * @param string[] $CacheTypesToClear
+     * @return boolean
      */
     public function clearCache($UserID, $CacheTypesToClear = null) {
         if (is_null($UserID) || !$UserID) {

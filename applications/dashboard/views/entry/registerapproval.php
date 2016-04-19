@@ -44,12 +44,6 @@
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.t("Passwords don't match").'</span>';
                 ?>
             </li>
-            <li class="Gender">
-                <?php
-                echo $this->Form->label('Gender', 'Gender');
-                echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
-                ?>
-            </li>
             <?php $this->fireEvent('ExtendedRegistrationFields'); ?>
             <li>
                 <?php

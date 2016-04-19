@@ -2,7 +2,7 @@
 /**
  * RBAC (Role Based Access Control) system.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -92,7 +92,7 @@ class RoleController extends DashboardController {
             }
             if ($this->Form->errorCount() == 0) {
                 // Go ahead and delete the Role
-                $this->RoleModel->delete($RoleID, $this->Form->getValue('ReplacementRoleID'));
+                $this->RoleModel->deleteAndReplace($RoleID, $this->Form->getValue('ReplacementRoleID'));
                 $this->RedirectUrl = url('dashboard/role');
                 $this->informMessage(t('Deleting role...'));
             }

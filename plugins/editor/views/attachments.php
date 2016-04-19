@@ -37,9 +37,20 @@ $editorkey = $this->data('_editorkey');
          <?php echo $filePreviewCss; ?>
          <div class="file-data">
             <a class="filename" data-type="<?php echo $attachment['Type']; ?>"
-               data-width="<?php echo $attachment['ImageWidth']; ?>"
-               data-height="<?php echo $attachment['ImageHeight']; ?>" href="<?php echo $pathParse['Url'] ?>"
-               target="_blank"><?php echo htmlspecialchars($attachment['Name']); ?></a>
+               href="<?php echo $pathParse['Url'] ?>"
+               target="_blank"
+                <?php
+                if ($attachment['ImageHeight']) {
+                    echo 'data-width="'.$attachment['ImageWidth'].'"';
+                    echo 'data-height="'.$attachment['ImageHeight'].'"';
+                } else {
+                    // Only add the download attribute if it's not an image.
+                    echo 'download="'.htmlspecialchars($attachment['Name']).'"';
+                }
+                ?>
+                >
+                <?php echo htmlspecialchars($attachment['Name']); ?>
+            </a>
             <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
          </div>
          <span class="editor-file-remove" title="<?php echo t('Remove'); ?>"></span>

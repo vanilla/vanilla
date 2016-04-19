@@ -3,7 +3,7 @@
  * Routing system.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -30,12 +30,13 @@ class Gdn_Router extends Gdn_Pluggable {
     public function __construct() {
         parent::__construct();
         $this->RouteTypes = array(
-            'Internal' => 'Internal',
-            'Temporary' => 'Temporary (302)',
-            'Permanent' => 'Permanent (301)',
+            'Internal'      => 'Internal',
+            'Temporary'     => 'Temporary (302)',
+            'Permanent'     => 'Permanent (301)',
             'NotAuthorized' => 'Not Authorized (401)',
-            'NotFound' => 'Not Found (404)',
-            'Test' => 'Test'
+            'NotFound'      => 'Not Found (404)',
+            'Drop'          => 'Drop Request',
+            'Test'          => 'Test'
         );
         $this->ReservedRoutes = array('DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode');
         $this->_loadRoutes();

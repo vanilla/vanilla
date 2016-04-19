@@ -1,0 +1,28 @@
+{
+  "name": "assets",
+  "private": true,
+  "devDependencies": {
+    "bower": "*",
+    "grunt": "0.4.x",
+    "grunt-autoprefixer": "3.0.x",
+    "grunt-cli": "0.1.x",
+    "grunt-contrib-csslint": "0.5.x",
+    "grunt-contrib-imagemin": "1.0.x",
+    "grunt-contrib-jshint": "0.11.x",
+    "grunt-contrib-watch": "0.6.x",
+    "grunt-sass": "1.1.x",
+    "grunt-scss-lint": "^0.3.8",
+    "grunt-wiredep": "2.0.x",
+    "load-grunt-tasks": "3.3.x",
+    "time-grunt": "1.2.x",
+    "wiredep": "3.0.x"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "install": "bower install",
+    "build": "grunt",
+    "watch": "grunt watch"
+  }
+}

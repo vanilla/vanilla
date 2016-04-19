@@ -209,23 +209,6 @@
             }());
 
             /**
-             * Toggle spoilers.
-             */
-            $(document).on('mouseup', '.Spoiled', function(e) {
-                // Do not close if its a link or user selects some text.
-                if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-                    $(this).removeClass('Spoiled').addClass('Spoiler');
-                }
-                e.stopPropagation(); // for nesting
-            });
-
-            $(document).on('mouseup', '.Spoiler', function(e) {
-                $(this).removeClass('Spoiler').addClass('Spoiled');
-                e.stopPropagation(); // for nesting
-            });
-
-
-            /**
              * Lights on/off in fullpage
              *
              * Note: Wysiwyg makes styling the BodyBox more difficult as it's an
@@ -1500,6 +1483,14 @@
 
                 var currentEditableCommentId = (new Date()).getTime();
                 var editorName = 'vanilla-editor-text-' + currentEditableCommentId;
+                $(document).on('click', 'a.PreviewButton', function() {
+
+                    $currentEditorToolbar.hide();
+                });
+
+                $(document).on('click', 'a.WriteButton', function() {
+                    $currentEditorToolbar.show();
+                });
 
                 switch (format) {
                     case 'wysiwyg':
@@ -1794,7 +1785,6 @@ jQuery(document).ready(function($) {
 $(document).on('start', function(e, element) {
     $('.BodyBox', $(element)).setAsEditor();
 });
-
 
 /*
  * This is an example of hooking into the custom parse event, to enable

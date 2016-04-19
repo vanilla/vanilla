@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package vanilla-smarty
  * @since 2.0
@@ -16,7 +16,6 @@
 function smarty_function_searchbox($params, &$smarty) {
     $placeholder = array_key_exists('placeholder', $params) ? val('placeholder', $params, '', true) : t('SearchBoxPlaceHolder', 'Search');
     $form = Gdn::factory('Form');
-    $form->InputPrefix = '';
     $result =
         $form->open(array('action' => url('/search'), 'method' => 'get')).
         $form->textBox('Search', array('placeholder' => $placeholder, 'accesskey' => '/')).

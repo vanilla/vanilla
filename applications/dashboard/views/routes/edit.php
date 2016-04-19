@@ -1,9 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php
-        if ($this->Route !== FALSE)
+        if ($this->Route !== false) {
             echo t('Edit Route');
-        else
+        } else {
             echo t('Add Route');
+        }
         ?></h1>
 <?php
 echo $this->Form->open();
@@ -30,7 +31,7 @@ echo $this->Form->errors();
         <li>
             <?php
             echo $this->Form->label('Type', 'Route Type');
-            echo $this->Form->DropDown('Type', Gdn::router()->GetRouteTypes());
+            echo $this->Form->dropDown('Type', Gdn::router()->getRouteTypes());
             ?>
         </li>
     </ul>

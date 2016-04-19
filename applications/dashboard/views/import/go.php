@@ -68,9 +68,9 @@ if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
 
 if ($Complete) {
     include($this->fetchViewLocation('stats', 'import', 'dashboard'));
-    echo anchor(t('Finished'), 'dashboard/import/restart', 'Button');
+    echo anchor(t('Finished'), 'dashboard/import/restart/'.urlencode(Gdn::session()->transientKey()), 'Button');
 } else {
     echo '<noscript><div>',
-    anchor(t('Continue'), strtolower($this->Application).'/import/go', 'Button'),
+    anchor(t('Continue'), strtolower($this->Application).'/import/go/'.urlencode(Gdn::session()->transientKey()), 'Button'),
     '</div></noscript>';
 }

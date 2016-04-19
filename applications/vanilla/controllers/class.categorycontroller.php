@@ -2,7 +2,7 @@
 /**
  * Discussion controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0.17.9
@@ -31,6 +31,19 @@ class CategoryController extends VanillaController {
         }
 
         $this->render();
+    }
+
+    public function initialize() {
+        parent::initialize();
+
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues with outdated category
+         * information (e.g. counts).  The same check is performed here as in Gdn_Controller before the Cache-Control
+         * header is added, but this value includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
     }
 
     public function markRead($CategoryID, $TKey) {

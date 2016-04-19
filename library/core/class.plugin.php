@@ -3,7 +3,7 @@
  * Gdn_Plugin
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -256,7 +256,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     public function autoToggle($Sender, $Redirect = null) {
         $PluginName = $this->getPluginIndex();
         $EnabledKey = "Plugins.{$PluginName}.Enabled";
-        $CurrentConfig = C($EnabledKey, false);
+        $CurrentConfig = c($EnabledKey, false);
         $PassedKey = val(1, $Sender->RequestArgs);
 
         if ($Sender->Form->authenticatedPostBack() || Gdn::session()->validateTransientKey($PassedKey)) {
@@ -304,7 +304,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     public function IsEnabled() {
         $PluginName = $this->GetPluginIndex();
         $EnabledKey = "Plugins.{$PluginName}.Enabled";
-        return C($EnabledKey, false);
+        return c($EnabledKey, false);
     }
 
     /**

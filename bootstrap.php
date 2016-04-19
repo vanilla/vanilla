@@ -2,7 +2,7 @@
 /**
  * Bootstrap.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -90,6 +90,8 @@ debug(c('Debug', false));
 Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
 Gdn::request()->fromEnvironment();
 
+setHandlers();
+
 /**
  * Extension Managers
  *
@@ -108,8 +110,8 @@ Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
 // Load the configurations for enabled Applications.
-foreach (Gdn::applicationManager()->enabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
-    Gdn::config()->load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
+foreach (Gdn::applicationManager()->enabledApplicationFolders() as $applicationName => $applicationFolder) {
+    Gdn::config()->load(PATH_APPLICATIONS."/{$applicationFolder}/settings/configuration.php");
 }
 
 /**
@@ -169,7 +171,7 @@ Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
 Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher');
 
 // Smarty Templating Engine
-Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/Smarty-2.6.25/libs/Smarty.class.php');
+Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/smarty/libs/Smarty.class.php');
 Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 
 // Slice handler
@@ -184,6 +186,7 @@ Gdn::factoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
 Gdn::regarding();
 
 // Other objects.
+Gdn::FactoryInstall('BBCodeFormatter', 'BBCode', null, Gdn::FactorySingleton);
 Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
 
 /**
@@ -194,22 +197,22 @@ Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
  */
 
 // Applications startup
-foreach (Gdn::applicationManager()->enabledApplicationFolders() as $ApplicationName => $ApplicationFolder) {
+foreach (Gdn::applicationManager()->enabledApplicationFolders() as $applicationName => $applicationFolder) {
     // Include the application's bootstrap.
-    $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
-    if (file_exists($Gdn_Path)) {
-        include_once($Gdn_Path);
+    $gdnPath = PATH_APPLICATIONS."/{$applicationFolder}/settings/bootstrap.php";
+    if (file_exists($gdnPath)) {
+        include_once($gdnPath);
     }
 
     // Include the application's hooks.
-    $Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
-    if (file_exists($Hooks_Path)) {
-        include_once($Hooks_Path);
+    $hooksPath = PATH_APPLICATIONS."/{$applicationFolder}/settings/class.hooks.php";
+    if (file_exists($hooksPath)) {
+        include_once($hooksPath);
     }
 }
 
-unset($Gdn_Path);
-unset($Hooks_Path);
+unset($gdnPath);
+unset($hooksPath);
 
 // Themes startup
 Gdn::themeManager()->start();
@@ -227,9 +230,9 @@ Gdn_Autoloader::attach(Gdn_Autoloader::CONTEXT_PLUGIN);
  */
 
 // Load the Garden locale system
-$Gdn_Locale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
-Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $Gdn_Locale);
-unset($Gdn_Locale);
+$gdnLocale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
+Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $gdnLocale);
+unset($gdnLocale);
 
 require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
 

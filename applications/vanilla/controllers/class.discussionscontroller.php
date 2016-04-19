@@ -2,7 +2,7 @@
 /**
  * Discussions controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -29,6 +29,7 @@ class DiscussionsController extends VanillaController {
 
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
+
 
     /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
@@ -64,6 +65,9 @@ class DiscussionsController extends VanillaController {
                 break;
         }
         Gdn_Theme::section('DiscussionList');
+
+        // Remove score sort
+        DiscussionModel::removeSort('top');
 
         // Check for the feed keyword.
         if ($Page === 'feed' && $this->SyndicationMethod != SYNDICATION_NONE) {
@@ -117,6 +121,10 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
 
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
@@ -141,7 +149,7 @@ class DiscussionsController extends VanillaController {
         $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : array(), true);
 
         // Get Discussions
-        $this->DiscussionData = $DiscussionModel->getWhere($where, $Offset, $Limit);
+        $this->DiscussionData = $DiscussionModel->getWhereRecent($where, $Limit, $Offset);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $Offset.' to '.$Limit);
@@ -153,6 +161,8 @@ class DiscussionsController extends VanillaController {
         if (!$this->data('_PagerUrl')) {
             $this->setData('_PagerUrl', 'discussions/{Page}');
         }
+        $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
+        $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
         $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
@@ -236,6 +246,10 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
         $DiscussionModel->Watching = true;
 
         // Get Discussion Count
@@ -299,6 +313,16 @@ class DiscussionsController extends VanillaController {
 
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
 
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues (e.g. inaccurate unread
+         * status or new comment counts) when users visit the discussion list via the browser's back button.  The same
+         * check is performed here as in Gdn_Controller before the Cache-Control header is added, but this value
+         * includes the no-store specifier.
+         */
+        if (Gdn::session()->isValid()) {
+            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+        }
+
         $this->fireEvent('AfterInitialize');
     }
 
@@ -337,6 +361,11 @@ class DiscussionsController extends VanillaController {
         }
 
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
+
         $Wheres = array(
             'w.Bookmarked' => '1',
             'w.UserID' => Gdn::session()->UserID
@@ -433,7 +462,13 @@ class DiscussionsController extends VanillaController {
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
         $Session = Gdn::session();
         $Wheres = array('d.InsertUserID' => $Session->UserID);
+
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
+
         $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, $Wheres);
         $this->setData('Discussions', $this->DiscussionData);
         $CountDiscussions = $this->setData('CountDiscussions', $DiscussionModel->getCount($Wheres));
@@ -578,6 +613,9 @@ class DiscussionsController extends VanillaController {
      * Set user preference for sorting discussions.
      */
     public function sort($Target = '') {
+        deprecated("sort");
+        return;
+
         if (!Gdn::session()->isValid()) {
             throw permissionException();
         }

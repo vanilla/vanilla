@@ -1,5 +1,8 @@
 /********* Source File: src/elycharts_defaults.js*********/
 /*!*********************************************************************
+ * Patched version of 2.1.4 for VanillaForums.
+ * This version doesn't rely on the deprecated "jQuery.browser".
+ *
  * ELYCHARTS v2.1.4-SNAPSHOT $Id: elycharts.js 52 2011-08-07 19:57:09Z stefano.bagnara@gmail.com $
  * A Javascript library to generate interactive charts with vectorial graphics.
  *

@@ -2,7 +2,7 @@
 /**
  * GooglePlus Plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package GooglePlus
  */
@@ -21,7 +21,8 @@ $PluginInfo['GooglePlus'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Hidden' => false,
     'SocialConnect' => true,
-    'RequiresRegistration' => false
+    'RequiresRegistration' => false,
+    'Icon' => 'google.svg'
 );
 
 /**

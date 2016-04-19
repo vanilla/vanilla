@@ -287,7 +287,6 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    json = $.postParseJson(json);
                     $(msg).after(json.Data).trigger('start');
                     $(msg).hide();
                 },

@@ -2,7 +2,7 @@
 /**
  * Default user-facing text strings.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  */
@@ -94,27 +94,10 @@ $Definition['EmailMembershipApproved'] = 'Hello %1$s,
 You have been approved for membership. Sign in now at the following link:
 
   %2$s';
-$Definition['EmailWelcome'] = '%2$s has created an account for you at %3$s. Your login credentials are:
-
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s';
 $Definition['EmailPassword'] = '%2$s has reset your password at %3$s for your login with email address %6$s. Please contact them if you do not know the new password.
 
   Url: %4$s';
 $Definition['EmailConfirmEmail'] = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
-$Definition['EmailWelcomeRegister'] = 'You have successfully registered for an account at {Title}. Here is your information:
-
-  Username: {User.Name}
-  Email: {User.Email}
-
-You can access the site at {/,exurl,domain}.';
-$Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}. Here is your information:
-
-  Username: {User.Name}
-  Connected With: {ProviderName}
-
-You can access the site at {/,exurl,domain}.';
 $Definition['PasswordRequest'] = 'Someone has requested to reset your password at %2$s. To reset your password, follow this link:
 
   %3$s
@@ -176,6 +159,12 @@ $Definition['ConnectName'] = 'Username';
 //$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 //<p>{Excerpt}</p>
 //<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
+$Definition['Check out the new community forum I\'ve just set up.'] = 'Hi Pal!
+
+Check out the new community forum I\'ve just set up. It\'s a great place for us to chat with each other online.';
+$Definition['Large images will be scaled down.'] = 'Large images will be scaled down to a max width of %spx and a max height of %spx.';
+$Definition['Test Email Message'] = '<p>This is a test email message.</p>'.
+    '<p>You can configure the appearance of your forum\'s emails by navigating to the Email page in the dashboard.</p>';
 
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

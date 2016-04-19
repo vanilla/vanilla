@@ -6,7 +6,7 @@
  * caching.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.10
@@ -195,7 +195,7 @@ abstract class Gdn_Cache {
         if (defined('CACHE_METHOD_OVERRIDE')) {
             $ActiveCache = CACHE_METHOD_OVERRIDE;
         } else {
-            $ActiveCache = C('Cache.Method', false);
+            $ActiveCache = c('Cache.Method', false);
         }
 
         // This should only fire when cache is loading automatically
@@ -222,7 +222,7 @@ abstract class Gdn_Cache {
             $AllowCaching |= CACHE_ENABLED_OVERRIDE;
         }
 
-        $AllowCaching |= C('Cache.Enabled', false);
+        $AllowCaching |= c('Cache.Enabled', false);
         $AllowCaching |= $ForceEnable;
 
         return (bool)$AllowCaching;
@@ -251,7 +251,7 @@ abstract class Gdn_Cache {
 
         // Use APC cache?
         $apc = false;
-        if (C('Garden.Apc', false) && C('Garden.Cache.ApcPrecache', false) && function_exists('apc_fetch')) {
+        if (c('Garden.Apc', false) && c('Garden.Cache.ApcPrecache', false) && function_exists('apc_fetch')) {
             $apc = true;
         }
 
@@ -349,7 +349,7 @@ abstract class Gdn_Cache {
 
         // Use APC?
         $apc = false;
-        if (C('Garden.Apc', false) && function_exists('apc_fetch')) {
+        if (c('Garden.Apc', false) && function_exists('apc_fetch')) {
             $apc = true;
         }
 
@@ -590,7 +590,7 @@ abstract class Gdn_Cache {
             }
 
             if ($ConfigPrefix === false) {
-                $ConfigPrefix = C('Cache.Prefix', false);
+                $ConfigPrefix = c('Cache.Prefix', false);
             }
         }
 

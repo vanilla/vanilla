@@ -730,8 +730,11 @@ if (!function_exists('dbdecode')) {
      * @return mixed A decoded value on success or false on failure.
      */
     function dbdecode($value) {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
+        } elseif (is_array($value)) {
+            // This handles a common double decoding scenario.
+            return $value;
         }
 
         $decodedValue = @unserialize($value);
@@ -748,7 +751,7 @@ if (!function_exists('dbencode')) {
      * @return mixed An encoded string representation of the provided value or false on failure.
      */
     function dbencode($value) {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
         }
 

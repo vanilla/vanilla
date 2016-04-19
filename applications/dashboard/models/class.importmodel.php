@@ -2202,7 +2202,7 @@ class ImportModel extends Gdn_Model {
         $Count = 0;
         while ($Row = self::FGetCSV2($fp)) {
             ++$Count;
-
+            $Row = array_map('trim', $Row);
             // Quote the values in the row.
             $Row = array_map(array($PDO, 'quote'), $Row);
 

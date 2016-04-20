@@ -531,7 +531,7 @@ jQuery(document).ready(function($) {
                     $target.text(item.Data);
                     break;
                 case 'Html':
-                    gdn.addHtml($target, item.Data);
+                    $target.htmlStart(item.Data);
                     break;
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
@@ -649,7 +649,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    gdn.addHtml($elem, data);
+                    $elem.htmlStart(data);
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');

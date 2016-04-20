@@ -875,9 +875,18 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle($ActivityHeadline);
 
-                if ($message = val('Story', $Activity)) {
-                    $prefix = c('Garden.Email.Prefix', '');
-                    $emailTemplate->setMessage($prefix.$message, true);
+		$message = '';
+
+		if ($prefix = c('Garden.Email.Prefix', '')) {
+		    $message = $prefix;
+		}
+
+		if ($story = val('Story', $Activity)) {
+		    $message .= $story;
+		}
+
+		if ($message) {
+		    $emailTemplate->setMessage($message, true);
                 }
 
                 $Email->setEmailTemplate($emailTemplate);
@@ -968,9 +977,18 @@ class ActivityModel extends Gdn_Model {
             ->setButton($url, val('ActionText', $Activity, t('Check it out')))
             ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
-        if ($message = val('Story', $Activity)) {
-            $prefix = c('Garden.Email.Prefix', '');
-            $emailTemplate->setMessage($prefix.$message, true);
+	$message = '';
+
+	if ($prefix = c('Garden.Email.Prefix', '')) {
+	    $message = $prefix;
+	}
+
+	if ($story = val('Story', $Activity)) {
+	    $message .= $story;
+	}
+
+	if ($message) {
+	    $emailTemplate->setMessage($message, true);
         }
 
         $Email->setEmailTemplate($emailTemplate);
@@ -1230,10 +1248,21 @@ class ActivityModel extends Gdn_Model {
                 $emailTemplate = $Email->getEmailTemplate()
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
-                if ($message = val('Story', $Activity)) {
-                    $prefix = c('Garden.Email.Prefix', '');
-                    $emailTemplate->setMessage($prefix.$message, true);
+
+		$message = '';
+
+		if ($prefix = c('Garden.Email.Prefix', '')) {
+		    $message = $prefix;
+		}
+
+		if ($story = val('Story', $Activity)) {
+		    $message .= $story;
+		}
+
+		if ($message) {
+		    $emailTemplate->setMessage($message, true);
                 }
+
                 $Email->setEmailTemplate($emailTemplate);
 
                 if (!array_key_exists($User->UserID, $this->_NotificationQueue)) {

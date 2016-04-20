@@ -165,7 +165,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function captcha_validate_handler($sender) {
-        $valid = $sender->EventArguments['captchavalid'];
+        $valid = &$sender->EventArguments['captchavalid'];
 
         $recaptchaResponse = Gdn::request()->post('g-recaptcha-response');
         if (!$recaptchaResponse) {

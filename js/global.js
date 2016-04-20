@@ -106,6 +106,41 @@
             return output;
         }
     });
+
+    var funcStart = function(func, html) {
+        this.each(function() {
+            var $elem = $(html);
+            $(this)[func]($elem);
+            $elem.trigger('start');
+        });
+    };
+
+    $.fn.extend({
+        appendStart: function(html) {
+            funcStart.call(this, 'append', html);
+        },
+
+        beforeStart: function(html) {
+            funcStart.call(this, 'before', html);
+        },
+
+        afterStart: function(html) {
+            funcStart.call(this, 'after', html);
+        },
+
+        prependStart: function(html) {
+            funcStart.call(this, 'prepend', html);
+        },
+
+        htmlStart: function(html) {
+            funcStart.call(this, 'html', html);
+        },
+
+        replaceWithStart: function(html) {
+            funcStart.call(this, 'html', html);
+        }
+    });
+
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
@@ -457,19 +492,19 @@ jQuery(document).ready(function($) {
                     });
                     break;
                 case 'Append':
-                    $target.append(item.Data).trigger('start');
+                    $target.appendStart(item.Data);
                     break;
                 case 'Before':
-                    $target.before(item.Data).trigger('start');
+                    $target.beforeStart(item.Data);
                     break;
                 case 'After':
-                    $target.after(item.Data).trigger('start');
+                    $target.afterStart(item.Data);
                     break;
                 case 'Highlight':
                     $target.effect("highlight", {}, "slow");
                     break;
                 case 'Prepend':
-                    $target.prepend(item.Data).trigger('start');
+                    $target.prependStart(item.Data);
                     break;
                 case 'Redirect':
                     window.location.replace(item.Data);
@@ -484,7 +519,7 @@ jQuery(document).ready(function($) {
                     $target.removeClass(item.Data);
                     break;
                 case 'ReplaceWith':
-                    $target.replaceWith(item.Data);
+                    $target.replaceWithStart(item.Data);
                     break;
                 case 'SlideUp':
                     $target.slideUp('fast');
@@ -493,7 +528,7 @@ jQuery(document).ready(function($) {
                     $target.slideDown('fast');
                     break;
                 case 'Text':
-                    $target.text(item.Data).trigger('start');
+                    $target.text(item.Data);
                     break;
                 case 'Html':
                     gdn.addHtml($target, item.Data);
@@ -787,20 +822,6 @@ jQuery(document).ready(function($) {
             }
         }
     }
-
-
-    /**
-     * Inserts the html in the passed element and triggers an event that can be plugged
-     * into to start javascript when the DOM is updated. The javascript applied on
-     * the 'start' event should optimally target just the $element.
-     *
-     * @param $element The element to insert the html into.
-     * @param html The html to insert into the element.
-     */
-    gdn.addHtml = function(element, html) {
-        $(element).html(html).trigger('start', element);
-    }
-
 
     gdn.stats = function() {
         // Call directly back to the deployment and invoke the stats handler

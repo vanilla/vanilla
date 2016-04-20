@@ -258,7 +258,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       if (json == false) {
          // This is something other than json, so just put it into the popup directly
          if (data) { // Prevent blank popups
-            gdn.addHtml($('#' + settings.popupId + ' .Content'), data);
+             $('#'+settings.popupId+' .Content').appendStart(data);
          }
 
       } else {
@@ -279,7 +279,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          // the content?
          // if (formSaved == false)
          if (data) { // Prevent blank popups
-            gdn.addHtml($('#' + settings.popupId + ' .Content'), data);
+             $('#'+settings.popupId+' .Content').htmlStart(data);
          }
       }
 

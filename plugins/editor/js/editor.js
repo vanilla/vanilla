@@ -1787,8 +1787,8 @@ jQuery(document).ready(function($) {
     $('.BodyBox').setAsEditor();
 });
 
-$(document).on('start', function(e, element) {
-    $('.BodyBox', $(element)).setAsEditor();
+$(document).on('start', function(e) {
+    $('.BodyBox', e.target).setAsEditor();
 });
 
 /*

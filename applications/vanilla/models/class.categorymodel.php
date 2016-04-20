@@ -25,6 +25,11 @@ class CategoryModel extends Gdn_Model {
     /** Cache key. */
     const MASTER_VOTE_KEY = 'Categories.Rebuild.Vote';
 
+    /**
+     * @var CategoryModel $instance;
+     */
+    private static $instance;
+
     /** @var bool */
     public $Watching = false;
 
@@ -48,6 +53,18 @@ class CategoryModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Category');
+    }
+
+    /**
+     * The shared instance of this object.
+     *
+     * @return CategoryModel Returns the instance.
+     */
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new CategoryModel();
+        }
+        return self::$instance;
     }
 
 

@@ -51,12 +51,11 @@
                 echo $this->Form->textBox('DiscoveryText', array('MultiLine' => true, 'Wrap' => TRUE));
                 ?>
             </li>
-            <li class="CaptchaInput">
-                <?php
-                echo $this->Form->label("Security Check", '');
-                echo $this->Form->Captcha();
-                ?></li>
+
+            <?php Captcha::render($this); ?>
+
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
+
             <li>
                 <?php
                 echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

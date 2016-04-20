@@ -6,5 +6,5 @@
     <?php include($this->fetchViewLocation('PasswordRequest')); ?>
 </div>
 <div id="Register" class="AjaxForm">
-    <?php include($this->fetchViewLocation($this->_RegistrationView())); ?>
+    <?php include($this->fetchViewLocation($this->getRegistrationHandler())); ?>
 </div>

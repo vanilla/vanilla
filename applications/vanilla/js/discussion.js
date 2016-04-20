@@ -297,9 +297,8 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    $(msg).after(json.Data);
+                    $(msg).afterStart(json.Data);
                     $(msg).hide();
-                    $(document).trigger('EditCommentFormLoaded', [container]);
                 },
                 complete: function() {
                     $(parent).find('span.TinyProgress').remove();

@@ -236,6 +236,8 @@ class RoleModel extends Gdn_Model {
             case self::TYPE_UNCONFIRMED:
                 $backRoleIDs = (array)c('Garden.Registration.ConfirmEmailRole', null);
                 break;
+            default:
+                $backRoleIDs = array();
         }
         $roleIDs = array_merge($roleIDs, $backRoleIDs);
         $roleIDs = array_unique($roleIDs);
@@ -332,17 +334,15 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
-     * Returns a resultset of role data related to the specified UserID.
+     * Get the roles for a user.
      *
-     * @param int The UserID to filter to.
-     * @return Gdn_DataSet
+     * @param int $userID The user to get the roles for.
+     * @return Gdn_DataSet Returns the roles as a dataset (with array values).
+     * @see UserModel::getRoles()
      */
-    public function getByUserID($UserID) {
-        return $this->SQL->select()
-            ->from('Role')
-            ->join('UserRole', 'Role.RoleID = UserRole.RoleID')
-            ->where('UserRole.UserID', $UserID)
-            ->get();
+    public function getByUserID($userID) {
+        $result = Gdn::userModel()->getRoles($userID);
+        return $result;
     }
 
     /**

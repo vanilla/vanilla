@@ -30,8 +30,8 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 
 body {
   line-height: 1;
-  color: black;
-  background: white;
+  color: #000;
+  background: #fff;
 }
 
 ol, ul {
@@ -223,7 +223,7 @@ a:hover .TextColor {
 }
 
 a.TextColor, a .TextColor {
-  color: black;
+  color: #000;
 }
 
 img.Thumbnail {
@@ -523,7 +523,6 @@ select {
   border: 1px solid #999;
   border-radius: 2px;
   white-space: nowrap;
-  box-shadow: inset 0 2px 0 #fff, inset 0 -1px 2px #eee;
   border-color: #999;
   color: #333;
 }
@@ -569,7 +568,6 @@ div.FileUpload .CurrentImage {
   border-color: #aaa;
   color: #333;
   background: #f7f7f7;
-  box-shadow: none;
 }
 
 .Button.FileInput > input {
@@ -731,7 +729,6 @@ div.FileUpload .CurrentImage {
 .ActivateSlider {
   display: inline-block;
   background: #bbb;
-  /*background: rgba(0, 0, 0, .2);*/
   box-shadow: 0 10px 30px #333 inset;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
   border: solid 1px #ccc;
@@ -779,7 +776,7 @@ div.FileUpload .CurrentImage {
 
 .Deleted {
   background: #f5f5f5;
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   margin: 10px 0 0;
   padding: 6px 10px;
   border-radius: 3px;
@@ -949,7 +946,7 @@ a.Small img {
 
 .DismissMessage.Warning {
   background: #ffebe9;
-  border: 1px solid #FFCCC9;
+  border: 1px solid #ffccc9;
 }
 
 .DismissMessage.Box {
@@ -961,24 +958,24 @@ a.Small img {
 }
 
 .CasualMessage {
-  background: #CFECFF;
-  border: 1px solid #ABDAFB;
-  color: #1E79A7;
+  background: #cfecff;
+  border: 1px solid #abdafb;
+  color: #1e79a7;
 }
 
 .InfoMessage {
-  background: #F6F6F6;
+  background: #f6f6f6;
   border: 1px solid #ddd;
 }
 
 .AlertMessage {
   background: #fff8ce;
-  border: 1px solid #DEDDAF;
+  border: 1px solid #deddaf;
 }
 
 .WarningMessage {
   background: #ffebe9;
-  border: 1px solid #FFCCC9;
+  border: 1px solid #ffccc9;
 }
 
 /* =================================================================== Header */
@@ -1043,7 +1040,6 @@ body > #Frame > .Head {
   position: absolute;
   top: 4px;
   right: 4px;
-  box-shadow: none;
   padding: 0;
 }
 
@@ -1065,7 +1061,7 @@ body > #Frame > .Head {
 .CategoryLink {
   padding: 2px 4px;
   font-size: 11px;
-  background: #CFECFF;
+  background: #cfecff;
   border-radius: 1px;
 }
 
@@ -1109,7 +1105,7 @@ body > #Frame > .Head {
 
 .Flyout:before,
 .Flyout:after {
-  border-bottom: 7px solid #444444;
+  border-bottom: 7px solid #444;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   content: "";
@@ -1150,13 +1146,13 @@ body > #Frame > .Head {
 }
 
 .MenuItems a:hover {
-  color: #ffffff !important;
+  color: #fff !important;
   text-decoration: none;
-  background-color: #004D9F !important;
+  background-color: #004d9f !important;
 }
 
 .MenuItems a:hover .Gloss {
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 .MenuItems li > strong {
@@ -1172,7 +1168,7 @@ body > #Frame > .Head {
 
 .MenuItems.Up:before,
 .MenuItems.Up:after {
-  border-top: 7px solid #444444;
+  border-top: 7px solid #444;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   content: "";
@@ -1347,9 +1343,6 @@ td.CheckBoxColumn {
   /*
 No overflow hidden on main elements. Causes too many bugs!
 overflow: hidden;
-}
-#Panel > :first-child {
-margin-top: 0;
 */
 }
 
@@ -1560,7 +1553,6 @@ margin-top: 0;
 }
 
 .PanelInfo .Heading {
-  /*color: #000;*/
   font-weight: bold;
 }
 
@@ -1590,7 +1582,7 @@ margin-top: 0;
 .PanelInfo .Meta strong {
   display: inline;
   border-radius: 2px;
-  background: #FF0;
+  background: #ff0;
   color: #000;
   font-size: 9px;
   font-weight: bold;
@@ -1952,7 +1944,7 @@ margin-top: 0;
 
 .HasNew {
   border-radius: 2px;
-  background: #FF0;
+  background: #ff0;
   color: #000;
   font-size: 9px;
   font-weight: bold;
@@ -1993,25 +1985,6 @@ margin-top: 0;
   opacity: 1 !important;
 }
 
-/*
-.Read {
-    background: transparent;
-}
-.Read > * {
-    opacity: 0.4;
-}
-.Read:hover > * {
-    opacity: 1;
-}
-.Checked {
-    background: #ffc;
-    opacity: 1;
-}
-.Checked > *,
-.Read:hover > * {
-    opacity: 1;
-}
-*/
 .DataList a.Delete {
   border-radius: 0;
   color: #333;
@@ -2421,7 +2394,7 @@ a.ChangePicture {
   display: block;
 }
 
-a.ChangePicuture:hover {
+a.ChangePicture:hover {
   color: #fff;
   text-decoration: underline;
 }
@@ -2592,7 +2565,7 @@ form.Thumbnail .Warning {
 }
 
 .jcropper-holder {
-  border: 1px black solid;
+  border: 1px #000 solid;
 }
 
 .jcrop-holder {
@@ -2602,7 +2575,7 @@ form.Thumbnail .Warning {
 .jcrop-vline, .jcrop-hline {
   font-size: 0;
   position: absolute;
-  background: white url("images/jcrop.gif") top left repeat;
+  background: #fff url("images/jcrop.gif") top left repeat;
 }
 
 .jcrop-vline {
@@ -2630,12 +2603,12 @@ form.Thumbnail .Warning {
 
 .custom .jcrop-vline,
 .custom .jcrop-hline {
-  background: yellow;
+  background: #ff0;
 }
 
 .custom .jcrop-handle {
-  border-color: black;
-  background-color: #C7BB00;
+  border-color: #000;
+  background-color: #c7bb00;
   border-radius: 3px;
 }
 
@@ -2891,19 +2864,19 @@ div.Popup form ul li label.RadioLabel {
   + New: there are new comments since the last viewed the discussion
 */
 .Tag {
-  background: #777777;
+  background: #777;
   border-radius: 2px;
-  color: #FFFFFF;
+  color: #fff;
   padding: 1px 4px;
   line-height: 14px;
 }
 
 .Tag a {
-  color: #FFFFFF;
+  color: #fff;
 }
 
 .Tag.Closed {
-  background: #555555;
+  background: #555;
 }
 
 .Tag.Category {
@@ -2916,7 +2889,7 @@ div.Popup form ul li label.RadioLabel {
 }
 
 .Tag.Tag-Banned {
-  background-color: #C70028;
+  background-color: #c70028;
 }
 
 .Discussion .PageTitle h1 {
@@ -3263,7 +3236,7 @@ textarea.MultiComplete {
   padding: 0;
   border: 1px solid #d7d8da;
   border-top: 0;
-  background-color: white;
+  background-color: #fff;
   overflow: hidden;
   z-index: 99999;
 }
@@ -3312,7 +3285,7 @@ textarea.MultiComplete {
 }
 
 .ac_over {
-  background: #004D9F;
+  background: #004d9f;
   color: #fff;
 }
 
@@ -3324,7 +3297,7 @@ textarea.MultiComplete {
 #ConversationForm label {
   display: block;
   text-align: left;
-  color: #666666;
+  color: #666;
   font-size: 14px;
   font-weight: bold;
 }
@@ -3432,7 +3405,6 @@ ul.Tabs li a.EntryTabFor_password {
 /* ============================================================ Entry Screens */
 body.Entry form ul li label {
   font-size: 14px;
-  /* color: #474747; */
   font-weight: bold;
   padding: 6px 0 0;
   display: block;
@@ -3447,7 +3419,7 @@ body.Entry form ul li label.RadioLabel {
 
 span.Incorrect {
   display: block;
-  color: red;
+  color: #f00;
 }
 
 .SingleEntryMethod {
@@ -3522,52 +3494,52 @@ body#dashboard_entry_index #Content input.Password,
 }
 
 .PasswordStrength.Score-0 .StrengthText {
-  color: #888888;
+  color: #888;
 }
 
 .PasswordStrength.Score-1 .Strength {
-  background-color: #C81818;
+  background-color: #c81818;
   width: 20%;
 }
 
 .PasswordStrength.Score-1 .StrengthText {
-  color: #C81818;
+  color: #c81818;
 }
 
 .PasswordStrength.Score-2 .Strength {
-  background-color: #FF891D;
+  background-color: #ff891d;
   width: 40%;
 }
 
 .PasswordStrength.Score-2 .StrengthText {
-  color: #FF891D;
+  color: #ff891d;
 }
 
 .PasswordStrength.Score-3 .Strength {
-  background-color: #FFAC1D;
+  background-color: #ffac1d;
   width: 60%;
 }
 
 .PasswordStrength.Score-3 .StrengthText {
-  color: #FFAC1D;
+  color: #ffac1d;
 }
 
 .PasswordStrength.Score-4 .Strength {
-  background-color: #A6C060;
+  background-color: #a6C060;
   width: 80%;
 }
 
 .PasswordStrength.Score-4 .StrengthText {
-  color: #A6C060;
+  color: #a6C060;
 }
 
 .PasswordStrength.Score-5 .Strength {
-  background-color: #27B30F;
+  background-color: #27b30f;
   width: 100%;
 }
 
 .PasswordStrength.Score-5 .StrengthText {
-  color: #27B30F;
+  color: #27b30f;
 }
 
 a.ForgotPassword {
@@ -3615,7 +3587,7 @@ body#dashboard_entry_handshake ul.NewAccount {
   float: left;
   width: 315px;
   margin-right: 44px;
-  border-right: 1px solid #A5D0E7;
+  border-right: 1px solid #a5d0e7;
 }
 
 body#dashboard_entry_handshake ul.LinkAccount {
@@ -3634,14 +3606,14 @@ ul.LinkAccount h2 {
 }
 
 body#dashboard_entry_handshake .Info {
-  border: 1px solid #A5D0E7;
-  background: #D3F0FF;
-  color: #02475A;
+  border: 1px solid #a5d0e7;
+  background: #d3f0ff;
+  color: #02475a;
 }
 
 body#dashboard_entry_handshake #Content h2 {
   border: none;
-  color: #02475A;
+  color: #02475a;
   font-size: 140%;
   font-weight: bold;
   padding: 6px 0;
@@ -3783,7 +3755,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   text-shadow: 0 1px 1px #000;
   text-align: left !important;
   border-radius: 2px;
-  background: black !important;
+  background: #000 !important;
   background: rgba(0, 0, 0, 0.7) !important;
   border: none !important;
   width: auto;
@@ -4853,9 +4825,6 @@ span.InformSprite.Dice {
 }
 
 /* ============================= Embedded Discussion & Comment Customizations */
-/*body.embed {
-	text-align: left;
-}*/
 body.embed #Content {
   float: none;
   margin: 0;
@@ -4866,15 +4835,9 @@ body.embed .InformMessages {
   display: none;
 }
 
-/*.Embed a.Button,
-.Embed a.Button:hover {
-	color: #333 !important;
-	text-decoration: none !important;
-	font-weight: bold;
-}*/
 .EmbedCommentForm {
   padding: 0;
-  border-top: 1px solid #ffffff;
+  border-top: 1px solid #fff;
 }
 
 .EmbedCommentForm .TextBox {
@@ -4936,7 +4899,7 @@ body.embed .InformMessages {
   text-shadow: 0 1px 1px #000;
   text-align: left !important;
   border-radius: 4px;
-  background: black !important;
+  background: #000 !important;
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
@@ -4947,7 +4910,7 @@ body.embed .InformMessages {
 
 .RegardingEvent a.ReportedUser,
 .RegardingEvent a.ReportingUser {
-  color: #CFECFF;
+  color: #cfecff;
 }
 
 .RegardingEvent .ReportedReason {
@@ -4958,7 +4921,7 @@ body.embed .InformMessages {
 .RegardingEvent .RegardingTime {
   font-size: 9px;
   text-transform: uppercase;
-  color: #B1B1B1;
+  color: #b1b1b1;
 }
 
 .RegardingActions {
@@ -4978,12 +4941,12 @@ body.embed .InformMessages {
   text-align: left !important;
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
-  background: black !important;
+  background: #000 !important;
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
 .RegardingActions .ActionButton a {
-  color: #CFECFF;
+  color: #cfecff;
   font-size: 10px;
   text-transform: uppercase;
 }
@@ -5363,9 +5326,6 @@ ul.token-input-list-focus input {
   background: #ffe;
 }
 
-/*#DiscussionForm input.Button {
-    margin-top: 20px;
-}*/
 ul.token-input-list li input {
   border: 0;
   width: 100px;
@@ -5388,13 +5348,13 @@ li.token-input-token {
 }
 
 li.token-input-token.not-allowed {
-  background-color: #FFC2C2;
-  color: #C91313;
-  border: 1px solid #FF3232;
+  background-color: #ffc2c2;
+  color: #c91313;
+  border: 1px solid #ff3232;
 }
 
 li.token-input-token.not-allowed span {
-  color: #C91313;
+  color: #c91313;
 }
 
 li.token-input-token p {
@@ -5419,13 +5379,13 @@ li.token-input-selected-token {
 }
 
 li.token-input-selected-token.not-allowed {
-  background-color: red;
-  color: #ffffff;
-  border: 1px solid #FF3232;
+  background-color: #f00;
+  color: #fff;
+  border: 1px solid #ff3232;
 }
 
 li.token-input-selected-token.not-allowed span {
-  color: #ffffff;
+  color: #fff;
 }
 
 li.token-input-input-token {
@@ -5496,7 +5456,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .atwho-view .cur {
-  background: #1E79A7;
+  background: #1e79a7;
   color: #fff;
 }
 
@@ -5505,7 +5465,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .atwho-view strong {
-  color: #1E79A7;
+  color: #1e79a7;
 }
 
 .atwho-view .cur strong {
@@ -5545,8 +5505,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   line-height: 34px;
   text-align: center;
   vertical-align: top;
-  /*padding-right: 5px;*/
-  /*background: #ff0;*/
 }
 
 .at-suggest-emoji .emoji-wrap > * {
@@ -5558,7 +5516,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   display: inline-block;
   line-height: 34px;
   vertical-align: top;
-  /*background: #f0f;*/
 }
 
 /**
@@ -5966,7 +5923,7 @@ Styleguide Alerts
 
 /* Warning alert */
 .item-attachment .alert-warning {
-  color: #222222;
+  color: #222;
   background-color: #ffcc00;
   border-color: #ffcc00;
 }
@@ -5991,7 +5948,7 @@ Styleguide Alerts
 }
 
 .item-attachment .alert-danger hr {
-  border-top-color: #a00000;
+  border-top-color: #a00;
 }
 
 /*

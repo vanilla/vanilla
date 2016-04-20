@@ -23,7 +23,7 @@ module.exports = function (grunt) {
             }
             , js: {
                 files: ['js/src/**/*.js']
-                , tasks: ['jshint', 'concat']
+                , tasks: ['jshint']
             }
             , gruntfile: {
                 files: ['Gruntfile.js']
@@ -99,15 +99,6 @@ module.exports = function (grunt) {
                    ,'design/style.css']
         },
 
-        concat: {
-            dist: {
-                src: (dependencies.js || []).concat([
-                    'js/src/main.js'
-                ])
-                , dest: 'js/dashboard.js'
-            }
-        },
-
         imagemin: {
             dist: {
                 files: [{
@@ -132,7 +123,6 @@ module.exports = function (grunt) {
         , 'scsslint'
         , 'sass'
         , 'autoprefixer'
-        , 'concat'
         , 'jshint'
         , 'csslint'
         , 'imagemin'

@@ -44,7 +44,7 @@ class TagModel extends Gdn_Model {
      * @return array
      */
     public function defaultTypes() {
-        $types = array_filter($this->types(), function ($val) {
+        $types = array_filter($this->types(), function($val) {
             if (val('default', $val)) {
                 return true;
             }
@@ -336,7 +336,7 @@ class TagModel extends Gdn_Model {
         }
 
         // Remove the types from the current tags that we don't need anymore.
-        $current_tags = array_filter($current_tags, function ($row) use ($types) {
+        $current_tags = array_filter($current_tags, function($row) use ($types) {
             if (in_array($row['Type'], $types)) {
                 return true;
             }

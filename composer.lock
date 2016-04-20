@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "56184395b4c2c752d2841200810d4f10",
-    "content-hash": "eb9c5630fb0ba793d08bcf0717addcfe",
+    "hash": "a5cdd474607b41eec6783bc8072c83a3",
+    "content-hash": "b677d81ec1d659d919bd6d9f4202ab83",
     "packages": [
         {
             "name": "vanilla/garden-http",
@@ -46,6 +46,81 @@
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
             "time": "2015-12-10 21:39:51"
+        },
+        {
+            "name": "vanilla/htmlawed",
+            "version": "v2.1.22",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/htmlawed.git",
+                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/685c88e3b6799ed82c3a8b50d59d536e16b72817",
+                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "tburry/pquery": "~1.0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/Htmlawed.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
+            "time": "2016-04-14 21:27:05"
+        },
+        {
+            "name": "vanilla/nbbc",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/nbbc.git",
+                "reference": "15af1d533da305afe8b873a98e392b64f3862978"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/15af1d533da305afe8b873a98e392b64f3862978",
+                "reference": "15af1d533da305afe8b873a98e392b64f3862978",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nbbc\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSDv2"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
+            "time": "2016-03-25 15:15:41"
         }
     ],
     "packages-dev": [],

@@ -1,9 +1,9 @@
-// This file contains javascript that is specific to the dashboard/profile controller.
+// This file contains javascript that is specific to the /profile controller.
 jQuery(document).ready(function($) {
 
     $('a.AddMessage, a.EditMessage').popup({
         onUnload: function(settings) {
-            $('#Content').load(gdn.url('/dashboard/message?DeliveryType=VIEW'));
+            $('#Content').load(gdn.url('/message?DeliveryType=VIEW'));
         }
     });
 
@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
         confirm: true,
         followConfirm: false,
         afterConfirm: function(json, sender) {
-            $('#Content').load(gdn.url('/dashboard/message?DeliveryType=VIEW'));
+            $('#Content').load(gdn.url('/message?DeliveryType=VIEW'));
         }
     });
 

@@ -3,11 +3,11 @@
 $Session = Gdn::session();
 $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID') ? true : false;
 $Editing = isset($this->Comment);
-
-$this->EventArguments['FormCssClass'] = 'MessageForm CommentForm FormTitleWrapper';
+$formCssClass = 'MessageForm CommentForm FormTitleWrapper';
+$this->EventArguments['FormCssClass'] = &$formCssClass;
 $this->fireEvent('BeforeCommentForm');
 ?>
-<div class="<?php echo $this->EventArguments['FormCssClass']; ?>">
+<div class="<?php echo $formCssClass; ?>">
     <h2 class="H"><?php echo t($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
 
     <div class="CommentFormWrap">

@@ -42,6 +42,18 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Handle the tracking of a page tick.
+     */
+    public function analyticsTick() {
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+
+        Gdn::statistics()->tick();
+        Gdn::statistics()->fireEvent("AnalyticsTick");
+        $this->render();
+    }
+
+    /**
      * Application management screen.
      *
      * @since 2.0.0
@@ -800,7 +812,7 @@ class SettingsController extends DashboardController {
             throw new Exception('Requires POST', 405);
         }
         $value = strtolower($value);
-        if (in_array($value, Gdn_Email::$supportedFormats)){
+        if (in_array($value, Gdn_Email::$supportedFormats)) {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
@@ -1093,6 +1105,11 @@ class SettingsController extends DashboardController {
             $this->setData('DefaultLocaleWarning', !$LocaleFound);
             $this->setData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
         }
+
+        // Remove all hidden locales, unless they are enabled.
+        $AvailableLocales = array_filter($AvailableLocales, function ($locale) use ($EnabledLocales) {
+            return !val('Hidden', $locale) || isset($EnabledLocales[val('Index', $locale)]);
+        });
 
         $this->setData('AvailableLocales', $AvailableLocales);
         $this->setData('EnabledLocales', $EnabledLocales);
@@ -1734,7 +1751,7 @@ class SettingsController extends DashboardController {
         if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
             $Logo = c('Garden.Logo', '');
             RemoveFromConfig('Garden.Logo');
-            @unlink(PATH_ROOT.DS.$Logo);
+            safeUnlink(PATH_ROOT."/$Logo");
         }
 
         redirect('/settings/banner');
@@ -1752,7 +1769,7 @@ class SettingsController extends DashboardController {
         if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
             $MobileLogo = c('Garden.MobileLogo', '');
             RemoveFromConfig('Garden.MobileLogo');
-            @unlink(PATH_ROOT.DS.$MobileLogo);
+            safeUnlink(PATH_ROOT."/$MobileLogo");
         }
 
         redirect('/settings/banner');

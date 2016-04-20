@@ -347,6 +347,11 @@ class ConversationMessageModel extends ConversationsModel {
                 $ConversationModel->updateUserUnreadCount($UpdateCountUserIDs, true);
             }
 
+            $body = val('Body', $Fields, '');
+            $subject = val('Subject', $Conversation, '');
+
+            $this->EventArguments['Body'] = &$body;
+            $this->EventArguments['Subject'] = &$subject;
             $this->fireEvent('AfterAdd');
 
             $activityModel = new ActivityModel();
@@ -362,13 +367,13 @@ class ConversationMessageModel extends ConversationsModel {
                     'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,user} sent you a <a href="{Url,html}">message</a>'),
                     'RecordType' => 'Conversation',
                     'RecordID' => $ConversationID,
-                    'Story' => val('Body', $Fields, ''),
+                    'Story' => $body,
                     'Format' => val('Format', $Fields, c('Garden.InputFormatter')),
                     'Route' => "/messages/{$ConversationID}#{$MessageID}",
                 );
 
-                if (c('Conversations.Subjects.Visible') && val('Subject', $Conversation, '')) {
-                    $activity['HeadlineFormat'] = val('Subject', $Conversation, '');
+                if (c('Conversations.Subjects.Visible') && $subject) {
+                    $activity['HeadlineFormat'] = $subject;
                 }
                 $activityModel->queue($activity, 'ConversationMessage');
             }

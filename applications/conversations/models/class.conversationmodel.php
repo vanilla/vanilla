@@ -569,11 +569,16 @@ class ConversationModel extends ConversationsModel {
             $this->updateUserUnreadCount(array_diff($RecipientUserIDs, array($formPostValues['InsertUserID'])));
             $this->updateParticipantCount($ConversationID);
 
+            $body = val('Body', $formPostValues, '');
+            $subject = val('Subject', $Fields, '');
+
             $this->EventArguments['Recipients'] = $RecipientUserIDs;
             $Conversation = $this->getID($ConversationID);
             $this->EventArguments['Conversation'] = $Conversation;
             $Message = $MessageModel->getID($MessageID, DATASET_TYPE_ARRAY);
             $this->EventArguments['Message'] = $Message;
+            $this->EventArguments['Body'] = &$body;
+            $this->EventArguments['Subject'] = &$subject;
             $this->fireEvent('AfterAdd');
 
             // Add notifications (this isn't done by the conversationmessagemodule
@@ -592,15 +597,14 @@ class ConversationModel extends ConversationsModel {
                 'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
                 'RecordType' => 'Conversation',
                 'RecordID' => $ConversationID,
-                'Story' => val('Body', $formPostValues),
+                'Story' => $body,
                 'ActionText' => t('Reply'),
                 'Format' => val('Format', $formPostValues, c('Garden.InputFormatter')),
                 'Route' => "/messages/$ConversationID#Message_$MessageID"
             );
 
-            $Subject = val('Subject', $Fields);
-            if ($Subject) {
-                $Activity['Story'] = sprintf(t('Re: %s'), $Subject).'<br>'.val('Body', $formPostValues);
+            if ($subject) {
+                $Activity['Story'] = sprintf(t('Re: %s'), $subject).'<br>'.$body;
             }
 
             $ActivityModel = new ActivityModel();

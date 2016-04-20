@@ -50,22 +50,30 @@ class CategoryModel extends Gdn_Model {
         parent::__construct('Category');
     }
 
-    /**
-     *
-     *
-     * @param $Category
-     * @return array
-     */
-    public static function allowedDiscussionTypes($Category) {
-        $Category = self::permissionCategory($Category);
-        $Allowed = val('AllowedDiscussionTypes', $Category);
-        $AllTypes = DiscussionModel::discussionTypes();
 
+    /**
+     * Checks the allowed discussion types on a category.
+     *
+     * @param array $PermissionCategory The permission category of the category.
+     * @param array $category The category we're checking the permission on.
+     * @return array The allowed discussion types on the category.
+     * @throws Exception
+     */
+    public static function allowedDiscussionTypes($PermissionCategory, $category = []) {
+        $PermissionCategory = self::permissionCategory($PermissionCategory);
+        $Allowed = val('AllowedDiscussionTypes', $PermissionCategory);
+        $AllTypes = DiscussionModel::discussionTypes();
         if (empty($Allowed) || !is_array($Allowed)) {
-            return $AllTypes;
+            $allowedTypes = $AllTypes;
         } else {
-            return array_intersect_key($AllTypes, array_flip($Allowed));
+            $allowedTypes = array_intersect_key($AllTypes, array_flip($Allowed));
         }
+        Gdn::pluginManager()->EventArguments['AllowedDiscussionTypes'] = &$allowedTypes;
+        Gdn::pluginManager()->EventArguments['Category'] = $category;
+        Gdn::pluginManager()->EventArguments['PermissionCategory'] = $PermissionCategory;
+        Gdn::pluginManager()->fireEvent('AllowedDiscussionTypes');
+
+        return $allowedTypes;
     }
 
     /**
@@ -91,8 +99,8 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
-        Gdn::pluginManager()->EventArguments['CategoryIDs'] =& $Watch;
-        Gdn::pluginManager()->fireEvent('CategoryWatch');
+        Gdn::pluginManager()->EventArguments['CategoryIDs'] = &$Watch;
+        Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('CategoryWatch');
 
         if ($AllCount == count($Watch)) {
             return true;
@@ -264,7 +272,7 @@ class CategoryModel extends Gdn_Model {
             }
 
             if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes'])) {
-                $Category['AllowedDiscussionTypes'] = unserialize($Category['AllowedDiscussionTypes']);
+                $Category['AllowedDiscussionTypes'] = dbdecode($Category['AllowedDiscussionTypes']);
             }
         }
 
@@ -1007,7 +1015,7 @@ class CategoryModel extends Gdn_Model {
     public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $category = $this->SQL->getWhere('Category', array('CategoryID' => $categoryID))->firstRow($datasetType);
         if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
-            setValue('AllowedDiscussionTypes', $category, unserialize(val('AllowedDiscussionTypes', $category)));
+            setValue('AllowedDiscussionTypes', $category, dbdecode(val('AllowedDiscussionTypes', $category)));
         }
 
         return $category;
@@ -1486,7 +1494,7 @@ class CategoryModel extends Gdn_Model {
             if (!isset($Categories[$ID])) {
                 continue;
             }
-            $Row = $Categories[$ID];
+            $Row = (array)$Categories[$ID];
             $Row['Depth'] += $DepthAdj;
             $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
             $Result[] = $Row;
@@ -1752,7 +1760,7 @@ class CategoryModel extends Gdn_Model {
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
         if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
-            $FormPostValues['AllowedDiscussionTypes'] = serialize($FormPostValues['AllowedDiscussionTypes']);
+            $FormPostValues['AllowedDiscussionTypes'] = dbencode($FormPostValues['AllowedDiscussionTypes']);
         }
 
         // Is this a new category?
@@ -1989,7 +1997,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         if (isset($Property['AllowedDiscussionTypes']) && is_array($Property['AllowedDiscussionTypes'])) {
-            $Property['AllowedDiscussionTypes'] = serialize($Property['AllowedDiscussionTypes']);
+            $Property['AllowedDiscussionTypes'] = dbencode($Property['AllowedDiscussionTypes']);
         }
 
         $this->SQL->put($this->Name, $Property, array('CategoryID' => $ID));

@@ -209,23 +209,6 @@
             }());
 
             /**
-             * Toggle spoilers.
-             */
-            $(document).on('mouseup', '.Spoiled', function(e) {
-                // Do not close if its a link or user selects some text.
-                if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-                    $(this).removeClass('Spoiled').addClass('Spoiler');
-                }
-                e.stopPropagation(); // for nesting
-            });
-
-            $(document).on('mouseup', '.Spoiler', function(e) {
-                $(this).removeClass('Spoiler').addClass('Spoiled');
-                e.stopPropagation(); // for nesting
-            });
-
-
-            /**
              * Lights on/off in fullpage
              *
              * Note: Wysiwyg makes styling the BodyBox more difficult as it's an

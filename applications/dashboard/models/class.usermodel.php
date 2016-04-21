@@ -2975,7 +2975,7 @@ class UserModel extends Gdn_Model {
      *
      * @param string $Email
      * @param string $Password
-     * @return object
+     * @return object|false Returns the user matching the credentials or **false** if the user doesn't validate.
      */
     public function validateCredentials($Email = '', $ID = 0, $Password) {
         $this->EventArguments['Credentials'] = array('Email' => $Email, 'ID' => $ID, 'Password' => $Password);
@@ -4287,9 +4287,9 @@ class UserModel extends Gdn_Model {
     /**
      * Get a user from the cache by name or ID
      *
-     * @param type $UserToken either a userid or a username
+     * @param string|int $UserToken either a userid or a username
      * @param string $TokenType either 'userid' or 'name'
-     * @return type user array or FALSE
+     * @return array|false Returns a user array or **false** if the user isn't in the cache.
      */
     public function getUserFromCache($UserToken, $TokenType) {
         if ($TokenType == 'name') {
@@ -4301,8 +4301,6 @@ class UserModel extends Gdn_Model {
             }
             $UserToken = $UserID;
             $TokenType = 'userid';
-        } else {
-            $UserID = $UserToken;
         }
 
         if ($TokenType != 'userid') {

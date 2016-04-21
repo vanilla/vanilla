@@ -262,8 +262,8 @@ class TaggingPlugin extends Gdn_Plugin {
             TagModel::instance()->joinTags($sender->Data['Discussions']);
         }
 
-        $Sender->addJsFile('tagging.js', 'plugins/Tagging');
-        $Sender->addJsFile('jquery.tokeninput.js');
+        $sender->addJsFile('tagging.js', 'plugins/Tagging');
+        $sender->addJsFile('jquery.tokeninput.js');
     }
 
     /**

@@ -66,14 +66,6 @@ var discussionTagging = {
     }
 }
 
-jQuery(document).ready(function($) {
-    $('#DiscussionForm').each(function() {
-        discussionTagging.start($(this));
-    });
-});
-
-$(document).on('start', function(e, element) {
-    $(element).find('#DiscussionForm').each(function() {
-        discussionTagging.start($(this));
-    });
+$(document).on('contentLoad', function(e) {
+    discussionTagging.start($('#DiscussionForm', e.target));
 });

@@ -599,6 +599,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (Gdn::session()->isValid()) {
             // Tell the client what our hour offset is so it can compare it to the user's real offset.
             touchValue('SetHourOffset', $this->_Definitions, Gdn::session()->User->HourOffset);
+            touchValue('SetTimeZone', $this->_Definitions, Gdn::session()->getAttribute('TimeZone', null));
         }
 
         if (!array_key_exists('ConfirmHeading', $this->_Definitions)) {

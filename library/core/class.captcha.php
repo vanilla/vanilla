@@ -27,9 +27,9 @@ class Captcha {
     }
 
     /**
-     * Wrapper for captcha rendering.
+     * Wrapper for captcha settings.
      *
-     * Allows conditional ignoring of captcha rendering if skipped in the config.
+     * Allows conditional ignoring of captcha settings if disabled in the config.
      *
      * @param Gdn_Controller $controller
      * @return null

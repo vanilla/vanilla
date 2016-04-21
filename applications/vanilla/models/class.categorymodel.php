@@ -2216,4 +2216,52 @@ class CategoryModel extends Gdn_Model {
         }
         return url($Result, $WithDomain);
     }
+
+    /**
+     * Recalculate the dynamic tree columns in the category.
+     */
+    public function recalculateTree() {
+        $px = $this->Database->DatabasePrefix;
+
+        // Update the child counts and reset the depth.
+        $sql = <<<SQL
+update {$px}Category c
+join (
+	select ParentCategoryID, count(ParentCategoryID) as CountCategories
+	from {$px}Category
+	group by ParentCategoryID
+) c2
+	on c.CategoryID = c2.ParentCategoryID
+set c.CountCategories = c2.CountCategories,
+    c.Depth = 0;
+SQL;
+        $this->Database->query($sql);
+
+        // Update the first pass of the categories.
+        $this->Database->query(<<<SQL
+update {$px}Category p
+join {$px}Category c
+	on c.ParentCategoryID = p.CategoryID
+set c.Depth = p.Depth + 1
+where p.CategoryID = -1 and c.CategoryID <> -1;
+SQL
+        );
+
+        // Update the child categories depth-by-depth.
+        $sql = <<<SQL
+update {$px}Category p
+join {$px}Category c
+	on c.ParentCategoryID = p.CategoryID
+set c.Depth = p.Depth + 1
+where p.Depth = :depth;
+SQL;
+
+        for ($i = 1; $i < 25; $i++) {
+            $this->Database->query($sql, ['depth' => $i]);
+
+            if (val('RowCount', $this->Database->LastInfo) == 0) {
+                break;
+            }
+        }
+    }
 }

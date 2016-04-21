@@ -3,26 +3,25 @@ function Gdn_Quotes() {
     var currentEditor = null;
 }
 
+// Track active editor.
+$(document).on('focus', 'textarea.TextBox', function () {
+    GdnQuotes.currentEditor = this;
+});
+
 // Attach event handler for quotes on the page.
-Gdn_Quotes.prototype.Prepare = function () {
+Gdn_Quotes.prototype.Prepare = function (element) {
     // Capture "this" for use in callbacks.
     var Quotes = this,
-        $document = $(document),
         QuoteFoldingLevel,
         MaxFoldingLevel;
 
     // Attach quote event to each Quote button, and return false to prevent link follow.
-    $document.on('click', 'a.ReactButton.Quote', function(event) {
+    $('a.ReactButton.Quote', element).on('click', function(event) {
         var QuoteLink = $(event.target).closest('a'),
             ObjectID = QuoteLink.attr('href').split('/').pop();
-
+        
         Quotes.Quote(ObjectID, QuoteLink);
         return false;
-    });
-
-    // Track active editor.
-    $document.on('focus', 'textarea.TextBox', function () {
-        Quotes.currentEditor = this;
     });
 
     // Handle quote folding.
@@ -47,14 +46,16 @@ Gdn_Quotes.prototype.Prepare = function () {
         QuoteFoldingLevel = parseInt(QuoteFoldingLevel) + 1;
         MaxFoldingLevel = 6;
 
-        $document.on('CommentAdded CommentEditingComplete CommentPagingComplete', folding);
         folding();
 
-        $document.on('click', 'a.QuoteFolding', function () {
+        $('a.QuoteFolding', element).on('click', function () {
+            console.log($(this)
+                .parent()
+                .next().html());
             var Anchor = $(this),
                 QuoteTarget = Anchor
-                    .closest('.QuoteText')
-                    .children('.Quote, .UserQuote')
+                    .parent()
+                    .next()
                     .toggle();
 
             if (QuoteTarget.css('display') != 'none') {
@@ -194,7 +195,9 @@ Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
 var GdnQuotes = null;
 
 // document.ready
-$(function () {
-    GdnQuotes = new Gdn_Quotes();
-    GdnQuotes.Prepare();
+$(document).on('contentLoad', function(e) {
+    if (GdnQuotes == null) {
+        GdnQuotes = new Gdn_Quotes();
+    }
+    GdnQuotes.Prepare(e.target);
 });

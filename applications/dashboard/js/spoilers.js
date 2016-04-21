@@ -79,11 +79,6 @@ var spoilers = {
     }
 };
 
-// Events!
-jQuery(document).ready(function(){
-    spoilers.findAndReplace();
-});
-
-jQuery(document).on("CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal", function() {
+jQuery(document).on("contentLoad", function() {
     spoilers.findAndReplace();
 });

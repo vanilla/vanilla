@@ -1,6 +1,6 @@
 var discussionTagging = {
     start: function($element) {
-        var btn = $element.find('div#DiscussionForm form :submit');
+        var btn = $element.find('form :submit');
         if (btn) {
             var parent = $(btn).parents('div#DiscussionForm');
             var frm = $(parent).find('form');
@@ -67,5 +67,9 @@ var discussionTagging = {
 }
 
 $(document).on('contentLoad', function(e) {
-    discussionTagging.start($('#DiscussionForm', e.target));
+    if (e.target.id === 'DiscussionForm') {
+        discussionTagging.start($('.FormWrapper', e.target));
+    } else {
+        discussionTagging.start($('#DiscussionForm', e.target));
+    }
 });

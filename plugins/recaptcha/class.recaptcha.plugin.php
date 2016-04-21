@@ -142,7 +142,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_registrationView_handler($sender) {
+    public function captcha_settings_handler($sender) {
         echo $sender->fetchView('registration', 'settings', 'plugins/recaptcha');
     }
 

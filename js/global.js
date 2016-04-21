@@ -146,8 +146,6 @@
 // Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
 
-    this.trigger('contentLoad');
-
     /**
 	 * @deprecated since Vanilla 2.2
 	 */
@@ -1872,7 +1870,7 @@ jQuery(document).ready(function($) {
     // calls this function directly when in wysiwyg format, as it needs to
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
-        $(document).on('start', function() {
+        $(document).on('contentLoad', function() {
             gdn.atCompleteInit('.BodyBox', '');
         });
         gdn.atCompleteInit('.BodyBox', '');
@@ -1923,6 +1921,8 @@ jQuery(document).ready(function($) {
             }
         });
     }
+
+    $(document).trigger('contentLoad');
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

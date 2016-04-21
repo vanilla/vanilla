@@ -1776,13 +1776,7 @@
     };
 }(jQuery));
 
-
-// Set all .BodyBox elements as editor, calling plugin above.
-jQuery(document).ready(function($) {
-    $('.BodyBox').setAsEditor();
-});
-
-$(document).on('start', function(e) {
+$(document).on('contentLoad', function(e) {
     $('.BodyBox', e.target).setAsEditor();
 });
 

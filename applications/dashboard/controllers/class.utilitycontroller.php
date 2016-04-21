@@ -454,8 +454,12 @@ class UtilityController extends DashboardController {
             $HourOffset = $Form->getFormValue('HourOffset');
             Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $HourOffset);
 
+            $timeZone = $Form->getFormValue('TimeZone', null);
+            Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'TimeZone', $timeZone);
+
             $this->setData('Result', true);
             $this->setData('HourOffset', $HourOffset);
+            $this->setData('TimeZone', $timeZone);
 
             $time = time();
             $this->setData('UTCDateTime', gmdate('r', $time));

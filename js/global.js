@@ -1163,13 +1163,19 @@ jQuery(document).ready(function($) {
 
     var d = new Date();
     var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
+    var tz = false;
+    var tzRegEx = /\(([^\)]+)\)$/;
+
+    if (tzRegEx.test(d.toString())) {
+        tz = d.toString().match(tzRegEx)[1];
+    }
 
     // Ajax/Save the ClientHour if it is different from the value in the db.
     var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
     if (hourOffset !== setHourOffset) {
         $.post(
             gdn.url('/utility/sethouroffset.json'),
-            {HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey')}
+            {HourOffset: hourOffset, TimeZone: tz, TransientKey: gdn.definition('TransientKey')}
         );
     }
 

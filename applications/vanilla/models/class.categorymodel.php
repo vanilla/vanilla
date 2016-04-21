@@ -256,41 +256,50 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Calculate the dynamic fields of a category.
+     *
+     * @param array &$category The category to calculate.
+     */
+    private static function calculate(&$category) {
+        $category['CountAllDiscussions'] = $category['CountDiscussions'];
+        $category['CountAllComments'] = $category['CountComments'];
+        $category['Url'] = self::categoryUrl($category, false, '/');
+        $category['ChildIDs'] = array();
+        if (val('Photo', $category)) {
+            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
+        } else {
+            $category['PhotoUrl'] = '';
+        }
+
+        if ($category['DisplayAs'] == 'Default') {
+            if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
+                $category['DisplayAs'] = 'Categories';
+            } elseif ($category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
+                $category['DisplayAs'] = 'Heading';
+            } else {
+                $category['DisplayAs'] = 'Discussions';
+            }
+        }
+
+        if (!val('CssClass', $category)) {
+            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+        }
+
+        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
+            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        }
+    }
+
+    /**
      * Build calculated category data on the passed set.
      *
      * @since 2.0.18
      * @access public
      * @param array $Data Dataset.
      */
-    protected static function calculateData(&$Data) {
+    private static function calculateData(&$Data) {
         foreach ($Data as &$Category) {
-            $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
-            $Category['CountAllComments'] = $Category['CountComments'];
-            $Category['Url'] = self::categoryUrl($Category, false, '/');
-            $Category['ChildIDs'] = array();
-            if (val('Photo', $Category)) {
-                $Category['PhotoUrl'] = Gdn_Upload::url($Category['Photo']);
-            } else {
-                $Category['PhotoUrl'] = '';
-            }
-
-            if ($Category['DisplayAs'] == 'Default') {
-                if ($Category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
-                    $Category['DisplayAs'] = 'Categories';
-                } elseif ($Category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
-                    $Category['DisplayAs'] = 'Heading';
-                } else {
-                    $Category['DisplayAs'] = 'Discussions';
-                }
-            }
-
-            if (!val('CssClass', $Category)) {
-                $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
-            }
-
-            if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes'])) {
-                $Category['AllowedDiscussionTypes'] = dbdecode($Category['AllowedDiscussionTypes']);
-            }
+            self::calculate($Category);
         }
 
         $Keys = array_reverse(array_keys($Data));

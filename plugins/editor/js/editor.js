@@ -1483,7 +1483,7 @@
 
                 var currentEditableCommentId = (new Date()).getTime();
                 var editorName = 'vanilla-editor-text-' + currentEditableCommentId;
-                
+
                 $(document).on('click', 'a.PreviewButton', function() {
                     $currentEditorToolbar.hide();
                 });

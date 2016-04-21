@@ -27,31 +27,7 @@ if (!function_exists('ValidateCaptcha')) {
      * @return bool Returns true if the captcha is valid or an error message otherwise.
      */
     function validateCaptcha($value = null) {
-        $recaptchaResponse = Gdn::request()->post('g-recaptcha-response');
-        if (!$recaptchaResponse) {
-            return false;
-        }
-
-        $api = new Garden\Http\HttpClient('https://www.google.com/recaptcha/api');
-        $data = array(
-            'secret' => c('Garden.Registration.CaptchaPrivateKey'),
-            'response' => $recaptchaResponse
-        );
-        $response = $api->get('/siteverify', $data);
-
-        if ($response->isSuccessful()) {
-            $result = $response->getBody();
-            $errorCodes = val('error_codes', $result);
-            if ($result && val('success', $result)) {
-                return true;
-            } else if (!empty($errorCodes) && $errorCodes != array('invalid-input-response')) {
-                throw new Exception(formatString(t('No response from reCAPTCHA.').' {ErrorCodes}', array('ErrorCodes' => join(', ', $errorCodes))));
-            }
-        } else {
-            throw new Exception(t('No response from reCAPTCHA.'));
-        }
-
-        return false;
+        return Captcha::validate($value);
     }
 }
 

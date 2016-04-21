@@ -42,9 +42,6 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                     <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                         <th><?php
                             $MethodName = $Method;
-                            if ($MethodName == 'Captcha')
-                                $MethodName = 'Basic';
-
                             echo $this->Form->radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
                             ?></th>
                         <td class="Alt"><?php echo t($Description); ?></td>
@@ -55,30 +52,11 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 </tbody>
             </table>
         </li>
-        <?php if ($this->Data('_ManageCaptcha')) : ?>
-        <li id="CaptchaSettings">
-            <div
-                class="Info"><?php echo t('The basic registration form requires new users to copy text from a CAPTCHA image.', '<strong>The basic registration form requires</strong> new users to use reCAPTCHA to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
-            <table class="Label AltColumns">
-                <thead>
-                <tr>
-                    <th><?php echo t('Key Type'); ?></th>
-                    <th class="Alt"><?php echo t('Key Value'); ?></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="Alt">
-                    <th><?php echo t('Public Key'); ?></th>
-                    <td class="Alt"><?php echo $this->Form->textBox('Garden.Registration.CaptchaPublicKey'); ?></td>
-                </tr>
-                <tr>
-                    <th><?php echo t('Private Key'); ?></th>
-                    <td class="Alt"><?php echo $this->Form->textBox('Garden.Registration.CaptchaPrivateKey'); ?></td>
-                </tr>
-                </tbody>
-            </table>
-        </li>
-        <?php endif; ?>
+
+        <?php Captcha::settings($this); ?>
+
+        <?php $this->fireEvent('RegistrationView'); ?>
+
         <li id="InvitationExpiration">
             <?php
             echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration');

@@ -299,6 +299,7 @@ jQuery(document).ready(function($) {
                 success: function(json) {
                     $(msg).afterStart(json.Data);
                     $(msg).hide();
+                    $(document).trigger('EditCommentFormLoaded', [container]);
                 },
                 complete: function() {
                     $(parent).find('span.TinyProgress').remove();

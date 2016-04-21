@@ -27,25 +27,46 @@ class Captcha {
     }
 
     /**
+     * Wrapper for captcha settings.
+     *
+     * Allows conditional ignoring of captcha settings if disabled in the config.
+     *
+     * @param Gdn_Controller $controller
+     * @return null
+     */
+    public static function settings($controller) {
+        if (!c('Garden.Registration.ManageCaptcha', true)) {
+            return null;
+        }
+
+        // Hook to allow rendering of captcha settings form
+        $controller->fireAs('captcha')->fireEvent('settings');
+        return null;
+    }
+
+    /**
      * Wrapper for captcha rendering.
      *
      * Allows conditional ignoring of captcha rendering if skipped in the config.
      *
      * @param Gdn_Controller $controller
+     * @return null;
      */
     public static function render($controller) {
         if (!Captcha::enabled()) {
-            return;
+            return null;
         }
 
         // Hook to allow rendering of captcha form
         $controller->fireAs('captcha')->fireEvent('render');
+        return null;
     }
 
     /**
      * Validate captcha.
      *
      * @param mixed $value
+     * @return boolean validity of captcha submission
      */
     public static function validate($value = null) {
         if (is_null($value)) {

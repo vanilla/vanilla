@@ -52,7 +52,9 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 </tbody>
             </table>
         </li>
-        
+
+        <?php Captcha::settings($this); ?>
+
         <?php $this->fireEvent('RegistrationView'); ?>
 
         <li id="InvitationExpiration">

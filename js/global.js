@@ -106,6 +106,41 @@
             return output;
         }
     });
+
+    var funcStart = function(func, html) {
+        this.each(function() {
+            var $elem = $(html);
+            $(this)[func]($elem);
+            $elem.trigger('start');
+        });
+    };
+
+    $.fn.extend({
+        appendStart: function(html) {
+            funcStart.call(this, 'append', html);
+        },
+
+        beforeStart: function(html) {
+            funcStart.call(this, 'before', html);
+        },
+
+        afterStart: function(html) {
+            funcStart.call(this, 'after', html);
+        },
+
+        prependStart: function(html) {
+            funcStart.call(this, 'prepend', html);
+        },
+
+        htmlStart: function(html) {
+            funcStart.call(this, 'html', html);
+        },
+
+        replaceWithStart: function(html) {
+            funcStart.call(this, 'html', html);
+        }
+    });
+
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
@@ -457,19 +492,19 @@ jQuery(document).ready(function($) {
                     });
                     break;
                 case 'Append':
-                    $target.append(item.Data);
+                    $target.appendStart(item.Data);
                     break;
                 case 'Before':
-                    $target.before(item.Data);
+                    $target.beforeStart(item.Data);
                     break;
                 case 'After':
-                    $target.after(item.Data);
+                    $target.afterStart(item.Data);
                     break;
                 case 'Highlight':
                     $target.effect("highlight", {}, "slow");
                     break;
                 case 'Prepend':
-                    $target.prepend(item.Data);
+                    $target.prependStart(item.Data);
                     break;
                 case 'Redirect':
                     window.location.replace(item.Data);
@@ -484,7 +519,7 @@ jQuery(document).ready(function($) {
                     $target.removeClass(item.Data);
                     break;
                 case 'ReplaceWith':
-                    $target.replaceWith(item.Data);
+                    $target.replaceWithStart(item.Data);
                     break;
                 case 'SlideUp':
                     $target.slideUp('fast');
@@ -496,7 +531,7 @@ jQuery(document).ready(function($) {
                     $target.text(item.Data);
                     break;
                 case 'Html':
-                    $target.html(item.Data);
+                    $target.htmlStart(item.Data);
                     break;
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
@@ -614,7 +649,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.html(data);
+                    $elem.htmlStart(data);
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');

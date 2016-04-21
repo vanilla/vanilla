@@ -107,37 +107,37 @@
         }
     });
 
-    var funcStart = function(func, html) {
+    var funcTrigger = function(func, html) {
         this.each(function() {
             var $elem = $(html);
             $(this)[func]($elem);
-            $elem.trigger('start');
+            $elem.trigger('contentLoad');
         });
     };
 
     $.fn.extend({
-        appendStart: function(html) {
-            funcStart.call(this, 'append', html);
+        appendTrigger: function(html) {
+            funcTrigger.call(this, 'append', html);
         },
 
-        beforeStart: function(html) {
-            funcStart.call(this, 'before', html);
+        beforeTrigger: function(html) {
+            funcTrigger.call(this, 'before', html);
         },
 
-        afterStart: function(html) {
-            funcStart.call(this, 'after', html);
+        afterTrigger: function(html) {
+            funcTrigger.call(this, 'after', html);
         },
 
-        prependStart: function(html) {
-            funcStart.call(this, 'prepend', html);
+        prependTrigger: function(html) {
+            funcTrigger.call(this, 'prepend', html);
         },
 
-        htmlStart: function(html) {
-            funcStart.call(this, 'html', html);
+        htmlTrigger: function(html) {
+            funcTrigger.call(this, 'html', html);
         },
 
-        replaceWithStart: function(html) {
-            funcStart.call(this, 'html', html);
+        replaceWithTrigger: function(html) {
+            funcTrigger.call(this, 'html', html);
         }
     });
 
@@ -146,7 +146,9 @@
 // Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
 
-	/**
+    this.trigger('contentLoad');
+
+    /**
 	 * @deprecated since Vanilla 2.2
 	 */
     $.postParseJson = function(json) {
@@ -492,19 +494,19 @@ jQuery(document).ready(function($) {
                     });
                     break;
                 case 'Append':
-                    $target.appendStart(item.Data);
+                    $target.appendTrigger(item.Data);
                     break;
                 case 'Before':
-                    $target.beforeStart(item.Data);
+                    $target.beforeTrigger(item.Data);
                     break;
                 case 'After':
-                    $target.afterStart(item.Data);
+                    $target.afterTrigger(item.Data);
                     break;
                 case 'Highlight':
                     $target.effect("highlight", {}, "slow");
                     break;
                 case 'Prepend':
-                    $target.prependStart(item.Data);
+                    $target.prependTrigger(item.Data);
                     break;
                 case 'Redirect':
                     window.location.replace(item.Data);
@@ -519,7 +521,7 @@ jQuery(document).ready(function($) {
                     $target.removeClass(item.Data);
                     break;
                 case 'ReplaceWith':
-                    $target.replaceWithStart(item.Data);
+                    $target.replaceWithTrigger(item.Data);
                     break;
                 case 'SlideUp':
                     $target.slideUp('fast');
@@ -531,7 +533,7 @@ jQuery(document).ready(function($) {
                     $target.text(item.Data);
                     break;
                 case 'Html':
-                    $target.htmlStart(item.Data);
+                    $target.htmlTrigger(item.Data);
                     break;
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
@@ -649,7 +651,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.htmlStart(data);
+                    $elem.htmlTrigger(data);
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');

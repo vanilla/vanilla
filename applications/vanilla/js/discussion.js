@@ -297,7 +297,7 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    $(msg).afterStart(json.Data);
+                    $(msg).afterTrigger(json.Data);
                     $(msg).hide();
                     $(document).trigger('EditCommentFormLoaded', [container]);
                 },

@@ -46,13 +46,11 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     public function addTabby($Sender) {
         if (c('Plugins.GooglePrettify.UseTabby', false)) {
             $Sender->addJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
-            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(function () {
+            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), '
         function init() {
             $("textarea").not(".Tabby").addClass("Tabby").tabby();
         }
-        $(document).on("contentLoad", init)
-        init();
-});');
+        $(document).on("contentLoad", init);');
         }
     }
 
@@ -70,8 +68,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
             $Class .= " lang-$Language";
         }
 
-        $Result = "jQuery(function ($) {
-
+        $Result = "
             function init() {
                 $('.Message').each(function () {
                     if ($(this).data('GooglePrettify')) {
@@ -91,9 +88,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                 });
             }
 
-            $(document).on('CommentAdded PreviewLoaded popupReveal', init);
-            init();
-        });";
+            $(document).on('contentLoad', init);";
         return $Result;
     }
 

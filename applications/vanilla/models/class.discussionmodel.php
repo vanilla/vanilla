@@ -25,16 +25,16 @@ class DiscussionModel extends VanillaModel {
     const EMPTY_FILTER_KEY = 'none';
 
     /** @var array */
-    protected static $_CategoryPermissions = null;
+    private static $categoryPermissions = null;
 
     /** @var array */
-    protected static $_DiscussionTypes = null;
+    private static $discussionTypes = null;
 
     /** @var bool */
     public $Watching = false;
 
     /** @var array Discussion Permissions */
-    protected $permissionTypes = ['Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View'];
+    private $permissionTypes = ['Add', 'Announce', 'Close', 'Delete', 'Edit', 'Sink', 'View'];
 
     /**
      * @var array The sorts that are accessible via GET. Each sort corresponds with an order by clause.
@@ -334,7 +334,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     public static function discussionTypes() {
-        if (!self::$_DiscussionTypes) {
+        if (!self::$discussionTypes) {
             $DiscussionTypes = ['Discussion' => [
                 'Singular' => 'Discussion',
                 'Plural' => 'Discussions',
@@ -345,10 +345,10 @@ class DiscussionModel extends VanillaModel {
 
             Gdn::pluginManager()->EventArguments['Types'] = &$DiscussionTypes;
             Gdn::pluginManager()->fireAs('DiscussionModel')->fireEvent('DiscussionTypes');
-            self::$_DiscussionTypes = $DiscussionTypes;
+            self::$discussionTypes = $DiscussionTypes;
             unset(Gdn::pluginManager()->EventArguments['Types']);
         }
-        return self::$_DiscussionTypes;
+        return self::$discussionTypes;
     }
 
     /**
@@ -1292,16 +1292,16 @@ class DiscussionModel extends VanillaModel {
      * @return array Protected local _CategoryPermissions
      */
     public static function categoryPermissions($Escape = false) {
-        if (is_null(self::$_CategoryPermissions)) {
+        if (is_null(self::$categoryPermissions)) {
             $Session = Gdn::session();
 
             if ((is_object($Session->User) && $Session->User->Admin)) {
-                self::$_CategoryPermissions = true;
+                self::$categoryPermissions = true;
             } elseif (c('Garden.Permissions.Disabled.Category')) {
                 if ($Session->checkPermission('Vanilla.Discussions.View')) {
-                    self::$_CategoryPermissions = true;
+                    self::$categoryPermissions = true;
                 } else {
-                    self::$_CategoryPermissions = []; // no permission
+                    self::$categoryPermissions = []; // no permission
                 }
             } else {
                 $Categories = CategoryModel::categories();
@@ -1317,17 +1317,17 @@ class DiscussionModel extends VanillaModel {
                 $CategoryCount = count($Categories);
 
                 if (count($IDs) == $CategoryCount) {
-                    self::$_CategoryPermissions = true;
+                    self::$categoryPermissions = true;
                 } else {
-                    self::$_CategoryPermissions = [];
+                    self::$categoryPermissions = [];
                     foreach ($IDs as $ID) {
-                        self::$_CategoryPermissions[] = ($Escape ? '@' : '').$ID;
+                        self::$categoryPermissions[] = ($Escape ? '@' : '').$ID;
                     }
                 }
             }
         }
 
-        return self::$_CategoryPermissions;
+        return self::$categoryPermissions;
     }
 
     public function fetchPageInfo($Url, $ThrowError = false) {

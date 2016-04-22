@@ -119,7 +119,6 @@
             var $elem = $($.parseHTML(html + '')); // Typecast html to a string and create a DOM node
             $(this)[func]($elem);
             $elem.trigger('contentLoad');
-            }
         });
         return this;
     };

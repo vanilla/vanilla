@@ -2931,12 +2931,10 @@ class DiscussionModel extends VanillaModel {
      */
     protected function getFiltersFromKeys($filterKeyValues) {
         $filters = [];
+        $allFilters = self::getAllowedFilters();
         foreach ($filterKeyValues as $key => $value) {
-            $allFilters = self::getAllowedFilters();
-            foreach ($filterKeyValues as $key => $value) {
-                if (isset($allFilters[$key]['filters'][$value])) {
-                    $filters[] = $allFilters[$key]['filters'][$value];
-                }
+            if (isset($allFilters[$key]['filters'][$value])) {
+                $filters[] = $allFilters[$key]['filters'][$value];
             }
         }
         return $filters;

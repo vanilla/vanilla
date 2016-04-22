@@ -3,10 +3,6 @@ var crop = {
     element: null,
 
     start: function(element) {
-        //console.log(element);
-        if ($('#cropbox', element).length === 0) {
-            return;
-        }
         crop.element = element;
         $('#save-crop', crop.element).hide();
         if ($.Jcrop) {
@@ -71,5 +67,8 @@ var crop = {
 
 
 $(document).on('contentLoad', function(e) {
+    if ($('#cropbox', e.target).length === 0) {
+        return;
+    }
     crop.start(e.target);
 });

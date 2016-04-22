@@ -41,6 +41,12 @@ class RecaptchaPlugin extends Gdn_Plugin {
     protected $publicKey;
 
     /**
+     * Compatibility flag, for old views
+     * @var boolean
+     */
+    protected $rendered = false;
+
+    /**
      * Plugin initialization.
      *
      */
@@ -154,7 +160,23 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function captcha_render_handler($sender) {
+        $this->rendered = true;
         echo $sender->fetchView('captcha', 'display', 'plugins/recaptcha');
+    }
+
+    /**
+     * Compatibility hook
+     *
+     * Older overridden views will not have the new Captcha::render() method.
+     * This hook catches the old registerFormBeforeTerms event and re-fires
+     * Captcha::render() if the captcha has not already rendered.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function entrycontroller_registerFormBeforeTerms_handler($sender) {
+        if (!$this->rendered) {
+            Captcha::render($sender);
+        }
     }
 
     /**

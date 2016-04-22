@@ -107,9 +107,16 @@
         }
     });
 
+    /**
+     * Takes a jQuery function that updates the DOM and the HTML to add. Converts the html to a jQuery object
+     * and then adds it to the DOM. Triggers 'contentLoad' to allow javascript manipulation of the new DOM elements.
+     *
+     * @param func The jQuery function name.
+     * @param html The html to add.
+     */
     var funcTrigger = function(func, html) {
         this.each(function() {
-            var $elem = $(html);
+            var $elem = $($.parseHTML(html + '')); // Typecast html to a string and create a DOM node
             $(this)[func]($elem);
             $elem.trigger('contentLoad');
         });
@@ -147,8 +154,8 @@
 jQuery(document).ready(function($) {
 
     /**
-	 * @deprecated since Vanilla 2.2
-	 */
+     * @deprecated since Vanilla 2.2
+     */
     $.postParseJson = function(json) {
         return json;
     };

@@ -324,15 +324,6 @@ class DiscussionModel extends VanillaModel {
         // Add any additional fields that were requested.
         if (is_array($AdditionalFields)) {
             foreach ($AdditionalFields as $Alias => $Field) {
-                // See if a new table needs to be joined to the query.
-                $TableAlias = explode('.', $Field);
-                $TableAlias = $TableAlias[0];
-                if (array_key_exists($TableAlias, $Tables)) {
-                    $Join = $Tables[$TableAlias];
-                    $this->SQL->join($Join[0], $Join[1]);
-                    unset($Tables[$TableAlias]);
-                }
-
                 // Select the field.
                 $this->SQL->select($Field, '', is_numeric($Alias) ? '' : $Alias);
             }

@@ -753,6 +753,9 @@ class ProfileController extends Gdn_Controller {
             $avatar = UserModel::getDefaultAvatarUrl();
         }
 
+        $source = '';
+        $crop = null;
+
         if ($this->isUploadedAvatar($avatar)) {
             //Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
@@ -789,7 +792,7 @@ class ProfileController extends Gdn_Controller {
                 $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions);
             }
             if ($this->Form->errorCount() == 0) {
-                if ($newAvatar) {
+                if ($newAvatar !== false) {
                     $thumbnailSize = c('Garden.Thumbnail.Size', 40);
                     // Update crop properties.
                     $basename = changeBasename($newAvatar, "p%s");

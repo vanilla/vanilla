@@ -109,7 +109,7 @@
 
     /**
      * Takes a jQuery function that updates the DOM and the HTML to add. Converts the html to a jQuery object
-     * and then adds it to the DOM. Triggers 'contentLoad' to allow javascript manipulation of the updated DOM elements.
+     * and then adds it to the DOM. Triggers 'contentLoad' to allow javascript manipulation of the new DOM elements.
      *
      * @param func The jQuery function name.
      * @param html The html to add.

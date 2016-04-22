@@ -722,7 +722,7 @@ class ActivityModel extends Gdn_Model {
         $ActivityTypeRow = self::getActivityType($ActivityType);
         $Notify = val('Notify', $ActivityTypeRow, false);
 
-        if ($ActivityTypeRow == false) {
+        if ($ActivityTypeRow === false) {
             trigger_error(
                 errorMessage(sprintf('Activity type could not be found: %s', $ActivityType), 'ActivityModel', 'Add'),
                 E_USER_ERROR
@@ -1339,7 +1339,7 @@ class ActivityModel extends Gdn_Model {
      * @param array $Data
      * @param bool $Preference
      * @param array $Options
-     * @return array|bool|null
+     * @return array|bool|string|null
      * @throws Exception
      */
     public function save($Data, $Preference = false, $Options = array()) {

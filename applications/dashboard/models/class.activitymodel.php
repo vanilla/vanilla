@@ -714,7 +714,7 @@ class ActivityModel extends Gdn_Model {
      * @param int $RegardingUserID
      * @param int $CommentActivityID
      * @param string $Route
-     * @param mixed $SendEmail
+     * @param string|bool $SendEmail
      * @return int ActivityID of item created.
      */
     public function add($ActivityUserID, $ActivityType, $Story = null, $RegardingUserID = null, $CommentActivityID = null, $Route = null, $SendEmail = '') {
@@ -760,7 +760,7 @@ class ActivityModel extends Gdn_Model {
         }
 
         // Otherwise let the decision to email lie with the $Notify setting.
-        if ($SendEmail == 'Force' || $Notify) {
+        if ($SendEmail === 'Force' || $Notify) {
             $Activity['Emailed'] = self::SENT_PENDING;
         } elseif ($Notify) {
             $Activity['Emailed'] = self::SENT_PENDING;

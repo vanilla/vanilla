@@ -548,6 +548,8 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
 
     /**
      * Returns an array of associative arrays containing the ResultSet data.
+     *
+     * @return &array Returns an array reference.
      */
     public function &resultArray() {
         return $this->result(DATASET_TYPE_ARRAY);

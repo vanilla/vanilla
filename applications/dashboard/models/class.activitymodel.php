@@ -195,7 +195,7 @@ class ActivityModel extends Gdn_Model {
             $this->SQL->delete('ActivityComment', array('ActivityID' => $ActivityID));
 
             // Delete the activity item
-            return parent::delete(array('ActivityID' => $ActivityID));
+            return parent::deleteID($ActivityID);
         } else {
             return false;
         }
@@ -231,17 +231,17 @@ class ActivityModel extends Gdn_Model {
      *
      * Events: AfterGet.
      *
-     * @param array|bool $Where A filter suitable for passing to Gdn_SQLDriver::Where().
+     * @param array $Where A filter suitable for passing to Gdn_SQLDriver::Where().
      * @param string $orderFields A comma delimited string to order the data.
      * @param string $orderDirection One of **asc** or **desc**.
      * @param int|false $Limit The database limit.
      * @param int|false $Offset The database offset.
      * @return Gdn_DataSet SQL results.
      */
-    public function getWhere($Where = false, $orderFields = '', $orderDirection = '', $Limit = false, $Offset = false) {
+    public function getWhere($Where = [], $orderFields = '', $orderDirection = '', $Limit = false, $Offset = false) {
         if (is_string($Where)) {
             deprecated('ActivityModel->getWhere($key, $value)', 'ActivityModel->getWhere([$key => $value])');
-            $Where = array($Where => $orderFields);
+            $Where = [$Where => $orderFields];
             $orderFields = '';
         }
         if (is_numeric($orderFields)) {
@@ -377,7 +377,7 @@ class ActivityModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Data
+     * @param array &$Data
      */
     public static function getUsers(&$Data) {
         $UserIDs = array();
@@ -651,30 +651,9 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
-     * Get number of notifications for a user.
-     *
-     * Events: BeforeGetNotificationsCount.
-     *
-     * @since 2.0.0
-     * @access public
-     * @param int $UserID Unique ID of user.
-     * @return int Number of notifications.
+     * @param int $ID
+     * @return array|false
      */
-    /*public function getCountNotifications($UserID) {
-       $this->SQL
-          ->select('a.ActivityID', 'count', 'ActivityCount')
-          ->from('Activity a')
-          ->join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID');
-
-       $this->fireEvent('BeforeGetNotificationsCount');
-       return $this->SQL
-          ->where('RegardingUserID', $UserID)
-          ->where('t.Notify', '1')
-          ->get()
-          ->firstRow()
-          ->ActivityCount;
-    }*/
-
     public function getComment($ID) {
         $Activity = $this->SQL->getWhere('ActivityComment', array('ActivityCommentID' => $ID))->resultArray();
         if ($Activity) {
@@ -798,7 +777,7 @@ class ActivityModel extends Gdn_Model {
      *  - Email: Email the notification.
      *  - NULL: True if either notification is true.
      *  - both: Return an array of (Popup, Email).
-     * @return bool
+     * @return bool|array
      */
     public static function notificationPreference($ActivityType, $Preferences, $Type = null) {
         if (is_numeric($Preferences)) {

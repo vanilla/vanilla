@@ -109,9 +109,11 @@
 
     var funcTrigger = function(func, html) {
         this.each(function() {
+            $(this)[func](html);
             var $elem = $(html);
-            $(this)[func]($elem);
-            $elem.trigger('contentLoad');
+            if ($elem !== undefined) {
+                $elem.trigger('contentLoad');
+            }
         });
     };
 

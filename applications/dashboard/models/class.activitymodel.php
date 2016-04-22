@@ -337,7 +337,7 @@ class ActivityModel extends Gdn_Model {
      *
      * Events: BeforeGet, AfterGet.
      *
-     * @param int $NotifyUserID Unique ID of user to gather activity for or one of the NOTIFY_* constants in this class.
+     * @param int|false $NotifyUserID Unique ID of user to gather activity for or one of the NOTIFY_* constants in this class.
      * @param int $Offset Number to skip.
      * @param int $Limit How many to return.
      * @return Gdn_DataSet SQL results.
@@ -355,7 +355,7 @@ class ActivityModel extends Gdn_Model {
 
         $this->activityQuery(false);
 
-        if (!$NotifyUserID) {
+        if ($NotifyUserID === false || $NotifyUserID === 0) {
             $NotifyUserID = self::NOTIFY_PUBLIC;
         }
         $this->SQL->whereIn('NotifyUserID', (array)$NotifyUserID);
@@ -690,7 +690,7 @@ class ActivityModel extends Gdn_Model {
      * @param int $ActivityUserID
      * @param string $ActivityType
      * @param string $Story
-     * @param int $RegardingUserID
+     * @param int|null $RegardingUserID
      * @param int $CommentActivityID
      * @param string $Route
      * @param string|bool $SendEmail
@@ -731,7 +731,7 @@ class ActivityModel extends Gdn_Model {
         }
 
         $Preference = false;
-        if (($ActivityTypeRow['Notify'] || !$ActivityTypeRow['Public']) && $RegardingUserID) {
+        if (($ActivityTypeRow['Notify'] || !$ActivityTypeRow['Public']) && !empty($RegardingUserID)) {
             $Activity['NotifyUserID'] = $Activity['RegardingUserID'];
             $Preference = $ActivityType;
         } else {
@@ -820,7 +820,7 @@ class ActivityModel extends Gdn_Model {
      * @access public
      * @param int $ActivityID
      * @param array $Story
-     * @param string $Force
+     * @param bool $Force
      */
     public function sendNotification($ActivityID, $Story = '', $Force = false) {
         $Activity = $this->getID($ActivityID);
@@ -886,6 +886,7 @@ class ActivityModel extends Gdn_Model {
                 try {
                     $this->SQL->put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
                 } catch (Exception $Ex) {
+                    // We don't want a noisy error in a behind-the-scenes notification.
                 }
             }
         }
@@ -1043,8 +1044,9 @@ class ActivityModel extends Gdn_Model {
 
     /**
      * Save a comment on an activity.
+     *
      * @param array $Comment
-     * @return int|bool
+     * @return int|bool|string
      * @since 2.1
      */
     public function comment($Comment) {
@@ -1146,6 +1148,7 @@ class ActivityModel extends Gdn_Model {
                     try {
                         $this->SQL->put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $Notification['ActivityID']));
                     } catch (Exception $Ex) {
+                        // Ignore an exception in a behind-the-scenes notification.
                     }
                 }
             }
@@ -1210,13 +1213,12 @@ class ActivityModel extends Gdn_Model {
             $Activity->RegardingUserID = $CommentActivity->RegardingUserID;
             $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
         }
-        $User = Gdn::userModel()->getID($Activity->RegardingUserID, DATASET_TYPE_OBJECT); //$this->SQL->select('UserID, Name, Email, Preferences')->from('User')->where('UserID', $Activity->RegardingUserID)->get()->firstRow();
+        $User = Gdn::userModel()->getID($Activity->RegardingUserID, DATASET_TYPE_OBJECT);
 
         if ($User) {
             if ($Force) {
                 $Preference = $Force;
             } else {
-            //            $Preferences = Gdn_Format::Unserialize($User->Preferences);
                 $ConfigPreference = c('Preferences.Email.'.$Activity->ActivityType, '0');
                 if ($ConfigPreference !== false) {
                     $Preference = val('Email.'.$Activity->ActivityType, $User->Preferences, $ConfigPreference);
@@ -1294,7 +1296,7 @@ class ActivityModel extends Gdn_Model {
             }
         }
 
-        if ($Preference) {
+        if (!empty($Preference)) {
             list($Popup, $Email) = self::notificationPreference($Preference, $Data['NotifyUserID'], 'both');
             if (!$Popup && !$Email) {
                 return; // don't queue if user doesn't want to be notified at all.

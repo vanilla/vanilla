@@ -154,7 +154,6 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function captcha_render_handler($sender) {
-        $this->rendered = true;
         echo $sender->fetchView('captcha', 'display', 'plugins/recaptcha');
     }
 

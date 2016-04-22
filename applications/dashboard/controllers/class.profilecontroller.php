@@ -475,8 +475,12 @@ class ProfileController extends Gdn_Controller {
      * @param int $UserID Unique ID.
      */
     public function index($User = '', $Username = '', $UserID = '', $Page = false) {
+        $this->addJsFile('cropimage.js');
+        $this->addCssFile('cropimage.css');
+        
         $this->editMode(false);
         $this->getUserInfo($User, $Username, $UserID);
+
 
         if ($this->User->Admin == 2 && $this->Head) {
             // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
@@ -745,6 +749,9 @@ class ProfileController extends Gdn_Controller {
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $this->Form->setModel($configurationModel);
         $avatar = $this->User->Photo;
+        if ($avatar === null) {
+            $avatar = UserModel::getDefaultAvatarUrl();
+        }
 
         if ($this->isUploadedAvatar($avatar)) {
             //Get the image source so we can manipulate it in the crop module.
@@ -795,6 +802,8 @@ class ProfileController extends Gdn_Controller {
                 }
             }
             $this->informMessage(t("Your settings have been saved."));
+            $this->RedirectUrl = url('/profile');
+            $this->render();
         }
 
         $this->title(t('Change Picture'));
@@ -804,7 +813,7 @@ class ProfileController extends Gdn_Controller {
 
 
     /**
-     * Deletes uploaded avatars in both size formats.
+     * Deletes uploaded avatars in the profile size format.
      *
      * @param string $avatar The avatar to delete.
      */
@@ -813,7 +822,6 @@ class ProfileController extends Gdn_Controller {
             $upload = new Gdn_Upload();
             $subdir = stringBeginsWith(dirname($avatar), PATH_UPLOADS.'/', false, true);
             $upload->delete($subdir.'/'.basename(changeBasename($avatar, 'p%s')));
-            $upload->delete($subdir.'/'.basename(changeBasename($avatar, 'n%s')));
         }
     }
 
@@ -823,7 +831,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $avatar The path to the avatar image to test
      * @return bool Whether the avatar has been uploaded from the dashboard.
      */
-    public function isUploadedAvatar($avatar) {
+    private function isUploadedAvatar($avatar) {
         return (!isUrl($avatar) && strpos($avatar, self::AVATAR_FOLDER.'/') !== false);
     }
 
@@ -1109,7 +1117,7 @@ class ProfileController extends Gdn_Controller {
         // Get user data & another permission check.
         $this->getUserInfo($UserReference, $Username, '', true);
 
-        $RedirectUrl = userUrl($this->User, '', 'picture');
+        $RedirectUrl = userUrl($this->User);
         if ($Session->validateTransientKey($tk) && is_object($this->User)) {
             $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {

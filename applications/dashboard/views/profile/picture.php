@@ -1,7 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 // Check that we have the necessary tools to allow image uploading
 $allowImages = Gdn_UploadImage::CanUploadImages();
-
+echo '<div class="change-picture">';
+echo '<h2 class="H">'.$this->title().'</h2>';
 echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-change-picture-form'));
 echo $this->Form->errors();
 // Is the photo hosted remotely?
@@ -23,4 +24,7 @@ if ($this->data('crop')) {
     echo wrap(anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey(), 'Button Danger PopConfirm'), 'div');
 }
 ?>
-<?php echo $this->Form->close(); ?>
+<?php
+echo $this->Form->close();
+echo '</div>';
+?>

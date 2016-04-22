@@ -163,6 +163,7 @@ class DiscussionModel extends VanillaModel {
                 return val('key', $sort, '');
             }
         }
+        return '';
     }
 
     /**
@@ -664,7 +665,6 @@ class DiscussionModel extends VanillaModel {
         }
 
         $Data = $Sql->get();
-        $Result =& $Data->result();
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($Data);
@@ -2102,9 +2102,7 @@ class DiscussionModel extends VanillaModel {
                 }
 
                 // Get CategoryID of this discussion
-
                 $Discussion = $this->getID($DiscussionID, DATASET_TYPE_OBJECT);
-                $CategoryID = val('CategoryID', $Discussion, false);
 
                 // Update discussion counter for affected categories.
                 if ($Insert || $StoredCategoryID) {
@@ -2363,7 +2361,6 @@ class DiscussionModel extends VanillaModel {
         if ($ForceValue !== null) {
             $Value = $ForceValue;
         } else {
-            $Value = '1';
             $Discussion = $this->getID($DiscussionID);
             $Value = ($Discussion->$Property == '1' ? '0' : '1');
         }

@@ -44,7 +44,7 @@ class ActivityModel extends Gdn_Model {
     public static $ActivityTypes = null;
 
     /** @var array Activity to be saved. */
-    public static $Queue = array();
+    public static $Queue = [];
 
     /** @var int Limit on number of activity to combine. */
     public static $MaxMergeCount = 10;
@@ -131,12 +131,12 @@ class ActivityModel extends Gdn_Model {
 
         $Data = $Row['Data'];
         if (isset($Data['ActivityUserIDs'])) {
-            $Row['ActivityUserID'] = array_merge(array($Row['ActivityUserID']), $Data['ActivityUserIDs']);
+            $Row['ActivityUserID'] = array_merge([$Row['ActivityUserID']], $Data['ActivityUserIDs']);
             $Row['ActivityUserID_Count'] = val('ActivityUserID_Count', $Data);
         }
 
         if (isset($Data['RegardingUserIDs'])) {
-            $Row['RegardingUserID'] = array_merge(array($Row['RegardingUserID']), $Data['RegardingUserIDs']);
+            $Row['RegardingUserID'] = array_merge([$Row['RegardingUserID']], $Data['RegardingUserIDs']);
             $Row['RegardingUserID_Count'] = val('RegardingUserID_Count', $Data);
         }
 
@@ -156,8 +156,8 @@ class ActivityModel extends Gdn_Model {
      * @param array $Activity The data that goes in the ActivityType table.
      * @since 2.1
      */
-    public function defineType($Name, $Activity = array()) {
-        $this->SQL->replace('ActivityType', $Activity, array('Name' => $Name), true);
+    public function defineType($Name, $Activity = []) {
+        $this->SQL->replace('ActivityType', $Activity, ['Name' => $Name], true);
     }
 
     /**
@@ -181,7 +181,7 @@ class ActivityModel extends Gdn_Model {
      * @param array $Options Not used.
      * @return bool Returns **true** if the activity was deleted or **false** otherwise.
      */
-    public function deleteID($ActivityID, $Options = array()) {
+    public function deleteID($ActivityID, $Options = []) {
         // Get the activity first.
         $Activity = $this->getID($ActivityID);
         if ($Activity) {
@@ -192,7 +192,7 @@ class ActivityModel extends Gdn_Model {
             }
 
             // Delete comments on the activity item
-            $this->SQL->delete('ActivityComment', array('ActivityID' => $ActivityID));
+            $this->SQL->delete('ActivityComment', ['ActivityID' => $ActivityID]);
 
             // Delete the activity item
             return parent::deleteID($ActivityID);
@@ -210,7 +210,7 @@ class ActivityModel extends Gdn_Model {
      * @return Gdn_DataSet
      */
     public function deleteComment($ID) {
-        return $this->SQL->delete('ActivityComment', array('ActivityCommentID' => $ID));
+        return $this->SQL->delete('ActivityComment', ['ActivityCommentID' => $ID]);
     }
 
     /**
@@ -305,7 +305,7 @@ class ActivityModel extends Gdn_Model {
      */
     public function joinComments(&$Activities) {
         // Grab all of the activity IDs.
-        $ActivityIDs = array();
+        $ActivityIDs = [];
         foreach ($Activities as $Activity) {
             if ($ID = val('CommentActivityID', $Activity['Data'])) {
                 // This activity shares its comments with another activity.
@@ -317,7 +317,7 @@ class ActivityModel extends Gdn_Model {
         $ActivityIDs = array_unique($ActivityIDs);
 
         $Comments = $this->getComments($ActivityIDs);
-        $Comments = Gdn_DataSet::index($Comments, array('ActivityID'), array('Unique' => false));
+        $Comments = Gdn_DataSet::index($Comments, ['ActivityID'], ['Unique' => false]);
         foreach ($Activities as &$Activity) {
             $ID = val('CommentActivityID', $Activity['Data']);
             if (!$ID) {
@@ -327,7 +327,7 @@ class ActivityModel extends Gdn_Model {
             if (isset($Comments[$ID])) {
                 $Activity['Comments'] = $Comments[$ID];
             } else {
-                $Activity['Comments'] = array();
+                $Activity['Comments'] = [];
             }
         }
     }
@@ -366,7 +366,7 @@ class ActivityModel extends Gdn_Model {
             ->limit($Limit, $Offset)
             ->get();
 
-        Gdn::userModel()->joinUsers($Result, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
+        Gdn::userModel()->joinUsers($Result, ['ActivityUserID', 'RegardingUserID'], ['Join' => ['Name', 'Photo', 'Email', 'Gender']]);
 
         $this->EventArguments['Data'] =& $Result;
         $this->fireEvent('AfterGet');
@@ -380,7 +380,7 @@ class ActivityModel extends Gdn_Model {
      * @param array &$Data
      */
     public static function getUsers(&$Data) {
-        $UserIDs = array();
+        $UserIDs = [];
 
         foreach ($Data as &$Row) {
             if (is_string($Row['Data'])) {
@@ -475,7 +475,7 @@ class ActivityModel extends Gdn_Model {
      */
     public function getForRole($RoleID = '', $Offset = '0', $Limit = '50') {
         if (!is_array($RoleID)) {
-            $RoleID = array($RoleID);
+            $RoleID = [$RoleID];
         }
 
         $Offset = is_numeric($Offset) ? $Offset : 0;
@@ -513,7 +513,7 @@ class ActivityModel extends Gdn_Model {
      */
     public function getCountForRole($RoleID = '') {
         if (!is_array($RoleID)) {
-            $RoleID = array($RoleID);
+            $RoleID = [$RoleID];
         }
 
         return $this->SQL
@@ -540,7 +540,7 @@ class ActivityModel extends Gdn_Model {
         $Activity = parent::getID($activityID, $dataSetType);
         if ($Activity) {
             $this->calculateRow($Activity);
-            $Activities = array($Activity);
+            $Activities = [$Activity];
             self::joinUsers($Activities);
             $Activity = array_pop($Activities);
         }
@@ -596,13 +596,13 @@ class ActivityModel extends Gdn_Model {
             return true;
         }
 
-        $notifyUserIds = array(ActivityModel::NOTIFY_PUBLIC);
+        $notifyUserIds = [ActivityModel::NOTIFY_PUBLIC];
         if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             $notifyUserIds[] = ActivityModel::NOTIFY_MODS;
         }
 
         // Is this a wall post?
-        if (!in_array(val('ActivityType', $activity), array('Status', 'WallPost')) || !in_array($notifyUserId, $notifyUserIds)) {
+        if (!in_array(val('ActivityType', $activity), ['Status', 'WallPost']) || !in_array($notifyUserId, $notifyUserIds)) {
             return false;
         }
         // Is this on the user's wall?
@@ -655,9 +655,9 @@ class ActivityModel extends Gdn_Model {
      * @return array|false
      */
     public function getComment($ID) {
-        $Activity = $this->SQL->getWhere('ActivityComment', array('ActivityCommentID' => $ID))->resultArray();
+        $Activity = $this->SQL->getWhere('ActivityComment', ['ActivityCommentID' => $ID])->resultArray();
         if ($Activity) {
-            Gdn::userModel()->joinUsers($Activity, array('InsertUserID'), array('Join' => array('Name', 'Photo', 'Email')));
+            Gdn::userModel()->joinUsers($Activity, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
             return array_shift($Activity);
         }
         return false;
@@ -678,7 +678,7 @@ class ActivityModel extends Gdn_Model {
             ->whereIn('c.ActivityID', $ActivityIDs)
             ->orderBy('c.ActivityID, c.DateInserted')
             ->get()->resultArray();
-        Gdn::userModel()->joinUsers($Result, array('InsertUserID'), array('Join' => array('Name', 'Photo', 'Email')));
+        Gdn::userModel()->joinUsers($Result, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
         return $Result;
     }
 
@@ -708,13 +708,13 @@ class ActivityModel extends Gdn_Model {
             );
         }
 
-        $Activity = array(
+        $Activity = [
             'ActivityUserID' => $ActivityUserID,
             'ActivityType' => $ActivityType,
             'Story' => $Story,
             'RegardingUserID' => $RegardingUserID,
             'Route' => $Route
-        );
+        ];
 
 
         // Massage $SendEmail to allow for only sending an email.
@@ -777,13 +777,13 @@ class ActivityModel extends Gdn_Model {
      *  - Email: Email the notification.
      *  - NULL: True if either notification is true.
      *  - both: Return an array of (Popup, Email).
-     * @return bool|array
+     * @return bool|bool[]
      */
     public static function notificationPreference($ActivityType, $Preferences, $Type = null) {
         if (is_numeric($Preferences)) {
             $User = Gdn::userModel()->getID($Preferences);
             if (!$User) {
-                return $Type == 'both' ? array(false, false) : false;
+                return $Type == 'both' ? [false, false] : false;
             }
             $Preferences = val('Preferences', $User);
         }
@@ -794,10 +794,10 @@ class ActivityModel extends Gdn_Model {
 
             return $Result;
         } elseif ($Type === 'both') {
-            $Result = array(
+            $Result = [
                 self::notificationPreference($ActivityType, $Preferences, 'Popup'),
                 self::notificationPreference($ActivityType, $Preferences, 'Email')
-            );
+            ];
             return $Result;
         }
 
@@ -864,7 +864,7 @@ class ActivityModel extends Gdn_Model {
 
                 $Email->setEmailTemplate($emailTemplate);
 
-                $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
+                $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity];
                 $this->EventArguments = $Notification;
                 $this->fireEvent('BeforeSendNotification');
                 try {
@@ -884,7 +884,7 @@ class ActivityModel extends Gdn_Model {
                     $Emailed = self::SENT_FAIL; // similar to http 5xx
                 }
                 try {
-                    $this->SQL->put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+                    $this->SQL->put('Activity', ['Emailed' => $Emailed], ['ActivityID' => $ActivityID]);
                 } catch (Exception $Ex) {
                     // We don't want a noisy error in a behind-the-scenes notification.
                 }
@@ -951,7 +951,7 @@ class ActivityModel extends Gdn_Model {
             if (!isset($Activity['ActivityGender'])) {
                 $AT = self::getActivityType($Activity['ActivityType']);
 
-                $Data = array($Activity);
+                $Data = [$Activity];
                 self::joinUsers($Data);
                 $Activity = $Data[0];
                 $Activity['RouteCode'] = val('RouteCode', $AT);
@@ -980,7 +980,7 @@ class ActivityModel extends Gdn_Model {
         $Email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
-        $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity);
+        $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity];
         $this->EventArguments = $Notification;
         $this->fireEvent('BeforeSendNotification');
 
@@ -1013,7 +1013,7 @@ class ActivityModel extends Gdn_Model {
         $Activity['Emailed'] = $Emailed;
         if ($ActivityID) {
             // Save the emailed flag back to the activity.
-            $this->SQL->put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+            $this->SQL->put('Activity', ['Emailed' => $Emailed], ['ActivityID' => $ActivityID]);
         }
         return true;
     }
@@ -1029,7 +1029,7 @@ class ActivityModel extends Gdn_Model {
      * should be cleared before it is used, and sending the queue will clear it
      * again.
      */
-    private $_NotificationQueue = array();
+    private $_NotificationQueue = [];
 
     /**
      * Clear notification queue.
@@ -1039,7 +1039,7 @@ class ActivityModel extends Gdn_Model {
      */
     public function clearNotificationQueue() {
         unset($this->_NotificationQueue);
-        $this->_NotificationQueue = array();
+        $this->_NotificationQueue = [];
     }
 
     /**
@@ -1091,9 +1091,9 @@ class ActivityModel extends Gdn_Model {
             if ($ID) {
                 // Check to see if this comment bumps the activity.
                 if ($Activity && val('Bump', $Activity['Data'])) {
-                    $this->SQL->put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $Activity['ActivityID']));
+                    $this->SQL->put('Activity', ['DateUpdated' => $Comment['DateInserted']], ['ActivityID' => $Activity['ActivityID']]);
                     if ($_ActivityID != $Comment['ActivityID']) {
-                        $this->SQL->put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $_ActivityID));
+                        $this->SQL->put('Activity', ['DateUpdated' => $Comment['DateInserted']], ['ActivityID' => $_ActivityID]);
                     }
                 }
 
@@ -1146,7 +1146,7 @@ class ActivityModel extends Gdn_Model {
                     }
 
                     try {
-                        $this->SQL->put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $Notification['ActivityID']));
+                        $this->SQL->put('Activity', ['Emailed' => $Emailed], ['ActivityID' => $Notification['ActivityID']]);
                     } catch (Exception $Ex) {
                         // Ignore an exception in a behind-the-scenes notification.
                     }
@@ -1156,7 +1156,7 @@ class ActivityModel extends Gdn_Model {
 
         // Clear out the queue
         unset($this->_NotificationQueue);
-        $this->_NotificationQueue = array();
+        $this->_NotificationQueue = [];
     }
 
     /**
@@ -1245,12 +1245,12 @@ class ActivityModel extends Gdn_Model {
                 $Email->setEmailTemplate($emailTemplate);
 
                 if (!array_key_exists($User->UserID, $this->_NotificationQueue)) {
-                    $this->_NotificationQueue[$User->UserID] = array();
+                    $this->_NotificationQueue[$User->UserID] = [];
                 }
 
-                $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
+                $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity];
                 if ($Position == 'first') {
-                    $this->_NotificationQueue[$User->UserID] = array_merge(array($Notification), $this->_NotificationQueue[$User->UserID]);
+                    $this->_NotificationQueue[$User->UserID] = array_merge([$Notification], $this->_NotificationQueue[$User->UserID]);
                 } else {
                     $this->_NotificationQueue[$User->UserID][] = $Notification;
                 }
@@ -1265,7 +1265,7 @@ class ActivityModel extends Gdn_Model {
      * @param string|FALSE $Preference The name of the preference governing the activity.
      * @param array $Options Additional options for saving.
      */
-    public function queue($Data, $Preference = false, $Options = array()) {
+    public function queue($Data, $Preference = false, $Options = []) {
         $this->_touch($Data);
         if (!isset($Data['NotifyUserID']) || !isset($Data['ActivityType'])) {
             throw new Exception('Data missing NotifyUserID and/or ActivityType', 400);
@@ -1311,7 +1311,7 @@ class ActivityModel extends Gdn_Model {
         $Data['Notified'] = $Notified;
         $Data['Emailed'] = $Emailed;
 
-        self::$Queue[$Data['NotifyUserID']][$Data['ActivityType']] = array($Data, $Options);
+        self::$Queue[$Data['NotifyUserID']][$Data['ActivityType']] = [$Data, $Options];
     }
 
     /**
@@ -1323,7 +1323,7 @@ class ActivityModel extends Gdn_Model {
      * @return array|bool|string|null
      * @throws Exception
      */
-    public function save($Data, $Preference = false, $Options = array()) {
+    public function save($Data, $Preference = false, $Options = []) {
         trace('ActivityModel->save()');
         $Activity = $Data;
         $this->_touch($Activity);
@@ -1375,7 +1375,7 @@ class ActivityModel extends Gdn_Model {
         // Make sure this activity isn't a duplicate.
         if (val('CheckRecord', $Options)) {
             // Check to see if this record already notified so we don't notify multiple times.
-            $Where = arrayTranslate($Activity, array('NotifyUserID', 'RecordType', 'RecordID'));
+            $Where = arrayTranslate($Activity, ['NotifyUserID', 'RecordType', 'RecordID']);
             $Where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-2 days')); // index hint
 
             $CheckActivity = $this->SQL->getWhere(
@@ -1396,7 +1396,7 @@ class ActivityModel extends Gdn_Model {
         // Group he activity.
         if ($GroupBy = val('GroupBy', $Options)) {
             $GroupBy = (array)$GroupBy;
-            $Where = array();
+            $Where = [];
             foreach ($GroupBy as $ColumnName) {
                 $Where[$ColumnName] = $Activity[$ColumnName];
             }
@@ -1484,7 +1484,7 @@ class ActivityModel extends Gdn_Model {
                 return false;
             }
 
-            $this->SQL->put('Activity', $Activity, array('ActivityID' => $ActivityID));
+            $this->SQL->put('Activity', $Activity, ['ActivityID' => $ActivityID]);
             $Activity['ActivityID'] = $ActivityID;
         }
         $Activity['Data'] = $ActivityData;
@@ -1517,8 +1517,8 @@ class ActivityModel extends Gdn_Model {
         // Mark all of a user's unread activities read.
         $this->SQL->put(
             'Activity',
-            array('Notified' => self::SENT_OK),
-            array('NotifyUserID' => $UserID, 'Notified' => self::SENT_PENDING)
+            ['Notified' => self::SENT_OK],
+            ['NotifyUserID' => $UserID, 'Notified' => self::SENT_PENDING]
         );
 
         $User = Gdn::userModel()->getID($UserID);
@@ -1535,9 +1535,9 @@ class ActivityModel extends Gdn_Model {
      * @param array $Options
      * @return array
      */
-    public function mergeActivities($OldActivity, $NewActivity, $Options = array()) {
+    public function mergeActivities($OldActivity, $NewActivity, $Options = []) {
         // Group the two activities together.
-        $ActivityUserIDs = val('ActivityUserIDs', $OldActivity['Data'], array());
+        $ActivityUserIDs = val('ActivityUserIDs', $OldActivity['Data'], []);
         $ActivityUserCount = val('ActivityUserID_Count', $OldActivity['Data'], 0);
         array_unshift($ActivityUserIDs, $OldActivity['ActivityUserID']);
         if (($i = array_search($NewActivity['ActivityUserID'], $ActivityUserIDs)) !== false) {
@@ -1552,7 +1552,7 @@ class ActivityModel extends Gdn_Model {
 
         $RegardingUserCount = 0;
         if (val('RegardingUserID', $NewActivity)) {
-            $RegardingUserIDs = val('RegardingUserIDs', $OldActivity['Data'], array());
+            $RegardingUserIDs = val('RegardingUserIDs', $OldActivity['Data'], []);
             $RegardingUserCount = val('RegardingUserID_Count', $OldActivity['Data'], 0);
             array_unshift($RegardingUserIDs, $OldActivity['RegardingUserID']);
             if (($i = array_search($NewActivity['RegardingUserID'], $RegardingUserIDs)) !== false) {
@@ -1601,7 +1601,7 @@ class ActivityModel extends Gdn_Model {
     protected function notifyWallComment($Comment, $WallPost) {
         $NotifyUser = Gdn::userModel()->getID($WallPost['ActivityUserID']);
 
-        $Activity = array(
+        $Activity = [
             'ActivityType' => 'WallComment',
             'ActivityUserID' => $Comment['InsertUserID'],
             'Format' => $Comment['Format'],
@@ -1612,7 +1612,7 @@ class ActivityModel extends Gdn_Model {
             'Route' => userUrl($NotifyUser, ''),
             'Story' => $Comment['Body'],
             'HeadlineFormat' => t('HeadlineFormat.NotifyWallComment', '{ActivityUserID,User} commented on your <a href="{Url,url}">wall</a>.')
-        );
+        ];
 
         $this->save($Activity, 'WallComment');
     }
@@ -1625,7 +1625,7 @@ class ActivityModel extends Gdn_Model {
     protected function notifyWallPost($WallPost) {
         $NotifyUser = Gdn::userModel()->getID($WallPost['ActivityUserID']);
 
-        $Activity = array(
+        $Activity = [
             'ActivityType' => 'WallPost',
             'ActivityUserID' => $WallPost['RegardingUserID'],
             'Format' => $WallPost['Format'],
@@ -1636,7 +1636,7 @@ class ActivityModel extends Gdn_Model {
             'Route' => userUrl($NotifyUser, ''),
             'Story' => $WallPost['Story'],
             'HeadlineFormat' => t('HeadlineFormat.NotifyWallPost', '{ActivityUserID,User} posted on your <a href="{Url,url}">wall</a>.')
-        );
+        ];
 
         $this->save($Activity, 'WallComment');
     }
@@ -1647,13 +1647,13 @@ class ActivityModel extends Gdn_Model {
      * @return array
      */
     public function saveQueue() {
-        $Result = array();
+        $Result = [];
         foreach (self::$Queue as $UserID => $Activities) {
             foreach ($Activities as $ActivityType => $Row) {
                 $Result[] = $this->save($Row[0], false, $Row[1]);
             }
         }
-        self::$Queue = array();
+        self::$Queue = [];
         return $Result;
     }
 
@@ -1673,7 +1673,7 @@ class ActivityModel extends Gdn_Model {
         touchValue('Photo', $Data, null);
         touchValue('Route', $Data, null);
         if (!isset($Data['Data']) || !is_array($Data['Data'])) {
-            $Data['Data'] = array();
+            $Data['Data'] = [];
         }
     }
 }

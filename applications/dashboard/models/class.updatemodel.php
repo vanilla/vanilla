@@ -32,7 +32,7 @@ class UpdateModel extends Gdn_Model {
      *
      * @param string $path Folder or zip file to look in.
      * @param array $fileNames List of files to attempt to locate inside $path.
-     * @return array|bool
+     * @return array
      * @throws Exception
      * @throws Gdn_UserException
      */
@@ -180,8 +180,15 @@ class UpdateModel extends Gdn_Model {
         }
 
         // Add the addon requirements.
-        if ($Addon) {
-            $Requirements = arrayTranslate($Addon, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
+        if (!empty($Addon)) {
+            $Requirements = arrayTranslate(
+                $Addon,
+                [
+                    'RequiredApplications' => 'Applications',
+                    'RequiredPlugins' => 'Plugins',
+                    'RequiredThemes' => 'Themes'
+                ]
+            );
             foreach ($Requirements as $Type => $Items) {
                 if (!is_array($Items)) {
                     unset($Requirements[$Type]);
@@ -220,13 +227,13 @@ class UpdateModel extends Gdn_Model {
     private static function getInfoFiles($Path, $InfoPaths) {
         $Path = str_replace('\\', '/', rtrim($Path));
 
-        $Result = array();
+        $Result = [];
         // Check to see if the paths exist.
         foreach ($InfoPaths as $InfoPath) {
             $Glob = glob($Path.$InfoPath);
             if (is_array($Glob)) {
                 foreach ($Glob as $GlobPath) {
-                    $Result[] = array('Name' => substr($GlobPath, strlen($Path)), 'Path' => $GlobPath);
+                    $Result[] = ['Name' => substr($GlobPath, strlen($Path)), 'Path' => $GlobPath];
                 }
             }
         }
@@ -241,7 +248,7 @@ class UpdateModel extends Gdn_Model {
      * @param array $InfoPaths
      * @param bool $TmpPath
      * @param bool $ThrowError
-     * @return array|bool
+     * @return array
      * @throws Exception
      */
     private static function getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
@@ -268,10 +275,11 @@ class UpdateModel extends Gdn_Model {
                 $Errors = array(ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
                     ZipArchive::ER_MEMORY => 'ER_MEMORY', ZipArchive::ER_NOENT => 'ER_NOENT', ZipArchive::ER_NOZIP => 'ER_NOZIP',
                     ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK');
+                $Error = val($ZipOpened, $Errors, 'Unknown Error');
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.val($ZipOpened, $Errors, 'Unknown Error').')', 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($Path $Error)", 400);
             }
-            return false;
+            return [];
         }
 
         if ($TmpPath === false) {
@@ -317,12 +325,12 @@ class UpdateModel extends Gdn_Model {
      * Parse the version out of the core's index.php file.
      *
      * @param string $Path The path to the index.php file.
-     * @return string|false A string containing the version or false if the file could not be parsed.
+     * @return string A string containing the version or empty if the file could not be parsed.
      */
     public static function parseCoreVersion($Path) {
         $fp = fopen($Path, 'rb');
         $Application = false;
-        $Version = false;
+        $Version = '';
 
         while (($Line = fgets($fp)) !== false) {
             if (preg_match("`define\\('(.*?)', '(.*?)'\\);`", $Line, $Matches)) {
@@ -537,7 +545,12 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'plugin', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, $Key));
+            $Addon = [
+                'AddonKey' => $Key,
+                'AddonType' => 'plugin',
+                'Version' => val('Version', $Info, '0.0'),
+                'Folder' => '/applications/'.GetValue('Folder', $Info, $Key)
+            ];
             self::addAddon($Addon, $Addons);
         }
 
@@ -555,7 +568,12 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'theme', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/themes/'.GetValue('Folder', $Info, $Key));
+            $Addon = [
+                'AddonKey' => $Key,
+                'AddonType' => 'theme',
+                'Version' => val('Version', $Info, '0.0'),
+                'Folder' => '/themes/'.GetValue('Folder', $Info, $Key)
+            ];
             self::addAddon($Addon, $Addons);
         }
 
@@ -573,7 +591,12 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'locale', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/locales/'.GetValue('Folder', $Info, $Key));
+            $Addon = [
+                'AddonKey' => $Key,
+                'AddonType' => 'locale',
+                'Version' => val('Version', $Info, '0.0'),
+                'Folder' => '/locales/'.GetValue('Folder', $Info, $Key)
+            ];
             self::addAddon($Addon, $Addons);
         }
 

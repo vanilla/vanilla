@@ -42,7 +42,8 @@ class DiscussionModel extends VanillaModel {
      * Each sort in the array has the following properties:
      * - **key**: string - The key name of the sort. Appears in the query string, should be url-friendly.
      * - **name**: string - The display name of the sort.
-     * - **orderBy**: string - An array indicating order by fields and their directions in the format: array('field1' => 'direction', 'field2' => 'direction')
+     * - **orderBy**: string - An array indicating order by fields and their directions in the format:
+     *   `['field1' => 'direction', 'field2' => 'direction']`
      */
     protected static $allowedSorts = [
         'hot' => ['key' => 'hot', 'name' => 'Hot', 'orderBy' => ['DateLastComment' => 'desc']],
@@ -168,7 +169,7 @@ class DiscussionModel extends VanillaModel {
      * Determines whether or not the current user can edit a discussion.
      *
      * @param object|array $discussion The discussion to examine.
-     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
+     * @param int &$timeLeft Sets the time left to edit or 0 if not applicable.
      * @return bool Returns true if the user can edit or false otherwise.
      */
     public static function canEdit($discussion, &$timeLeft = 0) {
@@ -853,7 +854,7 @@ class DiscussionModel extends VanillaModel {
      * WE NO LONGER NEED THIS SINCE THE LOGIC HAS BEEN CHANGED.
      *
      * @deprecated since version 2.1.26a
-     * @param type $Discussions
+     * @param Gdn_DataSet|stdClass $Discussions
      */
     public function addDenormalizedViews(&$Discussions) {
 
@@ -1468,10 +1469,9 @@ class DiscussionModel extends VanillaModel {
      * @access public
      *
      * @param array $Wheres SQL conditions.
-     * @param bool $ForceNoAnnouncements Not used.
      * @return int Number of discussions.
      */
-    public function getUnreadCount($Wheres = '', $ForceNoAnnouncements = false) {
+    public function getUnreadCount($Wheres = '') {
         if (is_array($Wheres) && count($Wheres) == 0) {
             $Wheres = '';
         }
@@ -2128,9 +2128,9 @@ class DiscussionModel extends VanillaModel {
 
     /**
      *
-     * @param type $Discussion
-     * @param type $NotifiedUsers
+     * @param int|array|stdClass $Discussion
      * @param ActivityModel $ActivityModel
+     * @param array $Activity
      */
     public function notifyNewDiscussion($Discussion, $ActivityModel, $Activity) {
         if (is_numeric($Discussion)) {
@@ -2732,13 +2732,11 @@ class DiscussionModel extends VanillaModel {
     /**
      * Convert tags from stored format to user-presentable format.
      *
-     * @since 2.1
-     * @access protected
-     *
-     * @param string Serialized array.
+     * @param string $Tags A string encoded with {@link dbencode()}.
      * @return string Comma-separated tags.
+     * @since 2.1
      */
-    protected function formatTags($Tags) {
+    private function formatTags($Tags) {
         // Don't bother if there aren't any tags
         if (!$Tags) {
             return '';
@@ -2765,8 +2763,10 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * We don't use this functionality anymore. Previously, you had to register any sorting field before sorting with it.
+     *
+     * @deprecated
      */
-    public static function allowedSortFields($Allowed = null) {
+    public static function allowedSortFields() {
         deprecated("allowedSortFields");
     }
 

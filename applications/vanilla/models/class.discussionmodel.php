@@ -972,8 +972,9 @@ class DiscussionModel extends VanillaModel {
         }
         if ($Discussion->CountUnreadComments === null) {
             $Discussion->CountUnreadComments = 0;
-        } elseif ($Discussion->CountUnreadComments < 0)
+        } elseif ($Discussion->CountUnreadComments < 0) {
             $Discussion->CountUnreadComments = 0;
+        }
 
         $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : null;
 
@@ -1403,8 +1404,9 @@ class DiscussionModel extends VanillaModel {
                 $CategoryIDs = (array)$Wheres['d.CategoryID'];
                 if ($Perms === false) {
                     $CategoryIDs = [];
-                } elseif (is_array($Perms))
+                } elseif (is_array($Perms)) {
                     $CategoryIDs = array_intersect($CategoryIDs, $Perms);
+                }
 
                 if (count($CategoryIDs) == 0) {
                     return 0;
@@ -1476,8 +1478,9 @@ class DiscussionModel extends VanillaModel {
                 $CategoryIDs = (array)$Wheres['d.CategoryID'];
                 if ($Perms === false) {
                     $CategoryIDs = [];
-                } elseif (is_array($Perms))
+                } elseif (is_array($Perms)) {
                     $CategoryIDs = array_intersect($CategoryIDs, $Perms);
+                }
 
                 if (count($CategoryIDs) == 0) {
                     return 0;
@@ -1526,7 +1529,7 @@ class DiscussionModel extends VanillaModel {
      *
      * @param int $ForeignID Foreign ID of discussion to get.
      * @param string $Type The record type or an empty string for any record type.
-     * @return object SQL result.
+     * @return stdClass SQL result.
      * @since 2.0.18
      */
     public function getForeignID($ForeignID, $Type = '') {
@@ -2840,7 +2843,7 @@ class DiscussionModel extends VanillaModel {
      * If not, returns an empty string. Will only return a safe sort key from the sort array or an empty string if not
      * found.
      *
-     * @param array $string The string to get the sort from.
+     * @param string $string The string to get the sort from.
      * @return string A valid sort key or an empty string.
      */
     protected function getSortFromString($string) {
@@ -2892,7 +2895,7 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * @param string sortKey
+     * @param string $sortKey
      * @return array
      */
     protected function getSortFromKey($sortKey) {

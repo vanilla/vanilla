@@ -144,7 +144,7 @@
         },
 
         replaceWithTrigger: function(html) {
-            funcTrigger.call(this, 'html', html);
+            funcTrigger.call(this, 'replaceWith', html);
         }
     });
 

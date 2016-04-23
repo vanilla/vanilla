@@ -830,7 +830,7 @@ class DiscussionModel extends VanillaModel {
      * @param object $Data SQL result.
      */
     public function removeAnnouncements($Data) {
-        $Result =& $Data->result();
+        $Result = &$Data->result();
         $Unset = false;
 
         foreach ($Result as $Key => &$Discussion) {
@@ -1224,7 +1224,7 @@ class DiscussionModel extends VanillaModel {
         $Data = $this->SQL->get();
 
 
-        $Result =& $Data->result();
+        $Result = &$Data->result();
         $this->LastDiscussionCount = $Data->numRows();
 
         if (count($Result) > 0) {
@@ -1262,7 +1262,7 @@ class DiscussionModel extends VanillaModel {
             $this->addDenormalizedViews($Data);
         }
 
-        $this->EventArguments['Data'] =& $Data;
+        $this->EventArguments['Data'] = &$Data;
         $this->fireEvent('AfterAddColumns');
 
         return $Data;

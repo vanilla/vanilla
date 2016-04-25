@@ -875,18 +875,18 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle($ActivityHeadline);
 
-		$message = '';
+                $message = '';
 
-		if ($prefix = c('Garden.Email.Prefix', '')) {
-		    $message = $prefix;
-		}
+                if ($prefix = c('Garden.Email.Prefix', '')) {
+                    $message = $prefix;
+                }
 
-		if ($story = val('Story', $Activity)) {
-		    $message .= $story;
-		}
+                if ($story = val('Story', $Activity)) {
+                    $message .= $story;
+                }
 
-		if ($message) {
-		    $emailTemplate->setMessage($message, true);
+                if ($message) {
+                    $emailTemplate->setMessage($message, true);
                 }
 
                 $Email->setEmailTemplate($emailTemplate);
@@ -977,18 +977,18 @@ class ActivityModel extends Gdn_Model {
             ->setButton($url, val('ActionText', $Activity, t('Check it out')))
             ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
-	$message = '';
+        $message = '';
 
-	if ($prefix = c('Garden.Email.Prefix', '')) {
-	    $message = $prefix;
-	}
+        if ($prefix = c('Garden.Email.Prefix', '')) {
+            $message = $prefix;
+        }
 
-	if ($story = val('Story', $Activity)) {
-	    $message .= $story;
-	}
+        if ($story = val('Story', $Activity)) {
+            $message .= $story;
+        }
 
-	if ($message) {
-	    $emailTemplate->setMessage($message, true);
+        if ($message) {
+            $emailTemplate->setMessage($message, true);
         }
 
         $Email->setEmailTemplate($emailTemplate);
@@ -1229,7 +1229,7 @@ class ActivityModel extends Gdn_Model {
             if ($Force) {
                 $Preference = $Force;
             } else {
-            //            $Preferences = Gdn_Format::Unserialize($User->Preferences);
+                //            $Preferences = Gdn_Format::Unserialize($User->Preferences);
                 $ConfigPreference = c('Preferences.Email.'.$Activity->ActivityType, '0');
                 if ($ConfigPreference !== false) {
                     $Preference = val('Email.'.$Activity->ActivityType, $User->Preferences, $ConfigPreference);
@@ -1249,18 +1249,18 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
-		$message = '';
+                $message = '';
 
-		if ($prefix = c('Garden.Email.Prefix', '')) {
-		    $message = $prefix;
-		}
+                if ($prefix = c('Garden.Email.Prefix', '')) {
+                    $message = $prefix;
+                }
 
-		if ($story = val('Story', $Activity)) {
-		    $message .= $story;
-		}
+                if ($story = val('Story', $Activity)) {
+                    $message .= $story;
+                }
 
-		if ($message) {
-		    $emailTemplate->setMessage($message, true);
+                if ($message) {
+                    $emailTemplate->setMessage($message, true);
                 }
 
                 $Email->setEmailTemplate($emailTemplate);

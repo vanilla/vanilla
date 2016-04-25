@@ -1231,7 +1231,7 @@ class ActivityModel extends Gdn_Model {
             if ($Force) {
                 $Preference = $Force;
             } else {
-                //            $Preferences = Gdn_Format::Unserialize($User->Preferences);
+            //            $Preferences = Gdn_Format::Unserialize($User->Preferences);
                 $ConfigPreference = c('Preferences.Email.'.$Activity->ActivityType, '0');
                 if ($ConfigPreference !== false) {
                     $Preference = val('Email.'.$Activity->ActivityType, $User->Preferences, $ConfigPreference);

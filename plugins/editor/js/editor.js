@@ -1595,8 +1595,7 @@
                                         // and we can write inside it.
                                         var formWrapper = $('div.FormWrapper');
                                         if (formWrapper.is(document.activeElement)) {
-                                            alert('focus out')
-                                            //formWrapper.blur();
+                                            formWrapper.blur();
                                         }
                                     }
 

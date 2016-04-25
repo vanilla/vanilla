@@ -875,17 +875,7 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle($ActivityHeadline);
 
-                $message = '';
-
-                if ($prefix = c('Garden.Email.Prefix', '')) {
-                    $message = $prefix;
-                }
-
-                if ($story = val('Story', $Activity)) {
-                    $message .= $story;
-                }
-
-                if ($message) {
+                if ($message = $this->getEmailMessage($Activity)) {
                     $emailTemplate->setMessage($message, true);
                 }
 
@@ -916,6 +906,28 @@ class ActivityModel extends Gdn_Model {
                 }
             }
         }
+    }
+
+
+    /**
+     * Takes an array representing an activity and builds the email message based on the activity's story and
+     * the contents of the global config Garden.Email.Prefix.
+     *
+     * @param array $activity The activity to build the email for.
+     * @return string The email message.
+     */
+    private function getEmailMessage($activity) {
+        $message = '';
+
+        if ($prefix = c('Garden.Email.Prefix', '')) {
+            $message = $prefix;
+        }
+
+        if ($story = val('Story', $activity)) {
+            $message .= $story;
+        }
+
+        return $message;
     }
 
     /**
@@ -977,17 +989,7 @@ class ActivityModel extends Gdn_Model {
             ->setButton($url, val('ActionText', $Activity, t('Check it out')))
             ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
-        $message = '';
-
-        if ($prefix = c('Garden.Email.Prefix', '')) {
-            $message = $prefix;
-        }
-
-        if ($story = val('Story', $Activity)) {
-            $message .= $story;
-        }
-
-        if ($message) {
+        if ($message = $this->getEmailMessage($Activity)) {
             $emailTemplate->setMessage($message, true);
         }
 
@@ -1249,17 +1251,7 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
-                $message = '';
-
-                if ($prefix = c('Garden.Email.Prefix', '')) {
-                    $message = $prefix;
-                }
-
-                if ($story = val('Story', $Activity)) {
-                    $message .= $story;
-                }
-
-                if ($message) {
+                if ($message = $this->getEmailMessage($Activity)) {
                     $emailTemplate->setMessage($message, true);
                 }
 

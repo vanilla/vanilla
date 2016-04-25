@@ -36,6 +36,7 @@ class EntryController extends Gdn_Controller {
      */
     public function __construct() {
         parent::__construct();
+        $this->internalMethods[] = 'target';
 
         // Set error message here so it can run thru t()
         $this->UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');

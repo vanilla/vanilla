@@ -213,6 +213,24 @@ class Gdn_Session {
     }
 
     /**
+     * Return the time zone for the current user.
+     *
+     * @return string A valid IANA time zone identifier.
+     */
+    public function getTimeZone() {
+        $timeZone = $this->getAttribute('TimeZone');
+        $hourOffset = $this->hourOffset();
+
+        if ($timeZone) {
+            return $timeZone;
+        } elseif (is_int($hourOffset)) {
+            return "Etc/GMT/{$hourOffset}";
+        } else {
+            return date_default_timezone_get();
+        }
+    }
+
+    /**
      * Return the timezone hour difference between the user and utc.
      * @return int The hour offset.
      */

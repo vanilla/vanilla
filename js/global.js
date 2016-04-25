@@ -1164,10 +1164,19 @@ jQuery(document).ready(function($) {
     var d = new Date();
     var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
     var tz = false;
-    var tzRegEx = /\(([^\)]+)\)$/;
 
-    if (tzRegEx.test(d.toString())) {
-        tz = d.toString().match(tzRegEx)[1];
+    /**
+     * ECMAScript Internationalization API is supported by all modern browsers, with the exception of Safari.  We use
+     * it here, with lots of careful checking, to attempt to fetch the user's current IANA time zone string.
+     */
+    if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+        var dateTimeFormat = Intl.DateTimeFormat();
+        if (typeof dateTimeFormat.resolvedOptions === 'function') {
+            var resolvedOptions = dateTimeFormat.resolvedOptions();
+            if (typeof resolvedOptions === 'object' && typeof resolvedOptions.timeZone === 'string') {
+                tz = resolvedOptions.timeZone;
+            }
+        }
     }
 
     // Ajax/Save the ClientHour if it is different from the value in the db.

@@ -454,8 +454,16 @@ class UtilityController extends DashboardController {
             $HourOffset = $Form->getFormValue('HourOffset');
             Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $HourOffset);
 
+            // If we receive a time zone, only accept it if we can verify it as a valid identifier.
             $timeZone = $Form->getFormValue('TimeZone');
-            Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'TimeZone', $timeZone);
+            if ($timeZone && function_exists('timezone_identifiers_list')) {
+                $validTimeZones = timezone_identifiers_list();
+                if (in_array($timeZone, $validTimeZones)) {
+                    Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'TimeZone', $timeZone);
+                } else {
+                    Logger::log(Logger::ERROR, 'InvalidTimeZone', ['Time Zone' => $timeZone]);
+                }
+            }
 
             $this->setData('Result', true);
             $this->setData('HourOffset', $HourOffset);

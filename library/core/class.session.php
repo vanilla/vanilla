@@ -34,6 +34,11 @@ class Gdn_Session {
     protected $_TransientKey;
 
     /**
+     * @var DateTimeZone The current timezone of the user.
+     */
+    private $timeZone;
+
+    /**
      * Private constructor prevents direct instantiation of object
      */
     public function __construct() {
@@ -189,6 +194,7 @@ class Gdn_Session {
         $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
+        $this->timeZone = null;
     }
 
     /**
@@ -210,6 +216,33 @@ class Gdn_Session {
      */
     public function getCookie($Suffix, $Default = null) {
         return GetValue(c('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
+    }
+
+    /**
+     * Return the time zone for the current user.
+     *
+     * @return DateTimeZone Returns the current timezone.
+     */
+    public function getTimeZone() {
+        if ($this->timeZone === null) {
+            $timeZone = $this->getAttribute('TimeZone', c('Garden.GuestTimeZone'));
+            $hourOffset = $this->hourOffset();
+
+            if (!$timeZone) {
+                if (is_numeric($hourOffset)) {
+                    $timeZone = 'Etc/GMT'.sprintf('%+d', -$hourOffset);
+                } else {
+                    $timeZone = date_default_timezone_get();
+                }
+            }
+            try {
+                $this->timeZone = new DateTimeZone($timeZone);
+            } catch (\Exception $ex) {
+                $this->timeZone = new DateTimeZone('UTC');
+            }
+        }
+
+        return $this->timeZone;
     }
 
     /**

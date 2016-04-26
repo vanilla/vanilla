@@ -230,7 +230,7 @@ class Gdn_Session {
 
             if (!$timeZone) {
                 if (is_numeric($hourOffset)) {
-                    $timeZone = 'Etc/GMT/'.sprintf('%+d', $hourOffset);
+                    $timeZone = 'Etc/GMT'.sprintf('%+d', -$hourOffset);
                 } else {
                     $timeZone = date_default_timezone_get();
                 }

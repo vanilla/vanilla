@@ -472,6 +472,28 @@ class UtilityController extends DashboardController {
                     );
                     $timeZone = '';
                 }
+            } elseif ($currentTimeZone = Gdn::session()->getAttribute('TimeZone')) {
+                // Check to see if the current timezone agrees with the posted offset.
+                try {
+                    $tz = new DateTimeZone($currentTimeZone);
+                    $currentHourOffset = $tz->getOffset(new DateTime()) / 3600;
+                    if ($currentHourOffset != $HourOffset) {
+                        // Clear out the current timezone or else it will override the browser's offset.
+                        Gdn::userModel()->saveAttribute(
+                            Gdn::session()->UserID,
+                            ['TimeZone' => null, 'SetTimeZone' => null]
+                        );
+                    } else {
+                        $timeZone = $tz->getName();
+                    }
+                } catch (Exception $ex) {
+                    Logger::log(Logger::ERROR, "Clearing out bad timezone: {timeZone}", ['timeZone' => $currentTimeZone]);
+                    // Clear out the bad timezone.
+                    Gdn::userModel()->saveAttribute(
+                        Gdn::session()->UserID,
+                        ['TimeZone' => null, 'SetTimeZone' => null]
+                    );
+                }
             }
 
             $this->setData('Result', true);

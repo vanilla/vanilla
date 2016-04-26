@@ -2385,7 +2385,7 @@ a.ChangePicture {
   display: block;
 }
 
-a.ChangePicuture:hover {
+a.ChangePicture:hover {
   color: $white;
   text-decoration: underline;
 }
@@ -2554,54 +2554,6 @@ form.Thumbnail table thead td {
 
 form.Thumbnail .Warning {
   margin-bottom: 20px;
-}
-
-.jcropper-holder {
-  border: 1px $black solid;
-}
-
-.jcrop-holder {
-  text-align: left;
-}
-
-.jcrop-vline, .jcrop-hline {
-  font-size: 0;
-  position: absolute;
-  background: $white url('images/jcrop.gif') top left repeat;
-}
-
-.jcrop-vline {
-  height: 100%;
-  width: 1px !important;
-}
-
-.jcrop-hline {
-  width: 100%;
-  height: 1px !important;
-}
-
-.jcrop-handle {
-  font-size: 1px;
-  width: 7px !important;
-  height: 7px !important;
-  border: 1px $grey-5 solid;
-  background-color: $grey-1;
-}
-
-.jcrop-tracker {
-  width: 100%;
-  height: 100%;
-}
-
-.custom .jcrop-vline,
-.custom .jcrop-hline {
-  background: $yellow-3;
-}
-
-.custom .jcrop-handle {
-  border-color: $black;
-  background-color: $yellow-b;
-  border-radius: 3px;
 }
 
 /* ================================================= CommentForm */

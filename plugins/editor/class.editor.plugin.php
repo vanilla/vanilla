@@ -542,7 +542,7 @@ class EditorPlugin extends Gdn_Plugin {
      * Placed these components everywhere due to some Web sites loading the
      * editor in some areas where the values were not yet injected into HTML.
      */
-    public function base_render_before(&$Sender) {
+    public function base_render_before($Sender) {
         // Don't render any assets for editor if it's embedded. This effectively
         // disables the editor from embedded comments. Some HTML is still
         // inserted, because of the BeforeBodyBox handler, which does not contain any data relating to embedded content.

@@ -34,6 +34,11 @@ class Gdn_Session {
     protected $_TransientKey;
 
     /**
+     * @var DateTimeZone The current timezone of the user.
+     */
+    private $timeZone;
+
+    /**
      * Private constructor prevents direct instantiation of object
      */
     public function __construct() {
@@ -189,6 +194,7 @@ class Gdn_Session {
         $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
+        $this->timeZone = null;
     }
 
     /**
@@ -215,19 +221,28 @@ class Gdn_Session {
     /**
      * Return the time zone for the current user.
      *
-     * @return string A valid IANA time zone identifier.
+     * @return DateTimeZone Returns the current timezone.
      */
     public function getTimeZone() {
-        $timeZone = $this->getAttribute('TimeZone');
-        $hourOffset = $this->hourOffset();
+        if ($this->timeZone === null) {
+            $timeZone = $this->getAttribute('TimeZone', c('Garden.GuestTimeZone'));
+            $hourOffset = $this->hourOffset();
 
-        if ($timeZone) {
-            return $timeZone;
-        } elseif (is_int($hourOffset)) {
-            return "Etc/GMT/{$hourOffset}";
-        } else {
-            return date_default_timezone_get();
+            if (!$timeZone) {
+                if (is_numeric($hourOffset)) {
+                    $timeZone = 'Etc/GMT/'.sprintf('%+d', $hourOffset);
+                } else {
+                    $timeZone = date_default_timezone_get();
+                }
+            }
+            try {
+                $this->timeZone = new DateTimeZone($timeZone);
+            } catch (\Exception $ex) {
+                $this->timeZone = new DateTimeZone('UTC');
+            }
         }
+
+        return $this->timeZone;
     }
 
     /**

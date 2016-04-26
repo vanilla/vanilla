@@ -1182,7 +1182,7 @@ jQuery(document).ready(function($) {
     // Ajax/Save the ClientHour if it is different from the value in the db.
     var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
     var setTimeZone = gdn.definition('SetTimeZone', tz);
-    if (hourOffset !== setHourOffset || tz !== setTimeZone) {
+    if (hourOffset !== setHourOffset || (tz && tz !== setTimeZone)) {
         $.post(
             gdn.url('/utility/sethouroffset.json'),
             {HourOffset: hourOffset, TimeZone: tz, TransientKey: gdn.definition('TransientKey')}

@@ -563,11 +563,11 @@ if (!function_exists('formatIP')) {
      * Format an IP address for display.
      *
      * @param string $IP An IP address to be formatted.
-     * @param bool $convert Convert special characters to HTML entities.
+     * @param bool $escape Convert special characters to HTML entities.
      * @return string The formatted IP address.
      */
-    function formatIP($IP, $convert = true) {
-        return $convert ? htmlspecialchars($IP) : $IP;
+    function formatIP($IP, $escape = true) {
+        return $escape ? htmlspecialchars($IP) : $IP;
     }
 }
 

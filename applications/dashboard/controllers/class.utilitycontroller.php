@@ -459,9 +459,18 @@ class UtilityController extends DashboardController {
             if (!empty($timeZone)) {
                 try {
                     $tz = new DateTimeZone($timeZone);
-                    Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'TimeZone', $tz->getName());
+                    Gdn::userModel()->saveAttribute(
+                        Gdn::session()->UserID,
+                        ['TimeZone' => $tz->getName(), 'SetTimeZone' => null]
+                    );
                 } catch (\Exception $ex) {
                     Logger::log(Logger::ERROR, $ex->getMessage(), ['timeZone' => $timeZone]);
+
+                    Gdn::userModel()->saveAttribute(
+                        Gdn::session()->UserID,
+                        ['TimeZone' => null, 'SetTimeZone' => $timeZone]
+                    );
+                    $timeZone = '';
                 }
             }
 

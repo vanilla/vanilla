@@ -199,7 +199,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Attributes['class'] = 'Button';
         }
 
-	$Return = '<button type="'.$Type.'"';
+        $Return = '<input type="'.$Type.'"';
         $Return .= $this->_idAttribute($ButtonCode, $Attributes);
         $Return .= $this->_nameAttribute($ButtonCode, $Attributes);
         $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';

@@ -623,7 +623,7 @@ class Gdn_Model extends Gdn_Pluggable {
                         break;
                     case 'datetime':
                     case 'timestamp':
-                        // Should already have been validated.
+                        $value = $value ?: null;
                         break;
                     case 'varchar':
                     case 'text':

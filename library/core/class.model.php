@@ -602,7 +602,11 @@ class Gdn_Model extends Gdn_Pluggable {
                     case 'tinyint':
                     case 'smallint':
                     case 'bigint':
-                        $value = (int)$value;
+                        if ($value === '' || $value === null) {
+                            $value = null;
+                        } else {
+                            $value = (int)$value;
+                        }
                         break;
                     case 'enum':
                         $enums = array_change_key_case(array_combine($column->Enum, $column->Enum));
@@ -616,10 +620,18 @@ class Gdn_Model extends Gdn_Pluggable {
                         }
                         break;
                     case 'float':
-                        $value = (float)$value;
+                        if ($value === '' || $value === null) {
+                            $value = null;
+                        } else {
+                            $value = (float)$value;
+                        }
                         break;
                     case 'double':
-                        $value = (double)$value;
+                        if ($value === '' || $value === null) {
+                            $value = null;
+                        } else {
+                            $value = (double)$value;
+                        }
                         break;
                     case 'datetime':
                     case 'timestamp':

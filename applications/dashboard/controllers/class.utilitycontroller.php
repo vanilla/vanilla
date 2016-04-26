@@ -456,6 +456,15 @@ class UtilityController extends DashboardController {
 
             // If we receive a time zone, only accept it if we can verify it as a valid identifier.
             $timeZone = $Form->getFormValue('TimeZone');
+            if (!empty($timeZone)) {
+                try {
+                    $tz = new DateTimeZone($timeZone);
+                    Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'TimeZone', $tz->getName());
+                } catch (\Exception $ex) {
+                    Logger::log(Logger::ERROR, $ex->getMessage(), ['timeZone' => $timeZone]);
+                }
+            }
+
             if ($timeZone && function_exists('timezone_identifiers_list')) {
                 $validTimeZones = timezone_identifiers_list();
                 if (in_array($timeZone, $validTimeZones)) {

@@ -465,15 +465,6 @@ class UtilityController extends DashboardController {
                 }
             }
 
-            if ($timeZone && function_exists('timezone_identifiers_list')) {
-                $validTimeZones = timezone_identifiers_list();
-                if (in_array($timeZone, $validTimeZones)) {
-                    Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'TimeZone', $timeZone);
-                } else {
-                    Logger::log(Logger::ERROR, 'InvalidTimeZone', ['Time Zone' => $timeZone]);
-                }
-            }
-
             $this->setData('Result', true);
             $this->setData('HourOffset', $HourOffset);
             $this->setData('TimeZone', $timeZone);

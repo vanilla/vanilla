@@ -1169,7 +1169,7 @@ jQuery(document).ready(function($) {
      * ECMAScript Internationalization API is supported by all modern browsers, with the exception of Safari.  We use
      * it here, with lots of careful checking, to attempt to fetch the user's current IANA time zone string.
      */
-    if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+    if (typeof Intl === 'object' && typeof Intl.DateTimeFormat === 'function') {
         var dateTimeFormat = Intl.DateTimeFormat();
         if (typeof dateTimeFormat.resolvedOptions === 'function') {
             var resolvedOptions = dateTimeFormat.resolvedOptions();

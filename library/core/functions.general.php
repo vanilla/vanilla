@@ -353,38 +353,38 @@ if (!function_exists('assetVersion')) {
     /**
      * Get a version string for a given asset.
      *
-     * @param string $Destination The path of the asset.
-     * @param string|null $Version A known version for the asset or **null** to grab it from the addon's info array.
+     * @param string $destination The path of the asset.
+     * @param string|null $version A known version for the asset or **null** to grab it from the addon's info array.
      * @return string Returns a version string.
      */
-    function assetVersion($Destination, $Version = null) {
+    function assetVersion($destination, $version = null) {
         // Figure out which version to put after the asset.
-        if (is_null($Version)) {
-            $Version = APPLICATION_VERSION;
-            if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                $Type = $Matches[1];
-                $Key = $Matches[2];
-                static $ThemeVersion = null;
+        if (is_null($version)) {
+            $version = APPLICATION_VERSION;
+            if (preg_match('`^/([^/]+)/([^/]+)/`', $destination, $matches)) {
+                $type = $matches[1];
+                $key = $matches[2];
+                static $themeVersion = null;
 
-                switch ($Type) {
+                switch ($type) {
                     case 'plugins':
-                        $PluginInfo = Gdn::pluginManager()->getPluginInfo($Key);
-                        $Version = val('Version', $PluginInfo, $Version);
+                        $pluginInfo = Gdn::pluginManager()->getPluginInfo($key);
+                        $version = val('Version', $pluginInfo, $version);
                         break;
                     case 'applications':
-                        $AppInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($Key));
-                        $Version = val('Version', $AppInfo, $Version);
+                        $applicationInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($key));
+                        $version = val('Version', $applicationInfo, $version);
                         break;
                     case 'themes':
-                        if ($ThemeVersion === null) {
-                            $ThemeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                            if ($ThemeInfo !== false) {
-                                $ThemeVersion = val('Version', $ThemeInfo, $Version);
+                        if ($themeVersion === null) {
+                            $themeInfo = Gdn::themeManager()->getThemeInfo(Theme());
+                            if ($themeInfo !== false) {
+                                $themeVersion = val('Version', $themeInfo, $version);
                             } else {
-                                $ThemeVersion = $Version;
+                                $themeVersion = $version;
                             }
                         }
-                        $Version = $ThemeVersion;
+                        $version = $themeVersion;
                         break;
                 }
             }
@@ -396,9 +396,9 @@ if (!function_exists('assetVersion')) {
             if (time() >= $graced) {
                 $timestamp = $graced;
             }
-            $Version .= '.'.dechex($timestamp);
+            $version .= '.'.dechex($timestamp);
         }
-        return $Version;
+        return $version;
     }
 }
 

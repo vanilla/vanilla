@@ -40,6 +40,20 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
+     * Return the cache-busting hash for the application.
+     *
+     * The cache buster is concatenated from two configuration values. One of the hashes is updated locally on structure
+     * and whenever a plugin is enabled/disabled. The other one is meant to represent the code as a whole and can be
+     * updated by an external code-pusher.
+     *
+     * @return string Returns a hash as a string.
+     */
+    public static function getCacheBuster() {
+        $result = c('Garden.ETagB').c('Garden.ETagA', 'x');
+        return $result;
+    }
+
+    /**
      * Add to the list of CSS files to serve.
      *
      * @param $filename
@@ -496,6 +510,19 @@ class AssetModel extends Gdn_Model {
         ksort($data);
         $result = substr(md5(implode(',', array_keys($data))), 0, 8).$suffix;
         return $result;
+    }
+
+    /**
+     * Refresh the cache buster hash.
+     *
+     * @param string $hash An optional hash to use for the local portion of the cache buster.
+     */
+    public static function refreshCacheBuster($hash = '') {
+        if (empty($hash)) {
+            $hash = substr(sha1(microtime(true)), 0, 8);
+        }
+        saveToConfig('Garden.ETagA', $hash);
+        Logger::event('cachebuster_refresh', Logger::DEBUG, "The etaga was refreshed to {etaga}", ['etaga' => $hash]);
     }
 
     /**

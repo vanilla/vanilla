@@ -211,7 +211,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
 
         Gdn::controller()->Head->addScript('https://www.google.com/recaptcha/api.js?hl=' . $language);
 
-        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => $this->getPublicKey());
+        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => $this->getPublicKey(), 'data-theme' => c('Recaptcha.Theme','light'));
 
         // see https://developers.google.com/recaptcha/docs/display for details
         $this->EventArguments['Attributes'] = &$attributes;

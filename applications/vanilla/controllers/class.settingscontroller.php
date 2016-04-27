@@ -368,7 +368,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategory($CategoryID = false) {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Garden.Community.Manage');
 
         // Set up head
         $this->addJsFile('categories.js');
@@ -460,7 +460,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Garden.Community.Manage');
 
         $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
 
@@ -634,7 +634,7 @@ class SettingsController extends Gdn_Controller {
         $CategoryData = $this->CategoryModel->getAll('TreeLeft');
 
         // Set CanDelete per-category so we can override later if we want.
-        $canDelete = checkPermission('Garden.Settings.Manage');
+        $canDelete = checkPermission('Garden.Community.Manage');
         array_walk($CategoryData->result(), function(&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
@@ -710,7 +710,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function sortCategories() {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Garden.Community.Manage');
 
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {

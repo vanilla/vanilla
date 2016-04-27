@@ -170,7 +170,8 @@ jQuery(document).ready(function($) {
                     if (processedTargets) {
                         // Don't do anything with the data b/c it's already been handled by processTargets
                     } else if (existingCommentRow.length > 0) {
-                        existingCommentRow.after(json.Data).remove();
+                        existingCommentRow.afterTrigger(json.Data);
+                        existingCommentRow.remove();
                         $('#Comment_' + commentID).effect("highlight", {}, "slow");
                     } else {
                         gdn.definition('LastCommentID', commentID, true);

@@ -219,10 +219,8 @@ $.fn.insertRoundTag = function(tagName, opts, props) {
 ButtonBar = {
 
     // Search for new button bars and handle their events.
-    init: function (selector) {
-        selector = selector || '.ButtonBar';
-
-        $('.ButtonBar')
+    init: function () {
+        $('.ButtonBar', this)
             .closest('form')
             .find('div.TextBoxWrapper textarea')
             .each(function (i, textarea) {
@@ -680,4 +678,6 @@ ButtonBar = {
 
 }
 
-$(document).on('contentLoad', ButtonBar.init);
+$(document).on('contentLoad', function(e) {
+    ButtonBar.init.apply(e.target);
+});

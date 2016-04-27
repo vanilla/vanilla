@@ -3,70 +3,67 @@ function Gdn_Quotes() {
     var currentEditor = null;
 }
 
-// Track active editor.
-$(document).on('focus', 'textarea.TextBox', function () {
-    GdnQuotes.currentEditor = this;
-});
-
 // Attach event handler for quotes on the page.
-Gdn_Quotes.prototype.Prepare = function (element) {
+Gdn_Quotes.prototype.Prepare = function () {
     // Capture "this" for use in callbacks.
     var Quotes = this,
-        QuoteFoldingLevel,
-        MaxFoldingLevel;
+        $document = $(document);
 
     // Attach quote event to each Quote button, and return false to prevent link follow.
-    $('a.ReactButton.Quote', element).on('click', function(event) {
+    $document.on('click', 'a.ReactButton.Quote', function(event) {
         var QuoteLink = $(event.target).closest('a'),
             ObjectID = QuoteLink.attr('href').split('/').pop();
-        
+
         Quotes.Quote(ObjectID, QuoteLink);
         return false;
     });
 
+    // Track active editor.
+    $document.on('focus', 'textarea.TextBox', function () {
+        Quotes.currentEditor = this;
+    });
+
+    // Handle quote folding clicks.
+    $document.on('click', 'a.QuoteFolding', function () {
+        var Anchor = $(this),
+            QuoteTarget = Anchor
+                .parent()
+                .next()
+                .toggle();
+
+        if (QuoteTarget.css('display') != 'none') {
+            Anchor.html(gdn.definition('&laquo; hide previous quotes'));
+        } else {
+            Anchor.html(gdn.definition('&raquo; show previous quotes'));
+        }
+
+        return false;
+    });
+};
+
+/**
+ * Format the quotes within a given parent element.
+ *
+ * @param elem The parent element.
+ */
+Gdn_Quotes.prototype.format = function (elem) {
     // Handle quote folding.
-    QuoteFoldingLevel = gdn.definition('QuotesFolding', 1);
-
-    function folding() {
-        $('.Discussion .Message, .Comment .Message').each(function () {
-            // Find the closest child quote
-            var Message = $(this),
-                PetQuote = Message.children('.Quote, .UserQuote');
-
-            if (Message.data('QuoteFolding') || !PetQuote.length) {
-                return;
-            }
-            Message.data('QuoteFolding', '1');
-
-            Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
-        });
-    }
-
-    if (QuoteFoldingLevel != 'None') {
-        QuoteFoldingLevel = parseInt(QuoteFoldingLevel) + 1;
+    var QuoteFoldingLevel = parseInt(gdn.getMeta('QuotesFolding', 1)) + 1,
+        Quotes = this,
         MaxFoldingLevel = 6;
 
-        folding();
+    $('.Discussion .Message, .Comment .Message', elem).each(function () {
+        // Find the closest child quote
+        var Message = $(this),
+            PetQuote = Message.children('.Quote, .UserQuote');
 
-        $('a.QuoteFolding', element).on('click', function () {
-            console.log($(this)
-                .parent()
-                .next().html());
-            var Anchor = $(this),
-                QuoteTarget = Anchor
-                    .parent()
-                    .next()
-                    .toggle();
+        if (Message.data('QuoteFolding') || !PetQuote.length) {
+            return;
+        }
+        Message.data('QuoteFolding', '1');
 
-            if (QuoteTarget.css('display') != 'none') {
-                Anchor.html(gdn.definition('&laquo; hide previous quotes'));
-            } else {
-                Anchor.html(gdn.definition('&raquo; show previous quotes'));
-            }
-
-            return false;
-        });
-    }
+        Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
+    });
 };
 
 
@@ -190,14 +187,12 @@ Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
         .trigger('autosize.resize');
 };
 
+(function(window) {
+    window.GdnQuotes = new Gdn_Quotes();
+    window.GdnQuotes.Prepare();
+})(window);
 
-// Instance for global access.
-var GdnQuotes = null;
-
-// document.ready
-$(document).on('contentLoad', function(e) {
-    if (GdnQuotes == null) {
-        GdnQuotes = new Gdn_Quotes();
-    }
-    GdnQuotes.Prepare(e.target);
+$(document).on('contentLoad', function (e) {
+    console.log('quotes.contentLoad');
+    GdnQuotes.format(e.target);
 });

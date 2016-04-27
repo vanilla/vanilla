@@ -12,7 +12,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.8',
+    'Version' => '1.9',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'HasLocale' => true,
@@ -32,6 +32,7 @@ $PluginInfo['Quotes'] = array(
  *  1.6.8   Textarea target will now automatically resize to fit text body.
  *  1.6.9   Security fix.
  *  1.7     Eliminate livequery and js refactor.
+ *  1.9     Use contentLoad to format quotes.
  */
 class QuotesPlugin extends Gdn_Plugin {
 

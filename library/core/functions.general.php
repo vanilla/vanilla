@@ -358,6 +358,8 @@ if (!function_exists('assetVersion')) {
      * @return string Returns a version string.
      */
     function assetVersion($destination, $version = null) {
+        static $gracePeriod = 90;
+
         // Figure out which version to put after the asset.
         if (is_null($version)) {
             $version = APPLICATION_VERSION;
@@ -392,7 +394,7 @@ if (!function_exists('assetVersion')) {
 
         // Add a timestamp component to the version if available.
         if ($timestamp = c('Garden.Deployed')) {
-            $graced = $timestamp + 30;
+            $graced = $timestamp + $gracePeriod;
             if (time() >= $graced) {
                 $timestamp = $graced;
             }

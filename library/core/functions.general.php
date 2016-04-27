@@ -342,47 +342,63 @@ if (!function_exists('asset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            if (is_null($Version)) {
-                $Version = APPLICATION_VERSION;
-                if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                    $Type = $Matches[1];
-                    $Key = $Matches[2];
-                    static $ThemeVersion = null;
-
-                    switch ($Type) {
-                        case 'plugins':
-                            $PluginInfo = Gdn::pluginManager()->getPluginInfo($Key);
-                            $Version = val('Version', $PluginInfo, $Version);
-                            break;
-                        case 'applications':
-                            $AppInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($Key));
-                            $Version = val('Version', $AppInfo, $Version);
-                            break;
-                        case 'themes':
-                            if ($ThemeVersion === null) {
-                                $ThemeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                                if ($ThemeInfo !== false) {
-                                    $ThemeVersion = val('Version', $ThemeInfo, $Version);
-                                } else {
-                                    $ThemeVersion = $Version;
-                                }
-                            }
-                            $Version = $ThemeVersion;
-                            break;
-                    }
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination, $Version);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
+    }
+}
+
+if (!function_exists('assetVersion')) {
+    /**
+     * Get a version string for a given asset.
+     *
+     * @param string $destination The path of the asset.
+     * @param string|null $version A known version for the asset or **null** to grab it from the addon's info array.
+     * @return string Returns a version string.
+     */
+    function assetVersion($destination, $version = null) {
+        // Figure out which version to put after the asset.
+        if (is_null($version)) {
+            $version = APPLICATION_VERSION;
+            if (preg_match('`^/([^/]+)/([^/]+)/`', $destination, $matches)) {
+                $type = $matches[1];
+                $key = $matches[2];
+                static $themeVersion = null;
+
+                switch ($type) {
+                    case 'plugins':
+                        $pluginInfo = Gdn::pluginManager()->getPluginInfo($key);
+                        $version = val('Version', $pluginInfo, $version);
+                        break;
+                    case 'applications':
+                        $applicationInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($key));
+                        $version = val('Version', $applicationInfo, $version);
+                        break;
+                    case 'themes':
+                        if ($themeVersion === null) {
+                            $themeInfo = Gdn::themeManager()->getThemeInfo(Theme());
+                            if ($themeInfo !== false) {
+                                $themeVersion = val('Version', $themeInfo, $version);
+                            } else {
+                                $themeVersion = $version;
+                            }
+                        }
+                        $version = $themeVersion;
+                        break;
+                }
+            }
+        }
+
+        // Add a timestamp component to the version if available.
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + 30;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $version .= '.'.dechex($timestamp);
+        }
+        return $version;
     }
 }
 
@@ -3315,39 +3331,8 @@ if (!function_exists('smartAsset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            $Version = APPLICATION_VERSION;
-            if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                $Type = $Matches[1];
-                $Key = $Matches[2];
-                static $ThemeVersion = null;
-
-                switch ($Type) {
-                    case 'plugins':
-                        $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
-                        $Version = GetValue('Version', $PluginInfo, $Version);
-                        break;
-                    case 'themes':
-                        if ($ThemeVersion === null) {
-                            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
-                            if ($ThemeInfo !== false) {
-                                $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
-                            } else {
-                                $ThemeVersion = $Version;
-                            }
-                        }
-                        $Version = $ThemeVersion;
-                        break;
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
     }

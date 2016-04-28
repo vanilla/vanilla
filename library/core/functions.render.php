@@ -934,20 +934,42 @@ if (!function_exists('userBuilder')) {
      * Take an object & prefix value and convert it to a user object that can be used by UserAnchor() && UserPhoto().
      *
      * The object must have the following fields: UserID, Name, Photo.
+     *
+     * @param stdClass|array $row The row with the user extract.
+     * @param string|array $userPrefix Either a single string user prefix or an array of prefix searches.
+     * @return stdClass Returns an object containing the user.
      */
-    function userBuilder($Object, $UserPrefix = '') {
-        $Object = (object)$Object;
-        $User = new stdClass();
-        $UserID = $UserPrefix.'UserID';
-        $Name = $UserPrefix.'Name';
-        $Photo = $UserPrefix.'Photo';
-        $Gender = $UserPrefix.'Gender';
-        $User->UserID = $Object->$UserID;
-        $User->Name = $Object->$Name;
-        $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-        $User->Email = val($UserPrefix.'Email', $Object, null);
-        $User->Gender = property_exists($Object, $Gender) ? $Object->$Gender : null;
-        return $User;
+    function userBuilder($row, $userPrefix = '') {
+        $row = (object)$row;
+        $user = new stdClass();
+
+        if (is_array($userPrefix)) {
+            // Look for the first user that has the desired prefix.
+            foreach ($userPrefix as $px) {
+                if (property_exists($row, $px.'Name')) {
+                    $userPrefix = $px;
+                    break;
+                }
+            }
+
+            if (is_array($userPrefix)) {
+                $userPrefix = '';
+            }
+        }
+
+        $userID = $userPrefix.'UserID';
+        $name = $userPrefix.'Name';
+        $photo = $userPrefix.'Photo';
+        $gender = $userPrefix.'Gender';
+
+
+        $user->UserID = $row->$userID;
+        $user->Name = $row->$name;
+        $user->Photo = property_exists($row, $photo) ? $row->$photo : '';
+        $user->Email = val($userPrefix.'Email', $row, null);
+        $user->Gender = property_exists($row, $gender) ? $row->$gender : null;
+
+        return $user;
     }
 }
 

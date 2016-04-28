@@ -46,6 +46,23 @@ switch ($this->data('Step')) {
         break;
     case 'run':
         // Display the status message from running the structure.
+        if (!empty($this->Data['Issues'])) {
+            echo '<pre class="Sql">';
+
+            $first = true;
+            foreach ($this->Data['Issues'] as $row) {
+                if ($first) {
+                    $first = false;
+                } else {
+                    echo "\n\n";
+                }
+
+                echo htmlspecialchars("/* {$row['table']}: {$row['message']} */\n");
+                echo htmlspecialchars($row['sql']);
+            }
+
+            echo '</pre>';
+        }
 
         echo '<div class="Buttons">',
             $this->Form->button('Scan', ['value' => t('Rescan')]),

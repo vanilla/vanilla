@@ -251,9 +251,16 @@ class UtilityController extends DashboardController {
             $this->setData('CapturedSql', array());
         }
 
+        $issues = Gdn::structure()->getIssues();
+
         if ($this->Form->errorCount() == 0 && !$captureOnly && $FoundStructureFile) {
-            $this->setData('Status', 'The structure was successfully executed.');
+            if (empty($issues)) {
+                $this->setData('Status', 'The structure was successfully executed.');
+            } else {
+                $this->setData('Status', 'The structure completed with issues.');
+            }
         }
+        $this->setData('Issues', $issues);
     }
 
     /**

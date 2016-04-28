@@ -95,6 +95,25 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Get the estimated number of rows in a table.
+     *
+     * @param string $tableName The name of the table to look up, without its prefix.
+     * @return int|null Returns the estimated number of rows or **null** if the information doesn't exist.
+     */
+    public function getRowCountEstimate($tableName) {
+        if (!isset($this->rowCountEstimates)) {
+            $data = $this->Database->query("show table status")->resultArray();
+            $this->rowCountEstimates = [];
+            foreach ($data as $row) {
+                $name = stringBeginsWith($row['Name'], $this->Database->DatabasePrefix, false, true);
+                $this->rowCountEstimates[$name] = $row['Rows'];
+            }
+        }
+
+        return val($tableName, $this->rowCountEstimates, null);
+    }
+
+    /**
      * Renames a column in $this->Table().
      *
      * @param string $OldName The name of the column to be renamed.
@@ -517,7 +536,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 }
 
                 $EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
-                if (!$this->query($EngineQuery)) {
+                if (!$this->query($EngineQuery, true)) {
                     throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
                 }
             }
@@ -588,7 +607,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         if (count($AlterSql) > 0) {
-            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
+            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql), true)) {
                 throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }
@@ -634,6 +653,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         // Run any additional Sql.
         foreach ($AdditionalSql as $Description => $Sql) {
+            // These queries are just for enum alters. If that changes then pass true as the second argument.
             if (!$this->query($Sql)) {
                 throw new Exception("Error modifying table: {$Description}.");
             }

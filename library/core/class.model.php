@@ -177,7 +177,7 @@ class Gdn_Model extends Gdn_Pluggable {
             unset($Row[$Name]);
 
             if (is_string($Attributes)) {
-                $Attributes = @unserialize($Attributes);
+                $Attributes = dbdecode($Attributes);
             }
 
             if (is_array($Attributes)) {
@@ -308,7 +308,7 @@ class Gdn_Model extends Gdn_Pluggable {
     public static function serializeRow(&$Row) {
         foreach ($Row as $Name => &$Value) {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
-                $Value = empty($Value) ? null : serialize($Value);
+                $Value = empty($Value) ? null : dbencode($Value);
             }
         }
     }
@@ -333,7 +333,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $QuotedFields = array();
             foreach ($Fields as $Name => $Value) {
                 if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
-                    $Value = empty($Value) ? null : serialize($Value);
+                    $Value = empty($Value) ? null : dbencode($Value);
                 }
 
                 $QuotedFields[$this->SQL->quoteIdentifier(trim($Name, '`'))] = $Value;
@@ -374,7 +374,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $QuotedFields = array();
             foreach ($Fields as $Name => $Value) {
                 if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
-                    $Value = empty($Value) ? null : serialize($Value);
+                    $Value = empty($Value) ? null : dbencode($Value);
                 }
 
                 $QuotedFields[$this->SQL->quoteIdentifier(trim($Name, '`'))] = $Value;
@@ -518,7 +518,7 @@ class Gdn_Model extends Gdn_Pluggable {
         foreach ($Fields as $Field) {
             if (is_array($Result)) {
                 if (isset($Result[$Field]) && is_string($Result[$Field])) {
-                    $Val = unserialize($Result[$Field]);
+                    $Val = dbdecode($Result[$Field]);
                     if ($Val) {
                         $Result[$Field] = $Val;
                     } else {
@@ -527,7 +527,7 @@ class Gdn_Model extends Gdn_Pluggable {
                 }
             } elseif (is_object($Result)) {
                 if (isset($Result->$Field) && is_string($Result->$Field)) {
-                    $Val = unserialize($Result->$Field);
+                    $Val = dbdecode($Result->$Field);
                     if ($Val) {
                         $Result->$Field = $Val;
                     } else {
@@ -678,7 +678,7 @@ class Gdn_Model extends Gdn_Pluggable {
         if (!$Row) {
             throw new Exception(T('ErrorRecordNotFound'));
         }
-        $Values = Gdn_Format::unserialize($Row->$Column);
+        $Values = dbdecode($Row->$Column);
 
         if (is_string($Values) && $Values != '') {
             throw new Exception(T('Serialized column failed to be unserialized.'));
@@ -692,7 +692,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $Name = array($Name => $Value);
         }
 
-        $Values = Gdn_Format::serialize(array_merge($Values, $Name));
+        $Values = dbencode(array_merge($Values, $Name));
 
         // Save the values back to the db
         return $this->SQL

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e21f678d20055c81d42146c61f83f92b",
-    "content-hash": "107049c1fc4107be95224e2829ecf176",
+    "hash": "a5cdd474607b41eec6783bc8072c83a3",
+    "content-hash": "b677d81ec1d659d919bd6d9f4202ab83",
     "packages": [
         {
             "name": "vanilla/garden-http",
@@ -49,16 +49,16 @@
         },
         {
             "name": "vanilla/htmlawed",
-            "version": "v1.2.4",
+            "version": "v2.1.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/htmlawed.git",
-                "reference": "7c717dc95b62a69d8c6757ea61410d080891496b"
+                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/7c717dc95b62a69d8c6757ea61410d080891496b",
-                "reference": "7c717dc95b62a69d8c6757ea61410d080891496b",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/685c88e3b6799ed82c3a8b50d59d536e16b72817",
+                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +84,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2016-01-18 19:42:40"
+            "time": "2016-04-14 21:27:05"
         },
         {
             "name": "vanilla/nbbc",

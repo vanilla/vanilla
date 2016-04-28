@@ -32,7 +32,7 @@ if (!function_exists('WriteDiscussionRow')) :
     /**
      * Writes a discussion in table row format.
      */
-    function writeDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
+    function writeDiscussionRow($Discussion, $Sender, $Session, $Alt2) {
         if (!property_exists($Sender, 'CanEditDiscussions')) {
             $Sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($Discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
         }

@@ -16,10 +16,11 @@
 function smarty_function_searchbox($params, &$smarty) {
     $placeholder = array_key_exists('placeholder', $params) ? val('placeholder', $params, '', true) : t('SearchBoxPlaceHolder', 'Search');
     $form = Gdn::factory('Form');
+    /* @var Gdn_Form $form */
     $result =
         $form->open(array('action' => url('/search'), 'method' => 'get')).
-        $form->textBox('Search', array('placeholder' => $placeholder, 'accesskey' => '/')).
-        $form->button('Go', array('Name' => '')).
+        $form->textBox('Search', array('placeholder' => $placeholder, 'accesskey' => '/', 'aria-label' => t('Enter your search term.'), 'title' => t('Enter your search term.'))).
+        $form->button('Go', array('Name' => '', 'aria-label' => t('Search'))).
         $form->close();
 
     return $result;

@@ -569,9 +569,9 @@
         } else {
           var textNode = $(document.createElement('div'));
           var html = this.$inputor.html();
-          var breaks = /<br(\s+)?(\/)?>/;
+          var breaks = /<br(\s+)?(\/)?>/g;
           result.offset = html.match(breaks) ? html.match(breaks).length : 0;
-          textNode.html(html.replace(breaks, " "));
+          textNode.html(html.replace(breaks, "\n"));
           result.content = textNode.text();
         }
 

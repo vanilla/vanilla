@@ -370,8 +370,12 @@ class FacebookPlugin extends Gdn_Plugin {
                     'link' => $Row['ShareUrl'],
                     'name' => Gdn_Format::plainText($Row['Name'], 'Text'),
                     'description' => $Message,
-                    'redirect_uri' => url('/post/shared/facebook', true)
                 );
+
+                // Do not redirect if we are in a popup (It will close itself :D)
+                if ($Sender->Request->get('display') !== 'popup') {
+                    $Get['redirect_uri'] = url('/post/shared/facebook', true);
+                }
 
                 $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
                 redirect($Url);

@@ -22,28 +22,28 @@
  */
 
 @font-face {
-    font-family: "vanillicon";
-    src: url("../fonts/vanillicon/vanillicon.eot");
-    src: url("../fonts/vanillicon/vanillicon.eot?#iefix") format("embedded-opentype"),
-         url("../fonts/vanillicon/vanillicon.woff") format("woff"),
-         url("../fonts/vanillicon/vanillicon.ttf") format("truetype"),
-         url("../fonts/vanillicon/vanillicon.svg?#vanillicon") format("svg");
-    font-weight: normal;
-    font-style: normal;
+  font-family: "vanillicon";
+  src: url("../fonts/vanillicon/vanillicon.eot");
+  src: url("../fonts/vanillicon/vanillicon.eot?#iefix") format("embedded-opentype"),
+  url("../fonts/vanillicon/vanillicon.woff") format("woff"),
+  url("../fonts/vanillicon/vanillicon.ttf") format("truetype"),
+  url("../fonts/vanillicon/vanillicon.svg?#vanillicon") format("svg");
+  font-weight: normal;
+  font-style: normal;
 }
 
 .icon:before {
-    display: inline-block;
-    font-family: "vanillicon";
-    font-variant: normal;
-    font-weight: normal;
-    font-style: normal;
-    min-width: 1em;
-    text-align: center;
-    text-decoration: inherit;
-    text-transform: none;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  min-width: 1em;
+  text-align: center;
+  text-decoration: inherit;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
 }
 
 .icon-adjust:before { content: "\f100"; }
@@ -168,6 +168,7 @@
 .icon-minus-sign:before { content: "\f16d"; }
 .icon-mobile-phone:before { content: "\f16e"; }
 .icon-mod:before { content: "\f16f"; }
+.icon-move:before { content: "\f1db"; }
 .icon-nib:before { content: "\f1bb"; }
 .icon-note:before { content: "\f170"; }
 .icon-ok:before { content: "\f171"; }

@@ -30,7 +30,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
         $Discussion = $Sender->EventArguments['Discussion'];
         if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
-            $ActionMessage .= ' '.anchor(t('Split'), 'vanilla/moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
+            $ActionMessage .= ' '.anchor(t('Split'), 'moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
         }
     }
 
@@ -40,7 +40,7 @@ class SplitMergePlugin extends Gdn_Plugin {
     public function base_beforeCheckDiscussions_handler($Sender) {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
         if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', 'any')) {
-            $ActionMessage .= ' '.anchor(t('Merge'), 'vanilla/moderation/mergediscussions/', 'Merge Popup');
+            $ActionMessage .= ' '.anchor(t('Merge'), 'moderation/mergediscussions/', 'Merge Popup');
         }
     }
 
@@ -150,7 +150,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         }
 
         // Check that the user has permission to edit all discussions
-        foreach($Discussions as $discussion) {
+        foreach ($Discussions as $discussion) {
             if (!DiscussionModel::canEdit($discussion)) {
                 throw permissionException('@'.t('You do not have permission to edit all of the posts you are trying to merge.'));
             }

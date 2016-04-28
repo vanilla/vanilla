@@ -431,10 +431,9 @@ class PostController extends VanillaController {
             if (!($Title = $this->Form->getFormValue('Name'))) {
                 $Title = val('Title', $PageInfo, '');
                 if ($Title == '') {
+                    $Title = t('Undefined discussion subject.');
                     if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
-                        $Title = t('Undefined discussion subject (Cause: timeout)');
-                    } else {
-                        $Title = t('Undefined discussion subject.');
+                        $Title .= ' '.t('Page timed out.');
                     }
 
                 }

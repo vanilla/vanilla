@@ -558,6 +558,19 @@ if (!function_exists('fixnl2br')) {
     }
 }
 
+if (!function_exists('formatIP')) {
+    /**
+     * Format an IP address for display.
+     *
+     * @param string $IP An IP address to be formatted.
+     * @param bool $html Format as HTML.
+     * @return string Returns the formatted IP address.
+     */
+    function formatIP($IP, $html = true) {
+        return $html ? htmlspecialchars($IP) : $IP;
+    }
+}
+
 if (!function_exists('formatPossessive')) {
     /**
      * Format a word using English "possessive" formatting.
@@ -726,7 +739,7 @@ if (!function_exists('ipAnchor')) {
      */
     function ipAnchor($IP, $CssClass = '') {
         if ($IP) {
-            return anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
+            return anchor(formatIP($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
         } else {
             return $IP;
         }

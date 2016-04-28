@@ -4,9 +4,47 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a5cdd474607b41eec6783bc8072c83a3",
-    "content-hash": "b677d81ec1d659d919bd6d9f4202ab83",
+    "hash": "92ae97a5015a8c5cdaad5c578551872a",
+    "content-hash": "536db3af55408625a36202a85121eca8",
     "packages": [
+        {
+            "name": "psr/log",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2012-12-21 11:40:51"
+        },
         {
             "name": "vanilla/garden-http",
             "version": "v1.1.1",
@@ -88,16 +126,16 @@
         },
         {
             "name": "vanilla/nbbc",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/nbbc.git",
-                "reference": "15af1d533da305afe8b873a98e392b64f3862978"
+                "reference": "ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/15af1d533da305afe8b873a98e392b64f3862978",
-                "reference": "15af1d533da305afe8b873a98e392b64f3862978",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69",
+                "reference": "ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69",
                 "shasum": ""
             },
             "require": {
@@ -120,7 +158,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-03-25 15:15:41"
+            "time": "2016-04-26 18:19:47"
         }
     ],
     "packages-dev": [],

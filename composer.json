@@ -23,6 +23,7 @@
 
 	],
 	"require": {
+		"psr/log": "~1.0",
 		"vanilla/garden-http": "~1.0",
 		"vanilla/htmlawed": "~2.0",
 		"vanilla/nbbc": "~2.1"

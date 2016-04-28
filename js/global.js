@@ -120,23 +120,24 @@
             $(this)[func]($elem);
             $elem.trigger('contentLoad');
         });
+        return this;
     };
 
     $.fn.extend({
         appendTrigger: function(html) {
-            funcTrigger.call(this, 'append', html);
+            return funcTrigger.call(this, 'append', html);
         },
 
         beforeTrigger: function(html) {
-            funcTrigger.call(this, 'before', html);
+            return funcTrigger.call(this, 'before', html);
         },
 
         afterTrigger: function(html) {
-            funcTrigger.call(this, 'after', html);
+            return funcTrigger.call(this, 'after', html);
         },
 
         prependTrigger: function(html) {
-            funcTrigger.call(this, 'prepend', html);
+            return funcTrigger.call(this, 'prepend', html);
         },
 
         htmlTrigger: function(html) {
@@ -144,7 +145,7 @@
         },
 
         replaceWithTrigger: function(html) {
-            funcTrigger.call(this, 'replaceWith', html);
+            return funcTrigger.call(this, 'replaceWith', html);
         }
     });
 

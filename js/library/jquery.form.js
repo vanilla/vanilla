@@ -950,13 +950,13 @@ $.fn.formToArray = function(semantic, elements) {
     var els = semantic ? form.getElementsByTagName('*') : form.elements;
     var els2;
 
-    if ( els ) {
+    if (els && !/MSIE [678]/.test(navigator.userAgent)) {
         els = $(els).get();  // convert to standard array
     }
 
     // #386; account for inputs outside the form which use the 'form' attribute
     if ( formId ) {
-        els2 = $('#' + formId + ' :input').get();
+        els2 = $(':input[form=' + formId + ']').get();
         if ( els2.length ) {
             els = (els || []).concat(els2);
         }

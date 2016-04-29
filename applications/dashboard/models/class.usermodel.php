@@ -910,7 +910,7 @@ class UserModel extends Gdn_Model {
      * @param array $Options Insert options.
      * @return int|false Returns the new ID of the user or **false** if there was an error.
      */
-    private function _insert($Fields, $Options = []) {
+    private function insertInternal($Fields, $Options = []) {
         $this->EventArguments['InsertFields'] =& $Fields;
         $this->fireEvent('BeforeInsertUser');
 
@@ -2141,7 +2141,7 @@ class UserModel extends Gdn_Model {
                     $SaveRoles = false;
 
                     // And insert the new user.
-                    $UserID = $this->_insert($Fields, $Settings);
+                    $UserID = $this->insertInternal($Fields, $Settings);
 
                     if ($UserID > 0) {
                         // Report that the user was created.
@@ -2225,7 +2225,7 @@ class UserModel extends Gdn_Model {
             $Fields = $this->Validation->schemaValidationFields(); // Only fields that are present in the schema
 
             // Insert the new user
-            $UserID = $this->_insert($Fields, ['NoConfirmEmail' => true, 'Setup' => true]);
+            $UserID = $this->insertInternal($Fields, ['NoConfirmEmail' => true, 'Setup' => true]);
 
             if ($UserID > 0) {
                 $ActivityModel = new ActivityModel();
@@ -2642,7 +2642,7 @@ class UserModel extends Gdn_Model {
             }
 
             $Fields['Roles'] = $RoleIDs;
-            $UserID = $this->_insert($Fields, $Options);
+            $UserID = $this->insertInternal($Fields, $Options);
 
             // Associate the new user id with the invitation (so it cannot be used again)
             $this->SQL
@@ -2731,7 +2731,7 @@ class UserModel extends Gdn_Model {
             $Fields['Roles'] = (array)$RoleIDs;
 
             // And insert the new user
-            $UserID = $this->_insert($Fields, $Options);
+            $UserID = $this->insertInternal($Fields, $Options);
         } else {
             $UserID = false;
         }
@@ -2812,7 +2812,7 @@ class UserModel extends Gdn_Model {
             $Fields['Email'] = $Email;
 
             // And insert the new user
-            $UserID = $this->_insert($Fields, $Options);
+            $UserID = $this->insertInternal($Fields, $Options);
             if ($UserID > 0 && !val('NoActivity', $Options)) {
                 $ActivityModel = new ActivityModel();
                 $ActivityModel->save(
@@ -4010,7 +4010,7 @@ class UserModel extends Gdn_Model {
 
                 // Insert the new user.
                 $this->addInsertFields($UserData);
-                $UserID = $this->_insert($UserData);
+                $UserID = $this->insertInternal($UserData);
             }
 
             if ($UserID > 0) {

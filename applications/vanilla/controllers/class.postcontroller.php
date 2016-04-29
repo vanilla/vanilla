@@ -432,6 +432,10 @@ class PostController extends VanillaController {
                 $Title = val('Title', $PageInfo, '');
                 if ($Title == '') {
                     $Title = t('Undefined discussion subject.');
+                    if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
+                        $Title .= ' '.t('Page timed out.');
+                    }
+
                 }
             }
 

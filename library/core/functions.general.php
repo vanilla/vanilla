@@ -1003,7 +1003,8 @@ if (!function_exists('fetchPageInfo')) {
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
                 'Timeout' => $timeout,
-                'Cookies' => $sendCookies
+                'Cookies' => $sendCookies,
+                'Redirects' => true,
             ));
 
             if (!$Request->status()) {

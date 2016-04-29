@@ -500,10 +500,9 @@ class UserModel extends Gdn_Model {
     /**
      * Unban a user.
      *
+     * @param int $UserID The user to unban.
+     * @param array $Options Options for the unban.
      * @since 2.1
-     *
-     * @param int $UserID
-     * @param array $Options
      */
     public function unBan($UserID, $Options = []) {
         $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
@@ -572,10 +571,9 @@ class UserModel extends Gdn_Model {
     /**
      * Users respond to confirmation emails by clicking a link that takes them here.
      *
-     * @param $User
-     * @param $EmailKey
-     * @return bool
-     * @throws Exception
+     * @param array|object $User The user confirming their email.
+     * @param string $EmailKey The token that was emailed to the user.
+     * @return bool Returns **true** if the email was confirmed.
      */
     public function confirmEmail($User, $EmailKey) {
         $Attributes = val('Attributes', $User);
@@ -620,7 +618,7 @@ class UserModel extends Gdn_Model {
     /**
      * Initiate an SSO connection.
      *
-     * @param $String
+     * @param string $String
      * @param bool $ThrowError
      * @return int|void
      */
@@ -784,6 +782,7 @@ class UserModel extends Gdn_Model {
      * @param string $UniqueID The user's unique key in the other authentication system.
      * @param string $ProviderKey The key of the system providing the authentication.
      * @param array $UserData Data to go in the user table.
+     * @param array $Options Additional connect options.
      * @return int The new/existing user ID.
      */
     public function connect($UniqueID, $ProviderKey, $UserData, $Options = []) {
@@ -860,9 +859,11 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * @param array $data
-     * @param bool $register
-     * @return array
+     * Filter dangerous fields out of user-submitted data.
+     *
+     * @param array $data The data to filter.
+     * @param bool $register Whether or not this is a registration.
+     * @return array Returns a filtered version of {@link $data}.
      */
     public function filterForm($data, $register = false) {
         if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
@@ -881,7 +882,7 @@ class UserModel extends Gdn_Model {
     /**
      * Force gender to be a verified value.
      *
-     * @param $Value
+     * @param string $Value The gender string.
      * @return string
      */
     public static function fixGender($Value) {
@@ -901,14 +902,15 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * A convenience method to be called when inserting users (because users
-     * are inserted in various methods depending on registration setups).
+     * A convenience method to be called when inserting users.
      *
-     * @param array $Fields
-     * @param array $Options
-     * @return int
+     * Users are inserted in various methods depending on registration setups.
+     *
+     * @param array $Fields The user to insert.
+     * @param array $Options Insert options.
+     * @return int|false Returns the new ID of the user or **false** if there was an error.
      */
-    protected function _insert($Fields, $Options = []) {
+    private function _insert($Fields, $Options = []) {
         $this->EventArguments['InsertFields'] =& $Fields;
         $this->fireEvent('BeforeInsertUser');
 
@@ -969,7 +971,7 @@ class UserModel extends Gdn_Model {
     /**
      * Add user data to a result set.
      *
-     * @param object $Data Results we need to associate user data with.
+     * @param object &$Data Results we need to associate user data with.
      * @param array $Columns Database columns containing UserIDs to get data for.
      * @param array $Options Optionally pass list of user data to collect with key 'Join'.
      */
@@ -1055,10 +1057,10 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * $SafeData makes sure that the query does not return any sensitive
-     * information about the user (password, attributes, preferences, etc).
+     * Query the user table.
      *
-     * @param bool $SafeData
+     * @param bool $SafeData Makes sure that the query does not return any sensitive information about the user.
+     * (password, attributes, preferences, etc).
      */
     public function userQuery($SafeData = false) {
         if ($SafeData) {
@@ -1112,7 +1114,7 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * Take raw permission definitions and create
+     * Take raw permission definitions and create.
      *
      * @param array $Permissions
      * @return array Compiled permissions
@@ -1155,7 +1157,6 @@ class UserModel extends Gdn_Model {
      * Prior to 2.0.18 it incorrectly behaved like GetID.
      * This method can be deleted entirely once it's been deprecated long enough.
      *
-     * @since 2.0.0
      * @return object DataSet
      */
     public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
@@ -1170,10 +1171,10 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Get a user by their username.
      *
-     *
-     * @param $Username
-     * @return bool|object
+     * @param string $Username The username of the user.
+     * @return bool|object Returns the user or **false** if they don't exist.
      */
     public function getByUsername($Username) {
         if ($Username == '') {
@@ -1206,8 +1207,8 @@ class UserModel extends Gdn_Model {
     /**
      * Get user by email address.
      *
-     * @param $Email
-     * @return array|bool|stdClass
+     * @param string $Email The email address of the user.
+     * @return array|bool|stdClass Returns the user or **false** if they don't exist.
      */
     public function getByEmail($Email) {
         $this->userQuery();
@@ -1219,8 +1220,8 @@ class UserModel extends Gdn_Model {
     /**
      * Get users by role.
      *
-     * @param $Role
-     * @return Gdn_DataSet
+     * @param int|string $Role The ID or name of the role.
+     * @return Gdn_DataSet Returns the users with the given role.
      */
     public function getByRole($Role) {
         $RoleID = $Role; // Optimistic
@@ -1247,11 +1248,10 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * Most recently active users.
+     * Get the most recently active users.
      *
-     * @param int $Limit
-     * @return Gdn_DataSet
-     * @throws Exception
+     * @param int $Limit The number of users to return.
+     * @return Gdn_DataSet Returns a list of users.
      */
     public function getActiveUsers($Limit = 5) {
         $UserIDs = $this->SQL
@@ -1314,7 +1314,7 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param bool $Like
+     * @param array|bool $Like
      * @return int
      */
     public function getCountLike($Like = false) {
@@ -1339,7 +1339,7 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param bool $Where
+     * @param array|false $Where
      * @return int
      */
     public function getCountWhere($Where = false) {
@@ -1415,7 +1415,7 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $IDs
+     * @param array $IDs
      * @param bool $SkipCacheQuery
      * @return array
      * @throws Exception
@@ -1533,8 +1533,10 @@ class UserModel extends Gdn_Model {
      * If $UserID is a scalar, the return value will be a single dimensional array of $UserMetaKey => $Value
      * pairs.
      *
-     * @param $UserID integer UserID or array of UserIDs.
-     * @param $Key string relative user meta key.
+     * @param int $UserID UserID or array of UserIDs.
+     * @param string $Key Relative user meta key.
+     * @param string $Prefix
+     * @param string $Default
      * @return array results or $Default
      */
     public static function getMeta($UserID, $Key, $Prefix = '', $Default = '') {
@@ -1607,7 +1609,7 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $UserID
+     * @param int $UserID
      * @param bool $Refresh
      * @return array|object|false
      */
@@ -1680,6 +1682,8 @@ class UserModel extends Gdn_Model {
 
     /**
      * Retrieves a "system user" id that can be used to perform non-real-person tasks.
+     * 
+     * @return int Returns a user ID.
      */
     public function getSystemUserID() {
         $SystemUserID = c('Garden.SystemUserID');
@@ -1709,8 +1713,11 @@ class UserModel extends Gdn_Model {
     /**
      * Add points to a user's total.
      *
+     * @param int $UserID
+     * @param int $Points
+     * @param string $Source
+     * @param int|false $Timestamp
      * @since 2.1.0
-     * @access public
      */
     public static function givePoints($UserID, $Points, $Source = 'Other', $Timestamp = false) {
         if (!$Timestamp) {
@@ -1732,15 +1739,15 @@ class UserModel extends Gdn_Model {
 
         foreach ($CategoryIDs as $ID) {
             // Increment source points for the user.
-            self::_givePoints($UserID, $Points, 'a', $Source, $ID);
+            self::givePointsInternal($UserID, $Points, 'a', $Source, $ID);
 
             // Increment total points for the user.
-            self::_givePoints($UserID, $Points, 'w', 'Total', $ID, $Timestamp);
-            self::_givePoints($UserID, $Points, 'm', 'Total', $ID, $Timestamp);
-            self::_givePoints($UserID, $Points, 'a', 'Total', $ID, $Timestamp);
+            self::givePointsInternal($UserID, $Points, 'w', 'Total', $ID, $Timestamp);
+            self::givePointsInternal($UserID, $Points, 'm', 'Total', $ID, $Timestamp);
+            self::givePointsInternal($UserID, $Points, 'a', 'Total', $ID, $Timestamp);
 
             // Increment global daily points.
-            self::_givePoints(0, $Points, 'd', 'Total', $ID, $Timestamp);
+            self::givePointsInternal(0, $Points, 'd', 'Total', $ID, $Timestamp);
         }
 
         // Grab the user's total points.
@@ -1757,13 +1764,18 @@ class UserModel extends Gdn_Model {
     }
 
     /**
-     * Add points to a user's total in a specific timeslot.
+     * Add points to a user's total in a specific time slot.
      *
+     * @param int $UserID
+     * @param int $Points
+     * @param string $SlotType
+     * @param string $Source
+     * @param int $CategoryID
+     * @param int|false $Timestamp
      * @since 2.1.0
-     * @access protected
-     * @see self::GivePoints
+     * @see UserModel::GivePoints()
      */
-    protected static function _givePoints($UserID, $Points, $SlotType, $Source = 'Total', $CategoryID = 0, $Timestamp = false) {
+    private static function givePointsInternal($UserID, $Points, $SlotType, $Source = 'Total', $CategoryID = 0, $Timestamp = false) {
         $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::timeSlotStamp($SlotType, $Timestamp));
 
         $Px = Gdn::database()->DatabasePrefix;
@@ -1784,10 +1796,9 @@ class UserModel extends Gdn_Model {
     /**
      * Register a new user.
      *
-     * @param $FormPostValues
+     * @param array $FormPostValues
      * @param array $Options
      * @return bool|int|string
-     * @throws Exception
      */
     public function register($FormPostValues, $Options = []) {
         $FormPostValues['LastIPAddress'] = Gdn::request()->ipAddress();
@@ -1847,7 +1858,7 @@ class UserModel extends Gdn_Model {
     /**
      * Remove the photo from a user.
      *
-     * @param $UserID
+     * @param int $UserID
      */
     public function removePicture($UserID) {
         // Grab the current photo.
@@ -1868,9 +1879,9 @@ class UserModel extends Gdn_Model {
     /**
      * Get a user's counter.
      *
-     * @param $User
-     * @param $Column
-     * @return bool
+     * @param int|string|object $User
+     * @param string $Column
+     * @return int|false
      */
     public function profileCount($User, $Column) {
         if (is_numeric($User)) {
@@ -1914,16 +1925,17 @@ class UserModel extends Gdn_Model {
     /**
      * Generic save procedure.
      *
-     * $Settings controls certain save functionality
+     * @param array $FormPostValues The user to save.
+     * @param array $Settings Controls certain save functionality.
      *
-     *  SaveRoles - Save 'RoleID' field as user's roles. Default false.
-     *  HashPassword - Hash the provided password on update. Default true.
-     *  FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
-     *  ValidateEmail - Make sure the provided email addresses is formattted properly. Default true.
-     *  NoConfirmEmail - Disable email confirmation. Default false.
+     * - SaveRoles - Save 'RoleID' field as user's roles. Default false.
+     * - HashPassword - Hash the provided password on update. Default true.
+     * - FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
+     * - ValidateEmail - Make sure the provided email addresses is formatted properly. Default true.
+     * - NoConfirmEmail - Disable email confirmation. Default false.
      *
      */
-    public function save($FormPostValues, $Settings = false) {
+    public function save($FormPostValues, $Settings = []) {
         // See if the user's related roles should be saved or not.
         $SaveRoles = val('SaveRoles', $Settings);
 
@@ -2246,9 +2258,9 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $UserID
-     * @param $RoleIDs
-     * @param $RecordEvent
+     * @param int $UserID
+     * @param array $RoleIDs
+     * @param bool $RecordEvent
      */
     public function saveRoles($UserID, $RoleIDs, $RecordEvent) {
         if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
@@ -2346,13 +2358,12 @@ class UserModel extends Gdn_Model {
     /**
      * Search users.
      *
-     * @param $Filter
+     * @param array|string $Filter
      * @param string $OrderFields
      * @param string $OrderDirection
      * @param bool $Limit
      * @param bool $Offset
      * @return Gdn_DataSet
-     * @throws Exception
      */
     public function search($Filter, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         $Optimize = false;
@@ -2452,10 +2463,10 @@ class UserModel extends Gdn_Model {
     /**
      * Count search results.
      *
-     * @param bool $Filter
+     * @param array|string $Filter
      * @return int
      */
-    public function searchCount($Filter = false) {
+    public function searchCount($Filter = '') {
         if (is_array($Filter)) {
             $Where = $Filter;
             $Keywords = $Where['Keywords'];
@@ -2521,6 +2532,7 @@ class UserModel extends Gdn_Model {
      * A simple search for tag queries.
      *
      * @param string $Search
+     * @param int $Limit
      * @since 2.2
      */
     public function tagSearch($Search, $Limit = 10) {
@@ -2742,7 +2754,7 @@ class UserModel extends Gdn_Model {
     /**
      * To be used for basic registration, and captcha registration.
      *
-     * @param $FormPostValues
+     * @param array $FormPostValues
      * @param bool $CheckCaptcha
      * @param array $Options
      * @return bool|int|string
@@ -2834,7 +2846,7 @@ class UserModel extends Gdn_Model {
     /**
      * Parent override.
      *
-     * @param array $Fields
+     * @param array &$Fields
      */
     public function addInsertFields(&$Fields) {
         $this->defineSchema();
@@ -3070,8 +3082,8 @@ class UserModel extends Gdn_Model {
     /**
      * Checks to see if $Username and $Email are already in use by another member.
      *
-     * @param $Username
-     * @param $Email
+     * @param string $Username
+     * @param string $Email
      * @param string $UserID
      * @param bool $Return
      * @return array|bool
@@ -3121,8 +3133,8 @@ class UserModel extends Gdn_Model {
     /**
      * Approve a membership applicant.
      *
-     * @param $UserID
-     * @param $Email
+     * @param int $UserID
+     * @param string $Email
      * @return bool
      * @throws Exception
      */
@@ -3218,7 +3230,7 @@ class UserModel extends Gdn_Model {
     /**
      * Delete a single user.
      *
-     * @param int $userID
+     * @param int $userID The user to delete.
      * @param array $options See {@link UserModel::deleteContent()}, and {@link UserModel::getDelete()}.
      */
     public function deleteID($userID, $options = []) {
@@ -3275,11 +3287,10 @@ class UserModel extends Gdn_Model {
     /**
      * Delete a user's content across many contexts.
      *
-     * @param $UserID
+     * @param int $UserID
      * @param array $Options
      * @param array $Content
      * @return bool|int
-     * @throws Exception
      */
     public function deleteContent($UserID, $Options = [], $Content = []) {
         $Log = val('Log', $Options);
@@ -3333,7 +3344,7 @@ class UserModel extends Gdn_Model {
     /**
      * Decline a user's application to join the forum.
      *
-     * @param $UserID
+     * @param int $UserID
      * @return bool
      * @throws Exception
      */
@@ -3363,7 +3374,7 @@ class UserModel extends Gdn_Model {
     /**
      * Get number of available invites a user has.
      *
-     * @param $UserID
+     * @param int $UserID
      * @return int
      */
     public function getInvitationCount($UserID) {
@@ -3536,8 +3547,7 @@ class UserModel extends Gdn_Model {
     /**
      * Saves a name/value to the user's specified $Column.
      *
-     * This method throws exceptions when errors are encountered. Use try ...
-     * catch blocks to capture these exceptions.
+     * This method throws exceptions when errors are encountered. Use try catch blocks to capture these exceptions.
      *
      * @param string $Column The name of the serialized column to save to. At the time of this writing there are three serialized columns on the user table: Permissions, Preferences, and Attributes.
      * @param int $UserID The UserID to save.
@@ -3639,7 +3649,7 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Data
+     * @param array $Data
      * @return Gdn_DataSet|string
      */
     public function saveAuthentication($Data) {
@@ -3658,7 +3668,7 @@ class UserModel extends Gdn_Model {
     /**
      * Set fields that need additional manipulation after retrieval.
      *
-     * @param $User
+     * @param array|object &$User
      * @throws Exception
      */
     public function setCalculatedFields(&$User) {
@@ -3708,8 +3718,8 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $UserID
-     * @param $Meta
+     * @param int $UserID
+     * @param array $Meta
      * @param string $Prefix
      */
     public static function setMeta($UserID, $Meta, $Prefix = '') {
@@ -3733,7 +3743,7 @@ class UserModel extends Gdn_Model {
     /**
      * Set the TransientKey attribute on a user.
      *
-     * @param $UserID
+     * @param int $UserID
      * @param string $ExplicitKey
      * @return string
      */
@@ -3746,9 +3756,9 @@ class UserModel extends Gdn_Model {
     /**
      * Get an Attribute from a single user.
      *
-     * @param $UserID
-     * @param $Attribute
-     * @param bool $DefaultValue
+     * @param int $UserID
+     * @param string $Attribute
+     * @param mixed $DefaultValue
      * @return mixed
      */
     public function getAttribute($UserID, $Attribute, $DefaultValue = false) {
@@ -3761,7 +3771,7 @@ class UserModel extends Gdn_Model {
     /**
      * Send the confirmation email.
      *
-     * @param null $User
+     * @param int|string|null $User
      * @param bool $Force
      * @throws Exception
      */
@@ -3836,10 +3846,10 @@ class UserModel extends Gdn_Model {
     /**
      * Send welcome email to user.
      *
-     * @param $UserID
-     * @param $Password
+     * @param int $UserID
+     * @param string $Password
      * @param string $RegisterType
-     * @param null $AdditionalData
+     * @param array|null $AdditionalData
      * @throws Exception
      */
     public function sendWelcomeEmail($UserID, $Password, $RegisterType = 'Add', $AdditionalData = null) {
@@ -3941,9 +3951,8 @@ class UserModel extends Gdn_Model {
     /**
      * Send password email.
      *
-     * @param $UserID
-     * @param $Password
-     * @throws Exception
+     * @param int $UserID
+     * @param string $Password
      */
     public function sendPasswordEmail($UserID, $Password) {
         $Session = Gdn::session();
@@ -4074,9 +4083,8 @@ class UserModel extends Gdn_Model {
     /**
      * Send forgot password email.
      *
-     * @param $Email
+     * @param string $Email
      * @return bool
-     * @throws Exception
      */
     public function passwordRequest($Email) {
         if (!$Email) {
@@ -4133,10 +4141,9 @@ class UserModel extends Gdn_Model {
     /**
      * Do a password reset.
      *
-     * @param $UserID
-     * @param $Password
+     * @param int $UserID
+     * @param string $Password
      * @return array|false Returns the user or **false** if the user doesn't exist.
-     * @throws Exception
      */
     public function passwordReset($UserID, $Password) {
         // Encrypt the password before saving
@@ -4157,7 +4164,7 @@ class UserModel extends Gdn_Model {
      * Check and apply login rate limiting
      *
      * @param array $User
-     * @param boolean $PasswordOK
+     * @param bool $PasswordOK
      */
     public static function rateLimit($User, $PasswordOK) {
         if (Gdn::cache()->activeEnabled()) {
@@ -4229,7 +4236,6 @@ class UserModel extends Gdn_Model {
      * @param array|string $Property
      * @param bool $Value
      * @return bool
-     * @throws Exception
      */
     public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
@@ -4311,9 +4317,9 @@ class UserModel extends Gdn_Model {
     /**
      *
      *
-     * @param $UserID
-     * @param $Field
-     * @param null $Value
+     * @param int $UserID
+     * @param string|array $Field
+     * @param mixed|null $Value
      */
     public function updateUserCache($UserID, $Field, $Value = null) {
         // Try and get the user from the cache.
@@ -4323,7 +4329,6 @@ class UserModel extends Gdn_Model {
             return;
         }
 
-//      $User = $this->getID($UserID, DATASET_TYPE_ARRAY);
         if (!is_array($Field)) {
             $Field = [$Field => $Value];
         }

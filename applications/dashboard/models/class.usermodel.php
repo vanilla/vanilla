@@ -242,9 +242,9 @@ class UserModel extends Gdn_Model {
         // Grab the permissions for the user.
         if ($User->UserID == 0) {
             $Permissions = $this->definePermissions(0, false);
-        } elseif (is_array($User->Permissions))
+        } elseif (is_array($User->Permissions)) {
             $Permissions = $User->Permissions;
-        else {
+        } else {
             $Permissions = $this->definePermissions($User->UserID, false);
         }
 
@@ -1878,10 +1878,11 @@ class UserModel extends Gdn_Model {
     public function profileCount($User, $Column) {
         if (is_numeric($User)) {
             $User = $this->SQL->getWhere('User', ['UserID' => $User])->firstRow(DATASET_TYPE_ARRAY);
-        } elseif (is_string($User))
+        } elseif (is_string($User)) {
             $User = $this->SQL->getWhere('User', ['Name' => $User])->firstRow(DATASET_TYPE_ARRAY);
-        elseif (is_object($User))
+        } elseif (is_object($User)) {
             $User = (array)$User;
+        }
 
         if (!$User) {
             return false;
@@ -3765,10 +3766,11 @@ class UserModel extends Gdn_Model {
 
         if (!$User) {
             $User = Gdn::session()->User;
-        } elseif (is_numeric($User))
+        } elseif (is_numeric($User)) {
             $User = $this->getID($User);
-        elseif (is_string($User))
+        } elseif (is_string($User)) {
             $User = $this->getByEmail($User);
+        }
 
         if (!$User) {
             throw notFoundException('User');

@@ -956,7 +956,7 @@ $.fn.formToArray = function(semantic, elements) {
 
     // #386; account for inputs outside the form which use the 'form' attribute
     if ( formId ) {
-        els2 = $(':input[form=' + formId + ']').get();
+        els2 = $('#' + formId + ' :input').get();
         if ( els2.length ) {
             els = (els || []).concat(els2);
         }

@@ -527,6 +527,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2);
 
+        if (val('DateOfBirth', $fields)) {
+            $columnNames[] = 'Birthday';
+            Gdn::sql()->select('u.DateOfBirth');
+            unset($fields['DateOfBirth']);
+        }
+
         $i = 0;
         foreach ($fields as $slug => $fieldData) {
             // Add this field to the output

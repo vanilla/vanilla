@@ -1401,7 +1401,7 @@ class CommentModel extends VanillaModel {
 
         // Do nothing yet.
         if ($Attributes = val('Attributes', $Comment)) {
-            setValue('Attributes', $Comment, unserialize($Attributes));
+            setValue('Attributes', $Comment, dbdecode($Attributes));
         }
 
         $this->EventArguments['Comment'] = $Comment;

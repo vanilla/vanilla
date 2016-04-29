@@ -212,10 +212,11 @@ class Gdn_Email extends Gdn_Pluggable {
      *
      * @param string $message The body of the message to be sent.
      * @param boolean $convertNewlines Optional. Convert newlines to br tags
+     * @param boolean $filter Optional. Filter HTML.
      * @return Gdn_Email
      */
-    public function message($message, $convertNewlines = true) {
-        $this->emailTemplate->setMessage($message, $convertNewlines);
+    public function message($message, $convertNewlines = true, $filter = true) {
+        $this->emailTemplate->setMessage($message, $convertNewlines, $filter);
         return $this;
     }
 

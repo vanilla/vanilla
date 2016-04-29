@@ -66,9 +66,9 @@ class EditorPlugin extends Gdn_Plugin {
     /** @var int How long memcached holds data until it expires. */
     protected $mediaCacheExpire;
 
-   /**
-    * Setup some variables for instance.
-    */
+    /**
+     * Setup some variables for instance.
+     */
     public function __construct() {
         parent::__construct();
         $this->mediaCache = null;
@@ -78,7 +78,7 @@ class EditorPlugin extends Gdn_Plugin {
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
 
         // Check for additional formats
-        $this->EventArguments['formats'] = & $this->Formats;
+        $this->EventArguments['formats'] = &$this->Formats;
         $this->fireEvent('GetFormats');
     }
 
@@ -161,11 +161,11 @@ class EditorPlugin extends Gdn_Plugin {
         return $fontColorList;
     }
 
-   /**
-    * Generate list of font families. Remember to create corresponding CSS.
-    *
-    * @return array
-    */
+    /**
+     * Generate list of font families. Remember to create corresponding CSS.
+     *
+     * @return array
+     */
     public function getFontFamilyOptions() {
         $fontFamilyOptions = array(
             'separator' => array(
@@ -243,21 +243,21 @@ class EditorPlugin extends Gdn_Plugin {
         return $fontFamilyOptions;
     }
 
-   /**
-    * Default formatting options available in the formatting dropdown.
-    *
-    * Visit https://github.com/xing/wysihtml5/wiki/Supported-Commands for a
-    * list of default commands and their allowed values. The array below has
-    * custom commands that must exist in the JavaScript, whitelist, and CSS to
-    * function.
-    *
-    * Formatting options can be ordered after the default list has been added.
-    * This is done by providing a sort weight to each editor action. If one
-    * weight is greater than another, it will be displayed higher than the
-    * other.
-    *
-    * @return array
-    */
+    /**
+     * Default formatting options available in the formatting dropdown.
+     *
+     * Visit https://github.com/xing/wysihtml5/wiki/Supported-Commands for a
+     * list of default commands and their allowed values. The array below has
+     * custom commands that must exist in the JavaScript, whitelist, and CSS to
+     * function.
+     *
+     * Formatting options can be ordered after the default list has been added.
+     * This is done by providing a sort weight to each editor action. If one
+     * weight is greater than another, it will be displayed higher than the
+     * other.
+     *
+     * @return array
+     */
     protected function getFontFormatOptions() {
         // Stuff like 'heading1' is the editor-action.
         $fontFormatOptions = array(
@@ -348,10 +348,10 @@ class EditorPlugin extends Gdn_Plugin {
         $fontFamilyOptions = $this->getFontFamilyOptions();
 
         // Let plugins and themes override the defaults.
-        $this->EventArguments['actions'] = & $allowedEditorActions;
-        $this->EventArguments['colors'] = & $fontColorList;
-        $this->EventArguments['format'] = & $fontFormatOptions;
-        $this->EventArguments['font'] = & $fontFamilyOptions;
+        $this->EventArguments['actions'] = &$allowedEditorActions;
+        $this->EventArguments['colors'] = &$fontColorList;
+        $this->EventArguments['format'] = &$fontFormatOptions;
+        $this->EventArguments['font'] = &$fontFamilyOptions;
         $this->fireEvent('toolbarConfig');
 
         // Order the specified dropdowns.
@@ -392,11 +392,11 @@ class EditorPlugin extends Gdn_Plugin {
             'text' => $actionValues['text'],
             'html_tag' => $htmlTag,
             'attr' => array(
-               'class' => "editor-action editor-action-{$editorAction} editor-dialog-fire-close {$actionValues['class']}",
-               'data-wysihtml5-command' => $actionValues['command'],
-               'data-wysihtml5-command-value' => $actionValues['value'],
-               'title' => $actionValues['text'],
-               'data-editor' => '{"action":"'.$editorAction.'","value":"'.$actionValues['value'].'"}'
+                'class' => "editor-action editor-action-{$editorAction} editor-dialog-fire-close {$actionValues['class']}",
+                'data-wysihtml5-command' => $actionValues['command'],
+                'data-wysihtml5-command-value' => $actionValues['value'],
+                'title' => $actionValues['text'],
+                'data-editor' => '{"action":"'.$editorAction.'","value":"'.$actionValues['value'].'"}'
             )
             );
         }
@@ -417,11 +417,11 @@ class EditorPlugin extends Gdn_Plugin {
             'html_tag' => 'span',
             'text' => $emoji->img($emojiFilePath, $emojiAlias),
             'attr' => array(
-               'class' => 'editor-action emoji-'.$emojiCanonical.' editor-dialog-fire-close emoji-wrap',
-               'data-wysihtml5-command' => 'insertHTML',
-               'data-wysihtml5-command-value' => ' '.$emojiAlias.' ',
-               'title' => $emojiAlias,
-               'data-editor' => $editorDataAttr));
+                'class' => 'editor-action emoji-'.$emojiCanonical.' editor-dialog-fire-close emoji-wrap',
+                'data-wysihtml5-command' => 'insertHTML',
+                'data-wysihtml5-command-value' => ' '.$emojiAlias.' ',
+                'title' => $emojiAlias,
+                'data-editor' => $editorDataAttr));
         }
 
         // Font family options.
@@ -505,17 +505,17 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
 
-   /**
-    * Check if comments are embedded.
-    *
-    * When editing embedded comments, the editor will still load its assets and
-    * render. This method will check whether content is embedded or not. This
-    * might not be the best way to do this, but there does not seem to be any
-    * easy way to determine whether content is embedded or not.
-    *
-    * @param Controller $Sender
-    * @return bool
-    */
+    /**
+     * Check if comments are embedded.
+     *
+     * When editing embedded comments, the editor will still load its assets and
+     * render. This method will check whether content is embedded or not. This
+     * might not be the best way to do this, but there does not seem to be any
+     * easy way to determine whether content is embedded or not.
+     *
+     * @param Controller $Sender
+     * @return bool
+     */
     public function isEmbeddedComment($Sender) {
         $isEmbeddedComment = false;
         $requestMethod = array();
@@ -538,11 +538,11 @@ class EditorPlugin extends Gdn_Plugin {
         return $isEmbeddedComment;
     }
 
-   /**
-    * Placed these components everywhere due to some Web sites loading the
-    * editor in some areas where the values were not yet injected into HTML.
-    */
-    public function base_render_before(&$Sender) {
+    /**
+     * Placed these components everywhere due to some Web sites loading the
+     * editor in some areas where the values were not yet injected into HTML.
+     */
+    public function base_render_before($Sender) {
         // Don't render any assets for editor if it's embedded. This effectively
         // disables the editor from embedded comments. Some HTML is still
         // inserted, because of the BeforeBodyBox handler, which does not contain any data relating to embedded content.
@@ -580,7 +580,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = array();
-        $this->EventArguments['definitions'] = & $additionalDefinitions;
+        $this->EventArguments['definitions'] = &$additionalDefinitions;
         $this->fireEvent('GetJSDefinitions');
 
         // Make sure we still have an array after all event handlers have had their turn and iterate through the result.
@@ -607,13 +607,13 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('maxFileUploads', ini_get('max_file_uploads'));
     }
 
-   /**
-    * Attach editor anywhere 'BodyBox' is used.
-    *
-    * It is not being used for editing a posted reply, so find another event to hook into.
-    *
-    * @param Gdn_Form $Sender
-    */
+    /**
+     * Attach editor anywhere 'BodyBox' is used.
+     *
+     * It is not being used for editing a posted reply, so find another event to hook into.
+     *
+     * @param Gdn_Form $Sender
+     */
     public function gdn_form_beforeBodyBox_handler($Sender, $Args) {
         // TODO have some way to prevent this content from getting loaded when in embedded.
         // The only problem is figuring out how to know when content is embedded.
@@ -651,7 +651,7 @@ class EditorPlugin extends Gdn_Plugin {
             // Get the generated editor toolbar from getEditorToolbar, and assign it data object for view.
             if (!isset($c->Data['_EditorToolbar'])) {
                 $editorToolbar = $this->getEditorToolbar($attributes);
-                $this->EventArguments['EditorToolbar'] = & $editorToolbar;
+                $this->EventArguments['EditorToolbar'] = &$editorToolbar;
                 $this->fireEvent('InitEditorToolbar');
 
                 // Set data for view
@@ -669,12 +669,12 @@ class EditorPlugin extends Gdn_Plugin {
         }
     }
 
-   /**
-    *
-    *
-    * @param PostController $Sender
-    * @param array $Args
-    */
+    /**
+     *
+     *
+     * @param PostController $Sender
+     * @param array $Args
+     */
     public function postController_editorUpload_create($Sender, $Args = array()) {
         // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';
@@ -726,10 +726,10 @@ class EditorPlugin extends Gdn_Plugin {
             $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
 
             $this->EventArguments['CategoryID'] = Gdn::request()->post('CategoryID');
-            $this->EventArguments['TmpFilePath'] = & $tmpFilePath;
+            $this->EventArguments['TmpFilePath'] = &$tmpFilePath;
             $this->EventArguments['FileExtension'] = $fileExtension;
             $this->EventArguments['ValidImage'] = $validImage;
-            $this->EventArguments['AbsoluteFileDestination'] = & $absoluteFileDestination;
+            $this->EventArguments['AbsoluteFileDestination'] = &$absoluteFileDestination;
             $this->EventArguments['DiscussionID'] = $discussionID;
             $this->fireEvent('BeforeSaveUploads');
 
@@ -820,15 +820,15 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
 
-   /**
-    * Attach a file to a foreign table and ID.
-    *
-    * @access protected
-    * @param int $FileID
-    * @param int $ForeignID
-    * @param string $ForeignType Lowercase.
-    * @return bool Whether attach was successful.
-    */
+    /**
+     * Attach a file to a foreign table and ID.
+     *
+     * @access protected
+     * @param int $FileID
+     * @param int $ForeignID
+     * @param string $ForeignType Lowercase.
+     * @return bool Whether attach was successful.
+     */
     protected function attachEditorUploads($FileID, $ForeignID, $ForeignType) {
         // Save data to database using model with media table
         $Model = new Gdn_Model('Media');
@@ -849,14 +849,14 @@ class EditorPlugin extends Gdn_Plugin {
         return false;
     }
 
-   /**
-    * Remove file from filesystem, and clear db entry.
-    *
-    * @param type $FileID
-    * @param type $ForeignID
-    * @param type $ForeignType
-    * @return boolean
-    */
+    /**
+     * Remove file from filesystem, and clear db entry.
+     *
+     * @param type $FileID
+     * @param type $ForeignID
+     * @param type $ForeignType
+     * @return boolean
+     */
     protected function deleteEditorUploads($MediaID, $ForeignID = '', $ForeignType = '') {
         // Save data to database using model with media table
         $Model = new Gdn_Model('Media');
@@ -869,7 +869,7 @@ class EditorPlugin extends Gdn_Plugin {
         if ($Media && $CanDelete) {
             try {
                 if ($Model->delete($MediaID)) {
-                   // unlink the images.
+                    // unlink the images.
                     $path = PATH_UPLOADS.'/'.$Media['Path'];
                     $thumbPath = PATH_UPLOADS.'/'.$Media['ThumbPath'];
 
@@ -890,12 +890,12 @@ class EditorPlugin extends Gdn_Plugin {
         return false;
     }
 
-   /**
-    * Save uploads.
-    *
-    * @param $id
-    * @param $type
-    */
+    /**
+     * Save uploads.
+     *
+     * @param $id
+     * @param $type
+     */
     public function saveUploads($id, $type) {
         // Array of Media IDs, as input is MediaIDs[]
         $mediaIds = (array)Gdn::request()->getValue('MediaIDs');
@@ -918,13 +918,13 @@ class EditorPlugin extends Gdn_Plugin {
         }
     }
 
-   /**
-    * Attach files to a comment during save.
-    *
-    * @access public
-    * @param object $Sender
-    * @param array $Args
-    */
+    /**
+     * Attach files to a comment during save.
+     *
+     * @access public
+     * @param object $Sender
+     * @param array $Args
+     */
     public function postController_afterCommentSave_handler($Sender, $Args) {
         if (!$Args['Comment']) {
             return;
@@ -938,13 +938,13 @@ class EditorPlugin extends Gdn_Plugin {
         $this->saveUploads($CommentID, 'comment');
     }
 
-   /**
-    * Attach files to a discussion during save.
-    *
-    * @access public
-    * @param object $Sender
-    * @param array $Args
-    */
+    /**
+     * Attach files to a discussion during save.
+     *
+     * @access public
+     * @param object $Sender
+     * @param array $Args
+     */
     public function postController_afterDiscussionSave_handler($Sender, $Args) {
         if (!$Args['Discussion']) {
             return;
@@ -958,13 +958,13 @@ class EditorPlugin extends Gdn_Plugin {
         $this->saveUploads($DiscussionID, 'discussion');
     }
 
-   /**
-    * Attach files to a message during save.
-    *
-    * @access public
-    * @param object $Sender
-    * @param array $Args
-    */
+    /**
+     * Attach files to a message during save.
+     *
+     * @access public
+     * @param object $Sender
+     * @param array $Args
+     */
     public function messagesController_afterMessageSave_handler($Sender, $Args) {
         if (!$Args['MessageID']) {
             return;
@@ -978,13 +978,13 @@ class EditorPlugin extends Gdn_Plugin {
         $this->saveUploads($MessageID, 'message');
     }
 
-   /**
-    * Attach files to a message during conversation save.
-    *
-    * @access public
-    * @param object $Sender
-    * @param array $Args
-    */
+    /**
+     * Attach files to a message during conversation save.
+     *
+     * @access public
+     * @param object $Sender
+     * @param array $Args
+     */
     public function messagesController_afterConversationSave_handler($Sender, $Args) {
         if (!$Args['MessageID']) {
             return;
@@ -998,16 +998,16 @@ class EditorPlugin extends Gdn_Plugin {
         $this->saveUploads($MessageID, 'message');
     }
 
-   /**
-    * Attach image to each discussion or comment.
-    *
-    * It will first perform a single request against the Media table, then filter out the ones that
-    * exist per discussion or comment.
-    *
-    * @param multiple $Controller The controller.
-    * @param string $Type The type of row, either discussion or comment.
-    * @param array|object $row The row of data being attached to.
-    */
+    /**
+     * Attach image to each discussion or comment.
+     *
+     * It will first perform a single request against the Media table, then filter out the ones that
+     * exist per discussion or comment.
+     *
+     * @param multiple $Controller The controller.
+     * @param string $Type The type of row, either discussion or comment.
+     * @param array|object $row The row of data being attached to.
+     */
     protected function attachUploadsToComment($Sender, $Type = 'comment', $row = null) {
         $param = ucfirst($Type).'ID';
         $foreignId = val($param, val(ucfirst($Type), $Sender->EventArguments));
@@ -1027,7 +1027,7 @@ class EditorPlugin extends Gdn_Plugin {
             });
 
             if (count($attachments)) {
-               // Loop through the attachments and add a flag if they are found in the source or not.
+                // Loop through the attachments and add a flag if they are found in the source or not.
                 $body = Gdn_Format::to(val('Body', $row), val('Format', $row));
                 foreach ($attachments as &$attachment) {
                     $src = Gdn_Upload::url($attachment['Path']);
@@ -1070,13 +1070,13 @@ class EditorPlugin extends Gdn_Plugin {
         return $MessageIDList;
     }
 
-   /**
-    * Called to prepare data grab, and then cache the results on the software level for the request.
-    *
-    * This will call PreloadDiscussionMedia, which will either query the db, or query memcached.
-    *
-    * @param mixed $Sender
-    */
+    /**
+     * Called to prepare data grab, and then cache the results on the software level for the request.
+     *
+     * This will call PreloadDiscussionMedia, which will either query the db, or query memcached.
+     *
+     * @param mixed $Sender
+     */
     protected function cacheAttachedMedia($Sender) {
         if ($Sender->data('Conversation')) {
             $ConversationMessageIDList = $this->getConversationMessageIDList(val('ConversationID', $Sender->data('Conversation')));
@@ -1151,9 +1151,9 @@ class EditorPlugin extends Gdn_Plugin {
         }
     }
 
-   /**
-    * Get media list for inserting into discussion and comments.
-    */
+    /**
+     * Get media list for inserting into discussion and comments.
+     */
     public function mediaCache($Sender) {
         if ($this->mediaCache === null) {
             $this->cacheAttachedMedia($Sender);
@@ -1162,14 +1162,14 @@ class EditorPlugin extends Gdn_Plugin {
         return $this->mediaCache;
     }
 
-   /**
-    * Query the Media table for any media related to the current discussion,
-    * including all the comments. This will be cached per discussion.
-    *
-    * @param int $discussionID
-    * @param array $commentIDList
-    * @return array
-    */
+    /**
+     * Query the Media table for any media related to the current discussion,
+     * including all the comments. This will be cached per discussion.
+     *
+     * @param int $discussionID
+     * @param array $commentIDList
+     * @return array
+     */
     public function preloadDiscussionMedia($discussionID, $commentIDList, $type = 'discussion') {
         $mediaData = array();
         $mediaDataDiscussion = array();
@@ -1231,11 +1231,11 @@ class EditorPlugin extends Gdn_Plugin {
         $this->attachUploadsToComment($Sender, 'message', val('Message', $Args));
     }
 
-   /**
-    * Specific to editor upload paths
-    */
+    /**
+     * Specific to editor upload paths
+     */
     public function getBaseUploadDestinationDir($subdir = false) {
-       // Set path
+        // Set path
         $basePath = PATH_UPLOADS.'/editor';
 
         $uploadTargetPath = ($subdir)
@@ -1245,13 +1245,13 @@ class EditorPlugin extends Gdn_Plugin {
         return $uploadTargetPath;
     }
 
-   /**
-    * Instead of using Gdn_Upload->GenerateTargetName, create one that
-    * depends on SHA1s, to reduce space for duplicates, and use smarter
-    * folder sorting based off the SHA1s.
-    *
-    * @param type $file
-    */
+    /**
+     * Instead of using Gdn_Upload->GenerateTargetName, create one that
+     * depends on SHA1s, to reduce space for duplicates, and use smarter
+     * folder sorting based off the SHA1s.
+     *
+     * @param type $file
+     */
     public function getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension, $uploadDestinationDir = '') {
         $absolutePath = '';
         $basePath = $this->editorBaseUploadDestinationDir;
@@ -1286,12 +1286,12 @@ class EditorPlugin extends Gdn_Plugin {
         return $absolutePath;
     }
 
-   /**
-    * Check if provided path is valid, creates it if it does not exist, and
-    * verifies that it is writable.
-    *
-    * @param string $path Path to validate
-    */
+    /**
+     * Check if provided path is valid, creates it if it does not exist, and
+     * verifies that it is writable.
+     *
+     * @param string $path Path to validate
+     */
     public function validateUploadDestinationPath($path) {
         $validDestination = true;
 
@@ -1303,20 +1303,20 @@ class EditorPlugin extends Gdn_Plugin {
         return $validDestination;
     }
 
-   /**
-    * Add upload option checkbox to custom permissions for categories.
-    *
-    * @param Gdn_Controller $Sender
-    */
+    /**
+     * Add upload option checkbox to custom permissions for categories.
+     *
+     * @param Gdn_Controller $Sender
+     */
     public function settingsController_addEditCategory_handler($Sender) {
         $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
     }
 
-   /**
-    *
-    * @param SettingsController $Sender
-    * @param array $Args
-    */
+    /**
+     *
+     * @param SettingsController $Sender
+     * @param array $Args
+     */
     public function settingsController_editor_create($Sender, $Args) {
         $Sender->permission('Garden.Settings.Manage');
         $Cf = new ConfigurationModule($Sender);
@@ -1339,12 +1339,12 @@ class EditorPlugin extends Gdn_Plugin {
         $Cf->renderAll();
     }
 
-   /**
-    * When enabled, disable other known editors that may clash with this one.
-    *
-    * If editor is loaded, then the other editors loaded after, there are CSS rules that hide them.
-    * This way, the editor plugin always takes precedence.
-    */
+    /**
+     * When enabled, disable other known editors that may clash with this one.
+     *
+     * If editor is loaded, then the other editors loaded after, there are CSS rules that hide them.
+     * This way, the editor plugin always takes precedence.
+     */
     public function setup() {
         $pluginEditors = array(
             'cleditor',
@@ -1379,9 +1379,9 @@ class EditorPlugin extends Gdn_Plugin {
             ->set();
     }
 
-   /**
-    * Create and display a thumbnail of an uploaded file.
-    */
+    /**
+     * Create and display a thumbnail of an uploaded file.
+     */
     public function utilityController_mediaThumbnail_create($sender, $media_id) {
         // When it makes it into core, it will be available in
         // functions.general.php
@@ -1438,7 +1438,7 @@ class EditorPlugin extends Gdn_Plugin {
             // Remove cf scratch copy, typically in cftemp, if there was actually a file pulled in from CF.
             if (strpos($local_path, 'cftemp') !== false) {
                 if (!unlink($local_path)) {
-                   // Maybe add logging for local cf copies not deleted.
+                    // Maybe add logging for local cf copies not deleted.
                 }
             }
 

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function writeActivity($Activity, &$Sender, &$Session) {
+function writeActivity($Activity, $Sender, $Session) {
     $Activity = (object)$Activity;
     // If this was a status update or a wall comment, don't bother with activity strings
     $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here

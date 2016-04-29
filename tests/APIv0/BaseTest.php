@@ -8,6 +8,8 @@
 namespace VanillaTests\APIv0;
 
 
+use Garden\Http\HttpResponse;
+
 abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     /** @var APIv0  $api */
     protected $api;
@@ -32,5 +34,15 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
             $this->api = new APIv0();
         }
         return $this->api;
+    }
+
+    /**
+     * Assert that the API returned a successful response.
+     *
+     * @param HttpResponse $response The response to test.
+     */
+    public function assertResponseSuccess(HttpResponse $response) {
+        $this->assertNotNull($response);
+        $this->assertTrue($response->isSuccessful());
     }
 }

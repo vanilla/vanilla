@@ -5,11 +5,11 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
-      <title><?php echo $this->Head->title(); ?></title>
-      <link><?php echo htmlspecialchars(url('/', TRUE, true)); ?></link>
+      <title><?php echo htmlspecialchars($this->Head->title()); ?></title>
+      <link><?php echo htmlspecialchars(url('/', true, true)); ?></link>
       <pubDate><?php echo date('r'); ?></pubDate>
       <?php
-         $this->RenderAsset('RssHead');
+         $this->renderAsset('RssHead');
 
          /* Sample RSS Content:
          <item>
@@ -20,8 +20,8 @@
             <description>Some text.</description>
          </item>
          */
-         $this->RenderAsset('Content');
+         $this->renderAsset('Content');
       ?>
-   <language><?php echo Gdn::Locale()->Locale; ?></language>
+   <language><?php echo Gdn::locale()->Locale; ?></language>
    </channel>
 </rss>

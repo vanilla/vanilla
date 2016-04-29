@@ -1982,9 +1982,10 @@ abstract class Gdn_SQLDriver {
         }
 
         foreach ($Field as $SubField => $SubValue) {
-            if (is_array($SubValue) && (isset($SubValue[0]) || count($SubValue) == 0)) {
+            if (is_array($SubValue)) {
                 if (count($SubValue) == 1) {
-                    $this->where($SubField, $SubValue[0]);
+                    list($firstVal) = $SubValue;
+                    $this->where($SubField, $firstVal);
                 } else {
                     $this->whereIn($SubField, $SubValue);
                 }

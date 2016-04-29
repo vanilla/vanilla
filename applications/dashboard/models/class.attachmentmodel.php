@@ -81,7 +81,7 @@ class AttachmentModel extends Gdn_Model {
             if (is_array($Row['Attributes'])) {
                 $Attributes = $Row['Attributes'];
             } else {
-                $Attributes = unserialize($Row['Attributes']);
+                $Attributes = dbdecode($Row['Attributes']);
             }
             if (is_array($Attributes)) {
                 $Row = array_replace($Row, $Attributes);
@@ -283,7 +283,7 @@ class AttachmentModel extends Gdn_Model {
             $PrimaryKeyVal = $Data['AttachmentID'];
             $CurrentAttachment = $this->SQL->getWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
             if ($CurrentAttachment) {
-                $Attributes = @unserialize($CurrentAttachment['Attributes']);
+                $Attributes = dbdecode($CurrentAttachment['Attributes']);
                 if (!$Attributes) {
                     $Attributes = array();
                 }

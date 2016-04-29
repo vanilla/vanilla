@@ -105,7 +105,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function profileController_beforeProfileOptions_handler($Sender, $Args) {
         if (!$Sender->EditMode &&
             Gdn::session()->UserID != $Sender->User->UserID &&
-            Gdn::session()->checkPermission('Conversations.Add')
+            Gdn::session()->checkPermission('Conversations.Conversations.Add')
         ) {
             $Sender->EventArguments['MemberOptions'][] = array(
                 'Text' => sprite('SpMessage').' '.t('Message'),

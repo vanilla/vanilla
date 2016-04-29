@@ -722,6 +722,45 @@ if (!function_exists('safePrint')) {
     }
 }
 
+if (!function_exists('dbdecode')) {
+    /**
+     * Decode a value retrieved from database storage.
+     *
+     * @param string $value An encoded string representation of a value to be decoded.
+     * @return mixed A decoded value on success or false on failure.
+     */
+    function dbdecode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        } elseif (is_array($value)) {
+            // This handles a common double decoding scenario.
+            return $value;
+        }
+
+        $decodedValue = @unserialize($value);
+
+        return $decodedValue;
+    }
+}
+
+if (!function_exists('dbencode')) {
+    /**
+     * Encode a value in preparation for database storage.
+     *
+     * @param mixed $value A value to be encoded.
+     * @return mixed An encoded string representation of the provided value or false on failure.
+     */
+    function dbencode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $encodedValue = serialize($value);
+
+        return $encodedValue;
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.
@@ -3098,6 +3137,23 @@ if (!function_exists('safeRedirect')) {
             Redirect($Destination, $StatusCode);
         } else {
             throw PermissionException();
+        }
+    }
+}
+
+if (!function_exists('safeUnlink')) {
+    /**
+     * A version of {@link unlinl()} that won't raise a warning.
+     * 
+     * @param string $filename Path to the file.
+     * @return Returns TRUE on success or FALSE on failure.
+     */
+    function safeUnlink($filename) {
+        try {
+            $r = unlink($filename);
+            return $r;
+        } catch (\Exception $ex) {
+            return false;
         }
     }
 }

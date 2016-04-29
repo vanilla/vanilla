@@ -507,7 +507,7 @@ class PostController extends VanillaController {
                 'Name' => $Title,
                 'Body' => $Body,
                 'Format' => 'Html',
-                'Attributes' => serialize($Attributes)
+                'Attributes' => dbencode($Attributes)
             );
             $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;
             $this->fireEvent('BeforeEmbedDiscussion');

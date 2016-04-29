@@ -455,7 +455,7 @@ class UserModel extends Gdn_Model {
      * @param int|null $UserID The user ID to get the counts for or **null** for the current user.
      */
     public function counts($Column, $UserID = null) {
-        if ($UserID) {
+        if ($UserID > 0) {
             $Where = ['UserID' => $UserID];
         } else {
             $Where = null;
@@ -474,7 +474,7 @@ class UserModel extends Gdn_Model {
                 break;
         }
 
-        if ($UserID) {
+        if ($UserID > 0) {
             $this->clearCache($UserID);
         }
     }
@@ -1040,7 +1040,7 @@ class UserModel extends Gdn_Model {
      * @return string The url to the default avatar image.
      */
     public static function getDefaultAvatarUrl($user = [], $size = 'thumbnail') {
-        if ($user && function_exists('UserPhotoDefaultUrl')) {
+        if (!empty($user) && function_exists('UserPhotoDefaultUrl')) {
             return userPhotoDefaultUrl($user);
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
@@ -1720,7 +1720,7 @@ class UserModel extends Gdn_Model {
      * @since 2.1.0
      */
     public static function givePoints($UserID, $Points, $Source = 'Other', $Timestamp = false) {
-        if (!$Timestamp) {
+        if (!$Timestamp === false) {
             $Timestamp = time();
         }
 
@@ -2152,7 +2152,7 @@ class UserModel extends Gdn_Model {
                     // And insert the new user.
                     $UserID = $this->_insert($Fields, $Settings);
 
-                    if ($UserID) {
+                    if ($UserID > 0) {
                         // Report that the user was created.
                         $ActivityModel = new ActivityModel();
                         $ActivityModel->save(
@@ -2236,7 +2236,7 @@ class UserModel extends Gdn_Model {
             // Insert the new user
             $UserID = $this->_insert($Fields, ['NoConfirmEmail' => true, 'Setup' => true]);
 
-            if ($UserID) {
+            if ($UserID > 0) {
                 $ActivityModel = new ActivityModel();
                 $ActivityModel->save(
                     [
@@ -2826,7 +2826,7 @@ class UserModel extends Gdn_Model {
 
             // And insert the new user
             $UserID = $this->_insert($Fields, $Options);
-            if ($UserID && !val('NoActivity', $Options)) {
+            if ($UserID > 0 && !val('NoActivity', $Options)) {
                 $ActivityModel = new ActivityModel();
                 $ActivityModel->save(
                     [
@@ -4024,7 +4024,7 @@ class UserModel extends Gdn_Model {
                 $UserID = $this->_insert($UserData);
             }
 
-            if ($UserID) {
+            if ($UserID > 0) {
                 $NewUserRoleIDs = $this->newUserRoleIDs();
 
                 // Save the roles.

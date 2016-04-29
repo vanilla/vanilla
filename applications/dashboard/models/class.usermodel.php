@@ -176,7 +176,7 @@ class UserModel extends Gdn_Model {
         $LogID = false;
         if (val('DeleteContent', $Options)) {
             $Options['Log'] = 'Ban';
-            $LogID = $this->DeleteContent($UserID, $Options);
+            $LogID = $this->deleteContent($UserID, $Options);
         }
 
         if ($LogID) {
@@ -389,7 +389,7 @@ class UserModel extends Gdn_Model {
 
         $UserSet = [];
         $OldUserSet = [];
-        if (DateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0) {
+        if (dateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0) {
             $UserSet['DateFirstVisit'] = $OldUser['DateFirstVisit'];
         }
 
@@ -557,15 +557,15 @@ class UserModel extends Gdn_Model {
                 ]
             ];
 
-            $ActivityModel->Queue($Activity);
+            $ActivityModel->queue($Activity);
 
             // Notify the user of the unban.
             $Activity['NotifyUserID'] = $UserID;
             $Activity['Emailed'] = ActivityModel::SENT_PENDING;
             $Activity['HeadlineFormat'] = t('HeadlineFormat.Unban.Notification', "You've been unbanned.");
-            $ActivityModel->Queue($Activity, false, ['Force' => true]);
+            $ActivityModel->queue($Activity, false, ['Force' => true]);
 
-            $ActivityModel->SaveQueue();
+            $ActivityModel->saveQueue();
         }
     }
 
@@ -873,7 +873,7 @@ class UserModel extends Gdn_Model {
             $this->addFilterField(['Banned', 'Verified', 'Confirmed', 'RankID']);
         }
 
-        $data = parent::FilterForm($data);
+        $data = parent::filterForm($data);
         return $data;
 
     }
@@ -1079,7 +1079,7 @@ class UserModel extends Gdn_Model {
     public function definePermissions($UserID, $Serialize = true) {
         $UserPermissionsKey = '';
         if (Gdn::cache()->activeEnabled()) {
-            $PermissionsIncrement = $this->GetPermissionsIncrement();
+            $PermissionsIncrement = $this->getPermissionsIncrement();
             $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, [
                 'UserID' => $UserID,
                 'PermissionsIncrement' => $PermissionsIncrement
@@ -1161,7 +1161,7 @@ class UserModel extends Gdn_Model {
     public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         if (is_numeric($OrderFields)) {
             // They're using the old version that was a misnamed GetID()
-            Deprecated('UserModel->get()', 'UserModel->getID()');
+            deprecated('UserModel->get()', 'UserModel->getID()');
             $Result = $this->getID($OrderFields);
         } else {
             $Result = parent::get($OrderFields, $OrderDirection, $Limit, $Offset);
@@ -1463,7 +1463,7 @@ class UserModel extends Gdn_Model {
         // If we are missing any users from cache query, fill em up here
         if (sizeof($DatabaseIDs)) {
             $DatabaseData = $this->SQL->whereIn('UserID', $DatabaseIDs)->getWhere('User')->result(DATASET_TYPE_ARRAY);
-            $DatabaseData = Gdn_DataSet::Index($DatabaseData, 'UserID');
+            $DatabaseData = Gdn_DataSet::index($DatabaseData, 'UserID');
 
             //echo "from DB:\n";
             //print_r($DatabaseData);
@@ -2101,7 +2101,7 @@ class UserModel extends Gdn_Model {
                         }
 
                         if (isset($OldPhoto) && $OldPhoto != $Photo) {
-                            if (IsUrl($Photo)) {
+                            if (isUrl($Photo)) {
                                 $PhotoUrl = $Photo;
                             } else {
                                 $PhotoUrl = Gdn_Upload::url(changeBasename($Photo, 'n%s'));
@@ -2207,7 +2207,7 @@ class UserModel extends Gdn_Model {
 
         // Add & apply any extra validation rules:
         $Name = val('Name', $FormPostValues, '');
-        $FormPostValues['Email'] = val('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::Host()));
+        $FormPostValues['Email'] = val('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::host()));
         $FormPostValues['ShowEmail'] = '0';
         $FormPostValues['TermsOfService'] = '1';
         $FormPostValues['DateOfBirth'] = '1975-09-16';
@@ -2691,11 +2691,11 @@ class UserModel extends Gdn_Model {
 
         // Make sure that the checkbox val for email is saved as the appropriate enum
         if (array_key_exists('ShowEmail', $FormPostValues)) {
-            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
         }
 
         if (array_key_exists('Banned', $FormPostValues)) {
-            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
         }
 
         $this->addInsertFields($FormPostValues);
@@ -2771,11 +2771,11 @@ class UserModel extends Gdn_Model {
         // TODO: DO I NEED THIS?!
         // Make sure that the checkbox val for email is saved as the appropriate enum
         if (array_key_exists('ShowEmail', $FormPostValues)) {
-            $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+            $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
         }
 
         if (array_key_exists('Banned', $FormPostValues)) {
-            $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
+            $FormPostValues['Banned'] = forceBool($FormPostValues['Banned'], '0', '1', '0');
         }
 
         $this->addInsertFields($FormPostValues);
@@ -2897,7 +2897,7 @@ class UserModel extends Gdn_Model {
             $AllIPs = [];
         }
         if ($IP = val('InsertIPAddress', $User)) {
-            array_unshift($AllIPs, ForceIPv4($IP));
+            array_unshift($AllIPs, forceIPv4($IP));
         }
         if ($IP = val('LastIPAddress', $User)) {
             array_unshift($AllIPs, $IP);
@@ -3160,7 +3160,7 @@ class UserModel extends Gdn_Model {
                 $message = sprintf(t('Hello %s!'), val('Name', $User)).' '.t('You have been approved for membership.');
                 $emailTemplate = $Email->getEmailTemplate()
                     ->setMessage($message)
-                    ->setButton(ExternalUrl(SignInUrl()), t('Sign In Now'))
+                    ->setButton(externalUrl(signInUrl()), t('Sign In Now'))
                     ->setTitle(t('Membership Approved'));
 
                 $Email->setEmailTemplate($emailTemplate);
@@ -3242,7 +3242,7 @@ class UserModel extends Gdn_Model {
             ->set([
                 'Name' => t('[Deleted User]'),
                 'Photo' => null,
-                'Password' => RandomString('10'),
+                'Password' => randomString('10'),
                 'About' => '',
                 'Email' => 'user_'.$userID.'@deleted.email',
                 'ShowEmail' => '0',
@@ -3341,7 +3341,7 @@ class UserModel extends Gdn_Model {
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
         // Make sure the user is an applicant
-        $RoleData = $this->GetRoles($UserID);
+        $RoleData = $this->getRoles($UserID);
         if ($RoleData->numRows() == 0) {
             throw new Exception(t('ErrorRecordNotFound'));
         } else {
@@ -3690,7 +3690,7 @@ class UserModel extends Gdn_Model {
             if (is_string($v)) {
                 $IPAddresses = explode(',', $v);
                 foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = ForceIPv4($IPAddress);
+                    $IPAddresses[$i] = forceIPv4($IPAddress);
                 }
                 setValue('AllIPAddresses', $User, $IPAddresses);
             }
@@ -3800,7 +3800,7 @@ class UserModel extends Gdn_Model {
         // Make sure there is a confirmation code.
         $Code = valr('Attributes.EmailKey', $User);
         if (!$Code) {
-            $Code = RandomString(8);
+            $Code = randomString(8);
             $Attributes = $User['Attributes'];
             if (!is_array($Attributes)) {
                 $Attributes = ['EmailKey' => $Code];
@@ -3992,7 +3992,7 @@ class UserModel extends Gdn_Model {
         if (!isset($Data['UserID']) || $Data['UserID'] <= 0) {
             // Prepare the user data.
             $UserData['Name'] = $Data['Name'];
-            $UserData['Password'] = RandomString(16);
+            $UserData['Password'] = randomString(16);
             $UserData['Email'] = val('Email', $Data, 'no@email.com');
             $UserData['Gender'] = strtolower(substr(val('Gender', $Data, 'u'), 0, 1));
             $UserData['HourOffset'] = val('HourOffset', $Data, 0);

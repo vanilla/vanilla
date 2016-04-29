@@ -1123,8 +1123,6 @@ class UserModel extends Gdn_Model {
         $Compiled = [];
         foreach ($Permissions as $i => $Row) {
             $JunctionID = array_key_exists('JunctionID', $Row) ? $Row['JunctionID'] : null;
-            //$JunctionTable = array_key_exists('JunctionColumn', $Row) ? $Row['JunctionTable'] : null;
-            //$JunctionColumn = array_key_exists('JunctionColumn', $Row) ? $Row['JunctionColumn'] : null;
             unset($Row['JunctionColumn'], $Row['JunctionColumn'], $Row['JunctionID'], $Row['RoleID'], $Row['PermissionID']);
 
             foreach ($Row as $PermissionName => $Value) {
@@ -1242,7 +1240,6 @@ class UserModel extends Gdn_Model {
             ->from('User u')
             ->join('UserRole ur', 'u.UserID = ur.UserID')
             ->where('ur.RoleID', $RoleID, true, false)
-//         ->groupBy('UserID')
             ->orderBy('DateInserted', 'desc')
             ->get();
     }
@@ -1753,7 +1750,6 @@ class UserModel extends Gdn_Model {
         // Grab the user's total points.
         $Points = Gdn::sql()->getWhere('UserPoints', ['UserID' => $UserID, 'SlotType' => 'a', 'Source' => 'Total', 'CategoryID' => 0])->value('Points');
 
-//      Gdn::controller()->informMessage('Points: '.$Points);
         Gdn::userModel()->setField($UserID, 'Points', $Points);
 
         // Fire a give points event.
@@ -1802,10 +1798,6 @@ class UserModel extends Gdn_Model {
      */
     public function register($FormPostValues, $Options = []) {
         $FormPostValues['LastIPAddress'] = Gdn::request()->ipAddress();
-
-        // Throw an error if the registering user has an active session
-//      if (Gdn::session()->isValid())
-//         $this->Validation->addValidationResult('Name', 'You are already registered.');
 
         // Check for banning first.
         $Valid = BanModel::checkUser($FormPostValues, null, true);
@@ -1945,14 +1937,12 @@ class UserModel extends Gdn_Model {
         // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
         if ($SaveRoles) {
             $this->Validation->addRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
-            // $this->Validation->AddValidationField('RoleID', $FormPostValues);
             $this->Validation->applyRule('RoleID', 'OneOrMoreArrayItemRequired');
         } else {
             $this->Validation->unapplyRule('RoleID', 'OneOrMoreArrayItemRequired');
         }
 
-        // Make sure that checkbox vals are saved as the appropriate value
-
+        // Make sure that checkbox values are saved as the appropriate value.
         if (array_key_exists('ShowEmail', $FormPostValues)) {
             $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
         }
@@ -2317,7 +2307,7 @@ class UserModel extends Gdn_Model {
 
         $this->clearCache($UserID, ['roles', 'permissions']);
 
-        if ($RecordEvent) { //} && (!empty($DeleteRoleIDs) || !empty($InsertRoleIDs))) {
+        if ($RecordEvent) {
             $User = $this->getID($UserID);
 
             $OldRoles = [];
@@ -2480,8 +2470,6 @@ class UserModel extends Gdn_Model {
         $RoleID = false;
         if (strtolower($Keywords) == 'banned') {
             $this->SQL->where('u.Banned >', 0);
-        } elseif (isset($UserID)) {
-            $this->SQL->where('u.UserID', $UserID);
         } else {
             $RoleID = $this->SQL->getWhere('Role', ['Name' => $Keywords])->value('RoleID');
         }
@@ -2496,8 +2484,6 @@ class UserModel extends Gdn_Model {
 
         if ($RoleID) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
-        } elseif (isset($UserID)) {
-            $this->SQL->where('u.UserID', $UserID);
         } else {
             // Search on the user table.
             $Like = trim($Keywords) == '' ? false : ['u.Name' => $Keywords, 'u.Email' => $Keywords];
@@ -2873,7 +2859,7 @@ class UserModel extends Gdn_Model {
      * @param int $UserID
      * @param string|int|float $ClientHour
      */
-    function updateVisit($UserID, $ClientHour = false) {
+    public function updateVisit($UserID, $ClientHour = false) {
         $UserID = (int)$UserID;
         if (!$UserID) {
             throw new Exception('A valid User ID is required.');
@@ -3707,7 +3693,7 @@ class UserModel extends Gdn_Model {
         }
 
         setValue('_CssClass', $User, '');
-        if ($v = val('Banned', $User)) {
+        if (val('Banned', $User)) {
             setValue('_CssClass', $User, 'Banned');
         }
 
@@ -4000,6 +3986,7 @@ class UserModel extends Gdn_Model {
         // account. So create one for them.
         if (!isset($Data['UserID']) || $Data['UserID'] <= 0) {
             // Prepare the user data.
+            $UserData = [];
             $UserData['Name'] = $Data['Name'];
             $UserData['Password'] = randomString(16);
             $UserData['Email'] = val('Email', $Data, 'no@email.com');
@@ -4065,8 +4052,6 @@ class UserModel extends Gdn_Model {
 
             case 'Invitation':
                 throw new Gdn_UserException(t('This forum is currently set to invitation only mode.'));
-                break;
-
             case 'Basic':
             case 'Captcha':
             default:

@@ -806,8 +806,6 @@ class UserModel extends Gdn_Model {
             }
         }
 
-        $UserInserted = false;
-
         if ($UserID) {
             // Save the user.
             $this->syncUser($UserID, $UserData);
@@ -844,7 +842,6 @@ class UserModel extends Gdn_Model {
 
                 trace($UserData, 'Registering User');
                 $UserID = $this->register($UserData, $Options);
-                $UserInserted = true;
             }
 
             if ($UserID) {
@@ -1793,7 +1790,6 @@ class UserModel extends Gdn_Model {
      * @throws Exception
      */
     public function register($FormPostValues, $Options = []) {
-        $Valid = true;
         $FormPostValues['LastIPAddress'] = Gdn::request()->ipAddress();
 
         // Throw an error if the registering user has an active session
@@ -2223,9 +2219,6 @@ class UserModel extends Gdn_Model {
         $this->addInsertFields($FormPostValues);
 
         if ($this->validate($FormPostValues, true) === true) {
-            $Fields = $this->Validation->validationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-            $Username = val('Name', $Fields);
-            $Email = val('Email', $Fields);
             $Fields = $this->Validation->schemaValidationFields(); // Only fields that are present in the schema
 
             // Insert the new user
@@ -2577,8 +2570,6 @@ class UserModel extends Gdn_Model {
 
         // Make sure that the user has a valid invitation code, and also grab
         // the user's email from the invitation:
-        $InviteUserID = 0;
-        $InviteUsername = '';
         $InvitationCode = val('InvitationCode', $FormPostValues, '');
 
         $Invitation = $this->SQL->getWhere('Invitation', ['Code' => $InvitationCode])->firstRow();

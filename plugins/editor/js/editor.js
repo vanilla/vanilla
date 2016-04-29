@@ -1591,12 +1591,13 @@
                                         //scrollToEditorContainer(editor.textarea.element);
                                         editor.focus();
                                     } else {
-                                        // Bug in IE 7,11 where the form wrapper div receive the focus for some unknown reason
-                                        // and we can write inside it.
+                                        // Bug in IE 10,11 where the caret is placed outside of the editor because it is hidden
+                                        // The bug is caused by focusWithoutScrolling() from wysihtml5-0.4.0pre
+                                        // To circumvent the issue let's focus the editor instead.
                                         var formWrapper = $('div.FormWrapper');
-                                        if (formWrapper.is(document.activeElement)) {
-                                            formWrapper.blur();
-                                        }
+                                        formWrapper.on('focus', function() {
+                                            editor.focus();
+                                        });
                                     }
 
                                     if (debug) {

@@ -43,34 +43,84 @@ class Logger {
     /** Log type. */
     const DEBUG = 'debug';
 
-    /** @var LoggerInterface The interface responsible for doing the actual logging. */
+    /** @var \Vanilla\Logger The interface responsible for doing the actual logging. */
     protected static $instance;
 
     /** @var string The global level at which events are committed to the log. */
     protected static $logLevel;
 
     /**
+     * Add a new logger to observe messages.
+     *
+     * @param LoggerInterface $logger The logger to add.
+     * @param string $level One of the **Logger::*** constants.
+     */
+    public static function addLogger(LoggerInterface $logger, $level = null) {
+        static::getLogger()->addLogger($logger, $level);
+    }
+
+    /**
+     * Remove a logger that was previously added with {@link Logger::addLogger()}.
+     *
+     * @param LoggerInterface $logger The logger to remove.
+     * @param bool $trigger Whether or not to trigger a notice if the logger isn't found.
+     */
+    public static function removeLogger($logger, $trigger = true) {
+        static::getLogger()->removeLogger($logger, $trigger);
+    }
+
+    /**
      * Set the logger.
      *
-     * @param LoggerInterface $value Specify a new value to set the logger to.
+     * @param LoggerInterface $logger Specify a new value to set the logger to.
      */
-    public static function setLogger($value = null) {
-        if ($value !== null) {
-            self::$instance = $value;
+    public static function setLogger($logger = null) {
+        if ($logger instanceof \Vanilla\Logger) {
+            self::$instance = $logger;
         } else {
-            self::$instance = new \Vanilla\Logger();
+            deprecated('Logger::setLogger()', 'Logger::addLogger');
+
+            // Check for class compatibility while we update plugins.
+            // TODO: Remove this check.
+            if ($logger instanceof LoggerInterface) {
+                static::addLogger($logger);
+            }
         }
     }
 
     /**
+     * Get the logger implementation.
      *
-     * @return LoggerInterface
+     * @return \Vanilla\Logger Returns a {@link \Vanilla\Logger}.
      */
     public static function getLogger() {
         if (!self::$instance) {
-            self::setLogger();
+            self::$instance = new \Vanilla\Logger();
         }
         return self::$instance;
+    }
+
+    /**
+     * Get the valid log levels.
+     *
+     * @return string[] Returns an array with level keys and label values.
+     */
+    public static function getLevels() {
+        $r = [
+            self::DEBUG => self::DEBUG,
+            self::INFO => self::INFO,
+            self::NOTICE => self::NOTICE,
+            self::WARNING => self::WARNING,
+            self::ERROR => self::ERROR,
+            self::CRITICAL => self::CRITICAL,
+            self::ALERT => self::ALERT,
+            self::EMERGENCY => self::EMERGENCY
+
+        ];
+
+        $r = array_map('t', $r);
+
+        return $r;
     }
 
     /**

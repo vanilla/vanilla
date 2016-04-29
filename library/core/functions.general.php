@@ -852,16 +852,7 @@ if (!function_exists('debug')) {
         if ($value === null) {
             return $Debug;
         }
-
-        $Changed = $Debug != $value;
         $Debug = $value;
-        if ($Debug) {
-            Logger::logLevel(Logger::DEBUG);
-        } else {
-            if ($Changed) {
-                Logger::logLevel(c('Garden.LogLevel', Logger::INFO));
-            }
-        }
         return $Debug;
     }
 }

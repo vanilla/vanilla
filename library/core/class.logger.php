@@ -44,10 +44,10 @@ class Logger {
     const DEBUG = 'debug';
 
     /** @var \Vanilla\Logger The interface responsible for doing the actual logging. */
-    protected static $instance;
+    private static $instance;
 
     /** @var string The global level at which events are committed to the log. */
-    protected static $logLevel;
+    private static $logLevel;
 
     /**
      * Add a new logger to observe messages.
@@ -237,9 +237,12 @@ class Logger {
             Logger::EMERGENCY => LOG_EMERG
         );
 
-        if (isset($priorities[$level])) {
+        if (empty($level)) {
+            return LOG_DEBUG;
+        } elseif (isset($priorities[$level])) {
             return $priorities[$level];
         } else {
+            error_log($level);
             self::log(Logger::NOTICE, "Unknown log level {unknownLevel}.", ['unknownLevel' => $level]);
             return LOG_DEBUG + 1;
         }
@@ -270,36 +273,16 @@ class Logger {
     }
 
     /**
-     * Gets or sets the current log level.
+     * Log a message.
      *
-     * @param string $value Pass a non-empty string to set a new log level.
-     * @return string Returns the current logLevel.
-     * @throws Exception Throws an exception of {@link $value} is an incorrect log level.
-     */
-    public static function logLevel($value = '') {
-        if ($value !== '') {
-            if (self::levelPriority($value) > LOG_DEBUG) {
-                throw new Exception("Invalid log level $value.", 422);
-            }
-            self::$logLevel = $value;
-        } elseif ($value === null) {
-            self::$logLevel = Logger::NOTICE;
-        }
-        return self::$logLevel;
-    }
-
-    /**
-     * Adds default fields to context if they do not exist
+     * A message can contain fields that will be filled by the context. Fields are enclosed in curly braces like
+     * `{this}`. Default fields are added to the context if they do not exist.
      *
-     * @param string $level
-     * @param string $message
-     * @param array $context
+     * @param string $level One of the **Logger::*** constants.
+     * @param string $message The message format.
+     * @param array $context The message data.
      */
     public static function log($level, $message, $context = array()) {
-        if (self::levelPriority($level) > self::levelPriority(self::logLevel())) {
-            return;
-        }
-
         // Add default fields to the context if they don't exist.
         $defaults = array(
             'userid' => Gdn::session()->UserID,

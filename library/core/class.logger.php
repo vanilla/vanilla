@@ -124,12 +124,92 @@ class Logger {
     }
 
     /**
-     * Log an event
+     * Log a debug message.
      *
-     * @param string $event
-     * @param string $level
-     * @param string $message
-     * @param array $context
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function debug($message, $context) {
+        static::log(Logger::DEBUG, $message, $context);
+    }
+
+    /**
+     * Log an info message.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function info($message, $context) {
+        static::log(Logger::INFO, $message, $context);
+    }
+
+    /**
+     * Log a notice.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function notice($message, $context) {
+        static::log(Logger::NOTICE, $message, $context);
+    }
+
+    /**
+     * Log a warning.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function warning($message, $context) {
+        static::log(Logger::WARNING, $message, $context);
+    }
+
+    /**
+     * Log an error.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function error($message, $context) {
+        static::log(Logger::ERROR, $message, $context);
+    }
+
+    /**
+     * Log a critical message.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function critical($message, $context) {
+        static::log(Logger::CRITICAL, $message, $context);
+    }
+
+    /**
+     * Log an alert.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function alert($message, $context) {
+        static::log(Logger::ALERT, $message, $context);
+    }
+
+    /**
+     * Log an emergency.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function emergency($message, $context) {
+        static::log(Logger::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * Log an event.
+     *
+     * @param string $event The code of the event.
+     * @param string $level One of the **Logger::*** constants.
+     * @param string $message The message.
+     * @param array $context The message data.
      */
     public static function event($event, $level, $message, $context = array()) {
         $context['event'] = $event;
@@ -160,6 +240,7 @@ class Logger {
         if (isset($priorities[$level])) {
             return $priorities[$level];
         } else {
+            self::log(Logger::NOTICE, "Unknown log level {unknownLevel}.", ['unknownLevel' => $level]);
             return LOG_DEBUG + 1;
         }
     }

@@ -511,7 +511,7 @@ class UpdateModel extends Gdn_Model {
     public function getAddons($Enabled = false) {
         deprecated('UpdateModel->getAddons()');
         return [];
-        }
+    }
 
     /**
      * Deprecated.
@@ -583,8 +583,8 @@ class UpdateModel extends Gdn_Model {
                     } catch (\Exception $ex) {
                         if (debug()) {
                             throw $ex;
-            }
-                }
+                        }
+                    }
                 }
             }
 

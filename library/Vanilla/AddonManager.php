@@ -181,7 +181,7 @@ class AddonManager {
                 try {
                     $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
                 } catch (\Exception $ex) {
-                    // TODO: Log this.
+                    trigger_error("The $type in $subdir is invalid and will be skipped.", E_USER_WARNING);
                     // Clear the addon out of the index.
                     $this->deleteSingleIndexKey($type, $key);
                 }
@@ -233,7 +233,7 @@ class AddonManager {
                 $addon = new Addon($subdir);
                 $addons[$addon->getKey()] = $addon;
             } catch (\Exception $ex) {
-                // TODO: Log this.
+                trigger_error("The $type in $subdir is invalid.", E_USER_WARNING);
             }
         }
         $this->multiCache = $addons;

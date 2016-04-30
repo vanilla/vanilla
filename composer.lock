@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7733ddc81b71a572045081c45d3fcae1",
-    "content-hash": "107049c1fc4107be95224e2829ecf176",
+    "hash": "92ae97a5015a8c5cdaad5c578551872a",
+    "content-hash": "536db3af55408625a36202a85121eca8",
     "packages": [
         {
             "name": "psr/log",
@@ -47,16 +47,16 @@
         },
         {
             "name": "vanilla/garden-http",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-http.git",
-                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a"
+                "reference": "8aea1091eb01062921fd91a87a4a879a53ee946e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/da3b859774613031788eaa148a7e9e8622f6bc2a",
-                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/8aea1091eb01062921fd91a87a4a879a53ee946e",
+                "reference": "8aea1091eb01062921fd91a87a4a879a53ee946e",
                 "shasum": ""
             },
             "require": {
@@ -83,7 +83,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2015-12-10 21:39:51"
+            "time": "2016-03-25 22:29:23"
         },
         {
             "name": "vanilla/htmlawed",

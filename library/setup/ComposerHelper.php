@@ -15,6 +15,22 @@ use Composer\Factory;
  */
 class ComposerHelper {
     /**
+     * Clear the addon manager cache.
+     */
+    private static function clearAddonManagerCache() {
+        $cacheDir = realpath(__DIR__.'/../../cache');
+
+        unlink($cacheDir.'/addon.php');
+
+        $paths = array_merge(
+            glob($cacheDir.'/locale/*.php'),
+            glob($cacheDir.'/theme/*.php'),
+            glob($cacheDir.'/*-index.php')
+        );
+        array_map('unlink', $paths);
+    }
+
+    /**
      * Merge repositories and requirements from a separate composer-local.json.
      *
      * This allows static development dependencies to be shipped with Vanilla, but can be customized with a
@@ -23,6 +39,8 @@ class ComposerHelper {
      * @param Event $event The event being fired.
      */
     public static function preUpdate(Event $event) {
+        self::clearAddonManagerCache();
+
         // Check for a composer-local.json.
         $composerLocalPath = './composer-local.json';
 

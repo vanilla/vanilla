@@ -517,8 +517,9 @@ class LogModel extends Gdn_Pluggable {
         // Grab the record from the DB.
         if ($OldData === null) {
             $OldData = Gdn::sql()->getWhere($RecordType, [$RecordType.'ID' => $RecordID])->resultArray();
-        } elseif (!is_array($OldData))
+        } elseif (!is_array($OldData)) {
             $OldData = [$OldData];
+        }
 
         foreach ($OldData as $Row) {
             // Don't log the change if it's right after an insert.
@@ -704,9 +705,9 @@ class LogModel extends Gdn_Pluggable {
 
         if (isset($Data['Attributes'])) {
             $Attr = 'Attributes';
-        } elseif (isset($Data['Data']))
+        } elseif (isset($Data['Data'])) {
             $Attr = 'Data';
-        else {
+        } else {
             $Attr = '';
         }
 

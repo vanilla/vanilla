@@ -223,8 +223,12 @@ class AddonManager {
         // Scan all of the addon directories.
         $addonDirs = $this->scanAddonDirs($type);
         foreach ($addonDirs as $subdir) {
-            $addon = new Addon($subdir);
-            $addons[$addon->getKey()] = $addon;
+            try {
+                $addon = new Addon($subdir);
+                $addons[$addon->getKey()] = $addon;
+            } catch (\Exception $ex) {
+                // TODO: Log this.
+            }
         }
         $this->multiCache = $addons;
 

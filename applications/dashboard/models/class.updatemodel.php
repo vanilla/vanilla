@@ -530,17 +530,11 @@ class UpdateModel extends Gdn_Model {
      *
      * The structure runs the addons in priority order so that higher priority addons override lower priority ones.
      *
+     * @param bool $captureOnly Run the structure or just capture the SQL changes.
      * @throws Exception Throws an exception if in debug mode and something goes wrong.
      */
-    public function runStructure() {
-        // Get the structure files for all of the enabled applications.
-        $ApplicationManager = new Gdn_ApplicationManager();
-        $Apps = $ApplicationManager->enabledApplications();
-        $AppNames = array_column($Apps, 'Folder');
-            $addons = [$addon];
-        } else {
-            $addons = array_reverse(Gdn::addonManager()->getEnabled());
-            }
+    public function runStructure($captureOnly) {
+        $addons = array_reverse(Gdn::addonManager()->getEnabled());
 
         // These variables are required for included structure files.
         $Database = Gdn::database();
@@ -567,7 +561,7 @@ class UpdateModel extends Gdn_Model {
                         throw $ex;
                     }
                 }
-        }
+            }
 
             // Look for a structure method on the plugin.
             if ($addon->getPluginClass()) {

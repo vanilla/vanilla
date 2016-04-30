@@ -158,7 +158,7 @@ class UtilityController extends DashboardController {
             $step = 'start';
             if (!empty($scan)) {
                 $step = 'scan';
-            } else if (!empty($run)) {
+            } elseif (!empty($run)) {
                 $step = 'run';
             }
         }
@@ -195,7 +195,7 @@ class UtilityController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         $updateModel = new UpdateModel();
-        $capturedSql = $updateModel->runStructure(null, $captureOnly);
+        $capturedSql = $updateModel->runStructure($captureOnly);
         $this->setData('CapturedSql', $capturedSql);
 
         $addons = array_reverse(Gdn::addonManager()->getEnabled());

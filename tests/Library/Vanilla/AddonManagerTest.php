@@ -240,10 +240,6 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         // Can't test requirements so just unset them.
         unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
 
-        if ($oldInfoArray['Index'] === 'easso') {
-            $foo = 'bar';
-        }
-
         $this->assertArraySubsetRecursive($oldInfoArray, $info);
     }
 

@@ -515,11 +515,10 @@ class UpdateModel extends Gdn_Model {
 
     /**
      * Deprecated.
-     * @param bool $Enabled Deprecated.
      *
-     * @param bool $OnlyUpdates Deprecated.
+     * @param bool $Enabled Deprecated.
      * @return array|bool Deprecated.
-     * @throws Exception Deprecated.
+     * @deprecated
      */
     public function getAddonUpdates($Enabled = false) {
         deprecated('UpdateModel->getAddonUpdates()');

@@ -13,15 +13,15 @@
  */
 class LogModel extends Gdn_Pluggable {
 
-    protected static $_Instance = null;
-    protected $_RecalcIDs = ['Discussion' => []];
-    protected static $_TransactionID = null;
+    private static $instance = null;
+    private $recalcIDs = ['Discussion' => []];
+    private static $transactionID = null;
 
     /**
      *
      */
     public static function beginTransaction() {
-        self::$_TransactionID = true;
+        self::$transactionID = true;
     }
 
     /**
@@ -55,7 +55,7 @@ class LogModel extends Gdn_Pluggable {
      *
      */
     public static function endTransaction() {
-        self::$_TransactionID = null;
+        self::$transactionID = null;
     }
 
     /**
@@ -342,20 +342,20 @@ class LogModel extends Gdn_Pluggable {
         }
 
         // Check to see if we are storing two versions of the data.
-        if (($InsertUserID = self::_LogValue($Data, 'Log_InsertUserID')) === null) {
+        if (($InsertUserID = self::logValue($Data, 'Log_InsertUserID')) === null) {
             $InsertUserID = Gdn::session()->UserID;
         }
-        if (($InsertIPAddress = self::_LogValue($Data, 'Log_InsertIPAddress')) == null) {
+        if (($InsertIPAddress = self::logValue($Data, 'Log_InsertIPAddress')) == null) {
             $InsertIPAddress = Gdn::request()->IPAddress();
         }
         // Do some known translations for the parent record ID.
-        if (($ParentRecordID = self::_LogValue($Data, 'ParentRecordID')) === null) {
+        if (($ParentRecordID = self::logValue($Data, 'ParentRecordID')) === null) {
             switch ($RecordType) {
                 case 'Activity':
-                    $ParentRecordID = self::_LogValue($Data, 'CommentActivityID', 'CommentActivityID');
+                    $ParentRecordID = self::logValue($Data, 'CommentActivityID', 'CommentActivityID');
                     break;
                 case 'Comment':
-                    $ParentRecordID = self::_LogValue($Data, 'DiscussionID', 'DiscussionID');
+                    $ParentRecordID = self::logValue($Data, 'DiscussionID', 'DiscussionID');
                     break;
             }
         }
@@ -364,15 +364,15 @@ class LogModel extends Gdn_Pluggable {
         $LogRow = [
             'Operation' => $Operation,
             'RecordType' => $RecordType,
-            'RecordID' => self::_LogValue($Data, 'RecordID', $RecordType.'ID'),
-            'RecordUserID' => self::_LogValue($Data, 'RecordUserID', 'UpdateUserID', 'InsertUserID'),
-            'RecordIPAddress' => self::_LogValue($Data, 'RecordIPAddress', 'LastIPAddress', 'InsertIPAddress'),
-            'RecordDate' => self::_LogValue($Data, 'RecordDate', 'DateUpdated', 'DateInserted'),
+            'RecordID' => self::logValue($Data, 'RecordID', $RecordType.'ID'),
+            'RecordUserID' => self::logValue($Data, 'RecordUserID', 'UpdateUserID', 'InsertUserID'),
+            'RecordIPAddress' => self::logValue($Data, 'RecordIPAddress', 'LastIPAddress', 'InsertIPAddress'),
+            'RecordDate' => self::logValue($Data, 'RecordDate', 'DateUpdated', 'DateInserted'),
             'InsertUserID' => $InsertUserID,
             'InsertIPAddress' => $InsertIPAddress,
             'DateInserted' => Gdn_Format::toDateTime(),
             'ParentRecordID' => $ParentRecordID,
-            'CategoryID' => self::_LogValue($Data, 'CategoryID'),
+            'CategoryID' => self::logValue($Data, 'CategoryID'),
             'OtherUserIDs' => implode(',', val('OtherUserIDs', $Options, [])),
             'Data' => dbencode($Data)
         ];
@@ -430,13 +430,13 @@ class LogModel extends Gdn_Pluggable {
                 $Set['Data'] = dbencode($Data);
                 $Set['DateUpdated'] = Gdn_Format::toDateTime();
 
-                if (self::$_TransactionID > 0) {
-                    $Set['TransactionLogID'] = self::$_TransactionID;
-                } elseif (self::$_TransactionID === true) {
+                if (self::$transactionID > 0) {
+                    $Set['TransactionLogID'] = self::$transactionID;
+                } elseif (self::$transactionID === true) {
                     if ($LogRow2['TransactionLogID']) {
-                        self::$_TransactionID = $LogRow2['TransactionLogID'];
+                        self::$transactionID = $LogRow2['TransactionLogID'];
                     } else {
-                        self::$_TransactionID = $LogID;
+                        self::$transactionID = $LogID;
                         $Set['TransactionLogID'] = $LogID;
                     }
                 }
@@ -447,19 +447,19 @@ class LogModel extends Gdn_Pluggable {
                     ['LogID' => $LogID]
                 );
             } else {
-                $L = self::_Instance();
+                $L = self::instance();
                 $L->EventArguments['Log'] =& $LogRow;
                 $L->fireEvent('BeforeInsert');
 
-                if (self::$_TransactionID > 0) {
-                    $LogRow['TransactionLogID'] = self::$_TransactionID;
+                if (self::$transactionID > 0) {
+                    $LogRow['TransactionLogID'] = self::$transactionID;
                 }
 
                 $LogID = Gdn::sql()->insert('Log', $LogRow);
 
-                if (self::$_TransactionID === true) {
+                if (self::$transactionID === true) {
                     // A new transaction was started and needs to assigned.
-                    self::$_TransactionID = $LogID;
+                    self::$transactionID = $LogID;
                     Gdn::sql()->put('Log', ['TransactionLogID' => $LogID], ['LogID' => $LogID]);
                 }
 
@@ -467,20 +467,20 @@ class LogModel extends Gdn_Pluggable {
                 $L->fireEvent('AfterInsert');
             }
         } else {
-            if (self::$_TransactionID > 0) {
-                $LogRow['TransactionLogID'] = self::$_TransactionID;
+            if (self::$transactionID > 0) {
+                $LogRow['TransactionLogID'] = self::$transactionID;
             }
 
             // Insert the log entry.
-            $L = self::_Instance();
+            $L = self::instance();
             $L->EventArguments['Log'] =& $LogRow;
             $L->fireEvent('BeforeInsert');
 
             $LogID = Gdn::sql()->insert('Log', $LogRow);
 
-            if (self::$_TransactionID === true) {
+            if (self::$transactionID === true) {
                 // A new transaction was started and needs to assigned.
-                self::$_TransactionID = $LogID;
+                self::$transactionID = $LogID;
                 Gdn::sql()->put('Log', ['TransactionLogID' => $LogID], ['LogID' => $LogID]);
             }
 
@@ -495,12 +495,12 @@ class LogModel extends Gdn_Pluggable {
      *
      * @return LogModel
      */
-    protected static function _Instance() {
-        if (!self::$_Instance) {
-            self::$_Instance = new LogModel();
+    private static function instance() {
+        if (!self::$instance) {
+            self::$instance = new LogModel();
         }
 
-        return self::$_Instance;
+        return self::$instance;
     }
 
     /**
@@ -540,7 +540,7 @@ class LogModel extends Gdn_Pluggable {
      * @param string $BakKey2
      * @return null
      */
-    protected static function _LogValue($Data, $LogKey, $BakKey1 = '', $BakKey2 = '') {
+    private static function logValue($Data, $LogKey, $BakKey1 = '', $BakKey2 = '') {
         $Data = (array)$Data;
         if (isset($Data[$LogKey]) && $LogKey != $BakKey1) {
             $Result = $Data[$LogKey];
@@ -564,18 +564,18 @@ class LogModel extends Gdn_Pluggable {
      * @throws Exception
      */
     public function recalculate() {
-        if ($DiscussionIDs = val('Discussion', $this->_RecalcIDs)) {
+        if ($DiscussionIDs = val('Discussion', $this->recalcIDs)) {
             $In = implode(',', array_keys($DiscussionIDs));
 
             if (!empty($In)) {
                 $Px = Gdn::database()->DatabasePrefix;
                 $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
                 Gdn::database()->query($Sql);
-                $this->_RecalcIDs['Discussion'] = [];
+                $this->recalcIDs['Discussion'] = [];
             }
         }
 
-        if ($UserIDsComment = val('UserComment', $this->_RecalcIDs)) {
+        if ($UserIDsComment = val('UserComment', $this->recalcIDs)) {
             $counts = $this->arrayFlipAndCombine($UserIDsComment);
 
             foreach ($counts as $key => $value) {
@@ -585,10 +585,10 @@ class LogModel extends Gdn_Pluggable {
                     ->where('UserID', $value)
                     ->put();
             }
-            $this->_RecalcIDs['UserComment'] = [];
+            $this->recalcIDs['UserComment'] = [];
         }
 
-        if ($UserIDsDiscussion = val('UserDiscussion', $this->_RecalcIDs)) {
+        if ($UserIDsDiscussion = val('UserDiscussion', $this->recalcIDs)) {
             $counts = $this->arrayFlipAndCombine($UserIDsDiscussion);
 
             foreach ($counts as $key => $value) {
@@ -598,7 +598,7 @@ class LogModel extends Gdn_Pluggable {
                     ->where('UserID', $value)
                     ->put();
             }
-            $this->_RecalcIDs['UserDiscussion'] = [];
+            $this->recalcIDs['UserDiscussion'] = [];
         }
     }
 
@@ -652,7 +652,7 @@ class LogModel extends Gdn_Pluggable {
 
 //      decho($Log, 'Log');
 
-        $this->_RestoreOne($Log, $DeleteLog);
+        $this->restoreOne($Log, $DeleteLog);
         // Check for a transaction.
         if ($TransactionID = $Log['TransactionLogID']) {
             $Logs = $this->getWhere(['TransactionLogID' => $TransactionID], '', 'asc', 0, 200);
@@ -661,7 +661,7 @@ class LogModel extends Gdn_Pluggable {
                     continue;
                 }
 
-                $this->_RestoreOne($LogRow, $DeleteLog);
+                $this->restoreOne($LogRow, $DeleteLog);
             }
         }
         // Check for child data.
@@ -675,7 +675,7 @@ class LogModel extends Gdn_Pluggable {
                         $LogRow['ParentRecordID'] = $Row['DiscussionID'];
                     }
 
-                    $this->_RestoreOne($LogRow, false);
+                    $this->restoreOne($LogRow, false);
                 }
             }
         }
@@ -691,7 +691,7 @@ class LogModel extends Gdn_Pluggable {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    protected function _RestoreOne($Log, $DeleteLog = true) {
+    private function restoreOne($Log, $DeleteLog = true) {
         // Throw an event to see if the restore is being overridden.
         $Handled = false;
         $this->EventArguments['Handled'] =& $Handled;
@@ -732,8 +732,6 @@ class LogModel extends Gdn_Pluggable {
             $Data[$Attr]['RestoreUserID'] = Gdn::session()->UserID;
             $Data[$Attr]['DateRestored'] = Gdn_Format::toDateTime();
         }
-
-//      decho($Data, 'Row being restored');
 
         if (!isset($Columns[$TableName])) {
             $Columns[$TableName] = Gdn::sql()->FetchColumns($TableName);
@@ -810,10 +808,10 @@ class LogModel extends Gdn_Pluggable {
                     if ($Log['Operation'] != 'Edit') {
                         switch ($Log['RecordType']) {
                             case 'Discussion':
-                                $this->_RecalcIDs['Discussion'][$ID] = true;
+                                $this->recalcIDs['Discussion'][$ID] = true;
                                 break;
                             case 'Comment':
-                                $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = true;
+                                $this->recalcIDs['Discussion'][$Log['ParentRecordID']] = true;
                                 break;
                         }
                     }
@@ -821,17 +819,17 @@ class LogModel extends Gdn_Pluggable {
                     if ($Log['Operation'] == 'Pending') {
                         switch ($Log['RecordType']) {
                             case 'Discussion':
-                                if (val('UserDiscussion', $this->_RecalcIDs) && val($Log['RecordUserID'], $this->_RecalcIDs['UserDiscussion'])) {
-                                    $this->_RecalcIDs['UserDiscussion'][$Log['RecordUserID']]++;
+                                if (val('UserDiscussion', $this->recalcIDs) && val($Log['RecordUserID'], $this->recalcIDs['UserDiscussion'])) {
+                                    $this->recalcIDs['UserDiscussion'][$Log['RecordUserID']]++;
                                 } else {
-                                    $this->_RecalcIDs['UserDiscussion'][$Log['RecordUserID']] = 1;
+                                    $this->recalcIDs['UserDiscussion'][$Log['RecordUserID']] = 1;
                                 }
                                 break;
                             case 'Comment':
-                                if (val('UserComment', $this->_RecalcIDs) && val($Log['RecordUserID'], $this->_RecalcIDs['UserComment'])) {
-                                    $this->_RecalcIDs['UserComment'][$Log['RecordUserID']]++;
+                                if (val('UserComment', $this->recalcIDs) && val($Log['RecordUserID'], $this->recalcIDs['UserComment'])) {
+                                    $this->recalcIDs['UserComment'][$Log['RecordUserID']]++;
                                 } else {
-                                    $this->_RecalcIDs['UserComment'][$Log['RecordUserID']] = 1;
+                                    $this->recalcIDs['UserComment'][$Log['RecordUserID']] = 1;
                                 }
                                 break;
                         }

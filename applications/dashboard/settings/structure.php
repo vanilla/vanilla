@@ -789,12 +789,5 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
 }
 
 // Make sure the smarty folders exist.
-if (!file_exists(PATH_CACHE.'/Smarty')) {
-    @mkdir(PATH_CACHE.'/Smarty');
-}
-if (!file_exists(PATH_CACHE.'/Smarty/cache')) {
-    @mkdir(PATH_CACHE.'/Smarty/cache');
-}
-if (!file_exists(PATH_CACHE.'/Smarty/compile')) {
-    @mkdir(PATH_CACHE.'/Smarty/compile');
-}
+touchFolder(PATH_CACHE.'/Smarty/cache');
+touchFolder(PATH_CACHE.'/Smarty/compile');

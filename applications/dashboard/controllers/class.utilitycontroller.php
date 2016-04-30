@@ -143,8 +143,6 @@ class UtilityController extends DashboardController {
 
     /**
      * Update database structure based on current definitions in each app's structure.php file.
-     *
-     * @param string $appName Unique app name or 'all' (default).
      */
     public function structure() {
         $this->permission('Garden.Settings.Manage');
@@ -198,7 +196,7 @@ class UtilityController extends DashboardController {
         $capturedSql = $updateModel->runStructure($captureOnly);
         $this->setData('CapturedSql', $capturedSql);
 
-        $addons = array_reverse(Gdn::addonManager()->getEnabled());
+        $issues = Gdn::structure()->getIssues();
         if ($this->Form->errorCount() == 0 && !$captureOnly) {
             if (empty($issues)) {
                 $this->setData('Status', 'The structure was successfully executed.');

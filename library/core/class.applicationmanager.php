@@ -330,7 +330,7 @@ class Gdn_ApplicationManager {
      */
     public function isEnabled($Name) {
         deprecated('Gdn_ApplicationManager->isEnabled()', 'AddonManager->isEnabled()');
-        return $this->addonManager->isEnabled($Name);
+        return $this->addonManager->isEnabled($Name, Addon::TYPE_ADDON);
     }
 
     /**

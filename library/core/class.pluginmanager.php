@@ -555,10 +555,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      *
      * @param string $pluginName The name of the plugin.
      * @return bool Returns **true** if the plugin is enabled or **false** otherwise.
-     * @deprecated Use {@link Gdn_PluginManager::isEnabled()} instead.
+     * @deprecated Use {@link AddonManager::isEnabled()} instead.
      */
     public function checkPlugin($pluginName) {
-        deprecated('Gdn_PluginManager->checkPlugin()', 'Gdn_PluginManager->isEnabled()');
+        deprecated('Gdn_PluginManager->checkPlugin()', 'AddonManager->isEnabled()');
         $result = $this->isEnabled($pluginName);
         return $result;
     }
@@ -685,11 +685,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      *
      * @param string $Name The name of the plugin.
      * @return bool Whether or not the plugin is enabled.
-     * @since 2.2
+     * @deprecated
      */
     public function isEnabled($Name) {
-        $Enabled = $this->enabledPlugins;
-        return isset($Enabled[$Name]) && $Enabled[$Name];
+        deprecated('Gdn_PluginManager->isEnabled()', 'AddonManager->isEnabled()');
+        $enabled = $this->addonManager->isEnabled($Name, Addon::TYPE_ADDON);
+        return $enabled;
     }
 
     /**

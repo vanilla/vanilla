@@ -18,16 +18,16 @@ class LogModel extends Gdn_Pluggable {
     private static $transactionID = null;
 
     /**
-     *
+     * Begin a log transaction.
      */
     public static function beginTransaction() {
         self::$transactionID = true;
     }
 
     /**
+     * Purge entries from the log.
      *
-     *
-     * @param $LogIDs
+     * @param int[]|string $LogIDs An array or CSV of log IDs.
      */
     public function delete($LogIDs) {
         if (!is_array($LogIDs)) {
@@ -52,7 +52,7 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     *
+     * End a log transaction.
      */
     public static function endTransaction() {
         self::$transactionID = null;
@@ -61,8 +61,8 @@ class LogModel extends Gdn_Pluggable {
     /**
      * Format the content of a log file.
      *
-     * @param $Log
-     * @return array|string
+     * @param array $Log The log entry to format.
+     * @return string Returns the formatted log entry.
      */
     public function formatContent($Log) {
         $Data = $Log['Data'];
@@ -71,25 +71,25 @@ class LogModel extends Gdn_Pluggable {
 
         switch ($Log['RecordType']) {
             case 'Activity':
-                $Result = $this->FormatKey('Story', $Data);
+                $Result = $this->formatKey('Story', $Data);
                 break;
             case 'Discussion':
                 $Result =
-                    '<b>'.$this->FormatKey('Name', $Data).'</b><br />'.
-                    $this->FormatKey('Body', $Data);
+                    '<b>'.$this->formatKey('Name', $Data).'</b><br />'.
+                    $this->formatKey('Body', $Data);
                 break;
             case 'ActivityComment':
             case 'Comment':
-                $Result = $this->FormatKey('Body', $Data);
+                $Result = $this->formatKey('Body', $Data);
                 break;
             case 'Configuration':
-                $Result = $this->FormatConfiguration($Data);
+                $Result = $this->formatConfiguration($Data);
                 break;
             case 'Registration':
             case 'User':
-                $Result = $this->FormatRecord(['Email', 'Name'], $Data);
+                $Result = $this->formatRecord(['Email', 'Name'], $Data);
                 if ($DiscoveryText = val('DiscoveryText', $Data)) {
-                    $Result .= '<br /><b>'.t('Why do you want to join?').'</b><br />'.Gdn_Format::Display($DiscoveryText);
+                    $Result .= '<br /><b>'.t('Why do you want to join?').'</b><br />'.Gdn_Format::display($DiscoveryText);
                 }
                 if (val('Banned', $Data)) {
                     $Result .= "<br />".t('Banned');
@@ -102,10 +102,10 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Format a configuration subtree.
      *
-     *
-     * @param $Data
-     * @return array|string
+     * @param array $Data The data to format.
+     * @return string Returns the formatted entry.
      */
     public function formatConfiguration($Data) {
         $Old = $Data;
@@ -114,7 +114,7 @@ class LogModel extends Gdn_Pluggable {
 
         $Old = Gdn_Configuration::format($Old);
         $New = Gdn_Configuration::format($New);
-        $Diffs = $this->FormatDiff($Old, $New, 'raw');
+        $Diffs = $this->formatDiff($Old, $New, 'raw');
 
         $Result = [];
         foreach ($Diffs as $Diff) {
@@ -137,20 +137,20 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Format a specific column from the log.
      *
-     *
-     * @param $Key
-     * @param $Data
-     * @return string
+     * @param string $Key The key in the log row to format.
+     * @param array $Data The log row.
+     * @return string Returns the formatted entry.
      */
     public function formatKey($Key, $Data) {
         if (!is_array($Data)) {
             $Data = (array)$Data;
         }
-        if (isset($Data['_New']) && isset($Data['_New'][$Key])) {
+        if (isset($Data['_New'][$Key])) {
             $Old = htmlspecialchars(val($Key, $Data, ''));
             $New = htmlspecialchars($Data['_New'][$Key]);
-            $Result = $this->FormatDiff($Old, $New);
+            $Result = $this->formatDiff($Old, $New);
         } else {
             $Result = htmlspecialchars(val($Key, $Data, ''));
         }
@@ -158,11 +158,11 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Format a record that the log points to.
      *
-     *
-     * @param $Keys
-     * @param $Data
-     * @return array|string
+     * @param string[] $Keys The keys to use from the record.
+     * @param array $Data The log row.
+     * @return string Returns the formatted record.
      */
     public function formatRecord($Keys, $Data) {
         $Result = [];
@@ -181,12 +181,12 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Format a diff of an edit.
      *
-     *
-     * @param $Old
-     * @param $New
-     * @param string $Method
-     * @return string
+     * @param array $Old The record before the edit.
+     * @param array $New The record after the edit.
+     * @param string $Method Either **normal**, **html**, or **mixed**.
+     * @return string|array Returns the diff formatted according to {@link $Method}.
      */
     public function formatDiff($Old, $New, $Method = 'html') {
         static $TinyDiff = null;
@@ -201,10 +201,10 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Get the log rows by array of IDs.
      *
-     *
-     * @param $IDs
-     * @return array|null
+     * @param int[]|string $IDs And array or CSV of IDs.
+     * @return array Returns an array of log rows.
      */
     public function getIDs($IDs) {
         if (is_string($IDs)) {
@@ -227,15 +227,14 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Get log rows by a query.
      *
-     *
-     * @param bool $Where
-     * @param string $OrderFields
-     * @param string $OrderDirection
-     * @param bool $Offset
-     * @param bool $Limit
-     * @return array|null
-     * @throws Exception
+     * @param array|false $Where The where filter.
+     * @param string $OrderFields The fields to order by.
+     * @param string $OrderDirection The order direction.
+     * @param bool $Offset The database offset.
+     * @param bool $Limit The database limit.
+     * @return array Returns a data set.
      */
     public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Offset = false, $Limit = false) {
         if ($Offset < 0) {
@@ -270,10 +269,10 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Get the count of log entries matching a query.
      *
-     *
-     * @param $Where
-     * @return mixed
+     * @param array $Where The filter.
+     * @return int Returns the count.
      */
     public function getCountWhere($Where) {
         if (isset($Where['Operation'])) {
@@ -291,10 +290,10 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Wrapper for GetCountWhere that takes care of caching specific operation counts.
+     * A wrapper for GetCountWhere that takes care of caching specific operation counts.
      *
      * @param string $Operation Comma-delimited list of operation types to get (sum of) counts for.
-     * @return int
+     * @return int Returns a count.
      */
     public function getOperationCount($Operation) {
         if ($Operation == 'edits') {
@@ -330,11 +329,12 @@ class LogModel extends Gdn_Pluggable {
      * @param array $Data The record data.
      *  - If you are logging just one row then pass the row as an array.
      *  - You can pass an additional _New element to tell the logger what the new data is.
-     * @return int The log id.
+     * @param array $Options Additional options to affect the insert.
+     * @return int|false The log ID or **false** if there was a problem.
      */
     public static function insert($Operation, $RecordType, $Data, $Options = []) {
         if ($Operation === false) {
-            return;
+            return false;
         }
 
         if (!is_array($Data)) {
@@ -346,7 +346,7 @@ class LogModel extends Gdn_Pluggable {
             $InsertUserID = Gdn::session()->UserID;
         }
         if (($InsertIPAddress = self::logValue($Data, 'Log_InsertIPAddress')) == null) {
-            $InsertIPAddress = Gdn::request()->IPAddress();
+            $InsertIPAddress = Gdn::request()->ipAddress();
         }
         // Do some known translations for the parent record ID.
         if (($ParentRecordID = self::logValue($Data, 'ParentRecordID')) === null) {
@@ -491,9 +491,9 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Returns the shared instance of this class.
      *
-     *
-     * @return LogModel
+     * @return LogModel Returns the instance.
      */
     private static function instance() {
         if (!self::$instance) {
@@ -504,12 +504,12 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Log a record edit.
      *
-     *
-     * @param $Operation
-     * @param $RecordType
-     * @param $NewData
-     * @param null $OldData
+     * @param string $Operation The specific operation being logged.
+     * @param string $RecordType The type of record. This matches the name of the record's table.
+     * @param array $NewData The record after the edit.
+     * @param array|null $OldData The record before the edit.
      */
     public static function logChange($Operation, $RecordType, $NewData, $OldData = null) {
         $RecordID = isset($NewData['RecordID']) ? $NewData['RecordID'] : val($RecordType.'ID', $NewData);
@@ -532,13 +532,13 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Get a value from a log entry.
      *
-     *
-     * @param $Data
-     * @param $LogKey
-     * @param string $BakKey1
-     * @param string $BakKey2
-     * @return null
+     * @param array $Data The log row.
+     * @param string $LogKey The key in the log row.
+     * @param string $BakKey1 A key to look at if the first key isn't found.
+     * @param string $BakKey2 A key to look at if the second key isn't found.
+     * @return mixed Returns the value.
      */
     private static function logValue($Data, $LogKey, $BakKey1 = '', $BakKey2 = '') {
         $Data = (array)$Data;
@@ -559,9 +559,7 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     *
-     *
-     * @throws Exception
+     * Recalculate a record after a log operation.
      */
     public function recalculate() {
         if ($DiscussionIDs = val('Discussion', $this->recalcIDs)) {
@@ -608,12 +606,12 @@ class LogModel extends Gdn_Pluggable {
      * In case of multiple values with the several occurrences, this reserves all original keys by
      * pushing them onto an array.
      *
-     * @param array $array An array in the format {[id1] => count, [id2] => count }
-     * @return array A 2D array the format {[count] => [id1, id2]}
+     * @param array $array An array in the format {[id1] => count, [id2] => count }.
+     * @return array|null A 2D array the format {[count] => [id1, id2]}
      */
     public function arrayFlipAndCombine($array) {
         if (!$array) {
-            return;
+            return null;
         }
         $uniqueValues = array_unique(array_values($array));
         $newArray = [];
@@ -629,16 +627,13 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
+     * Restore an entry from the log.
      *
-     *
-     * @param $Log
-     * @param bool $DeleteLog
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @param array|int $Log The log row or the ID of the log row.
+     * @param bool $DeleteLog Whether or not to delete the log row after restoring.
+     * @throws Gdn_UserException Throws an exception if the log entry isn't found.
      */
     public function restore($Log, $DeleteLog = true) {
-        static $Columns = [];
-
         if (is_numeric($Log)) {
             // Grab the log.
             $LogID = $Log;
@@ -649,8 +644,6 @@ class LogModel extends Gdn_Pluggable {
             }
             $Log = array_pop($Log);
         }
-
-//      decho($Log, 'Log');
 
         $this->restoreOne($Log, $DeleteLog);
         // Check for a transaction.
@@ -679,17 +672,14 @@ class LogModel extends Gdn_Pluggable {
                 }
             }
         }
-
-//      die();
     }
 
     /**
+     * Restores a single entry from the log.
      *
-     *
-     * @param $Log
-     * @param bool $DeleteLog
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @param array $Log The log entry.
+     * @param bool $DeleteLog Whether or not to delete the log entry after the restore.
+     * @throws Exception Throws an exception if restoring the record causes a validation error.
      */
     private function restoreOne($Log, $DeleteLog = true) {
         // Throw an event to see if the restore is being overridden.
@@ -734,7 +724,7 @@ class LogModel extends Gdn_Pluggable {
         }
 
         if (!isset($Columns[$TableName])) {
-            $Columns[$TableName] = Gdn::sql()->FetchColumns($TableName);
+            $Columns[$TableName] = Gdn::sql()->fetchColumns($TableName);
         }
 
         $Set = array_flip($Columns[$TableName]);
@@ -769,11 +759,8 @@ class LogModel extends Gdn_Pluggable {
             case 'Moderate':
             case 'Pending':
             case 'Ban':
-                $IDColumn = $Log['RecordType'].'ID';
-
                 if (!$Log['RecordID']) {
                     // This log entry was never in the table.
-//               unset($TableName);
                     if (isset($Set['DateInserted'])) {
                         $Set['DateInserted'] = Gdn_Format::toDateTime();
                     }
@@ -785,15 +772,15 @@ class LogModel extends Gdn_Pluggable {
                     if (isset($Data['Username'])) {
                         $Set['Name'] = $Data['Username'];
                     }
-                    $ID = Gdn::userModel()->InsertForBasic($Set, false, ['ValidateSpam' => false]);
+                    $ID = Gdn::userModel()->insertForBasic($Set, false, ['ValidateSpam' => false]);
                     if (!$ID) {
                         throw new Exception(Gdn::userModel()->Validation->resultsText());
                     } else {
-                        Gdn::userModel()->SendWelcomeEmail($ID, '', 'Register');
+                        Gdn::userModel()->sendWelcomeEmail($ID, '', 'Register');
                     }
                 } else {
                     $ID = Gdn::sql()
-                        ->Options('Replace', true)
+                        ->options('Replace', true)
                         ->insert($TableName, $Set);
                     if (!$ID && isset($Log['RecordID'])) {
                         $ID = $Log['RecordID'];

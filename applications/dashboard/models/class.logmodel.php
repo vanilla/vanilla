@@ -183,8 +183,8 @@ class LogModel extends Gdn_Pluggable {
     /**
      * Format a diff of an edit.
      *
-     * @param array $Old The record before the edit.
-     * @param array $New The record after the edit.
+     * @param string $Old The record before the edit.
+     * @param string $New The record after the edit.
      * @param string $Method Either **normal**, **html**, or **mixed**.
      * @return string|array Returns the diff formatted according to {@link $Method}.
      */

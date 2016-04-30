@@ -178,7 +178,13 @@ class AddonManager {
             $addons = [];
             foreach ($index as $key => $subdir) {
                 $caseKey = basename($subdir);
-                $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
+                try {
+                    $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
+                } catch (\Exception $ex) {
+                    // TODO: Log this.
+                    // Clear the addon out of the index.
+                    $this->deleteSingleIndexKey($type, $key);
+                }
             }
             return $addons;
         }
@@ -338,6 +344,26 @@ class AddonManager {
             }
         }
         return $this->singleIndex[$type];
+    }
+
+    /**
+     * Delete an item from a single index and re-cache it.
+     *
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @param string $key The index key.
+     * @return bool Returns **true** if the item was in the index or **false** otherwise.
+     */
+    private function deleteSingleIndexKey($type, $key) {
+        $index = $this->getSingleIndex($type);
+        if (isset($index[$key])) {
+            unset($index[$key]);
+
+            $cachePath = $this->cacheDir."/$type-index.php";
+            static::saveArrayCache($cachePath, $index);
+            $this->singleIndex[$type] = $index;
+            return true;
+        }
+        return false;
     }
 
     /**

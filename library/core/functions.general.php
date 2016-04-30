@@ -262,16 +262,16 @@ if (!function_exists('assetVersion')) {
                 switch ($type) {
                     case 'plugins':
                     case 'applications':
-                            $addon = Gdn::addonManager()->lookupAddon($Key);
-                            if ($addon) {
+                        $addon = Gdn::addonManager()->lookupAddon($key);
+                        if ($addon) {
+                            $version = $addon->getVersion();
+                        }
                         break;
                     case 'themes':
-                            if ($ThemeVersion === null) {
-                                $theme = Gdn::addonManager()->lookupTheme(theme());
-                                if ($theme) {
-                                $themeVersion = val('Version', $themeInfo, $version);
-                            } else {
-                                    $ThemeVersion = $theme->getVersion();
+                        if ($themeVersion === null) {
+                            $theme = Gdn::addonManager()->lookupTheme(theme());
+                            if ($theme) {
+                                $themeVersion = $theme->getVersion();
                             }
                         }
                         $version = $themeVersion;

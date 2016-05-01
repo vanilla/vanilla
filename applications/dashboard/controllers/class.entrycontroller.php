@@ -623,7 +623,7 @@ EOT;
             }
 
             if (!isset($NameFound) && !$IsPostBack) {
-                $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
+                $this->Form->setValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
             if (!$allowConnect) {

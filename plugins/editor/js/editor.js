@@ -1492,6 +1492,10 @@
                     $currentEditorToolbar.show();
                 });
 
+                $(document).on('click', 'input.CommentButton', function() {
+                    $currentEditorToolbar.show();
+                });
+
                 switch (format) {
                     case 'wysiwyg':
                     case 'ipb':

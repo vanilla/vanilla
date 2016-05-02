@@ -848,15 +848,16 @@ class CommentModel extends VanillaModel {
                 $Fields = $this->Validation->SchemaValidationFields();
                 unset($Fields[$this->PrimaryKey]);
 
+                $CommentData = $CommentID ? array_merge($Fields, ['CommentID' => $CommentID]) : $Fields;
                 // Check for spam
-                $spam = SpamModel::isSpam('Comment', array_merge($Fields, array('CommentID' => $CommentID)));
+                $spam = SpamModel::isSpam('Comment', $CommentData);
                 if ($spam) {
                     return SPAM;
                 }
 
                 $isValid = true;
                 $invalidReturnType = false;
-                $this->EventArguments['CommentData'] = $CommentID ? array_merge($Fields, array('CommentID' => $CommentID)) : $Fields;
+                $this->EventArguments['CommentData'] = $CommentData;
                 $this->EventArguments['IsValid'] = &$isValid;
                 $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
                 $this->fireEvent('AfterValidateComment');

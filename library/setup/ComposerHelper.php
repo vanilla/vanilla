@@ -20,14 +20,17 @@ class ComposerHelper {
     private static function clearAddonManagerCache() {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
-        unlink($cacheDir.'/addon.php');
-
         $paths = array_merge(
+            [$cacheDir.'/addon.php'],
             glob($cacheDir.'/locale/*.php'),
             glob($cacheDir.'/theme/*.php'),
             glob($cacheDir.'/*-index.php')
         );
-        array_map('unlink', $paths);
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
     }
 
     /**

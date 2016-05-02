@@ -87,7 +87,7 @@ class Gdn_Smarty {
         $Locale = Gdn::locale()->Locale;
         $CurrentLocale = array(
             'Key' => $Locale,
-            'Lang' => str_replace('_', '-', $Locale) // mirrors html5 lang attribute
+            'Lang' => str_replace('_', '-', Gdn::locale()->language(true)) // mirrors html5 lang attribute
         );
         if (class_exists('Locale')) {
             $CurrentLocale['Language'] = Locale::getPrimaryLanguage($Locale);

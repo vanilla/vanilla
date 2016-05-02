@@ -117,7 +117,7 @@ class NewDiscussionModule extends Gdn_Module {
 
             // Present a signin redirect for a $PrivilegedGuest.
             if (!$HasPermission) {
-                $Url = $this->GuestUrl . '?Target=' . $Url;
+                $Url = $this->GuestUrl.'?Target='.$Url;
             }
 
             $this->addButton(t(val('AddText', $Type)), $Url);

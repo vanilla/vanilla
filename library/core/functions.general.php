@@ -342,47 +342,65 @@ if (!function_exists('asset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            if (is_null($Version)) {
-                $Version = APPLICATION_VERSION;
-                if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                    $Type = $Matches[1];
-                    $Key = $Matches[2];
-                    static $ThemeVersion = null;
-
-                    switch ($Type) {
-                        case 'plugins':
-                            $PluginInfo = Gdn::pluginManager()->getPluginInfo($Key);
-                            $Version = val('Version', $PluginInfo, $Version);
-                            break;
-                        case 'applications':
-                            $AppInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($Key));
-                            $Version = val('Version', $AppInfo, $Version);
-                            break;
-                        case 'themes':
-                            if ($ThemeVersion === null) {
-                                $ThemeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                                if ($ThemeInfo !== false) {
-                                    $ThemeVersion = val('Version', $ThemeInfo, $Version);
-                                } else {
-                                    $ThemeVersion = $Version;
-                                }
-                            }
-                            $Version = $ThemeVersion;
-                            break;
-                    }
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination, $Version);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
+    }
+}
+
+if (!function_exists('assetVersion')) {
+    /**
+     * Get a version string for a given asset.
+     *
+     * @param string $destination The path of the asset.
+     * @param string|null $version A known version for the asset or **null** to grab it from the addon's info array.
+     * @return string Returns a version string.
+     */
+    function assetVersion($destination, $version = null) {
+        static $gracePeriod = 90;
+
+        // Figure out which version to put after the asset.
+        if (is_null($version)) {
+            $version = APPLICATION_VERSION;
+            if (preg_match('`^/([^/]+)/([^/]+)/`', $destination, $matches)) {
+                $type = $matches[1];
+                $key = $matches[2];
+                static $themeVersion = null;
+
+                switch ($type) {
+                    case 'plugins':
+                        $pluginInfo = Gdn::pluginManager()->getPluginInfo($key);
+                        $version = val('Version', $pluginInfo, $version);
+                        break;
+                    case 'applications':
+                        $applicationInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($key));
+                        $version = val('Version', $applicationInfo, $version);
+                        break;
+                    case 'themes':
+                        if ($themeVersion === null) {
+                            $themeInfo = Gdn::themeManager()->getThemeInfo(Theme());
+                            if ($themeInfo !== false) {
+                                $themeVersion = val('Version', $themeInfo, $version);
+                            } else {
+                                $themeVersion = $version;
+                            }
+                        }
+                        $version = $themeVersion;
+                        break;
+                }
+            }
+        }
+
+        // Add a timestamp component to the version if available.
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + $gracePeriod;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $version .= '.'.dechex($timestamp);
+        }
+        return $version;
     }
 }
 
@@ -722,6 +740,45 @@ if (!function_exists('safePrint')) {
     }
 }
 
+if (!function_exists('dbdecode')) {
+    /**
+     * Decode a value retrieved from database storage.
+     *
+     * @param string $value An encoded string representation of a value to be decoded.
+     * @return mixed A decoded value on success or false on failure.
+     */
+    function dbdecode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        } elseif (is_array($value)) {
+            // This handles a common double decoding scenario.
+            return $value;
+        }
+
+        $decodedValue = @unserialize($value);
+
+        return $decodedValue;
+    }
+}
+
+if (!function_exists('dbencode')) {
+    /**
+     * Encode a value in preparation for database storage.
+     *
+     * @param mixed $value A value to be encoded.
+     * @return mixed An encoded string representation of the provided value or false on failure.
+     */
+    function dbencode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $encodedValue = serialize($value);
+
+        return $encodedValue;
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.
@@ -946,7 +1003,8 @@ if (!function_exists('fetchPageInfo')) {
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
                 'Timeout' => $timeout,
-                'Cookies' => $sendCookies
+                'Cookies' => $sendCookies,
+                'Redirects' => true,
             ));
 
             if (!$Request->status()) {
@@ -3102,6 +3160,23 @@ if (!function_exists('safeRedirect')) {
     }
 }
 
+if (!function_exists('safeUnlink')) {
+    /**
+     * A version of {@link unlinl()} that won't raise a warning.
+     * 
+     * @param string $filename Path to the file.
+     * @return Returns TRUE on success or FALSE on failure.
+     */
+    function safeUnlink($filename) {
+        try {
+            $r = unlink($filename);
+            return $r;
+        } catch (\Exception $ex) {
+            return false;
+        }
+    }
+}
+
 if (!function_exists('saveToConfig')) {
     /**
      * Save values to the application's configuration file.
@@ -3259,39 +3334,8 @@ if (!function_exists('smartAsset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            $Version = APPLICATION_VERSION;
-            if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                $Type = $Matches[1];
-                $Key = $Matches[2];
-                static $ThemeVersion = null;
-
-                switch ($Type) {
-                    case 'plugins':
-                        $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
-                        $Version = GetValue('Version', $PluginInfo, $Version);
-                        break;
-                    case 'themes':
-                        if ($ThemeVersion === null) {
-                            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
-                            if ($ThemeInfo !== false) {
-                                $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
-                            } else {
-                                $ThemeVersion = $Version;
-                            }
-                        }
-                        $Version = $ThemeVersion;
-                        break;
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
     }

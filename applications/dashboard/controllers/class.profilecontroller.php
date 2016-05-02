@@ -743,7 +743,7 @@ class ProfileController extends Gdn_Controller {
                     // Generate the target image name.
                     $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
                     $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
-                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS . '/', false, true);
+                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', false, true);
 
                     // Delete any previously uploaded image.
                     $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
@@ -846,7 +846,7 @@ class ProfileController extends Gdn_Controller {
 
         // Get user data
         $this->getUserInfo($UserReference, $Username, $UserID, true);
-        $UserPrefs = Gdn_Format::unserialize($this->User->Preferences);
+        $UserPrefs = dbdecode($this->User->Preferences);
         if ($this->User->UserID != $Session->UserID) {
             $this->permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), false);
         }
@@ -1188,7 +1188,7 @@ class ProfileController extends Gdn_Controller {
                 Gdn::userModel()->setField($this->User->UserID, 'Photo', $UserPhoto);
 
                 // Remove the old profile picture.
-                @$Upload->delete($Basename);
+                $Upload->delete($Basename);
             } catch (Exception $Ex) {
                 $this->Form->addError($Ex);
             }
@@ -1200,7 +1200,7 @@ class ProfileController extends Gdn_Controller {
         }
         // Delete the source image if it is externally hosted.
         if ($PhotoParsed['Type']) {
-            @unlink($Source);
+            safeUnlink($Source);
         }
 
         $this->title(t('Edit My Thumbnail'));

@@ -22,7 +22,7 @@ class UpdateModel extends Gdn_Model {
      * @param $Addon
      * @param $Addons
      */
-    protected static function _addAddon($Addon, &$Addons) {
+    private static function addAddon($Addon, &$Addons) {
         $Slug = strtolower($Addon['AddonKey']).'-'.strtolower($Addon['AddonType']);
         $Addons[$Slug] = $Addon;
     }
@@ -32,16 +32,16 @@ class UpdateModel extends Gdn_Model {
      *
      * @param string $path Folder or zip file to look in.
      * @param array $fileNames List of files to attempt to locate inside $path.
-     * @return array|bool
+     * @return array
      * @throws Exception
      * @throws Gdn_UserException
      */
     public static function findFiles($path, $fileNames) {
         // Get the list of potential files to analyze.
         if (is_dir($path)) {
-            $entries = self::_getInfoFiles($path, $fileNames);
+            $entries = self::getInfoFiles($path, $fileNames);
         } else {
-            $entries = self::_getInfoZip($path, $fileNames);
+            $entries = self::getInfoZip($path, $fileNames);
         }
 
         return $entries;
@@ -51,7 +51,7 @@ class UpdateModel extends Gdn_Model {
      * Check an addon's file to extract the addon information out of it.
      *
      * @param string $Path The path to the file.
-     * @param bool $Fix Whether or not to fix files that have been zipped incorrectly.
+     * @param bool $ThrowError Whether or not to throw an exception if there is a problem analyzing the addon.
      * @return array An array of addon information.
      */
     public static function analyzeAddon($Path, $ThrowError = true) {
@@ -77,9 +77,10 @@ class UpdateModel extends Gdn_Model {
 
         // Get the list of potential files to analyze.
         if (is_dir($Path)) {
-            $Entries = self::_getInfoFiles($Path, $InfoPaths);
+            $Entries = self::getInfoFiles($Path, $InfoPaths);
+            $DeleteEntries = false;
         } else {
-            $Entries = self::_getInfoZip($Path, $InfoPaths, false, $ThrowError);
+            $Entries = self::getInfoZip($Path, $InfoPaths, false, $ThrowError);
             $DeleteEntries = true;
         }
 
@@ -179,8 +180,15 @@ class UpdateModel extends Gdn_Model {
         }
 
         // Add the addon requirements.
-        if ($Addon) {
-            $Requirements = arrayTranslate($Addon, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
+        if (!empty($Addon)) {
+            $Requirements = arrayTranslate(
+                $Addon,
+                [
+                    'RequiredApplications' => 'Applications',
+                    'RequiredPlugins' => 'Plugins',
+                    'RequiredThemes' => 'Themes'
+                ]
+            );
             foreach ($Requirements as $Type => $Items) {
                 if (!is_array($Items)) {
                     unset($Requirements[$Type]);
@@ -207,325 +215,25 @@ class UpdateModel extends Gdn_Model {
         }
 
         return $Addon;
-
-        // Figure out what kind of addon this is.
-        $Root = '';
-        $NewRoot = '';
-        $Addon = false;
-        foreach ($Entries as $Entry) {
-            $Name = '/'.ltrim($Entry['name'], '/');
-            $Filename = basename($Name);
-            $Folder = substr($Name, 0, -strlen($Filename));
-            $NewRoot = '';
-
-            // Check to see if the entry is a plugin file.
-            if ($Filename == 'default.php' || StringEndsWith($Filename, '.plugin.php')) {
-                if (count(explode('/', $Folder)) > 3) {
-                    // The file is too deep to be a plugin file.
-                    continue;
-                }
-
-                // This could be a plugin file, but we have to examine its info array.
-                $Zip->extractTo($FolderPath, $Entry['name']);
-                $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::parseInfoArray($FilePath, 'PluginInfo');
-                Gdn_FileSystem::removeFolder(dirname($FilePath));
-
-                if (!is_array($Info) || !count($Info)) {
-                    continue;
-                }
-
-                // Check to see if the info array conforms to a plugin spec.
-                $Key = key($Info);
-                $Info = $Info[$Key];
-                $Root = trim($Folder, '/');
-
-                $Valid = true;
-
-                // Make sure the key matches the folder name.
-                if ($Root && strcasecmp($Root, $Key) != 0) {
-                    $Result[] = "$Name: The plugin's key is not the same as its folder name.";
-                    $Valid = false;
-                } else {
-                    $NewRoot = $Root;
-                }
-
-                // Validate basic fields.
-                $checkResult = self::checkRequiredFields($Info);
-                if (count($checkResult)) {
-                    $Result = array_merge($Result, $checkResult);
-                    $Valid = false;
-                }
-
-                if ($Valid) {
-                    // The plugin was confirmed.
-                    $Addon = array(
-                        'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_PLUGIN,
-                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
-                        'Description' => $Info['Description'],
-                        'Version' => $Info['Version'],
-                        'License' => $Info['License'],
-                        'Path' => $Path);
-                    break;
-                }
-                continue;
-            }
-
-            // Check to see if the entry is an application file.
-            if (StringEndsWith($Name, '/settings/about.php')) {
-                if (count(explode('/', $Folder)) > 4) {
-                    $Result[] = "$Name: The application's info array was not in the correct location.";
-                    // The file is too deep to be a plugin file.
-                    continue;
-                }
-
-                // This could be a plugin file, but we have to examine its info array.
-                $Zip->extractTo($FolderPath, $Entry['name']);
-                $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::parseInfoArray($FilePath, 'ApplicationInfo');
-                Gdn_FileSystem::removeFolder(dirname($FilePath));
-
-                if (!is_array($Info) || !count($Info)) {
-                    $Result[] = "$Name: The application's info array could not be parsed.";
-                    continue;
-                }
-
-                $Key = key($Info);
-                $Info = $Info[$Key];
-                $Root = trim(substr($Name, 0, -strlen('/settings/about.php')), '/');
-                $Valid = true;
-
-                // Make sure the key matches the folder name.
-                if ($Root && strcasecmp($Root, $Key) != 0) {
-                    $Result[] = "$Name: The application's key is not the same as its folder name.";
-                    $Valid = false;
-                } else {
-                    $NewRoot = $Root;
-                }
-
-                // Validate basic fields.
-                $checkResult = self::checkRequiredFields($Info);
-                if (count($checkResult)) {
-                    $Result = array_merge($Result, $checkResult);
-                    $Valid = false;
-                }
-
-                if ($Valid) {
-                    // The application was confirmed.
-                    $Addon = array(
-                        'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_APPLICATION,
-                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
-                        'Description' => $Info['Description'],
-                        'Version' => $Info['Version'],
-                        'License' => $Info['License'],
-                        'Path' => $Path);
-                    break;
-                }
-                continue;
-            }
-
-            // Check to see if the entry is a theme file.
-            if (StringEndsWith($Name, '/about.php')) {
-                if (count(explode('/', $Folder)) > 3) {
-                    // The file is too deep to be a plugin file.
-                    continue;
-                }
-
-                // This could be a theme file, but we have to examine its info array.
-                $Zip->extractTo($FolderPath, $Entry['name']);
-                $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::parseInfoArray($FilePath, 'ThemeInfo');
-                Gdn_FileSystem::removeFolder(dirname($FilePath));
-
-                if (!is_array($Info) || !count($Info)) {
-                    continue;
-                }
-
-                $Key = key($Info);
-                $Info = $Info[$Key];
-                $Valid = true;
-
-                $Root = trim(substr($Name, 0, -strlen('/about.php')), '/');
-                // Make sure the theme is at least one folder deep.
-                if (strlen($Root) == 0) {
-                    $Result[] = $Name.': The theme must be in a folder.';
-                    $Valid = false;
-                }
-
-                // Validate basic fields.
-                $checkResult = self::checkRequiredFields($Info);
-                if (count($checkResult)) {
-                    $Result = array_merge($Result, $checkResult);
-                    $Valid = false;
-                }
-
-                if ($Valid) {
-                    // The application was confirmed.
-                    $Addon = array(
-                        'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_THEME,
-                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
-                        'Description' => $Info['Description'],
-                        'Version' => $Info['Version'],
-                        'License' => $Info['License'],
-                        'Path' => $Path);
-                    break;
-                }
-            }
-
-            if (StringEndsWith($Name, '/definitions.php')) {
-                if (count(explode('/', $Folder)) > 3) {
-                    // The file is too deep to be a plugin file.
-                    continue;
-                }
-
-                // This could be a locale pack, but we have to examine its info array.
-                $Zip->extractTo($FolderPath, $Entry['name']);
-                $FilePath = CombinePaths(array($FolderPath, $Name));
-                $Info = self::parseInfoArray($FilePath, 'LocaleInfo');
-                Gdn_FileSystem::removeFolder(dirname($FilePath));
-
-                if (!is_array($Info) || !count($Info)) {
-                    continue;
-                }
-
-                $Key = key($Info);
-                $Info = $Info[$Key];
-                $Valid = true;
-
-                $Root = trim(substr($Name, 0, -strlen('/definitions.php')), '/');
-                // Make sure the locale is at least one folder deep.
-                if ($Root != $Key) {
-                    $Result[] = $Name.': The locale pack\'s key must be the same as its folder name.';
-                    $Valid = false;
-                }
-
-                if (!val('Locale', $Info)) {
-                    $Result[] = $Name.': '.sprintf(t('ValidateRequired'), t('Locale'));
-                    $Valud = false;
-                } elseif (strcasecmp($Info['Locale'], $Key) == 0) {
-                    $Result[] = $Name.': '.t('The locale\'s key cannot be the same as the name of the locale.');
-                    $Valid = false;
-                }
-
-                // Validate basic fields.
-                $checkResult = self::checkRequiredFields($Info);
-                if (count($checkResult)) {
-                    $Result = array_merge($Result, $checkResult);
-                    $Valid = false;
-                }
-
-                if ($Valid) {
-                    // The locale pack was confirmed.
-                    $Addon = array(
-                        'AddonKey' => $Key,
-                        'AddonTypeID' => ADDON_TYPE_LOCALE,
-                        'Name' => val('Name', $Info) ? $Info['Name'] : $Key,
-                        'Description' => $Info['Description'],
-                        'Version' => $Info['Version'],
-                        'License' => $Info['License'],
-                        'Path' => $Path);
-                    break;
-                }
-            }
-
-            // Check to see if the entry is a core file.
-            if (stringEndsWith($Name, '/index.php')) {
-                if (count(explode('/', $Folder)) != 3) {
-                    // The file is too deep to be the core's index.php
-                    continue;
-                }
-
-                // This could be a theme file, but we have to examine its info array.
-                $Zip->extractTo($FolderPath, $Entry['name']);
-                $FilePath = CombinePaths(array($FolderPath, $Name));
-
-                // Get the version number from the core.
-                $Version = self::parseCoreVersion($FilePath);
-
-                if (!$Version) {
-                    continue;
-                }
-
-                // The application was confirmed.
-                $Addon = array(
-                    'AddonKey' => 'vanilla',
-                    'AddonTypeID' => ADDON_TYPE_CORE,
-                    'Name' => 'Vanilla',
-                    'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
-                    'Version' => $Version,
-                    'Path' => $Path);
-                $Info = array();
-                break;
-            }
-
-        }
-
-        if ($Addon) {
-            // Add the requirements.
-            $Requirements = arrayTranslate($Info, array('RequiredApplications' => 'Applications', 'RequiredPlugins' => 'Plugins', 'RequiredThemes' => 'Themes'));
-            foreach ($Requirements as $Type => $Items) {
-                if (!is_array($Items)) {
-                    unset($Requirements[$Type]);
-                }
-            }
-            $Addon['Requirements'] = serialize($Requirements);
-
-            $Addon['Checked'] = true;
-
-
-            $UploadsPath = PATH_ROOT.'/uploads/';
-            if (stringBeginsWith($Addon['Path'], $UploadsPath)) {
-                $Addon['File'] = substr($Addon['Path'], strlen($UploadsPath));
-            }
-            if ($Fix) {
-                // Delete extraneous files.
-                foreach ($Deletes as $Delete) {
-                    $Zip->deleteName($Delete['name']);
-                }
-            }
-        }
-
-        $Zip->close();
-
-        if (file_exists($FolderPath)) {
-            Gdn_FileSystem::removeFolder($FolderPath);
-        }
-
-
-        if ($Addon) {
-            $Addon['MD5'] = md5_file($Path);
-            $Addon['FileSize'] = filesize($Path);
-            return $Addon;
-        } else {
-            if ($ThrowError) {
-                $Msg = implode("\n", $Result);
-                throw new Exception($Msg, 400);
-            } else {
-                return false;
-            }
-        }
     }
 
     /**
      *
      *
-     * @param $Path
-     * @param $InfoPaths
+     * @param string $Path
+     * @param array $InfoPaths
      * @return array
      */
-    protected static function _getInfoFiles($Path, $InfoPaths) {
+    private static function getInfoFiles($Path, $InfoPaths) {
         $Path = str_replace('\\', '/', rtrim($Path));
 
-        $Result = array();
+        $Result = [];
         // Check to see if the paths exist.
         foreach ($InfoPaths as $InfoPath) {
             $Glob = glob($Path.$InfoPath);
             if (is_array($Glob)) {
                 foreach ($Glob as $GlobPath) {
-                    $Result[] = array('Name' => substr($GlobPath, strlen($Path)), 'Path' => $GlobPath);
+                    $Result[] = ['Name' => substr($GlobPath, strlen($Path)), 'Path' => $GlobPath];
                 }
             }
         }
@@ -536,16 +244,17 @@ class UpdateModel extends Gdn_Model {
     /**
      * Open a zip archive and inspect its contents for the requested paths.
      *
-     * @param $Path
-     * @param $InfoPaths
+     * @param string $Path
+     * @param array $InfoPaths
      * @param bool $TmpPath
      * @param bool $ThrowError
-     * @return array|bool
+     * @return array
      * @throws Exception
      */
-    protected static function _getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
+    private static function getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
         // Extract the zip file so we can make sure it has appropriate information.
         $Zip = null;
+        $ZipOpened = false;
 
         if (class_exists('ZipArchive', false)) {
             $Zip = new ZipArchive();
@@ -563,13 +272,14 @@ class UpdateModel extends Gdn_Model {
 
         if ($ZipOpened !== true) {
             if ($ThrowError) {
-                $Errors = array(ZIPARCHIVE::ER_EXISTS => 'ER_EXISTS', ZIPARCHIVE::ER_INCONS => 'ER_INCONS', ZIPARCHIVE::ER_INVAL => 'ER_INVAL',
-                    ZIPARCHIVE::ER_MEMORY => 'ER_MEMORY', ZIPARCHIVE::ER_NOENT => 'ER_NOENT', ZIPARCHIVE::ER_NOZIP => 'ER_NOZIP',
-                    ZIPARCHIVE::ER_OPEN => 'ER_OPEN', ZIPARCHIVE::ER_READ => 'ER_READ', ZIPARCHIVE::ER_SEEK => 'ER_SEEK');
+                $Errors = array(ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
+                    ZipArchive::ER_MEMORY => 'ER_MEMORY', ZipArchive::ER_NOENT => 'ER_NOENT', ZipArchive::ER_NOZIP => 'ER_NOZIP',
+                    ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK');
+                $Error = val($ZipOpened, $Errors, 'Unknown Error');
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.').' ('.$Path.' '.val($ZipOpened, $Errors, 'Unknown Error').')', 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($Path $Error)", 400);
             }
-            return false;
+            return [];
         }
 
         if ($TmpPath === false) {
@@ -615,12 +325,12 @@ class UpdateModel extends Gdn_Model {
      * Parse the version out of the core's index.php file.
      *
      * @param string $Path The path to the index.php file.
-     * @return string|false A string containing the version or false if the file could not be parsed.
+     * @return string A string containing the version or empty if the file could not be parsed.
      */
     public static function parseCoreVersion($Path) {
         $fp = fopen($Path, 'rb');
         $Application = false;
-        $Version = false;
+        $Version = '';
 
         while (($Line = fgets($fp)) !== false) {
             if (preg_match("`define\\('(.*?)', '(.*?)'\\);`", $Line, $Matches)) {
@@ -654,6 +364,7 @@ class UpdateModel extends Gdn_Model {
         $fp = fopen($Path, 'rb');
         $Lines = array();
         $InArray = false;
+        $GlobalKey = '';
 
         // Get all of the lines in the info array.
         while (($Line = fgets($fp)) !== false) {
@@ -735,12 +446,11 @@ class UpdateModel extends Gdn_Model {
     /**
      *
      *
-     * @param $MyAddons
-     * @param $LatestAddons
-     * @param bool|true $OnlyUpdates
+     * @param array $MyAddons
+     * @param array $LatestAddons
      * @return bool
      */
-    public function compareAddons($MyAddons, $LatestAddons, $OnlyUpdates = true) {
+    public function compareAddons($MyAddons, $LatestAddons) {
         $UpdateAddons = false;
 
         // Join the site addons with my addons.
@@ -801,7 +511,7 @@ class UpdateModel extends Gdn_Model {
         $Addons = array();
 
         // Get the core.
-        self::_addAddon(array('AddonKey' => 'vanilla', 'AddonType' => 'core', 'Version' => APPLICATION_VERSION, 'Folder' => '/'), $Addons);
+        self::addAddon(array('AddonKey' => 'vanilla', 'AddonType' => 'core', 'Version' => APPLICATION_VERSION, 'Folder' => '/'), $Addons);
 
         // Get a list of all of the applications.
         $ApplicationManager = new Gdn_ApplicationManager();
@@ -818,7 +528,7 @@ class UpdateModel extends Gdn_Model {
             }
 
             $Addon = array('AddonKey' => $Key, 'AddonType' => 'application', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, strtolower($Key)));
-            self::_AddAddon($Addon, $Addons);
+            self::addAddon($Addon, $Addons);
         }
 
         // Get a list of all of the plugins.
@@ -835,8 +545,13 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'plugin', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, $Key));
-            self::_addAddon($Addon, $Addons);
+            $Addon = [
+                'AddonKey' => $Key,
+                'AddonType' => 'plugin',
+                'Version' => val('Version', $Info, '0.0'),
+                'Folder' => '/applications/'.GetValue('Folder', $Info, $Key)
+            ];
+            self::addAddon($Addon, $Addons);
         }
 
         // Get a list of all the themes.
@@ -853,8 +568,13 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'theme', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/themes/'.GetValue('Folder', $Info, $Key));
-            self::_addAddon($Addon, $Addons);
+            $Addon = [
+                'AddonKey' => $Key,
+                'AddonType' => 'theme',
+                'Version' => val('Version', $Info, '0.0'),
+                'Folder' => '/themes/'.GetValue('Folder', $Info, $Key)
+            ];
+            self::addAddon($Addon, $Addons);
         }
 
         // Get a list of all locales.
@@ -871,8 +591,13 @@ class UpdateModel extends Gdn_Model {
                 continue;
             }
 
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'locale', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/locales/'.GetValue('Folder', $Info, $Key));
-            self::_addAddon($Addon, $Addons);
+            $Addon = [
+                'AddonKey' => $Key,
+                'AddonType' => 'locale',
+                'Version' => val('Version', $Info, '0.0'),
+                'Folder' => '/locales/'.GetValue('Folder', $Info, $Key)
+            ];
+            self::addAddon($Addon, $Addons);
         }
 
         return $Addons;
@@ -882,11 +607,10 @@ class UpdateModel extends Gdn_Model {
      *
      *
      * @param bool $Enabled
-     * @param bool $OnlyUpdates
      * @return array|bool
      * @throws Exception
      */
-    public function getAddonUpdates($Enabled = false, $OnlyUpdates = true) {
+    public function getAddonUpdates($Enabled = false) {
         // Get the addons on this site.
         $MyAddons = $this->getAddons($Enabled);
 
@@ -896,7 +620,7 @@ class UpdateModel extends Gdn_Model {
         $SlugsString = implode(',', $Slugs);
 
         $Url = $this->AddonSiteUrl.'/addon/getlist.json?ids='.$SlugsString;
-        $SiteAddons = ProxyRequest($Url);
+        $SiteAddons = proxyRequest($Url);
         $UpdateAddons = array();
 
         if ($SiteAddons) {
@@ -908,17 +632,13 @@ class UpdateModel extends Gdn_Model {
 
     /**
      *
-     *
-     * @param null $AddonCode
-     * @param bool $Explicit
-     * @param bool $Drop
      * @throws Exception
      */
-    public function runStructure($AddonCode = null, $Explicit = false, $Drop = false) {
+    public function runStructure() {
         // Get the structure files for all of the enabled applications.
         $ApplicationManager = new Gdn_ApplicationManager();
         $Apps = $ApplicationManager->enabledApplications();
-        $AppNames = consolidateArrayValuesByKey($Apps, 'Folder');
+        $AppNames = array_column($Apps, 'Folder');
         $Paths = array();
         foreach ($Apps as $Key => $AppInfo) {
             $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
@@ -926,7 +646,7 @@ class UpdateModel extends Gdn_Model {
                 $Paths[] = $Path;
             }
 
-            Gdn::applicationManager()->registerPermissions($Key, $this->Validation);
+            Gdn::applicationManager()->registerPermissions($Key);
         }
 
         // Execute the structures.
@@ -956,7 +676,7 @@ class UpdateModel extends Gdn_Model {
                 }
             } catch (Exception $Ex) {
                 // Do nothing, plugin wouldn't load/structure.
-                if (Debug()) {
+                if (debug()) {
                     throw $Ex;
                 }
             }

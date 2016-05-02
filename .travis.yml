@@ -24,11 +24,16 @@ addons:
     - vanilla.test
 
 install:
+  - composer self-update
   - composer install -o
   - tests/travis/nginx/install-nginx.sh
 
 script:
-  - tests/travis/php-lint.sh .
+  - tests/travis/php-lint.sh ./applications
+  - tests/travis/php-lint.sh ./conf
+  - tests/travis/php-lint.sh ./library
+  - tests/travis/php-lint.sh ./plugins
+  - tests/travis/php-lint.sh ./themes
   - phpunit -c phpunit.xml.dist
   - cat /tmp/error.log
   - cat /tmp/access.log

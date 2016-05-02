@@ -2,11 +2,17 @@ div.Spoiler {
    margin:4px 0;
    padding: 5px 10px;
    margin-right: 10px;
-   background-color: #808080;
-   background-color: rgba(128, 128, 128, .2);
+   color: #e6e6e6;
+   background-color: #e6e6e6;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
    border-radius: 3px;
+}
+
+div.Spoiler.SpoilerConfigured {
+   background-color: #e6e6e6;
+   background-color: rgba(128, 128, 128, .2);
+   color: inherit;
 }
 
 div.Spoiler div.SpoilerTitle {

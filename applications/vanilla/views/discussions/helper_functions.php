@@ -116,7 +116,7 @@ if (!function_exists('WriteDiscussion')) :
      * @param $Sender
      * @param $Session
      */
-    function writeDiscussion($Discussion, &$Sender, &$Session) {
+    function writeDiscussion($Discussion, $Sender, $Session) {
         $CssClass = CssClass($Discussion);
         $DiscussionUrl = $Discussion->Url;
         $Category = CategoryModel::categories($Discussion->CategoryID);

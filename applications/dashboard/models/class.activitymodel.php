@@ -107,7 +107,7 @@ class ActivityModel extends Gdn_Model {
         $ActivityType = self::GetActivityType($Row['ActivityTypeID']);
         $Row['ActivityType'] = val('Name', $ActivityType);
         if (is_string($Row['Data'])) {
-            $Row['Data'] = @unserialize($Row['Data']);
+            $Row['Data'] = dbdecode($Row['Data']);
         }
 
         $Row['PhotoUrl'] = url($Row['Route'], true);
@@ -379,7 +379,7 @@ class ActivityModel extends Gdn_Model {
 
         foreach ($Data as &$Row) {
             if (is_string($Row['Data'])) {
-                $Row['Data'] = @unserialize($Row['Data']);
+                $Row['Data'] = dbdecode($Row['Data']);
             }
 
             $UserIDs[$Row['ActivityUserID']] = 1;
@@ -876,7 +876,8 @@ class ActivityModel extends Gdn_Model {
                     ->setTitle($ActivityHeadline);
 
                 if ($message = val('Story', $Activity)) {
-                    $emailTemplate->setMessage($message, true);
+                    $prefix = c('Garden.Email.Prefix', '');
+                    $emailTemplate->setMessage($prefix.$message, true);
                 }
 
                 $Email->setEmailTemplate($emailTemplate);
@@ -968,7 +969,8 @@ class ActivityModel extends Gdn_Model {
             ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
 
         if ($message = val('Story', $Activity)) {
-            $emailTemplate->setMessage($message, true);
+            $prefix = c('Garden.Email.Prefix', '');
+            $emailTemplate->setMessage($prefix.$message, true);
         }
 
         $Email->setEmailTemplate($emailTemplate);
@@ -1229,7 +1231,8 @@ class ActivityModel extends Gdn_Model {
                     ->setButton($url, val('ActionText', $Activity, t('Check it out')))
                     ->setTitle(Gdn_Format::plainText(val('Headline', $Activity)));
                 if ($message = val('Story', $Activity)) {
-                    $emailTemplate->setMessage($message, true);
+                    $prefix = c('Garden.Email.Prefix', '');
+                    $emailTemplate->setMessage($prefix.$message, true);
                 }
                 $Email->setEmailTemplate($emailTemplate);
 
@@ -1400,7 +1403,7 @@ class ActivityModel extends Gdn_Model {
             )->firstRow(DATASET_TYPE_ARRAY);
 
             if ($GroupActivity) {
-                $GroupActivity['Data'] = @unserialize($GroupActivity['Data']);
+                $GroupActivity['Data'] = dbdecode($GroupActivity['Data']);
                 $Activity = $this->mergeActivities($GroupActivity, $Activity);
                 $NotificationInc = 0;
             }
@@ -1414,7 +1417,7 @@ class ActivityModel extends Gdn_Model {
 
         $ActivityData = $Activity['Data'];
         if (isset($Activity['Data']) && is_array($Activity['Data'])) {
-            $Activity['Data'] = serialize($Activity['Data']);
+            $Activity['Data'] = dbencode($Activity['Data']);
         }
 
         $this->defineSchema();
@@ -1525,11 +1528,6 @@ class ActivityModel extends Gdn_Model {
      * @return array
      */
     public function mergeActivities($OldActivity, $NewActivity, $Options = array()) {
-        $GroupHeadlineFormat = val('GroupHeadlineFormat', $Options, $NewActivity['HeadlineFormat']);
-        $GroupStory = val('GroupStory', $Options, $NewActivity['Story']);
-
-//      decho($OldActivity, 'OldAct');
-
         // Group the two activities together.
         $ActivityUserIDs = val('ActivityUserIDs', $OldActivity['Data'], array());
         $ActivityUserCount = val('ActivityUserID_Count', $OldActivity['Data'], 0);
@@ -1543,8 +1541,6 @@ class ActivityModel extends Gdn_Model {
             array_pop($ActivityUserIDs);
             $ActivityUserCount++;
         }
-
-//      decho($ActivityUserIDs, 'AIDs');
 
         if (val('RegardingUserID', $NewActivity)) {
             $RegardingUserIDs = val('RegardingUserIDs', $OldActivity['Data'], array());
@@ -1560,7 +1556,7 @@ class ActivityModel extends Gdn_Model {
             }
         }
 
-        $RecordIDs = val('RecordIDs', $GroupData, array());
+        $RecordIDs = [];
         if ($OldActivity['RecordID']) {
             $RecordIDs[] = $OldActivity['RecordID'];
         }

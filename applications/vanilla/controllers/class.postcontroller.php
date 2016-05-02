@@ -432,6 +432,10 @@ class PostController extends VanillaController {
                 $Title = val('Title', $PageInfo, '');
                 if ($Title == '') {
                     $Title = t('Undefined discussion subject.');
+                    if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
+                        $Title .= ' '.t('Page timed out.');
+                    }
+
                 }
             }
 
@@ -507,7 +511,7 @@ class PostController extends VanillaController {
                 'Name' => $Title,
                 'Body' => $Body,
                 'Format' => 'Html',
-                'Attributes' => serialize($Attributes)
+                'Attributes' => dbencode($Attributes)
             );
             $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;
             $this->fireEvent('BeforeEmbedDiscussion');

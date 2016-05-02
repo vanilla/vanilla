@@ -141,6 +141,12 @@ class MessageModel extends Gdn_Model {
             $Prefs[] = 0;
         }
 
+        $category = null;
+        if (!empty($CategoryID)) {
+            $categoryModel = new CategoryModel();
+            $category = $categoryModel->getID($CategoryID, DATASET_TYPE_ARRAY);
+        }
+
         $Exceptions = array_map('strtolower', $Exceptions);
 
         list($Application, $Controller, $Method) = explode('/', strtolower($Location));
@@ -162,11 +168,13 @@ class MessageModel extends Gdn_Model {
 
                 if (in_array($MController, $Exceptions)) {
                     $Visible = true;
-                } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
+                } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method) {
                     $Visible = true;
+                }
 
-                if ($Visible && !self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message))) {
-                    $Visible = false;
+                $Visible = $Visible && self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+                if ($category !== null) {
+                    $Visible = $Visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
                 }
 
                 if ($Visible) {
@@ -193,8 +201,12 @@ class MessageModel extends Gdn_Model {
             ->orderBy('Sort', 'asc')
             ->get()->resultArray();
 
-        $Result = array_filter($Result, function ($Message) use ($CategoryID) {
-            return MessageModel::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+        $Result = array_filter($Result, function($Message) use ($Session, $category) {
+            $visible = MessageModel::inCategory(val('CategoryID', $category, null), val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+            if ($category !== null) {
+                $visible = $visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+            }
+            return $visible;
         });
 
         return $Result;

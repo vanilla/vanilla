@@ -259,7 +259,7 @@ abstract class SortableModule extends Gdn_Module {
      */
     public function addItemModifiers(&$item, $modifiers) {
         $modifiers = array_intersect_key($modifiers, array_flip($this->allowedItemModifiers));
-        foreach($modifiers as $attribute => $value) {
+        foreach ($modifiers as $attribute => $value) {
             $item[$attribute] = $value;
         }
     }
@@ -272,7 +272,7 @@ abstract class SortableModule extends Gdn_Module {
     public function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
-            $this->keyNumber = $this->keyNumber+1;
+            $this->keyNumber = $this->keyNumber + 1;
         }
     }
 
@@ -374,7 +374,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $items The items to sort.
      */
     public function sortItems(&$items) {
-        foreach($items as &$item) {
+        foreach ($items as &$item) {
             if (val('items', $item)) {
                 $this->sortItems($item['items']);
             }
@@ -458,7 +458,7 @@ abstract class SortableModule extends Gdn_Module {
         $newitems = array();
         $itemslength = sizeof($items);
         $index = 0;
-        foreach($items as $key => $item) {
+        foreach ($items as $key => $item) {
             ++$index;
             unset($item['_sort'], $item['key']);
             $subitems = false;

@@ -157,7 +157,7 @@ class DiscussionModel extends VanillaModel {
         $orderBy = self::getDefaultOrderBy(); // check config
 
         // Try to find a matching sort.
-        foreach(self::getAllowedSorts() as $sort) {
+        foreach (self::getAllowedSorts() as $sort) {
             if (val('orderBy', $sort, []) == $orderBy) {
                 return val('key', $sort, '');
             }
@@ -351,7 +351,7 @@ class DiscussionModel extends VanillaModel {
             ));
 
 
-            Gdn::pluginManager()->EventArguments['Types'] =& $DiscussionTypes;
+            Gdn::pluginManager()->EventArguments['Types'] = &$DiscussionTypes;
             Gdn::pluginManager()->FireAs('DiscussionModel')->fireEvent('DiscussionTypes');
             self::$_DiscussionTypes = $DiscussionTypes;
             unset(Gdn::pluginManager()->EventArguments['Types']);
@@ -519,7 +519,7 @@ class DiscussionModel extends VanillaModel {
         $wheres = [];
         $filters = $this->getFiltersFromKeys($this->getFilters());
 
-        foreach($filters as $filter) {
+        foreach ($filters as $filter) {
 
             if ($categoryIDs) {
                 $setKey = val('setKey', $filter);
@@ -542,7 +542,7 @@ class DiscussionModel extends VanillaModel {
      * @return array A set of where clauses, array form.
      */
     protected function combineWheres($newWheres, $wheres) {
-        foreach($newWheres as $field => $value) {
+        foreach ($newWheres as $field => $value) {
             // Combine all our where clauses.
             if (!array_key_exists($field, $wheres)) {
                 // Add a new where field to the list.
@@ -910,7 +910,7 @@ class DiscussionModel extends VanillaModel {
 
         // Fix up output
         $Discussion->Name = Gdn_Format::text($Discussion->Name);
-        $Discussion->Attributes = @unserialize($Discussion->Attributes);
+        $Discussion->Attributes = dbdecode($Discussion->Attributes);
         $Discussion->Url = DiscussionUrl($Discussion);
         $Discussion->Tags = $this->FormatTags($Discussion->Tags);
 
@@ -1049,15 +1049,18 @@ class DiscussionModel extends VanillaModel {
         }
         if ($GroupID > 0) {
             $this->SQL->where('d.GroupID', $GroupID);
-        } elseif (is_array($CategoryID) || $CategoryID > 0) {
+        } elseif (is_array($CategoryID)) {
+            $this->SQL->whereIn('d.CategoryID', $CategoryID);
+        } elseif ($CategoryID > 0) {
             $this->SQL->where('d.CategoryID', $CategoryID);
         }
 
         $AnnouncementIDs = $this->SQL->get()->resultArray();
-        $AnnouncementIDs = consolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
+        $AnnouncementIDs = array_column($AnnouncementIDs, 'DiscussionID');
 
         // Short circuit querying when there are no announcements.
         if (count($AnnouncementIDs) == 0) {
+            $this->_AnnouncementIDs = $AnnouncementIDs;
             return new Gdn_DataSet();
         }
 
@@ -1079,12 +1082,6 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Add conditions passed.
-//      if (is_array($Wheres))
-//         $this->SQL->where($Wheres);
-//
-//      $this->SQL
-//         ->where('d.Announce', '1');
-
         $this->SQL->whereIn('d.DiscussionID', $AnnouncementIDs);
 
         // If we aren't viewing announcements in a category then only show global announcements.
@@ -2756,8 +2753,12 @@ class DiscussionModel extends VanillaModel {
             return '';
         }
 
-        // Get the array
-        $TagsArray = Gdn_Format::Unserialize($Tags);
+        // Get the array.
+        if (preg_match('`^(a:)|{|\[`', $Tags)) {
+            $TagsArray = dbdecode($Tags);
+        } else {
+            $TagsArray = $Tags;
+        }
 
         // Compensate for deprecated space-separated format
         if (is_string($TagsArray) && $TagsArray == $Tags) {
@@ -2849,7 +2850,7 @@ class DiscussionModel extends VanillaModel {
      */
     protected function getFiltersFromArray($array) {
         $filterKeys = [];
-        foreach(self::getAllowedFilters() as $filterSet) {
+        foreach (self::getAllowedFilters() as $filterSet) {
             $filterSetKey = val('key', $filterSet);
             // Check if any of our filters are in the array. Filter key value is unsafe.
             if ($filterKey = val($filterSetKey, $array)) {
@@ -2980,7 +2981,7 @@ class DiscussionModel extends VanillaModel {
                 if (!empty($filterString)) {
                     $filterString .= '&';
                 }
-                $filterString .= $setKey . '=' . $filterKey;
+                $filterString .= $setKey.'='.$filterKey;
             }
         }
 
@@ -3081,7 +3082,7 @@ class DiscussionModel extends VanillaModel {
      * @param array $filterKeys The key/value pairs of the filters to remove.
      */
     public static function removeFilter($filterKeys) {
-        foreach($filterKeys as $setKey => $filterKey) {
+        foreach ($filterKeys as $setKey => $filterKey) {
             if (isset(self::$allowedFilters[$setKey]['filters'][$filterKey])) {
                 unset(self::$allowedFilters[$setKey]['filters'][$filterKey]);
             }

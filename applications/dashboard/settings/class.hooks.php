@@ -27,6 +27,11 @@ class DashboardHooks implements Gdn_IPlugin {
     public function base_render_before($Sender) {
         $Session = Gdn::session();
 
+        // Check the statistics.
+        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            Gdn::statistics()->check();
+        }
+
         // Enable theme previewing
         if ($Session->isValid()) {
             $PreviewThemeName = htmlspecialchars($Session->getPreference('PreviewThemeName', ''));

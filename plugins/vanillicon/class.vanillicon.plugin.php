@@ -19,7 +19,8 @@ $PluginInfo['vanillicon'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'Icon' => 'vanillicon.svg'
 );
 
 /**

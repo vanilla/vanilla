@@ -22,7 +22,7 @@ $ConversationBody = "Pssst. Hey. A conversation is a private chat between two or
 $SystemUserID = Gdn::userModel()->getSystemUserID();
 $TargetUserID = Gdn::session()->UserID;
 $Now = Gdn_Format::toDateTime();
-$Contributors = Gdn_Format::serialize(array($SystemUserID, $TargetUserID));
+$Contributors = dbencode(array($SystemUserID, $TargetUserID));
 
 // Insert stub conversation
 $ConversationID = $SQL->insert('Conversation', array(

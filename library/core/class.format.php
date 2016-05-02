@@ -1620,14 +1620,26 @@ EOT;
             $suffix = '';
 
             // Quoted mention.
-            if ($str[0] == '"') {
-                $pos = strpos($str, '"', 1);
+            $hasQuote = false;
+            $quote = '"';
+            $quoteLength = strlen($quote);
+
+            if (strpos($str, '"') === 0) {
+                $hasQuote = true;
+            } else if (strpos($str, '&quot;') === 0) {
+                $hasQuote = true;
+                $quote = '&quot;';
+                $quoteLength = strlen($quote);
+            }
+
+            if ($hasQuote) {
+                $pos = strpos($str, $quote, $quoteLength);
 
                 if ($pos === false) {
-                    $str = substr($str, 1);
+                    $str = substr($str, $quoteLength);
                 } else {
-                    $mention = substr($str, 1, $pos - 1);
-                    $suffix = substr($str, $pos + 1);
+                    $mention = substr($str, $quoteLength, $pos - $quoteLength);
+                    $suffix = substr($str, $pos + $quoteLength);
                 }
             }
 
@@ -1822,8 +1834,8 @@ EOT;
      */
     public static function serialize($Mixed) {
         if (is_array($Mixed) || is_object($Mixed)
-            || (is_string($Mixed) && (substr_compare('a:', $Mixed, 0, 2) === 0 || substr_compare('O:', $Mixed, 0, 2) === 0
-                    || substr_compare('arr:', $Mixed, 0, 4) === 0 || substr_compare('obj:', $Mixed, 0, 4) === 0))
+            || (is_string($Mixed) && (substr_compare('a:', $Mixed, 0, 2) !== 0  && substr_compare('O:', $Mixed, 0, 2) !== 0
+                    && substr_compare('arr:', $Mixed, 0, 4) !== 0 && substr_compare('obj:', $Mixed, 0, 4) !== 0))
         ) {
             $Result = serialize($Mixed);
         } else {

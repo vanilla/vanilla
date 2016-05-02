@@ -21,7 +21,8 @@ $PluginInfo['GooglePlus'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Hidden' => false,
     'SocialConnect' => true,
-    'RequiresRegistration' => false
+    'RequiresRegistration' => false,
+    'Icon' => 'google.svg'
 );
 
 /**

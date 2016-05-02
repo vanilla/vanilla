@@ -33,6 +33,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     /** @var array The selected filters. */
     protected $selectedFilters;
 
+    /** @var bool Whether to show the sorting options in the view. */
+    protected $showSorts = true;
+
+    /** @var bool Whether to show the filter options in the view. */
+    protected $showFilters = true;
+
     /** @var int The ID of the category we're in. */
     protected $categoryID;
 
@@ -52,6 +58,34 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
         $this->selectedSort = $selectedSort;
         $this->selectedFilters = $selectedFilters;
+    }
+
+    /**
+     * @param $showSorts Whether to show the sorting options in the view.
+     */
+    public function setShowSorts($showSorts) {
+        $this->showSorts = $showSorts;
+    }
+
+    /**
+     * @param $showFilters Whether to show the filtering options in the view.
+     */
+    public function setShowFilters($showFilters) {
+        $this->showFilters = $showFilters;
+    }
+
+    /**
+     * @return bool Whether to show the sorting options in the view.
+     */
+    public function showSorts() {
+        return $this->showSorts;
+    }
+
+    /**
+     * @return bool Whether to show the filtering options in the view.
+     */
+    public function showFilters() {
+        return $this->showFilters;
     }
 
     /**

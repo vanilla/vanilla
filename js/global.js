@@ -1792,7 +1792,33 @@ jQuery(document).ready(function($) {
             .atwho({
                 at: ':',
                 tpl: emojiTemplate,
+                insert_tpl: "${atwho-data-value}",
                 callbacks: {
+                    /**
+                     * Default routine from At.js with more tolerant pattern matching.
+                     * @param {string} flag The character sequence used to trigger this match (e.g. :).
+                     * @param {string} subtext The string to be tested.
+                     * @param {bool} should_start_with_space Should the pattern include a test for a whitespace prefix?
+                     * @returns {string|null} String on successful match.  Null on failure to match.
+                     */
+                    matcher: function(flag, subtext, should_start_with_space) {
+                        var match, regexp;
+                        flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                        if (should_start_with_space) {
+                            flag = '(?:^|\\s)' + flag;
+                        }
+
+                        // Allow matches to end with a space, a line feed or the end of the string.
+                        regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)(?:\\s|\\n|$)|' + flag + '([^\\x00-\\xff]*)(?:\\s|\\n|$)', 'gi');
+                        match = regexp.exec(subtext);
+
+                        if (match) {
+                            return match[2] || match[1];
+                        } else {
+                            return null;
+                        }
+                    },
+
                     tplEval: function(tpl, map) {
                         console.log(map);
                     }

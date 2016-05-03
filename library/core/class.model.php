@@ -188,9 +188,10 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     * Connects to the database and defines the schema associated with
-     * $this->Name. Also instantiates and automatically defines
-     * $this->Validation.
+     * Connects to the database and defines the schema associated with $this->Name.
+     *
+     * Also instantiates and automatically defines $this->Validation.
+     *
      * @return Gdn_Schema Returns the schema for this model.
      */
     public function defineSchema() {
@@ -198,7 +199,6 @@ class Gdn_Model extends Gdn_Pluggable {
             $this->Schema = new Gdn_Schema($this->Name, $this->Database);
             $this->PrimaryKey = $this->Schema->primaryKey($this->Name, $this->Database);
             if (is_array($this->PrimaryKey)) {
-                //print_r($this->PrimaryKey);
                 $this->PrimaryKey = $this->PrimaryKey[0];
             }
 
@@ -257,6 +257,7 @@ class Gdn_Model extends Gdn_Pluggable {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert) === true) {
             $Fields = $this->Validation->validationFields();
+            $Fields = $this->coerceData($Fields, false);
             unset($Fields[$this->PrimaryKey]); // Don't try to insert or update the primary key
             if ($Insert === false) {
                 $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
@@ -575,6 +576,81 @@ class Gdn_Model extends Gdn_Pluggable {
         return $this->Validation->validate($FormPostValues, $Insert);
     }
 
+    /**
+     * Coerce the data in a given row to conform to the data types in this model's schema.
+     *
+     * This method doesn't do full data cleansing yet because that is too much of a change at this point. For this
+     * reason this method has been kept protected. The main purpose here is to clean the data enough to work better with
+     * MySQL's strict mode.
+     *
+     * @param array $row The row of data to coerce.
+     * @param bool $strip Whether or not to strip missing columns.
+     * @return array Returns a new data row with cleansed data.
+     */
+    protected function coerceData($row, $strip = true) {
+        $columns = array_change_key_case($this->defineSchema()->fields());
+
+        $result = [];
+        foreach ($row as $key => $value) {
+            $name = strtolower($key);
+
+            if (isset($columns[$name])) {
+                $column = $columns[$name];
+
+                switch ($column->Type) {
+                    case 'int':
+                    case 'tinyint':
+                    case 'smallint':
+                    case 'bigint':
+                        if ($value === '' || $value === null) {
+                            $value = null;
+                        } else {
+                            $value = (int)$value;
+                        }
+                        break;
+                    case 'enum':
+                        $enums = array_change_key_case(array_combine($column->Enum, $column->Enum));
+                        if (isset($enums[strtolower($value)])) {
+                            $value = $enums[strtolower($value)];
+                        } elseif (!$value) {
+                            $value = null;
+                        } else {
+                            trigger_error("Enum value of '$value' not valid for {$column->Key}", E_USER_NOTICE);
+                            $value = null;
+                        }
+                        break;
+                    case 'float':
+                        if ($value === '' || $value === null) {
+                            $value = null;
+                        } else {
+                            $value = (float)$value;
+                        }
+                        break;
+                    case 'double':
+                        if ($value === '' || $value === null) {
+                            $value = null;
+                        } else {
+                            $value = (double)$value;
+                        }
+                        break;
+                    case 'datetime':
+                    case 'timestamp':
+                        $value = $value ?: null;
+                        break;
+                    case 'varchar':
+                    case 'text':
+                    case 'mediumtext':
+                    case 'longtext':
+                        // Should already have been validated.
+                        break;
+                }
+                $result[$column->Name] = $value;
+            } elseif (!$strip) {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
 
     /**
      * Adds $this->InsertUserID and $this->DateInserted fields to an associative

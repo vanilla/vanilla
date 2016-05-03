@@ -1777,10 +1777,6 @@
             }
         } //editorInit
 
-        // Initialize new editors.
-        $(document).on('EditCommentFormLoaded popupReveal', function () {
-            editorInit('', $(selector));
-        })
         editorInit('', this);
 
         // jQuery chaining
@@ -1788,10 +1784,8 @@
     };
 }(jQuery));
 
-
-// Set all .BodyBox elements as editor, calling plugin above.
-jQuery(document).ready(function($) {
-    $('.BodyBox').setAsEditor();
+$(document).on('contentLoad', function(e) {
+    $('.BodyBox', e.target).setAsEditor();
 });
 
 /*

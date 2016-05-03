@@ -160,6 +160,8 @@ class ActivityController extends Gdn_Controller {
 
         // Page meta.
         $this->addJsFile('activity.js');
+        $this->addJsFile('spoilers.js');
+        $this->addCssFile('spoilers.css');
 
         if ($this->Head) {
             $this->Head->addRss(url('/activity/feed.rss', true), $this->Head->title());
@@ -323,7 +325,7 @@ class ActivityController extends Gdn_Controller {
 
     /**
      *
-     * 
+     *
      * @param bool $Notify
      * @param bool $UserID
      */

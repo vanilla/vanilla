@@ -7,9 +7,7 @@ function Gdn_Quotes() {
 Gdn_Quotes.prototype.Prepare = function () {
     // Capture "this" for use in callbacks.
     var Quotes = this,
-        $document = $(document),
-        QuoteFoldingLevel,
-        MaxFoldingLevel;
+        $document = $(document);
 
     // Attach quote event to each Quote button, and return false to prevent link follow.
     $document.on('click', 'a.ReactButton.Quote', function(event) {
@@ -25,47 +23,47 @@ Gdn_Quotes.prototype.Prepare = function () {
         Quotes.currentEditor = this;
     });
 
+    // Handle quote folding clicks.
+    $document.on('click', 'a.QuoteFolding', function () {
+        var Anchor = $(this),
+            QuoteTarget = Anchor
+                .parent()
+                .next()
+                .toggle();
+
+        if (QuoteTarget.css('display') != 'none') {
+            Anchor.html(gdn.definition('&laquo; hide previous quotes'));
+        } else {
+            Anchor.html(gdn.definition('&raquo; show previous quotes'));
+        }
+
+        return false;
+    });
+};
+
+/**
+ * Format the quotes within a given parent element.
+ *
+ * @param elem The parent element.
+ */
+Gdn_Quotes.prototype.format = function (elem) {
     // Handle quote folding.
-    QuoteFoldingLevel = gdn.definition('QuotesFolding', 1);
-
-    function folding() {
-        $('.Discussion .Message, .Comment .Message').each(function () {
-            // Find the closest child quote
-            var Message = $(this),
-                PetQuote = Message.children('.Quote, .UserQuote');
-
-            if (Message.data('QuoteFolding') || !PetQuote.length) {
-                return;
-            }
-            Message.data('QuoteFolding', '1');
-
-            Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
-        });
-    }
-
-    if (QuoteFoldingLevel != 'None') {
-        QuoteFoldingLevel = parseInt(QuoteFoldingLevel) + 1;
+    var QuoteFoldingLevel = parseInt(gdn.getMeta('QuotesFolding', 1)) + 1,
+        Quotes = this,
         MaxFoldingLevel = 6;
 
-        $document.on('CommentAdded CommentEditingComplete CommentPagingComplete', folding);
-        folding();
+    $('.Discussion .Message, .Comment .Message', elem).each(function () {
+        // Find the closest child quote
+        var Message = $(this),
+            PetQuote = Message.children('.Quote, .UserQuote');
 
-        $document.on('click', 'a.QuoteFolding', function () {
-            var Anchor = $(this),
-                QuoteTarget = Anchor
-                    .closest('.QuoteText')
-                    .children('.Quote, .UserQuote')
-                    .toggle();
+        if (Message.data('QuoteFolding') || !PetQuote.length) {
+            return;
+        }
+        Message.data('QuoteFolding', '1');
 
-            if (QuoteTarget.css('display') != 'none') {
-                Anchor.html(gdn.definition('&laquo; hide previous quotes'));
-            } else {
-                Anchor.html(gdn.definition('&raquo; show previous quotes'));
-            }
-
-            return false;
-        });
-    }
+        Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
+    });
 };
 
 
@@ -189,12 +187,12 @@ Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
         .trigger('autosize.resize');
 };
 
+(function(window) {
+    window.GdnQuotes = new Gdn_Quotes();
+    window.GdnQuotes.Prepare();
+})(window);
 
-// Instance for global access.
-var GdnQuotes = null;
-
-// document.ready
-$(function () {
-    GdnQuotes = new Gdn_Quotes();
-    GdnQuotes.Prepare();
+$(document).on('contentLoad', function (e) {
+    console.log('quotes.contentLoad');
+    GdnQuotes.format(e.target);
 });

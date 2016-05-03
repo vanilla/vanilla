@@ -261,6 +261,9 @@ class TaggingPlugin extends Gdn_Plugin {
         if (null !== $sender->data('Discussions', null)) {
             TagModel::instance()->joinTags($sender->Data['Discussions']);
         }
+
+        $sender->addJsFile('tagging.js', 'plugins/Tagging');
+        $sender->addJsFile('jquery.tokeninput.js');
     }
 
     /**
@@ -604,8 +607,6 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      */
     public function postController_render_before($Sender) {
-        $Sender->addJsFile('jquery.tokeninput.js');
-        $Sender->addJsFile('tagging.js', 'plugins/Tagging');
         $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
         $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
 

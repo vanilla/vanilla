@@ -1487,7 +1487,6 @@ jQuery(document).ready(function($) {
         // where it's actually triggered.
         var autosizeTriggers = [
             'clearCommentForm',
-            'EditCommentFormLoaded',
             'popupReveal'
             //'appendHtml'
         ];
@@ -1921,7 +1920,7 @@ jQuery(document).ready(function($) {
     // calls this function directly when in wysiwyg format, as it needs to
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
-        $(document).on('EditCommentFormLoaded popupReveal', function() {
+        $(document).on('contentLoad', function() {
             gdn.atCompleteInit('.BodyBox', '');
         });
         gdn.atCompleteInit('.BodyBox', '');
@@ -1972,6 +1971,8 @@ jQuery(document).ready(function($) {
             }
         });
     }
+
+    $(document).trigger('contentLoad');
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

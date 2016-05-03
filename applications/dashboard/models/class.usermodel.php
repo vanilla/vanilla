@@ -64,7 +64,7 @@ class UserModel extends Gdn_Model {
         $this->addFilterField(array(
             'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
-            'Score', 'Photo'
+            'Score'
         ));
     }
 

@@ -73,6 +73,59 @@ class StandardTest extends BaseTest {
 
         $siteUser['tk'] = $this->api()->getTK($siteUser['UserID']);
         $this->setTestUser($siteUser);
+        return $siteUser;
+    }
+
+    /**
+     * Test that a photo can be saved to a user.
+     *
+     * @param array $admin An admin user with permission to add a photo.
+     * @param array $user The user to test against.
+     * @depends testAddAdminUser
+     * @depends testRegisterBasic
+     */
+    public function testSetPhoto($admin, $user) {
+        $this->api()->setUser($admin);
+
+        $photo = 'http://example.com/u.gif';
+        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+
+        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+        $this->assertSame($photo, $dbUser['Photo']);
+    }
+
+    /**
+     * Test an invalid photo URL on a user.
+     *
+     * @param array $admin The user that will set the photo.
+     * @param array $user The user to test against.
+     * @depends testAddAdminUser
+     * @depends testRegisterBasic
+     */
+    public function testSetInvalidPhoto($admin, $user) {
+        $this->api()->setUser($admin);
+
+        $photo = 'javascript: alert("Xss");';
+        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+
+        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+        $this->assertSame($photo, $dbUser['Photo']);
+    }
+
+    /**
+     * Test a permission error when adding a photo.
+     *
+     * @param array $user The user to test against.
+     * @depends testRegisterBasic
+     */
+    public function testSetPhotoPermission($user) {
+        $this->api()->setUser($user);
+
+        $photo = 'http://example.com/u.gif';
+        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+
+        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+        $this->assertEmpty($dbUser['Photo']);
     }
 
     /**
@@ -181,5 +234,7 @@ class StandardTest extends BaseTest {
         $userRoles = $this->api()->query("select * from GDN_UserRole where UserID = :userID", [':userID' => $dbUser['UserID']]);
         $userRoleIDs = array_column($userRoles, 'RoleID');
         $this->assertEquals($adminUser['RoleID'], $userRoleIDs);
+
+        return $dbUser;
     }
 }

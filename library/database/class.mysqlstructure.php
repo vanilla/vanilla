@@ -16,6 +16,10 @@
  * Class Gdn_MySQLStructure
  */
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
+    /**
+     * @var array[int] An array of table names to row count estimates.
+     */
+    private $rowCountEstimates;
 
     /**
      *

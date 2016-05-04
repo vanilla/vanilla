@@ -14,11 +14,6 @@
  */
 abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
-     * @var array[int] An array of table names to row count estimates.
-     */
-    private $rowCountEstimates;
-
-    /**
      * @var int The maximum number of rows allowed for an alter table.
      */
     private $alterTableThreshold;

@@ -30,6 +30,11 @@ class CategoryModel extends Gdn_Model {
      */
     private static $instance;
 
+    /**
+     * @var CategoryCollection $collection;
+     */
+    private $collection;
+
     /** @var bool */
     public $Watching = false;
 
@@ -53,6 +58,7 @@ class CategoryModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Category');
+        $this->collection = new CategoryCollection();
     }
 
     /**
@@ -97,6 +103,8 @@ class CategoryModel extends Gdn_Model {
      * Load all of the categories from the cache or the database.
      */
     private static function loadAllCategories() {
+        Logger::log(Logger::DEBUG, "CategoryModel::loadAllCategories");
+
         // Try and get the categories from the cache.
         $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
         $rebuild = true;
@@ -185,6 +193,11 @@ class CategoryModel extends Gdn_Model {
      * @since 2.0.18
      */
     public static function categories($ID = false) {
+        if (is_int($ID) || is_string($ID)) {
+            $category = self::instance()->getOne($ID);
+            return $category;
+        }
+
         if (self::$Categories == null) {
             self::loadAllCategories();
 
@@ -468,6 +481,19 @@ class CategoryModel extends Gdn_Model {
             $permissionCategoryIDs = array_keys($permissionCategories);
             return array_intersect($categoryIDs, $permissionCategoryIDs);
         }
+    }
+
+    /**
+     * Check a category's permission.
+     *
+     * @param array $category The category to check.
+     * @param string $permission The permission name to check.
+     * @return bool Returns **true** if the current user has the permission or **false** otherwise.
+     */
+    public static function checkPermission($category, $permission) {
+        $permissionCategoryID = val('PermissionCategoryID', $category);
+        $result = Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID);
+        return $result;
     }
 
     /**
@@ -1083,6 +1109,16 @@ class CategoryModel extends Gdn_Model {
         $CategoryData = $this->SQL->get();
         $this->AddCategoryColumns($CategoryData);
         return $CategoryData;
+    }
+
+    /**
+     * Get a single category from the collection.
+     *
+     * @param string|int $id The category code or ID.
+     */
+    private function getOne($id) {
+        $category = $this->collection->get($id);
+        return $category;
     }
 
     /**

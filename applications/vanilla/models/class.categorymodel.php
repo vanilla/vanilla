@@ -1168,61 +1168,48 @@ class CategoryModel extends Gdn_Model {
      * @return array
      */
     public static function getAncestors($categoryID, $checkPermissions = true, $includeHeadings = false) {
-        $Categories = self::categories();
-        $Result = array();
+        $result = [];
 
-        // Grab the category by ID or url code.
-        if (is_numeric($categoryID)) {
-            if (isset($Categories[$categoryID])) {
-                $Category = $Categories[$categoryID];
-            }
-        } else {
-            foreach ($Categories as $ID => $Value) {
-                if ($Value['UrlCode'] == $categoryID) {
-                    $Category = $Categories[$ID];
-                    break;
-                }
-            }
-        }
+        $category = self::instance()->getOne($categoryID);
 
-        if (!isset($Category)) {
-            return $Result;
+        if (!isset($category)) {
+            return $result;
         }
 
         // Build up the ancestor array by tracing back through parents.
-        $Result[$Category['CategoryID']] = $Category;
+        $result[$category['CategoryID']] = $category;
         $Max = 20;
-        while (isset($Categories[$Category['ParentCategoryID']])) {
+        while ($category = self::instance()->getOne($category['ParentCategoryID'])) {
             // Check for an infinite loop.
             if ($Max <= 0) {
                 break;
             }
             $Max--;
 
-            if ($checkPermissions && !$Category['PermsDiscussionsView']) {
-                $Category = $Categories[$Category['ParentCategoryID']];
+            if ($checkPermissions && !$category['PermsDiscussionsView']) {
+                $category = self::instance()->getOne($category['ParentCategoryID']);
                 continue;
             }
 
-            if ($Category['CategoryID'] == -1) {
+            if ($category['CategoryID'] == -1) {
                 break;
             }
 
             // Return by ID or code.
             if (is_numeric($categoryID)) {
-                $ID = $Category['CategoryID'];
+                $ID = $category['CategoryID'];
             } else {
-                $ID = $Category['UrlCode'];
+                $ID = $category['UrlCode'];
             }
 
-            if ($includeHeadings || $Category['DisplayAs'] !== 'Heading') {
-                $Result[$ID] = $Category;
+            if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
+                $result[$ID] = $category;
             }
 
-            $Category = $Categories[$Category['ParentCategoryID']];
+            $category = self::instance()->getOne($category['ParentCategoryID']);
         }
-        $Result = array_reverse($Result, true); // order for breadcrumbs
-        return $Result;
+        $result = array_reverse($result, true); // order for breadcrumbs
+        return $result;
     }
 
     /**
@@ -1436,7 +1423,7 @@ class CategoryModel extends Gdn_Model {
         }
         return $Data;
     }
-
+    
     /**
      * A simplified version of GetWhere that polls the cache instead of the database.
      * @param array $Where

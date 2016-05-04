@@ -132,11 +132,19 @@ class APIv0 extends HttpClient {
      * @return string Returns the transient key for the user.
      */
     public function getTK($userID) {
-        $user = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $userID]);
+        $user = $this->queryOne("select * from GDN_User where UserID = :userID", ['userID' => $userID]);
         if (empty($user)) {
             return '';
         }
-        $attributes = @unserialize($user['Attributes']);
+        $attributes = (array)dbdecode($user['Attributes']);
+        if (empty($attributes['TransientKey'])) {
+            $attributes['TransientKey'] = randomString(20);
+            $r = $this->query(
+                "update GDN_User set Attributes = :attributes where UserID = :userID",
+                ['attributes' => dbencode($attributes), 'userID' => $userID],
+                true
+            );
+        }
         return val('TransientKey', $attributes, '');
     }
 

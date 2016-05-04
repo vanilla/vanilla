@@ -380,7 +380,7 @@ class ProfileController extends Gdn_Controller {
         $this->fireEvent('BeforeEdit');
 
         // If seeing the form for the first time...
-        if ($this->Form->authenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack(true)) {
             $this->Form->setFormValue('UserID', $UserID);
 
             if (!$CanEditUsername) {
@@ -432,6 +432,15 @@ class ProfileController extends Gdn_Controller {
 
             if ($CanConfirmEmail && is_bool($Confirmation)) {
                 $this->Form->setFormValue('Confirmed', (int)$Confirmation);
+            }
+
+            // Don't allow non-mods to set an explicit photo.
+            if ($photo = $this->Form->getFormValue('Photo')) {
+                if (!checkPermission('Garden.Users.Edit')) {
+                    $this->Form->removeFormValue('Photo');
+                } elseif (!filter_var($photo, FILTER_VALIDATE_URL)) {
+                    $this->Form->addError('Invalid photo URL.');
+                }
             }
 
             if ($this->Form->save($Settings) !== false) {
@@ -735,7 +744,7 @@ class ProfileController extends Gdn_Controller {
                 if (isUrl($photoUrl) && filter_var($photoUrl, FILTER_VALIDATE_URL)) {
                     $UserPhoto = $photoUrl;
                 } else {
-                    $this->Form->addError('Invalid photo URL');
+                    $this->Form->addError('Invalid photo URL.');
                 }
             } else {
                 $UploadImage = new Gdn_UploadImage();

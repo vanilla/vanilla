@@ -152,6 +152,28 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * @param $Category
+     */
+    private static function calculateUser(&$Category) {
+        $Category['Url'] = url($Category['Url'], '//');
+        if ($Photo = val('Photo', $Category)) {
+            $Category['PhotoUrl'] = Gdn_Upload::url($Photo);
+        }
+
+        if (!empty($Category['LastUrl'])) {
+            $Category['LastUrl'] = url($Category['LastUrl'], '//');
+        }
+        $Category['PermsDiscussionsView'] = Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $Category['PermissionCategoryID']);
+        $Category['PermsDiscussionsAdd'] = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', $Category['PermissionCategoryID']);
+        $Category['PermsDiscussionsEdit'] = Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Category['PermissionCategoryID']);
+        $Category['PermsCommentsAdd'] = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $Category['PermissionCategoryID']);
+
+        $Code = $Category['UrlCode'];
+        $Category['Name'] = TranslateContent("Categories.".$Code.".Name", $Category['Name']);
+        $Category['Description'] = TranslateContent("Categories.".$Code.".Description", $Category['Description']);
+    }
+
+    /**
      *
      *
      * @since 2.0.18
@@ -835,8 +857,6 @@ class CategoryModel extends Gdn_Model {
                 $UserData = array();
             }
 
-//         Gdn::controller()->setData('UserData', $UserData);
-
             foreach ($IDs as $ID) {
                 $Category = $Categories[$ID];
 
@@ -876,28 +896,9 @@ class CategoryModel extends Gdn_Model {
         }
 
         // Add permissions.
-        $Session = Gdn::session();
         foreach ($IDs as $CID) {
-            $Category = $Categories[$CID];
-            $Categories[$CID]['Url'] = url($Category['Url'], '//');
-            if ($Photo = val('Photo', $Category)) {
-                $Categories[$CID]['PhotoUrl'] = Gdn_Upload::url($Photo);
-            }
-
-            if (!empty($Category['LastUrl'])) {
-                $Categories[$CID]['LastUrl'] = url($Category['LastUrl'], '//');
-            }
-            $Categories[$CID]['PermsDiscussionsView'] = $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsDiscussionsAdd'] = $Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsDiscussionsEdit'] = $Session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsCommentsAdd'] = $Session->checkPermission('Vanilla.Comments.Add', true, 'Category', $Category['PermissionCategoryID']);
-        }
-
-        // Translate name and description
-        foreach ($IDs as $ID) {
-            $Code = $Categories[$ID]['UrlCode'];
-            $Categories[$ID]['Name'] = TranslateContent("Categories.".$Code.".Name", $Categories[$ID]['Name']);
-            $Categories[$ID]['Description'] = TranslateContent("Categories.".$Code.".Description", $Categories[$ID]['Description']);
+            $Category = &$Categories[$CID];
+            self::calculateUser($Category);
         }
     }
 
@@ -1118,6 +1119,9 @@ class CategoryModel extends Gdn_Model {
      */
     private function getOne($id) {
         $category = $this->collection->get($id);
+        self::calculate($category);
+        self::calculateUser($category);
+
         return $category;
     }
 

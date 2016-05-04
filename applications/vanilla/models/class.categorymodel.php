@@ -94,6 +94,56 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Load all of the categories from the cache or the database.
+     */
+    private static function loadAllCategories() {
+        // Try and get the categories from the cache.
+        $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
+        $rebuild = true;
+
+        // If we received a valid data structure, extract the embedded expiry
+        // and re-store the real categories on our static property.
+        if (is_array($categoriesCache)) {
+            // Test if it's time to rebuild
+            $rebuildAfter = val('expiry', $categoriesCache, null);
+            if (!is_null($rebuildAfter) && time() < $rebuildAfter) {
+                $rebuild = false;
+            }
+            self::$Categories = val('categories', $categoriesCache, null);
+        }
+        unset($categoriesCache);
+
+        if ($rebuild) {
+            // Try to get a rebuild lock
+            $haveRebuildLock = self::rebuildLock();
+            if ($haveRebuildLock || !self::$Categories) {
+                $Sql = Gdn::sql();
+                $Sql = clone $Sql;
+                $Sql->reset();
+
+                $Sql->select('c.*')
+                    ->from('Category c')
+                    //->select('lc.DateInserted', '', 'DateLastComment')
+                    //->join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
+                    ->orderBy('c.TreeLeft');
+
+                self::$Categories = array_merge(array(), $Sql->get()->resultArray());
+                self::$Categories = Gdn_DataSet::Index(self::$Categories, 'CategoryID');
+                self::buildCache();
+
+                // Release lock
+                if ($haveRebuildLock) {
+                    self::rebuildLock(true);
+                }
+            }
+        }
+
+        if (self::$Categories) {
+            self::joinUserData(self::$Categories, true);
+        }
+    }
+
+    /**
      *
      *
      * @since 2.0.18
@@ -136,53 +186,11 @@ class CategoryModel extends Gdn_Model {
      */
     public static function categories($ID = false) {
         if (self::$Categories == null) {
-            // Try and get the categories from the cache.
-            $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
-            $rebuild = true;
+            self::loadAllCategories();
 
-            // If we received a valid data structure, extract the embedded expiry
-            // and re-store the real categories on our static property.
-            if (is_array($categoriesCache)) {
-                // Test if it's time to rebuild
-                $rebuildAfter = val('expiry', $categoriesCache, null);
-                if (!is_null($rebuildAfter) && time() < $rebuildAfter) {
-                    $rebuild = false;
-                }
-                self::$Categories = val('categories', $categoriesCache, null);
-            }
-            unset($categoriesCache);
-
-            if ($rebuild) {
-                // Try to get a rebuild lock
-                $haveRebuildLock = self::rebuildLock();
-                if ($haveRebuildLock || !self::$Categories) {
-                    $Sql = Gdn::sql();
-                    $Sql = clone $Sql;
-                    $Sql->reset();
-
-                    $Sql->select('c.*')
-                        ->from('Category c')
-                        //->select('lc.DateInserted', '', 'DateLastComment')
-                        //->join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
-                        ->orderBy('c.TreeLeft');
-
-                    self::$Categories = array_merge(array(), $Sql->get()->resultArray());
-                    self::$Categories = Gdn_DataSet::Index(self::$Categories, 'CategoryID');
-                    self::buildCache();
-
-                    // Release lock
-                    if ($haveRebuildLock) {
-                        self::rebuildLock(true);
-                    }
-                }
-            }
-
-            if (self::$Categories) {
-                self::joinUserData(self::$Categories, true);
-            } else {
+            if (self::$Categories === null) {
                 return null;
             }
-
         }
 
         if ($ID !== false) {

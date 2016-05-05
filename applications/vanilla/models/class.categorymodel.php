@@ -571,11 +571,10 @@ class CategoryModel extends Gdn_Model {
     /**
      *
      *
-     * @since 2.0.18
-     * @access public
-     * @param array $Data Dataset.
+     * @param array|Gdn_DataSet &$Data Dataset.
      * @param string $Column Name of database column.
-     * @param array $Options 'Join' key may contain array of columns to join on.
+     * @param array $Options The 'Join' key may contain array of columns to join on.
+     * @since 2.0.18
      */
     public static function joinCategories(&$Data, $Column = 'CategoryID', $Options = array()) {
         $Join = val('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCode'));

@@ -11,7 +11,7 @@
 $PluginInfo['Gravatar'] = array(
     'Name' => 'Gravatar',
     'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
-    'Version' => '1.4.3',
+    'Version' => '1.5',
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
@@ -29,10 +29,10 @@ $PluginInfo['Gravatar'] = array(
 class GravatarPlugin extends Gdn_Plugin {
 
     /**
-     * Generate a Gravatar image URL based on the provided e-mail address.
+     * Generate a Gravatar image URL based on the provided email address.
      *
      * @link http://en.gravatar.com/site/implement/images/ Gravatar Image Requests
-     * @param string $email E-mail address for the user, used to generate the avatar ID.
+     * @param string $email Email address for the user, used to generate the avatar ID.
      * @param int $size Target image size.
      * @return string A formatted Gravatar image URL.
      */

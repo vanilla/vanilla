@@ -391,10 +391,13 @@ class CategoryCollection {
     /**
      * Refresh a category in the cache from the database.
      *
+     * This function is public for now, but should only be called from within the {@link CategoryModel}. Eventually it
+     * will be privatized.
+     *
      * @param int $categoryID The category to refresh.
      * @return bool Returns **true** if the category was refreshed or **false** otherwise.
      */
-    private function refreshCache($categoryID) {
+    public function refreshCache($categoryID) {
         $category = $this->sql->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         if ($category) {
             $this->calculate($category);

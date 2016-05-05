@@ -281,7 +281,7 @@ class CategoryModel extends Gdn_Model {
     /**
      * Build and augment the category cache.
      *
-     * @param integer $CategoryID restrict JoinRecentPosts to this ID
+     * @param int $CategoryID The category to
      *
      */
     protected static function buildCache($CategoryID = null) {
@@ -2047,6 +2047,7 @@ class CategoryModel extends Gdn_Model {
         self::BuildCache($ID);
 
         self::JoinUserData(self::$Categories, true);
+        self::instance()->collection->refreshCache((int)$ID);
     }
 
     /**

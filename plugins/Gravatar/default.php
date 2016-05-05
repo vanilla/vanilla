@@ -32,9 +32,9 @@ class GravatarPlugin extends Gdn_Plugin {
      * Generate a Gravatar image URL based on the provided e-mail address.
      *
      * @link http://en.gravatar.com/site/implement/images/ Gravatar Image Requests
-     * @param string $email
-     * @param int $size
-     * @return string
+     * @param string $email E-mail address for the user, used to generate the avatar ID.
+     * @param int $size Target image size.
+     * @return string A formatted Gravatar image URL.
      */
     public static function generateUrl($email, $size = 80) {
         $avatarID = md5(strtolower($email));

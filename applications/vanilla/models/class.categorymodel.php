@@ -1118,9 +1118,15 @@ class CategoryModel extends Gdn_Model {
      * @param string|int $id The category code or ID.
      */
     private function getOne($id) {
+        if (is_numeric($id)) {
+            $id = (int)$id;
+        }
+
         $category = $this->collection->get($id);
-        self::calculate($category);
-        self::calculateUser($category);
+        if (!empty($category)) {
+            self::calculate($category);
+            self::calculateUser($category);
+        }
 
         return $category;
     }

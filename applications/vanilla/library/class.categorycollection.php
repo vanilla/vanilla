@@ -14,16 +14,21 @@ class CategoryCollection {
     /**
      * @var string The cache key prefix that stores categories by ID.
      */
-    private static $CACHE_CATEGORY = 'cat/';
+    private static $CACHE_CATEGORY = '/cat/';
     /**
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
-    private static $CACHE_CATEGORY_SLUG = 'catslug/';
+    private static $CACHE_CATEGORY_SLUG = '/catslug/';
 
     /**
      * @var Gdn_Cache The cache dependency.
      */
     private $cache;
+
+    /**
+     * @var int
+     */
+    private $cacheInc;
 
     /**
      * @var Gdn_Configuration The config dependency.
@@ -104,6 +109,27 @@ class CategoryCollection {
     }
 
     /**
+     * Get the cache increment.
+     *
+     * The cache is flushed after major operations by incrementing a scoped key.
+     */
+    private function getCacheInc() {
+        if ($this->cacheInc === null) {
+            $this->cacheInc = (int)$this->cache->get(self::$CACHE_CATEGORY.'inc');
+        }
+        return $this->cacheInc;
+    }
+
+    /**
+     * Flush the entire category cache.
+     */
+    public function flushCache() {
+        $this->categories = [];
+        $this->categorySlugs = [];
+        $r = $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
+    }
+
+    /**
      * Generate a full cache key.
      *
      * All cache keys should be generated using this function to support cache increments.
@@ -113,7 +139,14 @@ class CategoryCollection {
      * @return string Returns the cache key.
      */
     private function cacheKey($type, $id) {
-        return $type.$id;
+        switch ($type) {
+            case self::$CACHE_CATEGORY;
+            case self::$CACHE_CATEGORY_SLUG;
+                $r = $this->getCacheInc().$type.$id;
+                return $r;
+            default:
+                throw new \InvalidArgumentException("Cache type '$type' is invalid.'", 500);
+        }
     }
 
     /**

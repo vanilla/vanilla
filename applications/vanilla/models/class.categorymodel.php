@@ -363,6 +363,7 @@ class CategoryModel extends Gdn_Model {
      */
     public static function clearCache() {
         Gdn::cache()->remove(self::CACHE_KEY);
+        self::instance()->collection->flushCache();
     }
 
     /**
@@ -1665,6 +1666,7 @@ class CategoryModel extends Gdn_Model {
             }
         }
         $this->SetCache();
+        $this->collection->flushCache();
     }
 
     /**
@@ -2017,6 +2019,8 @@ class CategoryModel extends Gdn_Model {
      * @param array $Data
      */
     public static function setCache($ID = false, $Data = false) {
+        self::instance()->collection->refreshCache((int)$ID);
+
         $Categories = Gdn::cache()->get(self::CACHE_KEY);
         self::$Categories = null;
 
@@ -2047,7 +2051,6 @@ class CategoryModel extends Gdn_Model {
         self::BuildCache($ID);
 
         self::JoinUserData(self::$Categories, true);
-        self::instance()->collection->refreshCache((int)$ID);
     }
 
     /**

@@ -520,6 +520,18 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the child categories of a category.
+     *
+     * @param int $categoryID The category to get the children of.
+     */
+    public static function getChildren($categoryID) {
+        $categories = self::instance()->collection->getChildren($categoryID);
+        self::calculateData($categories);
+        self::joinUserData($categories, false);
+        return $categories;
+    }
+
+    /**
      *
      *
      * @param string $Permission

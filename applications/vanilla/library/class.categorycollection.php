@@ -285,6 +285,23 @@ class CategoryCollection {
     }
 
     /**
+     * Get the children of a category.
+     *
+     * @param int $categoryID The category to get the children for.
+     * @return array Returns an array of categories.
+     */
+    public function getChildren($categoryID) {
+        $children = $this
+            ->sql
+            ->select('CategoryID')
+            ->getWhere('Category', ['ParentCategoryID' => $categoryID])
+            ->resultArray();
+        $ids = array_column($children, 'CategoryID');
+        $categories = $this->getMulti($ids);
+        return $categories;
+    }
+
+    /**
      * Get several categories by ID.
      *
      * @param array $categoryIDs An array of category IDs.

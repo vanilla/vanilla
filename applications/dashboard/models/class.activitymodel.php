@@ -169,6 +169,8 @@ class ActivityModel extends Gdn_Model {
 
             $result = $this->deleteID($where, $options);
             return $result;
+        } elseif (count($where) === 1 && isset($where['ActivityID'])) {
+            return parent::delete($where, $options);
         }
 
         throw new \BadMethodCallException("ActivityModel->delete() is not supported.", 400);

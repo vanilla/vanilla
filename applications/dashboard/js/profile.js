@@ -3,13 +3,6 @@ jQuery(document).ready(function($) {
     // Set the max chars in the about form.
     $('form.About textarea').setMaxChars(1000);
 
-    $(".js-new-avatar").click(function () {
-        $(".js-new-avatar-upload").trigger("click");
-        $(".js-new-avatar-upload").change(function() {
-            $('.js-change-picture-form').submit();
-        });
-    });
-
     // Ajax invitation uninvites and send agains if they're in a popup
     // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
     // $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
@@ -77,5 +70,12 @@ jQuery(document).ready(function($) {
             }
             return false;
         }
+    });
+});
+
+$(document).on('click', '.js-new-avatar', function () {
+    $(".js-new-avatar-upload").trigger("click");
+    $(".js-new-avatar-upload").change(function() {
+        $('.js-change-picture-form').submit();
     });
 });

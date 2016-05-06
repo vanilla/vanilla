@@ -13,7 +13,10 @@
  */
 class RecentActivityModule extends Gdn_Module {
 
-    public $ActivityData = false;
+    /**
+     * @var Gdn_DataSet|null
+     */
+    public $ActivityData = null;
 
     public $ActivityModuleTitle = '';
 
@@ -43,12 +46,12 @@ class RecentActivityModule extends Gdn_Module {
         }
 
         if (!$this->ActivityData) {
-            $this->GetData();
+            $this->getData();
         }
 
         $Data = $this->ActivityData;
         if (is_object($Data) && $Data->numRows() > 0) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

@@ -259,14 +259,14 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
     /**
      * Index a result array.
      *
-     * @param array $Data The array to index. It is formatted similar to the array returned by Gdn_DataSet::Result().
+     * @param array|Traversable $Data The array to index. It is formatted similar to the array returned by Gdn_DataSet::Result().
      * @param string|array $Columns The name of the column to index on or an array of columns to index on.
      * @param array $Options An array of options for the method.
      *  - <b>Sep</b>: The string to seperate index columns by. Default '|'.
      *  - <b>Unique</b>: Whether or not the results are unique.
      *   - <b>true</b> (default): The index is unique.
      *   - <b>false</b>: The index is not unique and each indexed row will be an array or arrays.
-     * @return type
+     * @return array
      */
     public static function index($Data, $Columns, $Options = array()) {
         $Columns = (array)$Columns;
@@ -548,6 +548,8 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
 
     /**
      * Returns an array of associative arrays containing the ResultSet data.
+     *
+     * @return array& Returns an array reference.
      */
     public function &resultArray() {
         return $this->result(DATASET_TYPE_ARRAY);

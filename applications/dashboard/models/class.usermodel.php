@@ -971,7 +971,7 @@ class UserModel extends Gdn_Model {
     /**
      * Add user data to a result set.
      *
-     * @param object &$Data Results we need to associate user data with.
+     * @param array|Gdn_DataSet $Data Results we need to associate user data with.
      * @param array $Columns Database columns containing UserIDs to get data for.
      * @param array $Options Optionally pass list of user data to collect with key 'Join'.
      */

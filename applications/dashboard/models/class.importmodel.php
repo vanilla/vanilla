@@ -2185,10 +2185,13 @@ class ImportModel extends Gdn_Model {
 
         // Figure out the current position.
         $fPosition = val('CurrentLoadPosition', $this->Data, 0);
+
         if ($fPosition == 0 && $skipHeader) {
             // Skip the header row.
             $Row = self::FGetCSV2($fp);
+        }
 
+        if ($fPosition == 0) {
             $Px = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX;
             Gdn::database()->query("truncate table {$Px}{$Tablename}");
         } else {

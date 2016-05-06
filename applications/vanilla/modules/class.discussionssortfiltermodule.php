@@ -62,16 +62,20 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
     /**
      * @param $showSorts Whether to show the sorting options in the view.
+     * @return DiscussionsSortFilterModule $this
      */
     public function setShowSorts($showSorts) {
         $this->showSorts = $showSorts;
+        return $this;
     }
 
     /**
      * @param $showFilters Whether to show the filtering options in the view.
+     * @return DiscussionsSortFilterModule $this
      */
     public function setShowFilters($showFilters) {
         $this->showFilters = $showFilters;
+        return $this;
     }
 
     /**
@@ -101,9 +105,11 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
     /**
      * @param string $dropdownView The view of the dropdown module to render.
+     * @return DiscussionsSortFilterModule $this
      */
     public function setDropdownView($dropdownView) {
         $this->dropdownView = $dropdownView;
+        return $this;
     }
 
     /**

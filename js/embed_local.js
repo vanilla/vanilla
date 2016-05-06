@@ -127,8 +127,16 @@ jQuery(document).ready(function($) {
 
     if (inIframe) {
         // DO NOT set the parent location if this is a page of embedded comments!!
-        if (path != '~' && !isEmbeddedComments)
-            remotePostMessage('location:' + encodePath(path), '*');
+        if (path != '~' && !isEmbeddedComments) {
+            var location = encodePath(path);
+
+            if (gdn.definition("Args").length > 0) {
+                var argsSeparator = path.indexOf("?") === -1 ? "?" : "&";
+                location = location + argsSeparator + gdn.definition("Args");
+            }
+
+            remotePostMessage('location:' + location, '*');
+        }
 
         // Unembed if in the dashboard, in an iframe, and not forcing dashboard embed
         if (inDashboard && !forceEmbedDashboard)

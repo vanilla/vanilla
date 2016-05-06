@@ -1006,6 +1006,7 @@ if (!function_exists('fetchPageInfo')) {
                 'Cookies' => $sendCookies,
                 'Redirects' => true,
             ));
+
             if (!$Request->status()) {
                 throw new Exception('Couldn\'t connect to host.', 400);
             }
@@ -1785,9 +1786,20 @@ if (!function_exists('htmlEntityDecode')) {
     function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
-        $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', function($matches) { chr_utf8(hexdec($matches[1])); }, $string);
-        $string = preg_replace_callback('/&#([0-9]+);/', function($matches) { return chr_utf8($matches[1]); }, $string);
+        $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
+        $string = preg_replace('/&#([0-9]+);/e', 'chr_utf8("\\1")', $string);
         return $string;
+    }
+
+    /**
+     * A callback helper for {@link htmlEntityDecode()}.
+     *
+     * @param array[string] $matches An array of matches from {@link preg_replace_callback()}.
+     * @return string Returns the match passed through {@link chr_utf8()}.
+     * @access private
+     */
+    function chr_utf8_callback($matches) {
+        return chr_utf8(hexdec($matches[1]));
     }
 
     /**
@@ -3150,8 +3162,8 @@ if (!function_exists('safeRedirect')) {
 
 if (!function_exists('safeUnlink')) {
     /**
-     * A version of {@link unlink()} that won't raise a warning.
-     *
+     * A version of {@link unlinl()} that won't raise a warning.
+     * 
      * @param string $filename Path to the file.
      * @return Returns TRUE on success or FALSE on failure.
      */

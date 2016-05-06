@@ -82,7 +82,7 @@ class CategoryCollection {
         $category['CountAllDiscussions'] = $category['CountDiscussions'];
         $category['CountAllComments'] = $category['CountComments'];
 //        $category['Url'] = self::categoryUrl($category, false, '/');
-        $category['ChildIDs'] = array();
+        $category['ChildIDs'] = [];
 //        if (val('Photo', $category)) {
 //            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
 //        } else {
@@ -126,7 +126,7 @@ class CategoryCollection {
     public function flushCache() {
         $this->categories = [];
         $this->categorySlugs = [];
-        $r = $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
+        $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
     }
 
     /**
@@ -156,9 +156,9 @@ class CategoryCollection {
      * @param mixed $default The default to return if the config isn't found.
      * @return mixed Returns the config value or {@link $default} if it isn't found.
      */
-    private function config($key, $default) {
+    private function config($key, $default = null) {
         if ($this->config !== null) {
-            return $this->config($key, $default);
+            return $this->config->get($key, $default);
         } else {
             return $default;
         }
@@ -194,17 +194,6 @@ class CategoryCollection {
             $this->schema = new Gdn_Schema('Category', $this->sql->Database);
         }
         return $this->schema;
-    }
-
-    /**
-     * Strip the ID part of the end of a cache key.
-     *
-     * @param string $key The key to strip.
-     * @return string Returns the ID portion of the key.
-     */
-    private function stripKey($key) {
-        return substr(strrchr($key, '/'), 1);
-
     }
 
     /**
@@ -315,7 +304,6 @@ class CategoryCollection {
         $categories = array_replace($categories, $internalCategories);
 
         // Look in the global cache.
-        $diff = array_diff_key($categories, $internalCategories);
         $keys = [];
         foreach (array_diff_key($categories, $internalCategories) as $id => $null) {
             $keys[] = $this->cacheKey(self::$CACHE_CATEGORY, $id);

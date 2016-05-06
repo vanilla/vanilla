@@ -7,8 +7,12 @@ jQuery(document).ready(function($) {
     }
 
     var encodePath = function(path) {
-        var result = encodeURIComponent(path);
+        var parts = path.split('?', 2);
+        var result = encodeURIComponent(parts[0]);
         result = result.replace(/%2F/g, '/');
+        if (parts[1] !== undefined) {
+            result += '?' + parts[1];
+        }
         return result;
     };
 
@@ -25,9 +29,15 @@ jQuery(document).ready(function($) {
         forceEmbedForum = gdn.definition('ForceEmbedForum') == '1',
         isEmbeddedComments = gdn.definition('Embedded', '') != '',
         webroot = gdn.definition('WebRoot'),
-        path = gdn.definition('Path', '~');
-    if (path.length > 0 && path[0] != '/')
+        path = gdn.getMeta('Path', '/'),
+        query = gdn.getMeta('Query', []);
+
+    if (path.length === 0 || path[0] !== '/') {
         path = '/' + path;
+    }
+    if (query.length > 0) {
+        path += '?' + query;
+    }
     /*
      Embedded pages can have very low height settings. As a result, when an
      absolutely positioned popup appears on the page, iframed content doesn't

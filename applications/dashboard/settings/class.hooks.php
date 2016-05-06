@@ -120,6 +120,7 @@ class DashboardHooks implements Gdn_IPlugin {
             }
 
             $Sender->addDefinition('Path', Gdn::request()->path());
+            $Sender->addDefinition('Query', http_build_query(Gdn::request()->get()));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $Sender->addDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
 

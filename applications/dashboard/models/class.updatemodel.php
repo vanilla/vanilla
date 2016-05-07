@@ -345,7 +345,7 @@ class UpdateModel extends Gdn_Model {
                 }
             }
 
-            if ($Application !== false && $Version !== false) {
+            if ($Application !== false && $Version !== '') {
                 break;
             }
         }

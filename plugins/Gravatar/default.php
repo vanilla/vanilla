@@ -60,12 +60,15 @@ class GravatarPlugin extends Gdn_Plugin {
 
             $default = "{$vanilliconBaseUrl}/{$avatarID}_{$vanilliconSize}.png";
         } else {
-            $pluginDefaultAvatar = $size <= 50 ? 'plugins/Gravatar/default.png' : 'plugins/Gravatar/default_250.png';
-
-            $default = asset(
-                c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar', $pluginDefaultAvatar)),
-                true
-            );
+            $configuredDefaultAvatar = c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar'));
+            if ($configuredDefaultAvatar) {
+                $default = Gdn_Upload::parse($configuredDefaultAvatar);
+            } else {
+                $default = asset(
+                    $size <= 50 ? 'plugins/Gravatar/default.png' : 'plugins/Gravatar/default_250.png',
+                    true
+                );
+            }
         }
 
         $query = [

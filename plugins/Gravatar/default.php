@@ -62,13 +62,16 @@ class GravatarPlugin extends Gdn_Plugin {
         } else {
             $configuredDefaultAvatar = c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar'));
             if ($configuredDefaultAvatar) {
-                $default = Gdn_Upload::parse($configuredDefaultAvatar);
-            } else {
-                $default = asset(
-                    $size <= 50 ? 'plugins/Gravatar/default.png' : 'plugins/Gravatar/default_250.png',
-                    true
-                );
+                $defaultParsed = Gdn_Upload::parse($configuredDefaultAvatar);
+                $default = val('Url', $defaultParsed);
             }
+        }
+
+        if (empty($default)){
+            $default = asset(
+                $size <= 50 ? 'plugins/Gravatar/default.png' : 'plugins/Gravatar/default_250.png',
+                true
+            );
         }
 
         $query = [

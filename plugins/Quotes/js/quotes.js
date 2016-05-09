@@ -193,6 +193,5 @@ Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
 })(window);
 
 $(document).on('contentLoad', function (e) {
-    console.log('quotes.contentLoad');
     GdnQuotes.format(e.target);
 });

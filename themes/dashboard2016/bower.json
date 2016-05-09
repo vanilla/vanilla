@@ -1,0 +1,7 @@
+{
+  "name": "dashboard-2016",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^4.0.0"
+  }
+}

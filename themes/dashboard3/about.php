@@ -1,7 +1,7 @@
 <?php
 
-$ThemeInfo['dashboard2016'] = array(
-    'Name'        => "Dashboard 2016",
+$ThemeInfo['dashboard3'] = array(
+    'Name'        => "Dashboard v3",
     'Description' => "A new dashboard design for Vanilla.",
     'Version'     => '1.0.0',
     'Author'      => "Becky Van Bussel",

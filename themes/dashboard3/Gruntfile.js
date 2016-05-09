@@ -54,7 +54,8 @@ module.exports = function (grunt) {
             // flatten: true,
             cwd: 'bower_components',
             src: [
-              'bootstrap/scss/_normalize.scss'
+              'bootstrap/LICENSE'
+              , 'bootstrap/scss/_normalize.scss'
               , 'bootstrap/scss/_utilities.scss'
               , 'bootstrap/scss/_variables.scss'
               , 'bootstrap/scss/mixins/*.scss'

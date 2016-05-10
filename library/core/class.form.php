@@ -46,9 +46,11 @@ class Gdn_Form extends Gdn_Pluggable {
             'checkbox-inline' => 'checkbox-inline',
             'file' => 'form-control-file',
             'inputbox' => 'form-control',
+            'popup' => 'js-popup',
             'primary' => 'btn-primary',
             'radio' => '',
             'radio-container' => 'radio',
+            'smallbutton' => 'btn btn-sm'
         ]
     ];
 
@@ -315,6 +317,26 @@ class Gdn_Form extends Gdn_Pluggable {
             $Return .= " />\n";
         }
         return $Return;
+    }
+
+    /**
+     * Return a linked that will look like a button.
+     *
+     * @param string $code The text of the anchor.
+     * @param string $destination The URL path of the anchor.
+     * @param array $attributes Additional attributes for the anchor.
+     * @see anchor()
+     */
+    public function linkButton($code, $destination = '', $attributes = []) {
+        if (empty($attributes['class'])) {
+            $cssClass = $this->getStyle('button', '');
+        } else {
+            $cssClass = $this->translateClasses($attributes['class']);
+            unset($attributes['class']);
+        }
+
+        $result = anchor(t($code), $destination, $cssClass, $attributes, true);
+        return $result;
     }
 
     /**

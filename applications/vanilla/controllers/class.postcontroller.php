@@ -990,7 +990,7 @@ function checkOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
 
         $Result = ' <b>'.t($LabelCode)."</b> <ul class=\"$CssClass\">";
         foreach ($ListOptions as $Value => $Code) {
-            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
+            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value, 'class' => 'radio-inline')).'</li> ';
         }
         $Result .= '</ul>';
         return $Result;

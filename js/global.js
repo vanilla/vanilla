@@ -1487,8 +1487,8 @@ jQuery(document).ready(function($) {
         // where it's actually triggered.
         var autosizeTriggers = [
             'clearCommentForm',
-            'popupReveal'
-            //'appendHtml'
+            'popupReveal',
+            'contentLoad'
         ];
 
         $(document).on(autosizeTriggers.join(' '), function(e, data) {

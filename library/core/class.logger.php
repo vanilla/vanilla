@@ -129,7 +129,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function debug($message, $context) {
+    public static function debug($message, $context = []) {
         static::log(Logger::DEBUG, $message, $context);
     }
 
@@ -139,7 +139,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function info($message, $context) {
+    public static function info($message, $context = []) {
         static::log(Logger::INFO, $message, $context);
     }
 
@@ -149,7 +149,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function notice($message, $context) {
+    public static function notice($message, $context = []) {
         static::log(Logger::NOTICE, $message, $context);
     }
 
@@ -159,7 +159,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function warning($message, $context) {
+    public static function warning($message, $context = []) {
         static::log(Logger::WARNING, $message, $context);
     }
 
@@ -169,7 +169,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function error($message, $context) {
+    public static function error($message, $context = []) {
         static::log(Logger::ERROR, $message, $context);
     }
 
@@ -179,7 +179,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function critical($message, $context) {
+    public static function critical($message, $context = []) {
         static::log(Logger::CRITICAL, $message, $context);
     }
 
@@ -189,7 +189,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function alert($message, $context) {
+    public static function alert($message, $context = []) {
         static::log(Logger::ALERT, $message, $context);
     }
 
@@ -199,7 +199,7 @@ class Logger {
      * @param string $message The message to log.
      * @param string $context The message data.
      */
-    public static function emergency($message, $context) {
+    public static function emergency($message, $context = []) {
         static::log(Logger::EMERGENCY, $message, $context);
     }
 

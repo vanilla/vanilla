@@ -26,7 +26,7 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     private $allStyles = [
         'legacy' => [
-            'bodybox' => 'TextBox BodyBox',
+            'bodybox' => 'TextBox BodyBox js-bodybox',
             'button' => 'Button',
             'button-element' => 'input',
             'checkbox' => 'CheckBoxLabel',
@@ -38,6 +38,7 @@ class Gdn_Form extends Gdn_Pluggable {
         ],
         'bootstrap' => [
             'default' => 'form-control',
+            'bodybox' => 'form-control js-bodybox',
             'button' => 'btn',
             'button-element' => 'button',
             'checkbox' => '',

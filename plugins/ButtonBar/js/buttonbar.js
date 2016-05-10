@@ -226,7 +226,7 @@ ButtonBar = {
             .each(function (i, textarea) {
                 var $textarea = $(textarea);
 
-                if ($textarea.hasClass('BodyBox') && !$textarea.data('ButtonBar')) {
+                if (($textarea.hasClass('BodyBox') || $textarea.hasClass('.js-bodybox')) && !$textarea.data('ButtonBar')) {
                     $textarea.data('ButtonBar', '1');
                     ButtonBar.AttachTo(textarea);
                 }

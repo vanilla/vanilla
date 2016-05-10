@@ -1916,7 +1916,7 @@ jQuery(document).ready(function($) {
                 // Either @ or : for now.
                 var at = context.at;
                 var text = context.query.text;
-                var font_mirror = $('.BodyBox');
+                var font_mirror = $('.BodyBox,.js-bodybox');
                 var font = font_mirror.css('font-size') + ' ' + font_mirror.css('font-family');
 
                 // Get font width
@@ -1965,9 +1965,9 @@ jQuery(document).ready(function($) {
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
         $(document).on('contentLoad', function() {
-            gdn.atCompleteInit('.BodyBox', '');
+            gdn.atCompleteInit('.BodyBox,.js-bodybox', '');
         });
-        gdn.atCompleteInit('.BodyBox', '');
+        gdn.atCompleteInit('.BodyBox,.js-bodybox', '');
     }
 
 

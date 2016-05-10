@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.11',
+   'Version' => '1.8.0',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -750,10 +750,10 @@ class EditorPlugin extends Gdn_Plugin {
 
             // Determine if image, and thus requires thumbnail generation, or simply saving the file.
             // Not all files will be images.
-            $thumbHeight = null;
-            $thumbWidth = null;
-            $imageHeight = null;
-            $imageWidth = null;
+            $thumbHeight = '';
+            $thumbWidth = '';
+            $imageHeight = '';
+            $imageWidth = '';
             $thumbPathParsed = array('SaveName' => '');
             $thumbUrl = '';
 
@@ -1395,8 +1395,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Get actual path to the file.
-        $upload = new Gdn_UploadImage();
-        $local_path = $upload->copyLocal(val('Path', $media));
+        $local_path = Gdn_Upload::copyLocal($media['Path']);
         if (!file_exists($local_path)) {
             throw notFoundException('File');
         }

@@ -1376,6 +1376,17 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * Get the count of discussions for an individual category.
+     *
+     * @param int $categoryID The category to get the count of.
+     * @return int Returns the count of discussions.
+     */
+    public function getCountForCategory($categoryID) {
+        $category = CategoryModel::categories((int)$categoryID);
+        return (int)val('CountDiscussions', $category, 0);
+    }
+
+    /**
      * Count how many discussions match the given criteria.
      *
      * @since 2.0.0
@@ -1389,6 +1400,8 @@ class DiscussionModel extends VanillaModel {
         $Wheres = $this->combineWheres($this->getWheres(), $Wheres);
         if (is_array($Wheres) && count($Wheres) == 0) {
             $Wheres = '';
+        } elseif (is_array($Wheres) && count($Wheres) === 1 && isset($Wheres['d.CategoryID'])) {
+            return $this->getCountForCategory($Wheres['d.CategoryID']);
         }
 
         // Check permission and limit to categories as necessary

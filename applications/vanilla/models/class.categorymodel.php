@@ -25,6 +25,16 @@ class CategoryModel extends Gdn_Model {
     /** Cache key. */
     const MASTER_VOTE_KEY = 'Categories.Rebuild.Vote';
 
+    /**
+     * @var CategoryModel $instance;
+     */
+    private static $instance;
+
+    /**
+     * @var CategoryCollection $collection;
+     */
+    private $collection;
+
     /** @var bool */
     public $Watching = false;
 
@@ -48,6 +58,19 @@ class CategoryModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Category');
+        $this->collection = new CategoryCollection();
+    }
+
+    /**
+     * The shared instance of this object.
+     *
+     * @return CategoryModel Returns the instance.
+     */
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new CategoryModel();
+        }
+        return self::$instance;
     }
 
 
@@ -74,6 +97,80 @@ class CategoryModel extends Gdn_Model {
         Gdn::pluginManager()->fireEvent('AllowedDiscussionTypes');
 
         return $allowedTypes;
+    }
+
+    /**
+     * Load all of the categories from the cache or the database.
+     */
+    private static function loadAllCategories() {
+        Logger::log(Logger::DEBUG, "CategoryModel::loadAllCategories");
+
+        // Try and get the categories from the cache.
+        $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
+        $rebuild = true;
+
+        // If we received a valid data structure, extract the embedded expiry
+        // and re-store the real categories on our static property.
+        if (is_array($categoriesCache)) {
+            // Test if it's time to rebuild
+            $rebuildAfter = val('expiry', $categoriesCache, null);
+            if (!is_null($rebuildAfter) && time() < $rebuildAfter) {
+                $rebuild = false;
+            }
+            self::$Categories = val('categories', $categoriesCache, null);
+        }
+        unset($categoriesCache);
+
+        if ($rebuild) {
+            // Try to get a rebuild lock
+            $haveRebuildLock = self::rebuildLock();
+            if ($haveRebuildLock || !self::$Categories) {
+                $Sql = Gdn::sql();
+                $Sql = clone $Sql;
+                $Sql->reset();
+
+                $Sql->select('c.*')
+                    ->from('Category c')
+                    //->select('lc.DateInserted', '', 'DateLastComment')
+                    //->join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
+                    ->orderBy('c.TreeLeft');
+
+                self::$Categories = array_merge(array(), $Sql->get()->resultArray());
+                self::$Categories = Gdn_DataSet::Index(self::$Categories, 'CategoryID');
+                self::buildCache();
+
+                // Release lock
+                if ($haveRebuildLock) {
+                    self::rebuildLock(true);
+                }
+            }
+        }
+
+        if (self::$Categories) {
+            self::joinUserData(self::$Categories, true);
+        }
+    }
+
+    /**
+     * @param $Category
+     */
+    private static function calculateUser(&$Category) {
+        $Category['Url'] = url($Category['Url'], '//');
+        if ($Photo = val('Photo', $Category)) {
+            $Category['PhotoUrl'] = Gdn_Upload::url($Photo);
+        }
+
+        if (!empty($Category['LastUrl'])) {
+            $Category['LastUrl'] = url($Category['LastUrl'], '//');
+        }
+        $Category['PermsDiscussionsView'] = Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $Category['PermissionCategoryID']);
+        $Category['PermsDiscussionsAdd'] = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', $Category['PermissionCategoryID']);
+        $Category['PermsDiscussionsEdit'] = Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Category['PermissionCategoryID']);
+        $Category['PermsCommentsAdd'] = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $Category['PermissionCategoryID']);
+
+        $Code = $Category['UrlCode'];
+        $Category['Name'] = TranslateContent("Categories.".$Code.".Name", $Category['Name']);
+        $Category['Description'] = TranslateContent("Categories.".$Code.".Description", $Category['Description']);
     }
 
     /**
@@ -118,54 +215,17 @@ class CategoryModel extends Gdn_Model {
      * @since 2.0.18
      */
     public static function categories($ID = false) {
+        if (is_int($ID) || is_string($ID)) {
+            $category = self::instance()->getOne($ID);
+            return $category;
+        }
+
         if (self::$Categories == null) {
-            // Try and get the categories from the cache.
-            $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
-            $rebuild = true;
+            self::loadAllCategories();
 
-            // If we received a valid data structure, extract the embedded expiry
-            // and re-store the real categories on our static property.
-            if (is_array($categoriesCache)) {
-                // Test if it's time to rebuild
-                $rebuildAfter = val('expiry', $categoriesCache, null);
-                if (!is_null($rebuildAfter) && time() < $rebuildAfter) {
-                    $rebuild = false;
-                }
-                self::$Categories = val('categories', $categoriesCache, null);
-            }
-            unset($categoriesCache);
-
-            if ($rebuild) {
-                // Try to get a rebuild lock
-                $haveRebuildLock = self::rebuildLock();
-                if ($haveRebuildLock || !self::$Categories) {
-                    $Sql = Gdn::sql();
-                    $Sql = clone $Sql;
-                    $Sql->reset();
-
-                    $Sql->select('c.*')
-                        ->from('Category c')
-                        //->select('lc.DateInserted', '', 'DateLastComment')
-                        //->join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
-                        ->orderBy('c.TreeLeft');
-
-                    self::$Categories = array_merge(array(), $Sql->get()->resultArray());
-                    self::$Categories = Gdn_DataSet::Index(self::$Categories, 'CategoryID');
-                    self::buildCache();
-
-                    // Release lock
-                    if ($haveRebuildLock) {
-                        self::rebuildLock(true);
-                    }
-                }
-            }
-
-            if (self::$Categories) {
-                self::joinUserData(self::$Categories, true);
-            } else {
+            if (self::$Categories === null) {
                 return null;
             }
-
         }
 
         if ($ID !== false) {
@@ -221,7 +281,7 @@ class CategoryModel extends Gdn_Model {
     /**
      * Build and augment the category cache.
      *
-     * @param integer $CategoryID restrict JoinRecentPosts to this ID
+     * @param int $CategoryID The category to
      *
      */
     protected static function buildCache($CategoryID = null) {
@@ -239,41 +299,50 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Calculate the dynamic fields of a category.
+     *
+     * @param array &$category The category to calculate.
+     */
+    private static function calculate(&$category) {
+        $category['CountAllDiscussions'] = $category['CountDiscussions'];
+        $category['CountAllComments'] = $category['CountComments'];
+        $category['Url'] = self::categoryUrl($category, false, '/');
+        $category['ChildIDs'] = array();
+        if (val('Photo', $category)) {
+            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
+        } else {
+            $category['PhotoUrl'] = '';
+        }
+
+        if ($category['DisplayAs'] == 'Default') {
+            if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
+                $category['DisplayAs'] = 'Categories';
+            } elseif ($category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
+                $category['DisplayAs'] = 'Heading';
+            } else {
+                $category['DisplayAs'] = 'Discussions';
+            }
+        }
+
+        if (!val('CssClass', $category)) {
+            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+        }
+
+        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
+            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        }
+    }
+
+    /**
      * Build calculated category data on the passed set.
      *
      * @since 2.0.18
      * @access public
      * @param array $Data Dataset.
      */
-    protected static function calculateData(&$Data) {
+    private static function calculateData(&$Data) {
         foreach ($Data as &$Category) {
-            $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
-            $Category['CountAllComments'] = $Category['CountComments'];
-            $Category['Url'] = self::categoryUrl($Category, false, '/');
-            $Category['ChildIDs'] = array();
-            if (val('Photo', $Category)) {
-                $Category['PhotoUrl'] = Gdn_Upload::url($Category['Photo']);
-            } else {
-                $Category['PhotoUrl'] = '';
-            }
-
-            if ($Category['DisplayAs'] == 'Default') {
-                if ($Category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
-                    $Category['DisplayAs'] = 'Categories';
-                } elseif ($Category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
-                    $Category['DisplayAs'] = 'Heading';
-                } else {
-                    $Category['DisplayAs'] = 'Discussions';
-                }
-            }
-
-            if (!val('CssClass', $Category)) {
-                $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
-            }
-
-            if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes'])) {
-                $Category['AllowedDiscussionTypes'] = dbdecode($Category['AllowedDiscussionTypes']);
-            }
+            self::calculate($Category);
         }
 
         $Keys = array_reverse(array_keys($Data));
@@ -294,6 +363,7 @@ class CategoryModel extends Gdn_Model {
      */
     public static function clearCache() {
         Gdn::cache()->remove(self::CACHE_KEY);
+        self::instance()->collection->flushCache();
     }
 
     /**
@@ -434,6 +504,31 @@ class CategoryModel extends Gdn_Model {
             $permissionCategoryIDs = array_keys($permissionCategories);
             return array_intersect($categoryIDs, $permissionCategoryIDs);
         }
+    }
+
+    /**
+     * Check a category's permission.
+     *
+     * @param array $category The category to check.
+     * @param string $permission The permission name to check.
+     * @return bool Returns **true** if the current user has the permission or **false** otherwise.
+     */
+    public static function checkPermission($category, $permission) {
+        $permissionCategoryID = val('PermissionCategoryID', $category);
+        $result = Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID);
+        return $result;
+    }
+
+    /**
+     * Get the child categories of a category.
+     *
+     * @param int $categoryID The category to get the children of.
+     */
+    public static function getChildren($categoryID) {
+        $categories = self::instance()->collection->getChildren($categoryID);
+        self::calculateData($categories);
+        self::joinUserData($categories, false);
+        return $categories;
     }
 
     /**
@@ -775,8 +870,6 @@ class CategoryModel extends Gdn_Model {
                 $UserData = array();
             }
 
-//         Gdn::controller()->setData('UserData', $UserData);
-
             foreach ($IDs as $ID) {
                 $Category = $Categories[$ID];
 
@@ -816,28 +909,9 @@ class CategoryModel extends Gdn_Model {
         }
 
         // Add permissions.
-        $Session = Gdn::session();
         foreach ($IDs as $CID) {
-            $Category = $Categories[$CID];
-            $Categories[$CID]['Url'] = url($Category['Url'], '//');
-            if ($Photo = val('Photo', $Category)) {
-                $Categories[$CID]['PhotoUrl'] = Gdn_Upload::url($Photo);
-            }
-
-            if (!empty($Category['LastUrl'])) {
-                $Categories[$CID]['LastUrl'] = url($Category['LastUrl'], '//');
-            }
-            $Categories[$CID]['PermsDiscussionsView'] = $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsDiscussionsAdd'] = $Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsDiscussionsEdit'] = $Session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Category['PermissionCategoryID']);
-            $Categories[$CID]['PermsCommentsAdd'] = $Session->checkPermission('Vanilla.Comments.Add', true, 'Category', $Category['PermissionCategoryID']);
-        }
-
-        // Translate name and description
-        foreach ($IDs as $ID) {
-            $Code = $Categories[$ID]['UrlCode'];
-            $Categories[$ID]['Name'] = TranslateContent("Categories.".$Code.".Name", $Categories[$ID]['Name']);
-            $Categories[$ID]['Description'] = TranslateContent("Categories.".$Code.".Description", $Categories[$ID]['Description']);
+            $Category = &$Categories[$CID];
+            self::calculateUser($Category);
         }
     }
 
@@ -1052,6 +1126,25 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get a single category from the collection.
+     *
+     * @param string|int $id The category code or ID.
+     */
+    private function getOne($id) {
+        if (is_numeric($id)) {
+            $id = (int)$id;
+        }
+
+        $category = $this->collection->get($id);
+        if (!empty($category)) {
+            self::calculate($category);
+            self::calculateUser($category);
+        }
+
+        return $category;
+    }
+
+    /**
      * Get list of categories (disregarding user permission for admins).
      *
      * @since 2.0.0
@@ -1094,61 +1187,48 @@ class CategoryModel extends Gdn_Model {
      * @return array
      */
     public static function getAncestors($categoryID, $checkPermissions = true, $includeHeadings = false) {
-        $Categories = self::categories();
-        $Result = array();
+        $result = [];
 
-        // Grab the category by ID or url code.
-        if (is_numeric($categoryID)) {
-            if (isset($Categories[$categoryID])) {
-                $Category = $Categories[$categoryID];
-            }
-        } else {
-            foreach ($Categories as $ID => $Value) {
-                if ($Value['UrlCode'] == $categoryID) {
-                    $Category = $Categories[$ID];
-                    break;
-                }
-            }
-        }
+        $category = self::instance()->getOne($categoryID);
 
-        if (!isset($Category)) {
-            return $Result;
+        if (!isset($category)) {
+            return $result;
         }
 
         // Build up the ancestor array by tracing back through parents.
-        $Result[$Category['CategoryID']] = $Category;
+        $result[$category['CategoryID']] = $category;
         $Max = 20;
-        while (isset($Categories[$Category['ParentCategoryID']])) {
+        while ($category = self::instance()->getOne($category['ParentCategoryID'])) {
             // Check for an infinite loop.
             if ($Max <= 0) {
                 break;
             }
             $Max--;
 
-            if ($checkPermissions && !$Category['PermsDiscussionsView']) {
-                $Category = $Categories[$Category['ParentCategoryID']];
+            if ($checkPermissions && !$category['PermsDiscussionsView']) {
+                $category = self::instance()->getOne($category['ParentCategoryID']);
                 continue;
             }
 
-            if ($Category['CategoryID'] == -1) {
+            if ($category['CategoryID'] == -1) {
                 break;
             }
 
             // Return by ID or code.
             if (is_numeric($categoryID)) {
-                $ID = $Category['CategoryID'];
+                $ID = $category['CategoryID'];
             } else {
-                $ID = $Category['UrlCode'];
+                $ID = $category['UrlCode'];
             }
 
-            if ($includeHeadings || $Category['DisplayAs'] !== 'Heading') {
-                $Result[$ID] = $Category;
+            if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
+                $result[$ID] = $category;
             }
 
-            $Category = $Categories[$Category['ParentCategoryID']];
+            $category = self::instance()->getOne($category['ParentCategoryID']);
         }
-        $Result = array_reverse($Result, true); // order for breadcrumbs
-        return $Result;
+        $result = array_reverse($result, true); // order for breadcrumbs
+        return $result;
     }
 
     /**
@@ -1362,7 +1442,7 @@ class CategoryModel extends Gdn_Model {
         }
         return $Data;
     }
-
+    
     /**
      * A simplified version of GetWhere that polls the cache instead of the database.
      * @param array $Where
@@ -1598,6 +1678,7 @@ class CategoryModel extends Gdn_Model {
             }
         }
         $this->SetCache();
+        $this->collection->flushCache();
     }
 
     /**
@@ -1950,6 +2031,8 @@ class CategoryModel extends Gdn_Model {
      * @param array $Data
      */
     public static function setCache($ID = false, $Data = false) {
+        self::instance()->collection->refreshCache((int)$ID);
+
         $Categories = Gdn::cache()->get(self::CACHE_KEY);
         self::$Categories = null;
 
@@ -2189,5 +2272,53 @@ class CategoryModel extends Gdn_Model {
             $Result .= '/p'.$Page;
         }
         return url($Result, $WithDomain);
+    }
+
+    /**
+     * Recalculate the dynamic tree columns in the category.
+     */
+    public function recalculateTree() {
+        $px = $this->Database->DatabasePrefix;
+
+        // Update the child counts and reset the depth.
+        $sql = <<<SQL
+update {$px}Category c
+join (
+	select ParentCategoryID, count(ParentCategoryID) as CountCategories
+	from {$px}Category
+	group by ParentCategoryID
+) c2
+	on c.CategoryID = c2.ParentCategoryID
+set c.CountCategories = c2.CountCategories,
+    c.Depth = 0;
+SQL;
+        $this->Database->query($sql);
+
+        // Update the first pass of the categories.
+        $this->Database->query(<<<SQL
+update {$px}Category p
+join {$px}Category c
+	on c.ParentCategoryID = p.CategoryID
+set c.Depth = p.Depth + 1
+where p.CategoryID = -1 and c.CategoryID <> -1;
+SQL
+        );
+
+        // Update the child categories depth-by-depth.
+        $sql = <<<SQL
+update {$px}Category p
+join {$px}Category c
+	on c.ParentCategoryID = p.CategoryID
+set c.Depth = p.Depth + 1
+where p.Depth = :depth;
+SQL;
+
+        for ($i = 1; $i < 25; $i++) {
+            $this->Database->query($sql, ['depth' => $i]);
+
+            if (val('RowCount', $this->Database->LastInfo) == 0) {
+                break;
+            }
+        }
     }
 }

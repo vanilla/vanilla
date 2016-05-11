@@ -15,8 +15,8 @@ var discussionTagging = {
             if (data_tags) {
                 tags = [];
                 if (jQuery.isPlainObject(data_tags)) {
-                    for (name in data_tags) {
-                        tags.push({id: data_tags[name], name: name});
+                    for (var tagID in data_tags) {
+                        tags.push({name: data_tags[tagID], id: tagID});
                     }
                 }
             } else {

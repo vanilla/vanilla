@@ -16,6 +16,44 @@
  * Helps with the rendering of form controls that link directly to a data model.
  */
 class Gdn_Form extends Gdn_Pluggable {
+    /**
+     * @var array
+     */
+    private $styles = [];
+
+    /**
+     * @var array All of the available styles.
+     */
+    private $allStyles = [
+        'legacy' => [
+            'bodybox' => 'TextBox BodyBox js-bodybox',
+            'button' => 'Button',
+            'button-element' => 'input',
+            'checkbox' => 'CheckBoxLabel',
+            'dropdown' => '',
+            'file' => '',
+            'radio' => 'RadioLabel',
+            'textarea' => 'TextBox',
+            'textbox' => 'InputBox',
+        ],
+        'bootstrap' => [
+            'default' => 'form-control',
+            'bodybox' => 'form-control js-bodybox',
+            'button' => 'btn',
+            'button-element' => 'button',
+            'checkbox' => '',
+            'checkbox-container' => 'checkbox',
+            'checkbox-inline' => 'checkbox-inline',
+            'file' => 'form-control-file',
+            'inputbox' => 'form-control',
+            'popup' => 'js-popup',
+            'primary' => 'btn-primary',
+            'radio' => '',
+            'radio-container' => 'radio',
+            'smallbutton' => 'btn btn-sm',
+            'textbox' => 'form-control',
+        ]
+    ];
 
     /** @var string Action with which the form should be sent. */
     public $Action = '';
@@ -74,12 +112,19 @@ class Gdn_Form extends Gdn_Pluggable {
      * Constructor
      *
      * @param string $TableName
+     * @param string $style The style key to use.
      */
-    public function __construct($TableName = '') {
+    public function __construct($TableName = '', $style = '') {
         if ($TableName != '') {
             $TableModel = new Gdn_Model($TableName);
             $this->setModel($TableModel);
         }
+
+        if ($style === '') {
+            $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
+            $style = val('ControlStyle', $themeInfo);
+        }
+        $this->setStyles($style);
 
         // Get custom error class
         $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
@@ -134,6 +179,68 @@ class Gdn_Form extends Gdn_Pluggable {
         }
     }
 
+
+    /**
+     * Set the styles to use when outputting controls.
+     *
+     * @param string $name The name of the style. Currently this should be **legacy** or **bootstrap**.
+     * @return bool Returns **true** if the styles were set or **false** otherwise.
+     */
+    public function setStyles($name) {
+        if (isset($this->allStyles[$name])) {
+            $this->styles = $this->allStyles[$name];
+            return true;
+        } else {
+            $this->styles = $this->allStyles['legacy'];
+            return false;
+        }
+    }
+
+    /**
+     * Get a style element for the form.
+     *
+     * @param string $item The item, such as the element name or whatnot.
+     * @param null $default The default. If this isn't supplied then the "default" class will be returned.
+     * @return string Returns the element.
+     */
+    public function getStyle($item, $default = null) {
+        $item = strtolower($item);
+
+        if (isset($this->styles[$item])) {
+            return $this->styles[$item];
+        } elseif ($default !== null) {
+            return $default;
+        } elseif (isset($this->styles['default'])) {
+            return $this->styles['default'];
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Translate old CSS classes using the style array.
+     *
+     * @param string|string[] $classes The classes to translate.
+     * @return string Returns the translated class string.
+     */
+    private function translateClasses($classes) {
+        if (is_string($classes)) {
+            $parts = explode(' ', trim($classes));
+        } elseif (is_array($classes)) {
+            $parts = $classes;
+        } else {
+            return '';
+        }
+        $classes = [];
+        foreach ($parts as $part) {
+            if (!empty($part)) {
+                $classes[] = $this->getStyle($part, $part);
+            }
+        }
+
+        return implode(' ', $classes);
+    }
+
     /**
      * A special text box for formattable text.
      *
@@ -148,7 +255,7 @@ class Gdn_Form extends Gdn_Pluggable {
         touchValue('MultiLine', $Attributes, true);
         touchValue('Wrap', $Attributes, true);
         touchValue('class', $Attributes, '');
-        $Attributes['class'] .= ' TextBox BodyBox';
+        $Attributes['class'] .= ' '.$this->getStyle('bodybox');
 
         $this->setValue('Format', val('Format', $Attributes, $this->getValue('Format', Gdn_Format::defaultFormat())));
 
@@ -196,16 +303,45 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $CssClass = arrayValueI('class', $Attributes);
         if ($CssClass === false) {
-            $Attributes['class'] = 'Button';
+            $Attributes['class'] = $this->getStyle('button');
+        } else {
+            $Attributes['class'] = $this->translateClasses($Attributes['class']);
         }
 
-        $Return = '<input type="'.$Type.'"';
+        $elem = $this->getStyle('button-element');
+
+        $Return = "<$elem type=\"$Type\"";
         $Return .= $this->_idAttribute($ButtonCode, $Attributes);
         $Return .= $this->_nameAttribute($ButtonCode, $Attributes);
-        $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
         $Return .= $this->_attributesToString($Attributes);
-        $Return .= " />\n";
+
+        if ($elem === 'button') {
+            $Return .= '>'.htmlspecialchars(t($ButtonCode, val('value', $Attributes))).'</button>';
+        } else {
+            $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
+            $Return .= " />\n";
+        }
         return $Return;
+    }
+
+    /**
+     * Return a linked that will look like a button.
+     *
+     * @param string $code The text of the anchor.
+     * @param string $destination The URL path of the anchor.
+     * @param array $attributes Additional attributes for the anchor.
+     * @see anchor()
+     */
+    public function linkButton($code, $destination = '', $attributes = []) {
+        if (empty($attributes['class'])) {
+            $cssClass = $this->getStyle('button', '');
+        } else {
+            $cssClass = $this->translateClasses($attributes['class']);
+            unset($attributes['class']);
+        }
+
+        $result = anchor(t($code), $destination, $cssClass, $attributes, true);
+        return $result;
     }
 
     /**
@@ -335,6 +471,12 @@ class Gdn_Form extends Gdn_Pluggable {
 
         unset($Options['Filter'], $Options['PermFilter']);
 
+        if (!isset($Options['class'])) {
+            $Options['class'] = $this->getStyle('dropdown');
+        } else {
+            $Options['class'] = $this->translateClasses($Attributes['class']);
+        }
+
         // Opening select tag
         $Return = '<select';
         $Return .= $this->_idAttribute($FieldName, $Options);
@@ -443,16 +585,22 @@ class Gdn_Form extends Gdn_Pluggable {
         // Show inline errors?
         $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
 
-        // Add error class to input element
+        // Add error class to input element.
         if ($ShowErrors) {
             $this->addErrorClass($Attributes);
+        }
+
+        if (isset($Attributes['class'])) {
+            $class = $this->translateClasses($Attributes['class']);
+        } else {
+            $class = $this->getStyle('checkbox', '');
         }
 
         $Input = $this->input($FieldName, 'checkbox', $Attributes);
         if ($Label != '') {
             $LabelElement = '<label for="'.
-                arrayValueI('id', $Attributes, $this->escapeID($FieldName, false)).
-                '" class="'.val('class', $Attributes, 'CheckBoxLabel').'"'.
+                arrayValueI('id', $Attributes, $this->escapeID($FieldName, false)).'"'.
+                attribute('class', $class).
                 attribute('title', val('title', $Attributes)).'>';
 
             if ($Display === 'wrap') {
@@ -467,6 +615,11 @@ class Gdn_Form extends Gdn_Pluggable {
         // Append validation error message
         if ($ShowErrors && arrayValueI('InlineErrors', $Attributes, true)) {
             $Input .= $this->inlineError($FieldName);
+        }
+
+        if ($this->getStyle('checkbox-container', '') && stripos($class, 'inline') == false) {
+            $container = $this->getStyle('checkbox-container');
+            $Input = "<div class=\"$container\">".$Input.'</div>';
         }
 
         return $Input;
@@ -950,6 +1103,12 @@ class Gdn_Form extends Gdn_Pluggable {
             $this->addErrorClass($Attributes);
         }
 
+        if (!isset($Attributes['class'])) {
+            $Attributes['class'] = $this->getStyle('dropdown');
+        } else {
+            $Attributes['class'] = $this->translateClasses($Attributes['class']);
+        }
+
         // Opening select tag
         $Return = '<select';
         $Return .= $this->_idAttribute($FieldName, $Attributes);
@@ -1312,12 +1471,23 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function input($FieldName, $Type = 'text', $Attributes = array()) {
-        if ($Type == 'text' || $Type == 'password') {
-            $CssClass = arrayValueI('class', $Attributes);
-            if ($CssClass == false) {
-                $Attributes['class'] = 'InputBox';
-            }
+        switch ($Type) {
+            case 'checkbox':
+            case 'button':
+            case 'hidden':
+            case 'radio':
+            case 'reset':
+            case 'submit':
+                $typeClass = '';
+                break;
+            case 'file':
+                $typeClass = 'file';
+                break;
+            default:
+                $typeClass = 'textbox';
+                break;
         }
+        $Attributes['class'] = $this->translateClasses(arrayValueI('class', $Attributes).' '.$typeClass);
 
         // Show inline errors?
         $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
@@ -1561,11 +1731,17 @@ PASSWORDMETER;
         // Get standard radio Input
         $Input = $this->Input($FieldName, 'radio', $Attributes);
 
+        if (isset($Attributes['class'])) {
+            $class = $this->translateClasses($Attributes['class']);
+        } else {
+            $class = $this->getStyle('radio');
+        }
+
         // Wrap with label.
         if ($Label != '') {
             $LabelElement = '<label for="'.arrayValueI('id', $Attributes, $this->EscapeID($FieldName, false)).'" class="'.val('class', $Attributes, 'RadioLabel').'">';
             if ($Display === 'wrap') {
-                $LabelElement = '<label class="'.val('class', $Attributes, 'RadioLabel').'">';
+                $LabelElement = '<label'.attribute('class', $class).'>';
                 $Input = $LabelElement.$Input.' '.t($Label).'</label>';
             } elseif ($Display === 'before') {
                 $Input = $LabelElement.t($Label).'</label> '.$Input;
@@ -1609,8 +1785,12 @@ PASSWORDMETER;
 
         if ($List) {
             $Return .= '<ul'.(isset($Attributes['listclass']) ? " class=\"{$Attributes['listclass']}\"" : '').'>';
-            $LiOpen = '<li>';
+            $LiOpen = '<li'.attribute('class', $this->getStyle('radio-container', '')).'>';
             $LiClose = '</li>';
+        } elseif ($this->getStyle('radio-container', '') && stripos(val('class', $Attributes), 'inline') === false) {
+            $class = $this->getStyle('radio-container');
+            $LiOpen = "<div class=\"$class\">";
+            $LiClose = '</div>';
         } else {
             $LiOpen = '';
             $LiClose = ' ';
@@ -1684,7 +1864,9 @@ PASSWORDMETER;
 
         $CssClass = arrayValueI('class', $Attributes);
         if ($CssClass == false) {
-            $Attributes['class'] = $MultiLine ? 'TextBox' : 'InputBox';
+            $Attributes['class'] = $this->getStyle($MultiLine ? 'textarea' : 'textbox');
+        } else {
+            $Attributes['class'] = $this->translateClasses($CssClass);
         }
 
         // Add error class to input element
@@ -2437,7 +2619,7 @@ PASSWORDMETER;
     public function simple($Schema, $Options = array()) {
         $Result = valr('Wrap.0', $Options, '<ul>');
 
-        $ItemWrap = val('ItemWrap', $Options, array("<li>\n  ", "\n</li>\n"));
+        $ItemWrap = val('ItemWrap', $Options, array("<li class=\"form-group\">\n  ", "\n</li>\n"));
 
         foreach ($Schema as $Index => $Row) {
             if (is_string($Row)) {

@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $Sf = $this->ConfigurationModule;
+/* @var Gdn_Form $Form */
 $Form = $Sf->Form();
 
 if ($Sf->RenderAll) {
@@ -11,8 +12,9 @@ if ($Sf->RenderAll) {
 }
 
 $Options = array();
-if ($Sf->HasFiles())
+if ($Sf->HasFiles()) {
     $Options['enctype'] = 'multipart/form-data';
+}
 
 echo $Form->open($Options);
 echo $Form->errors();
@@ -21,7 +23,7 @@ echo $Form->errors();
     <?php
 
     foreach ($Sf->Schema() as $Row) {
-        echo "<li>\n  ";
+        echo "<li class=\"form-group\">\n  ";
 
         $LabelCode = $Sf->LabelCode($Row);
         $Description = val('Description', $Row, '');

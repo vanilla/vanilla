@@ -421,7 +421,7 @@ if (!function_exists('attribute')) {
             $Exclude = $ValueOrExclude;
         }
         foreach ($Name as $Attribute => $Val) {
-            if ($Exclude && StringBeginsWith($Attribute, $Exclude)) {
+            if (empty($Val) || ($Exclude && StringBeginsWith($Attribute, $Exclude))) {
                 continue;
             }
 

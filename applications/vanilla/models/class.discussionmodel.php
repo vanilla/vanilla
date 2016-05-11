@@ -1378,12 +1378,16 @@ class DiscussionModel extends VanillaModel {
     /**
      * Get the count of discussions for an individual category.
      *
-     * @param int $categoryID The category to get the count of.
+     * @param int|array $categoryID The category to get the count of or an array of category IDs to get the count of.
      * @return int Returns the count of discussions.
      */
     public function getCountForCategory($categoryID) {
-        $category = CategoryModel::categories((int)$categoryID);
-        return (int)val('CountDiscussions', $category, 0);
+        $count = 0;
+        foreach ((array)$categoryID as $id) {
+            $category = CategoryModel::categories((int)$id);
+            $count += (int)val('CountDiscussions', $category, 0);
+        }
+        return $count;
     }
 
     /**

@@ -7,14 +7,14 @@
     <meta name="generator" content="kss-node" />
     <meta name="viewport" content="width=device-width, minimal-ui">
     <!-- Latest compiled and minified CSS -->
-    <link type="text/css" rel="stylesheet" href="public/bootstrap.css">
     <link type="text/css" rel="stylesheet" href="public/kss.css">
+    <link type="text/css" rel="stylesheet" href="public/admin.css">
     <link type="text/css" rel="stylesheet" href="public/prettify.css">
     
     <script src="http://code.jquery.com/jquery.js"></script>
   </head>
   <body class="kss-styleguide" data-spy="scroll" data-target="#sidebar">
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse" role="navigation">
       <div class="container">
         <div class="navbar-header">
           <a class="navbar-brand" href="./index.html">Styleguide</a>
@@ -23,7 +23,7 @@
           <ul class="nav navbar-nav navbar-right">
             <li><a href="./">Home</a></li>
               <li>
-                <a href="section-1.html"><!--1.0: -->A button suitable for giving stars to someone.</a>
+                <a href="section-1.html"><!--1.0: -->Typography</a>
               </li>
               <li>
                 <a href="section-3.html"><!--3.0: -->Forms</a>
@@ -38,22 +38,80 @@
 
               <section class="kss-depth-1 jumbotron">
                 <div class="component-description">
-                  <h1 class="kss-title" id="1">A button suitable for giving stars to someone.</h1>
-
-              <h4><span class="pull-right"><code>:hover</code></span> Subtle hover highlight.</h4>
-              <h4><span class="pull-right"><code>.stars-given</code></span> A highlight indicating you&#39;ve already given a star.</h4>
-              <h4><span class="pull-right"><code>.stars-given:hover</code></span> Subtle hover highlight on top of stars-given styling.</h4>
-              <h4><span class="pull-right"><code>.disabled</code></span> Dims the button to indicate it cannot be used.</h4>
+                  <h1 class="kss-title" id="1">Typography</h1>
 
 
+              <div class="kss-box"><p>Basic heading and paragraph styling.</p>
+</div>
+
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="1-1">
+                    <span class="kss-ref badge pull-right">1-1</span> Headings
+                  </h2>
+
+
+              <div class="kss-box"><p>Base heading styles. Each header level has a css class associated with it, so
+one can emulate the heading style. (i.e., p class=&#39;h1&#39; would adopt the styles
+associated with a h1 tag)</p>
+</div>
+
+              <div class="kss-example"><h1>Heading level 1</h1>
+<h2>Heading level 2</h2>
+<h3>Heading level 3</h3>
+<h4>Heading level 4</h4>
+<h5>Heading level 5</h5>
+<h6>Heading level 6</h6></div>
+              <pre class="prettyprint lang-html">&lt;h1&gt;Heading level 1&lt;/h1&gt;
+&lt;h2&gt;Heading level 2&lt;/h2&gt;
+&lt;h3&gt;Heading level 3&lt;/h3&gt;
+&lt;h4&gt;Heading level 4&lt;/h4&gt;
+&lt;h5&gt;Heading level 5&lt;/h5&gt;
+&lt;h6&gt;Heading level 6&lt;/h6&gt;</pre>
+
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="1-2">
+                    <span class="kss-ref badge pull-right">1-2</span> Paragraph
+                  </h2>
+
+
+              <div class="kss-box"><p>Base paragraph style</p>
+</div>
+
+              <div class="kss-example"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
+mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
+purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
+<p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
+nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
+sociis natoque penatibus et magnis dis parturient montes, nascetur
+ridiculus mus.</p></div>
+              <pre class="prettyprint lang-html">&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
+mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
+purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.&lt;/p&gt;
+&lt;p&gt;Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
+nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
+sociis natoque penatibus et magnis dis parturient montes, nascetur
+ridiculus mus.&lt;/p&gt;</pre>
+
+
+              <hr />
               </div><!-- // closes .component-description -->
             </section>
         </article>
         <div class="col-xs-6 col-sm-3" id="sidebar">
           <div class="list-group" data-spy="affix">
                 <!--<li><a href="#" class="list-group-item disabled">
-                  <h4 class="list-group-item-heading">A button suitable for giving stars to someone.</h4>
+                  <h4 class="list-group-item-heading">Typography</h4>
                 </a></li>-->
+                <a class="list-group-item" href="#1-1"><!--<span class="kss-ref badge" >1-1</span> -->Headings</a>
+                <a class="list-group-item" href="#1-2"><!--<span class="kss-ref badge" >1-2</span> -->Paragraph</a>
           </div>
         </div>
       </div>

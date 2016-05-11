@@ -420,7 +420,7 @@ if (!class_exists('HeadModule', false)) {
                 // Inline the content of the tag, if necessary.
                 if (val('_hint', $Attributes) == 'inline') {
                     $Path = val('_path', $Attributes);
-                    if (!stringBeginsWith($Path, 'http')) {
+                    if ($Path && !stringBeginsWith($Path, 'http')) {
                         $Attributes[self::CONTENT_KEY] = file_get_contents($Path);
 
                         if (isset($Attributes['src'])) {

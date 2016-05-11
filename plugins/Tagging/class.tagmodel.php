@@ -316,6 +316,17 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Add existing tags to a discussion.
+     *
+     * @param int $discussionID The ID of the discussion to add the tags to.
+     * @param string|array $tags An array of tag IDs or a CSV of tag names.
+     * @throws Throws an exception if some of the tags don't exist.
+     */
+    public function addDiscussion($discussionID, $tags) {
+        // TODO:
+    }
+
+    /**
      *
      *
      * @param $discussion_id

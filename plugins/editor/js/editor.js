@@ -1183,7 +1183,7 @@
 
                                 var payloadHeight = payload.original_height;
                                 var payloadWidth = payload.original_width;
-                                var editorWidth = $(this).find('.BodyBox').width();
+                                var editorWidth = $(this).find('.BodyBox,.js-bodybox').width();
 
                                 // Image max-width is 100%. Change the height to refect scaling down the width.
                                 if (editorWidth < payloadWidth) {

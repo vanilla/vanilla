@@ -50,7 +50,8 @@ class Gdn_Form extends Gdn_Pluggable {
             'primary' => 'btn-primary',
             'radio' => '',
             'radio-container' => 'radio',
-            'smallbutton' => 'btn btn-sm'
+            'smallbutton' => 'btn btn-sm',
+            'textbox' => 'form-control',
         ]
     ];
 
@@ -111,15 +112,19 @@ class Gdn_Form extends Gdn_Pluggable {
      * Constructor
      *
      * @param string $TableName
+     * @param string $style The style key to use.
      */
-    public function __construct($TableName = '') {
+    public function __construct($TableName = '', $style = '') {
         if ($TableName != '') {
             $TableModel = new Gdn_Model($TableName);
             $this->setModel($TableModel);
         }
 
-        $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
-        $this->setStyles(val('ControlStyle', $themeInfo));
+        if ($style === '') {
+            $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
+            $style = val('ControlStyle', $themeInfo);
+        }
+        $this->setStyles($style);
 
         // Get custom error class
         $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
@@ -1466,14 +1471,23 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function input($FieldName, $Type = 'text', $Attributes = array()) {
-        if ($Type == 'text' || $Type == 'password') {
-            $CssClass = arrayValueI('class', $Attributes);
-            if ($CssClass == false) {
-                $Attributes['class'] = $this->getStyle('textbox');
-            }
-        } elseif ($Type === 'file') {
-            $Attributes['class'] = $this->getStyle('file', '');
+        switch ($Type) {
+            case 'checkbox':
+            case 'button':
+            case 'hidden':
+            case 'radio':
+            case 'reset':
+            case 'submit':
+                $typeClass = '';
+                break;
+            case 'file':
+                $typeClass = 'file';
+                break;
+            default:
+                $typeClass = 'textbox';
+                break;
         }
+        $Attributes['class'] = $this->translateClasses(arrayValueI('class', $Attributes).' '.$typeClass);
 
         // Show inline errors?
         $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);

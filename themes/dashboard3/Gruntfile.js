@@ -23,7 +23,7 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'csslint']
+        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'csslint', 'styleguide']
       }
       , livereload: {
         options: {
@@ -35,6 +35,17 @@ module.exports = function (grunt) {
           , 'js/**/*.js'
           , 'views/**/*.tpl'
         ]
+      }
+    },
+
+    kss: {
+      options: {
+        verbose: true,
+        template: 'template'
+      },
+      dist: {
+        src: ['scss'],
+        dest: 'styleguide'
       }
     },
 
@@ -63,6 +74,18 @@ module.exports = function (grunt) {
             dest: 'scss/vendors'
           }
         ]
+      },
+      styleguide: {
+        files: [
+          {
+            flatten: true,
+            src: [
+              'design/admin.css'
+            ],
+            dest: 'template/public/admin.css'
+          }
+        ]
+
       }
     },
 
@@ -140,7 +163,8 @@ module.exports = function (grunt) {
         files: {
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
-          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss']
+          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss'],
+          'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss']
         },
         options: {
           useSingleQuotes: true,
@@ -150,8 +174,13 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.registerTask('styleguide', [
+      'copy:styleguide',
+      'kss'
+  ]);
+
   grunt.registerTask('default', [
-    'copy'
+    'copy:main'
     , 'sass_globbing'
     , 'scsslint'
     , 'sass'
@@ -160,5 +189,6 @@ module.exports = function (grunt) {
     , 'jshint'
     , 'csslint'
     , 'imagemin'
+    , 'styleguide'
   ]);
 };

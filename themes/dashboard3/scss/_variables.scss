@@ -61,6 +61,7 @@ $display3-weight:             300 !default;
 $display4-weight:             300 !default;
 
 $line-height:                1.5 !default;
+$line-height-computed:       $font-size-root * $line-height;
 
 $headings-margin-bottom:     ($spacer / 2) !default;
 $headings-font-family:       inherit !default;

@@ -1,0 +1,23 @@
+//PROBLEMS: Remove em tag
+//          More logical nesting for body
+//          Class name for OP block
+
+.Feed {
+  @extend .media;
+}
+
+.FeedItem {
+  @extend .media;
+
+  > a {
+    @extend .h4;
+    //@extend .link;
+    @extend .media-heading;
+  }
+
+  .Date,
+  .tptn_counter,
+  p:last-child {
+    @extend .small;
+  }
+}

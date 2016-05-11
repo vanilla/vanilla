@@ -66,9 +66,10 @@ module.exports = function (grunt) {
             cwd: 'bower_components',
             src: [
               'bootstrap/LICENSE'
-              , 'bootstrap/scss/_normalize.scss'
-              , 'bootstrap/scss/_utilities.scss'
-              , 'bootstrap/scss/_variables.scss'
+              // , 'bootstrap/scss/_normalize.scss'
+              // , 'bootstrap/scss/_utilities.scss'
+              // , 'bootstrap/scss/_variables.scss'
+              , 'bootstrap/scss/*.scss'
               , 'bootstrap/scss/mixins/*.scss'
             ],
             dest: 'scss/vendors'
@@ -161,9 +162,11 @@ module.exports = function (grunt) {
     sass_globbing: {
       vendors: {
         files: {
+          'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
-          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss'],
+          // 'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss'],
+          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss', '!scss/vendors/bootstrap/scss/_reboot.scss', '!scss/vendors/bootstrap/scss/bootstrap*.scss'],
           'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss']
         },
         options: {

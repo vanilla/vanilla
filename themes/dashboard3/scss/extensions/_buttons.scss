@@ -1,0 +1,22 @@
+.Button {
+  @extend .btn;
+  @extend .btn-primary;
+}
+
+.SmallButton {
+  @extend .btn;
+  @extend .btn-primary;
+  @extend .btn-sm;
+}
+
+
+.Leave {
+  @extend .btn;
+  @extend .btn-primary;
+}
+
+#Head h1 a span {
+  @extend .btn;
+  @extend .btn-primary;
+  @extend .btn-lg;
+}

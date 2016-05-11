@@ -1,0 +1,7 @@
+@mixin box-shadow($shadow, $extras: '') {
+  box-shadow: $shadow;
+}
+
+@mixin transition($transition, $extras: '') {
+  transition: $transition;
+}

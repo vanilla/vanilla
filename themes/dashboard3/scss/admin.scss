@@ -7,10 +7,11 @@
  */
 
 @import 'maps/bootstrapVariables';
-@import 'maps/bootstrapMixins';
-@import 'maps/bootstrapSubset';
-
 @import 'variables';
+
+@import 'maps/bootstrapMixins';
 @import 'mixins';
 
+@import 'maps/bootstrapSubset';
 @import 'maps/dashboard';
+@import 'maps/extensions';

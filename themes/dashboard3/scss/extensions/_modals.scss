@@ -1,0 +1,30 @@
+// .Overlay {
+//   @extend .modal;
+//   @extend .fade;
+//   @extend .in;
+// }
+//
+// .Overlay .Popup {
+//   @extend .modal-backdrop;
+//   @extend .fade;
+//   @extend .in;
+// }
+
+.Border {
+  @extend .modal-dialog;
+}
+
+div.Popup h1 {
+  @extend .h4;
+  @extend .modal-title;
+}
+
+.Close {
+  //@extend button;
+  @extend .close;
+
+}
+
+.Overlay .Popup .Body {
+  @extend .modal-content;
+}

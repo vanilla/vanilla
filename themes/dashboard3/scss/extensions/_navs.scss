@@ -1,0 +1,6 @@
+.Tabs {
+  ul {
+    @extend .nav;
+    @extend .nav-tabs;
+  }
+}

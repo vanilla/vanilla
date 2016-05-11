@@ -19,29 +19,28 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="./index.html">Styleguide</a>
         </div>
-        <div class="collapse navbar-collapse navbar-styleguide-collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="./">Home</a></li>
-              <li>
-                <a href="section-1.html"><!--1.0: -->Typography</a>
-              </li>
-              <li>
-                <a href="section-3.html"><!--3.0: -->Forms</a>
-              </li>
-          </ul>
-        </div>
       </div>
     </nav>
+    <aside class="nav-fixed">
+      <nav>
+        <ul>
+          <li><a href="index.html">0.0: Overview</a></li>
+          <li><a href="section-1.html">1.0: Typography</a></li>
+          <li><a href="section-2.html">2.0: Navs</a></li>
+          <li><a href="section-3.html">3.0: Forms</a></li>
+        </ul>
+      </nav>
+    </aside>
     <div class="container">
       <div class="row">
           <article class="col-xs-12 col-sm-9">
 
-              <section class="kss-depth-1 jumbotron">
+              <section class="kss-depth-1">
                 <div class="component-description">
                   <h1 class="kss-title" id="3">Forms</h1>
 
 
-              <div class="kss-box"><p>Find the dashboard form styling here!</p>
+              <div class="kss-box"><p>Find the dashboard form styling here.</p>
 </div>
 
               </div><!-- // closes .component-description -->
@@ -56,17 +55,18 @@
               <div class="kss-box"><p>Form control labels.</p>
 </div>
 
-              <div class="kss-example"><div class="group-label" for="input1">Group label:</div>
-<div class="form-input-group">
-  <input class="control-input" type="checkbox" id="input1">
-  <label class="control-label {$modifiers}" for="input1">Control label</label>
-</div></div>
               <pre class="prettyprint lang-html">&lt;div class=&quot;group-label&quot; for=&quot;input1&quot;&gt;Group label:&lt;/div&gt;
 &lt;div class=&quot;form-input-group&quot;&gt;
   &lt;input class=&quot;control-input&quot; type=&quot;checkbox&quot; id=&quot;input1&quot;&gt;
   &lt;label class=&quot;control-label {$modifiers}&quot; for=&quot;input1&quot;&gt;Control label&lt;/label&gt;
 &lt;/div&gt;</pre>
 
+              <h4>Default styling</h4>
+              <div class="kss-example"><div class="group-label" for="input1">Group label:</div>
+<div class="form-input-group">
+  <input class="control-input" type="checkbox" id="input1">
+  <label class="control-label {$modifiers}" for="input1">Control label</label>
+</div></div>
                 <h4>Danger color <span class="pull-right"><code>.danger</code></span></h4>
                 <div class="kss-example"><div class="group-label" for="input1">Group label:</div>
 <div class="form-input-group">

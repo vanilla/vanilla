@@ -12,19 +12,3 @@
     @extend .list-group-item;
   }
 }
-
-.PanelInfo {
-  @extend .list-unstyled;
-
-  li {
-    @extend .list-group;
-  }
-
-  li a {
-    @extend .list-group-item;
-  }
-
-  .Active a {
-    @extend .list-group-item.active;
-  }
-}

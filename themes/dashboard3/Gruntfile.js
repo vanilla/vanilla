@@ -23,7 +23,7 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'csslint', 'styleguide']
+        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {
@@ -166,7 +166,7 @@ module.exports = function (grunt) {
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
           // 'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss'],
-          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss', '!scss/vendors/bootstrap/scss/_reboot.scss', '!scss/vendors/bootstrap/scss/bootstrap*.scss'],
+          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss', '!scss/vendors/bootstrap/scss/bootstrap*.scss'],
           'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss']
         },
         options: {
@@ -190,7 +190,7 @@ module.exports = function (grunt) {
     , 'autoprefixer'
     , 'concat'
     , 'jshint'
-    , 'csslint'
+    // , 'csslint'
     , 'imagemin'
     , 'styleguide'
   ]);

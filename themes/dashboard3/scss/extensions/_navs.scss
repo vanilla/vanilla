@@ -4,3 +4,25 @@
     @extend .nav-tabs;
   }
 }
+
+.PanelInfo {
+  @extend .nav;
+  @extend .nav-pills;
+  @extend .nav-stacked;
+
+  li {
+    @extend .nav-item;
+  }
+
+  li a {
+    @extend .nav-link;
+  }
+
+  .Active a {
+    @extend .nav-link.active;
+  }
+}
+
+.panel-nav h4 {
+  @extend .nav-heading;
+}

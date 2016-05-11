@@ -19,24 +19,23 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="./index.html">Styleguide</a>
         </div>
-        <div class="collapse navbar-collapse navbar-styleguide-collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="./">Home</a></li>
-              <li>
-                <a href="section-1.html"><!--1.0: -->Typography</a>
-              </li>
-              <li>
-                <a href="section-3.html"><!--3.0: -->Forms</a>
-              </li>
-          </ul>
-        </div>
       </div>
     </nav>
+    <aside class="nav-fixed">
+      <nav>
+        <ul>
+          <li><a href="index.html">0.0: Overview</a></li>
+          <li><a href="section-1.html">1.0: Typography</a></li>
+          <li><a href="section-2.html">2.0: Navs</a></li>
+          <li><a href="section-3.html">3.0: Forms</a></li>
+        </ul>
+      </nav>
+    </aside>
     <div class="container">
       <div class="row">
           <article class="col-xs-12 col-sm-9">
 
-              <section class="kss-depth-1 jumbotron">
+              <section class="kss-depth-1">
                 <div class="component-description">
                   <h1 class="kss-title" id="1">Typography</h1>
 
@@ -58,12 +57,6 @@ one can emulate the heading style. (i.e., p class=&#39;h1&#39; would adopt the s
 associated with a h1 tag)</p>
 </div>
 
-              <div class="kss-example"><h1>Heading level 1</h1>
-<h2>Heading level 2</h2>
-<h3>Heading level 3</h3>
-<h4>Heading level 4</h4>
-<h5>Heading level 5</h5>
-<h6>Heading level 6</h6></div>
               <pre class="prettyprint lang-html">&lt;h1&gt;Heading level 1&lt;/h1&gt;
 &lt;h2&gt;Heading level 2&lt;/h2&gt;
 &lt;h3&gt;Heading level 3&lt;/h3&gt;
@@ -71,6 +64,13 @@ associated with a h1 tag)</p>
 &lt;h5&gt;Heading level 5&lt;/h5&gt;
 &lt;h6&gt;Heading level 6&lt;/h6&gt;</pre>
 
+              <h4>Default styling</h4>
+              <div class="kss-example"><h1>Heading level 1</h1>
+<h2>Heading level 2</h2>
+<h3>Heading level 3</h3>
+<h4>Heading level 4</h4>
+<h5>Heading level 5</h5>
+<h6>Heading level 6</h6></div>
 
               <hr />
               </div><!-- // closes .component-description -->
@@ -85,13 +85,6 @@ associated with a h1 tag)</p>
               <div class="kss-box"><p>Base paragraph style</p>
 </div>
 
-              <div class="kss-example"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
-mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
-purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
-<p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
-nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
-sociis natoque penatibus et magnis dis parturient montes, nascetur
-ridiculus mus.</p></div>
               <pre class="prettyprint lang-html">&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
 mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
 purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.&lt;/p&gt;
@@ -100,6 +93,14 @@ nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
 sociis natoque penatibus et magnis dis parturient montes, nascetur
 ridiculus mus.&lt;/p&gt;</pre>
 
+              <h4>Default styling</h4>
+              <div class="kss-example"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
+mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
+purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
+<p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
+nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
+sociis natoque penatibus et magnis dis parturient montes, nascetur
+ridiculus mus.</p></div>
 
               <hr />
               </div><!-- // closes .component-description -->

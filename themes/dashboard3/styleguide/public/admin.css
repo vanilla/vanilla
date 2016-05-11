@@ -1,9 +1,7 @@
 /*!
- * Dashboard 2016 - A new dashboard design for Vanilla.
+ * Dashboard 3 - A new dashboard design for Vanilla.
  *
  * @author    Becky Van Bussel <beckyvanbussel@gmail.com>
- * @copyright 2016 (c) Becky Van Bussel
- * @license   MIT
  */
 .alert, .Help.Aside {
   padding: 15px;
@@ -456,21 +454,21 @@ fieldset[disabled] a.Leave {
 
 .btn-primary, .Button, .SmallButton, .Leave, #Head h1 a span {
   color: #fff;
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-primary:hover, .Button:hover, .SmallButton:hover, .Leave:hover, #Head h1 a span:hover {
   color: #fff;
-  background-color: #025aa5;
-  border-color: #01549b;
+  background-color: #0270a8;
+  border-color: #01699e;
 }
 
 .btn-primary:focus, .Button:focus, .SmallButton:focus, .Leave:focus, #Head h1 a span:focus, .btn-primary.focus, .focus.Button, .focus.SmallButton, .focus.Leave, #Head h1 a span.focus {
   color: #fff;
-  background-color: #025aa5;
-  border-color: #01549b;
+  background-color: #0270a8;
+  border-color: #01699e;
 }
 
 .btn-primary:active, .Button:active, .SmallButton:active, .Leave:active, #Head h1 a span:active, .btn-primary.active, .active.Button, .active.SmallButton, .active.Leave, #Head h1 a span.active,
@@ -480,8 +478,8 @@ fieldset[disabled] a.Leave {
 .open > .dropdown-toggle.Leave, #Head h1 a
 .open > span.dropdown-toggle {
   color: #fff;
-  background-color: #025aa5;
-  border-color: #01549b;
+  background-color: #0270a8;
+  border-color: #01699e;
   background-image: none;
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
@@ -503,18 +501,18 @@ fieldset[disabled] a.Leave {
 .open > .dropdown-toggle.focus.Leave, #Head h1 a
 .open > span.dropdown-toggle.focus {
   color: #fff;
-  background-color: #014682;
-  border-color: #01315a;
+  background-color: #015885;
+  border-color: #013d5d;
 }
 
 .btn-primary.disabled:focus, .disabled.Button:focus, .disabled.SmallButton:focus, .disabled.Leave:focus, #Head h1 a span.disabled:focus, .btn-primary.disabled.focus, .disabled.focus.Button, .disabled.focus.SmallButton, .disabled.focus.Leave, #Head h1 a span.disabled.focus, .btn-primary:disabled:focus, .Button:disabled:focus, .SmallButton:disabled:focus, .Leave:disabled:focus, #Head h1 a span:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus, .SmallButton:disabled.focus, .Leave:disabled.focus, #Head h1 a span:disabled.focus {
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .btn-primary.disabled:hover, .disabled.Button:hover, .disabled.SmallButton:hover, .disabled.Leave:hover, #Head h1 a span.disabled:hover, .btn-primary:disabled:hover, .Button:disabled:hover, .SmallButton:disabled:hover, .Leave:disabled:hover, #Head h1 a span:disabled:hover {
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .btn-secondary {
@@ -566,28 +564,28 @@ fieldset[disabled] a.Leave {
 
 .btn-info {
   color: #fff;
-  background-color: #5bc0de;
-  border-color: #5bc0de;
+  background-color: #97afbf;
+  border-color: #97afbf;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-info:hover {
   color: #fff;
-  background-color: #31b0d5;
-  border-color: #2aabd2;
+  background-color: #7797ac;
+  border-color: #7192a8;
 }
 
 .btn-info:focus, .btn-info.focus {
   color: #fff;
-  background-color: #31b0d5;
-  border-color: #2aabd2;
+  background-color: #7797ac;
+  border-color: #7192a8;
 }
 
 .btn-info:active, .btn-info.active,
 .open > .btn-info.dropdown-toggle {
   color: #fff;
-  background-color: #31b0d5;
-  border-color: #2aabd2;
+  background-color: #7797ac;
+  border-color: #7192a8;
   background-image: none;
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
@@ -597,44 +595,44 @@ fieldset[disabled] a.Leave {
 .open > .btn-info.dropdown-toggle:focus,
 .open > .btn-info.dropdown-toggle.focus {
   color: #fff;
-  background-color: #269abc;
-  border-color: #1f7e9a;
+  background-color: #61869e;
+  border-color: #527085;
 }
 
 .btn-info.disabled:focus, .btn-info.disabled.focus, .btn-info:disabled:focus, .btn-info:disabled.focus {
-  background-color: #5bc0de;
-  border-color: #5bc0de;
+  background-color: #97afbf;
+  border-color: #97afbf;
 }
 
 .btn-info.disabled:hover, .btn-info:disabled:hover {
-  background-color: #5bc0de;
-  border-color: #5bc0de;
+  background-color: #97afbf;
+  border-color: #97afbf;
 }
 
 .btn-success {
   color: #fff;
-  background-color: #5cb85c;
-  border-color: #5cb85c;
+  background-color: #60bd68;
+  border-color: #60bd68;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-success:hover {
   color: #fff;
-  background-color: #449d44;
-  border-color: #419641;
+  background-color: #45a54d;
+  border-color: #429e4a;
 }
 
 .btn-success:focus, .btn-success.focus {
   color: #fff;
-  background-color: #449d44;
-  border-color: #419641;
+  background-color: #45a54d;
+  border-color: #429e4a;
 }
 
 .btn-success:active, .btn-success.active,
 .open > .btn-success.dropdown-toggle {
   color: #fff;
-  background-color: #449d44;
-  border-color: #419641;
+  background-color: #45a54d;
+  border-color: #429e4a;
   background-image: none;
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
@@ -644,44 +642,44 @@ fieldset[disabled] a.Leave {
 .open > .btn-success.dropdown-toggle:focus,
 .open > .btn-success.dropdown-toggle.focus {
   color: #fff;
-  background-color: #398439;
-  border-color: #2d672d;
+  background-color: #3a8c41;
+  border-color: #2e6f34;
 }
 
 .btn-success.disabled:focus, .btn-success.disabled.focus, .btn-success:disabled:focus, .btn-success:disabled.focus {
-  background-color: #5cb85c;
-  border-color: #5cb85c;
+  background-color: #60bd68;
+  border-color: #60bd68;
 }
 
 .btn-success.disabled:hover, .btn-success:disabled:hover {
-  background-color: #5cb85c;
-  border-color: #5cb85c;
+  background-color: #60bd68;
+  border-color: #60bd68;
 }
 
 .btn-warning {
   color: #fff;
-  background-color: #f0ad4e;
-  border-color: #f0ad4e;
+  background-color: #faa43a;
+  border-color: #faa43a;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-warning:hover {
   color: #fff;
-  background-color: #ec971f;
-  border-color: #eb9316;
+  background-color: #f98d08;
+  border-color: #f18806;
 }
 
 .btn-warning:focus, .btn-warning.focus {
   color: #fff;
-  background-color: #ec971f;
-  border-color: #eb9316;
+  background-color: #f98d08;
+  border-color: #f18806;
 }
 
 .btn-warning:active, .btn-warning.active,
 .open > .btn-warning.dropdown-toggle {
   color: #fff;
-  background-color: #ec971f;
-  border-color: #eb9316;
+  background-color: #f98d08;
+  border-color: #f18806;
   background-image: none;
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
@@ -691,44 +689,44 @@ fieldset[disabled] a.Leave {
 .open > .btn-warning.dropdown-toggle:focus,
 .open > .btn-warning.dropdown-toggle.focus {
   color: #fff;
-  background-color: #d58512;
-  border-color: #b06d0f;
+  background-color: #d87a05;
+  border-color: #b06304;
 }
 
 .btn-warning.disabled:focus, .btn-warning.disabled.focus, .btn-warning:disabled:focus, .btn-warning:disabled.focus {
-  background-color: #f0ad4e;
-  border-color: #f0ad4e;
+  background-color: #faa43a;
+  border-color: #faa43a;
 }
 
 .btn-warning.disabled:hover, .btn-warning:disabled:hover {
-  background-color: #f0ad4e;
-  border-color: #f0ad4e;
+  background-color: #faa43a;
+  border-color: #faa43a;
 }
 
 .btn-danger {
   color: #fff;
-  background-color: #d9534f;
-  border-color: #d9534f;
+  background-color: #f9281d;
+  border-color: #f9281d;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-danger:hover {
   color: #fff;
-  background-color: #c9302c;
-  border-color: #c12e2a;
+  background-color: #dd1106;
+  border-color: #d31006;
 }
 
 .btn-danger:focus, .btn-danger.focus {
   color: #fff;
-  background-color: #c9302c;
-  border-color: #c12e2a;
+  background-color: #dd1106;
+  border-color: #d31006;
 }
 
 .btn-danger:active, .btn-danger.active,
 .open > .btn-danger.dropdown-toggle {
   color: #fff;
-  background-color: #c9302c;
-  border-color: #c12e2a;
+  background-color: #dd1106;
+  border-color: #d31006;
   background-image: none;
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
@@ -738,46 +736,46 @@ fieldset[disabled] a.Leave {
 .open > .btn-danger.dropdown-toggle:focus,
 .open > .btn-danger.dropdown-toggle.focus {
   color: #fff;
-  background-color: #ac2925;
-  border-color: #8b211e;
+  background-color: #ba0e05;
+  border-color: #930b04;
 }
 
 .btn-danger.disabled:focus, .btn-danger.disabled.focus, .btn-danger:disabled:focus, .btn-danger:disabled.focus {
-  background-color: #d9534f;
-  border-color: #d9534f;
+  background-color: #f9281d;
+  border-color: #f9281d;
 }
 
 .btn-danger.disabled:hover, .btn-danger:disabled:hover {
-  background-color: #d9534f;
-  border-color: #d9534f;
+  background-color: #f9281d;
+  border-color: #f9281d;
 }
 
 .btn-primary-outline {
-  color: #0275d8;
+  color: #0291db;
   background-image: none;
   background-color: transparent;
-  border-color: #0275d8;
+  border-color: #0291db;
 }
 
 .btn-primary-outline:focus, .btn-primary-outline.focus, .btn-primary-outline:active, .btn-primary-outline.active,
 .open > .btn-primary-outline.dropdown-toggle {
   color: #fff;
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .btn-primary-outline:hover {
   color: #fff;
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .btn-primary-outline.disabled:focus, .btn-primary-outline.disabled.focus, .btn-primary-outline:disabled:focus, .btn-primary-outline:disabled.focus {
-  border-color: #43a7fd;
+  border-color: #46bffd;
 }
 
 .btn-primary-outline.disabled:hover, .btn-primary-outline:disabled:hover {
-  border-color: #43a7fd;
+  border-color: #46bffd;
 }
 
 .btn-secondary-outline {
@@ -809,120 +807,120 @@ fieldset[disabled] a.Leave {
 }
 
 .btn-info-outline {
-  color: #5bc0de;
+  color: #97afbf;
   background-image: none;
   background-color: transparent;
-  border-color: #5bc0de;
+  border-color: #97afbf;
 }
 
 .btn-info-outline:focus, .btn-info-outline.focus, .btn-info-outline:active, .btn-info-outline.active,
 .open > .btn-info-outline.dropdown-toggle {
   color: #fff;
-  background-color: #5bc0de;
-  border-color: #5bc0de;
+  background-color: #97afbf;
+  border-color: #97afbf;
 }
 
 .btn-info-outline:hover {
   color: #fff;
-  background-color: #5bc0de;
-  border-color: #5bc0de;
+  background-color: #97afbf;
+  border-color: #97afbf;
 }
 
 .btn-info-outline.disabled:focus, .btn-info-outline.disabled.focus, .btn-info-outline:disabled:focus, .btn-info-outline:disabled.focus {
-  border-color: #b0e1ef;
+  border-color: #d6e0e6;
 }
 
 .btn-info-outline.disabled:hover, .btn-info-outline:disabled:hover {
-  border-color: #b0e1ef;
+  border-color: #d6e0e6;
 }
 
 .btn-success-outline {
-  color: #5cb85c;
+  color: #60bd68;
   background-image: none;
   background-color: transparent;
-  border-color: #5cb85c;
+  border-color: #60bd68;
 }
 
 .btn-success-outline:focus, .btn-success-outline.focus, .btn-success-outline:active, .btn-success-outline.active,
 .open > .btn-success-outline.dropdown-toggle {
   color: #fff;
-  background-color: #5cb85c;
-  border-color: #5cb85c;
+  background-color: #60bd68;
+  border-color: #60bd68;
 }
 
 .btn-success-outline:hover {
   color: #fff;
-  background-color: #5cb85c;
-  border-color: #5cb85c;
+  background-color: #60bd68;
+  border-color: #60bd68;
 }
 
 .btn-success-outline.disabled:focus, .btn-success-outline.disabled.focus, .btn-success-outline:disabled:focus, .btn-success-outline:disabled.focus {
-  border-color: #a3d7a3;
+  border-color: #a8dbac;
 }
 
 .btn-success-outline.disabled:hover, .btn-success-outline:disabled:hover {
-  border-color: #a3d7a3;
+  border-color: #a8dbac;
 }
 
 .btn-warning-outline {
-  color: #f0ad4e;
+  color: #faa43a;
   background-image: none;
   background-color: transparent;
-  border-color: #f0ad4e;
+  border-color: #faa43a;
 }
 
 .btn-warning-outline:focus, .btn-warning-outline.focus, .btn-warning-outline:active, .btn-warning-outline.active,
 .open > .btn-warning-outline.dropdown-toggle {
   color: #fff;
-  background-color: #f0ad4e;
-  border-color: #f0ad4e;
+  background-color: #faa43a;
+  border-color: #faa43a;
 }
 
 .btn-warning-outline:hover {
   color: #fff;
-  background-color: #f0ad4e;
-  border-color: #f0ad4e;
+  background-color: #faa43a;
+  border-color: #faa43a;
 }
 
 .btn-warning-outline.disabled:focus, .btn-warning-outline.disabled.focus, .btn-warning-outline:disabled:focus, .btn-warning-outline:disabled.focus {
-  border-color: #f8d9ac;
+  border-color: #fdd29d;
 }
 
 .btn-warning-outline.disabled:hover, .btn-warning-outline:disabled:hover {
-  border-color: #f8d9ac;
+  border-color: #fdd29d;
 }
 
 .btn-danger-outline {
-  color: #d9534f;
+  color: #f9281d;
   background-image: none;
   background-color: transparent;
-  border-color: #d9534f;
+  border-color: #f9281d;
 }
 
 .btn-danger-outline:focus, .btn-danger-outline.focus, .btn-danger-outline:active, .btn-danger-outline.active,
 .open > .btn-danger-outline.dropdown-toggle {
   color: #fff;
-  background-color: #d9534f;
-  border-color: #d9534f;
+  background-color: #f9281d;
+  border-color: #f9281d;
 }
 
 .btn-danger-outline:hover {
   color: #fff;
-  background-color: #d9534f;
-  border-color: #d9534f;
+  background-color: #f9281d;
+  border-color: #f9281d;
 }
 
 .btn-danger-outline.disabled:focus, .btn-danger-outline.disabled.focus, .btn-danger-outline:disabled:focus, .btn-danger-outline:disabled.focus {
-  border-color: #eba5a3;
+  border-color: #fc8780;
 }
 
 .btn-danger-outline.disabled:hover, .btn-danger-outline:disabled:hover {
-  border-color: #eba5a3;
+  border-color: #fc8780;
 }
 
 .btn-link {
   font-weight: normal;
-  color: #0275d8;
+  color: #0291db;
   border-radius: 0;
 }
 
@@ -940,7 +938,7 @@ fieldset[disabled] a.Leave {
 }
 
 .btn-link:focus, .btn-link:hover {
-  color: #014c8c;
+  color: #015f8f;
   text-decoration: underline;
   background-color: transparent;
 }
@@ -1013,11 +1011,11 @@ input[type="button"].btn-block {
   margin-left: 1.25rem;
 }
 
-.card > .list-group:first-child .list-group-item:first-child, .Grid_50 .card > ul:first-child .list-group-item:first-child, .PanelInfo .card > li:first-child .list-group-item:first-child, .card > .list-group:first-child .Grid_50 ul li:first-child, .Grid_50 ul .card > .list-group:first-child li:first-child, .Grid_50 .card > ul:first-child li:first-child, .PanelInfo .card > li:first-child .Grid_50 ul li:first-child, .Grid_50 ul .PanelInfo .card > li:first-child li:first-child, .card > .list-group:first-child .PanelInfo li a:first-child, .PanelInfo li .card > .list-group:first-child a:first-child, .Grid_50 .card > ul:first-child .PanelInfo li a:first-child, .PanelInfo li .Grid_50 .card > ul:first-child a:first-child, .PanelInfo .card > li:first-child a:first-child {
+.card > .list-group:first-child .list-group-item:first-child, .Grid_50 .card > ul:first-child .list-group-item:first-child, .card > .list-group:first-child .Grid_50 ul li:first-child, .Grid_50 ul .card > .list-group:first-child li:first-child, .Grid_50 .card > ul:first-child li:first-child {
   border-radius: 0.25rem 0.25rem 0 0;
 }
 
-.card > .list-group:last-child .list-group-item:last-child, .Grid_50 .card > ul:last-child .list-group-item:last-child, .PanelInfo .card > li:last-child .list-group-item:last-child, .card > .list-group:last-child .Grid_50 ul li:last-child, .Grid_50 ul .card > .list-group:last-child li:last-child, .Grid_50 .card > ul:last-child li:last-child, .PanelInfo .card > li:last-child .Grid_50 ul li:last-child, .Grid_50 ul .PanelInfo .card > li:last-child li:last-child, .card > .list-group:last-child .PanelInfo li a:last-child, .PanelInfo li .card > .list-group:last-child a:last-child, .Grid_50 .card > ul:last-child .PanelInfo li a:last-child, .PanelInfo li .Grid_50 .card > ul:last-child a:last-child, .PanelInfo .card > li:last-child a:last-child {
+.card > .list-group:last-child .list-group-item:last-child, .Grid_50 .card > ul:last-child .list-group-item:last-child, .card > .list-group:last-child .Grid_50 ul li:last-child, .Grid_50 ul .card > .list-group:last-child li:last-child, .Grid_50 .card > ul:last-child li:last-child {
   border-radius: 0 0 0.25rem 0.25rem;
 }
 
@@ -1042,33 +1040,33 @@ input[type="button"].btn-block {
 }
 
 .card-primary {
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .card-success {
-  background-color: #5cb85c;
-  border-color: #5cb85c;
+  background-color: #60bd68;
+  border-color: #60bd68;
 }
 
 .card-info {
-  background-color: #5bc0de;
-  border-color: #5bc0de;
+  background-color: #97afbf;
+  border-color: #97afbf;
 }
 
 .card-warning {
-  background-color: #f0ad4e;
-  border-color: #f0ad4e;
+  background-color: #faa43a;
+  border-color: #faa43a;
 }
 
 .card-danger {
-  background-color: #d9534f;
-  border-color: #d9534f;
+  background-color: #f9281d;
+  border-color: #f9281d;
 }
 
 .card-primary-outline {
   background-color: transparent;
-  border-color: #0275d8;
+  border-color: #0291db;
 }
 
 .card-secondary-outline {
@@ -1078,22 +1076,22 @@ input[type="button"].btn-block {
 
 .card-info-outline {
   background-color: transparent;
-  border-color: #5bc0de;
+  border-color: #97afbf;
 }
 
 .card-success-outline {
   background-color: transparent;
-  border-color: #5cb85c;
+  border-color: #60bd68;
 }
 
 .card-warning-outline {
   background-color: transparent;
-  border-color: #f0ad4e;
+  border-color: #faa43a;
 }
 
 .card-danger-outline {
   background-color: transparent;
-  border-color: #d9534f;
+  border-color: #f9281d;
 }
 
 .card-inverse .card-header,
@@ -1785,7 +1783,7 @@ pre code {
 .dropdown-item.active, .dropdown-item.active:focus, .dropdown-item.active:hover {
   color: #fff;
   text-decoration: none;
-  background-color: #0275d8;
+  background-color: #0291db;
   outline: 0;
 }
 
@@ -2149,7 +2147,7 @@ input[type="checkbox"].disabled {
 .has-success.checkbox label,
 .has-success.radio-inline label,
 .has-success.checkbox-inline label {
-  color: #5cb85c;
+  color: #60bd68;
 }
 
 .has-success .form-control, .has-success form input[type="text"], form .has-success input[type="text"], .has-success
@@ -2157,17 +2155,17 @@ form textarea,
 form .has-success textarea, .has-success
 form select,
 form .has-success select {
-  border-color: #5cb85c;
+  border-color: #60bd68;
 }
 
 .has-success .input-group-addon {
-  color: #5cb85c;
-  border-color: #5cb85c;
-  background-color: #eaf6ea;
+  color: #60bd68;
+  border-color: #60bd68;
+  background-color: #f0f9f1;
 }
 
 .has-success .form-control-feedback {
-  color: #5cb85c;
+  color: #60bd68;
 }
 
 .has-success .form-control-success {
@@ -2184,7 +2182,7 @@ form .has-success select {
 .has-warning.checkbox label,
 .has-warning.radio-inline label,
 .has-warning.checkbox-inline label {
-  color: #f0ad4e;
+  color: #faa43a;
 }
 
 .has-warning .form-control, .has-warning form input[type="text"], form .has-warning input[type="text"], .has-warning
@@ -2192,17 +2190,17 @@ form textarea,
 form .has-warning textarea, .has-warning
 form select,
 form .has-warning select {
-  border-color: #f0ad4e;
+  border-color: #faa43a;
 }
 
 .has-warning .input-group-addon {
-  color: #f0ad4e;
-  border-color: #f0ad4e;
+  color: #faa43a;
+  border-color: #faa43a;
   background-color: white;
 }
 
 .has-warning .form-control-feedback {
-  color: #f0ad4e;
+  color: #faa43a;
 }
 
 .has-warning .form-control-warning {
@@ -2219,7 +2217,7 @@ form .has-warning select {
 .has-danger.checkbox label,
 .has-danger.radio-inline label,
 .has-danger.checkbox-inline label {
-  color: #d9534f;
+  color: #f9281d;
 }
 
 .has-danger .form-control, .has-danger form input[type="text"], form .has-danger input[type="text"], .has-danger
@@ -2227,17 +2225,17 @@ form textarea,
 form .has-danger textarea, .has-danger
 form select,
 form .has-danger select {
-  border-color: #d9534f;
+  border-color: #f9281d;
 }
 
 .has-danger .input-group-addon {
-  color: #d9534f;
-  border-color: #d9534f;
-  background-color: #fdf7f7;
+  color: #f9281d;
+  border-color: #f9281d;
+  background-color: #fee5e4;
 }
 
 .has-danger .form-control-feedback {
-  color: #d9534f;
+  color: #f9281d;
 }
 
 .has-danger .form-control-danger {
@@ -3566,51 +3564,51 @@ a.label:focus, a.label:hover {
 }
 
 .label-primary {
-  background-color: #0275d8;
+  background-color: #0291db;
 }
 
 .label-primary[href]:focus, .label-primary[href]:hover {
-  background-color: #025aa5;
+  background-color: #0270a8;
 }
 
 .label-success {
-  background-color: #5cb85c;
+  background-color: #60bd68;
 }
 
 .label-success[href]:focus, .label-success[href]:hover {
-  background-color: #449d44;
+  background-color: #45a54d;
 }
 
 .label-info {
-  background-color: #5bc0de;
+  background-color: #97afbf;
 }
 
 .label-info[href]:focus, .label-info[href]:hover {
-  background-color: #31b0d5;
+  background-color: #7797ac;
 }
 
 .label-warning {
-  background-color: #f0ad4e;
+  background-color: #faa43a;
 }
 
 .label-warning[href]:focus, .label-warning[href]:hover {
-  background-color: #ec971f;
+  background-color: #f98d08;
 }
 
 .label-danger {
-  background-color: #d9534f;
+  background-color: #f9281d;
 }
 
 .label-danger[href]:focus, .label-danger[href]:hover {
-  background-color: #c9302c;
+  background-color: #dd1106;
 }
 
-.list-group, .Grid_50 ul, .PanelInfo li {
+.list-group, .Grid_50 ul {
   padding-left: 0;
   margin-bottom: 0;
 }
 
-.list-group-item, .Grid_50 ul li, .PanelInfo li a {
+.list-group-item, .Grid_50 ul li {
   position: relative;
   display: block;
   padding: .75rem 1.25rem;
@@ -3619,43 +3617,43 @@ a.label:focus, a.label:hover {
   border: 1px solid #ddd;
 }
 
-.list-group-item:first-child, .Grid_50 ul li:first-child, .PanelInfo li a:first-child {
+.list-group-item:first-child, .Grid_50 ul li:first-child {
   border-top-right-radius: 0.25rem;
   border-top-left-radius: 0.25rem;
 }
 
-.list-group-item:last-child, .Grid_50 ul li:last-child, .PanelInfo li a:last-child {
+.list-group-item:last-child, .Grid_50 ul li:last-child {
   margin-bottom: 0;
   border-bottom-right-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
 }
 
-.list-group-flush .list-group-item, .list-group-flush .Grid_50 ul li, .Grid_50 ul .list-group-flush li, .list-group-flush .PanelInfo li a, .PanelInfo li .list-group-flush a {
+.list-group-flush .list-group-item, .list-group-flush .Grid_50 ul li, .Grid_50 ul .list-group-flush li {
   border-width: 1px 0;
   border-radius: 0;
 }
 
-.list-group-flush:first-child .list-group-item:first-child, .list-group-flush:first-child .Grid_50 ul li:first-child, .Grid_50 ul .list-group-flush:first-child li:first-child, .list-group-flush:first-child .PanelInfo li a:first-child, .PanelInfo li .list-group-flush:first-child a:first-child {
+.list-group-flush:first-child .list-group-item:first-child, .list-group-flush:first-child .Grid_50 ul li:first-child, .Grid_50 ul .list-group-flush:first-child li:first-child {
   border-top: 0;
 }
 
-.list-group-flush:last-child .list-group-item:last-child, .list-group-flush:last-child .Grid_50 ul li:last-child, .Grid_50 ul .list-group-flush:last-child li:last-child, .list-group-flush:last-child .PanelInfo li a:last-child, .PanelInfo li .list-group-flush:last-child a:last-child {
+.list-group-flush:last-child .list-group-item:last-child, .list-group-flush:last-child .Grid_50 ul li:last-child, .Grid_50 ul .list-group-flush:last-child li:last-child {
   border-bottom: 0;
 }
 
-a.list-group-item, .PanelInfo li a,
+a.list-group-item,
 button.list-group-item {
   width: 100%;
   color: #555;
   text-align: inherit;
 }
 
-a.list-group-item .list-group-item-heading, .PanelInfo li a .list-group-item-heading,
+a.list-group-item .list-group-item-heading,
 button.list-group-item .list-group-item-heading {
   color: #333;
 }
 
-a.list-group-item:focus, .PanelInfo li a:focus, a.list-group-item:hover, .PanelInfo li a:hover,
+a.list-group-item:focus, a.list-group-item:hover,
 button.list-group-item:focus,
 button.list-group-item:hover {
   color: #555;
@@ -3663,105 +3661,81 @@ button.list-group-item:hover {
   background-color: #f5f5f5;
 }
 
-.list-group-item.disabled, .Grid_50 ul li.disabled, .PanelInfo li a.disabled, .list-group-item.disabled:focus, .Grid_50 ul li.disabled:focus, .PanelInfo li a.disabled:focus, .list-group-item.disabled:hover, .Grid_50 ul li.disabled:hover, .PanelInfo li a.disabled:hover {
+.list-group-item.disabled, .Grid_50 ul li.disabled, .list-group-item.disabled:focus, .Grid_50 ul li.disabled:focus, .list-group-item.disabled:hover, .Grid_50 ul li.disabled:hover {
   color: #818a91;
   cursor: not-allowed;
   background-color: #eceeef;
 }
 
-.list-group-item.disabled .list-group-item-heading, .Grid_50 ul li.disabled .list-group-item-heading, .PanelInfo li a.disabled .list-group-item-heading, .list-group-item.disabled:focus .list-group-item-heading, .Grid_50 ul li.disabled:focus .list-group-item-heading, .PanelInfo li a.disabled:focus .list-group-item-heading, .list-group-item.disabled:hover .list-group-item-heading, .Grid_50 ul li.disabled:hover .list-group-item-heading, .PanelInfo li a.disabled:hover .list-group-item-heading {
+.list-group-item.disabled .list-group-item-heading, .Grid_50 ul li.disabled .list-group-item-heading, .list-group-item.disabled:focus .list-group-item-heading, .Grid_50 ul li.disabled:focus .list-group-item-heading, .list-group-item.disabled:hover .list-group-item-heading, .Grid_50 ul li.disabled:hover .list-group-item-heading {
   color: inherit;
 }
 
-.list-group-item.disabled .list-group-item-text, .Grid_50 ul li.disabled .list-group-item-text, .PanelInfo li a.disabled .list-group-item-text, .list-group-item.disabled:focus .list-group-item-text, .Grid_50 ul li.disabled:focus .list-group-item-text, .PanelInfo li a.disabled:focus .list-group-item-text, .list-group-item.disabled:hover .list-group-item-text, .Grid_50 ul li.disabled:hover .list-group-item-text, .PanelInfo li a.disabled:hover .list-group-item-text {
+.list-group-item.disabled .list-group-item-text, .Grid_50 ul li.disabled .list-group-item-text, .list-group-item.disabled:focus .list-group-item-text, .Grid_50 ul li.disabled:focus .list-group-item-text, .list-group-item.disabled:hover .list-group-item-text, .Grid_50 ul li.disabled:hover .list-group-item-text {
   color: #818a91;
 }
 
-.list-group-item.active, .Grid_50 ul li.active, .PanelInfo li a.active, .PanelInfo .Active a, .list-group-item.active:focus, .Grid_50 ul li.active:focus, .PanelInfo li a.active:focus, .PanelInfo .Active a:focus, .list-group-item.active:hover, .Grid_50 ul li.active:hover, .PanelInfo li a.active:hover, .PanelInfo .Active a:hover {
+.list-group-item.active, .Grid_50 ul li.active, .list-group-item.active:focus, .Grid_50 ul li.active:focus, .list-group-item.active:hover, .Grid_50 ul li.active:hover {
   z-index: 2;
   color: #fff;
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
-.list-group-item.active .list-group-item-heading, .Grid_50 ul li.active .list-group-item-heading, .PanelInfo li a.active .list-group-item-heading, .PanelInfo .Active a .list-group-item-heading,
-.list-group-item.active .list-group-item-heading > small, .Grid_50 ul li.active .list-group-item-heading > small, .PanelInfo li a.active .list-group-item-heading > small, .PanelInfo .Active a .list-group-item-heading > small,
-.list-group-item.active .list-group-item-heading > .small, .Grid_50 ul li.active .list-group-item-heading > .small, .PanelInfo li a.active .list-group-item-heading > .small, .PanelInfo .Active a .list-group-item-heading > .small,
+.list-group-item.active .list-group-item-heading, .Grid_50 ul li.active .list-group-item-heading,
+.list-group-item.active .list-group-item-heading > small, .Grid_50 ul li.active .list-group-item-heading > small,
+.list-group-item.active .list-group-item-heading > .small, .Grid_50 ul li.active .list-group-item-heading > .small,
 .list-group-item.active .FeedItem .list-group-item-heading > .Date, .FeedItem
-.list-group-item.active .list-group-item-heading > .Date, .Grid_50 ul li.active .FeedItem .list-group-item-heading > .Date, .FeedItem .Grid_50 ul li.active .list-group-item-heading > .Date, .PanelInfo li a.active .FeedItem .list-group-item-heading > .Date, .FeedItem .PanelInfo li a.active .list-group-item-heading > .Date, .PanelInfo .Active a .FeedItem .list-group-item-heading > .Date, .FeedItem .PanelInfo .Active a .list-group-item-heading > .Date,
+.list-group-item.active .list-group-item-heading > .Date, .Grid_50 ul li.active .FeedItem .list-group-item-heading > .Date, .FeedItem .Grid_50 ul li.active .list-group-item-heading > .Date,
 .list-group-item.active
 .FeedItem .list-group-item-heading > .tptn_counter,
 .FeedItem
 .list-group-item.active .list-group-item-heading > .tptn_counter, .Grid_50 ul li.active
 .FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .Grid_50 ul li.active .list-group-item-heading > .tptn_counter, .PanelInfo li a.active
-.FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .PanelInfo li a.active .list-group-item-heading > .tptn_counter, .PanelInfo .Active a
-.FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .PanelInfo .Active a .list-group-item-heading > .tptn_counter,
+.FeedItem .Grid_50 ul li.active .list-group-item-heading > .tptn_counter,
 .list-group-item.active
 .FeedItem .list-group-item-heading > p:last-child,
 .FeedItem
 .list-group-item.active .list-group-item-heading > p:last-child, .Grid_50 ul li.active
 .FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .Grid_50 ul li.active .list-group-item-heading > p:last-child, .PanelInfo li a.active
-.FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .PanelInfo li a.active .list-group-item-heading > p:last-child, .PanelInfo .Active a
-.FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .PanelInfo .Active a .list-group-item-heading > p:last-child, .list-group-item.active:focus .list-group-item-heading, .Grid_50 ul li.active:focus .list-group-item-heading, .PanelInfo li a.active:focus .list-group-item-heading, .PanelInfo .Active a:focus .list-group-item-heading,
-.list-group-item.active:focus .list-group-item-heading > small, .Grid_50 ul li.active:focus .list-group-item-heading > small, .PanelInfo li a.active:focus .list-group-item-heading > small, .PanelInfo .Active a:focus .list-group-item-heading > small,
-.list-group-item.active:focus .list-group-item-heading > .small, .Grid_50 ul li.active:focus .list-group-item-heading > .small, .PanelInfo li a.active:focus .list-group-item-heading > .small, .PanelInfo .Active a:focus .list-group-item-heading > .small,
+.FeedItem .Grid_50 ul li.active .list-group-item-heading > p:last-child, .list-group-item.active:focus .list-group-item-heading, .Grid_50 ul li.active:focus .list-group-item-heading,
+.list-group-item.active:focus .list-group-item-heading > small, .Grid_50 ul li.active:focus .list-group-item-heading > small,
+.list-group-item.active:focus .list-group-item-heading > .small, .Grid_50 ul li.active:focus .list-group-item-heading > .small,
 .list-group-item.active:focus .FeedItem .list-group-item-heading > .Date, .FeedItem
-.list-group-item.active:focus .list-group-item-heading > .Date, .Grid_50 ul li.active:focus .FeedItem .list-group-item-heading > .Date, .FeedItem .Grid_50 ul li.active:focus .list-group-item-heading > .Date, .PanelInfo li a.active:focus .FeedItem .list-group-item-heading > .Date, .FeedItem .PanelInfo li a.active:focus .list-group-item-heading > .Date, .PanelInfo .Active a:focus .FeedItem .list-group-item-heading > .Date, .FeedItem .PanelInfo .Active a:focus .list-group-item-heading > .Date,
+.list-group-item.active:focus .list-group-item-heading > .Date, .Grid_50 ul li.active:focus .FeedItem .list-group-item-heading > .Date, .FeedItem .Grid_50 ul li.active:focus .list-group-item-heading > .Date,
 .list-group-item.active:focus
 .FeedItem .list-group-item-heading > .tptn_counter,
 .FeedItem
 .list-group-item.active:focus .list-group-item-heading > .tptn_counter, .Grid_50 ul li.active:focus
 .FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .Grid_50 ul li.active:focus .list-group-item-heading > .tptn_counter, .PanelInfo li a.active:focus
-.FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .PanelInfo li a.active:focus .list-group-item-heading > .tptn_counter, .PanelInfo .Active a:focus
-.FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .PanelInfo .Active a:focus .list-group-item-heading > .tptn_counter,
+.FeedItem .Grid_50 ul li.active:focus .list-group-item-heading > .tptn_counter,
 .list-group-item.active:focus
 .FeedItem .list-group-item-heading > p:last-child,
 .FeedItem
 .list-group-item.active:focus .list-group-item-heading > p:last-child, .Grid_50 ul li.active:focus
 .FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .Grid_50 ul li.active:focus .list-group-item-heading > p:last-child, .PanelInfo li a.active:focus
-.FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .PanelInfo li a.active:focus .list-group-item-heading > p:last-child, .PanelInfo .Active a:focus
-.FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .PanelInfo .Active a:focus .list-group-item-heading > p:last-child, .list-group-item.active:hover .list-group-item-heading, .Grid_50 ul li.active:hover .list-group-item-heading, .PanelInfo li a.active:hover .list-group-item-heading, .PanelInfo .Active a:hover .list-group-item-heading,
-.list-group-item.active:hover .list-group-item-heading > small, .Grid_50 ul li.active:hover .list-group-item-heading > small, .PanelInfo li a.active:hover .list-group-item-heading > small, .PanelInfo .Active a:hover .list-group-item-heading > small,
-.list-group-item.active:hover .list-group-item-heading > .small, .Grid_50 ul li.active:hover .list-group-item-heading > .small, .PanelInfo li a.active:hover .list-group-item-heading > .small, .PanelInfo .Active a:hover .list-group-item-heading > .small,
+.FeedItem .Grid_50 ul li.active:focus .list-group-item-heading > p:last-child, .list-group-item.active:hover .list-group-item-heading, .Grid_50 ul li.active:hover .list-group-item-heading,
+.list-group-item.active:hover .list-group-item-heading > small, .Grid_50 ul li.active:hover .list-group-item-heading > small,
+.list-group-item.active:hover .list-group-item-heading > .small, .Grid_50 ul li.active:hover .list-group-item-heading > .small,
 .list-group-item.active:hover .FeedItem .list-group-item-heading > .Date, .FeedItem
-.list-group-item.active:hover .list-group-item-heading > .Date, .Grid_50 ul li.active:hover .FeedItem .list-group-item-heading > .Date, .FeedItem .Grid_50 ul li.active:hover .list-group-item-heading > .Date, .PanelInfo li a.active:hover .FeedItem .list-group-item-heading > .Date, .FeedItem .PanelInfo li a.active:hover .list-group-item-heading > .Date, .PanelInfo .Active a:hover .FeedItem .list-group-item-heading > .Date, .FeedItem .PanelInfo .Active a:hover .list-group-item-heading > .Date,
+.list-group-item.active:hover .list-group-item-heading > .Date, .Grid_50 ul li.active:hover .FeedItem .list-group-item-heading > .Date, .FeedItem .Grid_50 ul li.active:hover .list-group-item-heading > .Date,
 .list-group-item.active:hover
 .FeedItem .list-group-item-heading > .tptn_counter,
 .FeedItem
 .list-group-item.active:hover .list-group-item-heading > .tptn_counter, .Grid_50 ul li.active:hover
 .FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .Grid_50 ul li.active:hover .list-group-item-heading > .tptn_counter, .PanelInfo li a.active:hover
-.FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .PanelInfo li a.active:hover .list-group-item-heading > .tptn_counter, .PanelInfo .Active a:hover
-.FeedItem .list-group-item-heading > .tptn_counter,
-.FeedItem .PanelInfo .Active a:hover .list-group-item-heading > .tptn_counter,
+.FeedItem .Grid_50 ul li.active:hover .list-group-item-heading > .tptn_counter,
 .list-group-item.active:hover
 .FeedItem .list-group-item-heading > p:last-child,
 .FeedItem
 .list-group-item.active:hover .list-group-item-heading > p:last-child, .Grid_50 ul li.active:hover
 .FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .Grid_50 ul li.active:hover .list-group-item-heading > p:last-child, .PanelInfo li a.active:hover
-.FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .PanelInfo li a.active:hover .list-group-item-heading > p:last-child, .PanelInfo .Active a:hover
-.FeedItem .list-group-item-heading > p:last-child,
-.FeedItem .PanelInfo .Active a:hover .list-group-item-heading > p:last-child {
+.FeedItem .Grid_50 ul li.active:hover .list-group-item-heading > p:last-child {
   color: inherit;
 }
 
-.list-group-item.active .list-group-item-text, .Grid_50 ul li.active .list-group-item-text, .PanelInfo li a.active .list-group-item-text, .PanelInfo .Active a .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .Grid_50 ul li.active:focus .list-group-item-text, .PanelInfo li a.active:focus .list-group-item-text, .PanelInfo .Active a:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .Grid_50 ul li.active:hover .list-group-item-text, .PanelInfo li a.active:hover .list-group-item-text, .PanelInfo .Active a:hover .list-group-item-text {
-  color: #a8d6fe;
+.list-group-item.active .list-group-item-text, .Grid_50 ul li.active .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .Grid_50 ul li.active:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .Grid_50 ul li.active:hover .list-group-item-text {
+  color: #abe2fe;
 }
 
 .list-group-item-success {
@@ -4098,36 +4072,42 @@ button.list-group-item-danger.active:hover {
   }
 }
 
-.nav, .Tabs ul {
+.nav, .Tabs ul, .PanelInfo {
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
 }
 
-.nav-link {
+.nav-link, .PanelInfo li a {
   display: inline-block;
 }
 
-.nav-link:focus, .nav-link:hover {
+.nav-link:focus, .PanelInfo li a:focus, .nav-link:hover, .PanelInfo li a:hover {
   text-decoration: none;
 }
 
-.nav-link.disabled {
+.nav-link.disabled, .PanelInfo li a.disabled {
   color: #818a91;
 }
 
-.nav-link.disabled, .nav-link.disabled:focus, .nav-link.disabled:hover {
+.nav-link.disabled, .PanelInfo li a.disabled, .nav-link.disabled:focus, .PanelInfo li a.disabled:focus, .nav-link.disabled:hover, .PanelInfo li a.disabled:hover {
   color: #818a91;
   cursor: not-allowed;
   background-color: transparent;
 }
 
-.nav-inline .nav-item {
+.nav-inline .nav-item, .nav-inline .PanelInfo li, .PanelInfo .nav-inline li {
   display: inline-block;
 }
 
-.nav-inline .nav-item + .nav-item,
-.nav-inline .nav-link + .nav-link {
+.nav-inline .nav-item + .nav-item, .nav-inline .PanelInfo li + .nav-item, .PanelInfo .nav-inline li + .nav-item, .nav-inline .PanelInfo .nav-item + li, .PanelInfo .nav-inline .nav-item + li, .nav-inline .PanelInfo li + li, .PanelInfo .nav-inline li + li,
+.nav-inline .nav-link + .nav-link,
+.nav-inline .PanelInfo li a + .nav-link, .PanelInfo li
+.nav-inline a + .nav-link,
+.nav-inline .PanelInfo li .nav-link + a, .PanelInfo li
+.nav-inline .nav-link + a,
+.nav-inline .PanelInfo li a + a, .PanelInfo li
+.nav-inline a + a {
   margin-left: 1rem;
 }
 
@@ -4141,76 +4121,112 @@ button.list-group-item-danger.active:hover {
   clear: both;
 }
 
-.nav-tabs .nav-item, .Tabs ul .nav-item {
+.nav-tabs .nav-item, .Tabs ul .nav-item, .nav-tabs .PanelInfo li, .PanelInfo .nav-tabs li, .Tabs ul .PanelInfo li, .PanelInfo .Tabs ul li {
   float: left;
   margin-bottom: -1px;
 }
 
-.nav-tabs .nav-item + .nav-item, .Tabs ul .nav-item + .nav-item {
+.nav-tabs .nav-item + .nav-item, .Tabs ul .nav-item + .nav-item, .nav-tabs .PanelInfo li + .nav-item, .PanelInfo .nav-tabs li + .nav-item, .Tabs ul .PanelInfo li + .nav-item, .PanelInfo .Tabs ul li + .nav-item, .nav-tabs .PanelInfo .nav-item + li, .PanelInfo .nav-tabs .nav-item + li, .Tabs ul .PanelInfo .nav-item + li, .PanelInfo .Tabs ul .nav-item + li, .nav-tabs .PanelInfo li + li, .PanelInfo .nav-tabs li + li, .Tabs ul .PanelInfo li + li, .PanelInfo .Tabs ul li + li {
   margin-left: .2rem;
 }
 
-.nav-tabs .nav-link, .Tabs ul .nav-link {
+.nav-tabs .nav-link, .Tabs ul .nav-link, .nav-tabs .PanelInfo li a, .PanelInfo li .nav-tabs a, .Tabs ul .PanelInfo li a, .PanelInfo li .Tabs ul a {
   display: block;
   padding: 0.5em 1em;
   border: 1px solid transparent;
   border-radius: 0.25rem 0.25rem 0 0;
 }
 
-.nav-tabs .nav-link:focus, .Tabs ul .nav-link:focus, .nav-tabs .nav-link:hover, .Tabs ul .nav-link:hover {
+.nav-tabs .nav-link:focus, .Tabs ul .nav-link:focus, .nav-tabs .PanelInfo li a:focus, .PanelInfo li .nav-tabs a:focus, .Tabs ul .PanelInfo li a:focus, .PanelInfo li .Tabs ul a:focus, .nav-tabs .nav-link:hover, .Tabs ul .nav-link:hover, .nav-tabs .PanelInfo li a:hover, .PanelInfo li .nav-tabs a:hover, .Tabs ul .PanelInfo li a:hover, .PanelInfo li .Tabs ul a:hover {
   border-color: #eceeef #eceeef #ddd;
 }
 
-.nav-tabs .nav-link.disabled, .Tabs ul .nav-link.disabled, .nav-tabs .nav-link.disabled:focus, .Tabs ul .nav-link.disabled:focus, .nav-tabs .nav-link.disabled:hover, .Tabs ul .nav-link.disabled:hover {
+.nav-tabs .nav-link.disabled, .Tabs ul .nav-link.disabled, .nav-tabs .PanelInfo li a.disabled, .PanelInfo li .nav-tabs a.disabled, .Tabs ul .PanelInfo li a.disabled, .PanelInfo li .Tabs ul a.disabled, .nav-tabs .nav-link.disabled:focus, .Tabs ul .nav-link.disabled:focus, .nav-tabs .PanelInfo li a.disabled:focus, .PanelInfo li .nav-tabs a.disabled:focus, .Tabs ul .PanelInfo li a.disabled:focus, .PanelInfo li .Tabs ul a.disabled:focus, .nav-tabs .nav-link.disabled:hover, .Tabs ul .nav-link.disabled:hover, .nav-tabs .PanelInfo li a.disabled:hover, .PanelInfo li .nav-tabs a.disabled:hover, .Tabs ul .PanelInfo li a.disabled:hover, .PanelInfo li .Tabs ul a.disabled:hover {
   color: #818a91;
   background-color: transparent;
   border-color: transparent;
 }
 
-.nav-tabs .nav-link.active, .Tabs ul .nav-link.active, .nav-tabs .nav-link.active:focus, .Tabs ul .nav-link.active:focus, .nav-tabs .nav-link.active:hover, .Tabs ul .nav-link.active:hover,
+.nav-tabs .nav-link.active, .Tabs ul .nav-link.active, .nav-tabs .PanelInfo li a.active, .PanelInfo li .nav-tabs a.active, .Tabs ul .PanelInfo li a.active, .PanelInfo li .Tabs ul a.active, .nav-tabs .PanelInfo .Active a, .PanelInfo .Active .nav-tabs a, .Tabs ul .PanelInfo .Active a, .PanelInfo .Active .Tabs ul a, .nav-tabs .nav-link.active:focus, .Tabs ul .nav-link.active:focus, .nav-tabs .PanelInfo li a.active:focus, .PanelInfo li .nav-tabs a.active:focus, .Tabs ul .PanelInfo li a.active:focus, .PanelInfo li .Tabs ul a.active:focus, .nav-tabs .PanelInfo .Active a:focus, .PanelInfo .Active .nav-tabs a:focus, .Tabs ul .PanelInfo .Active a:focus, .PanelInfo .Active .Tabs ul a:focus, .nav-tabs .nav-link.active:hover, .Tabs ul .nav-link.active:hover, .nav-tabs .PanelInfo li a.active:hover, .PanelInfo li .nav-tabs a.active:hover, .Tabs ul .PanelInfo li a.active:hover, .PanelInfo li .Tabs ul a.active:hover, .nav-tabs .PanelInfo .Active a:hover, .PanelInfo .Active .nav-tabs a:hover, .Tabs ul .PanelInfo .Active a:hover, .PanelInfo .Active .Tabs ul a:hover,
 .nav-tabs .nav-item.open .nav-link, .Tabs ul .nav-item.open .nav-link,
+.nav-tabs .PanelInfo li.open .nav-link, .PanelInfo
+.nav-tabs li.open .nav-link, .Tabs ul .PanelInfo li.open .nav-link, .PanelInfo .Tabs ul li.open .nav-link,
+.nav-tabs .nav-item.open .PanelInfo li a, .PanelInfo li
+.nav-tabs .nav-item.open a, .Tabs ul .nav-item.open .PanelInfo li a, .PanelInfo li .Tabs ul .nav-item.open a,
+.nav-tabs .PanelInfo li.open a, .PanelInfo
+.nav-tabs li.open a, .Tabs ul .PanelInfo li.open a, .PanelInfo .Tabs ul li.open a,
 .nav-tabs .nav-item.open .nav-link:focus, .Tabs ul .nav-item.open .nav-link:focus,
-.nav-tabs .nav-item.open .nav-link:hover, .Tabs ul .nav-item.open .nav-link:hover {
+.nav-tabs .PanelInfo li.open .nav-link:focus, .PanelInfo
+.nav-tabs li.open .nav-link:focus, .Tabs ul .PanelInfo li.open .nav-link:focus, .PanelInfo .Tabs ul li.open .nav-link:focus,
+.nav-tabs .nav-item.open .PanelInfo li a:focus, .PanelInfo li
+.nav-tabs .nav-item.open a:focus, .Tabs ul .nav-item.open .PanelInfo li a:focus, .PanelInfo li .Tabs ul .nav-item.open a:focus,
+.nav-tabs .PanelInfo li.open a:focus, .PanelInfo
+.nav-tabs li.open a:focus, .Tabs ul .PanelInfo li.open a:focus, .PanelInfo .Tabs ul li.open a:focus,
+.nav-tabs .nav-item.open .nav-link:hover, .Tabs ul .nav-item.open .nav-link:hover,
+.nav-tabs .PanelInfo li.open .nav-link:hover, .PanelInfo
+.nav-tabs li.open .nav-link:hover, .Tabs ul .PanelInfo li.open .nav-link:hover, .PanelInfo .Tabs ul li.open .nav-link:hover,
+.nav-tabs .nav-item.open .PanelInfo li a:hover, .PanelInfo li
+.nav-tabs .nav-item.open a:hover, .Tabs ul .nav-item.open .PanelInfo li a:hover, .PanelInfo li .Tabs ul .nav-item.open a:hover,
+.nav-tabs .PanelInfo li.open a:hover, .PanelInfo
+.nav-tabs li.open a:hover, .Tabs ul .PanelInfo li.open a:hover, .PanelInfo .Tabs ul li.open a:hover {
   color: #55595c;
   background-color: #fff;
   border-color: #ddd #ddd transparent;
 }
 
-.nav-pills::after {
+.nav-pills::after, .PanelInfo::after {
   content: "";
   display: table;
   clear: both;
 }
 
-.nav-pills .nav-item {
+.nav-pills .nav-item, .PanelInfo .nav-item, .nav-pills .PanelInfo li, .PanelInfo .nav-pills li, .PanelInfo li {
   float: left;
 }
 
-.nav-pills .nav-item + .nav-item {
+.nav-pills .nav-item + .nav-item, .PanelInfo .nav-item + .nav-item, .nav-pills .PanelInfo li + .nav-item, .PanelInfo .nav-pills li + .nav-item, .PanelInfo li + .nav-item, .nav-pills .PanelInfo .nav-item + li, .PanelInfo .nav-pills .nav-item + li, .PanelInfo .nav-item + li, .nav-pills .PanelInfo li + li, .PanelInfo .nav-pills li + li, .PanelInfo li + li {
   margin-left: .2rem;
 }
 
-.nav-pills .nav-link {
+.nav-pills .nav-link, .PanelInfo .nav-link, .nav-pills .PanelInfo li a, .PanelInfo li .nav-pills a, .PanelInfo li a {
   display: block;
   padding: 0.5em 1em;
   border-radius: 0.25rem;
 }
 
-.nav-pills .nav-link.active, .nav-pills .nav-link.active:focus, .nav-pills .nav-link.active:hover,
-.nav-pills .nav-item.open .nav-link,
-.nav-pills .nav-item.open .nav-link:focus,
-.nav-pills .nav-item.open .nav-link:hover {
+.nav-pills .nav-link.active, .PanelInfo .nav-link.active, .nav-pills .PanelInfo li a.active, .PanelInfo li .nav-pills a.active, .PanelInfo li a.active, .nav-pills .PanelInfo .Active a, .PanelInfo .Active .nav-pills a, .PanelInfo .Active a, .nav-pills .nav-link.active:focus, .PanelInfo .nav-link.active:focus, .nav-pills .PanelInfo li a.active:focus, .PanelInfo li .nav-pills a.active:focus, .PanelInfo li a.active:focus, .nav-pills .PanelInfo .Active a:focus, .PanelInfo .Active .nav-pills a:focus, .PanelInfo .Active a:focus, .nav-pills .nav-link.active:hover, .PanelInfo .nav-link.active:hover, .nav-pills .PanelInfo li a.active:hover, .PanelInfo li .nav-pills a.active:hover, .PanelInfo li a.active:hover, .nav-pills .PanelInfo .Active a:hover, .PanelInfo .Active .nav-pills a:hover, .PanelInfo .Active a:hover,
+.nav-pills .nav-item.open .nav-link, .PanelInfo .nav-item.open .nav-link,
+.nav-pills .PanelInfo li.open .nav-link, .PanelInfo
+.nav-pills li.open .nav-link, .PanelInfo li.open .nav-link,
+.nav-pills .nav-item.open .PanelInfo li a, .PanelInfo li
+.nav-pills .nav-item.open a, .PanelInfo .nav-item.open li a, .PanelInfo li .nav-item.open a,
+.nav-pills .PanelInfo li.open a, .PanelInfo
+.nav-pills li.open a, .PanelInfo li.open a,
+.nav-pills .nav-item.open .nav-link:focus, .PanelInfo .nav-item.open .nav-link:focus,
+.nav-pills .PanelInfo li.open .nav-link:focus, .PanelInfo
+.nav-pills li.open .nav-link:focus, .PanelInfo li.open .nav-link:focus,
+.nav-pills .nav-item.open .PanelInfo li a:focus, .PanelInfo li
+.nav-pills .nav-item.open a:focus, .PanelInfo .nav-item.open li a:focus, .PanelInfo li .nav-item.open a:focus,
+.nav-pills .PanelInfo li.open a:focus, .PanelInfo
+.nav-pills li.open a:focus, .PanelInfo li.open a:focus,
+.nav-pills .nav-item.open .nav-link:hover, .PanelInfo .nav-item.open .nav-link:hover,
+.nav-pills .PanelInfo li.open .nav-link:hover, .PanelInfo
+.nav-pills li.open .nav-link:hover, .PanelInfo li.open .nav-link:hover,
+.nav-pills .nav-item.open .PanelInfo li a:hover, .PanelInfo li
+.nav-pills .nav-item.open a:hover, .PanelInfo .nav-item.open li a:hover, .PanelInfo li .nav-item.open a:hover,
+.nav-pills .PanelInfo li.open a:hover, .PanelInfo
+.nav-pills li.open a:hover, .PanelInfo li.open a:hover {
   color: #fff;
   cursor: default;
-  background-color: #0275d8;
+  background-color: #0291db;
 }
 
-.nav-stacked .nav-item {
+.nav-stacked .nav-item, .PanelInfo .nav-item, .nav-stacked .PanelInfo li, .PanelInfo .nav-stacked li, .PanelInfo li {
   display: block;
   float: none;
 }
 
-.nav-stacked .nav-item + .nav-item {
+.nav-stacked .nav-item + .nav-item, .PanelInfo .nav-item + .nav-item, .nav-stacked .PanelInfo li + .nav-item, .PanelInfo .nav-stacked li + .nav-item, .PanelInfo li + .nav-item, .nav-stacked .PanelInfo .nav-item + li, .PanelInfo .nav-stacked .nav-item + li, .PanelInfo .nav-item + li, .nav-stacked .PanelInfo li + li, .PanelInfo .nav-stacked li + li, .PanelInfo li + li {
   margin-top: .2rem;
   margin-left: 0;
 }
@@ -4354,21 +4370,21 @@ button.list-group-item-danger.active:hover {
   }
 }
 
-.navbar-nav .nav-item {
+.navbar-nav .nav-item, .navbar-nav .PanelInfo li, .PanelInfo .navbar-nav li {
   float: left;
 }
 
-.navbar-nav .nav-link {
+.navbar-nav .nav-link, .navbar-nav .PanelInfo li a, .PanelInfo li .navbar-nav a {
   display: block;
   padding-top: .425rem;
   padding-bottom: .425rem;
 }
 
-.navbar-nav .nav-link + .nav-link {
+.navbar-nav .nav-link + .nav-link, .navbar-nav .PanelInfo li a + .nav-link, .PanelInfo li .navbar-nav a + .nav-link, .navbar-nav .PanelInfo li .nav-link + a, .PanelInfo li .navbar-nav .nav-link + a, .navbar-nav .PanelInfo li a + a, .PanelInfo li .navbar-nav a + a {
   margin-left: 1rem;
 }
 
-.navbar-nav .nav-item + .nav-item {
+.navbar-nav .nav-item + .nav-item, .navbar-nav .PanelInfo li + .nav-item, .PanelInfo .navbar-nav li + .nav-item, .navbar-nav .PanelInfo .nav-item + li, .PanelInfo .navbar-nav .nav-item + li, .navbar-nav .PanelInfo li + li, .PanelInfo .navbar-nav li + li {
   margin-left: 1rem;
 }
 
@@ -4380,24 +4396,48 @@ button.list-group-item-danger.active:hover {
   color: rgba(0, 0, 0, 0.8);
 }
 
-.navbar-light .navbar-nav .nav-link {
+.navbar-light .navbar-nav .nav-link, .navbar-light .navbar-nav .PanelInfo li a, .PanelInfo li .navbar-light .navbar-nav a {
   color: rgba(0, 0, 0, 0.3);
 }
 
-.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .PanelInfo li a:focus, .PanelInfo li .navbar-light .navbar-nav a:focus, .navbar-light .navbar-nav .nav-link:hover, .navbar-light .navbar-nav .PanelInfo li a:hover, .PanelInfo li .navbar-light .navbar-nav a:hover {
   color: rgba(0, 0, 0, 0.6);
 }
 
-.navbar-light .navbar-nav .open > .nav-link, .navbar-light .navbar-nav .open > .nav-link:focus, .navbar-light .navbar-nav .open > .nav-link:hover,
+.navbar-light .navbar-nav .open > .nav-link, .navbar-light .navbar-nav .PanelInfo li .open > a, .PanelInfo li .navbar-light .navbar-nav .open > a, .navbar-light .navbar-nav .open > .nav-link:focus, .navbar-light .navbar-nav .PanelInfo li .open > a:focus, .PanelInfo li .navbar-light .navbar-nav .open > a:focus, .navbar-light .navbar-nav .open > .nav-link:hover, .navbar-light .navbar-nav .PanelInfo li .open > a:hover, .PanelInfo li .navbar-light .navbar-nav .open > a:hover,
 .navbar-light .navbar-nav .active > .nav-link,
+.navbar-light .navbar-nav .PanelInfo li .active > a, .PanelInfo li
+.navbar-light .navbar-nav .active > a,
 .navbar-light .navbar-nav .active > .nav-link:focus,
+.navbar-light .navbar-nav .PanelInfo li .active > a:focus, .PanelInfo li
+.navbar-light .navbar-nav .active > a:focus,
 .navbar-light .navbar-nav .active > .nav-link:hover,
+.navbar-light .navbar-nav .PanelInfo li .active > a:hover, .PanelInfo li
+.navbar-light .navbar-nav .active > a:hover,
 .navbar-light .navbar-nav .nav-link.open,
+.navbar-light .navbar-nav .PanelInfo li a.open, .PanelInfo li
+.navbar-light .navbar-nav a.open,
 .navbar-light .navbar-nav .nav-link.open:focus,
+.navbar-light .navbar-nav .PanelInfo li a.open:focus, .PanelInfo li
+.navbar-light .navbar-nav a.open:focus,
 .navbar-light .navbar-nav .nav-link.open:hover,
+.navbar-light .navbar-nav .PanelInfo li a.open:hover, .PanelInfo li
+.navbar-light .navbar-nav a.open:hover,
 .navbar-light .navbar-nav .nav-link.active,
+.navbar-light .navbar-nav .PanelInfo li a.active, .PanelInfo li
+.navbar-light .navbar-nav a.active,
+.navbar-light .navbar-nav .PanelInfo .Active a, .PanelInfo .Active
+.navbar-light .navbar-nav a,
 .navbar-light .navbar-nav .nav-link.active:focus,
-.navbar-light .navbar-nav .nav-link.active:hover {
+.navbar-light .navbar-nav .PanelInfo li a.active:focus, .PanelInfo li
+.navbar-light .navbar-nav a.active:focus,
+.navbar-light .navbar-nav .PanelInfo .Active a:focus, .PanelInfo .Active
+.navbar-light .navbar-nav a:focus,
+.navbar-light .navbar-nav .nav-link.active:hover,
+.navbar-light .navbar-nav .PanelInfo li a.active:hover, .PanelInfo li
+.navbar-light .navbar-nav a.active:hover,
+.navbar-light .navbar-nav .PanelInfo .Active a:hover, .PanelInfo .Active
+.navbar-light .navbar-nav a:hover {
   color: rgba(0, 0, 0, 0.8);
 }
 
@@ -4413,24 +4453,48 @@ button.list-group-item-danger.active:hover {
   color: white;
 }
 
-.navbar-dark .navbar-nav .nav-link {
+.navbar-dark .navbar-nav .nav-link, .navbar-dark .navbar-nav .PanelInfo li a, .PanelInfo li .navbar-dark .navbar-nav a {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link:hover {
+.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .PanelInfo li a:focus, .PanelInfo li .navbar-dark .navbar-nav a:focus, .navbar-dark .navbar-nav .nav-link:hover, .navbar-dark .navbar-nav .PanelInfo li a:hover, .PanelInfo li .navbar-dark .navbar-nav a:hover {
   color: rgba(255, 255, 255, 0.75);
 }
 
-.navbar-dark .navbar-nav .open > .nav-link, .navbar-dark .navbar-nav .open > .nav-link:focus, .navbar-dark .navbar-nav .open > .nav-link:hover,
+.navbar-dark .navbar-nav .open > .nav-link, .navbar-dark .navbar-nav .PanelInfo li .open > a, .PanelInfo li .navbar-dark .navbar-nav .open > a, .navbar-dark .navbar-nav .open > .nav-link:focus, .navbar-dark .navbar-nav .PanelInfo li .open > a:focus, .PanelInfo li .navbar-dark .navbar-nav .open > a:focus, .navbar-dark .navbar-nav .open > .nav-link:hover, .navbar-dark .navbar-nav .PanelInfo li .open > a:hover, .PanelInfo li .navbar-dark .navbar-nav .open > a:hover,
 .navbar-dark .navbar-nav .active > .nav-link,
+.navbar-dark .navbar-nav .PanelInfo li .active > a, .PanelInfo li
+.navbar-dark .navbar-nav .active > a,
 .navbar-dark .navbar-nav .active > .nav-link:focus,
+.navbar-dark .navbar-nav .PanelInfo li .active > a:focus, .PanelInfo li
+.navbar-dark .navbar-nav .active > a:focus,
 .navbar-dark .navbar-nav .active > .nav-link:hover,
+.navbar-dark .navbar-nav .PanelInfo li .active > a:hover, .PanelInfo li
+.navbar-dark .navbar-nav .active > a:hover,
 .navbar-dark .navbar-nav .nav-link.open,
+.navbar-dark .navbar-nav .PanelInfo li a.open, .PanelInfo li
+.navbar-dark .navbar-nav a.open,
 .navbar-dark .navbar-nav .nav-link.open:focus,
+.navbar-dark .navbar-nav .PanelInfo li a.open:focus, .PanelInfo li
+.navbar-dark .navbar-nav a.open:focus,
 .navbar-dark .navbar-nav .nav-link.open:hover,
+.navbar-dark .navbar-nav .PanelInfo li a.open:hover, .PanelInfo li
+.navbar-dark .navbar-nav a.open:hover,
 .navbar-dark .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .PanelInfo li a.active, .PanelInfo li
+.navbar-dark .navbar-nav a.active,
+.navbar-dark .navbar-nav .PanelInfo .Active a, .PanelInfo .Active
+.navbar-dark .navbar-nav a,
 .navbar-dark .navbar-nav .nav-link.active:focus,
-.navbar-dark .navbar-nav .nav-link.active:hover {
+.navbar-dark .navbar-nav .PanelInfo li a.active:focus, .PanelInfo li
+.navbar-dark .navbar-nav a.active:focus,
+.navbar-dark .navbar-nav .PanelInfo .Active a:focus, .PanelInfo .Active
+.navbar-dark .navbar-nav a:focus,
+.navbar-dark .navbar-nav .nav-link.active:hover,
+.navbar-dark .navbar-nav .PanelInfo li a.active:hover, .PanelInfo li
+.navbar-dark .navbar-nav a.active:hover,
+.navbar-dark .navbar-nav .PanelInfo .Active a:hover, .PanelInfo .Active
+.navbar-dark .navbar-nav a:hover {
   color: white;
 }
 
@@ -4743,8 +4807,8 @@ th {
   z-index: 2;
   color: #fff;
   cursor: default;
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .page-item.disabled .page-link, .page-item.disabled .page-link:focus, .page-item.disabled .page-link:hover {
@@ -4760,14 +4824,14 @@ th {
   padding: 0.5rem 0.75rem;
   margin-left: -1px;
   line-height: 1.5;
-  color: #0275d8;
+  color: #0291db;
   text-decoration: none;
   background-color: #fff;
   border: 1px solid #ddd;
 }
 
 .page-link:focus, .page-link:hover {
-  color: #014c8c;
+  color: #015f8f;
   background-color: #eceeef;
   border-color: #ddd;
 }
@@ -5121,59 +5185,272 @@ th {
 }
 
 .progress-success[value]::-webkit-progress-value {
-  background-color: #5cb85c;
+  background-color: #60bd68;
 }
 
 .progress-success[value]::-moz-progress-bar {
-  background-color: #5cb85c;
+  background-color: #60bd68;
 }
 
 @media screen and (min-width: 0\0) {
   .progress-success .progress-bar {
-    background-color: #5cb85c;
+    background-color: #60bd68;
   }
 }
 
 .progress-info[value]::-webkit-progress-value {
-  background-color: #5bc0de;
+  background-color: #97afbf;
 }
 
 .progress-info[value]::-moz-progress-bar {
-  background-color: #5bc0de;
+  background-color: #97afbf;
 }
 
 @media screen and (min-width: 0\0) {
   .progress-info .progress-bar {
-    background-color: #5bc0de;
+    background-color: #97afbf;
   }
 }
 
 .progress-warning[value]::-webkit-progress-value {
-  background-color: #f0ad4e;
+  background-color: #faa43a;
 }
 
 .progress-warning[value]::-moz-progress-bar {
-  background-color: #f0ad4e;
+  background-color: #faa43a;
 }
 
 @media screen and (min-width: 0\0) {
   .progress-warning .progress-bar {
-    background-color: #f0ad4e;
+    background-color: #faa43a;
   }
 }
 
 .progress-danger[value]::-webkit-progress-value {
-  background-color: #d9534f;
+  background-color: #f9281d;
 }
 
 .progress-danger[value]::-moz-progress-bar {
-  background-color: #d9534f;
+  background-color: #f9281d;
 }
 
 @media screen and (min-width: 0\0) {
   .progress-danger .progress-bar {
-    background-color: #d9534f;
+    background-color: #f9281d;
   }
+}
+
+html {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+@-moz-viewport {
+  width: device-width;
+}
+
+@-ms-viewport {
+  width: device-width;
+}
+
+@-o-viewport {
+  width: device-width;
+}
+
+@-webkit-viewport {
+  width: device-width;
+}
+
+@viewport {
+  width: device-width;
+}
+
+html {
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #373a3c;
+  background-color: #fff;
+}
+
+[tabindex="-1"]:focus {
+  outline: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: .5rem;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+abbr[title],
+abbr[data-original-title] {
+  cursor: help;
+  border-bottom: 1px dotted #818a91;
+}
+
+address {
+  margin-bottom: 1rem;
+  font-style: normal;
+  line-height: inherit;
+}
+
+ol,
+ul,
+dl {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+ol ol,
+ul ul,
+ol ul,
+ul ol {
+  margin-bottom: 0;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-bottom: .5rem;
+  margin-left: 0;
+}
+
+blockquote {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: #0291db;
+  text-decoration: none;
+}
+
+a:focus, a:hover {
+  color: #015f8f;
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+pre {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+figure {
+  margin: 0 0 1rem;
+}
+
+img {
+  vertical-align: middle;
+}
+
+[role="button"] {
+  cursor: pointer;
+}
+
+a,
+area,
+button,
+[role="button"],
+input,
+label,
+select,
+summary,
+textarea {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+}
+
+table {
+  background-color: transparent;
+}
+
+caption {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  color: #818a91;
+  text-align: left;
+  caption-side: bottom;
+}
+
+th {
+  text-align: left;
+}
+
+label {
+  display: inline-block;
+  margin-bottom: .5rem;
+}
+
+button:focus {
+  outline: 1px dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+}
+
+input,
+button,
+select,
+textarea {
+  margin: 0;
+  line-height: inherit;
+  border-radius: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: .5rem;
+  font-size: 1.5rem;
+  line-height: inherit;
+}
+
+input[type="search"] {
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+  -webkit-appearance: none;
+}
+
+output {
+  display: inline-block;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 .embed-responsive {
@@ -5614,7 +5891,7 @@ mark,
   background-color: #fcf8e3;
 }
 
-.list-unstyled, .Help.Aside ul, .PanelInfo {
+.list-unstyled, .Help.Aside ul {
   padding-left: 0;
   list-style: none;
 }
@@ -5693,47 +5970,47 @@ mark,
 
 .bg-primary {
   color: #fff !important;
-  background-color: #0275d8 !important;
+  background-color: #0291db !important;
 }
 
 a.bg-primary:focus, a.bg-primary:hover {
-  background-color: #025aa5;
+  background-color: #0270a8;
 }
 
 .bg-success {
   color: #fff !important;
-  background-color: #5cb85c !important;
+  background-color: #60bd68 !important;
 }
 
 a.bg-success:focus, a.bg-success:hover {
-  background-color: #449d44;
+  background-color: #45a54d;
 }
 
 .bg-info {
   color: #fff !important;
-  background-color: #5bc0de !important;
+  background-color: #97afbf !important;
 }
 
 a.bg-info:focus, a.bg-info:hover {
-  background-color: #31b0d5;
+  background-color: #7797ac;
 }
 
 .bg-warning {
   color: #fff !important;
-  background-color: #f0ad4e !important;
+  background-color: #faa43a !important;
 }
 
 a.bg-warning:focus, a.bg-warning:hover {
-  background-color: #ec971f;
+  background-color: #f98d08;
 }
 
 .bg-danger {
   color: #fff !important;
-  background-color: #d9534f !important;
+  background-color: #f9281d !important;
 }
 
 a.bg-danger:focus, a.bg-danger:hover {
-  background-color: #c9302c;
+  background-color: #dd1106;
 }
 
 .hidden-xs-up {
@@ -6288,43 +6565,43 @@ a.bg-danger:focus, a.bg-danger:hover {
 }
 
 .text-primary {
-  color: #0275d8 !important;
+  color: #0291db !important;
 }
 
 a.text-primary:focus, a.text-primary:hover {
-  color: #025aa5;
+  color: #0270a8;
 }
 
 .text-success {
-  color: #5cb85c !important;
+  color: #60bd68 !important;
 }
 
 a.text-success:focus, a.text-success:hover {
-  color: #449d44;
+  color: #45a54d;
 }
 
 .text-info {
-  color: #5bc0de !important;
+  color: #97afbf !important;
 }
 
 a.text-info:focus, a.text-info:hover {
-  color: #31b0d5;
+  color: #7797ac;
 }
 
 .text-warning {
-  color: #f0ad4e !important;
+  color: #faa43a !important;
 }
 
 a.text-warning:focus, a.text-warning:hover {
-  color: #ec971f;
+  color: #f98d08;
 }
 
 .text-danger {
-  color: #d9534f !important;
+  color: #f9281d !important;
 }
 
 a.text-danger:focus, a.text-danger:hover {
-  color: #c9302c;
+  color: #dd1106;
 }
 
 input:focus, input:active,
@@ -6342,7 +6619,17 @@ textarea:active {
 }
 
 .control-label.danger, form label.danger {
-  color: #55595c;
+  color: #f9281d;
+}
+
+.panel {
+  padding-top: 4rem;
+  padding-left: 4rem;
+}
+
+.nav-heading, .panel-nav h4 {
+  font-size: 0.875rem;
+  text-transform: uppercase;
 }
 
 h1, .h1,
@@ -6384,18 +6671,18 @@ h6, .h6 {
 h1, .h1,
 h2, .h2,
 h3, .h3 {
-  margin-top: 24px;
-  margin-bottom: 12px;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 h4, .h4, .Help.Aside h2, .FeedItem > a, div.Popup h1,
 h5, .h5,
 h6, .h6 {
-  margin-top: 12px;
-  margin-bottom: 12px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 p {
-  margin-bottom: 12px;
+  margin-bottom: 10.5px;
 }
 /*# sourceMappingURL=admin.css.map */

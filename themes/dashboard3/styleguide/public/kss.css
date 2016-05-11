@@ -63,3 +63,7 @@ footer {
     width: 50%; /* 6 columns */
   }
 }
+
+.nav-fixed {
+ position: fixed;
+}

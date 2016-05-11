@@ -1,0 +1,81 @@
+// Navs
+//
+// The dashboard nav styling.
+//
+// Styleguide 2.
+
+// Nav item styling
+//
+// Nav item styling.
+//
+// .nav-pills - Nav pills.
+// .nav-tabs - Nav tabs.
+//
+// Markup:
+//<ul class="nav {{modifier_class}}">
+//  <li class="nav-item">
+//    <a class="nav-link active" href="#">Active</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link" href="#">Link</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link" href="#">Another link</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link disabled" href="#">Disabled</a>
+//  </li>
+//</ul>
+//
+// Styleguide 2.1
+
+// Nav direction
+//
+// Build a vertical nav by using the nav-stacked class
+//
+// Markup:
+//<ul class="nav nav-pills nav-stacked">
+//  <li class="nav-item">
+//    <a class="nav-link active" href="#">Active</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link" href="#">Link</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link" href="#">Another link</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link disabled" href="#">Disabled</a>
+//  </li>
+//</ul>
+//
+// Styleguide 2.2
+
+
+// Stacked navs list with a heading
+//
+// Stacked navs list with a heading.
+//
+// Markup:
+//<div class="nav-heading">Nav Heading</div>
+//<ul class="nav nav-pills nav-stacked">
+//  <li class="nav-item">
+//    <a class="nav-link active" href="#">Active</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link" href="#">Link</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link" href="#">Another link</a>
+//  </li>
+//  <li class="nav-item">
+//    <a class="nav-link disabled" href="#">Disabled</a>
+//  </li>
+//</ul>
+//
+// Styleguide 2.3
+
+.nav-heading {
+  font-size: $font-size-sm;
+  text-transform: uppercase;
+}

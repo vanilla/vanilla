@@ -19,18 +19,18 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="./index.html">Styleguide</a>
         </div>
-        <div class="collapse navbar-collapse navbar-styleguide-collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="./">Home</a></li>
-            {{#eachRoot}}
-              <li>
-                <a href="section-{{referenceURI}}.html"><!--{{referenceURI}}.0: -->{{header}}</a>
-              </li>
-            {{/eachRoot}}
-          </ul>
-        </div>
       </div>
     </nav>
+    <aside class="nav-fixed">
+      <nav>
+        <ul>
+          <li><a href="index.html">0.0: Overview</a></li>
+          {{#eachRoot}}
+          <li><a href="section-{{reference}}.html">{{reference}}.0: {{header}}</a></li>
+          {{/eachRoot}}
+        </ul>
+      </nav>
+    </aside>
     <div class="container">
       <div class="row">
         {{#if homepage}}
@@ -52,7 +52,7 @@
           }}
           {{#eachSection rootName}}
             {{#ifDepth 1}}
-              <section class="kss-depth-{{ depth }} jumbotron">
+              <section class="kss-depth-{{ depth }}">
                 <div class="component-description">
                   <h1 class="kss-title" id="{{ referenceURI }}">{{ header }}</h1>
             {{else}}
@@ -72,9 +72,10 @@
             {{/if}}
 
             {{#if markup}}
-              <div class="kss-example">{{{markup}}}</div>
               <pre class="prettyprint lang-html">{{markup}}</pre>
 
+              <h4>Default styling</h4>
+              <div class="kss-example">{{{markup}}}</div>
               {{#eachModifier}}
                 <h4>{{{description}}} <span class="pull-right"><code>{{name}}</code></span></h4>
                 <div class="kss-example">{{{markup}}}</div>

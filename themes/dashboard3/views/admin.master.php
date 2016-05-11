@@ -7,42 +7,55 @@
     <meta name="robots" content="noindex,nofollow"/>
 </head>
 <body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
-<div id="Frame">
-    <div id="Head">
-        <h1><?php echo anchor(c('Garden.Title').' '.Wrap(t('Visit Site')), '/'); ?></h1>
+<div class="navbar ">
+    <h1><?php echo anchor(c('Garden.Title').' '.Wrap(t('Visit Site')), '/'); ?></h1>
 
-        <div class="User">
-            <?php
-            if (Gdn::session()->isValid()) {
-                $this->fireEvent('BeforeUserOptionsMenu');
-
-                $Name = Gdn::session()->User->Name;
-                $CountNotifications = Gdn::session()->User->CountNotifications;
-                if (is_numeric($CountNotifications) && $CountNotifications > 0) {
-                    $Name .= wrap($CountNotifications);
-                }
-
-                echo anchor($Name, userUrl(Gdn::session()->User), 'Profile');
-                echo anchor(t('Sign Out'), SignOutUrl(), 'Leave');
-            }
-            ?>
-        </div>
-    </div>
-    <div id="Body">
-        <div id="Panel">
-            <?php
-            $this->renderAsset('Panel');
-            ?>
-        </div>
-        <div id="Content"><?php $this->renderAsset('Content'); ?></div>
-    </div>
-    <div id="Foot">
+    <div class="User">
         <?php
-        $this->renderAsset('Foot');
-        echo '<div class="Version">Version ', APPLICATION_VERSION, '</div>';
-        echo wrap(anchor(img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), c('Garden.VanillaUrl')), 'div');
+        if (Gdn::session()->isValid()) {
+            $this->fireEvent('BeforeUserOptionsMenu');
+
+            $Name = Gdn::session()->User->Name;
+            $CountNotifications = Gdn::session()->User->CountNotifications;
+            if (is_numeric($CountNotifications) && $CountNotifications > 0) {
+                $Name .= wrap($CountNotifications);
+            }
+
+            echo anchor($Name, userUrl(Gdn::session()->User), 'Profile');
+            echo anchor(t('Sign Out'), SignOutUrl(), 'Leave');
+        }
         ?>
     </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <?php if($this->data('HelpModule') || true) { ?>
+            <div class="col-sm-3 col-md-2 panel panel-nav">
+                <?php $this->renderAsset('Panel'); ?>
+            </div>
+            <div class="col-sm-6 col-md-8 main">
+                <?php $this->renderAsset('Content'); ?>
+            </div>
+            <div class="col-sm-3 col-md-2 panel panel-help">
+                <?php echo $this->data('HelpModule'); ?>
+            </div>
+        <?php } else { ?>
+            <div class="col-sm-3 col-md-2 side-nav">
+                <?php $this->renderAsset('Panel'); ?>
+            </div>
+            <div class="col-sm-9 col-md-10 main">
+                <?php $this->renderAsset('Content'); ?>
+            </div>
+        <?php } ?>
+    </div>
+</div>
+<div id="Foot">
+    <?php
+    $this->renderAsset('Foot');
+    echo '<div class="Version">Version ', APPLICATION_VERSION, '</div>';
+    echo wrap(anchor(img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), c('Garden.VanillaUrl')), 'div');
+    ?>
+</div>
 </div>
 <?php $this->fireEvent('AfterBody'); ?>
 </body>

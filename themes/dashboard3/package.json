@@ -18,8 +18,7 @@
     "grunt-scss-lint": "^0.3.8",
     "grunt-wiredep": "2.0.x",
     "load-grunt-tasks": "3.3.x",
-    "time-grunt": "1.2.x",
-    "wiredep": "3.0.x"
+    "time-grunt": "1.2.x"
   },
   "engines": {
     "node": ">=0.10.0"

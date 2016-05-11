@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Style Guide</title>
+    <meta name="description" content="" />
+    <meta name="generator" content="kss-node" />
+    <meta name="viewport" content="width=device-width, minimal-ui">
+    <!-- Latest compiled and minified CSS -->
+    <link type="text/css" rel="stylesheet" href="public/kss.css">
+    <link type="text/css" rel="stylesheet" href="public/admin.css">
+    <link type="text/css" rel="stylesheet" href="public/prettify.css">
+    
+    <script src="http://code.jquery.com/jquery.js"></script>
+  </head>
+  <body class="kss-styleguide" data-spy="scroll" data-target="#sidebar">
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="./index.html">Styleguide</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-styleguide-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="./">Home</a></li>
+              <li>
+                <a href="section-1.html"><!--1.0: -->Typography</a>
+              </li>
+              <li>
+                <a href="section-3.html"><!--3.0: -->Forms</a>
+              </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+          <article class="col-xs-12 col-sm-9">
+
+              <section class="kss-depth-1 jumbotron">
+                <div class="component-description">
+                  <h1 class="kss-title" id="3">Forms</h1>
+
+
+              <div class="kss-box"><p>Find the dashboard form styling here!</p>
+</div>
+
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-3">
+                <div class="component-description">
+                  <h3 class="kss-title" id="3-4-2">
+                    <span class="kss-ref badge pull-right">3-4-2</span> Form control labels
+                  </h3>
+
+
+              <div class="kss-box"><p>Form control labels.</p>
+</div>
+
+              <div class="kss-example"><div class="group-label" for="input1">Group label:</div>
+<div class="form-input-group">
+  <input class="control-input" type="checkbox" id="input1">
+  <label class="control-label {$modifiers}" for="input1">Control label</label>
+</div></div>
+              <pre class="prettyprint lang-html">&lt;div class=&quot;group-label&quot; for=&quot;input1&quot;&gt;Group label:&lt;/div&gt;
+&lt;div class=&quot;form-input-group&quot;&gt;
+  &lt;input class=&quot;control-input&quot; type=&quot;checkbox&quot; id=&quot;input1&quot;&gt;
+  &lt;label class=&quot;control-label {$modifiers}&quot; for=&quot;input1&quot;&gt;Control label&lt;/label&gt;
+&lt;/div&gt;</pre>
+
+                <h4>Danger color <span class="pull-right"><code>.danger</code></span></h4>
+                <div class="kss-example"><div class="group-label" for="input1">Group label:</div>
+<div class="form-input-group">
+  <input class="control-input" type="checkbox" id="input1">
+  <label class="control-label {$modifiers}" for="input1">Control label</label>
+</div></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+        </article>
+        <div class="col-xs-6 col-sm-3" id="sidebar">
+          <div class="list-group" data-spy="affix">
+                <!--<li><a href="#" class="list-group-item disabled">
+                  <h4 class="list-group-item-heading">Forms</h4>
+                </a></li>-->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="public/kss.js"></script>
+    <script src="public/prettify.js"></script>
+    <script>
+      jQuery(document).ready(function(){
+        // Ensure code blocks are highlighted properly...
+        jQuery('pre>code').addClass('prettyprint');
+        prettyPrint();
+
+        // Set the navigation to be the correct width.
+        jQuery('#sidebar .list-group').on('affix.bs.affix', function () {
+          jQuery('#sidebar .list-group').width(jQuery('.col-sm-3').width());
+        });
+      });
+    </script>
+    
+  </body>
+</html>

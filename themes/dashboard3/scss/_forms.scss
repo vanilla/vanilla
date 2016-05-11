@@ -1,0 +1,40 @@
+// Forms
+//
+// This section needs a description!
+//
+// Styleguide 3.
+
+input,
+select,
+textarea {
+  &:focus,
+  &:active {
+    outline: 0;
+  }
+}
+
+
+// Form control labels
+//
+// Form control labels.
+//
+// .danger - Danger color
+//
+// Markup:
+// <div class="group-label" for="input1">Group label:</div>
+// <div class="form-input-group">
+//   <input class="control-input" type="checkbox" id="input1">
+//   <label class="control-label {$modifiers}" for="input1">Control label</label>
+// </div>
+//
+// Styleguide 3.4.2
+
+.control-label {
+  display: inline-block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &.danger {
+    color: $grey;
+  }
+}

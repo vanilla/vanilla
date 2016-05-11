@@ -27,6 +27,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
 ?>
 <div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
     <div class="Discussion">
+        <?php $this->fireEvent('BeforeDiscussionMeta'); ?>
         <div class="Item-Header DiscussionHeader">
             <div class="AuthorWrap">
             <span class="Author">

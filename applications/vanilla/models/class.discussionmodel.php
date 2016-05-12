@@ -1400,7 +1400,10 @@ class DiscussionModel extends VanillaModel {
         $Wheres = $this->combineWheres($this->getWheres(), $Wheres);
         if (is_array($Wheres) && count($Wheres) == 0) {
             $Wheres = '';
-        } elseif (is_array($Wheres) && count($Wheres) === 1 && isset($Wheres['d.CategoryID'])) {
+        } elseif (is_array($Wheres) && count($Wheres) === 1 && isset($Wheres['d.CategoryID']) && count($Wheres['d.CategoryID']) == 1) {
+            if (is_array($Wheres['d.CategoryID'])) {
+                $Wheres['d.CategoryID'] = array_shift($Wheres['d.CategoryID']);
+            }
             return $this->getCountForCategory($Wheres['d.CategoryID']);
         }
 

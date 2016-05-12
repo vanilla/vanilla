@@ -215,7 +215,7 @@ class CategoryModel extends Gdn_Model {
      * @since 2.0.18
      */
     public static function categories($ID = false) {
-        if (is_int($ID) || is_string($ID)) {
+        if ((is_int($ID) || is_string($ID)) && empty(self::$Categories)) {
             $category = self::instance()->getOne($ID);
             return $category;
         }
@@ -1285,6 +1285,7 @@ class CategoryModel extends Gdn_Model {
      */
     public static function getSubtree($parentCategory, $includeParent = true, $adjustDepth = false) {
         $Result = array();
+        self::categories(); // kludge all categories loading properly.
         $Category = self::categories($parentCategory);
 
         // Check to see if the depth should be adjusted.

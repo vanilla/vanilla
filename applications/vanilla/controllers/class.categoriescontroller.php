@@ -371,6 +371,7 @@ class CategoriesController extends VanillaController {
 
         if ($Category) {
             $Subtree = CategoryModel::GetSubtree($Category, false);
+            $this->setData('Category', CategoryModel::categories($this->data('Category.CategoryID')));
             $CategoryIDs = consolidateArrayValuesByKey($Subtree, 'CategoryID');
             $Categories = $this->CategoryModel->GetFull($CategoryIDs)->resultArray();
         } else {

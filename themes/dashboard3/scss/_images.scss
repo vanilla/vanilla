@@ -1,0 +1,10 @@
+.imagewrap-table {
+  display: block;
+  height: $spacer * 2;
+  width: $spacer * 2;
+  overflow: hidden;
+}
+
+img {
+  @include img-fluid();
+}

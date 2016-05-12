@@ -1,0 +1,58 @@
+// Navbar
+//
+// Find the navbar styling here.
+//
+// No styleguide reference.
+
+.navbar {
+  position: relative;
+  padding: $navbar-padding-vertical $navbar-padding-horizontal;
+  height: $spacer * 4;
+  color: $white;
+  background-color: $brand-primary;
+  font-weight: 200;
+
+  a {
+    color: $white;
+  }
+
+  img {
+    height: $spacer * 2.75;
+  }
+
+  .nav {
+    float: left;
+  }
+
+  .nav-item {
+    min-width: 11.25rem;
+    text-align: center;
+    border-right: 1px solid $white;
+
+    &:first-child {
+      border-left: 1px solid $white;
+    }
+  }
+
+  .nav-link-description {
+    font-size: $font-size-xs;
+    line-height: $line-height-sm;
+  }
+
+  .navbar-brand,
+  .Profile {
+    float: left;
+  }
+
+  @include clearfix;
+}
+
+.btn-navbar {
+  display: block;
+  float: left;
+  font-weight: 300;
+  text-transform: uppercase;
+
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-xs, $line-height-sm, $btn-border-radius-navbar);
+  @include button-variant($white, $btn-primary-bg, $white);
+}

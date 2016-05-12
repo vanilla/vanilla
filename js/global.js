@@ -156,6 +156,30 @@
             $("input[name=TransientKey]").val(csrfToken);
         }
     });
+
+    // Hijack form submits.
+    $(document).on('contentLoad', function (e) {
+        $('form', e.target).submit(function (e) {
+            var $form = $(this);
+            var $parent = $form.closest('.js-form');
+
+            if ($parent.length === 0) {
+                return;
+            }
+            e.preventDefault();
+
+            $form.ajaxSubmit({
+                data: { DeliveryType: 'VIEW' },
+                success: function (html) {
+                    $parent.html($.parseHTML(html)).trigger('contentLoad');
+                },
+                error: function (xhr) {
+
+                }
+            });
+
+        });
+    });
 })(window, jQuery);
 
 // Stuff to fire on document.ready().

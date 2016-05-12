@@ -11,13 +11,6 @@
 
   > a {
     @extend .h4;
-    //@extend .link;
     @extend .media-heading;
-  }
-
-  .Date,
-  .tptn_counter,
-  p:last-child {
-    @extend .small;
   }
 }

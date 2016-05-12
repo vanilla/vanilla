@@ -4,14 +4,19 @@
 //
 // No styleguide reference.
 
+$enable-flex: true;
+
 // Colors
 
+$white: #fff;
+$black: #000;
+
 // Override the grays
-$gray-dark:                 #373a3c;
-$gray:                      #55595c;
-$gray-light:                #818a91;
-$gray-lighter:              #eceeef;
-$gray-lightest:             #f7f7f9;
+$gray-dark:                 #555a62;
+$gray:                      lighten(#555a62, 25%);
+$gray-light:                #f4f4f5;
+$gray-lighter:              #f4f6fb;
+$gray-lightest:             #fbfcfc;
 
 // Map our grEys
 $grey-dark:                 $gray-dark;
@@ -37,12 +42,12 @@ $font-family-monospace:      Menlo, Monaco, Consolas, "Courier New", monospace !
 $font-family-base:           $font-family-sans-serif !default;
 
 // Pixel value used to responsively scale all typography. Applied to the `<html>` element.
-$font-size-root:             14px;
+$font-size-root:             16px;
 
-$font-size-base:             1rem !default;
+$font-size-base:             .875rem;
 $font-size-lg:               1.25rem !default;
-$font-size-sm:               .875rem !default;
-$font-size-xs:               .75rem !default;
+$font-size-sm:               .75rem;
+$font-size-xs:               .675rem;
 
 $font-size-h1:               2.5rem !default;
 $font-size-h2:               2rem !default;
@@ -62,20 +67,114 @@ $display3-weight:             300 !default;
 $display4-weight:             300 !default;
 
 $line-height:                1.5 !default;
-$line-height-computed:       $font-size-root * $line-height;
 
 $headings-font-family:       inherit !default;
-$headings-font-weight:       500 !default;
+$headings-font-weight:       400;
 $headings-line-height:       1.1 !default;
 $headings-color:             inherit !default;
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+
+$spacer:                     1rem !default;
+$spacer-x:                   $spacer !default;
+$spacer-y:                   $spacer !default;
+$border-width:               1px !default;
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg:                    $grey-light;
+$body-color:                 $gray-dark !default;
 
 // Components
 //
 // Define common padding and border radius sizes and more.
 
-$line-height-lg:         (4 / 3) !default;
-$line-height-sm:         1.5 !default;
+$line-height-lg:         (4 / 3);
+$line-height-sm:         1.5;
 
-$border-radius:          .25rem !default;
-$border-radius-lg:       .3rem !default;
-$border-radius-sm:       .2rem !default;
+$border-radius:          .1rem;
+$border-radius-lg:       .25rem;
+$border-radius-sm:       .05rem;
+
+$component-active-color: #fff !default;
+$component-active-bg:    $brand-primary !default;
+
+$caret-width:            .375em !default;
+$caret-width-lg:         $caret-width !default;
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background and border color.
+
+$btn-min-width:                  $spacer * 6.75;
+$btn-padding-x:                  1rem !default;
+$btn-padding-y:                  .425rem;
+$btn-font-weight:                normal !default;
+
+$btn-primary-color:              $brand-primary;
+$btn-primary-bg:                 transparent;
+$btn-primary-border:             $btn-primary-color !default;
+
+$btn-secondary-color:            $gray-dark !default;
+$btn-secondary-bg:               #fff !default;
+$btn-secondary-border:           #ccc !default;
+
+$btn-info-color:                 #fff !default;
+$btn-info-bg:                    $brand-info !default;
+$btn-info-border:                $btn-info-bg !default;
+
+$btn-success-color:              #fff !default;
+$btn-success-bg:                 $brand-success !default;
+$btn-success-border:             $btn-success-bg !default;
+
+$btn-warning-color:              #fff !default;
+$btn-warning-bg:                 $brand-warning !default;
+$btn-warning-border:             $btn-warning-bg !default;
+
+$btn-danger-color:               #fff !default;
+$btn-danger-bg:                  $brand-danger !default;
+$btn-danger-border:              $btn-danger-bg !default;
+
+$btn-link-disabled-color:        $gray-light !default;
+
+$btn-padding-x-sm:               .75rem;
+$btn-padding-y-sm:               .125rem;
+
+$btn-padding-x-lg:               1.25rem !default;
+$btn-padding-y-lg:               .75rem !default;
+
+// Allows for customizing button radius independently from global border radius
+$btn-border-radius:              $border-radius !default;
+$btn-border-radius-lg:           $border-radius-lg !default;
+$btn-border-radius-sm:           $border-radius-sm !default;
+
+$btn-border-radius-navbar:       $btn-padding-y-sm + ($line-height-sm / 2);
+
+// Navs
+
+$nav-link-padding:                          .5em 1em !default;
+$nav-link-hover-bg:                         $gray-lighter !default;
+
+$nav-disabled-link-color:                   $gray-light !default;
+$nav-disabled-link-hover-color:             $gray-light !default;
+
+$nav-tabs-border-color:                     #ddd !default;
+
+$nav-tabs-link-border-width:                $border-width !default;
+$nav-tabs-link-hover-border-color:          $gray-lighter !default;
+
+$nav-tabs-active-link-hover-bg:             $body-bg !default;
+$nav-tabs-active-link-hover-color:          $gray !default;
+$nav-tabs-active-link-hover-border-color:   #ddd !default;
+
+$nav-tabs-justified-link-border-color:            #ddd !default;
+$nav-tabs-justified-active-link-border-color:     $body-bg !default;
+
+$nav-pills-border-radius:                   $border-radius !default;
+$nav-pills-active-link-hover-bg:            $component-active-bg !default;
+$nav-pills-active-link-hover-color:         $component-active-color !default;

@@ -1,0 +1,19 @@
+// Panel
+//
+// Find the panel styling here.
+//
+// No styleguide reference.
+
+.panel {
+  padding-top: $spacer * 4;
+  padding-left: $spacer * 4;
+}
+
+
+.panel-left {
+  padding-right: 0;
+}
+
+.panel-right {
+  padding-left: 0;
+}

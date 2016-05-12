@@ -69,5 +69,15 @@ h6, .h6 {
 // Styleguide 1.2
 
 p {
-  margin-bottom: ($line-height-computed / 2);
+  margin-bottom: ($spacer / 2);
+}
+
+
+.main {
+  h1 {
+    display: block;
+    font-size: $font-size-lg;
+    border-bottom: 1px solid $grey-light;
+  }
+
 }

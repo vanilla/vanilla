@@ -23,7 +23,7 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer']
+        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
       }
       , livereload: {
         options: {
@@ -165,8 +165,21 @@ module.exports = function (grunt) {
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
-          // 'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss'],
-          'scss/maps/_bootstrapSubset.scss': ['scss/vendors/bootstrap/scss/*.scss', '!scss/vendors/bootstrap/scss/_variables.scss', '!scss/vendors/bootstrap/scss/bootstrap*.scss'],
+          'scss/maps/_bootstrapSubset.scss': [
+            'scss/vendors/bootstrap/scss/_normalize.scss',
+            'scss/vendors/bootstrap/scss/_utilities.scss',
+            'scss/vendors/bootstrap/scss/_nav.scss',
+            'scss/vendors/bootstrap/scss/_navbar.scss',
+            'scss/vendors/bootstrap/scss/_button-group.scss',
+            'scss/vendors/bootstrap/scss/_tables.scss',
+            'scss/vendors/bootstrap/scss/_media.scss',
+            'scss/vendors/bootstrap/scss/_dropdown.scss',
+            'scss/vendors/bootstrap/scss/_modal.scss',
+            'scss/vendors/bootstrap/scss/_forms.scss',
+            'scss/vendors/bootstrap/scss/_nav.scss',
+            'scss/vendors/bootstrap/scss/_grid.scss',
+            'scss/vendors/bootstrap/scss/_reboot.scss'
+          ],
           'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss']
         },
         options: {

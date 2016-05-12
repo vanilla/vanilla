@@ -21,6 +21,10 @@
   .Active a {
     @extend .nav-link.active;
   }
+
+  li a:hover {
+    @extend .nav-link.active;
+  }
 }
 
 .panel-nav h4 {

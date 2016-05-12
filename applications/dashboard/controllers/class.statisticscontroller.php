@@ -49,7 +49,6 @@ class StatisticsController extends DashboardController {
         $this->addSideMenu('dashboard/statistics');
         //$this->addJsFile('statistics.js');
         $this->title(t('Vanilla Statistics'));
-        $this->enableSlicing($this);
 
         if ($this->Form->authenticatedPostBack()) {
             $Flow = true;

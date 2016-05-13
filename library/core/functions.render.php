@@ -272,8 +272,10 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param array $Category
-     * @return string
+     * @param string|array $Category
+     * @param string|int $Page The page number.
+     * @param bool $WithDomain Whether to add the domain to the URL
+     * @return string The url to a category.
      */
     function categoryUrl($Category, $Page = '', $WithDomain = true) {
         if (is_string($Category)) {
@@ -556,6 +558,19 @@ if (!function_exists('fixnl2br')) {
     }
 }
 
+if (!function_exists('formatIP')) {
+    /**
+     * Format an IP address for display.
+     *
+     * @param string $IP An IP address to be formatted.
+     * @param bool $html Format as HTML.
+     * @return string Returns the formatted IP address.
+     */
+    function formatIP($IP, $html = true) {
+        return $html ? htmlspecialchars($IP) : $IP;
+    }
+}
+
 if (!function_exists('formatPossessive')) {
     /**
      * Format a word using English "possessive" formatting.
@@ -650,6 +665,13 @@ if (!function_exists('hasEditProfile')) {
 }
 
 if (!function_exists('hoverHelp')) {
+    /**
+     * Add span with hover text to a string.
+     *
+     * @param $String
+     * @param $Help
+     * @return string
+     */
     function hoverHelp($String, $Help) {
         return wrap($String.wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
     }
@@ -717,7 +739,7 @@ if (!function_exists('ipAnchor')) {
      */
     function ipAnchor($IP, $CssClass = '') {
         if ($IP) {
-            return anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
+            return anchor(formatIP($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
         } else {
             return $IP;
         }
@@ -912,20 +934,42 @@ if (!function_exists('userBuilder')) {
      * Take an object & prefix value and convert it to a user object that can be used by UserAnchor() && UserPhoto().
      *
      * The object must have the following fields: UserID, Name, Photo.
+     *
+     * @param stdClass|array $row The row with the user extract.
+     * @param string|array $userPrefix Either a single string user prefix or an array of prefix searches.
+     * @return stdClass Returns an object containing the user.
      */
-    function userBuilder($Object, $UserPrefix = '') {
-        $Object = (object)$Object;
-        $User = new stdClass();
-        $UserID = $UserPrefix.'UserID';
-        $Name = $UserPrefix.'Name';
-        $Photo = $UserPrefix.'Photo';
-        $Gender = $UserPrefix.'Gender';
-        $User->UserID = $Object->$UserID;
-        $User->Name = $Object->$Name;
-        $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-        $User->Email = val($UserPrefix.'Email', $Object, null);
-        $User->Gender = property_exists($Object, $Gender) ? $Object->$Gender : null;
-        return $User;
+    function userBuilder($row, $userPrefix = '') {
+        $row = (object)$row;
+        $user = new stdClass();
+
+        if (is_array($userPrefix)) {
+            // Look for the first user that has the desired prefix.
+            foreach ($userPrefix as $px) {
+                if (property_exists($row, $px.'Name')) {
+                    $userPrefix = $px;
+                    break;
+                }
+            }
+
+            if (is_array($userPrefix)) {
+                $userPrefix = '';
+            }
+        }
+
+        $userID = $userPrefix.'UserID';
+        $name = $userPrefix.'Name';
+        $photo = $userPrefix.'Photo';
+        $gender = $userPrefix.'Gender';
+
+
+        $user->UserID = $row->$userID;
+        $user->Name = $row->$name;
+        $user->Photo = property_exists($row, $photo) ? $row->$photo : '';
+        $user->Email = val($userPrefix.'Email', $row, null);
+        $user->Gender = property_exists($row, $gender) ? $row->$gender : null;
+
+        return $user;
     }
 }
 
@@ -1206,7 +1250,7 @@ if (!function_exists('writeReactions')) {
     function writeReactions($Row) {
         $Attributes = GetValue('Attributes', $Row);
         if (is_string($Attributes)) {
-            $Attributes = @unserialize($Attributes);
+            $Attributes = dbdecode($Attributes);
             SetValue('Attributes', $Row, $Attributes);
         }
 

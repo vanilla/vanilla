@@ -350,6 +350,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $SearchPluginInfo['RealFile'] = $RealPluginFile;
             $SearchPluginInfo['RealRoot'] = dirname($RealPluginFile);
             $SearchPluginInfo['SearchPath'] = $SearchPath;
+            $SearchPluginInfo['Dir'] = "/plugins/$PluginFolderName";
+
+            $iconUrl = $SearchPluginInfo['Dir'].'/'.val('Icon', $SearchPluginInfo, 'icon.png');
+            if (file_exists(PATH_ROOT.$iconUrl)) {
+                $SearchPluginInfo['IconUrl'] = $iconUrl;
+            }
+
             $PluginInfo[$PluginFolderName] = $SearchPluginInfo;
 
             $PluginClassName = val('ClassName', $SearchPluginInfo);
@@ -570,10 +577,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return bool
      */
     public function checkPlugin($PluginName) {
-        if (array_key_exists($PluginName, $this->enabledPlugins())) {
+        if (array_key_exists(strtolower($PluginName), array_change_key_case($this->enabledPlugins(), CASE_LOWER))) {
             return true;
         }
-
         return false;
     }
 

@@ -73,7 +73,7 @@ $allowConnect = $this->data('AllowConnect');
                 <?php endif; ?>
                 <li>
                     <?php
-                      if (!$this->Form->getFormValue('ConnectName') || !$allowConnect ) {
+                      if (!$this->Form->getFormValue('ConnectName') || !$allowConnect) {
                           if (count($ExistingUsers) == 1 && $NoConnectName) {
                               $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                               $Row = reset($ExistingUsers);

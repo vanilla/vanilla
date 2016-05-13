@@ -12,14 +12,15 @@
 $PluginInfo['vanillicon'] = array(
    'Name' => 'Vanillicon',
    'Description' => "Provides fun default user icons from vanillicon.com.",
-   'Version' => '2.0',
+   'Version' => '2.1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'Icon' => 'vanillicon.svg'
 );
 
 /**
@@ -38,7 +39,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     * Perform any necessary database or configuration updates.
     */
     public function structure() {
-        TouchConfig('Plugins.Vanillicon.Type', 'v1');
+        touchConfig('Plugins.Vanillicon.Type', 'v2');
     }
 
    /**
@@ -64,7 +65,7 @@ class VanilliconPlugin extends Gdn_Plugin {
 
         $items = array(
          'v1' => 'Vanillicon 1',
-         'v2' => 'Vanillicon 2 (beta)'
+         'v2' => 'Vanillicon 2'
         );
 
         $cf->initialize(array(

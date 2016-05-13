@@ -133,7 +133,7 @@ class Gdn_Request {
 
             switch ($key) {
                 case 'URI':
-                    $value = !is_null($value) ? urldecode($value) : $value;
+                    $value = !is_null($value) ? rawurldecode($value) : $value;
                     break;
                 case 'SCRIPT':
                     $value = !is_null($value) ? trim($value, '/') : $value;
@@ -514,8 +514,19 @@ class Gdn_Request {
                 safeParseStr($get, $get, $original);
             }
 
-            if (!empty($_SERVER['X_REWRITE'])) {
-                $path = $_SERVER['PATH_INFO'];
+            if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
+                $path = val('PATH_INFO', $_SERVER, '');
+
+                // Some hosts block PATH_INFO from being passed (or even manually set).
+                // We set X_PATH_INFO in the .htaccess as a fallback for those situations.
+                // If you work for one of those hosts, know that many beautiful kittens lost their lives for your sins.
+                if (!$path) {
+                    if (!empty($_SERVER['X_PATH_INFO'])) {
+                        $path = $_SERVER['X_PATH_INFO'];
+                    } elseif (!empty($_SERVER['REDIRECT_X_PATH_INFO'])) {
+                        $path = $_SERVER['REDIRECT_X_PATH_INFO'];
+                    }
+                }
             } elseif (isset($get['_p'])) {
                 $path = $get['_p'];
                 unset($_GET['_p']);
@@ -722,7 +733,7 @@ class Gdn_Request {
             if ($path === true) {
                 // Encode the path.
                 $parts = explode('/', $result);
-                $parts = array_map('urlencode', $parts);
+                $parts = array_map('rawurlencode', $parts);
                 $result = implode('/', $parts);
             }
         }

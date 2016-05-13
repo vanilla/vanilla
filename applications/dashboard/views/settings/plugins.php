@@ -82,9 +82,12 @@ $DisabledCount = $PluginCount - $EnabledCount;
             $NewVersion = val('NewVersion', $PluginInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
             $RowClass = $Css;
-            if ($Alt) $RowClass .= ' Alt';
-            $IconPath = '/plugins/'.GetValue('Folder', $PluginInfo, '').'/icon.png';
-            $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
+            if ($Alt) {
+                $RowClass .= ' Alt';
+            }
+
+            $IconPath = val('IconUrl', $PluginInfo, '/applications/dashboard/design/images/plugin-icon.png');
+
             ?>
             <tr <?php echo 'id="'.Gdn_Format::url(strtolower($PluginName)).'-plugin"', ' class="More '.$RowClass.'"'; ?>>
                 <td rowspan="2" class="Less"><?php echo img($IconPath, array('class' => 'PluginIcon')); ?></td>

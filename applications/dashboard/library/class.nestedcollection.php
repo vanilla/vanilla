@@ -61,6 +61,8 @@ trait NestedCollection {
      */
     private $isPrepared = false;
 
+    private $allowedItemModifiers = array('rel', 'popinRel', 'icon', 'badge');
+
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */
@@ -280,7 +282,7 @@ trait NestedCollection {
      */
     public function addItemModifiers(&$item, $modifiers) {
         $modifiers = array_intersect_key($modifiers, array_flip($this->allowedItemModifiers));
-        foreach($modifiers as $attribute => $value) {
+        foreach ($modifiers as $attribute => $value) {
             $item[$attribute] = $value;
         }
     }
@@ -293,7 +295,7 @@ trait NestedCollection {
     protected function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
-            $this->keyNumber = $this->keyNumber+1;
+            $this->keyNumber = $this->keyNumber + 1;
         }
     }
 

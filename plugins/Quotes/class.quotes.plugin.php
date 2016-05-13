@@ -12,7 +12,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.7',
+    'Version' => '1.9',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'HasLocale' => true,
@@ -32,6 +32,7 @@ $PluginInfo['Quotes'] = array(
  *  1.6.8   Textarea target will now automatically resize to fit text body.
  *  1.6.9   Security fix.
  *  1.7     Eliminate livequery and js refactor.
+ *  1.9     Use contentLoad to format quotes.
  */
 class QuotesPlugin extends Gdn_Plugin {
 
@@ -93,7 +94,7 @@ class QuotesPlugin extends Gdn_Plugin {
         list($UserReference, $Username) = $Args;
 
         $Sender->getUserInfo($UserReference, $Username);
-        $UserPrefs = Gdn_Format::unserialize($Sender->User->Preferences);
+        $UserPrefs = dbdecode($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
@@ -143,7 +144,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $UserPrefs = Gdn_Format::unserialize(Gdn::session()->User->Preferences);
+        $UserPrefs = dbdecode(Gdn::session()->User->Preferences);
         if (!is_array($UserPrefs)) {
             $UserPrefs = array();
         }
@@ -440,6 +441,8 @@ BLOCKQUOTE;
                 }
             }
             $Data->Body = $NewBody;
+            $this->EventArguments['String'] = &$Data->Body;
+            $this->fireEvent('FilterContent');
 
             // Format the quote according to the format.
             switch ($Format) {

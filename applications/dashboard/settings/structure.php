@@ -155,27 +155,33 @@ $Construct
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
-    if ($v = c('Garden.Registration.ApplicantRoleID')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_APPLICANT)
-            ->where('RoleID', $types[RoleModel::TYPE_APPLICANT])
-            ->put();
+    if (c('Garden.Registration.ApplicantRoleID')) {
+        $SQL->replace(
+            'Role',
+            array('Type' => RoleModel::TYPE_APPLICANT),
+            array('RoleID' => $types[RoleModel::TYPE_APPLICANT]),
+            true
+        );
 //      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
     }
 
-    if ($v = c('Garden.Registration.DefaultRoles')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_MEMBER)
-            ->where('RoleID', $types[RoleModel::TYPE_MEMBER])
-            ->put();
+    if (c('Garden.Registration.DefaultRoles')) {
+        $SQL->replace(
+            'Role',
+            array('Type' => RoleModel::TYPE_MEMBER),
+            array('RoleID' => $types[RoleModel::TYPE_MEMBER]),
+            true
+        );
 //      RemoveFromConfig('Garden.Registration.DefaultRoles');
     }
 
-    if ($v = c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_UNCONFIRMED)
-            ->where('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
-            ->put();
+    if (c('Garden.Registration.ConfirmEmailRole')) {
+        $SQL->replace(
+            'Role',
+            array('Type' => RoleModel::TYPE_UNCONFIRMED),
+            array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
+            true
+        );
 //      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
     }
 
@@ -772,13 +778,22 @@ if (!c('Garden.Html.SafeStyles')) {
     removeFromConfig('Garden.Html.SafeStyles');
 }
 
+// We need to ensure that recaptcha is enabled if this site is upgrading from
+// 2.2 and has never had a captcha plugin
+touchConfig('EnabledPlugins.recaptcha', true);
+
+// Move recaptcha private key to plugin namespace.
+if (c('Garden.Registration.CaptchaPrivateKey')) {
+    touchConfig('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
+    removeFromConfig('Garden.Registration.CaptchaPrivateKey');
+}
+
+// Move recaptcha public key to plugin namespace.
+if (c('Garden.Registration.CaptchaPublicKey')) {
+    touchConfig('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
+    removeFromConfig('Garden.Registration.CaptchaPublicKey');
+}
+
 // Make sure the smarty folders exist.
-if (!file_exists(PATH_CACHE.'/Smarty')) {
-    @mkdir(PATH_CACHE.'/Smarty');
-}
-if (!file_exists(PATH_CACHE.'/Smarty/cache')) {
-    @mkdir(PATH_CACHE.'/Smarty/cache');
-}
-if (!file_exists(PATH_CACHE.'/Smarty/compile')) {
-    @mkdir(PATH_CACHE.'/Smarty/compile');
-}
+touchFolder(PATH_CACHE.'/Smarty/cache');
+touchFolder(PATH_CACHE.'/Smarty/compile');

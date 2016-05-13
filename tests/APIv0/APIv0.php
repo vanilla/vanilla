@@ -132,11 +132,19 @@ class APIv0 extends HttpClient {
      * @return string Returns the transient key for the user.
      */
     public function getTK($userID) {
-        $user = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $userID]);
+        $user = $this->queryOne("select * from GDN_User where UserID = :userID", ['userID' => $userID]);
         if (empty($user)) {
             return '';
         }
-        $attributes = @unserialize($user['Attributes']);
+        $attributes = (array)dbdecode($user['Attributes']);
+        if (empty($attributes['TransientKey'])) {
+            $attributes['TransientKey'] = randomString(20);
+            $r = $this->query(
+                "update GDN_User set Attributes = :attributes where UserID = :userID",
+                ['attributes' => dbencode($attributes), 'userID' => $userID],
+                true
+            );
+        }
         return val('TransientKey', $attributes, '');
     }
 
@@ -235,11 +243,21 @@ class APIv0 extends HttpClient {
 
             $request->setHeader('Cookie', static::cookieEncode($cookieArray));
 
-            if (!in_array($request->getMethod(), ['GET', 'OPTIONS']) && is_array($request->getBody())) {
+            if (!in_array($request->getMethod(), ['GET', 'OPTIONS'])) {
                 $body = $request->getBody();
-                if (!isset($body['TransientKey'])) {
-                    $body['TransientKey'] = $user['tk'];
-                    $request->setBody($body);
+                if (is_array($body)) {
+                    if (!isset($body['TransientKey'])) {
+                        $body['TransientKey'] = $user['tk'];
+                        $request->setBody($body);
+                    }
+                } elseif (is_string($body)) {
+                    if (strpos($body, 'TransientKey') === false) {
+                        if (!empty($body)) {
+                            $body .= '&';
+                        }
+                        $body .= http_build_query(['TransientKey' => $user['tk']]);
+                        $request->setBody($body);
+                    }
                 }
             }
         }
@@ -453,25 +471,59 @@ class APIv0 extends HttpClient {
     }
 
     /**
+     * Query the system user.
+     *
+     * @param bool $throw Whether or not to throw an exception if the system user is not found.
+     * @return array|null Returns the system user or **null** if they aren't found.
+     * @throws \Exception Throws an exception if {@link $throw} is **true** and the system user isn't found.
+     */
+    public function querySystemUser($throw = false) {
+        $user = $this->queryUser(['Admin' => 1], $throw);
+        return $user;
+    }
+
+    /**
      * Query a user in the database.
      *
      * @param string|int $userKey The user ID or username of the user.
      * @param bool $throw Whether or not to throw an exception if the user isn't found.
      * @return array Returns the found user as an array.
      */
-    public function queryUser($userKey, $throw = false) {
+    public function queryUserKey($userKey, $throw = false) {
         if (is_numeric($userKey)) {
-            $row = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $userKey]);
+            $row = $this->queryUser(['UserID' => $userKey], $throw);
         } elseif (is_string($userKey)) {
-            $row = $this->queryOne("select * from GDN_User where Name = :name", [':name' => $userKey]);
+            $row = $this->queryUser(['Name' => $userKey], $throw);
         }
 
+        return $row;
+    }
+
+    /**
+     * Query a use with a where array.
+     *
+     * @param array $where An array in the form **[field => value]**.
+     * @param bool $throw Whether or not to throw an exception if the user isn't found.
+     * @return array|null Returns the user array or null if no user is found.
+     */
+    public function queryUser($where, $throw = false) {
+        // Build the where clause from the where array.
+        $whereSql = [];
+        $whereArgs = [];
+        foreach ($where as $field => $value) {
+            $whereSql[$field] = "$field = :$field";
+            $whereArgs[':'.$field] = $value;
+        }
+
+        $sql = "select * from GDN_User where ".implode(' and ', $whereSql);
+        $row = $this->queryOne($sql, $whereArgs);
         if (empty($row)) {
             if ($throw) {
-                throw new \Exception("User $userKey not found.", 404);
+                throw new \Exception("User not found.", 404);
             }
-            return false;
+            return null;
         }
+
         $attributes = @unserialize($row['Attributes']);
         $row['Attributes'] = $attributes;
         $row['tk'] = val('TransientKey', $attributes);
@@ -493,7 +545,7 @@ class APIv0 extends HttpClient {
         }
 
         if (is_scalar($user)) {
-            $user = $this->queryUser($user, true);
+            $user = $this->queryUserKey($user, true);
         }
 
         if (empty($user['tk'])) {

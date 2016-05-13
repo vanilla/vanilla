@@ -248,32 +248,35 @@ class TaggingPlugin extends Gdn_Plugin {
     /**
      * Add tag breadcrumbs and tags data if appropriate.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         // Set breadcrumbs, where relevant.
-        $this->setTagBreadcrumbs($Sender->Data);
+        $this->setTagBreadcrumbs($sender);
 
-        if (isset($Sender->Data['Announcements'])) {
-            TagModel::instance()->joinTags($Sender->Data['Announcements']);
+        if (null !== $sender->data('Announcements', null)) {
+            TagModel::instance()->joinTags($sender->Data['Announcements']);
         }
 
-        if (isset($Sender->Data['Discussions'])) {
-            TagModel::instance()->joinTags($Sender->Data['Discussions']);
+        if (null !== $sender->data('Discussions', null)) {
+            TagModel::instance()->joinTags($sender->Data['Discussions']);
         }
+
+        $sender->addJsFile('tagging.js', 'plugins/Tagging');
+        $sender->addJsFile('jquery.tokeninput.js');
     }
 
     /**
      * Create breadcrumbs for tag listings.
      *
-     * @param object $data Sender->Data object
+     * @param Gdn_Controller $sender Controller object
      */
-    protected function setTagBreadcrumbs($data) {
+    protected function setTagBreadcrumbs($sender) {
 
-        if (isset($data['Tag']) && isset($data['Tags'])) {
+        if (null !== $sender->data('Tag', null) && null !== $sender->data('Tags')) {
             $ParentTag = array();
-            $CurrentTag = $data['Tag'];
-            $CurrentTags = $data['Tags'];
+            $CurrentTag = $sender->data('Tag');
+            $CurrentTags = $sender->data('Tags');
 
             $ParentTagID = ($CurrentTag['ParentTagID'])
                 ? $CurrentTag['ParentTagID']
@@ -300,7 +303,7 @@ class TaggingPlugin extends Gdn_Plugin {
             if (count($Breadcrumbs)) {
                 // Rebuild breadcrumbs in discussions when there is a child, as the
                 // parent must come before it.
-                Gdn::controller()->setData('Breadcrumbs', $Breadcrumbs);
+                $sender->setData('Breadcrumbs', $Breadcrumbs);
             }
 
         }
@@ -326,8 +329,8 @@ class TaggingPlugin extends Gdn_Plugin {
         // Let plugins add their information getting saved.
         $Types = array('');
         $this->EventArguments['Data'] = $FormPostValues;
-        $this->EventArguments['Tags'] =& $FormTags;
-        $this->EventArguments['Types'] =& $Types;
+        $this->EventArguments['Tags'] = &$FormTags;
+        $this->EventArguments['Types'] = &$Types;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('SaveDiscussion');
 
@@ -350,6 +353,10 @@ class TaggingPlugin extends Gdn_Plugin {
      * Validate tags when saving a discussion.
      */
     public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+        $reservedTags = [];
+        $Sender->EventArguments['ReservedTags'] = &$reservedTags;
+        $Sender->FireEvent('ReservedTags');
+
         $FormPostValues = val('FormPostValues', $Args, array());
         $TagsString = trim(strtolower(val('Tags', $FormPostValues, '')));
         $NumTagsMax = c('Plugin.Tagging.Max', 5);
@@ -358,6 +365,13 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
             $Tags = TagModel::splitTags($TagsString);
+            // Handle upper/lowercase
+            $Tags = array_map('strtolower', $Tags);
+            $reservedTags = array_map('strtolower', $reservedTags);
+            if ($reservedTags = array_intersect($Tags, $reservedTags)) {
+                $names = implode(', ', $reservedTags);
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
+            }
             if (!TagModel::validateTags($Tags)) {
                 $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
             } elseif (count($Tags) > $NumTagsMax) {
@@ -593,8 +607,6 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      */
     public function postController_render_before($Sender) {
-        $Sender->addJsFile('jquery.tokeninput.js');
-        $Sender->addJsFile('tagging.js', 'plugins/Tagging');
         $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
         $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
 

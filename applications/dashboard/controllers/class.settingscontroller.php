@@ -42,6 +42,18 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Handle the tracking of a page tick.
+     */
+    public function analyticsTick() {
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+
+        Gdn::statistics()->tick();
+        Gdn::statistics()->fireEvent("AnalyticsTick");
+        $this->render();
+    }
+
+    /**
      * Application management screen.
      *
      * @since 2.0.0
@@ -800,7 +812,7 @@ class SettingsController extends DashboardController {
             throw new Exception('Requires POST', 405);
         }
         $value = strtolower($value);
-        if (in_array($value, Gdn_Email::$supportedFormats)){
+        if (in_array($value, Gdn_Email::$supportedFormats)) {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
@@ -1094,6 +1106,11 @@ class SettingsController extends DashboardController {
             $this->setData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
         }
 
+        // Remove all hidden locales, unless they are enabled.
+        $AvailableLocales = array_filter($AvailableLocales, function ($locale) use ($EnabledLocales) {
+            return !val('Hidden', $locale) || isset($EnabledLocales[val('Index', $locale)]);
+        });
+
         $this->setData('AvailableLocales', $AvailableLocales);
         $this->setData('EnabledLocales', $EnabledLocales);
         $this->setData('Locales', $LocaleModel->availableLocales());
@@ -1178,27 +1195,6 @@ class SettingsController extends DashboardController {
         $this->addJsFile('registration.js');
         $this->title(t('Registration'));
 
-        // Create a model to save configuration settings
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-
-        $registrationOptions = array(
-            'Garden.Registration.Method' => 'Captcha',
-            'Garden.Registration.InviteExpiration',
-            'Garden.Registration.ConfirmEmail'
-        );
-
-        if ($manageCaptcha = c('Garden.Registration.ManageCaptcha', true)) {
-            $registrationOptions[] = 'Garden.Registration.CaptchaPrivateKey';
-            $registrationOptions[] = 'Garden.Registration.CaptchaPublicKey';
-        }
-        $this->setData('_ManageCaptcha', $manageCaptcha);
-
-        $ConfigurationModel->setField($registrationOptions);
-
-        // Set the model on the forms.
-        $this->Form->setModel($ConfigurationModel);
-
         // Load roles with sign-in permission
         $RoleModel = new RoleModel();
         $this->RoleData = $RoleModel->getByPermission('Garden.SignIn.Allow');
@@ -1216,8 +1212,7 @@ class SettingsController extends DashboardController {
         // Registration methods.
         $this->RegistrationMethods = array(
             // 'Closed' => "Registration is closed.",
-            // 'Basic' => "The applicants are granted access immediately.",
-            'Captcha' => "New users fill out a simple form and are granted access immediately.",
+            'Basic' => "New users fill out a simple form and are granted access immediately.",
             'Approval' => "New users are reviewed and approved by an administrator (that's you!).",
             'Invitation' => "Existing members send invitations to new members.",
             'Connect' => "New users are only registered through SSO plugins."
@@ -1239,6 +1234,29 @@ class SettingsController extends DashboardController {
             '1 month' => t('1 month after being sent'),
             'FALSE' => t('never')
         );
+
+        // Replace 'Captcha' with 'Basic' if needed
+        if (c('Garden.Registration.Method') == 'Captcha') {
+            saveToConfig('Garden.Registration.Method', 'Basic');
+        }
+
+        // Create a model to save configuration settings
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+
+        $registrationOptions = array(
+            'Garden.Registration.Method' => 'Basic',
+            'Garden.Registration.InviteExpiration',
+            'Garden.Registration.ConfirmEmail'
+        );
+        $ConfigurationModel->setField($registrationOptions);
+
+        $this->EventArguments['Validation'] = &$Validation;
+        $this->EventArguments['Configuration'] = &$ConfigurationModel;
+        $this->fireEvent('Registration');
+
+        // Set the model on the forms.
+        $this->Form->setModel($ConfigurationModel);
 
         if ($this->Form->authenticatedPostBack() === false) {
             $this->Form->setData($ConfigurationModel->Data);
@@ -1734,7 +1752,7 @@ class SettingsController extends DashboardController {
         if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
             $Logo = c('Garden.Logo', '');
             RemoveFromConfig('Garden.Logo');
-            @unlink(PATH_ROOT.DS.$Logo);
+            safeUnlink(PATH_ROOT."/$Logo");
         }
 
         redirect('/settings/banner');
@@ -1752,7 +1770,7 @@ class SettingsController extends DashboardController {
         if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
             $MobileLogo = c('Garden.MobileLogo', '');
             RemoveFromConfig('Garden.MobileLogo');
-            @unlink(PATH_ROOT.DS.$MobileLogo);
+            safeUnlink(PATH_ROOT."/$MobileLogo");
         }
 
         redirect('/settings/banner');

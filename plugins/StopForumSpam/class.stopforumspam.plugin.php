@@ -16,7 +16,8 @@ $PluginInfo['StopForumSpam'] = array(
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/settings/stopforumspam'
+    'SettingsUrl' => '/settings/stopforumspam',
+    'Icon' => 'sfs.svg'
 );
 
 /**

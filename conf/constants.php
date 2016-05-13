@@ -8,12 +8,18 @@
  * @since 2.0
  */
 
-// If you want to change where the garden libraries are located on your server, edit these paths:
+// If you want to change where these paths are located on your server, edit these constants.
+if (!defined('PATH_CACHE')) {
+    define('PATH_CACHE', PATH_ROOT.'/cache');
+}
+if (!defined('PATH_UPLOADS')) {
+    define('PATH_UPLOADS', PATH_ROOT.'/uploads');
+}
+
+// You should not change these paths.
 define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
-define('PATH_CACHE', PATH_ROOT.'/cache');
 define('PATH_PLUGINS', PATH_ROOT.'/plugins');
 define('PATH_THEMES', PATH_ROOT.'/themes');
-define('PATH_UPLOADS', PATH_ROOT.'/uploads');
 define('PATH_LIBRARY', PATH_ROOT.'/library');
 define('PATH_LIBRARY_CORE', PATH_LIBRARY.'/core');
 

@@ -27,6 +27,11 @@ class DashboardHooks implements Gdn_IPlugin {
     public function base_render_before($Sender) {
         $Session = Gdn::session();
 
+        // Check the statistics.
+        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            Gdn::statistics()->check();
+        }
+
         // Enable theme previewing
         if ($Session->isValid()) {
             $PreviewThemeName = htmlspecialchars($Session->getPreference('PreviewThemeName', ''));
@@ -115,6 +120,10 @@ class DashboardHooks implements Gdn_IPlugin {
             }
 
             $Sender->addDefinition('Path', Gdn::request()->path());
+
+            $get = Gdn::request()->get();
+            unset($get['p']); // kludge for old index.php?p=/path
+            $Sender->addDefinition('Query', http_build_query($get));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $Sender->addDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
 

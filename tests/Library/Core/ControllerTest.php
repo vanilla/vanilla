@@ -2,10 +2,10 @@
 /**
  * @author Eric Vachaviolos <eric.v@vanillaforums.com>
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
-namespace VanillaTests\Library\Core\ControllerTest;
+namespace VanillaTests\Library\Core;
 
 use Gdn_Controller;
 use PHPUnit_Framework_TestCase;

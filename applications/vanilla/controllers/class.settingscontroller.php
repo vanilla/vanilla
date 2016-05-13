@@ -48,8 +48,6 @@ class SettingsController extends Gdn_Controller {
             'Vanilla.Archive.Exclude',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
-            'Vanilla.Discussions.SortField' => 'd.DateLastComment',
-            'Vanilla.Discussions.UserSortField',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength'
         ));
@@ -271,7 +269,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function addCategory() {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
@@ -342,7 +340,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function getCategory($categoryID) {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         if (!$categoryID) {
             throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));
@@ -378,7 +376,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategory($CategoryID = false) {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('categories.js');
@@ -470,7 +468,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
 
@@ -523,7 +521,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function editCategory($CategoryID = '') {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up models
         $RoleModel = new RoleModel();
@@ -621,7 +619,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function manageCategories() {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->addSideMenu('vanilla/settings/managecategories');
 
         $this->addJsFile('categories.js');
@@ -644,8 +642,8 @@ class SettingsController extends Gdn_Controller {
         $CategoryData = $this->CategoryModel->getAll('TreeLeft');
 
         // Set CanDelete per-category so we can override later if we want.
-        $canDelete = checkPermission('Garden.Settings.Manage');
-        array_walk($CategoryData->result(), function (&$value) use ($canDelete) {
+        $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
+        array_walk($CategoryData->result(), function(&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
 
@@ -720,7 +718,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function sortCategories() {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {

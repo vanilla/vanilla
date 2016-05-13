@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
     }
 
     // Show/Hide the CaptchaSettings depending on the selected registration method
-    if (selected == 'Captcha' || selected == 'Approval')
+    if (selected == 'Basic' || selected == 'Approval')
         $('#CaptchaSettings').show();
     else
         $('#CaptchaSettings').hide();
@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
         }
 
         // Show/Hide the CaptchaSettings depending on the selected registration method
-        if ($(this).val() == 'Captcha' || $(this).val() == 'Approval')
+        if ($(this).val() == 'Basic' || $(this).val() == 'Approval')
             $('#CaptchaSettings').slideDown('fast');
         else
             $('#CaptchaSettings').slideUp('fast');

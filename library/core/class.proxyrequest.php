@@ -116,10 +116,17 @@ class ProxyRequest {
      * @return int
      */
     public function curlHeader(&$Handler, $HeaderString) {
-        $Line = explode(':', trim($HeaderString));
+        $Line = explode(':', $HeaderString);
         $Key = trim(array_shift($Line));
         $Value = trim(implode(':', $Line));
-        if (!empty($Key)) {
+        // Prevent overwriting existing $this->ResponseHeaders[$Key] entries.
+        if (array_key_exists($Key, $this->ResponseHeaders)) {
+            if (!is_array($this->ResponseHeaders[$Key])) {
+                // Transform ResponseHeader to an array.
+                $this->ResponseHeaders[$Key] = array($this->ResponseHeaders[$Key]);
+            }
+            $this->ResponseHeaders[$Key][] = $Value;
+        } elseif (!empty($Key)) {
             $this->ResponseHeaders[$Key] = $Value;
         }
         return strlen($HeaderString);
@@ -130,53 +137,49 @@ class ProxyRequest {
      * @return mixed|string
      */
     protected function curlReceive(&$Handler) {
-        $this->ResponseHeaders = array();
         $startTime = microtime(true);
         $Response = curl_exec($Handler);
         $this->ResponseTime = microtime(true) - $startTime;
 
-        $this->ResponseStatus = curl_getinfo($Handler, CURLINFO_HTTP_CODE);
-        $this->ContentType = strtolower(curl_getinfo($Handler, CURLINFO_CONTENT_TYPE));
-        $this->ContentLength = (int)curl_getinfo($Handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-
-        $RequestHeaderInfo = trim(curl_getinfo($Handler, CURLINFO_HEADER_OUT));
-        $RequestHeaderLines = explode("\n", $RequestHeaderInfo);
-        $Request = trim(array_shift($RequestHeaderLines));
-        $this->RequestHeaders['HTTP'] = $Request;
-        // Parse header status line
-        foreach ($RequestHeaderLines as $Line) {
-            $Line = explode(':', trim($Line));
-            $Key = trim(array_shift($Line));
-            $Value = trim(implode(':', $Line));
-            $this->RequestHeaders[$Key] = $Value;
-        }
-        $this->action(" Request Headers: ".print_r($this->RequestHeaders, true));
-        $this->action(" Response Headers: ".print_r($this->ResponseHeaders, true));
-
         if ($Response == false) {
-            $Success = false;
             $this->ResponseBody = curl_error($Handler);
-            return $this->ResponseBody;
-        }
+        } else {
+            $this->ResponseStatus = curl_getinfo($Handler, CURLINFO_HTTP_CODE);
+            $this->ContentType = strtolower(curl_getinfo($Handler, CURLINFO_CONTENT_TYPE));
+            $this->ContentLength = (int)curl_getinfo($Handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
-        if ($this->Options['TransferMode'] == 'normal') {
-            $Response = trim($Response);
-        }
+            $RequestHeaderInfo = trim(curl_getinfo($Handler, CURLINFO_HEADER_OUT));
+            $RequestHeaderLines = explode("\n", $RequestHeaderInfo);
+            $Request = trim(array_shift($RequestHeaderLines));
+            $this->RequestHeaders['HTTP'] = $Request;
+            // Parse header status line
+            foreach ($RequestHeaderLines as $Line) {
+                $Line = explode(':', trim($Line));
+                $Key = trim(array_shift($Line));
+                $Value = trim(implode(':', $Line));
+                $this->RequestHeaders[$Key] = $Value;
+            }
+            $this->action(" Request Headers: " . print_r($this->RequestHeaders, true));
 
-        $this->ResponseBody = $Response;
+            if ($this->Options['TransferMode'] == 'normal') {
+                $Response = trim($Response);
+            }
 
-        if ($this->SaveFile) {
-            $Success = file_exists($this->SaveFile);
-            $SavedFileResponse = array(
-                'Error' => curl_error($Handler),
-                'Success' => $Success,
-                'Size' => filesize($this->SaveFile),
-                'Time' => curl_getinfo($Handler, CURLINFO_TOTAL_TIME),
-                'Speed' => curl_getinfo($Handler, CURLINFO_SPEED_DOWNLOAD),
-                'Type' => curl_getinfo($Handler, CURLINFO_CONTENT_TYPE),
-                'File' => $this->SaveFile
-            );
-            $this->ResponseBody = json_encode($SavedFileResponse);
+            $this->ResponseBody = $Response;
+
+            if ($this->SaveFile) {
+                $Success = file_exists($this->SaveFile);
+                $SavedFileResponse = array(
+                    'Error' => curl_error($Handler),
+                    'Success' => $Success,
+                    'Size' => filesize($this->SaveFile),
+                    'Time' => curl_getinfo($Handler, CURLINFO_TOTAL_TIME),
+                    'Speed' => curl_getinfo($Handler, CURLINFO_SPEED_DOWNLOAD),
+                    'Type' => curl_getinfo($Handler, CURLINFO_CONTENT_TYPE),
+                    'File' => $this->SaveFile
+                );
+                $this->ResponseBody = json_encode($SavedFileResponse);
+            }
         }
 
         return $this->ResponseBody;
@@ -419,7 +422,7 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_HEADER, false);
         curl_setopt($Handler, CURLINFO_HEADER_OUT, true);
         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+        curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
         curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
         curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
 
@@ -516,6 +519,12 @@ class ProxyRequest {
 
                 $this->RequestBody = $PostData;
             }
+        }
+
+        // Allow HEAD
+        if ($RequestMethod == 'HEAD') {
+            curl_setopt($Handler, CURLOPT_HEADER, true);
+            curl_setopt($Handler, CURLOPT_NOBODY, true);
         }
 
         // Any extra needed headers

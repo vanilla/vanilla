@@ -66,6 +66,9 @@ class DiscussionsController extends VanillaController {
         }
         Gdn_Theme::section('DiscussionList');
 
+        // Remove score sort
+        DiscussionModel::removeSort('top');
+
         // Check for the feed keyword.
         if ($Page === 'feed' && $this->SyndicationMethod != SYNDICATION_NONE) {
             $Page = 'p1';
@@ -118,6 +121,10 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
 
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
@@ -154,6 +161,8 @@ class DiscussionsController extends VanillaController {
         if (!$this->data('_PagerUrl')) {
             $this->setData('_PagerUrl', 'discussions/{Page}');
         }
+        $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
+        $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
         $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
@@ -237,6 +246,10 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
         $DiscussionModel->Watching = true;
 
         // Get Discussion Count
@@ -348,6 +361,11 @@ class DiscussionsController extends VanillaController {
         }
 
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
+
         $Wheres = array(
             'w.Bookmarked' => '1',
             'w.UserID' => Gdn::session()->UserID
@@ -444,7 +462,13 @@ class DiscussionsController extends VanillaController {
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
         $Session = Gdn::session();
         $Wheres = array('d.InsertUserID' => $Session->UserID);
+
         $DiscussionModel = new DiscussionModel();
+        $DiscussionModel->setSort(Gdn::request()->get());
+        $DiscussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $DiscussionModel->getSort());
+        $this->setData('Filters', $DiscussionModel->getFilters());
+
         $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, $Wheres);
         $this->setData('Discussions', $this->DiscussionData);
         $CountDiscussions = $this->setData('CountDiscussions', $DiscussionModel->getCount($Wheres));
@@ -587,8 +611,12 @@ class DiscussionsController extends VanillaController {
 
     /**
      * Set user preference for sorting discussions.
+     *
+     * @param string $Target The target to redirect to.
      */
     public function sort($Target = '') {
+        deprecated("sort");
+
         if (!Gdn::session()->isValid()) {
             throw permissionException();
         }
@@ -597,23 +625,12 @@ class DiscussionsController extends VanillaController {
             throw forbiddenException('GET');
         }
 
-        // Get param
-        $SortField = Gdn::request()->Post('DiscussionSort');
-        $SortField = 'd.'.stringBeginsWith($SortField, 'd.', true, true);
-
-        // Use whitelist here too to keep database clean
-        if (!in_array($SortField, DiscussionModel::AllowedSortFields())) {
-            throw new Gdn_UserException("Unknown sort $SortField.");
-        }
-
-        // Set user pref
-        Gdn::userModel()->SavePreference(Gdn::session()->UserID, 'Discussions.SortField', $SortField);
-
         if ($Target) {
             redirect($Target);
         }
 
         // Send sorted discussions.
+        $this->setData('Deprecated', true);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
     }

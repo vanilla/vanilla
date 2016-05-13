@@ -12,7 +12,7 @@
 /**
  * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
  */
-class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
+class Gdn_Regarding extends Gdn_Pluggable {
 
     /**
      *
@@ -233,11 +233,9 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
-     *
-     *
-     * @param $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_beforeCommentBody_handler($Sender) {
+    public function beforeCommentBody($Sender) {
         $Context = strtolower($Sender->EventArguments['Type']);
 
         $RegardingID = val('RegardingID', $Sender->EventArguments['Object'], null);

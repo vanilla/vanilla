@@ -21,7 +21,8 @@ $PluginInfo['Twitter'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SocialConnect' => true,
-    'RequiresRegistration' => true
+    'RequiresRegistration' => true,
+    'Icon' => 'twitter.svg'
 );
 
 require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';

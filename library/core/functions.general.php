@@ -57,115 +57,6 @@ if (!function_exists('absoluteSource')) {
     }
 }
 
-/**
- * This file is part of the array_column library
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
- * @copyright Copyright (c) 2013 Ben Ramsey <http://benramsey.com>
- * @license http://opensource.org/licenses/MIT MIT
- */
-
-if (!function_exists('array_column')) {
-    /**
-     * Returns the values from a single column of the input array, identified by the $columnKey.
-     *
-     * Optionally, you may provide an $indexKey to index the values in the returned
-     * array by the values from the $indexKey column in the input array.
-     *
-     * @param array $input A multi-dimensional array (record set) from which to pull a column of values.
-     * @param mixed $columnKey The column of values to return. This value may be the integer key of the column you wish
-     * to retrieve, or it may be the string key name for an associative array.
-     * @param mixed $indexKey The column to use as the index/keys for the returned array. This value may be the integer
-     * key of the column, or it may be the string key name.
-     * @return array
-     */
-    function array_column($input = null, $columnKey = null, $indexKey = null) {
-        // Using func_get_args() in order to check for proper number of
-        // parameters and trigger errors exactly as the built-in array_column()
-        // does in PHP 5.5.
-        $argc = func_num_args();
-        $params = func_get_args();
-
-        if ($argc < 2) {
-            trigger_error("array_column() expects at least 2 parameters, {$argc} given", E_USER_WARNING);
-            return null;
-        }
-
-        if (!is_array($params[0])) {
-            trigger_error(
-                'array_column() expects parameter 1 to be array, '.gettype($params[0]).' given',
-                E_USER_WARNING
-            );
-            return null;
-        }
-
-        if (!is_int($params[1])
-            && !is_float($params[1])
-            && !is_string($params[1])
-            && $params[1] !== null
-            && !(is_object($params[1]) && method_exists($params[1], '__toString'))
-        ) {
-            trigger_error('array_column(): The column key should be either a string or an integer', E_USER_WARNING);
-            return false;
-        }
-
-        if (isset($params[2])
-            && !is_int($params[2])
-            && !is_float($params[2])
-            && !is_string($params[2])
-            && !(is_object($params[2]) && method_exists($params[2], '__toString'))
-        ) {
-            trigger_error('array_column(): The index key should be either a string or an integer', E_USER_WARNING);
-            return false;
-        }
-
-        $paramsInput = $params[0];
-        $paramsColumnKey = ($params[1] !== null) ? (string)$params[1] : null;
-
-        $paramsIndexKey = null;
-        if (isset($params[2])) {
-            if (is_float($params[2]) || is_int($params[2])) {
-                $paramsIndexKey = (int)$params[2];
-            } else {
-                $paramsIndexKey = (string)$params[2];
-            }
-        }
-
-        $resultArray = array();
-
-        foreach ($paramsInput as $row) {
-            $key = $value = null;
-            $keySet = $valueSet = false;
-
-            if ($paramsIndexKey !== null && array_key_exists($paramsIndexKey, $row)) {
-                $keySet = true;
-                $key = (string)$row[$paramsIndexKey];
-            }
-
-            if ($paramsColumnKey === null) {
-                $valueSet = true;
-                $value = $row;
-            } elseif (is_array($row) && array_key_exists($paramsColumnKey, $row)) {
-                $valueSet = true;
-                $value = $row[$paramsColumnKey];
-            }
-
-            if ($valueSet) {
-                if ($keySet) {
-                    $resultArray[$key] = $value;
-                } else {
-                    $resultArray[] = $value;
-                }
-            }
-
-        }
-
-        return $resultArray;
-    }
-}
-
 if (!function_exists('arrayCombine')) {
     /**
      * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
@@ -342,47 +233,65 @@ if (!function_exists('asset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            if (is_null($Version)) {
-                $Version = APPLICATION_VERSION;
-                if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                    $Type = $Matches[1];
-                    $Key = $Matches[2];
-                    static $ThemeVersion = null;
-
-                    switch ($Type) {
-                        case 'plugins':
-                            $PluginInfo = Gdn::pluginManager()->getPluginInfo($Key);
-                            $Version = val('Version', $PluginInfo, $Version);
-                            break;
-                        case 'applications':
-                            $AppInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($Key));
-                            $Version = val('Version', $AppInfo, $Version);
-                            break;
-                        case 'themes':
-                            if ($ThemeVersion === null) {
-                                $ThemeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                                if ($ThemeInfo !== false) {
-                                    $ThemeVersion = val('Version', $ThemeInfo, $Version);
-                                } else {
-                                    $ThemeVersion = $Version;
-                                }
-                            }
-                            $Version = $ThemeVersion;
-                            break;
-                    }
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination, $Version);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
+    }
+}
+
+if (!function_exists('assetVersion')) {
+    /**
+     * Get a version string for a given asset.
+     *
+     * @param string $destination The path of the asset.
+     * @param string|null $version A known version for the asset or **null** to grab it from the addon's info array.
+     * @return string Returns a version string.
+     */
+    function assetVersion($destination, $version = null) {
+        static $gracePeriod = 90;
+
+        // Figure out which version to put after the asset.
+        if (is_null($version)) {
+            $version = APPLICATION_VERSION;
+            if (preg_match('`^/([^/]+)/([^/]+)/`', $destination, $matches)) {
+                $type = $matches[1];
+                $key = $matches[2];
+                static $themeVersion = null;
+
+                switch ($type) {
+                    case 'plugins':
+                        $pluginInfo = Gdn::pluginManager()->getPluginInfo($key);
+                        $version = val('Version', $pluginInfo, $version);
+                        break;
+                    case 'applications':
+                        $applicationInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($key));
+                        $version = val('Version', $applicationInfo, $version);
+                        break;
+                    case 'themes':
+                        if ($themeVersion === null) {
+                            $themeInfo = Gdn::themeManager()->getThemeInfo(Theme());
+                            if ($themeInfo !== false) {
+                                $themeVersion = val('Version', $themeInfo, $version);
+                            } else {
+                                $themeVersion = $version;
+                            }
+                        }
+                        $version = $themeVersion;
+                        break;
+                }
+            }
+        }
+
+        // Add a timestamp component to the version if available.
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + $gracePeriod;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $version .= '.'.dechex($timestamp);
+        }
+        return $version;
     }
 }
 
@@ -722,6 +631,45 @@ if (!function_exists('safePrint')) {
     }
 }
 
+if (!function_exists('dbdecode')) {
+    /**
+     * Decode a value retrieved from database storage.
+     *
+     * @param string $value An encoded string representation of a value to be decoded.
+     * @return mixed A decoded value on success or false on failure.
+     */
+    function dbdecode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        } elseif (is_array($value)) {
+            // This handles a common double decoding scenario.
+            return $value;
+        }
+
+        $decodedValue = @unserialize($value);
+
+        return $decodedValue;
+    }
+}
+
+if (!function_exists('dbencode')) {
+    /**
+     * Encode a value in preparation for database storage.
+     *
+     * @param mixed $value A value to be encoded.
+     * @return mixed An encoded string representation of the provided value or false on failure.
+     */
+    function dbencode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $encodedValue = serialize($value);
+
+        return $encodedValue;
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.
@@ -795,16 +743,7 @@ if (!function_exists('debug')) {
         if ($value === null) {
             return $Debug;
         }
-
-        $Changed = $Debug != $value;
         $Debug = $value;
-        if ($Debug) {
-            Logger::logLevel(Logger::DEBUG);
-        } else {
-            if ($Changed) {
-                Logger::logLevel(c('Garden.LogLevel', Logger::INFO));
-            }
-        }
         return $Debug;
     }
 }
@@ -946,7 +885,8 @@ if (!function_exists('fetchPageInfo')) {
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
                 'Timeout' => $timeout,
-                'Cookies' => $sendCookies
+                'Cookies' => $sendCookies,
+                'Redirects' => true,
             ));
 
             if (!$Request->status()) {
@@ -1456,24 +1396,6 @@ if (!function_exists('forceBool')) {
     }
 }
 
-if (!function_exists('getallheaders')) {
-    /**
-     * If PHP isn't running as an apache module, getallheaders doesn't exist in some systems.
-     *
-     * @return array Returns an array of the current HTTP headers.
-     * @see https://github.com/vanilla/vanilla/issues/3
-     */
-    function getallheaders() {
-        $headers = [];
-        foreach ($_SERVER as $name => $value) {
-            if (substr($name, 0, 5) == 'HTTP_') {
-                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-            }
-        }
-        return $headers;
-    }
-}
-
 if (!function_exists('getAppCookie')) {
     /**
      * Get a cookie with the application prefix.
@@ -1728,8 +1650,8 @@ if (!function_exists('htmlEntityDecode')) {
     function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
-        $string = preg_replace_callback('~&#x([0-9a-fA-F]+);~i', "chr_utf8_callback", $string);
-        $string = preg_replace('~&#([0-9]+);~e', 'chr_utf8("\\1")', $string);
+        $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
+        $string = preg_replace_callback('/&#([0-9]+);/', function($matches) { return chr_utf8($matches[1]); }, $string);
         return $string;
     }
 
@@ -1769,7 +1691,19 @@ if (!function_exists('htmlEntityDecode')) {
         }
         return '';
     }
+}
 
+if (!function_exists('htmlEsc')) {
+    /**
+     * Alias htmlspecialchars() for code brevity.
+     *
+     * @param string $string
+     * @param int $flags See: htmlspecialchars().
+     * @return string|array Escaped string or array.
+     */
+    function htmlEsc($string, $flags = ENT_COMPAT) {
+        return htmlspecialchars($string, $flags, 'UTF-8');
+    }
 }
 
 if (!function_exists('implodeAssoc')) {
@@ -2210,28 +2144,6 @@ if (!function_exists('pageNumber')) {
             $Result = $urlParam.$Result;
         }
 
-        return $Result;
-    }
-}
-
-if (!function_exists('parse_ini_string')) {
-    /**
-     * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
-     *
-     * @param string $Ini The INI string to parse.
-     * @return array Returns the array representation of the INI string.
-     */
-    function parse_ini_string($Ini) {
-        $Lines = explode("\n", $Ini);
-        $Result = array();
-        foreach ($Lines as $Line) {
-            $Parts = explode('=', $Line, 2);
-            if (count($Parts) == 1) {
-                $Result[trim($Parts[0])] = '';
-            } elseif (count($Parts) >= 2) {
-                $Result[trim($Parts[0])] = trim($Parts[1]);
-            }
-        }
         return $Result;
     }
 }
@@ -3090,6 +3002,23 @@ if (!function_exists('safeRedirect')) {
     }
 }
 
+if (!function_exists('safeUnlink')) {
+    /**
+     * A version of {@link unlink()} that won't raise a warning.
+     *
+     * @param string $filename Path to the file.
+     * @return Returns TRUE on success or FALSE on failure.
+     */
+    function safeUnlink($filename) {
+        try {
+            $r = unlink($filename);
+            return $r;
+        } catch (\Exception $ex) {
+            return false;
+        }
+    }
+}
+
 if (!function_exists('saveToConfig')) {
     /**
      * Save values to the application's configuration file.
@@ -3152,11 +3081,15 @@ if (!function_exists('sliceParagraph')) {
      * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
      *
      * @param string $String The string to slice.
-     * @param int $MaxLength The maximum length of the string.
+     * @param int|array $Limits Either int $MaxLength or array($MaxLength, $MinLength); whereas $MaxLength The maximum length of the string; $MinLength The intended minimum length of the string (slice on sentence if paragraph is too short).
      * @param string $Suffix The suffix if the string must be sliced mid-sentence.
      * @return string
      */
-    function sliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
+    function sliceParagraph($String, $Limits = 500, $Suffix = '…') {
+        if(is_int($Limits)) {
+            $Limits = array($Limits, 32);
+        }
+        list($MaxLength, $MinLength) = $Limits;
         if ($MaxLength >= strlen($String)) {
             return $String;
         }
@@ -3166,7 +3099,7 @@ if (!function_exists('sliceParagraph')) {
         // See if there is a paragraph.
         $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
 
-        if ($Pos === false) {
+        if ($Pos === false || $Pos < $MinLength) {
             // There was no paragraph so try and split on sentences.
             $Sentences = preg_split('`([.!?:]\s+)`', $String, null, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -3243,39 +3176,8 @@ if (!function_exists('smartAsset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            $Version = APPLICATION_VERSION;
-            if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                $Type = $Matches[1];
-                $Key = $Matches[2];
-                static $ThemeVersion = null;
-
-                switch ($Type) {
-                    case 'plugins':
-                        $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
-                        $Version = GetValue('Version', $PluginInfo, $Version);
-                        break;
-                    case 'themes':
-                        if ($ThemeVersion === null) {
-                            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
-                            if ($ThemeInfo !== false) {
-                                $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
-                            } else {
-                                $ThemeVersion = $Version;
-                            }
-                        }
-                        $Version = $ThemeVersion;
-                        break;
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
     }
@@ -3786,5 +3688,42 @@ if (!function_exists('increaseMaxExecutionTime')) {
         }
 
         return true;
+    }
+}
+
+if (!function_exists('slugify')) {
+    /**
+     * Converts a string to a slug-type string.
+     *
+     * Based off Symfony's Jobeet tutorial, and found here:
+     * http://stackoverflow.com/questions/2955251/php-function-to-make-slug-url-string
+     *
+     * @param string $text The text to convert.
+     * @return string mixed|string The slugified text.
+     */
+    function slugify($text) {
+        // replace non letter or digits by -
+        $text = preg_replace('/[^\pL\d]+/u', '-', $text);
+
+        // transliterate
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+        $text = preg_replace('/[^-\w]+/', '', $text);
+
+        // trim
+        $text = trim($text, '-');
+
+        // remove duplicate -
+        $text = preg_replace('/-+/', '-', $text);
+
+        // lowercase
+        $text = strtolower($text);
+
+        if (empty($text)) {
+            return 'n-a';
+        }
+
+        return $text;
     }
 }

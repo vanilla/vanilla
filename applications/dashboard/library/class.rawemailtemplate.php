@@ -45,10 +45,11 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     /**
      * @param string $message The HTML formatted email message (the body of the email).
      * @param bool $convertNewlines Whether to convert new lines to html br tags.
+     * @param bool $filter Whether to filter HTML or not.
      * @return EmailTemplate $this The calling object.
      */
-    public function setMessage($message, $convertNewlines = false) {
-        $this->message = $this->formatContent($message, $convertNewlines);
+    public function setMessage($message, $convertNewlines = false, $filter = false) {
+        $this->message = $this->formatContent($message, $convertNewlines, $filter);
         return $this;
     }
 
@@ -57,10 +58,14 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      *
      * @param string $html The HTML to filter.
      * @param bool $convertNewlines Whether to convert new lines to html br tags.
+     * @param bool $filter Whether to filter HTML or not.
      * @return string The filtered HTML string.
      */
-    protected function formatContent($html, $convertNewlines = false) {
-        $str = Gdn_Format::htmlFilter($html);
+    protected function formatContent($html, $convertNewlines = false, $filter = false) {
+        $str = $html;
+        if ($filter) {
+            $str = Gdn_Format::htmlFilter($str);
+        }
         if ($convertNewlines) {
             $str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
         }

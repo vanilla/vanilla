@@ -236,6 +236,8 @@ class RoleModel extends Gdn_Model {
             case self::TYPE_UNCONFIRMED:
                 $backRoleIDs = (array)c('Garden.Registration.ConfirmEmailRole', null);
                 break;
+            default:
+                $backRoleIDs = array();
         }
         $roleIDs = array_merge($roleIDs, $backRoleIDs);
         $roleIDs = array_unique($roleIDs);
@@ -332,17 +334,15 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
-     * Returns a resultset of role data related to the specified UserID.
+     * Get the roles for a user.
      *
-     * @param int The UserID to filter to.
-     * @return Gdn_DataSet
+     * @param int $userID The user to get the roles for.
+     * @return Gdn_DataSet Returns the roles as a dataset (with array values).
+     * @see UserModel::getRoles()
      */
-    public function getByUserID($UserID) {
-        return $this->SQL->select()
-            ->from('Role')
-            ->join('UserRole', 'Role.RoleID = UserRole.RoleID')
-            ->where('UserRole.UserID', $UserID)
-            ->get();
+    public function getByUserID($userID) {
+        $result = Gdn::userModel()->getRoles($userID);
+        return $result;
     }
 
     /**
@@ -548,9 +548,6 @@ class RoleModel extends Gdn_Model {
         $RoleID = val('RoleID', $FormPostValues);
         $Insert = $RoleID > 0 ? false : true;
 
-        // Strict-mode.
-        setValue('PersonalInfo', $FormPostValues, forceBool(val('PersonalInfo', $FormPostValues), '0', '1', '0'));
-
         if ($Insert) {
             // Figure out the next role ID.
             $MaxRoleID = $this->SQL->select('r.RoleID', 'MAX')->from('Role r')->get()->value('RoleID', 0);
@@ -565,6 +562,7 @@ class RoleModel extends Gdn_Model {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields();
+            $Fields = $this->coerceData($Fields);
 
             if ($Insert === false) {
                 $this->update($Fields, array('RoleID' => $RoleID));

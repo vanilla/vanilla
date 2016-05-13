@@ -108,16 +108,13 @@ class PostController extends VanillaController {
         $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
         $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
         $Category = false;
+        $CategoryModel = new CategoryModel();
+
         if (isset($this->Discussion)) {
             $this->CategoryID = $this->Discussion->CategoryID;
             $Category = CategoryModel::categories($this->CategoryID);
         } elseif ($CategoryUrlCode != '') {
-            $CategoryModel = new CategoryModel();
-            if (is_numeric($CategoryUrlCode)) {
-                $Category = CategoryModel::categories($CategoryUrlCode);
-            } else {
-                $Category = $CategoryModel->getByCode($CategoryUrlCode);
-            }
+            $Category = CategoryModel::categories($CategoryUrlCode);
 
             if ($Category) {
                 $this->CategoryID = val('CategoryID', $Category);
@@ -127,12 +124,14 @@ class PostController extends VanillaController {
         if ($Category) {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
+            $this->ShowCategorySelector = false;
+            $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
         } else {
             $this->CategoryID = 0;
             $this->Category = null;
         }
 
-        $CategoryData = $UseCategories ? CategoryModel::categories() : false;
+        $CategoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
 
         // Check permission
         if (isset($this->Discussion)) {
@@ -157,22 +156,33 @@ class PostController extends VanillaController {
                 $this->setData('Type', 'Discussion');
             }
         } else {
-            // Permission to add
-            $this->permission('Vanilla.Discussions.Add');
+            // Permission to add.
+            if ($this->Category) {
+                $this->permission('Vanilla.Discussions.Add', true, 'Category', $this->Category->PermissionCategoryID);
+            } else {
+                $this->permission('Vanilla.Discussions.Add');
+            }
             $this->title(t('New Discussion'));
         }
 
         touchValue('Type', $this->Data, 'Discussion');
 
         // See if we should hide the category dropdown.
-        $AllowedCategories = CategoryModel::getByPermission('Discussions.Add', $this->Form->getValue('CategoryID', $this->CategoryID), array('Archived' => 0, 'AllowDiscussions' => 1), array('AllowedDiscussionTypes' => $this->Data['Type']));
-        if (count($AllowedCategories) == 1) {
-            $AllowedCategory = array_pop($AllowedCategories);
-            $this->ShowCategorySelector = false;
-            $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
+        if ($this->ShowCategorySelector) {
+            $AllowedCategories = CategoryModel::getByPermission(
+                'Discussions.Add',
+                $this->Form->getValue('CategoryID', $this->CategoryID),
+                ['Archived' => 0, 'AllowDiscussions' => 1],
+                ['AllowedDiscussionTypes' => $this->Data['Type']]
+            );
+            if (count($AllowedCategories) == 1) {
+                $AllowedCategory = array_pop($AllowedCategories);
+                $this->ShowCategorySelector = false;
+                $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
 
-            if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {
-                $this->Form->setFormValue('CategoryID', $AllowedCategory['CategoryID']);
+                if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {
+                    $this->Form->setFormValue('CategoryID', $AllowedCategory['CategoryID']);
+                }
             }
         }
 
@@ -277,14 +287,14 @@ class PostController extends VanillaController {
                 $this->fireEvent('BeforeDiscussionPreview');
 
                 if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                    $this->AddAsset('Content', $this->fetchView('preview'));
+                    $this->addAsset('Content', $this->fetchView('preview'));
                 } else {
                     $this->View = 'preview';
                 }
             }
             if ($this->Form->errorCount() > 0) {
                 // Return the form errors
-                $this->ErrorMessage($this->Form->errors());
+                $this->errorMessage($this->Form->errors());
             } elseif ($DiscussionID > 0 || $DraftID > 0) {
                 // Make sure that the ajax request form knows about the newly created discussion or draft id
                 $this->setJson('DiscussionID', $DiscussionID);
@@ -300,9 +310,9 @@ class PostController extends VanillaController {
                         $this->fireEvent('AfterDiscussionSave');
 
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                            redirect(DiscussionUrl($Discussion)).'?new=1';
+                            redirect(discussionUrl($Discussion)).'?new=1';
                         } else {
-                            $this->RedirectUrl = DiscussionUrl($Discussion, '', true).'?new=1';
+                            $this->RedirectUrl = discussionUrl($Discussion, '', true).'?new=1';
                         }
                     } else {
                         // If this was a draft save, notify the user about the save
@@ -323,7 +333,11 @@ class PostController extends VanillaController {
         } else {
             $Breadcrumbs = array();
         }
-        $Breadcrumbs[] = array('Name' => $this->data('Title'), 'Url' => '/post/discussion');
+
+        $Breadcrumbs[] = array(
+            'Name' => $this->data('Title'),
+            'Url' => val('AddUrl', val($this->data('Type'), DiscussionModel::discussionTypes()), '/post/discussion')
+        );
 
         $this->setData('Breadcrumbs', $Breadcrumbs);
 
@@ -422,12 +436,16 @@ class PostController extends VanillaController {
             $this->Form->addHidden('vanilla_url', $vanilla_url);
             $this->Form->addHidden('vanilla_category_id', $vanilla_category_id);
 
-            $PageInfo = FetchPageInfo($vanilla_url);
+            $PageInfo = fetchPageInfo($vanilla_url);
 
             if (!($Title = $this->Form->getFormValue('Name'))) {
                 $Title = val('Title', $PageInfo, '');
                 if ($Title == '') {
                     $Title = t('Undefined discussion subject.');
+                    if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
+                        $Title .= ' '.t('Page timed out.');
+                    }
+
                 }
             }
 
@@ -503,7 +521,7 @@ class PostController extends VanillaController {
                 'Name' => $Title,
                 'Body' => $Body,
                 'Format' => 'Html',
-                'Attributes' => serialize($Attributes)
+                'Attributes' => dbencode($Attributes)
             );
             $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;
             $this->fireEvent('BeforeEmbedDiscussion');

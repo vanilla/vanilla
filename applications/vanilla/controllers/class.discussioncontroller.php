@@ -58,6 +58,14 @@ class DiscussionController extends VanillaController {
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('autosave.js');
         $this->addJsFile('discussion.js');
+
+        // Spoilers assets
+        $this->addJsFile('spoilers.js', 'dashboard');
+        $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('Spoiler', t('Spoiler'));
+        $this->addDefinition('show', t('show'));
+        $this->addDefinition('hide', t('hide'));
+
         Gdn_Theme::section('Discussion');
 
         // Load the discussion record
@@ -78,15 +86,15 @@ class DiscussionController extends VanillaController {
         $OffsetProvided = $Page != '';
         list($Offset, $Limit) = offsetLimit($Page, $Limit);
 
-        // Check permissions
-        $this->permission('Vanilla.Discussions.View', true, 'Category', $this->Discussion->PermissionCategoryID);
+        // Check permissions.
+        $Category = CategoryModel::categories($this->Discussion->CategoryID);
+        $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category, -1));
         $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
         if (strcasecmp(val('Type', $this->Discussion), 'redirect') === 0) {
             $this->redirectDiscussion($this->Discussion);
         }
 
-        $Category = CategoryModel::categories($this->Discussion->CategoryID);
         $this->setData('Category', $Category);
 
         if ($CategoryCssClass = val('CssClass', $Category)) {
@@ -548,16 +556,12 @@ class DiscussionController extends VanillaController {
     /**
      *
      *
-     * @param $Discussion
+     * @param $discussion
      * @throws Exception
      */
-    public function sendOptions($Discussion) {
+    public function sendOptions($discussion) {
         require_once $this->fetchViewLocation('helper_functions', 'Discussion');
-        ob_start();
-        writeDiscussionOptions($Discussion);
-        $Options = ob_get_clean();
-
-        $this->jsonTarget("#Discussion_{$Discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+        $this->jsonTarget("#Discussion_{$discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", getDiscussionOptionsDropdown($discussion)->toString(), 'ReplaceWith');
     }
 
     /**

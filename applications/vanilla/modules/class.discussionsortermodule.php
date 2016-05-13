@@ -20,9 +20,11 @@ class DiscussionSorterModule extends Gdn_Module {
     var $SortFieldSelected;
 
     public function __construct($Sender) {
+        deprecated('DiscussionSorterModule', 'DiscussionSortFilterModule', 'March 2016');
+
         parent::__construct($Sender, 'Vanilla');
 
-        $this->Visible = c('Vanilla.Discussions.UserSortField');
+        $this->Visible = false;
 
         // Default options
         $this->SortOptions = array(

@@ -90,6 +90,8 @@ debug(c('Debug', false));
 Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
 Gdn::request()->fromEnvironment();
 
+setHandlers();
+
 /**
  * Extension Managers
  *
@@ -184,6 +186,7 @@ Gdn::factoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
 Gdn::regarding();
 
 // Other objects.
+Gdn::FactoryInstall('BBCodeFormatter', 'BBCode', null, Gdn::FactorySingleton);
 Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
 
 /**

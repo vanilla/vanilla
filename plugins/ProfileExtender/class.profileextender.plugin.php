@@ -86,7 +86,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $Sender->RegistrationFields[$Name] = $Field;
             }
         }
-        include($this->getView('registrationfields.php'));
+        include_once $Sender->fetchViewLocation('registrationfields', '', 'plugins/ProfileExtender');
     }
 
     /**
@@ -100,7 +100,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $Sender->RegistrationFields[$Name] = $Field;
             }
         }
-        include($this->getView('registrationfields.php'));
+        include_once $Sender->fetchViewLocation('registrationfields', '', 'plugins/ProfileExtender');
     }
 
     /**
@@ -246,7 +246,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $Sender->Form->setValue($Field, $Value);
         }
 
-        include($this->getView('profilefields.php'));
+        include_once $Sender->fetchViewLocation('profilefields', '', 'plugins/ProfileExtender');
     }
 
     /**
@@ -526,6 +526,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->from('User u')
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2);
+
+        if (val('DateOfBirth', $fields)) {
+            $columnNames[] = 'Birthday';
+            Gdn::sql()->select('u.DateOfBirth');
+            unset($fields['DateOfBirth']);
+        }
 
         $i = 0;
         foreach ($fields as $slug => $fieldData) {

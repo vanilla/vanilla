@@ -1,11 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <style>
-    .Connection-Header * {
-        line-height: 48px;
-        position: relative;
-    }
-
     .Connection-Name {
         font-size: 28px;
     }

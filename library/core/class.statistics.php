@@ -14,8 +14,7 @@
 /**
  * Handles install-side analytics gathering and sending.
  */
-class Gdn_Statistics extends Gdn_Plugin {
-
+class Gdn_Statistics extends Gdn_Pluggable {
     /** @var mixed  */
     protected $AnalyticsServer;
 
@@ -137,18 +136,6 @@ class Gdn_Statistics extends Gdn_Plugin {
         $Reason = val('Reason', $JsonResponse, null);
         if (!is_null($Reason)) {
             Gdn::controller()->informMessage("Analytics: {$Reason}");
-        }
-    }
-
-    /**
-     *
-     *
-     * @param $Sender
-     */
-    public function base_render_before($Sender) {
-        // If this is a full page request, trigger stats environment check
-        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            $this->check();
         }
     }
 
@@ -504,19 +491,6 @@ class Gdn_Statistics extends Gdn_Plugin {
             'Success' => 'DoneRegister',
             'Failure' => 'AnalyticsFailed'
         ));
-    }
-
-    /**
-     *
-     * @param Gdn_Controller $Sender
-     */
-    public function settingsController_analyticsTick_create($Sender) {
-        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->deliveryType(DELIVERY_TYPE_DATA);
-
-        Gdn::statistics()->tick();
-        $this->fireEvent("AnalyticsTick");
-        $Sender->render();
     }
 
     /**
@@ -1162,5 +1136,22 @@ class Gdn_Statistics extends Gdn_Plugin {
         }
 
         return false;
+    }
+
+    /**
+     * Generate an access token for stats graphs.
+     *
+     * @return bool|string Returns a token or **false** if required information is missing.
+     */
+    public static function generateToken() {
+        $id = Gdn::installationID();
+        $secret = Gdn::installationSecret();
+        if (empty($id) || empty($secret)) {
+            return false;
+        }
+
+        $str = 'v1.'.dechex(time());
+        $token = $str.'.'.hash_hmac('sha1', $str, $secret);
+        return $token;
     }
 }

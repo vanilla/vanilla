@@ -50,10 +50,16 @@ class ActivityModel extends Gdn_Model {
     public static $MaxMergeCount = 10;
 
     /**
+     * @var string The amount of time to delete logs after.
+     */
+    private $pruneAfter;
+
+    /**
      * Defines the related database table name.
      */
     public function __construct() {
         parent::__construct('Activity');
+        $this->setPruneAfter('-2 months');
     }
 
     /**
@@ -1473,6 +1479,8 @@ class ActivityModel extends Gdn_Model {
 
                 $ActivityID = $this->SQL->insert('Activity', $Activity);
                 $Activity['ActivityID'] = $ActivityID;
+
+                $this->prune();
             }
         } else {
             $Activity['DateUpdated'] = Gdn_Format::toDateTime();
@@ -1677,5 +1685,63 @@ class ActivityModel extends Gdn_Model {
         if (!isset($Data['Data']) || !is_array($Data['Data'])) {
             $Data['Data'] = [];
         }
+    }
+
+    /**
+     * Get the delete after time.
+     *
+     * @return string Returns a string compatible with {@link strtotime()}.
+     */
+    public function getPruneAfter() {
+        return $this->pruneAfter;
+    }
+
+    /**
+     * Get the exact timestamp to prune.
+     *
+     * @return \DateTimeInterface|null Returns the date that we should prune after.
+     */
+    private function getPruneDate() {
+        if (!$this->pruneAfter) {
+            return null;
+        } else {
+            return new \DateTimeImmutable($this->pruneAfter, new DateTimeZone('UTC'));
+        }
+    }
+
+    /**
+     * Set the deleteAfter.
+     *
+     * @param string $pruneAfter A string compatible with {@link strtotime()}. Be sure to specify a negative string.
+     * @return DbLogger Returns `$this` for fluent calls.
+     */
+    public function setPruneAfter($pruneAfter) {
+        if ($pruneAfter) {
+            // Make sure the string is negative.
+            $now = time();
+            $testTime = strtotime($pruneAfter, $now);
+            if ($testTime === false) {
+                throw new InvalidArgumentException('Invalid timespan value for "prune after".', 400);
+            }
+            if ($testTime >= $now) {
+                throw new InvalidArgumentException('You must specify a timespan in the past for "prune after".', 400);
+            }
+        }
+
+        $this->pruneAfter = $pruneAfter;
+        return $this;
+    }
+
+    /**
+     * Prune old activities.
+     */
+    private function prune() {
+        $date = $this->getPruneDate();
+
+        $this->SQL->delete(
+            'Activity',
+            ['DateUpdated <' => Gdn_Format::toDateTime($date->getTimestamp())],
+            10
+        );
     }
 }

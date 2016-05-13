@@ -4,13 +4,21 @@
 //
 // No styleguide reference.
 
+$navbar-border-color: rgba(0,0,0,.125);
+
 .navbar {
   position: relative;
-  padding: $navbar-padding-vertical $navbar-padding-horizontal;
-  height: $spacer * 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0;
+  height: $navbar-height;
   color: $white;
   background-color: $brand-primary;
-  font-weight: 200;
+  font-weight: 100;
+  letter-spacing: .0375rem;
+  z-index: 10;
+  border: 1px solid $navbar-border-color;
 
   a {
     color: $white;
@@ -20,39 +28,95 @@
     height: $spacer * 2.75;
   }
 
-  .nav {
-    float: left;
+  .nav-item + .nav-item {
+    margin: 0;
   }
 
   .nav-item {
     min-width: 11.25rem;
     text-align: center;
-    border-right: 1px solid $white;
+    border-right: 1px solid $navbar-border-color;
 
     &:first-child {
-      border-left: 1px solid $white;
+      border-left: 1px solid $navbar-border-color;
     }
+  }
+
+  .nav-link {
+    position: relative;
+    padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
+
+    &.active,
+    &:active {
+
+      &,
+      &:hover {
+        > * {
+          opacity: 1;
+        }
+        background-color: $nav-navbar-active-link-active-bg;
+      }
+
+      &:before {
+        position: absolute;
+        display: block;
+        width: $spacer;
+        height: $spacer;
+        bottom: - ($spacer / 2);
+        left: (11.25 / 2) - ($spacer / 2);
+        rotate: 45deg;
+        background-color: $nav-navbar-active-link-active-bg;
+        border-bottom: 1px solid $navbar-border-color;
+        border-right: 1px solid $navbar-border-color;
+        content: '';
+      }
+    }
+
+    &.hover,
+    &:hover {
+      background-color: $nav-navbar-active-link-active-bg;
+    }
+  }
+
+  .navbar-memenu,
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav {
+    display: flex;
   }
 
   .nav-link-description {
     font-size: $font-size-xs;
-    line-height: $line-height-sm;
+    line-height: $line-height-lg;
+    opacity: .75;
   }
 
-  .navbar-brand,
-  .Profile {
-    float: left;
+  .nav-link-heading {
+    line-height: $line-height-lg;
+    opacity: .75;
   }
 
-  @include clearfix;
 }
 
+
+
+
 .btn-navbar {
-  display: block;
-  float: left;
+  display: inline-block;
   font-weight: 300;
   text-transform: uppercase;
+  margin-left: $spacer;
+  opacity: .75;
 
-  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-xs, $line-height-sm, $btn-border-radius-navbar);
   @include button-variant($white, $btn-primary-bg, $white);
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, 0.575rem, $line-height-sm, $btn-border-radius-navbar);
+
+  &:hover {
+    opacity: 100;
+    background-color: $nav-navbar-active-link-active-bg;
+  }
 }

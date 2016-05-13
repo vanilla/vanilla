@@ -24,17 +24,16 @@
 }
 
 .panel {
+  a {
+    color: $grey;
+  }
+
   .nav-link {
     font-weight: 300;
 
-    &:hover {
+    &.active {
       color: $white;
-    }
-  }
-
-  li:not(.Active) {
-    a {
-      color: $grey;
+      border-radius: $nav-pills-panel-border-radius;
     }
   }
 

@@ -533,7 +533,7 @@ a.text-danger:focus, a.text-danger:hover {
 
 .nav-tabs .nav-link, .Tabs ul .nav-link, .nav-tabs .PanelInfo li a, .PanelInfo li .nav-tabs a, .Tabs ul .PanelInfo li a, .PanelInfo li .Tabs ul a {
   display: block;
-  padding: 0.5em 1em;
+  padding: 0.375em 1em;
   border: 1px solid transparent;
   border-radius: 0.1rem 0.1rem 0 0;
 }
@@ -591,7 +591,7 @@ a.text-danger:focus, a.text-danger:hover {
 
 .nav-pills .nav-link, .PanelInfo .nav-link, .nav-pills .PanelInfo li a, .PanelInfo li .nav-pills a, .PanelInfo li a {
   display: block;
-  padding: 0.5em 1em;
+  padding: 0.375em 1em;
   border-radius: 0.1rem;
 }
 
@@ -2159,7 +2159,7 @@ form .has-danger select {
   margin-right: -0.9375rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .Column.Grid_50, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {
   position: relative;
   min-height: 1px;
   padding-left: 0.9375rem;
@@ -2571,7 +2571,7 @@ form .has-danger select {
     -ms-flex: 0 0 41.6666666667%;
     flex: 0 0 41.6666666667%;
   }
-  .col-md-6 {
+  .col-md-6, .Column.Grid_50 {
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
@@ -4084,16 +4084,17 @@ img {
   margin-right: .5rem;
 }
 
+.panel a {
+  color: #949aa2;
+}
+
 .panel .nav-link, .panel .PanelInfo li a, .PanelInfo li .panel a {
   font-weight: 300;
 }
 
-.panel .nav-link:hover, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover {
+.panel .nav-link.active, .panel .PanelInfo li a.active, .PanelInfo li .panel a.active, .panel .PanelInfo .Active a, .PanelInfo .Active .panel a, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover {
   color: #fff;
-}
-
-.panel li:not(.Active) a {
-  color: #949aa2;
+  border-radius: 0.1rem 0 0 0.1rem;
 }
 
 .panel .nav-stacked .nav-item + .nav-item, .panel .PanelInfo .nav-item + .nav-item, .panel .nav-stacked .PanelInfo li + .nav-item, .PanelInfo .panel .nav-stacked li + .nav-item, .panel .PanelInfo li + .nav-item, .panel .nav-stacked .PanelInfo .nav-item + li, .PanelInfo .panel .nav-stacked .nav-item + li, .panel .PanelInfo .nav-item + li, .panel .nav-stacked .PanelInfo li + li, .PanelInfo .panel .nav-stacked li + li, .panel .PanelInfo li + li {
@@ -4102,11 +4103,20 @@ img {
 
 .navbar {
   position: relative;
-  padding: 0.5rem 1rem;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+  padding: 0;
   height: 4rem;
   color: #fff;
   background-color: #0291db;
-  font-weight: 200;
+  font-weight: 100;
+  letter-spacing: .0375rem;
+  z-index: 10;
+  border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .navbar a {
@@ -4117,48 +4127,90 @@ img {
   height: 2.75rem;
 }
 
-.navbar .nav, .navbar .Tabs ul, .Tabs .navbar ul, .navbar .PanelInfo {
-  float: left;
+.navbar .nav-item + .nav-item, .navbar .PanelInfo li + .nav-item, .PanelInfo .navbar li + .nav-item, .navbar .PanelInfo .nav-item + li, .PanelInfo .navbar .nav-item + li, .navbar .PanelInfo li + li, .PanelInfo .navbar li + li {
+  margin: 0;
 }
 
 .navbar .nav-item, .navbar .PanelInfo li, .PanelInfo .navbar li {
   min-width: 11.25rem;
   text-align: center;
-  border-right: 1px solid #fff;
+  border-right: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .navbar .nav-item:first-child, .navbar .PanelInfo li:first-child, .PanelInfo .navbar li:first-child {
-  border-left: 1px solid #fff;
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.navbar .nav-link, .navbar .PanelInfo li a, .PanelInfo li .navbar a {
+  position: relative;
+  padding: 0.9666666667rem;
+}
+
+.navbar .nav-link.active, .navbar .PanelInfo li a.active, .PanelInfo li .navbar a.active, .navbar .PanelInfo .Active a, .PanelInfo .Active .navbar a, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link.active:hover, .navbar .PanelInfo li a.active:hover, .PanelInfo li .navbar a.active:hover, .navbar .PanelInfo .Active a:hover, .PanelInfo .Active .navbar a:hover, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link:active, .navbar .PanelInfo li a:active, .PanelInfo li .navbar a:active, .navbar .nav-link:active:hover, .navbar .PanelInfo li a:active:hover, .PanelInfo li .navbar a:active:hover {
+  background-color: #0cb0f8;
+}
+
+.navbar .nav-link.active > *, .navbar .PanelInfo li a.active > *, .PanelInfo li .navbar a.active > *, .navbar .PanelInfo .Active a > *, .PanelInfo .Active .navbar a > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link.active:hover > *, .navbar .PanelInfo li a.active:hover > *, .PanelInfo li .navbar a.active:hover > *, .navbar .PanelInfo .Active a:hover > *, .PanelInfo .Active .navbar a:hover > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link:active > *, .navbar .PanelInfo li a:active > *, .PanelInfo li .navbar a:active > *, .navbar .nav-link:active:hover > *, .navbar .PanelInfo li a:active:hover > *, .PanelInfo li .navbar a:active:hover > * {
+  opacity: 1;
+}
+
+.navbar .nav-link.active:before, .navbar .PanelInfo li a.active:before, .PanelInfo li .navbar a.active:before, .navbar .PanelInfo .Active a:before, .PanelInfo .Active .navbar a:before, .navbar .PanelInfo li a:hover:before, .PanelInfo li .navbar a:hover:before, .navbar .nav-link:active:before, .navbar .PanelInfo li a:active:before, .PanelInfo li .navbar a:active:before {
+  position: absolute;
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  bottom: -0.5rem;
+  left: 5.125rem;
+  rotate: 45deg;
+  background-color: #0cb0f8;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  border-right: 1px solid rgba(0, 0, 0, 0.125);
+  content: '';
+}
+
+.navbar .nav-link.hover, .navbar .PanelInfo li a.hover, .PanelInfo li .navbar a.hover, .navbar .nav-link:hover, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover {
+  background-color: #0cb0f8;
+}
+
+.navbar .navbar-memenu,
+.navbar .navbar-brand {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.navbar .nav, .navbar .Tabs ul, .Tabs .navbar ul, .navbar .PanelInfo {
+  display: -ms-flexbox;
+  display: flex;
 }
 
 .navbar .nav-link-description {
   font-size: 0.675rem;
-  line-height: 1.5;
+  line-height: 1.3333333333;
+  opacity: .75;
 }
 
-.navbar .navbar-brand,
-.navbar .Profile {
-  float: left;
-}
-
-.navbar::after {
-  content: "";
-  display: table;
-  clear: both;
+.navbar .nav-link-heading {
+  line-height: 1.3333333333;
+  opacity: .75;
 }
 
 .btn-navbar {
-  display: block;
-  float: left;
+  display: inline-block;
   font-weight: 300;
   text-transform: uppercase;
-  padding: 0.125rem 0.75rem;
-  font-size: 0.675rem;
-  line-height: 1.5;
-  border-radius: 0.875rem;
+  margin-left: 1rem;
+  opacity: .75;
   color: #fff;
   background-color: transparent;
   border-color: #fff;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.575rem;
+  line-height: 1.5;
+  border-radius: 0.875rem;
 }
 
 .btn-navbar:hover {
@@ -4200,6 +4252,11 @@ img {
   border-color: #fff;
 }
 
+.btn-navbar:hover {
+  opacity: 100;
+  background-color: #0cb0f8;
+}
+
 .panel {
   padding-top: 4rem;
   padding-left: 4rem;
@@ -4230,23 +4287,23 @@ h6, .h6 {
 }
 
 h1, .h1 {
-  font-size: 2.5rem;
-}
-
-h2, .h2 {
   font-size: 2rem;
 }
 
+h2, .h2 {
+  font-size: 1.125rem;
+}
+
 h3, .h3 {
-  font-size: 1.75rem;
+  font-size: 1.125rem;
 }
 
 h4, .h4, .FeedItem > a, div.Popup h1 {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
 }
 
 h5, .h5 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
 }
 
 h6, .h6 {
@@ -4271,10 +4328,27 @@ p {
   margin-bottom: 0.5rem;
 }
 
+.main {
+  z-index: 5;
+}
+
 .main h1 {
   display: block;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
   font-size: 1.25rem;
   border-bottom: 1px solid #f4f4f5;
+}
+
+form ul {
+  padding-left: 0;
+}
+
+form ul li {
+  list-style: none;
 }
 
 .Hidden,

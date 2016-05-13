@@ -1862,7 +1862,7 @@ EOT;
          * things like <3, they'll lead to invalid markup and strip_tags will truncate the
          * text.
          */
-        $result = preg_replace_callback('/<(?![a-z\/])/i', '&lt;', $result);
+        $result = preg_replace('/<(?![a-z\/])/i', '&lt;', $result);
         $result = strip_tags($result);
         $result = htmlspecialchars($result, ENT_NOQUOTES, 'UTF-8', false);
 

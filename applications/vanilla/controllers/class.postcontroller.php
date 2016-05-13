@@ -108,16 +108,13 @@ class PostController extends VanillaController {
         $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
         $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
         $Category = false;
+        $CategoryModel = new CategoryModel();
+
         if (isset($this->Discussion)) {
             $this->CategoryID = $this->Discussion->CategoryID;
             $Category = CategoryModel::categories($this->CategoryID);
         } elseif ($CategoryUrlCode != '') {
-            $CategoryModel = new CategoryModel();
-            if (is_numeric($CategoryUrlCode)) {
-                $Category = CategoryModel::categories($CategoryUrlCode);
-            } else {
-                $Category = $CategoryModel->getByCode($CategoryUrlCode);
-            }
+            $Category = CategoryModel::categories($CategoryUrlCode);
 
             if ($Category) {
                 $this->CategoryID = val('CategoryID', $Category);
@@ -127,12 +124,14 @@ class PostController extends VanillaController {
         if ($Category) {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
+            $this->ShowCategorySelector = false;
+            $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
         } else {
             $this->CategoryID = 0;
             $this->Category = null;
         }
 
-        $CategoryData = $UseCategories ? CategoryModel::categories() : false;
+        $CategoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
 
         // Check permission
         if (isset($this->Discussion)) {
@@ -157,22 +156,33 @@ class PostController extends VanillaController {
                 $this->setData('Type', 'Discussion');
             }
         } else {
-            // Permission to add
-            $this->permission('Vanilla.Discussions.Add');
+            // Permission to add.
+            if ($this->Category) {
+                $this->permission('Vanilla.Discussions.Add', true, 'Category', $this->Category->PermissionCategoryID);
+            } else {
+                $this->permission('Vanilla.Discussions.Add');
+            }
             $this->title(t('New Discussion'));
         }
 
         touchValue('Type', $this->Data, 'Discussion');
 
         // See if we should hide the category dropdown.
-        $AllowedCategories = CategoryModel::getByPermission('Discussions.Add', $this->Form->getValue('CategoryID', $this->CategoryID), array('Archived' => 0, 'AllowDiscussions' => 1), array('AllowedDiscussionTypes' => $this->Data['Type']));
-        if (count($AllowedCategories) == 1) {
-            $AllowedCategory = array_pop($AllowedCategories);
-            $this->ShowCategorySelector = false;
-            $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
+        if ($this->ShowCategorySelector) {
+            $AllowedCategories = CategoryModel::getByPermission(
+                'Discussions.Add',
+                $this->Form->getValue('CategoryID', $this->CategoryID),
+                ['Archived' => 0, 'AllowDiscussions' => 1],
+                ['AllowedDiscussionTypes' => $this->Data['Type']]
+            );
+            if (count($AllowedCategories) == 1) {
+                $AllowedCategory = array_pop($AllowedCategories);
+                $this->ShowCategorySelector = false;
+                $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
 
-            if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {
-                $this->Form->setFormValue('CategoryID', $AllowedCategory['CategoryID']);
+                if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {
+                    $this->Form->setFormValue('CategoryID', $AllowedCategory['CategoryID']);
+                }
             }
         }
 

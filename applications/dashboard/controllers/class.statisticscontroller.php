@@ -55,7 +55,19 @@ class StatisticsController extends DashboardController {
             $Flow = true;
 
             if ($Flow && $this->Form->getFormValue('Reregister')) {
+                $id = Gdn::installationID();
+                $secret = Gdn::installationSecret();
+                Gdn::installationID(false);
+                Gdn::installationSecret(false);
+
                 Gdn::Statistics()->register();
+
+                if (!Gdn::installationID()) {
+                    Gdn::installationID($id);
+                    Gdn::installationSecret($secret);
+                }
+                $this->Form->setFormValue('InstallationID', Gdn::installationID());
+                $this->Form->setFormValue('InstallationSecret', Gdn::installationSecret());
             }
 
             if ($Flow && $this->Form->getFormValue('Save')) {

@@ -1395,7 +1395,8 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Get actual path to the file.
-        $local_path = Gdn_Upload::copyLocal($media['Path']);
+        $upload = new Gdn_UploadImage();
+        $local_path = $upload->copyLocal(val('Path', $media));
         if (!file_exists($local_path)) {
             throw notFoundException('File');
         }

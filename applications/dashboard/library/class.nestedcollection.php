@@ -1,7 +1,7 @@
 <?php
 
 /**
- * A module for a sortable list.
+ * A trait for a sortable list.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -9,7 +9,12 @@
  * @since 2.3
  */
 
-abstract class SortableModule extends Gdn_Module {
+trait NestedCollection {
+
+    /**
+     * @var string The css class to add to active items and groups.
+     */
+    public $activeCssClass = 'Active';
 
     /**
      * @var array List of items to sort.
@@ -44,7 +49,7 @@ abstract class SortableModule extends Gdn_Module {
     /**
      * @var bool Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
      */
-    private $flatten;
+    private $flatten = false;
 
     /**
      * @var bool Whether to separate groups with a hr element. Only supported for flattened lists.
@@ -52,23 +57,14 @@ abstract class SortableModule extends Gdn_Module {
     private $forceDivider = false;
 
     /**
-     * @var bool Whether we have run the prepare method yet.
+     * @var array The allowed keys in the $modifiers array parameter in the 'addItem' methods.
      */
     private $isPrepared = false;
-
-    private $allowedItemModifiers = array('rel', 'popinRel', 'icon', 'badge');
-
+    
     /**
-     * Constructor. Should be called by all extending classes' constructors.
-     *
-     * @param string $view The filename of the view to render, excluding the extension.
-     * @param bool $flatten Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
-     * @param bool $useCssPrefix Whether to use CSS prefixes on the generated CSS classes for the items.
+     * @var array The item modifiers allowed to be passed in the modifiers array.
      */
-    public function __construct($flatten, $useCssPrefix = false) {
-        $this->flatten = $flatten;
-        $this->useCssPrefix = $useCssPrefix;
-    }
+    private $allowedItemModifiers = array('popinRel', 'icon', 'badge', 'rel');
 
     /**
      * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
@@ -80,7 +76,8 @@ abstract class SortableModule extends Gdn_Module {
     /**
      * Add a divider to the items array if it satisfies the $isAllowed condition.
      *
-     * @param bool $isAllowed Whether to actually add the item.
+     * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
+     * or a permission string or array of permission strings (full match) to check.
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @param string $cssClass The divider's CSS class.
@@ -88,7 +85,7 @@ abstract class SortableModule extends Gdn_Module {
      * @throws Exception
      */
     public function addDividerIf($isAllowed = true, $key = '', $cssClass = '', $sort = array()) {
-        if (!$isAllowed) {
+        if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
             return $this->addDivider($key, $cssClass, $sort);
@@ -120,7 +117,8 @@ abstract class SortableModule extends Gdn_Module {
     /**
      * Add a group to the items array if it satisfies the $isAllowed condition.
      *
-     * @param bool $isAllowed Whether to actually add the item.
+     * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
+     * or a permission string or array of permission strings (full match) to check.
      * @param string $text The display text for the group header.
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param string $cssClass The group header's CSS class.
@@ -133,11 +131,30 @@ abstract class SortableModule extends Gdn_Module {
      * @throws Exception
      */
     public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
-        if (!$isAllowed) {
+        if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
             return $this->addGroup($text, $key, $cssClass, $sort, $modifiers);
         }
+    }
+
+
+    /**
+     * Checks whether an item can be added to the items list by returning it if it is already a boolean,
+     * or checking the permission if it is a string or array.
+     *
+     * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
+     * or a permission string or array of permission strings (full match) to check.
+     * @return bool Whether the item has permission to be added to the items list.
+     */
+    protected function isAllowed($isAllowed) {
+        if (is_bool($isAllowed)) {
+            return $isAllowed;
+        }
+        if (is_string($isAllowed) || is_array($isAllowed)) {
+            return Gdn::session()->checkPermission($isAllowed);
+        }
+        return false;
     }
 
     /**
@@ -181,25 +198,25 @@ abstract class SortableModule extends Gdn_Module {
     /**
      * Add a link to the items array if it satisfies the $isAllowed condition.
      *
-     * @param bool $isAllowed Whether to actually add the item.
+     * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
+     * or a permission string or array of permission strings (full match) to check.
      * @param string $text The display text for the link.
      * @param string $url The destination url for the link.
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param string $cssClass The link's CSS class.
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
-     * @param bool $disabled Whether to disable the link.
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
+     * @param bool $disabled Whether to disable the link.
      * @return object $this The calling object.
-     * @throws Exception
      */
-    public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = array(), $disabled = false, $modifiers = array()) {
-        if (!$isAllowed) {
+    public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = array(), $modifiers = array(), $disabled = false) {
+        if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
-            return $this->addLink($text, $url, $key, $cssClass, $sort, $disabled, $modifiers);
+            return $this->addLink($text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         }
     }
 
@@ -211,18 +228,18 @@ abstract class SortableModule extends Gdn_Module {
      * @param string $key The item's key (for sorting and CSS targeting).
      * @param string $cssClass The link's CSS class.
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
-     * @param bool $disabled Whether to disable the link.
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
+     * @param bool $disabled Whether to disable the link.
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addLink($text, $url, $key = '', $cssClass = '', $sort = array(), $disabled = false, $modifiers = array()) {
+    public function addLink($text, $url, $key = '', $cssClass = '', $sort = array(), $modifiers = array(), $disabled = false) {
         $link = array(
             'text' => $text,
-            'url' => $url,
+            'url' => url($url),
             'key' => $key,
         );
 
@@ -242,11 +259,15 @@ abstract class SortableModule extends Gdn_Module {
             $listItemCssClasses[] = 'disabled';
         }
         if ($this->isActive($link)) {
-            $listItemCssClasses[] = 'active';
+            $link['isActive'] = true;
+            $listItemCssClasses[] = $this->activeCssClass;
+        } else {
+            $link['isActive'] = false;
         }
+
         $link['listItemCssClass'] = implode(' ', $listItemCssClasses);
 
-	    $this->addItem('link', $link);
+        $this->addItem('link', $link);
         return $this;
     }
 
@@ -269,7 +290,7 @@ abstract class SortableModule extends Gdn_Module {
      *
      * @param array $item The item to generate and add a key for.
      */
-    public function touchKey(&$item) {
+    protected function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
             $this->keyNumber = $this->keyNumber + 1;
@@ -362,10 +383,9 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $item The item to check.
      * @return bool Whether the current request url matches an item's link url.
      */
-    public function isActive($item) {
-        $highlightRoute = Gdn_Url::request();
-        $highlightUrl = Url($highlightRoute);
-        return (val('linkUrl', $item) && Url(val('linkUrl', $item)) == $highlightUrl);
+    protected function isActive($item) {
+        $highlightRoute = Gdn_Url::request(true);
+        return (val('url', $item) && (trim(val('url', $item), '/') == trim($highlightRoute, '/')));
     }
 
     /**
@@ -373,8 +393,8 @@ abstract class SortableModule extends Gdn_Module {
      *
      * @param array $items The items to sort.
      */
-    public function sortItems(&$items) {
-        foreach ($items as &$item) {
+    protected function sortItems(&$items) {
+        foreach($items as &$item) {
             if (val('items', $item)) {
                 $this->sortItems($item['items']);
             }
@@ -404,7 +424,7 @@ abstract class SortableModule extends Gdn_Module {
      * @param int $depth The current recursive depth used to prevent infinite recursion.
      * @return number
      */
-    public function sortItemsOrder($item, $items, $depth = 0) {
+    protected function sortItemsOrder($item, $items, $depth = 0) {
         $default_sort = val('_sort', $item, 100);
 
         // Check to see if a custom sort has been specified.
@@ -441,10 +461,46 @@ abstract class SortableModule extends Gdn_Module {
         }
         $this->isPrepared = true;
         $this->sortItems($this->items);
+        $this->prepareData($this->items);
         if ($this->flatten) {
             $this->items = $this->flattenArray($this->items);
         }
         return !empty($this->items);
+    }
+
+    /**
+     * Performs post-sort operations to the items array.
+     * Removes empty groups, removes the '_sort' and 'key' attributes and bubbles up the active css class.
+     *
+     * @param array $items The item list to parse.
+     */
+    protected function prepareData(&$items) {
+        foreach($items as $key => &$item) {
+            unset($item['_sort'], $item['key']);
+            $subItems = array();
+
+            // Group item
+            if (val('type', $item) == 'group') {
+                // ensure groups have items
+                if (val('items', $item)) {
+                    $subItems = $item['items'];
+                } else {
+                    unset($items[$key]);
+                }
+            }
+            if ($subItems) {
+                $this->prepareData($subItems);
+                // Set active state on parents if child has it
+                if (!$this->flatten) {
+                    foreach ($subItems as $subItem) {
+                        if (val('isActive', $subItem)) {
+                            $item['isActive'] = true;
+                            $item['cssClass'] .= ' '.$this->activeCssClass;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -454,37 +510,34 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $items The item list to flatten.
      * @return array The flattened items list.
      */
-    public function flattenArray($items) {
-        $newitems = array();
+    protected function flattenArray($items) {
+        $newItems = array();
         $itemslength = sizeof($items);
         $index = 0;
-        foreach ($items as $key => $item) {
-            ++$index;
-            unset($item['_sort'], $item['key']);
-            $subitems = false;
+        foreach($items as $key => $item) {
+            $subItems = array();
 
             // Group item
             if (val('type', $item) == 'group') {
-                // ensure groups have items
                 if (val('items', $item)) {
-                    $subitems = $item['items'];
+                    $subItems = $item['items'];
                     unset($item['items']);
                     if (val('text', $item)) {
-                        $newitems[] = $item;
+                        $newItems[] = $item;
                     }
                 }
             }
             if ((val('type', $item) != 'group')) {
-                $newitems[] = $item;
+                $newItems[] = $item;
             }
-            if ($subitems) {
-                $newitems = array_merge($newitems, $this->flattenArray($subitems));
+            if ($subItems) {
+                $newItems = array_merge($newItems, $this->flattenArray($subItems));
                 if ($this->forceDivider && $index < $itemslength) {
                     // Add hr after group but not the last one
                     $newitems[] = array('type' => 'divider');
                 }
             }
         }
-        return $newitems;
+        return $newItems;
     }
 }

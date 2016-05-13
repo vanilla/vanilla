@@ -77,13 +77,15 @@ $nav = [
         <?php } ?>
     </div>
 </div>
-<div class="container footer">
+<div class="container-fluid">
     <div class="row">
-    <?php
-    $this->renderAsset('Foot');
-    echo '<div class="Version">Version ', APPLICATION_VERSION, '</div>';
-    echo wrap(anchor(img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), c('Garden.VanillaUrl')), 'div');
-    ?>
+        <div class="col-sm-6 col-md-8 col-md-offset-2 col-sm-offset-3 footer">
+            <?php
+            $this->renderAsset('Foot');
+            echo '<div class="Version">Version ', APPLICATION_VERSION, '</div>';
+            echo wrap(anchor(img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), c('Garden.VanillaUrl')), 'div');
+            ?>
+        </div>
     </div>
 </div>
 <?php $this->fireEvent('AfterBody'); ?>

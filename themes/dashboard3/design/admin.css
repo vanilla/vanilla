@@ -4272,6 +4272,14 @@ img {
 
 .main {
   background-color: #fff;
+  z-index: 5;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: 0;
+}
+
+.footer {
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+  border-right: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 h1, .h1,
@@ -4328,10 +4336,6 @@ p {
   margin-bottom: 0.5rem;
 }
 
-.main {
-  z-index: 5;
-}
-
 .main h1 {
   display: block;
   margin-left: -1rem;
@@ -4343,11 +4347,21 @@ p {
   border-bottom: 1px solid #f4f4f5;
 }
 
-form ul {
+form ul,
+form ol {
   padding-left: 0;
 }
 
-form ul li {
+form ul li,
+form ol li {
+  list-style: none;
+}
+
+.Sortable {
+  padding-left: 0;
+}
+
+.Sortable li {
   list-style: none;
 }
 

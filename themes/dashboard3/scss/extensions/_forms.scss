@@ -21,11 +21,20 @@ form {
     @extend .form-control;
   }
 
-  ul {
+  ul,
+  ol {
     padding-left: 0;
 
     li {
       list-style: none;
     }
+  }
+}
+
+.Sortable {
+  padding-left: 0;
+
+  li {
+    list-style: none;
   }
 }

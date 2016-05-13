@@ -482,14 +482,14 @@ class VanillaHooks implements Gdn_IPlugin {
         $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
         // Add the site discussion links.
-	$sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, array('icon' => 'th-list'));
-	$sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, array('icon' => 'discussion'));
-	$sender->addGroup(t('Favorites'), 'favorites', '', 3);
+        $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, array('icon' => 'th-list'));
+        $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, array('icon' => 'discussion'));
+        $sender->addGroup(t('Favorites'), 'favorites', '', 3);
 
         if (Gdn::session()->isValid()) {
-	    $sender->addLink(t('My Bookmarks'), '/discussions/bookmarked', 'favorites.bookmarks', '', array(), array('icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks));
-	    $sender->addLink(t('My Discussions'), '/discussions/mine', 'favorites.discussions', '', array(), array('icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions));
-	    $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', array(), array('icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts));
+            $sender->addLink(t('My Bookmarks'), '/discussions/bookmarked', 'favorites.bookmarks', '', array(), array('icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks));
+            $sender->addLink(t('My Discussions'), '/discussions/mine', 'favorites.discussions', '', array(), array('icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions));
+            $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', array(), array('icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts));
         }
     }
 
@@ -505,9 +505,9 @@ class VanillaHooks implements Gdn_IPlugin {
             return;
         }
         $user_id = val('UserID', $user);
-	$sender->addGroup(t('Posts'), 'posts');
-	$sender->addLink(t('Discussions'), userUrl($user, '', 'discussions'), 'posts.discussions', '', array(), array('icon' => 'discussion', 'badge' => val('CountDiscussions', $user)));
-	$sender->addLink(t('Comments'), userUrl($user, '', 'comments'), 'posts.comments', '', array(), array('icon' => 'comment', 'badge' => val('CountComments', $user)));
+        $sender->addGroup(t('Posts'), 'posts');
+        $sender->addLink(t('Discussions'), userUrl($user, '', 'discussions'), 'posts.discussions', '', array(), array('icon' => 'discussion', 'badge' => val('CountDiscussions', $user)));
+        $sender->addLink(t('Comments'), userUrl($user, '', 'comments'), 'posts.comments', '', array(), array('icon' => 'comment', 'badge' => val('CountComments', $user)));
     }
 
     /**
@@ -694,16 +694,17 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $Sender DashboardController.
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-	$menu = &$sender->EventArguments['Nav'];
-//        $menu = new NavModule();
-	$menu->addLinkIf('Garden.Settings.Manage', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control');
-	$menu->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories');
-	$menu->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advacned', 'nav-forum-advanced');
-	$menu->addLinkIf('Garden.Settings.Manage', t('Blog Comments'), '/dashboard/embed/comments', 'forum.embed-comments', 'nav-embed nav-embed-comments');
-	$menu->addLinkIf('Garden.Settings.Manage', t('Embed Forum'), '/dashboard/embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site');
+    public function dashboardNavModule_settings_handler($sender) {
+        $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories');
+        $sender->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advacned', 'nav-forum-advanced');
+        $sender->addLinkIf('Garden.Settings.Manage', t('Blog Comments'), '/dashboard/embed/comments', 'forum.embed-comments', 'nav-embed nav-embed-comments');
+        $sender->addLinkIf('Garden.Settings.Manage', t('Embed Forum'), '/dashboard/embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site');
 //        $menu->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.newavatars');
+    }
 
+
+    public function dashboardNavModule_moderation_handler($sender) {
+        $sender->addLinkIf('Garden.Settings.Manage', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control');
     }
 
     /**

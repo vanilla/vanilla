@@ -149,18 +149,31 @@ class DashboardHooks implements Gdn_IPlugin {
     /**
      * @param $Sender
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
+    public function dashboardNavModule_dashboardHome_handler($sender) {
+        $sender->addGroup(t('Dashboard'), 'dashboard')
+            ->addLinkIf('Garden.Settings.View', t('Dashboard'), '/dashboard/settings', 'dashboard.dashboard')
+            ->addLinkIf('Garden.Settings.Manage', t('Getting Started'), '/dashboard/settings/gettingstarted', 'dashboard.getting-started')
+            ->addLinkIf('Garden.Settings.View', t('Help &amp Tutorials'), '/dashboard/settings/tutorials', 'dashboard.tutorials');
+    }
+
+    public function dashboardNavModule_moderation_handler($sender) {
+        $session = Gdn::session();
+        $sender->addGroup(t('Moderation'), 'moderation')
+            ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false), t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue')
+            ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false), t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', array(), false, array('popinRel' => '/dashboard/log/count/moderate'))
+            ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log')
+            ->addLinkIf('Garden.Community.Manage', t('Banning'), '/dashboard/settings/bans', 'moderation.bans');
+    }
+
+    public function dashboardNavModule_analytics_handler($sender) {
+        $sender->addGroup(t('Analytics'), 'analytics');
+    }
+
+    public function dashboardNavModule_settings_handler($sender) {
         $session = Gdn::session();
         $themeOptionsName = c('Garden.ThemeOptions.Name');
         $mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
-
-        // SideMenuModule menu
-        $menu = &$Sender->EventArguments['Nav'];
-        $menu->addGroup(t('Dashboard'), 'dashboard')
-            ->addLinkIf('Garden.Settings.View', t('Dashboard'), '/dashboard/settings', 'dashboard.dashboard')
-            ->addLinkIf('Garden.Settings.Manage', t('Getting Started'), '/dashboard/settings/gettingstarted', 'dashboard.getting-started')
-            ->addLinkIf('Garden.Settings.View', t('Help &amp Tutorials'), '/dashboard/settings/tutorials', 'dashboard.tutorials')
-            ->addGroup(t('Appearance'), 'appearance')
+        $sender->addGroup(t('Appearance'), 'appearance')
             ->addLinkIf('Garden.Settings.Manage', t('Banner'), '/dashboard/settings/banner', 'appearance.banner')
             ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage')
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes')
@@ -175,11 +188,6 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration')
             ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/authentication', 'users.authentication')
             ->addLinkIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), t('Applicants'), '/dashboard/user/applicants', 'users.applicants', '', array(), false, array('popinRel' => '/dashboard/user/applicantcount'))
-            ->addGroup(t('Moderation'), 'moderation')
-            ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false), t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue')
-            ->addLinkIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false), t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', array(), false, array('popinRel' => '/dashboard/log/count/moderate'))
-            ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log')
-            ->addLinkIf('Garden.Community.Manage', t('Banning'), '/dashboard/settings/bans', 'moderation.bans')
             ->addGroup(t('Forum Settings'), 'forum')
             ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social')
             ->addGroup(t('Reputation'), 'reputation')

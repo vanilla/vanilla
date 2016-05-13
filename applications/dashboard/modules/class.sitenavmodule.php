@@ -14,7 +14,7 @@
 class SiteNavModule extends NavModule {
 
     /** @var array  */
-    protected $customSections = array('EditProfile', 'Profile');
+    protected static $customSections = array('EditProfile', 'Profile');
 
     /** @var string The section to */
     protected $section;
@@ -48,9 +48,9 @@ class SiteNavModule extends NavModule {
      */
     public function prepare() {
         $section_found = false;
-
+        
         // The module contains different links depending on its section.
-        foreach ($this->customSections as $section) {
+        foreach (self::$customSections as $section) {
             if (InSection($section)) {
                 $this->fireEvent($section);
                 $section_found = true;

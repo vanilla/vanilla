@@ -4146,15 +4146,15 @@ img {
   padding: 0.9666666667rem;
 }
 
-.navbar .nav-link.active, .navbar .PanelInfo li a.active, .PanelInfo li .navbar a.active, .navbar .PanelInfo .Active a, .PanelInfo .Active .navbar a, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link.active:hover, .navbar .PanelInfo li a.active:hover, .PanelInfo li .navbar a.active:hover, .navbar .PanelInfo .Active a:hover, .PanelInfo .Active .navbar a:hover, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link:active, .navbar .PanelInfo li a:active, .PanelInfo li .navbar a:active, .navbar .nav-link:active:hover, .navbar .PanelInfo li a:active:hover, .PanelInfo li .navbar a:active:hover {
+.navbar .nav-link.active, .navbar .PanelInfo li a.active, .PanelInfo li .navbar a.active, .navbar .PanelInfo .Active a, .PanelInfo .Active .navbar a, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link.active:hover, .navbar .PanelInfo li a.active:hover, .PanelInfo li .navbar a.active:hover, .navbar .PanelInfo .Active a:hover, .PanelInfo .Active .navbar a:hover, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover {
   background-color: #0cb0f8;
 }
 
-.navbar .nav-link.active > *, .navbar .PanelInfo li a.active > *, .PanelInfo li .navbar a.active > *, .navbar .PanelInfo .Active a > *, .PanelInfo .Active .navbar a > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link.active:hover > *, .navbar .PanelInfo li a.active:hover > *, .PanelInfo li .navbar a.active:hover > *, .navbar .PanelInfo .Active a:hover > *, .PanelInfo .Active .navbar a:hover > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link:active > *, .navbar .PanelInfo li a:active > *, .PanelInfo li .navbar a:active > *, .navbar .nav-link:active:hover > *, .navbar .PanelInfo li a:active:hover > *, .PanelInfo li .navbar a:active:hover > * {
+.navbar .nav-link.active > *, .navbar .PanelInfo li a.active > *, .PanelInfo li .navbar a.active > *, .navbar .PanelInfo .Active a > *, .PanelInfo .Active .navbar a > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link.active:hover > *, .navbar .PanelInfo li a.active:hover > *, .PanelInfo li .navbar a.active:hover > *, .navbar .PanelInfo .Active a:hover > *, .PanelInfo .Active .navbar a:hover > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > * {
   opacity: 1;
 }
 
-.navbar .nav-link.active:before, .navbar .PanelInfo li a.active:before, .PanelInfo li .navbar a.active:before, .navbar .PanelInfo .Active a:before, .PanelInfo .Active .navbar a:before, .navbar .PanelInfo li a:hover:before, .PanelInfo li .navbar a:hover:before, .navbar .nav-link:active:before, .navbar .PanelInfo li a:active:before, .PanelInfo li .navbar a:active:before {
+.navbar .nav-link.active:before, .navbar .PanelInfo li a.active:before, .PanelInfo li .navbar a.active:before, .navbar .PanelInfo .Active a:before, .PanelInfo .Active .navbar a:before, .navbar .PanelInfo li a:hover:before, .PanelInfo li .navbar a:hover:before {
   position: absolute;
   display: block;
   width: 1rem;

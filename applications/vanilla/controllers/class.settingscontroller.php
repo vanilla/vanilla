@@ -181,6 +181,7 @@ class SettingsController extends Gdn_Controller {
 
         // Display options
         $this->title(t('Flood Control'));
+        Gdn_Theme::section('Moderation');
         $this->addSideMenu('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.

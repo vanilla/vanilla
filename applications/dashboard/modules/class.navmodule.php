@@ -56,13 +56,10 @@ class NavModule extends Gdn_Module {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the nav items.
      */
     public function __construct($cssClass = '', $useCssPrefix = true) {
-        // Don't render an empty group.
-	parent::__construct();
-            return;
-        }
+		parent::__construct();
 
-	$this->flatten = false;
-	$this->useCssPrefix = $useCssPrefix;
+		$this->flatten = false;
+		$this->useCssPrefix = $useCssPrefix;
         $this->cssClass = $cssClass;
 
         if ($useCssPrefix) {

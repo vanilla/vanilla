@@ -60,9 +60,7 @@ trait NestedCollection {
      * @var array The allowed keys in the $modifiers array parameter in the 'addItem' methods.
      */
     private $isPrepared = false;
-
-    private $allowedItemModifiers = array('rel', 'popinRel', 'icon', 'badge');
-
+    
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */

@@ -1710,7 +1710,7 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
-     * Set the deleteAfter.
+     * Set the prune after date.
      *
      * @param string $pruneAfter A string compatible with {@link strtotime()}. Be sure to specify a negative string.
      * @return ActivityModel Returns `$this` for fluent calls.

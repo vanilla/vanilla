@@ -155,27 +155,33 @@ $Construct
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
-    if ($v = c('Garden.Registration.ApplicantRoleID')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_APPLICANT)
-            ->where('RoleID', $types[RoleModel::TYPE_APPLICANT])
-            ->put();
+    if (c('Garden.Registration.ApplicantRoleID')) {
+        $SQL->replace(
+            'Role',
+            array('Type' => RoleModel::TYPE_APPLICANT),
+            array('RoleID' => $types[RoleModel::TYPE_APPLICANT]),
+            true
+        );
 //      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
     }
 
-    if ($v = c('Garden.Registration.DefaultRoles')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_MEMBER)
-            ->where('RoleID', $types[RoleModel::TYPE_MEMBER])
-            ->put();
+    if (c('Garden.Registration.DefaultRoles')) {
+        $SQL->replace(
+            'Role',
+            array('Type' => RoleModel::TYPE_MEMBER),
+            array('RoleID' => $types[RoleModel::TYPE_MEMBER]),
+            true
+        );
 //      RemoveFromConfig('Garden.Registration.DefaultRoles');
     }
 
-    if ($v = c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_UNCONFIRMED)
-            ->where('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
-            ->put();
+    if (c('Garden.Registration.ConfirmEmailRole')) {
+        $SQL->replace(
+            'Role',
+            array('Type' => RoleModel::TYPE_UNCONFIRMED),
+            array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
+            true
+        );
 //      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
     }
 

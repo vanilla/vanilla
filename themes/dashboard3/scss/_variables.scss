@@ -49,11 +49,11 @@ $font-size-lg:               1.25rem !default;
 $font-size-sm:               .75rem;
 $font-size-xs:               .675rem;
 
-$font-size-h1:               2.5rem !default;
-$font-size-h2:               2rem !default;
-$font-size-h3:               1.75rem !default;
-$font-size-h4:               1.5rem !default;
-$font-size-h5:               1.25rem !default;
+$font-size-h1:               2rem;
+$font-size-h2:               1.125rem;
+$font-size-h3:               1.125rem;
+$font-size-h4:               1.125rem;
+$font-size-h5:               1.125rem !default;
 $font-size-h6:               1rem !default;
 
 $display1-size:               6rem !default;
@@ -157,7 +157,7 @@ $btn-border-radius-navbar:       $btn-padding-y-sm + ($line-height-sm / 2);
 
 // Navs
 
-$nav-link-padding:                          .5em 1em !default;
+$nav-link-padding:                          .375em 1em;
 $nav-link-hover-bg:                         $gray-lighter !default;
 
 $nav-disabled-link-color:                   $gray-light !default;
@@ -178,3 +178,8 @@ $nav-tabs-justified-active-link-border-color:     $body-bg !default;
 $nav-pills-border-radius:                   $border-radius !default;
 $nav-pills-active-link-hover-bg:            $component-active-bg !default;
 $nav-pills-active-link-hover-color:         $component-active-color !default;
+
+$nav-pills-panel-border-radius:             $border-radius 0 0 $border-radius;
+
+$navbar-height:                             $spacer * 4;
+$nav-navbar-active-link-active-bg:          #0cb0f8;

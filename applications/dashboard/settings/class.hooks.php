@@ -150,9 +150,9 @@ class DashboardHooks implements Gdn_IPlugin {
      * @param $Sender
      */
     public function base_getAppSettingsMenuItems_handler($Sender) {
-	$session = Gdn::session();
-	$themeOptionsName = c('Garden.ThemeOptions.Name');
-	$mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
+        $session = Gdn::session();
+        $themeOptionsName = c('Garden.ThemeOptions.Name');
+        $mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
 
         // SideMenuModule menu
         $menu = &$Sender->EventArguments['Nav'];
@@ -181,7 +181,7 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log')
             ->addLinkIf('Garden.Community.Manage', t('Banning'), '/dashboard/settings/bans', 'moderation.bans')
             ->addGroup(t('Forum Settings'), 'forum')
-	    ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social')
+            ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social')
             ->addGroup(t('Reputation'), 'reputation')
             ->addGroup(t('Addons'), 'add-ons')
             ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins')
@@ -277,11 +277,11 @@ class DashboardHooks implements Gdn_IPlugin {
      */
     public function siteNavModule_all_handler($sender) {
         // Add a link to the community home.
-	$sender->addLink(t('Community Home'), '/', 'main.home', '', -100, array('icon' => 'home'), false);
-	$sender->addGroup('', 'etc', '', 100);
-	$sender->addLinkIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', '', 100, array('icon' => 'resize-full'));
-	$sender->addLinkIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, array('icon' => 'signout'));
-	$sender->addLinkIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, array('icon' => 'signin'));
+        $sender->addLink(t('Community Home'), '/', 'main.home', '', -100, array('icon' => 'home'), false);
+        $sender->addGroup('', 'etc', '', 100);
+        $sender->addLinkIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', '', 100, array('icon' => 'resize-full'));
+        $sender->addLinkIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, array('icon' => 'signout'));
+        $sender->addLinkIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, array('icon' => 'signin'));
     }
 
     /**
@@ -291,20 +291,20 @@ class DashboardHooks implements Gdn_IPlugin {
      */
     public function siteNavModule_default_handler($sender) {
 
-	$sender->addLinkIf(Gdn::session()->isValid(), t('Profile'), '/profile', 'main.profile', 'profile', 10, array('icon' => 'user'));
-	$sender->addLinkIf('Garden.Activity.View', t('Activity'), '/activity', 'main.activity', 'activity', 10, array('icon' => 'time'));
+        $sender->addLinkIf(Gdn::session()->isValid(), t('Profile'), '/profile', 'main.profile', 'profile', 10, array('icon' => 'user'));
+        $sender->addLinkIf('Garden.Activity.View', t('Activity'), '/activity', 'main.activity', 'activity', 10, array('icon' => 'time'));
 
         // Add the moderation items.
-	$sender->addGroup(t('Moderation'), 'moderation', 'moderation', 90);
+        $sender->addGroup(t('Moderation'), 'moderation', 'moderation', 90);
         if (Gdn::session()->checkPermission('Garden.Users.Approve')) {
             $RoleModel = new RoleModel();
             $applicant_count = (int)$RoleModel->getApplicantCount();
             if ($applicant_count > 0 || true) {
-		$sender->addLink(t('Applicants'), '/user/applicants', 'moderation.applicants', 'applicants', array(), array('icon' => 'user', 'badge' => $applicant_count));
+                $sender->addLink(t('Applicants'), '/user/applicants', 'moderation.applicants', 'applicants', array(), array('icon' => 'user', 'badge' => $applicant_count));
             }
         }
-	$sender->addLinkIf('Garden.Moderation.Manage', t('Spam Queue'), '/log/spam', 'moderation.spam', 'spam', array(), array('icon' => 'spam'));
-	$sender->addLinkIf('Garden.Settings.Manage', t('Dashboard'), '/settings', 'etc.dashboard', 'dashboard', array(), array('icon' => 'dashboard'));
+        $sender->addLinkIf('Garden.Moderation.Manage', t('Spam Queue'), '/log/spam', 'moderation.spam', 'spam', array(), array('icon' => 'spam'));
+        $sender->addLinkIf('Garden.Settings.Manage', t('Dashboard'), '/settings', 'etc.dashboard', 'dashboard', array(), array('icon' => 'dashboard'));
     }
 
     /**
@@ -320,10 +320,10 @@ class DashboardHooks implements Gdn_IPlugin {
             return;
         }
 
-	// Users can edit their own profiles and moderators can edit any profile.
-	$sender->addLinkIf(hasEditProfile($user_id), t('Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'))
-	    ->addLinkIf('Garden.Users.Edit', t('Edit Account'), '/user/edit/'.$user_id, 'main.editaccount', 'Popup', array(), array('icon' => 'cog'))
-	    ->addLink(t('Back to Profile'), userUrl($user), 'main.profile', '', 100, array('icon' => 'arrow-left'));
+        // Users can edit their own profiles and moderators can edit any profile.
+        $sender->addLinkIf(hasEditProfile($user_id), t('Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'))
+            ->addLinkIf('Garden.Users.Edit', t('Edit Account'), '/user/edit/'.$user_id, 'main.editaccount', 'Popup', array(), array('icon' => 'cog'))
+            ->addLink(t('Back to Profile'), userUrl($user), 'main.profile', '', 100, array('icon' => 'arrow-left'));
     }
 
     /**
@@ -336,16 +336,16 @@ class DashboardHooks implements Gdn_IPlugin {
         $user_id = val('UserID', $user);
 
         $sender->addLinkIf(c('Garden.Profile.ShowActivities', true), t('Activity'), userUrl($user, '', 'activity'), 'main.activity', '', array(), array('icon' => 'time'));
-	$sender->addLinkIf(Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID, t('Notifications'), userUrl($user, '', 'notifications'), 'main.notifications', '', array(), array('icon' => 'globe', 'badge' => Gdn::controller()->data('Profile.CountNotifications')));
+        $sender->addLinkIf(Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID, t('Notifications'), userUrl($user, '', 'notifications'), 'main.notifications', '', array(), array('icon' => 'globe', 'badge' => Gdn::controller()->data('Profile.CountNotifications')));
 
         // Show the invitations if we're using the invite registration method.
-	$sender->addLinkIf(strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0, t('Invitations'), userUrl($user, '', 'invitations'), 'main.invitations', '', array(), array('icon' => 'ticket'));
+        $sender->addLinkIf(strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0, t('Invitations'), userUrl($user, '', 'invitations'), 'main.invitations', '', array(), array('icon' => 'ticket'));
 
         // Users can edit their own profiles and moderators can edit any profile.
-	$sender->addLinkIf(hasEditProfile($user_id), t('Edit Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'));
+        $sender->addLinkIf(hasEditProfile($user_id), t('Edit Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'));
 
         // Add a stub group for moderation.
-	$sender->addGroup(t('Moderation'), 'moderation', '', 90);
+        $sender->addGroup(t('Moderation'), 'moderation', '', 90);
     }
 
     /**

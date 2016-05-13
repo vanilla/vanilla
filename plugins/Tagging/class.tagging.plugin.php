@@ -10,7 +10,7 @@
 $PluginInfo['Tagging'] = array(
     'Name' => 'Tagging',
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-    'Version' => '1.8.12',
+    'Version' => '1.9.0',
     'SettingsUrl' => '/dashboard/settings/tagging',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",

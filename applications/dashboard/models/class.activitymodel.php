@@ -1699,13 +1699,13 @@ class ActivityModel extends Gdn_Model {
     /**
      * Get the exact timestamp to prune.
      *
-     * @return \DateTimeInterface|null Returns the date that we should prune after.
+     * @return \DateTime|null Returns the date that we should prune after.
      */
     private function getPruneDate() {
         if (!$this->pruneAfter) {
             return null;
         } else {
-            return new \DateTimeImmutable($this->pruneAfter, new DateTimeZone('UTC'));
+            return new \DateTime($this->pruneAfter, new DateTimeZone('UTC'));
         }
     }
 

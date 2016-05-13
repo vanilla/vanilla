@@ -119,9 +119,9 @@ class DropdownModule extends Gdn_Module {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
     public function __construct($triggerId = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
-	parent::__construct();
-	$this->flatten = true;
-	$this->useCssPrefix = $useCssPrefix;
+        parent::__construct();
+        $this->flatten = true;
+        $this->useCssPrefix = $useCssPrefix;
 
         $this->triggerId = $triggerId;
         $this->trigger['text'] = $triggerText;

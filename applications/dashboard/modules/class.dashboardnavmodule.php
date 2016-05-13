@@ -11,9 +11,40 @@
 /**
  * Module for a list of links.
  */
-class DashboardNavModule extends NavModule {
+class DashboardNavModule extends SiteNavModule {
+
+    protected $customSections = ['Dashboard', 'Moderation', 'Settings', 'Analytics'];
+
+    protected $customSectionsInfo = [
+        'dashboard' => [
+            'title' => 'Dashboard',
+            'description' => 'Forum Overview'
+        ],
+        'moderation' => [
+            'title' => 'Moderation',
+            'description' => 'Gate Keeping'
+        ],
+        'settings' => [
+            'title' => 'Settings',
+            'description' => 'Preferences & Addons'
+        ],
+        'analytics' => [
+            'title' => 'Analytics',
+            'description' => 'Eye Candy For Your Boss'
+        ]
+    ];
+
+    protected $defaultEvent = 'Settings';
 
     public function __construct() {
-	parent::__construct();
+        parent::__construct();
+    }
+
+    public function prepare() {
+        if (!inSection('Dashboard')) {
+            return;
+        } else {
+            return parent::prepare();
+        }
     }
 }

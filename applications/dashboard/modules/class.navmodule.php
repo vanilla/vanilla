@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-use NestedCollection;
-
+<?php 
 /**
  * A nav menu module.
  *

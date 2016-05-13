@@ -28,14 +28,11 @@ $nav = [
     </div>
     <nav class="nav nav-pills">
         <?php
-        foreach ($nav as $navHeading => $navDescription) {
-            $active = '';
-            if ($navHeading == 'Settings') {$active = 'active';}
-            ?>
+        foreach (DashboardNavModule::getSectionsInfo() as $section) { ?>
             <div class="nav-item">
-                <a class="nav-link <?php echo $active ?>" href="#">
-                    <div class="nav-link-heading"><?php echo $navHeading; ?></div>
-                    <div class="nav-link-description"><?php echo $navDescription; ?></div>
+                <a class="nav-link <?php echo val('active', $section); ?>" href="<?php echo val('url', $section); ?>">
+                    <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
+                    <div class="nav-link-description"><?php echo val('description', $section, '&nbsp;'); ?></div>
                 </a>
             </div>
         <?php } ?>
@@ -59,7 +56,10 @@ $nav = [
     <div class="row">
         <?php if($this->data('HelpModule') || true) { ?>
             <div class="col-sm-3 col-md-2 panel panel-nav panel-left">
-                <?php $this->renderAsset('Panel'); ?>
+                <?php
+//                $this->renderAsset('Panel');
+                echo new DashboardNavModule();
+                ?>
             </div>
             <div class="col-sm-6 col-md-8 main">
                 <?php $this->renderAsset('Content'); ?>
@@ -69,7 +69,10 @@ $nav = [
             </div>
         <?php } else { ?>
             <div class="col-sm-3 col-md-2 panel panel-nav panel-left">
-                <?php $this->renderAsset('Panel'); ?>
+                <?php
+//                $this->renderAsset('Panel');
+                echo new DashboardNavModule();
+                ?>
             </div>
             <div class="col-sm-9 col-md-10 main">
                 <?php $this->renderAsset('Content'); ?>

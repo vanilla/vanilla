@@ -521,6 +521,7 @@ class SettingsController extends DashboardController {
                 break;
         }
 
+        Gdn_Theme::section('Moderation');
         $this->render();
     }
 
@@ -944,6 +945,7 @@ class SettingsController extends DashboardController {
         // Fire an event so other applications can add some data to be displayed
         $this->fireEvent('DashboardData');
 
+        Gdn_Theme::section('DashboardHome');
         $this->render();
     }
 
@@ -1785,6 +1787,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Getting Started'));
         $this->addSideMenu('dashboard/settings/gettingstarted');
 
+        Gdn_Theme::section('DashboardHome');
         $this->render();
     }
 
@@ -1797,6 +1800,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Help &amp; Tutorials'));
         $this->addSideMenu('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);
+        Gdn_Theme::section('DashboardHome');
         $this->render();
     }
 }

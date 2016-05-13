@@ -46,8 +46,7 @@ $navbar-border-color: rgba(0,0,0,.125);
     position: relative;
     padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
 
-    &.active,
-    &:active {
+    &.active {
 
       &,
       &:hover {

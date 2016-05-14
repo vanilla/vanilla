@@ -59,7 +59,12 @@ class CategoryModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('Category');
         $this->collection = new CategoryCollection();
+        // Inject the calculator dependency.
         $this->collection->setConfig(Gdn::config());
+        $this->collection->setCalculator(function (&$category) {
+            self::calculate($category);
+            self::calculateUser($category);
+        });
     }
 
     /**
@@ -1138,11 +1143,6 @@ class CategoryModel extends Gdn_Model {
         }
 
         $category = $this->collection->get($id);
-        if (!empty($category)) {
-            self::calculate($category);
-            self::calculateUser($category);
-        }
-
         return $category;
     }
 

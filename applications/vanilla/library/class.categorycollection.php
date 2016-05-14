@@ -31,6 +31,11 @@ class CategoryCollection {
     private $cacheInc;
 
     /**
+     * @var callable The callback used to calculate individual categories.
+     */
+    private $calculator;
+
+    /**
      * @var Gdn_Configuration The config dependency.
      */
     private $config;
@@ -71,6 +76,7 @@ class CategoryCollection {
             $cache = Gdn::cache();
         }
         $this->cache = $cache;
+        $this->setCalculator();
     }
 
     /**
@@ -79,6 +85,39 @@ class CategoryCollection {
      * @param array &$category The category to calculate.
      */
     private function calculate(&$category) {
+        call_user_func($this->calculator, $category);
+    }
+
+    /**
+     * Get the calculator.
+     *
+     * @return callable Returns the calculator.
+     */
+    public function getCalculator() {
+        return $this->calculator;
+    }
+
+    /**
+     * Set the calculator.
+     *
+     * @param callable $calculator The new calculator.
+     * @return CategoryCollection Returns `$this` for fluent calls.
+     */
+    public function setCalculator(callable $calculator = null) {
+        if ($calculator === null) {
+            $this->calculator = [$this, 'defaultCalculator'];
+        } else {
+            $this->calculator = $calculator;
+        }
+        return $this;
+    }
+
+    /**
+     * Calculate dynamic data on a category.
+     *
+     * @param array &$category The category to calculate.
+     */
+    private function defaultCalculator(&$category) {
         $category['CountAllDiscussions'] = $category['CountDiscussions'];
         $category['CountAllComments'] = $category['CountComments'];
 //        $category['Url'] = self::categoryUrl($category, false, '/');

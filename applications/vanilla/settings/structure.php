@@ -30,7 +30,7 @@ $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
 
 $Construct->PrimaryKey('CategoryID')
-    ->column('ParentCategoryID', 'int', true)
+    ->column('ParentCategoryID', 'int', true, 'key')
     ->column('TreeLeft', 'int', true)
     ->column('TreeRight', 'int', true)
     ->column('Depth', 'int', '0')

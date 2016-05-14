@@ -539,6 +539,28 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Cast a category ID or slug to be passed to the various {@link CategoryCollection} methods.
+     *
+     * @param int|string|null $category The category ID or slug.
+     * @return int|string|null Returns the cast category ID.
+     */
+    private static function castID($category) {
+        if (empty($category)) {
+            return null;
+        } elseif (is_numeric($category)) {
+            return (int)$category;
+        } else {
+            return (string)$category;
+        }
+    }
+
+    public function getChildTree($category, $depth = 3, $adjustDepth = false) {
+        $category = self::castID($category);
+
+        return $this->collection->getTree($category, $depth, $adjustDepth);
+    }
+
+    /**
      *
      *
      * @param string $Permission

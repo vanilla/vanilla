@@ -513,4 +513,13 @@ class CategoriesController extends VanillaController {
             $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
         }
     }
+
+    /**
+     * Returns the full list of categories for the APIv1.
+     */
+    public function apiV1List() {
+        $categories = CategoryModel::categories();
+        $this->setData('Categories', $categories);
+        $this->render('blank', 'utility', 'dashboard');
+    }
 }

@@ -263,13 +263,7 @@ class CategoryCollection {
      * @return array Returns an array of categories.
      */
     public function getChildren($categoryID) {
-        $children = $this
-            ->sql
-            ->select('CategoryID')
-            ->getWhere('Category', ['ParentCategoryID' => $categoryID])
-            ->resultArray();
-        $ids = array_column($children, 'CategoryID');
-        $categories = $this->getMulti($ids);
+        $categories = $this->getChildrenByParents([$categoryID]);
         return $categories;
     }
 
@@ -334,17 +328,17 @@ class CategoryCollection {
      * Get all of the categories from a root.
      *
      * @param int $parentID The ID of the parent category.
-     * @param int $depth The max depth to grab.
-     * @param int $adjustDepth Whether to adjust the depth field on categories.
+     * @param int $maxDepth The maximum relative depth to grab.
+     * @param bool $adjustDepth Whether to adjust the depth field on categories.
      */
-    public function getTree($parentID = -1, $depth = 3, $adjustDepth = false) {
+    public function getTree($parentID = -1, $maxDepth = 3, $adjustDepth = false) {
         $tree = [];
         $categories = [];
         $parentID = $parentID ?: -1;
 
         $currentDepth = 1;
         $parents = [$parentID];
-        for ($i = 0; $i < $depth; $i++) {
+        for ($i = 0; $i < $maxDepth; $i++) {
             $children = $this->getChildrenByParents($parents);
 
             // Go through the children and wire them up.
@@ -604,7 +598,7 @@ class CategoryCollection {
      * @param array $category The current category being examined.
      * @param array &$result The working result.
      */
-    private function flatTreeInternal(array $category, array &$result) {
+    private function flattenTreeInternal(array $category, array &$result) {
         $result[] = $category;
         if (empty($category['Children'])) {
             return;

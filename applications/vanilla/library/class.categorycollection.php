@@ -604,7 +604,7 @@ class CategoryCollection {
             return;
         }
         foreach ($category['Children'] as $child) {
-            $this->flatTreeInternal($child, $result);
+            $this->flattenTreeInternal($child, $result);
         }
     }
 }

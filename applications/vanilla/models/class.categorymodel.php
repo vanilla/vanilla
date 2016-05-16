@@ -59,6 +59,7 @@ class CategoryModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('Category');
         $this->collection = new CategoryCollection();
+        $this->collection->setConfig(Gdn::config());
     }
 
     /**

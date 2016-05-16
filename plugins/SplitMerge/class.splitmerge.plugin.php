@@ -91,6 +91,11 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Data['Body'] = sprintf(t('This discussion was created from comments split from: %s.'), anchor(Gdn_Format::text($Discussion->Name), 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::url($Discussion->Name).'/'));
             $Data['Format'] = 'Html';
             $Data['Type'] = 'Discussion';
+
+            // Make sure we can save this new discussion as HTML.
+            if (c('Garden.ForceInputFormatter')) {
+                saveToConfig('Garden.InputFormatter', 'Html', false);
+            }
             $NewDiscussionID = $DiscussionModel->save($Data);
             $Sender->Form->setValidationResults($DiscussionModel->validationResults());
 

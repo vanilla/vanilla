@@ -376,8 +376,8 @@ class CategoriesController extends VanillaController {
         // Get category data
         $this->CategoryModel->Watching = !Gdn::session()->GetPreference('ShowAllCategories');
 
-        if ($CategoryID = val('CategoryID', $Category)) {
-            $this->setData('Category', CategoryModel::categories($CategoryID));
+        if ($Category) {
+            $this->setData('Category', CategoryModel::categories($Category));
 
             $this->categoriesCompatibilityCallback = function () use ($Category) {
                 $Subtree = CategoryModel::GetSubtree($Category, false);
@@ -389,6 +389,13 @@ class CategoriesController extends VanillaController {
                 return $this->CategoryModel->GetFull()->resultArray();
             };
         }
+        $categoryTree = $this->CategoryModel->getChildTree(
+            $Category ?: null,
+            $this->CategoryModel->getMaxDisplayDepth(),
+            true
+        );
+        $this->CategoryModel->joinRecent($categoryTree);
+        $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
         $this->addModule('NewDiscussionModule');

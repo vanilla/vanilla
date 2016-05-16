@@ -4,7 +4,7 @@
 <?php
 $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
-$Categories = CategoryModel::MakeTree($this->data('Categories'), $this->data('Category', null));
+$Categories = $this->data('CategoryTree');
 
 if (c('Vanilla.Categories.DoHeadings')) {
     foreach ($Categories as $Category) {

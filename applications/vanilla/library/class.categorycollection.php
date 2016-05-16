@@ -158,8 +158,8 @@ class CategoryCollection {
         // Figure out the ID.
         if (is_int($categoryID)) {
             $id = $categoryID;
-        } elseif (isset($this->categorySlugs[$categoryID])) {
-            $id = $this->categorySlugs[$categoryID];
+        } elseif (isset($this->categorySlugs[strtolower($categoryID)])) {
+            $id = $this->categorySlugs[strtolower($categoryID)];
         } else {
             // The ID still might not be found here.
             $id = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_SLUG, $categoryID));
@@ -175,7 +175,7 @@ class CategoryCollection {
 
                 if (!empty($category)) {
                     $this->categories[$id] = $category;
-                    $this->categorySlugs[$category['UrlCode']] = $id;
+                    $this->categorySlugs[strtolower($category['UrlCode'])] = $id;
                     return $category;
                 }
 
@@ -190,7 +190,7 @@ class CategoryCollection {
             $this->calculate($category);
 
             $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[$category['UrlCode']] = (int)$category['CategoryID'];
+            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
             $this->cache->store(
                 $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
@@ -208,7 +208,7 @@ class CategoryCollection {
                 $this->categories[$id] = false;
             }
             if (is_string($categoryID)) {
-                $this->categorySlugs[$categoryID] = false;
+                $this->categorySlugs[strtolower($categoryID)] = false;
             }
 
             return null;
@@ -227,8 +227,10 @@ class CategoryCollection {
     private function cacheKey($type, $id) {
         switch ($type) {
             case self::$CACHE_CATEGORY;
-            case self::$CACHE_CATEGORY_SLUG;
                 $r = $this->getCacheInc().$type.$id;
+                return $r;
+            case self::$CACHE_CATEGORY_SLUG;
+                $r = $this->getCacheInc().$type.strtolower($id);
                 return $r;
             default:
                 throw new \InvalidArgumentException("Cache type '$type' is invalid.'", 500);
@@ -289,7 +291,7 @@ class CategoryCollection {
             $cacheCategories = $this->cache->get($keys);
             foreach ($cacheCategories as $key => $category) {
                 $this->categories[(int)$category['CategoryID']] = $category;
-                $this->categorySlugs[$category['UrlCode']] = (int)$category['CategoryID'];
+                $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
                 $categories[(int)$category['CategoryID']] = $category;
             }
@@ -316,7 +318,7 @@ class CategoryCollection {
             );
 
             $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[$category['UrlCode']] = (int)$category['CategoryID'];
+            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
             $categories[(int)$category['CategoryID']] = $category;
         }
@@ -571,7 +573,7 @@ class CategoryCollection {
             );
 
             $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[$category['UrlCode']] = (int)$category['CategoryID'];
+            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
             return true;
         } else {
             return false;

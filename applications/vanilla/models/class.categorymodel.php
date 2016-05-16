@@ -554,10 +554,10 @@ class CategoryModel extends Gdn_Model {
         }
     }
 
-    public function getChildTree($category, $depth = 3, $adjustDepth = false) {
-        $category = self::castID($category);
+    public function getChildTree($id, $depth = 3, $adjustDepth = false) {
+        $category = $this->getOne($id);
 
-        return $this->collection->getTree($category, $depth, $adjustDepth);
+        return $this->collection->getTree((int)val('CategoryID', $category), $depth, $adjustDepth);
     }
 
     /**
@@ -752,7 +752,9 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * @param array &$categoryTree
+     * Join recent posts and users to a category tree.
+     *
+     * @param array &$categoryTree A category tree obtained with {@link CategoryModel::getChildTree()}.
      */
     public function joinRecent(&$categoryTree) {
         // Gather all of the IDs from the posts.
@@ -788,6 +790,13 @@ class CategoryModel extends Gdn_Model {
         $this->joinRecentInternal($categoryTree, $discussions, $comments);
     }
 
+    /**
+     * This method supports {@link CategoryModel::joinRecent()}.
+     *
+     * @param array &$categoryTree The array of categories in tree format.
+     * @param array $discussions An array of discussions indexed by discussion ID.
+     * @param array $comments An array of comments indexed by comment ID.
+     */
     private function joinRecentInternal(&$categoryTree, $discussions, $comments) {
         foreach ($categoryTree as &$category) {
             $discussion = val($category['LastDiscussionID'], $discussions, null);
@@ -803,6 +812,9 @@ class CategoryModel extends Gdn_Model {
                 $category['LastUserID'] = $comment['InsertUserID'];
             } elseif (!empty($discussion)) {
                 $category['LastUserID'] = $discussion['InsertUserID'];
+            } else {
+                $category['LastTitle'] = '';
+                $category['LastUserID'] = null;
             }
             $user = Gdn::userModel()->getID($category['LastUserID']);
             if ($user) {

@@ -367,9 +367,47 @@ class CategoryCollection {
             $parents = array_column($children, 'CategoryID');
             $currentDepth++;
         }
+        $this->calculateTreeCounts($tree);
 
         return $tree;
     }
+
+    /**
+     * Calculate aggregate tree counts.
+     *
+     * @param array &$categories An array of category roots with populated children.
+     */
+    private function calculateTreeCounts(array &$categories) {
+        foreach ($categories as &$category) {
+            $category['CountAllDiscussions'] = $category['CountDiscussions'];
+            $category['CountAllComments'] = $category['CountComments'];
+
+            $lastCategory = $category;
+            if (!empty($category['Children'])) {
+                $this->calculateTreeCounts($category['Children']);
+
+                // Calculate my count based on my children.
+                $lastDateInserted = empty($category['LastDateInserted']) ? 0 : strtotime($category['LastDateInserted']);
+                foreach ($category['Children'] as $child) {
+                    $category['CountAllDiscussions'] += $child['CountAllDiscussions'];
+                    $category['CountAllComments'] += $child['CountAllComments'];
+
+                    $dateInserted = empty($child['LastDateInserted']) ? 0 : strtotime($child['LastDateInserted']);
+                    if ($dateInserted > 0 && $dateInserted > $lastDateInserted) {
+                        $lastCategory = $child;
+                    }
+                }
+            }
+            $category['LastCommentID'] = $lastCategory['LastCommentID'];
+            $category['LastDiscussionID'] = $lastCategory['LastDiscussionID'];
+            $category['LastDateInserted'] = $lastCategory['LastDateInserted'];
+            if ($lastCategory['CategoryID'] != $category['CategoryID']) {
+                $category['LastCategoryID'] = $lastCategory['CategoryID'];
+            }
+        }
+    }
+    
+    
 
     /**
      * Get all of the children of a parent category.

@@ -729,6 +729,95 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Gather all of the last discussion and comment IDs from the categories.
+     *
+     * @param array $categoryTree A nested array of categories.
+     * @param array &$result Where to store the result.
+     */
+    private function gatherLastIDs($categoryTree, &$result = null) {
+        if ($result === null) {
+            $result = [];
+        }
+
+        foreach ($categoryTree as $category) {
+            $result["{$category['LastDiscussionID']}/{$category['LastCommentID']}"] = [
+                'DiscussionID' => $category['LastDiscussionID'],
+                'CommentID' => $category['LastCommentID']
+            ];
+
+            if (!empty($category['Children'])) {
+                $this->gatherLastIDs($category['Children'], $result);
+            }
+        }
+    }
+
+    /**
+     * @param array &$categoryTree
+     */
+    public function joinRecent(&$categoryTree) {
+        // Gather all of the IDs from the posts.
+        $this->gatherLastIDs($categoryTree, $ids);
+        $discussionIDs = array_unique(array_column($ids, 'DiscussionID'));
+        $commentIDs = array_filter(array_unique(array_column($ids, 'CommentID')));
+
+        if (!empty($discussionIDs)) {
+            $discussions = $this->SQL->getWhere('Discussion', ['DiscussionID' => $discussionIDs])->resultArray();
+            $discussions = array_column($discussions, null, 'DiscussionID');
+        } else {
+            $discussions = [];
+        }
+
+        if (!empty($commentIDs)) {
+            $comments = $this->SQL->getWhere('Comment', ['CommentID' => $commentIDs])->resultArray();
+            $comments = array_column($comments, null, 'CommentID');
+        } else {
+            $comments = [];
+        }
+
+        $userIDs = [];
+        foreach ($ids as $row) {
+            if (!empty($row['CommentID']) && !empty($comments[$row['CommentID']]['InsertUserID'])) {
+                $userIDs[] = $comments[$row['CommentID']]['InsertUserID'];
+            } elseif (!empty($row['DiscussionID']) && !empty($discussions[$row['DiscussionID']]['InsertUserID'])) {
+                $userIDs[] = $discussions[$row['DiscussionID']]['InsertUserID'];
+            }
+        }
+        // Just gather the users into the local cache.
+        Gdn::userModel()->getIDs($userIDs);
+
+        $this->joinRecentInternal($categoryTree, $discussions, $comments);
+    }
+
+    private function joinRecentInternal(&$categoryTree, $discussions, $comments) {
+        foreach ($categoryTree as &$category) {
+            $discussion = val($category['LastDiscussionID'], $discussions, null);
+            $comment = val($category['LastCommentID'], $comments, null);
+
+            if (!empty($discussion)) {
+                $category['LastTitle'] = $discussion['Name'];
+                $category['LastUrl'] = discussionUrl($discussion, false, '/').'#latest';
+                $category['LastDiscussionUserID'] = $discussion['InsertUserID'];
+            }
+
+            if (!empty($comment)) {
+                $category['LastUserID'] = $comment['InsertUserID'];
+            } elseif (!empty($discussion)) {
+                $category['LastUserID'] = $discussion['InsertUserID'];
+            }
+            $user = Gdn::userModel()->getID($category['LastUserID']);
+            if ($user) {
+                foreach (['Name', 'Email', 'Photo'] as $field) {
+                    $category['Last'.$field] = val($field, $user);
+                }
+            }
+
+            if (!empty($category['Children'])) {
+                $this->joinRecentInternal($category['Children'], $discussions, $comments);
+            }
+        }
+    }
+
+    /**
      *
      *
      * @param $Data

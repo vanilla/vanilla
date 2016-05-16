@@ -804,14 +804,22 @@ class ProfileController extends Gdn_Controller {
                     $this->setData('crop', $crop);
                 }
             }
+            if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+                $this->RedirectUrl = url('/profile');
+            }
             $this->informMessage(t("Your settings have been saved."));
-            $this->RedirectUrl = url('/profile');
-            $this->render();
+            $this->render('picture', 'profile', 'dashboard');
+        }
+
+        if (val('SideMenuModule', val('Panel', val('Assets', $this)))) {
+            /** @var SideMenuModule $sidemenu */
+            $sidemenu = $this->Assets['Panel']['SideMenuModule'];
+            $sidemenu->highlightRoute('/profile/picture');
         }
 
         $this->title(t('Change Picture'));
         $this->_setBreadcrumbs(t('Change My Picture'), userUrl($this->User, '', 'picture'));
-        $this->render();
+        $this->render('picture', 'profile', 'dashboard');
     }
 
 
@@ -1197,7 +1205,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function thumbnail($UserReference = '', $Username = '') {
-        redirectUrl('picture');
+        $this->picture($UserReference, $Username);
     }
 
     /**

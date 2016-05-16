@@ -92,11 +92,19 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Data['Format'] = 'Html';
             $Data['Type'] = 'Discussion';
 
-            // Make sure we can save this new discussion as HTML.
+            // Pass a forced input formatter around this exception.
             if (c('Garden.ForceInputFormatter')) {
+                $inputFormat = c('Garden.InputFormatter');
                 saveToConfig('Garden.InputFormatter', 'Html', false);
             }
+
             $NewDiscussionID = $DiscussionModel->save($Data);
+
+            // Reset the input formatter
+            if (c('Garden.ForceInputFormatter')) {
+                saveToConfig('Garden.InputFormatter', $inputFormat, false);
+            }
+
             $Sender->Form->setValidationResults($DiscussionModel->validationResults());
 
             if ($Sender->Form->errorCount() == 0 && $NewDiscussionID > 0) {

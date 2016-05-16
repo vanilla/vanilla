@@ -1652,10 +1652,12 @@ class CategoryModel extends Gdn_Model {
         $Categories = (array)$Categories;
 
         if ($Root) {
-            $Root = (array)$Root;
-            // Make the tree out of this category as a subtree.
-            $DepthAdjust = -$Root['Depth'];
-            $Result = self::_MakeTreeChildren($Root, $Categories, $DepthAdjust);
+            $Result = self::instance()->collection->getTree(
+                (int)val('CategoryID', $Root),
+                self::instance()->getMaxDisplayDepth(),
+                true
+            );
+            self::instance()->joinRecent($Result);
         } else {
             // Make a tree out of all categories.
             foreach ($Categories as $Category) {

@@ -28,6 +28,10 @@ class CategoriesController extends VanillaController {
     /** @var object Category object. */
     public $Category;
 
+    /**
+     * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->Data('Categories')`.
+     */
+    private $categoriesCompatibilityCallback;
 
     /**
      *
@@ -137,7 +141,7 @@ class CategoriesController extends VanillaController {
                     break;
                 default:
                     $this->View = 'all';
-                    $this->All();
+                    $this->all();
                     break;
             }
             return;
@@ -145,21 +149,13 @@ class CategoriesController extends VanillaController {
             $Category = CategoryModel::categories($CategoryIdentifier);
 
             if (empty($Category)) {
-                // Try lowercasing before outright failing
-                $LowerCategoryIdentifier = strtolower($CategoryIdentifier);
-                if ($LowerCategoryIdentifier != $CategoryIdentifier) {
-                    $Category = CategoryModel::categories($LowerCategoryIdentifier);
-                    if ($Category) {
-                        redirect("/categories/{$LowerCategoryIdentifier}", 301);
-                    }
-                }
                 throw notFoundException();
             }
             $Category = (object)$Category;
             Gdn_Theme::section($Category->CssClass);
 
             // Load the breadcrumbs.
-            $this->setData('Breadcrumbs', CategoryModel::GetAncestors(val('CategoryID', $Category)));
+            $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $Category)));
 
             $this->setData('Category', $Category, true);
 
@@ -168,7 +164,7 @@ class CategoriesController extends VanillaController {
 
 
             if ($Category->DisplayAs == 'Categories') {
-                if (val('Depth', $Category) > c('Vanilla.Categories.NavDepth', 0)) {
+                if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
                     // Headings don't make sense if we've cascaded down one level.
                     saveToConfig('Vanilla.Categories.DoHeadings', false, false);
                 }
@@ -214,8 +210,19 @@ class CategoriesController extends VanillaController {
             }
 
             // Load the subtree.
-            $Categories = CategoryModel::GetSubtree($CategoryIdentifier, false);
-            $this->setData('Categories', $Categories);
+            $this->setData(
+                'CategoryTree',
+                CategoryModel::instance()->getChildTree(
+                    $CategoryIdentifier,
+                    CategoryModel::instance()->getMaxDisplayDepth()
+                )
+            );
+
+            // Add a backwards-compatibility shim for the old categories.
+            $this->categoriesCompatibilityCallback = function () use ($CategoryIdentifier) {
+                $categories = CategoryModel::GetSubtree($CategoryIdentifier, false);
+                return $categories;
+            };
 
             // Setup head
             $this->Menu->highlightRoute('/discussions');
@@ -369,15 +376,19 @@ class CategoriesController extends VanillaController {
         // Get category data
         $this->CategoryModel->Watching = !Gdn::session()->GetPreference('ShowAllCategories');
 
-        if ($Category) {
-            $Subtree = CategoryModel::GetSubtree($Category, false);
-            $this->setData('Category', CategoryModel::categories($this->data('Category.CategoryID')));
-            $CategoryIDs = consolidateArrayValuesByKey($Subtree, 'CategoryID');
-            $Categories = $this->CategoryModel->GetFull($CategoryIDs)->resultArray();
+        if ($CategoryID = val('CategoryID', $Category)) {
+            $this->setData('Category', CategoryModel::categories($CategoryID));
+
+            $this->categoriesCompatibilityCallback = function () use ($Category) {
+                $Subtree = CategoryModel::GetSubtree($Category, false);
+                $CategoryIDs = array_column($Subtree, 'CategoryID');
+                return $this->CategoryModel->GetFull($CategoryIDs)->resultArray();
+            };
         } else {
-            $Categories = $this->CategoryModel->GetFull()->resultArray();
+            $this->categoriesCompatibilityCallback = function () {
+                return $this->CategoryModel->GetFull()->resultArray();
+            };
         }
-        $this->setData('Categories', $Categories);
 
         // Add modules
         $this->addModule('NewDiscussionModule');
@@ -514,6 +525,12 @@ class CategoriesController extends VanillaController {
         }
     }
 
+    public function tree($category = '') {
+        $tree = CategoryModel::instance()->getChildTree($category);
+        $this->setData('Categories', $tree);
+        $this->render('blank', 'utility', 'dashboard');
+    }
+
     /**
      * Returns the full list of categories for the APIv1.
      */
@@ -521,5 +538,26 @@ class CategoriesController extends VanillaController {
         $categories = CategoryModel::categories();
         $this->setData('Categories', $categories);
         $this->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function data($Path, $Default = '') {
+        if (isset($this->Data[$Path])) {
+            return $this->Data[$Path];
+        }
+
+        switch ($Path) {
+            case 'Categories':
+                if ($this->categoriesCompatibilityCallback instanceof \Closure) {
+                    deprecated('Categories', 'CategoryTree');
+                    $this->Data['Categories'] = $categories = call_user_func($this->categoriesCompatibilityCallback);
+                    return $categories;
+                }
+                return $Default;
+            default:
+                return parent::data($Path, $Default);
+        }
     }
 }

@@ -2300,6 +2300,24 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the category nav depth.
+     *
+     * @return int Returns the nav depth as an integer.
+     */
+    public function getNavDepth() {
+        return (int)c('Vanilla.Categories.NavDepth', 0);
+    }
+
+    /**
+     * Get the maximum display depth for categories.
+     *
+     * @return int Returns the display depth as an integer.
+     */
+    public function getMaxDisplayDepth() {
+        return (int)c('Vanilla.Categories.MaxDisplayDepth', 3);
+    }
+
+    /**
      * Recalculate the dynamic tree columns in the category.
      */
     public function recalculateTree() {

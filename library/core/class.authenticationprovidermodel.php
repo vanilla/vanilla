@@ -3,7 +3,7 @@
  * Authentication Helper: Authentication Provider Model
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.10
@@ -41,7 +41,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             return;
         }
 
-        $Attributes = @unserialize($Row['Attributes']);
+        $Attributes = dbdecode($Row['Attributes']);
         if (is_array($Attributes)) {
             $Row = array_merge($Attributes, $Row);
         }
@@ -199,7 +199,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
 
         if (!empty($Attributes)) {
             $Data = array_diff_key($Data, $Attributes);
-            $Data['Attributes'] = serialize($Attributes);
+            $Data['Attributes'] = dbencode($Attributes);
         }
 
         $Insert = !$Row;

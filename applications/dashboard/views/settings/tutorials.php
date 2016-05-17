@@ -1,16 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->fetchViewLocation('helper_functions');
-$Tutorials = GetTutorials();
+$Tutorials = getTutorials();
 
 // Figure out the current video
 $CurrentTutorialCode = $this->data('CurrentTutorial');
-$Keys = consolidateArrayValuesByKey($Tutorials, 'Code');
-$Index = array_search($CurrentTutorialCode, $Keys);
-if (!$Index)
-    $Index = 0;
+$Tutorials = array_column($Tutorials, null, 'Code');
+if (isset($Tutorials[$CurrentTutorialCode])) {
+    $CurrentTutorial = $Tutorials[$CurrentTutorialCode];
+} else {
+    $CurrentTutorial = reset($Tutorials);
+    $CurrentTutorialCode = key($Tutorials);
+}
 
-$CurrentTutorial = val($Index, $Tutorials);
-$CurrentTutorialCode = val('Code', $CurrentTutorial, '');
 ?>
 <style type="text/css">
     div.Tutorials {
@@ -80,7 +81,6 @@ $CurrentTutorialCode = val('Code', $CurrentTutorial, '');
         <?php
         echo wrap($CurrentTutorial['Name'], 'strong');
         echo wrap($CurrentTutorial['Description'], 'em');
-        // echo '<input type="text" value="'.Url('/settings/tutorials/'.$Tutorial['Code'], true).'" />';
         ?>
     </div>
     <div class="Videos">

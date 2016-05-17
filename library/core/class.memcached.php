@@ -3,7 +3,7 @@
  * Gdn_Memcached & MemcachedShard.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -65,7 +65,7 @@ class Gdn_Memcached extends Gdn_Cache {
         $this->registerFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
         $this->registerFeature(Gdn_Cache::FEATURE_SHARD);
 
-        if (C('Garden.Cache.Local', true)) {
+        if (c('Garden.Cache.Local', true)) {
             $this->registerFeature(Gdn_Cache::FEATURE_LOCAL);
         }
 
@@ -726,7 +726,7 @@ class Gdn_Memcached extends Gdn_Cache {
         switch ($tryBinary) {
             case false:
                 $incremented = $this->memcache->increment($realKey, $amount);
-                if (is_null($incremented) && $initial) {
+                if ($incremented === false && $initial) {
                     $incremented = $this->memcache->set($realKey, $initial);
                     if ($incremented) {
                         $incremented = $initial;

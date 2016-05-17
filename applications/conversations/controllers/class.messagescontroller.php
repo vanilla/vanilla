@@ -2,7 +2,7 @@
 /**
  * Messages controller.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -42,6 +42,13 @@ class MessagesController extends ConversationsController {
         $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
 //      $this->addModule('MeModule');
         $this->addModule('SignedInModule');
+
+        // Spoilers assets
+        $this->addJsFile('spoilers.js', 'dashboard');
+        $this->addCssFile('spoilers.css', 'dashboard');
+        $this->addDefinition('Spoiler', t('Spoiler'));
+        $this->addDefinition('show', t('show'));
+        $this->addDefinition('hide', t('hide'));
 
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');
@@ -96,12 +103,16 @@ class MessagesController extends ConversationsController {
             $this->fireEvent('BeforeAddConversation');
 
             $this->Form->setFormValue('RecipientUserID', $RecipientUserIDs);
-            $ConversationID = $this->Form->save($this->ConversationMessageModel);
+            $ConversationID = $this->Form->save();
             if ($ConversationID !== false) {
                 $Target = $this->Form->getFormValue('Target', 'messages/'.$ConversationID);
                 $this->RedirectUrl = url($Target);
 
-                $Conversation = $this->ConversationModel->getID($ConversationID, Gdn::session()->UserID);
+                $Conversation = $this->ConversationModel->getID(
+                    $ConversationID,
+                    false,
+                    ['viewingUserID' => Gdn::session()->UserID]
+                );
                 $NewMessageID = val('FirstMessageID', $Conversation);
                 $this->EventArguments['MessageID'] = $NewMessageID;
                 $this->fireEvent('AfterConversationSave');
@@ -121,9 +132,9 @@ class MessagesController extends ConversationsController {
             array('Name' => t('Inbox'), 'Url' => '/messages/inbox'),
             array('Name' => $this->data('Title'), 'Url' => 'messages/add')
         ));
-        
+
         $this->CssClass = 'NoPanel';
-        
+
         $this->render();
     }
 
@@ -154,7 +165,11 @@ class MessagesController extends ConversationsController {
                 }
             }
 
-            $Conversation = $this->ConversationModel->getID($ConversationID, Gdn::session()->UserID);
+            $Conversation = $this->ConversationModel->getID(
+                $ConversationID,
+                false,
+                ['viewingUserID' => Gdn::session()->UserID]
+            );
 
             $this->EventArguments['Conversation'] = $Conversation;
             $this->EventArguments['ConversationID'] = $ConversationID;
@@ -380,7 +395,7 @@ class MessagesController extends ConversationsController {
         }
 
         // Fetch message data
-        $this->MessageData = $this->ConversationMessageModel->get(
+        $this->MessageData = $this->ConversationMessageModel->getRecent(
             $ConversationID,
             $Session->UserID,
             $this->Offset,
@@ -429,7 +444,7 @@ class MessagesController extends ConversationsController {
         $this->addModule($ClearHistoryModule);
 
         $InThisConversationModule = new InThisConversationModule($this);
-        $InThisConversationModule->setData($this->Conversation->Participants);
+        $InThisConversationModule->setData('Participants', $this->Conversation->Participants);
         $this->addModule($InThisConversationModule);
 
         // Doesn't make sense for people who can't even start conversations to be adding people
@@ -498,7 +513,7 @@ class MessagesController extends ConversationsController {
         // Fetch message data
         $this->setData(
             'MessageData',
-            $this->ConversationMessageModel->get(
+            $this->ConversationMessageModel->getRecent(
                 $ConversationID,
                 Gdn::session()->UserID,
                 0,

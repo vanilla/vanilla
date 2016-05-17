@@ -1,13 +1,14 @@
 <?php
 
-$Category = $this->data('Category');
-if (!$Category)
+$CategoryID = $this->data('Category.CategoryID');
+if (!$CategoryID) {
     return;
+}
 
-$SubCategories = CategoryModel::MakeTree(CategoryModel::categories(), $Category);
-
-if (!$SubCategories)
+$SubCategories = CategoryModel::getChildren($CategoryID);
+if (empty($SubCategories)) {
     return;
+}
 
 require_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 

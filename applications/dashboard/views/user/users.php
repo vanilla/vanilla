@@ -39,7 +39,7 @@ foreach ($this->UserData->result() as $User) {
         <td class="Alt"><?php echo Gdn_Format::date($User->DateFirstVisit, 'html'); ?></td>
         <td><?php echo Gdn_Format::date($User->DateLastActive, 'html'); ?></td>
         <?php if ($ViewPersonalInfo) : ?>
-            <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
+            <td><?php echo formatIP($User->LastIPAddress); ?></td>
         <?php endif; ?>
         <?php
         $this->EventArguments['User'] = $User;

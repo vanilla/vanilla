@@ -2,7 +2,7 @@
 /**
  * Managing site statistic reporting.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -55,7 +55,19 @@ class StatisticsController extends DashboardController {
             $Flow = true;
 
             if ($Flow && $this->Form->getFormValue('Reregister')) {
+                $id = Gdn::installationID();
+                $secret = Gdn::installationSecret();
+                Gdn::installationID(false);
+                Gdn::installationSecret(false);
+
                 Gdn::Statistics()->register();
+
+                if (!Gdn::installationID()) {
+                    Gdn::installationID($id);
+                    Gdn::installationSecret($secret);
+                }
+                $this->Form->setFormValue('InstallationID', Gdn::installationID());
+                $this->Form->setFormValue('InstallationSecret', Gdn::installationSecret());
             }
 
             if ($Flow && $this->Form->getFormValue('Save')) {

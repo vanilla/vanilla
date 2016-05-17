@@ -2,7 +2,7 @@
 <div class="Box InThisConversation">
     <?php echo panelHeading(t('In this Conversation')); ?>
     <ul class="PanelInfo">
-        <?php foreach ($this->Data->result() as $User): ?>
+        <?php foreach ($this->data('Participants') as $User): ?>
             <li>
                 <?php
                 $Username = htmlspecialchars(val('Name', $User));

@@ -2,7 +2,7 @@
 /**
  * Hooks for Conversations.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -103,7 +103,10 @@ class ConversationsHooks implements Gdn_IPlugin {
      * Add "Message" option to profile options.
      */
     public function profileController_beforeProfileOptions_handler($Sender, $Args) {
-        if (!$Sender->EditMode && Gdn::session()->isValid() && Gdn::session()->UserID != $Sender->User->UserID) {
+        if (!$Sender->EditMode &&
+            Gdn::session()->UserID != $Sender->User->UserID &&
+            Gdn::session()->checkPermission('Conversations.Conversations.Add')
+        ) {
             $Sender->EventArguments['MemberOptions'][] = array(
                 'Text' => sprite('SpMessage').' '.t('Message'),
                 'Url' => '/messages/add/'.$Sender->User->Name,
@@ -209,7 +212,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function setup() {
         $Database = Gdn::database();
         $Config = Gdn::factory(Gdn::AliasConfig);
-        $Drop = false; //C('Conversations.Version') === FALSE ? TRUE : FALSE;
+        $Drop = false; //c('Conversations.Version') === FALSE ? TRUE : FALSE;
         $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'structure.php');
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'stub.php');

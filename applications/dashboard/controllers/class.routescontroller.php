@@ -2,7 +2,7 @@
 /**
  * Controlling default routes in Garden's MVC dispatcher system.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -40,7 +40,7 @@ class RoutesController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
         // Use the edit form with no roleid specified.
         $this->View = 'Edit';
-        $this->Edit();
+        $this->edit();
     }
 
     /**
@@ -53,7 +53,7 @@ class RoutesController extends DashboardController {
     public function edit($RouteIndex = false) {
         $this->permission('Garden.Settings.Manage');
         $this->addSideMenu('dashboard/routes');
-        $this->Route = Gdn::router()->GetRoute($RouteIndex);
+        $this->Route = Gdn::router()->getRoute($RouteIndex);
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -72,7 +72,6 @@ class RoutesController extends DashboardController {
                     'Type' => $this->Route['Type']
                 ));
             }
-
         } else {
             // Define some validation rules for the fields being saved
             $ConfigurationModel->Validation->applyRule('Route', 'Required');
@@ -91,10 +90,10 @@ class RoutesController extends DashboardController {
                 $NewRouteName = val('Route', $FormPostValues);
 
                 if ($this->Route !== false && $NewRouteName != $this->Route['Route']) {
-                    Gdn::router()->DeleteRoute($this->Route['Route']);
+                    Gdn::router()->deleteRoute($this->Route['Route']);
                 }
 
-                Gdn::router()->SetRoute(
+                Gdn::router()->setRoute(
                     $NewRouteName,
                     val('Target', $FormPostValues),
                     val('Type', $FormPostValues)

@@ -1,4 +1,4 @@
-// This file contains javascript that is specific to the dashboard/profile controller.
+// This file contains javascript that is specific to the /profile controller.
 jQuery(document).ready(function($) {
     // Set the max chars in the about form.
     $('form.About textarea').setMaxChars(1000);
@@ -29,7 +29,6 @@ jQuery(document).ready(function($) {
                 $.popup({}, XMLHttpRequest.responseText);
             },
             success: function(json) {
-                json = $.postParseJson(json);
                 $.popup.reveal({popupId: popupId}, json);
             }
         });

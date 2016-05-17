@@ -47,11 +47,16 @@ abstract class SortableModule extends Gdn_Module {
     private $flatten;
 
     /**
+     * @var bool Whether to separate groups with a hr element. Only supported for flattened lists.
+     */
+    private $forceDivider = false;
+
+    /**
      * @var bool Whether we have run the prepare method yet.
      */
     private $isPrepared = false;
 
-    private $allowedItemModifiers = array('popinRel', 'icon', 'badge');
+    private $allowedItemModifiers = array('rel', 'popinRel', 'icon', 'badge');
 
     /**
      * Constructor. Should be called by all extending classes' constructors.
@@ -63,6 +68,13 @@ abstract class SortableModule extends Gdn_Module {
     public function __construct($flatten, $useCssPrefix = false) {
         $this->flatten = $flatten;
         $this->useCssPrefix = $useCssPrefix;
+    }
+
+    /**
+     * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
+     */
+    public function setForceDivider($forceDivider) {
+        $this->forceDivider = $forceDivider;
     }
 
     /**
@@ -247,7 +259,7 @@ abstract class SortableModule extends Gdn_Module {
      */
     public function addItemModifiers(&$item, $modifiers) {
         $modifiers = array_intersect_key($modifiers, array_flip($this->allowedItemModifiers));
-        foreach($modifiers as $attribute => $value) {
+        foreach ($modifiers as $attribute => $value) {
             $item[$attribute] = $value;
         }
     }
@@ -260,7 +272,7 @@ abstract class SortableModule extends Gdn_Module {
     public function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
-            $this->keyNumber = $this->keyNumber+1;
+            $this->keyNumber = $this->keyNumber + 1;
         }
     }
 
@@ -362,6 +374,11 @@ abstract class SortableModule extends Gdn_Module {
      * @param array $items The items to sort.
      */
     public function sortItems(&$items) {
+        foreach ($items as &$item) {
+            if (val('items', $item)) {
+                $this->sortItems($item['items']);
+            }
+        }
         uasort($items, function($a, $b) use ($items) {
             $sort_a = $this->sortItemsOrder($a, $items);
             $sort_b = $this->sortItemsOrder($b, $items);
@@ -439,7 +456,10 @@ abstract class SortableModule extends Gdn_Module {
      */
     public function flattenArray($items) {
         $newitems = array();
-        foreach($items as $key => $item) {
+        $itemslength = sizeof($items);
+        $index = 0;
+        foreach ($items as $key => $item) {
+            ++$index;
             unset($item['_sort'], $item['key']);
             $subitems = false;
 
@@ -459,6 +479,10 @@ abstract class SortableModule extends Gdn_Module {
             }
             if ($subitems) {
                 $newitems = array_merge($newitems, $this->flattenArray($subitems));
+                if ($this->forceDivider && $index < $itemslength) {
+                    // Add hr after group but not the last one
+                    $newitems[] = array('type' => 'divider');
+                }
             }
         }
         return $newitems;

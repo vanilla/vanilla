@@ -2,7 +2,7 @@
 /**
  * GooglePrettify Plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package GooglePrettify
  */
@@ -11,7 +11,7 @@
 $PluginInfo['GooglePrettify'] = array(
     'Name' => 'Syntax Prettifier',
     'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
-    'Version' => '1.2.2',
+    'Version' => '1.2.3',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
@@ -46,13 +46,11 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     public function addTabby($Sender) {
         if (c('Plugins.GooglePrettify.UseTabby', false)) {
             $Sender->addJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
-            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(function () {
+            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), '
         function init() {
             $("textarea").not(".Tabby").addClass("Tabby").tabby();
         }
-        $(document).on("EditCommentFormLoaded", init)
-        init();
-});');
+        $(document).on("contentLoad", init);');
         }
     }
 
@@ -70,8 +68,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
             $Class .= " lang-$Language";
         }
 
-        $Result = "jQuery(function ($) {
-
+        $Result = "
             function init() {
                 $('.Message').each(function () {
                     if ($(this).data('GooglePrettify')) {
@@ -91,9 +88,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                 });
             }
 
-            $(document).on('CommentAdded PreviewLoaded popupReveal', init);
-            init();
-        });";
+            $(document).on('contentLoad', init);";
         return $Result;
     }
 

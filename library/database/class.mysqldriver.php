@@ -11,7 +11,7 @@
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -218,10 +218,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $TableName The name of the table to delete from.
      * @param array $Wheres An array of where conditions.
      */
-    public function getDelete($TableName, $Wheres = array()) {
+    public function getDelete($TableName, $Wheres = array(), $Limit = 0) {
         $Conditions = '';
         $Joins = '';
         $DeleteFrom = '';
+        $LimitSql = '';
 
         if (count($this->_Joins) > 0) {
             $Joins .= "\n";
@@ -238,6 +239,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 }
             }
             $DeleteFrom = implode(', ', $DeleteFroms);
+        } elseif ($Limit > 0) {
+            $LimitSql = "\nlimit ".((int)$Limit);
         }
 
         if (count($Wheres) > 0) {
@@ -246,10 +249,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
             // Close any where groups that were left open.
             $this->_endQuery();
-
         }
 
-        return "delete $DeleteFrom from ".$TableName.$Joins.$Conditions;
+        return "delete $DeleteFrom from ".$TableName.$Joins.$Conditions.$LimitSql;
     }
 
     /**

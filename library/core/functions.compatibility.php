@@ -5,11 +5,167 @@
  * These functions are copies of existing functions but with new and improved
  * names. Parent functions will be deprecated in a future release.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.2
  */
+
+/**
+ * This file is part of the array_column library
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright Copyright (c) 2013 Ben Ramsey <http://benramsey.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ */
+
+if (!function_exists('array_column')) {
+    /**
+     * Returns the values from a single column of the input array, identified by the $columnKey.
+     *
+     * Optionally, you may provide an $indexKey to index the values in the returned
+     * array by the values from the $indexKey column in the input array.
+     *
+     * @param array $input A multi-dimensional array (record set) from which to pull a column of values.
+     * @param mixed $columnKey The column of values to return. This value may be the integer key of the column you wish
+     * to retrieve, or it may be the string key name for an associative array.
+     * @param mixed $indexKey The column to use as the index/keys for the returned array. This value may be the integer
+     * key of the column, or it may be the string key name.
+     * @return array
+     */
+    function array_column($input = null, $columnKey = null, $indexKey = null) {
+        // Using func_get_args() in order to check for proper number of
+        // parameters and trigger errors exactly as the built-in array_column()
+        // does in PHP 5.5.
+        $argc = func_num_args();
+        $params = func_get_args();
+
+        if ($argc < 2) {
+            trigger_error("array_column() expects at least 2 parameters, {$argc} given", E_USER_WARNING);
+            return null;
+        }
+
+        if (!is_array($params[0])) {
+            trigger_error(
+                'array_column() expects parameter 1 to be array, '.gettype($params[0]).' given',
+                E_USER_WARNING
+            );
+            return null;
+        }
+
+        if (!is_int($params[1])
+            && !is_float($params[1])
+            && !is_string($params[1])
+            && $params[1] !== null
+            && !(is_object($params[1]) && method_exists($params[1], '__toString'))
+        ) {
+            trigger_error('array_column(): The column key should be either a string or an integer', E_USER_WARNING);
+            return false;
+        }
+
+        if (isset($params[2])
+            && !is_int($params[2])
+            && !is_float($params[2])
+            && !is_string($params[2])
+            && !(is_object($params[2]) && method_exists($params[2], '__toString'))
+        ) {
+            trigger_error('array_column(): The index key should be either a string or an integer', E_USER_WARNING);
+            return false;
+        }
+
+        $paramsInput = $params[0];
+        $paramsColumnKey = ($params[1] !== null) ? (string)$params[1] : null;
+
+        $paramsIndexKey = null;
+        if (isset($params[2])) {
+            if (is_float($params[2]) || is_int($params[2])) {
+                $paramsIndexKey = (int)$params[2];
+            } else {
+                $paramsIndexKey = (string)$params[2];
+            }
+        }
+
+        $resultArray = array();
+
+        foreach ($paramsInput as $row) {
+            $key = $value = null;
+            $keySet = $valueSet = false;
+
+            if ($paramsIndexKey !== null && array_key_exists($paramsIndexKey, $row)) {
+                $keySet = true;
+                $key = (string)$row[$paramsIndexKey];
+            }
+
+            if ($paramsColumnKey === null) {
+                $valueSet = true;
+                $value = $row;
+            } elseif (is_array($row) && array_key_exists($paramsColumnKey, $row)) {
+                $valueSet = true;
+                $value = $row[$paramsColumnKey];
+            }
+
+            if ($valueSet) {
+                if ($keySet) {
+                    $resultArray[$key] = $value;
+                } else {
+                    $resultArray[] = $value;
+                }
+            }
+
+        }
+
+        return $resultArray;
+    }
+}
+
+if (!function_exists('apc_fetch') && function_exists('apcu_fetch')) {
+    /**
+     * Fetch a stored variable from the cache.
+     *
+     * @param mixed $key The key used to store the value.
+     * @param bool &$success Set to **true** in success and **false** in failure.
+     * @return mixed The stored variable or array of variables on success; **false** on failure
+     * @see http://php.net/manual/en/function.apcu-fetch.php
+     */
+    function apc_fetch($key, &$success = null) {
+        return apcu_fetch($key, $success);
+    }
+}
+
+if (!function_exists('apc_store') && function_exists('apcu_store')) {
+    /**
+     * Cache a variable in the data store.
+     *
+     * @param string $key Store the variable using this name.
+     * @param mixed $var The variable to store.
+     * @param int $ttl The time to live.
+     * @return bool Returns **true** on success or **false** on failure.
+     * @see http://php.net/manual/en/function.apcu-store.php
+     */
+    function apc_store($key, $var = null, $ttl = 0) {
+        return apcu_store($key, $var, $ttl);
+    }
+}
+
+if (!function_exists('getallheaders')) {
+    /**
+     * If PHP isn't running as an apache module, getallheaders doesn't exist in some systems.
+     *
+     * @return array Returns an array of the current HTTP headers.
+     * @see https://github.com/vanilla/vanilla/issues/3
+     */
+    function getallheaders() {
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
+}
 
 /**
  * Allow gzopen64 to be a fallback for gzopen. Workaround for a PHP bug.
@@ -20,6 +176,32 @@
 if (!function_exists('gzopen') && function_exists('gzopen64')) {
     function gzopen($filename, $mode, $use_include_path = 0) {
         return gzopen64($filename, $mode, $use_include_path);
+    }
+}
+
+if (!function_exists('hash_equals')) {
+    /**
+     * Determine whether or not two strings are equal in a time that is independent of partial matches.
+     *
+     * This snippet prevents HMAC Timing attacks (http://codahale.com/a-lesson-in-timing-attacks/).
+     * Thanks to Eric Karulf (ekarulf @ github) for this fix.
+     *
+     * @param string $known_string The string of known length to compare against.
+     * @param string $user_string The user-supplied string.
+     * @return bool Returns **true** when the two strings are equal, **false** otherwise.
+     * @see http://php.net/manual/en/function.hash-equals.php
+     */
+    function hash_equals($known_string, $user_string) {
+        if (strlen($known_string) !== strlen($user_string)) {
+            return false;
+        }
+
+        $result = 0;
+        for ($i = strlen($known_string) - 1; $i >= 0; $i--) {
+            $result |= ord($known_string[$i]) ^ ord($user_string[$i]);
+        }
+
+        return 0 === $result;
     }
 }
 
@@ -157,6 +339,28 @@ if (!function_exists('is_id')) {
      */
     function is_id($val) {
         return is_numeric($val);
+    }
+}
+
+if (!function_exists('parse_ini_string')) {
+    /**
+     * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
+     *
+     * @param string $Ini The INI string to parse.
+     * @return array Returns the array representation of the INI string.
+     */
+    function parse_ini_string($Ini) {
+        $Lines = explode("\n", $Ini);
+        $Result = array();
+        foreach ($Lines as $Line) {
+            $Parts = explode('=', $Line, 2);
+            if (count($Parts) == 1) {
+                $Result[trim($Parts[0])] = '';
+            } elseif (count($Parts) >= 2) {
+                $Result[trim($Parts[0])] = trim($Parts[1]);
+            }
+        }
+        return $Result;
     }
 }
 
@@ -326,7 +530,7 @@ if (!function_exists('requestContext')) {
     function requestContext() {
         static $context = null;
         if (is_null($context)) {
-            $context = C('Garden.RequestContext', null);
+            $context = c('Garden.RequestContext', null);
             if (is_null($context)) {
                 $protocol = val('SERVER_PROTOCOL', $_SERVER);
                 if (preg_match('`^HTTP/`', $protocol)) {

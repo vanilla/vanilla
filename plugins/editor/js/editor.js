@@ -209,23 +209,6 @@
             }());
 
             /**
-             * Toggle spoilers.
-             */
-            $(document).on('mouseup', '.Spoiled', function(e) {
-                // Do not close if its a link or user selects some text.
-                if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-                    $(this).removeClass('Spoiled').addClass('Spoiler');
-                }
-                e.stopPropagation(); // for nesting
-            });
-
-            $(document).on('mouseup', '.Spoiler', function(e) {
-                $(this).removeClass('Spoiler').addClass('Spoiled');
-                e.stopPropagation(); // for nesting
-            });
-
-
-            /**
              * Lights on/off in fullpage
              *
              * Note: Wysiwyg makes styling the BodyBox more difficult as it's an
@@ -1501,6 +1484,14 @@
                 var currentEditableCommentId = (new Date()).getTime();
                 var editorName = 'vanilla-editor-text-' + currentEditableCommentId;
 
+                $(document).on('click', 'a.PreviewButton', function() {
+                    $currentEditorToolbar.hide();
+                });
+
+                $(document).on('click', 'a.WriteButton', function() {
+                    $currentEditorToolbar.show();
+                });
+
                 switch (format) {
                     case 'wysiwyg':
                     case 'ipb':
@@ -1599,6 +1590,14 @@
                                     if (!singleInstance) {
                                         //scrollToEditorContainer(editor.textarea.element);
                                         editor.focus();
+                                    } else {
+                                        // Bug in IE 10,11 where the caret is placed outside of the editor because it is hidden
+                                        // The bug is caused by focusWithoutScrolling() from wysihtml5-0.4.0pre
+                                        // To circumvent the issue let's focus the editor instead.
+                                        var formWrapper = $('div.FormWrapper');
+                                        formWrapper.on('focus', function() {
+                                            editor.focus();
+                                        });
                                     }
 
                                     if (debug) {
@@ -1778,10 +1777,6 @@
             }
         } //editorInit
 
-        // Initialize new editors.
-        $(document).on('EditCommentFormLoaded popupReveal', function () {
-            editorInit('', $(selector));
-        })
         editorInit('', this);
 
         // jQuery chaining
@@ -1789,12 +1784,9 @@
     };
 }(jQuery));
 
-
-// Set all .BodyBox elements as editor, calling plugin above.
-jQuery(document).ready(function($) {
-    $('.BodyBox').setAsEditor();
+$(document).on('contentLoad', function(e) {
+    $('.BodyBox', e.target).setAsEditor();
 });
-
 
 /*
  * This is an example of hooking into the custom parse event, to enable

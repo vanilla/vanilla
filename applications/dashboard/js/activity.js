@@ -85,8 +85,6 @@ jQuery(document).ready(function($) {
                 gdn.informError(xhr);
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 gdn.inform(json);
 
                 // Remove any old errors from the form
@@ -96,7 +94,7 @@ jQuery(document).ready(function($) {
                     if (json.ErrorMessages)
                         $(row).prepend(json.ErrorMessages);
                 } else {
-                    $(row).before(json.Data);
+                    $(row).beforeTrigger(json.Data);
                     textbox.val('').blur();
                     // Make sure that hidden items appear
                     $('ul.ActivityComments li.Hidden').slideDown('fast');
@@ -133,8 +131,6 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    json = $.postParseJson(json);
-
                     gdn.inform(json);
 
                     if (json['FormSaved'] == true) {
@@ -146,7 +142,7 @@ jQuery(document).ready(function($) {
                             // And add the activity list
                             $(frm).after('<ul class="Activities"></ul>');
                         }
-                        $('ul.Activities').prepend(json.Data);
+                        $('ul.Activities').prependTrigger(json.Data);
                         // Make sure that hidden items appear
                         $('ul.Activities li.Hidden').slideDown('fast');
                         // If the user's status was updated, show it.

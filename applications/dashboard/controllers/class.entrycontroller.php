@@ -2,7 +2,7 @@
 /**
  * Manages users manually authenticating (signing in).
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -36,6 +36,7 @@ class EntryController extends Gdn_Controller {
      */
     public function __construct() {
         parent::__construct();
+        $this->internalMethods[] = 'target';
 
         // Set error message here so it can run thru t()
         $this->UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
@@ -381,6 +382,15 @@ EOT;
         $IsPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
         $UserSelect = $this->Form->getFormValue('UserSelect');
 
+        /**
+         * When a user is connecting through SSO he is prompted to choose a username. If he chooses an existing user name
+         * he is then prompted to enter the password for that username 'claiming' it as their own.
+         * By setting AllowConnect to false, we take away that workflow, forcing the user to choose a unique username.
+         */
+        $allowConnect = c('Garden.Registration.AllowConnect', true);
+        $this->setData('AllowConnect', $allowConnect);
+        $this->addDefinition('AllowConnect', $allowConnect);
+
         if (!$IsPostBack) {
             // Here are the initial data array values. that can be set by a plugin.
             $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->target());
@@ -393,6 +403,9 @@ EOT;
 
         // Fire ConnectData event & error handling.
         $currentData = $this->Form->formValues();
+
+        $this->addDefinition('Username already exists.', t('Username already exists.'));
+        $this->addDefinition('Choose a name to identify yourself on the site.', t('Choose a name to identify yourself on the site.'));
 
         // Filter the form data for users here. SSO plugins must reset validated data each postback.
         $filteredData = Gdn::userModel()->filterForm($currentData, true);
@@ -613,6 +626,16 @@ EOT;
                 $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
+            if (!$allowConnect) {
+                // Since we are not connecting a joining user to an existing user...
+
+                // make sure the photo of the existing user doesn't show up on the form.
+                $this->Form->setFormValue("Photo", null);
+
+                // ignore any existing user(s) found.
+                $ExistingUsers = array();
+            }
+
             $this->setData('ExistingUsers', $ExistingUsers);
 
             if (UserModel::noEmail()) {
@@ -633,6 +656,7 @@ EOT;
                 $User['SourceID'] = $this->Form->getFormValue('UniqueID');
                 $User['Attributes'] = $this->Form->getFormValue('Attributes', null);
                 $User['Email'] = $this->Form->getFormValue('ConnectEmail', $this->Form->getFormValue('Email', null));
+                $User['Name'] = $this->Form->getFormValue('ConnectName', $this->Form->getFormValue('Name', null));
 
                 $UserID = $UserModel->register($User, array('CheckCaptcha' => false, 'ValidateEmail' => false, 'NoConfirmEmail' => true, 'SaveRoles' => $SaveRolesRegister));
 
@@ -704,7 +728,7 @@ EOT;
 
             if (isset($User) && $User) {
                 // Make sure the user authenticates.
-                if (!$User['UserID'] == Gdn::session()->UserID) {
+                if (!$User['UserID'] == Gdn::session()->UserID && $allowConnect) {
                     if ($this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')))) {
                         try {
                             if (!$PasswordHash->checkPassword($this->Form->getFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'], $this->Form->getFormValue('ConnectName'))) {
@@ -1063,7 +1087,7 @@ EOT;
 
                         // This resets vanilla's internal "where am I" to the homepage. Needed.
                         Gdn::request()->withRoute('DefaultController');
-                        $this->SelfUrl = url('');//Gdn::request()->Path();
+                        $this->SelfUrl = url(''); //Gdn::request()->Path();
 
                         $this->View = 'syncfailed';
                         $this->ProviderSite = $Authenticator->getProviderUrl();
@@ -1246,26 +1270,41 @@ EOT;
 
         $this->setData('NoEmail', UserModel::noEmail());
 
-        $RegistrationMethod = $this->_registrationView();
-        $this->View = $RegistrationMethod;
-        $this->$RegistrationMethod($InvitationCode);
+        // Sub-dispatch to a specific handler for each registration method
+        $registrationHandler = $this->getRegistrationhandler();
+        $this->setData('Method', stringBeginsWith($registrationHandler, 'register', true, true));
+        $this->$registrationHandler($InvitationCode);
     }
 
     /**
      * Select view/method to be used for registration (from config).
      *
      * @access protected
-     * @since 2.0.0
-     *
-     * @return string Method name.
+     * @since 2.3
+     * @return string Method name to invoke for registration
      */
-    protected function _registrationView() {
-        $RegistrationMethod = Gdn::config('Garden.Registration.Method');
-        if (!in_array($RegistrationMethod, array('Closed', 'Basic', 'Captcha', 'Approval', 'Invitation', 'Connect'))) {
-            $RegistrationMethod = 'Basic';
+    protected function getRegistrationhandler() {
+        $registrationMethod = Gdn::config('Garden.Registration.Method');
+        if (!in_array($registrationMethod, array('Closed', 'Basic', 'Captcha', 'Approval', 'Invitation', 'Connect'))) {
+            $registrationMethod = 'Basic';
         }
 
-        return 'Register'.$RegistrationMethod;
+        // We no longer support captcha-less registration, both Basic and Captcha require a captcha
+        if ($registrationMethod == 'Captcha') {
+            $registrationMethod = 'Basic';
+        }
+
+        return "register{$registrationMethod}";
+    }
+
+    /**
+     * Alias of EntryController::getRegistrationHandler
+     *
+     * @deprecated since 2.3
+     * @return string
+     */
+    protected function _registrationView() {
+        return $this->getRegistrationHandler();
     }
 
     /**
@@ -1277,6 +1316,7 @@ EOT;
      * @since 2.0.0
      */
     private function registerApproval() {
+        $this->View = 'registerapproval';
         Gdn::userModel()->addPasswordStrength($this);
 
         // If the form has been posted back...
@@ -1298,6 +1338,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
                 } else {
@@ -1334,7 +1375,10 @@ EOT;
     }
 
     /**
-     * Basic/simple registration. Allows immediate access.
+     * Captcha-authenticated registration. Used by default.
+     *
+     * Allows immediate access upon successful registration, and optionally requires
+     * email address confirmation.
      *
      * Events: RegistrationSuccessful
      *
@@ -1342,6 +1386,7 @@ EOT;
      * @since 2.0.0
      */
     private function registerBasic() {
+        $this->View = 'registerbasic';
         Gdn::userModel()->addPasswordStrength($this);
 
         if ($this->Form->isPostBack() === true) {
@@ -1361,6 +1406,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values);
+                $this->setData('UserID', $AuthUserID);
                 if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
                     $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
@@ -1400,78 +1446,29 @@ EOT;
     }
 
     /**
-     * Deprecated since 2.0.18.
-     */
-    private function registerConnect() {
-        throw notFoundException();
-    }
-
-    /**
-     * Captcha-authenticated registration. Used by default.
+     * Captcha-authenticated registration.
+     *
+     * Deprecated in favor of 'basic' registration which now also requires
+     * captcha authentication.
      *
      * Events: RegistrationSuccessful
      *
+     * @deprecated since v2.2.106
+     * @see registerBasic
      * @access private
      * @since 2.0.0
      */
     private function registerCaptcha() {
-        Gdn::userModel()->addPasswordStrength($this);
+        $this->registerBasic();
+    }
 
-        if ($this->Form->isPostBack() === true) {
-            // Add validation rules that are not enforced by the model
-            $this->UserModel->defineSchema();
-            $this->UserModel->Validation->applyRule('Name', 'Username', $this->UsernameError);
-            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
-            $this->UserModel->Validation->applyRule('Password', 'Required');
-            $this->UserModel->Validation->applyRule('Password', 'Strength');
-            $this->UserModel->Validation->applyRule('Password', 'Match');
-            // $this->UserModel->Validation->applyRule('DateOfBirth', 'MinimumAge');
-
-            $this->fireEvent('RegisterValidation');
-
-            try {
-                $Values = $this->Form->formValues();
-                $Values = $this->UserModel->filterForm($Values, true);
-                unset($Values['Roles']);
-                $AuthUserID = $this->UserModel->register($Values);
-                if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
-                    $this->Form->setFormValue('Target', '/entry/registerthanks');
-                    $this->_setRedirect();
-                    return;
-                } elseif (!$AuthUserID) {
-                    $this->Form->setValidationResults($this->UserModel->validationResults());
-                    if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
-                    }
-
-                } else {
-                    // The user has been created successfully, so sign in now.
-                    if (!Gdn::session()->isValid()) {
-                        Gdn::session()->start($AuthUserID, true, (bool)$this->Form->getFormValue('RememberMe'));
-                    }
-
-                    try {
-                        $this->UserModel->SendWelcomeEmail($AuthUserID, '', 'Register');
-                    } catch (Exception $Ex) {
-                    }
-
-                    $this->fireEvent('RegistrationSuccessful');
-
-                    // ... and redirect them appropriately
-                    $Route = $this->RedirectTo();
-                    if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->RedirectUrl = url($Route);
-                    } else {
-                        if ($Route !== false) {
-                            redirect($Route);
-                        }
-                    }
-                }
-            } catch (Exception $Ex) {
-                $this->Form->addError($Ex);
-            }
-        }
-        $this->render();
+    /**
+     * Connect registration
+     *
+     * @deprecated since 2.0.18.
+     */
+    private function registerConnect() {
+        throw notFoundException();
     }
 
     /**
@@ -1481,6 +1478,7 @@ EOT;
      * @since 2.0.0
      */
     private function registerClosed() {
+        $this->View = 'registerclosed';
         $this->render();
     }
 
@@ -1491,6 +1489,7 @@ EOT;
      * @since 2.0.0
      */
     public function registerInvitation($InvitationCode = 0) {
+        $this->View = 'registerinvitation';
         $this->Form->setModel($this->UserModel);
 
         // Define gender dropdown options
@@ -1544,7 +1543,7 @@ EOT;
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
                 $AuthUserID = $this->UserModel->register($Values, array('Method' => 'Invitation'));
-
+                $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
                 } else {
@@ -1584,6 +1583,8 @@ EOT;
     }
 
     /**
+     * Display registration thank-you message
+     *
      * @since 2.1
      */
     public function registerThanks() {
@@ -1715,8 +1716,7 @@ EOT;
                 Logger::event(
                     'password_reset',
                     Logger::NOTICE,
-                    '{username} has reset their password.',
-                    array('UserName', $User->Name)
+                    '{username} has reset their password.'
                 );
                 Gdn::session()->start($User->UserID, true);
 //            $Authenticator = Gdn::authenticator()->AuthenticateWith('password');

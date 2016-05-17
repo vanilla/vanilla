@@ -4,7 +4,7 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -14,11 +14,11 @@
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
  * that can be accessed directly by the Dispatcher.
  *
- * @method string RequestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
- * @method string RequestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
- * @method string RequestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
- * @method string RequestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
- * @method string RequestFolder($URI = NULL) Get/Set the Request script's Folder.
+ * @method string requestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
+ * @method string requestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
+ * @method string requestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
+ * @method string requestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
+ * @method string requestFolder($URI = NULL) Get/Set the Request script's Folder.
  */
 class Gdn_Request {
 
@@ -133,7 +133,7 @@ class Gdn_Request {
 
             switch ($key) {
                 case 'URI':
-                    $value = !is_null($value) ? urldecode($value) : $value;
+                    $value = !is_null($value) ? rawurldecode($value) : $value;
                     break;
                 case 'SCRIPT':
                     $value = !is_null($value) ? trim($value, '/') : $value;
@@ -514,8 +514,19 @@ class Gdn_Request {
                 safeParseStr($get, $get, $original);
             }
 
-            if (!empty($_SERVER['X_REWRITE'])) {
-                $path = $_SERVER['PATH_INFO'];
+            if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
+                $path = val('PATH_INFO', $_SERVER, '');
+
+                // Some hosts block PATH_INFO from being passed (or even manually set).
+                // We set X_PATH_INFO in the .htaccess as a fallback for those situations.
+                // If you work for one of those hosts, know that many beautiful kittens lost their lives for your sins.
+                if (!$path) {
+                    if (!empty($_SERVER['X_PATH_INFO'])) {
+                        $path = $_SERVER['X_PATH_INFO'];
+                    } elseif (!empty($_SERVER['REDIRECT_X_PATH_INFO'])) {
+                        $path = $_SERVER['REDIRECT_X_PATH_INFO'];
+                    }
+                }
             } elseif (isset($get['_p'])) {
                 $path = $get['_p'];
                 unset($_GET['_p']);
@@ -722,7 +733,7 @@ class Gdn_Request {
             if ($path === true) {
                 // Encode the path.
                 $parts = explode('/', $result);
-                $parts = array_map('urlencode', $parts);
+                $parts = array_map('rawurlencode', $parts);
                 $result = implode('/', $parts);
             }
         }
@@ -925,11 +936,11 @@ class Gdn_Request {
     public function url($path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
         if ($allowSSL === null) {
-            $allowSSL = C('Garden.AllowSSL', false);
+            $allowSSL = c('Garden.AllowSSL', false);
         }
         static $rewrite = null;
         if ($rewrite === null) {
-            $rewrite = val('X_REWRITE', $_SERVER, C('Garden.RewriteUrls', false));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
         }
 
         if (!$allowSSL) {
@@ -1082,7 +1093,7 @@ class Gdn_Request {
         static $allowSSL = null;
 
         if ($allowSSL === null) {
-            $allowSSL = C('Garden.AllowSSL', null);
+            $allowSSL = c('Garden.AllowSSL', null);
         }
 
         if (!$withDomain || $withDomain === '/') {

@@ -6,7 +6,7 @@
  * database servers.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -16,6 +16,10 @@
  * Class Gdn_MySQLStructure
  */
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
+    /**
+     * @var array[int] An array of table names to row count estimates.
+     */
+    private $rowCountEstimates;
 
     /**
      *
@@ -92,6 +96,25 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $this->_TableStorageEngine = $Engine;
         return $this;
+    }
+
+    /**
+     * Get the estimated number of rows in a table.
+     *
+     * @param string $tableName The name of the table to look up, without its prefix.
+     * @return int|null Returns the estimated number of rows or **null** if the information doesn't exist.
+     */
+    public function getRowCountEstimate($tableName) {
+        if (!isset($this->rowCountEstimates)) {
+            $data = $this->Database->query("show table status")->resultArray();
+            $this->rowCountEstimates = [];
+            foreach ($data as $row) {
+                $name = stringBeginsWith($row['Name'], $this->Database->DatabasePrefix, false, true);
+                $this->rowCountEstimates[$name] = $row['Rows'];
+            }
+        }
+
+        return val($tableName, $this->rowCountEstimates, null);
     }
 
     /**
@@ -187,7 +210,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $Keys = '';
         $Sql = '';
 
-        $ForceDatabaseEngine = C('Database.ForceStorageEngine');
+        $ForceDatabaseEngine = c('Database.ForceStorageEngine');
         if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
             $this->_TableStorageEngine = $ForceDatabaseEngine;
             $AllowFullText = $this->_supportsFulltext();
@@ -264,7 +287,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             if ($HasFulltext) {
                 $this->_TableStorageEngine = 'myisam';
             } else {
-                $this->_TableStorageEngine = C('Database.DefaultStorageEngine', 'innodb');
+                $this->_TableStorageEngine = c('Database.DefaultStorageEngine', 'innodb');
             }
 
             if (!$this->hasEngine($this->_TableStorageEngine)) {
@@ -474,7 +497,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Returns an array of schema data objects for each field in the specified
         // table. The returned array of objects contains the following properties:
         // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
-        $ExistingColumns = $this->existingColumns();
+        $existingColumns = array_change_key_case($this->existingColumns());
+        $columns = array_change_key_case($this->_Columns);
         $AlterSql = array();
 
         // 1. Remove any unnecessary columns if this is an explicit modification
@@ -482,9 +506,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             // array_diff returns values from the first array that aren't present
             // in the second array. In this example, all columns currently in the
             // table that are NOT in $this->_Columns.
-            $RemoveColumns = array_diff(array_keys($ExistingColumns), array_keys($this->_Columns));
+            $RemoveColumns = array_diff(array_keys($existingColumns), array_keys($columns));
             foreach ($RemoveColumns as $Column) {
-                $AlterSql[] = "drop column `$Column`";
+                $AlterSql[] = "drop column `{$columns[$Column]}`";
             }
         }
 
@@ -516,7 +540,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 }
 
                 $EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
-                if (!$this->query($EngineQuery)) {
+                if (!$this->query($EngineQuery, true)) {
                     throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
                 }
             }
@@ -528,33 +552,28 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // the second array. In this example, all columns in $this->_Columns that
         // are NOT in the table.
         $PrevColumnName = false;
-        foreach ($this->_Columns as $ColumnName => $Column) {
-            if (!array_key_exists($ColumnName, $ExistingColumns)) {
+        foreach ($columns as $columnKey => $Column) {
+            $ColumnName = val('Name', $Column);
+            if (!array_key_exists($columnKey, $existingColumns)) {
                 // This column name is not in the existing column collection, so add the column
-                $AddColumnSql = 'add '.$this->_defineColumn(val($ColumnName, $this->_Columns));
+                $AddColumnSql = 'add '.$this->_defineColumn($Column);
                 if ($PrevColumnName !== false) {
                     $AddColumnSql .= " after `$PrevColumnName`";
                 }
 
                 $AlterSql[] = $AddColumnSql;
 
-//            if (!$this->Query($AlterSqlPrefix.$AddColumnSql))
-//               throw new Exception(sprintf(T('Failed to add the `%1$s` column to the `%1$s` table.'), $Column, $this->_DatabasePrefix.$this->_TableName));
             } else {
-                $ExistingColumn = $ExistingColumns[$ColumnName];
+                $ExistingColumn = $existingColumns[$columnKey];
 
                 $ExistingColumnDef = $this->_defineColumn($ExistingColumn);
                 $ColumnDef = $this->_defineColumn($Column);
-                $Comment = "/* Existing: $ExistingColumnDef, New: $ColumnDef */\n";
+                $Comment = "-- Existing: $ExistingColumnDef, New: $ColumnDef";
 
-                if ($ExistingColumnDef != $ColumnDef) {  //$Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
+                if ($ExistingColumnDef !== $ColumnDef) {
                     // The existing & new column types do not match, so modify the column.
-                    $ChangeSql = $Comment.'change `'.$ColumnName.'` '.$this->_defineColumn(val($ColumnName, $this->_Columns));
+                    $ChangeSql = "$Comment\nchange `{$ExistingColumn->Name}` $ColumnDef";
                     $AlterSql[] = $ChangeSql;
-//					if (!$this->Query($AlterSqlPrefix.$ChangeSql))
-//						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
-//                     $ColumnName,
-//                     $this->_DatabasePrefix.$this->_TableName));
 
                     // Check for a modification from an enum to an int.
                     if (strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->types('int'))) {
@@ -592,7 +611,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         if (count($AlterSql) > 0) {
-            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
+            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql), true)) {
                 throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }
@@ -638,6 +657,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         // Run any additional Sql.
         foreach ($AdditionalSql as $Description => $Sql) {
+            // These queries are just for enum alters. If that changes then pass true as the second argument.
             if (!$this->query($Sql)) {
                 throw new Exception("Error modifying table: {$Description}.");
             }

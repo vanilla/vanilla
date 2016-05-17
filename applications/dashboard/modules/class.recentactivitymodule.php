@@ -2,7 +2,7 @@
 /**
  * Recent activity module.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -13,7 +13,10 @@
  */
 class RecentActivityModule extends Gdn_Module {
 
-    public $ActivityData = false;
+    /**
+     * @var Gdn_DataSet|null
+     */
+    public $ActivityData = null;
 
     public $ActivityModuleTitle = '';
 
@@ -25,7 +28,7 @@ class RecentActivityModule extends Gdn_Module {
         }
 
         $ActivityModel = new ActivityModel();
-        $Data = $ActivityModel->getWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 0, $Limit);
+        $Data = $ActivityModel->getWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), '', '', $Limit, 0);
         $this->ActivityData = $Data;
     }
 
@@ -43,12 +46,12 @@ class RecentActivityModule extends Gdn_Module {
         }
 
         if (!$this->ActivityData) {
-            $this->GetData();
+            $this->getData();
         }
 
         $Data = $this->ActivityData;
         if (is_object($Data) && $Data->numRows() > 0) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

@@ -2,7 +2,7 @@
 /**
  * Settings controller
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -48,8 +48,6 @@ class SettingsController extends Gdn_Controller {
             'Vanilla.Archive.Exclude',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
-            'Vanilla.Discussions.SortField' => 'd.DateLastComment',
-            'Vanilla.Discussions.UserSortField',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength'
         ));
@@ -263,7 +261,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function addCategory() {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
@@ -288,6 +286,12 @@ class SettingsController extends Gdn_Controller {
             $IsParent = $this->Form->getFormValue('IsParent', '0');
             $this->Form->setFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
+
+            // Enforces tinyint values on boolean fields to comply with strict mode
+            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
+            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+
             $CategoryID = $this->Form->save();
             if ($CategoryID) {
                 $Category = CategoryModel::categories($CategoryID);
@@ -328,7 +332,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function getCategory($categoryID) {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         if (!$categoryID) {
             throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));
@@ -364,7 +368,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategory($CategoryID = false) {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('categories.js');
@@ -456,7 +460,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
 
@@ -509,7 +513,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function editCategory($CategoryID = '') {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up models
         $RoleModel = new RoleModel();
@@ -607,7 +611,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function manageCategories() {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->addSideMenu('vanilla/settings/managecategories');
 
         $this->addJsFile('categories.js');
@@ -630,8 +634,8 @@ class SettingsController extends Gdn_Controller {
         $CategoryData = $this->CategoryModel->getAll('TreeLeft');
 
         // Set CanDelete per-category so we can override later if we want.
-        $canDelete = checkPermission('Garden.Settings.Manage');
-        array_walk($CategoryData->result(), function (&$value) use ($canDelete) {
+        $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
+        array_walk($CategoryData->result(), function(&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
 
@@ -706,7 +710,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function sortCategories() {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {

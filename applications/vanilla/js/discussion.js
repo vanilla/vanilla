@@ -38,8 +38,9 @@ jQuery(document).ready(function($) {
         if (preview) {
             type = 'Preview';
             // If there is already a preview showing, kill processing.
-            if ($('div.Preview').length > 0 || jQuery.trim($(textbox).val()) == '')
+            if ($('div.Preview').length > 0) {
                 return false;
+            }
         }
         var draft = $(btn).hasClass('DraftButton');
         if (draft) {
@@ -101,8 +102,6 @@ jQuery(document).ready(function($) {
                 gdn.informError(xhr, draft);
             },
             success: function(json) {
-                json = $.postParseJson(json);
-
                 var processedTargets = false;
                 // If there are targets, process them
                 if (json.Targets && json.Targets.length > 0) {
@@ -155,7 +154,7 @@ jQuery(document).ready(function($) {
                     $(btn).hide();
                     $(parent).find('.WriteButton').removeClass('Hidden');
 
-                    $(frm).find('.TextBoxWrapper').hide().after(json.Data);
+                    $(frm).find('.TextBoxWrapper').hide().afterTrigger(json.Data);
                     $(frm).trigger('PreviewLoaded', [frm]);
 
                 } else if (!draft) {
@@ -171,7 +170,8 @@ jQuery(document).ready(function($) {
                     if (processedTargets) {
                         // Don't do anything with the data b/c it's already been handled by processTargets
                     } else if (existingCommentRow.length > 0) {
-                        existingCommentRow.after(json.Data).remove();
+                        existingCommentRow.afterTrigger(json.Data);
+                        existingCommentRow.remove();
                         $('#Comment_' + commentID).effect("highlight", {}, "slow");
                     } else {
                         gdn.definition('LastCommentID', commentID, true);
@@ -180,7 +180,10 @@ jQuery(document).ready(function($) {
                             $(json.Data).prependTo('ul.Comments,.DiscussionTable');
                             $('ul.Comments li:first').effect("highlight", {}, "slow");
                         } else {
-                            $(json.Data).appendTo('ul.Comments,.DiscussionTable').effect("highlight", {}, "slow");
+                            $(json.Data)
+                                .appendTo('ul.Comments,.DiscussionTable')
+                                .effect("highlight", {}, "slow")
+                                .trigger('contentLoad');
 //                     $('ul.Comments li:last,.DiscussionTable li:last').effect("highlight", {}, "slow");
                         }
                     }
@@ -225,8 +228,18 @@ jQuery(document).ready(function($) {
     }
 
     // Utility function to clear out the comment form
-    function clearCommentForm(sender) {
+    function clearCommentForm(sender, deleteDraft) {
         var container = $(sender).parents('.Editing');
+
+        // By default, we delete comment drafts, unless sender was a "Post Comment" button. Can be overriden.
+        if (typeof deleteDraft !== 'undefined') {
+            deleteDraft = !!deleteDraft;
+        } else if ($(sender).hasClass('CommentButton')) {
+            deleteDraft = false;
+        } else {
+            deleteDraft = true
+        }
+
         $(container).removeClass('Editing');
         $('div.Popup,.Overlay').remove();
         var frm = $(sender).parents('div.CommentForm, .EditCommentForm');
@@ -234,13 +247,14 @@ jQuery(document).ready(function($) {
         frm.find('input:hidden[name$=CommentID]').val('');
         // Erase any drafts
         var draftInp = frm.find('input:hidden[name$=DraftID]');
-        if (draftInp.val() != '')
+        if (deleteDraft && draftInp.val() != '') {
             $.ajax({
                 type: "POST",
                 url: gdn.url('/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
                 data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
                 dataType: 'json'
             });
+        }
 
         draftInp.val('');
         frm.find('div.Errors').remove();
@@ -287,9 +301,7 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    json = $.postParseJson(json);
-
-                    $(msg).after(json.Data);
+                    $(msg).afterTrigger(json.Data);
                     $(msg).hide();
                     $(document).trigger('EditCommentFormLoaded', [container]);
                 },
@@ -362,8 +374,6 @@ jQuery(document).ready(function($) {
 //            gdn.informError(xhr, true);
 //         },
 //         success: function(json) {
-//            json = $.postParseJson(json);
-//
 //            if(json.Data && json.LastCommentID) {
 //               gdn.definition('LastCommentID', json.LastCommentID, true);
 //               $(json.Data).appendTo("ul.Comments")

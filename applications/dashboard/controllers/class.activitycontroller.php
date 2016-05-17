@@ -2,7 +2,7 @@
 /**
  * Manages the activity stream.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -160,6 +160,8 @@ class ActivityController extends Gdn_Controller {
 
         // Page meta.
         $this->addJsFile('activity.js');
+        $this->addJsFile('spoilers.js');
+        $this->addCssFile('spoilers.css');
 
         if ($this->Head) {
             $this->Head->addRss(url('/activity/feed.rss', true), $this->Head->title());
@@ -168,7 +170,7 @@ class ActivityController extends Gdn_Controller {
         // Comment submission
         $Session = Gdn::session();
         $Comment = $this->Form->getFormValue('Comment');
-        $Activities = $this->ActivityModel->getWhere(array('NotifyUserID' => $NotifyUserID), $Offset, $Limit)->resultArray();
+        $Activities = $this->ActivityModel->getWhere(array('NotifyUserID' => $NotifyUserID), '', '', $Limit, $Offset)->resultArray();
         $this->ActivityModel->joinComments($Activities);
 
         $this->setData('Filter', strtolower($Filter));
@@ -234,7 +236,7 @@ class ActivityController extends Gdn_Controller {
             throw permissionException();
         }
 
-        $this->ActivityModel->delete($ActivityID);
+        $this->ActivityModel->deleteID($ActivityID);
 
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -269,6 +271,17 @@ class ActivityController extends Gdn_Controller {
             $Body = $this->Form->getValue('Body', '');
             $ActivityID = $this->Form->getValue('ActivityID', '');
             if (is_numeric($ActivityID) && $ActivityID > 0) {
+                $activity = $this->ActivityModel->getID($ActivityID);
+                if ($activity) {
+                    if ($activity['NotifyUserID'] == ActivityModel::NOTIFY_ADMINS) {
+                        $this->permission('Garden.Settings.Manage');
+                    } elseif ($activity['NotifyUserID'] == ActivityModel::NOTIFY_MODS) {
+                        $this->permission('Garden.Moderation.Manage');
+                    }
+                } else {
+                    throw new Exception(t('Invalid activity'));
+                }
+
                 $ActivityComment = array(
                     'ActivityID' => $ActivityID,
                     'Body' => $Body,
@@ -312,7 +325,7 @@ class ActivityController extends Gdn_Controller {
 
     /**
      *
-     * 
+     *
      * @param bool $Notify
      * @param bool $UserID
      */

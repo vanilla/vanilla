@@ -2,7 +2,7 @@
 /**
  * SplitMerge plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package SplitMerge
  */
@@ -30,7 +30,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
         $Discussion = $Sender->EventArguments['Discussion'];
         if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
-            $ActionMessage .= ' '.anchor(t('Split'), 'vanilla/moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
+            $ActionMessage .= ' '.anchor(t('Split'), 'moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
         }
     }
 
@@ -40,7 +40,7 @@ class SplitMergePlugin extends Gdn_Plugin {
     public function base_beforeCheckDiscussions_handler($Sender) {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
         if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', 'any')) {
-            $ActionMessage .= ' '.anchor(t('Merge'), 'vanilla/moderation/mergediscussions/', 'Merge Popup');
+            $ActionMessage .= ' '.anchor(t('Merge'), 'moderation/mergediscussions/', 'Merge Popup');
         }
     }
 
@@ -91,7 +91,20 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Data['Body'] = sprintf(t('This discussion was created from comments split from: %s.'), anchor(Gdn_Format::text($Discussion->Name), 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::url($Discussion->Name).'/'));
             $Data['Format'] = 'Html';
             $Data['Type'] = 'Discussion';
+
+            // Pass a forced input formatter around this exception.
+            if (c('Garden.ForceInputFormatter')) {
+                $inputFormat = c('Garden.InputFormatter');
+                saveToConfig('Garden.InputFormatter', 'Html', false);
+            }
+
             $NewDiscussionID = $DiscussionModel->save($Data);
+
+            // Reset the input formatter
+            if (c('Garden.ForceInputFormatter')) {
+                saveToConfig('Garden.InputFormatter', $inputFormat, false);
+            }
+
             $Sender->Form->setValidationResults($DiscussionModel->validationResults());
 
             if ($Sender->Form->errorCount() == 0 && $NewDiscussionID > 0) {
@@ -150,7 +163,7 @@ class SplitMergePlugin extends Gdn_Plugin {
         }
 
         // Check that the user has permission to edit all discussions
-        foreach($Discussions as $discussion) {
+        foreach ($Discussions as $discussion) {
             if (!DiscussionModel::canEdit($discussion)) {
                 throw permissionException('@'.t('You do not have permission to edit all of the posts you are trying to merge.'));
             }
@@ -224,7 +237,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                             $CommentModel->removePageCache($Discussion['DiscussionID']);
                         } else {
                             // Delete discussion that was merged.
-                            $DiscussionModel->delete($Discussion['DiscussionID']);
+                            $DiscussionModel->deleteID($Discussion['DiscussionID']);
                         }
                     } else {
                         $Sender->informMessage($CommentModel->Validation->resultsText());

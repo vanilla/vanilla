@@ -2,7 +2,7 @@
 /**
  * Perform miscellaneous operations for Dashboard.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -251,9 +251,16 @@ class UtilityController extends DashboardController {
             $this->setData('CapturedSql', array());
         }
 
+        $issues = Gdn::structure()->getIssues();
+
         if ($this->Form->errorCount() == 0 && !$captureOnly && $FoundStructureFile) {
-            $this->setData('Status', 'The structure was successfully executed.');
+            if (empty($issues)) {
+                $this->setData('Status', 'The structure was successfully executed.');
+            } else {
+                $this->setData('Status', 'The structure completed with issues.');
+            }
         }
+        $this->setData('Issues', $issues);
     }
 
     /**
@@ -321,7 +328,7 @@ class UtilityController extends DashboardController {
         }
 
         if ($Target = $this->Request->get('Target')) {
-            redirect($Target);
+            safeRedirect($Target);
         }
 
         $this->fireEvent('AfterUpdate');
@@ -454,8 +461,51 @@ class UtilityController extends DashboardController {
             $HourOffset = $Form->getFormValue('HourOffset');
             Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $HourOffset);
 
+            // If we receive a time zone, only accept it if we can verify it as a valid identifier.
+            $timeZone = $Form->getFormValue('TimeZone');
+            if (!empty($timeZone)) {
+                try {
+                    $tz = new DateTimeZone($timeZone);
+                    Gdn::userModel()->saveAttribute(
+                        Gdn::session()->UserID,
+                        ['TimeZone' => $tz->getName(), 'SetTimeZone' => null]
+                    );
+                } catch (\Exception $ex) {
+                    Logger::log(Logger::ERROR, $ex->getMessage(), ['timeZone' => $timeZone]);
+
+                    Gdn::userModel()->saveAttribute(
+                        Gdn::session()->UserID,
+                        ['TimeZone' => null, 'SetTimeZone' => $timeZone]
+                    );
+                    $timeZone = '';
+                }
+            } elseif ($currentTimeZone = Gdn::session()->getAttribute('TimeZone')) {
+                // Check to see if the current timezone agrees with the posted offset.
+                try {
+                    $tz = new DateTimeZone($currentTimeZone);
+                    $currentHourOffset = $tz->getOffset(new DateTime()) / 3600;
+                    if ($currentHourOffset != $HourOffset) {
+                        // Clear out the current timezone or else it will override the browser's offset.
+                        Gdn::userModel()->saveAttribute(
+                            Gdn::session()->UserID,
+                            ['TimeZone' => null, 'SetTimeZone' => null]
+                        );
+                    } else {
+                        $timeZone = $tz->getName();
+                    }
+                } catch (Exception $ex) {
+                    Logger::log(Logger::ERROR, "Clearing out bad timezone: {timeZone}", ['timeZone' => $currentTimeZone]);
+                    // Clear out the bad timezone.
+                    Gdn::userModel()->saveAttribute(
+                        Gdn::session()->UserID,
+                        ['TimeZone' => null, 'SetTimeZone' => null]
+                    );
+                }
+            }
+
             $this->setData('Result', true);
             $this->setData('HourOffset', $HourOffset);
+            $this->setData('TimeZone', $timeZone);
 
             $time = time();
             $this->setData('UTCDateTime', gmdate('r', $time));

@@ -9,7 +9,7 @@
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -438,6 +438,7 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $RefExpr The reference expression to be escaped.
      *   The reference should be in the form of alias.column.
+     * @return string Returns the escaped string.
      */
     protected function escapeIdentifier($RefExpr) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'EscapeSql'), E_USER_ERROR);
@@ -1379,7 +1380,7 @@ abstract class Gdn_SQLDriver {
     public function options($Key, $Value = null) {
         if (is_array($Key)) {
             foreach ($Key as $K => $V) {
-                $this->Options[$K] = $V;
+                $this->_Options[$K] = $V;
                 return $this;
             }
         } elseif ($Value !== null) {
@@ -1404,7 +1405,7 @@ abstract class Gdn_SQLDriver {
             return $this;
         }
 
-        if ($Direction && $Direction != 'asc') {
+        if ($Direction && strtolower($Direction) != 'asc') {
             $Direction = 'desc';
         } else {
             $Direction = 'asc';
@@ -1832,7 +1833,15 @@ abstract class Gdn_SQLDriver {
             if (is_array($v) || is_object($v)) {
                 throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
             } else {
-                if ($EscapeString) {
+                if (in_array(substr($f, -1),  ['+', '-'], true)) {
+                    // This is an increment/decrement.
+                    $op = substr($f, -1);
+                    $f = substr($f, 0, -1);
+
+                    $parameter = $this->namedParameter($f, $CreateNewNamedParameter);
+                    $this->_NamedParameters[$parameter] = $v;
+                    $this->_Sets[$this->escapeIdentifier($f)] = $this->escapeIdentifier($f)." $op ".$parameter;
+                } elseif ($EscapeString) {
                     $NamedParameter = $this->namedParameter($f, $CreateNewNamedParameter);
                     $this->_NamedParameters[$NamedParameter] = $v;
                     $this->_Sets[$this->escapeIdentifier($f)] = $NamedParameter;
@@ -1982,9 +1991,10 @@ abstract class Gdn_SQLDriver {
         }
 
         foreach ($Field as $SubField => $SubValue) {
-            if (is_array($SubValue) && (isset($SubValue[0]) || count($SubValue) == 0)) {
+            if (is_array($SubValue)) {
                 if (count($SubValue) == 1) {
-                    $this->where($SubField, $SubValue[0]);
+                    list($firstVal) = $SubValue;
+                    $this->where($SubField, $firstVal);
                 } else {
                     $this->whereIn($SubField, $SubValue);
                 }

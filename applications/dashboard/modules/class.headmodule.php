@@ -2,7 +2,7 @@
 /**
  * Head module.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -378,7 +378,7 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
             }
 
-            if ($Description = $this->_Sender->Description()) {
+            if ($Description = Gdn_Format::reduceWhiteSpaces($this->_Sender->Description())) {
                 $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
             }
 
@@ -420,7 +420,7 @@ if (!class_exists('HeadModule', false)) {
                 // Inline the content of the tag, if necessary.
                 if (val('_hint', $Attributes) == 'inline') {
                     $Path = val('_path', $Attributes);
-                    if (!stringBeginsWith($Path, 'http')) {
+                    if ($Path && !stringBeginsWith($Path, 'http')) {
                         $Attributes[self::CONTENT_KEY] = file_get_contents($Path);
 
                         if (isset($Attributes['src'])) {

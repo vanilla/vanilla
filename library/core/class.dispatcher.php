@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -205,7 +205,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('AfterAnalyzeRequest');
 
         // If we're in update mode and can block, redirect to signin
-        if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
+        if (c('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
             if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
@@ -480,6 +480,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     safeHeader("HTTP/1.1 404 Not Found");
                     $this->Request = $MatchRoute['FinalDestination'];
                     break;
+
+                case 'Drop':
+                    die();
+
                 case 'Test':
                     $Request->pathAndQuery($MatchRoute['FinalDestination']);
                     $this->Request = $Request->path(false);

@@ -3,7 +3,7 @@
  * ButtonBar Plugin
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package ButtonBar
  */
@@ -11,7 +11,7 @@
 $PluginInfo['ButtonBar'] = array(
     'Name' => 'Button Bar',
     'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-    'Version' => '1.7.1',
+    'Version' => '1.7.2',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => false,

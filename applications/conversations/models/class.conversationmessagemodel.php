@@ -2,7 +2,7 @@
 /**
  * Conversation message model.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -12,6 +12,10 @@
  * Manages messages in a conversation.
  */
 class ConversationMessageModel extends ConversationsModel {
+    /**
+     * @var ConversationMessageModel The singleton instance of this class.
+     */
+    private static $instance;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -22,6 +26,14 @@ class ConversationMessageModel extends ConversationsModel {
     public function __construct() {
         parent::__construct('ConversationMessage');
         $this->PrimaryKey = 'MessageID';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated
+     */
+    public function get($OrderFields = '', $OrderDirection = 'asc', $Limit = false, $PageNumber = false) {
+        throw new \BadMethodCallException('ConversationMessageModel->get() is not supported.', 400);
     }
 
     /**
@@ -39,7 +51,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $Wheres SQL conditions.
      * @return Gdn_DataSet SQL results.
      */
-    public function get($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
+    public function getRecent($ConversationID, $ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
         if ($Limit == '') {
             $Limit = Gdn::config('Conversations.Messages.PerPage', 50);
         }
@@ -74,9 +86,10 @@ class ConversationMessageModel extends ConversationsModel {
      *
      * @param mixed $ID The value of the primary key in the database.
      * @param string $DatasetType The format of the result dataset.
+     * @param array $options Not used.
      * @return Gdn_DataSet
      */
-    public function getID($ID, $DatasetType = false) {
+    public function getID($ID, $DatasetType = false, $options = []) {
         $Result = $this->getWhere(array("MessageID" => $ID))->firstRow($DatasetType);
         return $Result;
     }
@@ -94,7 +107,21 @@ class ConversationMessageModel extends ConversationsModel {
     public function getNew($ConversationID, $LastMessageID) {
         $Session = Gdn::session();
         $this->SQL->where('MessageID > ', $LastMessageID);
-        return $this->get($ConversationID, $Session->UserID);
+        return $this->getRecent($ConversationID, $Session->UserID);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated
+     */
+    public function getCount($wheres = []) {
+        deprecated('ConversationMessageModel->getCount()', 'ConversationMessageModel->getCountByConversation()');
+        $args = func_get_args();
+        return $this->getCountByConversation(
+            val(0, $args, 0),
+            val(1, $args, Gdn::session()->UserID),
+            val(2, $args, '')
+        );
     }
 
     /**
@@ -108,7 +135,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $Wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCount($ConversationID, $ViewingUserID, $Wheres = '') {
+    public function getCountByConversation($ConversationID, $ViewingUserID, $Wheres = '') {
         if (is_array($Wheres)) {
             $this->SQL->where($Wheres);
         }
@@ -320,6 +347,11 @@ class ConversationMessageModel extends ConversationsModel {
                 $ConversationModel->updateUserUnreadCount($UpdateCountUserIDs, true);
             }
 
+            $body = val('Body', $Fields, '');
+            $subject = val('Subject', $Conversation, '');
+
+            $this->EventArguments['Body'] = &$body;
+            $this->EventArguments['Subject'] = &$subject;
             $this->fireEvent('AfterAdd');
 
             $activityModel = new ActivityModel();
@@ -335,19 +367,29 @@ class ConversationMessageModel extends ConversationsModel {
                     'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,user} sent you a <a href="{Url,html}">message</a>'),
                     'RecordType' => 'Conversation',
                     'RecordID' => $ConversationID,
-                    'Story' => val('Body', $Fields, ''),
+                    'Story' => $body,
                     'Format' => val('Format', $Fields, c('Garden.InputFormatter')),
                     'Route' => "/messages/{$ConversationID}#{$MessageID}",
                 );
 
-                if (c('Conversations.Subjects.Visible') && val('Subject', $Conversation, '')) {
-                    $activity['HeadlineFormat'] = val('Subject', $Conversation, '');
+                if (c('Conversations.Subjects.Visible') && $subject) {
+                    $activity['HeadlineFormat'] = $subject;
                 }
                 $activityModel->queue($activity, 'ConversationMessage');
             }
             $activityModel->saveQueue();
         }
         return $MessageID;
+    }
+
+    /**
+     * Return the singleton instance of this class.
+     */
+    public static function instance() {
+        if (!isset(static::$instance)) {
+            static::$instance = new ConversationMessageModel();
+        }
+        return static::$instance;
     }
 
     /**

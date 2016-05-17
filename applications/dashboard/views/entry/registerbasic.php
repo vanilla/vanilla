@@ -6,6 +6,7 @@
         <?php
         $TermsOfServiceUrl = Gdn::config('Garden.TermsOfService', '#');
         $TermsOfServiceText = sprintf(t('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), url($TermsOfServiceUrl));
+
         // Make sure to force this form to post to the correct place in case the view is
         // rendered within another view (ie. /dashboard/entry/index/):
         echo $this->Form->open(array('Action' => url('/entry/register'), 'id' => 'Form_User_Register'));
@@ -24,7 +25,7 @@
             <li>
                 <?php
                 echo $this->Form->label('Username', 'Name');
-                echo $this->Form->textBox('Name', array('Wrap' => true, 'autocorrect' => 'off', 'autocapitalize' => 'off'));
+                echo $this->Form->textBox('Name', array('autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE));
                 echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.t('Name Unavailable').'</span>';
                 ?>
             </li>
@@ -43,12 +44,6 @@
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.t("Passwords don't match").'</span>';
                 ?>
             </li>
-            <li class="Gender">
-                <?php
-                echo $this->Form->label('Gender', 'Gender');
-                echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
-                ?>
-            </li>
             <?php $this->fireEvent('ExtendedRegistrationFields'); ?>
             <?php if ($this->Form->getValue('DiscoveryText') || val('DiscoveryText', $this->Form->validationResults())): ?>
                 <li>
@@ -58,7 +53,11 @@
                     ?>
                 </li>
             <?php endif; ?>
+
+            <?php Captcha::render($this); ?>
+
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
+
             <li>
                 <?php
                 echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, array('value' => '1'));

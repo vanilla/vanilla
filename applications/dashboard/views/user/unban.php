@@ -11,7 +11,10 @@
         echo formatString(t('You are about to unban {User.UserID,user}.'), $this->Data);
 
         if ($this->data('OtherReasons')) {
-            echo "\n".t('This user is also banned for other reasons and may stay banned.');
+            echo "\n".t(
+                    'This user is also banned for other reasons and may stay banned.',
+                    'This user is also banned for other reasons and may stay banned or become banned again.'
+                );
         }
         ?>
     </div>

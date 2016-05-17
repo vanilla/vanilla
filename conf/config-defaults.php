@@ -14,10 +14,10 @@ $Configuration['Database']['User']                             = 'dbuser';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
                                                                   12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
-                                                                  1000  => TRUE,  // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
-                                                                  1002  => "set names 'utf8'" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
+                                                                  1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
+                                                                  1002  => "set names 'utf8'; set time_zone = '+0:0';" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
                                                                );
-$Configuration['Database']['CharacterEncoding']                = 'utf8';
+$Configuration['Database']['CharacterEncoding'] = 'utf8';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
 $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
 
@@ -80,7 +80,7 @@ $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';
 $Configuration['Garden']['Upload']['MaxFileSize']               = '50M';
-$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','jpeg','gif','png', 'bmp', 'tiff', 'ico', 'zip','gz','tar.gz','tgz','psd','ai','fla','pdf','doc','xls','ppt','docx','xlsx','log','rar','7z');
+$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'fla', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'log', 'rar', '7z');
 $Configuration['Garden']['Picture']['MaxHeight']                = 1000;
 $Configuration['Garden']['Picture']['MaxWidth']                 = 600;
 $Configuration['Garden']['Profile']['MaxHeight']                = 1000;

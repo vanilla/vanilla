@@ -2,7 +2,7 @@
 /**
  * Tagging plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Tagging
  */
@@ -44,7 +44,7 @@ class TagModel extends Gdn_Model {
      * @return array
      */
     public function defaultTypes() {
-        $types = array_filter($this->types(), function ($val) {
+        $types = array_filter($this->types(), function($val) {
             if (val('default', $val)) {
                 return true;
             }
@@ -316,6 +316,53 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Add existing tags to a discussion.
+     *
+     * @param int $discussionID The ID of the discussion to add the tags to.
+     * @param array $tags An array of tag IDs.
+     * @throws Gdn_UserException Throws an exception if some of the tags don't exist.
+     */
+    public function addDiscussion($discussionID, $tags) {
+        $tagIDs = array_unique($tags);
+
+        $validTags = $this->SQL->select('*')
+            ->from('Tag')
+            ->where('TagID', $tagIDs)
+            ->get()->resultArray();
+
+        if (count($tagIDs) != count($validTags)) {
+            throw new Gdn_UserException('Non existing tag(s) supplied.');
+        }
+
+        $tagsToAdd = $tagIDs;
+
+        $currentTags = $this->getDiscussionTags($discussionID, TagModel::IX_TAGID);
+        if ($currentTags) {
+            $tagsToAdd = array_diff($tagsToAdd, array_keys($currentTags));
+        }
+
+        if (!empty($tagsToAdd)) {
+            $now = Gdn_Format::toDateTime();
+
+            // Insert new tags
+            foreach($tagsToAdd as $tagID) {
+                $this->SQL
+                    ->options('Ignore', true)
+                    ->insert(
+                        'TagDiscussion',
+                        ['DiscussionID' => $discussionID, 'TagID' => $tagID, 'DateInserted' => $now, 'CategoryID' => $validTags[$tagID]['CategoryID']]
+                    );
+            }
+
+            // Increment the tag counts.
+            $this->SQL->update('Tag')
+                ->set('CountDiscussions', 'CountDiscussions + 1', false)
+                ->whereIn('TagID', $tagsToAdd)
+                ->put();
+        }
+    }
+
+    /**
      *
      *
      * @param $discussion_id
@@ -336,7 +383,7 @@ class TagModel extends Gdn_Model {
         }
 
         // Remove the types from the current tags that we don't need anymore.
-        $current_tags = array_filter($current_tags, function ($row) use ($types) {
+        $current_tags = array_filter($current_tags, function($row) use ($types) {
             if (in_array($row['Type'], $types)) {
                 return true;
             }

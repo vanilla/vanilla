@@ -2,7 +2,7 @@
 /**
  * Conversations database structure.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -37,7 +37,7 @@ $Construct
     ->column('Type', 'varchar(10)', true, 'index')
     ->column('ForeignID', 'varchar(40)', true)
     ->column('Subject', 'varchar(255)', null)
-    ->column('Contributors', 'varchar(255)')
+    ->column('Contributors', 'varchar(255)', true)
     ->column('FirstMessageID', 'int', true, 'key')
     ->column('InsertUserID', 'int', false, 'key')
     ->column('DateInserted', 'datetime', null, 'key')

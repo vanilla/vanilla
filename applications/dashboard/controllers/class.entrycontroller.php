@@ -1904,43 +1904,67 @@ EOT;
                 $Target = '/';
             }
         } else {
-            $MyHostname = parse_url(Gdn::request()->domain(), PHP_URL_HOST);
             $TargetHostname = parse_url($Target, PHP_URL_HOST);
 
             // Only allow external redirects to trusted domains.
-            $TrustedDomains = c('Garden.TrustedDomains', true);
+            $TrustedDomains = [
+                parse_url(Gdn::request()->domain(), PHP_URL_HOST)
+            ];
+
+            $configuredDomains = c('Garden.TrustedDomains', true);
+
             // Trusted domains were previously saved in config as an array.
-            if ($TrustedDomains && $TrustedDomains !== true && !is_array($TrustedDomains)) {
-                $TrustedDomains = explode("\n", $TrustedDomains);
+            if ($configuredDomains && is_string($configuredDomains)) {
+                $configuredDomains = array_merge($TrustedDomains, explode("\n", $configuredDomains));
             }
 
-            if (is_array($TrustedDomains)) {
-                // Add this domain to the trusted hosts.
-                $TrustedDomains[] = $MyHostname;
+            // Build a collection of authentication provider URLs.
+            $authProviderModel = new Gdn_AuthenticationProviderModel();
+            $providers = $authProviderModel->getProviders();
+            $providerUrls = [
+                'URL',
+                'RegisterUrl',
+                'SignInUrl',
+                'SignOutUrl',
+                'PasswordUrl',
+                'ProfileUrl'
+            ];
+
+            // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
+            if (is_array($providers) && count($providers) > 0) {
+                foreach ($providers as $key => $record) {
+                    foreach ($providerUrls as $urlKey) {
+                        $providerUrl = $record[$urlKey];
+                        if ($providerUrl && $providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
+                            if (!in_array($providerDomain, $TrustedDomains)) {
+                                $TrustedDomains[] = $providerDomain;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (is_array($configuredDomains)) {
+                $TrustedDomains = array_merge($TrustedDomains, $configuredDomains);
+
                 $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
                 $this->fireEvent('BeforeTargetReturn');
             }
 
-            if ($TrustedDomains === true) {
-                return $Target;
-            } elseif (count($TrustedDomains) == 0) {
-                // Only allow http redirects if they are to the same host name.
-                if ($MyHostname != $TargetHostname) {
-                    $Target = '';
-                }
-            } else {
-                // Loop the trusted domains looking for a match
-                $Match = false;
-                foreach ($TrustedDomains as $TrustedDomain) {
-                    if (stringEndsWith($TargetHostname, $TrustedDomain, true)) {
-                        $Match = true;
-                    }
-                }
-                if (!$Match) {
-                    $Target = '';
+            // Loop the trusted domains looking for a match
+            $Match = false;
+            foreach ($TrustedDomains as $TrustedDomain) {
+                if (stringEndsWith($TargetHostname, $TrustedDomain, true)) {
+                    $Match = true;
+                    break;
                 }
             }
+
+            if (!$Match) {
+                $Target = url('/home/leaving?target='.urlencode($Target));
+            }
         }
+
         return $Target;
     }
 }

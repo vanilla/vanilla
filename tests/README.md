@@ -3,7 +3,7 @@
 Vanilla's tests are designed to work on [Travis CI](https://travis-ci.org/), but you can set your local environment up
 to run the tests with minimal setup.
 
-Vanilla has 2 testsuites, "Library" and "AIv0". The requirements below are for the "AIv0" testsuite, which does our integration testing via web server. The "Library" testsuite is actual unit testing. For more thorough results, you must run both.
+Vanilla has 2 testsuites, "Library" and "APIv0". The requirements below are for the "APIv0" testsuite, which does our integration testing via web server. The "Library" testsuite is actual unit testing. For more thorough results, you must run both.
 
 You can use the `--testsuite Library` flag when running phpunit to only run our unit tests and bypass the web server requirements below.
 
@@ -18,9 +18,9 @@ create and drop databases. The only database that the tests use is `vanilla_test
   * Pay particular attention to the `/cgi-bin` mapping.    
   * If you are on Apache, the default `.htaccess` file should work for you.
 
-3. All of the developer dependencies installed with `composer install`.
+3. All of the developer dependencies are installed with `composer install`.
 
-4. [PHPUnit installed](https://github.com/sebastianbergmann/phpunit#installation).
+4. PHPUnit must be [installed](https://github.com/sebastianbergmann/phpunit#installation).
 
 ## Running
 

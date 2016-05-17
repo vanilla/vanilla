@@ -263,7 +263,9 @@ class CategoryCollection {
      * @param array &$category The category to calculate.
      */
     private function calculateStatic(&$category) {
-        call_user_func($this->staticCalculator, $category);
+        if ($category['CategoryID'] > 0) {
+            call_user_func($this->staticCalculator, $category);
+        }
     }
 
     /**
@@ -272,7 +274,9 @@ class CategoryCollection {
      * @param array &$category The category to calculate.
      */
     private function calculateDynamic(&$category) {
-        call_user_func($this->userCalculator, $category);
+        if ($category['CategoryID'] > 0) {
+            call_user_func($this->userCalculator, $category);
+        }
     }
 
     /**
@@ -353,7 +357,6 @@ class CategoryCollection {
      * @param int $parentID The ID of the parent category.
      * @param int $maxDepth The maximum relative depth to grab.
      * @param int $permission The permission column to check.
-     * @param bool $adjustDepth Whether to adjust the depth field on categories.
      */
     public function getTree($parentID = -1, $maxDepth = 3, $permission = 'PermsDiscussionsView') {
         $tree = [];
@@ -453,7 +456,7 @@ class CategoryCollection {
             ->select($select)
             ->from('Category')
             ->where('ParentCategoryID', $parentIDs)
-            ->where('CategoryID <>', -1)
+            ->where('CategoryID >', 0)
             ->limit($this->absoluteLimit)
             ->orderBy('ParentCategoryID, Sort')
             ->get()->resultArray();

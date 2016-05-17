@@ -508,7 +508,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             // table that are NOT in $this->_Columns.
             $RemoveColumns = array_diff(array_keys($existingColumns), array_keys($columns));
             foreach ($RemoveColumns as $Column) {
-                $AlterSql[] = "drop column `{$columns[$Column]}`";
+                $AlterSql[] = "drop column `$Column`";
             }
         }
 

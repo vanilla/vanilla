@@ -212,10 +212,12 @@ class CategoriesController extends VanillaController {
             // Load the subtree.
             $this->setData(
                 'CategoryTree',
-                CategoryModel::instance()->getChildTree(
-                    $CategoryIdentifier,
-                    CategoryModel::instance()->getMaxDisplayDepth()
-                )
+                $this->CategoryModel
+                    ->setJoinUserCategory(true)
+                    ->getChildTree(
+                        $CategoryIdentifier,
+                        CategoryModel::instance()->getMaxDisplayDepth()
+                    )
             );
 
             // Add a backwards-compatibility shim for the old categories.
@@ -389,10 +391,12 @@ class CategoriesController extends VanillaController {
                 return $this->CategoryModel->GetFull()->resultArray();
             };
         }
-        $categoryTree = $this->CategoryModel->getChildTree(
-            $Category ?: null,
-            $this->CategoryModel->getMaxDisplayDepth()
-        );
+        $categoryTree = $this->CategoryModel
+            ->setJoinUserCategory(true)
+            ->getChildTree(
+                $Category ?: null,
+                $this->CategoryModel->getMaxDisplayDepth()
+            );
         $this->CategoryModel->joinRecent($categoryTree);
         $this->setData('CategoryTree', $categoryTree);
 

@@ -51,6 +51,11 @@ class CategoryModel extends Gdn_Model {
     public $JoinRecentUsers = true;
 
     /**
+     * @var bool Whether or not to join GDN_UserCategoryInformation in {@link CategoryModel::calculateUser()}.
+     */
+    private $joinUserCategory = false;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @since 2.0.0
@@ -66,7 +71,7 @@ class CategoryModel extends Gdn_Model {
         });
 
         $this->collection->setUserCalculator(function (&$category) {
-            self::calculateUser($category);
+            $this->calculateUser($category);
         });
     }
 
@@ -161,25 +166,93 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * @param $Category
+     * Calculate the user-specific information on a category.
+     *
+     * @param array &$category The category to calculate.
      */
-    private static function calculateUser(&$Category) {
-        $Category['Url'] = url($Category['Url'], '//');
-        if ($Photo = val('Photo', $Category)) {
-            $Category['PhotoUrl'] = Gdn_Upload::url($Photo);
+    private function calculateUser(&$category, $addUserCategory = null) {
+        $category['Url'] = url($category['Url'], '//');
+        if ($Photo = val('Photo', $category)) {
+            $category['PhotoUrl'] = Gdn_Upload::url($Photo);
         }
 
-        if (!empty($Category['LastUrl'])) {
-            $Category['LastUrl'] = url($Category['LastUrl'], '//');
+        if (!empty($category['LastUrl'])) {
+            $category['LastUrl'] = url($category['LastUrl'], '//');
         }
-        $Category['PermsDiscussionsView'] = Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $Category['PermissionCategoryID']);
-        $Category['PermsDiscussionsAdd'] = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', $Category['PermissionCategoryID']);
-        $Category['PermsDiscussionsEdit'] = Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Category['PermissionCategoryID']);
-        $Category['PermsCommentsAdd'] = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $Category['PermissionCategoryID']);
+        $session = Gdn::session();
+        $permissionID = $category['PermissionCategoryID'];
 
-        $Code = $Category['UrlCode'];
-        $Category['Name'] = TranslateContent("Categories.".$Code.".Name", $Category['Name']);
-        $Category['Description'] = TranslateContent("Categories.".$Code.".Description", $Category['Description']);
+        $category['PermsDiscussionsView'] = $session->checkPermission('Vanilla.Discussions.View', true, 'Category', $permissionID);
+        $category['PermsDiscussionsAdd'] = $session->checkPermission('Vanilla.Discussions.Add', true, 'Category', $permissionID);
+        $category['PermsDiscussionsEdit'] = $session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $permissionID);
+        $category['PermsCommentsAdd'] = $session->checkPermission('Vanilla.Comments.Add', true, 'Category', $permissionID);
+
+        $Code = $category['UrlCode'];
+        $category['Name'] = translateContent("Categories.".$Code.".Name", $category['Name']);
+        $category['Description'] = translateContent("Categories.".$Code.".Description", $category['Description']);
+
+        if ($addUserCategory || ($addUserCategory === null && $this->joinUserCategory())) {
+            $userCategories = $this->getUserCategories();
+
+            $dateMarkedRead = val('DateMarkedRead', $category);
+            $userData = val($category['CategoryID'], $userCategories);
+            if ($userData) {
+                $userDateMarkedRead = $userData['DateMarkedRead'];
+
+                if (!$dateMarkedRead ||
+                    ($userDateMarkedRead && Gdn_Format::toTimestamp($userDateMarkedRead) > Gdn_Format::toTimestamp($dateMarkedRead))) {
+
+                    $category['DateMarkedRead'] = $userDateMarkedRead;
+                    $dateMarkedRead = $userDateMarkedRead;
+                }
+
+                $category['Unfollow'] = $userData['Unfollow'];
+            } else {
+                $category['Unfollow'] = false;
+            }
+
+            // Calculate the following field.
+            $Following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
+            $category['Following'] = $Following;
+
+            // Calculate the read field.
+            if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
+                $category['Read'] = false;
+            } elseif ($dateMarkedRead) {
+                if (val('LastDateInserted', $category)) {
+                    $category['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($category['LastDateInserted']);
+                } else {
+                    $category['Read'] = true;
+                }
+            } else {
+                $category['Read'] = false;
+            }
+        }
+    }
+
+    /**
+     * Get the per-category information for the current user.
+     *
+     * @return array|mixed
+     */
+    private function getUserCategories() {
+        if (Gdn::session()->UserID) {
+            $key = 'UserCategory_'.Gdn::session()->UserID;
+            $userData = Gdn::cache()->get($key);
+            if ($userData === Gdn_Cache::CACHEOP_FAILURE) {
+                $sql = clone $this->SQL;
+                $sql->reset();
+
+                $userData = $sql->getWhere('UserCategory', ['UserID' => Gdn::session()->UserID])->resultArray();
+                $userData = array_column($userData, null, 'CategoryID');
+                Gdn::cache()->store($key, $userData);
+                return $userData;
+            }
+            return $userData;
+        } else {
+            $userData = [];
+            return $userData;
+        }
     }
 
     /**
@@ -986,20 +1059,7 @@ class CategoryModel extends Gdn_Model {
         $DoHeadings = c('Vanilla.Categories.DoHeadings');
 
         if ($AddUserCategory) {
-            $SQL = clone Gdn::sql();
-            $SQL->reset();
-
-            if (Gdn::session()->UserID) {
-                $Key = 'UserCategory_'.Gdn::session()->UserID;
-                $UserData = Gdn::cache()->get($Key);
-                if ($UserData === Gdn_Cache::CACHEOP_FAILURE) {
-                    $UserData = $SQL->getWhere('UserCategory', array('UserID' => Gdn::session()->UserID))->resultArray();
-                    $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
-                    Gdn::cache()->store($Key, $UserData);
-                }
-            } else {
-                $UserData = array();
-            }
+            $UserData = self::instance()->getUserCategories();
 
             foreach ($IDs as $ID) {
                 $Category = $Categories[$ID];
@@ -1042,7 +1102,7 @@ class CategoryModel extends Gdn_Model {
         // Add permissions.
         foreach ($IDs as $CID) {
             $Category = &$Categories[$CID];
-            self::calculateUser($Category);
+            self::instance()->calculateUser($Category);
         }
     }
 
@@ -1331,13 +1391,13 @@ class CategoryModel extends Gdn_Model {
             }
             $Max--;
 
+            if ($category['CategoryID'] == -1) {
+                break;
+            }
+
             if ($checkPermissions && !$category['PermsDiscussionsView']) {
                 $category = self::instance()->getOne($category['ParentCategoryID']);
                 continue;
-            }
-
-            if ($category['CategoryID'] == -1) {
-                break;
             }
 
             // Return by ID or code.
@@ -1924,6 +1984,29 @@ class CategoryModel extends Gdn_Model {
         }
         self::ClearCache();
         return $Saves;
+    }
+
+    /**
+     * Whether or not to join information from GDN_UserCategory in {@link CategoryModel::calculateUser()}.
+     *
+     * You only need the information from this table when looking at categories in a list. Controllers should set this
+     * flag if they are going to be sending read/unread information with the category.
+     *
+     * @return boolean Returns the joinUserCategory.
+     */
+    public function joinUserCategory() {
+        return $this->joinUserCategory;
+    }
+
+    /**
+     * Set whether or not to join information from GDN_UserCategory in {@link CategoryModel::calculateUser()}.
+     *
+     * @param boolean $joinUserCategory The new value to set.
+     * @return CategoryModel Returns `$this` for fluent calls.
+     */
+    public function setJoinUserCategory($joinUserCategory) {
+        $this->joinUserCategory = $joinUserCategory;
+        return $this;
     }
 
     /**

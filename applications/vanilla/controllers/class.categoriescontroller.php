@@ -169,10 +169,6 @@ class CategoriesController extends VanillaController {
                     saveToConfig('Vanilla.Categories.DoHeadings', false, false);
                 }
 
-                trace($this->deliveryMethod(), 'delivery method');
-                trace($this->deliveryType(), 'delivery type');
-                trace($this->SyndicationMethod, 'syndication');
-
                 if ($this->SyndicationMethod != SYNDICATION_NONE) {
                     // RSS can't show a category list so just tell it to expand all categories.
                     saveToConfig('Vanilla.ExpandCategories', true, false);

@@ -61,8 +61,11 @@ class CategoryModel extends Gdn_Model {
         $this->collection = new CategoryCollection();
         // Inject the calculator dependency.
         $this->collection->setConfig(Gdn::config());
-        $this->collection->setCalculator(function (&$category) {
+        $this->collection->setStaticCalculator(function (&$category) {
             self::calculate($category);
+        });
+
+        $this->collection->setUserCalculator(function (&$category) {
             self::calculateUser($category);
         });
     }
@@ -320,7 +323,7 @@ class CategoryModel extends Gdn_Model {
             $category['PhotoUrl'] = '';
         }
 
-        if ($category['DisplayAs'] == 'Default') {
+        if ($category['DisplayAs'] === 'Default') {
             if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
                 $category['DisplayAs'] = 'Categories';
             } elseif ($category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
@@ -554,10 +557,10 @@ class CategoryModel extends Gdn_Model {
         }
     }
 
-    public function getChildTree($id, $depth = 3, $adjustDepth = false) {
+    public function getChildTree($id, $depth = 3, $permission = 'PermsDiscussionsView') {
         $category = $this->getOne($id);
 
-        return $this->collection->getTree((int)val('CategoryID', $category), $depth, $adjustDepth);
+        return $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
     }
 
     /**
@@ -817,11 +820,9 @@ class CategoryModel extends Gdn_Model {
                 $category['LastUserID'] = null;
             }
             $user = Gdn::userModel()->getID($category['LastUserID']);
-            if ($user) {
                 foreach (['Name', 'Email', 'Photo'] as $field) {
                     $category['Last'.$field] = val($field, $user);
                 }
-            }
 
             if (!empty($category['Children'])) {
                 $this->joinRecentInternal($category['Children'], $discussions, $comments);
@@ -1666,8 +1667,7 @@ class CategoryModel extends Gdn_Model {
         if ($Root) {
             $Result = self::instance()->collection->getTree(
                 (int)val('CategoryID', $Root),
-                self::instance()->getMaxDisplayDepth(),
-                true
+                self::instance()->getMaxDisplayDepth()
             );
             self::instance()->joinRecent($Result);
         } else {
@@ -2464,7 +2464,17 @@ SQL;
 
             if (val('RowCount', $this->Database->LastInfo) == 0) {
                 break;
+    }
             }
         }
+
+    /**
+     * Return a flattened version of a tree.
+     *
+     * @param array $categories The category tree.
+     * @return array Returns the flattened category tree.
+     */
+    public static function flattenTree($categories) {
+        return self::instance()->collection->flattenTree($categories);
     }
 }

@@ -391,8 +391,7 @@ class CategoriesController extends VanillaController {
         }
         $categoryTree = $this->CategoryModel->getChildTree(
             $Category ?: null,
-            $this->CategoryModel->getMaxDisplayDepth(),
-            true
+            $this->CategoryModel->getMaxDisplayDepth()
         );
         $this->CategoryModel->joinRecent($categoryTree);
         $this->setData('CategoryTree', $categoryTree);

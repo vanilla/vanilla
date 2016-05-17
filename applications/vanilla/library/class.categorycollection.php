@@ -39,7 +39,12 @@ class CategoryCollection {
     /**
      * @var callable The callback used to calculate individual categories.
      */
-    private $calculator;
+    private $staticCalculator;
+
+    /**
+     * @var callable The callback used to calculate request specific data on a calculator.
+     */
+    private $userCalculator;
 
     /**
      * @var Gdn_Configuration The config dependency.
@@ -82,7 +87,10 @@ class CategoryCollection {
             $cache = Gdn::cache();
         }
         $this->cache = $cache;
-        $this->setCalculator();
+        $this->setStaticCalculator([$this, 'defaultCalculator']);
+        $this->setUserCalculator(function (&$category) {
+            // do nothing
+        });
     }
 
     /**
@@ -90,22 +98,18 @@ class CategoryCollection {
      *
      * @return callable Returns the calculator.
      */
-    public function getCalculator() {
-        return $this->calculator;
+    public function getStaticCalculator() {
+        return $this->staticCalculator;
     }
 
     /**
      * Set the calculator.
      *
-     * @param callable $calculator The new calculator.
+     * @param callable $staticCalculator The new calculator.
      * @return CategoryCollection Returns `$this` for fluent calls.
      */
-    public function setCalculator(callable $calculator = null) {
-        if ($calculator === null) {
-            $this->calculator = [$this, 'defaultCalculator'];
-        } else {
-            $this->calculator = $calculator;
-        }
+    public function setStaticCalculator(callable $staticCalculator) {
+        $this->staticCalculator = $staticCalculator;
         return $this;
     }
 
@@ -156,7 +160,9 @@ class CategoryCollection {
      */
     public function get($categoryID) {
         // Figure out the ID.
-        if (is_int($categoryID)) {
+        if (empty($categoryID)) {
+            return null;
+        } elseif (is_int($categoryID)) {
             $id = $categoryID;
         } elseif (isset($this->categorySlugs[strtolower($categoryID)])) {
             $id = $this->categorySlugs[strtolower($categoryID)];
@@ -174,6 +180,7 @@ class CategoryCollection {
                 $category = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY, $id));
 
                 if (!empty($category)) {
+                    $this->calculateDynamic($category);
                     $this->categories[$id] = $category;
                     $this->categorySlugs[strtolower($category['UrlCode'])] = $id;
                     return $category;
@@ -187,10 +194,7 @@ class CategoryCollection {
 
         if (!empty($category)) {
             // This category came from the database, so must be calculated.
-            $this->calculate($category);
-
-            $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+            $this->calculateStatic($category);
 
             $this->cache->store(
                 $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
@@ -200,6 +204,10 @@ class CategoryCollection {
                 $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
                 (int)$category['CategoryID']
             );
+
+            $this->calculateDynamic($category);
+            $this->categories[(int)$category['CategoryID']] = $category;
+            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
             return $category;
         } else {
@@ -250,12 +258,21 @@ class CategoryCollection {
     }
 
     /**
-     * Calculate dynamic data on a category.
+     * Calculate static data on a category.
      *
      * @param array &$category The category to calculate.
      */
-    private function calculate(&$category) {
-        call_user_func($this->calculator, $category);
+    private function calculateStatic(&$category) {
+        call_user_func($this->staticCalculator, $category);
+    }
+
+    /**
+     * Calculate request-specific data on a category.
+     *
+     * @param array &$category The category to calculate.
+     */
+    private function calculateDynamic(&$category) {
+        call_user_func($this->userCalculator, $category);
     }
 
     /**
@@ -290,6 +307,7 @@ class CategoryCollection {
         if (!empty($keys)) {
             $cacheCategories = $this->cache->get($keys);
             foreach ($cacheCategories as $key => $category) {
+                $this->calculateDynamic($category);
                 $this->categories[(int)$category['CategoryID']] = $category;
                 $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
@@ -304,23 +322,26 @@ class CategoryCollection {
                 $dbCategoryIDs[] = $id;
             }
         }
-        $dbCategories = $this->sql->getWhere('Category', ['CategoryID' => $dbCategoryIDs])->resultArray();
-        foreach ($dbCategories as &$category) {
-            $this->calculate($category);
+        if (!empty($dbCategories)) {
+            $dbCategories = $this->sql->getWhere('Category', ['CategoryID' => $dbCategoryIDs])->resultArray();
+            foreach ($dbCategories as &$category) {
+                $this->calculateStatic($category);
 
-            $this->cache->store(
-                $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
-                $category
-            );
-            $this->cache->store(
-                $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
-                (int)$category['CategoryID']
-            );
+                $this->cache->store(
+                    $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
+                    $category
+                );
+                $this->cache->store(
+                    $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
+                    (int)$category['CategoryID']
+                );
 
-            $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+                $this->calculateDynamic($category);
+                $this->categories[(int)$category['CategoryID']] = $category;
+                $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
-            $categories[(int)$category['CategoryID']] = $category;
+                $categories[(int)$category['CategoryID']] = $category;
+            }
         }
 
         return $categories;
@@ -331,9 +352,10 @@ class CategoryCollection {
      *
      * @param int $parentID The ID of the parent category.
      * @param int $maxDepth The maximum relative depth to grab.
+     * @param int $permission The permission column to check.
      * @param bool $adjustDepth Whether to adjust the depth field on categories.
      */
-    public function getTree($parentID = -1, $maxDepth = 3, $adjustDepth = false) {
+    public function getTree($parentID = -1, $maxDepth = 3, $permission = 'PermsDiscussionsView') {
         $tree = [];
         $categories = [];
         $parentID = $parentID ?: -1;
@@ -341,7 +363,7 @@ class CategoryCollection {
         $currentDepth = 1;
         $parents = [$parentID];
         for ($i = 0; $i < $maxDepth; $i++) {
-            $children = $this->getChildrenByParents($parents);
+            $children = $this->getChildrenByParents($parents, $permission);
 
             // Go through the children and wire them up.
             foreach ($children as $child) {
@@ -353,9 +375,7 @@ class CategoryCollection {
                     continue;
                 }
 
-                if ($adjustDepth) {
-                    $category['Depth'] = $currentDepth;
-                }
+                $category['Depth'] = $currentDepth;
 
                 $categories[$category['CategoryID']] = $category;
                 if (!isset($categories[$category['ParentCategoryID']])) {
@@ -415,10 +435,10 @@ class CategoryCollection {
      * Get all of the children of a parent category.
      *
      * @param int[] $parentIDs The IDs of the parent categories.
-     * @return array
-     * @throws Exception
+     * @param string $permission The name of the permission to check.
+     * @return array Returns an array of child categories.
      */
-    private function getChildrenByParents(array $parentIDs) {
+    private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView') {
         if ($this->cache->activeEnabled()) {
             $select = 'CategoryID';
         } else {
@@ -439,8 +459,17 @@ class CategoryCollection {
             $ids = array_column($data, 'CategoryID');
             $data = $this->getMulti($ids);
         } else {
-            array_walk($data, [$this, 'calculate']);
+            array_walk($data, [$this, 'calculateStatic']);
+            array_walk($data, [$this, 'calculateDynamic']);
         }
+
+        // Remove categories without permission.
+        if ($permission) {
+            $data = array_filter($data, function ($category) use ($permission) {
+                return (bool)val($permission, $category);
+            });
+        }
+
         return $data;
     }
 
@@ -562,7 +591,7 @@ class CategoryCollection {
     public function refreshCache($categoryID) {
         $category = $this->sql->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         if ($category) {
-            $this->calculate($category);
+            $this->calculateStatic($category);
             $this->cache->store(
                 $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
                 $category
@@ -578,6 +607,26 @@ class CategoryCollection {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get the dynamic calculator.
+     *
+     * @return callable Returns the dynamicCalculator.
+     */
+    public function getUserCalculator() {
+        return $this->userCalculator;
+    }
+
+    /**
+     * Set the dynamic calculator.
+     *
+     * @param callable $userCalculator The new dynamic calculator.
+     * @return CategoryCollection Returns `$this` for fluent calls.
+     */
+    public function setUserCalculator($userCalculator) {
+        $this->userCalculator = $userCalculator;
+        return $this;
     }
 
     /**

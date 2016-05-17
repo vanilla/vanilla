@@ -23,7 +23,7 @@ class CategoryController extends VanillaController {
 
     public function follow($CategoryID, $Value, $TKey) {
         if (Gdn::session()->validateTransientKey($TKey)) {
-            $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => !(bool)$Value));
+            $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => (int)(!(bool)$Value)));
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {

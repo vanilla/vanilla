@@ -630,10 +630,37 @@ class CategoryModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Get a category tree based on, but not including a parent category.
+     *
+     * @param int|string $id The parent category ID or slug.
+     * @param int $depth The maximum depth of categories.
+     * @param string $permission The permission to check to see which categories to get.
+     * @return array Returns an array of categories with child categories in the **Children** key.
+     */
     public function getChildTree($id, $depth = 3, $permission = 'PermsDiscussionsView') {
         $category = $this->getOne($id);
 
         return $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+    }
+
+    /**
+     * Filter a category tree to only the followed categories.
+     *
+     * @param array $categories The category tree to filter.
+     * @return array Returns a category tree.
+     */
+    public function filterFollowing($categories) {
+        $result = [];
+        foreach ($categories as $category) {
+            if (val('Following', $category)) {
+                if (!empty($category['Children'])) {
+                    $category['Children'] = $this->filterFollowing($category['Children']);
+                }
+                $result[] = $category;
+            }
+        }
+        return $result;
     }
 
     /**

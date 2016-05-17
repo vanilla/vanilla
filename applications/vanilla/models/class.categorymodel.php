@@ -609,8 +609,6 @@ class CategoryModel extends Gdn_Model {
      */
     public static function getChildren($categoryID) {
         $categories = self::instance()->collection->getChildren($categoryID);
-        self::calculateData($categories);
-        self::joinUserData($categories, false);
         return $categories;
     }
 

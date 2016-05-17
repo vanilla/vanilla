@@ -28,11 +28,11 @@ if (!function_exists('WriteDiscussionHeading')) :
     }
 endif;
 
-if (!function_exists('WriteDiscussionRow')) :
+if (!function_exists('writeDiscussionRow')) :
     /**
      * Writes a discussion in table row format.
      */
-    function writeDiscussionRow($Discussion, $Sender, $Session, $Alt2) {
+    function writeDiscussionRow($Discussion, $Sender, $Session) {
         if (!property_exists($Sender, 'CanEditDiscussions')) {
             $Sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($Discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
         }
@@ -178,22 +178,18 @@ if (!function_exists('WriteDiscussionTable')) :
                 <tbody>
                 <?php
                 $Session = Gdn::session();
-                $Alt = '';
                 $Announcements = $c->data('Announcements');
                 if (is_a($Announcements, 'Gdn_DataSet')) {
                     foreach ($Announcements->result() as $Discussion) {
-                        $Alt = $Alt == ' Alt' ? '' : ' Alt';
-                        WriteDiscussionRow($Discussion, $c, $Session, $Alt);
+                        writeDiscussionRow($Discussion, $c, $Session);
                     }
                 }
 
-                $Alt = '';
                 $Discussions = $c->data('Discussions');
                 if (is_a($Discussions, 'Gdn_DataSet')) {
                     foreach ($Discussions->result() as $Discussion) {
-                        $Alt = $Alt == ' Alt' ? '' : ' Alt';
 //            var_dump($Discussion);
-                        WriteDiscussionRow($Discussion, $c, $Session, $Alt);
+                        writeDiscussionRow($Discussion, $c, $Session);
                     }
                 }
                 ?>

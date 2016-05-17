@@ -364,6 +364,9 @@ class CategoryCollection {
         $parents = [$parentID];
         for ($i = 0; $i < $maxDepth; $i++) {
             $children = $this->getChildrenByParents($parents, $permission);
+            if (empty($children)) {
+                break;
+            }
 
             // Go through the children and wire them up.
             foreach ($children as $child) {

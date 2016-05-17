@@ -18,7 +18,6 @@ echo $this->Form->errors();
     <table class="SelectionGrid ThemeStyles">
         <tbody>
         <?php
-        $Alt = FALSE;
         $Cols = 3;
         $Col = 0;
         $Classes = array('FirstCol', 'MiddleCol', 'LastCol');

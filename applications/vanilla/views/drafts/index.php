@@ -3,7 +3,6 @@ echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 include($this->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $Session = Gdn::session();
 $ShowOptions = TRUE;
-$Alt = '';
 $ViewLocation = $this->fetchViewLocation('drafts', 'drafts');
 // WriteFilterTabs($this);
 echo Gdn_Theme::Module('DiscussionFilterModule');

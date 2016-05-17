@@ -322,7 +322,7 @@ class CategoryCollection {
                 $dbCategoryIDs[] = $id;
             }
         }
-        if (!empty($dbCategories)) {
+        if (!empty($dbCategoryIDs)) {
             $dbCategories = $this->sql->getWhere('Category', ['CategoryID' => $dbCategoryIDs])->resultArray();
             foreach ($dbCategories as &$category) {
                 $this->calculateStatic($category);

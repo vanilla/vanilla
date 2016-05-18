@@ -503,7 +503,8 @@ class CategoryModel extends Gdn_Model {
             return $categoryIDs;
         } else {
             $permissionCategoryIDs = array_keys($permissionCategories);
-            return array_intersect($categoryIDs, $permissionCategoryIDs);
+            // Reindex the result.  array_intersect leaves the original, potentially incomplete, numeric indexes.
+            return array_values(array_intersect($categoryIDs, $permissionCategoryIDs));
         }
     }
 

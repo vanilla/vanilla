@@ -119,9 +119,12 @@ class TaggingPlugin extends Gdn_Plugin {
 
     /**
      * Load discussions for a specific tag.
-     * @param DiscussionsController $Sender
+     *
+     * @param DiscussionsController $Sender Sending controller instance
+     * @param array $Args Event's arguments
+     * @throws Exception
      */
-    public function discussionsController_Tagged_create($Sender) {
+    public function discussionsController_tagged_create($Sender, $Args) {
         Gdn_Theme::section('DiscussionList');
 
         $Args = $Sender->RequestArgs;
@@ -221,14 +224,22 @@ class TaggingPlugin extends Gdn_Plugin {
 
         // Build a pager.
         $PagerFactory = new Gdn_PagerFactory();
-        $Sender->Pager = $PagerFactory->GetPager('Pager', $Sender);
+        $Sender->EventArguments['PagerType'] = 'Pager';
+        $Sender->fireEvent('BeforeBuildPager');
+        if (!$Sender->data('_PagerUrl')) {
+            $Sender->setData('_PagerUrl', "/discussions/tagged/$UrlTag/{Page}");
+        }
+        $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
         $Sender->Pager->ClientID = 'Pager';
         $Sender->Pager->configure(
             $Offset,
             $Limit,
-            $RecordCount, // record count
-            ''
+            $RecordCount,
+            $Sender->data('_PagerUrl')
         );
+        $Sender->setData('_Page', $Page);
+        $Sender->setData('_Limit', $Limit);
+        $Sender->fireEvent('AfterBuildPager');
 
         $Sender->View = c('Vanilla.Discussions.Layout');
 

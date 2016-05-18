@@ -389,7 +389,6 @@ class CategoryModel extends Gdn_Model {
         $category['CountAllDiscussions'] = $category['CountDiscussions'];
         $category['CountAllComments'] = $category['CountComments'];
         $category['Url'] = self::categoryUrl($category, false, '/');
-        $category['ChildIDs'] = array();
         if (val('Photo', $category)) {
             $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
         } else {
@@ -435,6 +434,9 @@ class CategoryModel extends Gdn_Model {
             if (isset($Data[$ParentID]) && $ParentID != $Key) {
                 $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
                 $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
+                if (empty($Data[$ParentID]['ChildIDs'])) {
+                    $Data[$ParentID]['ChildIDs'] = [];
+                }
                 array_unshift($Data[$ParentID]['ChildIDs'], $Key);
             }
         }
@@ -1489,37 +1491,28 @@ class CategoryModel extends Gdn_Model {
      * @param string $parentCategory The ID or url code of the parent category.
      * @since 2.0.18
      * @param bool $includeParent Whether or not to include the parent in the result.
-     * @param bool|int $adjustDepth Whether or not to adjust the depth or a number to adjust the depth by.
-     * Passing `true` as this parameter will make the returned subtree look like the full tree which is useful for many
-     * views that expect the full category tree.
      * @return array An array of categories.
      */
-    public static function getSubtree($parentCategory, $includeParent = true, $adjustDepth = false) {
-        $Result = array();
-        self::categories(); // kludge all categories loading properly.
-        $Category = self::categories($parentCategory);
-
-        // Check to see if the depth should be adjusted.
-        // This value is true if called by a dev or a number if called recursively.
-        if ($adjustDepth === true) {
-            $adjustDepth = -val('Depth', $Category) + ($includeParent ? 1 : 0);
+    public static function getSubtree($parentCategory, $includeParent = true) {
+        $parent = self::instance()->getOne($parentCategory);
+        if ($parent === null) {
+            return [];
         }
+        $categories = self::instance()->collection->getTree($parent['CategoryID'], 10, '');
+        $categories = self::instance()->flattenTree($categories);
 
-        if ($Category) {
-            if ($includeParent) {
-                if ($adjustDepth) {
-                    $Category['Depth'] += $adjustDepth;
-                }
+        if ($includeParent) {
+            $parent['Depth'] = 1;
+            $result = [$parent['CategoryID'] => $parent];
 
-                $Result[$Category['CategoryID']] = $Category;
+            foreach ($categories as $category) {
+                $category['Depth']--;
+                $result[$category['CategoryID']] = $category;
             }
-            $ChildIDs = val('ChildIDs', $Category, array());
-
-            foreach ($ChildIDs as $ChildID) {
-                $Result = array_replace($Result, self::GetSubtree($ChildID, true, $adjustDepth));
-            }
+        } else {
+            $result = array_column($categories, null, 'CategoryID');
         }
-        return $Result;
+        return $result;
     }
 
     public function getFull($CategoryID = false, $Permissions = false) {

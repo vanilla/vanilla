@@ -324,27 +324,5 @@ if (!class_exists('SideMenuModule', false)) {
 
             return parent::ToString();
         }
-
-        /**
-         * @param NavModule $navModule
-         */
-        public function addToNavModule($navModule) {
-            $navGroups = array_keys($navModule->items);
-            foreach($this->Items as $item) {
-                $group = strtolower(val('Group', $item));
-                $group = preg_replace('/\s/', '-', $group);
-                if (!in_array($group, $navGroups)) {
-                    $navModule->addGroup(val('Group', $item), $group);
-                }
-                if ($links = val('Links', $item)) {
-                    foreach($links as $link) {
-                        $url = '/'.trim(val('Url', $link), '/');
-                        $slug = array_pop(explode('/', $url));
-			$navModule->addLinkIf(Gdn::session()->checkPermission(val('Permission', $link)), val('Text', $link), $url, $group . '.' . $slug
-                        );
-                    }
-                }
-            }
-        }
     }
 }

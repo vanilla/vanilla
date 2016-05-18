@@ -19,7 +19,7 @@ trait NestedCollection {
     /**
      * @var array List of items to sort.
      */
-    public $items = array();
+    public $items = [];
 
     /**
      * @var int Index number to start the item* key-generation with.
@@ -60,17 +60,38 @@ trait NestedCollection {
      * @var array The allowed keys in the $modifiers array parameter in the 'addItem' methods.
      */
     private $isPrepared = false;
-    
+
+    /**
+     * @var string The url to the display as active.
+     */
+    private $highlightRoute = '';
+
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */
-    private $allowedItemModifiers = array('popinRel', 'icon', 'badge', 'rel');
+    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel'];
 
     /**
      * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
      */
     public function setForceDivider($forceDivider) {
         $this->forceDivider = $forceDivider;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHighlightRoute() {
+        return $this->highlightRoute;
+    }
+
+    /**
+     * @param string $highlightRoute
+     * @return $this
+     */
+    public function setHighlightRoute($highlightRoute) {
+        $this->highlightRoute = $highlightRoute;
+        return $this;
     }
 
     /**
@@ -84,7 +105,7 @@ trait NestedCollection {
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addDividerIf($isAllowed = true, $key = '', $cssClass = '', $sort = array()) {
+    public function addDividerIf($isAllowed = true, $key = '', $cssClass = '', $sort = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -101,7 +122,7 @@ trait NestedCollection {
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addDivider($key = '', $cssClass = '', $sort = array()) {
+    public function addDivider($key = '', $cssClass = '', $sort = []) {
         $divider['key'] = $key;
         if ($sort) {
             $divider['sort'] = $sort;
@@ -130,7 +151,7 @@ trait NestedCollection {
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
+    public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -171,7 +192,7 @@ trait NestedCollection {
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addGroup($text = '', $key = '', $cssClass = '', $sort = array(), $modifiers = array()) {
+    public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         $group = array(
             'text' => $text,
             'key' => $key,
@@ -212,7 +233,7 @@ trait NestedCollection {
      * @param bool $disabled Whether to disable the link.
      * @return object $this The calling object.
      */
-    public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = array(), $modifiers = array(), $disabled = false) {
+    public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -236,7 +257,7 @@ trait NestedCollection {
      * @return object $this The calling object.
      * @throws Exception
      */
-    public function addLink($text, $url, $key = '', $cssClass = '', $sort = array(), $modifiers = array(), $disabled = false) {
+    public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         $link = array(
             'text' => $text,
             'url' => url($url),
@@ -254,7 +275,7 @@ trait NestedCollection {
         $this->touchKey($link);
         $link['cssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);
 
-        $listItemCssClasses = array();
+        $listItemCssClasses = [];
         if ($disabled) {
             $listItemCssClasses[] = 'disabled';
         }
@@ -266,7 +287,6 @@ trait NestedCollection {
         }
 
         $link['listItemCssClass'] = implode(' ', $listItemCssClasses);
-
         $this->addItem('link', $link);
         return $this;
     }
@@ -338,12 +358,12 @@ trait NestedCollection {
                 // This is a group.
                 if (!array_key_exists($key_part, $items)) {
                     // The group doesn't exist so lazy-create it.
-                    $items[$key_part] = array('type' => 'group', 'text' => '', 'items' => array(), '_sort' => count($items));
+                    $items[$key_part] = array('type' => 'group', 'text' => '', 'items' => [], '_sort' => count($items));
                 } elseif ($items[$key_part]['type'] !== 'group') {
                     throw new \Exception("$key_part is not a group", 500);
                 } elseif (!array_key_exists('items', $items[$key_part])) {
                     // Lazy create the items array.
-                    $items[$key_part]['items'] = array();
+                    $items[$key_part]['items'] = [];
                 }
                 $items =& $items[$key_part]['items'];
             }
@@ -384,7 +404,11 @@ trait NestedCollection {
      * @return bool Whether the current request url matches an item's link url.
      */
     protected function isActive($item) {
-        $highlightRoute = Gdn_Url::request(true);
+        if (empty($this->highlightRoute)) {
+            $highlightRoute = Gdn_Url::request(true);
+        } else {
+            $highlightRoute = url($this->highlightRoute);
+        }
         return (val('url', $item) && (trim(val('url', $item), '/') == trim($highlightRoute, '/')));
     }
 
@@ -477,7 +501,7 @@ trait NestedCollection {
     protected function prepareData(&$items) {
         foreach($items as $key => &$item) {
             unset($item['_sort'], $item['key']);
-            $subItems = array();
+            $subItems = [];
 
             // Group item
             if (val('type', $item) == 'group') {
@@ -511,11 +535,11 @@ trait NestedCollection {
      * @return array The flattened items list.
      */
     protected function flattenArray($items) {
-        $newItems = array();
+        $newItems = [];
         $itemslength = sizeof($items);
         $index = 0;
         foreach($items as $key => $item) {
-            $subItems = array();
+            $subItems = [];
 
             // Group item
             if (val('type', $item) == 'group') {

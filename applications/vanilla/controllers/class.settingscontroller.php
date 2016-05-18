@@ -150,22 +150,13 @@ class SettingsController extends Gdn_Controller {
     public function addSideMenu() {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-	    // Configure SideMenu module.
-	    // The SideMenuModule is deprecated, the addToNavModule ports the data from the SideMenuModule to the NavModule.
-	    $sideMenu = new SideMenuModule($this);
-
-	    $nav = new NavModule();
-	    $nav->setView('nav-dashboard');
-
-	    $this->EventArguments['Nav'] = $nav;
-	    $this->EventArguments['SideMenu'] = $sideMenu;
-
+            // Configure SideMenu module.
+            $nav = new DashboardNavAdapterModule();
+            $this->EventArguments['SideMenu'] = $nav;
             $this->fireEvent('GetAppSettingsMenuItems');
-	    $sideMenu->Sort = c('Garden.DashboardMenu.Sort');
 
-	    // Add the module
-	    $sideMenu->addToNavModule($nav);
-	    $this->addModule($nav, 'Panel');
+            // Add the module
+            $this->addModule($nav, 'Panel');
         }
     }
 
@@ -181,6 +172,7 @@ class SettingsController extends Gdn_Controller {
 
         // Display options
         $this->title(t('Flood Control'));
+        Gdn_Theme::section('Moderation');
         $this->addSideMenu('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.

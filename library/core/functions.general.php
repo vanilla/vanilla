@@ -2997,7 +2997,7 @@ if (!function_exists('safeRedirect')) {
         if (in_array($Domain, TrustedDomains())) {
             Redirect($Destination, $StatusCode);
         } else {
-            throw PermissionException();
+            redirect(url("/home/leaving?Target=".urlencode($Destination)));
         }
     }
 }
@@ -3377,15 +3377,46 @@ if (!function_exists('trustedDomains')) {
      * @return array
      */
     function trustedDomains() {
-        $Result = c('Garden.TrustedDomains', array());
-        if (!is_array($Result)) {
-            $Result = explode("\n", $Result);
+        // This domain is safe.
+        $trustedDomains = [Gdn::request()->host()];
+
+        $configuredDomains = c('Garden.TrustedDomains', []);
+        if (!is_array($configuredDomains)) {
+            $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
         }
 
-        // This domain is safe.
-        $Result[] = Gdn::Request()->Host();
+        $trustedDomains = array_merge($trustedDomains, $configuredDomains);
 
-        return array_unique($Result);
+        // Build a collection of authentication provider URLs.
+        $authProviderModel = new Gdn_AuthenticationProviderModel();
+        $providers = $authProviderModel->getProviders();
+        $providerUrls = [
+            'PasswordUrl',
+            'ProfileUrl',
+            'RegisterUrl',
+            'SignInUrl',
+            'SignOutUrl',
+            'URL'
+        ];
+
+        // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
+        if (is_array($providers) && count($providers) > 0) {
+            foreach ($providers as $key => $record) {
+                foreach ($providerUrls as $urlKey) {
+                    $providerUrl = $record[$urlKey];
+                    if ($providerUrl && $providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
+                        if (!in_array($providerDomain, $trustedDomains)) {
+                            $trustedDomains[] = $providerDomain;
+                        }
+                    }
+                }
+            }
+        }
+
+        Gdn::pluginManager()->EventArguments['TrustedDomains'] = &$trustedDomains;
+        Gdn::pluginManager()->fireAs('EntryController')->fireEvent('BeforeTargetReturn');
+
+        return array_unique($trustedDomains);
     }
 }
 

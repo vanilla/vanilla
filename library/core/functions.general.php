@@ -3773,3 +3773,58 @@ if (!function_exists('slugify')) {
         return $text;
     }
 }
+
+if (!function_exists('urlMatch')) {
+
+    /**
+     * Match a URL against a pattern.
+     *
+     * @param string $pattern The URL pattern.
+     * @param string $url The URL to test.
+     * @return bool Returns **true** if {@link $url} matches against {@link $pattern} or **false** otherwise.
+     */
+    function urlMatch($pattern, $url) {
+        $urlParts = parse_url($url);
+        $patternParts = parse_url($pattern);
+
+        if ($urlParts === false || $patternParts === false) {
+            return false;
+        }
+        $urlParts += ['scheme' => '', 'host' => '', 'path' => ''];
+
+        // Fix a pattern with no path.
+        if (empty($patternParts['host'])) {
+            $pathParts = explode('/', val('path', $patternParts), 2);
+            $patternParts['host'] = $pathParts[0];
+            $patternParts['path'] = '/'.trim(val(1, $pathParts), '/');
+        }
+
+        if (!empty($patternParts['scheme']) && $patternParts['scheme'] !== $urlParts['scheme']) {
+            return false;
+        }
+
+        if (!empty($patternParts['host'])) {
+            $p = $patternParts['host'];
+            $host = $urlParts['host'];
+
+            if (!fnmatch($p, $host)) {
+                if (substr($p, 0, 2) !== '*.' || !fnmatch(substr($p, 2), $host)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!empty($patternParts['path']) && $patternParts['path'] !== '/') {
+            $p = $patternParts['path'];
+            $path = '/'.trim(val('path', $urlParts), '/');
+
+            if (!fnmatch($p, $path)) {
+                if (substr($p, -2) !== '/*' || !fnmatch(substr($p, 0, -2), $path)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}

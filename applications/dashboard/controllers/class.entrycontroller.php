@@ -800,7 +800,7 @@ EOT;
         } elseif ($CheckPopup || $this->data('CheckPopup')) {
             $this->addDefinition('CheckPopup', true);
         } else {
-            redirect(url($this->RedirectUrl));
+            safeRedirect(url($this->RedirectUrl));
         }
     }
 
@@ -1902,66 +1902,6 @@ EOT;
             // Never redirect back to signin.
             if (preg_match('`^/entry/signin`i', $Target)) {
                 $Target = '/';
-            }
-        } else {
-            $TargetHostname = parse_url($Target, PHP_URL_HOST);
-
-            // Only allow external redirects to trusted domains.
-            $TrustedDomains = [
-                parse_url(Gdn::request()->domain(), PHP_URL_HOST)
-            ];
-
-            $configuredDomains = c('Garden.TrustedDomains', true);
-
-            // Trusted domains were previously saved in config as an array.
-            if ($configuredDomains && is_string($configuredDomains)) {
-                $configuredDomains = array_merge($TrustedDomains, explode("\n", $configuredDomains));
-            }
-
-            // Build a collection of authentication provider URLs.
-            $authProviderModel = new Gdn_AuthenticationProviderModel();
-            $providers = $authProviderModel->getProviders();
-            $providerUrls = [
-                'URL',
-                'RegisterUrl',
-                'SignInUrl',
-                'SignOutUrl',
-                'PasswordUrl',
-                'ProfileUrl'
-            ];
-
-            // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
-            if (is_array($providers) && count($providers) > 0) {
-                foreach ($providers as $key => $record) {
-                    foreach ($providerUrls as $urlKey) {
-                        $providerUrl = $record[$urlKey];
-                        if ($providerUrl && $providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
-                            if (!in_array($providerDomain, $TrustedDomains)) {
-                                $TrustedDomains[] = $providerDomain;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (is_array($configuredDomains)) {
-                $TrustedDomains = array_merge($TrustedDomains, $configuredDomains);
-
-                $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
-                $this->fireEvent('BeforeTargetReturn');
-            }
-
-            // Loop the trusted domains looking for a match
-            $Match = false;
-            foreach ($TrustedDomains as $TrustedDomain) {
-                if (stringEndsWith($TargetHostname, $TrustedDomain, true)) {
-                    $Match = true;
-                    break;
-                }
-            }
-
-            if (!$Match) {
-                $Target = url('/home/leaving?target='.urlencode($Target));
             }
         }
 

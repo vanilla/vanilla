@@ -94,5 +94,22 @@ echo $this->Form->errors();
             echo $this->Form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput'));
             ?>
         </li>
+        <li>
+            <div class="Info">
+                <?php echo t('You can optionally specify a white-list of trusted domains (ie. yourdomain.com) that are allowed to embed elements of your community (forum, comments, or modules).'); ?>
+            </div>
+            <div class="Info">
+                <small>
+                    <strong><?php echo t('Notes'); ?>:</strong>
+                    <?php echo t('Specify one domain per line, without protocol (ie. yourdomain.com).'); ?><br/>
+                    <?php echo t('The domain will include all subdomains (ie. yourdomain.com will also allow blog.yourdomain.com, news.yourdomain.com, etc).'); ?><br/>
+                    <?php echo t('Leaving this input blank will mean that you allow embedding on any site, anywhere.'); ?>
+                </small>
+            </div>
+            <?php
+            echo $this->Form->label('Trusted Domains', 'Garden.TrustedDomains');
+            echo $this->Form->textBox('Garden.TrustedDomains', ['MultiLine' => true]);
+            ?>
+        </li>
     </ul>
 <?php echo $this->Form->close('Save');

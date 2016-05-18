@@ -3398,6 +3398,7 @@ if (!function_exists('trustedDomains')) {
         if (!is_array($configuredDomains)) {
             $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
         }
+        $configuredDomains = array_filter($configuredDomains);
 
         $trustedDomains = array_merge($trustedDomains, $configuredDomains);
 

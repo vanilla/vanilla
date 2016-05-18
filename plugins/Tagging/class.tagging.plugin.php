@@ -229,7 +229,7 @@ class TaggingPlugin extends Gdn_Plugin {
         if (!$Sender->data('_PagerUrl')) {
             $Sender->setData('_PagerUrl', "/discussions/tagged/$UrlTag/{Page}");
         }
-        $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $this);
+        $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
         $Sender->Pager->ClientID = 'Pager';
         $Sender->Pager->configure(
             $Offset,

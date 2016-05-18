@@ -287,7 +287,6 @@ trait NestedCollection {
         }
 
         $link['listItemCssClass'] = implode(' ', $listItemCssClasses);
-
         $this->addItem('link', $link);
         return $this;
     }

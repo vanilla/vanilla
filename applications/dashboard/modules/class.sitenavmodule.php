@@ -293,7 +293,7 @@ class SiteNavModule extends NavModule {
             $currentSections = array_map('strtolower', $this->currentSections);
         }
 
-        foreach ($currentSections as &$currentSection) {
+        foreach ($currentSections as $currentSection) {
             if ($section = val(strtolower($currentSection), self::$sectionItems)) {
                 $this->addSectionItems($section);
             }

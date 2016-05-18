@@ -11,10 +11,12 @@
 /**
  * Collects the links for an application, organizes them by section, and renders the appropriate links given the section.
  *
- * Global items display no matter the section we're in.
+ * By default, global items display no matter the section we're in.
  *
  * If a section is not specified, the item is added to the SECTION_DEFAULT. If we are in a section without a custom nav,
  * these items will display.
+ *
+ * We can force the module to display any section menus by setting the currentSections property.
  *
  * TODO: Handle the dropdown menu case.
  */
@@ -30,6 +32,26 @@ class SiteNavModule extends NavModule {
 
     /** @var bool */
     protected static $initStaticFired = false;
+
+    /** @var array */
+    protected $currentSections = [];
+
+
+    /**
+     * @return array
+     */
+    public function getCurrentSections() {
+        return $this->currentSections;
+    }
+
+    /**
+     * @param array $currentSections
+     * @return $this
+     */
+    public function setCurrentSections($currentSections) {
+        $this->currentSections = $currentSections;
+        return $this;
+    }
 
     /**
      * @param $section
@@ -255,17 +277,21 @@ class SiteNavModule extends NavModule {
             $this->fireEvent('init');
         }
 
-        $currentSections = Gdn_Theme::section('', 'get');
-        $currentSections = array_map('strtolower', $currentSections);
+        if (empty($this->currentSections)) {
+            $currentSections = Gdn_Theme::section('', 'get');
+            $currentSections = array_map('strtolower', $currentSections);
 
-        $hasCustomMenu = !empty(array_intersect(array_keys(self::$sectionItems), $currentSections));
+            $hasCustomMenu = !empty(array_intersect(array_keys(self::$sectionItems), $currentSections));
 
-        if (!$hasCustomMenu) {
-            $currentSections = [self::SECTION_DEFAULT];
+            if (!$hasCustomMenu) {
+                $currentSections = [self::SECTION_DEFAULT];
+            }
+
+            // Add global items
+            $currentSections[] = self::SECTION_GLOBAL;
+        } else {
+            $currentSections = array_map('strtolower', $this->currentSections);
         }
-
-        // Add global items
-        $currentSections[] = self::SECTION_GLOBAL;
 
         foreach ($currentSections as &$currentSection) {
             if ($section = val(strtolower($currentSection), self::$sectionItems)) {

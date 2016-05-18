@@ -9,26 +9,65 @@
  */
 
 /**
- * Module for a list of links.
+ * Collects the links for an application, organizes them by section, and renders the appropriate links given the section.
+ *
+ * Global items display no matter the section we're in.
+ *
+ * If a section is not specified, the item is added to the SECTION_DEFAULT. If we are in a section without a custom nav,
+ * these items will display.
+ *
+ * TODO: Handle the dropdown menu case.
  */
 class SiteNavModule extends NavModule {
 
     const SECTION_GLOBAL = 'globals';
     const SECTION_DEFAULT = 'defaults';
-
     const LINKS_INDEX = 'links';
     const GROUPS_INDEX = 'groups';
 
     /** @var array  */
     protected static $sectionItems = [];
+
+    /** @var bool */
     protected static $initStaticFired = false;
 
+    /**
+     * @param $section
+     * @param $text
+     * @param $url
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @param bool $disabled
+     * @return $this
+     */
     public function addLinkToSection($section, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
-        $args = func_get_args();
+        $args = [
+            'text' => $text,
+            'url' => $url,
+            'key' => $key,
+            'cssClass' => $cssClass,
+            'sort' => $sort,
+            'modifiers' => $modifiers,
+            'disabled' => $disabled
+        ];
         self::$sectionItems[strtolower($section)][self::LINKS_INDEX][] = $args;
         return $this;
     }
 
+    /**
+     * @param $isAllowed
+     * @param $section
+     * @param $text
+     * @param $url
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @param bool $disabled
+     * @return $this|SiteNavModule
+     */
     public function addLinkToSectionIf($isAllowed, $section, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
@@ -37,12 +76,37 @@ class SiteNavModule extends NavModule {
         }
     }
 
+    /**
+     * @param $section
+     * @param string $text
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @return $this
+     */
     public function addGroupToSection($section, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
-        $args = func_get_args();
+        $args = [
+            'text' => $text,
+            'key' => $key,
+            'cssClass' => $cssClass,
+            'sort' => $sort,
+            'modifiers' => $modifiers
+        ];
         self::$sectionItems[strtolower($section)][self::GROUPS_INDEX][] = $args;
         return $this;
     }
 
+    /**
+     * @param $isAllowed
+     * @param $section
+     * @param string $text
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @return $this|SiteNavModule
+     */
     public function addGroupToSectionIf($isAllowed, $section, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
@@ -51,11 +115,32 @@ class SiteNavModule extends NavModule {
         }
     }
 
+    /**
+     * @param string $text
+     * @param string $url
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @param bool $disabled
+     * @return $this
+     */
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         $this->addLinkToSection(self::SECTION_DEFAULT, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         return $this;
     }
 
+    /**
+     * @param array|bool|string $isAllowed
+     * @param string $text
+     * @param string $url
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @param bool $disabled
+     * @return $this|SiteNavModule
+     */
     public function addLinkIf($isAllowed, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
@@ -64,11 +149,28 @@ class SiteNavModule extends NavModule {
         }
     }
 
+    /**
+     * @param string $text
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @return $this
+     */
     public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         $this->addGroupToSection(self::SECTION_DEFAULT, $text, $key, $cssClass, $sort, $modifiers);
         return $this;
     }
 
+    /**
+     * @param array|bool|string $isAllowed
+     * @param string $text
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @return $this|SiteNavModule
+     */
     public function addGroupIf($isAllowed, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
@@ -77,11 +179,32 @@ class SiteNavModule extends NavModule {
         }
     }
 
+    /**
+     * @param $text
+     * @param $url
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @param bool $disabled
+     * @return $this
+     */
     public function addLinkToGlobals($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         $this->addLinkToSection(self::SECTION_GLOBAL, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         return $this;
     }
 
+    /**
+     * @param bool $isAllowed
+     * @param $text
+     * @param $url
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @param bool $disabled
+     * @return $this|SiteNavModule
+     */
     public function addLinkToGlobalsIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
@@ -90,11 +213,28 @@ class SiteNavModule extends NavModule {
         }
     }
 
+    /**
+     * @param string $text
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @return $this
+     */
     public function addGroupToGlobals($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         $this->addGroupToSection(self::SECTION_GLOBAL, $text, $key, $cssClass, $sort, $modifiers);
         return $this;
     }
 
+    /**
+     * @param $isAllowed
+     * @param string $text
+     * @param string $key
+     * @param string $cssClass
+     * @param array $sort
+     * @param array $modifiers
+     * @return $this|SiteNavModule
+     */
     public function addGroupToGlobalsIf($isAllowed, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
@@ -103,9 +243,9 @@ class SiteNavModule extends NavModule {
         }
     }
 
+
     /**
-     *
-     *
+     * @return bool
      * @throws Exception
      */
     public function prepare() {
@@ -135,16 +275,33 @@ class SiteNavModule extends NavModule {
         return parent::prepare();
     }
 
+    /**
+     * @param array $section
+     */
     public function addSectionItems($section) {
         if ($groups = val(self::GROUPS_INDEX, $section)) {
             foreach ($groups as $group) {
-                parent::addGroup($group[1], $group[2]);
+                parent::addGroup(
+                    $group['text'],
+                    $group['key'],
+                    $group['cssClass'],
+                    $group['sort'],
+                    $group['modifiers']
+                );
             }
         }
 
         if ($links = val(self::LINKS_INDEX, $section)) {
             foreach ($links as $link) {
-                parent::addLink($link[1], $link[2], $link[3], $link[4], $link[5], $link[6], $link[7]);
+                parent::addLink(
+                    $link['text'],
+                    $link['url'],
+                    $link['key'],
+                    $link['cssClass'],
+                    $link['sort'],
+                    $link['modifiers'],
+                    $link['disabled']
+                );
             }
         }
     }

@@ -67,7 +67,12 @@ class DashboardController extends Gdn_Controller {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             // Configure SideMenu module.
+
+            $nav1 = new DashboardNavModule();
+            $nav1->prepare();
+
             $nav = new DashboardNavAdapterModule();
+
             $this->EventArguments['SideMenu'] = $nav;
             $this->fireEvent('GetAppSettingsMenuItems');
 

@@ -1891,7 +1891,7 @@ EOT;
         if ($Target === false) {
             $Target = $this->Form->getFormValue('Target', false);
             if (!$Target) {
-                $Target = $this->Request->get('Target', '/');
+                $Target = $this->Request->get('Target', $this->Request->get('target', '/'));
             }
         }
 

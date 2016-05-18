@@ -3007,11 +3007,9 @@ if (!function_exists('safeRedirect')) {
         if ($isTrustedDomain) {
             redirect($Destination, $StatusCode);
         } else {
-            if (c('Garden.TrustedDomains', true) === true) {
-                Logger::notice('Redirect to {url} without Garden.TrustedDomains.', [
-                    'url' => $Destination
-                ]);
-            }
+            Logger::notice('Redirect to untrusted domain: {url}.', [
+                'url' => $Destination
+            ]);
 
             redirect(url("/home/leaving?Target=".urlencode($Destination)));
         }

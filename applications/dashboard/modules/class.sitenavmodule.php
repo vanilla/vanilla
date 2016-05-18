@@ -118,12 +118,9 @@ class SiteNavModule extends NavModule {
         $currentSections = Gdn_Theme::section('', 'get');
         $currentSections = array_map('strtolower', $currentSections);
 
+        $hasCustomMenu = !empty(array_intersect(array_keys(self::$sectionItems), $currentSections));
 
-        if (!empty(array_intersect(array_keys(self::$sectionItems), $currentSections))) {
-            $customMenu = true;
-        }
-
-        if (!$customMenu) {
+        if (!$hasCustomMenu) {
             $currentSections = [self::SECTION_DEFAULT];
         }
 

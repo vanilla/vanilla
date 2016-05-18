@@ -433,9 +433,9 @@ class AssetModel extends Gdn_Model {
         foreach ($paths as $info) {
             if (file_exists($info[0])) {
                 if (!empty($info[2])) {
-                    // This path is deprecate. The script should be moved into the /js/ sub-directory
+                    // This path is deprecate. The script should be moved into a /js/ sub-directory
                     unset($info[2]);
-                    deprecated("File path '$filename'", "'js/$filename'");
+                    deprecated("The file path '$folder/$filename'", "'$folder/js/$filename'");
                 }
 
                 return $info;

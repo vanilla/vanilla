@@ -5,4 +5,5 @@
 class DashboardNavAdapterModule extends DashboardNavModule {
 
     use NestedCollectionAdapter;
+    
 }

@@ -13,12 +13,7 @@
  */
 class DashboardNavModule extends SiteNavModule {
 
-    use StaticInitializer;
-
-    /**
-     * @var array The custom sections for the dashboard.
-     */
-    protected static $customSections = ['DashboardHome', 'Moderation', 'Settings', 'Analytics'];
+    public $view = 'nav-dashboard';
 
     /**
      * @var array The section info for the dashboard's main nav.
@@ -45,17 +40,6 @@ class DashboardNavModule extends SiteNavModule {
         ]
     ];
 
-    /**
-     * @var string The view for rendering the panel
-     */
-    public $view = 'nav-dashboard';
-
-    protected $defaultEvent = 'Settings';
-
-    public function __construct() {
-        parent::$customSections = self::$customSections;
-        parent::__construct();
-    }
 
     /**
      * Check user permissions, translate our translate-ables and url-ify our urls. Returns an array of the main sections
@@ -63,8 +47,12 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @return array The sections to display in the main dashboard nav.
      */
-    public static function getSectionsInfo() {
-        self::initStatic();
+    public function getSectionsInfo() {
+
+        if (!self::$initStaticFired) {
+            self::$initStaticFired = true;
+            $this->fireEvent('init');
+        }
 
         $session = Gdn::session();
         foreach (self::$sectionsInfo as $key => &$section) {
@@ -100,7 +88,7 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @param $section
      */
-    public static function registerSection($section) {
+    public function registerSection($section) {
         $requiredArrayKeys = ['title', 'description', 'url', 'section'];
 
         // Make sure we have what we need.
@@ -110,14 +98,5 @@ class DashboardNavModule extends SiteNavModule {
             }
         }
         self::$sectionsInfo[$section['section']] = $section;
-        self::$customSections[] = $section['section'];
-    }
-
-    public function prepare() {
-        if (!inSection('Dashboard')) {
-            return false;
-        } else {
-            return parent::prepare();
-        }
     }
 }

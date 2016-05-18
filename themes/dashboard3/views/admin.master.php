@@ -1,13 +1,4 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
-<?php
-$nav = [
-    'Dashboard' => 'Overview, Updates',
-    'Moderation' => 'Gate Keeping',
-    'Settings' => 'Preferences & Addons',
-    'Analytics' => 'Eye Candy For Your Boss'
-];
-
-?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
 <head>
@@ -26,9 +17,10 @@ $nav = [
         <?php } ?>
         <?php echo anchor(t('Visit Site'), '/', 'btn btn-navbar'); ?>
     </div>
+    <?php $dashboardNav = new DashboardNavModule(); ?>
     <nav class="nav nav-pills">
         <?php
-        foreach (DashboardNavModule::getSectionsInfo() as $section) { ?>
+        foreach ($dashboardNav->getSectionsInfo() as $section) { ?>
             <div class="nav-item">
                 <a class="nav-link <?php echo val('active', $section); ?>" href="<?php echo val('url', $section); ?>">
                     <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
@@ -56,10 +48,7 @@ $nav = [
     <div class="row">
         <?php if($this->data('HelpModule') || true) { ?>
             <div class="col-sm-3 col-md-2 panel panel-nav panel-left">
-                <?php
-//                $this->renderAsset('Panel');
-                echo new DashboardNavModule();
-                ?>
+                <?php echo $dashboardNav; ?>
             </div>
             <div class="col-sm-6 col-md-8 main">
                 <?php $this->renderAsset('Content'); ?>
@@ -69,10 +58,7 @@ $nav = [
             </div>
         <?php } else { ?>
             <div class="col-sm-3 col-md-2 panel panel-nav panel-left">
-                <?php
-//                $this->renderAsset('Panel');
-                echo new DashboardNavModule();
-                ?>
+                <?php echo $dashboardNav; ?>
             </div>
             <div class="col-sm-9 col-md-10 main">
                 <?php $this->renderAsset('Content'); ?>

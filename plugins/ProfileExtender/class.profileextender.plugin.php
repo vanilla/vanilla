@@ -70,9 +70,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add the Dashboard menu item.
      */
-    public function base_GetAppSettingsMenuItems_handler($Sender) {
-	$nav = &$Sender->EventArguments['Nav'];
-	$nav->addLinkIf(Gdn::session()->checkPermission('Garden.Settings.Manage'), t('Profile Fields'), 'settings/profileextender', 'users.profile-extender');
+    public function base_getAppSettingsMenuItems_handler($Sender) {
+        $Menu = &$Sender->EventArguments['SideMenu'];
+        $Menu->addLink('Users', t('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
     }
 
     /**

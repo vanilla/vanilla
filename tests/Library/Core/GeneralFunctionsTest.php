@@ -40,6 +40,8 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
             'subdomain' => ['foo.com', 'http://www.foo.com', false],
             'subdomain wildcard' => ['*.foo.com', 'http://www.foo.com', true],
             'subdomain wildcard 2' => ['*.foo.com', 'http://foo.com', true],
+            'bad substring domain' => ['*.foo.com', 'http://xssfoo.com', false],
+            'bad substring domain 2' => ['foo.com', 'http://xssfoo.com', false],
         ];
         return $r;
     }

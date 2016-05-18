@@ -2993,10 +2993,26 @@ if (!function_exists('safeRedirect')) {
             $Destination = Url($Destination, true);
         }
 
+        $trustedDomains = TrustedDomains();
         $Domain = parse_url($Destination, PHP_URL_HOST);
-        if (in_array($Domain, TrustedDomains())) {
-            Redirect($Destination, $StatusCode);
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (stringEndsWith($Domain, $trustedDomain, true)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        if ($isTrustedDomain) {
+            redirect($Destination, $StatusCode);
         } else {
+            if (c('Garden.TrustedDomains', true) === true) {
+                Logger::notice('Redirect to {url} without Garden.TrustedDomains.', [
+                    'url' => $Destination
+                ]);
+            }
+
             redirect(url("/home/leaving?Target=".urlencode($Destination)));
         }
     }

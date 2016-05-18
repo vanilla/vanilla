@@ -2994,11 +2994,10 @@ if (!function_exists('safeRedirect')) {
         }
 
         $trustedDomains = TrustedDomains();
-        $Domain = parse_url($Destination, PHP_URL_HOST);
         $isTrustedDomain = false;
 
         foreach ($trustedDomains as $trustedDomain) {
-            if (stringEndsWith($Domain, $trustedDomain, true)) {
+            if (urlMatch($trustedDomain, $Destination, true)) {
                 $isTrustedDomain = true;
                 break;
             }

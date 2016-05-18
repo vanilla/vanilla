@@ -805,7 +805,7 @@ class ProfileController extends Gdn_Controller {
                 }
             }
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
-                $this->RedirectUrl = url('/profile');
+                $this->RedirectUrl = userUrl($this->User);
             }
             $this->informMessage(t("Your settings have been saved."));
             $this->render('picture', 'profile', 'dashboard');
@@ -1118,7 +1118,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      * @param string $tk Security token.
      */
-    public function removePicture($UserReference = '', $Username = '', $tk = '') {
+    public function removePicture($UserReference = '', $Username = '', $tk = '', $deliveryType = '') {
         $this->permission('Garden.SignIn.Allow');
         $Session = Gdn::session();
         if (!$Session->isValid()) {
@@ -1128,7 +1128,6 @@ class ProfileController extends Gdn_Controller {
         // Get user data & another permission check.
         $this->getUserInfo($UserReference, $Username, '', true);
 
-        $RedirectUrl = userUrl($this->User);
         if ($Session->validateTransientKey($tk) && is_object($this->User)) {
             $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
@@ -1138,12 +1137,12 @@ class ProfileController extends Gdn_Controller {
             }
         }
 
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($RedirectUrl);
+        if ($deliveryType === DELIVERY_TYPE_VIEW) {
+            $redirectUrl = userUrl($this->User);
         } else {
-            $this->RedirectUrl = url($RedirectUrl);
-            $this->render();
+            $redirectUrl = userUrl($this->User, '', 'picture');
         }
+        redirectUrl($redirectUrl);
     }
 
     /**

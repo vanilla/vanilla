@@ -21,7 +21,7 @@ if ($this->data('crop') && $allowImages) {
 <?php
 echo $this->Form->input('Avatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));
 if ($this->data('crop')) {
-    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey(), 'Button Danger PopConfirm');
+    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey().'&deliveryType='.$this->deliveryType(), 'Button Danger PopConfirm');
 }
 ?>
 <?php

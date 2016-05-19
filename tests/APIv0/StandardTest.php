@@ -191,8 +191,8 @@ class StandardTest extends BaseTest {
         $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
 
         $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);
-        $this->assertNotEquals($photo, $dbUser2['Photo']);
-        $this->assertSame($dbUser['Photo'], $dbUser2['Photo']);
+        $this->assertSame($photo, $dbUser2['Photo']);
+        $this->assertNotEquals($dbUser['Photo'], $dbUser2['Photo']);
     }
 
     /**

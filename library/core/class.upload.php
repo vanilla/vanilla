@@ -281,6 +281,26 @@ class Gdn_Upload extends Gdn_Pluggable {
     }
 
     /**
+     * Determine if a URL matches the format of a valid type/domain upload.
+     *
+     * @param string $url
+     * @return bool
+     */
+    public static function isUploaded($url) {
+        $parsed = Gdn_Upload::parse($url);
+        $type = val('Type', $parsed);
+        $domain = val('Domain', $parsed);
+
+        $prefixes = array_keys(Gdn_Upload::urls());
+
+        if (!$type || !$domain) {
+            return false;
+        }
+
+        return in_array("{$type}://{$domain}", $prefixes);
+    }
+
+    /**
      *
      *
      * @param $Source

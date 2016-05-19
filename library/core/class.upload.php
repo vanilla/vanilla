@@ -281,23 +281,23 @@ class Gdn_Upload extends Gdn_Pluggable {
     }
 
     /**
-     * Determine if a URL matches the format of a valid type/domain upload.
+     * Determine if a URI matches the format of a valid type/domain upload.
      *
-     * @param string $url A full file URL to test.
-     * @return bool
+     * @param string $uri The URI to test. This would be the value saved in the database (ex. GDN_User.Photo).
+     * @return bool Returns **true** if {@link uri} looks like an uploaded file or **false** otherwise.
      */
-    public static function isUploaded($url) {
-        $parsed = Gdn_Upload::parse($url);
-        $type = val('Type', $parsed);
-        $domain = val('Domain', $parsed);
+    public static function isUploadUri($uri) {
+        $parsed = Gdn_Upload::parse($uri);
 
-        $prefixes = array_keys(Gdn_Upload::urls());
-
-        if (!$type || !$domain) {
+        if (empty($parsed['Type'])) {
+            // This is a local file upload.
+            return true;
+        } elseif (empty($parsed['Domain'])) {
             return false;
         }
+        $prefixes = Gdn_Upload::urls();
 
-        return in_array("{$type}://{$domain}", $prefixes);
+        return !empty($prefixes["{$parsed['Type']}://{$parsed['Domain']}"]);
     }
 
     /**

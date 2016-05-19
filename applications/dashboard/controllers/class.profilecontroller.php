@@ -438,7 +438,7 @@ class ProfileController extends Gdn_Controller {
 
             // Don't allow non-mods to set an explicit photo.
             if ($photo = $this->Form->getFormValue('Photo')) {
-                if (!Gdn_Upload::isUploaded($photo) && !checkPermission('Garden.Users.Edit')) {
+                if (!Gdn_Upload::isUploadUri($photo) && !checkPermission('Garden.Users.Edit')) {
                     $this->Form->removeFormValue('Photo');
                 } elseif (!filter_var($photo, FILTER_VALIDATE_URL)) {
                     $this->Form->addError('Invalid photo URL.');

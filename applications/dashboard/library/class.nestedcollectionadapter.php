@@ -10,7 +10,17 @@
  * @since 2.3
  */
 
-trait NestedCollectionAdapter {
+class NestedCollectionAdapter {
+
+    public $siteNavModule;
+
+    public function __construct($siteNavModule = null) {
+        if ($siteNavModule) {
+            $this->siteNavModule = $siteNavModule;
+        } else {
+            $this->siteNavModule =  new SiteNavModule();
+        }
+    }
 
     /**
      *
@@ -23,12 +33,12 @@ trait NestedCollectionAdapter {
      * @return $this|object
      */
     public function addLink($group, $text, $url, $permission = false, $attributes = []) {
+        if ($permission === false) {
+            $permission = true;
+        }
         $key = slugify($group) . '.' . slugify($text);
         $cssClass = val('class', $attributes, '');
-        if ($permission != false && !$this->isAllowed($permission)) {
-            return $this;
-        }
-        parent::addLink($text, $url, $key, $cssClass, [], $attributes);
+        $this->siteNavModule->addLinkIf($permission, $text, $url, $key, $cssClass, [], $attributes);
         return $this;
     }
 
@@ -42,17 +52,10 @@ trait NestedCollectionAdapter {
      * @return $this|void
      */
     public function addItem($group, $text, $permission = false, $attributes = array()) {
-
-        // If the first argument is link, group, or divider, add to the Nested Collection.
-        $itemTypes = ['link', 'group', 'divider'];
-        if (in_array($group, $itemTypes)) {
-            parent::addItem($group, $text);
+        if ($permission === false) {
+            $permission = true;
         }
-
-        if ($permission != false && !$this->isAllowed($permission)) {
-            return $this;
-        }
-        parent::addGroup($text, slugify($group), val('class', $attributes), '', $attributes);
+        $this->siteNavModule->addGroupIf($permission, $text, slugify($group), val('class', $attributes), '', $attributes);
         return $this;
     }
 

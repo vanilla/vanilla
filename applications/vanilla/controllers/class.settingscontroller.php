@@ -151,12 +151,10 @@ class SettingsController extends Gdn_Controller {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
 
-            $nav1 = new DashboardNavModule();
-            $nav1->prepare();
-            
+            $nav = new DashboardNavModule();
             // Configure SideMenu module.
-            $nav = new DashboardNavAdapterModule();
-            $this->EventArguments['SideMenu'] = $nav;
+            $navAdapter = new NestedCollectionAdapter($nav);
+            $this->EventArguments['SideMenu'] = $navAdapter;
             $this->fireEvent('GetAppSettingsMenuItems');
 
             // Add the module

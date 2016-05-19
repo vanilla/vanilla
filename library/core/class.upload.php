@@ -289,7 +289,7 @@ class Gdn_Upload extends Gdn_Pluggable {
     public static function isUploadUri($uri) {
         $parsed = Gdn_Upload::parse($uri);
 
-        return empty($parsed['Type']) || $parsed['Type'] !== 'external';
+        return (empty($parsed['Type']) || $parsed['Type'] !== 'external') && !empty($parsed['Url']);
     }
 
     /**

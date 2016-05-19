@@ -810,7 +810,6 @@ class ProfileController extends Gdn_Controller {
                 $this->RedirectUrl = userUrl($this->User);
             }
             $this->informMessage(t("Your settings have been saved."));
-            $this->render('picture', 'profile', 'dashboard');
         }
 
         if (val('SideMenuModule', val('Panel', val('Assets', $this)))) {
@@ -902,6 +901,8 @@ class ProfileController extends Gdn_Controller {
         $userPhoto = sprintf($parts['SaveFormat'], self::AVATAR_FOLDER."/$subdir/$imageBaseName");
         if (!$this->UserModel->save(array('UserID' => $this->User->UserID, 'Photo' => $userPhoto), array('CheckExisting' => true))) {
             $this->Form->setValidationResults($this->UserModel->validationResults());
+        } else {
+            $this->User->Photo = $userPhoto;
         }
 
         $this->deleteAvatars($bak);

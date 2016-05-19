@@ -40,8 +40,8 @@ echo $this->Form->errors();
                 '-1' => t('Authors may always edit'));
             $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
             echo $this->Form->label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
-            echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
             echo wrap(t('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'Info'));
+            echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
             ?>
         </li>
         <!--   <li>
@@ -79,19 +79,41 @@ echo $this->Form->errors();
     </ul>
     <ul>
         <li>
-            <div
-                class="Info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
             <?php
             echo $this->Form->label('Max Comment Length', 'Vanilla.Comment.MaxLength');
+            ?>
+            <div class="Info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
+            <?php
             echo $this->Form->textBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput'));
             ?>
         </li>
         <li>
-            <div
-                class="Info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
             <?php
             echo $this->Form->label('Min Comment Length', 'Vanilla.Comment.MinLength');
+            ?>
+            <div class="Info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
+            <?php
             echo $this->Form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput'));
+            ?>
+        </li>
+        <li>
+            <?php
+            echo $this->Form->label('Trusted Domains', 'Garden.TrustedDomains');
+            ?>
+            <div class="Info">
+                <?php
+                echo t(
+                    'You can specify a whitelist of trusted domains.',
+                    'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe for redirects and embedding.'
+                );
+                ?>
+                <div><small>
+                    <strong><?php echo t('Note'); ?>:</strong>
+                    <?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?>
+                </small></div>
+            </div>
+            <?php
+            echo $this->Form->textBox('Garden.TrustedDomains', ['MultiLine' => true]);
             ?>
         </li>
     </ul>

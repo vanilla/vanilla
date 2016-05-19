@@ -49,7 +49,8 @@ class SettingsController extends Gdn_Controller {
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
-            'Vanilla.Comment.MinLength'
+            'Vanilla.Comment.MinLength',
+            'Garden.TrustedDomains'
         ));
 
         // Set the model on the form.
@@ -57,6 +58,14 @@ class SettingsController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
+            // Format trusted domains as a string
+            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
+            if (is_array($TrustedDomains)) {
+                $TrustedDomains = implode("\n", $TrustedDomains);
+            }
+
+            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
+
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
         } else {
@@ -75,6 +84,13 @@ class SettingsController extends Gdn_Controller {
             $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
             $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
+            // Format the trusted domains as an array based on newlines & spaces
+            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
+            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
+            $TrustedDomains = array_unique(array_filter($TrustedDomains));
+            $TrustedDomains = implode("\n", $TrustedDomains);
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+
             // Save new settings
             $Saved = $this->Form->save();
             if ($Saved) {
@@ -87,6 +103,10 @@ class SettingsController extends Gdn_Controller {
                 }
                 $this->informMessage(t("Your changes have been saved."));
             }
+
+            // Reformat array as string so it displays properly in the form
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+
         }
 
         $this->addSideMenu('vanilla/settings/advanced');

@@ -140,7 +140,7 @@ class Gdn_Smarty {
             $CompileID = CLIENT_NAME;
         }
 
-        $Smarty->template_dir = dirname($Path);
+        $Smarty->setTemplateDir(dirname($Path));
         $Smarty->display($Path, null, $CompileID);
     }
 

@@ -289,15 +289,7 @@ class Gdn_Upload extends Gdn_Pluggable {
     public static function isUploadUri($uri) {
         $parsed = Gdn_Upload::parse($uri);
 
-        if (empty($parsed['Type'])) {
-            // This is a local file upload.
-            return true;
-        } elseif (empty($parsed['Domain'])) {
-            return false;
-        }
-        $prefixes = Gdn_Upload::urls();
-
-        return !empty($prefixes["{$parsed['Type']}://{$parsed['Domain']}"]);
+        return empty($parsed['Type']) || $parsed['Type'] !== 'external';
     }
 
     /**

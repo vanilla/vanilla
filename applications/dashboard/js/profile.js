@@ -1,4 +1,14 @@
 // This file contains javascript that is specific to the /profile controller.
+(function(window, $) {
+    $(document)
+        .on('click', '.js-new-avatar', function () {
+            $(".js-new-avatar-upload", $(this.closest('form'))).trigger("click");
+        })
+        .on('change', ".js-new-avatar-upload", function () {
+            $(this).closest('.js-change-picture-form').submit();
+        });
+})(window, jQuery);
+
 jQuery(document).ready(function($) {
     // Set the max chars in the about form.
     $('form.About textarea').setMaxChars(1000);
@@ -70,12 +80,5 @@ jQuery(document).ready(function($) {
             }
             return false;
         }
-    });
-});
-
-$(document).on('click', '.js-new-avatar', function () {
-    $(".js-new-avatar-upload").trigger("click");
-    $(".js-new-avatar-upload").change(function() {
-        $('.js-change-picture-form').submit();
     });
 });

@@ -1,72 +1,30 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::session();
-
 // Check that we have the necessary tools to allow image uploading
-$AllowImages = Gdn_UploadImage::CanUploadImages();
-
+$allowImages = Gdn_UploadImage::CanUploadImages();
+echo '<div class="change-picture">';
+echo '<h2 class="H">'.$this->title().'</h2>';
+echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-change-picture-form'));
+echo $this->Form->errors();
 // Is the photo hosted remotely?
-$RemotePhoto = IsUrl($this->User->Photo, 0, 7);
-
-// Define the current profile picture
-$Picture = '';
-if ($this->User->Photo != '') {
-    if (IsUrl($this->User->Photo))
-        $Picture = img($this->User->Photo, array('class' => 'ProfilePhotoLarge'));
-    else
-        $Picture = img(Gdn_Upload::url(changeBasename($this->User->Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
+$remotePhoto = isUrl($this->User->Photo);
+if ($this->data('crop') && $allowImages) {
+    echo $this->data('crop');
+} else { ?>
+    <div class="avatars">
+        <div class="Padded current-avatar">
+            <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
+        </div>
+    </div>
+<?php } ?>
+<div class="DismissMessage WarningMessage"><?php echo t('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
+<div class="js-new-avatar Button" style="margin-bottom: 20px;"><?php echo t('Upload New Picture'); ?></div>
+<?php
+echo $this->Form->input('Avatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));
+if ($this->data('crop')) {
+    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey().'&deliveryType='.$this->deliveryType(), 'Button Danger PopConfirm');
 }
-
-// Define the current thumbnail icon
-$Thumbnail = $this->User->Photo;
-if ($Thumbnail && !isUrl($Thumbnail)) {
-    $Thumbnail = Gdn_Upload::url(changeBasename($Thumbnail, 'n%s'));
-} else {
-    $Thumbnail = UserModel::getDefaultAvatarUrl($this->User);
-}
-
-$Thumbnail = img($Thumbnail, array('alt' => t('Thumbnail')));
 ?>
-<div class="SmallPopup FormTitleWrapper">
-    <h1 class="H"><?php echo $this->data('Title'); ?></h1>
-    <?php
-    echo $this->Form->open(array('enctype' => 'multipart/form-data'));
-    echo $this->Form->errors();
-    ?>
-    <ul>
-        <?php if ($Picture != '') { ?>
-            <li class="CurrentPicture">
-                <table>
-                    <thead>
-                    <tr>
-                        <td><?php echo t('Picture'); ?></td>
-                        <td><?php echo t('Thumbnail'); ?></td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td><?php
-                            echo $Picture;
-                            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-                            echo wrap(Anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->TransientKey(), 'Button Danger PopConfirm'), 'p');
-                            ?>
-                        </td>
-                        <td><?php
-                            echo $Thumbnail;
-                            echo wrap(Anchor(t('Edit Thumbnail'), userUrl($this->User, '', 'thumbnail'), 'Button'), 'p');
-                            }
-                            ?>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </li>
-        <?php } ?>
-        <li>
-            <p><?php echo t('Select an image on your computer (2mb max)'); ?></p>
-            <?php echo $this->Form->Input('Picture', 'file'); ?>
-        </li>
-    </ul>
-    <div
-        class="DismissMessage WarningMessage"><?php echo t('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
-    <?php echo $this->Form->close('Upload', '', array('class' => 'Button Primary')); ?>
-</div>
+<?php
+echo $this->Form->close();
+echo '</div>';
+?>

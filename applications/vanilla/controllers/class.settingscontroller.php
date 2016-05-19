@@ -86,8 +86,8 @@ class SettingsController extends Gdn_Controller {
 
             // Format the trusted domains as an array based on newlines & spaces
             $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
-            $TrustedDomains = explode("\n", $TrustedDomains);
-            $TrustedDomains = array_unique(array_filter(array_map('trim', $TrustedDomains)));
+            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
+            $TrustedDomains = array_unique(array_filter($TrustedDomains));
             $TrustedDomains = implode("\n", $TrustedDomains);
             $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
 

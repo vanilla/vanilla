@@ -283,7 +283,7 @@ class Gdn_Upload extends Gdn_Pluggable {
     /**
      * Determine if a URL matches the format of a valid type/domain upload.
      *
-     * @param string $url
+     * @param string $url A full file URL to test.
      * @return bool
      */
     public static function isUploaded($url) {

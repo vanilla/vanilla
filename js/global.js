@@ -1532,10 +1532,10 @@ jQuery(document).ready(function($) {
         gdn.atempty = gdn.atempty || {};
 
         // Set minimum characters to type for @mentions to fire
-        var min_characters = 2;
+        var min_characters = gdn.getMeta('mentionMinChars', 2);
 
         // Max suggestions to show in dropdown.
-        var max_suggestions = 5;
+        var max_suggestions = gdn.getMeta('mentionSuggestionCount', 5);
 
         // Server response limit. This should match the limit set in
         // *UserController->TagSearch* and UserModel->TagSearch
@@ -1634,7 +1634,8 @@ jQuery(document).ready(function($) {
                             if (filter_more && !empty_query && !gdn.atcache[query]) {
                                 $.getJSON(gdn.url('/user/tagsearch'), {
                                     "q": query,
-                                    "limit": server_limit
+                                    "limit": server_limit,
+                                    "x-cache": 1
                                 }, function(data) {
                                     callback(data);
 

@@ -159,6 +159,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
+                '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
                 '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
                 '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,

@@ -1634,8 +1634,7 @@ jQuery(document).ready(function($) {
                             if (filter_more && !empty_query && !gdn.atcache[query]) {
                                 $.getJSON(gdn.url('/user/tagsearch'), {
                                     "q": query,
-                                    "limit": server_limit,
-                                    "x-cache": 1
+                                    "limit": server_limit
                                 }, function(data) {
                                     callback(data);
 

@@ -176,6 +176,26 @@ class StandardTest extends BaseTest {
     }
 
     /**
+     * Test setting an uploaded photo that isn't a valid URL.
+     *
+     * @param array $user The user to test against.
+     * @depends testRegisterBasic
+     */
+    public function testSetPhotoPermissionLocal($user) {
+        $this->api()->setUser($user);
+
+        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+
+        // This is a valid upload URL and should be allowed.
+        $photo = 'userpics/679/FPNH7GFCMGBA.jpg';
+        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+
+        $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);
+        $this->assertNotEquals($photo, $dbUser2['Photo']);
+        $this->assertSame($dbUser['Photo'], $dbUser2['Photo']);
+    }
+
+    /**
      * Test that the APIv0 can actually send a correctly formatted user cookie.
      *
      * @depends testRegisterBasic

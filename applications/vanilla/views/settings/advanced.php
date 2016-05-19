@@ -101,9 +101,7 @@ echo $this->Form->errors();
             <div class="Info">
                 <small>
                     <strong><?php echo t('Notes'); ?>:</strong>
-                    <?php echo t('Specify one domain per line, without protocol (ie. yourdomain.com).'); ?><br/>
-                    <?php echo t('The domain will include all subdomains (ie. yourdomain.com will also allow blog.yourdomain.com, news.yourdomain.com, etc).'); ?><br/>
-                    <?php echo t('Leaving this input blank will mean that you allow embedding on any site, anywhere.'); ?>
+                    <?php echo t('Specify one domain per line, without protocol (ie. yourdomain.com).'); ?>
                 </small>
             </div>
             <?php

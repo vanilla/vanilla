@@ -805,6 +805,8 @@ class ProfileController extends Gdn_Controller {
                 }
             }
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+                $this->jsonTarget('', '', 'Refresh');
+
                 $this->RedirectUrl = userUrl($this->User);
             }
             $this->informMessage(t("Your settings have been saved."));
@@ -1142,7 +1144,7 @@ class ProfileController extends Gdn_Controller {
         } else {
             $redirectUrl = userUrl($this->User, '', 'picture');
         }
-        redirectUrl($redirectUrl);
+        redirect($redirectUrl);
     }
 
     /**

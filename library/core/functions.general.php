@@ -2997,7 +2997,7 @@ if (!function_exists('safeRedirect')) {
         $isTrustedDomain = false;
 
         foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $Destination, true)) {
+            if (urlMatch($trustedDomain, $Destination)) {
                 $isTrustedDomain = true;
                 break;
             }

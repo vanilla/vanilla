@@ -100,16 +100,11 @@ class HomeController extends Gdn_Controller {
      * @param string $target
      */
     public function leaving($target = '') {
-        $delayInSeconds = 3;
         $this->setData('Target', $target);
 
         $this->removeCssFile('admin.css');
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->Head->addTag('meta', [
-            'http-equiv' => 'refresh',
-            'content' => "{$delayInSeconds};url=".htmlspecialchars($target)
-        ]);
         $this->MasterView = 'default';
         $this->render();
     }

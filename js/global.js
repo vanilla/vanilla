@@ -1532,10 +1532,10 @@ jQuery(document).ready(function($) {
         gdn.atempty = gdn.atempty || {};
 
         // Set minimum characters to type for @mentions to fire
-        var min_characters = 2;
+        var min_characters = gdn.getMeta('mentionMinChars', 2);
 
         // Max suggestions to show in dropdown.
-        var max_suggestions = 5;
+        var max_suggestions = gdn.getMeta('mentionSuggestionCount', 5);
 
         // Server response limit. This should match the limit set in
         // *UserController->TagSearch* and UserModel->TagSearch

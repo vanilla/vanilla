@@ -2148,9 +2148,9 @@ form .has-danger select {
   padding-right: 0.9375rem;
 }
 
-.row, #Body,
+.row, form > div > ul > li, #Body,
 #Foot,
-#Head, .Row {
+#Head, .Row, .form-row, .DiscussionTypes {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -4035,15 +4035,148 @@ input[type="button"].btn-block {
   width: 100%;
 }
 
-input:focus, input:active,
-select:focus,
-select:active,
-textarea:focus,
-textarea:active {
-  outline: 0;
+.Sortable {
+  padding-left: 0;
 }
 
-.control-label, form label {
+.Sortable li {
+  list-style: none;
+}
+
+form ul,
+form ol {
+  padding-left: 0;
+}
+
+form ul li,
+form ol li {
+  list-style: none;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+form label {
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.label-wrap .Info {
+  font-size: 0.75rem;
+  line-height: 1.3333333333;
+  color: #949aa2;
+}
+
+.form-group, form > div > ul > li {
+  -ms-flex-align: center;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px dotted #f4f4f5;
+}
+
+.form-group:first-child, form > div > ul > li:first-child {
+  padding-top: 1rem;
+  border-top: 1px dotted #f4f4f5;
+}
+
+.toggle-box-label-wrap {
+  padding-left: 0.9375rem;
+}
+
+.toggle-box-wrapper {
+  padding-right: 0.9375rem;
+}
+
+.toggle-box-wrapper .toggle-box {
+  position: relative;
+  width: 4rem;
+  height: 2rem;
+}
+
+.toggle-box-wrapper .toggle-box label {
+  display: inline;
+}
+
+.toggle-box-wrapper input[type="checkbox"] {
+  position: absolute;
+  margin-left: -9999px;
+  visibility: hidden;
+}
+
+.toggle-box-wrapper input[type="checkbox"] + label {
+  padding: 0.125rem;
+  width: 2rem;
+  height: 2rem;
+  background-color: #fff;
+  transition: background 0.4s;
+}
+
+.toggle-box-wrapper input[type="checkbox"] + label:before, .toggle-box-wrapper input[type="checkbox"] + label:after {
+  display: block;
+  position: absolute;
+  background-color: #fff;
+  content: "";
+}
+
+.toggle-box-wrapper input[type="checkbox"] + label:before {
+  top: 0.125rem;
+  left: 0.125rem;
+  bottom: 0.125rem;
+  right: 0.125rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  border: 1px solid #949aa2;
+  transition: background 0.4s;
+}
+
+.toggle-box-wrapper input[type="checkbox"] + label:after {
+  top: 0.25rem;
+  left: 0.25rem;
+  bottom: 0.25rem;
+  width: 1.5rem;
+  border-radius: 0.875rem;
+  border: 1px solid #949aa2;
+  transition: margin 0.4s, background 0.4s;
+}
+
+.toggle-box-wrapper input[type="checkbox"]:checked + label:before {
+  background-color: #0291db;
+}
+
+.toggle-box-wrapper input[type="checkbox"]:checked + label:after {
+  margin-left: 1.96875rem;
+}
+
+.color-picker {
+  position: relative;
+  width: 250px;
+}
+
+.color-picker-color {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.color-picker-preview {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 40px;
+  height: 27px;
+  background: #000;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.Hidden,
+.hidden {
+  display: none !important;
+}
+
+.Help.Aside {
+  position: absolute;
   display: inline-block;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -4348,36 +4481,7 @@ p {
 }
 
 form ul,
-form ol {
-  padding-left: 0;
-}
-
-form ul li,
-form ol li {
-  list-style: none;
-}
-
-.Sortable {
-  padding-left: 0;
-}
-
-.Sortable li {
-  list-style: none;
-}
-
-.Hidden,
-.hidden {
-  display: none;
-}
-
-.Help.Aside {
-  position: absolute;
-  display: block;
-  width: 200px;
-  right: -200px;
-}
-
-.Help.Aside h2 {
-  font-size: 1.25rem;
+#UrlCode {
+  padding-left: 0.9375rem;
 }
 /*# sourceMappingURL=admin.css.map */

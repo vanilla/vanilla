@@ -188,6 +188,7 @@ class StandardTest extends BaseTest {
 
         // This is a valid upload URL and should be allowed.
         $photo = 'userpics/679/FPNH7GFCMGBA.jpg';
+        $this->assertNotEquals($dbUser['Photo'], $photo);
         $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
 
         $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);

@@ -641,7 +641,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->addSideMenu('vanilla/settings/managecategories');
-        $this->addJsFile('categories.js');
+        $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
 
 

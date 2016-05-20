@@ -355,23 +355,33 @@ class CategoryCollection {
      * Get all of the categories from a root.
      *
      * @param int $parentID The ID of the parent category.
-     * @param int $maxDepth The maximum relative depth to grab.
-     * @param int $permission The permission column to check.
+     * @param array $options An array of options to affect the fetching.
+     *
+     * - maxdepth: The maximum depth of the tree.
+     * - collapsed: Stop when looking at a category of a certain type.
+     * - permission: The permission to use when looking at the tree.
      */
-    public function getTree($parentID = -1, $maxDepth = 3, $permission = 'PermsDiscussionsView') {
+    public function getTree($parentID = -1, $options = []) {
         $tree = [];
         $categories = [];
         $parentID = $parentID ?: -1;
+        $options = array_change_key_case($options) + [
+                'maxdepth' => 3,
+                'collapsecategories' => false,
+                'permission' => 'PermsDiscussionsView'
+            ];
+
 
         $currentDepth = 1;
         $parents = [$parentID];
-        for ($i = 0; $i < $maxDepth; $i++) {
-            $children = $this->getChildrenByParents($parents, $permission);
+        for ($i = 0; $i < $options['maxdepth']; $i++) {
+            $children = $this->getChildrenByParents($parents, $options['permission']);
             if (empty($children)) {
                 break;
             }
 
             // Go through the children and wire them up.
+            $parents = [];
             foreach ($children as $child) {
                 $category = $child;
                 $category['Children'] = [];
@@ -389,10 +399,13 @@ class CategoryCollection {
                 } else {
                     $categories[$category['ParentCategoryID']]['Children'][] = &$categories[$category['CategoryID']];
                 }
+
+                if (!$options['collapsecategories'] || !in_array($child['DisplayAs'], ['Categories'])) {
+                    $parents[] = $child['CategoryID'];
+                }
             }
 
             // Get the IDs for the next depth of children.
-            $parents = array_column($children, 'CategoryID');
             $currentDepth++;
         }
         $this->calculateTreeCounts($tree);
@@ -443,7 +456,7 @@ class CategoryCollection {
      * @return array Returns an array of child categories.
      */
     private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView') {
-        if ($this->cache->activeEnabled()) {
+        if (!$this->cache instanceof Gdn_Dirtycache) {
             $select = 'CategoryID';
         } else {
             $select = '*';
@@ -459,7 +472,7 @@ class CategoryCollection {
             ->orderBy('ParentCategoryID, Sort')
             ->get()->resultArray();
 
-        if ($this->cache->activeEnabled()) {
+        if (!$this->cache instanceof Gdn_Dirtycache) {
             $ids = array_column($data, 'CategoryID');
             $data = $this->getMulti($ids);
         } else {

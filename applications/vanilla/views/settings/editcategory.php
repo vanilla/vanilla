@@ -56,10 +56,12 @@ echo $this->Form->errors();
         array('Wrap' => array('', '')));
     ?>
     <li>
+    <li>
         <?php
         echo $this->Form->label('Display As', 'DisplayAs');
-        echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'));
+        echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'), ['Wrap' => true]);
         ?>
+    </li>
     </li>
     <li>
         <?php

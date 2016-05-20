@@ -11,3 +11,35 @@
 .Column.Grid_50 {
   @extend .col-md-6;
 }
+
+
+.input-wrap {
+  @extend .col-sm-7;
+}
+
+.label-wrap {
+  @extend .col-sm-5;
+}
+
+form {
+  > div > ul > li {
+    @extend .form-row;
+  }
+}
+
+.DiscussionTypes {
+  @extend .form-row;
+}
+
+.form-row {
+  @extend .row;
+  > label {
+    @extend .col-sm-5;
+  }
+  > textarea {
+    @extend .col-sm-7;
+  }
+  > input {
+    @extend .col-sm-7;
+  }
+}

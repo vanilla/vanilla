@@ -2,17 +2,13 @@
 //           Text input needs to have label separate from input, not wrapped
 
 form {
-
   > div > ul {
     @extend .input-group;
 
     > li {
       @extend .form-group;
+      @extend .row;
     }
-  }
-
-  label {
-    @extend .control-label;
   }
 
   input[type="text"],
@@ -21,20 +17,7 @@ form {
     @extend .form-control;
   }
 
-  ul,
-  ol {
-    padding-left: 0;
-
-    li {
-      list-style: none;
-    }
-  }
-}
-
-.Sortable {
-  padding-left: 0;
-
-  li {
-    list-style: none;
+  select {
+    @extend .c-select;
   }
 }

@@ -4,36 +4,144 @@
 //
 // Styleguide 3.
 
-input,
-select,
-textarea {
-  &:focus,
-  &:active {
-    outline: 0;
+.Sortable {
+  padding-left: 0;
+
+  li {
+    list-style: none;
+  }
+}
+
+form {
+  ul,
+  ol {
+    padding-left: 0;
+
+    li {
+      list-style: none;
+      justify-content: space-between;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+}
+
+.label-wrap {
+  .Info {
+    font-size: $font-size-sm;
+    line-height: $line-height-lg;
+    color: $grey;
+  }
+}
+
+.form-group {
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px dotted $grey-light;
+
+  &:first-child {
+    padding-top: 1rem;
+    border-top: 1px dotted $grey-light;
   }
 }
 
 
-// Form control labels
-//
-// Form control labels.
-//
-// .danger - Danger color
-//
-// Markup:
-// <div class="group-label" for="input1">Group label:</div>
-// <div class="form-input-group">
-//   <input class="control-input" type="checkbox" id="input1">
-//   <label class="control-label {$modifiers}" for="input1">Control label</label>
-// </div>
-//
+// Section 3.3 Toggles
+.toggle-box-label-wrap {
+  padding-left: $grid-gutter-width / 2;
+}
 
-.control-label {
-  display: inline-block;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.toggle-box-wrapper {
+  padding-right: $grid-gutter-width / 2;
 
-  &.danger {
-    color: $brand-danger;
+  .toggle-box {
+    position: relative;
+    width: $toggle-height * 2;
+    height: $toggle-height;
+
+    label {
+      display: inline;
+    }
+  }
+
+  input[type="checkbox"] {
+    position: absolute;
+    margin-left: -9999px;
+    visibility: hidden;
+  }
+
+  input[type="checkbox"] + label {
+    padding: $toggle-padding;
+    width: $toggle-height;
+    height: $toggle-height;
+    background-color: $white;
+    transition: background 0.4s;
+
+    &:before,
+    &:after {
+      display: block;
+      position: absolute;
+      background-color: $white;
+      content: "";
+    }
+
+    &:before {
+      top: $toggle-padding;
+      left: $toggle-padding;
+      bottom: $toggle-padding;
+      right: $toggle-padding;
+      background-color: $white;
+      border-radius: $toggle-height / 2;
+      border: 1px solid $grey;
+      transition: background 0.4s;
+    }
+
+    &:after {
+      top: $toggle-padding * 2;
+      left: $toggle-padding * 2;
+      bottom: $toggle-padding * 2;
+      width: $toggle-height - ($toggle-padding * 4);
+      border-radius: ($toggle-height - ($toggle-padding * 2)) / 2;
+      border: 1px solid $grey;
+      transition: margin 0.4s, background 0.4s;
+    }
+  }
+
+  // When checked, move and change background color
+  input[type="checkbox"]:checked + label:before {
+    background-color: $brand-primary;
+  }
+  input[type="checkbox"]:checked + label:after {
+    margin-left: $toggle-height - ($toggle-padding / 4);
   }
 }
+
+// Section 3.4 Color Pickers
+.color-picker {
+  position: relative;
+  width: 250px;
+}
+
+// Hide the html color input
+.color-picker-color {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.color-picker-preview {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 40px;
+  height: 27px;
+  background: $black;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+

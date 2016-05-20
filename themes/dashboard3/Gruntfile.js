@@ -176,6 +176,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_dropdown.scss',
             'scss/vendors/bootstrap/scss/_modal.scss',
             'scss/vendors/bootstrap/scss/_forms.scss',
+            'scss/vendors/bootstrap/scss/_custom-forms.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',
             'scss/vendors/bootstrap/scss/_grid.scss',
             'scss/vendors/bootstrap/scss/_reboot.scss'

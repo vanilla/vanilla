@@ -1,0 +1,15 @@
+.Hidden,
+.hidden {
+  display: none !important;
+}
+
+.Help.Aside {
+  position: absolute;
+  display: block;
+  width: 200px;
+  right: -200px;
+
+  h2 {
+    font-size: $font-size-lg;
+  }
+}

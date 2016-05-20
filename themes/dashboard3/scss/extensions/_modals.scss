@@ -1,14 +1,13 @@
-// .Overlay {
-//   @extend .modal;
-//   @extend .fade;
-//   @extend .in;
-// }
-//
-// .Overlay .Popup {
-//   @extend .modal-backdrop;
-//   @extend .fade;
-//   @extend .in;
-// }
+ //.Overlay {
+   //@extend .modal;
+   //@extend .fade;
+ //}
+
+ //.Overlay .Popup {
+ //  @extend .modal-dialog;
+ //  @extend .fade;
+ //  @extend .in;
+ //}
 
 .Border {
   @extend .modal-dialog;
@@ -20,9 +19,7 @@ div.Popup h1 {
 }
 
 .Close {
-  //@extend button;
   @extend .close;
-
 }
 
 .Overlay .Popup .Body {

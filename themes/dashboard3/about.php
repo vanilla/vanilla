@@ -8,5 +8,5 @@ $ThemeInfo['dashboard3'] = array(
     'AuthorEmail'   => 'beckyvanbussel@gmail.com',
     'AuthorUrl'     => 'https://vanillaforums.com',
     'License'       => 'MIT',
-    'ControlStyles' => 'bootstrap'
+    'ControlStyle'  => 'bootstrap'
 );

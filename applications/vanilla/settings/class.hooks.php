@@ -704,7 +704,7 @@ class VanillaHooks implements Gdn_IPlugin {
     public function dashboardNavModule_init_handler($sender) {
         $sort = -1;
 
-        $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories', $sort)
+        $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/categories', 'forum.manage-categories', 'nav-manage-categories', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Embed'), 'embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);

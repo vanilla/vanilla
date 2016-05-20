@@ -16,6 +16,9 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array Models to include. */
     public $Uses = array('Database', 'Form', 'CategoryModel');
 
+    /** @var CategoryModel */
+    public $CategoryModel;
+
     /** @var Gdn_Form */
     public $Form;
 
@@ -627,6 +630,35 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->render();
+    }
+
+    /**
+     * Manage the category hierarchy.
+     *
+     * @param string $category The URL slug of a parent category if looking at a sub tree.
+     */
+    public function categories($category = '') {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+        $this->addSideMenu('vanilla/settings/categories');
+
+        // Make sure we are reading the categories from the database only.
+        $collection = $this->CategoryModel->createCollection(Gdn::sql(), new Gdn_Dirtycache());
+
+        if (!empty($category)) {
+            $categoryRow = $collection->get((string)$category);
+            if (empty($categoryRow)) {
+                throw notFoundException('Category');
+            }
+            $this->setData('Category', $category);
+            $parentID = $categoryRow['CategoryID'];
+        } else {
+            $parentID = -1;
+        }
+
+        $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
+        $this->setData('Categories', $categories);
+
         $this->render();
     }
 

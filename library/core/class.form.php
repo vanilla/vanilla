@@ -2742,6 +2742,7 @@ PASSWORDMETER;
                         .$this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
                     break;
                 case 'textbox':
+                    $Row['Options']['Wrap'] = true;
                     $Result .= $labelWrap
                         .$this->textBox($Row['Name'], $Row['Options']);
                     break;

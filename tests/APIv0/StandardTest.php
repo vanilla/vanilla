@@ -167,11 +167,33 @@ class StandardTest extends BaseTest {
 
         $dbUser = $this->api()->queryUserKey($user['UserID'], true);
 
-        $photo = $user['Photo'].'.png';
+        $photo = 'http://foo.com/bar.png';
         $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
 
         $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);
+        $this->assertNotEquals($photo, $dbUser2['Photo']);
         $this->assertSame($dbUser['Photo'], $dbUser2['Photo']);
+    }
+
+    /**
+     * Test setting an uploaded photo that isn't a valid URL.
+     *
+     * @param array $user The user to test against.
+     * @depends testRegisterBasic
+     */
+    public function testSetPhotoPermissionLocal($user) {
+        $this->api()->setUser($user);
+
+        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+
+        // This is a valid upload URL and should be allowed.
+        $photo = 'userpics/679/FPNH7GFCMGBA.jpg';
+        $this->assertNotEquals($dbUser['Photo'], $photo);
+        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+
+        $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);
+        $this->assertSame($photo, $dbUser2['Photo']);
+        $this->assertNotEquals($dbUser['Photo'], $dbUser2['Photo']);
     }
 
     /**

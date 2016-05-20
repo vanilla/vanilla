@@ -4677,4 +4677,8 @@ p {
   font-size: 1.25rem;
   border-bottom: 1px solid #f4f4f5;
 }
+
+#UrlCode {
+  padding-left: 0.9375rem;
+}
 /*# sourceMappingURL=admin.css.map */

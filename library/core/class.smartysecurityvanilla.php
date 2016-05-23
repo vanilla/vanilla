@@ -3,7 +3,7 @@
 /**
  * Vanilla implementation of Smarty security policy.
  */
-class Gdn_SmartySecurity extends Smarty_Security {
+class SmartySecurityVanilla extends Smarty_Security {
 
     /**
      * Check if PHP function is trusted.

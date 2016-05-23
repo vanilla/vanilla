@@ -104,7 +104,7 @@ class Gdn_Smarty {
         // Assign the controller data last so the controllers override any default data.
         $Smarty->assign($Controller->Data);
 
-        $security = new Gdn_SmartySecurity($Smarty);
+        $security = new SmartySecurityVanilla($Smarty);
 
         $security->php_handling = Smarty::PHP_REMOVE;
         $security->allow_constants = false;

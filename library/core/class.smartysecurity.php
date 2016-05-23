@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Vanilla implementation of Smarty security policy object.
+ * Vanilla implementation of Smarty security policy.
  */
 class Gdn_SmartySecurity extends Smarty_Security {
 
@@ -30,8 +30,9 @@ class Gdn_SmartySecurity extends Smarty_Security {
      * Set allowed PHP functions.  Normalize casing for comparison.
      *
      * @param array $php_functions PHP functions to allow.
-     * @throws Gdn_UserException if $php_functions is not an array.
+     *
      * @return array
+     * @throws Gdn_UserException if $php_functions is not an array.
      */
     public function setPhpFunctions($php_functions) {
         if (!is_array($php_functions)) {

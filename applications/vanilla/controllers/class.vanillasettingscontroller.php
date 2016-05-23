@@ -10,10 +10,8 @@
 
 /**
  * Handles displaying the dashboard "settings" pages for Vanilla via /settings endpoint.
- *
- * @todo Remove this controller in favor of Dashboard's settings controller.
  */
-class SettingsController extends Gdn_Controller {
+class VanillaSettingsController extends Gdn_Controller {
 
     /** @var array Models to include. */
     public $Uses = array('Database', 'Form', 'CategoryModel');

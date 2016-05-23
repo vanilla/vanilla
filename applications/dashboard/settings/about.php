@@ -11,5 +11,6 @@ $ApplicationInfo['Dashboard'] = array(
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
     'License' => 'GNU GPL v2',
+    'Priority' => 5,
     'Hidden' => true
 );

@@ -261,20 +261,17 @@ if (!function_exists('assetVersion')) {
 
                 switch ($type) {
                     case 'plugins':
-                        $pluginInfo = Gdn::pluginManager()->getPluginInfo($key);
-                        $version = val('Version', $pluginInfo, $version);
-                        break;
                     case 'applications':
-                        $applicationInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($key));
-                        $version = val('Version', $applicationInfo, $version);
+                        $addon = Gdn::addonManager()->lookupAddon($key);
+                        if ($addon) {
+                            $version = $addon->getVersion();
+                        }
                         break;
                     case 'themes':
                         if ($themeVersion === null) {
-                            $themeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                            if ($themeInfo !== false) {
-                                $themeVersion = val('Version', $themeInfo, $version);
-                            } else {
-                                $themeVersion = $version;
+                            $theme = Gdn::addonManager()->lookupTheme(theme());
+                            if ($theme) {
+                                $themeVersion = $theme->getVersion();
                             }
                         }
                         $version = $themeVersion;
@@ -439,44 +436,6 @@ if (!function_exists('multiCheckPermission')) {
     function multiCheckPermission($PermissionName) {
         $Result = Gdn::session()->checkPermission($PermissionName, false);
         return $Result;
-    }
-}
-
-if (!function_exists('checkRequirements')) {
-    /**
-     * Check an addon's requirements.
-     *
-     * @param string $ItemName The name of the item checking requirements.
-     * @param array $RequiredItems An array of requirements.
-     * @param array $EnabledItems An array of currently enabled items to check against.
-     * @throws Gdn_UserException Throws an exception if there are missing requirements.
-     */
-    function checkRequirements($ItemName, $RequiredItems, $EnabledItems) {
-        // 1. Make sure that $RequiredItems are present
-        if (is_array($RequiredItems)) {
-            $MissingRequirements = array();
-
-            foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
-                if (!array_key_exists($RequiredItemName, $EnabledItems)) {
-                    $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
-                    // If the item exists and is enabled, check the version
-                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
-                    // Compare the versions.
-                    if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
-                        $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                    }
-                }
-            }
-            if (count($MissingRequirements) > 0) {
-                $Msg = sprintf(
-                    "%s is missing the following requirement(s): %s.",
-                    $ItemName,
-                    implode(', ', $MissingRequirements)
-                );
-                throw new Gdn_UserException($Msg);
-            }
-        }
     }
 }
 

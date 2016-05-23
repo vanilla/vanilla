@@ -11,8 +11,6 @@ switch ($this->data('Step')) {
         // Display the scan of the structure.
         if (!empty($this->Data['CapturedSql'])) {
             $CapturedSql = (array)$this->Data['CapturedSql'];
-            $Url = 'dashboard/utility/structure/'.$this->Data['ApplicationName'].'/0/'.(int)$this->Data['Drop'].'/'.(int)$this->Data['Explicit'];
-
             if (count($CapturedSql) > 0) {
                 ?>
                 <div class="Info"><?php echo t('The following structure changes are required for your database.'); ?></div>

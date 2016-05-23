@@ -1,14 +1,16 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 namespace VanillaTests\APIv0;
 
-
-class StandardTest extends BaseTest {
+/**
+ * Test some basic Vanilla functionality to make sure nothing is horribly broken.
+ */
+class SmokeTest extends BaseTest {
 
     /**
      * @var array
@@ -221,7 +223,7 @@ class StandardTest extends BaseTest {
 
         $discussion = [
             'CategoryID' => 1,
-            'Name' => 'StandardTest::testPostDiscussion()',
+            'Name' => 'SmokeTest::testPostDiscussion()',
             'Body' => 'Test '.date('r')
         ];
 
@@ -254,7 +256,7 @@ class StandardTest extends BaseTest {
 
         $comment = [
             'DiscussionID' => $discussion['DiscussionID'],
-            'Body' => 'StandardTest->testPostComment() '.date('r')
+            'Body' => 'SmokeTest->testPostComment() '.date('r')
         ];
 
         $r = $this->api()->post(

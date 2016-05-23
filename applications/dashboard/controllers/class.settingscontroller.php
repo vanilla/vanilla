@@ -7,6 +7,7 @@
  * @package Dashboard
  * @since 2.0
  */
+use Vanilla\Addon;
 
 /**
  * Handles /settings endpoint.
@@ -81,17 +82,19 @@ class SettingsController extends DashboardController {
         }
         $this->Filter = $Filter;
 
-        $ApplicationManager = new Gdn_ApplicationManager();
+        $ApplicationManager = Gdn::applicationManager();
         $this->AvailableApplications = $ApplicationManager->availableVisibleApplications();
         $this->EnabledApplications = $ApplicationManager->enabledVisibleApplications();
 
         if ($ApplicationName != '') {
-            $this->EventArguments['ApplicationName'] = $ApplicationName;
-            if (array_key_exists($ApplicationName, $this->EnabledApplications) === true) {
+            $addon = Gdn::addonManager()->lookupAddon($ApplicationName);
+            if (!$addon) {
+                throw notFoundException('Application');
+            }
+
+            if (Gdn::addonManager()->isEnabled($ApplicationName, Addon::TYPE_ADDON)) {
                 try {
                     $ApplicationManager->disableApplication($ApplicationName);
-                    Gdn_LibraryMap::clearCache();
-                    $this->fireEvent('AfterDisableApplication');
                 } catch (Exception $e) {
                     $this->Form->addError(strip_tags($e->getMessage()));
                 }
@@ -105,11 +108,7 @@ class SettingsController extends DashboardController {
                     $Validation = new Gdn_Validation();
                     $ApplicationManager->registerPermissions($ApplicationName, $Validation);
                     $ApplicationManager->enableApplication($ApplicationName, $Validation);
-                    Gdn_LibraryMap::clearCache();
                     $this->Form->setValidationResults($Validation->results());
-
-                    $this->EventArguments['Validation'] = $Validation;
-                    $this->fireEvent('AfterEnableApplication');
                 }
 
             }
@@ -970,53 +969,21 @@ class SettingsController extends DashboardController {
         ) {
             $UpdateData = array();
 
-            // Grab all of the plugins & versions
-            $Plugins = Gdn::pluginManager()->availablePlugins();
-            foreach ($Plugins as $Plugin => $Info) {
-                $Name = val('Name', $Info, $Plugin);
-                $Version = val('Version', $Info, '');
-                if ($Version != '') {
-                    $UpdateData[] = array(
-                        'Name' => $Name,
-                        'Version' => $Version,
-                        'Type' => 'Plugin'
-                    );
+            // Grab all of the available addons & versions.
+            foreach ([Addon::TYPE_ADDON, Addon::TYPE_THEME] as $type) {
+                $addons = Gdn::addonManager()->lookupAllByType($type);
+                /* @var Addon $addon */
+                foreach ($addons as $addon) {
+                    $UpdateData[] = [
+                        'Name' => $addon->getRawKey(),
+                        'Version' => $addon->getVersion(),
+                        'Type' => $addon->getSpecial('oldType', $type)
+                    ];
                 }
             }
 
-            // Grab all of the applications & versions
-            $ApplicationManager = Gdn::factory('ApplicationManager');
-            $Applications = $ApplicationManager->availableApplications();
-            foreach ($Applications as $Application => $Info) {
-                $Name = val('Name', $Info, $Application);
-                $Version = val('Version', $Info, '');
-                if ($Version != '') {
-                    $UpdateData[] = array(
-                        'Name' => $Name,
-                        'Version' => $Version,
-                        'Type' => 'Application'
-                    );
-                }
-            }
-
-            // Grab all of the themes & versions
-            $ThemeManager = new Gdn_ThemeManager;
-            $Themes = $ThemeManager->availableThemes();
-            foreach ($Themes as $Theme => $Info) {
-                $Name = val('Name', $Info, $Theme);
-                $Version = val('Version', $Info, '');
-                if ($Version != '') {
-                    $UpdateData[] = array(
-                        'Name' => $Name,
-                        'Version' => $Version,
-                        'Type' => 'Theme'
-                    );
-                }
-            }
-
-            // Dump the entire set of information into the definition list (jQuery
-            // will pick it up and ping the VanillaForums.org server with this info).
-            $this->addDefinition('UpdateChecks', Gdn_Format::serialize($UpdateData));
+            // Dump the entire set of information into the definition list. The client will ping the server for updates.
+            $this->addDefinition('UpdateChecks', $UpdateData);
         }
     }
 
@@ -1381,7 +1348,7 @@ class SettingsController extends DashboardController {
             $this->addJsFile('addons.js');
             $this->addSideMenu('dashboard/settings/themeoptions');
 
-            $ThemeManager = new Gdn_ThemeManager();
+            $ThemeManager = Gdn::themeManager();
             $this->setData('ThemeInfo', $ThemeManager->enabledThemeInfo());
 
             if ($this->Form->authenticatedPostBack()) {
@@ -1401,8 +1368,6 @@ class SettingsController extends DashboardController {
                 }
 
                 saveToConfig($ConfigSaveData);
-                $this->fireEvent['AfterSaveThemeOptions'];
-
                 $this->informMessage(t("Your changes have been saved."));
             }
 

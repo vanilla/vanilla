@@ -62,7 +62,7 @@ class SetupController extends DashboardController {
                 $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
             }
 
-            $ApplicationManager = new Gdn_ApplicationManager();
+            $ApplicationManager = Gdn::applicationManager();
 
             // Need to go through all of the setups for each application. Garden,
             if ($this->configure() && $this->Form->isPostBack()) {
@@ -128,11 +128,6 @@ class SetupController extends DashboardController {
         // Set the models on the forms.
         $this->Form->setModel($ConfigurationModel);
 
-        // Load the locales for the locale dropdown
-        // $Locale = Gdn::locale();
-        // $AvailableLocales = $Locale->GetAvailableLocaleSources();
-        // $this->LocaleData = array_combine($AvailableLocales, $AvailableLocales);
-
         // If seeing the form for the first time...
         if (!$this->Form->isPostback()) {
             // Force the webroot using our best guesstimates
@@ -197,9 +192,8 @@ class SetupController extends DashboardController {
                 // If changing locale, redefine locale sources:
                 $NewLocale = 'en-CA'; // $this->Form->getFormValue('Garden.Locale', false);
                 if ($NewLocale !== false && Gdn::config('Garden.Locale') != $NewLocale) {
-                    $ApplicationManager = new Gdn_ApplicationManager();
                     $Locale = Gdn::locale();
-                    $Locale->set($NewLocale, $ApplicationManager->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders(), true);
+                    $Locale->set($NewLocale);
                 }
 
                 // Install db structure & basic data.

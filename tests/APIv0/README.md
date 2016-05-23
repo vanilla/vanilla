@@ -6,7 +6,7 @@ come from the browser, but usually with JSON responses.
 ## Adding New Tests
 
 1. Subclass the `VanillaTests\APIv0\BaseTest` class or add new methods to an existing class such as
-`VanillaTests\APIv0\StandardTest`.
+`VanillaTests\APIv0\SmokeTest`.
 
 2. Make API calls with the API client provided in the `$this->api()` method.
 

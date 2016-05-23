@@ -248,7 +248,7 @@ class Gdn_Theme {
                     $Class = trim($Class.' HasCount');
                     $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
                 }
-                if (!$Session->isValid() || !Gdn::applicationManager()->checkApplication('Conversations')) {
+                if (!$Session->isValid() || !Gdn::addonManager()->lookupAddon('conversations')) {
                     $Text = false;
                 }
                 break;

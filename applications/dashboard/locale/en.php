@@ -61,9 +61,6 @@ $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['User not found.'] = 'Sorry, no account could be found related to the %s you entered.';
 $Definition['Invalid password.'] = 'The password you entered was incorrect. Remember that passwords are case-sensitive.';
-$Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
-$Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
-$Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
 //$Definition['ErrorTermsOfService'] = 'You must agree to the terms of service.';
 $Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
 

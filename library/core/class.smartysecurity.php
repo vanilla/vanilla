@@ -18,8 +18,8 @@ class Gdn_SmartySecurity extends Smarty_Security {
         if (isset($this->php_functions)) {
             if (empty($this->php_functions)) {
                 return true;
-            } else {
-                return in_array(strtolower($function_name), $this->php_functions);
+            } elseif (in_array(strtolower($function_name), $this->php_functions)) {
+                return true;
             }
         }
 

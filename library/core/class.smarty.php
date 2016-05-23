@@ -104,7 +104,7 @@ class Gdn_Smarty {
         // Assign the controller data last so the controllers override any default data.
         $Smarty->assign($Controller->Data);
 
-        $security = new Smarty_Security($Smarty);
+        $security = new SmartySecurityVanilla($Smarty);
 
         $security->php_handling = Smarty::PHP_REMOVE;
         $security->allow_constants = false;
@@ -112,10 +112,10 @@ class Gdn_Smarty {
         $security->secure_dir = [$Path];
         $security->streams = null;
 
-        $security->php_functions =  array_merge(
+        $security->setPhpFunctions(array_merge(
             $security->php_functions,
             array('category', 'checkPermission', 'inSection', 'inCategory', 'multiCheckPermission', 'getValue', 'setValue', 'url')
-        );
+        ));
 
         $security->php_modifiers = array_merge(
             $security->php_functions,

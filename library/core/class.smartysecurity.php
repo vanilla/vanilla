@@ -16,9 +16,7 @@ class Gdn_SmartySecurity extends Smarty_Security {
      */
     public function isTrustedPhpFunction($function_name, $compiler) {
         if (isset($this->php_functions)) {
-            if (empty($this->php_functions)) {
-                return true;
-            } elseif (in_array(strtolower($function_name), $this->php_functions)) {
+            if (empty($this->php_functions) || in_array(strtolower($function_name), $this->php_functions)) {
                 return true;
             }
         }

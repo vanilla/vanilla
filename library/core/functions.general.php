@@ -1725,6 +1725,45 @@ if (!function_exists('inSubArray')) {
     }
 }
 
+if (!function_exists('ipDecode')) {
+    /**
+     * Decode a packed IP address to its human-readable form.
+     *
+     * @param string $packedIP A string representing a packed IP address.
+     * @return string|null A human-readable representation of the provided IP address.
+     */
+    function ipDecode($packedIP) {
+        if (filter_var($packedIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+            // If it's already a valid IP address, don't bother unpacking it.
+            $result = $packedIP;
+        } elseif ($IP = @inet_ntop($packedIP)) {
+            $result = $IP;
+        } else {
+            $result = null;
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('ipEncode')) {
+    /**
+     * Encode a human-readable IP address as a packed string.
+     *
+     * @param string $IP A human-readable IP address.
+     * @return null|string A packed string representing a packed IP address.
+     */
+    function ipEncode($IP) {
+        $result = null;
+
+        if ($packedIP = @inet_pton($IP)) {
+            $result = $packedIP;
+        }
+
+        return $result;
+    }
+}
+
 if (!function_exists('isMobile')) {
     /**
      * Determine whether or not the site is in mobile mode.

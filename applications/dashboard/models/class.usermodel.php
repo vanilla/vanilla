@@ -1487,6 +1487,25 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Retrieve IP addresses associated with a user.
+     *
+     * @param int $userID Unique ID for a user.
+     * @return array IP addresses for the user.
+     */
+    public function getIPs($userID) {
+        $IPs = [];
+        $packedIPs = Gdn::sql()->getWhere('UserIP', ['UserID' => $userID])->resultArray();
+
+        foreach ($packedIPs as $UserIP) {
+            if ($unpackedIP = ipDecode($UserIP['IPAddress'])) {
+                $IPs[] = $unpackedIP;
+            }
+        }
+
+        return $IPs;
+    }
+
+    /**
      *
      *
      * @param bool $Like

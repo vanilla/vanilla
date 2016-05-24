@@ -174,6 +174,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $SideMenu->highlightRoute($CurrentUrl);
             $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
             $this->EventArguments['SideMenu'] = &$SideMenu;
+            $this->fireAs('SettingsController');
             $this->fireEvent('GetAppSettingsMenuItems');
             $this->addModule($SideMenu, 'Panel');
         }
@@ -296,6 +297,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Load all roles with editable permissions.
         $this->RoleArray = $RoleModel->getArray();
 
+        $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
         $this->setupDiscussionTypes(array());
 
@@ -566,6 +568,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Load all roles with editable permissions
         $this->RoleArray = $RoleModel->getArray();
 
+        $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
 
         if ($this->Form->authenticatedPostBack()) {

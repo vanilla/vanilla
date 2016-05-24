@@ -142,6 +142,14 @@ if (!$SystemUserID) {
     }
 }
 
+// UserIP Table
+$Construct->table('UserIP')
+    ->column('UserID', 'int', false, 'primary')
+    ->column('IPAddress', 'varbinary(16)', false, 'primary')
+    ->column('DateInserted', 'datetime', false)
+    ->column('DateUpdated', 'datetime', false)
+    ->set($Explicit, $Drop);
+
 // UserRole Table
 $Construct->table('UserRole');
 

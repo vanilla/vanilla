@@ -256,8 +256,8 @@ linters:
     exclude: vendors/**
 
   UnnecessaryParentReference:
-    enabled: true
-    exclude: vendors/**
+    enabled: false
+    exclude: legacy/**
 
   UrlFormat:
     enabled: true

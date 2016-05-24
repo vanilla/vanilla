@@ -659,6 +659,10 @@ class VanillaSettingsController extends Gdn_Controller {
         $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         $this->setData('Categories', $categories);
 
+        $this->addJsFile('category-settings.js');
+        $this->addJsFile('jquery.nestable.js');
+        require_once $this->fetchViewLocation('category-settings-functions');
+        $this->addAsset('Content', $this->fetchView('symbols'));
         $this->render();
     }
 

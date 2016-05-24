@@ -1,16 +1,12 @@
+// ## Vendors
 //
-// Dashboard 3 - A new dashboard design for Vanilla.
+// Library dependencies installed using Bower are automagically wired up when
+// running the `npm run build` command. Don't manually edit this section!
 //
-// @author    Becky Van Bussel <beckyvanbussel@gmail.com>
-//
+// bower:scss
+// endbower
+// bower:sass
+// endbower
 
-@import 'variables';
-@import 'maps/bootstrapVariables';
-@import 'maps/bootstrapMixins';
-@import 'maps/bootstrapAnimation';
-@import 'mixins';
-
-@import 'maps/vanillicon';
-@import 'maps/bootstrapSubset';
-@import 'maps/dashboard';
-@import 'maps/extensions';
+@import 'legacy/admin';
+@import 'category-settings';

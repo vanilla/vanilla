@@ -9187,4 +9187,113 @@ form h2 {
   z-index: 1040;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+.dd {
+  color: #555a62;
+  padding: 12px 18px;
+  position: relative;
+  fill: #555a62;
+}
+
+.dd * {
+  box-sizing: border-box;
+}
+
+.dd-list {
+  position: relative;
+}
+
+.dd-list .dd-list {
+  padding-left: 30px;
+}
+
+.dd-item,
+.dd-empty,
+.dd-placeholder {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  min-height: 36px;
+}
+
+.dd-item > button {
+  border: 0;
+  background: none;
+  position: absolute;
+  top: 0;
+  left: 30px;
+  padding: 9px 6px;
+  cursor: pointer;
+}
+
+.dd-item > button:active, .dd-item > button:hover {
+  color: #0291db;
+  fill: #0291db;
+}
+
+.dd-item .options {
+  float: right;
+}
+
+.dd-handle {
+  padding: 9px;
+  position: absolute;
+  margin: 0;
+  left: 0;
+  top: 0;
+  cursor: -webkit-grab;
+  cursor: grab;
+  line-height: 1;
+  fill: rgba(85, 89, 97, 0.2);
+}
+
+.dd-handle:hover {
+  fill: #555a62;
+}
+
+.dd-content {
+  display: block;
+  border: solid 1px rgba(85, 89, 97, 0.2);
+  background: #fdfdff;
+  border-radius: 2px;
+  padding: 6px 6px 6px 60px;
+  margin: 3px 0;
+}
+
+.dd-dragel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  margin-top: 0;
+  margin-left: 0;
+  opacity: .8;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+.dd-dragel > .dd-item > .dd-handle {
+  fill: #555a62;
+}
+
+.dd-placeholder,
+.dd-empty {
+  margin: 3px 0;
+  padding: 0;
+  background: #f1faff;
+  border: 1px dashed #0291db;
+  min-height: 36px;
+  border-radius: 2px;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+.icon {
+  display: inline-block;
+}
+
+.icon-16 {
+  height: 16px;
+  width: 16px;
+}
 /*# sourceMappingURL=admin.css.map */

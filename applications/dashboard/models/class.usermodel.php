@@ -2871,6 +2871,31 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Record an IP address for a user.
+     *
+     * @param int $userID Unique ID of the user.
+     * @param string $IP Human-readable IP address.
+     */
+    public function saveIP($userID, $IP) {
+        $packedIP = ipEncode($IP);
+        $px = Gdn::database()->DatabasePrefix;
+        $currentDateTime = Gdn_Format::toDateTime();
+
+        $query = "insert into {$px}UserIP (UserID, IPAddress, DateInserted, DateUpdated)
+            values (:UserID, :IPAddress, :DateInserted, :DateUpdated)
+            on duplicate key update DateUpdated = :DateUpdated2";
+        $values = [
+            ':UserID' => $userID,
+            ':IPAddress' => $packedIP,
+            ':DateInserted' => $currentDateTime,
+            ':DateUpdated' => $currentDateTime,
+            ':DateUpdated2' => $currentDateTime
+        ];
+
+        Gdn::database()->query($query, $values);
+    }
+
+    /**
      * Updates visit level information such as date last active and the user's ip address.
      *
      * @param int $UserID

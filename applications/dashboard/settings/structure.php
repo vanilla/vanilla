@@ -591,18 +591,17 @@ if ($Construct->tableExists('Tag') && $TagCategoryColumnExists) {
 
     $DupTags = Gdn::sql()
         ->select('Name, CategoryID')
-        ->select('TagID', 'min', 'TagID')
-        ->select('TagID', 'count', 'CountTags')
+        ->select('TagID', 'min', 'FirstTagID')
         ->from('Tag')
         ->groupBy('Name')
         ->groupBy('CategoryID')
-        ->having('CountTags >', 1)
+        ->having('count(TagID) >', 1)
         ->get()->resultArray();
 
     foreach ($DupTags as $Row) {
         $Name = $Row['Name'];
         $CategoryID = $Row['CategoryID'];
-        $TagID = $Row['TagID'];
+        $TagID = $Row['FirstTagID'];
         // Get the tags that need to be deleted.
         $DeleteTags = Gdn::sql()->getWhere('Tag', array('Name' => $Name, 'CategoryID' => $CategoryID, 'TagID <> ' => $TagID))->resultArray();
         foreach ($DeleteTags as $DRow) {

@@ -68,7 +68,17 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
         return false;
     }
 
-    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+    $fatalErrorBitmask = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+    if ($ErrorNumber & $fatalErrorBitmask) {
+        // Convert all fatal errors to an exception
+        throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+    }
+
+    // All other unprocessed non-fatal PHP errors are possibly Traced and delegated back to the native PHP handler.
+    if (function_exists('trace')) {
+        trace(new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line), TRACE_NOTICE);
+    }
+    return false;
 }
 
 /**

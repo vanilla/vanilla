@@ -373,11 +373,23 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Send a query to the database and return the result.
      *
+     * @deprecated
+     * @param string $sql The sql to execute.
+     * @return Gdn_Dataset
+     */
+    public function query($sql) {
+        deprecated(__CLASS__.'::query()', 'Gdn_SQLDriver::query()');
+        return $this->Database->query($sql);
+    }
+
+    /**
+     * Send a query to the database and return the result.
+     *
      * @param string $sql The sql to execute.
      * @param bool $checkThreshold Whether or not to check the alter table threshold before altering the table.
      * @return bool Whether or not the query succeeded.
      */
-    public function query($sql, $checkThreshold = false) {
+    protected function executeQuery($sql, $checkThreshold = false) {
         if ($this->CaptureOnly) {
             if (!property_exists($this->Database, 'CapturedSql')) {
                 $this->Database->CapturedSql = array();

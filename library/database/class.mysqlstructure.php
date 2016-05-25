@@ -35,7 +35,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      */
     public function drop() {
         if ($this->tableExists()) {
-            return $this->query('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
+            return $this->executeQuery('drop table `'.$this->_DatabasePrefix.$this->_TableName.'`');
         }
     }
 
@@ -46,7 +46,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @return boolean
      */
     public function dropColumn($Name) {
-        if (!$this->query('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`')) {
+        if (!$this->executeQuery('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$Name.'`')) {
             throw new Exception(sprintf(T('Failed to remove the `%1$s` column from the `%2$s` table.'), $Name, $this->_DatabasePrefix.$this->_TableName));
         }
 
@@ -153,7 +153,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Rename the column
         // The syntax for renaming a column is:
         // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
-        if (!$this->query('alter table `'.$OldPrefix.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_defineColumn($OldColumn))) {
+        if (!$this->executeQuery('alter table `'.$OldPrefix.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_defineColumn($OldColumn))) {
             throw new Exception(sprintf(t('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
         }
 
@@ -170,7 +170,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @return boolean
      */
     public function renameTable($OldName, $NewName, $UsePrefix = false) {
-        if (!$this->query('rename table `'.$OldName.'` to `'.$NewName.'`')) {
+        if (!$this->executeQuery('rename table `'.$OldName.'` to `'.$NewName.'`')) {
             throw new Exception(sprintf(t('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
         }
 
@@ -192,7 +192,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $SQLString = $SQL->getSelect();
         }
 
-        $Result = $this->query('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
+        $Result = $this->executeQuery('create or replace view '.$this->_DatabasePrefix.$Name." as \n".$SQLString);
         if (!is_null($SQL)) {
             $SQL->reset();
         }
@@ -309,7 +309,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $Sql .= ';';
 
-        $Result = $this->query($Sql);
+        $Result = $this->executeQuery($Sql);
         $this->reset();
 
         return $Result;
@@ -532,7 +532,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     foreach ($IndexesDb as $IndexName => $IndexSql) {
                         if (StringBeginsWith($IndexSql, 'fulltext', true)) {
                             $DropIndexQuery = "$AlterSqlPrefix drop index $IndexName;\n";
-                            if (!$this->query($DropIndexQuery)) {
+                            if (!$this->executeQuery($DropIndexQuery)) {
                                 throw new Exception(sprintf(t('Failed to drop the index `%1$s` on table `%2$s`.'), $IndexName, $this->_TableName));
                             }
                         }
@@ -540,7 +540,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 }
 
                 $EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
-                if (!$this->query($EngineQuery, true)) {
+                if (!$this->executeQuery($EngineQuery, true)) {
                     throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
                 }
             }
@@ -611,7 +611,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         if (count($AlterSql) > 0) {
-            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql), true)) {
+            if (!$this->executeQuery($AlterSqlPrefix.implode(",\n", $AlterSql), true)) {
                 throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }
@@ -649,7 +649,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Modify all of the indexes.
         foreach ($IndexSql as $Name => $Sqls) {
             foreach ($Sqls as $Sql) {
-                if (!$this->query($Sql)) {
+                if (!$this->executeQuery($Sql)) {
                     throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $Name, $this->_TableName));
                 }
             }
@@ -658,7 +658,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Run any additional Sql.
         foreach ($AdditionalSql as $Description => $Sql) {
             // These queries are just for enum alters. If that changes then pass true as the second argument.
-            if (!$this->query($Sql)) {
+            if (!$this->executeQuery($Sql)) {
                 throw new Exception("Error modifying table: {$Description}.");
             }
         }

@@ -189,10 +189,10 @@ $Construct
     ->set($Explicit, $Drop);
 
 if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
-    $Construct->query("drop index FK_Comment_DiscussionID on {$Px}Comment");
+    $SQL->query("drop index FK_Comment_DiscussionID on {$Px}Comment");
 }
 if (isset($CommentIndexes['FK_Comment_DateInserted'])) {
-    $Construct->query("drop index FK_Comment_DateInserted on {$Px}Comment");
+    $SQL->query("drop index FK_Comment_DateInserted on {$Px}Comment");
 }
 
 // Update the participated flag.
@@ -324,18 +324,18 @@ Removed FirstComment from :_Discussion and moved it into the discussion table.
 $Prefix = $SQL->Database->DatabasePrefix;
 
 if ($FirstCommentIDExists && !$BodyExists) {
-    $Construct->query("update {$Prefix}Discussion, {$Prefix}Comment
+    $SQL->query("update {$Prefix}Discussion, {$Prefix}Comment
    set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
       {$Prefix}Discussion.Format = {$Prefix}Comment.Format
    where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
 
-    $Construct->query("delete {$Prefix}Comment
+    $SQL->query("delete {$Prefix}Comment
    from {$Prefix}Comment inner join {$Prefix}Discussion
    where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
 }
 
 if (!$LastCommentIDExists || !$LastCommentUserIDExists) {
-    $Construct->query("update {$Prefix}Discussion d
+    $SQL->query("update {$Prefix}Discussion d
    inner join {$Prefix}Comment c
       on c.DiscussionID = d.DiscussionID
    inner join (
@@ -350,7 +350,7 @@ where d.LastCommentUserID is null");
 }
 
 if (!$CountBookmarksExists) {
-    $Construct->query("update {$Prefix}Discussion d
+    $SQL->query("update {$Prefix}Discussion d
    set CountBookmarks = (
       select count(ud.DiscussionID)
       from {$Prefix}UserDiscussion ud

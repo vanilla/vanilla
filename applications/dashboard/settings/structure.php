@@ -413,15 +413,15 @@ $Construct
     ->set($Explicit, $Drop);
 
 if (isset($ActivityIndexes['IX_Activity_NotifyUserID'])) {
-    $Construct->query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
+    $SQL->query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
 }
 
 if (isset($ActivityIndexes['FK_Activity_ActivityUserID'])) {
-    $Construct->query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
+    $SQL->query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
 }
 
 if (isset($ActivityIndexes['FK_Activity_RegardingUserID'])) {
-    $Construct->query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
+    $SQL->query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
 }
 
 if (!$EmailedExists) {
@@ -475,7 +475,7 @@ if (!$ActivityCommentExists && $CommentActivityIDExists) {
       select CommentActivityID, Story, 'Text', InsertUserID, DateInserted, InsertIPAddress
       from {$Px}Activity
       where CommentActivityID > 0";
-    $Construct->query($Q);
+    $SQL->query($Q);
     $SQL->delete('Activity', array('CommentActivityID >' => 0));
 }
 
@@ -570,7 +570,7 @@ $Construct->table('Message')
 $Prefix = $SQL->Database->DatabasePrefix;
 
 if ($PhotoIDExists && !$PhotoExists) {
-    $Construct->query("update {$Prefix}User u
+    $SQL->query("update {$Prefix}User u
    join {$Prefix}Photo p
       on u.PhotoID = p.PhotoID
    set u.Photo = p.Name");

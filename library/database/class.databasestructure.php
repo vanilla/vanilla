@@ -375,6 +375,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *
      * @deprecated
      * @param string $sql The sql to execute.
+     * @param bool $checkTreshold Should not be used
      * @return Gdn_Dataset
      */
     public function query($sql, $checkTreshold = false) {

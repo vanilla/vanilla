@@ -543,36 +543,13 @@ if (!function_exists('LogException')) {
         if (!class_exists('Gdn', false)) {
             return;
         }
-        if (!ini_get('log_errors')) {
-            return;
-        }
 
         if ($Ex instanceof Gdn_UserException) {
             return;
         }
 
-        try {
-            $Px = Gdn::request()->host().' Garden ';
-        } catch (Exception $Ex) {
-            $Px = 'Garden ';
-        }
-
-        $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
-        if (!$ErrorLogFile) {
-            $Type = 0;
-        } else {
-            $Type = 3;
-            $Date = date(Gdn::config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
-            $Px = "$Date $Px";
-        }
-
-        $Message = 'Exception: '.$Ex->getMessage().' in '.$Ex->getFile().' on '.$Ex->getLine();
-        @error_log($Px.$Message, $Type, $ErrorLogFile);
-
-        $TraceLines = explode("\n", $Ex->getTraceAsString());
-        foreach ($TraceLines as $i => $Line) {
-            @error_log("$Px  $Line", $Type, $ErrorLogFile);
-        }
+        // Attempt to log the exception in the PHP logs
+        errorLog(formatException($Ex));
     }
 }
 

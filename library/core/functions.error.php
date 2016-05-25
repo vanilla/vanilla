@@ -79,6 +79,9 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
  */
 function Gdn_ExceptionHandler($Exception) {
     try {
+        // Attempt to log the exception as early as possible
+        errorLog($Exception);
+
         $ErrorNumber = $Exception->getCode();
         $Message = $Exception->getMessage();
         $File = $Exception->getFile();
@@ -353,9 +356,6 @@ function Gdn_ExceptionHandler($Exception) {
    </html>';
             }
         }
-
-        // Attempt to log an error message no matter what.
-        LogException($Exception);
     } catch (Exception $e) {
         print get_class($e)." thrown within the exception handler.<br/>Message: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
         exit();
@@ -375,6 +375,36 @@ if (!function_exists('ErrorMessage')) {
      */
     function errorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
         return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
+    }
+}
+
+if (!function_exists('errorLog')) {
+    /**
+     * Attempt to log an error message to the PHP error log.
+     *
+     * @param string|\Exception $message
+     */
+    function errorLog($message) {
+
+        $errorLogFile = Gdn::config('Garden.Errors.LogFile');
+
+        // Log only if the PHP setting "log_errors" is enabled
+        // OR if the Garden config "Garden.Errors.LogFile" is provided
+        if (! ($errorLogFile || ini_get('log_errors'))) {
+            return;
+        }
+
+        $destination = null;
+        if (!$errorLogFile) {
+            // sends to PHP's system logger
+            $messageType = 0;
+        } else {
+            // appends to a file
+            $messageType = 3;
+            $destination = $errorLogFile;
+        }
+
+        error_log($message, $messageType, $destination);
     }
 }
 

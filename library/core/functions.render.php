@@ -569,14 +569,15 @@ if (!function_exists('formatIP')) {
     function formatIP($IP, $html = true) {
         $result = '';
 
+        // Is this a packed IP address?
+        if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6) && $unpackedIP = @inet_ntop($IP)) {
+            $IP = $unpackedIP;
+        }
+
         if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $result = $html ? htmlspecialchars($IP) : $IP;
-        } elseif ($unpackedIP = @inet_ntop($IP)) {
-            if (filter_var($unpackedIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $result = $html ? htmlspecialchars($unpackedIP) : $unpackedIP;
-            } elseif (filter_var($unpackedIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                $result = $html ? wrap(t('IPv6'), 'span', ['title' => $unpackedIP]) : $unpackedIP;
-            }
+        } elseif (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $result = $html ? wrap(t('IPv6'), 'span', ['title' => $IP]) : $IP;
         }
 
         return $result;

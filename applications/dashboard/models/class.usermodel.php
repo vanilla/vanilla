@@ -2034,11 +2034,6 @@ class UserModel extends Gdn_Model {
             $this->Validation->applyRule('Email', 'Email');
         }
 
-        // AllIPAdresses is stored as a CSV, so handle the case where an array is submitted.
-        if (array_key_exists('AllIPAddresses', $FormPostValues) && is_array($FormPostValues['AllIPAddresses'])) {
-            $FormPostValues['AllIPAddresses'] = implode(',', $FormPostValues['AllIPAddresses']);
-        }
-
         if ($this->validate($FormPostValues, $Insert) && $UniqueValid) {
             // All fields on the form that need to be validated (including non-schema field rules defined above)
             $Fields = $this->Validation->validationFields();
@@ -2939,31 +2934,13 @@ class UserModel extends Gdn_Model {
         if ($UserID == Gdn::session()->UserID) {
             $IP = Gdn::request()->ipAddress();
             $Fields['LastIPAddress'] = $IP;
+            $this->saveIP($UserID, $IP);
 
             if (Gdn::session()->newVisit()) {
                 $Fields['CountVisits'] = val('CountVisits', $User, 0) + 1;
                 $this->fireEvent('Visit');
             }
         }
-
-        // Generate the AllIPs field.
-        $AllIPs = val('AllIPAddresses', $User, []);
-        if (is_string($AllIPs)) {
-            $AllIPs = explode(',', $AllIPs);
-            setValue('AllIPAddresses', $User, $AllIPs);
-        }
-        if (!is_array($AllIPs)) {
-            $AllIPs = [];
-        }
-        if ($IP = val('InsertIPAddress', $User)) {
-            array_unshift($AllIPs, forceIPv4($IP));
-        }
-        if ($IP = val('LastIPAddress', $User)) {
-            array_unshift($AllIPs, $IP);
-        }
-        // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
-        $AllIPs = array_unique($AllIPs);
-        $Fields['AllIPAddresses'] = $AllIPs;
 
         // Set the hour offset based on the client's clock.
         if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
@@ -3743,15 +3720,8 @@ class UserModel extends Gdn_Model {
 
             setValue('PhotoUrl', $User, $PhotoUrl);
         }
-        if ($v = val('AllIPAddresses', $User)) {
-            if (is_string($v)) {
-                $IPAddresses = explode(',', $v);
-                foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = forceIPv4($IPAddress);
-                }
-                setValue('AllIPAddresses', $User, $IPAddresses);
-            }
-        }
+
+        setValue('AllIPAddresses', $User, $this->getIPs(val('UserID', $User)));
 
         setValue('_CssClass', $User, '');
         if (val('Banned', $User)) {
@@ -4291,19 +4261,6 @@ class UserModel extends Gdn_Model {
 
         $this->defineSchema();
         $Fields = $this->Schema->fields();
-
-        if (isset($Property['AllIPAddresses'])) {
-            if (is_array($Property['AllIPAddresses'])) {
-                $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
-                $IPs = array_unique($IPs);
-                $Property['AllIPAddresses'] = implode(',', $IPs);
-                // Ensure this isn't too big for our column
-                while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {
-                    array_pop($IPs);
-                    $Property['AllIPAddresses'] = implode(',', $IPs);
-                }
-            }
-        }
 
         $Set = array_intersect_key($Property, $Fields);
         self::serializeRow($Set);

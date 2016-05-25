@@ -377,9 +377,26 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * @param string $sql The sql to execute.
      * @return Gdn_Dataset
      */
-    public function query($sql) {
-        deprecated(__CLASS__.'::query()', 'Gdn_SQLDriver::query()');
-        return $this->Database->query($sql);
+    public function query($sql, $checkTreshold = false) {
+
+        $class = null;
+        $internalCall = false;
+
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        if (count($backtrace) > 1) {
+            $class = val('class', $backtrace[1]);
+            if ($class) {
+                $internalCall = is_a($class, __CLASS__, true);
+            }
+        }
+
+        if ($internalCall) {
+            deprecated("$class::query()", "$class::executeQuery()");
+            return $this->executeQuery($sql, $checkTreshold);
+        } else {
+            deprecated(__CLASS__.'::query()', 'Gdn_SQLDriver::query()');
+            return $this->Database->query($sql);
+        }
     }
 
     /**

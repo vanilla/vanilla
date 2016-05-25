@@ -388,7 +388,7 @@ if (!function_exists('LogException')) {
         if (!class_exists('Gdn', false)) {
             return;
         }
-        if (!Gdn::config('Garden.Errors.LogEnabled', false)) {
+        if (!ini_get('log_errors')) {
             return;
         }
 
@@ -436,8 +436,7 @@ if (!function_exists('LogMessage')) {
     function logMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
         // Figure out where to save the log
         if (class_exists('Gdn', false)) {
-            $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', false);
-            if ($LogErrors === true) {
+            if (ini_get('log_errors')) {
                 $Log = "[Garden] $File, $Line, $Object.$Method()";
                 if ($Message <> '') {
                     $Log .= ", $Message";

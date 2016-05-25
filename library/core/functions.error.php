@@ -80,7 +80,11 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
 function Gdn_ExceptionHandler($Exception) {
     try {
         // Attempt to log the exception as early as possible
-        errorLog($Exception);
+        if ($Exception instanceof \ErrorException) {
+            errorLog(formatErrorException($Exception));
+        } else {
+            errorLog(formatException($Exception));
+        }
 
         $ErrorNumber = $Exception->getCode();
         $Message = $Exception->getMessage();
@@ -382,15 +386,25 @@ if (!function_exists('errorLog')) {
     /**
      * Attempt to log an error message to the PHP error log.
      *
+     * @access private
      * @param string|\Exception $message
      */
     function errorLog($message) {
+        // Make sure the message can be converted to a string otherwise bail out
+        if (!is_string($message) && !method_exists($message, '__toString')) {
+            return;
+        }
+
+        if (!is_string($message)) {
+            // Cast the $message to a string
+            $message = (string) $message;
+        }
 
         $errorLogFile = Gdn::config('Garden.Errors.LogFile');
 
         // Log only if the PHP setting "log_errors" is enabled
         // OR if the Garden config "Garden.Errors.LogFile" is provided
-        if (! ($errorLogFile || ini_get('log_errors'))) {
+        if (!($errorLogFile || ini_get('log_errors'))) {
             return;
         }
 
@@ -402,9 +416,100 @@ if (!function_exists('errorLog')) {
             // appends to a file
             $messageType = 3;
             $destination = $errorLogFile;
+            $message .= PHP_EOL;
         }
 
-        error_log($message, $messageType, $destination);
+        @error_log($message, $messageType, $destination);
+    }
+}
+
+if (!function_exists('formatErrorException')) {
+    /**
+     * Format an \ErrorException into a string destined for PHP error_log()
+     *
+     * @access private
+     * @param \ErrorException $exception The error exception to format
+     * @return string The formatted error message
+     */
+    function formatErrorException($exception) {
+        if (!($exception instanceof \ErrorException)) {
+            return '';
+        }
+
+        $errorType = '';
+        $errorCode = $exception->getCode();
+
+        // Find an error type based on the error code
+        switch ($errorCode) {
+            case $errorCode & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR):
+                $errorType = 'PHP Fatal error';
+                break;
+            case $errorCode & (E_NOTICE | E_USER_NOTICE):
+                $errorType = 'PHP Notice';
+                break;
+            case $errorCode & (E_WARNING | E_CORE_WARNING | E_COMPILE_WARNING | E_USER_WARNING):
+                $errorType = 'PHP Warning';
+                break;
+            case $errorCode & (E_DEPRECATED | E_USER_DEPRECATED):
+                $errorType = 'PHP Deprecated';
+                break;
+            case $errorCode & (E_PARSE):
+                $errorType = 'PHP Parse error';
+                break;
+            case $errorCode & (E_STRICT):
+                $errorType = 'PHP Strict standards';
+                break;
+        }
+
+        return formatPHPErrorLog($exception->getMessage(), $errorType, $exception->getFile(), $exception->getLine());
+    }
+}
+
+if (!function_exists('formatException')) {
+    /**
+     * Format an \Exception or any object implementing \Throwable
+     * into a string destined for PHP error_log()
+     *
+     * @access private
+     * @param mixed $exception The Exception to format
+     * @return string The formatted error message
+     */
+    function formatException($exception) {
+        if (!($exception instanceof \Exception) && !($exception instanceof \Throwable)) {
+            // Not an Exception or a Throwable type (PHP7)
+            return '';
+        }
+
+        $errorMessage = 'Uncaught ' . (string) $exception . PHP_EOL . '  thrown';
+
+        return formatPHPErrorLog($errorMessage, 'PHP Fatal error', $exception->getFile(), $exception->getLine());
+    }
+}
+
+if (!function_exists('formatPHPErrorLog')) {
+    /**
+     * Format an error message to be sent to PHP error_log()
+     *
+     * @access private
+     * @param string $errorMsg The error message
+     * @param string $errorType Optional error type such as "PHP Fatal error" or "PHP Notice".  It will be prefixed to the $errorMsg
+     * @param string $file Optional file path where the error occured
+     * @param string $line Optional line number where the error occured
+     * @return string The formatted error message
+     */
+    function formatPHPErrorLog($errorMsg, $errorType = null, $file = null, $line = null) {
+        $formattedMessage = $errorMsg;
+        if ($errorType) {
+            $formattedMessage = sprintf('%s:  %s', $errorType, $errorMsg);
+        }
+
+        if ($file && is_numeric($line)) {
+            $formattedMessage = sprintf('%s in %s on line %s', $formattedMessage, $file, $line);
+        } elseif ($file) {
+            $formattedMessage = sprintf('%s in %s', $formattedMessage, $file, $line);
+        }
+
+        return $formattedMessage;
     }
 }
 

@@ -83,7 +83,7 @@ function Gdn_ExceptionHandler($Exception) {
         if ($Exception instanceof \ErrorException) {
             errorLog(formatErrorException($Exception));
         } else {
-            errorLog(formatException($Exception));
+            errorLog(formatException($Exception, true));
         }
 
         $ErrorNumber = $Exception->getCode();
@@ -472,17 +472,27 @@ if (!function_exists('formatException')) {
      *
      * @access private
      * @param mixed $exception The Exception to format
+     * @param boolean $uncaught Whether the exception was uncaught or not
      * @return string The formatted error message
      */
-    function formatException($exception) {
+    function formatException($exception, $uncaught = false) {
         if (!($exception instanceof \Exception) && !($exception instanceof \Throwable)) {
             // Not an Exception or a Throwable type (PHP7)
             return '';
         }
 
-        $errorMessage = 'Uncaught ' . (string) $exception . PHP_EOL . '  thrown';
+        $errorMessage = (string) $exception;
 
-        return formatPHPErrorLog($errorMessage, 'PHP Fatal error', $exception->getFile(), $exception->getLine());
+        if ($uncaught) {
+            $errorType = 'PHP Fatal error';
+            $errorMessage = 'Uncaught ' . $errorMessage;
+        } else {
+            $errorType = 'APP Log';
+            $errorMessage = 'Caught ' . $errorMessage;
+        }
+        $errorMessage .= PHP_EOL . '  thrown';
+
+        return formatPHPErrorLog($errorMessage, $errorType, $exception->getFile(), $exception->getLine());
     }
 }
 

@@ -4,15 +4,6 @@
   @extend .row;
 }
 
-.Row {
-  @extend .row;
-}
-
-.Column.Grid_50 {
-  @extend .col-md-6;
-}
-
-
 .input-wrap {
   @extend .col-sm-7;
 }
@@ -40,6 +31,9 @@ form {
     @extend .col-sm-7;
   }
   > input {
+    @extend .col-sm-7;
+  }
+  > select {
     @extend .col-sm-7;
   }
 }

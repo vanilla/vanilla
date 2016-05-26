@@ -3,6 +3,11 @@
   display: none !important;
 }
 
+.Padded,
+.padded {
+  padding: $padding-default 0;
+}
+
 .Help.Aside {
   position: absolute;
   display: block;

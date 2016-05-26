@@ -1,0 +1,13 @@
+.plugins {
+  table {
+    .Info {
+      @extend .btn-group;
+    }
+  }
+}
+
+table {
+  .btn {
+    min-width: inherit;
+  }
+}

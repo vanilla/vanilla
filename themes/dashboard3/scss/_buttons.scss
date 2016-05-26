@@ -25,7 +25,7 @@
   &.active {
     &:focus,
     &.focus {
-      @include tab-focus();
+      //@include tab-focus();
     }
   }
 
@@ -63,34 +63,23 @@ fieldset[disabled] a.btn {
 //
 
 .btn-primary {
-  min-width: $btn-min-width;
-
-  &:hover,
-  &.hover,
-  &:active,
-  &.active {
-    color: $btn-primary-bg;
-    background-color: $btn-primary-color;
-    border-color: $btn-primary-color;
-  }
-
-  @include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border);
+  @include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }
 .btn-secondary {
-  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border);
+  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }
-.btn-info {
-  @include button-variant($btn-info-color, $btn-info-bg, $btn-info-border);
-}
-.btn-success {
-  @include button-variant($btn-success-color, $btn-success-bg, $btn-success-border);
-}
-.btn-warning {
-  @include button-variant($btn-warning-color, $btn-warning-bg, $btn-warning-border);
-}
-.btn-danger {
-  @include button-variant($btn-danger-color, $btn-danger-bg, $btn-danger-border);
-}
+//.btn-info {
+//  @include button-variant($btn-info-color, $btn-info-bg, $btn-info-border);
+//}
+//.btn-success {
+//  @include button-variant($btn-success-color, $btn-success-bg, $btn-success-border);
+//}
+//.btn-warning {
+//  @include button-variant($btn-warning-color, $btn-warning-bg, $btn-warning-border);
+//}
+//.btn-danger {
+//  @include button-variant($btn-danger-color, $btn-danger-bg, $btn-danger-border);
+//}
 
 // Remove all backgrounds
 .btn-primary-outline {

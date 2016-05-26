@@ -566,28 +566,21 @@ if (!function_exists('LogMessage')) {
      * @param string Any additional information that could be useful to debuggers.
      */
     function logMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
-        // Figure out where to save the log
-        if (class_exists('Gdn', false)) {
-            if (ini_get('log_errors')) {
-                $Log = "[Garden] $File, $Line, $Object.$Method()";
-                if ($Message <> '') {
-                    $Log .= ", $Message";
-                }
-                if ($Code <> '') {
-                    $Log .= ", $Code";
-                }
-
-                // Fail silently (there could be permission issues on badly set up servers).
-                $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
-                if ($ErrorLogFile == '') {
-                    @error_log($Log);
-                } else {
-                    $Date = date(Gdn::config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
-                    $Log = "$Date: $Log\n";
-                    @error_log($Log, 3, $ErrorLogFile);
-                }
-            }
+        if (!class_exists('Gdn', false)) {
+            return;
         }
+
+        // Prepare the log message
+        $Log = "[Garden] $File, $Line, $Object.$Method()";
+        if ($Message <> '') {
+            $Log .= ", $Message";
+        }
+        if ($Code <> '') {
+            $Log .= ", $Code";
+        }
+
+        // Attempt to log the message in the PHP logs
+        errorLog($Log);
     }
 }
 

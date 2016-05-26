@@ -153,6 +153,7 @@
         var csrfToken = jqXHR.getResponseHeader("X-CSRF-Token");
         if (csrfToken) {
             gdn.setMeta("TransientKey", csrfToken);
+            $("input[name=TransientKey]").val(csrfToken);
         }
     });
 })(window, jQuery);

@@ -194,7 +194,6 @@ class OpenIDPlugin extends Gdn_Plugin {
             $OpenID = $this->getOpenID();
         } catch (Gdn_UserException $ex) {
             $Sender->Form->addError('@'.$ex->getMessage());
-            $Sender->render('Url', '', 'plugins/OpenID');
         }
 
         $Mode = $Sender->Request->get('openid_mode');

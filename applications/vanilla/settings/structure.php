@@ -287,7 +287,7 @@ $ActivityModel->DefineType('Discussion');
 $ActivityModel->DefineType('Comment');
 
 $PermissionModel = Gdn::permissionModel();
-$PermissionModel->Database = $Database;
+$PermissionModel->Database = Gdn::database();
 $PermissionModel->SQL = $SQL;
 
 // Define some global vanilla permissions.

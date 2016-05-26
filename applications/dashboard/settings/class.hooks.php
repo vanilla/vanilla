@@ -269,13 +269,11 @@ class DashboardHooks implements Gdn_IPlugin {
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_sendHeaders_handler($sender) {
-        $headers = array_change_key_case(getallheaders(), CASE_UPPER);
-
         $csrfToken = Gdn::request()->post(
             Gdn_Session::CSRF_NAME,
             Gdn::request()->get(
                 Gdn_Session::CSRF_NAME,
-                val('X-CSRF-TOKEN', $headers)
+                Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_CSRF_TOKEN')
             )
         );
 

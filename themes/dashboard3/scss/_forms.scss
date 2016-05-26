@@ -4,36 +4,278 @@
 //
 // Styleguide 3.
 
-input,
-select,
-textarea {
-  &:focus,
-  &:active {
-    outline: 0;
+.Sortable,
+.DataList {
+  padding-left: 0;
+
+  li {
+    list-style: none;
+  }
+}
+
+form {
+  ul,
+  ol {
+    padding-left: 0;
+
+    li {
+      list-style: none;
+      justify-content: space-between;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+}
+
+.label-wrap {
+  .Info {
+    font-size: $font-size-sm;
+    line-height: $line-height-lg;
+    color: $grey;
+  }
+}
+
+.input-wrap-left {
+  padding-left: $padding-default;
+}
+
+.input-wrap-right {
+  padding-right: $padding-default;
+}
+
+.form-group {
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px dotted $grey-light;
+
+  &:first-child {
+    padding-top: 1rem;
+    border-top: 1px dotted $grey-light;
   }
 }
 
 
-// Form control labels
+
+// Toggles
 //
-// Form control labels.
+// Toggles can either be a checkbox form element or an anchor.
 //
-// .danger - Danger color
+// Styleguide 3.3.
+
+// Anchor toggle
+//
+// Here's how to build an anchor toggle.
+//
+// .toggle-wrap-on - On state
 //
 // Markup:
-// <div class="group-label" for="input1">Group label:</div>
-// <div class="form-input-group">
-//   <input class="control-input" type="checkbox" id="input1">
-//   <label class="control-label {$modifiers}" for="input1">Control label</label>
+// <div class="toggle-wrap {{modifier_class}}">
+//   <a href="#">
+//     <div class="toggle-well"></div>
+//     <div class="toggle-slider"></div>
+//   </a>
 // </div>
 //
+// Styleguide 3.3.1.
 
-.control-label {
-  display: inline-block;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.toggle-wrap {
+  display: block;
+  position: relative;
+  width: $toggle-height * 2;
+  height: $toggle-height;
+}
 
-  &.danger {
-    color: $brand-danger;
+.toggle-well {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $toggle-height * 2;
+  height: $toggle-height;
+  background-color: $white;
+  border-radius: $toggle-height / 2;
+  border: $toggle-border-width solid $grey;
+  transition: background 0.4s;
+}
+
+.toggle-slider {
+  display: block;
+  position: absolute;
+  top: $toggle-padding + $toggle-border-width;
+  left: $toggle-padding + $toggle-border-width;
+  bottom: $toggle-padding + $toggle-border-width;
+  width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width *2);
+  height: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
+  border-radius: ($toggle-height - ($toggle-padding)) / 2;
+  border: $toggle-border-width solid $grey;
+  background-color: $white;
+  outline: 0;
+  transition: left 0.4s;
+}
+
+.toggle-well-on {
+  background-color: $brand-primary;
+}
+
+.toggle-slider-on {
+  left: $toggle-height + $toggle-padding;
+}
+
+.toggle-slider-active {
+  left: ($toggle-height / 2) + $toggle-padding;
+  transition: left 0.4s;
+}
+
+.toggle-wrap-on {
+  .toggle-well {
+    @extend .toggle-well-on;
   }
+
+  .toggle-slider {
+    @extend .toggle-slider-on;
+  }
+}
+
+.InProgress {
+  .toggle-slider {
+    @extend .toggle-slider-active;
+  }
+}
+
+.toggle-box-label-wrap {
+  padding-left: $padding-default;
+}
+
+// Checkbox toggle
+//
+// Here's how to build an checkbox toggle.
+//
+// Markup:
+// <div class="toggle-wrap">
+//   <input id="toggle-checkbox" type="checkbox" />
+//   <label for="toggle-checkbox"></label>
+// </div>
+//
+// Styleguide 3.3.2.
+
+.toggle-wrap {
+  label {
+    display: inline;
+  }
+
+  input[type="checkbox"] {
+    position: absolute;
+    margin-left: -9999px;
+    visibility: hidden;
+  }
+
+  input[type="checkbox"] + label {
+    &:before,
+    &:after {
+      content: "";
+    }
+
+    &:before {
+      @extend .toggle-well;
+    }
+
+    &:after {
+      @extend .toggle-slider;
+    }
+  }
+
+  // When checked, move and change background color
+  input[type="checkbox"]:checked + label:before {
+    @extend .toggle-well-on;
+  }
+  input[type="checkbox"]:checked + label:after {
+    @extend .toggle-slider-on;
+  }
+}
+
+.ActivateSlider {
+  @extend .toggle-wrap;
+
+  a {
+    &,
+    &:focus,
+    &:hover,
+    &:active,
+    &:hover:active {
+      @extend .text-hide;
+      outline: 0;
+    }
+
+    &:before {
+      @extend .toggle-well;
+      content: '';
+    }
+
+    &:after {
+      @extend .toggle-slider;
+      content: '';
+    }
+  }
+
+  .InProgress {
+    &:after {
+      @extend .toggle-slider-active;
+    }
+  }
+}
+
+.ActivateSlider-Active{
+  a {
+    &:before {
+      @extend .toggle-well-on;
+      content: '';
+    }
+
+    &:after {
+      @extend .toggle-slider-on;
+      content: '';
+    }
+  }
+}
+
+// Color Pickers
+//
+//
+//
+// Markup:
+// <div class="js-color-picker color-picker ">
+//   <input type="text" class="js-color-picker-value color-picker-value hidden" />
+//   <input type="text" class="js-color-picker-text color-picker-text form-control" />
+//   <span class="js-color-picker-preview color-picker-preview"></span>
+//   <input type="color" class="js-color-picker-color color-picker-color" />
+// </div>
+//
+// Styleguide 3.4
+
+.color-picker {
+  position: relative;
+  @extend .input-wrap;
+}
+
+// Hide the html color input
+.color-picker-color {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.color-picker-preview {
+  position: absolute;
+  top: $padding-default / 4;
+  right: $padding-default + ($padding-default / 4);
+  width: 40px;
+  height: 27px;
+  background: $black;
+  border: 1px solid transparent;
+  cursor: pointer;
 }

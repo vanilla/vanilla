@@ -5,6 +5,14 @@
   overflow: hidden;
 }
 
+table,
+.DataList {
+  img {
+    max-width: 64px;
+  }
+}
+
 img {
   @include img-fluid();
 }
+

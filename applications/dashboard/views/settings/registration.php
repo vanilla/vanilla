@@ -31,8 +31,11 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 $i = 0;
                 $Alt = false;
                 foreach ($this->RegistrationMethods as $Method => $Description) {
-                    $Alt = $Alt ? false : true;
-                    $CssClass = $Alt ? 'Alt' : '';
+                    $Alt = !$Alt;
+                    $CssClass = '';
+                    if ($Alt) {
+                        $CssClass = 'Alt';
+                    }
                     ++$i;
                     if ($Count == $i)
                         $CssClass .= ' Last';
@@ -87,11 +90,15 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 $Count = $this->RoleData->numRows();
                 $Alt = false;
                 foreach ($this->RoleData->result() as $Role) {
-                    $Alt = $Alt ? false : true;
-                    $CssClass = $Alt ? 'Alt' : '';
+                    $Alt = !$Alt;
+                    $CssClass = '';
+                    if ($Alt) {
+                        $CssClass = 'Alt';
+                    }
                     ++$i;
-                    if ($Count == $i)
+                    if ($Count == $i) {
                         $CssClass .= ' Last';
+                    }
 
                     $CssClass = trim($CssClass);
                     $CurrentValue = val($Role['RoleID'], $this->ExistingRoleInvitations, false);

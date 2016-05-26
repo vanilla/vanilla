@@ -100,7 +100,6 @@ if ($AddonUrl != '')
         <table class="SelectionGrid Themes">
             <tbody>
             <?php
-            $Alt = FALSE;
             $Cols = 3;
             $Col = 0;
 

@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-$Alt = FALSE;
+$Alt = false;
 $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $DeleteUser = $Session->checkPermission('Garden.Users.Delete');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 foreach ($this->UserData->result() as $User) {
-    $Alt = $Alt ? FALSE : TRUE;
+    $Alt = !$Alt;
     ?>
     <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>
         data-userid="<?php echo $User->UserID ?>">

@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
-$Alt = FALSE;
+$Alt = false;
 $SubjectsVisible = c('Conversations.Subjects.Visible');
 
 foreach ($this->data('Conversations') as $Conversation) {
     $Conversation = (object)$Conversation;
-    $Alt = $Alt == TRUE ? FALSE : TRUE;
+    $Alt = !$Alt;
 
 
     // Figure out the last photo.

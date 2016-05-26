@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 
-$Alt = FALSE;
+$Alt = false;
 $CurrentOffset = $this->Offset;
 $Messages = $this->data('Messages', array());
 foreach ($Messages as $Message) {
     $CurrentOffset++;
-    $Alt = $Alt == TRUE ? FALSE : TRUE;
+    $Alt = !$Alt;
     $Class = 'Item';
     $Class .= $Alt ? ' Alt' : '';
     if ($this->Conversation->DateLastViewed < $Message->DateInserted)

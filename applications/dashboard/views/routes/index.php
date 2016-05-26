@@ -19,7 +19,7 @@ $Session = Gdn::session();
     <tbody>
     <?php
     $i = 0;
-    $Alt = FALSE;
+    $Alt = false;
     foreach ($this->MyRoutes as $Route => $RouteData) {
         $Alt = !$Alt;
 

@@ -131,6 +131,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     public function start() {
         $this->fireEvent('AppStartup');
+        header_register_callback([$this, 'sendHeaders']);
     }
 
     /**
@@ -795,6 +796,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 }
             }
         }
+    }
+
+    /**
+     * Trigger an event allowing addons to modify response headers.
+     */
+    public function sendHeaders() {
+        $this->fireEvent('SendHeaders');
     }
 }
 

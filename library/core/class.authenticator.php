@@ -401,8 +401,8 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
             ->where('uat.ForeignUserKey', $UserKey)
             ->where('uat.ProviderKey', $ProviderKey)
             ->beginWhereGroup()
-            ->where('(uat.Timestamp + uat.Lifetime) >=', 'NOW()')
-            ->orWHere('uat.Lifetime', 0)
+            ->where('(uat.Timestamp + uat.Lifetime) >=', 'NOW()', true, false)
+            ->orWhere('uat.Lifetime', 0)
             ->endWhereGroup()
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);

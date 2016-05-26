@@ -14,3 +14,32 @@
     @extend .media-heading;
   }
 }
+
+.DataList li {
+  @extend .media;
+
+  .IconWrap {
+    @extend .media-left;
+
+    img {
+      @extend .media-object;
+    }
+  }
+
+  .Connection-Info {
+    @extend .media-body;
+  }
+
+  .Connection-Buttons {
+    @extend .media-right;
+  }
+
+  .Connection-Name {
+    @extend .h4;
+    @extend .media-heading;
+
+    .Addendums {
+      @extend small;
+    }
+  }
+}

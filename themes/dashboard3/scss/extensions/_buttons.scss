@@ -3,6 +3,10 @@
   @extend .btn-primary;
 }
 
+button.btn {
+  @extend .btn-primary;
+}
+
 .SmallButton {
   @extend .btn;
   @extend .btn-primary;
@@ -13,4 +17,32 @@
   @extend .btn;
   @extend .btn-primary;
   @extend .btn-lg;
+}
+
+.Buttons {
+  @extend .btn-group;
+}
+
+
+.panel-nav h4 {
+  @extend .nav-heading;
+}
+
+.Tabs ul,
+.tabbed-content {
+  @extend .btn-group;
+
+  li {
+    display: inline-block;
+  }
+
+  li a {
+    @extend .btn;
+    @extend .btn-secondary;
+  }
+
+  .Active a,
+  .current-tab {
+    @extend .active;
+  }
 }

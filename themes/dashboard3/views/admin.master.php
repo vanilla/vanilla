@@ -1,4 +1,22 @@
-<?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
+<?php echo '<?xml version="1.0" encoding="utf-8"?>';
+$dropdown = new DropdownModule('my-dropdown');
+$dropdown->setView('dropdown-twbs');
+$dropdown->setTrigger('A New Name')
+    ->addLink('Link 1', '#') // automatically creates key: item1
+    ->addDivider() // automatically creates key: item2
+    ->addLink('Link 2', '#', 'link2', 'danger') // creates item with key: link2
+    ->addLink('Link 3', '#') // automatically creates key: item3
+    ->addLink('Link 4', '#') // automatically creates key: item4
+    ->addGroup('', 'group1') // creates group with no header
+    ->addGroup('Group 3', 'group3') // creates group with header: 'Group 3', empty so will not display
+    ->addGroup('Group 2', 'group2') // creates group with header: 'Group 2'
+    ->addLink('Link 5', '#', '', '', array('before', 'link2'), array('badge' => '4')) // automatically creates key: item5. Inserts before Link 2
+    ->addLink('Link 6', '#') // automatically creates key: item6
+    ->addLink('Link 7', '#') // automatically creates key: item7
+    ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
+    ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
+    ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
 <head>
@@ -54,6 +72,7 @@
                 <?php $this->renderAsset('Content'); ?>
             </div>
             <div class="col-sm-3 col-md-2 panel panel-help panel-right">
+                <?php echo $dropdown; ?>
                 <?php echo $this->data('HelpModule'); ?>
             </div>
         <?php } else { ?>

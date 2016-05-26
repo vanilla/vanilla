@@ -111,11 +111,6 @@ $navbar-border-color: rgba(0,0,0,.125);
   margin-left: $spacer;
   opacity: .75;
 
-  @include button-variant($white, $btn-primary-bg, $white);
+  @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
   @include button-size($btn-padding-y-sm, $btn-padding-x-sm, 0.575rem, $line-height-sm, $btn-border-radius-navbar);
-
-  &:hover {
-    opacity: 100;
-    background-color: $nav-navbar-active-link-active-bg;
-  }
 }

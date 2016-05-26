@@ -32,6 +32,13 @@ $brand-info:                #97afbf;
 $brand-warning:             #faa43a;
 $brand-danger:              #f9281d;
 
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns:               12 !default;
+$grid-gutter-width:          1.875rem !default; // 30px
+
 // Typography
 //
 // Font, line-height, and color for body text, headings, and more.
@@ -117,7 +124,7 @@ $btn-padding-y:                  .425rem;
 $btn-font-weight:                normal !default;
 
 $btn-primary-color:              $brand-primary;
-$btn-primary-bg:                 transparent;
+$btn-primary-bg:                 $white;
 $btn-primary-border:             $btn-primary-color !default;
 
 $btn-secondary-color:            $gray-dark !default;
@@ -185,5 +192,9 @@ $navbar-height:                             $spacer * 4;
 $nav-navbar-active-link-active-bg:          #0cb0f8;
 
 // Checkbox toggles
+$toggle-border-width:                       0.05rem;
 $toggle-height:                             2rem;
 $toggle-padding:                            $toggle-height / 16;
+
+// Padding
+$padding-default:                           $grid-gutter-width / 2;

@@ -57,6 +57,8 @@ module.exports = function (grunt) {
             flatten: true,
             cwd: 'bower_components',
             src: [
+              'bootstrap/js/dist/dropdown.js'
+              , 'bootstrap/js/dist/util.js'
             ],
             dest: 'js/vendors'
           },
@@ -169,6 +171,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_normalize.scss',
             'scss/vendors/bootstrap/scss/_utilities.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',
+            'scss/vendors/bootstrap/scss/_card.scss',
             'scss/vendors/bootstrap/scss/_navbar.scss',
             'scss/vendors/bootstrap/scss/_button-group.scss',
             'scss/vendors/bootstrap/scss/_tables.scss',

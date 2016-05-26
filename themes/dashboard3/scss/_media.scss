@@ -1,0 +1,8 @@
+.media {
+  @extend .row;
+  padding-left: $padding-default;
+  padding-right: $padding-default;
+  margin-bottom: .5rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px dotted $grey-light;
+}

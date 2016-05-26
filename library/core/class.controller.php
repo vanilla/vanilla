@@ -469,7 +469,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $Parts[] = strtolower($this->ApplicationFolder);
                 }
 
-                $Parts[] = $Controller;
+                if ($Controller != 'root') {
+                    $Parts[] = $Controller;
+                }
 
                 if (strcasecmp($this->RequestMethod, 'index') != 0) {
                     $Parts[] = strtolower($this->RequestMethod);

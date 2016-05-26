@@ -31,9 +31,9 @@ $Session = Gdn::session();
     <span id="plaintext-toggle">
         <?php
         if (strtolower(c('Garden.Email.Format', 'text') === 'text')) {
-            echo wrap(anchor(t('Disabled'), '/dashboard/settings/setemailformat/html', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
+            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
         } else {
-            echo wrap(anchor(t('Enabled'), '/dashboard/settings/setemailformat/text', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
+            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
         }
         ?>
     </span>
@@ -53,13 +53,15 @@ $Session = Gdn::session();
         }
         ?>
     </div>
-    <?php
-    echo wrap(anchor(t('Upload New Email Logo'), '/dashboard/settings/emailimage', 'js-upload-email-image-button Button'), 'div', array('style' => 'margin-bottom: 20px'));
+    <div class="btn-group">
+        <?php
+        echo anchor(t('Upload New Email Logo'), '/dashboard/settings/emailimage', 'js-upload-email-image-button Button');
+        ?>
+        <?php
+        $hideCssClass = $emailImage ? '' : ' Hidden';
+        echo wrap(t('Remove Email Logo'), 'div', array('class' => 'js-remove-email-image-button RemoveButton Button'.$hideCssClass));
     ?>
-    <?php
-    $hideCssClass = $emailImage ? '' : ' Hidden';
-    echo wrap(t('Remove Email Logo'), 'div', array('class' => 'js-remove-email-image-button RemoveButton Button'.$hideCssClass));
-    ?>
+    </div>
     <ul>
         <li>
             <?php
@@ -92,6 +94,8 @@ $Session = Gdn::session();
             ?>
         </li>
     </ul>
-    <?php echo wrap(t('Preview Colors'), 'span', array('class' => 'js-email-preview-button Button', 'style' => 'line-height: 1.25;'));
-    echo $this->Form->button(t('Save Colors')); ?>
+    <div class="btn-group">
+        <?php echo wrap(t('Preview Colors'), 'span', array('class' => 'js-email-preview-button Button'));
+        echo $this->Form->button(t('Save Colors')); ?>
+    </div>
 </div>

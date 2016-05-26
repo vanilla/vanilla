@@ -15,12 +15,13 @@ if ($this->data('crop')) {
         </div>
     </div>
 <?php } ?>
-<div class="js-new-avatar Button" style="margin-bottom: 20px;">Upload New Avatar</div>
+<div class="btn-group">
+<?php echo $this->Form->input('DefaultAvatar', 'file', array('class' => 'js-new-avatar-upload Hidden')); ?>
+    <div class="js-new-avatar Button">Upload New Avatar</div>
 <?php
-echo $this->Form->input('DefaultAvatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));
-if ($defaultAvatar) {
-    echo wrap(anchor(t('Remove Default Avatar'), '/dashboard/settings/removedefaultavatar/'.Gdn::session()->transientKey(), 'Button'), 'div');
-}
-?>
+    if ($defaultAvatar) {
+        echo anchor(t('Remove Default Avatar'), '/dashboard/settings/removedefaultavatar/'.Gdn::session()->transientKey(), 'Button');
+    } ?>
+</div>
 <?php echo $this->Form->close(); ?>
 

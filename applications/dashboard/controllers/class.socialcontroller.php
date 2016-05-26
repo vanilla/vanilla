@@ -111,7 +111,7 @@ class SocialController extends DashboardController {
 
         require_once($this->fetchViewLocation('connection_functions'));
         ob_start();
-        WriteConnection($Connection);
+        WriteConnection($Connection, false);
         $Row = ob_get_clean();
 
         $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
@@ -146,7 +146,7 @@ class SocialController extends DashboardController {
 
         require_once($this->fetchViewLocation('connection_functions'));
         ob_start();
-        WriteConnection($Connection);
+        WriteConnection($Connection, false);
         $Row = ob_get_clean();
 
         $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);

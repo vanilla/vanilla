@@ -1885,16 +1885,16 @@ class CategoryModel extends Gdn_Model {
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields();
+            $Fields = $this->coerceData($Fields);
             unset($Fields['CategoryID']);
-            $AllowDiscussions = val('AllowDiscussions', $Fields) == '1' ? true : false;
-            $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+            $Fields['AllowDiscussions'] = (bool)val('AllowDiscussions', $Fields);
 
             if ($Insert === false) {
                 $OldCategory = $this->getID($CategoryID, DATASET_TYPE_ARRAY);
                 if (null === val('AllowDiscussions', $FormPostValues, null)) {
                     $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
                 }
-                $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+                $Fields['AllowDiscussions'] = (bool)$AllowDiscussions;
 
                 // Figure out custom points.
                 if ($CustomPoints !== null) {

@@ -426,7 +426,11 @@ if (!function_exists('errorLog')) {
             // appends to a file
             $messageType = 3;
             $destination = $errorLogFile;
-            $message .= PHP_EOL;
+
+            // Need to prepend the date when appending to an error log file
+            // and also add a newline manually
+            $date = date('d-M-Y H:i:s e');
+            $message = sprintf('[%s] %s', $date, $message) . PHP_EOL;
         }
 
         @error_log($message, $messageType, $destination);

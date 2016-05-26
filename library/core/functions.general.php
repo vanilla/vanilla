@@ -1536,7 +1536,7 @@ if (!function_exists('getRecord')) {
                     $Discussion = $Model->getID($Row['DiscussionID']);
                     if ($Discussion) {
                         $Discussion->Url = DiscussionUrl($Discussion);
-                        $Row['ShareUrl'] = $Discussion->Url;
+                        $Row['ShareUrl'] = $Row['Url'];
                         $Row['Name'] = $Discussion->Name;
                         $Row['Discussion'] = (array)$Discussion;
                     }

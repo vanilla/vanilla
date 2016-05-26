@@ -1,30 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
-    <style>
-        .Row {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-
-        .Column {
-            margin: 0;
-            overflow: hidden;
-            float: left;
-            display: inline;
-        }
-
-        .Grid_50 {
-            width: 50%;
-        }
-
-        .Buttons {
-            margin: 20px;
-            text-align: right;
-        }
-    </style>
-
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';

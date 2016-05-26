@@ -588,8 +588,8 @@ class Gdn_Form extends Gdn_Pluggable {
             <div class="label-wrap">
                 <div class="label label-'.$fieldName.'">'.$label.'</div>
             </div>
-            <div class="toggle-box-wrapper">
-                <div class="toggle-box">'.
+            <div class="input-wrap-right">
+                <div class="toggle-wrap">'.
                     $input.
                     $toggleLabel.'
                 </div>

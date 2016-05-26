@@ -100,35 +100,6 @@ echo $this->Form->close();
 
 } else {
     ?>
-    <style type="text/css">
-        .CopyBox {
-            font-family: 'Inconsolata', Courier, monospace;
-            font-size: 12px;
-            box-shadow: inset 0 0 3px #333;
-            white-space: pre;
-            overflow: auto;
-            padding: 8px 10px;
-            background: #fffff3;
-        }
-
-        .CopyBox strong {
-            color: #000;
-            background: #ffa;
-            padding: 2px 0;
-        }
-
-        p.WarningMessage {
-            padding: 6px;
-            margin-top: 0;
-            border-top: 0;
-        }
-
-        p.AlertMessage {
-            padding: 6px;
-            margin-bottom: 0;
-            border-bottom: 0;
-        }
-    </style>
     <h1><?php echo t('Use Vanilla as a commenting system in your site'); ?></h1>
     <div class="Info">
         <p>You can use Vanilla as a commenting system for your website, and all

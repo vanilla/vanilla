@@ -817,9 +817,9 @@ class SettingsController extends DashboardController {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
-                    $newToggle = wrap(anchor(t('Enabled'), '/dashboard/settings/setemailformat/text', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
                 } else {
-                    $newToggle = wrap(anchor(t('Disabled'), '/dashboard/settings/setemailformat/html', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
                 }
                 $this->jsonTarget("#plaintext-toggle", $newToggle);
             }

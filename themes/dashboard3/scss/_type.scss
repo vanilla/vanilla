@@ -75,13 +75,18 @@ p {
 
 .main {
   h1 {
-    display: block;
-    margin-left: -$spacer;
-    margin-right: -$spacer;
-    padding-right: $spacer;
-    padding-bottom: $spacer;
-    padding-left: $spacer;
-    font-size: $font-size-lg;
-    border-bottom: 1px solid $grey-light;
+    @extend .heading-block;
   }
+}
+
+.heading-block {
+  display: block;
+  margin-left: -$spacer;
+  margin-right: -$spacer;
+  margin-bottom: $padding-default;
+  padding-right: $spacer;
+  padding-bottom: $spacer;
+  padding-left: $spacer;
+  font-size: $font-size-lg;
+  border-bottom: 1px solid $grey-light;
 }

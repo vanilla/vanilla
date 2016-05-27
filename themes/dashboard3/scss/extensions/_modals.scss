@@ -1,21 +1,14 @@
- //.Overlay {
-   //@extend .modal;
-   //@extend .fade;
- //}
-
- //.Overlay .Popup {
- //  @extend .modal-dialog;
- //  @extend .fade;
- //  @extend .in;
- //}
-
 .Border {
   @extend .modal-dialog;
 }
 
 div.Popup h1 {
-  @extend .h4;
   @extend .modal-title;
+  @extend .heading-block;
+}
+
+.Content {
+  @extend .modal-body;
 }
 
 .Close {

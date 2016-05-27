@@ -2,24 +2,20 @@
 //           Text input needs to have label separate from input, not wrapped
 
 form {
-  > div > ul {
-    @extend .input-group;
+  //> div > ul {
+  //  @extend .input-group;
+  //
+  //  > li {
+  //    @extend .form-group;
+  //    @extend .row;
+  //  }
+  //}
 
-    > li {
-      @extend .form-group;
-      @extend .row;
-    }
-  }
-
-  input[type="text"],
-  textarea,
-  select {
-    @extend .form-control;
-  }
-
-  select {
-    @extend .c-select;
-  }
+  //input[type="text"],
+  //textarea,
+  //select {
+  //  @extend .form-control;
+  //}
 }
 
 // Temp. Kludge

@@ -33,7 +33,7 @@
     </aside>
     <div class="container">
       <div class="row">
-          <article class="col-xs-12 col-sm-9">
+          <article class="col-xs-12 col-sm-9 main">
 
               <section class="kss-depth-1">
                 <div class="component-description">
@@ -43,6 +43,72 @@
               <div class="kss-box"><p>Find the dashboard form styling here.</p>
 </div>
 
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-1">
+                    <span class="kss-ref badge pull-right">3-1</span> Forms
+                  </h2>
+
+
+
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-3">
+                <div class="component-description">
+                  <h3 class="kss-title" id="3-1-1">
+                    <span class="kss-ref badge pull-right">3-1-1</span> Form layout
+                  </h3>
+
+
+              <div class="kss-box"><p>Here&#39;s how to build a basic form field.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;form&gt;
+  &lt;ul&gt;
+    &lt;li class=&quot;form-group row&quot;&gt;
+      &lt;div class=&quot;label-wrap&quot;&gt;
+         &lt;label for=&quot;fieldID&quot;&gt;Field&lt;/label&gt;
+         &lt;div class=&quot;info&quot;&gt;Info text for field&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID&quot; class=&quot;form-control&quot;&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/form&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><form>
+  <ul>
+    <li class="form-group row">
+      <div class="label-wrap">
+         <label for="fieldID">Field</label>
+         <div class="info">Info text for field</div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID" class="form-control">
+      </div>
+    </li>
+  </ul>
+</form></div>
+                <h4>Stacks radio or checkboxes. <span class="pull-right"><code>.stacked</code></span></h4>
+                <div class="kss-example"><form>
+  <ul>
+    <li class="form-group row">
+      <div class="label-wrap">
+         <label for="fieldID">Field</label>
+         <div class="info">Info text for field</div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID" class="form-control">
+      </div>
+    </li>
+  </ul>
+</form></div>
+
+              <hr />
               </div><!-- // closes .component-description -->
             </section>
               <section class="kss-depth-2">
@@ -68,7 +134,7 @@
 </div>
 
               <pre class="prettyprint lang-html">&lt;div class=&quot;toggle-wrap [modifier class]&quot;&gt;
-  &lt;a href=&quot;#&quot;&gt;
+  &lt;a&gt;
     &lt;div class=&quot;toggle-well&quot;&gt;&lt;/div&gt;
     &lt;div class=&quot;toggle-slider&quot;&gt;&lt;/div&gt;
   &lt;/a&gt;
@@ -76,14 +142,14 @@
 
               <h4>Default styling</h4>
               <div class="kss-example"><div class="toggle-wrap [modifier class]">
-  <a href="#">
+  <a>
     <div class="toggle-well"></div>
     <div class="toggle-slider"></div>
   </a>
 </div></div>
                 <h4>On state <span class="pull-right"><code>.toggle-wrap-on</code></span></h4>
                 <div class="kss-example"><div class="toggle-wrap toggle-wrap-on">
-  <a href="#">
+  <a>
     <div class="toggle-well"></div>
     <div class="toggle-slider"></div>
   </a>
@@ -148,6 +214,7 @@
                 <!--<li><a href="#" class="list-group-item disabled">
                   <h4 class="list-group-item-heading">Forms</h4>
                 </a></li>-->
+                <a class="list-group-item" href="#3-1"><!--<span class="kss-ref badge" >3-1</span> -->Forms</a>
                 <a class="list-group-item" href="#3-3"><!--<span class="kss-ref badge" >3-3</span> -->Toggles</a>
                 <a class="list-group-item" href="#3-4"><!--<span class="kss-ref badge" >3-4</span> -->Color Pickers</a>
           </div>

@@ -9,7 +9,7 @@
     </div>
     <h1><?php echo t('Advanced'); ?></h1>
 <?php
-echo $this->Form->open();
+echo $this->Form->open(['class' => 'form-horizontal']);
 echo $this->Form->errors();
 ?>
     <ul>

@@ -54,7 +54,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'radio-container' => 'radio',
             'smallbutton' => 'btn btn-sm',
             'textbox' => 'form-control',
-            'dropdown' => 'form-control-select',
+            'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
             'form-group' => 'form-group',
         ]
@@ -585,7 +585,7 @@ class Gdn_Form extends Gdn_Pluggable {
             attribute('title', val('title', $attributes)) .'>';
 
         $toggle = '
-            <div class="label-wrap">
+            <div class="label-wrap label-wrap-wide">
                 <div class="label label-'.$fieldName.'">'.$label.'</div>
             </div>
             <div class="input-wrap-right">
@@ -596,6 +596,17 @@ class Gdn_Form extends Gdn_Pluggable {
             </div>';
 
         return $toggle;
+    }
+
+    public function fileUpload($fieldName, $attributes = []) {
+        $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
+        $upload = '
+            <label class="file-upload">
+              <input type="file" name="'.$fieldName.'" id="'.$id.'" class="js-file-upload form-control">
+              <span class="file-upload-choose">'.t('Choose').'</span>
+              <span class="file-upload-browse">'.t('Browse').'</span>
+            </label>';
+        return $upload;
     }
 
     /**

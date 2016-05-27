@@ -1,17 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'form-horizontal'));
 echo $this->Form->errors();
 ?>
 <h1><?php echo $this->data('Title'); ?></h1>
 <ul>
-    <li>
+    <li class="form-group">
         <?php
         echo $this->Form->label('Category', 'Name');
         echo $this->Form->textBox('Name', ['Wrap' => true]);
         ?>
-    </li>
-    <li>
+    <li class="form-group">
         <div id="UrlCode">
         <?php
         echo wrap(t('Category Url:'), 'strong');
@@ -26,62 +25,63 @@ echo $this->Form->errors();
         ?>
         </div>
     </li>
-    <li>
+    <li class="form-group">
         <?php
         echo $this->Form->label('Description', 'Description');
         echo $this->Form->textBox('Description', array('MultiLine' => TRUE, 'Wrap' => true));
         ?>
     </li>
-    <li>
+    <li class="form-group">
         <?php
         echo $this->Form->label('Css Class', 'CssClass');
         echo $this->Form->textBox('CssClass', array('MultiLine' => FALSE, 'Wrap' => true));
         ?>
     </li>
-    <li>
+    <li class="form-group">
+        <div class="label-wrap">
         <?php
         echo $this->Form->label('Photo', 'PhotoUpload');
         if ($Photo = $this->Form->getValue('Photo')) {
             echo img(Gdn_Upload::url($Photo));
-            echo '<br />'.anchor(t('Delete Photo'),
+            echo anchor(t('Delete Photo'),
                     CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
                     'SmallButton Danger PopConfirm');
-        }
-        echo $this->Form->Input('PhotoUpload', 'file');
-        ?>
+        } ?>
+        </div>
+        <div class="input-wrap">
+        <?php echo $this->Form->fileUpload('PhotoUpload'); ?>
+        </div>
     </li>
     <?php
     echo $this->Form->Simple(
         $this->data('_ExtendedFields', array()),
         array('Wrap' => array('', '')));
     ?>
-    <li>
-    <li>
+    <li class="form-group">
         <?php
         echo $this->Form->label('Display As', 'DisplayAs');
         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'), ['Wrap' => true]);
         ?>
     </li>
-    </li>
-    <li>
+    <li class="form-group">
         <?php
         echo $this->Form->toggle('HideAllDiscussions', 'Hide from the recent discussions page.');
         ?>
     </li>
     <?php if ($this->ShowCustomPoints): ?>
-        <li>
+        <li class="form-group">
             <?php
             echo $this->Form->toggle('CustomPoints', 'Track points for this category separately.');
             ?>
         </li>
     <?php endif; ?>
-    <li>
+    <li class="form-group">
         <?php
         echo $this->Form->toggle('Archived', 'This category is archived.');
         ?>
     </li>
     <?php $this->fireEvent('AfterCategorySettings'); ?>
-    <li>
+    <li class="form-group">
         <?php
         if (count($this->PermissionData) > 0) {
             echo $this->Form->toggle('CustomPermissions', 'This category has custom permissions.');

@@ -376,7 +376,7 @@ function Gdn_ExceptionHandler($Exception) {
     }
 }
 
-if (!function_exists('ErrorMessage')) {
+if (!function_exists('errorMessage')) {
     /**
      * Returns an error message formatted in a way that the custom ErrorHandler
      * function can understand (allows a little more information to be displayed
@@ -537,7 +537,7 @@ if (!function_exists('formatPHPErrorLog')) {
     }
 }
 
-if (!function_exists('LogException')) {
+if (!function_exists('logException')) {
     /**
      * Log an exception.
      *
@@ -557,7 +557,7 @@ if (!function_exists('LogException')) {
     }
 }
 
-if (!function_exists('LogMessage')) {
+if (!function_exists('logMessage')) {
     /**
      * Logs errors to a file. This function does not throw errors because it is
      * a last-ditch effort after errors have already been rendered.
@@ -588,7 +588,7 @@ if (!function_exists('LogMessage')) {
     }
 }
 
-if (!function_exists('Boop')) {
+if (!function_exists('boop')) {
     /**
      * Logs a message or print_r()'s an array to the screen.
      *
@@ -618,7 +618,7 @@ if (!function_exists('Boop')) {
     }
 }
 
-if (!function_exists('CleanErrorArguments')) {
+if (!function_exists('cleanErrorArguments')) {
     /**
      *
      *

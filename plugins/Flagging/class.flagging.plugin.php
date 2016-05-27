@@ -28,13 +28,13 @@ class FlaggingPlugin extends Gdn_Plugin {
      * Add Flagging to Dashboard menu.
      */
     public function base_getAppSettingsMenuItems_handler($Sender) {
-        $flaggedItemsResult = Gdn::sql()->select('count(distinct(ForeignURL)) as NumFlagedItems')
+        $flaggedItemsResult = Gdn::sql()->select('count(distinct(ForeignURL)) as NumFlaggedItems')
             ->from('Flag fl')
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $LinkText = t('Flagged Content');
-        if ($flaggedItemsResult['NumFlagedItems']) {
-            $LinkText .= ' <span class="Alert">'.$flaggedItemsResult['NumFlagedItems'].'</span>';
+        if ($flaggedItemsResult['NumFlaggedItems']) {
+            $LinkText .= ' <span class="Alert">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
         }
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->AddItem('Forum', t('Forum'));

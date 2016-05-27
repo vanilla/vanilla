@@ -2,41 +2,20 @@
 //           Text input needs to have label separate from input, not wrapped
 
 form {
+  //> div > ul {
+  //  @extend .input-group;
+  //
+  //  > li {
+  //    @extend .form-group;
+  //    @extend .row;
+  //  }
+  //}
 
-  > div > ul {
-    @extend .input-group;
-
-    > li {
-      @extend .form-group;
-    }
-  }
-
-  label {
-    @extend .control-label;
-  }
-
-  input[type="text"],
-  textarea,
-  select {
-    @extend .form-control;
-  }
-
-  ul,
-  ol {
-    padding-left: 0;
-
-    li {
-      list-style: none;
-    }
-  }
-}
-
-.Sortable {
-  padding-left: 0;
-
-  li {
-    list-style: none;
-  }
+  //input[type="text"],
+  //textarea,
+  //select {
+  //  @extend .form-control;
+  //}
 }
 
 // Temp. Kludge

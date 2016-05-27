@@ -400,6 +400,14 @@ if (!function_exists('errorLog')) {
      * @param string|\Exception $message
      */
     function errorLog($message) {
+        $errorLogFile = class_exists('Gdn', false) ? Gdn::config('Garden.Errors.LogFile', '') : '';
+
+        // Log only if the PHP setting "log_errors" is enabled
+        // OR if the Garden config "Garden.Errors.LogFile" is provided
+        if (!$errorLogFile && !ini_get('log_errors')) {
+            return;
+        }
+
         // Make sure the message can be converted to a string otherwise bail out
         if (!is_string($message) && !method_exists($message, '__toString')) {
             return;
@@ -408,14 +416,6 @@ if (!function_exists('errorLog')) {
         if (!is_string($message)) {
             // Cast the $message to a string
             $message = (string) $message;
-        }
-
-        $errorLogFile = Gdn::config('Garden.Errors.LogFile');
-
-        // Log only if the PHP setting "log_errors" is enabled
-        // OR if the Garden config "Garden.Errors.LogFile" is provided
-        if (!($errorLogFile || ini_get('log_errors'))) {
-            return;
         }
 
         $destination = null;

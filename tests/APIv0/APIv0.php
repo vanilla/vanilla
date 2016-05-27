@@ -19,17 +19,18 @@ class APIv0 extends HttpClient {
     /**
      * @var string The API key for making calls to the special test helper script.
      */
-    protected static $apiKey;
+    private static $apiKey;
 
     /**
      * @var array The current config from the install.
      */
-    protected static $config;
+    private $config;
+
 
     /**
      * @var array The user context to make requests with.
      */
-    protected $user;
+    private $user;
 
     /**
      * APIv0 constructor.
@@ -83,7 +84,7 @@ class APIv0 extends HttpClient {
      * @return mixed Returns the config setting or {@link $default}.
      */
     public function getConfig($key, $default = null) {
-        return valr($key, static::$config, $default);
+        return valr($key, $this->config, $default);
     }
 
     /**
@@ -132,11 +133,19 @@ class APIv0 extends HttpClient {
      * @return string Returns the transient key for the user.
      */
     public function getTK($userID) {
-        $user = $this->queryOne("select * from GDN_User where UserID = :userID", [':userID' => $userID]);
+        $user = $this->queryOne("select * from GDN_User where UserID = :userID", ['userID' => $userID]);
         if (empty($user)) {
             return '';
         }
-        $attributes = @unserialize($user['Attributes']);
+        $attributes = (array)dbdecode($user['Attributes']);
+        if (empty($attributes['TransientKey'])) {
+            $attributes['TransientKey'] = randomString(20);
+            $r = $this->query(
+                "update GDN_User set Attributes = :attributes where UserID = :userID",
+                ['attributes' => dbencode($attributes), 'userID' => $userID],
+                true
+            );
+        }
         return val('TransientKey', $attributes, '');
     }
 
@@ -165,11 +174,7 @@ class APIv0 extends HttpClient {
      * @param string $title The title of the app.
      */
     public function install($title = '') {
-        // Create the database for Vanilla.
-        $pdo = $this->getPDO();
-        $dbname = $this->getDbName();
-        $pdo->query("create database `$dbname`");
-        $pdo->query("use `$dbname`");
+        $this->createDatabase();
 
         // Touch the config file because hhvm runs as root and we don't want the config file to have those permissions.
         $configPath = $this->getConfigPath();
@@ -355,7 +360,7 @@ class APIv0 extends HttpClient {
      * This is necessary because HHVM runs as root and takes over the config file and so it can only be edited in an
      * API context.
      *
-     * @param array $values The values to save.
+     * @param array $values The values to save or the string `['DELETE']` to delete the config.
      */
     public function saveToConfig(array $values) {
         $r = $this->post(
@@ -366,8 +371,8 @@ class APIv0 extends HttpClient {
                 'Authorization: token '.self::getApiKey()
             ]
         );
-        static::$config = $r->getBody();
-        return static::$config;
+        $this->config = $r->getBody();
+        return $this->config;
     }
 
     /**
@@ -392,7 +397,7 @@ class APIv0 extends HttpClient {
         $r = file_put_contents($path, $str);
 
         if ($r) {
-            static::$config = $config;
+            $this->config = $config;
         }
     }
 
@@ -421,13 +426,7 @@ class APIv0 extends HttpClient {
         $pdo = $this->getPDO();
 
         // Delete the config file.
-        $configPath = $this->getConfigPath();
-        if (file_exists($configPath)) {
-            $r = unlink($configPath);
-            if (!$r) {
-                throw new \Exception("Could not delete config file: $configPath", 500);
-            }
-        }
+        $this->saveToConfig(['DELETE']);
 
         // Delete the database.
         $dbname = $this->getDbName();
@@ -548,5 +547,13 @@ class APIv0 extends HttpClient {
 
         $this->user = $partialUser;
         return $this;
+    }
+
+    public function createDatabase() {
+        // Create the database for Vanilla.
+        $pdo = $this->getPDO();
+        $dbname = $this->getDbName();
+        $pdo->query("create database `$dbname`");
+        $pdo->query("use `$dbname`");
     }
 }

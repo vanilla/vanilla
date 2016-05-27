@@ -15,7 +15,7 @@
  * @return string
  */
 function smarty_function_breadcrumbs($Params, &$Smarty) {
-    $Breadcrumbs = $Smarty->Controller->data('Breadcrumbs');
+    $Breadcrumbs = Gdn::controller()->data('Breadcrumbs');
     if (!is_array($Breadcrumbs)) {
         $Breadcrumbs = array();
     }

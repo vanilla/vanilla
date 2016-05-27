@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.7',
+   'Version' => '1.7.8',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -78,7 +78,7 @@ class EditorPlugin extends Gdn_Plugin {
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
 
         // Check for additional formats
-        $this->EventArguments['formats'] = & $this->Formats;
+        $this->EventArguments['formats'] = &$this->Formats;
         $this->fireEvent('GetFormats');
     }
 
@@ -348,10 +348,10 @@ class EditorPlugin extends Gdn_Plugin {
         $fontFamilyOptions = $this->getFontFamilyOptions();
 
         // Let plugins and themes override the defaults.
-        $this->EventArguments['actions'] = & $allowedEditorActions;
-        $this->EventArguments['colors'] = & $fontColorList;
-        $this->EventArguments['format'] = & $fontFormatOptions;
-        $this->EventArguments['font'] = & $fontFamilyOptions;
+        $this->EventArguments['actions'] = &$allowedEditorActions;
+        $this->EventArguments['colors'] = &$fontColorList;
+        $this->EventArguments['format'] = &$fontFormatOptions;
+        $this->EventArguments['font'] = &$fontFamilyOptions;
         $this->fireEvent('toolbarConfig');
 
         // Order the specified dropdowns.
@@ -542,7 +542,7 @@ class EditorPlugin extends Gdn_Plugin {
      * Placed these components everywhere due to some Web sites loading the
      * editor in some areas where the values were not yet injected into HTML.
      */
-    public function base_render_before(&$Sender) {
+    public function base_render_before($Sender) {
         // Don't render any assets for editor if it's embedded. This effectively
         // disables the editor from embedded comments. Some HTML is still
         // inserted, because of the BeforeBodyBox handler, which does not contain any data relating to embedded content.
@@ -580,7 +580,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = array();
-        $this->EventArguments['definitions'] = & $additionalDefinitions;
+        $this->EventArguments['definitions'] = &$additionalDefinitions;
         $this->fireEvent('GetJSDefinitions');
 
         // Make sure we still have an array after all event handlers have had their turn and iterate through the result.
@@ -651,7 +651,7 @@ class EditorPlugin extends Gdn_Plugin {
             // Get the generated editor toolbar from getEditorToolbar, and assign it data object for view.
             if (!isset($c->Data['_EditorToolbar'])) {
                 $editorToolbar = $this->getEditorToolbar($attributes);
-                $this->EventArguments['EditorToolbar'] = & $editorToolbar;
+                $this->EventArguments['EditorToolbar'] = &$editorToolbar;
                 $this->fireEvent('InitEditorToolbar');
 
                 // Set data for view
@@ -726,10 +726,10 @@ class EditorPlugin extends Gdn_Plugin {
             $validImage = !empty($imageType) && in_array($imageType, $validImageTypes);
 
             $this->EventArguments['CategoryID'] = Gdn::request()->post('CategoryID');
-            $this->EventArguments['TmpFilePath'] = & $tmpFilePath;
+            $this->EventArguments['TmpFilePath'] = &$tmpFilePath;
             $this->EventArguments['FileExtension'] = $fileExtension;
             $this->EventArguments['ValidImage'] = $validImage;
-            $this->EventArguments['AbsoluteFileDestination'] = & $absoluteFileDestination;
+            $this->EventArguments['AbsoluteFileDestination'] = &$absoluteFileDestination;
             $this->EventArguments['DiscussionID'] = $discussionID;
             $this->fireEvent('BeforeSaveUploads');
 
@@ -1395,7 +1395,8 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Get actual path to the file.
-        $local_path = Gdn_Upload::copyLocal($media['Path']);
+        $upload = new Gdn_UploadImage();
+        $local_path = $upload->copyLocal(val('Path', $media));
         if (!file_exists($local_path)) {
             throw notFoundException('File');
         }

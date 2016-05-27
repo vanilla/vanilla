@@ -8,6 +8,8 @@
  * @since 2.2
  */
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Global event logging object.
  *
@@ -41,44 +43,173 @@ class Logger {
     /** Log type. */
     const DEBUG = 'debug';
 
-    /** @var LoggerInterface The interface responsible for doing the actual logging. */
-    protected static $instance;
+    /** @var \Vanilla\Logger The interface responsible for doing the actual logging. */
+    private static $instance;
 
     /** @var string The global level at which events are committed to the log. */
-    protected static $logLevel;
+    private static $logLevel;
 
     /**
+     * Add a new logger to observe messages.
      *
-     *
-     * @param LoggerInterface $value Specify a new value to set the logger to.
+     * @param LoggerInterface $logger The logger to add.
+     * @param string $level One of the **Logger::*** constants.
      */
-    public static function setLogger(LoggerInterface $value = null) {
-        if ($value !== null) {
-            self::$instance = $value;
+    public static function addLogger(LoggerInterface $logger, $level = null) {
+        static::getLogger()->addLogger($logger, $level);
+    }
+
+    /**
+     * Remove a logger that was previously added with {@link Logger::addLogger()}.
+     *
+     * @param LoggerInterface $logger The logger to remove.
+     * @param bool $trigger Whether or not to trigger a notice if the logger isn't found.
+     */
+    public static function removeLogger($logger, $trigger = true) {
+        static::getLogger()->removeLogger($logger, $trigger);
+    }
+
+    /**
+     * Set the logger.
+     *
+     * @param LoggerInterface $logger Specify a new value to set the logger to.
+     */
+    public static function setLogger($logger = null) {
+        if ($logger instanceof \Vanilla\Logger) {
+            self::$instance = $logger;
         } else {
-            self::$instance = new BaseLogger();
+            deprecated('Logger::setLogger()', 'Logger::addLogger');
+
+            // Check for class compatibility while we update plugins.
+            // TODO: Remove this check.
+            if ($logger instanceof LoggerInterface) {
+                static::addLogger($logger);
+            }
         }
     }
 
     /**
+     * Get the logger implementation.
      *
-     *
-     * @return LoggerInterface
+     * @return \Vanilla\Logger Returns a {@link \Vanilla\Logger}.
      */
     public static function getLogger() {
         if (!self::$instance) {
-            self::setLogger();
+            self::$instance = new \Vanilla\Logger();
         }
         return self::$instance;
     }
 
     /**
-     * Log an event
+     * Get the valid log levels.
      *
-     * @param string $event
-     * @param string $level
-     * @param string $message
-     * @param array $context
+     * @return string[] Returns an array with level keys and label values.
+     */
+    public static function getLevels() {
+        $r = [
+            self::DEBUG => self::DEBUG,
+            self::INFO => self::INFO,
+            self::NOTICE => self::NOTICE,
+            self::WARNING => self::WARNING,
+            self::ERROR => self::ERROR,
+            self::CRITICAL => self::CRITICAL,
+            self::ALERT => self::ALERT,
+            self::EMERGENCY => self::EMERGENCY
+
+        ];
+
+        $r = array_map('t', $r);
+
+        return $r;
+    }
+
+    /**
+     * Log a debug message.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function debug($message, $context = []) {
+        static::log(Logger::DEBUG, $message, $context);
+    }
+
+    /**
+     * Log an info message.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function info($message, $context = []) {
+        static::log(Logger::INFO, $message, $context);
+    }
+
+    /**
+     * Log a notice.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function notice($message, $context = []) {
+        static::log(Logger::NOTICE, $message, $context);
+    }
+
+    /**
+     * Log a warning.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function warning($message, $context = []) {
+        static::log(Logger::WARNING, $message, $context);
+    }
+
+    /**
+     * Log an error.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function error($message, $context = []) {
+        static::log(Logger::ERROR, $message, $context);
+    }
+
+    /**
+     * Log a critical message.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function critical($message, $context = []) {
+        static::log(Logger::CRITICAL, $message, $context);
+    }
+
+    /**
+     * Log an alert.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function alert($message, $context = []) {
+        static::log(Logger::ALERT, $message, $context);
+    }
+
+    /**
+     * Log an emergency.
+     *
+     * @param string $message The message to log.
+     * @param string $context The message data.
+     */
+    public static function emergency($message, $context = []) {
+        static::log(Logger::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * Log an event.
+     *
+     * @param string $event The code of the event.
+     * @param string $level One of the **Logger::*** constants.
+     * @param string $message The message.
+     * @param array $context The message data.
      */
     public static function event($event, $level, $message, $context = array()) {
         $context['event'] = $event;
@@ -106,9 +237,13 @@ class Logger {
             Logger::EMERGENCY => LOG_EMERG
         );
 
-        if (isset($priorities[$level])) {
+        if (empty($level)) {
+            return LOG_DEBUG;
+        } elseif (isset($priorities[$level])) {
             return $priorities[$level];
         } else {
+            error_log($level);
+            self::log(Logger::NOTICE, "Unknown log level {unknownLevel}.", ['unknownLevel' => $level]);
             return LOG_DEBUG + 1;
         }
     }
@@ -138,36 +273,16 @@ class Logger {
     }
 
     /**
-     * Gets or sets the current log level.
+     * Log a message.
      *
-     * @param string $value Pass a non-empty string to set a new log level.
-     * @return string Returns the current logLevel.
-     * @throws Exception Throws an exception of {@link $value} is an incorrect log level.
-     */
-    public static function logLevel($value = '') {
-        if ($value !== '') {
-            if (self::levelPriority($value) > LOG_DEBUG) {
-                throw new Exception("Invalid log level $value.", 422);
-            }
-            self::$logLevel = $value;
-        } elseif ($value === null) {
-            self::$logLevel = Logger::NOTICE;
-        }
-        return self::$logLevel;
-    }
-
-    /**
-     * Adds default fields to context if they do not exist
+     * A message can contain fields that will be filled by the context. Fields are enclosed in curly braces like
+     * `{this}`. Default fields are added to the context if they do not exist.
      *
-     * @param string $level
-     * @param string $message
-     * @param array $context
+     * @param string $level One of the **Logger::*** constants.
+     * @param string $message The message format.
+     * @param array $context The message data.
      */
     public static function log($level, $message, $context = array()) {
-        if (self::levelPriority($level) > self::levelPriority(self::logLevel())) {
-            return;
-        }
-
         // Add default fields to the context if they don't exist.
         $defaults = array(
             'userid' => Gdn::session()->UserID,

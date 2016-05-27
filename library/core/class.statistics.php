@@ -1137,4 +1137,21 @@ class Gdn_Statistics extends Gdn_Pluggable {
 
         return false;
     }
+
+    /**
+     * Generate an access token for stats graphs.
+     *
+     * @return bool|string Returns a token or **false** if required information is missing.
+     */
+    public static function generateToken() {
+        $id = Gdn::installationID();
+        $secret = Gdn::installationSecret();
+        if (empty($id) || empty($secret)) {
+            return false;
+        }
+
+        $str = 'v1.'.dechex(time());
+        $token = $str.'.'.hash_hmac('sha1', $str, $secret);
+        return $token;
+    }
 }

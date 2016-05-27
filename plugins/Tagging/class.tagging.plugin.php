@@ -10,7 +10,7 @@
 $PluginInfo['Tagging'] = array(
     'Name' => 'Tagging',
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-    'Version' => '1.8.12',
+    'Version' => '1.9.0',
     'SettingsUrl' => '/dashboard/settings/tagging',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
@@ -119,9 +119,12 @@ class TaggingPlugin extends Gdn_Plugin {
 
     /**
      * Load discussions for a specific tag.
-     * @param DiscussionsController $Sender
+     *
+     * @param DiscussionsController $Sender Sending controller instance
+     * @param array $Args Event's arguments
+     * @throws Exception
      */
-    public function discussionsController_Tagged_create($Sender) {
+    public function discussionsController_tagged_create($Sender, $Args) {
         Gdn_Theme::section('DiscussionList');
 
         $Args = $Sender->RequestArgs;
@@ -221,14 +224,22 @@ class TaggingPlugin extends Gdn_Plugin {
 
         // Build a pager.
         $PagerFactory = new Gdn_PagerFactory();
-        $Sender->Pager = $PagerFactory->GetPager('Pager', $Sender);
+        $Sender->EventArguments['PagerType'] = 'Pager';
+        $Sender->fireEvent('BeforeBuildPager');
+        if (!$Sender->data('_PagerUrl')) {
+            $Sender->setData('_PagerUrl', "/discussions/tagged/$UrlTag/{Page}");
+        }
+        $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
         $Sender->Pager->ClientID = 'Pager';
         $Sender->Pager->configure(
             $Offset,
             $Limit,
-            $RecordCount, // record count
-            ''
+            $RecordCount,
+            $Sender->data('_PagerUrl')
         );
+        $Sender->setData('_Page', $Page);
+        $Sender->setData('_Limit', $Limit);
+        $Sender->fireEvent('AfterBuildPager');
 
         $Sender->View = c('Vanilla.Discussions.Layout');
 
@@ -261,6 +272,9 @@ class TaggingPlugin extends Gdn_Plugin {
         if (null !== $sender->data('Discussions', null)) {
             TagModel::instance()->joinTags($sender->Data['Discussions']);
         }
+
+        $sender->addJsFile('tagging.js', 'plugins/Tagging');
+        $sender->addJsFile('jquery.tokeninput.js');
     }
 
     /**
@@ -326,8 +340,8 @@ class TaggingPlugin extends Gdn_Plugin {
         // Let plugins add their information getting saved.
         $Types = array('');
         $this->EventArguments['Data'] = $FormPostValues;
-        $this->EventArguments['Tags'] = & $FormTags;
-        $this->EventArguments['Types'] = & $Types;
+        $this->EventArguments['Tags'] = &$FormTags;
+        $this->EventArguments['Types'] = &$Types;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('SaveDiscussion');
 
@@ -604,8 +618,6 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      */
     public function postController_render_before($Sender) {
-        $Sender->addJsFile('jquery.tokeninput.js');
-        $Sender->addJsFile('tagging.js', 'plugins/Tagging');
         $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
         $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
 

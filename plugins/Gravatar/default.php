@@ -11,7 +11,7 @@
 $PluginInfo['Gravatar'] = array(
     'Name' => 'Gravatar',
     'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
-    'Version' => '1.4.3',
+    'Version' => '1.5',
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
@@ -29,54 +29,87 @@ $PluginInfo['Gravatar'] = array(
 class GravatarPlugin extends Gdn_Plugin {
 
     /**
+     * Generate a Gravatar image URL based on the provided email address.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @link http://en.gravatar.com/site/implement/images/ Gravatar Image Requests
+     * @param string $email Email address for the user, used to generate the avatar ID.
+     * @param int $size Target image size.
+     * @return string A formatted Gravatar image URL.
      */
-    public function profileController_afterAddSideMenu_handler($Sender, $Args) {
-        if (!$Sender->User->Photo) {
-            $Email = val('Email', $Sender->User);
-            $Protocol = Gdn::request()->scheme() == 'https' ? 'https://secure.' : 'http://www.';
+    public static function generateUrl($email, $size = 80) {
+        $avatarID = md5(strtolower($email));
 
-            $Url = $Protocol.'gravatar.com/avatar.php?'
-                .'gravatar_id='.md5(strtolower($Email))
-                .'&amp;size='.c('Garden.Profile.MaxWidth', 200);
+        // Figure out our base URLs.  Gravatar doesn't support SVGs, so we're stuck with using Vanillicon v1.
+        if (Gdn::request()->scheme() === 'https') {
+            $baseUrl = 'https://secure.gravatar.com/avatar';
+            $vanilliconBaseUrl = 'https://vanillicon.com';
+        } else {
+            $baseUrl = 'http://www.gravatar.com/avatar';
+            $vanilliconBaseUrl = 'http://vanillicon.com';
+        }
 
-            if (c('Plugins.Gravatar.UseVanillicon', true)) {
-                $Url .= '&default='.urlencode(Gdn::request()->scheme().'://vanillicon.com/'.md5($Email).'_200.png');
+        if (c('Plugins.Gravatar.UseVanillicon', true)) {
+            // Version 1 of Vanillicon only supports three sizes.  Figure out which one is best for this image.
+            if ($size <= 50) {
+                $vanilliconSize = 50;
+            } elseif ($size <= 100) {
+                $vanilliconSize = 100;
             } else {
-                $Url .= '&default='.urlencode(asset(c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar', 'plugins/Gravatar/default_250.png')), true));
+                $vanilliconSize = 200;
             }
 
+            $default = "{$vanilliconBaseUrl}/{$avatarID}_{$vanilliconSize}.png";
+        } else {
+            $configuredDefaultAvatar = c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar'));
+            if ($configuredDefaultAvatar) {
+                $defaultParsed = Gdn_Upload::parse($configuredDefaultAvatar);
+                $default = val('Url', $defaultParsed);
+            }
+        }
 
-            $Sender->User->Photo = $Url;
+        if (empty($default)){
+            $default = asset(
+                $size <= 50 ? 'plugins/Gravatar/default.png' : 'plugins/Gravatar/default_250.png',
+                true
+            );
+        }
+
+        $query = [
+            'default' => $default,
+            'rating' => c('Plugins.Gravatar.Rating', 'g'),
+            'size' => $size
+        ];
+
+        return $baseUrl."/{$avatarID}/?".http_build_query($query);
+    }
+
+    /**
+     * Set the Gravatar image on the user's profile.
+     *
+     * @param ProfileController $sender Reference to the current profile controller instance.
+     * @param array $args Additional parameters for the current event.
+     */
+    public function profileController_afterAddSideMenu_handler($sender, $args) {
+        if (!$sender->User->Photo) {
+            $sender->User->Photo = self::generateUrl(
+                val('Email', $sender->User),
+                c('Garden.Profile.MaxWidth', 200)
+            );
         }
     }
 }
 
 if (!function_exists('UserPhotoDefaultUrl')) {
     /**
+     * Calculate the user's default photo url.
      *
-     *
-     * @param $User
-     * @return string
+     * @param array|object $user The user to examine.
+     * @return string Gravatar image URL.
      */
-    function userPhotoDefaultUrl($User) {
-        $Email = val('Email', $User);
-        $Https = Gdn::request()->scheme() == 'https';
-        $Protocol = $Https ? 'https://secure.' : 'http://www.';
-
-        $Url = $Protocol.'gravatar.com/avatar.php?'
-            .'gravatar_id='.md5(strtolower($Email))
-            .'&amp;size='.c('Garden.Thumbnail.Width', 50);
-
-        if (c('Plugins.Gravatar.UseVanillicon', true)) {
-            $Url .= '&default='.urlencode(Gdn::request()->scheme().'://vanillicon.com/'.md5($Email).'.png');
-        } else {
-            $Url .= '&default='.urlencode(Asset(c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar', 'plugins/Gravatar/default.png')), true));
-        }
-
-        return $Url;
+    function userPhotoDefaultUrl($user) {
+        return GravatarPlugin::generateUrl(
+            val('Email', $user),
+            c('Garden.Thumbnail.Width', 50)
+        );
     }
 }

@@ -106,14 +106,57 @@
             return output;
         }
     });
+
+    /**
+     * Takes a jQuery function that updates the DOM and the HTML to add. Converts the html to a jQuery object
+     * and then adds it to the DOM. Triggers 'contentLoad' to allow javascript manipulation of the new DOM elements.
+     *
+     * @param func The jQuery function name.
+     * @param html The html to add.
+     */
+    var funcTrigger = function(func, html) {
+        this.each(function() {
+            var $elem = $($.parseHTML(html + '')); // Typecast html to a string and create a DOM node
+            $(this)[func]($elem);
+            $elem.trigger('contentLoad');
+        });
+        return this;
+    };
+
+    $.fn.extend({
+        appendTrigger: function(html) {
+            return funcTrigger.call(this, 'append', html);
+        },
+
+        beforeTrigger: function(html) {
+            return funcTrigger.call(this, 'before', html);
+        },
+
+        afterTrigger: function(html) {
+            return funcTrigger.call(this, 'after', html);
+        },
+
+        prependTrigger: function(html) {
+            return funcTrigger.call(this, 'prepend', html);
+        },
+
+        htmlTrigger: function(html) {
+            funcTrigger.call(this, 'html', html);
+        },
+
+        replaceWithTrigger: function(html) {
+            return funcTrigger.call(this, 'replaceWith', html);
+        }
+    });
+
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
 
-	/**
-	 * @deprecated since Vanilla 2.2
-	 */
+    /**
+     * @deprecated since Vanilla 2.2
+     */
     $.postParseJson = function(json) {
         return json;
     };
@@ -457,19 +500,19 @@ jQuery(document).ready(function($) {
                     });
                     break;
                 case 'Append':
-                    $target.append(item.Data);
+                    $target.appendTrigger(item.Data);
                     break;
                 case 'Before':
-                    $target.before(item.Data);
+                    $target.beforeTrigger(item.Data);
                     break;
                 case 'After':
-                    $target.after(item.Data);
+                    $target.afterTrigger(item.Data);
                     break;
                 case 'Highlight':
                     $target.effect("highlight", {}, "slow");
                     break;
                 case 'Prepend':
-                    $target.prepend(item.Data);
+                    $target.prependTrigger(item.Data);
                     break;
                 case 'Redirect':
                     window.location.replace(item.Data);
@@ -484,7 +527,7 @@ jQuery(document).ready(function($) {
                     $target.removeClass(item.Data);
                     break;
                 case 'ReplaceWith':
-                    $target.replaceWith(item.Data);
+                    $target.replaceWithTrigger(item.Data);
                     break;
                 case 'SlideUp':
                     $target.slideUp('fast');
@@ -496,7 +539,7 @@ jQuery(document).ready(function($) {
                     $target.text(item.Data);
                     break;
                 case 'Html':
-                    $target.html(item.Data);
+                    $target.htmlTrigger(item.Data);
                     break;
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
@@ -614,7 +657,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.html(data);
+                    $elem.htmlTrigger(data);
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
@@ -1163,13 +1206,29 @@ jQuery(document).ready(function($) {
 
     var d = new Date();
     var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
+    var tz = false;
+
+    /**
+     * ECMAScript Internationalization API is supported by all modern browsers, with the exception of Safari.  We use
+     * it here, with lots of careful checking, to attempt to fetch the user's current IANA time zone string.
+     */
+    if (typeof Intl === 'object' && typeof Intl.DateTimeFormat === 'function') {
+        var dateTimeFormat = Intl.DateTimeFormat();
+        if (typeof dateTimeFormat.resolvedOptions === 'function') {
+            var resolvedOptions = dateTimeFormat.resolvedOptions();
+            if (typeof resolvedOptions === 'object' && typeof resolvedOptions.timeZone === 'string') {
+                tz = resolvedOptions.timeZone;
+            }
+        }
+    }
 
     // Ajax/Save the ClientHour if it is different from the value in the db.
     var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
-    if (hourOffset !== setHourOffset) {
+    var setTimeZone = gdn.definition('SetTimeZone', tz);
+    if (hourOffset !== setHourOffset || (tz && tz !== setTimeZone)) {
         $.post(
             gdn.url('/utility/sethouroffset.json'),
-            {HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey')}
+            {HourOffset: hourOffset, TimeZone: tz, TransientKey: gdn.definition('TransientKey')}
         );
     }
 
@@ -1428,9 +1487,8 @@ jQuery(document).ready(function($) {
         // where it's actually triggered.
         var autosizeTriggers = [
             'clearCommentForm',
-            'EditCommentFormLoaded',
-            'popupReveal'
-            //'appendHtml'
+            'popupReveal',
+            'contentLoad'
         ];
 
         $(document).on(autosizeTriggers.join(' '), function(e, data) {
@@ -1474,10 +1532,10 @@ jQuery(document).ready(function($) {
         gdn.atempty = gdn.atempty || {};
 
         // Set minimum characters to type for @mentions to fire
-        var min_characters = 2;
+        var min_characters = gdn.getMeta('mentionMinChars', 2);
 
         // Max suggestions to show in dropdown.
-        var max_suggestions = 5;
+        var max_suggestions = gdn.getMeta('mentionSuggestionCount', 5);
 
         // Server response limit. This should match the limit set in
         // *UserController->TagSearch* and UserModel->TagSearch
@@ -1733,7 +1791,33 @@ jQuery(document).ready(function($) {
             .atwho({
                 at: ':',
                 tpl: emojiTemplate,
+                insert_tpl: "${atwho-data-value}",
                 callbacks: {
+                    /**
+                     * Default routine from At.js with more tolerant pattern matching.
+                     * @param {string} flag The character sequence used to trigger this match (e.g. :).
+                     * @param {string} subtext The string to be tested.
+                     * @param {bool} should_start_with_space Should the pattern include a test for a whitespace prefix?
+                     * @returns {string|null} String on successful match.  Null on failure to match.
+                     */
+                    matcher: function(flag, subtext, should_start_with_space) {
+                        var match, regexp;
+                        flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                        if (should_start_with_space) {
+                            flag = '(?:^|\\s)' + flag;
+                        }
+
+                        // Allow matches to end with a space, a line feed or the end of the string.
+                        regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)(?:\\s|\\n|$)|' + flag + '([^\\x00-\\xff]*)(?:\\s|\\n|$)', 'gi');
+                        match = regexp.exec(subtext);
+
+                        if (match) {
+                            return match[2] || match[1];
+                        } else {
+                            return null;
+                        }
+                    },
+
                     tplEval: function(tpl, map) {
                         console.log(map);
                     }
@@ -1836,7 +1920,7 @@ jQuery(document).ready(function($) {
     // calls this function directly when in wysiwyg format, as it needs to
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
-        $(document).on('EditCommentFormLoaded popupReveal', function() {
+        $(document).on('contentLoad', function() {
             gdn.atCompleteInit('.BodyBox', '');
         });
         gdn.atCompleteInit('.BodyBox', '');
@@ -1887,6 +1971,8 @@ jQuery(document).ready(function($) {
             }
         });
     }
+
+    $(document).trigger('contentLoad');
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

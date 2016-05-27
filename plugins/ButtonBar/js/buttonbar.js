@@ -216,473 +216,468 @@ $.fn.insertRoundTag = function(tagName, opts, props) {
     jQuery(this).insertRoundCaret(strStart + prepend, strEnd, strReplace);
 }
 
-jQuery(document).ready(function($) {
+ButtonBar = {
 
-    ButtonBar = {
+    // Search for new button bars and handle their events.
+    init: function () {
+        $('.ButtonBar', this)
+            .closest('form')
+            .find('div.TextBoxWrapper textarea')
+            .each(function (i, textarea) {
+                var $textarea = $(textarea);
 
-        // Search for new button bars and handle their events.
-        init: function (selector) {
-            selector = selector || '.ButtonBar';
-
-            $('.ButtonBar')
-                .closest('form')
-                .find('div.TextBoxWrapper textarea')
-                .each(function (i, textarea) {
-                    var $textarea = $(textarea);
-
-                    if ($textarea.hasClass('BodyBox') && !$textarea.data('ButtonBar')) {
-                        $textarea.data('ButtonBar', '1');
-                        ButtonBar.AttachTo(textarea);
-                    }
-                });
-        },
-
-        AttachTo: function(TextArea) {
-            // Load the buttonbar and bind this textarea to it
-            var ThisButtonBar = $(TextArea).closest('form').find('.ButtonBar');
-            $(ThisButtonBar).data('ButtonBarTarget', TextArea);
-
-            var format = $(TextArea).attr('format');
-            if (!format)
-                format = gdn.definition('InputFormat', 'Html');
-
-            switch (format) {
-                case 'Raw':
-                case 'Wysiwyg':
-                    format = 'Html';
-                    break;
-            }
-
-            // Apply the page's InputFormat to this textarea.
-            $(TextArea).data('InputFormat', format);
-
-            // Build button UIs
-            $(ThisButtonBar).find('.ButtonWrap').each(function(i, el) {
-                var Operation = $(el).find('span').text();
-
-                var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
-                $(el).attr('title', UIOperation);
-
-                var Action = "ButtonBar" + UIOperation;
-                $(el).addClass(Action);
-            });
-
-            // Attach shortcut keys
-            ButtonBar.BindShortcuts(TextArea);
-
-            // Attach events
-            $(ThisButtonBar).find('.ButtonWrap').mousedown(function(event) {
-                var MyButtonBar = $(event.target).closest('.ButtonBar');
-                var Button = $(event.target).find('span').closest('.ButtonWrap');
-                if ($(Button).hasClass('ButtonOff')) return;
-
-                var TargetTextArea = $(MyButtonBar).data('ButtonBarTarget');
-                if (!TargetTextArea) return false;
-
-                var Operation = $(Button).find('span').text();
-                ButtonBar.Perform(TargetTextArea, Operation, event);
-                return false;
-            });
-
-            ButtonBar.Prepare(ThisButtonBar, TextArea);
-        },
-
-        BindShortcuts: function(TextArea) {
-            ButtonBar.BindShortcut(TextArea, 'bold', 'ctrl+B');
-            ButtonBar.BindShortcut(TextArea, 'italic', 'ctrl+I');
-            ButtonBar.BindShortcut(TextArea, 'underline', 'ctrl+U');
-            ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+S');
-            ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
-            ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
-            ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
-            ButtonBar.BindShortcut(TextArea, 'quickurl', 'ctrl+shift+L');
-            ButtonBar.BindShortcut(TextArea, 'post', 'tab');
-        },
-
-        BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {
-            if (OpFunction == undefined)
-                OpFunction = function(e) {
-                    ButtonBar.Perform(TextArea, Operation, e);
+                if ($textarea.hasClass('BodyBox') && !$textarea.data('ButtonBar')) {
+                    $textarea.data('ButtonBar', '1');
+                    ButtonBar.AttachTo(textarea);
                 }
+            });
+    },
 
-            if (ShortcutMode == undefined)
-                ShortcutMode = 'keydown';
+    AttachTo: function(TextArea) {
+        // Load the buttonbar and bind this textarea to it
+        var ThisButtonBar = $(TextArea).closest('form').find('.ButtonBar');
+        $(ThisButtonBar).data('ButtonBarTarget', TextArea);
 
-            $(TextArea).bind(ShortcutMode, Shortcut, OpFunction);
+        var format = $(TextArea).attr('format');
+        if (!format)
+            format = gdn.definition('InputFormat', 'Html');
+
+        switch (format) {
+            case 'Raw':
+            case 'Wysiwyg':
+                format = 'Html';
+                break;
+        }
+
+        // Apply the page's InputFormat to this textarea.
+        $(TextArea).data('InputFormat', format);
+
+        // Build button UIs
+        $(ThisButtonBar).find('.ButtonWrap').each(function(i, el) {
+            var Operation = $(el).find('span').text();
 
             var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
+            $(el).attr('title', UIOperation);
+
             var Action = "ButtonBar" + UIOperation;
+            $(el).addClass(Action);
+        });
 
-            var ButtonBarObj = $(TextArea).closest('form').find('.ButtonBar');
-            var Button = $(ButtonBarObj).find('.' + Action);
-            Button.attr('title', Button.attr('title') + ', ' + Shortcut);
+        // Attach shortcut keys
+        ButtonBar.BindShortcuts(TextArea);
 
-        },
+        // Attach events
+        $(ThisButtonBar).find('.ButtonWrap').mousedown(function(event) {
+            var MyButtonBar = $(event.target).closest('.ButtonBar');
+            var Button = $(event.target).find('span').closest('.ButtonWrap');
+            if ($(Button).hasClass('ButtonOff')) return;
 
-        DisableButton: function(ButtonBarObj, Operation) {
-            $(ButtonBarObj).find('.ButtonWrap').each(function(i, Button) {
-                var ButtonOperation = $(Button).find('span').text();
-                if (ButtonOperation == Operation)
-                    $(Button).addClass('ButtonOff');
-            });
-        },
+            var TargetTextArea = $(MyButtonBar).data('ButtonBarTarget');
+            if (!TargetTextArea) return false;
 
-        Prepare: function(ButtonBarObj, TextArea) {
-            var InputFormat = $(TextArea).data('InputFormat');
-            var PrepareMethod = 'Prepare' + InputFormat;
-            if (ButtonBar[PrepareMethod] == undefined)
-                return;
+            var Operation = $(Button).find('span').text();
+            ButtonBar.Perform(TargetTextArea, Operation, event);
+            return false;
+        });
 
-            // Call preparer
-            ButtonBar[PrepareMethod](ButtonBarObj, TextArea);
-        },
+        ButtonBar.Prepare(ThisButtonBar, TextArea);
+    },
 
-        PrepareBBCode: function(ButtonBarObj, TextArea) {
-            var HelpText = gdn.definition('ButtonBarBBCodeHelpText', 'ButtonBar.BBCodeHelp');
-            $("<div></div>")
-                .addClass('ButtonBarMarkupHint')
-                .html(HelpText)
-                .insertAfter(TextArea);
-        },
+    BindShortcuts: function(TextArea) {
+        ButtonBar.BindShortcut(TextArea, 'bold', 'ctrl+B');
+        ButtonBar.BindShortcut(TextArea, 'italic', 'ctrl+I');
+        ButtonBar.BindShortcut(TextArea, 'underline', 'ctrl+U');
+        ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+S');
+        ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
+        ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
+        ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
+        ButtonBar.BindShortcut(TextArea, 'quickurl', 'ctrl+shift+L');
+        ButtonBar.BindShortcut(TextArea, 'post', 'tab');
+    },
 
-        PrepareHtml: function(ButtonBarObj, TextArea) {
-            ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
-
-            var HelpText = gdn.definition('ButtonBarHtmlHelpText', 'ButtonBar.HtmlHelp');
-            $("<div></div>")
-                .addClass('ButtonBarMarkupHint')
-                .html(HelpText)
-                .insertAfter(TextArea);
-        },
-
-        PrepareMarkdown: function(ButtonBarObj, TextArea) {
-            ButtonBar.DisableButton(ButtonBarObj, 'underline');
-            ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
-
-            var HelpText = gdn.definition('ButtonBarMarkdownHelpText', 'ButtonBar.MarkdownHelp');
-            $("<div></div>")
-                .addClass('ButtonBarMarkupHint')
-                .html(HelpText)
-                .insertAfter(TextArea);
-        },
-
-        Perform: function(TextArea, Operation, Event) {
-            Event.preventDefault();
-
-            var InputFormat = $(TextArea).data('InputFormat');
-            var PerformMethod = 'Perform' + InputFormat;
-            if (ButtonBar[PerformMethod] == undefined)
-                return;
-
-            // Call performer
-            ButtonBar[PerformMethod](TextArea, Operation);
-
-            switch (Operation) {
-                case 'post':
-                    $(TextArea).closest('form').find('.CommentButton').focus();
-                    break;
+    BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {
+        if (OpFunction == undefined)
+            OpFunction = function(e) {
+                ButtonBar.Perform(TextArea, Operation, e);
             }
-        },
 
-        PerformBBCode: function(TextArea, Operation) {
-            bbcodeOpts = {
-                opener: '[',
-                closer: ']'
-            }
-            switch (Operation) {
-                case 'bold':
-                    $(TextArea).insertRoundTag('b', bbcodeOpts);
-                    break;
+        if (ShortcutMode == undefined)
+            ShortcutMode = 'keydown';
 
-                case 'italic':
-                    $(TextArea).insertRoundTag('i', bbcodeOpts);
-                    break;
+        $(TextArea).bind(ShortcutMode, Shortcut, OpFunction);
 
-                case 'underline':
-                    $(TextArea).insertRoundTag('u', bbcodeOpts);
-                    break;
+        var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
+        var Action = "ButtonBar" + UIOperation;
 
-                case 'strike':
-                    $(TextArea).insertRoundTag('s', bbcodeOpts);
-                    break;
+        var ButtonBarObj = $(TextArea).closest('form').find('.ButtonBar');
+        var Button = $(ButtonBarObj).find('.' + Action);
+        Button.attr('title', Button.attr('title') + ', ' + Shortcut);
 
-                case 'code':
-                    $(TextArea).insertRoundTag('code', bbcodeOpts);
-                    break;
+    },
 
-                case 'image':
-                    var thisOpts = $.extend(bbcodeOpts, {});
+    DisableButton: function(ButtonBarObj, Operation) {
+        $(ButtonBarObj).find('.ButtonWrap').each(function(i, Button) {
+            var ButtonOperation = $(Button).find('span').text();
+            if (ButtonOperation == Operation)
+                $(Button).addClass('ButtonOff');
+        });
+    },
 
-                    var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
-                    NewURL = prompt(PromptText);
-                    thisOpts.replace = NewURL;
+    Prepare: function(ButtonBarObj, TextArea) {
+        var InputFormat = $(TextArea).data('InputFormat');
+        var PrepareMethod = 'Prepare' + InputFormat;
+        if (ButtonBar[PrepareMethod] == undefined)
+            return;
 
-                    $(TextArea).insertRoundTag('img', thisOpts);
-                    break;
+        // Call preparer
+        ButtonBar[PrepareMethod](ButtonBarObj, TextArea);
+    },
 
-                case 'quickurl':
-                    var thisOpts = $.extend(bbcodeOpts, {});
+    PrepareBBCode: function(ButtonBarObj, TextArea) {
+        var HelpText = gdn.definition('ButtonBarBBCodeHelpText', 'ButtonBar.BBCodeHelp');
+        $("<div></div>")
+            .addClass('ButtonBarMarkupHint')
+            .html(HelpText)
+            .insertAfter(TextArea);
+    },
 
-                    var hasSelection = $(TextArea).hasSelection();
-                    console.log("sel: " + hasSelection);
-                    var NewURL = '';
-                    var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
-                    if (hasSelection !== false)
-                        NewURL = hasSelection;
-                    else
-                        NewURL = prompt(PromptText, 'http://');
+    PrepareHtml: function(ButtonBarObj, TextArea) {
+        ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
 
-                    thisOpts.shortprop = NewURL;
+        var HelpText = gdn.definition('ButtonBarHtmlHelpText', 'ButtonBar.HtmlHelp');
+        $("<div></div>")
+            .addClass('ButtonBarMarkupHint')
+            .html(HelpText)
+            .insertAfter(TextArea);
+    },
 
-                    $(TextArea).insertRoundTag('url', thisOpts);
-                    break;
+    PrepareMarkdown: function(ButtonBarObj, TextArea) {
+        ButtonBar.DisableButton(ButtonBarObj, 'underline');
+        ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
 
-                case 'quote':
-                    $(TextArea).insertRoundTag('quote', bbcodeOpts);
-                    break;
+        var HelpText = gdn.definition('ButtonBarMarkdownHelpText', 'ButtonBar.MarkdownHelp');
+        $("<div></div>")
+            .addClass('ButtonBarMarkupHint')
+            .html(HelpText)
+            .insertAfter(TextArea);
+    },
 
-                case 'spoiler':
-                    $(TextArea).insertRoundTag('spoiler', bbcodeOpts);
-                    break;
+    Perform: function(TextArea, Operation, Event) {
+        Event.preventDefault();
 
-                case 'url':
-                    var thisOpts = $.extend(bbcodeOpts, {});
+        var InputFormat = $(TextArea).data('InputFormat');
+        var PerformMethod = 'Perform' + InputFormat;
+        if (ButtonBar[PerformMethod] == undefined)
+            return;
 
-                    var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
-                    var NewURL = prompt(PromptText, 'http://');
-                    var GuessText = NewURL.replace('http://', '').replace('www.', '');
-                    thisOpts.shortprop = NewURL;
+        // Call performer
+        ButtonBar[PerformMethod](TextArea, Operation);
 
-                    var CurrentSelectText = GuessText;
-                    var CurrentSelect = $(TextArea).hasSelection();
-                    if (CurrentSelect)
-                        CurrentSelectText = CurrentSelect.toString();
+        switch (Operation) {
+            case 'post':
+                $(TextArea).closest('form').find('.CommentButton').focus();
+                break;
+        }
+    },
 
-                    thisOpts.replace = CurrentSelectText;
+    PerformBBCode: function(TextArea, Operation) {
+        bbcodeOpts = {
+            opener: '[',
+            closer: ']'
+        }
+        switch (Operation) {
+            case 'bold':
+                $(TextArea).insertRoundTag('b', bbcodeOpts);
+                break;
 
-                    $(TextArea).insertRoundTag('url', thisOpts);
-                    break;
-            }
-        },
+            case 'italic':
+                $(TextArea).insertRoundTag('i', bbcodeOpts);
+                break;
 
-        PerformHtml: function(TextArea, Operation) {
-            var htmlOpts = {
-                opener: '<',
-                closer: '>'
-            }
-            switch (Operation) {
-                case 'bold':
-                    $(TextArea).insertRoundTag('b', htmlOpts);
-                    break;
+            case 'underline':
+                $(TextArea).insertRoundTag('u', bbcodeOpts);
+                break;
 
-                case 'italic':
-                    $(TextArea).insertRoundTag('i', htmlOpts);
-                    break;
+            case 'strike':
+                $(TextArea).insertRoundTag('s', bbcodeOpts);
+                break;
 
-                case 'underline':
-                    $(TextArea).insertRoundTag('u', htmlOpts);
-                    break;
+            case 'code':
+                $(TextArea).insertRoundTag('code', bbcodeOpts);
+                break;
 
-                case 'strike':
-                    $(TextArea).insertRoundTag('del', htmlOpts);
-                    break;
+            case 'image':
+                var thisOpts = $.extend(bbcodeOpts, {});
 
-                case 'code':
-                    var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
-                    if (multiline) {
-                        var thisOpts = $.extend(htmlOpts, {
-                            opentag: '<pre><code>',
-                            closetag: '</code></pre>',
-                            opener: '',
-                            closer: '',
-                            closeslice: ''
-                        });
-                        $(TextArea).insertRoundTag('', thisOpts);
-                    } else {
-                        $(TextArea).insertRoundTag('code', htmlOpts);
-                    }
-                    break;
+                var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
+                NewURL = prompt(PromptText);
+                thisOpts.replace = NewURL;
 
-                case 'image':
-                    var urlOpts = {};
+                $(TextArea).insertRoundTag('img', thisOpts);
+                break;
+
+            case 'quickurl':
+                var thisOpts = $.extend(bbcodeOpts, {});
+
+                var hasSelection = $(TextArea).hasSelection();
+                console.log("sel: " + hasSelection);
+                var NewURL = '';
+                var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+                if (hasSelection !== false)
+                    NewURL = hasSelection;
+                else
+                    NewURL = prompt(PromptText, 'http://');
+
+                thisOpts.shortprop = NewURL;
+
+                $(TextArea).insertRoundTag('url', thisOpts);
+                break;
+
+            case 'quote':
+                $(TextArea).insertRoundTag('quote', bbcodeOpts);
+                break;
+
+            case 'spoiler':
+                $(TextArea).insertRoundTag('spoiler', bbcodeOpts);
+                break;
+
+            case 'url':
+                var thisOpts = $.extend(bbcodeOpts, {});
+
+                var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+                var NewURL = prompt(PromptText, 'http://');
+                var GuessText = NewURL.replace('http://', '').replace('www.', '');
+                thisOpts.shortprop = NewURL;
+
+                var CurrentSelectText = GuessText;
+                var CurrentSelect = $(TextArea).hasSelection();
+                if (CurrentSelect)
+                    CurrentSelectText = CurrentSelect.toString();
+
+                thisOpts.replace = CurrentSelectText;
+
+                $(TextArea).insertRoundTag('url', thisOpts);
+                break;
+        }
+    },
+
+    PerformHtml: function(TextArea, Operation) {
+        var htmlOpts = {
+            opener: '<',
+            closer: '>'
+        }
+        switch (Operation) {
+            case 'bold':
+                $(TextArea).insertRoundTag('b', htmlOpts);
+                break;
+
+            case 'italic':
+                $(TextArea).insertRoundTag('i', htmlOpts);
+                break;
+
+            case 'underline':
+                $(TextArea).insertRoundTag('u', htmlOpts);
+                break;
+
+            case 'strike':
+                $(TextArea).insertRoundTag('del', htmlOpts);
+                break;
+
+            case 'code':
+                var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
+                if (multiline) {
                     var thisOpts = $.extend(htmlOpts, {
-                        closetype: 'short'
-                    });
-
-                    var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
-                    NewURL = prompt(PromptText);
-                    urlOpts.src = NewURL;
-
-                    $(TextArea).insertRoundTag('img', thisOpts, urlOpts);
-                    break;
-
-                case 'quickurl':
-                    var urlOpts = {};
-                    var thisOpts = $.extend(htmlOpts, {
-                        center: 'href'
-                    });
-
-                    var hasSelection = $(TextArea).hasSelection();
-                    var NewURL = '';
-                    var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
-                    if (hasSelection !== false) {
-                        NewURL = hasSelection;
-                        delete thisOpts.center;
-                    } else
-                        NewURL = prompt(PromptText, 'http://');
-
-                    urlOpts.href = NewURL;
-
-                    $(TextArea).insertRoundTag('a', thisOpts, urlOpts);
-                    break;
-
-                case 'quote':
-                    $(TextArea).insertRoundTag('blockquote', htmlOpts);
-                    break;
-
-                case 'spoiler':
-                    $(TextArea).insertRoundTag('div', htmlOpts, {'class': 'Spoiler'});
-                    break;
-
-                case 'url':
-                    var urlOpts = {};
-                    var thisOpts = $.extend(htmlOpts, {});
-
-                    var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
-                    var NewURL = prompt(PromptText, 'http://');
-                    var GuessText = NewURL.replace('http://', '').replace('www.', '');
-                    urlOpts.href = NewURL;
-
-                    var CurrentSelectText = GuessText;
-
-                    var CurrentSelect = $(TextArea).hasSelection();
-                    if (CurrentSelect)
-                        CurrentSelectText = CurrentSelect.toString();
-
-                    thisOpts.replace = CurrentSelectText;
-
-                    $(TextArea).insertRoundTag('a', thisOpts, urlOpts);
-                    break;
-            }
-        },
-
-        PerformMarkdown: function(TextArea, Operation) {
-            var markdownOpts = {
-                opener: '',
-                closer: '',
-                closeslice: ''
-            }
-            switch (Operation) {
-                case 'bold':
-                    $(TextArea).insertRoundTag('**', markdownOpts);
-                    break;
-
-                case 'italic':
-                    $(TextArea).insertRoundTag('_', markdownOpts);
-                    break;
-
-                case 'underline':
-                    // DISABLED
-                    return;
-                    break;
-
-                case 'strike':
-                    $(TextArea).insertRoundTag('del', {opener: '<', closer: '>'});
-                    break;
-
-                case 'code':
-                    var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
-                    if (multiline) {
-                        var thisOpts = $.extend(markdownOpts, {
-                            prefix: '    ',
-                            opentag: '',
-                            closetag: '',
-                            opener: '',
-                            closer: ''
-                        });
-                        $(TextArea).insertRoundTag('', thisOpts);
-                    } else {
-                        $(TextArea).insertRoundTag('`', markdownOpts);
-                    }
-                    break;
-
-                case 'image':
-                    var thisOpts = $.extend(markdownOpts, {
-                        prefix: '',
-                        opentag: '![](',
-                        closetag: ')',
+                        opentag: '<pre><code>',
+                        closetag: '</code></pre>',
                         opener: '',
-                        closer: ''
+                        closer: '',
+                        closeslice: ''
                     });
-                    var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
-                    var NewURL = prompt(PromptText, '');
-                    thisOpts.prepend = NewURL;
                     $(TextArea).insertRoundTag('', thisOpts);
-                    break;
+                } else {
+                    $(TextArea).insertRoundTag('code', htmlOpts);
+                }
+                break;
 
-                case 'quickurl':
+            case 'image':
+                var urlOpts = {};
+                var thisOpts = $.extend(htmlOpts, {
+                    closetype: 'short'
+                });
+
+                var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
+                NewURL = prompt(PromptText);
+                urlOpts.src = NewURL;
+
+                $(TextArea).insertRoundTag('img', thisOpts, urlOpts);
+                break;
+
+            case 'quickurl':
+                var urlOpts = {};
+                var thisOpts = $.extend(htmlOpts, {
+                    center: 'href'
+                });
+
+                var hasSelection = $(TextArea).hasSelection();
+                var NewURL = '';
+                var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+                if (hasSelection !== false) {
+                    NewURL = hasSelection;
+                    delete thisOpts.center;
+                } else
+                    NewURL = prompt(PromptText, 'http://');
+
+                urlOpts.href = NewURL;
+
+                $(TextArea).insertRoundTag('a', thisOpts, urlOpts);
+                break;
+
+            case 'quote':
+                $(TextArea).insertRoundTag('blockquote', htmlOpts);
+                break;
+
+            case 'spoiler':
+                $(TextArea).insertRoundTag('div', htmlOpts, {'class': 'Spoiler'});
+                break;
+
+            case 'url':
+                var urlOpts = {};
+                var thisOpts = $.extend(htmlOpts, {});
+
+                var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+                var NewURL = prompt(PromptText, 'http://');
+                var GuessText = NewURL.replace('http://', '').replace('www.', '');
+                urlOpts.href = NewURL;
+
+                var CurrentSelectText = GuessText;
+
+                var CurrentSelect = $(TextArea).hasSelection();
+                if (CurrentSelect)
+                    CurrentSelectText = CurrentSelect.toString();
+
+                thisOpts.replace = CurrentSelectText;
+
+                $(TextArea).insertRoundTag('a', thisOpts, urlOpts);
+                break;
+        }
+    },
+
+    PerformMarkdown: function(TextArea, Operation) {
+        var markdownOpts = {
+            opener: '',
+            closer: '',
+            closeslice: ''
+        }
+        switch (Operation) {
+            case 'bold':
+                $(TextArea).insertRoundTag('**', markdownOpts);
+                break;
+
+            case 'italic':
+                $(TextArea).insertRoundTag('_', markdownOpts);
+                break;
+
+            case 'underline':
+                // DISABLED
+                return;
+                break;
+
+            case 'strike':
+                $(TextArea).insertRoundTag('del', {opener: '<', closer: '>'});
+                break;
+
+            case 'code':
+                var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
+                if (multiline) {
                     var thisOpts = $.extend(markdownOpts, {
-                        opentag: '(',
-                        closetag: ')'
-                    });
-
-                    var hasSelection = $(TextArea).hasSelection();
-                    var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
-                    if (hasSelection !== false)
-                        var NewURL = hasSelection;
-                    else {
-                        var NewURL = prompt(PromptText, 'http://');
-                        thisOpts.prepend = NewURL;
-                    }
-
-                    var GuessText = NewURL.replace('http://', '').replace('www.', '');
-                    thisOpts.prefix = '[' + GuessText + ']';
-
-                    $(TextArea).insertRoundTag('', thisOpts);
-                    break;
-
-                case 'quote':
-                    var thisOpts = $.extend(markdownOpts, {
-                        prefix: '> ',
+                        prefix: '    ',
                         opentag: '',
                         closetag: '',
                         opener: '',
                         closer: ''
                     });
                     $(TextArea).insertRoundTag('', thisOpts);
-                    break;
+                } else {
+                    $(TextArea).insertRoundTag('`', markdownOpts);
+                }
+                break;
 
-                case 'spoiler':
-                    // DISABLED
-                    return;
-                    break;
+            case 'image':
+                var thisOpts = $.extend(markdownOpts, {
+                    prefix: '',
+                    opentag: '![](',
+                    closetag: ')',
+                    opener: '',
+                    closer: ''
+                });
+                var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
+                var NewURL = prompt(PromptText, '');
+                thisOpts.prepend = NewURL;
+                $(TextArea).insertRoundTag('', thisOpts);
+                break;
 
-                case 'url':
-                    var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+            case 'quickurl':
+                var thisOpts = $.extend(markdownOpts, {
+                    opentag: '(',
+                    closetag: ')'
+                });
+
+                var hasSelection = $(TextArea).hasSelection();
+                var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+                if (hasSelection !== false)
+                    var NewURL = hasSelection;
+                else {
                     var NewURL = prompt(PromptText, 'http://');
-                    var GuessText = NewURL.replace('http://', '').replace('www.', '');
+                    thisOpts.prepend = NewURL;
+                }
 
-                    var CurrentSelectText = GuessText;
-                    var CurrentSelect = $(TextArea).hasSelection();
-                    if (CurrentSelect)
-                        CurrentSelectText = CurrentSelect.toString();
+                var GuessText = NewURL.replace('http://', '').replace('www.', '');
+                thisOpts.prefix = '[' + GuessText + ']';
 
-                    var thisOpts = $.extend(markdownOpts, {
-                        prefix: '[' + CurrentSelectText + ']',
-                        opentag: '(',
-                        closetag: ')',
-                        opener: '',
-                        closer: '',
-                        replace: NewURL
-                    });
-                    $(TextArea).insertRoundTag('', markdownOpts);
-                    break;
-            }
+                $(TextArea).insertRoundTag('', thisOpts);
+                break;
+
+            case 'quote':
+                var thisOpts = $.extend(markdownOpts, {
+                    prefix: '> ',
+                    opentag: '',
+                    closetag: '',
+                    opener: '',
+                    closer: ''
+                });
+                $(TextArea).insertRoundTag('', thisOpts);
+                break;
+
+            case 'spoiler':
+                // DISABLED
+                return;
+                break;
+
+            case 'url':
+                var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+                var NewURL = prompt(PromptText, 'http://');
+                var GuessText = NewURL.replace('http://', '').replace('www.', '');
+
+                var CurrentSelectText = GuessText;
+                var CurrentSelect = $(TextArea).hasSelection();
+                if (CurrentSelect)
+                    CurrentSelectText = CurrentSelect.toString();
+
+                var thisOpts = $.extend(markdownOpts, {
+                    prefix: '[' + CurrentSelectText + ']',
+                    opentag: '(',
+                    closetag: ')',
+                    opener: '',
+                    closer: '',
+                    replace: NewURL
+                });
+                $(TextArea).insertRoundTag('', markdownOpts);
+                break;
         }
-
     }
 
-    $(document).on('EditCommentFormLoaded popupReveal', ButtonBar.init);
-    ButtonBar.init();
+}
 
+$(document).on('contentLoad', function(e) {
+    ButtonBar.init.apply(e.target);
 });

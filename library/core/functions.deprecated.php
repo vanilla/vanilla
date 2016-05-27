@@ -92,6 +92,47 @@ if (!function_exists('arrayValuesToKeys')) {
     }
 }
 
+if (!function_exists('checkRequirements')) {
+    /**
+     * Check an addon's requirements.
+     *
+     * @param string $ItemName The name of the item checking requirements.
+     * @param array $RequiredItems An array of requirements.
+     * @param array $EnabledItems An array of currently enabled items to check against.
+     * @throws Gdn_UserException Throws an exception if there are missing requirements.
+     * @deprecated
+     */
+    function checkRequirements($ItemName, $RequiredItems, $EnabledItems) {
+        deprecated('checkRequirements()', 'AddonManager');
+
+        // 1. Make sure that $RequiredItems are present
+        if (is_array($RequiredItems)) {
+            $MissingRequirements = array();
+
+            foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
+                if (!array_key_exists($RequiredItemName, $EnabledItems)) {
+                    $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
+                } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
+                    // If the item exists and is enabled, check the version
+                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
+                    // Compare the versions.
+                    if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
+                        $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
+                    }
+                }
+            }
+            if (count($MissingRequirements) > 0) {
+                $Msg = sprintf(
+                    "%s is missing the following requirement(s): %s.",
+                    $ItemName,
+                    implode(', ', $MissingRequirements)
+                );
+                throw new Gdn_UserException($Msg);
+            }
+        }
+    }
+}
+
 if (!function_exists('compareHashDigest')) {
     /**
      * Determine whether or not two strings are equal in a time that is independent of partial matches.

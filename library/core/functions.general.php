@@ -57,115 +57,6 @@ if (!function_exists('absoluteSource')) {
     }
 }
 
-/**
- * This file is part of the array_column library
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
- * @copyright Copyright (c) 2013 Ben Ramsey <http://benramsey.com>
- * @license http://opensource.org/licenses/MIT MIT
- */
-
-if (!function_exists('array_column')) {
-    /**
-     * Returns the values from a single column of the input array, identified by the $columnKey.
-     *
-     * Optionally, you may provide an $indexKey to index the values in the returned
-     * array by the values from the $indexKey column in the input array.
-     *
-     * @param array $input A multi-dimensional array (record set) from which to pull a column of values.
-     * @param mixed $columnKey The column of values to return. This value may be the integer key of the column you wish
-     * to retrieve, or it may be the string key name for an associative array.
-     * @param mixed $indexKey The column to use as the index/keys for the returned array. This value may be the integer
-     * key of the column, or it may be the string key name.
-     * @return array
-     */
-    function array_column($input = null, $columnKey = null, $indexKey = null) {
-        // Using func_get_args() in order to check for proper number of
-        // parameters and trigger errors exactly as the built-in array_column()
-        // does in PHP 5.5.
-        $argc = func_num_args();
-        $params = func_get_args();
-
-        if ($argc < 2) {
-            trigger_error("array_column() expects at least 2 parameters, {$argc} given", E_USER_WARNING);
-            return null;
-        }
-
-        if (!is_array($params[0])) {
-            trigger_error(
-                'array_column() expects parameter 1 to be array, '.gettype($params[0]).' given',
-                E_USER_WARNING
-            );
-            return null;
-        }
-
-        if (!is_int($params[1])
-            && !is_float($params[1])
-            && !is_string($params[1])
-            && $params[1] !== null
-            && !(is_object($params[1]) && method_exists($params[1], '__toString'))
-        ) {
-            trigger_error('array_column(): The column key should be either a string or an integer', E_USER_WARNING);
-            return false;
-        }
-
-        if (isset($params[2])
-            && !is_int($params[2])
-            && !is_float($params[2])
-            && !is_string($params[2])
-            && !(is_object($params[2]) && method_exists($params[2], '__toString'))
-        ) {
-            trigger_error('array_column(): The index key should be either a string or an integer', E_USER_WARNING);
-            return false;
-        }
-
-        $paramsInput = $params[0];
-        $paramsColumnKey = ($params[1] !== null) ? (string)$params[1] : null;
-
-        $paramsIndexKey = null;
-        if (isset($params[2])) {
-            if (is_float($params[2]) || is_int($params[2])) {
-                $paramsIndexKey = (int)$params[2];
-            } else {
-                $paramsIndexKey = (string)$params[2];
-            }
-        }
-
-        $resultArray = array();
-
-        foreach ($paramsInput as $row) {
-            $key = $value = null;
-            $keySet = $valueSet = false;
-
-            if ($paramsIndexKey !== null && array_key_exists($paramsIndexKey, $row)) {
-                $keySet = true;
-                $key = (string)$row[$paramsIndexKey];
-            }
-
-            if ($paramsColumnKey === null) {
-                $valueSet = true;
-                $value = $row;
-            } elseif (is_array($row) && array_key_exists($paramsColumnKey, $row)) {
-                $valueSet = true;
-                $value = $row[$paramsColumnKey];
-            }
-
-            if ($valueSet) {
-                if ($keySet) {
-                    $resultArray[$key] = $value;
-                } else {
-                    $resultArray[] = $value;
-                }
-            }
-
-        }
-
-        return $resultArray;
-    }
-}
-
 if (!function_exists('arrayCombine')) {
     /**
      * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
@@ -342,47 +233,62 @@ if (!function_exists('asset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            if (is_null($Version)) {
-                $Version = APPLICATION_VERSION;
-                if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                    $Type = $Matches[1];
-                    $Key = $Matches[2];
-                    static $ThemeVersion = null;
-
-                    switch ($Type) {
-                        case 'plugins':
-                            $PluginInfo = Gdn::pluginManager()->getPluginInfo($Key);
-                            $Version = val('Version', $PluginInfo, $Version);
-                            break;
-                        case 'applications':
-                            $AppInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($Key));
-                            $Version = val('Version', $AppInfo, $Version);
-                            break;
-                        case 'themes':
-                            if ($ThemeVersion === null) {
-                                $ThemeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                                if ($ThemeInfo !== false) {
-                                    $ThemeVersion = val('Version', $ThemeInfo, $Version);
-                                } else {
-                                    $ThemeVersion = $Version;
-                                }
-                            }
-                            $Version = $ThemeVersion;
-                            break;
-                    }
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination, $Version);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
+    }
+}
+
+if (!function_exists('assetVersion')) {
+    /**
+     * Get a version string for a given asset.
+     *
+     * @param string $destination The path of the asset.
+     * @param string|null $version A known version for the asset or **null** to grab it from the addon's info array.
+     * @return string Returns a version string.
+     */
+    function assetVersion($destination, $version = null) {
+        static $gracePeriod = 90;
+
+        // Figure out which version to put after the asset.
+        if (is_null($version)) {
+            $version = APPLICATION_VERSION;
+            if (preg_match('`^/([^/]+)/([^/]+)/`', $destination, $matches)) {
+                $type = $matches[1];
+                $key = $matches[2];
+                static $themeVersion = null;
+
+                switch ($type) {
+                    case 'plugins':
+                    case 'applications':
+                        $addon = Gdn::addonManager()->lookupAddon($key);
+                        if ($addon) {
+                            $version = $addon->getVersion();
+                        }
+                        break;
+                    case 'themes':
+                        if ($themeVersion === null) {
+                            $theme = Gdn::addonManager()->lookupTheme(theme());
+                            if ($theme) {
+                                $themeVersion = $theme->getVersion();
+                            }
+                        }
+                        $version = $themeVersion;
+                        break;
+                }
+            }
+        }
+
+        // Add a timestamp component to the version if available.
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + $gracePeriod;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $version .= '.'.dechex($timestamp);
+        }
+        return $version;
     }
 }
 
@@ -530,44 +436,6 @@ if (!function_exists('multiCheckPermission')) {
     function multiCheckPermission($PermissionName) {
         $Result = Gdn::session()->checkPermission($PermissionName, false);
         return $Result;
-    }
-}
-
-if (!function_exists('checkRequirements')) {
-    /**
-     * Check an addon's requirements.
-     *
-     * @param string $ItemName The name of the item checking requirements.
-     * @param array $RequiredItems An array of requirements.
-     * @param array $EnabledItems An array of currently enabled items to check against.
-     * @throws Gdn_UserException Throws an exception if there are missing requirements.
-     */
-    function checkRequirements($ItemName, $RequiredItems, $EnabledItems) {
-        // 1. Make sure that $RequiredItems are present
-        if (is_array($RequiredItems)) {
-            $MissingRequirements = array();
-
-            foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
-                if (!array_key_exists($RequiredItemName, $EnabledItems)) {
-                    $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
-                    // If the item exists and is enabled, check the version
-                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
-                    // Compare the versions.
-                    if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
-                        $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                    }
-                }
-            }
-            if (count($MissingRequirements) > 0) {
-                $Msg = sprintf(
-                    "%s is missing the following requirement(s): %s.",
-                    $ItemName,
-                    implode(', ', $MissingRequirements)
-                );
-                throw new Gdn_UserException($Msg);
-            }
-        }
     }
 }
 
@@ -722,6 +590,45 @@ if (!function_exists('safePrint')) {
     }
 }
 
+if (!function_exists('dbdecode')) {
+    /**
+     * Decode a value retrieved from database storage.
+     *
+     * @param string $value An encoded string representation of a value to be decoded.
+     * @return mixed A decoded value on success or false on failure.
+     */
+    function dbdecode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        } elseif (is_array($value)) {
+            // This handles a common double decoding scenario.
+            return $value;
+        }
+
+        $decodedValue = @unserialize($value);
+
+        return $decodedValue;
+    }
+}
+
+if (!function_exists('dbencode')) {
+    /**
+     * Encode a value in preparation for database storage.
+     *
+     * @param mixed $value A value to be encoded.
+     * @return mixed An encoded string representation of the provided value or false on failure.
+     */
+    function dbencode($value) {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $encodedValue = serialize($value);
+
+        return $encodedValue;
+    }
+}
+
 if (!function_exists('decho')) {
     /**
      * Echo debug messages and variables.
@@ -795,16 +702,7 @@ if (!function_exists('debug')) {
         if ($value === null) {
             return $Debug;
         }
-
-        $Changed = $Debug != $value;
         $Debug = $value;
-        if ($Debug) {
-            Logger::logLevel(Logger::DEBUG);
-        } else {
-            if ($Changed) {
-                Logger::logLevel(c('Garden.LogLevel', Logger::INFO));
-            }
-        }
         return $Debug;
     }
 }
@@ -946,7 +844,8 @@ if (!function_exists('fetchPageInfo')) {
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
                 'Timeout' => $timeout,
-                'Cookies' => $sendCookies
+                'Cookies' => $sendCookies,
+                'Redirects' => true,
             ));
 
             if (!$Request->status()) {
@@ -1456,24 +1355,6 @@ if (!function_exists('forceBool')) {
     }
 }
 
-if (!function_exists('getallheaders')) {
-    /**
-     * If PHP isn't running as an apache module, getallheaders doesn't exist in some systems.
-     *
-     * @return array Returns an array of the current HTTP headers.
-     * @see https://github.com/vanilla/vanilla/issues/3
-     */
-    function getallheaders() {
-        $headers = [];
-        foreach ($_SERVER as $name => $value) {
-            if (substr($name, 0, 5) == 'HTTP_') {
-                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-            }
-        }
-        return $headers;
-    }
-}
-
 if (!function_exists('getAppCookie')) {
     /**
      * Get a cookie with the application prefix.
@@ -1729,7 +1610,7 @@ if (!function_exists('htmlEntityDecode')) {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
         $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
-        $string = preg_replace('/&#([0-9]+);/e', 'chr_utf8("\\1")', $string);
+        $string = preg_replace_callback('/&#([0-9]+);/', function($matches) { return chr_utf8($matches[1]); }, $string);
         return $string;
     }
 
@@ -2222,28 +2103,6 @@ if (!function_exists('pageNumber')) {
             $Result = $urlParam.$Result;
         }
 
-        return $Result;
-    }
-}
-
-if (!function_exists('parse_ini_string')) {
-    /**
-     * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
-     *
-     * @param string $Ini The INI string to parse.
-     * @return array Returns the array representation of the INI string.
-     */
-    function parse_ini_string($Ini) {
-        $Lines = explode("\n", $Ini);
-        $Result = array();
-        foreach ($Lines as $Line) {
-            $Parts = explode('=', $Line, 2);
-            if (count($Parts) == 1) {
-                $Result[trim($Parts[0])] = '';
-            } elseif (count($Parts) >= 2) {
-                $Result[trim($Parts[0])] = trim($Parts[1]);
-            }
-        }
         return $Result;
     }
 }
@@ -3093,11 +2952,24 @@ if (!function_exists('safeRedirect')) {
             $Destination = Url($Destination, true);
         }
 
-        $Domain = parse_url($Destination, PHP_URL_HOST);
-        if (in_array($Domain, TrustedDomains())) {
-            Redirect($Destination, $StatusCode);
+        $trustedDomains = TrustedDomains();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $Destination)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        if ($isTrustedDomain) {
+            redirect($Destination, $StatusCode);
         } else {
-            throw PermissionException();
+            Logger::notice('Redirect to untrusted domain: {url}.', [
+                'url' => $Destination
+            ]);
+
+            redirect(url("/home/leaving?Target=".urlencode($Destination)));
         }
     }
 }
@@ -3105,7 +2977,7 @@ if (!function_exists('safeRedirect')) {
 if (!function_exists('safeUnlink')) {
     /**
      * A version of {@link unlink()} that won't raise a warning.
-     * 
+     *
      * @param string $filename Path to the file.
      * @return Returns TRUE on success or FALSE on failure.
      */
@@ -3276,39 +3148,8 @@ if (!function_exists('smartAsset')) {
         }
 
         if ($AddVersion) {
-            if (strpos($Result, '?') === false) {
-                $Result .= '?';
-            } else {
-                $Result .= '&';
-            }
-
-            // Figure out which version to put after the asset.
-            $Version = APPLICATION_VERSION;
-            if (preg_match('`^/([^/]+)/([^/]+)/`', $Destination, $Matches)) {
-                $Type = $Matches[1];
-                $Key = $Matches[2];
-                static $ThemeVersion = null;
-
-                switch ($Type) {
-                    case 'plugins':
-                        $PluginInfo = Gdn::PluginManager()->GetPluginInfo($Key);
-                        $Version = GetValue('Version', $PluginInfo, $Version);
-                        break;
-                    case 'themes':
-                        if ($ThemeVersion === null) {
-                            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo(Theme());
-                            if ($ThemeInfo !== false) {
-                                $ThemeVersion = GetValue('Version', $ThemeInfo, $Version);
-                            } else {
-                                $ThemeVersion = $Version;
-                            }
-                        }
-                        $Version = $ThemeVersion;
-                        break;
-                }
-            }
-
-            $Result .= 'v='.urlencode($Version);
+            $Version = assetVersion($Destination);
+            $Result .= (strpos($Result, '?') === false ? '?' : '&').'v='.urlencode($Version);
         }
         return $Result;
     }
@@ -3508,15 +3349,47 @@ if (!function_exists('trustedDomains')) {
      * @return array
      */
     function trustedDomains() {
-        $Result = c('Garden.TrustedDomains', array());
-        if (!is_array($Result)) {
-            $Result = explode("\n", $Result);
+        // This domain is safe.
+        $trustedDomains = [Gdn::request()->host()];
+
+        $configuredDomains = c('Garden.TrustedDomains', []);
+        if (!is_array($configuredDomains)) {
+            $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
+        }
+        $configuredDomains = array_filter($configuredDomains);
+
+        $trustedDomains = array_merge($trustedDomains, $configuredDomains);
+
+        // Build a collection of authentication provider URLs.
+        $authProviderModel = new Gdn_AuthenticationProviderModel();
+        $providers = $authProviderModel->getProviders();
+        $providerUrls = [
+            'PasswordUrl',
+            'ProfileUrl',
+            'RegisterUrl',
+            'SignInUrl',
+            'SignOutUrl',
+            'URL'
+        ];
+
+        // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
+        if (is_array($providers) && count($providers) > 0) {
+            foreach ($providers as $key => $record) {
+                foreach ($providerUrls as $urlKey) {
+                    $providerUrl = $record[$urlKey];
+                    if ($providerUrl && $providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
+                        if (!in_array($providerDomain, $trustedDomains)) {
+                            $trustedDomains[] = $providerDomain;
+                        }
+                    }
+                }
+            }
         }
 
-        // This domain is safe.
-        $Result[] = Gdn::Request()->Host();
+        Gdn::pluginManager()->EventArguments['TrustedDomains'] = &$trustedDomains;
+        Gdn::pluginManager()->fireAs('EntryController')->fireEvent('BeforeTargetReturn');
 
-        return array_unique($Result);
+        return array_unique($trustedDomains);
     }
 }
 
@@ -3856,5 +3729,60 @@ if (!function_exists('slugify')) {
         }
 
         return $text;
+    }
+}
+
+if (!function_exists('urlMatch')) {
+
+    /**
+     * Match a URL against a pattern.
+     *
+     * @param string $pattern The URL pattern.
+     * @param string $url The URL to test.
+     * @return bool Returns **true** if {@link $url} matches against {@link $pattern} or **false** otherwise.
+     */
+    function urlMatch($pattern, $url) {
+        $urlParts = parse_url($url);
+        $patternParts = parse_url($pattern);
+
+        if ($urlParts === false || $patternParts === false) {
+            return false;
+        }
+        $urlParts += ['scheme' => '', 'host' => '', 'path' => ''];
+
+        // Fix a pattern with no path.
+        if (empty($patternParts['host'])) {
+            $pathParts = explode('/', val('path', $patternParts), 2);
+            $patternParts['host'] = $pathParts[0];
+            $patternParts['path'] = '/'.trim(val(1, $pathParts), '/');
+        }
+
+        if (!empty($patternParts['scheme']) && $patternParts['scheme'] !== $urlParts['scheme']) {
+            return false;
+        }
+
+        if (!empty($patternParts['host'])) {
+            $p = $patternParts['host'];
+            $host = $urlParts['host'];
+
+            if (!fnmatch($p, $host)) {
+                if (substr($p, 0, 2) !== '*.' || !fnmatch(substr($p, 2), $host)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!empty($patternParts['path']) && $patternParts['path'] !== '/') {
+            $p = $patternParts['path'];
+            $path = '/'.trim(val('path', $urlParts), '/');
+
+            if (!fnmatch($p, $path)) {
+                if (substr($p, -2) !== '/*' || !fnmatch(substr($p, 0, -2), $path)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -10,6 +10,8 @@
  * @since 2.1
  */
 
+use Vanilla\Addon;
+
 /**
  * Manages Assets.
  */
@@ -457,17 +459,40 @@ class AssetModel extends Gdn_Model {
         $data = [];
         $data['vanilla-core-'.APPLICATION_VERSION] = true;
 
-        $plugins = Gdn::pluginManager()->enabledPlugins();
-        foreach ($plugins as $info) {
-            $data[strtolower("{$info['Index']}-plugin-{$info['Version']}")] = true;
-        }
+        // Look through the enabled addons.
+        /* @var Addon $addon */
+        foreach(Gdn::addonManager()->getEnabled() as $addon) {
+            if ($addon->getType() == Addon::TYPE_THEME) {
+                // Themes have to figured out separately.
+                continue;
+            }
 
-        $applications = Gdn::applicationManager()->enabledApplications();
-        foreach ($applications as $info) {
-            $data[strtolower("{$info['Index']}-app-{$info['Version']}")] = true;
+            $key = $addon->getKey();
+            $version = $addon->getVersion();
+            $type = $addon->getType();
+            $data[strtolower("$key-$type-$version")] = true;
         }
 
         // Add the desktop theme version.
+        $themes = [
+            '' => Gdn::addonManager()->lookupTheme(Gdn::themeManager()->desktopTheme()),
+            'Mobile' => Gdn::addonManager()->lookupTheme(Gdn::themeManager()->mobileTheme())
+        ];
+        foreach ($themes as $optionsPx => $theme) {
+            if (!$theme instanceof Addon) {
+                continue;
+            }
+
+            $data[$theme->getKey().'-theme-'.$theme->getVersion()] = true;
+
+            // Look for theme options.
+            $options = c("Garden.{$optionsPx}ThemeOptions");
+            if (!empty($options)) {
+                $data[valr('Styles.Value', $options)] = true;
+            }
+        }
+
+
         $info = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->desktopTheme());
         if (!empty($info)) {
             $version = val('Version', $info, 'v0');

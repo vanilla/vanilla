@@ -13,7 +13,7 @@ if (PHP_VERSION_ID < 50400) {
 }
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.2.106');
+define('APPLICATION_VERSION', '2.2.112.2');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
@@ -32,12 +32,7 @@ define('PATH_ROOT', getcwd());
 require_once(PATH_ROOT.'/bootstrap.php');
 
 // Create and configure the dispatcher.
-
 $dispatcher = Gdn::dispatcher();
-
-$enabledApplications = Gdn::applicationManager()->enabledApplicationFolders();
-$dispatcher->enabledApplicationFolders($enabledApplications);
-$dispatcher->passProperty('EnabledApplications', $enabledApplications);
 
 // Process the request.
 $dispatcher->start();

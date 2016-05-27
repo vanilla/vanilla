@@ -1,12 +1,14 @@
+<div class="Info">
+    <?php echo t('Define Thumbnail', 'Click and drag across the picture to define your thumbnail.');?>
+</div>
 <div class="box-crop">
     <div class="box-image box-source">
         <?php
-        echo '<h2>'.t('Source').'</h2>';
-        echo img($this->getSourceImageUrl(), array('id' => 'cropbox'));
-        echo '<label>'.t('Define Thumbnail', 'Click and drag across the picture to define the thumbnail.').'</label>'; ?>
+        echo '<div>'.t('Picture').'</div>';
+        echo img($this->getSourceImageUrl(), array('id' => 'cropbox')); ?>
     </div>
     <div class="box-image box-cropped-image">
-        <?php echo '<h2>'.t('Thumbnail').'</h2>'; ?>
+        <?php echo '<div>'.t('Thumbnail').'</div>'; ?>
         <div class="thumbnail-preview" style="<?php echo 'width:'.$this->getWidth().'px;height:'.$this->getHeight().'px;'; ?>overflow:hidden;">
             <?php
             echo img($this->getExistingCropUrl(), array('id' => 'current-crop', 'style' => 'min-width: '.$this->getWidth().'px; min-height: '.$this->getHeight().'px;'));
@@ -19,4 +21,3 @@
         ?>
     </div>
 </div>
-

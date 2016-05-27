@@ -1303,83 +1303,13 @@ class ImportModel extends Gdn_Model {
     protected function _LoadTableWithInsert($Tablename, $Path) {
         // This option could take a while so set the timeout.
         increaseMaxExecutionTime(60 * 10);
+        $result = $this->loadTableInsert($Tablename, $Path);
 
-        // Get the column count of the table.
-        $St = Gdn::structure();
-        $St->get(self::TABLE_PREFIX.$Tablename);
-        $ColumnCount = count($St->Columns());
-        $St->reset();
-
-        ini_set('auto_detect_line_endings', true);
-        $fp = fopen($Path, 'rb');
-
-        // Figure out the current position.
-        $fPosition = val('CurrentLoadPosition', $this->Data, 0);
-        if ($fPosition == 0) {
-            // Skip the header row.
-            $Row = self::FGetCSV2($fp);
-
-            $Px = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX;
-            Gdn::database()->query("truncate table {$Px}{$Tablename}");
-        } else {
-            fseek($fp, $fPosition);
+        if ($result) {
+            unset($this->Data['CurrentLoadPosition']);
+            unset($this->Data['CurrentStepMessage']);
         }
-
-        $PDO = Gdn::database()->connection();
-        $PxTablename = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
-
-        $Inserts = '';
-        $Count = 0;
-        while ($Row = self::FGetCSV2($fp)) {
-            ++$Count;
-
-            // Quote the values in the row.
-            $Row = array_map(array($PDO, 'quote'), $Row);
-
-            // Add any extra columns to the row.
-            while (count($Row) < $ColumnCount) {
-                $Row[] = 'null';
-            }
-
-            // Add the insert values to the sql.
-            if (strlen($Inserts) > 0) {
-                $Inserts .= ',';
-            }
-            $Inserts .= '('.implode(',', $Row).')';
-
-            if ($Count >= 25) {
-                // Insert in chunks.
-                $Sql = "insert $PxTablename values $Inserts";
-                $this->query($Sql);
-                $Count = 0;
-                $Inserts = '';
-
-                // Check for a timeout.
-                if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
-                    // The step's taken too long. Save the file position.
-                    $Pos = ftell($fp);
-                    $this->Data['CurrentLoadPosition'] = $Pos;
-
-                    $Filesize = filesize($Path);
-                    if ($Filesize > 0) {
-                        $PercentComplete = $Pos / filesize($Path);
-                        $this->Data['CurrentStepMessage'] = $Tablename.' ('.round($PercentComplete * 100.0).'%)';
-                    }
-
-                    fclose($fp);
-                    return false;
-                }
-            }
-        }
-        fclose($fp);
-
-        if (strlen($Inserts) > 0) {
-            $Sql = "insert $PxTablename values $Inserts";
-            $this->query($Sql);
-        }
-        unset($this->Data['CurrentLoadPosition']);
-        unset($this->Data['CurrentStepMessage']);
-        return true;
+        return $result;
     }
 
     /**
@@ -2232,5 +2162,94 @@ class ImportModel extends Gdn_Model {
         );
 
         return true;
+    }
+
+    /**
+     * Import a table from a CSV using SQL insert statements.
+     *
+     * @param string $Tablename The name of the table to import to.
+     * @param string $Path The path to the CSV.
+     * @param bool $skipHeader Whether the CSV contains a header row.
+     * @param int $chunk The number of records to chunk the imports to.
+     * @return bool
+     */
+    public function loadTableInsert($Tablename, $Path, $skipHeader = true, $chunk = 100) {
+        // Get the column count of the table.
+        $St = Gdn::structure();
+        $St->get(self::TABLE_PREFIX.$Tablename);
+        $ColumnCount = count($St->Columns());
+        $St->reset();
+
+        ini_set('auto_detect_line_endings', true);
+        $fp = fopen($Path, 'rb');
+
+        // Figure out the current position.
+        $fPosition = val('CurrentLoadPosition', $this->Data, 0);
+
+        if ($fPosition == 0 && $skipHeader) {
+            // Skip the header row.
+            $Row = self::FGetCSV2($fp);
+        }
+
+        if ($fPosition == 0) {
+            $Px = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX;
+            Gdn::database()->query("truncate table {$Px}{$Tablename}");
+        } else {
+            fseek($fp, $fPosition);
+        }
+
+        $PDO = Gdn::database()->connection();
+        $PxTablename = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
+
+        $Inserts = '';
+        $Count = 0;
+        while ($Row = self::FGetCSV2($fp)) {
+            ++$Count;
+            $Row = array_map('trim', $Row);
+            // Quote the values in the row.
+            $Row = array_map(array($PDO, 'quote'), $Row);
+
+            // Add any extra columns to the row.
+            while (count($Row) < $ColumnCount) {
+                $Row[] = 'null';
+            }
+
+            // Add the insert values to the sql.
+            if (strlen($Inserts) > 0) {
+                $Inserts .= ',';
+            }
+            $Inserts .= '('.implode(',', $Row).')';
+
+            if ($Count >= $chunk) {
+                // Insert in chunks.
+                $Sql = "insert $PxTablename values $Inserts";
+                $this->Database->query($Sql);
+                $Count = 0;
+                $Inserts = '';
+
+                // Check for a timeout.
+                if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+                    // The step's taken too long. Save the file position.
+                    $Pos = ftell($fp);
+                    $this->Data['CurrentLoadPosition'] = $Pos;
+
+                    $Filesize = filesize($Path);
+                    if ($Filesize > 0) {
+                        $PercentComplete = $Pos / filesize($Path);
+                        $this->Data['CurrentStepMessage'] = $Tablename.' ('.round($PercentComplete * 100.0).'%)';
+                    }
+
+                    fclose($fp);
+                    return 0;
+                }
+            }
+        }
+        fclose($fp);
+
+        if (strlen($Inserts) > 0) {
+            $Sql = "insert $PxTablename values $Inserts";
+            $this->query($Sql);
+        }
+        return $Count;
     }
 }

@@ -950,7 +950,7 @@ $.fn.formToArray = function(semantic, elements) {
     var els = semantic ? form.getElementsByTagName('*') : form.elements;
     var els2;
 
-    if ( els ) {
+    if (els && !/MSIE [678]/.test(navigator.userAgent)) {
         els = $(els).get();  // convert to standard array
     }
 

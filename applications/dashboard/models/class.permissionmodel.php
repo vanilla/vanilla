@@ -474,7 +474,7 @@ class PermissionModel extends Gdn_Model {
      * @return array
      */
     public function getAllowedPermissionNamespaces() {
-        $ApplicationManager = new Gdn_ApplicationManager();
+        $ApplicationManager = Gdn::applicationManager();
         $EnabledApplications = $ApplicationManager->EnabledApplications();
 
         $PluginNamespaces = array();

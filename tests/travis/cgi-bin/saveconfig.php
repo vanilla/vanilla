@@ -4,7 +4,7 @@
  * DO NOT USE THIS FILE IN PRODUCTION.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -25,14 +25,6 @@ class SimpleConfig {
         $this->pathRoot = realpath(__DIR__.'/..');
     }
 
-    public function checkAuthorization($authorization = '') {
-        $config = $this->loadConfig();
-        $token = $this->getvalr('Test.APIKey', $config, '');
-        if (empty($token) || sha1($authorization) !== sha1("token $token")) {
-            throw new \Exception("Invalid access token.", 401);
-        }
-    }
-
     public function getConfigPath() {
         $host = $_SERVER['HTTP_HOST'];
         if (strpos($host, ':') !== false) {
@@ -45,8 +37,8 @@ class SimpleConfig {
             $slug = "$host-{$_SERVER['NODE_SLUG']}";
         } else {
             // This is a site per host setup.
-            if (in_array($host, ['vanilla.local', 'vanilla.lc'])) {
-                $slug = 'config';
+            if (in_array($host, ['config'])) {
+                throw new \Exception('Invalid config.');
             } else {
                 $slug = $host;
             }
@@ -96,6 +88,20 @@ class SimpleConfig {
     }
 
     /**
+     * Delete the config.
+     *
+     * @throws Exception Throws an exception if the config exists and could not be deleted.
+     */
+    public function deleteConfig() {
+        $path = $this->getConfigPath();
+        if (!file_exists($path)) {
+            return;
+        } elseif (!unlink($path)) {
+            throw new \Exception('Could not delete config.', 500);
+        }
+    }
+
+    /**
      * Return the value from an associative array or an object.
      *
      * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used
@@ -106,7 +112,7 @@ class SimpleConfig {
      * @param mixed $default The value to return if the key does not exist.
      * @return mixed The value from the array or object.
      */
-    function getvalr($key, $collection, $default = false) {
+    private function getvalr($key, $collection, $default = false) {
         $path = explode('.', $key);
 
         $value = $collection;
@@ -135,7 +141,7 @@ class SimpleConfig {
      * @param mixed $value The value to set.
      * @return mixed Newly set value or if array merge.
      */
-    protected static function setvalr($key, &$collection, $value = null) {
+    private static function setvalr($key, &$collection, $value = null) {
         if (is_array($key)) {
             $collection = array_merge($collection, $key);
             return null;
@@ -189,14 +195,18 @@ try {
     $data = @json_decode($input_raw, true);
 
     $config = new SimpleConfig();
-    $config->checkAuthorization($config->getvalr('HTTP_AUTHORIZATION', $_SERVER));
 
     if ($data === false) {
         throw new Exception('There was an error decoding the config data.', 400);
     }
 
-    $config->saveToConfig($data);
-    $data = $config->loadConfig();
+    if ($data === ['DELETE']) {
+        $config->deleteConfig();
+        $data = [];
+    } else {
+        $config->saveToConfig($data);
+        $data = $config->loadConfig();
+    }
 
     echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $ex) {
@@ -205,6 +215,6 @@ try {
     die(json_encode([
         'message' => $ex->getMessage(),
         'code' => $ex->getCode()
-    ]));
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 }
 ob_end_flush();

@@ -33,6 +33,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     /** @var array The selected filters. */
     protected $selectedFilters;
 
+    /** @var bool Whether to show the sorting options in the view. */
+    protected $showSorts = true;
+
+    /** @var bool Whether to show the filter options in the view. */
+    protected $showFilters = true;
+
     /** @var int The ID of the category we're in. */
     protected $categoryID;
 
@@ -55,6 +61,38 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     }
 
     /**
+     * @param $showSorts Whether to show the sorting options in the view.
+     * @return DiscussionsSortFilterModule $this
+     */
+    public function setShowSorts($showSorts) {
+        $this->showSorts = $showSorts;
+        return $this;
+    }
+
+    /**
+     * @param $showFilters Whether to show the filtering options in the view.
+     * @return DiscussionsSortFilterModule $this
+     */
+    public function setShowFilters($showFilters) {
+        $this->showFilters = $showFilters;
+        return $this;
+    }
+
+    /**
+     * @return bool Whether to show the sorting options in the view.
+     */
+    public function showSorts() {
+        return $this->showSorts;
+    }
+
+    /**
+     * @return bool Whether to show the filtering options in the view.
+     */
+    public function showFilters() {
+        return $this->showFilters;
+    }
+
+    /**
      * Checks whether we should even render this whole thing.
      *
      * @return bool Whether to render the module.
@@ -67,9 +105,11 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
     /**
      * @param string $dropdownView The view of the dropdown module to render.
+     * @return DiscussionsSortFilterModule $this
      */
     public function setDropdownView($dropdownView) {
         $this->dropdownView = $dropdownView;
+        return $this;
     }
 
     /**

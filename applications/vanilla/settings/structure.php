@@ -24,6 +24,7 @@ $Px = $Construct->DatabasePrefix();
 
 $Construct->table('Category');
 $CategoryExists = $Construct->TableExists();
+$CountCategoriesExists = $Construct->columnExists('CountCategories');
 $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
 
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
@@ -32,7 +33,8 @@ $Construct->PrimaryKey('CategoryID')
     ->column('ParentCategoryID', 'int', true)
     ->column('TreeLeft', 'int', true)
     ->column('TreeRight', 'int', true)
-    ->column('Depth', 'int', true)
+    ->column('Depth', 'int', '0')
+    ->column('CountCategories', 'int', '0')
     ->column('CountDiscussions', 'int', '0')
     ->column('CountComments', 'int', '0')
     ->column('DateMarkedRead', 'datetime', null)
@@ -76,8 +78,8 @@ if ($Drop || !$CategoryExists) {
 }
 
 if ($CategoryExists) {
-    $CategoryModel = new CategoryModel();
-    $CategoryModel->RebuildTree();
+    CategoryModel::instance()->rebuildTree();
+    CategoryModel::instance()->recalculateTree();
     unset($CategoryModel);
 }
 

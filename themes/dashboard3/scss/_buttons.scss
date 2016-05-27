@@ -177,3 +177,15 @@ input[type="button"] {
     width: 100%;
   }
 }
+
+.btn-group {
+  .btn {
+    border-radius: 0;
+  }
+}
+
+.btn-search {
+  position: absolute;
+  right: 1rem;
+
+}

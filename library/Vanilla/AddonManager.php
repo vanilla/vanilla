@@ -803,13 +803,14 @@ class AddonManager {
         foreach ($keys as $key => $value) {
             if (in_array($value, [true, 1, '1'], true)) {
                 // This addon key is represented as addon => true.
-                $addon = $this->lookupByType($key, $type);
+                $lookup = $key;
             } else {
                 // This addon is represented as addon => folder.
-                $addon = $this->lookupByType($value, $type);
+                $lookup = $value;
             }
+            $addon = $this->lookupByType($lookup, $type);
             if (empty($addon)) {
-                trigger_error("The $type with key $key could not be found and will not be started.");
+                trigger_error("The $type with key $lookup could not be found and will not be started.");
             } else {
                 $this->startAddon($addon);
                 $count++;

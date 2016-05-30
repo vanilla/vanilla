@@ -4,29 +4,23 @@
 //
 // Styleguide 3.
 
-.Sortable,
-.DataList {
+@mixin list-reset() {
   padding-left: 0;
 
   li {
     list-style: none;
-  }
-}
-
-form {
-  ul,
-  ol {
-    padding-left: 0;
-
-    li {
-      list-style: none;
-      justify-content: space-between;
-    }
+    justify-content: space-between;
   }
 
   label {
     font-weight: 500;
     margin-bottom: 0;
+  }
+}
+
+form {
+  ul, ol {
+    @include list-reset();
   }
 }
 
@@ -283,51 +277,6 @@ form {
   }
 }
 
-.ActivateSlider {
-  @extend .toggle-wrap;
-
-  a {
-    &,
-    &:focus,
-    &:hover,
-    &:active,
-    &:hover:active {
-      @extend .text-hide;
-      outline: 0;
-    }
-
-    &:before {
-      @extend .toggle-well;
-      content: '';
-    }
-
-    &:after {
-      @extend .toggle-slider;
-      content: '';
-    }
-  }
-
-  .InProgress {
-    &:after {
-      @extend .toggle-slider-active;
-    }
-  }
-}
-
-.ActivateSlider-Active{
-  a {
-    &:before {
-      @extend .toggle-well-on;
-      content: '';
-    }
-
-    &:after {
-      @extend .toggle-slider-on;
-      content: '';
-    }
-  }
-}
-
 // Color Pickers
 //
 //
@@ -464,7 +413,11 @@ select {
 //   <li>
 //     <input type="radio" id="babySeal" name="babyAnimals">
 //     <label for="babySeal">
-//       <img src="./public/resources/001.jpg" alt="Baby Seal">
+//       <div class="image-wrap">
+//         <img src="./public/resources/001.jpg" alt="Baby Seal">
+//         <div class="overlay">
+//         </div>
+//       </div>
 //       <div class="title">Baby Seal</div>
 //       <div class="info">by Author</div>
 //       <p class="description">Choose this happy baby seal. It's so very happy.</p>
@@ -473,7 +426,11 @@ select {
 //   <li>
 //     <input type="radio" id="puppy" name="babyAnimals">
 //     <label for="puppy">
-//       <img src="./public/resources/002.jpg" alt="Puppy">
+//       <div class="image-wrap">
+//         <img src="./public/resources/002.jpg" alt="Puppy">
+//         <div class="overlay">
+//         </div>
+//       </div>
 //       <div class="title">Puppy</div>
 //       <div class="info">by Author</div>
 //       <p class="description">Choose this sleepy puppy. Sooo tired, puppy.</p>
@@ -486,44 +443,104 @@ select {
 
 .label-selector {
   @extend .row;
+  @include list-reset();
 
-  li {
+  > li,
+  > a {
     @extend .col-md-6;
     @extend .col-lg-4;
     @extend .col-xl-3;
+
+    padding: ($spacer / 2) $spacer $spacer;
   }
 
   img {
     display: block;
     width: 100%;
-    margin-bottom: $spacer;
+    border: 1px solid $grey-light;
   }
 
-  label {
+  label,
+  > a {
     cursor: pointer;
-    opacity: .5;
-    transition: opacity .2s;
   }
 
-  input[type=radio] {
-    position: absolute;
-    opacity: 0;
-  }
-
-  input[type=radio]:checked ~ label {
-    opacity: 1;
-  }
-
+  input[type=radio],
   input[type=checkbox] {
     position: absolute;
     opacity: 0;
   }
 
+  .active,
+  input[type=radio]:checked ~ label,
   input[type=radio]:checked ~ label {
-    opacity: 1;
+    cursor: default;
+
+    .overlay {
+      height: 100%;
+      opacity: .75;
+      background-color: $white;
+
+      &:before {
+        position: relative;
+        display: block;
+        top: 35%;
+        width: 30%;
+        height: 30%;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: green;
+        content: "";
+      }
+    }
   }
 
   .title {
-    @extend .h3;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .image-wrap {
+    position: relative;
+    display: block;
+    margin-bottom: $spacer;
+
+    &:hover .overlay {
+      height: 100%;
+    }
+  }
+
+  .overlay {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 0;
+    z-index: 20;
+    background-color: $brand-primary;
+    opacity: .9;
+    overflow: hidden;
+    transition: all 0.5s;
+    text-align: center;
+  }
+
+  .buttons {
+    position: relative;
+    top: 40%;
+    left: auto;
+    right: auto;
+    height: 20%;
+
+    > .btn {
+      min-width: 5rem;
+      margin-left: .125rem;
+      margin-right: .125rem;
+    }
+  }
+
+  .description {
+    display: none;
   }
 }

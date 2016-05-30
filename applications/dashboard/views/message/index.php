@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -9,6 +10,7 @@ $Session = Gdn::session();
         echo '</ul>';
         ?>
     </div>
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Manage Messages'); ?></h1>
     <div
         class="Info"><?php echo t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>

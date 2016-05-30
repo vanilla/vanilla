@@ -25,6 +25,7 @@
   &.active {
     &:focus,
     &.focus {
+      outline: 0;
       //@include tab-focus();
     }
   }
@@ -67,6 +68,9 @@ fieldset[disabled] a.btn {
 }
 .btn-secondary {
   @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
+}
+.btn-transparent {
+  @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
 }
 //.btn-info {
 //  @include button-variant($btn-info-color, $btn-info-bg, $btn-info-border);

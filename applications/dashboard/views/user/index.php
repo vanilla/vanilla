@@ -3,6 +3,7 @@ $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 ?>
+<?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo wrap(t('Need More Help?'), 'h2');
@@ -11,6 +12,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         echo '</ul>';
         ?>
     </div>
+<?php Gdn_Theme::assetEnd('Help'); ?>
     <h1><?php echo t('Manage Users'); ?></h1>
 <?php echo $this->Form->open(array('action' => url('/user/browse'))); ?>
     <div class="Wrap">

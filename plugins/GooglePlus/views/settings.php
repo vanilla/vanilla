@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -8,6 +9,7 @@
         echo '</ul>';
         ?>
     </div>
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo $this->data('Title'); ?></h1>
     <div class="Info">
         <?php echo anchor(t('How to set up Google+ Social Connect.'), 'http://docs.vanillaforums.com/addons/googleplus/', array('target' => '_blank')); ?>

@@ -11,6 +11,7 @@
             color: #252525;
         }
     </style>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -20,6 +21,7 @@
         echo '</ul>';
         ?>
     </div>
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();

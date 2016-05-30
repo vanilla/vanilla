@@ -14,7 +14,17 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
     if ($Current == $Url)
         $CssClass .= ' Current';
     $CssClass .= ' Choice';
-    echo anchor(t($Title).Wrap(sprite($SpriteClass), 'span', array('class' => 'Wrap')), $Url, array('class' => $CssClass, 'title' => $Description, 'rel' => $Url));
+    echo anchor(
+        '<span class="image-wrap">'
+        .sprite($SpriteClass)
+        .'<div class="overlay">'
+        .'<div class="buttons">'
+        .'<button class="btn btn-transparent">'.t('Select').'</button>'
+        .'</div>'
+        .'</div></span>'.t($Title),
+        $Url,
+        array('class' => $CssClass, 'title' => $Description, 'rel' => $Url)
+    );
 }
 
 ?>
@@ -41,6 +51,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
 
         });
     </script>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -50,7 +61,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
         echo '</ul>';
         ?>
     </div>
-
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Homepage'); ?></h1>
     <div class="Info">
         <?php printf(t('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), url('/', true)) ?>
@@ -75,23 +86,23 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
             ?>
         </div>
         <?php if (Gdn::ApplicationManager()->CheckApplication('Vanilla')): ?>
+            <p>
+                <?php echo wrap(t('Discussions Layout'), 'strong'); ?>
+                <br/><?php echo t('Choose the preferred layout for the discussions page.'); ?>
+            </p>
             <div class="LayoutOptions DiscussionsLayout">
-                <p>
-                    <?php echo wrap(t('Discussions Layout'), 'strong'); ?>
-                    <br/><?php echo t('Choose the preferred layout for the discussions page.'); ?>
-                </p>
                 <?php
                 echo WriteHomepageOption('Modern Layout', 'modern', 'SpDiscussions', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
                 echo WriteHomepageOption('Table Layout', 'table', 'SpDiscussionsTable', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
                 ?>
             </div>
+            <p>
+                <?php echo wrap(t('Categories Layout'), 'strong'); ?>
+                (<?php echo anchor(t("adjust layout"), '/vanilla/settings/managecategories', array('class' => 'AdjustCategories')); ?>
+                )
+                <br/><?php echo t('Choose the preferred layout for the categories page.'); ?>
+            </p>
             <div class="LayoutOptions CategoriesLayout">
-                <p>
-                    <?php echo wrap(t('Categories Layout'), 'strong'); ?>
-                    (<?php echo anchor(t("adjust layout"), '/vanilla/settings/managecategories', array('class' => 'AdjustCategories')); ?>
-                    )
-                    <br/><?php echo t('Choose the preferred layout for the categories page.'); ?>
-                </p>
                 <?php
                 echo WriteHomepageOption('Modern Layout', 'modern', 'SpCategories', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
                 echo WriteHomepageOption('Table Layout', 'table', 'SpCategoriesTable', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));

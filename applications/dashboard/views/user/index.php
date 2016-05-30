@@ -2,6 +2,8 @@
 $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
+
+Gdn_Theme::assetBegin('Help');
 ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">

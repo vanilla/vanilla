@@ -21,15 +21,15 @@ function writeCategoryItem($category, $indent = 0) {
     if (in_array($category['DisplayAs'], ['Categories'])) {
         echo anchor(
             htmlspecialchars($category['Name']),
-            '/vanilla/settings/categories/'.rawurlencode($category['UrlCode'])
+            '/vanilla/settings/categories?parent='.urlencode($category['UrlCode'])
         );
     } else {
         echo htmlspecialchars($category['Name']);
     }
 
-    echo "\n$i  <div class=\"options\">",
-        displayAsSymbol($category['DisplayAs']),
-        "</div>";
+    echo "\n$i  <div class=\"options\">";
+    writeCategoryOptions($category);
+    echo "</div>";
 
     echo "</div>\n";
 
@@ -62,4 +62,49 @@ function symbol($name, $alt = '') {
 EOT;
 
     return $r;
+}
+
+function writeCategoryOptions($category) {
+    $cdd = new DropdownModule('');
+
+    $cdd->setTrigger(displayAsSymbol($category['DisplayAs']), 'span')
+        ->setForceDivider(true);
+
+    $cdd->addGroup('', 'edit')
+        ->addLink(t('Edit'), url("/vanilla/settings/editcategory?categoryid={$category['CategoryID']}"), 'edit.edit');
+
+    $cdd->addGroup(t('Display as'), 'displayas');
+    $displayasOptions = ['Heading', 'Categories', 'Discussions'];
+    foreach ($displayasOptions as $displayAs) {
+        $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
+
+        $icon = displayAsSymbol($displayAs);
+
+        $cdd->addLink(
+            t($displayAs),
+            '#',
+            'displayas.'.strtolower($displayAs),
+            'js-displayas '.$cssClass,
+            [],
+            false,
+            ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]]
+        );
+    }
+
+    $cdd->addGroup('', 'actions')
+        ->addLink(
+            t('Add Subcategory'),
+            url("/vanilla/settings/addcategory?parent={$category['CategoryID']}"),
+            'actions.add'
+        );
+
+    $cdd->addGroup('', 'delete')
+        ->addLink(
+            t('Delete'),
+            url("/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}"),
+            'delete.delete',
+            'Popup'
+        );
+
+    echo $cdd->toString();
 }

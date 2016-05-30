@@ -13,6 +13,10 @@
 writeCategoryBreadcrumbs($this->data('Ancestors', []));
 ?>
 
+<?php
+writeCategoryBreadcrumbs($this->data('Ancestors', []));
+?>
+
 <div class="dd tree tree-categories">
 <?php
 writeCategoryTree($this->data('Categories', []));

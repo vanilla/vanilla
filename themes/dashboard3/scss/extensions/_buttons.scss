@@ -21,7 +21,7 @@ button.btn {
 }
 
 .Buttons {
-  @extend .btn-group;
+  //@extend .btn-group;
 }
 
 
@@ -42,7 +42,7 @@ button.btn {
     @extend .btn-secondary;
   }
 
-  .Active a,
+  li.Active a,
   .current-tab {
     @extend .active;
   }

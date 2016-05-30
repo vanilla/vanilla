@@ -35,8 +35,6 @@ form {
   li {
     @extend .form-group;
     @extend .row;
-    padding-left: $padding-default;
-    padding-right: $padding-default;
   }
 
   li > label {
@@ -82,19 +80,20 @@ form {
 // Styleguide 3.1.1
 
 .label-wrap {
-  .Info,
-  .info {
-    display: block;
-    font-size: $font-size-sm;
-    line-height: $line-height-lg;
-    color: $grey;
-  }
-
   img {
     @extend .padded;
     max-width: 50%;
     max-height: 200px;
   }
+}
+
+.Info,
+.Info2,
+.info {
+  display: block;
+  font-size: $font-size-sm;
+  line-height: $line-height-lg;
+  color: $grey;
 }
 
 // Form grid
@@ -451,5 +450,80 @@ select {
   // Hides the default caret in IE11
   &::-ms-expand {
     opacity: 0;
+  }
+}
+
+
+// Label selectors
+//
+// Label selectors replace checkboxes and radios with a image and/or text selector.
+//
+// Markup:
+// <form>
+// <ul class="label-selector">
+//   <li>
+//     <input type="radio" id="babySeal" name="babyAnimals">
+//     <label for="babySeal">
+//       <img src="./public/resources/001.jpg" alt="Baby Seal">
+//       <div class="title">Baby Seal</div>
+//       <div class="info">by Author</div>
+//       <p class="description">Choose this happy baby seal. It's so very happy.</p>
+//     </label>
+//   </li>
+//   <li>
+//     <input type="radio" id="puppy" name="babyAnimals">
+//     <label for="puppy">
+//       <img src="./public/resources/002.jpg" alt="Puppy">
+//       <div class="title">Puppy</div>
+//       <div class="info">by Author</div>
+//       <p class="description">Choose this sleepy puppy. Sooo tired, puppy.</p>
+//     </label>
+//   </li>
+// </ul>
+// </form>
+//
+// Styleguide 3.5.
+
+.label-selector {
+  @extend .row;
+
+  li {
+    @extend .col-md-6;
+    @extend .col-lg-4;
+    @extend .col-xl-3;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    margin-bottom: $spacer;
+  }
+
+  label {
+    cursor: pointer;
+    opacity: .5;
+    transition: opacity .2s;
+  }
+
+  input[type=radio] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  input[type=radio]:checked ~ label {
+    opacity: 1;
+  }
+
+  input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  input[type=radio]:checked ~ label {
+    opacity: 1;
+  }
+
+  .title {
+    @extend .h3;
   }
 }

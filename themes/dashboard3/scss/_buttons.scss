@@ -179,8 +179,11 @@ input[type="button"] {
 }
 
 .btn-group {
+  font-size: 0;
+
   .btn {
     border-radius: 0;
+    margin-right: -$input-btn-border-width;
   }
 }
 

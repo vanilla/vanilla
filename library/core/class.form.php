@@ -56,9 +56,12 @@ class Gdn_Form extends Gdn_Pluggable {
             'textbox' => 'form-control',
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
-            'form-group' => 'form-group',
+            'form-group' => 'form-group row',
         ]
     ];
+
+    /** @var boolean Whether to wrap label and input elements */
+    public $wrapElements = false;
 
     /** @var string Action with which the form should be sent. */
     public $Action = '';
@@ -1184,7 +1187,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '';
 
         $Wrap = val('Wrap', $Attributes, false);
-        if ($Wrap) {
+        if ($Wrap || $this->wrapElements) {
             $Return = '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
@@ -1583,7 +1586,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
         $Strength = val('Strength', $Attributes, false, true);
-        if ($Wrap) {
+        if ($Wrap || $this->wrapElements) {
             $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
@@ -1659,7 +1662,11 @@ PASSWORDMETER;
         $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
         $For = arrayValueI('for', $Attributes, arrayValueI('id', $Attributes, $this->escapeID($DefaultFor, false)));
 
-        return '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
+        $return = '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
+        if ($this->wrapElements) {
+            $return = wrap($return, 'div', ['class' => 'label-wrap']);
+        }
+        return $return;
     }
 
     /**
@@ -1713,6 +1720,10 @@ PASSWORDMETER;
     public function open($Attributes = array()) {
         if (!is_array($Attributes)) {
             $Attributes = array();
+        }
+
+        if ($this->wrapElements) {
+            $Attributes['class'] .= 'form-horizontal';
         }
 
         $Return = '<form';
@@ -1959,7 +1970,7 @@ PASSWORDMETER;
 
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
-        if ($Wrap) {
+        if ($Wrap || $this->wrapElements) {
             $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 

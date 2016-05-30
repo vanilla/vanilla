@@ -291,6 +291,44 @@ class CategoryCollection {
     }
 
     /**
+     * Get all of the ancestor categories above this one.
+     *
+     * @param int|string $categoryID The category ID or url code.
+     * @param bool $includeHeadings Whether or not to include heading categories.
+     * @return array
+     */
+    public function getAncestors($categoryID, $includeHeadings = false) {
+        $result = [];
+
+        $category = $this->get($categoryID);
+
+        if ($category === null) {
+            return $result;
+        }
+
+        // Build up the ancestor array by tracing back through parents.
+        $result[] = $category;
+        $max = 20;
+        while ($category = $this->get($category['ParentCategoryID'])) {
+            // Check for an infinite loop.
+            if ($max <= 0) {
+                break;
+            }
+            $max--;
+
+            if ($category['CategoryID'] == -1) {
+                break;
+            }
+
+            if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
+                $result[] = $category;
+            }
+        }
+        $result = array_reverse($result);
+        return $result;
+    }
+
+    /**
      * Get several categories by ID.
      *
      * @param array $categoryIDs An array of category IDs.

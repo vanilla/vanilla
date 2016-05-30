@@ -26,7 +26,7 @@ if (!function_exists('FilterCountString')) {
     }
 }
 if (c('Vanilla.Discussions.ShowCounts', true)) {
-    $Bookmarked .= FilterCountString($CountBookmarks, url('/discussions/UserBookmarkCount'));
+    $Bookmarked .= FilterCountString($CountBookmarks, '/discussions/UserBookmarkCount');
     $MyDiscussions .= FilterCountString($CountDiscussions);
     $MyDrafts .= FilterCountString($CountDrafts);
 }

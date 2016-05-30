@@ -151,7 +151,7 @@ class Gdn_Smarty {
      */
     public function smarty() {
         if (is_null($this->_Smarty)) {
-            $Smarty = new Smarty();
+            $Smarty = new SmartyBC();
 
             $Smarty->setCacheDir(PATH_CACHE.'/Smarty/cache');
             $Smarty->setCompileDir(PATH_CACHE.'/Smarty/compile');

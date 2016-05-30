@@ -69,7 +69,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
             }
             //echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
 
-            if (Gdn::pluginManager()->CheckPlugin('Reactions')) {
+            if (Gdn::addonManager()->isEnabled('Reactions')) {
                 echo WriteHomepageOption('Best Of', 'bestof', 'SpBestOf', $CurrentTarget);
             }
             ?>

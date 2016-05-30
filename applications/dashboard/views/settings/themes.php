@@ -2,6 +2,7 @@
 $Session = Gdn::session();
 $AddonUrl = Gdn::config('Garden.AddonUrl');
 ?>
+<?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -12,6 +13,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
         echo '</ul>';
         ?>
     </div>
+<?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Manage Themes'); ?></h1>
     <div class="Info">
         <?php
@@ -43,7 +45,7 @@ if ($AddonUrl != '')
         $NewVersion = $this->data('EnabledTheme.NewVersion');
         $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
 
-        $PreviewUrl = $this->data('EnabledTheme.IconUrl', false);
+        $PreviewUrl = $this->data('EnabledTheme.ScreenshotUrl', false);
         if ($PreviewUrl !== FALSE)
             echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
 
@@ -56,7 +58,7 @@ if ($AddonUrl != '')
             echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author).'</span>';
 
         echo '</h4>';
-        echo '<div class="Description">'.$this->data('EnabledTheme.Description', '').'</div>';
+        echo '<div class="Description">'.GetValue('Description', $this->data('EnabledTheme'), '').'</div>';
         if ($this->data('EnabledTheme.Options')) {
             $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
                 anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
@@ -97,12 +99,8 @@ if ($AddonUrl != '')
 <?php if (count($this->data('AvailableThemes', array())) > 1) { ?>
     <div class="BrowseThemes">
         <h3><?php echo t('Other Themes'); ?></h3>
-        <table class="SelectionGrid Themes">
-            <tbody>
+        <ul class="label-selector">
             <?php
-            $Cols = 3;
-            $Col = 0;
-
             foreach ($this->data('AvailableThemes') as $ThemeName => $ThemeInfo) {
                 $ScreenName = val('Name', $ThemeInfo, $ThemeName);
                 $ThemeFolder = val('Folder', $ThemeInfo, '');
@@ -114,52 +112,38 @@ if ($AddonUrl != '')
                     $AuthorUrl = val('AuthorUrl', $ThemeInfo, '');
                     $NewVersion = val('NewVersion', $ThemeInfo, '');
                     $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-                    $PreviewUrl = val('IconUrl', $ThemeInfo, false);
+                    $PreviewUrl = val('ScreenshotUrl', $ThemeInfo, false);
 
-                    $Col++;
-                    if ($Col == 1) {
-                        $ColClass = 'FirstCol';
-                        echo '<tr>';
-                    } elseif ($Col == 2) {
-                        $ColClass = 'MiddleCol';
-                    } else {
-                        $ColClass = 'LastCol';
-                        $Col = 0;
-                    }
-                    $ColClass .= $Active ? ' Enabled' : '';
-                    $ColClass .= $PreviewUrl ? ' HasPreview' : '';
+                    $class .= $Active ? ' Enabled' : '';
+                    $class .= $PreviewUrl ? ' HasPreview' : '';
                     ?>
-                    <td class="<?php echo $ColClass; ?>">
+                    <li class="<?php echo $class; ?>">
                         <?php
-                        echo '<h4>';
-                        echo $ThemeUrl != '' ? anchor($ScreenName, $ThemeUrl) : $ScreenName;
-                        /*
-                 if ($Version != '')
-                    $Info = sprintf(t('Version %s'), $Version);
-
-                 if ($Author != '')
-                    $Info .= sprintf('by %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author);
-                        */
-                        echo '</h4>';
-
+                        echo '<div class="image-wrap">';
                         if ($PreviewUrl !== FALSE) {
-                            echo anchor(Img($PreviewUrl, array('alt' => $ScreenName, 'height' => '112', 'width' => '150')),
-                                'dashboard/settings/previewtheme/'.$ThemeName,
-                                '',
-                                array('target' => '_top')
-                            );
+                            echo Img($PreviewUrl, array('alt' => $ScreenName));
+                        } else {
+                            echo img('themes/default/screenshot.png');
                         }
-
-                        echo '<div class="Buttons">';
-                        echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
+                        echo '<div class="overlay">';
+                        echo '<div class="buttons">';
+                        echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-transparent EnableAddon EnableTheme', array('target' => '_top'));
+                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-transparent PreviewAddon', array('target' => '_top'));
                         $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                         $this->fireEvent('AfterThemeButtons');
                         echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '<div class="title">';
+                        echo $ThemeUrl != '' ? anchor($ScreenName, $ThemeUrl) : $ScreenName;
+                        echo '</div>';
 
+
+                        echo '<div class="description">';
                         $Description = val('Description', $ThemeInfo);
-                        if ($Description)
-                            echo '<em>'.$Description.'</em>';
+                        if ($Description) {
+                            echo '<div class="theme-description">'.$Description.'</div>';
+                        }
 
                         $RequiredApplications = val('RequiredApplications', $ThemeInfo, false);
                         if (is_array($RequiredApplications)) {
@@ -186,19 +170,14 @@ if ($AddonUrl != '')
                             );
                             echo '</div>';
                         }
+                        echo '</div>';
                         ?>
-                    </td>
+                    </li>
                     <?php
-                    if ($Col == 0)
-                        echo '</tr>';
                 }
             }
-            // Close the row if it wasn't a full row.
-            if ($Col > 0)
-                echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&#160;</td></tr>';
             ?>
-            </tbody>
-        </table>
+        </ul>
     </div>
 <?php
 }

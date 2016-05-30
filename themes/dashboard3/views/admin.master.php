@@ -64,25 +64,15 @@ $dropdown->setTrigger('A New Name')
 </div>
 <div class="container-fluid">
     <div class="row">
-        <?php if($this->data('HelpModule') || true) { ?>
-            <div class="col-sm-3 col-md-2 panel panel-nav panel-left">
-                <?php echo $dashboardNav; ?>
-            </div>
-            <div class="col-sm-6 col-md-8 main">
-                <?php $this->renderAsset('Content'); ?>
-            </div>
-            <div class="col-sm-3 col-md-2 panel panel-help panel-right">
-                <?php echo $dropdown; ?>
-                <?php echo $this->data('HelpModule'); ?>
-            </div>
-        <?php } else { ?>
-            <div class="col-sm-3 col-md-2 panel panel-nav panel-left">
-                <?php echo $dashboardNav; ?>
-            </div>
-            <div class="col-sm-9 col-md-10 main">
-                <?php $this->renderAsset('Content'); ?>
-            </div>
-        <?php } ?>
+        <div class="col-sm-3 col-lg-3 col-xl-2 panel panel-nav panel-left">
+            <?php echo $dashboardNav; ?>
+        </div>
+        <div class="col-sm-9 col-lg-6 col-xl-8 main">
+            <?php $this->renderAsset('Content'); ?>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-xl-2 panel panel-help panel-right">
+            <?php $this->renderAsset('Help'); ?>
+        </div>
     </div>
 </div>
 <div class="container-fluid">

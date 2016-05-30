@@ -174,7 +174,11 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             $manifest = $this->getManifest($emojiSet);
 
             $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
-            $items[$key] = '@'.$icon.
+            $items[$key] =
+                '@<div class="image-wrap">'.
+                $icon.
+                '<div class="overlay"></div>'.
+                '</div>'.
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
                 (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(t('by %s'), $manifest['author']).'</div>').

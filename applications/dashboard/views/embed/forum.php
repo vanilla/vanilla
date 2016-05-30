@@ -2,6 +2,7 @@
 $this->EmbedType = val('0', $this->RequestArgs, 'wordpress');
 $AllowEmbed = c('Garden.Embed.Allow');
 ?>
+<?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
     echo '<h2>', t('Need More Help?'), '</h2>';
@@ -10,6 +11,7 @@ $AllowEmbed = c('Garden.Embed.Allow');
     echo '</ul>';
     ?>
 </div>
+<?php Gdn_Theme::assetEnd('Help'); ?>
 <h1><?php echo t('Embed Forum'); ?></h1>
 <?php
 echo $this->Form->open();

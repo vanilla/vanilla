@@ -12,6 +12,7 @@
             color: #252525;
         }
     </style>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -21,6 +22,7 @@
         echo '</ul>';
         ?>
     </div>
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo $this->data('Title'); ?></h1>
     <div class="Info">
         <?php echo t("The Vanilla Statistics plugin turns your forum's dashboard into an analytics reporting tool", "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://vanillaforums.org/docs/vanillastatistics\">read more about Vanilla Statistics</a> in our documentation."); ?>

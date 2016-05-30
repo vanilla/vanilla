@@ -23,6 +23,19 @@
   }
 }
 
+.nav-inline {
+  font-size: 0;
+
+  .nav-item {
+    display: inline-block;
+  }
+
+  .nav-item + .nav-item,
+  .nav-link + .nav-link {
+    margin-left: 1rem;
+  }
+}
+
 .panel {
   a {
     color: $grey;

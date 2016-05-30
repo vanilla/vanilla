@@ -30,7 +30,7 @@ div.Popup {
     display: block;
     margin-left: -$spacer;
     margin-right: -$spacer;
-    padding: $spacer;
+    padding: $spacer $spacer 0;
     border-top: 1px solid $grey-light;
   }
 }

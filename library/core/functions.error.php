@@ -74,11 +74,13 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
         throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
     }
 
-    // All other unprocessed non-fatal PHP errors are possibly Traced and delegated back to the native PHP handler.
+    // All other unprocessed non-fatal PHP errors are possibly Traced and logged to the PHP error log file
+    $nonFatalErrorException = new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line);
     if (function_exists('trace')) {
-        trace(new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line), TRACE_NOTICE);
+        trace($nonFatalErrorException, TRACE_NOTICE);
     }
-    return false;
+
+    errorLog(formatErrorException($nonFatalErrorException));
 }
 
 /**

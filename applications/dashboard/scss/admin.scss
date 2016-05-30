@@ -8,5 +8,7 @@
 // bower:sass
 // endbower
 
+@import 'legacy/admin-variables';
 @import 'legacy/admin';
-@import 'category-settings';
+@import 'legacy/dropdowns';
+@import 'legacy/category-settings';

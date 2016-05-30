@@ -69,7 +69,7 @@ trait NestedCollection {
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */
-    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description'];
+    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description', 'attributes'];
 
     /**
      * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
@@ -189,7 +189,7 @@ trait NestedCollection {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return object $this The calling object.
+     * @return SortableModule $this The calling object.
      * @throws Exception
      */
     public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
@@ -254,7 +254,7 @@ trait NestedCollection {
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
      * @param bool $disabled Whether to disable the link.
-     * @return object $this The calling object.
+     * @return $this The calling object.
      * @throws Exception
      */
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {

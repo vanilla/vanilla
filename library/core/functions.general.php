@@ -1725,6 +1725,26 @@ if (!function_exists('inSubArray')) {
     }
 }
 
+if (!function_exists('isEnabled')) {
+    /**
+     * Determine whether or not an addon is enabled.
+     *
+     * @see AddonManager::isEnabled().
+     *
+     * @param string $key The addon key.
+     * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return bool
+     */
+    function isEnabled($key, $type = null) {
+        // Add a useful assumption that we're talking about addons.
+        if (is_null($type)) {
+            $type = \Vanilla\Addon::TYPE_ADDON;
+        }
+
+        return AddonManager::isEnabled($key, $type);
+    }
+}
+
 if (!function_exists('isMobile')) {
     /**
      * Determine whether or not the site is in mobile mode.

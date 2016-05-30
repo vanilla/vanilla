@@ -108,3 +108,28 @@ function writeCategoryOptions($category) {
 
     echo $cdd->toString();
 }
+
+function writeCategoryBreadcrumbs($ancestors) {
+    echo '<div class="bigcrumbs">';
+
+    writeCategoryBreadcrumb(
+        symbol('root', t('Root')),
+        '/vanilla/settings/categories',
+        empty($ancestors) ? 'last' : ''
+    );
+
+    foreach ($ancestors as $i => $ancestor) {
+        $last = $i === count($ancestors) - 1;
+
+        writeCategoryBreadcrumb(
+            htmlspecialchars($ancestor['Name']),
+            '/vanilla/settings/categories?parent='.$ancestor['UrlCode'],
+            $last ? 'last' : ''
+        );
+    }
+    echo '</div>';
+}
+
+function writeCategoryBreadcrumb($text, $uri, $cssClass = '') {
+    echo anchor($text, $uri, trim('crumb '.$cssClass));
+}

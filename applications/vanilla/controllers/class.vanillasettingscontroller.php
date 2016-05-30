@@ -650,7 +650,7 @@ class VanillaSettingsController extends Gdn_Controller {
             if (empty($categoryRow)) {
                 throw notFoundException('Category');
             }
-            $this->setData('Category', $parent);
+            $this->setData('Category', $categoryRow);
             $parentID = $categoryRow['CategoryID'];
         } else {
             $parentID = -1;
@@ -658,6 +658,11 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         $this->setData('Categories', $categories);
+        
+        if ($parentID > 0) {
+            $ancestors = $collection->getAncestors($parentID, true);
+            $this->setData('Ancestors', $ancestors);
+        }
 
         $this->addJsFile('category-settings.js');
         $this->addJsFile('jquery.nestable.js');

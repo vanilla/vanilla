@@ -43,32 +43,44 @@ class Gdn_ErrorException extends ErrorException {
 /**
  *
  *
- * @param $ErrorNumber
- * @param $Message
- * @param $File
- * @param $Line
- * @param $Arguments
+ * @param $errorNumber
+ * @param $message
+ * @param $file
+ * @param $line
+ * @param $arguments
  * @return bool|void
  * @throws Gdn_ErrorException
  */
-function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
-    $ErrorReporting = error_reporting();
+function Gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
+    $errorReporting = error_reporting();
 
     // Don't do anything for @supressed errors.
-    if ($ErrorReporting === 0) {
+    if ($errorReporting === 0) {
         return;
     }
 
-    if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
+    if (($errorReporting & $errorNumber) !== $errorNumber) {
         if (function_exists('trace')) {
-            trace(new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line), TRACE_NOTICE);
+            trace(new \ErrorException($message, $errorNumber, $errorNumber, $file, $line), TRACE_NOTICE);
         }
 
         // Ignore errors that are below the current error reporting level.
         return false;
     }
 
-    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+    $fatalErrorBitmask = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+    if ($errorNumber & $fatalErrorBitmask) {
+        // Convert all fatal errors to an exception
+        throw new Gdn_ErrorException($message, $errorNumber, $file, $line, $arguments);
+    }
+
+    // All other unprocessed non-fatal PHP errors are possibly Traced and logged to the PHP error log file
+    $nonFatalErrorException = new \ErrorException($message, $errorNumber, $errorNumber, $file, $line);
+    if (function_exists('trace')) {
+        trace($nonFatalErrorException, TRACE_NOTICE);
+    }
+
+    errorLog(formatErrorException($nonFatalErrorException));
 }
 
 /**
@@ -79,6 +91,13 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
  */
 function Gdn_ExceptionHandler($Exception) {
     try {
+        // Attempt to log the exception as early as possible
+        if ($Exception instanceof \ErrorException) {
+            errorLog(formatErrorException($Exception));
+        } else {
+            errorLog(formatException($Exception, true));
+        }
+
         $ErrorNumber = $Exception->getCode();
         $Message = $Exception->getMessage();
         $File = $Exception->getFile();
@@ -353,16 +372,13 @@ function Gdn_ExceptionHandler($Exception) {
    </html>';
             }
         }
-
-        // Attempt to log an error message no matter what.
-        LogException($Exception);
     } catch (Exception $e) {
         print get_class($e)." thrown within the exception handler.<br/>Message: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
         exit();
     }
 }
 
-if (!function_exists('ErrorMessage')) {
+if (!function_exists('errorMessage')) {
     /**
      * Returns an error message formatted in a way that the custom ErrorHandler
      * function can understand (allows a little more information to be displayed
@@ -378,7 +394,152 @@ if (!function_exists('ErrorMessage')) {
     }
 }
 
-if (!function_exists('LogException')) {
+if (!function_exists('errorLog')) {
+    /**
+     * Attempt to log an error message to the PHP error log.
+     *
+     * @access private
+     * @param string|\Exception $message
+     */
+    function errorLog($message) {
+        $errorLogFile = class_exists('Gdn', false) ? Gdn::config('Garden.Errors.LogFile', '') : '';
+
+        // Log only if the PHP setting "log_errors" is enabled
+        // OR if the Garden config "Garden.Errors.LogFile" is provided
+        if (!$errorLogFile && !ini_get('log_errors')) {
+            return;
+        }
+
+        // Make sure the message can be converted to a string otherwise bail out
+        if (!is_string($message) && !method_exists($message, '__toString')) {
+            return;
+        }
+
+        if (!is_string($message)) {
+            // Cast the $message to a string
+            $message = (string) $message;
+        }
+
+        $destination = null;
+        if (!$errorLogFile) {
+            // sends to PHP's system logger
+            $messageType = 0;
+        } else {
+            // appends to a file
+            $messageType = 3;
+            $destination = $errorLogFile;
+
+            // Need to prepend the date when appending to an error log file
+            // and also add a newline manually
+            $date = date('d-M-Y H:i:s e');
+            $message = sprintf('[%s] %s', $date, $message) . PHP_EOL;
+        }
+
+        @error_log($message, $messageType, $destination);
+    }
+}
+
+if (!function_exists('formatErrorException')) {
+    /**
+     * Format an \ErrorException into a string destined for PHP error_log()
+     *
+     * @access private
+     * @param \ErrorException $exception The error exception to format
+     * @return string The formatted error message
+     */
+    function formatErrorException($exception) {
+        if (!($exception instanceof \ErrorException)) {
+            return '';
+        }
+
+        $errorType = '';
+        $errorCode = $exception->getCode();
+
+        // Find an error type based on the error code
+        switch ($errorCode) {
+            case $errorCode & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR):
+                $errorType = 'PHP Fatal error';
+                break;
+            case $errorCode & (E_NOTICE | E_USER_NOTICE):
+                $errorType = 'PHP Notice';
+                break;
+            case $errorCode & (E_WARNING | E_CORE_WARNING | E_COMPILE_WARNING | E_USER_WARNING):
+                $errorType = 'PHP Warning';
+                break;
+            case $errorCode & (E_DEPRECATED | E_USER_DEPRECATED):
+                $errorType = 'PHP Deprecated';
+                break;
+            case $errorCode & (E_PARSE):
+                $errorType = 'PHP Parse error';
+                break;
+            case $errorCode & (E_STRICT):
+                $errorType = 'PHP Strict standards';
+                break;
+        }
+
+        return formatPHPErrorLog($exception->getMessage(), $errorType, $exception->getFile(), $exception->getLine());
+    }
+}
+
+if (!function_exists('formatException')) {
+    /**
+     * Format an \Exception or any object implementing \Throwable
+     * into a string destined for PHP error_log()
+     *
+     * @access private
+     * @param mixed $exception The Exception to format
+     * @param boolean $uncaught Whether the exception was uncaught or not
+     * @return string The formatted error message
+     */
+    function formatException($exception, $uncaught = false) {
+        if (!($exception instanceof \Exception) && !($exception instanceof \Throwable)) {
+            // Not an Exception or a Throwable type (PHP7)
+            return '';
+        }
+
+        $errorMessage = (string) $exception;
+
+        if ($uncaught) {
+            $errorType = 'PHP Fatal error';
+            $errorMessage = 'Uncaught ' . $errorMessage;
+        } else {
+            $errorType = 'APP Log';
+            $errorMessage = 'Caught ' . $errorMessage;
+        }
+        $errorMessage .= PHP_EOL . '  thrown';
+
+        return formatPHPErrorLog($errorMessage, $errorType, $exception->getFile(), $exception->getLine());
+    }
+}
+
+if (!function_exists('formatPHPErrorLog')) {
+    /**
+     * Format an error message to be sent to PHP error_log()
+     *
+     * @access private
+     * @param string $errorMsg The error message
+     * @param string $errorType Optional error type such as "PHP Fatal error" or "PHP Notice".  It will be prefixed to the $errorMsg
+     * @param string $file Optional file path where the error occured
+     * @param string $line Optional line number where the error occured
+     * @return string The formatted error message
+     */
+    function formatPHPErrorLog($errorMsg, $errorType = null, $file = null, $line = null) {
+        $formattedMessage = $errorMsg;
+        if ($errorType) {
+            $formattedMessage = sprintf('%s:  %s', $errorType, $errorMsg);
+        }
+
+        if ($file && is_numeric($line)) {
+            $formattedMessage = sprintf('%s in %s on line %s', $formattedMessage, $file, $line);
+        } elseif ($file) {
+            $formattedMessage = sprintf('%s in %s', $formattedMessage, $file, $line);
+        }
+
+        return $formattedMessage;
+    }
+}
+
+if (!function_exists('logException')) {
     /**
      * Log an exception.
      *
@@ -388,40 +549,17 @@ if (!function_exists('LogException')) {
         if (!class_exists('Gdn', false)) {
             return;
         }
-        if (!Gdn::config('Garden.Errors.LogEnabled', false)) {
-            return;
-        }
 
         if ($Ex instanceof Gdn_UserException) {
             return;
         }
 
-        try {
-            $Px = Gdn::request()->host().' Garden ';
-        } catch (Exception $Ex) {
-            $Px = 'Garden ';
-        }
-
-        $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
-        if (!$ErrorLogFile) {
-            $Type = 0;
-        } else {
-            $Type = 3;
-            $Date = date(Gdn::config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
-            $Px = "$Date $Px";
-        }
-
-        $Message = 'Exception: '.$Ex->getMessage().' in '.$Ex->getFile().' on '.$Ex->getLine();
-        @error_log($Px.$Message, $Type, $ErrorLogFile);
-
-        $TraceLines = explode("\n", $Ex->getTraceAsString());
-        foreach ($TraceLines as $i => $Line) {
-            @error_log("$Px  $Line", $Type, $ErrorLogFile);
-        }
+        // Attempt to log the exception in the PHP logs
+        errorLog(formatException($Ex));
     }
 }
 
-if (!function_exists('LogMessage')) {
+if (!function_exists('logMessage')) {
     /**
      * Logs errors to a file. This function does not throw errors because it is
      * a last-ditch effort after errors have already been rendered.
@@ -434,33 +572,25 @@ if (!function_exists('LogMessage')) {
      * @param string Any additional information that could be useful to debuggers.
      */
     function logMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
-        // Figure out where to save the log
-        if (class_exists('Gdn', false)) {
-            $LogErrors = Gdn::Config('Garden.Errors.LogEnabled', false);
-            if ($LogErrors === true) {
-                $Log = "[Garden] $File, $Line, $Object.$Method()";
-                if ($Message <> '') {
-                    $Log .= ", $Message";
-                }
-                if ($Code <> '') {
-                    $Log .= ", $Code";
-                }
-
-                // Fail silently (there could be permission issues on badly set up servers).
-                $ErrorLogFile = Gdn::config('Garden.Errors.LogFile');
-                if ($ErrorLogFile == '') {
-                    @error_log($Log);
-                } else {
-                    $Date = date(Gdn::config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
-                    $Log = "$Date: $Log\n";
-                    @error_log($Log, 3, $ErrorLogFile);
-                }
-            }
+        if (!class_exists('Gdn', false)) {
+            return;
         }
+
+        // Prepare the log message
+        $Log = "[Garden] $File, $Line, $Object.$Method()";
+        if ($Message <> '') {
+            $Log .= ", $Message";
+        }
+        if ($Code <> '') {
+            $Log .= ", $Code";
+        }
+
+        // Attempt to log the message in the PHP logs
+        errorLog($Log);
     }
 }
 
-if (!function_exists('Boop')) {
+if (!function_exists('boop')) {
     /**
      * Logs a message or print_r()'s an array to the screen.
      *
@@ -490,7 +620,7 @@ if (!function_exists('Boop')) {
     }
 }
 
-if (!function_exists('CleanErrorArguments')) {
+if (!function_exists('cleanErrorArguments')) {
     /**
      *
      *

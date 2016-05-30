@@ -43,25 +43,25 @@ class Gdn_ErrorException extends ErrorException {
 /**
  *
  *
- * @param $ErrorNumber
- * @param $Message
- * @param $File
- * @param $Line
- * @param $Arguments
+ * @param $errorNumber
+ * @param $message
+ * @param $file
+ * @param $line
+ * @param $arguments
  * @return bool|void
  * @throws Gdn_ErrorException
  */
-function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
-    $ErrorReporting = error_reporting();
+function Gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
+    $errorReporting = error_reporting();
 
     // Don't do anything for @supressed errors.
-    if ($ErrorReporting === 0) {
+    if ($errorReporting === 0) {
         return;
     }
 
-    if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
+    if (($errorReporting & $errorNumber) !== $errorNumber) {
         if (function_exists('trace')) {
-            trace(new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line), TRACE_NOTICE);
+            trace(new \ErrorException($message, $errorNumber, $errorNumber, $file, $line), TRACE_NOTICE);
         }
 
         // Ignore errors that are below the current error reporting level.
@@ -69,13 +69,13 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
     }
 
     $fatalErrorBitmask = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
-    if ($ErrorNumber & $fatalErrorBitmask) {
+    if ($errorNumber & $fatalErrorBitmask) {
         // Convert all fatal errors to an exception
-        throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
+        throw new Gdn_ErrorException($message, $errorNumber, $file, $line, $arguments);
     }
 
     // All other unprocessed non-fatal PHP errors are possibly Traced and logged to the PHP error log file
-    $nonFatalErrorException = new \ErrorException($Message, $ErrorNumber, $ErrorNumber, $File, $Line);
+    $nonFatalErrorException = new \ErrorException($message, $errorNumber, $errorNumber, $file, $line);
     if (function_exists('trace')) {
         trace($nonFatalErrorException, TRACE_NOTICE);
     }

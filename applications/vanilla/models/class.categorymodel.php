@@ -1437,8 +1437,6 @@ class CategoryModel extends Gdn_Model {
             if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
                 $result[$ID] = $category;
             }
-
-            $category = self::instance()->getOne($category['ParentCategoryID']);
         }
         $result = array_reverse($result, true); // order for breadcrumbs
         return $result;

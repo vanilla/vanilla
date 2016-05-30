@@ -1582,7 +1582,7 @@ EOT;
      *
      * Supports most usernames by using double-quotes, for example:  @"a $pecial user's! name."
      * Without double-quotes, a mentioned username is terminated by any of the following characters:
-     * whitespace | . | , | ; | ? | ! | :
+     * whitespace | . | , | ; | ? | ! | : | '
      *
      * @since 2.3
      *
@@ -1645,7 +1645,7 @@ EOT;
 
             // Unquoted mention.
             if (!$mention && !empty($str)) {
-                $parts2 = preg_split('`([\s.,;?!:])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $parts2 = preg_split('`([\s.,;?!:\'])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
                 $suffix = val(1, $parts2, '') . val(2, $parts2, '');
             }

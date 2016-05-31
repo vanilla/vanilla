@@ -20,7 +20,7 @@ if (!defined('APPLICATION')) exit();
  * No Garden features are available yet.
  */
 if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
-    require_once(PATH_ROOT.'/conf/bootstrap.before.php');
+    require_once PATH_ROOT.'/conf/bootstrap.before.php';
 }
 
 /**
@@ -63,6 +63,23 @@ if (!class_exists('Gdn')) {
 // Cache Layer
 Gdn::factoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');
 
+// AddonManager
+Gdn::factoryInstall(
+    Gdn::AliasAddonManager,
+    '\\Vanilla\\AddonManager',
+    '',
+    Gdn::FactorySingleton,
+    [
+        [
+            Addon::TYPE_ADDON => ['/applications', '/plugins'],
+            Addon::TYPE_THEME => '/themes',
+            Addon::TYPE_LOCALE => '/locales'
+        ],
+        PATH_CACHE
+    ]
+);
+spl_autoload_register([Gdn::addonManager(), 'autoload']);
+
 // Install the configuration handler.
 Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 
@@ -80,11 +97,10 @@ Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
  * here, but some things have already been loaded and are immutable.
  */
 if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
-    require_once(PATH_CONF.'/bootstrap.early.php');
+    require_once PATH_CONF.'/bootstrap.early.php';
 }
 
 Gdn::config()->caching(true);
-
 debug(c('Debug', false));
 
 // Default request object
@@ -110,23 +126,6 @@ if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(
  * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
  * process the application-specific configuration defaults.
  */
-
-// AddonManager
-Gdn::factoryInstall(
-    Gdn::AliasAddonManager,
-    '\\Vanilla\\AddonManager',
-    '',
-    Gdn::FactorySingleton,
-    [
-        [
-            Addon::TYPE_ADDON => ['/applications', '/plugins'],
-            Addon::TYPE_THEME => '/themes',
-            Addon::TYPE_LOCALE => '/locales'
-        ],
-        PATH_CACHE
-    ]
-);
-spl_autoload_register([Gdn::addonManager(), 'autoload']);
 
 // ApplicationManager
 Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
@@ -163,7 +162,7 @@ Gdn::config()->overlayDynamic();
  * managers.
  */
 if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
-    require_once(PATH_CONF.'/bootstrap.late.php');
+    require_once PATH_CONF.'/bootstrap.late.php';
 }
 
 if (c('Debug')) {
@@ -250,7 +249,7 @@ $gdnLocale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::addonManager());
 Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $gdnLocale);
 unset($gdnLocale);
 
-require_once(PATH_LIBRARY_CORE.'/functions.validation.php');
+require_once PATH_LIBRARY_CORE.'/functions.validation.php';
 
 // Start Authenticators
 Gdn::authenticator()->startAuthenticator();
@@ -263,11 +262,11 @@ Gdn::authenticator()->startAuthenticator();
  * is handled.
  */
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php')) {
-    require_once(PATH_ROOT.'/conf/bootstrap.after.php');
+    require_once PATH_ROOT.'/conf/bootstrap.after.php';
 }
 
 // Include "Render" functions now - this way pluggables and custom confs can override them.
-require_once(PATH_LIBRARY_CORE.'/functions.render.php');
+require_once PATH_LIBRARY_CORE.'/functions.render.php';
 
 if (!defined('CLIENT_NAME')) {
     define('CLIENT_NAME', 'vanilla');

@@ -89,6 +89,10 @@ Gdn::config()->load(PATH_CONF.'/config-defaults.php');
 // Load installation-specific configuration so that we know what apps are enabled.
 Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
 
+// Default request object
+Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
+Gdn::request()->fromEnvironment();
+
 /**
  * Bootstrap Early
  *
@@ -102,10 +106,6 @@ if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
 
 Gdn::config()->caching(true);
 debug(c('Debug', false));
-
-// Default request object
-Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
-Gdn::request()->fromEnvironment();
 
 setHandlers();
 

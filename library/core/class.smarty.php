@@ -112,10 +112,17 @@ class Gdn_Smarty {
         $security->secure_dir = [$Path];
         $security->streams = null;
 
-        $security->setPhpFunctions(array_merge(
-            $security->php_functions,
-            array('category', 'checkPermission', 'inSection', 'inCategory', 'multiCheckPermission', 'getValue', 'setValue', 'url')
-        ));
+        $security->setPhpFunctions(array_merge($security->php_functions, [
+            'array', // Yes, Smarty really blocks this.
+            'category',
+            'checkPermission',
+            'inSection',
+            'inCategory',
+            'multiCheckPermission',
+            'getValue',
+            'setValue',
+            'url'
+        ]));
 
         $security->php_modifiers = array_merge(
             $security->php_functions,

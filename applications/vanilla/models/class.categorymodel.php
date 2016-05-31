@@ -1743,7 +1743,7 @@ class CategoryModel extends Gdn_Model {
         if ($Root) {
             $Result = self::instance()->collection->getTree(
                 (int)val('CategoryID', $Root),
-                self::instance()->getMaxDisplayDepth()
+                self::instance()->getMaxDisplayDepth() ?: 10
             );
             self::instance()->joinRecent($Result);
         } else {

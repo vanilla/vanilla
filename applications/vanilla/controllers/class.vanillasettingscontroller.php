@@ -195,7 +195,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addSideMenu('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.
-        $IsConversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+        $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
 
         $ConfigurationFields = array(
             'Vanilla.Discussion.SpamCount',

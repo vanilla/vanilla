@@ -348,7 +348,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
 
         $dropdown->addLinkIf($canDismiss, t('Dismiss'), url("vanilla/discussion/dismissannouncement?discussionid={$discussionID}"), 'dismiss', 'DismissAnnouncement Hijack')
             ->addLinkIf($canEdit, t('Edit').$timeLeft, url('/post/editdiscussion/'.$discussionID), 'edit')
-            ->addLinkIf($canAnnounce, t('Announce'), url('/discussion/announce?discussionid='.$discussionID.'&Target='.urlencode($sender->SelfUrl.'#Head')), 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canAnnounce, t('Announce'), url('/discussion/announce?discussionid='.$discussionID), 'announce', 'AnnounceDiscussion Popup')
             ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), url('/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink), 'sink', 'SinkDiscussion Hijack')
             ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), url('/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed), 'close', 'CloseDiscussion Hijack')
             ->addLinkIf($canRefetch, t('Refetch Page'), url('/discussion/refetchpageinfo.json?discussionid='.$discussionID), 'refetch', 'RefetchPage Hijack')

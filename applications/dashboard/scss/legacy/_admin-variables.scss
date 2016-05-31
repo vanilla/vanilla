@@ -1,5 +1,6 @@
 $body-color: #555a62;
 $link-color: #0291db;
+$border-color: rgba(85, 89, 97, .2);
 
 $dropdown-font-size: 14px !default;
 $dropdown-min-width: 180px !default;
@@ -25,7 +26,7 @@ $icon-color: transparentize($body-color, .4);
 $icon-size: 16px;
 
 $tree-background: #fdfdff;
-$tree-border: rgba(85, 89, 97, .2);
+$tree-border: $border-color;
 $tree-item-height: 36px;
 $tree-padding: 6px;
 $tree-icon-padding: (($tree-item-height - $icon-size - 1px) / 2);

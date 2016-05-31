@@ -1494,7 +1494,12 @@ class UserModel extends Gdn_Model {
      */
     public function getIPs($userID) {
         $IPs = [];
-        $packedIPs = Gdn::sql()->getWhere('UserIP', ['UserID' => $userID])->resultArray();
+
+        try {
+            $packedIPs = Gdn::sql()->getWhere('UserIP', ['UserID' => $userID])->resultArray();
+        } catch (Exception $e) {
+            return $IPs;
+        }
 
         foreach ($packedIPs as $UserIP) {
             if ($unpackedIP = ipDecode($UserIP['IPAddress'])) {
@@ -2889,6 +2894,7 @@ class UserModel extends Gdn_Model {
      *
      * @param int $userID Unique ID of the user.
      * @param string $IP Human-readable IP address.
+     * @return bool Was the operation successful?
      */
     public function saveIP($userID, $IP) {
         $packedIP = ipEncode($IP);
@@ -2906,7 +2912,14 @@ class UserModel extends Gdn_Model {
             ':DateUpdated2' => $currentDateTime
         ];
 
-        Gdn::database()->query($query, $values);
+        try {
+            Gdn::database()->query($query, $values);
+            $result = true;
+        } catch (Gdn_UserException $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**

@@ -264,7 +264,7 @@ class CategoryCollection {
      */
     private function calculateStatic(&$category) {
         if ($category['CategoryID'] > 0) {
-            call_user_func($this->staticCalculator, $category);
+            call_user_func_array($this->staticCalculator, [&$category]);
         }
     }
 
@@ -275,7 +275,7 @@ class CategoryCollection {
      */
     private function calculateDynamic(&$category) {
         if ($category['CategoryID'] > 0) {
-            call_user_func($this->userCalculator, $category);
+            call_user_func_array($this->userCalculator, [&$category]);
         }
     }
 

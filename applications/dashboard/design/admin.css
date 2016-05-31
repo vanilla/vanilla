@@ -9456,4 +9456,41 @@ form h2 {
   height: 16px;
   width: 16px;
 }
+
+.bigcrumbs {
+  border-bottom: solid 1px rgba(85, 89, 97, 0.2);
+  fill: #555a62;
+  padding-left: 6px;
+}
+
+.bigcrumbs .crumb {
+  display: inline-block;
+  line-height: 20px;
+  padding: 8px 24px 8px 12px;
+  position: relative;
+}
+
+.bigcrumbs .crumb:before, .bigcrumbs .crumb:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  right: -12px;
+  width: 0;
+  border: solid 12px transparent;
+  border-top-width: 19px;
+  border-bottom-width: 19px;
+  border-left-color: rgba(85, 89, 97, 0.2);
+}
+
+.bigcrumbs .crumb:after {
+  content: '';
+  border-left-color: #fff;
+  right: -11px;
+}
+
+.bigcrumbs .crumb:before {
+  content: '';
+}
 /*# sourceMappingURL=admin.css.map */

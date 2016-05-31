@@ -131,3 +131,40 @@
   height: 16px;
   width: 16px;
 }
+
+.bigcrumbs {
+  border-bottom: solid 1px $border-color;
+  fill: $body-color;
+  padding-left: 6px;
+
+  .crumb {
+    display: inline-block;
+    line-height: 20px;
+    padding: ((36px - 20px) / 2) (12px + 12px) ((36px - 20px) / 2) 12px;
+    position: relative;
+
+    &:before,
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      right: -12px;
+      width: 0;
+      border: solid 12px transparent;
+      border-top-width: 19px;
+      border-bottom-width: 19px;
+      border-left-color: $border-color;
+    }
+
+    &:after {
+      content: '';
+      border-left-color: #fff;
+      right: -11px;
+    }
+    &:before {
+      content: '';
+    }
+  }
+}

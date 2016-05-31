@@ -1863,7 +1863,7 @@ if (!function_exists('isWritable')) {
         fclose($File);
 
         if (!$KeepPath) {
-            unlink($Path);
+            safeUnlink($Path);
         }
 
         return true;

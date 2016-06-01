@@ -1488,7 +1488,7 @@
                     $currentEditorToolbar.hide();
                 });
 
-                $(document).on('click', 'a.WriteButton', function() {
+                $(document).on('click', 'a.WriteButton, input.CommentButton', function() {
                     $currentEditorToolbar.show();
                 });
 

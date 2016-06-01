@@ -1,6 +1,34 @@
-jQuery(document).ready(function($) {
+(function(window, $) {
+    $(document)
+        // Categories->Delete().
+        // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
+        .on('click', '[name$=DeleteDiscussions]', function () {
+            if ($(this).prop('checked')) {
+                $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
+                $('#DeleteDiscussions').slideUp('fast');
+            } else {
+                $('#ReplacementCategory,#ReplacementWarning').slideUp('fast');
+                $('#DeleteDiscussions').slideDown('fast');
+            }
+        })
+        // Categories->Delete()
+        // Hide onload if unchecked.
+        .on('contentLoad', function (e) {
+            if (!$('[name$=DeleteDiscussions]', e.target).prop('checked')) {
+                $('#ReplacementCategory,#ReplacementWarning', e.target).hide();
+                $('#DeleteDiscussions', e.target).show();
+            } else {
+                $('#ReplacementCategory,#ReplacementWarning', e.target).show();
+                $('#DeleteDiscussions', e.target).hide();
+            }
+        })
+    ;
+})(window, jQuery);
+
+
+jQuery(document).ready(function ($) {
     // Map plain text category to url code
-    $("#Form_Name").keyup(function(event) {
+    $("#Form_Name").keyup(function (event) {
         if ($('#Form_CodeIsDefined').val() == '0') {
             $('#UrlCode').show();
             var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-');
@@ -23,27 +51,6 @@ jQuery(document).ready(function($) {
         $('#UrlCode input').focus();
         return false;
     });
-
-    // Categories->Delete()
-    // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
-    $('[name$=DeleteDiscussions]').on('change', function() {
-        if ($(this).prop('checked')) {
-            $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
-            $('#DeleteDiscussions').slideUp('fast');
-        } else {
-            $('#ReplacementCategory,#ReplacementWarning').slideUp('fast');
-            $('#DeleteDiscussions').slideDown('fast');
-        }
-    });
-    // Categories->Delete()
-    // Hide onload if unchecked
-    if (!$('[name$=DeleteDiscussions]').prop('checked')) {
-        $('#ReplacementCategory,#ReplacementWarning').hide();
-        $('#DeleteDiscussions').show();
-    } else {
-        $('#ReplacementCategory,#ReplacementWarning').show();
-        $('#DeleteDiscussions').hide();
-    }
 
     // Set custom categories display.
     var displayCategoryPermissions = function() {

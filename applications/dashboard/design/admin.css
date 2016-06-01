@@ -9792,9 +9792,16 @@ form h2 {
 
 .bigcrumbs .crumb {
   display: inline-block;
-  line-height: 20px;
-  padding: 8px 24px 8px 12px;
+  line-height: 24px;
+  padding: 6px 24px 6px 12px;
   position: relative;
+  fill: #555a62;
+  color: #555a62;
+}
+
+.bigcrumbs .crumb:hover {
+  fill: #0291db;
+  color: #0291db;
 }
 
 .bigcrumbs .crumb:before, .bigcrumbs .crumb:after {
@@ -9819,5 +9826,14 @@ form h2 {
 
 .bigcrumbs .crumb:before {
   content: '';
+}
+
+.bigcrumbs .crumb:last-child:before, .bigcrumbs .crumb:last-child:after {
+  display: none;
+}
+
+.bigcrumbs .icon-root {
+  padding: 0 8px;
+  margin-bottom: 4px;
 }
 /*# sourceMappingURL=admin.css.map */

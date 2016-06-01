@@ -3,6 +3,7 @@
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
+echo $this->Form->hidden('ParentCategoryID');
 ?>
 <?php
 Gdn_Theme::assetBegin('Help');

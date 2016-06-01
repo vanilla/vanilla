@@ -298,7 +298,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Add Category'));
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('vanilla/settings/categories');
 
         // Prep models
         $RoleModel = new RoleModel();
@@ -329,7 +329,7 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/managecategories');
+                    redirect('vanilla/settings/categories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -339,6 +339,13 @@ class VanillaSettingsController extends Gdn_Controller {
                 unset($CategoryID);
             }
         } else {
+            if ($parent) {
+                $category = CategoryModel::categories($parent);
+                if ($category) {
+                    $this->Form->setValue('ParentCategoryID', $category['CategoryID']);
+                }
+            }
+
             $this->Form->addHidden('CodeIsDefined', '0');
         }
 
@@ -404,7 +411,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Set up head
         $this->addJsFile('manage-categories.js');
         $this->title(t('Delete Category'));
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('vanilla/settings/categories');
 
         // Get category data
         $this->Category = $this->CategoryModel->getID($CategoryID);
@@ -470,7 +477,7 @@ class VanillaSettingsController extends Gdn_Controller {
                         $this->Form->addError($ex);
                     }
                     if ($this->Form->errorCount() == 0) {
-                        $this->RedirectUrl = url('vanilla/settings/managecategories');
+                        $this->RedirectUrl = url('vanilla/settings/categories');
                         $this->informMessage(t('Deleting category...'));
                     }
                 }
@@ -570,7 +577,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Edit Category'));
 
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('vanilla/settings/categories');
 
         // Make sure the form knows which item we are editing.
         $this->Form->addHidden('CategoryID', $CategoryID);
@@ -610,7 +617,7 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/managecategories');
+                    redirect('vanilla/settings/categories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -683,7 +690,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->addSideMenu('vanilla/settings/categories');
         $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
 
@@ -764,7 +771,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Enabled', $enabled);
 
             if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->RedirectUrl = url('/vanilla/settings/managecategories');
+                $this->RedirectUrl = url('/vanilla/settings/categories');
             }
         } else {
             throw forbiddenException('GET');

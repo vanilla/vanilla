@@ -657,7 +657,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.htmlTrigger(data);
+                    $elem.html($.parseHTML(data + '')).trigger('contentLoad');
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
@@ -668,7 +668,7 @@ jQuery(document).ready(function($) {
             });
         });
     };
-    $('.Popin').not('.Message .Popin').popin();
+    $('.Popin, .js-popin').not('.Message .Popin, .Message .js-popin').popin();
 
     var hijackClick = function(e) {
         var $elem = $(this);

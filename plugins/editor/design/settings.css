@@ -1,12 +1,11 @@
-/* line 1, /Users/rebecca/Development/phpenvironment/www/vanilla/plugins/editor/scss/settings.scss */
 .forceWysiwyg {
   opacity: 1;
   height: 130px;
   overflow: hidden;
   transition: all 0.3s ease; }
 
-/* line 8, /Users/rebecca/Development/phpenvironment/www/vanilla/plugins/editor/scss/settings.scss */
 .forceWysiwygDisabled {
   opacity: 0;
   height: 0px;
   pointer-events: none; }
+/*# sourceMappingURL=settings.css.map */

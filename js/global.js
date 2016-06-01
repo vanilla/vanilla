@@ -668,7 +668,7 @@ jQuery(document).ready(function($) {
             });
         });
     };
-    $('.Popin,.js-popin').not('.Message .Popin,.Message .js-popin').popin();
+    $('.Popin, .js-popin').not('.Message .Popin, .Message .js-popin').popin();
 
     var hijackClick = function(e) {
         var $elem = $(this);

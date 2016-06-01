@@ -806,7 +806,7 @@ class PostController extends VanillaController {
                 }
             }
         } elseif ($this->Request->isPostBack()) {
-            throw new Gdn_UserException('Invalid CSRF token.', 401);
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 401);
         } else {
             // Load form
             if (isset($this->Comment)) {

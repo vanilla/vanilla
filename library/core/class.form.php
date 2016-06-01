@@ -1825,7 +1825,7 @@ PASSWORDMETER;
         $result = Gdn::session()->validateTransientKey($postBackKey);
 
         if (!$result && $throw && Gdn::request()->isPostBack()) {
-            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
         }
 
         return $result;

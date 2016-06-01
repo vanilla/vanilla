@@ -9509,4 +9509,9 @@ form h2 {
   padding: 0 8px;
   margin-bottom: 4px;
 }
+
+.heading-bar .actions {
+  float: right;
+  padding: 6px 18px 0 0;
+}
 /*# sourceMappingURL=admin.css.map */

@@ -672,6 +672,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         $this->addJsFile('category-settings.js');
+        $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.nestable.js');
         require_once $this->fetchViewLocation('category-settings-functions');
         $this->addAsset('Content', $this->fetchView('symbols'));

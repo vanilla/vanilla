@@ -139,9 +139,16 @@
 
   .crumb {
     display: inline-block;
-    line-height: 20px;
-    padding: ((36px - 20px) / 2) (12px + 12px) ((36px - 20px) / 2) 12px;
+    line-height: 24px;
+    padding: 6px (12px + 12px) 6px 12px;
     position: relative;
+    fill: $body-color;
+    color: $body-color;
+
+    &:hover {
+      fill: $link-color;
+      color: $link-color;
+    }
 
     &:before,
     &:after {
@@ -166,5 +173,18 @@
     &:before {
       content: '';
     }
+
+    &:last-child {
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  .icon-root {
+    padding: 0 8px;
+    margin-bottom: 4px;
   }
 }

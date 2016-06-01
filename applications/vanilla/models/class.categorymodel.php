@@ -2119,12 +2119,23 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
+        if (isset($FormPostValues['ParentCategoryID'])) {
+            if (empty($FormPostValues['ParentCategoryID'])) {
+                $FormPostValues['ParentCategoryID'] = -1;
+            } else {
+                $parent = CategoryModel::categories($FormPostValues['ParentCategoryID']);
+                if (!$parent) {
+                    $FormPostValues['ParentCategoryID'] = -1;
+                }
+            }
+        }
+
         //	Prep and fire event.
         $this->EventArguments['FormPostValues'] = &$FormPostValues;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('BeforeSaveCategory');
 
-        // Validate the form posted values
+        // Validate the form posted values.
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields();
             $Fields = $this->coerceData($Fields);

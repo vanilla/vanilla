@@ -238,5 +238,7 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
             <h2><?php echo t('Encourage your friends to join your new community!'); ?></h2>
 
             <p><?php echo t('Invite your friends to register to your new forum!'); ?></p>
+            <?php $registrationURL = url('entry/register', true); ?>
+            <p><?php echo sprintf(t('Simply tell them to go to the following URL and register: %s'), anchor($registrationURL, $registrationURL)); ?></p>
         </div>
     </div>

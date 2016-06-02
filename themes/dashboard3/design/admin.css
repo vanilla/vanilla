@@ -1,8 +1,919 @@
-/*!
- * Dashboard 3 - A new dashboard design for Vanilla.
- *
- * @author    Becky Van Bussel <beckyvanbussel@gmail.com>
- */
+@charset "UTF-8";
+@font-face {
+  font-family: "vanillicon";
+  font-style: normal;
+  font-weight: "vanillicon.eot";
+  src: font-source-declaration("vanillicon", font-files("vanillicon.woff", "woff", "vanillicon.ttf", "truetype", "vanillicon.svg", "svg"), normal, eot woff2 woff ttf svg, font-url-prefixer(normal));
+}
+
+.icon:before {
+  display: inline-block;
+  min-width: 1em;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  text-decoration: inherit;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.icon:before {
+  display: inline-block;
+  min-width: 1em;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  text-decoration: inherit;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+  font-family: "vanillicon";
+  src: url("/resources/fonts/vanillicon/vanillicon.eot");
+  src: url("/resources/fonts/vanillicon/vanillicon.eot?#iefix") format("embedded-opentype"), url("/resources/fonts/vanillicon/vanillicon.woff") format("woff"), url("/resources/fonts/vanillicon/vanillicon.ttf") format("truetype"), url("/resources/fonts/vanillicon/vanillicon.svg?#vanillicon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.icon-adjust:before {
+  content: "";
+}
+
+.icon-agree:before {
+  content: "";
+}
+
+.icon-align-center:before {
+  content: "";
+}
+
+.icon-align-justify:before {
+  content: "";
+}
+
+.icon-align-left:before {
+  content: "";
+}
+
+.icon-align-right:before {
+  content: "";
+}
+
+.icon-android:before {
+  content: "";
+}
+
+.icon-angry:before {
+  content: "";
+}
+
+.icon-apple:before {
+  content: "";
+}
+
+.icon-archive:before {
+  content: "";
+}
+
+.icon-arrow-down:before {
+  content: "";
+}
+
+.icon-arrow-left:before {
+  content: "";
+}
+
+.icon-arrow-right:before {
+  content: "";
+}
+
+.icon-arrow-up:before {
+  content: "";
+}
+
+.icon-ban:before {
+  content: "";
+}
+
+.icon-bar-chart:before {
+  content: "";
+}
+
+.icon-bell:before {
+  content: "";
+}
+
+.icon-bold:before {
+  content: "";
+}
+
+.icon-bookmark:before {
+  content: "";
+}
+
+.icon-bookmark-empty:before {
+  content: "";
+}
+
+.icon-bug:before {
+  content: "";
+}
+
+.icon-bullhorn:before {
+  content: "";
+}
+
+.icon-bullseye:before {
+  content: "";
+}
+
+.icon-calendar:before {
+  content: "";
+}
+
+.icon-camera:before {
+  content: "";
+}
+
+.icon-caret-down:before {
+  content: "";
+}
+
+.icon-caret-left:before {
+  content: "";
+}
+
+.icon-caret-right:before {
+  content: "";
+}
+
+.icon-caret-up:before {
+  content: "";
+}
+
+.icon-certificate:before {
+  content: "";
+}
+
+.icon-check:before {
+  content: "";
+}
+
+.icon-check-empty:before {
+  content: "";
+}
+
+.icon-check-sign:before {
+  content: "";
+}
+
+.icon-chevron-down:before {
+  content: "";
+}
+
+.icon-chevron-left:before {
+  content: "";
+}
+
+.icon-chevron-right:before {
+  content: "";
+}
+
+.icon-chevron-sign-down:before {
+  content: "";
+}
+
+.icon-chevron-sign-left:before {
+  content: "";
+}
+
+.icon-chevron-sign-right:before {
+  content: "";
+}
+
+.icon-chevron-sign-up:before {
+  content: "";
+}
+
+.icon-chevron-up:before {
+  content: "";
+}
+
+.icon-circle:before {
+  content: "";
+}
+
+.icon-circle-blank:before {
+  content: "";
+}
+
+.icon-cloud:before {
+  content: "";
+}
+
+.icon-cloud-download:before {
+  content: "";
+}
+
+.icon-cloud-upload:before {
+  content: "";
+}
+
+.icon-code:before {
+  content: "";
+}
+
+.icon-cog:before {
+  content: "";
+}
+
+.icon-cogs:before {
+  content: "";
+}
+
+.icon-collapse:before {
+  content: "";
+}
+
+.icon-collapse-top:before {
+  content: "";
+}
+
+.icon-comment:before {
+  content: "";
+}
+
+.icon-comments:before {
+  content: "";
+}
+
+.icon-compass:before {
+  content: "";
+}
+
+.icon-compose:before {
+  content: "";
+}
+
+.icon-crown:before {
+  content: "";
+}
+
+.icon-dashboard:before {
+  content: "";
+}
+
+.icon-discussion:before {
+  content: "";
+}
+
+.icon-dot-circle:before {
+  content: "";
+}
+
+.icon-dropbox:before {
+  content: "";
+}
+
+.icon-edit:before {
+  content: "";
+}
+
+.icon-edit-sign:before {
+  content: "";
+}
+
+.icon-ellipsis:before {
+  content: "";
+}
+
+.icon-exclamation-sign:before {
+  content: "";
+}
+
+.icon-expand:before {
+  content: "";
+}
+
+.icon-external-link:before {
+  content: "";
+}
+
+.icon-eye-close:before {
+  content: "";
+}
+
+.icon-eye-open:before {
+  content: "";
+}
+
+.icon-facebook:before {
+  content: "";
+}
+
+.icon-facebook-alt:before {
+  content: "";
+}
+
+.icon-facebook-alt-round:before {
+  content: "";
+}
+
+.icon-file:before {
+  content: "";
+}
+
+.icon-file-text:before {
+  content: "";
+}
+
+.icon-filter:before {
+  content: "";
+}
+
+.icon-flag:before {
+  content: "";
+}
+
+.icon-flame:before {
+  content: "";
+}
+
+.icon-flickr:before {
+  content: "";
+}
+
+.icon-folder-close:before {
+  content: "";
+}
+
+.icon-folder-open:before {
+  content: "";
+}
+
+.icon-font:before {
+  content: "";
+}
+
+.icon-frown:before {
+  content: "";
+}
+
+.icon-gift:before {
+  content: "";
+}
+
+.icon-github:before {
+  content: "";
+}
+
+.icon-github-alt:before {
+  content: "";
+}
+
+.icon-github-octocat:before {
+  content: "";
+}
+
+.icon-globe:before {
+  content: "";
+}
+
+.icon-google:before {
+  content: "";
+}
+
+.icon-google-plus:before {
+  content: "";
+}
+
+.icon-google-plus-alt:before {
+  content: "";
+}
+
+.icon-group:before {
+  content: "";
+}
+
+.icon-hand-down:before {
+  content: "";
+}
+
+.icon-hand-left:before {
+  content: "";
+}
+
+.icon-hand-right:before {
+  content: "";
+}
+
+.icon-hand-up:before {
+  content: "";
+}
+
+.icon-heart:before {
+  content: "";
+}
+
+.icon-home:before {
+  content: "";
+}
+
+.icon-inbox:before {
+  content: "";
+}
+
+.icon-indent-left:before {
+  content: "";
+}
+
+.icon-indent-right:before {
+  content: "";
+}
+
+.icon-info-sign:before {
+  content: "";
+}
+
+.icon-instagram:before {
+  content: "";
+}
+
+.icon-italic:before {
+  content: "";
+}
+
+.icon-jail:before {
+  content: "";
+}
+
+.icon-key:before {
+  content: "";
+}
+
+.icon-lightbulb:before {
+  content: "";
+}
+
+.icon-link:before {
+  content: "";
+}
+
+.icon-linkedin:before {
+  content: "";
+}
+
+.icon-linkedin-alt:before {
+  content: "";
+}
+
+.icon-linux:before {
+  content: "";
+}
+
+.icon-list-ol:before {
+  content: "";
+}
+
+.icon-list-ul:before {
+  content: "";
+}
+
+.icon-lock:before {
+  content: "";
+}
+
+.icon-lol:before {
+  content: "";
+}
+
+.icon-mail:before {
+  content: "";
+}
+
+.icon-mail-open:before {
+  content: "";
+}
+
+.icon-map-marker:before {
+  content: "";
+}
+
+.icon-medium:before {
+  content: "";
+}
+
+.icon-meh:before {
+  content: "";
+}
+
+.icon-menu:before {
+  content: "";
+}
+
+.icon-minus-sign:before {
+  content: "";
+}
+
+.icon-mobile-phone:before {
+  content: "";
+}
+
+.icon-mod:before {
+  content: "";
+}
+
+.icon-nib:before {
+  content: "";
+}
+
+.icon-note:before {
+  content: "";
+}
+
+.icon-ok:before {
+  content: "";
+}
+
+.icon-ok-circle:before {
+  content: "";
+}
+
+.icon-ok-sign:before {
+  content: "";
+}
+
+.icon-paper-clip:before {
+  content: "";
+}
+
+.icon-paragraph:before {
+  content: "";
+}
+
+.icon-paypal:before {
+  content: "";
+}
+
+.icon-pencil:before {
+  content: "";
+}
+
+.icon-permalink:before {
+  content: "";
+}
+
+.icon-picture:before {
+  content: "";
+}
+
+.icon-pinterest:before {
+  content: "";
+}
+
+.icon-pinterest-alt:before {
+  content: "";
+}
+
+.icon-play-circle:before {
+  content: "";
+}
+
+.icon-plus-sign:before {
+  content: "";
+}
+
+.icon-poll:before {
+  content: "";
+}
+
+.icon-preview:before {
+  content: "";
+}
+
+.icon-pushpin:before {
+  content: "";
+}
+
+.icon-question:before {
+  content: "";
+}
+
+.icon-question-sign:before {
+  content: "";
+}
+
+.icon-quote:before {
+  content: "";
+}
+
+.icon-reddit:before {
+  content: "";
+}
+
+.icon-reddit-alien:before {
+  content: "";
+}
+
+.icon-reddit-alt:before {
+  content: "";
+}
+
+.icon-refresh:before {
+  content: "";
+}
+
+.icon-remove:before {
+  content: "";
+}
+
+.icon-remove-sign:before {
+  content: "";
+}
+
+.icon-repeat:before {
+  content: "";
+}
+
+.icon-reply:before {
+  content: "";
+}
+
+.icon-reply-all:before {
+  content: "";
+}
+
+.icon-report:before {
+  content: "";
+}
+
+.icon-resize-full:before {
+  content: "";
+}
+
+.icon-resize-small:before {
+  content: "";
+}
+
+.icon-retweet:before {
+  content: "";
+}
+
+.icon-robot:before {
+  content: "";
+}
+
+.icon-rss:before {
+  content: "";
+}
+
+.icon-salesforce:before {
+  content: "";
+}
+
+.icon-search:before {
+  content: "";
+}
+
+.icon-select:before {
+  content: "";
+}
+
+.icon-share:before {
+  content: "";
+}
+
+.icon-share-alt:before {
+  content: "";
+}
+
+.icon-share-alt-square:before {
+  content: "";
+}
+
+.icon-shield:before {
+  content: "";
+}
+
+.icon-sign-blank:before {
+  content: "";
+}
+
+.icon-signin:before {
+  content: "";
+}
+
+.icon-signout:before {
+  content: "";
+}
+
+.icon-skull:before {
+  content: "";
+}
+
+.icon-skype:before {
+  content: "";
+}
+
+.icon-smile:before {
+  content: "";
+}
+
+.icon-source:before {
+  content: "";
+}
+
+.icon-spam:before {
+  content: "";
+}
+
+.icon-star:before {
+  content: "";
+}
+
+.icon-star-empty:before {
+  content: "";
+}
+
+.icon-star-half-empty:before {
+  content: "";
+}
+
+.icon-steam:before {
+  content: "";
+}
+
+.icon-steam-alt:before {
+  content: "";
+}
+
+.icon-strikethrough:before {
+  content: "";
+}
+
+.icon-subscript:before {
+  content: "";
+}
+
+.icon-superscript:before {
+  content: "";
+}
+
+.icon-table:before {
+  content: "";
+}
+
+.icon-tag:before {
+  content: "";
+}
+
+.icon-tags:before {
+  content: "";
+}
+
+.icon-th:before {
+  content: "";
+}
+
+.icon-th-large:before {
+  content: "";
+}
+
+.icon-th-list:before {
+  content: "";
+}
+
+.icon-thumbs-down:before {
+  content: "";
+}
+
+.icon-thumbs-up:before {
+  content: "";
+}
+
+.icon-ticket:before {
+  content: "";
+}
+
+.icon-time:before {
+  content: "";
+}
+
+.icon-trash:before {
+  content: "";
+}
+
+.icon-troll:before {
+  content: "";
+}
+
+.icon-trophy:before {
+  content: "";
+}
+
+.icon-tumblr:before {
+  content: "";
+}
+
+.icon-tumblr-alt:before {
+  content: "";
+}
+
+.icon-twitter:before {
+  content: "";
+}
+
+.icon-twitter-alt:before {
+  content: "";
+}
+
+.icon-underline:before {
+  content: "";
+}
+
+.icon-undo:before {
+  content: "";
+}
+
+.icon-unlink:before {
+  content: "";
+}
+
+.icon-unlock:before {
+  content: "";
+}
+
+.icon-user:before {
+  content: "";
+}
+
+.icon-vcard:before {
+  content: "";
+}
+
+.icon-video:before {
+  content: "";
+}
+
+.icon-vimeo:before {
+  content: "";
+}
+
+.icon-vimeo-alt:before {
+  content: "";
+}
+
+.icon-vine:before {
+  content: "";
+}
+
+.icon-warn:before {
+  content: "";
+}
+
+.icon-warning-sign:before {
+  content: "";
+}
+
+.icon-windows:before {
+  content: "";
+}
+
+.icon-wordpress:before {
+  content: "";
+}
+
+.icon-wtf:before {
+  content: "";
+}
+
+.icon-yahoo:before {
+  content: "";
+}
+
+.icon-yelp:before {
+  content: "";
+}
+
+.icon-youtube:before {
+  content: "";
+}
+
+.icon-youtube-alt:before {
+  content: "";
+}
+
+.icon-zendesk:before {
+  content: "";
+}
+
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 html {
   font-family: sans-serif;
@@ -3466,25 +4377,25 @@ a.text-danger:focus, a.text-danger:hover {
 
 .btn .caret, .file-upload-browse .caret, .Button .caret,
 .TextButton .caret, .SmallButton .caret, #Head h1 a span .caret, .Tabs ul li a .caret,
-.tabbed-content li a .caret, .btn .nav-heading:before, .file-upload-browse .nav-heading:before, .Button .nav-heading:before,
-.TextButton .nav-heading:before, .SmallButton .nav-heading:before, #Head h1 a span .nav-heading:before, .Tabs ul li a .nav-heading:before,
-.tabbed-content li a .nav-heading:before, .btn .panel-nav h4:before, .panel-nav .btn h4:before, .file-upload-browse .panel-nav h4:before, .panel-nav .file-upload-browse h4:before, .Button .panel-nav h4:before, .panel-nav .Button h4:before,
-.TextButton .panel-nav h4:before, .panel-nav
-.TextButton h4:before, .SmallButton .panel-nav h4:before, .panel-nav .SmallButton h4:before, #Head h1 a span .panel-nav h4:before, .panel-nav #Head h1 a span h4:before, .Tabs ul li a .panel-nav h4:before, .panel-nav .Tabs ul li a h4:before,
-.tabbed-content li a .panel-nav h4:before, .panel-nav
-.tabbed-content li a h4:before {
+.tabbed-content li a .caret, .btn .nav-heading::before, .file-upload-browse .nav-heading::before, .Button .nav-heading::before,
+.TextButton .nav-heading::before, .SmallButton .nav-heading::before, #Head h1 a span .nav-heading::before, .Tabs ul li a .nav-heading::before,
+.tabbed-content li a .nav-heading::before, .btn .panel-nav h4::before, .panel-nav .btn h4::before, .file-upload-browse .panel-nav h4::before, .panel-nav .file-upload-browse h4::before, .Button .panel-nav h4::before, .panel-nav .Button h4::before,
+.TextButton .panel-nav h4::before, .panel-nav
+.TextButton h4::before, .SmallButton .panel-nav h4::before, .panel-nav .SmallButton h4::before, #Head h1 a span .panel-nav h4::before, .panel-nav #Head h1 a span h4::before, .Tabs ul li a .panel-nav h4::before, .panel-nav .Tabs ul li a h4::before,
+.tabbed-content li a .panel-nav h4::before, .panel-nav
+.tabbed-content li a h4::before {
   margin-left: 0;
 }
 
 .btn-lg .caret, .btn-group-lg > .btn .caret, .btn-group-lg > .file-upload-browse .caret, .btn-group-lg > .Button .caret, .btn-group-lg >
 .TextButton .caret, .btn-group-lg > .SmallButton .caret, .Tabs ul li .btn-group-lg > a .caret,
-.tabbed-content li .btn-group-lg > a .caret, #Head h1 a span .caret, .btn-lg .nav-heading:before, .btn-group-lg > .btn .nav-heading:before, .btn-group-lg > .file-upload-browse .nav-heading:before, .btn-group-lg > .Button .nav-heading:before, .btn-group-lg >
-.TextButton .nav-heading:before, .btn-group-lg > .SmallButton .nav-heading:before, .Tabs ul li .btn-group-lg > a .nav-heading:before,
-.tabbed-content li .btn-group-lg > a .nav-heading:before, #Head h1 a span .nav-heading:before, .btn-lg .panel-nav h4:before, .panel-nav .btn-lg h4:before, .btn-group-lg > .btn .panel-nav h4:before, .panel-nav .btn-group-lg > .btn h4:before, .btn-group-lg > .file-upload-browse .panel-nav h4:before, .panel-nav .btn-group-lg > .file-upload-browse h4:before, .btn-group-lg > .Button .panel-nav h4:before, .panel-nav .btn-group-lg > .Button h4:before, .btn-group-lg >
-.TextButton .panel-nav h4:before, .panel-nav .btn-group-lg >
-.TextButton h4:before, .btn-group-lg > .SmallButton .panel-nav h4:before, .panel-nav .btn-group-lg > .SmallButton h4:before, .Tabs ul li .btn-group-lg > a .panel-nav h4:before, .panel-nav .Tabs ul li .btn-group-lg > a h4:before,
-.tabbed-content li .btn-group-lg > a .panel-nav h4:before, .panel-nav
-.tabbed-content li .btn-group-lg > a h4:before, #Head h1 a span .panel-nav h4:before, .panel-nav #Head h1 a span h4:before {
+.tabbed-content li .btn-group-lg > a .caret, #Head h1 a span .caret, .btn-lg .nav-heading::before, .btn-group-lg > .btn .nav-heading::before, .btn-group-lg > .file-upload-browse .nav-heading::before, .btn-group-lg > .Button .nav-heading::before, .btn-group-lg >
+.TextButton .nav-heading::before, .btn-group-lg > .SmallButton .nav-heading::before, .Tabs ul li .btn-group-lg > a .nav-heading::before,
+.tabbed-content li .btn-group-lg > a .nav-heading::before, #Head h1 a span .nav-heading::before, .btn-lg .panel-nav h4::before, .panel-nav .btn-lg h4::before, .btn-group-lg > .btn .panel-nav h4::before, .panel-nav .btn-group-lg > .btn h4::before, .btn-group-lg > .file-upload-browse .panel-nav h4::before, .panel-nav .btn-group-lg > .file-upload-browse h4::before, .btn-group-lg > .Button .panel-nav h4::before, .panel-nav .btn-group-lg > .Button h4::before, .btn-group-lg >
+.TextButton .panel-nav h4::before, .panel-nav .btn-group-lg >
+.TextButton h4::before, .btn-group-lg > .SmallButton .panel-nav h4::before, .panel-nav .btn-group-lg > .SmallButton h4::before, .Tabs ul li .btn-group-lg > a .panel-nav h4::before, .panel-nav .Tabs ul li .btn-group-lg > a h4::before,
+.tabbed-content li .btn-group-lg > a .panel-nav h4::before, .panel-nav
+.tabbed-content li .btn-group-lg > a h4::before, #Head h1 a span .panel-nav h4::before, .panel-nav #Head h1 a span h4::before {
   border-width: 0.375em 0.375em 0;
   border-bottom-width: 0;
 }
@@ -3492,16 +4403,16 @@ a.text-danger:focus, a.text-danger:hover {
 .dropup .btn-lg .caret, .dropup .btn-group-lg > .btn .caret, .dropup .btn-group-lg > .file-upload-browse .caret, .dropup .btn-group-lg > .Button .caret, .dropup .btn-group-lg >
 .TextButton .caret, .dropup .btn-group-lg > .SmallButton .caret, .dropup .Tabs ul li .btn-group-lg > a .caret, .Tabs ul li .dropup .btn-group-lg > a .caret, .dropup
 .tabbed-content li .btn-group-lg > a .caret,
-.tabbed-content li .dropup .btn-group-lg > a .caret, .dropup #Head h1 a span .caret, #Head h1 a .dropup span .caret, .dropup .btn-lg .nav-heading:before, .dropup .btn-group-lg > .btn .nav-heading:before, .dropup .btn-group-lg > .file-upload-browse .nav-heading:before, .dropup .btn-group-lg > .Button .nav-heading:before, .dropup .btn-group-lg >
-.TextButton .nav-heading:before, .dropup .btn-group-lg > .SmallButton .nav-heading:before, .dropup .Tabs ul li .btn-group-lg > a .nav-heading:before, .Tabs ul li .dropup .btn-group-lg > a .nav-heading:before, .dropup
-.tabbed-content li .btn-group-lg > a .nav-heading:before,
-.tabbed-content li .dropup .btn-group-lg > a .nav-heading:before, .dropup #Head h1 a span .nav-heading:before, #Head h1 a .dropup span .nav-heading:before, .dropup .btn-lg .panel-nav h4:before, .panel-nav .dropup .btn-lg h4:before, .dropup .btn-group-lg > .btn .panel-nav h4:before, .panel-nav .dropup .btn-group-lg > .btn h4:before, .dropup .btn-group-lg > .file-upload-browse .panel-nav h4:before, .panel-nav .dropup .btn-group-lg > .file-upload-browse h4:before, .dropup .btn-group-lg > .Button .panel-nav h4:before, .panel-nav .dropup .btn-group-lg > .Button h4:before, .dropup .btn-group-lg >
-.TextButton .panel-nav h4:before, .panel-nav .dropup .btn-group-lg >
-.TextButton h4:before, .dropup .btn-group-lg > .SmallButton .panel-nav h4:before, .panel-nav .dropup .btn-group-lg > .SmallButton h4:before, .dropup .Tabs ul li .btn-group-lg > a .panel-nav h4:before, .panel-nav .dropup .Tabs ul li .btn-group-lg > a h4:before, .Tabs ul li .dropup .btn-group-lg > a .panel-nav h4:before, .panel-nav .Tabs ul li .dropup .btn-group-lg > a h4:before, .dropup
-.tabbed-content li .btn-group-lg > a .panel-nav h4:before, .panel-nav .dropup
-.tabbed-content li .btn-group-lg > a h4:before,
-.tabbed-content li .dropup .btn-group-lg > a .panel-nav h4:before, .panel-nav
-.tabbed-content li .dropup .btn-group-lg > a h4:before, .dropup #Head h1 a span .panel-nav h4:before, .panel-nav .dropup #Head h1 a span h4:before, #Head h1 a .dropup span .panel-nav h4:before, .panel-nav #Head h1 a .dropup span h4:before {
+.tabbed-content li .dropup .btn-group-lg > a .caret, .dropup #Head h1 a span .caret, #Head h1 a .dropup span .caret, .dropup .btn-lg .nav-heading::before, .dropup .btn-group-lg > .btn .nav-heading::before, .dropup .btn-group-lg > .file-upload-browse .nav-heading::before, .dropup .btn-group-lg > .Button .nav-heading::before, .dropup .btn-group-lg >
+.TextButton .nav-heading::before, .dropup .btn-group-lg > .SmallButton .nav-heading::before, .dropup .Tabs ul li .btn-group-lg > a .nav-heading::before, .Tabs ul li .dropup .btn-group-lg > a .nav-heading::before, .dropup
+.tabbed-content li .btn-group-lg > a .nav-heading::before,
+.tabbed-content li .dropup .btn-group-lg > a .nav-heading::before, .dropup #Head h1 a span .nav-heading::before, #Head h1 a .dropup span .nav-heading::before, .dropup .btn-lg .panel-nav h4::before, .panel-nav .dropup .btn-lg h4::before, .dropup .btn-group-lg > .btn .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .btn h4::before, .dropup .btn-group-lg > .file-upload-browse .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .file-upload-browse h4::before, .dropup .btn-group-lg > .Button .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .Button h4::before, .dropup .btn-group-lg >
+.TextButton .panel-nav h4::before, .panel-nav .dropup .btn-group-lg >
+.TextButton h4::before, .dropup .btn-group-lg > .SmallButton .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .SmallButton h4::before, .dropup .Tabs ul li .btn-group-lg > a .panel-nav h4::before, .panel-nav .dropup .Tabs ul li .btn-group-lg > a h4::before, .Tabs ul li .dropup .btn-group-lg > a .panel-nav h4::before, .panel-nav .Tabs ul li .dropup .btn-group-lg > a h4::before, .dropup
+.tabbed-content li .btn-group-lg > a .panel-nav h4::before, .panel-nav .dropup
+.tabbed-content li .btn-group-lg > a h4::before,
+.tabbed-content li .dropup .btn-group-lg > a .panel-nav h4::before, .panel-nav
+.tabbed-content li .dropup .btn-group-lg > a h4::before, .dropup #Head h1 a span .panel-nav h4::before, .panel-nav .dropup #Head h1 a span h4::before, #Head h1 a .dropup span .panel-nav h4::before, .panel-nav #Head h1 a .dropup span h4::before {
   border-width: 0 0.375em 0.375em;
 }
 
@@ -4255,7 +5166,7 @@ a.text-danger:focus, a.text-danger:hover {
   position: relative;
 }
 
-.dropdown-toggle::after, .caret, .nav-heading:before, .panel-nav h4:before {
+.dropdown-toggle::after, .caret, .nav-heading::before, .panel-nav h4::before {
   display: inline-block;
   width: 0;
   height: 0;
@@ -4272,7 +5183,7 @@ a.text-danger:focus, a.text-danger:hover {
   outline: 0;
 }
 
-.dropup .dropdown-toggle::after, .dropup .caret, .dropup .nav-heading:before, .dropup .panel-nav h4:before, .panel-nav .dropup h4:before {
+.dropup .dropdown-toggle::after, .dropup .caret, .dropup .nav-heading::before, .dropup .panel-nav h4::before, .panel-nav .dropup h4::before {
   border-top: 0;
   border-bottom: 0.375em solid;
 }
@@ -4393,11 +5304,11 @@ a.text-danger:focus, a.text-danger:hover {
   left: auto;
 }
 
-.dropup .caret, .dropup .nav-heading:before, .dropup .panel-nav h4:before, .panel-nav .dropup h4:before,
+.dropup .caret, .dropup .nav-heading::before, .dropup .panel-nav h4::before, .panel-nav .dropup h4::before,
 .navbar-fixed-bottom .dropdown .caret,
-.navbar-fixed-bottom .dropdown .nav-heading:before,
-.navbar-fixed-bottom .dropdown .panel-nav h4:before, .panel-nav
-.navbar-fixed-bottom .dropdown h4:before {
+.navbar-fixed-bottom .dropdown .nav-heading::before,
+.navbar-fixed-bottom .dropdown .panel-nav h4::before, .panel-nav
+.navbar-fixed-bottom .dropdown h4::before {
   content: "";
   border-top: 0;
   border-bottom: 0.375em solid;
@@ -7511,11 +8422,6 @@ input[type="button"].btn-block {
   margin-right: -1px;
 }
 
-.btn-search {
-  position: absolute;
-  right: 1rem;
-}
-
 .dropdown-menu {
   margin: 0;
 }
@@ -7524,17 +8430,20 @@ input[type="button"].btn-block {
   border-radius: 0;
 }
 
-form ul, form ol {
+form ul,
+form ol {
   padding-left: 0;
 }
 
-form ul li, form ol li {
+form ul li,
+form ol li {
   list-style: none;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
 
-form ul label, form ol label {
+form ul label,
+form ol label {
   font-weight: 500;
   margin-bottom: 0;
 }
@@ -7591,7 +8500,7 @@ form ul label, form ol label {
   height: 2rem;
 }
 
-.toggle-well, .toggle-wrap input[type="checkbox"] + label:before, .ActivateSlider input[type="checkbox"] + label:before, .ActivateSlider a:before {
+.toggle-well, .toggle-wrap input[type="checkbox"] + label::before, .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider a:before {
   display: block;
   position: absolute;
   top: 0;
@@ -7601,11 +8510,11 @@ form ul label, form ol label {
   background-color: #fff;
   border-radius: 1rem;
   border: 0.05rem solid #949aa2;
-  transition: background 0.4s;
+  transition: background .4s;
   cursor: pointer;
 }
 
-.toggle-slider, .toggle-wrap input[type="checkbox"] + label:after, .ActivateSlider input[type="checkbox"] + label:after, .ActivateSlider a:after {
+.toggle-slider, .toggle-wrap input[type="checkbox"] + label::after, .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider a:after {
   display: block;
   position: absolute;
   top: 0.175rem;
@@ -7617,21 +8526,21 @@ form ul label, form ol label {
   border: 0.05rem solid #949aa2;
   background-color: #fff;
   outline: 0;
-  transition: left 0.4s;
+  transition: left .4s;
   cursor: pointer;
 }
 
-.toggle-well-on, .toggle-wrap-on .toggle-well, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label:before, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label:before, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label:before, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label:before, .toggle-wrap-on .ActivateSlider a:before, .ActivateSlider .toggle-wrap-on a:before, .toggle-wrap input[type="checkbox"]:checked + label:before, .ActivateSlider input[type="checkbox"]:checked + label:before, .ActivateSlider-Active a:before {
+.toggle-well-on, .toggle-wrap-on .toggle-well, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap-on .ActivateSlider a:before, .ActivateSlider .toggle-wrap-on a:before, .toggle-wrap input[type="checkbox"]:checked + label::before, .ActivateSlider input[type="checkbox"]:checked + label::before, .ActivateSlider-Active a:before {
   background-color: #0291db;
 }
 
-.toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label:after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label:after, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label:after, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label:after, .toggle-wrap-on .ActivateSlider a:after, .ActivateSlider .toggle-wrap-on a:after, .toggle-wrap input[type="checkbox"]:checked + label:after, .ActivateSlider input[type="checkbox"]:checked + label:after, .ActivateSlider-Active a:after {
+.toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider a:after, .ActivateSlider .toggle-wrap-on a:after, .toggle-wrap input[type="checkbox"]:checked + label::after, .ActivateSlider input[type="checkbox"]:checked + label::after, .ActivateSlider-Active a:after {
   left: 2.125rem;
 }
 
-.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label:after, .toggle-wrap .InProgress input[type="checkbox"] + label:after, .InProgress .ActivateSlider input[type="checkbox"] + label:after, .ActivateSlider .InProgress input[type="checkbox"] + label:after, .InProgress .ActivateSlider a:after, .ActivateSlider .InProgress a:after, .ActivateSlider .InProgress:after {
+.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider a:after, .ActivateSlider .InProgress a:after, .ActivateSlider .InProgress:after {
   left: 1.125rem;
-  transition: left 0.4s;
+  transition: left .4s;
 }
 
 .toggle-box-label-wrap {
@@ -7648,8 +8557,8 @@ form ul label, form ol label {
   visibility: hidden;
 }
 
-.toggle-wrap input[type="checkbox"] + label:before, .ActivateSlider input[type="checkbox"] + label:before, .toggle-wrap input[type="checkbox"] + label:after, .ActivateSlider input[type="checkbox"] + label:after {
-  content: "";
+.toggle-wrap input[type="checkbox"] + label::before, .ActivateSlider input[type="checkbox"] + label::before, .toggle-wrap input[type="checkbox"] + label::after, .ActivateSlider input[type="checkbox"] + label::after {
+  content: '';
 }
 
 .color-picker {
@@ -7730,7 +8639,7 @@ select {
   -webkit-appearance: none;
 }
 
-select:focus {
+select::focus {
   border-color: #51a7e8;
   outline: none;
 }
@@ -7906,57 +8815,57 @@ select::-ms-expand {
   background-color: #fff;
 }
 
-.label-selector .active .overlay:before, .emojiext-list .active .overlay:before,
-.LayoutOptions .active .overlay:before,
-.HomeOptions .active .overlay:before, .label-selector .Tabs ul li.Active a .overlay:before, .Tabs ul li.Active .label-selector a .overlay:before, .emojiext-list .Tabs ul li.Active a .overlay:before, .Tabs ul li.Active .emojiext-list a .overlay:before,
-.LayoutOptions .Tabs ul li.Active a .overlay:before, .Tabs ul li.Active
-.LayoutOptions a .overlay:before,
-.HomeOptions .Tabs ul li.Active a .overlay:before, .Tabs ul li.Active
-.HomeOptions a .overlay:before, .label-selector
-.Tabs ul .current-tab .overlay:before,
-.Tabs ul .label-selector .current-tab .overlay:before, .emojiext-list
-.Tabs ul .current-tab .overlay:before,
-.Tabs ul .emojiext-list .current-tab .overlay:before,
+.label-selector .active .overlay::before, .emojiext-list .active .overlay::before,
+.LayoutOptions .active .overlay::before,
+.HomeOptions .active .overlay::before, .label-selector .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active .label-selector a .overlay::before, .emojiext-list .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active .emojiext-list a .overlay::before,
+.LayoutOptions .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active
+.LayoutOptions a .overlay::before,
+.HomeOptions .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active
+.HomeOptions a .overlay::before, .label-selector
+.Tabs ul .current-tab .overlay::before,
+.Tabs ul .label-selector .current-tab .overlay::before, .emojiext-list
+.Tabs ul .current-tab .overlay::before,
+.Tabs ul .emojiext-list .current-tab .overlay::before,
 .LayoutOptions
-.Tabs ul .current-tab .overlay:before,
+.Tabs ul .current-tab .overlay::before,
 .Tabs ul
-.LayoutOptions .current-tab .overlay:before,
+.LayoutOptions .current-tab .overlay::before,
 .HomeOptions
-.Tabs ul .current-tab .overlay:before,
+.Tabs ul .current-tab .overlay::before,
 .Tabs ul
-.HomeOptions .current-tab .overlay:before, .label-selector
-.tabbed-content li.Active a .overlay:before,
-.tabbed-content li.Active .label-selector a .overlay:before, .emojiext-list
-.tabbed-content li.Active a .overlay:before,
-.tabbed-content li.Active .emojiext-list a .overlay:before,
+.HomeOptions .current-tab .overlay::before, .label-selector
+.tabbed-content li.Active a .overlay::before,
+.tabbed-content li.Active .label-selector a .overlay::before, .emojiext-list
+.tabbed-content li.Active a .overlay::before,
+.tabbed-content li.Active .emojiext-list a .overlay::before,
 .LayoutOptions
-.tabbed-content li.Active a .overlay:before,
+.tabbed-content li.Active a .overlay::before,
 .tabbed-content li.Active
-.LayoutOptions a .overlay:before,
+.LayoutOptions a .overlay::before,
 .HomeOptions
-.tabbed-content li.Active a .overlay:before,
+.tabbed-content li.Active a .overlay::before,
 .tabbed-content li.Active
-.HomeOptions a .overlay:before, .label-selector
-.tabbed-content .current-tab .overlay:before,
-.tabbed-content .label-selector .current-tab .overlay:before, .emojiext-list
-.tabbed-content .current-tab .overlay:before,
-.tabbed-content .emojiext-list .current-tab .overlay:before,
+.HomeOptions a .overlay::before, .label-selector
+.tabbed-content .current-tab .overlay::before,
+.tabbed-content .label-selector .current-tab .overlay::before, .emojiext-list
+.tabbed-content .current-tab .overlay::before,
+.tabbed-content .emojiext-list .current-tab .overlay::before,
 .LayoutOptions
-.tabbed-content .current-tab .overlay:before,
+.tabbed-content .current-tab .overlay::before,
 .tabbed-content
-.LayoutOptions .current-tab .overlay:before,
+.LayoutOptions .current-tab .overlay::before,
 .HomeOptions
-.tabbed-content .current-tab .overlay:before,
+.tabbed-content .current-tab .overlay::before,
 .tabbed-content
-.HomeOptions .current-tab .overlay:before, .label-selector .Current .overlay:before, .emojiext-list .Current .overlay:before,
-.LayoutOptions .Current .overlay:before,
-.HomeOptions .Current .overlay:before,
-.label-selector input[type=radio]:checked ~ label .overlay:before, .emojiext-list input[type=radio]:checked ~ label .overlay:before,
-.LayoutOptions input[type=radio]:checked ~ label .overlay:before,
-.HomeOptions input[type=radio]:checked ~ label .overlay:before,
-.label-selector input[type=radio]:checked ~ label .overlay:before, .emojiext-list input[type=radio]:checked ~ label .overlay:before,
-.LayoutOptions input[type=radio]:checked ~ label .overlay:before,
-.HomeOptions input[type=radio]:checked ~ label .overlay:before {
+.HomeOptions .current-tab .overlay::before, .label-selector .Current .overlay::before, .emojiext-list .Current .overlay::before,
+.LayoutOptions .Current .overlay::before,
+.HomeOptions .Current .overlay::before,
+.label-selector input[type=radio]:checked ~ label .overlay::before, .emojiext-list input[type=radio]:checked ~ label .overlay::before,
+.LayoutOptions input[type=radio]:checked ~ label .overlay::before,
+.HomeOptions input[type=radio]:checked ~ label .overlay::before,
+.label-selector input[type=radio]:checked ~ label .overlay::before, .emojiext-list input[type=radio]:checked ~ label .overlay::before,
+.LayoutOptions input[type=radio]:checked ~ label .overlay::before,
+.HomeOptions input[type=radio]:checked ~ label .overlay::before {
   position: relative;
   display: block;
   top: 35%;
@@ -8009,7 +8918,7 @@ select::-ms-expand {
   background-color: #0291db;
   opacity: .9;
   overflow: hidden;
-  transition: all 0.5s;
+  transition: all .5s;
   text-align: center;
 }
 
@@ -8067,6 +8976,15 @@ select::-ms-expand {
 .LayoutOptions .description,
 .HomeOptions .description {
   display: none;
+}
+
+.search-wrap::before {
+  content: "";
+}
+
+.search-submit, #Form_Go {
+  position: absolute;
+  left: -9999px;
 }
 
 .Hidden,
@@ -8176,7 +9094,7 @@ div.Popup .Buttons {
   text-transform: uppercase;
 }
 
-.nav-heading:before, .panel-nav h4:before {
+.nav-heading::before, .panel-nav h4::before {
   margin-left: -1rem;
   margin-right: .5rem;
 }
@@ -8272,14 +9190,14 @@ div.Popup .Buttons {
   height: 2.75rem;
 }
 
-.navbar .nav-item + .nav-item, .navbar .PanelInfo li + .nav-item, .PanelInfo .navbar li + .nav-item, .navbar .PanelInfo .nav-item + li, .PanelInfo .navbar .nav-item + li, .navbar .PanelInfo li + li, .PanelInfo .navbar li + li {
-  margin: 0;
-}
-
 .navbar .nav-item, .navbar .PanelInfo li, .PanelInfo .navbar li {
   min-width: 11.25rem;
   text-align: center;
   border-right: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.navbar .nav-item + .nav-item, .navbar .PanelInfo li + .nav-item, .PanelInfo .navbar li + .nav-item, .navbar .PanelInfo .nav-item + li, .PanelInfo .navbar .nav-item + li, .navbar .PanelInfo li + li, .PanelInfo .navbar li + li {
+  margin: 0;
 }
 
 .navbar .nav-item:first-child, .navbar .PanelInfo li:first-child, .PanelInfo .navbar li:first-child {
@@ -8355,28 +9273,27 @@ div.Popup .Buttons {
   opacity: 1;
 }
 
-.navbar .nav-link.active:before, .navbar .Tabs ul li.Active a.nav-link:before, .Tabs ul li.Active .navbar a.nav-link:before, .navbar
-.Tabs ul .nav-link.current-tab:before,
-.Tabs ul .navbar .nav-link.current-tab:before, .navbar
-.Tabs ul .PanelInfo li a.current-tab:before,
-.Tabs ul .PanelInfo li .navbar a.current-tab:before, .navbar .PanelInfo li
-.Tabs ul a.current-tab:before, .PanelInfo li
-.Tabs ul .navbar a.current-tab:before, .navbar
-.tabbed-content li.Active a.nav-link:before,
-.tabbed-content li.Active .navbar a.nav-link:before, .navbar
-.tabbed-content .nav-link.current-tab:before,
-.tabbed-content .navbar .nav-link.current-tab:before, .navbar
-.tabbed-content .PanelInfo li a.current-tab:before,
-.tabbed-content .PanelInfo li .navbar a.current-tab:before, .navbar .PanelInfo li
-.tabbed-content a.current-tab:before, .PanelInfo li
-.tabbed-content .navbar a.current-tab:before, .navbar .nav-link.Current:before, .navbar .PanelInfo li a.Current:before, .PanelInfo li .navbar a.Current:before, .navbar .PanelInfo li a.active:before, .PanelInfo li .navbar a.active:before, .navbar .PanelInfo .Active a:before, .PanelInfo .Active .navbar a:before, .navbar .PanelInfo li a:hover:before, .PanelInfo li .navbar a:hover:before {
+.navbar .nav-link.active::before, .navbar .Tabs ul li.Active a.nav-link::before, .Tabs ul li.Active .navbar a.nav-link::before, .navbar
+.Tabs ul .nav-link.current-tab::before,
+.Tabs ul .navbar .nav-link.current-tab::before, .navbar
+.Tabs ul .PanelInfo li a.current-tab::before,
+.Tabs ul .PanelInfo li .navbar a.current-tab::before, .navbar .PanelInfo li
+.Tabs ul a.current-tab::before, .PanelInfo li
+.Tabs ul .navbar a.current-tab::before, .navbar
+.tabbed-content li.Active a.nav-link::before,
+.tabbed-content li.Active .navbar a.nav-link::before, .navbar
+.tabbed-content .nav-link.current-tab::before,
+.tabbed-content .navbar .nav-link.current-tab::before, .navbar
+.tabbed-content .PanelInfo li a.current-tab::before,
+.tabbed-content .PanelInfo li .navbar a.current-tab::before, .navbar .PanelInfo li
+.tabbed-content a.current-tab::before, .PanelInfo li
+.tabbed-content .navbar a.current-tab::before, .navbar .nav-link.Current::before, .navbar .PanelInfo li a.Current::before, .PanelInfo li .navbar a.Current::before, .navbar .PanelInfo li a.active::before, .PanelInfo li .navbar a.active::before, .navbar .PanelInfo .Active a::before, .PanelInfo .Active .navbar a::before, .navbar .PanelInfo li a:hover::before, .PanelInfo li .navbar a:hover::before {
   position: absolute;
   display: block;
   width: 1rem;
   height: 1rem;
   bottom: -0.5rem;
   left: 5.125rem;
-  rotate: 45deg;
   background-color: #0cb0f8;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
   border-right: 1px solid rgba(0, 0, 0, 0.125);
@@ -8473,9 +9390,6 @@ div.Popup .Buttons {
 .panel-right {
   padding-left: 1rem;
   padding-right: 4rem;
-}
-
-.panel-right {
   color: #555a62;
   font-weight: 200;
 }
@@ -8547,7 +9461,7 @@ table .btn, table .file-upload-browse, table .Button, table
 .SelectionGrid em {
   display: block;
   padding: 0.9375rem;
-  text-style: normal;
+  font-style: normal;
 }
 
 .SelectionGrid img, .SelectionGrid .LayoutOptions .Sprite, .LayoutOptions .SelectionGrid .Sprite, .SelectionGrid
@@ -8623,6 +9537,11 @@ p {
   padding-left: 1rem;
   font-size: 1.25rem;
   border-bottom: 1px solid #f4f4f5;
+}
+
+.Tabs ul,
+.tabbed-content {
+  padding-left: 0;
 }
 
 .Tabs ul li,

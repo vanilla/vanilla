@@ -16,7 +16,7 @@
   font-weight: 500;
   text-transform: uppercase;
 
-  &:before {
+  &::before {
     @extend .caret;
     margin-left: -1rem;
     margin-right: .5rem;
@@ -52,7 +52,7 @@
 
   .nav-stacked {
     .nav-item + .nav-item {
-        margin-top: 0;
+      margin-top: 0;
     }
   }
 }

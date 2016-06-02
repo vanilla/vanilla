@@ -164,6 +164,7 @@ module.exports = function (grunt) {
     sass_globbing: {
       vendors: {
         files: {
+          'scss/maps/_vanillicon.scss': 'scss/vanillicon/*.scss',
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',

@@ -19,7 +19,8 @@
 }
 
 form {
-  ul, ol {
+  ul,
+  ol {
     @include list-reset();
   }
 }
@@ -29,18 +30,18 @@ form {
   li {
     @extend .form-group;
     @extend .row;
-  }
 
-  li > label {
-    @extend .label-wrap;
-  }
+    > label {
+      @extend .label-wrap;
+    }
 
-  li > input {
-    @extend .input-wrap;
-  }
+    > input {
+      @extend .input-wrap;
+    }
 
-  li > select {
-    @extend .input-wrap;
+    > select {
+      @extend .input-wrap;
+    }
   }
 }
 
@@ -102,10 +103,10 @@ form {
 
   > .label-wrap-wide {
     @extend .col-sm-8;
-  }
 
-  > .label-wrap-wide + .input-wrap {
-    @extend .col-sm-4;
+    + .input-wrap {
+      @extend .col-sm-4;
+    }
   }
 
   .input-wrap-right {
@@ -177,7 +178,7 @@ form {
   background-color: $white;
   border-radius: $toggle-height / 2;
   border: $toggle-border-width solid $grey;
-  transition: background 0.4s;
+  transition: background .4s;
   cursor: pointer;
 }
 
@@ -187,13 +188,13 @@ form {
   top: $toggle-padding + $toggle-border-width;
   left: $toggle-padding + $toggle-border-width;
   bottom: $toggle-padding + $toggle-border-width;
-  width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width *2);
+  width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
   height: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
   border-radius: ($toggle-height - ($toggle-padding)) / 2;
   border: $toggle-border-width solid $grey;
   background-color: $white;
   outline: 0;
-  transition: left 0.4s;
+  transition: left .4s;
   cursor: pointer;
 }
 
@@ -207,7 +208,7 @@ form {
 
 .toggle-slider-active {
   left: ($toggle-height / 2) + $toggle-padding;
-  transition: left 0.4s;
+  transition: left .4s;
 }
 
 .toggle-wrap-on {
@@ -251,28 +252,29 @@ form {
     position: absolute;
     margin-left: -9999px;
     visibility: hidden;
-  }
 
-  input[type="checkbox"] + label {
-    &:before,
-    &:after {
-      content: "";
-    }
+    + label {
+      &::before,
+      &::after {
+        content: '';
+      }
 
-    &:before {
-      @extend .toggle-well;
-    }
+      &::before {
+        @extend .toggle-well;
+      }
 
-    &:after {
-      @extend .toggle-slider;
+      &::after {
+        @extend .toggle-slider;
+      }
     }
   }
 
   // When checked, move and change background color
-  input[type="checkbox"]:checked + label:before {
+  input[type="checkbox"]:checked + label::before {
     @extend .toggle-well-on;
   }
-  input[type="checkbox"]:checked + label:after {
+
+  input[type="checkbox"]:checked + label::after {
     @extend .toggle-slider-on;
   }
 }
@@ -390,10 +392,10 @@ select {
   -moz-appearance: none;
   -webkit-appearance: none;
 
-  &:focus {
+  &::focus {
     border-color: #51a7e8;
     outline: none;
-    @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, 0.075), 0 0 5px rgba(81, 167, 232, 0.5));
+    @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, .075), 0 0 5px rgba(81, 167, 232, .5));
   }
 
   // Hides the default caret in IE11
@@ -481,7 +483,7 @@ select {
       opacity: .75;
       background-color: $white;
 
-      &:before {
+      &::before {
         position: relative;
         display: block;
         top: 35%;
@@ -522,7 +524,7 @@ select {
     background-color: $brand-primary;
     opacity: .9;
     overflow: hidden;
-    transition: all 0.5s;
+    transition: all .5s;
     text-align: center;
   }
 
@@ -543,4 +545,22 @@ select {
   .description {
     display: none;
   }
+}
+
+// Search input
+
+.search-wrap {
+  &::before {
+    @extend .icon;
+    content: $icon-search;
+  }
+}
+.search-input {
+
+}
+
+// Hide the button
+.search-submit {
+  position: absolute;
+  left: -9999px;
 }

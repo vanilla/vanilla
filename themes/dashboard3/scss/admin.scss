@@ -1,15 +1,15 @@
-/*!
- * Dashboard 3 - A new dashboard design for Vanilla.
- *
- * @author    Becky Van Bussel <beckyvanbussel@gmail.com>
- */
+//
+// Dashboard 3 - A new dashboard design for Vanilla.
+//
+// @author    Becky Van Bussel <beckyvanbussel@gmail.com>
+//
 
 @import 'variables';
 @import 'maps/bootstrapVariables';
-
 @import 'maps/bootstrapMixins';
 @import 'mixins';
 
+@import 'maps/vanillicon';
 @import 'maps/bootstrapSubset';
 @import 'maps/dashboard';
 @import 'maps/extensions';

@@ -182,10 +182,6 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
         }
     </style>
     <h1><?php echo t('Getting Started with Vanilla'); ?></h1>
-<?php
-echo $this->Form->open();
-echo $this->Form->errors();
-?>
     <div class="Info">
         <div class="Welcome">
             <h2><?php echo t('Getting Started with Vanilla'); ?></h2>
@@ -244,4 +240,3 @@ echo $this->Form->errors();
             <p><?php echo t('Invite your friends to register to your new forum!'); ?></p>
         </div>
     </div>
-<?php echo $this->Form->close(); ?>

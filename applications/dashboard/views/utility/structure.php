@@ -11,8 +11,6 @@ switch ($this->data('Step')) {
         // Display the scan of the structure.
         if (!empty($this->Data['CapturedSql'])) {
             $CapturedSql = (array)$this->Data['CapturedSql'];
-            $Url = 'dashboard/utility/structure/'.$this->Data['ApplicationName'].'/0/'.(int)$this->Data['Drop'].'/'.(int)$this->Data['Explicit'];
-
             if (count($CapturedSql) > 0) {
                 ?>
                 <div class="Info"><?php echo t('The following structure changes are required for your database.'); ?></div>
@@ -46,6 +44,23 @@ switch ($this->data('Step')) {
         break;
     case 'run':
         // Display the status message from running the structure.
+        if (!empty($this->Data['Issues'])) {
+            echo '<pre class="Sql">';
+
+            $first = true;
+            foreach ($this->Data['Issues'] as $row) {
+                if ($first) {
+                    $first = false;
+                } else {
+                    echo "\n\n";
+                }
+
+                echo htmlspecialchars("/* {$row['table']}: {$row['message']} */\n");
+                echo htmlspecialchars($row['sql']);
+            }
+
+            echo '</pre>';
+        }
 
         echo '<div class="Buttons">',
             $this->Form->button('Scan', ['value' => t('Rescan')]),

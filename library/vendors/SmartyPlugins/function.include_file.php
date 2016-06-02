@@ -23,7 +23,7 @@ function smarty_function_include_file($Params, &$Smarty) {
     if (isUrl($Name)) {
         return '<!-- Error, urls are not allowed -->';
     }
-    $filename = rtrim($Smarty->template_dir, '/').'/'.$Name;
+    $filename = rtrim($Smarty->getTemplateDir(), '/').'/'.$Name;
     if (!file_exists($filename)) {
         return '<!-- Error, file does not exist -->';
     }

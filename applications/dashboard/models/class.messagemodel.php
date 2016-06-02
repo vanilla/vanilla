@@ -143,8 +143,7 @@ class MessageModel extends Gdn_Model {
 
         $category = null;
         if (!empty($CategoryID)) {
-            $categoryModel = new CategoryModel();
-            $category = $categoryModel->getID($CategoryID, DATASET_TYPE_ARRAY);
+            $category = CategoryModel::categories($CategoryID);
         }
 
         $Exceptions = array_map('strtolower', $Exceptions);
@@ -174,7 +173,7 @@ class MessageModel extends Gdn_Model {
 
                 $Visible = $Visible && self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
                 if ($category !== null) {
-                    $Visible = $Visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+                    $Visible &= CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
                 }
 
                 if ($Visible) {

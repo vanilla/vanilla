@@ -7,7 +7,7 @@ var spoilers = {
      * Gather all UserSpoiler DIVs and attempt to augment them with spoiler capabilities.
      */
     findAndReplace: function() {
-        jQuery("div.Spoiler").each(function(i, el) {
+        jQuery("div.Spoiler", this).each(function(i, el) {
             spoilers.replaceSpoiler(el);
         });
     },
@@ -79,11 +79,6 @@ var spoilers = {
     }
 };
 
-// Events!
-jQuery(document).ready(function(){
-    spoilers.findAndReplace();
-});
-
-jQuery(document).on("CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal", function() {
-    spoilers.findAndReplace();
+jQuery(document).on("contentLoad", function(e) {
+    spoilers.findAndReplace.apply(e.target);
 });

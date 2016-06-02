@@ -16,6 +16,10 @@
  * Class Gdn_MySQLStructure
  */
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
+    /**
+     * @var array[int] An array of table names to row count estimates.
+     */
+    private $rowCountEstimates;
 
     /**
      *
@@ -92,6 +96,25 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $this->_TableStorageEngine = $Engine;
         return $this;
+    }
+
+    /**
+     * Get the estimated number of rows in a table.
+     *
+     * @param string $tableName The name of the table to look up, without its prefix.
+     * @return int|null Returns the estimated number of rows or **null** if the information doesn't exist.
+     */
+    public function getRowCountEstimate($tableName) {
+        if (!isset($this->rowCountEstimates)) {
+            $data = $this->Database->query("show table status")->resultArray();
+            $this->rowCountEstimates = [];
+            foreach ($data as $row) {
+                $name = stringBeginsWith($row['Name'], $this->Database->DatabasePrefix, false, true);
+                $this->rowCountEstimates[$name] = $row['Rows'];
+            }
+        }
+
+        return val($tableName, $this->rowCountEstimates, null);
     }
 
     /**
@@ -186,6 +209,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $Indexes = array();
         $Keys = '';
         $Sql = '';
+        $TableName = Gdn_Format::alphaNumeric($this->_TableName);
 
         $ForceDatabaseEngine = c('Database.ForceStorageEngine');
         if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
@@ -225,11 +249,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
         // Build unique keys.
         if (count($UniqueKey) > 0) {
-            $Keys .= ",\nunique index `".Gdn_Format::alphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
+            $Keys .= ",\nunique index `UX_{$TableName}` (`".implode('`, `', $UniqueKey)."`)";
         }
         // Build full text index.
         if (count($FullTextKey) > 0) {
-            $Keys .= ",\nfulltext index `".Gdn_Format::alphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
+            $Keys .= ",\nfulltext index `TX_{$TableName}` (`".implode('`, `', $FullTextKey)."`)";
         }
         // Build the rest of the keys.
         foreach ($Indexes as $IndexType => $IndexGroups) {
@@ -237,15 +261,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
                 if (!$IndexGroup) {
                     foreach ($ColumnNames as $ColumnName) {
-                        $Keys .= ",\n{$CreateString} `{$IndexType}_{$this->_TableName}_{$ColumnName}` (`{$ColumnName}`)";
+                        $Keys .= ",\n{$CreateString} `{$IndexType}_{$TableName}_{$ColumnName}` (`{$ColumnName}`)";
                     }
                 } else {
-                    $Keys .= ",\n{$CreateString} `{$IndexType}_{$this->_TableName}_{$IndexGroup}` (`".implode('`, `', $ColumnNames).'`)';
+                    $Keys .= ",\n{$CreateString} `{$IndexType}_{$TableName}_{$IndexGroup}` (`".implode('`, `', $ColumnNames).'`)';
                 }
             }
         }
 
-        $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
+        $Sql = 'create table `'.$this->_DatabasePrefix.$TableName.'` ('
             .$Sql
             .$Keys
             ."\n)";
@@ -485,7 +509,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             // table that are NOT in $this->_Columns.
             $RemoveColumns = array_diff(array_keys($existingColumns), array_keys($columns));
             foreach ($RemoveColumns as $Column) {
-                $AlterSql[] = "drop column `{$columns[$Column]}`";
+                $AlterSql[] = "drop column `$Column`";
             }
         }
 
@@ -517,7 +541,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 }
 
                 $EngineQuery = $AlterSqlPrefix.' engine = '.$this->_TableStorageEngine;
-                if (!$this->query($EngineQuery)) {
+                if (!$this->query($EngineQuery, true)) {
                     throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
                 }
             }
@@ -588,7 +612,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         if (count($AlterSql) > 0) {
-            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
+            if (!$this->query($AlterSqlPrefix.implode(",\n", $AlterSql), true)) {
                 throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }
@@ -634,6 +658,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         // Run any additional Sql.
         foreach ($AdditionalSql as $Description => $Sql) {
+            // These queries are just for enum alters. If that changes then pass true as the second argument.
             if (!$this->query($Sql)) {
                 throw new Exception("Error modifying table: {$Description}.");
             }

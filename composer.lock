@@ -4,21 +4,114 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6b1df29b6d0beddc179932f4ac1b10b7",
-    "content-hash": "b677d81ec1d659d919bd6d9f4202ab83",
+    "hash": "f86602f1ac9ae5205f3baca73b6a8514",
+    "content-hash": "810372b6f714bceb65afa73a6f8ac4ae",
     "packages": [
         {
-            "name": "vanilla/garden-http",
-            "version": "v1.1.1",
+            "name": "psr/log",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/vanilla/garden-http.git",
-                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a"
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/da3b859774613031788eaa148a7e9e8622f6bc2a",
-                "reference": "da3b859774613031788eaa148a7e9e8622f6bc2a",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "smarty/smarty",
+            "version": "v3.1.29",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smarty-php/smarty.git",
+                "reference": "35480f10e7ce9b0fdaf23d3799d7b79463919b1e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/35480f10e7ce9b0fdaf23d3799d7b79463919b1e",
+                "reference": "35480f10e7ce9b0fdaf23d3799d7b79463919b1e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1.x-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "libs/Smarty.class.php",
+                    "libs/SmartyBC.class.php",
+                    "libs/sysplugins/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Monte Ohrt",
+                    "email": "monte@ohrt.com"
+                },
+                {
+                    "name": "Uwe Tews",
+                    "email": "uwe.tews@googlemail.com"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "rodney.rehm@medialize.de"
+                }
+            ],
+            "description": "Smarty - the compiling PHP template engine",
+            "homepage": "http://www.smarty.net",
+            "keywords": [
+                "templating"
+            ],
+            "time": "2015-12-21 01:57:06"
+        },
+        {
+            "name": "vanilla/garden-http",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-http.git",
+                "reference": "8aea1091eb01062921fd91a87a4a879a53ee946e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/8aea1091eb01062921fd91a87a4a879a53ee946e",
+                "reference": "8aea1091eb01062921fd91a87a4a879a53ee946e",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +138,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2015-12-10 21:39:51"
+            "time": "2016-03-25 22:29:23"
         },
         {
             "name": "vanilla/htmlawed",
@@ -88,16 +181,16 @@
         },
         {
             "name": "vanilla/nbbc",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/nbbc.git",
-                "reference": "15af1d533da305afe8b873a98e392b64f3862978"
+                "reference": "ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/15af1d533da305afe8b873a98e392b64f3862978",
-                "reference": "15af1d533da305afe8b873a98e392b64f3862978",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69",
+                "reference": "ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69",
                 "shasum": ""
             },
             "require": {
@@ -120,7 +213,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-03-25 15:15:41"
+            "time": "2016-04-26 18:19:47"
         }
     ],
     "packages-dev": [],

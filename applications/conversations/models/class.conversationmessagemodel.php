@@ -386,10 +386,10 @@ class ConversationMessageModel extends ConversationsModel {
      * Return the singleton instance of this class.
      */
     public static function instance() {
-        if (!isset(static::$instance)) {
-            static::$instance = new ConversationMessageModel();
+        if (!isset(self::$instance)) {
+            self::$instance = new ConversationMessageModel();
         }
-        return static::$instance;
+        return self::$instance;
     }
 
     /**

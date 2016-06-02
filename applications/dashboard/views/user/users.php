@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-$Alt = FALSE;
+$Alt = false;
 $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $DeleteUser = $Session->checkPermission('Garden.Users.Delete');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 foreach ($this->UserData->result() as $User) {
-    $Alt = $Alt ? FALSE : TRUE;
+    $Alt = !$Alt;
     ?>
     <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>
         data-userid="<?php echo $User->UserID ?>">
@@ -39,7 +39,7 @@ foreach ($this->UserData->result() as $User) {
         <td class="Alt"><?php echo Gdn_Format::date($User->DateFirstVisit, 'html'); ?></td>
         <td><?php echo Gdn_Format::date($User->DateLastActive, 'html'); ?></td>
         <?php if ($ViewPersonalInfo) : ?>
-            <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
+            <td><?php echo formatIP($User->LastIPAddress); ?></td>
         <?php endif; ?>
         <?php
         $this->EventArguments['User'] = $User;

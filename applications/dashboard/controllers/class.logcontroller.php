@@ -238,6 +238,44 @@ class LogController extends DashboardController {
         $this->render();
     }
 
+
+    /**
+     * Searches the logs for edit, delete or ban operations on posts made by the user with the given user ID.
+     *
+     * @param $recordUserID The user ID to search the logs for.
+     * @param string $Page The page number.
+     * @throws Exception
+     */
+    public function user($recordUserID, $Page = '') {
+        if (!is_numeric($recordUserID)) {
+            throw new Exception('Invalid ID');
+        }
+        $this->permission('Garden.Moderation.Manage');
+        list($Offset, $Limit) = offsetLimit($Page, 10);
+        $this->setData('Title', t('Change Log by User'));
+
+        $Where = array(
+            'Operation' => array('Edit', 'Delete', 'Ban'),
+            'RecordUserID' => $recordUserID
+        );
+
+        $RecordCount = $this->LogModel->getCountWhere($Where);
+        $this->setData('RecordCount', $RecordCount);
+        if ($Offset >= $RecordCount) {
+            $Offset = $RecordCount - $Limit;
+        }
+
+        $Log = $this->LogModel->getWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
+        $this->setData('Log', $Log);
+
+        if ($this->deliveryType() == DELIVERY_TYPE_VIEW) {
+            $this->View = 'Table';
+        }
+
+        $this->addSideMenu('dashboard/log/edits');
+        $this->render('record');
+    }
+
     /**
      * Convenience method to call model's FormatContent.
      *

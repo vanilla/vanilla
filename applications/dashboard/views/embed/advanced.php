@@ -39,25 +39,9 @@ $AllowEmbed = c('Garden.Embed.Allow');
 </div>
 <h1><?php echo t('Settings'); ?></h1>
 <div class="Info">
-    <h2>Trusted Domains</h2>
-
-    <p>You can optionally specify a white-list of trusted domains (ie.
-        yourdomain.com) that are allowed to embed elements of your community
-        (forum, comments, or modules).</p>
-
-    <p>
-        <small>
-            <strong>Notes:</strong>
-            Specify one domain per line, without protocol (ie. yourdomain.com).
-            <br/>The domain will include all subdomains (ie. yourdomain.com will
-            also allow blog.yourdomain.com, news.yourdomain.com, etc).
-            <br/>Leaving this input blank will mean that you allow embedding on any site, anywhere.
-        </small>
-    </p>
     <?php
     echo $this->Form->open();
     echo $this->Form->errors();
-    echo wrap($this->Form->textBox('Garden.TrustedDomains', array('MultiLine' => TRUE)), 'p');
     ?>
 
     <h2>Forum Embed Settings</h2>

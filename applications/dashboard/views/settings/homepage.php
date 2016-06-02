@@ -62,19 +62,19 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
             // Only show the vanilla pages if Vanilla is enabled
             $CurrentTarget = $this->data('CurrentTarget');
 
-            if (Gdn::ApplicationManager()->CheckApplication('Vanilla')) {
+            if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)) {
                 echo WriteHomepageOption('Discussions', 'discussions', 'SpDiscussions', $CurrentTarget);
                 echo WriteHomepageOption('Categories', 'categories', 'SpCategories', $CurrentTarget);
                 // echo WriteHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
             }
             //echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
 
-            if (Gdn::pluginManager()->CheckPlugin('Reactions')) {
+            if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON)) {
                 echo WriteHomepageOption('Best Of', 'bestof', 'SpBestOf', $CurrentTarget);
             }
             ?>
         </div>
-        <?php if (Gdn::ApplicationManager()->CheckApplication('Vanilla')): ?>
+        <?php if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)): ?>
             <div class="LayoutOptions DiscussionsLayout">
                 <p>
                     <?php echo wrap(t('Discussions Layout'), 'strong'); ?>

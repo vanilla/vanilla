@@ -50,7 +50,6 @@ $Configuration['Garden']['Authenticator']['SignOutUrl']         = '/entry/signou
 $Configuration['Garden']['Authenticator']['EnabledSchemes']     = array('password');
 $Configuration['Garden']['Authenticator']['SyncScreen']         = "smart";
 $Configuration['Garden']['Authenticators']['password']['Name']  = "Password";
-$Configuration['Garden']['Errors']['LogEnabled']                = FALSE;
 $Configuration['Garden']['Errors']['LogFile']                   = '';
 //$Configuration['Garden']['Errors']['MasterView']                = 'deverror.master.php'; // Used at installation time and you should use it too view when debugging
 $Configuration['Garden']['SignIn']['Popup']                     = TRUE; // Should the sign-in link pop up or go to it's own page? (SSO requires going to it's own external page)

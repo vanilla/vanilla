@@ -49,13 +49,24 @@ class StatisticsController extends DashboardController {
         $this->addSideMenu('dashboard/statistics');
         //$this->addJsFile('statistics.js');
         $this->title(t('Vanilla Statistics'));
-        $this->enableSlicing($this);
 
         if ($this->Form->authenticatedPostBack()) {
             $Flow = true;
 
             if ($Flow && $this->Form->getFormValue('Reregister')) {
+                $id = Gdn::installationID();
+                $secret = Gdn::installationSecret();
+                Gdn::installationID(false);
+                Gdn::installationSecret(false);
+
                 Gdn::Statistics()->register();
+
+                if (!Gdn::installationID()) {
+                    Gdn::installationID($id);
+                    Gdn::installationSecret($secret);
+                }
+                $this->Form->setFormValue('InstallationID', Gdn::installationID());
+                $this->Form->setFormValue('InstallationSecret', Gdn::installationSecret());
             }
 
             if ($Flow && $this->Form->getFormValue('Save')) {

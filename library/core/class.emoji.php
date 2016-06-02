@@ -192,7 +192,7 @@ class Emoji {
             ':/' => 'confused',
             ':o' => 'open_mouth',
             ':s' => 'confounded',
-            ':p' => 'stuck_out_tongue',
+            ':p' => 'tongue',
             ":'(" => 'cry',
             ':|' => 'neutral',
             'D:' => 'anguished',

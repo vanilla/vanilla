@@ -108,16 +108,13 @@ class PostController extends VanillaController {
         $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
         $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
         $Category = false;
+        $CategoryModel = new CategoryModel();
+
         if (isset($this->Discussion)) {
             $this->CategoryID = $this->Discussion->CategoryID;
             $Category = CategoryModel::categories($this->CategoryID);
         } elseif ($CategoryUrlCode != '') {
-            $CategoryModel = new CategoryModel();
-            if (is_numeric($CategoryUrlCode)) {
                 $Category = CategoryModel::categories($CategoryUrlCode);
-            } else {
-                $Category = $CategoryModel->getByCode($CategoryUrlCode);
-            }
 
             if ($Category) {
                 $this->CategoryID = val('CategoryID', $Category);
@@ -127,12 +124,14 @@ class PostController extends VanillaController {
         if ($Category) {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
+            $this->ShowCategorySelector = false;
+            $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
         } else {
             $this->CategoryID = 0;
             $this->Category = null;
         }
 
-        $CategoryData = $UseCategories ? CategoryModel::categories() : false;
+        $CategoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
 
        // Check permission
         if (isset($this->Discussion)) {
@@ -157,15 +156,25 @@ class PostController extends VanillaController {
                 $this->setData('Type', 'Discussion');
             }
         } else {
-           // Permission to add
+            // Permission to add.
+            if ($this->Category) {
+                $this->permission('Vanilla.Discussions.Add', true, 'Category', $this->Category->PermissionCategoryID);
+            } else {
             $this->permission('Vanilla.Discussions.Add');
+            }
             $this->title(t('New Discussion'));
         }
 
         touchValue('Type', $this->Data, 'Discussion');
 
        // See if we should hide the category dropdown.
-        $AllowedCategories = CategoryModel::getByPermission('Discussions.Add', $this->Form->getValue('CategoryID', $this->CategoryID), array('Archived' => 0, 'AllowDiscussions' => 1), array('AllowedDiscussionTypes' => $this->Data['Type']));
+        if ($this->ShowCategorySelector) {
+            $AllowedCategories = CategoryModel::getByPermission(
+                'Discussions.Add',
+                $this->Form->getValue('CategoryID', $this->CategoryID),
+                ['Archived' => 0, 'AllowDiscussions' => 1],
+                ['AllowedDiscussionTypes' => $this->Data['Type']]
+            );
         if (count($AllowedCategories) == 1) {
             $AllowedCategory = array_pop($AllowedCategories);
             $this->ShowCategorySelector = false;
@@ -173,6 +182,7 @@ class PostController extends VanillaController {
 
             if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {
                 $this->Form->setFormValue('CategoryID', $AllowedCategory['CategoryID']);
+        }
             }
         }
 
@@ -300,9 +310,9 @@ class PostController extends VanillaController {
                         $this->fireEvent('AfterDiscussionSave');
 
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                            redirect(discussionUrl($Discussion)).'?new=1';
+                            redirect(discussionUrl($Discussion, 1)).'?new=1';
                         } else {
-                            $this->RedirectUrl = discussionUrl($Discussion, '', true).'?new=1';
+                            $this->RedirectUrl = discussionUrl($Discussion, 1, true).'?new=1';
                         }
                     } else {
                        // If this was a draft save, notify the user about the save
@@ -432,7 +442,11 @@ class PostController extends VanillaController {
                 $Title = val('Title', $PageInfo, '');
                 if ($Title == '') {
                     $Title = t('Undefined discussion subject.');
+                    if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
+                        $Title .= ' '.t('Page timed out.');
                 }
+
+            }
             }
 
             $Description = val('Description', $PageInfo, '');
@@ -792,7 +806,7 @@ class PostController extends VanillaController {
                 }
             }
         } elseif ($this->Request->isPostBack()) {
-            throw new Gdn_UserException('Invalid CSRF token.', 401);
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 401);
         } else {
            // Load form
             if (isset($this->Comment)) {

@@ -29,7 +29,7 @@ if ($Photo) {
         $Img = img($Photo, array('class' => 'ProfilePhotoLarge'));
         $canEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
         if (!$User->Banned && $canEditPhotos && (Gdn::session()->UserID == $User->UserID || Gdn::session()->checkPermission('Garden.Users.Edit')))
-            echo anchor(Wrap(t('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture');
+            echo anchor(Wrap(t('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture Popup');
 
         echo $Img;
         ?>

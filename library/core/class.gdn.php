@@ -21,6 +21,8 @@ class Gdn {
 
     const AliasAuthenticator = 'Authenticator';
 
+    const AliasAddonManager = 'AddonManager';
+
     const AliasCache = 'Cache';
 
     const AliasConfig = 'Config';
@@ -85,6 +87,15 @@ class Gdn {
     protected static $_Session = null;
 
     /**
+     * Get the addon manager.
+     *
+     * @return \Vanilla\AddonManager
+     */
+    public static function addonManager() {
+        return self::factory(self::AliasAddonManager);
+    }
+
+    /**
      * Get the application manager
      *
      * @return Gdn_ApplicationManager
@@ -116,7 +127,7 @@ class Gdn {
      *
      * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
      * @param mixed $Default The result to return if the configuration setting is not found.
-     * @return Gdn_Config|mixed The configuration setting.
+     * @return Gdn_Configuration|mixed The configuration setting.
      */
     public static function config($Name = false, $Default = false) {
         $Config = self::$_Config;

@@ -1108,7 +1108,11 @@ class UserController extends DashboardController {
      * @param int $limit
      */
     public function tagSearch($q, $limit = 10) {
-        $data = Gdn::userModel()->tagSearch($q, $limit);
+        if (!empty($q)) {
+            $data = Gdn::userModel()->tagSearch($q, $limit);
+        } else {
+            $data = [];
+        }
         $this->contentType('application/json; charset=utf-8');
         $this->sendHeaders();
         die(json_encode($data));

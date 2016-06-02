@@ -27,7 +27,7 @@ function smarty_function_asset($Params, &$Smarty) {
 		$Class = ' class="'.$Class.'"';
     }
 	
-	$Controller = $Smarty->Controller;
+	$Controller = Gdn::controller();
     $Controller->EventArguments['AssetName'] = $Name;
    
     $Result = '';

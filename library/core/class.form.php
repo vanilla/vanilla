@@ -267,36 +267,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function captcha() {
-        $handled = false;
-        $this->EventArguments['Handled'] =& $handled;
         $this->fireEvent('Captcha');
-        if ($handled) {
-            // A plugin handled the captcha so don't display anything more.
-            return;
-        }
-        
-        if (!c('Garden.Registration.CaptchaPublicKey') || !c('Garden.Registration.CaptchaPrivateKey')) {
-            return '<div class="Warning">' . t('reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
-        }
-
-        // Google whitelist https://developers.google.com/recaptcha/docs/language
-        $whitelist = array('ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi');
-
-        // Use our current locale against the whitelist.
-        $language = Gdn::locale()->language();
-        if (!in_array($language, $whitelist)) {
-            $language = (in_array(Gdn::locale()->Locale, $whitelist)) ? Gdn::locale()->Locale : false;
-        }
-
-        Gdn::controller()->Head->addScript('https://www.google.com/recaptcha/api.js?hl=' . $language);
-
-        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => c('Garden.Registration.CaptchaPublicKey'));
-
-        // see https://developers.google.com/recaptcha/docs/display for details
-        $this->EventArguments['Attributes'] = &$attributes;
-        $this->fireEvent('BeforeCaptcha');
-
-        return '<div '. attribute($attributes) . '></div>';
     }
 
     /**
@@ -1206,25 +1177,25 @@ class Gdn_Form extends Gdn_Pluggable {
         $RowCount = count($Rows);
         $ColCount = count($Cols);
         for ($j = 0; $j < $RowCount; ++$j) {
-            $Alt = 1;
+            $Alt = true;
             for ($i = 0; $i < $ColCount; ++$i) {
-                $Alt = $Alt == 0 ? 1 : 0;
                 $ColName = $Cols[$i];
                 $RowName = $Rows[$j];
 
                 if ($j == 0) {
-                    $Headings .= '<td'.($Alt == 0 ? ' class="Alt"' : '').
+                    $Headings .= '<td'.($Alt ? ' class="Alt"' : '').
                     '>'.T($ColName).'</td>';
                 }
 
                 if (array_key_exists($RowName, $Group[$ColName])) {
-                    $Cells .= '<td'.($Alt == 0 ? ' class="Alt"' : '').
+                    $Cells .= '<td'.($Alt ? ' class="Alt"' : '').
                         '>'.$Group[$ColName][$RowName].
                         '</td>';
                 } else {
-                    $Cells .= '<td'.($Alt == 0 ? ' class="Alt"' : '').
+                    $Cells .= '<td'.($Alt ? ' class="Alt"' : '').
                         '>&#160;</td>';
                 }
+                $Alt = !$Alt;
             }
             if ($Headings != '') {
                 $Return .= "<thead><tr><th>".t($GroupName)."</th>".
@@ -1854,7 +1825,7 @@ PASSWORDMETER;
         $result = Gdn::session()->validateTransientKey($postBackKey);
 
         if (!$result && $throw && Gdn::request()->isPostBack()) {
-            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
         }
 
         return $result;

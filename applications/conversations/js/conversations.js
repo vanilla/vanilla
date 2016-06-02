@@ -41,7 +41,7 @@ jQuery(document).ready(function($) {
                   clearMessageForm();
 
                   // And show the new comments
-                  $('ul.Conversation').append(json.Data);
+                  $('ul.Conversation').appendTrigger(json.Data);
 
                   // Remove any "More" pager links
                   $('#PagerMore').remove();
@@ -170,7 +170,7 @@ jQuery(document).ready(function($) {
                    var id = $(this).attr('id');
 
                    if ($('#'+id).length == 0) {
-                   $(this).appendTo($list);
+                   $(this).appendTo($list).trigger('contentLoad');
                    }
                });
            }

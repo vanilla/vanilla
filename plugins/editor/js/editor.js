@@ -1590,6 +1590,14 @@
                                     if (!singleInstance) {
                                         //scrollToEditorContainer(editor.textarea.element);
                                         editor.focus();
+                                    } else {
+                                        // Bug in IE 10,11 where the caret is placed outside of the editor because it is hidden
+                                        // The bug is caused by focusWithoutScrolling() from wysihtml5-0.4.0pre
+                                        // To circumvent the issue let's focus the editor instead.
+                                        var formWrapper = $('div.FormWrapper');
+                                        formWrapper.on('focus', function() {
+                                            editor.focus();
+                                        });
                                     }
 
                                     if (debug) {
@@ -1769,10 +1777,6 @@
             }
         } //editorInit
 
-        // Initialize new editors.
-        $(document).on('EditCommentFormLoaded popupReveal', function () {
-            editorInit('', $(selector));
-        })
         editorInit('', this);
 
         // jQuery chaining
@@ -1780,10 +1784,8 @@
     };
 }(jQuery));
 
-
-// Set all .BodyBox elements as editor, calling plugin above.
-jQuery(document).ready(function($) {
-    $('.BodyBox').setAsEditor();
+$(document).on('contentLoad', function(e) {
+    $('.BodyBox', e.target).setAsEditor();
 });
 
 /*

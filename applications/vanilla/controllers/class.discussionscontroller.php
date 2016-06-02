@@ -611,10 +611,11 @@ class DiscussionsController extends VanillaController {
 
     /**
      * Set user preference for sorting discussions.
+     *
+     * @param string $Target The target to redirect to.
      */
     public function sort($Target = '') {
         deprecated("sort");
-        return;
 
         if (!Gdn::session()->isValid()) {
             throw permissionException();
@@ -624,23 +625,12 @@ class DiscussionsController extends VanillaController {
             throw forbiddenException('GET');
         }
 
-        // Get param
-        $SortField = Gdn::request()->Post('DiscussionSort');
-        $SortField = 'd.'.stringBeginsWith($SortField, 'd.', true, true);
-
-        // Use whitelist here too to keep database clean
-        if (!in_array($SortField, DiscussionModel::AllowedSortFields())) {
-            throw new Gdn_UserException("Unknown sort $SortField.");
-        }
-
-        // Set user pref
-        Gdn::userModel()->SavePreference(Gdn::session()->UserID, 'Discussions.SortField', $SortField);
-
         if ($Target) {
             redirect($Target);
         }
 
         // Send sorted discussions.
+        $this->setData('Deprecated', true);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
     }

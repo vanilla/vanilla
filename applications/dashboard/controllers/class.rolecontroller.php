@@ -161,6 +161,12 @@ class RoleController extends DashboardController {
         } else {
             $this->removeRankPermissions();
 
+            // Make sure the role's checkbox has a false value so that the role model can handle a sparse update of
+            // column from other places.
+            if (!$this->Form->getFormValue('PersonalInfo')) {
+                $this->Form->setFormValue('PersonalInfo', false);
+            }
+
             // If the form has been posted back...
             // 2. Save the data (validation occurs within):
             if ($RoleID = $this->Form->save()) {

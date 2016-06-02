@@ -40,7 +40,7 @@ class InThisDiscussionModule extends Gdn_Module {
             ->from('User u')
             ->join('Comment c', 'u.UserID = c.InsertUserID')
             ->where('c.DiscussionID', $DiscussionID)
-            ->groupBy('u.UserID, u.Name')
+            ->groupBy('u.UserID, u.Name, u.Photo')
             ->orderBy('c.DateInserted', 'desc')
             ->limit($Limit)
             ->get();

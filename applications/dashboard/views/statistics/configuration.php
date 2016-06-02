@@ -64,7 +64,7 @@
         <ul>
             <li>
                 <?php echo $this->Form->label('API Status'); ?>
-                <div class="Slice Async" rel="statistics/verify"></div>
+                <div class="Popin" rel="/statistics/verify"></div>
             </li>
             <li>
                 <?php

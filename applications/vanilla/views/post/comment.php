@@ -48,7 +48,7 @@ $this->fireEvent('BeforeCommentForm');
                     if ($CategoryID = $this->data('Discussion.CategoryID')) {
                         $Category = CategoryModel::categories($CategoryID);
                         if ($Category) {
-                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), $Category['Url']);
+                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));
                         }
                     }
                     echo '</span>';

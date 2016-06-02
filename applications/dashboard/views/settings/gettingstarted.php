@@ -241,31 +241,7 @@ echo $this->Form->errors();
             <div class="NumberPoint"><?= t('4'); ?></div>
             <h2><?php echo t('Encourage your friends to join your new community!'); ?></h2>
 
-            <div class="TextBoxWrapper">
-                <?php
-                $Attribs = array('Multiline' => true, 'class' => 'Message');
-                if (!$this->Form->authenticatedPostBack())
-                    $Attribs['value'] = t('Check out the new community forum I\'ve just set up.');
-                echo $this->Form->textBox('InvitationMessage', $Attribs);
-                echo $this->Form->textBox('Recipients', array('class' => 'RecipientBox'));
-                ?>
-            </div>
-            <script type="text/javascript">
-                jQuery(document).ready(function($) {
-                    if ($('input.RecipientBox').val() == '')
-                        $('input.RecipientBox').val("<?php echo $this->TextEnterEmails; ?>");
-
-                    $('input.RecipientBox').focus(function() {
-                        if ($(this).val() == "<?php echo $this->TextEnterEmails; ?>")
-                            $(this).val('');
-                    });
-                    $('input.RecipientBox').blur(function() {
-                        if ($(this).val() == '')
-                            $(this).val("<?php echo $this->TextEnterEmails; ?>");
-                    });
-                });
-            </script>
-            <?php echo $this->Form->button(t('Send Invitations!')); ?>
+            <p><?php echo t('Invite your friends to register to your new forum!'); ?></p>
         </div>
     </div>
 <?php echo $this->Form->close(); ?>

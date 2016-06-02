@@ -1784,52 +1784,6 @@ class SettingsController extends DashboardController {
 
         $this->setData('Title', t('Getting Started'));
         $this->addSideMenu('dashboard/settings/gettingstarted');
-        $this->TextEnterEmails = t('TextEnterEmails', 'Type email addresses separated by commas here');
-
-        if ($this->Form->authenticatedPostBack()) {
-            // Do invitations to new members.
-            $Message = $this->Form->getFormValue('InvitationMessage');
-            $Message = trim($Message);
-            $Recipients = $this->Form->getFormValue('Recipients');
-            if ($Recipients == $this->TextEnterEmails) {
-                $Recipients = '';
-            }
-
-            $Recipients = explode(',', $Recipients);
-            $CountRecipients = 0;
-            foreach ($Recipients as $Recipient) {
-                if (trim($Recipient) != '') {
-                    $CountRecipients++;
-                    if (!validateEmail($Recipient)) {
-                        $this->Form->addError(sprintf(t('%s is not a valid email address'), $Recipient));
-                    }
-                }
-            }
-            if ($CountRecipients == 0) {
-                $this->Form->addError(t('You must provide at least one recipient'));
-            }
-            if ($this->Form->errorCount() == 0) {
-                $Email = new Gdn_Email();
-                $Email->subject(t('Check out my new community!'));
-                $emailTemplate = $Email->getEmailTemplate();
-                $emailTemplate->setMessage($Message, true)
-                    ->setButton(externalUrl('/'), t('Check it out'));
-                $Email->setEmailTemplate($emailTemplate);
-                foreach ($Recipients as $Recipient) {
-                    if (trim($Recipient) != '') {
-                        $Email->to($Recipient);
-                        try {
-                            $Email->send();
-                        } catch (Exception $ex) {
-                            $this->Form->addError($ex);
-                        }
-                    }
-                }
-            }
-            if ($this->Form->errorCount() == 0) {
-                $this->informMessage(t('Your invitations were sent successfully.'));
-            }
-        }
 
         $this->render();
     }

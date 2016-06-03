@@ -114,16 +114,16 @@ if ($AddonUrl != '')
                     $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
                     $PreviewUrl = val('ScreenshotUrl', $ThemeInfo, false);
 
-                    $class .= $Active ? ' Enabled' : '';
+                    $class = $Active ? ' Enabled' : '';
                     $class .= $PreviewUrl ? ' HasPreview' : '';
                     ?>
-                    <li class="<?php echo $class; ?>">
+                    <li class="<?php echo $class; ?> label-selector-item">
                         <?php
                         echo '<div class="image-wrap">';
                         if ($PreviewUrl !== FALSE) {
-                            echo Img($PreviewUrl, array('alt' => $ScreenName));
+                            echo Img($PreviewUrl, array('alt' => $ScreenName, 'class' => 'label-selector-image'));
                         } else {
-                            echo img('themes/default/screenshot.png');
+                            echo img('themes/default/screenshot.png', array('alt' => $ScreenName, 'class' => 'label-selector-image'));
                         }
                         echo '<div class="overlay">';
                         echo '<div class="buttons">';

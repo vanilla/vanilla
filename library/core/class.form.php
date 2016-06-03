@@ -41,7 +41,7 @@ class Gdn_Form extends Gdn_Pluggable {
         'bootstrap' => [
             'default' => 'form-control',
             'bodybox' => 'form-control js-bodybox',
-            'button' => 'btn',
+            'button' => 'btn btn-primary',
             'button-element' => 'button',
             'checkbox' => '',
             'checkbox-container' => 'checkbox',

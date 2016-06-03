@@ -177,7 +177,7 @@ linters:
   SelectorDepth:
     enabled: true
     exclude: vendors/**
-    max_depth: 3
+    max_depth: 4
 
   SelectorFormat:
     enabled: false

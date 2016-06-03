@@ -6,7 +6,7 @@
   src: font-source-declaration("vanillicon", font-files("vanillicon.woff", "woff", "vanillicon.ttf", "truetype", "vanillicon.svg", "svg"), normal, eot woff2 woff ttf svg, font-url-prefixer(normal));
 }
 
-.icon:before {
+.icon:before, .search-wrap::before {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -20,7 +20,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.icon:before {
+.icon:before, .search-wrap::before {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -994,7 +994,7 @@ mark {
   color: #000;
 }
 
-small, .SelectionGrid em, .DataList li .Connection-Name .Addendums {
+small, .DataList li .Connection-Name .Addendums {
   font-size: 80%;
 }
 
@@ -1474,7 +1474,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .PanelInfo li a.current-tab,
 .tabbed-content .PanelInfo li .nav-tabs a.current-tab, .nav-tabs .PanelInfo li
 .tabbed-content a.current-tab, .PanelInfo li
-.tabbed-content .nav-tabs a.current-tab, .nav-tabs .nav-link.Current, .nav-tabs .PanelInfo li a.Current, .PanelInfo li .nav-tabs a.Current, .nav-tabs .PanelInfo li a.active, .PanelInfo li .nav-tabs a.active, .nav-tabs .PanelInfo .Active a, .PanelInfo .Active .nav-tabs a, .nav-tabs .PanelInfo li a:hover, .PanelInfo li .nav-tabs a:hover, .nav-tabs .nav-link.active:focus, .nav-tabs .Tabs ul li.Active a.nav-link:focus, .Tabs ul li.Active .nav-tabs a.nav-link:focus, .nav-tabs
+.tabbed-content .nav-tabs a.current-tab, .nav-tabs .nav-link.Current, .nav-tabs .PanelInfo li a.Current, .PanelInfo li .nav-tabs a.Current, .nav-tabs
+.nav-link.current-theme, .nav-tabs .PanelInfo li a.current-theme, .PanelInfo li .nav-tabs a.current-theme, .nav-tabs .PanelInfo li a.active, .PanelInfo li .nav-tabs a.active, .nav-tabs .PanelInfo .Active a, .PanelInfo .Active .nav-tabs a, .nav-tabs .PanelInfo li a:hover, .PanelInfo li .nav-tabs a:hover, .nav-tabs .nav-link.active:focus, .nav-tabs .Tabs ul li.Active a.nav-link:focus, .Tabs ul li.Active .nav-tabs a.nav-link:focus, .nav-tabs
 .Tabs ul .nav-link.current-tab:focus,
 .Tabs ul .nav-tabs .nav-link.current-tab:focus, .nav-tabs
 .Tabs ul .PanelInfo li a.current-tab:focus,
@@ -1488,7 +1489,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .PanelInfo li a.current-tab:focus,
 .tabbed-content .PanelInfo li .nav-tabs a.current-tab:focus, .nav-tabs .PanelInfo li
 .tabbed-content a.current-tab:focus, .PanelInfo li
-.tabbed-content .nav-tabs a.current-tab:focus, .nav-tabs .nav-link.Current:focus, .nav-tabs .PanelInfo li a.Current:focus, .PanelInfo li .nav-tabs a.Current:focus, .nav-tabs .PanelInfo li a.active:focus, .PanelInfo li .nav-tabs a.active:focus, .nav-tabs .PanelInfo .Active a:focus, .PanelInfo .Active .nav-tabs a:focus, .nav-tabs .PanelInfo li a:focus:hover, .PanelInfo li .nav-tabs a:focus:hover, .nav-tabs .nav-link.active:hover, .nav-tabs .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .nav-tabs a.nav-link:hover, .nav-tabs
+.tabbed-content .nav-tabs a.current-tab:focus, .nav-tabs .nav-link.Current:focus, .nav-tabs .PanelInfo li a.Current:focus, .PanelInfo li .nav-tabs a.Current:focus, .nav-tabs
+.nav-link.current-theme:focus, .nav-tabs .PanelInfo li a.current-theme:focus, .PanelInfo li .nav-tabs a.current-theme:focus, .nav-tabs .PanelInfo li a.active:focus, .PanelInfo li .nav-tabs a.active:focus, .nav-tabs .PanelInfo .Active a:focus, .PanelInfo .Active .nav-tabs a:focus, .nav-tabs .PanelInfo li a:focus:hover, .PanelInfo li .nav-tabs a:focus:hover, .nav-tabs .nav-link.active:hover, .nav-tabs .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .nav-tabs a.nav-link:hover, .nav-tabs
 .Tabs ul .nav-link.current-tab:hover,
 .Tabs ul .nav-tabs .nav-link.current-tab:hover, .nav-tabs
 .Tabs ul .PanelInfo li a.current-tab:hover,
@@ -1502,7 +1504,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .PanelInfo li a.current-tab:hover,
 .tabbed-content .PanelInfo li .nav-tabs a.current-tab:hover, .nav-tabs .PanelInfo li
 .tabbed-content a.current-tab:hover, .PanelInfo li
-.tabbed-content .nav-tabs a.current-tab:hover, .nav-tabs .nav-link.Current:hover, .nav-tabs .PanelInfo li a.Current:hover, .PanelInfo li .nav-tabs a.Current:hover, .nav-tabs .PanelInfo li a.active:hover, .PanelInfo li .nav-tabs a.active:hover, .nav-tabs .PanelInfo .Active a:hover, .PanelInfo .Active .nav-tabs a:hover, .nav-tabs .PanelInfo li a:hover, .PanelInfo li .nav-tabs a:hover,
+.tabbed-content .nav-tabs a.current-tab:hover, .nav-tabs .nav-link.Current:hover, .nav-tabs .PanelInfo li a.Current:hover, .PanelInfo li .nav-tabs a.Current:hover, .nav-tabs
+.nav-link.current-theme:hover, .nav-tabs .PanelInfo li a.current-theme:hover, .PanelInfo li .nav-tabs a.current-theme:hover, .nav-tabs .PanelInfo li a.active:hover, .PanelInfo li .nav-tabs a.active:hover, .nav-tabs .PanelInfo .Active a:hover, .PanelInfo .Active .nav-tabs a:hover, .nav-tabs .PanelInfo li a:hover, .PanelInfo li .nav-tabs a:hover,
 .nav-tabs .nav-item.open .nav-link,
 .nav-tabs .PanelInfo li.open .nav-link, .PanelInfo
 .nav-tabs li.open .nav-link,
@@ -1566,7 +1569,9 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .nav-link.current-tab,
 .tabbed-content .PanelInfo .nav-link.current-tab,
 .tabbed-content .PanelInfo li a.current-tab, .PanelInfo li
-.tabbed-content a.current-tab, .nav-pills .nav-link.Current, .PanelInfo .nav-link.Current, .nav-pills .PanelInfo li a.Current, .PanelInfo li .nav-pills a.Current, .PanelInfo li a.Current, .nav-pills .PanelInfo li a.active, .PanelInfo li .nav-pills a.active, .PanelInfo li a.active, .nav-pills .PanelInfo .Active a, .PanelInfo .Active .nav-pills a, .PanelInfo .Active a, .nav-pills .PanelInfo li a:hover, .PanelInfo li .nav-pills a:hover, .PanelInfo li a:hover, .nav-pills .nav-link.active:focus, .PanelInfo .nav-link.active:focus, .nav-pills .Tabs ul li.Active a.nav-link:focus, .Tabs ul li.Active .nav-pills a.nav-link:focus, .Tabs ul li.Active .PanelInfo a.nav-link:focus, .nav-pills
+.tabbed-content a.current-tab, .nav-pills .nav-link.Current, .PanelInfo .nav-link.Current, .nav-pills .PanelInfo li a.Current, .PanelInfo li .nav-pills a.Current, .PanelInfo li a.Current, .nav-pills
+.nav-link.current-theme, .PanelInfo
+.nav-link.current-theme, .nav-pills .PanelInfo li a.current-theme, .PanelInfo li .nav-pills a.current-theme, .PanelInfo li a.current-theme, .nav-pills .PanelInfo li a.active, .PanelInfo li .nav-pills a.active, .PanelInfo li a.active, .nav-pills .PanelInfo .Active a, .PanelInfo .Active .nav-pills a, .PanelInfo .Active a, .nav-pills .PanelInfo li a:hover, .PanelInfo li .nav-pills a:hover, .PanelInfo li a:hover, .nav-pills .nav-link.active:focus, .PanelInfo .nav-link.active:focus, .nav-pills .Tabs ul li.Active a.nav-link:focus, .Tabs ul li.Active .nav-pills a.nav-link:focus, .Tabs ul li.Active .PanelInfo a.nav-link:focus, .nav-pills
 .Tabs ul .nav-link.current-tab:focus,
 .Tabs ul .nav-pills .nav-link.current-tab:focus, .PanelInfo
 .Tabs ul .nav-link.current-tab:focus,
@@ -1581,7 +1586,9 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .nav-link.current-tab:focus,
 .tabbed-content .PanelInfo .nav-link.current-tab:focus,
 .tabbed-content .PanelInfo li a.current-tab:focus, .PanelInfo li
-.tabbed-content a.current-tab:focus, .nav-pills .nav-link.Current:focus, .PanelInfo .nav-link.Current:focus, .nav-pills .PanelInfo li a.Current:focus, .PanelInfo li .nav-pills a.Current:focus, .PanelInfo li a.Current:focus, .nav-pills .PanelInfo li a.active:focus, .PanelInfo li .nav-pills a.active:focus, .PanelInfo li a.active:focus, .nav-pills .PanelInfo .Active a:focus, .PanelInfo .Active .nav-pills a:focus, .PanelInfo .Active a:focus, .nav-pills .PanelInfo li a:focus:hover, .PanelInfo li .nav-pills a:focus:hover, .PanelInfo li a:focus:hover, .nav-pills .nav-link.active:hover, .PanelInfo .nav-link.active:hover, .nav-pills .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .nav-pills a.nav-link:hover, .Tabs ul li.Active .PanelInfo a.nav-link:hover, .nav-pills
+.tabbed-content a.current-tab:focus, .nav-pills .nav-link.Current:focus, .PanelInfo .nav-link.Current:focus, .nav-pills .PanelInfo li a.Current:focus, .PanelInfo li .nav-pills a.Current:focus, .PanelInfo li a.Current:focus, .nav-pills
+.nav-link.current-theme:focus, .PanelInfo
+.nav-link.current-theme:focus, .nav-pills .PanelInfo li a.current-theme:focus, .PanelInfo li .nav-pills a.current-theme:focus, .PanelInfo li a.current-theme:focus, .nav-pills .PanelInfo li a.active:focus, .PanelInfo li .nav-pills a.active:focus, .PanelInfo li a.active:focus, .nav-pills .PanelInfo .Active a:focus, .PanelInfo .Active .nav-pills a:focus, .PanelInfo .Active a:focus, .nav-pills .PanelInfo li a:focus:hover, .PanelInfo li .nav-pills a:focus:hover, .PanelInfo li a:focus:hover, .nav-pills .nav-link.active:hover, .PanelInfo .nav-link.active:hover, .nav-pills .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .nav-pills a.nav-link:hover, .Tabs ul li.Active .PanelInfo a.nav-link:hover, .nav-pills
 .Tabs ul .nav-link.current-tab:hover,
 .Tabs ul .nav-pills .nav-link.current-tab:hover, .PanelInfo
 .Tabs ul .nav-link.current-tab:hover,
@@ -1592,7 +1599,9 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .nav-link.current-tab:hover,
 .tabbed-content .nav-pills .nav-link.current-tab:hover, .PanelInfo
 .tabbed-content .nav-link.current-tab:hover,
-.tabbed-content .PanelInfo .nav-link.current-tab:hover, .nav-pills .nav-link.Current:hover, .PanelInfo .nav-link.Current:hover, .nav-pills .PanelInfo li a.Current:hover, .PanelInfo li .nav-pills a.Current:hover, .nav-pills .PanelInfo li a.active:hover, .PanelInfo li .nav-pills a.active:hover, .nav-pills .PanelInfo .Active a:hover, .PanelInfo .Active .nav-pills a:hover, .PanelInfo .Active a:hover, .nav-pills .PanelInfo li a:hover, .PanelInfo li .nav-pills a:hover, .PanelInfo li a:hover,
+.tabbed-content .PanelInfo .nav-link.current-tab:hover, .nav-pills .nav-link.Current:hover, .PanelInfo .nav-link.Current:hover, .nav-pills .PanelInfo li a.Current:hover, .PanelInfo li .nav-pills a.Current:hover, .nav-pills
+.nav-link.current-theme:hover, .PanelInfo
+.nav-link.current-theme:hover, .nav-pills .PanelInfo li a.current-theme:hover, .PanelInfo li .nav-pills a.current-theme:hover, .nav-pills .PanelInfo li a.active:hover, .PanelInfo li .nav-pills a.active:hover, .nav-pills .PanelInfo .Active a:hover, .PanelInfo .Active .nav-pills a:hover, .PanelInfo .Active a:hover, .nav-pills .PanelInfo li a:hover, .PanelInfo li .nav-pills a:hover, .PanelInfo li a:hover,
 .nav-pills .nav-item.open .nav-link, .PanelInfo .nav-item.open .nav-link,
 .nav-pills .PanelInfo li.open .nav-link, .PanelInfo
 .nav-pills li.open .nav-link, .PanelInfo li.open .nav-link,
@@ -1636,7 +1645,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tab-content > .active, .Tabs ul li.Active .tab-content > a,
 .Tabs ul .tab-content > .current-tab,
 .tabbed-content li.Active .tab-content > a,
-.tabbed-content .tab-content > .current-tab, .tab-content > .Current {
+.tabbed-content .tab-content > .current-tab, .tab-content > .Current, .tab-content >
+.current-theme {
   display: block;
 }
 
@@ -2065,6 +2075,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .navbar-light .navbar-nav .current-tab > .nav-link,
 .navbar-light .navbar-nav .Current > .nav-link,
+.navbar-light .navbar-nav
+.current-theme > .nav-link,
 .navbar-light .navbar-nav .PanelInfo li .active > a, .PanelInfo li
 .navbar-light .navbar-nav .active > a,
 .navbar-light .navbar-nav .Tabs ul .PanelInfo li.Active a > a, .PanelInfo
@@ -2097,6 +2109,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-light .navbar-nav .current-tab > a,
 .navbar-light .navbar-nav .PanelInfo li .Current > a, .PanelInfo li
 .navbar-light .navbar-nav .Current > a,
+.navbar-light .navbar-nav .PanelInfo li
+.current-theme > a, .PanelInfo li
+.navbar-light .navbar-nav
+.current-theme > a,
 .navbar-light .navbar-nav .active > .nav-link:focus,
 .navbar-light .navbar-nav .Tabs ul li.Active a > .nav-link:focus, .Tabs ul li.Active
 .navbar-light .navbar-nav a > .nav-link:focus,
@@ -2113,6 +2129,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .navbar-light .navbar-nav .current-tab > .nav-link:focus,
 .navbar-light .navbar-nav .Current > .nav-link:focus,
+.navbar-light .navbar-nav
+.current-theme > .nav-link:focus,
 .navbar-light .navbar-nav .PanelInfo li .active > a:focus, .PanelInfo li
 .navbar-light .navbar-nav .active > a:focus,
 .navbar-light .navbar-nav .Tabs ul .PanelInfo li.Active a > a:focus, .PanelInfo
@@ -2145,6 +2163,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-light .navbar-nav .current-tab > a:focus,
 .navbar-light .navbar-nav .PanelInfo li .Current > a:focus, .PanelInfo li
 .navbar-light .navbar-nav .Current > a:focus,
+.navbar-light .navbar-nav .PanelInfo li
+.current-theme > a:focus, .PanelInfo li
+.navbar-light .navbar-nav
+.current-theme > a:focus,
 .navbar-light .navbar-nav .active > .nav-link:hover,
 .navbar-light .navbar-nav .Tabs ul li.Active a > .nav-link:hover, .Tabs ul li.Active
 .navbar-light .navbar-nav a > .nav-link:hover,
@@ -2161,6 +2183,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .navbar-light .navbar-nav .current-tab > .nav-link:hover,
 .navbar-light .navbar-nav .Current > .nav-link:hover,
+.navbar-light .navbar-nav
+.current-theme > .nav-link:hover,
 .navbar-light .navbar-nav .PanelInfo li .active > a:hover, .PanelInfo li
 .navbar-light .navbar-nav .active > a:hover,
 .navbar-light .navbar-nav .Tabs ul .PanelInfo li.Active a > a:hover, .PanelInfo
@@ -2193,6 +2217,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-light .navbar-nav .current-tab > a:hover,
 .navbar-light .navbar-nav .PanelInfo li .Current > a:hover, .PanelInfo li
 .navbar-light .navbar-nav .Current > a:hover,
+.navbar-light .navbar-nav .PanelInfo li
+.current-theme > a:hover, .PanelInfo li
+.navbar-light .navbar-nav
+.current-theme > a:hover,
 .navbar-light .navbar-nav .nav-link.open,
 .navbar-light .navbar-nav .PanelInfo li a.open, .PanelInfo li
 .navbar-light .navbar-nav a.open,
@@ -2236,6 +2264,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-light .navbar-nav .nav-link.Current,
 .navbar-light .navbar-nav .PanelInfo li a.Current, .PanelInfo li
 .navbar-light .navbar-nav a.Current,
+.navbar-light .navbar-nav
+.nav-link.current-theme,
+.navbar-light .navbar-nav .PanelInfo li a.current-theme, .PanelInfo li
+.navbar-light .navbar-nav a.current-theme,
 .navbar-light .navbar-nav .PanelInfo li a.active, .PanelInfo li
 .navbar-light .navbar-nav a.active,
 .navbar-light .navbar-nav .PanelInfo .Active a, .PanelInfo .Active
@@ -2276,6 +2308,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-light .navbar-nav .nav-link.Current:focus,
 .navbar-light .navbar-nav .PanelInfo li a.Current:focus, .PanelInfo li
 .navbar-light .navbar-nav a.Current:focus,
+.navbar-light .navbar-nav
+.nav-link.current-theme:focus,
+.navbar-light .navbar-nav .PanelInfo li a.current-theme:focus, .PanelInfo li
+.navbar-light .navbar-nav a.current-theme:focus,
 .navbar-light .navbar-nav .PanelInfo li a.active:focus, .PanelInfo li
 .navbar-light .navbar-nav a.active:focus,
 .navbar-light .navbar-nav .PanelInfo .Active a:focus, .PanelInfo .Active
@@ -2316,6 +2352,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-light .navbar-nav .nav-link.Current:hover,
 .navbar-light .navbar-nav .PanelInfo li a.Current:hover, .PanelInfo li
 .navbar-light .navbar-nav a.Current:hover,
+.navbar-light .navbar-nav
+.nav-link.current-theme:hover,
+.navbar-light .navbar-nav .PanelInfo li a.current-theme:hover, .PanelInfo li
+.navbar-light .navbar-nav a.current-theme:hover,
 .navbar-light .navbar-nav .PanelInfo li a.active:hover, .PanelInfo li
 .navbar-light .navbar-nav a.active:hover,
 .navbar-light .navbar-nav .PanelInfo .Active a:hover, .PanelInfo .Active
@@ -2362,6 +2402,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .navbar-dark .navbar-nav .current-tab > .nav-link,
 .navbar-dark .navbar-nav .Current > .nav-link,
+.navbar-dark .navbar-nav
+.current-theme > .nav-link,
 .navbar-dark .navbar-nav .PanelInfo li .active > a, .PanelInfo li
 .navbar-dark .navbar-nav .active > a,
 .navbar-dark .navbar-nav .Tabs ul .PanelInfo li.Active a > a, .PanelInfo
@@ -2394,6 +2436,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-dark .navbar-nav .current-tab > a,
 .navbar-dark .navbar-nav .PanelInfo li .Current > a, .PanelInfo li
 .navbar-dark .navbar-nav .Current > a,
+.navbar-dark .navbar-nav .PanelInfo li
+.current-theme > a, .PanelInfo li
+.navbar-dark .navbar-nav
+.current-theme > a,
 .navbar-dark .navbar-nav .active > .nav-link:focus,
 .navbar-dark .navbar-nav .Tabs ul li.Active a > .nav-link:focus, .Tabs ul li.Active
 .navbar-dark .navbar-nav a > .nav-link:focus,
@@ -2410,6 +2456,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .navbar-dark .navbar-nav .current-tab > .nav-link:focus,
 .navbar-dark .navbar-nav .Current > .nav-link:focus,
+.navbar-dark .navbar-nav
+.current-theme > .nav-link:focus,
 .navbar-dark .navbar-nav .PanelInfo li .active > a:focus, .PanelInfo li
 .navbar-dark .navbar-nav .active > a:focus,
 .navbar-dark .navbar-nav .Tabs ul .PanelInfo li.Active a > a:focus, .PanelInfo
@@ -2442,6 +2490,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-dark .navbar-nav .current-tab > a:focus,
 .navbar-dark .navbar-nav .PanelInfo li .Current > a:focus, .PanelInfo li
 .navbar-dark .navbar-nav .Current > a:focus,
+.navbar-dark .navbar-nav .PanelInfo li
+.current-theme > a:focus, .PanelInfo li
+.navbar-dark .navbar-nav
+.current-theme > a:focus,
 .navbar-dark .navbar-nav .active > .nav-link:hover,
 .navbar-dark .navbar-nav .Tabs ul li.Active a > .nav-link:hover, .Tabs ul li.Active
 .navbar-dark .navbar-nav a > .nav-link:hover,
@@ -2458,6 +2510,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .navbar-dark .navbar-nav .current-tab > .nav-link:hover,
 .navbar-dark .navbar-nav .Current > .nav-link:hover,
+.navbar-dark .navbar-nav
+.current-theme > .nav-link:hover,
 .navbar-dark .navbar-nav .PanelInfo li .active > a:hover, .PanelInfo li
 .navbar-dark .navbar-nav .active > a:hover,
 .navbar-dark .navbar-nav .Tabs ul .PanelInfo li.Active a > a:hover, .PanelInfo
@@ -2490,6 +2544,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-dark .navbar-nav .current-tab > a:hover,
 .navbar-dark .navbar-nav .PanelInfo li .Current > a:hover, .PanelInfo li
 .navbar-dark .navbar-nav .Current > a:hover,
+.navbar-dark .navbar-nav .PanelInfo li
+.current-theme > a:hover, .PanelInfo li
+.navbar-dark .navbar-nav
+.current-theme > a:hover,
 .navbar-dark .navbar-nav .nav-link.open,
 .navbar-dark .navbar-nav .PanelInfo li a.open, .PanelInfo li
 .navbar-dark .navbar-nav a.open,
@@ -2533,6 +2591,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-dark .navbar-nav .nav-link.Current,
 .navbar-dark .navbar-nav .PanelInfo li a.Current, .PanelInfo li
 .navbar-dark .navbar-nav a.Current,
+.navbar-dark .navbar-nav
+.nav-link.current-theme,
+.navbar-dark .navbar-nav .PanelInfo li a.current-theme, .PanelInfo li
+.navbar-dark .navbar-nav a.current-theme,
 .navbar-dark .navbar-nav .PanelInfo li a.active, .PanelInfo li
 .navbar-dark .navbar-nav a.active,
 .navbar-dark .navbar-nav .PanelInfo .Active a, .PanelInfo .Active
@@ -2573,6 +2635,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-dark .navbar-nav .nav-link.Current:focus,
 .navbar-dark .navbar-nav .PanelInfo li a.Current:focus, .PanelInfo li
 .navbar-dark .navbar-nav a.Current:focus,
+.navbar-dark .navbar-nav
+.nav-link.current-theme:focus,
+.navbar-dark .navbar-nav .PanelInfo li a.current-theme:focus, .PanelInfo li
+.navbar-dark .navbar-nav a.current-theme:focus,
 .navbar-dark .navbar-nav .PanelInfo li a.active:focus, .PanelInfo li
 .navbar-dark .navbar-nav a.active:focus,
 .navbar-dark .navbar-nav .PanelInfo .Active a:focus, .PanelInfo .Active
@@ -2613,6 +2679,10 @@ a.text-danger:focus, a.text-danger:hover {
 .navbar-dark .navbar-nav .nav-link.Current:hover,
 .navbar-dark .navbar-nav .PanelInfo li a.Current:hover, .PanelInfo li
 .navbar-dark .navbar-nav a.Current:hover,
+.navbar-dark .navbar-nav
+.nav-link.current-theme:hover,
+.navbar-dark .navbar-nav .PanelInfo li a.current-theme:hover, .PanelInfo li
+.navbar-dark .navbar-nav a.current-theme:hover,
 .navbar-dark .navbar-nav .PanelInfo li a.active:hover, .PanelInfo li
 .navbar-dark .navbar-nav a.active:hover,
 .navbar-dark .navbar-nav .PanelInfo .Active a:hover, .PanelInfo .Active
@@ -2725,7 +2795,12 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content ul > .file-upload-browse.current-tab,
 .tabbed-content .Tabs ul > .file-upload-browse.current-tab,
 .tabbed-content > .file-upload-browse.current-tab, .btn-group > .file-upload-browse.Current, .plugins table .Info > .file-upload-browse.Current, .Tabs ul > .file-upload-browse.Current,
-.tabbed-content > .file-upload-browse.Current, .btn-group > .active.Button, .plugins table .Info > .active.Button, .Tabs ul > .active.Button,
+.tabbed-content > .file-upload-browse.Current, .btn-group >
+.file-upload-browse.current-theme, .plugins table .Info >
+.file-upload-browse.current-theme, .Tabs ul >
+.file-upload-browse.current-theme,
+.tabbed-content >
+.file-upload-browse.current-theme, .btn-group > .active.Button, .plugins table .Info > .active.Button, .Tabs ul > .active.Button,
 .tabbed-content > .active.Button, .Tabs ul li.Active .btn-group > a.Button, .plugins table .Tabs ul li.Active .Info > a.Button, .Tabs ul li.Active .plugins table .Info > a.Button, .Tabs ul li.Active ul > a.Button, .Tabs ul li.Active
 .tabbed-content > a.Button,
 .Tabs ul .btn-group > .Button.current-tab, .plugins table
@@ -2747,6 +2822,11 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .Tabs ul > .Button.current-tab,
 .tabbed-content > .Button.current-tab, .btn-group > .Button.Current, .plugins table .Info > .Button.Current, .Tabs ul > .Button.Current,
 .tabbed-content > .Button.Current, .btn-group >
+.Button.current-theme, .plugins table .Info >
+.Button.current-theme, .Tabs ul >
+.Button.current-theme,
+.tabbed-content >
+.Button.current-theme, .btn-group >
 .active.TextButton, .plugins table .Info >
 .active.TextButton, .Tabs ul >
 .active.TextButton,
@@ -2771,7 +2851,12 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content ul > .TextButton.current-tab,
 .tabbed-content .Tabs ul > .TextButton.current-tab,
 .tabbed-content > .TextButton.current-tab, .btn-group > .TextButton.Current, .plugins table .Info > .TextButton.Current, .Tabs ul > .TextButton.Current,
-.tabbed-content > .TextButton.Current, .btn-group > .active.SmallButton, .plugins table .Info > .active.SmallButton, .Tabs ul > .active.SmallButton,
+.tabbed-content > .TextButton.Current, .btn-group >
+.TextButton.current-theme, .plugins table .Info >
+.TextButton.current-theme, .Tabs ul >
+.TextButton.current-theme,
+.tabbed-content >
+.TextButton.current-theme, .btn-group > .active.SmallButton, .plugins table .Info > .active.SmallButton, .Tabs ul > .active.SmallButton,
 .tabbed-content > .active.SmallButton, .Tabs ul li.Active .btn-group > a.SmallButton, .plugins table .Tabs ul li.Active .Info > a.SmallButton, .Tabs ul li.Active .plugins table .Info > a.SmallButton, .Tabs ul li.Active ul > a.SmallButton, .Tabs ul li.Active
 .tabbed-content > a.SmallButton,
 .Tabs ul .btn-group > .SmallButton.current-tab, .plugins table
@@ -2792,7 +2877,12 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content ul > .SmallButton.current-tab,
 .tabbed-content .Tabs ul > .SmallButton.current-tab,
 .tabbed-content > .SmallButton.current-tab, .btn-group > .SmallButton.Current, .plugins table .Info > .SmallButton.Current, .Tabs ul > .SmallButton.Current,
-.tabbed-content > .SmallButton.Current, #Head h1 a .btn-group > span.active, .plugins table #Head h1 a .Info > span.active, #Head h1 a .plugins table .Info > span.active, .Tabs #Head h1 a ul > span.active, #Head h1 a .Tabs ul > span.active, #Head h1 a
+.tabbed-content > .SmallButton.Current, .btn-group >
+.SmallButton.current-theme, .plugins table .Info >
+.SmallButton.current-theme, .Tabs ul >
+.SmallButton.current-theme,
+.tabbed-content >
+.SmallButton.current-theme, #Head h1 a .btn-group > span.active, .plugins table #Head h1 a .Info > span.active, #Head h1 a .plugins table .Info > span.active, .Tabs #Head h1 a ul > span.active, #Head h1 a .Tabs ul > span.active, #Head h1 a
 .tabbed-content > span.active, #Head h1 a
 .Tabs ul .btn-group > span.current-tab, .plugins table #Head h1 a
 .Tabs ul .Info > span.current-tab, #Head h1 a
@@ -2817,11 +2907,24 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content #Head h1 a .Tabs ul > span.current-tab,
 .tabbed-content #Head h1 a
 .tabbed-content > span.current-tab, #Head h1 a .btn-group > span.Current, .plugins table #Head h1 a .Info > span.Current, #Head h1 a .plugins table .Info > span.Current, .Tabs #Head h1 a ul > span.Current, #Head h1 a .Tabs ul > span.Current, #Head h1 a
-.tabbed-content > span.Current, .Tabs ul li .btn-group > a.active, .plugins table .Tabs ul li .Info > a.active, .Tabs ul li .plugins table .Info > a.active, .Tabs ul li ul > a.active, .Tabs ul li
+.tabbed-content > span.Current, #Head h1 a .btn-group >
+span.current-theme, .plugins table #Head h1 a .Info >
+span.current-theme, #Head h1 a .plugins table .Info >
+span.current-theme, .Tabs #Head h1 a ul >
+span.current-theme, #Head h1 a .Tabs ul >
+span.current-theme, #Head h1 a
+.tabbed-content >
+span.current-theme, .Tabs ul li .btn-group > a.active, .plugins table .Tabs ul li .Info > a.active, .Tabs ul li .plugins table .Info > a.active, .Tabs ul li ul > a.active, .Tabs ul li
 .tabbed-content > a.active, .Tabs ul li.Active .btn-group > a, .plugins table .Tabs ul li.Active .Info > a, .Tabs ul li.Active .plugins table .Info > a, .Tabs ul li.Active ul > a, .Tabs ul li.Active
 .tabbed-content > a, .Tabs ul li .btn-group > a.current-tab, .plugins table .Tabs ul li .Info > a.current-tab, .Tabs ul li .plugins table .Info > a.current-tab, .Tabs ul li ul > a.current-tab, .Tabs ul li
 .tabbed-content > a.current-tab, .Tabs ul li .btn-group > a.Current, .plugins table .Tabs ul li .Info > a.Current, .Tabs ul li .plugins table .Info > a.Current, .Tabs ul li ul > a.Current, .Tabs ul li
-.tabbed-content > a.Current,
+.tabbed-content > a.Current, .Tabs ul li .btn-group >
+a.current-theme, .plugins table .Tabs ul li .Info >
+a.current-theme, .Tabs ul li .plugins table .Info >
+a.current-theme, .Tabs ul li ul >
+a.current-theme, .Tabs ul li
+.tabbed-content >
+a.current-theme,
 .tabbed-content li .btn-group > a.active, .plugins table
 .tabbed-content li .Info > a.active,
 .tabbed-content li .plugins table .Info > a.active, .Tabs
@@ -2850,6 +2953,19 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content li .Tabs ul > a.Current,
 .tabbed-content li
 .tabbed-content > a.Current,
+.tabbed-content li .btn-group >
+a.current-theme, .plugins table
+.tabbed-content li .Info >
+a.current-theme,
+.tabbed-content li .plugins table .Info >
+a.current-theme, .Tabs
+.tabbed-content li ul >
+a.current-theme,
+.tabbed-content li .Tabs ul >
+a.current-theme,
+.tabbed-content li
+.tabbed-content >
+a.current-theme,
 .Tabs ul .btn-group > .btn.current-tab, .plugins table
 .Tabs ul .Info > .btn.current-tab,
 .Tabs ul .plugins table .Info > .btn.current-tab, .Tabs ul > .btn.current-tab,
@@ -2876,7 +2992,12 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content .plugins table .Info > a.current-tab, .Tabs ul li
 .tabbed-content ul > a.current-tab, .Tabs ul li
 .tabbed-content > a.current-tab, .btn-group > .btn.Current, .plugins table .Info > .btn.Current, .Tabs ul > .btn.Current,
-.tabbed-content > .btn.Current,
+.tabbed-content > .btn.Current, .btn-group >
+.btn.current-theme, .plugins table .Info >
+.btn.current-theme, .Tabs ul >
+.btn.current-theme,
+.tabbed-content >
+.btn.current-theme,
 .btn-group-vertical > .btn:focus,
 .btn-group-vertical > .file-upload-browse:focus,
 .btn-group-vertical > .Button:focus,
@@ -2904,6 +3025,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content
 .btn-group-vertical > .file-upload-browse.current-tab,
 .btn-group-vertical > .file-upload-browse.Current,
+.btn-group-vertical >
+.file-upload-browse.current-theme,
 .btn-group-vertical > .active.Button,
 .Tabs ul
 .btn-group-vertical > .Button.current-tab,
@@ -2911,18 +3034,24 @@ a.text-danger:focus, a.text-danger:hover {
 .btn-group-vertical > .Button.current-tab,
 .btn-group-vertical > .Button.Current,
 .btn-group-vertical >
+.Button.current-theme,
+.btn-group-vertical >
 .active.TextButton,
 .Tabs ul
 .btn-group-vertical > .TextButton.current-tab,
 .tabbed-content
 .btn-group-vertical > .TextButton.current-tab,
 .btn-group-vertical > .TextButton.Current,
+.btn-group-vertical >
+.TextButton.current-theme,
 .btn-group-vertical > .active.SmallButton,
 .Tabs ul
 .btn-group-vertical > .SmallButton.current-tab,
 .tabbed-content
 .btn-group-vertical > .SmallButton.current-tab,
-.btn-group-vertical > .SmallButton.Current, #Head h1 a
+.btn-group-vertical > .SmallButton.Current,
+.btn-group-vertical >
+.SmallButton.current-theme, #Head h1 a
 .btn-group-vertical > span.active, #Head h1 a
 .Tabs ul
 .btn-group-vertical > span.current-tab,
@@ -2932,17 +3061,24 @@ a.text-danger:focus, a.text-danger:hover {
 .btn-group-vertical > span.current-tab,
 .tabbed-content #Head h1 a
 .btn-group-vertical > span.current-tab, #Head h1 a
-.btn-group-vertical > span.Current, .Tabs ul li
+.btn-group-vertical > span.Current, #Head h1 a
+.btn-group-vertical >
+span.current-theme, .Tabs ul li
 .btn-group-vertical > a.active, .Tabs ul li.Active
 .btn-group-vertical > a, .Tabs ul li
 .btn-group-vertical > a.current-tab, .Tabs ul li
-.btn-group-vertical > a.Current,
+.btn-group-vertical > a.Current, .Tabs ul li
+.btn-group-vertical >
+a.current-theme,
 .tabbed-content li
 .btn-group-vertical > a.active, .tabbed-content li.Active
 .btn-group-vertical > a, .tabbed-content li
 .btn-group-vertical > a.current-tab,
 .tabbed-content li
 .btn-group-vertical > a.Current,
+.tabbed-content li
+.btn-group-vertical >
+a.current-theme,
 .Tabs ul
 .btn-group-vertical > .btn.current-tab,
 .tabbed-content li
@@ -2952,7 +3088,9 @@ a.text-danger:focus, a.text-danger:hover {
 .btn-group-vertical > .btn.current-tab, .Tabs ul li
 .tabbed-content
 .btn-group-vertical > a.current-tab,
-.btn-group-vertical > .btn.Current {
+.btn-group-vertical > .btn.Current,
+.btn-group-vertical >
+.btn.current-theme {
   z-index: 2;
 }
 
@@ -5238,13 +5376,16 @@ a.text-danger:focus, a.text-danger:hover {
 .dropdown-item.active, .Tabs ul li.Active a.dropdown-item,
 .Tabs ul .dropdown-item.current-tab,
 .tabbed-content li.Active a.dropdown-item,
-.tabbed-content .dropdown-item.current-tab, .dropdown-item.Current, .dropdown-item.active:focus, .Tabs ul li.Active a.dropdown-item:focus,
+.tabbed-content .dropdown-item.current-tab, .dropdown-item.Current,
+.dropdown-item.current-theme, .dropdown-item.active:focus, .Tabs ul li.Active a.dropdown-item:focus,
 .Tabs ul .dropdown-item.current-tab:focus,
 .tabbed-content li.Active a.dropdown-item:focus,
-.tabbed-content .dropdown-item.current-tab:focus, .dropdown-item.Current:focus, .dropdown-item.active:hover, .Tabs ul li.Active a.dropdown-item:hover,
+.tabbed-content .dropdown-item.current-tab:focus, .dropdown-item.Current:focus,
+.dropdown-item.current-theme:focus, .dropdown-item.active:hover, .Tabs ul li.Active a.dropdown-item:hover,
 .Tabs ul .dropdown-item.current-tab:hover,
 .tabbed-content li.Active a.dropdown-item:hover,
-.tabbed-content .dropdown-item.current-tab:hover, .dropdown-item.Current:hover {
+.tabbed-content .dropdown-item.current-tab:hover, .dropdown-item.Current:hover,
+.dropdown-item.current-theme:hover {
   color: #fff;
   text-decoration: none;
   background-color: #0291db;
@@ -6488,12 +6629,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li
 .LayoutOptions > .color-picker,
 .HomeOptions > .color-picker, .media > .color-picker, .Feed > .color-picker, .FeedItem > .color-picker, .DataList li > .color-picker, .col-sm-8, .row > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
-.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .Feed > .label-wrap-wide, .FeedItem > .label-wrap-wide, .DataList li > .label-wrap-wide, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .label-selector > li, .emojiext-list > li,
-.LayoutOptions > li,
-.HomeOptions > li,
-.label-selector > a, .emojiext-list > a,
-.LayoutOptions > a,
-.HomeOptions > a, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .Feed > .label-wrap-wide, .FeedItem > .label-wrap-wide, .DataList li > .label-wrap-wide, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .label-selector-item, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {
   position: relative;
   min-height: 1px;
   padding-left: 0.9375rem;
@@ -6927,12 +7063,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li
     -ms-flex: 0 0 41.6666666667%;
     flex: 0 0 41.6666666667%;
   }
-  .col-md-6, .label-selector > li, .emojiext-list > li,
-  .LayoutOptions > li,
-  .HomeOptions > li,
-  .label-selector > a, .emojiext-list > a,
-  .LayoutOptions > a,
-  .HomeOptions > a {
+  .col-md-6, .label-selector-item {
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
@@ -7092,12 +7223,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
-  .col-lg-4, .label-selector > li, .emojiext-list > li,
-  .LayoutOptions > li,
-  .HomeOptions > li,
-  .label-selector > a, .emojiext-list > a,
-  .LayoutOptions > a,
-  .HomeOptions > a {
+  .col-lg-4, .label-selector-item {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -7261,12 +7387,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li
     -ms-flex: 0 0 16.6666666667%;
     flex: 0 0 16.6666666667%;
   }
-  .col-xl-3, .label-selector > li, .emojiext-list > li,
-  .LayoutOptions > li,
-  .HomeOptions > li,
-  .label-selector > a, .emojiext-list > a,
-  .LayoutOptions > a,
-  .HomeOptions > a {
+  .col-xl-3, .label-selector-item {
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
@@ -7873,39 +7994,57 @@ output {
 .TextButton:active.focus, .SmallButton:active.focus, #Head h1 a span:active.focus, .Tabs ul li a:active.focus,
 .tabbed-content li a:active.focus, .btn.active:focus, .active.file-upload-browse:focus,
 .Tabs ul .file-upload-browse.current-tab:focus,
-.tabbed-content .file-upload-browse.current-tab:focus, .file-upload-browse.Current:focus, .active.Button:focus,
+.tabbed-content .file-upload-browse.current-tab:focus, .file-upload-browse.Current:focus,
+.file-upload-browse.current-theme:focus, .active.Button:focus,
 .Tabs ul .Button.current-tab:focus,
 .tabbed-content .Button.current-tab:focus, .Button.Current:focus,
+.Button.current-theme:focus,
 .active.TextButton:focus,
 .Tabs ul .TextButton.current-tab:focus,
-.tabbed-content .TextButton.current-tab:focus, .TextButton.Current:focus, .active.SmallButton:focus,
+.tabbed-content .TextButton.current-tab:focus, .TextButton.Current:focus,
+.TextButton.current-theme:focus, .active.SmallButton:focus,
 .Tabs ul .SmallButton.current-tab:focus,
-.tabbed-content .SmallButton.current-tab:focus, .SmallButton.Current:focus, #Head h1 a span.active:focus, #Head h1 a
+.tabbed-content .SmallButton.current-tab:focus, .SmallButton.Current:focus,
+.SmallButton.current-theme:focus, #Head h1 a span.active:focus, #Head h1 a
 .Tabs ul span.current-tab:focus,
 .Tabs ul #Head h1 a span.current-tab:focus, #Head h1 a
 .tabbed-content span.current-tab:focus,
-.tabbed-content #Head h1 a span.current-tab:focus, #Head h1 a span.Current:focus, .Tabs ul li a.active:focus, .Tabs ul li.Active a:focus, .Tabs ul li a.current-tab:focus, .Tabs ul li a.Current:focus,
+.tabbed-content #Head h1 a span.current-tab:focus, #Head h1 a span.Current:focus, #Head h1 a
+span.current-theme:focus, .Tabs ul li a.active:focus, .Tabs ul li.Active a:focus, .Tabs ul li a.current-tab:focus, .Tabs ul li a.Current:focus, .Tabs ul li
+a.current-theme:focus,
 .tabbed-content li a.active:focus, .tabbed-content li.Active a:focus, .tabbed-content li a.current-tab:focus,
 .tabbed-content li a.Current:focus,
+.tabbed-content li
+a.current-theme:focus,
 .Tabs ul .btn.current-tab:focus,
-.tabbed-content .btn.current-tab:focus, .btn.Current:focus, .btn.active.focus, .active.focus.file-upload-browse,
+.tabbed-content .btn.current-tab:focus, .btn.Current:focus,
+.btn.current-theme:focus, .btn.active.focus, .active.focus.file-upload-browse,
 .Tabs ul .focus.file-upload-browse.current-tab,
-.tabbed-content .focus.file-upload-browse.current-tab, .focus.file-upload-browse.Current, .active.focus.Button,
+.tabbed-content .focus.file-upload-browse.current-tab, .focus.file-upload-browse.Current,
+.focus.file-upload-browse.current-theme, .active.focus.Button,
 .Tabs ul .focus.Button.current-tab,
 .tabbed-content .focus.Button.current-tab, .focus.Button.Current,
+.focus.Button.current-theme,
 .active.focus.TextButton,
 .Tabs ul .focus.TextButton.current-tab,
-.tabbed-content .focus.TextButton.current-tab, .focus.TextButton.Current, .active.focus.SmallButton,
+.tabbed-content .focus.TextButton.current-tab, .focus.TextButton.Current,
+.focus.TextButton.current-theme, .active.focus.SmallButton,
 .Tabs ul .focus.SmallButton.current-tab,
-.tabbed-content .focus.SmallButton.current-tab, .focus.SmallButton.Current, #Head h1 a span.active.focus, #Head h1 a
+.tabbed-content .focus.SmallButton.current-tab, .focus.SmallButton.Current,
+.focus.SmallButton.current-theme, #Head h1 a span.active.focus, #Head h1 a
 .Tabs ul span.focus.current-tab,
 .Tabs ul #Head h1 a span.focus.current-tab, #Head h1 a
 .tabbed-content span.focus.current-tab,
-.tabbed-content #Head h1 a span.focus.current-tab, #Head h1 a span.focus.Current, .Tabs ul li a.active.focus, .Tabs ul li.Active a.focus, .Tabs ul li a.focus.current-tab, .Tabs ul li a.focus.Current,
+.tabbed-content #Head h1 a span.focus.current-tab, #Head h1 a span.focus.Current, #Head h1 a
+span.focus.current-theme, .Tabs ul li a.active.focus, .Tabs ul li.Active a.focus, .Tabs ul li a.focus.current-tab, .Tabs ul li a.focus.Current, .Tabs ul li
+a.focus.current-theme,
 .tabbed-content li a.active.focus, .tabbed-content li.Active a.focus, .tabbed-content li a.focus.current-tab,
 .tabbed-content li a.focus.Current,
+.tabbed-content li
+a.focus.current-theme,
 .Tabs ul .btn.focus.current-tab,
-.tabbed-content .btn.focus.current-tab, .btn.focus.Current {
+.tabbed-content .btn.focus.current-tab, .btn.focus.Current,
+.btn.focus.current-theme {
   outline: 0;
 }
 
@@ -7927,22 +8066,31 @@ output {
 .TextButton:active, .SmallButton:active, #Head h1 a span:active, .Tabs ul li a:active,
 .tabbed-content li a:active, .btn.active, .active.file-upload-browse,
 .Tabs ul .file-upload-browse.current-tab,
-.tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current, .active.Button,
+.tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current,
+.file-upload-browse.current-theme, .active.Button,
 .Tabs ul .Button.current-tab,
 .tabbed-content .Button.current-tab, .Button.Current,
+.Button.current-theme,
 .active.TextButton,
 .Tabs ul .TextButton.current-tab,
-.tabbed-content .TextButton.current-tab, .TextButton.Current, .active.SmallButton,
+.tabbed-content .TextButton.current-tab, .TextButton.Current,
+.TextButton.current-theme, .active.SmallButton,
 .Tabs ul .SmallButton.current-tab,
-.tabbed-content .SmallButton.current-tab, .SmallButton.Current, #Head h1 a span.active, #Head h1 a
+.tabbed-content .SmallButton.current-tab, .SmallButton.Current,
+.SmallButton.current-theme, #Head h1 a span.active, #Head h1 a
 .Tabs ul span.current-tab,
 .Tabs ul #Head h1 a span.current-tab, #Head h1 a
 .tabbed-content span.current-tab,
-.tabbed-content #Head h1 a span.current-tab, #Head h1 a span.Current, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current,
+.tabbed-content #Head h1 a span.current-tab, #Head h1 a span.Current, #Head h1 a
+span.current-theme, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current, .Tabs ul li
+a.current-theme,
 .tabbed-content li a.active, .tabbed-content li.Active a, .tabbed-content li a.current-tab,
 .tabbed-content li a.Current,
+.tabbed-content li
+a.current-theme,
 .Tabs ul .btn.current-tab,
-.tabbed-content .btn.current-tab, .btn.Current {
+.tabbed-content .btn.current-tab, .btn.Current,
+.btn.current-theme {
   background-image: none;
   outline: 0;
 }
@@ -7975,57 +8123,55 @@ fieldset[disabled] a {
 }
 
 .btn-primary, .Button,
-.TextButton, button.btn, button.file-upload-browse, button.Button,
-button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
+.TextButton, .SmallButton, #Head h1 a span {
   color: #0291db;
   background-color: #fff;
   border-color: #0291db;
 }
 
 .btn-primary:hover, .Button:hover,
-.TextButton:hover, button.btn:hover, button.file-upload-browse:hover, .SmallButton:hover, #Head h1 a span:hover {
+.TextButton:hover, .SmallButton:hover, #Head h1 a span:hover {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
 .btn-primary:focus, .Button:focus,
-.TextButton:focus, button.btn:focus, button.file-upload-browse:focus, .SmallButton:focus, #Head h1 a span:focus, .btn-primary.focus, .focus.Button,
-.focus.TextButton, button.focus.btn, button.focus.file-upload-browse, .focus.SmallButton, #Head h1 a span.focus {
+.TextButton:focus, .SmallButton:focus, #Head h1 a span:focus, .btn-primary.focus, .focus.Button,
+.focus.TextButton, .focus.SmallButton, #Head h1 a span.focus {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
 .btn-primary:active, .Button:active,
-.TextButton:active, button.btn:active, button.file-upload-browse:active, .SmallButton:active, #Head h1 a span:active, .btn-primary.active, .active.Button, .Tabs ul li.Active a.Button,
+.TextButton:active, .SmallButton:active, #Head h1 a span:active, .btn-primary.active, .active.Button, .Tabs ul li.Active a.Button,
 .Tabs ul .Button.current-tab,
 .tabbed-content li.Active a.Button,
 .tabbed-content .Button.current-tab, .Button.Current,
+.Button.current-theme,
 .active.TextButton, .Tabs ul li.Active a.TextButton,
 .Tabs ul .TextButton.current-tab,
 .tabbed-content li.Active a.TextButton,
-.tabbed-content .TextButton.current-tab, .TextButton.Current, button.active.btn, button.active.file-upload-browse,
-.Tabs ul button.file-upload-browse.current-tab,
-.tabbed-content button.file-upload-browse.current-tab, button.file-upload-browse.Current,
-.Tabs ul button.btn.current-tab,
-.tabbed-content button.btn.current-tab, button.btn.Current, .active.SmallButton, .Tabs ul li.Active a.SmallButton,
+.tabbed-content .TextButton.current-tab, .TextButton.Current,
+.TextButton.current-theme, .active.SmallButton, .Tabs ul li.Active a.SmallButton,
 .Tabs ul .SmallButton.current-tab,
 .tabbed-content li.Active a.SmallButton,
-.tabbed-content .SmallButton.current-tab, .SmallButton.Current, #Head h1 a span.active, #Head h1 a
+.tabbed-content .SmallButton.current-tab, .SmallButton.Current,
+.SmallButton.current-theme, #Head h1 a span.active, #Head h1 a
 .Tabs ul span.current-tab,
 .Tabs ul #Head h1 a span.current-tab, #Head h1 a
 .tabbed-content span.current-tab,
-.tabbed-content #Head h1 a span.current-tab, #Head h1 a span.Current, .Tabs ul li.Active a.btn-primary,
+.tabbed-content #Head h1 a span.current-tab, #Head h1 a span.Current, #Head h1 a
+span.current-theme, .Tabs ul li.Active a.btn-primary,
 .Tabs ul .btn-primary.current-tab,
 .tabbed-content li.Active a.btn-primary,
 .tabbed-content .btn-primary.current-tab, .btn-primary.Current,
+.btn-primary.current-theme,
 .open > .btn-primary.dropdown-toggle,
 .open > .dropdown-toggle.Button,
 .open >
 .dropdown-toggle.TextButton,
-.open > button.dropdown-toggle.btn,
-.open > button.dropdown-toggle.file-upload-browse,
 .open > .dropdown-toggle.SmallButton, #Head h1 a
 .open > span.dropdown-toggle {
   color: #fff;
@@ -8035,17 +8181,17 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 }
 
 .btn-primary.disabled:focus, .disabled.Button:focus,
-.disabled.TextButton:focus, button.disabled.btn:focus, button.disabled.file-upload-browse:focus, .disabled.SmallButton:focus, #Head h1 a span.disabled:focus, .btn-primary.disabled.focus, .disabled.focus.Button,
-.disabled.focus.TextButton, button.disabled.focus.btn, button.disabled.focus.file-upload-browse, .disabled.focus.SmallButton, #Head h1 a span.disabled.focus, .btn-primary:disabled:focus, .Button:disabled:focus,
-.TextButton:disabled:focus, button.btn:disabled:focus, button.file-upload-browse:disabled:focus, .SmallButton:disabled:focus, #Head h1 a span:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus,
-.TextButton:disabled.focus, button.btn:disabled.focus, button.file-upload-browse:disabled.focus, .SmallButton:disabled.focus, #Head h1 a span:disabled.focus {
+.disabled.TextButton:focus, .disabled.SmallButton:focus, #Head h1 a span.disabled:focus, .btn-primary.disabled.focus, .disabled.focus.Button,
+.disabled.focus.TextButton, .disabled.focus.SmallButton, #Head h1 a span.disabled.focus, .btn-primary:disabled:focus, .Button:disabled:focus,
+.TextButton:disabled:focus, .SmallButton:disabled:focus, #Head h1 a span:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus,
+.TextButton:disabled.focus, .SmallButton:disabled.focus, #Head h1 a span:disabled.focus {
   background-color: #fff;
   border-color: #0291db;
 }
 
 .btn-primary.disabled:hover, .disabled.Button:hover,
-.disabled.TextButton:hover, button.disabled.btn:hover, button.disabled.file-upload-browse:hover, .disabled.SmallButton:hover, #Head h1 a span.disabled:hover, .btn-primary:disabled:hover, .Button:disabled:hover,
-.TextButton:disabled:hover, button.btn:disabled:hover, button.file-upload-browse:disabled:hover, .SmallButton:disabled:hover, #Head h1 a span:disabled:hover {
+.disabled.TextButton:hover, .disabled.SmallButton:hover, #Head h1 a span.disabled:hover, .btn-primary:disabled:hover, .Button:disabled:hover,
+.TextButton:disabled:hover, .SmallButton:disabled:hover, #Head h1 a span:disabled:hover {
   background-color: #fff;
   border-color: #0291db;
 }
@@ -8075,11 +8221,16 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .btn-secondary:active, .file-upload-browse:active, .Tabs ul li a:active,
 .tabbed-content li a:active, .btn-secondary.active, .active.file-upload-browse,
 .Tabs ul .file-upload-browse.current-tab,
-.tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current,
+.tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current,
+.file-upload-browse.current-theme, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current, .Tabs ul li
+a.current-theme,
 .tabbed-content li a.active, .tabbed-content li.Active a, .tabbed-content li a.current-tab,
 .tabbed-content li a.Current,
+.tabbed-content li
+a.current-theme,
 .Tabs ul .btn-secondary.current-tab,
 .tabbed-content .btn-secondary.current-tab, .btn-secondary.Current,
+.btn-secondary.current-theme,
 .open > .btn-secondary.dropdown-toggle,
 .open > .dropdown-toggle.file-upload-browse, .Tabs ul li
 .open > a.dropdown-toggle,
@@ -8129,6 +8280,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-transparent.current-tab,
 .tabbed-content li.Active a.btn-transparent,
 .tabbed-content .btn-transparent.current-tab, .btn-transparent.Current,
+.btn-transparent.current-theme,
 .open > .btn-transparent.dropdown-toggle {
   color: #fff;
   background-color: #0cb0f8;
@@ -8157,6 +8309,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-primary-outline.current-tab,
 .tabbed-content li.Active a.btn-primary-outline,
 .tabbed-content .btn-primary-outline.current-tab, .btn-primary-outline.Current,
+.btn-primary-outline.current-theme,
 .open > .btn-primary-outline.dropdown-toggle {
   color: #fff;
   background-color: #fff;
@@ -8188,6 +8341,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-secondary-outline.current-tab,
 .tabbed-content li.Active a.btn-secondary-outline,
 .tabbed-content .btn-secondary-outline.current-tab, .btn-secondary-outline.Current,
+.btn-secondary-outline.current-theme,
 .open > .btn-secondary-outline.dropdown-toggle {
   color: #fff;
   background-color: #ccc;
@@ -8219,6 +8373,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-info-outline.current-tab,
 .tabbed-content li.Active a.btn-info-outline,
 .tabbed-content .btn-info-outline.current-tab, .btn-info-outline.Current,
+.btn-info-outline.current-theme,
 .open > .btn-info-outline.dropdown-toggle {
   color: #fff;
   background-color: #97afbf;
@@ -8250,6 +8405,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-success-outline.current-tab,
 .tabbed-content li.Active a.btn-success-outline,
 .tabbed-content .btn-success-outline.current-tab, .btn-success-outline.Current,
+.btn-success-outline.current-theme,
 .open > .btn-success-outline.dropdown-toggle {
   color: #fff;
   background-color: #60bd68;
@@ -8281,6 +8437,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-warning-outline.current-tab,
 .tabbed-content li.Active a.btn-warning-outline,
 .tabbed-content .btn-warning-outline.current-tab, .btn-warning-outline.Current,
+.btn-warning-outline.current-theme,
 .open > .btn-warning-outline.dropdown-toggle {
   color: #fff;
   background-color: #faa43a;
@@ -8312,6 +8469,7 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .Tabs ul .btn-danger-outline.current-tab,
 .tabbed-content li.Active a.btn-danger-outline,
 .tabbed-content .btn-danger-outline.current-tab, .btn-danger-outline.Current,
+.btn-danger-outline.current-theme,
 .open > .btn-danger-outline.dropdown-toggle {
   color: #fff;
   background-color: #f9281d;
@@ -8341,7 +8499,8 @@ button.TextButton, button.SmallButton, .SmallButton, #Head h1 a span {
 .btn-link, .btn-link:active, .btn-link.active, .Tabs ul li.Active a.btn-link,
 .Tabs ul .btn-link.current-tab,
 .tabbed-content li.Active a.btn-link,
-.tabbed-content .btn-link.current-tab, .btn-link.Current, .btn-link:disabled {
+.tabbed-content .btn-link.current-tab, .btn-link.Current,
+.btn-link.current-theme, .btn-link:disabled {
   background-color: transparent;
 }
 
@@ -8500,7 +8659,7 @@ form ol label {
   height: 2rem;
 }
 
-.toggle-well, .toggle-wrap input[type="checkbox"] + label::before, .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider a:before {
+.toggle-well, .toggle-wrap input[type="checkbox"] + label::before, .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider a::before {
   display: block;
   position: absolute;
   top: 0;
@@ -8514,7 +8673,7 @@ form ol label {
   cursor: pointer;
 }
 
-.toggle-slider, .toggle-wrap input[type="checkbox"] + label::after, .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider a:after {
+.toggle-slider, .toggle-wrap input[type="checkbox"] + label::after, .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider a::after {
   display: block;
   position: absolute;
   top: 0.175rem;
@@ -8530,15 +8689,15 @@ form ol label {
   cursor: pointer;
 }
 
-.toggle-well-on, .toggle-wrap-on .toggle-well, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap-on .ActivateSlider a:before, .ActivateSlider .toggle-wrap-on a:before, .toggle-wrap input[type="checkbox"]:checked + label::before, .ActivateSlider input[type="checkbox"]:checked + label::before, .ActivateSlider-Active a:before {
+.toggle-well-on, .toggle-wrap-on .toggle-well, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap-on .ActivateSlider a::before, .ActivateSlider .toggle-wrap-on a::before, .toggle-wrap input[type="checkbox"]:checked + label::before, .ActivateSlider input[type="checkbox"]:checked + label::before, .ActivateSlider-Active a::before {
   background-color: #0291db;
 }
 
-.toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider a:after, .ActivateSlider .toggle-wrap-on a:after, .toggle-wrap input[type="checkbox"]:checked + label::after, .ActivateSlider input[type="checkbox"]:checked + label::after, .ActivateSlider-Active a:after {
+.toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider a::after, .ActivateSlider .toggle-wrap-on a::after, .toggle-wrap input[type="checkbox"]:checked + label::after, .ActivateSlider input[type="checkbox"]:checked + label::after, .ActivateSlider-Active a::after {
   left: 2.125rem;
 }
 
-.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider a:after, .ActivateSlider .InProgress a:after, .ActivateSlider .InProgress:after {
+.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider a::after, .ActivateSlider .InProgress a::after, .ActivateSlider .InProgress::after {
   left: 1.125rem;
   transition: left .4s;
 }
@@ -8669,29 +8828,9 @@ select::-ms-expand {
   margin-bottom: 0;
 }
 
-.label-selector > li, .emojiext-list > li,
-.LayoutOptions > li,
-.HomeOptions > li,
-.label-selector > a, .emojiext-list > a,
-.LayoutOptions > a,
-.HomeOptions > a {
-  padding: 0.5rem 1rem 1rem;
-}
-
-.label-selector img, .emojiext-list img,
-.LayoutOptions img,
-.HomeOptions img, .LayoutOptions .Sprite, .HomeOptions .Sprite {
-  display: block;
-  width: 100%;
-  border: 1px solid #f4f4f5;
-}
-
 .label-selector label, .emojiext-list label,
 .LayoutOptions label,
-.HomeOptions label,
-.label-selector > a, .emojiext-list > a,
-.LayoutOptions > a,
-.HomeOptions > a {
+.HomeOptions label {
   cursor: pointer;
 }
 
@@ -8749,7 +8888,13 @@ select::-ms-expand {
 .tabbed-content
 .HomeOptions .current-tab, .label-selector .Current, .emojiext-list .Current,
 .LayoutOptions .Current,
-.HomeOptions .Current,
+.HomeOptions .Current, .label-selector
+.current-theme, .emojiext-list
+.current-theme,
+.LayoutOptions
+.current-theme,
+.HomeOptions
+.current-theme,
 .label-selector input[type=radio]:checked ~ label, .emojiext-list input[type=radio]:checked ~ label,
 .LayoutOptions input[type=radio]:checked ~ label,
 .HomeOptions input[type=radio]:checked ~ label,
@@ -8803,78 +8948,264 @@ select::-ms-expand {
 .tabbed-content
 .HomeOptions .current-tab .overlay, .label-selector .Current .overlay, .emojiext-list .Current .overlay,
 .LayoutOptions .Current .overlay,
-.HomeOptions .Current .overlay,
+.HomeOptions .Current .overlay, .label-selector
+.current-theme .overlay, .emojiext-list
+.current-theme .overlay,
+.LayoutOptions
+.current-theme .overlay,
+.HomeOptions
+.current-theme .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay,
 .LayoutOptions input[type=radio]:checked ~ label .overlay,
 .HomeOptions input[type=radio]:checked ~ label .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay,
 .LayoutOptions input[type=radio]:checked ~ label .overlay,
 .HomeOptions input[type=radio]:checked ~ label .overlay {
-  height: 100%;
-  opacity: .75;
-  background-color: #fff;
+  display: none;
 }
 
-.label-selector .active .overlay::before, .emojiext-list .active .overlay::before,
-.LayoutOptions .active .overlay::before,
-.HomeOptions .active .overlay::before, .label-selector .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active .label-selector a .overlay::before, .emojiext-list .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active .emojiext-list a .overlay::before,
-.LayoutOptions .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active
-.LayoutOptions a .overlay::before,
-.HomeOptions .Tabs ul li.Active a .overlay::before, .Tabs ul li.Active
-.HomeOptions a .overlay::before, .label-selector
-.Tabs ul .current-tab .overlay::before,
-.Tabs ul .label-selector .current-tab .overlay::before, .emojiext-list
-.Tabs ul .current-tab .overlay::before,
-.Tabs ul .emojiext-list .current-tab .overlay::before,
+.label-selector .active .image-wrap::after, .emojiext-list .active .image-wrap::after,
+.LayoutOptions .active .image-wrap::after,
+.HomeOptions .active .image-wrap::after, .label-selector .Tabs ul li.Active a .image-wrap::after, .Tabs ul li.Active .label-selector a .image-wrap::after, .emojiext-list .Tabs ul li.Active a .image-wrap::after, .Tabs ul li.Active .emojiext-list a .image-wrap::after,
+.LayoutOptions .Tabs ul li.Active a .image-wrap::after, .Tabs ul li.Active
+.LayoutOptions a .image-wrap::after,
+.HomeOptions .Tabs ul li.Active a .image-wrap::after, .Tabs ul li.Active
+.HomeOptions a .image-wrap::after, .label-selector
+.Tabs ul .current-tab .image-wrap::after,
+.Tabs ul .label-selector .current-tab .image-wrap::after, .emojiext-list
+.Tabs ul .current-tab .image-wrap::after,
+.Tabs ul .emojiext-list .current-tab .image-wrap::after,
 .LayoutOptions
-.Tabs ul .current-tab .overlay::before,
+.Tabs ul .current-tab .image-wrap::after,
 .Tabs ul
-.LayoutOptions .current-tab .overlay::before,
+.LayoutOptions .current-tab .image-wrap::after,
 .HomeOptions
-.Tabs ul .current-tab .overlay::before,
+.Tabs ul .current-tab .image-wrap::after,
 .Tabs ul
-.HomeOptions .current-tab .overlay::before, .label-selector
-.tabbed-content li.Active a .overlay::before,
-.tabbed-content li.Active .label-selector a .overlay::before, .emojiext-list
-.tabbed-content li.Active a .overlay::before,
-.tabbed-content li.Active .emojiext-list a .overlay::before,
+.HomeOptions .current-tab .image-wrap::after, .label-selector
+.tabbed-content li.Active a .image-wrap::after,
+.tabbed-content li.Active .label-selector a .image-wrap::after, .emojiext-list
+.tabbed-content li.Active a .image-wrap::after,
+.tabbed-content li.Active .emojiext-list a .image-wrap::after,
 .LayoutOptions
-.tabbed-content li.Active a .overlay::before,
+.tabbed-content li.Active a .image-wrap::after,
 .tabbed-content li.Active
-.LayoutOptions a .overlay::before,
+.LayoutOptions a .image-wrap::after,
 .HomeOptions
-.tabbed-content li.Active a .overlay::before,
+.tabbed-content li.Active a .image-wrap::after,
 .tabbed-content li.Active
-.HomeOptions a .overlay::before, .label-selector
-.tabbed-content .current-tab .overlay::before,
-.tabbed-content .label-selector .current-tab .overlay::before, .emojiext-list
-.tabbed-content .current-tab .overlay::before,
-.tabbed-content .emojiext-list .current-tab .overlay::before,
+.HomeOptions a .image-wrap::after, .label-selector
+.tabbed-content .current-tab .image-wrap::after,
+.tabbed-content .label-selector .current-tab .image-wrap::after, .emojiext-list
+.tabbed-content .current-tab .image-wrap::after,
+.tabbed-content .emojiext-list .current-tab .image-wrap::after,
 .LayoutOptions
-.tabbed-content .current-tab .overlay::before,
+.tabbed-content .current-tab .image-wrap::after,
 .tabbed-content
-.LayoutOptions .current-tab .overlay::before,
+.LayoutOptions .current-tab .image-wrap::after,
 .HomeOptions
-.tabbed-content .current-tab .overlay::before,
+.tabbed-content .current-tab .image-wrap::after,
 .tabbed-content
-.HomeOptions .current-tab .overlay::before, .label-selector .Current .overlay::before, .emojiext-list .Current .overlay::before,
-.LayoutOptions .Current .overlay::before,
-.HomeOptions .Current .overlay::before,
-.label-selector input[type=radio]:checked ~ label .overlay::before, .emojiext-list input[type=radio]:checked ~ label .overlay::before,
-.LayoutOptions input[type=radio]:checked ~ label .overlay::before,
-.HomeOptions input[type=radio]:checked ~ label .overlay::before,
-.label-selector input[type=radio]:checked ~ label .overlay::before, .emojiext-list input[type=radio]:checked ~ label .overlay::before,
-.LayoutOptions input[type=radio]:checked ~ label .overlay::before,
-.HomeOptions input[type=radio]:checked ~ label .overlay::before {
-  position: relative;
+.HomeOptions .current-tab .image-wrap::after, .label-selector .Current .image-wrap::after, .emojiext-list .Current .image-wrap::after,
+.LayoutOptions .Current .image-wrap::after,
+.HomeOptions .Current .image-wrap::after, .label-selector
+.current-theme .image-wrap::after, .emojiext-list
+.current-theme .image-wrap::after,
+.LayoutOptions
+.current-theme .image-wrap::after,
+.HomeOptions
+.current-theme .image-wrap::after,
+.label-selector input[type=radio]:checked ~ label .image-wrap::after, .emojiext-list input[type=radio]:checked ~ label .image-wrap::after,
+.LayoutOptions input[type=radio]:checked ~ label .image-wrap::after,
+.HomeOptions input[type=radio]:checked ~ label .image-wrap::after,
+.label-selector input[type=radio]:checked ~ label .image-wrap::after, .emojiext-list input[type=radio]:checked ~ label .image-wrap::after,
+.LayoutOptions input[type=radio]:checked ~ label .image-wrap::after,
+.HomeOptions input[type=radio]:checked ~ label .image-wrap::after {
+  opacity: 1;
+}
+
+.label-selector .active .label-selector-image, .emojiext-list .active .label-selector-image,
+.LayoutOptions .active .label-selector-image,
+.HomeOptions .active .label-selector-image, .label-selector .Tabs ul li.Active a .label-selector-image, .Tabs ul li.Active .label-selector a .label-selector-image, .emojiext-list .Tabs ul li.Active a .label-selector-image, .Tabs ul li.Active .emojiext-list a .label-selector-image,
+.LayoutOptions .Tabs ul li.Active a .label-selector-image, .Tabs ul li.Active
+.LayoutOptions a .label-selector-image,
+.HomeOptions .Tabs ul li.Active a .label-selector-image, .Tabs ul li.Active
+.HomeOptions a .label-selector-image, .label-selector
+.Tabs ul .current-tab .label-selector-image,
+.Tabs ul .label-selector .current-tab .label-selector-image, .emojiext-list
+.Tabs ul .current-tab .label-selector-image,
+.Tabs ul .emojiext-list .current-tab .label-selector-image,
+.LayoutOptions
+.Tabs ul .current-tab .label-selector-image,
+.Tabs ul
+.LayoutOptions .current-tab .label-selector-image,
+.HomeOptions
+.Tabs ul .current-tab .label-selector-image,
+.Tabs ul
+.HomeOptions .current-tab .label-selector-image, .label-selector
+.tabbed-content li.Active a .label-selector-image,
+.tabbed-content li.Active .label-selector a .label-selector-image, .emojiext-list
+.tabbed-content li.Active a .label-selector-image,
+.tabbed-content li.Active .emojiext-list a .label-selector-image,
+.LayoutOptions
+.tabbed-content li.Active a .label-selector-image,
+.tabbed-content li.Active
+.LayoutOptions a .label-selector-image,
+.HomeOptions
+.tabbed-content li.Active a .label-selector-image,
+.tabbed-content li.Active
+.HomeOptions a .label-selector-image, .label-selector
+.tabbed-content .current-tab .label-selector-image,
+.tabbed-content .label-selector .current-tab .label-selector-image, .emojiext-list
+.tabbed-content .current-tab .label-selector-image,
+.tabbed-content .emojiext-list .current-tab .label-selector-image,
+.LayoutOptions
+.tabbed-content .current-tab .label-selector-image,
+.tabbed-content
+.LayoutOptions .current-tab .label-selector-image,
+.HomeOptions
+.tabbed-content .current-tab .label-selector-image,
+.tabbed-content
+.HomeOptions .current-tab .label-selector-image, .label-selector .Current .label-selector-image, .emojiext-list .Current .label-selector-image,
+.LayoutOptions .Current .label-selector-image,
+.HomeOptions .Current .label-selector-image, .label-selector
+.current-theme .label-selector-image, .emojiext-list
+.current-theme .label-selector-image,
+.LayoutOptions
+.current-theme .label-selector-image,
+.HomeOptions
+.current-theme .label-selector-image, .label-selector .active .Homepage .Sprite, .Homepage .label-selector .active .Sprite, .emojiext-list .active .Homepage .Sprite, .Homepage .emojiext-list .active .Sprite,
+.LayoutOptions .active .Homepage .Sprite, .Homepage
+.LayoutOptions .active .Sprite,
+.HomeOptions .active .Homepage .Sprite, .Homepage
+.HomeOptions .active .Sprite, .label-selector .Tabs ul li.Active a .Homepage .Sprite, .Homepage .label-selector .Tabs ul li.Active a .Sprite, .Tabs ul li.Active .label-selector a .Homepage .Sprite, .Homepage .Tabs ul li.Active .label-selector a .Sprite, .emojiext-list .Tabs ul li.Active a .Homepage .Sprite, .Homepage .emojiext-list .Tabs ul li.Active a .Sprite, .Tabs ul li.Active .emojiext-list a .Homepage .Sprite, .Homepage .Tabs ul li.Active .emojiext-list a .Sprite,
+.LayoutOptions .Tabs ul li.Active a .Homepage .Sprite, .Homepage
+.LayoutOptions .Tabs ul li.Active a .Sprite, .Tabs ul li.Active
+.LayoutOptions a .Homepage .Sprite, .Homepage .Tabs ul li.Active
+.LayoutOptions a .Sprite,
+.HomeOptions .Tabs ul li.Active a .Homepage .Sprite, .Homepage
+.HomeOptions .Tabs ul li.Active a .Sprite, .Tabs ul li.Active
+.HomeOptions a .Homepage .Sprite, .Homepage .Tabs ul li.Active
+.HomeOptions a .Sprite, .label-selector
+.Tabs ul .current-tab .Homepage .Sprite, .Homepage .label-selector
+.Tabs ul .current-tab .Sprite,
+.Tabs ul .label-selector .current-tab .Homepage .Sprite, .Homepage
+.Tabs ul .label-selector .current-tab .Sprite, .emojiext-list
+.Tabs ul .current-tab .Homepage .Sprite, .Homepage .emojiext-list
+.Tabs ul .current-tab .Sprite,
+.Tabs ul .emojiext-list .current-tab .Homepage .Sprite, .Homepage
+.Tabs ul .emojiext-list .current-tab .Sprite,
+.LayoutOptions
+.Tabs ul .current-tab .Homepage .Sprite, .Homepage
+.LayoutOptions
+.Tabs ul .current-tab .Sprite,
+.Tabs ul
+.LayoutOptions .current-tab .Homepage .Sprite, .Homepage
+.Tabs ul
+.LayoutOptions .current-tab .Sprite,
+.HomeOptions
+.Tabs ul .current-tab .Homepage .Sprite, .Homepage
+.HomeOptions
+.Tabs ul .current-tab .Sprite,
+.Tabs ul
+.HomeOptions .current-tab .Homepage .Sprite, .Homepage
+.Tabs ul
+.HomeOptions .current-tab .Sprite, .label-selector
+.tabbed-content li.Active a .Homepage .Sprite, .Homepage .label-selector
+.tabbed-content li.Active a .Sprite,
+.tabbed-content li.Active .label-selector a .Homepage .Sprite, .Homepage
+.tabbed-content li.Active .label-selector a .Sprite, .emojiext-list
+.tabbed-content li.Active a .Homepage .Sprite, .Homepage .emojiext-list
+.tabbed-content li.Active a .Sprite,
+.tabbed-content li.Active .emojiext-list a .Homepage .Sprite, .Homepage
+.tabbed-content li.Active .emojiext-list a .Sprite,
+.LayoutOptions
+.tabbed-content li.Active a .Homepage .Sprite, .Homepage
+.LayoutOptions
+.tabbed-content li.Active a .Sprite,
+.tabbed-content li.Active
+.LayoutOptions a .Homepage .Sprite, .Homepage
+.tabbed-content li.Active
+.LayoutOptions a .Sprite,
+.HomeOptions
+.tabbed-content li.Active a .Homepage .Sprite, .Homepage
+.HomeOptions
+.tabbed-content li.Active a .Sprite,
+.tabbed-content li.Active
+.HomeOptions a .Homepage .Sprite, .Homepage
+.tabbed-content li.Active
+.HomeOptions a .Sprite, .label-selector
+.tabbed-content .current-tab .Homepage .Sprite, .Homepage .label-selector
+.tabbed-content .current-tab .Sprite,
+.tabbed-content .label-selector .current-tab .Homepage .Sprite, .Homepage
+.tabbed-content .label-selector .current-tab .Sprite, .emojiext-list
+.tabbed-content .current-tab .Homepage .Sprite, .Homepage .emojiext-list
+.tabbed-content .current-tab .Sprite,
+.tabbed-content .emojiext-list .current-tab .Homepage .Sprite, .Homepage
+.tabbed-content .emojiext-list .current-tab .Sprite,
+.LayoutOptions
+.tabbed-content .current-tab .Homepage .Sprite, .Homepage
+.LayoutOptions
+.tabbed-content .current-tab .Sprite,
+.tabbed-content
+.LayoutOptions .current-tab .Homepage .Sprite, .Homepage
+.tabbed-content
+.LayoutOptions .current-tab .Sprite,
+.HomeOptions
+.tabbed-content .current-tab .Homepage .Sprite, .Homepage
+.HomeOptions
+.tabbed-content .current-tab .Sprite,
+.tabbed-content
+.HomeOptions .current-tab .Homepage .Sprite, .Homepage
+.tabbed-content
+.HomeOptions .current-tab .Sprite, .label-selector .Current .Homepage .Sprite, .Homepage .label-selector .Current .Sprite, .emojiext-list .Current .Homepage .Sprite, .Homepage .emojiext-list .Current .Sprite,
+.LayoutOptions .Current .Homepage .Sprite, .Homepage
+.LayoutOptions .Current .Sprite,
+.HomeOptions .Current .Homepage .Sprite, .Homepage
+.HomeOptions .Current .Sprite, .label-selector
+.current-theme .Homepage .Sprite, .Homepage .label-selector
+.current-theme .Sprite, .emojiext-list
+.current-theme .Homepage .Sprite, .Homepage .emojiext-list
+.current-theme .Sprite,
+.LayoutOptions
+.current-theme .Homepage .Sprite, .Homepage
+.LayoutOptions
+.current-theme .Sprite,
+.HomeOptions
+.current-theme .Homepage .Sprite, .Homepage
+.HomeOptions
+.current-theme .Sprite,
+.label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image,
+.LayoutOptions input[type=radio]:checked ~ label .label-selector-image,
+.HomeOptions input[type=radio]:checked ~ label .label-selector-image,
+.label-selector input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
+.label-selector input[type=radio]:checked ~ label .Sprite, .emojiext-list input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage .emojiext-list input[type=radio]:checked ~ label .Sprite,
+.LayoutOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
+.LayoutOptions input[type=radio]:checked ~ label .Sprite,
+.HomeOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
+.HomeOptions input[type=radio]:checked ~ label .Sprite,
+.label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image,
+.LayoutOptions input[type=radio]:checked ~ label .label-selector-image,
+.HomeOptions input[type=radio]:checked ~ label .label-selector-image,
+.label-selector input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
+.label-selector input[type=radio]:checked ~ label .Sprite, .emojiext-list input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage .emojiext-list input[type=radio]:checked ~ label .Sprite,
+.LayoutOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
+.LayoutOptions input[type=radio]:checked ~ label .Sprite,
+.HomeOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
+.HomeOptions input[type=radio]:checked ~ label .Sprite {
+  opacity: .5;
+}
+
+.label-selector .label-selector-image, .emojiext-list .label-selector-image,
+.LayoutOptions .label-selector-image,
+.HomeOptions .label-selector-image, .label-selector .Homepage .Sprite, .Homepage .label-selector .Sprite, .emojiext-list .Homepage .Sprite, .Homepage .emojiext-list .Sprite,
+.LayoutOptions .Homepage .Sprite, .Homepage
+.LayoutOptions .Sprite,
+.HomeOptions .Homepage .Sprite, .Homepage
+.HomeOptions .Sprite {
   display: block;
-  top: 35%;
-  width: 30%;
-  height: 30%;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: green;
-  content: "";
+  width: 100%;
+  border: 1px solid #f4f4f5;
 }
 
 .label-selector .title, .emojiext-list .title,
@@ -8904,6 +9235,34 @@ select::-ms-expand {
   height: 100%;
 }
 
+.label-selector .image-wrap::after, .emojiext-list .image-wrap::after,
+.LayoutOptions .image-wrap::after,
+.HomeOptions .image-wrap::after {
+  position: absolute;
+  top: 35%;
+  left: auto;
+  right: auto;
+  height: 30%;
+  width: 100%;
+  display: inline-block;
+  min-width: 1em;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  text-decoration: inherit;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  font-size: 4rem;
+  color: #60bd68;
+  content: "";
+  text-align: center;
+  opacity: 0;
+  transition: opacity .1s;
+}
+
 .label-selector .overlay, .emojiext-list .overlay,
 .LayoutOptions .overlay,
 .HomeOptions .overlay {
@@ -8918,7 +9277,7 @@ select::-ms-expand {
   background-color: #0291db;
   opacity: .9;
   overflow: hidden;
-  transition: all .5s;
+  transition: all .1s;
   text-align: center;
 }
 
@@ -8978,7 +9337,19 @@ select::-ms-expand {
   display: none;
 }
 
+.label-selector-item {
+  padding: 0.5rem 1rem 1rem;
+}
+
+.search-wrap {
+  position: relative;
+}
+
 .search-wrap::before {
+  position: absolute;
+  top: .375rem;
+  right: 1rem;
+  line-height: 1.3125rem;
   content: "";
 }
 
@@ -8989,7 +9360,7 @@ select::-ms-expand {
 
 .Hidden,
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 .Padded,
@@ -9029,8 +9400,7 @@ table img, table .LayoutOptions .Sprite, .LayoutOptions table .Sprite, table
   max-width: 64px;
 }
 
-img, .LayoutOptions .Sprite,
-.HomeOptions .Sprite {
+.img-fluid {
   display: block;
   max-width: 100%;
   height: auto;
@@ -9140,7 +9510,8 @@ div.Popup .Buttons {
 .tabbed-content .PanelInfo li a.current-tab,
 .tabbed-content .PanelInfo li .panel a.current-tab, .panel .PanelInfo li
 .tabbed-content a.current-tab, .PanelInfo li
-.tabbed-content .panel a.current-tab, .panel .nav-link.Current, .panel .PanelInfo li a.Current, .PanelInfo li .panel a.Current, .panel .PanelInfo li a.active, .PanelInfo li .panel a.active, .panel .PanelInfo .Active a, .PanelInfo .Active .panel a, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover {
+.tabbed-content .panel a.current-tab, .panel .nav-link.Current, .panel .PanelInfo li a.Current, .PanelInfo li .panel a.Current, .panel
+.nav-link.current-theme, .panel .PanelInfo li a.current-theme, .PanelInfo li .panel a.current-theme, .panel .PanelInfo li a.active, .PanelInfo li .panel a.active, .panel .PanelInfo .Active a, .PanelInfo .Active .panel a, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover {
   color: #fff;
   border-radius: 0.1rem 0 0 0.1rem;
 }
@@ -9158,7 +9529,8 @@ div.Popup .Buttons {
 .tabbed-content li.Active a,
 .tabbed-content .nav-link.current-tab,
 .tabbed-content .PanelInfo li a.current-tab, .PanelInfo li
-.tabbed-content a.current-tab, .nav-link.Current, .PanelInfo li a.Current, .PanelInfo li a.active, .PanelInfo .Active a, .PanelInfo li a:hover, .nav-link:active, .PanelInfo li a:active, .nav-link.hover, .PanelInfo li a.hover, .nav-link:hover, .PanelInfo li a:hover {
+.tabbed-content a.current-tab, .nav-link.Current, .PanelInfo li a.Current,
+.nav-link.current-theme, .PanelInfo li a.current-theme, .PanelInfo li a.active, .PanelInfo .Active a, .PanelInfo li a:hover, .nav-link:active, .PanelInfo li a:active, .nav-link.hover, .PanelInfo li a.hover, .nav-link:hover, .PanelInfo li a:hover {
   cursor: pointer;
 }
 
@@ -9223,7 +9595,8 @@ div.Popup .Buttons {
 .tabbed-content .PanelInfo li a.current-tab,
 .tabbed-content .PanelInfo li .navbar a.current-tab, .navbar .PanelInfo li
 .tabbed-content a.current-tab, .PanelInfo li
-.tabbed-content .navbar a.current-tab, .navbar .nav-link.Current, .navbar .PanelInfo li a.Current, .PanelInfo li .navbar a.Current, .navbar .PanelInfo li a.active, .PanelInfo li .navbar a.active, .navbar .PanelInfo .Active a, .PanelInfo .Active .navbar a, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link.active:hover, .navbar .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .navbar a.nav-link:hover, .navbar
+.tabbed-content .navbar a.current-tab, .navbar .nav-link.Current, .navbar .PanelInfo li a.Current, .PanelInfo li .navbar a.Current, .navbar
+.nav-link.current-theme, .navbar .PanelInfo li a.current-theme, .PanelInfo li .navbar a.current-theme, .navbar .PanelInfo li a.active, .PanelInfo li .navbar a.active, .navbar .PanelInfo .Active a, .PanelInfo .Active .navbar a, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover, .navbar .nav-link.active:hover, .navbar .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .navbar a.nav-link:hover, .navbar
 .Tabs ul .nav-link.current-tab:hover,
 .Tabs ul .navbar .nav-link.current-tab:hover, .navbar
 .Tabs ul .PanelInfo li a.current-tab:hover,
@@ -9237,7 +9610,8 @@ div.Popup .Buttons {
 .tabbed-content .PanelInfo li a.current-tab:hover,
 .tabbed-content .PanelInfo li .navbar a.current-tab:hover, .navbar .PanelInfo li
 .tabbed-content a.current-tab:hover, .PanelInfo li
-.tabbed-content .navbar a.current-tab:hover, .navbar .nav-link.Current:hover, .navbar .PanelInfo li a.Current:hover, .PanelInfo li .navbar a.Current:hover, .navbar .PanelInfo li a.active:hover, .PanelInfo li .navbar a.active:hover, .navbar .PanelInfo .Active a:hover, .PanelInfo .Active .navbar a:hover, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover {
+.tabbed-content .navbar a.current-tab:hover, .navbar .nav-link.Current:hover, .navbar .PanelInfo li a.Current:hover, .PanelInfo li .navbar a.Current:hover, .navbar
+.nav-link.current-theme:hover, .navbar .PanelInfo li a.current-theme:hover, .PanelInfo li .navbar a.current-theme:hover, .navbar .PanelInfo li a.active:hover, .PanelInfo li .navbar a.active:hover, .navbar .PanelInfo .Active a:hover, .PanelInfo .Active .navbar a:hover, .navbar .PanelInfo li a:hover, .PanelInfo li .navbar a:hover {
   background-color: #0cb0f8;
 }
 
@@ -9255,7 +9629,8 @@ div.Popup .Buttons {
 .tabbed-content .PanelInfo li a.current-tab > *,
 .tabbed-content .PanelInfo li .navbar a.current-tab > *, .navbar .PanelInfo li
 .tabbed-content a.current-tab > *, .PanelInfo li
-.tabbed-content .navbar a.current-tab > *, .navbar .nav-link.Current > *, .navbar .PanelInfo li a.Current > *, .PanelInfo li .navbar a.Current > *, .navbar .PanelInfo li a.active > *, .PanelInfo li .navbar a.active > *, .navbar .PanelInfo .Active a > *, .PanelInfo .Active .navbar a > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link.active:hover > *, .navbar .Tabs ul li.Active a.nav-link:hover > *, .Tabs ul li.Active .navbar a.nav-link:hover > *, .navbar
+.tabbed-content .navbar a.current-tab > *, .navbar .nav-link.Current > *, .navbar .PanelInfo li a.Current > *, .PanelInfo li .navbar a.Current > *, .navbar
+.nav-link.current-theme > *, .navbar .PanelInfo li a.current-theme > *, .PanelInfo li .navbar a.current-theme > *, .navbar .PanelInfo li a.active > *, .PanelInfo li .navbar a.active > *, .navbar .PanelInfo .Active a > *, .PanelInfo .Active .navbar a > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > *, .navbar .nav-link.active:hover > *, .navbar .Tabs ul li.Active a.nav-link:hover > *, .Tabs ul li.Active .navbar a.nav-link:hover > *, .navbar
 .Tabs ul .nav-link.current-tab:hover > *,
 .Tabs ul .navbar .nav-link.current-tab:hover > *, .navbar
 .Tabs ul .PanelInfo li a.current-tab:hover > *,
@@ -9269,7 +9644,8 @@ div.Popup .Buttons {
 .tabbed-content .PanelInfo li a.current-tab:hover > *,
 .tabbed-content .PanelInfo li .navbar a.current-tab:hover > *, .navbar .PanelInfo li
 .tabbed-content a.current-tab:hover > *, .PanelInfo li
-.tabbed-content .navbar a.current-tab:hover > *, .navbar .nav-link.Current:hover > *, .navbar .PanelInfo li a.Current:hover > *, .PanelInfo li .navbar a.Current:hover > *, .navbar .PanelInfo li a.active:hover > *, .PanelInfo li .navbar a.active:hover > *, .navbar .PanelInfo .Active a:hover > *, .PanelInfo .Active .navbar a:hover > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > * {
+.tabbed-content .navbar a.current-tab:hover > *, .navbar .nav-link.Current:hover > *, .navbar .PanelInfo li a.Current:hover > *, .PanelInfo li .navbar a.Current:hover > *, .navbar
+.nav-link.current-theme:hover > *, .navbar .PanelInfo li a.current-theme:hover > *, .PanelInfo li .navbar a.current-theme:hover > *, .navbar .PanelInfo li a.active:hover > *, .PanelInfo li .navbar a.active:hover > *, .navbar .PanelInfo .Active a:hover > *, .PanelInfo .Active .navbar a:hover > *, .navbar .PanelInfo li a:hover > *, .PanelInfo li .navbar a:hover > * {
   opacity: 1;
 }
 
@@ -9287,13 +9663,15 @@ div.Popup .Buttons {
 .tabbed-content .PanelInfo li a.current-tab::before,
 .tabbed-content .PanelInfo li .navbar a.current-tab::before, .navbar .PanelInfo li
 .tabbed-content a.current-tab::before, .PanelInfo li
-.tabbed-content .navbar a.current-tab::before, .navbar .nav-link.Current::before, .navbar .PanelInfo li a.Current::before, .PanelInfo li .navbar a.Current::before, .navbar .PanelInfo li a.active::before, .PanelInfo li .navbar a.active::before, .navbar .PanelInfo .Active a::before, .PanelInfo .Active .navbar a::before, .navbar .PanelInfo li a:hover::before, .PanelInfo li .navbar a:hover::before {
+.tabbed-content .navbar a.current-tab::before, .navbar .nav-link.Current::before, .navbar .PanelInfo li a.Current::before, .PanelInfo li .navbar a.Current::before, .navbar
+.nav-link.current-theme::before, .navbar .PanelInfo li a.current-theme::before, .PanelInfo li .navbar a.current-theme::before, .navbar .PanelInfo li a.active::before, .PanelInfo li .navbar a.active::before, .navbar .PanelInfo .Active a::before, .PanelInfo .Active .navbar a::before, .navbar .PanelInfo li a:hover::before, .PanelInfo li .navbar a:hover::before {
   position: absolute;
   display: block;
   width: 1rem;
   height: 1rem;
   bottom: -0.5rem;
   left: 5.125rem;
+  rotate: 45deg;
   background-color: #0cb0f8;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
   border-right: 1px solid rgba(0, 0, 0, 0.125);
@@ -9361,6 +9739,7 @@ div.Popup .Buttons {
 .Tabs ul .btn-navbar.current-tab,
 .tabbed-content li.Active a.btn-navbar,
 .tabbed-content .btn-navbar.current-tab, .btn-navbar.Current,
+.btn-navbar.current-theme,
 .open > .btn-navbar.dropdown-toggle {
   color: #fff;
   background-color: #0cb0f8;
@@ -9447,30 +9826,6 @@ table .btn, table .file-upload-browse, table .Button, table
 .tabbed-content li a,
 .tabbed-content li table a {
   min-width: inherit;
-}
-
-.SelectionGrid {
-  text-align: center;
-}
-
-.SelectionGrid td {
-  width: 33%;
-  border: 1px dotted rgba(0, 0, 0, 0.125);
-}
-
-.SelectionGrid em {
-  display: block;
-  padding: 0.9375rem;
-  font-style: normal;
-}
-
-.SelectionGrid img, .SelectionGrid .LayoutOptions .Sprite, .LayoutOptions .SelectionGrid .Sprite, .SelectionGrid
-.HomeOptions .Sprite,
-.HomeOptions .SelectionGrid .Sprite {
-  padding: 0.9375rem;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: inherit;
 }
 
 h1, .h1,
@@ -9563,19 +9918,19 @@ p {
   outline: 0;
 }
 
-.ActivateSlider a:before {
+.ActivateSlider a::before {
   content: '';
 }
 
-.ActivateSlider a:after {
+.ActivateSlider a::after {
   content: '';
 }
 
-.ActivateSlider-Active a:before {
+.ActivateSlider-Active a::before {
   content: '';
 }
 
-.ActivateSlider-Active a:after {
+.ActivateSlider-Active a::after {
   content: '';
 }
 
@@ -9597,7 +9952,6 @@ p {
   margin-right: auto;
 }
 
-/* Homepage Admin */
 .Homepage .Sprite {
   display: block;
   height: 124px;

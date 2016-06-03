@@ -11,19 +11,24 @@ if ($CurrentCategoriesLayout == '')
 
 function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '') {
     $SpriteClass = $CssClass;
-    if ($Current == $Url)
+    if ($Current == $Url) {
         $CssClass .= ' Current';
+    }
     $CssClass .= ' Choice';
-    echo anchor(
+
+    echo wrap(
         '<span class="image-wrap">'
         .sprite($SpriteClass)
         .'<div class="overlay">'
         .'<div class="buttons">'
-        .'<button class="btn btn-transparent">'.t('Select').'</button>'
+        .anchor(t('Select'), $Url, 'btn btn-transparent', ['title' => $Description, 'rel' => $Url])
         .'</div>'
-        .'</div></span>'.t($Title),
-        $Url,
-        array('class' => $CssClass, 'title' => $Description, 'rel' => $Url)
+        .'</div></span>'
+        .'<div class="title">'
+        .t($Title)
+        .'</div>',
+        'div',
+        array('class' => $CssClass.' label-selector-item')
     );
 }
 
@@ -31,19 +36,19 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
     <script type="text/javascript">
         jQuery(document).ready(function($) {
 
-            $('.HomeOptions a.Choice').click(function() {
-                $('.HomeOptions a.Choice').removeClass('Current');
-                $(this).addClass('Current');
+            $('.HomeOptions a').click(function() {
+                $('.HomeOptions .Choice').removeClass('Current');
+                $(this).parents('.Choice').addClass('Current');
                 var page = $(this).attr('rel');
                 $('#Form_Target').val(page);
                 return false;
             });
 
-            $('.LayoutOptions a.Choice').click(function() {
+            $('.LayoutOptions a').click(function() {
                 var parent = $(this).parents('.LayoutOptions');
                 var layoutContainer = $(parent).hasClass('DiscussionsLayout') ? 'DiscussionsLayout' : 'CategoriesLayout';
-                $(parent).find('a').removeClass('Current');
-                $(this).addClass('Current');
+                $(parent).find('.Choice').removeClass('Current');
+                $(this).parents('.Choice').addClass('Current');
                 var layout = $(this).attr('rel');
                 $('#Form_' + layoutContainer).val(layout);
                 return false;

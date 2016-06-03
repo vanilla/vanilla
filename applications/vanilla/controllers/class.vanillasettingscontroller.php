@@ -828,4 +828,23 @@ class VanillaSettingsController extends Gdn_Controller {
         // Renders true/false rather than template
         $this->render();
     }
+
+    /**
+     * Sorting display order of categories.
+     */
+    public function categoriesTree() {
+        // Check permission
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+
+        if ($this->Request->isAuthenticatedPostBack(true)) {
+            $tree = json_decode($this->Request->post('Subtree'), true);
+            $result = $this->CategoryModel->SaveSubtree($tree);
+            $this->setData('Result', $result);
+        } else {
+            throw new Gdn_UserException($this->Request->requestMethod().' is not allowed.', 405);
+        }
+
+        // Renders true/false rather than template
+        $this->render();
+    }
 }

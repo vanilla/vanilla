@@ -1909,6 +1909,60 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Save a subtree.
+     * 
+     * @param array $subtree A nested array where each array contains a CategoryID and optional Children element.
+     */
+    public function saveSubtree($subtree) {
+        $this->saveSubtreeInternal($subtree);
+    }
+
+    /**
+     * Save a subtree.
+     *
+     * @param array $subtree A nested array where each array contains a CategoryID and optional Children element.
+     * @param int|null $parentID The parent ID of the subtree.
+     * @param bool $rebuild Whether or not to rebuild the nested set after saving.
+     */
+    private function saveSubtreeInternal($subtree, $parentID = null, $rebuild = true) {
+        $order = 1;
+        foreach ($subtree as $row) {
+            $save = [];
+            $category = $this->collection->get((int)$row['CategoryID']);
+            if (!$category) {
+                $this->Validation->addValidationResult("CategoryID", "@Category {$row['CategoryID']} does not exist.");
+                continue;
+            }
+
+            if ($category['Sort'] != $order) {
+                $save['Sort'] = $order;
+            }
+
+            if ($parentID !== null && $category['ParentCategoryID'] != $parentID) {
+                $save['ParentCategoryID'] = $parentID;
+
+                if ($category['PermissionCategoryID'] != $category['CategoryID']) {
+                    $parentCategory = $this->collection->get((int)$parentID);
+                    $save['PermissionCategoryID'] = $parentCategory['PermissionCategoryID'];
+                }
+            }
+
+            if (!empty($save)) {
+                $this->setField($category['CategoryID'], $save);
+            }
+
+            if (!empty($row['Children'])) {
+                $this->saveSubtree($row['Children'], $category['CategoryID'], false);
+            }
+
+            $order++;
+        }
+        if ($rebuild) {
+            $this->rebuildTree(true);
+        }
+    }
+
+    /**
      * Saves the category tree based on a provided tree array. We are using the
      * Nested Set tree model.
      *

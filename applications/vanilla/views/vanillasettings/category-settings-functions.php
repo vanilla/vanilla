@@ -113,7 +113,7 @@ function writeCategoryBreadcrumbs($ancestors) {
     echo '<div class="bigcrumbs">';
 
     writeCategoryBreadcrumb(
-        symbol('root', t('Root')),
+        t('Home'),
         '/vanilla/settings/categories',
         empty($ancestors) ? 'last' : ''
     );

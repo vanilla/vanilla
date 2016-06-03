@@ -73,6 +73,10 @@ class DashboardController extends Gdn_Controller {
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             // Configure SideMenu module
             $SideMenu = new SideMenuModule($this);
+
+            $this->EventArguments['SideMenu'] = $SideMenu;
+            $this->fireEvent('earlyAppSettingsMenuItems');
+
             $SideMenu->EventName = 'GetAppSettingsMenuItems';
             $SideMenu->HtmlId = '';
             $SideMenu->highlightRoute($CurrentUrl);

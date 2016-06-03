@@ -19,7 +19,8 @@
   opacity: 0 !important;
   transition: opacity 0.7s ease; }
 
-.editor-drop-cue .BodyBox, .editor-drop-cue iframe.wysihtml5-sandbox {
+.editor-drop-cue .BodyBox,
+.editor-drop-cue iframe.wysihtml5-sandbox {
   border: 2px dashed rgba(0, 0, 0, 0.25) !important;
   border-radius: 2px !important; }
 
@@ -47,17 +48,18 @@
 /* If editor is fullpage */
 #editor-fullpage-candidate .editor-upload-progress {
   margin: 0; }
+
 #editor-fullpage-candidate .editor-upload-attention {
   top: 60px; }
 
-.editor-upload-previews, .editor-upload-saved {
+.editor-upload-previews,
+.editor-upload-saved {
   overflow: hidden;
   padding: 5px;
   margin: 0 -10px;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  position: relative;
-  z-index: 10; }
+  position: relative; }
 
 .editor-file-preview {
   position: relative;
@@ -144,14 +146,18 @@
     display: none; }
   .editor-file-preview.file-readonly .file-data {
     width: 178px; }
-  .editor-file-preview.file-readonly .editor-file-remove, .editor-file-preview.file-readonly .editor-file-reattach {
+  .editor-file-preview.file-readonly .editor-file-remove,
+  .editor-file-preview.file-readonly .editor-file-reattach {
     display: none; }
 
 /* Any files in this wrapper have no delete options. Only when moved into
 .editor-upload-previews will the options be activated */
 .editor-upload-readonly .file-data {
   width: 178px; }
-.editor-upload-readonly .editor-file-remove, .editor-upload-readonly .editor-file-reattach, .editor-upload-readonly .in-body {
+
+.editor-upload-readonly .editor-file-remove,
+.editor-upload-readonly .editor-file-reattach,
+.editor-upload-readonly .in-body {
   display: none; }
 
 .editor-file-removed {
@@ -172,7 +178,6 @@
     opacity: 0;
     -webkit-transform: scale(1.1);
     transform: scale(1.1); }
-
   100% {
     opacity: 1;
     -webkit-transform: scale(1);
@@ -183,7 +188,6 @@
     opacity: 0;
     -webkit-transform: scale(1.1);
     transform: scale(1.1); }
-
   100% {
     opacity: 1;
     -webkit-transform: scale(1);
@@ -231,7 +235,11 @@
   font-size: 11px; }
 
 /* State of icons */
-.editor .icon:hover, .wysihtml5-command-active, .wysihtml5-action-active, .wysihtml5-command-dialog-opened, .editor-dropdown-open > .editor-action {
+.editor .icon:hover,
+.wysihtml5-command-active,
+.wysihtml5-action-active,
+.wysihtml5-command-dialog-opened,
+.editor-dropdown-open > .editor-action {
   background-color: #999;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 2px; }
@@ -290,10 +298,10 @@
   transition: transform 0.2s ease;
   margin: 1px; }
 
-.editor-dropdown-color .editor-insert-dialog .color:hover, .editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
+.editor-dropdown-color .editor-insert-dialog .color:hover,
+.editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
   border: 1px solid transparent;
   -webkit-transform: scale(1.1);
-  -ms-transform: scale(1.1);
   transform: scale(1.1);
   position: relative;
   z-index: 10;
@@ -386,15 +394,16 @@
     pointer-events: none;
     transition: all 200ms ease;
     -webkit-transform: scale(0);
-    -ms-transform: scale(0);
     transform: scale(0); }
 
 .editor-dropdown-image .editor-file-image .image-input {
   border-top: 0; }
 
 /* If uploads disabled entirely, hide some options in the dropdown */
-.editor-uploads-disabled .file-drop, .editor-uploads-disabled .file-input {
+.editor-uploads-disabled .file-drop,
+.editor-uploads-disabled .file-input {
   display: none; }
+
 .editor-uploads-disabled .image-input {
   border: 0; }
 
@@ -410,7 +419,8 @@
   overflow: hidden !important; }
   .editor-fullpage .TextBoxWrapper {
     padding: 0; }
-    .editor-fullpage .TextBoxWrapper .BodyBox, .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+    .editor-fullpage .TextBoxWrapper .BodyBox,
+    .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
       width: 100% !important;
       color: #000;
       -moz-box-sizing: border-box !important;
@@ -452,7 +462,9 @@
     .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
       padding: 50px 0 10px 0;
       margin: 0 auto; }
-    .editor-fullpage #editor-fullpage-candidate .editor, .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper, .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+    .editor-fullpage #editor-fullpage-candidate .editor,
+    .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
+    .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
       max-width: 800px;
       -webkit-animation-duration: 800ms;
       animation-duration: 800ms;
@@ -479,11 +491,15 @@
     color: #fff;
     background-color: rgba(0, 0, 0, 0.8);
     box-shadow: 0 5px 5px -5px #999; }
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .icon:hover, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-active, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-action-active, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-dialog-opened {
+  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .icon:hover,
+  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-active,
+  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-action-active,
+  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-dialog-opened {
     background-color: rgba(255, 255, 255, 0.25); }
   .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .editor-sep {
     border-left: 1px solid rgba(255, 255, 255, 0.25); }
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .BodyBox, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .wysihtml5-sandbox {
+  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .BodyBox,
+  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .wysihtml5-sandbox {
     color: #999 !important;
     background-color: #000 !important;
     border-color: #222 !important; }
@@ -512,15 +528,56 @@ directly on the iframe's bodybox contenteditable. */
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg,
  * so hide the particular ones.
  */
-.editor-format-html .editor-toggle-source, .editor-format-bbcode .editor-toggle-source, .editor-format-markdown .editor-toggle-source, .editor-format-html .sep-switches, .editor-format-bbcode .sep-switches, .editor-format-markdown .sep-switches, .editor-format-markdown .sep-align, .editor-format-markdown .icon-align-left, .editor-format-markdown .icon-align-center, .editor-format-markdown .icon-align-right, .editor-format-html .editor-image-align, .editor-format-bbcode .editor-image-align, .editor-format-markdown .editor-image-align, .editor-format-bbcode .editor-action-heading1, .editor-format-bbcode .editor-action-heading2, .editor-format-bbcode .editor-action-separator {
+.editor-format-html .editor-toggle-source,
+.editor-format-bbcode .editor-toggle-source,
+.editor-format-markdown .editor-toggle-source,
+.editor-format-html .sep-switches,
+.editor-format-bbcode .sep-switches,
+.editor-format-markdown .sep-switches,
+.editor-format-markdown .sep-align,
+.editor-format-markdown .icon-align-left,
+.editor-format-markdown .icon-align-center,
+.editor-format-markdown .icon-align-right,
+.editor-format-html .editor-image-align,
+.editor-format-bbcode .editor-image-align,
+.editor-format-markdown .editor-image-align,
+.editor-format-bbcode .editor-action-heading1,
+.editor-format-bbcode .editor-action-heading2,
+.editor-format-bbcode .editor-action-separator {
   /* Defined as important, because some themes have overriden with their own
      !important values. */
   display: none !important; }
 
-.editor-format-text .editor-sep, .editor-format-text .icon-bold, .editor-format-text .icon-italic, .editor-format-text .icon-strikethrough, .editor-format-text .icon-list-ol, .editor-format-text .icon-list-ul, .editor-format-text .editor-dropdown-link, .editor-format-text .editor-action-headers, .editor-format-text .icon-align-left, .editor-format-text .icon-align-center, .editor-format-text .icon-align-right, .editor-format-text .editor-toggle-source, .editor-format-text .editor-toggle-fullpage-button, .editor-format-textex .editor-sep, .editor-format-textex .icon-bold, .editor-format-textex .icon-italic, .editor-format-textex .icon-strikethrough, .editor-format-textex .icon-list-ol, .editor-format-textex .icon-list-ul, .editor-format-textex .editor-dropdown-link, .editor-format-textex .editor-action-headers, .editor-format-textex .icon-align-left, .editor-format-textex .icon-align-center, .editor-format-textex .icon-align-right, .editor-format-textex .editor-toggle-source, .editor-format-textex .editor-toggle-fullpage-button {
+.editor-format-text .editor-sep,
+.editor-format-text .icon-bold,
+.editor-format-text .icon-italic,
+.editor-format-text .icon-strikethrough,
+.editor-format-text .icon-list-ol,
+.editor-format-text .icon-list-ul,
+.editor-format-text .editor-dropdown-link,
+.editor-format-text .editor-action-headers,
+.editor-format-text .icon-align-left,
+.editor-format-text .icon-align-center,
+.editor-format-text .icon-align-right,
+.editor-format-text .editor-toggle-source,
+.editor-format-text .editor-toggle-fullpage-button,
+.editor-format-textex .editor-sep,
+.editor-format-textex .icon-bold,
+.editor-format-textex .icon-italic,
+.editor-format-textex .icon-strikethrough,
+.editor-format-textex .icon-list-ol,
+.editor-format-textex .icon-list-ul,
+.editor-format-textex .editor-dropdown-link,
+.editor-format-textex .editor-action-headers,
+.editor-format-textex .icon-align-left,
+.editor-format-textex .icon-align-center,
+.editor-format-textex .icon-align-right,
+.editor-format-textex .editor-toggle-source,
+.editor-format-textex .editor-toggle-fullpage-button {
   display: none !important; }
 
-.editor-format-text .editor-dropdown-image, .editor-format-text .editor-dropdown-upload {
+.editor-format-text .editor-dropdown-image,
+.editor-format-text .editor-dropdown-upload {
   display: none !important; }
 
 /**
@@ -532,7 +589,9 @@ directly on the iframe's bodybox contenteditable. */
 .wysihtml5-commands-disabled .editor-action {
   opacity: 0.25;
   pointer-events: none; }
-.wysihtml5-commands-disabled .editor-toggle-source, .wysihtml5-commands-disabled .editor-toggle-fullpage-button {
+
+.wysihtml5-commands-disabled .editor-toggle-source,
+.wysihtml5-commands-disabled .editor-toggle-fullpage-button {
   opacity: 1;
   pointer-events: auto; }
 
@@ -550,17 +609,20 @@ directly on the iframe's bodybox contenteditable. */
 .editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important; }
 
-.editor-active .cleditorToolbar, .editor-active .ButtonBar, .editor-active .ButtonBarMarkupHint {
+.editor-active .cleditorToolbar,
+.editor-active .ButtonBar,
+.editor-active .ButtonBarMarkupHint {
   display: none !important; }
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* This is not necessary or very specific, but on mobile, apple products
-     add rounded corners */
   .editor-optional-button {
     display: none !important; }
-  .editor-fullpage .TextBoxWrapper .BodyBox, .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+  .editor-fullpage .TextBoxWrapper .BodyBox,
+  .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important; }
+  /* This is not necessary or very specific, but on mobile, apple products
+     add rounded corners */
   textarea {
     border-radius: 0; } }
 
@@ -574,9 +636,11 @@ directly on the iframe's bodybox contenteditable. */
     right: 0;
     top: auto;
     width: auto; }
+
 .editor-mobile .editor-dropdown-default .editor-dd-emoji + .editor-insert-dialog {
   min-width: 132px;
   padding: 5px; }
+
 .editor-mobile .editor-dropdown-default .editor-dd-format + .editor-insert-dialog {
   right: auto;
   left: 0; }
@@ -584,13 +648,18 @@ directly on the iframe's bodybox contenteditable. */
     display: block;
     padding: 5px 10px;
     cursor: pointer; }
+
 .editor-mobile .editor-dropdown-link .editor-insert-dialog {
   padding: 5px; }
-.editor-mobile #drop-cue-dropdown, .editor-mobile .file-input .file-or {
+
+.editor-mobile #drop-cue-dropdown,
+.editor-mobile .file-input .file-or {
   display: none !important; }
+
 .editor-mobile .FileBox {
   overflow: hidden; }
-  .editor-mobile .FileBox label, .editor-mobile .FileBox input {
+  .editor-mobile .FileBox label,
+  .editor-mobile .FileBox input {
     float: left;
     width: auto; }
   .editor-mobile .FileBox label {
@@ -621,7 +690,9 @@ directly on the iframe's bodybox contenteditable. */
 .post-font-size-large {
   font-size: 18px; }
 
-.post-font-size-medium, .post-font-size-normal, .post-font-size-default {
+.post-font-size-medium,
+.post-font-size-normal,
+.post-font-size-default {
   font-size: 13px; }
 
 .post-font-size-small {
@@ -652,103 +723,120 @@ cell-* are used for the dropdown */
 .post-color-black {
   color: #111111; }
 
-.cell-color-black, .post-highlightcolor-black {
+.cell-color-black,
+.post-highlightcolor-black {
   background-color: #111111; }
 
 .post-color-silver {
   color: #dddddd; }
 
-.cell-color-silver, .post-highlightcolor-silver {
+.cell-color-silver,
+.post-highlightcolor-silver {
   background-color: #dddddd; }
 
 .post-color-gray {
   color: #aaaaaa; }
 
-.cell-color-gray, .post-highlightcolor-gray {
+.cell-color-gray,
+.post-highlightcolor-gray {
   background-color: #aaaaaa; }
 
 .post-color-white {
   color: #ffffff; }
 
-.cell-color-white, .post-highlightcolor-white {
+.cell-color-white,
+.post-highlightcolor-white {
   background-color: #ffffff; }
 
 .post-color-maroon {
   color: #85144b; }
 
-.cell-color-maroon, .post-highlightcolor-maroon {
+.cell-color-maroon,
+.post-highlightcolor-maroon {
   background-color: #85144b; }
 
 .post-color-red {
   color: #ff4136; }
 
-.cell-color-red, .post-highlightcolor-red {
+.cell-color-red,
+.post-highlightcolor-red {
   background-color: #ff4136; }
 
 .post-color-purple {
   color: #7b11d0; }
 
-.cell-color-purple, .post-highlightcolor-purple {
+.cell-color-purple,
+.post-highlightcolor-purple {
   background-color: #7b11d0; }
 
 .post-color-fuchsia {
   color: #f012be; }
 
-.cell-color-fuchsia, .post-highlightcolor-fuchsia {
+.cell-color-fuchsia,
+.post-highlightcolor-fuchsia {
   background-color: #f012be; }
 
 .post-color-green {
   color: #2ecc40; }
 
-.cell-color-green, .post-highlightcolor-green {
+.cell-color-green,
+.post-highlightcolor-green {
   background-color: #2ecc40; }
 
 .post-color-lime {
   color: #01ff70; }
 
-.cell-color-lime, .post-highlightcolor-lime {
+.cell-color-lime,
+.post-highlightcolor-lime {
   background-color: #01ff70; }
 
 .post-color-olive {
   color: #3d9970; }
 
-.cell-color-olive, .post-highlightcolor-olive {
+.cell-color-olive,
+.post-highlightcolor-olive {
   background-color: #3d9970; }
 
 .post-color-yellow {
   color: #ffdc00; }
 
-.cell-color-yellow, .post-highlightcolor-yellow {
+.cell-color-yellow,
+.post-highlightcolor-yellow {
   background-color: #ffdc00; }
 
 .post-color-navy {
   color: #001f3f; }
 
-.cell-color-navy, .post-highlightcolor-navy {
+.cell-color-navy,
+.post-highlightcolor-navy {
   background-color: #001f3f; }
 
 .post-color-blue {
   color: #0074d9; }
 
-.cell-color-blue, .post-highlightcolor-blue {
+.cell-color-blue,
+.post-highlightcolor-blue {
   background-color: #0074d9; }
 
 .post-color-teal {
   color: #39cccc; }
 
-.cell-color-teal, .post-highlightcolor-teal {
+.cell-color-teal,
+.post-highlightcolor-teal {
   background-color: #39cccc; }
 
 .post-color-aqua {
   color: #7fdbff; }
 
-.cell-color-aqua, .post-highlightcolor-aqua {
+.cell-color-aqua,
+.post-highlightcolor-aqua {
   background-color: #7fdbff; }
 
 .post-color-orange {
   color: #ffa500; }
 
-.cell-color-orange, .post-highlightcolor-orange {
+.cell-color-orange,
+.post-highlightcolor-orange {
   background-color: #ffa500; }
 
 .post-text-align-right {
@@ -808,7 +896,6 @@ cell-* are used for the dropdown */
   font-family: Verdana, Geneva, sans-serif; }
 
 /* Custom classes */
-
 blockquote.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
@@ -820,7 +907,6 @@ blockquote.Quote {
 pre.CodeBlock {
   background-color: rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.07); }
-
 
 .AlignLeft {
   text-align: left; }
@@ -840,7 +926,6 @@ pre.CodeBlock {
  * this).
  */
 /* iframe */
-
 /* body within iframe */
 .editor-composer {
   margin: 0;
@@ -857,6 +942,7 @@ pre.CodeBlock {
  */
 .editor-composer h1 {
   font-size: 21px; }
+
 .editor-composer h2 {
   font-size: 18px; }
 

@@ -226,7 +226,7 @@ class ProxyRequest {
         $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 
         $this->ResponseHeaders = array();
-        $this->ResponseStatus = "";
+        $this->ResponseStatus = 0;
         $this->ResponseBody = "";
         $this->RequestBody = "";
         $this->ResponseTime = 0;

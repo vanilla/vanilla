@@ -1,72 +1,310 @@
-jQuery(document).ready(function($) {
-    statsUrl = gdn.definition('VanillaStatsUrl', '//analytics.vanillaforums.com');
+vanillaStats = (function() {
+    function VanillaStats() {
+        /**
+         * @type {string}
+         */
+        var apiUrl;
 
-    frame = function() {
-        var frame = document.getElementById('VanillaStatsGraph');
-        return !frame ? null : frame;
+        /**
+         * @type {string}
+         */
+        var authToken;
+
+        /**
+         * @type {Object}
+         */
+        var links;
+
+        /**
+         * @type {Object}
+         */
+        var range = {
+            from: null,
+            to: null
+        };
+
+        /**
+         * @type {string}
+         */
+        var slotType = 'm';
+
+        /**
+         * @type {Array}
+         */
+        var timeline;
+
+        /**
+         * @type {string}
+         */
+        var vanillaID;
+
+        /**
+         * @type {string}
+         */
+        var paths = {
+            timeline: "/stats/timeline/{vanillaID}.json"
+        };
+
+        /**
+         * @returns {string}
+         */
+        this.getApiUrl = function() {
+            if (typeof apiUrl === "undefined") {
+                apiUrl = gdn.definition("VanillaStatsUrl", "//analytics.vanillaforums.com");
+            }
+
+            return apiUrl;
+        };
+
+        /**
+         * @returns {bool|string}
+         */
+        this.getAuthToken = function() {
+            if (typeof authToken === "undefined") {
+                authToken = gdn.definition("AuthToken");
+            }
+
+            return authToken;
+        };
+
+        /**
+         * @returns {Object}
+         */
+        this.getLinks = function() {
+            return links;
+        };
+
+        /**
+         * @param {string} [key]
+         * @returns {Object|string|bool}
+         */
+        this.getPaths = function(key) {
+            if (typeof key !== "undefined") {
+                if (typeof paths[key] !== "undefined") {
+                    return paths[key];
+                } else {
+                    return false;
+                }
+            } else {
+                return paths;
+            }
+        };
+
+        /**
+         * @param {string} [key]
+         * @returns {Object|string|bool}
+         */
+        this.getRange = function(key) {
+            if (typeof key !== "undefined") {
+                if (typeof range[key] !== "undefined") {
+                    return range[key];
+                } else {
+                    return false;
+                }
+            } else {
+                return range;
+            }
+        };
+
+        /**
+         * @returns {string}
+         */
+        this.getSlotType = function() {
+            return slotType;
+        };
+
+        /**
+         * @returns {Array}
+         */
+        this.getTimeline = function() {
+            return timeline;
+        };
+
+        /**
+         * @returns {bool|string}
+         */
+        this.getVanillaID = function() {
+            if (typeof vanillaID === "undefined") {
+                vanillaID = gdn.definition("VanillaID");
+            }
+
+            return vanillaID;
+        };
+
+        /**
+         * @param {Object} data
+         * @returns {VanillaStats}
+         */
+        this.setData = function(data) {
+            if (typeof data === "object") {
+                if (typeof data.Links !== "undefined") {
+                    this.setLinks(data.Links);
+                }
+
+                if (typeof data.From !== "undefined" || typeof data.To !== "undefined") {
+                    var newFrom = typeof data.From !== "undefined" ? data.From : null;
+                    var newTo = typeof data.To !== "undefined" ? data.To : null;
+
+                    this.setRange(newFrom, newTo);
+                }
+
+                if (typeof data.SlotType !== "undefined") {
+                    this.setSlotType(data.SlotType);
+                }
+
+                if (typeof data.Timeline !== "undefined") {
+                    this.setTimeline(data.Timeline);
+                }
+            }
+
+            return this;
+        };
+
+        /**
+         * @param {Object} newLinks
+         * @returns {VanillaStats}
+         */
+        this.setLinks = function(newLinks) {
+            if (typeof newLinks === "object") {
+                links = newLinks;
+            }
+
+            return this;
+        };
+
+        /**
+         * @param {string} newSlotType
+         * @returns {VanillaStats}
+         */
+        this.setSlotType = function(newSlotType) {
+            if (typeof newSlotType === "string") {
+                slotType = newSlotType === "d" ? "d" : "m";
+            }
+
+            return this;
+        };
+
+        /**
+         * @param {Array} newTimeline
+         * @returns {VanillaStats}
+         */
+        this.setTimeline = function(newTimeline) {
+            if (Array.isArray(newTimeline)) {
+                timeline = newTimeline;
+            }
+
+            return this;
+        };
+
+        /**
+         * @param {Date|string} newFrom
+         * @param {Date|string} newTo
+         * @return {VanillaStats}
+         */
+        this.setRange = function(newFrom, newTo) {
+            if (!(newFrom instanceof Date)) {
+                newFrom = new Date(newFrom);
+            }
+            if (!(newTo instanceof Date)) {
+                newTo = new Date(newTo);
+            }
+
+            if (!isNaN(newFrom.getTime()) && !isNaN(newTo.getTime())) {
+                range.from = newFrom;
+                range.to = newTo;
+            }
+
+            return this;
+        };
     }
 
-    function getData() {
-        // Add spinners
-        if ($('#Content h1 span').length == 0)
-            $('<span class="TinyProgress"></span>').appendTo('#Content h1:last');
-
-        if ($('div.DashboardSummaries div.Loading').length == 0)
-            $('div.DashboardSummaries').html('<div class="Loading"></div>');
-
-        // Grab the installation id, version, and token
-        var vanillaId = $('input.VanillaID').val();
-        var vanillaVersion = $('input.VanillaVersion').val();
-        var securityToken = $('input.SecurityToken').val();
-
-        // Grab the ranges and
-        var range = $('input.Range').val();
-        var dateRange = $('input.DateRange').val();
-
-        // Load the graph data
-        // REMOTE QUERY
-        frame().src = statsUrl
-        + '/graph/'
-        + '?VanillaID=' + vanillaId
-        + '&VanillaVersion=' + vanillaVersion
-        + '&SecurityToken=' + securityToken
-        + '&Range=' + range
-        + '&DateRange=' + dateRange
-
-        // Load the summary data
-        // LOCAL QUERY
-        var range = $('input.Range').val();
-        var dateRange = $('input.DateRange').val();
-
-        $.ajax({
-            url: gdn.url('/dashboard/settings/dashboardsummaries?DeliveryType=VIEW&Range=' + range + '&DateRange=' + dateRange),
-            success: function(data) {
-                $('div.DashboardSummaries').html(data);
+    /**
+     * @param {string} [path]
+     * @param {Object} [data]
+     * @param {function} [successCallback]
+     */
+    VanillaStats.prototype.apiRequest = function(path, data, successCallback) {
+        var requestConfig = {
+            complete: function(jqXHR, textStatus) { },
+            context: this,
+            dataType: "json",
+            error: function (jqXHR, textStatus, errorThrown) { },
+            headers: {
+                Authorization: "token " + this.getAuthToken()
             },
-            error: function(xhr, status, error) {
-                $('div.DashboardSummaries').html('<div class="NoStats">Remote Analytics Server request failed.</div>');
-                $('div.DashboardSummaries div.NoStats').css('padding', '10px');
+            url: this.buildUrl(path)
+        };
+
+        if (typeof data === "object") {
+            requestConfig.data = data;
+        }
+
+        if (typeof successCallback === "function") {
+            requestConfig.success = successCallback;
+        }
+
+        $.ajax(requestConfig);
+    };
+
+    /**
+     * @param {string} path
+     * @returns {string}
+     */
+    VanillaStats.prototype.buildUrl = function(path) {
+        var baseUrl = this.getApiUrl();
+
+        if (typeof path !== "string") {
+            return baseUrl;
+        } else {
+            // Trim up the path and append it.
+            path = path.replace(/(^\/+)/, "");
+            return baseUrl.replace(/\/+$/, "") + "/" + path;
+        }
+    };
+
+    /**
+     * @param {Object} data
+     * @param {string} textStatus
+     * @param {Object} jqXHR
+     */
+    VanillaStats.prototype.timelineResponseHandler = function(data, textStatus, jqXHR) {
+        if (jqXHR.status === 200 && typeof data === "object") {
+            this.setData(data);
+        }
+    };
+
+    /**
+     * @returns {bool|string}
+     */
+    VanillaStats.prototype.updateChart = function(refDate) {
+        if (typeof refDate === "undefined") {
+            refDate = new Date();
+        } else {
+            if (!(refDate instanceof Date)) {
+                refDate = new Date(refDate);
+            }
+
+            if (isNaN(refDate.getTime())) {
+                refDate = new Date();
+            }
+        }
+
+        var date = refDate.getFullYear() + "-" + (refDate.getMonth() + 1) + "-" + refDate.getDate();
+        console.log(refDate);
+
+        this.apiRequest(
+            this.getPaths("timeline").replace("{vanillaID}", this.getVanillaID()),
+            {
+                date: date,
+                slotType: this.getSlotType()
             },
-            timeout: 15000 // 15 seconds in ms
-        });
+            this.timelineResponseHandler
+        );
+    };
 
-        // Remove Spinners
-        $('#Content h1 span.TinyProgress').remove();
-    }
+    return new VanillaStats();
+}());
 
-    // Draw the graph when the window is loaded.
-    window.onload = function() {
-        getData();
-    }
-
-    // Redraw the graph when the window is resized
-    $(window).resize(function() {
-        getData();
-    });
-
-    // Redraw the graph if the date range changes
-    $(document).on('change', 'input.DateRange', function() {
-        getData();
-    });
-
+$(document).ready(function() {
+    vanillaStats.updateChart();
 });

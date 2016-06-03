@@ -97,49 +97,52 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Override the default index method of the settings controller in the
-     * dashboard application to render new statistics.
+     * Override the index of the dashboard's settings controller in the to render new statistics.
+     *
+     * @param SettingsController $sender Instance of the dashboard's settings controller.
      */
-    public function statsDashboard($Sender) {
-        $StatsUrl = $this->AnalyticsServer;
-        if (!stringBeginsWith($StatsUrl, 'http:') && !stringBeginsWith($StatsUrl, 'https:')) {
-            $StatsUrl = Gdn::request()->scheme()."://{$StatsUrl}";
+    public function statsDashboard($sender) {
+        $statsUrl = $this->AnalyticsServer;
+        if (!stringBeginsWith($statsUrl, 'http:') && !stringBeginsWith($statsUrl, 'https:')) {
+            $statsUrl = Gdn::request()->scheme()."://{$statsUrl}";
         }
 
         // Tell the page where to find the Vanilla Analytics provider
-        $Sender->addDefinition('VanillaStatsUrl', $StatsUrl);
-        $Sender->setData('VanillaStatsUrl', $StatsUrl);
+        $sender->addDefinition('VanillaStatsUrl', $statsUrl);
+        $sender->setData('VanillaStatsUrl', $statsUrl);
 
         // Load javascript & css, check permissions, and load side menu for this page.
-        $Sender->addJsFile('settings.js');
-        $Sender->title(t('Dashboard'));
-        $Sender->RequiredAdminPermissions[] = 'Garden.Settings.View';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Community.Manage';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
-        $Sender->fireEvent('DefineAdminPermissions');
-        $Sender->permission($Sender->RequiredAdminPermissions, '', false);
-        $Sender->addSideMenu('dashboard/settings');
+        $sender->addJsFile('settings.js');
+        $sender->title(t('Dashboard'));
+        $sender->RequiredAdminPermissions[] = 'Garden.Settings.View';
+        $sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+        $sender->RequiredAdminPermissions[] = 'Garden.Community.Manage';
+        $sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
+        $sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
+        $sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
+        $sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+        $sender->fireEvent('DefineAdminPermissions');
+        $sender->permission($sender->RequiredAdminPermissions, '', false);
+        $sender->addSideMenu('dashboard/settings');
 
         if (!Gdn_Statistics::checkIsEnabled() && Gdn_Statistics::checkIsLocalhost()) {
-            $Sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');
+            $sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');
         } else {
-            $Sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
-            $Sender->addJsFile('picker.js', 'plugins/VanillaStats');
-            $Sender->addCSSFile('picker.css', 'plugins/VanillaStats');
+            $sender->addCssFile('picker.css', 'plugins/VanillaStats');
+            $sender->addCssFile('vendors.min.css', 'plugins/vanillaanalytics');
 
-            $this->configureRange($Sender);
+            $sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
+            $sender->addJsFile('picker.js', 'plugins/VanillaStats');
+            $sender->addJsFile('vendors/d3.min.js', 'plugins/VanillaStats');
+            $sender->addJsFile('vendors/c3.min.js', 'plugins/VanillaStats');
 
-            $VanillaID = Gdn::installationID();
-            $Sender->setData('VanillaID', $VanillaID);
-            $Sender->setData('VanillaVersion', APPLICATION_VERSION);
-            $Sender->setData('SecurityToken', $this->securityToken());
+            $this->configureRange($sender);
+
+            $sender->addDefinition('VanillaID', Gdn::installationID());
+            $sender->addDefinition('AuthToken', Gdn_Statistics::generateToken());
 
             // Render the custom dashboard view
-            $Sender->render('dashboard', '', 'plugins/VanillaStats');
+            $sender->render('dashboard', '', 'plugins/VanillaStats');
         }
     }
 

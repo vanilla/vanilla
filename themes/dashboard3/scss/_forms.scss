@@ -412,12 +412,15 @@ select {
 // Markup:
 // <form>
 // <ul class="label-selector">
-//   <li>
+//   <li class="label-selector-item">
 //     <input type="radio" id="babySeal" name="babyAnimals">
 //     <label for="babySeal">
 //       <div class="image-wrap">
-//         <img src="./public/resources/001.jpg" alt="Baby Seal">
+//         <img class="label-selector-image" src="./public/resources/001.jpg" alt="Baby Seal">
 //         <div class="overlay">
+//           <div class="buttons">
+//             <a class="btn btn-transparent">Button</a>
+//           </div>
 //         </div>
 //       </div>
 //       <div class="title">Baby Seal</div>
@@ -425,12 +428,15 @@ select {
 //       <p class="description">Choose this happy baby seal. It's so very happy.</p>
 //     </label>
 //   </li>
-//   <li>
+//   <li class="label-selector-item">
 //     <input type="radio" id="puppy" name="babyAnimals">
 //     <label for="puppy">
 //       <div class="image-wrap">
-//         <img src="./public/resources/002.jpg" alt="Puppy">
+//         <img class="label-selector-image" src="./public/resources/002.jpg" alt="Puppy">
 //         <div class="overlay">
+//           <div class="buttons">
+//             <a class="btn btn-transparent">Button</a>
+//           </div>
 //         </div>
 //       </div>
 //       <div class="title">Puppy</div>
@@ -447,23 +453,7 @@ select {
   @extend .row;
   @include list-reset();
 
-  > li,
-  > a {
-    @extend .col-md-6;
-    @extend .col-lg-4;
-    @extend .col-xl-3;
-
-    padding: ($spacer / 2) $spacer $spacer;
-  }
-
-  img {
-    display: block;
-    width: 100%;
-    border: 1px solid $grey-light;
-  }
-
-  label,
-  > a {
+  label {
     cursor: pointer;
   }
 
@@ -479,22 +469,24 @@ select {
     cursor: default;
 
     .overlay {
-      height: 100%;
-      opacity: .75;
-      background-color: $white;
+      display: none;
+    }
 
-      &::before {
-        position: relative;
-        display: block;
-        top: 35%;
-        width: 30%;
-        height: 30%;
-        margin-left: auto;
-        margin-right: auto;
-        background-color: green;
-        content: "";
+    .image-wrap {
+      &::after {
+        opacity: 1;
       }
     }
+
+    .label-selector-image {
+      opacity: .5;
+    }
+  }
+
+  .label-selector-image {
+    display: block;
+    width: 100%;
+    border: 1px solid $grey-light;
   }
 
   .title {
@@ -510,6 +502,22 @@ select {
     &:hover .overlay {
       height: 100%;
     }
+
+    &::after {
+      position: absolute;
+      top: 35%;
+      left: auto;
+      right: auto;
+      height: 30%;
+      width: 100%;
+      @include icon;
+      font-size: 4rem;
+      color: $brand-success;
+      content: $icon-ok-circle;
+      text-align: center;
+      opacity: 0;
+      transition: opacity .1s;
+    }
   }
 
   .overlay {
@@ -524,7 +532,7 @@ select {
     background-color: $brand-primary;
     opacity: .9;
     overflow: hidden;
-    transition: all .5s;
+    transition: all .1s;
     text-align: center;
   }
 
@@ -547,16 +555,28 @@ select {
   }
 }
 
+.label-selector-item {
+  @extend .col-md-6;
+  @extend .col-lg-4;
+  @extend .col-xl-3;
+
+  padding: ($spacer / 2) $spacer $spacer;
+}
+
 // Search input
 
 .search-wrap {
+  position: relative;
+
   &::before {
-    @extend .icon;
+    position: absolute;
+    top: .375rem;
+    right: 1rem;
+    line-height: $font-size-base * $line-height;
+    @extend %icon;
+
     content: $icon-search;
   }
-}
-.search-input {
-
 }
 
 // Hide the button

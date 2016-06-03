@@ -21,7 +21,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 
         echo '<div>', t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'), '</div>';
 
-        echo '<div>';
+        echo '<div class="search-wrap input-wrap">';
         echo $this->Form->textBox('Keywords');
         echo ' ', $this->Form->button(t('Go'));
         $count = $this->data('RecordCount', $this->data('UserCount', null));

@@ -23,32 +23,32 @@
       outline: 0;
     }
 
-    &:before {
+    &::before {
       @extend .toggle-well;
       content: '';
     }
 
-    &:after {
+    &::after {
       @extend .toggle-slider;
       content: '';
     }
   }
 
   .InProgress {
-    &:after {
+    &::after {
       @extend .toggle-slider-active;
     }
   }
 }
 
-.ActivateSlider-Active{
+.ActivateSlider-Active {
   a {
-    &:before {
+    &::before {
       @extend .toggle-well-on;
       content: '';
     }
 
-    &:after {
+    &::after {
       @extend .toggle-slider-on;
       content: '';
     }
@@ -90,12 +90,14 @@
   }
 }
 
-/* Homepage Admin */
+// Homepage page
 .Homepage .Sprite {
   display: block;
   height: 124px;
   width: 180px;
   background: url("./images/homepage-sprites.png") 0 0 no-repeat;
+
+  @extend .label-selector-image;
 }
 
 .Homepage .SpDiscussionsTable {
@@ -126,7 +128,8 @@
   background-position: -540px 0;
 }
 
-.Current {
+.Current,
+.current-theme {
   @extend .active;
 }
 

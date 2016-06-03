@@ -63,6 +63,7 @@ $navbar-border-color: rgba(0,0,0,.125);
         height: $spacer;
         bottom: - ($spacer / 2);
         left: (11.25 / 2) - ($spacer / 2);
+        rotate: 45deg;
         background-color: $nav-navbar-active-link-active-bg;
         border-bottom: 1px solid $navbar-border-color;
         border-right: 1px solid $navbar-border-color;

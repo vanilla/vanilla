@@ -149,7 +149,7 @@ class DashboardHooks implements Gdn_IPlugin {
     /**
      * @param $Sender
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
+    public function base_earlyAppSettingsMenuItems_handler($Sender) {
         // SideMenuModule menu
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));

@@ -119,7 +119,17 @@ module.exports = function (grunt) {
             dest: 'template/public/admin.css'
           }
         ]
-
+      },
+      styleguidefonts: {
+        files: [
+          {
+            flatten: true,
+            src: [
+              '../../resources/fonts/*'
+            ],
+            dest: 'template/public/resources/fonts'
+          }
+        ]
       }
     },
 

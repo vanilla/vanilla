@@ -310,7 +310,7 @@ form {
 .color-picker-preview {
   position: absolute;
   top: $padding-default / 4;
-  right: $padding-default + ($padding-default / 4);
+  right: ($padding-default / 4) + $border-width-rem;
   width: 40px;
   height: 27px;
   background: $black;
@@ -416,7 +416,7 @@ select {
 //     <input type="radio" id="babySeal" name="babyAnimals">
 //     <label for="babySeal">
 //       <div class="image-wrap">
-//         <img class="label-selector-image" src="./public/resources/001.jpg" alt="Baby Seal">
+//         <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
 //         <div class="overlay">
 //           <div class="buttons">
 //             <a class="btn btn-transparent">Button</a>
@@ -432,7 +432,7 @@ select {
 //     <input type="radio" id="puppy" name="babyAnimals">
 //     <label for="puppy">
 //       <div class="image-wrap">
-//         <img class="label-selector-image" src="./public/resources/002.jpg" alt="Puppy">
+//         <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
 //         <div class="overlay">
 //           <div class="buttons">
 //             <a class="btn btn-transparent">Button</a>
@@ -513,10 +513,10 @@ select {
       @include icon;
       font-size: 4rem;
       color: $brand-success;
-      content: $icon-ok-circle;
       text-align: center;
       opacity: 0;
       transition: opacity .1s;
+      @include content($icon-ok-circle);
     }
   }
 
@@ -564,6 +564,19 @@ select {
 }
 
 // Search input
+//
+// Search inputs have a hidden button and a search icon on the input.
+//
+// Markup:
+// <form>
+//   <div class="search-wrap">
+//     <input class="form-control">
+//     <button type="submit" class="search-submit">Search</button>
+//   </div>
+// </form>
+//
+// Styleguide 3.6.
+
 
 .search-wrap {
   position: relative;
@@ -574,8 +587,7 @@ select {
     right: 1rem;
     line-height: $font-size-base * $line-height;
     @extend %icon;
-
-    content: $icon-search;
+    @include content($icon-ok-circle);
   }
 }
 

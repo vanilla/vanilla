@@ -20,5 +20,5 @@
   "trailing": true,
   "smarttabs": true,
   "white": true,
-  "predef": ["prettyPrint", "jQuery"]
+  "predef": ["prettyPrint", "jQuery", "ace"]
 }

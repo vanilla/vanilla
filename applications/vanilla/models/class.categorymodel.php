@@ -1952,7 +1952,7 @@ class CategoryModel extends Gdn_Model {
             }
 
             if (!empty($row['Children'])) {
-                $this->saveSubtree($row['Children'], $category['CategoryID'], false);
+                $this->saveSubtreeInternal($row['Children'], $category['CategoryID'], false);
             }
 
             $order++;

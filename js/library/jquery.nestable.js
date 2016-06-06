@@ -307,13 +307,13 @@
 		dragStart: function(e)
 		{
 			var mouse    = this.mouse,
-				target   = $(e.target),
+				target   = $(e.target).closest('.'+this.options.handleClass),
 				dragItem = target.closest(this.options.itemNodeName);
 
 			this.placeEl.css('height', dragItem.height());
 
-			mouse.offsetX = e.offsetX !== undefined ? e.offsetX : e.pageX - target.offset().left;
-			mouse.offsetY = e.offsetY !== undefined ? e.offsetY : e.pageY - target.offset().top;
+			mouse.offsetX = e.pageX !== undefined ? e.pageX - target.offset().left : e.offsetX;
+			mouse.offsetY = e.pageY !== undefined ? e.pageY - target.offset().top : e.offsetY;
 			mouse.startX = mouse.lastX = e.pageX;
 			mouse.startY = mouse.lastY = e.pageY;
 

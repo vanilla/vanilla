@@ -1,0 +1,915 @@
+// Font Vanillicon
+//
+// Vanillicon is the icon font for use on Vanilla Forums and is an extension of
+// the excellent Font Awesome.
+//
+// Authors
+//
+// - Todd Burry <todd@vanillaforums.com>
+// - Kasper Isager <kasper@vanillaforums.com>
+//
+// License
+//
+// - The Font Vanillicon font is licensed under the SIL OFL 1.1 -
+//   http://scripts.sil.org/OFL
+// - The Font Vanillicon CSS, LESS, and Sass files are licensed under the
+//   MIT License - http://opensource.org/licenses/mit-license.html
+//
+// - All brand icons are trademarks of their respective owners.
+//   The use of these trademarks does not indicate endorsement of the trademark
+//   holder by Vanilla Forums, nor vice versa.
+
+@import "vanillicon-icons";
+@import "vanillicon-mixins";
+
+@font-face {
+  font-family: "vanillicon";
+  src: url("#{$vanillicon-font-path}vanillicon.eot");
+  src: url("#{$vanillicon-font-path}vanillicon.eot?#iefix") format("embedded-opentype"),
+  url("#{$vanillicon-font-path}vanillicon.woff") format("woff"),
+  url("#{$vanillicon-font-path}vanillicon.ttf") format("truetype"),
+  url("#{$vanillicon-font-path}vanillicon.svg?#vanillicon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@mixin content($icon) {
+  content: unquote('"') + unquote(str-insert($icon, "\\", 1)) + unquote('"');
+}
+
+.icon:before {
+  @extend %icon;
+}
+
+.icon-adjust:before {
+  @include content($icon-adjust);
+}
+
+.icon-agree:before {
+  @include content($icon-agree);
+}
+
+.icon-align-center:before {
+  @include content($icon-align-center);
+}
+
+.icon-align-justify:before {
+  @include content($icon-align-justify);
+}
+
+.icon-align-left:before {
+  @include content($icon-align-left);
+}
+
+.icon-align-right:before {
+  @include content($icon-align-right);
+}
+
+.icon-android:before {
+  @include content($icon-android);
+}
+
+.icon-angry:before {
+  @include content($icon-angry);
+}
+
+.icon-apple:before {
+  @include content($icon-apple);
+}
+
+.icon-archive:before {
+  @include content($icon-archive);
+}
+
+.icon-arrow-down:before {
+  @include content($icon-arrow-down);
+}
+
+.icon-arrow-left:before {
+  @include content($icon-arrow-left);
+}
+
+.icon-arrow-right:before {
+  @include content($icon-arrow-right);
+}
+
+.icon-arrow-up:before {
+  @include content($icon-arrow-up);
+}
+
+.icon-ban:before {
+  @include content($icon-ban);
+}
+
+.icon-bar-chart:before {
+  @include content($icon-bar-chart);
+}
+
+.icon-bell:before {
+  @include content($icon-bell);
+}
+
+.icon-bold:before {
+  @include content($icon-bold);
+}
+
+.icon-bookmark:before {
+  @include content($icon-bookmark);
+}
+
+.icon-bookmark-empty:before {
+  @include content($icon-bookmark-empty);
+}
+
+.icon-bug:before {
+  @include content($icon-bug);
+}
+
+.icon-bullhorn:before {
+  @include content($icon-bullhorn);
+}
+
+.icon-bullseye:before {
+  @include content($icon-bullseye);
+}
+
+.icon-calendar:before {
+  @include content($icon-calendar);
+}
+
+.icon-camera:before {
+  @include content($icon-camera);
+}
+
+.icon-caret-down:before {
+  @include content($icon-caret-down);
+}
+
+.icon-caret-left:before {
+  @include content($icon-caret-left);
+}
+
+.icon-caret-right:before {
+  @include content($icon-caret-right);
+}
+
+.icon-caret-up:before {
+  @include content($icon-caret-up);
+}
+
+.icon-certificate:before {
+  @include content($icon-certificate);
+}
+
+.icon-check:before {
+  @include content($icon-check);
+}
+
+.icon-check-empty:before {
+  @include content($icon-check-empty);
+}
+
+.icon-check-sign:before {
+  @include content($icon-check-sign);
+}
+
+.icon-chevron-down:before {
+  @include content($icon-chevron-down);
+}
+
+.icon-chevron-left:before {
+  @include content($icon-chevron-left);
+}
+
+.icon-chevron-right:before {
+  @include content($icon-chevron-right);
+}
+
+.icon-chevron-sign-down:before {
+  @include content($icon-chevron-sign-down);
+}
+
+.icon-chevron-sign-left:before {
+  @include content($icon-chevron-sign-left);
+}
+
+.icon-chevron-sign-right:before {
+  @include content($icon-chevron-sign-right);
+}
+
+.icon-chevron-sign-up:before {
+  @include content($icon-chevron-sign-up);
+}
+
+.icon-chevron-up:before {
+  @include content($icon-chevron-up);
+}
+
+.icon-circle:before {
+  @include content($icon-circle);
+}
+
+.icon-circle-blank:before {
+  @include content($icon-circle-blank);
+}
+
+.icon-cloud:before {
+  @include content($icon-cloud);
+}
+
+.icon-cloud-download:before {
+  @include content($icon-cloud-download);
+}
+
+.icon-cloud-upload:before {
+  @include content($icon-cloud-upload);
+}
+
+.icon-code:before {
+  @include content($icon-code);
+}
+
+.icon-cog:before {
+  @include content($icon-cog);
+}
+
+.icon-cogs:before {
+  @include content($icon-cogs);
+}
+
+.icon-collapse:before {
+  @include content($icon-collapse);
+}
+
+.icon-collapse-top:before {
+  @include content($icon-collapse-top);
+}
+
+.icon-comment:before {
+  @include content($icon-comment);
+}
+
+.icon-comments:before {
+  @include content($icon-comments);
+}
+
+.icon-compass:before {
+  @include content($icon-compass);
+}
+
+.icon-compose:before {
+  @include content($icon-compose);
+}
+
+.icon-crown:before {
+  @include content($icon-crown);
+}
+
+.icon-dashboard:before {
+  @include content($icon-dashboard);
+}
+
+.icon-discussion:before {
+  @include content($icon-discussion);
+}
+
+.icon-dot-circle:before {
+  @include content($icon-dot-circle);
+}
+
+.icon-dropbox:before {
+  @include content($icon-dropbox);
+}
+
+.icon-edit:before {
+  @include content($icon-edit);
+}
+
+.icon-edit-sign:before {
+  @include content($icon-edit-sign);
+}
+
+.icon-ellipsis:before {
+  @include content($icon-ellipsis);
+}
+
+.icon-exclamation-sign:before {
+  @include content($icon-exclamation-sign);
+}
+
+.icon-expand:before {
+  @include content($icon-expand);
+}
+
+.icon-external-link:before {
+  @include content($icon-external-link);
+}
+
+.icon-eye-close:before {
+  @include content($icon-eye-close);
+}
+
+.icon-eye-open:before {
+  @include content($icon-eye-open);
+}
+
+.icon-facebook:before {
+  @include content($icon-facebook);
+}
+
+.icon-facebook-alt:before {
+  @include content($icon-facebook-alt);
+}
+
+.icon-facebook-alt-round:before {
+  @include content($icon-facebook-alt-round);
+}
+
+.icon-file:before {
+  @include content($icon-file);
+}
+
+.icon-file-text:before {
+  @include content($icon-file-text);
+}
+
+.icon-filter:before {
+  @include content($icon-filter);
+}
+
+.icon-flag:before {
+  @include content($icon-flag);
+}
+
+.icon-flame:before {
+  @include content($icon-flame);
+}
+
+.icon-flickr:before {
+  @include content($icon-flickr);
+}
+
+.icon-folder-close:before {
+  @include content($icon-folder-close);
+}
+
+.icon-folder-open:before {
+  @include content($icon-folder-open);
+}
+
+.icon-font:before {
+  @include content($icon-font);
+}
+
+.icon-frown:before {
+  @include content($icon-frown);
+}
+
+.icon-gift:before {
+  @include content($icon-gift);
+}
+
+.icon-github:before {
+  @include content($icon-github);
+}
+
+.icon-github-alt:before {
+  @include content($icon-github-alt);
+}
+
+.icon-github-octocat:before {
+  @include content($icon-github-octocat);
+}
+
+.icon-globe:before {
+  @include content($icon-globe);
+}
+
+.icon-google:before {
+  @include content($icon-google);
+}
+
+.icon-google-plus:before {
+  @include content($icon-google-plus);
+}
+
+.icon-google-plus-alt:before {
+  @include content($icon-google-plus-alt);
+}
+
+.icon-group:before {
+  @include content($icon-group);
+}
+
+.icon-hand-down:before {
+  @include content($icon-hand-down);
+}
+
+.icon-hand-left:before {
+  @include content($icon-hand-left);
+}
+
+.icon-hand-right:before {
+  @include content($icon-hand-right);
+}
+
+.icon-hand-up:before {
+  @include content($icon-hand-up);
+}
+
+.icon-heart:before {
+  @include content($icon-heart);
+}
+
+.icon-home:before {
+  @include content($icon-home);
+}
+
+.icon-inbox:before {
+  @include content($icon-inbox);
+}
+
+.icon-indent-left:before {
+  @include content($icon-indent-left);
+}
+
+.icon-indent-right:before {
+  @include content($icon-indent-right);
+}
+
+.icon-info-sign:before {
+  @include content($icon-info-sign);
+}
+
+.icon-instagram:before {
+  @include content($icon-instagram);
+}
+
+.icon-italic:before {
+  @include content($icon-italic);
+}
+
+.icon-jail:before {
+  @include content($icon-jail);
+}
+
+.icon-key:before {
+  @include content($icon-key);
+}
+
+.icon-lightbulb:before {
+  @include content($icon-lightbulb);
+}
+
+.icon-link:before {
+  @include content($icon-link);
+}
+
+.icon-linkedin:before {
+  @include content($icon-linkedin);
+}
+
+.icon-linkedin-alt:before {
+  @include content($icon-linkedin-alt);
+}
+
+.icon-linux:before {
+  @include content($icon-linux);
+}
+
+.icon-list-ol:before {
+  @include content($icon-list-ol);
+}
+
+.icon-list-ul:before {
+  @include content($icon-list-ul);
+}
+
+.icon-lock:before {
+  @include content($icon-lock);
+}
+
+.icon-lol:before {
+  @include content($icon-lol);
+}
+
+.icon-mail:before {
+  @include content($icon-mail);
+}
+
+.icon-mail-open:before {
+  @include content($icon-mail-open);
+}
+
+.icon-map-marker:before {
+  @include content($icon-map-marker);
+}
+
+.icon-medium:before {
+  @include content($icon-medium);
+}
+
+.icon-meh:before {
+  @include content($icon-meh);
+}
+
+.icon-menu:before {
+  @include content($icon-menu);
+}
+
+.icon-minus-sign:before {
+  @include content($icon-minus-sign);
+}
+
+.icon-mobile-phone:before {
+  @include content($icon-mobile-phone);
+}
+
+.icon-mod:before {
+  @include content($icon-mod);
+}
+
+.icon-nib:before {
+  @include content($icon-nib);
+}
+
+.icon-note:before {
+  @include content($icon-note);
+}
+
+.icon-ok:before {
+  @include content($icon-ok);
+}
+
+.icon-ok-circle:before {
+  @include content($icon-ok-circle);
+}
+
+.icon-ok-sign:before {
+  @include content($icon-ok-sign);
+}
+
+.icon-paper-clip:before {
+  @include content($icon-paper-clip);
+}
+
+.icon-paragraph:before {
+  @include content($icon-paragraph);
+}
+
+.icon-paypal:before {
+  @include content($icon-paypal);
+}
+
+.icon-pencil:before {
+  @include content($icon-pencil);
+}
+
+.icon-permalink:before {
+  @include content($icon-permalink);
+}
+
+.icon-picture:before {
+  @include content($icon-picture);
+}
+
+.icon-pinterest:before {
+  @include content($icon-pinterest);
+}
+
+.icon-pinterest-alt:before {
+  @include content($icon-pinterest-alt);
+}
+
+.icon-play-circle:before {
+  @include content($icon-play-circle);
+}
+
+.icon-plus-sign:before {
+  @include content($icon-plus-sign);
+}
+
+.icon-poll:before {
+  @include content($icon-poll);
+}
+
+.icon-preview:before {
+  @include content($icon-preview);
+}
+
+.icon-pushpin:before {
+  @include content($icon-pushpin);
+}
+
+.icon-question:before {
+  @include content($icon-question);
+}
+
+.icon-question-sign:before {
+  @include content($icon-question-sign);
+}
+
+.icon-quote:before {
+  @include content($icon-quote);
+}
+
+.icon-reddit:before {
+  @include content($icon-reddit);
+}
+
+.icon-reddit-alien:before {
+  @include content($icon-reddit-alien);
+}
+
+.icon-reddit-alt:before {
+  @include content($icon-reddit-alt);
+}
+
+.icon-refresh:before {
+  @include content($icon-refresh);
+}
+
+.icon-remove:before {
+  @include content($icon-remove);
+}
+
+.icon-remove-sign:before {
+  @include content($icon-remove-sign);
+}
+
+.icon-repeat:before {
+  @include content($icon-repeat);
+}
+
+.icon-reply:before {
+  @include content($icon-reply);
+}
+
+.icon-reply-all:before {
+  @include content($icon-reply-all);
+}
+
+.icon-report:before {
+  @include content($icon-report);
+}
+
+.icon-resize-full:before {
+  @include content($icon-resize-full);
+}
+
+.icon-resize-small:before {
+  @include content($icon-resize-small);
+}
+
+.icon-retweet:before {
+  @include content($icon-retweet);
+}
+
+.icon-robot:before {
+  @include content($icon-robot);
+}
+
+.icon-rss:before {
+  @include content($icon-rss);
+}
+
+.icon-salesforce:before {
+  @include content($icon-salesforce);
+}
+
+.icon-search:before {
+  @include content($icon-search);
+}
+
+.icon-select:before {
+  @include content($icon-select);
+}
+
+.icon-share:before {
+  @include content($icon-share);
+}
+
+.icon-share-alt:before {
+  @include content($icon-share-alt);
+}
+
+.icon-share-alt-square:before {
+  @include content($icon-share-alt-square);
+}
+
+.icon-shield:before {
+  @include content($icon-shield);
+}
+
+.icon-sign-blank:before {
+  @include content($icon-sign-blank);
+}
+
+.icon-signin:before {
+  @include content($icon-signin);
+}
+
+.icon-signout:before {
+  @include content($icon-signout);
+}
+
+.icon-skull:before {
+  @include content($icon-skull);
+}
+
+.icon-skype:before {
+  @include content($icon-skype);
+}
+
+.icon-smile:before {
+  @include content($icon-smile);
+}
+
+.icon-source:before {
+  @include content($icon-source);
+}
+
+.icon-spam:before {
+  @include content($icon-spam);
+}
+
+.icon-star:before {
+  @include content($icon-star);
+}
+
+.icon-star-empty:before {
+  @include content($icon-star-empty);
+}
+
+.icon-star-half-empty:before {
+  @include content($icon-star-half-empty);
+}
+
+.icon-steam:before {
+  @include content($icon-steam);
+}
+
+.icon-steam-alt:before {
+  @include content($icon-steam-alt);
+}
+
+.icon-strikethrough:before {
+  @include content($icon-strikethrough);
+}
+
+.icon-subscript:before {
+  @include content($icon-subscript);
+}
+
+.icon-superscript:before {
+  @include content($icon-superscript);
+}
+
+.icon-table:before {
+  @include content($icon-table);
+}
+
+.icon-tag:before {
+  @include content($icon-tag);
+}
+
+.icon-tags:before {
+  @include content($icon-tags);
+}
+
+.icon-th:before {
+  @include content($icon-th);
+}
+
+.icon-th-large:before {
+  @include content($icon-th-large);
+}
+
+.icon-th-list:before {
+  @include content($icon-th-list);
+}
+
+.icon-thumbs-down:before {
+  @include content($icon-thumbs-down);
+}
+
+.icon-thumbs-up:before {
+  @include content($icon-thumbs-up);
+}
+
+.icon-ticket:before {
+  @include content($icon-ticket);
+}
+
+.icon-time:before {
+  @include content($icon-time);
+}
+
+.icon-trash:before {
+  @include content($icon-trash);
+}
+
+.icon-troll:before {
+  @include content($icon-troll);
+}
+
+.icon-trophy:before {
+  @include content($icon-trophy);
+}
+
+.icon-tumblr:before {
+  @include content($icon-tumblr);
+}
+
+.icon-tumblr-alt:before {
+  @include content($icon-tumblr-alt);
+}
+
+.icon-twitter:before {
+  @include content($icon-twitter);
+}
+
+.icon-twitter-alt:before {
+  @include content($icon-twitter-alt);
+}
+
+.icon-underline:before {
+  @include content($icon-underline);
+}
+
+.icon-undo:before {
+  @include content($icon-undo);
+}
+
+.icon-unlink:before {
+  @include content($icon-unlink);
+}
+
+.icon-unlock:before {
+  @include content($icon-unlock);
+}
+
+.icon-user:before {
+  @include content($icon-user);
+}
+
+.icon-vcard:before {
+  @include content($icon-vcard);
+}
+
+.icon-video:before {
+  @include content($icon-video);
+}
+
+.icon-vimeo:before {
+  @include content($icon-vimeo);
+}
+
+.icon-vimeo-alt:before {
+  @include content($icon-vimeo-alt);
+}
+
+.icon-vine:before {
+  @include content($icon-vine);
+}
+
+.icon-warn:before {
+  @include content($icon-warn);
+}
+
+.icon-warning-sign:before {
+  @include content($icon-warning-sign);
+}
+
+.icon-windows:before {
+  @include content($icon-windows);
+}
+
+.icon-wordpress:before {
+  @include content($icon-wordpress);
+}
+
+.icon-wtf:before {
+  @include content($icon-wtf);
+}
+
+.icon-yahoo:before {
+  @include content($icon-yahoo);
+}
+
+.icon-yelp:before {
+  @include content($icon-yelp);
+}
+
+.icon-youtube:before {
+  @include content($icon-youtube);
+}
+
+.icon-youtube-alt:before {
+  @include content($icon-youtube-alt);
+}
+
+.icon-zendesk:before {
+  @include content($icon-zendesk);
+}
+

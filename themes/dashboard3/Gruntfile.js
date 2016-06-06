@@ -64,6 +64,37 @@ module.exports = function (grunt) {
           },
           {
             expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'ace-builds/src-min/ace.js'
+              , 'ace-builds/src-min/mode-html.js'
+              , 'ace-builds/src-min/mode-css.js'
+              , 'ace-builds/src-min/theme-clouds.js'
+            ],
+            dest: 'js/vendors/ace'
+          },
+          {
+            expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'google-code-prettify/src/lang-html.js'
+              , 'google-code-prettify/src/prettify.js'
+            ],
+            dest: 'js/vendors/prettify'
+          },
+          {
+            expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'google-code-prettify/src/prettify.css'
+            ],
+            dest: 'design/vendors'
+          },
+          {
+            expand: true,
             // flatten: true,
             cwd: 'bower_components',
             src: [

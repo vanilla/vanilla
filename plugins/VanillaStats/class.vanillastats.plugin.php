@@ -133,8 +133,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
             $sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
             $sender->addJsFile('picker.js', 'plugins/VanillaStats');
-            $sender->addJsFile('vendors/d3.min.js', 'plugins/VanillaStats');
-            $sender->addJsFile('vendors/c3.min.js', 'plugins/VanillaStats');
+            $sender->addJsFile('d3.min.js');
+            $sender->addJsFile('c3.min.js');
 
             $this->configureRange($sender);
 

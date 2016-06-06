@@ -11,22 +11,40 @@ vanillaStats = (function() {
         var authToken;
 
         /**
+         * @type {object}
+         */
+        var chart;
+
+        /**
          * @type {Object}
          */
-        var links;
+        var counts = {
+            "Comments": 0,
+            "Discussions": 0,
+            "Users": 0,
+            "Views": 0
+        };
+
+        /**
+         * @type {Object}
+         */
+        var links = {
+            Next: null,
+            Prev: null
+        };
 
         /**
          * @type {Object}
          */
         var range = {
-            from: null,
-            to: null
+            From: null,
+            To: null
         };
 
         /**
          * @type {string}
          */
-        var slotType = 'm';
+        var slotType = "m";
 
         /**
          * @type {Array}
@@ -57,7 +75,7 @@ vanillaStats = (function() {
         };
 
         /**
-         * @returns {bool|string}
+         * @returns {boolean|string}
          */
         this.getAuthToken = function() {
             if (typeof authToken === "undefined") {
@@ -68,10 +86,90 @@ vanillaStats = (function() {
         };
 
         /**
+         * @returns {object}
+         */
+        this.getChart = function() {
+            if (typeof chart !== "object") {
+                var statsChart = document.getElementById("StatsChart");
+
+                if (statsChart) {
+                    chart = c3.generate({
+                        axis: {
+                            x: {
+                                tick: {
+                                    format: (function(date) { return this.formatDate(date) }).bind(this)
+                                },
+                                type: "timeseries"
+                            }
+                        },
+                        bindto: statsChart,
+                        data: {
+                            columns: []
+                        },
+                        legend: {
+                            show: false
+                        }
+                    });
+                }
+            }
+
+            return chart;
+        };
+
+        /**
+         * @param {string} [key]
+         */
+        this.getCounts = function(key) {
+            if (key) {
+                if (typeof counts[key] === "number") {
+                    return counts[key];
+                } else {
+                    return false;
+                }
+            } else {
+                return counts;
+            }
+        };
+
+        /**
+         * @returns {string} date
+         */
+        this.formatDate = function(date) {
+            var dateFormat;
+            date = new Date(date);
+
+            if (this.getSlotType() === "m") {
+                dateFormat = "%b %Y";
+            } else {
+                dateFormat = "%Y-%m-%d"
+            }
+
+            var formatter = d3.time.format(dateFormat);
+
+            return formatter(date);
+        };
+
+        /**
+         * @param {string} [type] Prev or Next to grab the specific link value.
          * @returns {Object}
          */
-        this.getLinks = function() {
-            return links;
+        this.getLinks = function(type) {
+            if (type) {
+                if (typeof type === "string") {
+                    type = type.toLowerCase();
+
+                    switch (type) {
+                        case "next":
+                            return links["Next"];
+                        case "prev":
+                            return links["Prev"];
+                    }
+                } else {
+                    return null;
+                }
+            } else {
+                return links;
+            }
         };
 
         /**
@@ -121,7 +219,7 @@ vanillaStats = (function() {
         };
 
         /**
-         * @returns {bool|string}
+         * @returns {boolean|string}
          */
         this.getVanillaID = function() {
             if (typeof vanillaID === "undefined") {
@@ -129,6 +227,35 @@ vanillaStats = (function() {
             }
 
             return vanillaID;
+        };
+
+        /**
+         * @param {Object} newCounts
+         */
+        this.setCounts = function(newCounts) {
+            if (typeof newCounts !== "object") {
+                return false;
+            }
+
+            var requiredValues = [
+                "Comments",
+                "Discussions",
+                "Users",
+                "Views"
+            ];
+
+            var validCounts = true;
+            requiredValues.forEach(function (value, index, array) {
+                if (typeof newCounts[value] !== "number") {
+                    return validCounts = false;
+                }
+            });
+
+            if (validCounts) {
+                counts = newCounts;
+            }
+
+            return this;
         };
 
         /**
@@ -189,14 +316,37 @@ vanillaStats = (function() {
          * @returns {VanillaStats}
          */
         this.setTimeline = function(newTimeline) {
+            var updatedCounts = {
+                "Comments": 0,
+                "Discussions": 0,
+                "Users": 0,
+                "Views": 0
+            };
+
             if (Array.isArray(newTimeline)) {
                 timeline = newTimeline;
+                timeline.forEach(function(interval, index, array) {
+                    if (typeof interval.CountViews === "number") {
+                        updatedCounts.Views += interval.CountViews;
+                    }
+                    if (typeof interval.CountUsers === "number") {
+                        updatedCounts.Users += interval.CountUsers;
+                    }
+                    if (typeof interval.CountDiscussions === "number") {
+                        updatedCounts.Discussions += interval.CountDiscussions;
+                    }
+                    if (typeof interval.CountComments === "number") {
+                        updatedCounts.Comments += interval.CountComments;
+                    }
+                });
+
+                this.setCounts(updatedCounts);
             }
 
             return this;
         };
 
-        /**
+            /**
          * @param {Date|string} newFrom
          * @param {Date|string} newTo
          * @return {VanillaStats}
@@ -270,13 +420,76 @@ vanillaStats = (function() {
     VanillaStats.prototype.timelineResponseHandler = function(data, textStatus, jqXHR) {
         if (jqXHR.status === 200 && typeof data === "object") {
             this.setData(data);
+            this.writeData();
         }
     };
 
     /**
-     * @returns {bool|string}
+     * @param {string} key
      */
-    VanillaStats.prototype.updateChart = function(refDate) {
+    VanillaStats.prototype.updateChart = function(key) {
+        if (typeof key !== "string") {
+            return false;
+        }
+
+        var dataIndex, label;
+        switch (key.toLowerCase()) {
+            case "views":
+                dataIndex = "CountViews";
+                label = "Views";
+                break;
+            case "comments":
+                dataIndex = "CountComments";
+                label = "Comments";
+                break;
+            case "discussions":
+                dataIndex = "CountDiscussions";
+                label = "Discussions";
+                break;
+            case "users":
+                dataIndex = "CountUsers";
+                label = "Users";
+                break;
+            default:
+                dataIndex = key;
+                label = "Count";
+        }
+
+        var newData = {
+            json: [],
+            keys: {
+                x: "Date",
+                value: [label]
+            },
+            unload: true
+        };
+        var timeline = this.getTimeline();
+
+        if (Array.isArray(timeline)) {
+            timeline.forEach(function (value, index, array) {
+                var newInterval = {
+                    Date: ""
+                };
+                newInterval[label] = 0;
+
+                if (typeof value["Date"] === "string") {
+                    newInterval.Date = value["Date"];
+                }
+                if (typeof value[dataIndex] === "number") {
+                    newInterval[label] = value[dataIndex];
+                }
+
+                newData.json.push(newInterval);
+            });
+        }
+
+        this.getChart().load(newData);
+    };
+
+    /**
+     * @returns {boolean|string}
+     */
+    VanillaStats.prototype.updateStats = function(refDate) {
         if (typeof refDate === "undefined") {
             refDate = new Date();
         } else {
@@ -290,7 +503,6 @@ vanillaStats = (function() {
         }
 
         var date = refDate.getFullYear() + "-" + (refDate.getMonth() + 1) + "-" + refDate.getDate();
-        console.log(refDate);
 
         this.apiRequest(
             this.getPaths("timeline").replace("{vanillaID}", this.getVanillaID()),
@@ -302,9 +514,47 @@ vanillaStats = (function() {
         );
     };
 
+    /**
+     * @param {string} containerID
+     * @param {number} count
+     * @return {boolean}
+     */
+    VanillaStats.prototype.writeCount = function(containerID, count) {
+        var countString;
+
+        if (typeof count !== "number") {
+            countString = "-";
+        } else {
+            countString = count.toString(10);
+        }
+
+        var containerElement = document.getElementById(containerID);
+        if (containerElement) {
+            var valueElements = containerElement.getElementsByClassName("StatsValue");
+            if (valueElements.length) {
+                valueElements[0].innerHTML = countString;
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    /**
+     *
+     */
+    VanillaStats.prototype.writeData = function() {
+        this.writeCount("NewComments", this.getCounts("Comments"));
+        this.writeCount("NewDiscussions", this.getCounts("Discussions"));
+        this.writeCount("NewUsers", this.getCounts("Users"));
+        this.writeCount("PageViews", this.getCounts("Views"));
+
+        this.updateChart("Views");
+    };
+
     return new VanillaStats();
 }());
 
 $(document).ready(function() {
-    vanillaStats.updateChart();
+    vanillaStats.updateStats();
 });

@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
+<div id="StatsChart"></div>
 <ul id="StatsOverview">
     <li id="PageViews">
         <div>

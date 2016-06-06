@@ -143,6 +143,7 @@ class ProxyRequest {
 
         if ($Response == false) {
             $this->ResponseBody = curl_error($Handler);
+            $this->ResponseStatus = 400;
         } else {
             $this->ResponseStatus = curl_getinfo($Handler, CURLINFO_HTTP_CODE);
             $this->ContentType = strtolower(curl_getinfo($Handler, CURLINFO_CONTENT_TYPE));
@@ -226,7 +227,7 @@ class ProxyRequest {
         $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 
         $this->ResponseHeaders = array();
-        $this->ResponseStatus = "";
+        $this->ResponseStatus = 0;
         $this->ResponseBody = "";
         $this->RequestBody = "";
         $this->ResponseTime = 0;

@@ -78,11 +78,16 @@ $dropdown->setTrigger('A New Name')
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-6 col-md-8 col-md-offset-2 col-sm-offset-3 footer">
-            <?php
-            $this->renderAsset('Foot');
-            echo '<div class="Version">Version ', APPLICATION_VERSION, '</div>';
-            echo wrap(anchor(img('/applications/dashboard/design/images/logo_footer.png', array('alt' => 'Vanilla Forums')), c('Garden.VanillaUrl')), 'div');
-            ?>
+            <?php $this->renderAsset('Foot'); ?>
+            <div class="footer-logo logo-wrap">
+                <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>
+                <div class="footer-logo-powered">
+                    <div class="footer-logo-powered-text">— <?php echo t('%s Powered', 'Powered'); ?> —</div>
+                </div>
+            </div>
+            <div class="footer-nav nav">
+                <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
+            </div>
         </div>
     </div>
 </div>

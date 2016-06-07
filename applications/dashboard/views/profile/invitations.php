@@ -20,6 +20,7 @@ if ($this->InvitationCount != 0) {
 
 if ($this->InvitationData->numRows() > 0) {
     ?>
+<div class="table-wrap">
     <table class="AltRows Invitations DataTable">
         <thead>
         <tr>
@@ -86,6 +87,7 @@ if ($this->InvitationData->numRows() > 0) {
         <?php } ?>
         </tbody>
     </table>
+</div>
 <?php
 }
 echo $this->Form->close();

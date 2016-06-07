@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count($this->data('Bans'))));
 ?>
+<div class="table-wrap">
     <table id="Log" class="AltColumns">
         <thead>
         <tr>
@@ -45,5 +46,6 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
         ?>
         </tbody>
     </table>
+</div>
 <?php
 PagerModule::write();

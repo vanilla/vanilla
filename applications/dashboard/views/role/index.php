@@ -24,6 +24,7 @@ $this->DefaultRolesWarning();
 <?php if ($Advanced) { ?>
     <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'SmallButton'); ?></div>
 <?php } ?>
+<div class="table-wrap">
     <table border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable" id="RoleTable">
         <thead>
         <tr id="0">
@@ -66,5 +67,6 @@ $this->DefaultRolesWarning();
         <?php } ?>
         </tbody>
     </table>
+</div>
 <?php
 echo $this->Form->close();

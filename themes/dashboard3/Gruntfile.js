@@ -23,7 +23,8 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
+        // , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
+        , tasks: ['scsslint', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {

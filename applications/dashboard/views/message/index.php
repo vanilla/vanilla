@@ -17,6 +17,7 @@ $Session = Gdn::session();
     <div
         class="FilterMenu"><?php echo anchor(t('Add Message'), 'dashboard/message/add', 'AddMessage SmallButton'); ?></div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
+<div class="table-wrap">
     <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
         <thead>
         <tr id="0">
@@ -55,10 +56,12 @@ $Session = Gdn::session();
                     ?>
                     <div>
                         <strong><?php echo $Message->Enabled == '1' ? t('Enabled') : t('Disabled'); ?></strong>
-                        <?php
-                        echo anchor(t('Edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage SmallButton');
-                        echo anchor(t('Delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage SmallButton');
-                        ?>
+                        <div class="btn-group">
+                            <?php
+                            echo anchor(t('Edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage btn-edit btn');
+                            echo anchor(t('Delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage btn-delete btn');
+                            ?>
+                        </div>
                     </div>
                 </td>
                 <td class="Alt">
@@ -69,4 +72,5 @@ $Session = Gdn::session();
         <?php } ?>
         </tbody>
     </table>
+</div>
 <?php } ?>

@@ -392,7 +392,7 @@ select {
   -moz-appearance: none;
   -webkit-appearance: none;
 
-  &::focus {
+  &:focus {
     border-color: #51a7e8;
     outline: none;
     @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, .075), 0 0 5px rgba(81, 167, 232, .5));
@@ -516,7 +516,7 @@ select {
       text-align: center;
       opacity: 0;
       transition: opacity .1s;
-      @include content($icon-ok-circle);
+      @include char-content($icon-ok-circle);
     }
   }
 
@@ -587,7 +587,7 @@ select {
     right: 1rem;
     line-height: $font-size-base * $line-height;
     @extend %icon;
-    @include content($icon-ok-circle);
+    @include char-content($icon-search);
   }
 }
 

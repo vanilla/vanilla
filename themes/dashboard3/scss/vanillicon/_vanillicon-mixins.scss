@@ -1,1 +1,19 @@
-../../../../resources/sass/_vanillicon-mixins.scss
+// Vanillicon Mixins
+
+@mixin icon {
+  display: inline-block;
+  min-width: 1em;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  text-decoration: inherit;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+%icon {
+  @include icon;
+}

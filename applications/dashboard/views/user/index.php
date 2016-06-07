@@ -13,7 +13,18 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         ?>
     </div>
 <?php Gdn_Theme::assetEnd('Help'); ?>
+<div class="header-block">
+    <div class="header-title">
     <h1><?php echo t('Manage Users'); ?></h1>
+    </div>
+    <div class="header-buttons btn-group">
+    <?php
+    if (checkPermission('Garden.Users.Add')) {
+        echo anchor(t('Add User'), 'dashboard/user/add', 'Popup btn btn-primary');
+    }
+    ?>
+    </div>
+</div>
 <?php echo $this->Form->open(array('action' => url('/user/browse'))); ?>
     <div class="Wrap">
         <?php
@@ -42,41 +53,32 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         echo anchor(t('Delete'), '#', 'Popup SmallButton');
         ?>
    </span>-->
-
-        <?php
-        if (checkPermission('Garden.Users.Add')) {
-            echo anchor(t('Add User'), 'dashboard/user/add', 'Popup SmallButton');
-        }
-        ?>
     </div>
-    <table id="Users" class="AltColumns">
-        <thead>
-        <tr>
-            <!--         <th class="CheckboxCell"><input id="SelectAll" type="checkbox" /></th>-->
-            <th><?php echo anchor(t('Username'), $this->_OrderUrl('Name')); ?></th>
-            <?php if ($ViewPersonalInfo) : ?>
-                <th class="Alt"><?php echo t('Email'); ?></th>
-            <?php endif; ?>
-            <th><?php echo t('Roles'); ?></th>
-            <th class="Alt"><?php echo anchor(t('First Visit'), $this->_OrderUrl('DateFirstVisit')); ?></th>
-            <th><?php echo anchor(t('Last Visit'), $this->_OrderUrl('DateLastActive')); ?></th>
-            <?php if ($ViewPersonalInfo) : ?>
-                <th><?php echo t('Last IP'); ?></th>
-            <?php endif; ?>
-            <?php
-            $this->fireEvent('UserCell');
-            ?>
-            <?php if ($EditUser) { ?>
-                <th><?php echo t('Options'); ?></th>
-            <?php } ?>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        include($this->fetchViewLocation('users'));
-        ?>
-        </tbody>
-    </table>
+    <div class="table-wrap">
+        <table id="Users" class="AltColumns">
+            <thead>
+            <tr>
+                <!--         <th class="CheckboxCell"><input id="SelectAll" type="checkbox" /></th>-->
+                <th><?php echo anchor(t('Username'), $this->_OrderUrl('Name')); ?></th>
+                <th><?php echo t('Roles'); ?></th>
+                <th class="Alt"><?php echo anchor(t('First Visit'), $this->_OrderUrl('DateFirstVisit')); ?></th>
+                <th><?php echo anchor(t('Last Visit'), $this->_OrderUrl('DateLastActive')); ?></th>
+                <?php if ($ViewPersonalInfo) : ?>
+                    <th><?php echo t('Last IP'); ?></th>
+                <?php endif; ?>
+                <?php
+                $this->fireEvent('UserCell');
+                ?>
+                <?php if ($EditUser) { ?>
+                    <th><?php echo t('Options'); ?></th>
+                <?php } ?>
+            </tr>
+            </thead>
+            <tbody>
+            <?php include($this->fetchViewLocation('users')); ?>
+            </tbody>
+        </table>
+    </div>
 <?php
 PagerModule::write(array('Sender' => $this));
 echo $this->Form->close();

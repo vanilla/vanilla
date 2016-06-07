@@ -11,7 +11,7 @@
 <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Advanced'); ?></h1>
 <?php
-echo $this->Form->open(['class' => 'form-horizontal']);
+echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>

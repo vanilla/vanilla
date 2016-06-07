@@ -10,12 +10,21 @@ foreach ($this->UserData->result() as $User) {
     <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>
         data-userid="<?php echo $User->UserID ?>">
         <!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
-        <td><strong><?php
-                echo userAnchor($User, 'Username');
-                ?></strong></td>
-        <?php if ($ViewPersonalInfo) : ?>
-            <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
-        <?php endif; ?>
+        <td>
+            <div class="user-block">
+                <div class="user-image-wrap">
+                    <?php echo userPhoto($User); ?>
+                </div>
+                <div class="user-info">
+                    <div class="username">
+                        <?php echo userAnchor($User, 'Username'); ?>
+                    </div>
+                    <?php if ($ViewPersonalInfo) : ?>
+                    <div class="Info info"><?php echo Gdn_Format::Email($User->Email); ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </td>
         <td style="max-width: 200px;">
             <?php
             $Roles = val('Roles', $User, array());
@@ -46,16 +55,20 @@ foreach ($this->UserData->result() as $User) {
         $this->fireEvent('UserCell');
         ?>
         <?php if ($EditUser || $DeleteUser) { ?>
-            <td><?php
+            <td>
+                <div class="btn-group">
+                <?php
                 if ($EditUser)
-                    echo anchor(t('Edit'), '/user/edit/'.$User->UserID, 'Popup SmallButton');
+                    echo anchor(t('Edit'), '/user/edit/'.$User->UserID, 'Popup btn btn-edit');
 
                 if ($DeleteUser && $User->UserID != $Session->User->UserID)
-                    echo anchor(t('Delete'), '/user/delete/'.$User->UserID, 'SmallButton');
+                    echo anchor(t('Delete'), '/user/delete/'.$User->UserID, 'btn btn-delete');
 
                 $this->EventArguments['User'] = $User;
                 $this->fireEvent('UserListOptions');
-                ?></td>
+                ?>
+                </div>
+            </td>
         <?php } ?>
     </tr>
 <?php

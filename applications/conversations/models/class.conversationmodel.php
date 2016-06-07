@@ -141,14 +141,14 @@ class ConversationModel extends ConversationsModel {
     }
 
     /**
-     * Get a list of conversaitons for a user's inbox. This is an optimized version of ConversationModel::get().
+     * Get a list of conversations for a user's inbox. This is an optimized version of ConversationModel::get().
      *
-     * @param int $UserID
+     * @param int $UserID The user looking at the conversations.
      * @param int $Offset Number to skip.
      * @param int $Limit Maximum to return.
      */
-    public function get2($UserID, $Offset = 0, $Limit = false) {
-        if (!$Limit) {
+    public function get2($UserID, $Offset = 0, $Limit = 0) {
+        if ($Limit <= 0) {
             $Limit = c('Conversations.Conversations.PerPage', 30);
         }
 
@@ -403,8 +403,9 @@ class ConversationModel extends ConversationsModel {
     /**
      * Gets a nice title to represent the participants in a conversation.
      *
-     * @param array|object $Conversation
-     * @param array|object $Participants
+     * @param array|object $Conversation The conversation to get the participants for.
+     * @param bool $Html Whether or not to return HTML.
+     * @param int $Max The maximum number of participants to show in the list.
      * @return string Returns a title for the conversation.
      */
     public static function participantTitle($Conversation, $Html = true, $Max = 3) {
@@ -474,7 +475,6 @@ class ConversationModel extends ConversationsModel {
         if ($settings instanceof ConversationMessageModel) {
             deprecated('ConversationModel->save(array, ConversationMessageModel)');
             $MessageModel = $settings;
-            $settings = [];
         } else {
             $MessageModel = ConversationMessageModel::instance();
         }

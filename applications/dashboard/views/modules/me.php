@@ -41,7 +41,7 @@ if ($Session->isValid()):
     echo '<div class="Flyout FlyoutMenu"></div></span>';
 
     // Inbox
-    if (Gdn::ApplicationManager()->CheckApplication('Conversations')) {
+    if (Gdn::addonManager()->lookupAddon('conversations')) {
         $CountInbox = val('CountUnreadConversations', Gdn::session()->User);
         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
         echo '<span class="ToggleFlyout" rel="/messages/popin">';
@@ -51,7 +51,7 @@ if ($Session->isValid()):
     }
 
     // Bookmarks
-    if (Gdn::ApplicationManager()->CheckApplication('Vanilla')) {
+    if (Gdn::addonManager()->lookupAddon('Vanilla')) {
         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
         echo anchor(sprite('SpBookmarks', 'Sprite Sprite16').Wrap(t('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => t('Bookmarks')));
         echo sprite('SpFlyoutHandle', 'Arrow');

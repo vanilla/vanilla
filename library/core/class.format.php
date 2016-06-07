@@ -1278,7 +1278,7 @@ class Gdn_Format {
         // https://www.youtube.com/watch?v=p5kcBxL7-qI
         // https://www.youtube.com/watch?v=bG6b3V2MNxQ#t=33
 
-        $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]*)))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i';
+        $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i';
         $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
         $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
         $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w]+)';
@@ -1582,7 +1582,7 @@ EOT;
      *
      * Supports most usernames by using double-quotes, for example:  @"a $pecial user's! name."
      * Without double-quotes, a mentioned username is terminated by any of the following characters:
-     * whitespace | . | , | ; | ? | ! | :
+     * whitespace | . | , | ; | ? | ! | : | '
      *
      * @since 2.3
      *
@@ -1645,7 +1645,7 @@ EOT;
 
             // Unquoted mention.
             if (!$mention && !empty($str)) {
-                $parts2 = preg_split('`([\s.,;?!:])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $parts2 = preg_split('`([\s.,;?!:\'])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
                 $suffix = val(1, $parts2, '') . val(2, $parts2, '');
             }
@@ -1847,20 +1847,30 @@ EOT;
     /**
      * Takes a mixed variable, formats it for display on the screen as plain text.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return mixed
+     * @param mixed $mixed An object, array, or string to be formatted.
+     * @return string
      */
-    public static function text($Mixed, $AddBreaks = true) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Text');
-        } else {
-            $Result = htmlspecialchars(strip_tags(preg_replace('`<br\s?/?>`', "\n",
-                html_entity_decode($Mixed, ENT_QUOTES, 'UTF-8'))), ENT_NOQUOTES, 'UTF-8');
-            if ($AddBreaks && c('Garden.Format.ReplaceNewlines', true)) {
-                $Result = nl2br(trim($Result));
-            }
-            return $Result;
+    public static function text($mixed, $addBreaks = true) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Text');
         }
+
+        $result = html_entity_decode($mixed, ENT_QUOTES, 'UTF-8');
+        $result = preg_replace('`<br\s?/?>`', "\n", $result);
+        /**
+         * We need special handling for invalid markup here, because if we don't compensate
+         * things like <3, they'll lead to invalid markup and strip_tags will truncate the
+         * text.
+         */
+        $result = preg_replace('/<(?![a-z\/])/i', '&lt;', $result);
+        $result = strip_tags($result);
+        $result = htmlspecialchars($result, ENT_NOQUOTES, 'UTF-8', false);
+
+        if ($addBreaks && c('Garden.Format.ReplaceNewlines', true)) {
+            $result = nl2br(trim($result));
+        }
+
+        return $result;
     }
 
     /**

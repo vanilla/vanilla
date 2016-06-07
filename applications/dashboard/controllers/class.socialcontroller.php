@@ -69,14 +69,14 @@ class SocialController extends DashboardController {
 
             $ConnectionName = $PluginInfo['Index'];
 
-            if (Gdn::pluginManager()->CheckPlugin($PluginKey)) {
+            if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON)) {
                 $Configured = Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
             } else {
                 $Configured = null;
             }
 
             $Connections[$PluginKey] = array_merge($Connections[$PluginKey], $PluginInfo, array(
-                'Enabled' => Gdn::pluginManager()->CheckPlugin($PluginKey),
+                'Enabled' => Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON),
                 'Configured' => $Configured
             ), array(
                 'Icon' => sprintf("/plugins/%s/icon.png", $PluginInfo['Folder'])

@@ -14,11 +14,13 @@
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
  * that can be accessed directly by the Dispatcher.
  *
- * @method string requestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
- * @method string requestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
- * @method string requestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
- * @method string requestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
- * @method string requestFolder($URI = NULL) Get/Set the Request script's Folder.
+ * @method string requestURI($uri = null) Get/Set the Request URI (REQUEST_URI).
+ * @method string requestScript($scriptName = null) Get/Set the Request ScriptName (SCRIPT_NAME).
+ * @method string requestMethod($method = null) Get/Set the Request Method (REQUEST_METHOD).
+ * @method string requestHost($uri = null) Get/Set the Request Host (HTTP_HOST).
+ * @method string requestFolder($folder = null) Get/Set the Request script's Folder.
+ * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR, 
+ *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
 class Gdn_Request {
 
@@ -101,7 +103,7 @@ class Gdn_Request {
      * "http://localhost/this/that/garden/index.php?/controller/action/"
      *
      * @param $Domain optional value to set
-     * @return string | NULL
+     * @return string | null
      */
     public function domain($Domain = null) {
         return $this->_parsedRequestElement('Domain', $Domain);
@@ -121,10 +123,12 @@ class Gdn_Request {
      *  - METHOD   -> REQUEST_METHOD
      *  - FOLDER   -> none. this is extracted from SCRIPT_NAME and only available after _ParseRequest()
      *  - SCHEME   -> none. this is derived from 'HTTPS' and 'X-Forwarded-Proto'
+     *  - ADDRESS  -> first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR, HTTP_X_CLUSTER_CLIENT_IP,
+     *                HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR
      *
      * @param $key Key to retrieve or set.
      * @param $value Value of $Key key to set.
-     * @return string | NULL
+     * @return string | null
      */
     protected function _environmentElement($key, $value = null) {
         $key = strtoupper($key);
@@ -145,6 +149,7 @@ class Gdn_Request {
                 case 'SCHEME':
                 case 'METHOD':
                 case 'FOLDER':
+                case 'ADDRESS':
                 default:
                     // Do nothing special for these
                     break;
@@ -315,7 +320,7 @@ class Gdn_Request {
      * "http://foo.com/this/that/garden/index.php?/controller/action/"
      *
      * @param $hostname optional value to set.
-     * @return string | NULL
+     * @return string | null
      */
     public function host($hostname = null) {
         return $this->requestHost($hostname);
@@ -362,7 +367,7 @@ class Gdn_Request {
         $result = Gdn::session()->validateTransientKey($transientKey, false);
 
         if (!$result && $throw) {
-            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
         }
 
         return $result;
@@ -393,7 +398,7 @@ class Gdn_Request {
      * "http://foo.com/this/that/garden/index.php?/controller/action/"
      *
      * @param $Scheme optional value to set.
-     * @return string | NULL
+     * @return string | null
      */
     public function scheme($Scheme = null) {
         return $this->requestScheme($Scheme);
@@ -601,7 +606,7 @@ class Gdn_Request {
      * then this method will return the filetype (in this case 'pdf').
      *
      * @param $outputFormat Optional OutputFormat to set.
-     * @return string | NULL
+     * @return string | null
      */
     public function outputFormat($outputFormat = null) {
         $outputFormat = (!is_null($outputFormat)) ? strtolower($outputFormat) : $outputFormat;
@@ -723,7 +728,7 @@ class Gdn_Request {
      *  - string: Set a new path.
      *  - true: Url encode the returned path.
      *  - null: Return the path.
-     * @return string | NULL
+     * @return string | null
      */
     public function path($path = null) {
         if (is_string($path)) {
@@ -1174,7 +1179,7 @@ class Gdn_Request {
      * Chainable URI Setter, source is a controller + method + args list
      *
      * @param $controller Gdn_Controller Object or string controller name.
-     * @param $method Optional name of the method to call. Omit or NULL for default (Index).
+     * @param $method Optional name of the method to call. Omit or null for default (Index).
      * @param $args Optional argument list to forward to the method. Omit for none.
      * @flow chain
      * @return Gdn_Request

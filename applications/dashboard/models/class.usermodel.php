@@ -2525,13 +2525,29 @@ class UserModel extends Gdn_Model {
     public function tagSearch($Search, $Limit = 10) {
         $Search = trim(str_replace(['%', '_'], ['\%', '\_'], $Search));
 
+        switch (c('Garden.MentionsOrder')) {
+            case 'Name':
+                $order = 'Name';
+                $direction = 'asc';
+                break;
+            case 'DateLastActive':
+                $order = 'DateLastActive';
+                $direction = 'desc';
+                break;
+            case 'CountComments':
+            default:
+                $order = 'CountComments';
+                $direction = 'desc';
+                break;
+        }
+
         return $this->SQL
             ->select('UserID', '', 'id')
             ->select('Name', '', 'name')
             ->from('User')
             ->like('Name', $Search, 'right')
             ->where('Deleted', 0)
-            ->orderBy('CountComments', 'desc')
+            ->orderBy($order, $direction)
             ->limit($Limit)
             ->get()
             ->resultArray();

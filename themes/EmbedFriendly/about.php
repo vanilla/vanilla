@@ -9,7 +9,7 @@
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['Embed Friendly'] = array(
+$ThemeInfo['EmbedFriendly'] = array(
     'Name' => 'Embed-Friendly',
     'Description' => "A fluid theme that fits into any width. Use it for embedding Vanilla into other website pages.",
     'Version' => '3.0',

@@ -20,28 +20,25 @@ if ($this->InvitationCount != 0) {
 
 if ($this->InvitationData->numRows() > 0) {
     ?>
-<div class="table-wrap">
-    <table class="AltRows Invitations DataTable">
+    <table class="Invitations DataTable">
         <thead>
         <tr>
             <th class=""><?php echo t('Sent To', 'Recipient'); ?></th>
-            <th class="Alt InviteMeta"><?php echo t('On'); ?></th>
+            <th class="InviteMeta"><?php echo t('On'); ?></th>
             <th class="InviteMeta"><?php echo t('Status'); ?></th>
-            <th class="Alt InviteMeta"><?php echo t('Expires'); ?></th>
+            <th class="InviteMeta"><?php echo t('Expires'); ?></th>
             <?php
-            //         <th class="InviteCode Alt InviteMeta"><?php echo t('Invitation Code', 'Code'); <!--</th>-->
+            //         <th class="InviteCode InviteMeta"><?php echo t('Invitation Code', 'Code'); <!--</th>-->
             ?>
         </tr>
         </thead>
         <tbody>
         <?php
         $Session = Gdn::session();
-        $Alt = FALSE;
         foreach ($this->InvitationData->Format('Text')->result() as $Invitation) {
-            $Alt = $Alt == TRUE ? FALSE : TRUE;
             ?>
             <tr class="js-invitation" data-id="<?php echo $Invitation->InvitationID ?>">
-                <td class="Alt"><?php
+                <td><?php
                     if ($Invitation->AcceptedName == '') {
                         echo $Invitation->Email;
                         echo wrap(
@@ -63,7 +60,7 @@ if ($this->InvitationData->numRows() > 0) {
                     }
                     ?></td>
                 <td><?php echo Gdn_Format::date($Invitation->DateInserted, 'html'); ?></td>
-                <td class="Alt"><?php
+                <td><?php
                     if ($Invitation->AcceptedName == '') {
                         echo t('Pending');
                     } else {

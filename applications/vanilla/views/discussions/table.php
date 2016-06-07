@@ -42,18 +42,14 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
             </thead>
             <tbody>
             <?php
-            $Alt = '';
             if (property_exists($this, 'AnnounceData') && is_object($this->AnnounceData)) {
                 foreach ($this->AnnounceData->result() as $Discussion) {
-                    $Alt = $Alt == ' Alt' ? '' : ' Alt';
-                    WriteDiscussionRow($Discussion, $this, $Session, $Alt);
+                    writeDiscussionRow($Discussion, $this, $Session);
                 }
             }
 
-            $Alt = '';
             foreach ($this->DiscussionData->result() as $Discussion) {
-                $Alt = $Alt == ' Alt' ? '' : ' Alt';
-                WriteDiscussionRow($Discussion, $this, $Session, $Alt);
+                writeDiscussionRow($Discussion, $this, $Session);
             }
             ?>
             </tbody>

@@ -14,13 +14,11 @@ $this->RenderAsset('Messages');
       -->
         <tbody>
         <?php
-        $Alt = '';
+        $Alt = false;
         foreach ($this->ActiveUserData as $User) {
+            $Alt = !$Alt;
             ?>
-            <tr<?php
-            $Alt = $Alt == '' ? ' class="Alt"' : '';
-            echo $Alt;
-            ?>>
+            <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
                 <th><?php
                     $PhotoUser = UserBuilder($User);
                     echo userPhoto($PhotoUser);

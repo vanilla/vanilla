@@ -49,7 +49,7 @@ $Session = Gdn::session();
     </thead>
     <tbody>
     <?php
-    $Alt = FALSE;
+    $Alt = false;
     foreach ($this->data('AvailableLocales') as $Key => $Info) {
         // Hide skeleton locale pack
         if ($Key == 'skeleton')
@@ -57,7 +57,10 @@ $Session = Gdn::session();
 
         $ToggleText = $this->data("EnabledLocales.$Key") ? 'Disable' : 'Enable';
         $RowClass = $this->data("EnabledLocales.$Key") ? 'Enabled' : 'Disabled';
-        if ($Alt) $RowClass .= ' Alt';
+        $Alt = !$Alt;
+        if ($Alt) {
+            $RowClass .= ' Alt';
+        }
         ?>
         <tr class="More <?php echo $RowClass; ?>">
             <th><?php echo val('Name', $Info, $Key); ?></th>

@@ -27,10 +27,10 @@ $Session = Gdn::session();
         </thead>
         <tbody>
         <?php
-        $Alt = FALSE;
+        $Alt = false;
         foreach ($this->MessageData->result() as $Message) {
             $Message = $this->MessageModel->DefineLocation($Message);
-            $Alt = $Alt ? FALSE : TRUE;
+            $Alt = !$Alt;
             ?>
             <tr id="<?php
             echo $Message->MessageID;

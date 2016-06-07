@@ -41,12 +41,12 @@ $DisabledCount = $AppCount - $EnabledCount;
     </thead>
     <tbody>
     <?php
-    $Alt = FALSE;
+    $Alt = false;
     foreach ($this->AvailableApplications as $AppName => $AppInfo) {
         $Css = array_key_exists($AppName, $this->EnabledApplications) ? 'Enabled' : 'Disabled';
         $State = strtolower($Css);
         if ($this->Filter == 'all' || $this->Filter == $State) {
-            $Alt = $Alt ? FALSE : TRUE;
+            $Alt = !$Alt;
             $Version = val('Version', $AppInfo, '');
             $ScreenName = val('Name', $AppInfo, $AppName);
             $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $AppInfo, '') : '';
@@ -56,7 +56,9 @@ $DisabledCount = $AppCount - $EnabledCount;
             $NewVersion = val('NewVersion', $AppInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
             $RowClass = $Css;
-            if ($Alt) $RowClass .= ' Alt';
+            if ($Alt) {
+                $RowClass .= ' Alt';
+            }
             ?>
             <tr class="More <?php echo $RowClass; ?>">
                 <th><?php echo $ScreenName; ?></th>

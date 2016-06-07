@@ -68,7 +68,7 @@ if ($SQL->getWhere('Category', array('CategoryID' => -1))->numRows() == 0) {
 }
 
 if ($Drop || !$CategoryExists) {
-    $SQL->insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
+    $SQL->insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'Depth' => 1, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
 } elseif ($CategoryExists && !$PermissionCategoryIDExists) {
     if (!c('Garden.Permissions.Disabled.Category')) {
         // Existing installations need to be set up with per/category permissions.
@@ -287,7 +287,7 @@ $ActivityModel->DefineType('Discussion');
 $ActivityModel->DefineType('Comment');
 
 $PermissionModel = Gdn::permissionModel();
-$PermissionModel->Database = $Database;
+$PermissionModel->Database = Gdn::database();
 $PermissionModel->SQL = $SQL;
 
 // Define some global vanilla permissions.

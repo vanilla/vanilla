@@ -9,20 +9,20 @@ $Session = Gdn::session();
     ?></div>
 <div class="FilterMenu"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'AddRoute SmallButton'); ?></div>
 <div class="table-wrap">
-    <table class="AltColumns" id="RouteTable">
-        <thead>
-        <tr>
-            <th><?php echo t('Route'); ?></th>
-            <th class="Alt"><?php echo t('Target'); ?></th>
-            <th class="Alt"><?php echo t('Type'); ?></th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        $i = 0;
-        $Alt = FALSE;
-        foreach ($this->MyRoutes as $Route => $RouteData) {
-            $Alt = !$Alt;
+<table class="AltColumns" id="RouteTable">
+    <thead>
+    <tr>
+        <th><?php echo t('Route'); ?></th>
+        <th class="Alt"><?php echo t('Target'); ?></th>
+        <th class="Alt"><?php echo t('Type'); ?></th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php
+    $i = 0;
+    $Alt = false;
+    foreach ($this->MyRoutes as $Route => $RouteData) {
+        $Alt = !$Alt;
 
             $Target = $RouteData['Destination'];
             $RouteType = t(Gdn::router()->RouteTypes[$RouteData['Type']]);

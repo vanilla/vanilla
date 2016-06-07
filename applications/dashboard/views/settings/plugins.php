@@ -61,7 +61,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
     </thead>
     <tbody>
     <?php
-    $Alt = FALSE;
+    $Alt = false;
     foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
         // Skip Hidden & Trigger plugins
         if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE)
@@ -72,7 +72,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
         $Css = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Enabled' : 'Disabled';
         $State = strtolower($Css);
         if ($this->Filter == 'all' || $this->Filter == $State) {
-            $Alt = $Alt ? FALSE : TRUE;
+            $Alt = !$Alt;
             $Version = Gdn_Format::Display(val('Version', $PluginInfo, ''));
             $ScreenName = Gdn_Format::Display(val('Name', $PluginInfo, $PluginName));
             $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $PluginInfo, '') : '';

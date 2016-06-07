@@ -48,58 +48,66 @@
                     <?php
                     echo wrap(t('Notification'), 'td', array('style' => 'text-align: left'));
 
-                    $CountTypes = 0;
-                    foreach ($this->data("PreferenceTypes.{$PreferenceGroup}") as $PreferenceType) {
+                    $PreferenceTypes = $this->data("PreferenceTypes.{$PreferenceGroup}");
+                    foreach ($PreferenceTypes as $PreferenceType) {
                         echo wrap(t($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
-                        $PreferenceTypeOrder[$PreferenceType] = $CountTypes;
-                        $CountTypes++;
                     }
                     ?>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
-                foreach ($Preferences as $Names) {
-                    // Make sure there are preferences.
-                    $ConfigCount = 0;
-                    foreach ($Names as $Name) {
-                        $CP = c('Preferences.'.$Name, '0');
-                        if ($CP !== FALSE && $CP != 2)
-                            $ConfigCount++;
-                    }
-                    if ($ConfigCount == 0)
-                        continue;
-
-                    echo '<tr>';
-                    $Desc = val($Name, $this->data("PreferenceList.{$PreferenceGroup}"));
-                    if (is_array($Desc))
-                        list($Desc, $Location) = $Desc;
-                    echo wrap($Desc, 'td', array('class' => 'Description'));
-
-                    $LastName = '';
-                    $i = 0;
-                    foreach ($Names as $Name) {
-                        $NameTypeExplode = explode(".", $Name);
-                        $NameType = $NameTypeExplode[0];
-                        $ConfigPref = c('Preferences.'.$Name, '0');
-                        if ($ConfigPref === FALSE || $ConfigPref == 2) {
-                            echo wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
+                // Get all descriptions of possible notifications
+                $Descriptions = $this->data("PreferenceList.{$PreferenceGroup}");
+                // Loop through all possible preferences.
+                foreach ($Preferences as $Event => $Settings) {
+                    $RowHasConfigValues = false;
+                    $ColumnsMarkup = '';
+                    // Loop through all means of notification.
+                    foreach ($PreferenceTypes as $NotificationType) {
+                        $ConfigPreference = c('Preferences.'.$NotificationType.'.'.$Event, 0);
+                        if (
+                            !in_array($NotificationType.'.'.$Event, $Settings) ||
+                            $ConfigPreference === false ||
+                            $ConfigPreference == 2
+                         ) {
+                            // If preference does not exist, or is excluded by
+                            // a config setting, show an empty cell.
+                            $ColumnsMarkup .= wrap(
+                                '&nbsp;',
+                                'td',
+                                array('class' => 'PrefCheckBox')
+                            );
                         } else {
-                            if (count($Names) < $CountTypes) {
-                                $PreferenceTypeOrderCount = 0;
-                                foreach ($PreferenceTypeOrder as $PreferenceTypeName => $PreferenceTypeOrderValue) {
-                                    if ($NameType == $PreferenceTypeName) {
-                                        if ($PreferenceTypeOrderValue == $PreferenceTypeOrderCount) echo wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
-                                    } else echo wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
-                                    $PreferenceTypeOrderCount++;
-                                }
-                            } else echo wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+                            // Everything's fine, show checkbox.
+                            $ColumnsMarkup .= wrap(
+                                $this->Form->CheckBox(
+                                    $NotificationType.'.'.$Event,
+                                    '',
+                                    array('value' => '1')
+                                ),
+                                'td',
+                                array('class' => 'PrefCheckBox')
+                            );
+                            // Set flag so that line is printed.
+                            $RowHasConfigValues = true;
                         }
-                        $LastName = $Name;
-                        $i++;
                     }
-
-                    echo '</tr>';
+                    // Check if there are config values in this row.
+                    if ($RowHasConfigValues) {
+                        $Description = val($Settings[0], $Descriptions);
+                        if (is_array($Description)) {
+                            $Description = $Description[0];
+                        }
+                        echo '<tr>';
+                        echo wrap(
+                            $Description,
+                            'td',
+                            array('class' => 'Description')
+                        );
+                        echo $ColumnsMarkup;
+                        echo '</tr>';
+                    }
                 }
                 ?>
                 </tbody>

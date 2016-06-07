@@ -14,7 +14,7 @@
  * @return string
  */
 function smarty_function_custom_menu($Params, &$Smarty) {
-    $Controller = $Smarty->Controller;
+    $Controller = Gdn::controller();
     if (is_object($Menu = val('Menu', $Controller))) {
         $Format = val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', val('wrap', $Params, 'li')));
         $Result = '';

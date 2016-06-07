@@ -23,7 +23,6 @@ $this->EventArguments['NumRows'] = count($this->data('Categories'));
 //}
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
-$Alt = FALSE;
 foreach ($this->data('Categories') as $CategoryRow) {
     $Category = (object)$CategoryRow;
 
@@ -51,11 +50,8 @@ foreach ($this->data('Categories') as $CategoryRow) {
             $CatList .= '<li id="Category_'.$CategoryID.'" class="CategoryHeading '.$CssClass.'">
                <div class="ItemContent Category"><div class="Options">'.getOptions($Category, $this).'</div>'.Gdn_Format::text($Category->Name).'</div>
             </li>';
-            $Alt = FALSE;
         } else {
             $LastComment = UserBuilder($Category, 'Last');
-            $AltCss = $Alt ? ' Alt' : '';
-            $Alt = !$Alt;
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
                 .'<div class="Options">'

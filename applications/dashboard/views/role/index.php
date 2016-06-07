@@ -34,9 +34,9 @@ $this->DefaultRolesWarning();
         </thead>
         <tbody>
         <?php
-        $Alt = FALSE;
+        $Alt = false;
         foreach ($this->data('Roles') as $Role) {
-            $Alt = $Alt ? FALSE : TRUE;
+            $Alt = !$Alt;
             ?>
             <tr id="<?php echo $Role['RoleID']; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
                 <td class="Info">

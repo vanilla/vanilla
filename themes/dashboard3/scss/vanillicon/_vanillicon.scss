@@ -30,8 +30,8 @@
   font-style: normal;
 }
 
-@mixin content($icon) {
-  content: unquote('"') + unquote(str-insert($icon, "\\", 1)) + unquote('"');
+@mixin char-content($char-no-slash) {
+  content: unquote('"') + unquote(str-insert($char-no-slash, "\\", 1)) + unquote('"');
 }
 
 .icon:before {
@@ -39,874 +39,874 @@
 }
 
 .icon-adjust:before {
-  @include content($icon-adjust);
+  @include char-content($icon-adjust);
 }
 
 .icon-agree:before {
-  @include content($icon-agree);
+  @include char-content($icon-agree);
 }
 
 .icon-align-center:before {
-  @include content($icon-align-center);
+  @include char-content($icon-align-center);
 }
 
 .icon-align-justify:before {
-  @include content($icon-align-justify);
+  @include char-content($icon-align-justify);
 }
 
 .icon-align-left:before {
-  @include content($icon-align-left);
+  @include char-content($icon-align-left);
 }
 
 .icon-align-right:before {
-  @include content($icon-align-right);
+  @include char-content($icon-align-right);
 }
 
 .icon-android:before {
-  @include content($icon-android);
+  @include char-content($icon-android);
 }
 
 .icon-angry:before {
-  @include content($icon-angry);
+  @include char-content($icon-angry);
 }
 
 .icon-apple:before {
-  @include content($icon-apple);
+  @include char-content($icon-apple);
 }
 
 .icon-archive:before {
-  @include content($icon-archive);
+  @include char-content($icon-archive);
 }
 
 .icon-arrow-down:before {
-  @include content($icon-arrow-down);
+  @include char-content($icon-arrow-down);
 }
 
 .icon-arrow-left:before {
-  @include content($icon-arrow-left);
+  @include char-content($icon-arrow-left);
 }
 
 .icon-arrow-right:before {
-  @include content($icon-arrow-right);
+  @include char-content($icon-arrow-right);
 }
 
 .icon-arrow-up:before {
-  @include content($icon-arrow-up);
+  @include char-content($icon-arrow-up);
 }
 
 .icon-ban:before {
-  @include content($icon-ban);
+  @include char-content($icon-ban);
 }
 
 .icon-bar-chart:before {
-  @include content($icon-bar-chart);
+  @include char-content($icon-bar-chart);
 }
 
 .icon-bell:before {
-  @include content($icon-bell);
+  @include char-content($icon-bell);
 }
 
 .icon-bold:before {
-  @include content($icon-bold);
+  @include char-content($icon-bold);
 }
 
 .icon-bookmark:before {
-  @include content($icon-bookmark);
+  @include char-content($icon-bookmark);
 }
 
 .icon-bookmark-empty:before {
-  @include content($icon-bookmark-empty);
+  @include char-content($icon-bookmark-empty);
 }
 
 .icon-bug:before {
-  @include content($icon-bug);
+  @include char-content($icon-bug);
 }
 
 .icon-bullhorn:before {
-  @include content($icon-bullhorn);
+  @include char-content($icon-bullhorn);
 }
 
 .icon-bullseye:before {
-  @include content($icon-bullseye);
+  @include char-content($icon-bullseye);
 }
 
 .icon-calendar:before {
-  @include content($icon-calendar);
+  @include char-content($icon-calendar);
 }
 
 .icon-camera:before {
-  @include content($icon-camera);
+  @include char-content($icon-camera);
 }
 
 .icon-caret-down:before {
-  @include content($icon-caret-down);
+  @include char-content($icon-caret-down);
 }
 
 .icon-caret-left:before {
-  @include content($icon-caret-left);
+  @include char-content($icon-caret-left);
 }
 
 .icon-caret-right:before {
-  @include content($icon-caret-right);
+  @include char-content($icon-caret-right);
 }
 
 .icon-caret-up:before {
-  @include content($icon-caret-up);
+  @include char-content($icon-caret-up);
 }
 
 .icon-certificate:before {
-  @include content($icon-certificate);
+  @include char-content($icon-certificate);
 }
 
 .icon-check:before {
-  @include content($icon-check);
+  @include char-content($icon-check);
 }
 
 .icon-check-empty:before {
-  @include content($icon-check-empty);
+  @include char-content($icon-check-empty);
 }
 
 .icon-check-sign:before {
-  @include content($icon-check-sign);
+  @include char-content($icon-check-sign);
 }
 
 .icon-chevron-down:before {
-  @include content($icon-chevron-down);
+  @include char-content($icon-chevron-down);
 }
 
 .icon-chevron-left:before {
-  @include content($icon-chevron-left);
+  @include char-content($icon-chevron-left);
 }
 
 .icon-chevron-right:before {
-  @include content($icon-chevron-right);
+  @include char-content($icon-chevron-right);
 }
 
 .icon-chevron-sign-down:before {
-  @include content($icon-chevron-sign-down);
+  @include char-content($icon-chevron-sign-down);
 }
 
 .icon-chevron-sign-left:before {
-  @include content($icon-chevron-sign-left);
+  @include char-content($icon-chevron-sign-left);
 }
 
 .icon-chevron-sign-right:before {
-  @include content($icon-chevron-sign-right);
+  @include char-content($icon-chevron-sign-right);
 }
 
 .icon-chevron-sign-up:before {
-  @include content($icon-chevron-sign-up);
+  @include char-content($icon-chevron-sign-up);
 }
 
 .icon-chevron-up:before {
-  @include content($icon-chevron-up);
+  @include char-content($icon-chevron-up);
 }
 
 .icon-circle:before {
-  @include content($icon-circle);
+  @include char-content($icon-circle);
 }
 
 .icon-circle-blank:before {
-  @include content($icon-circle-blank);
+  @include char-content($icon-circle-blank);
 }
 
 .icon-cloud:before {
-  @include content($icon-cloud);
+  @include char-content($icon-cloud);
 }
 
 .icon-cloud-download:before {
-  @include content($icon-cloud-download);
+  @include char-content($icon-cloud-download);
 }
 
 .icon-cloud-upload:before {
-  @include content($icon-cloud-upload);
+  @include char-content($icon-cloud-upload);
 }
 
 .icon-code:before {
-  @include content($icon-code);
+  @include char-content($icon-code);
 }
 
 .icon-cog:before {
-  @include content($icon-cog);
+  @include char-content($icon-cog);
 }
 
 .icon-cogs:before {
-  @include content($icon-cogs);
+  @include char-content($icon-cogs);
 }
 
 .icon-collapse:before {
-  @include content($icon-collapse);
+  @include char-content($icon-collapse);
 }
 
 .icon-collapse-top:before {
-  @include content($icon-collapse-top);
+  @include char-content($icon-collapse-top);
 }
 
 .icon-comment:before {
-  @include content($icon-comment);
+  @include char-content($icon-comment);
 }
 
 .icon-comments:before {
-  @include content($icon-comments);
+  @include char-content($icon-comments);
 }
 
 .icon-compass:before {
-  @include content($icon-compass);
+  @include char-content($icon-compass);
 }
 
 .icon-compose:before {
-  @include content($icon-compose);
+  @include char-content($icon-compose);
 }
 
 .icon-crown:before {
-  @include content($icon-crown);
+  @include char-content($icon-crown);
 }
 
 .icon-dashboard:before {
-  @include content($icon-dashboard);
+  @include char-content($icon-dashboard);
 }
 
 .icon-discussion:before {
-  @include content($icon-discussion);
+  @include char-content($icon-discussion);
 }
 
 .icon-dot-circle:before {
-  @include content($icon-dot-circle);
+  @include char-content($icon-dot-circle);
 }
 
 .icon-dropbox:before {
-  @include content($icon-dropbox);
+  @include char-content($icon-dropbox);
 }
 
 .icon-edit:before {
-  @include content($icon-edit);
+  @include char-content($icon-edit);
 }
 
 .icon-edit-sign:before {
-  @include content($icon-edit-sign);
+  @include char-content($icon-edit-sign);
 }
 
 .icon-ellipsis:before {
-  @include content($icon-ellipsis);
+  @include char-content($icon-ellipsis);
 }
 
 .icon-exclamation-sign:before {
-  @include content($icon-exclamation-sign);
+  @include char-content($icon-exclamation-sign);
 }
 
 .icon-expand:before {
-  @include content($icon-expand);
+  @include char-content($icon-expand);
 }
 
 .icon-external-link:before {
-  @include content($icon-external-link);
+  @include char-content($icon-external-link);
 }
 
 .icon-eye-close:before {
-  @include content($icon-eye-close);
+  @include char-content($icon-eye-close);
 }
 
 .icon-eye-open:before {
-  @include content($icon-eye-open);
+  @include char-content($icon-eye-open);
 }
 
 .icon-facebook:before {
-  @include content($icon-facebook);
+  @include char-content($icon-facebook);
 }
 
 .icon-facebook-alt:before {
-  @include content($icon-facebook-alt);
+  @include char-content($icon-facebook-alt);
 }
 
 .icon-facebook-alt-round:before {
-  @include content($icon-facebook-alt-round);
+  @include char-content($icon-facebook-alt-round);
 }
 
 .icon-file:before {
-  @include content($icon-file);
+  @include char-content($icon-file);
 }
 
 .icon-file-text:before {
-  @include content($icon-file-text);
+  @include char-content($icon-file-text);
 }
 
 .icon-filter:before {
-  @include content($icon-filter);
+  @include char-content($icon-filter);
 }
 
 .icon-flag:before {
-  @include content($icon-flag);
+  @include char-content($icon-flag);
 }
 
 .icon-flame:before {
-  @include content($icon-flame);
+  @include char-content($icon-flame);
 }
 
 .icon-flickr:before {
-  @include content($icon-flickr);
+  @include char-content($icon-flickr);
 }
 
 .icon-folder-close:before {
-  @include content($icon-folder-close);
+  @include char-content($icon-folder-close);
 }
 
 .icon-folder-open:before {
-  @include content($icon-folder-open);
+  @include char-content($icon-folder-open);
 }
 
 .icon-font:before {
-  @include content($icon-font);
+  @include char-content($icon-font);
 }
 
 .icon-frown:before {
-  @include content($icon-frown);
+  @include char-content($icon-frown);
 }
 
 .icon-gift:before {
-  @include content($icon-gift);
+  @include char-content($icon-gift);
 }
 
 .icon-github:before {
-  @include content($icon-github);
+  @include char-content($icon-github);
 }
 
 .icon-github-alt:before {
-  @include content($icon-github-alt);
+  @include char-content($icon-github-alt);
 }
 
 .icon-github-octocat:before {
-  @include content($icon-github-octocat);
+  @include char-content($icon-github-octocat);
 }
 
 .icon-globe:before {
-  @include content($icon-globe);
+  @include char-content($icon-globe);
 }
 
 .icon-google:before {
-  @include content($icon-google);
+  @include char-content($icon-google);
 }
 
 .icon-google-plus:before {
-  @include content($icon-google-plus);
+  @include char-content($icon-google-plus);
 }
 
 .icon-google-plus-alt:before {
-  @include content($icon-google-plus-alt);
+  @include char-content($icon-google-plus-alt);
 }
 
 .icon-group:before {
-  @include content($icon-group);
+  @include char-content($icon-group);
 }
 
 .icon-hand-down:before {
-  @include content($icon-hand-down);
+  @include char-content($icon-hand-down);
 }
 
 .icon-hand-left:before {
-  @include content($icon-hand-left);
+  @include char-content($icon-hand-left);
 }
 
 .icon-hand-right:before {
-  @include content($icon-hand-right);
+  @include char-content($icon-hand-right);
 }
 
 .icon-hand-up:before {
-  @include content($icon-hand-up);
+  @include char-content($icon-hand-up);
 }
 
 .icon-heart:before {
-  @include content($icon-heart);
+  @include char-content($icon-heart);
 }
 
 .icon-home:before {
-  @include content($icon-home);
+  @include char-content($icon-home);
 }
 
 .icon-inbox:before {
-  @include content($icon-inbox);
+  @include char-content($icon-inbox);
 }
 
 .icon-indent-left:before {
-  @include content($icon-indent-left);
+  @include char-content($icon-indent-left);
 }
 
 .icon-indent-right:before {
-  @include content($icon-indent-right);
+  @include char-content($icon-indent-right);
 }
 
 .icon-info-sign:before {
-  @include content($icon-info-sign);
+  @include char-content($icon-info-sign);
 }
 
 .icon-instagram:before {
-  @include content($icon-instagram);
+  @include char-content($icon-instagram);
 }
 
 .icon-italic:before {
-  @include content($icon-italic);
+  @include char-content($icon-italic);
 }
 
 .icon-jail:before {
-  @include content($icon-jail);
+  @include char-content($icon-jail);
 }
 
 .icon-key:before {
-  @include content($icon-key);
+  @include char-content($icon-key);
 }
 
 .icon-lightbulb:before {
-  @include content($icon-lightbulb);
+  @include char-content($icon-lightbulb);
 }
 
 .icon-link:before {
-  @include content($icon-link);
+  @include char-content($icon-link);
 }
 
 .icon-linkedin:before {
-  @include content($icon-linkedin);
+  @include char-content($icon-linkedin);
 }
 
 .icon-linkedin-alt:before {
-  @include content($icon-linkedin-alt);
+  @include char-content($icon-linkedin-alt);
 }
 
 .icon-linux:before {
-  @include content($icon-linux);
+  @include char-content($icon-linux);
 }
 
 .icon-list-ol:before {
-  @include content($icon-list-ol);
+  @include char-content($icon-list-ol);
 }
 
 .icon-list-ul:before {
-  @include content($icon-list-ul);
+  @include char-content($icon-list-ul);
 }
 
 .icon-lock:before {
-  @include content($icon-lock);
+  @include char-content($icon-lock);
 }
 
 .icon-lol:before {
-  @include content($icon-lol);
+  @include char-content($icon-lol);
 }
 
 .icon-mail:before {
-  @include content($icon-mail);
+  @include char-content($icon-mail);
 }
 
 .icon-mail-open:before {
-  @include content($icon-mail-open);
+  @include char-content($icon-mail-open);
 }
 
 .icon-map-marker:before {
-  @include content($icon-map-marker);
+  @include char-content($icon-map-marker);
 }
 
 .icon-medium:before {
-  @include content($icon-medium);
+  @include char-content($icon-medium);
 }
 
 .icon-meh:before {
-  @include content($icon-meh);
+  @include char-content($icon-meh);
 }
 
 .icon-menu:before {
-  @include content($icon-menu);
+  @include char-content($icon-menu);
 }
 
 .icon-minus-sign:before {
-  @include content($icon-minus-sign);
+  @include char-content($icon-minus-sign);
 }
 
 .icon-mobile-phone:before {
-  @include content($icon-mobile-phone);
+  @include char-content($icon-mobile-phone);
 }
 
 .icon-mod:before {
-  @include content($icon-mod);
+  @include char-content($icon-mod);
 }
 
 .icon-nib:before {
-  @include content($icon-nib);
+  @include char-content($icon-nib);
 }
 
 .icon-note:before {
-  @include content($icon-note);
+  @include char-content($icon-note);
 }
 
 .icon-ok:before {
-  @include content($icon-ok);
+  @include char-content($icon-ok);
 }
 
 .icon-ok-circle:before {
-  @include content($icon-ok-circle);
+  @include char-content($icon-ok-circle);
 }
 
 .icon-ok-sign:before {
-  @include content($icon-ok-sign);
+  @include char-content($icon-ok-sign);
 }
 
 .icon-paper-clip:before {
-  @include content($icon-paper-clip);
+  @include char-content($icon-paper-clip);
 }
 
 .icon-paragraph:before {
-  @include content($icon-paragraph);
+  @include char-content($icon-paragraph);
 }
 
 .icon-paypal:before {
-  @include content($icon-paypal);
+  @include char-content($icon-paypal);
 }
 
 .icon-pencil:before {
-  @include content($icon-pencil);
+  @include char-content($icon-pencil);
 }
 
 .icon-permalink:before {
-  @include content($icon-permalink);
+  @include char-content($icon-permalink);
 }
 
 .icon-picture:before {
-  @include content($icon-picture);
+  @include char-content($icon-picture);
 }
 
 .icon-pinterest:before {
-  @include content($icon-pinterest);
+  @include char-content($icon-pinterest);
 }
 
 .icon-pinterest-alt:before {
-  @include content($icon-pinterest-alt);
+  @include char-content($icon-pinterest-alt);
 }
 
 .icon-play-circle:before {
-  @include content($icon-play-circle);
+  @include char-content($icon-play-circle);
 }
 
 .icon-plus-sign:before {
-  @include content($icon-plus-sign);
+  @include char-content($icon-plus-sign);
 }
 
 .icon-poll:before {
-  @include content($icon-poll);
+  @include char-content($icon-poll);
 }
 
 .icon-preview:before {
-  @include content($icon-preview);
+  @include char-content($icon-preview);
 }
 
 .icon-pushpin:before {
-  @include content($icon-pushpin);
+  @include char-content($icon-pushpin);
 }
 
 .icon-question:before {
-  @include content($icon-question);
+  @include char-content($icon-question);
 }
 
 .icon-question-sign:before {
-  @include content($icon-question-sign);
+  @include char-content($icon-question-sign);
 }
 
 .icon-quote:before {
-  @include content($icon-quote);
+  @include char-content($icon-quote);
 }
 
 .icon-reddit:before {
-  @include content($icon-reddit);
+  @include char-content($icon-reddit);
 }
 
 .icon-reddit-alien:before {
-  @include content($icon-reddit-alien);
+  @include char-content($icon-reddit-alien);
 }
 
 .icon-reddit-alt:before {
-  @include content($icon-reddit-alt);
+  @include char-content($icon-reddit-alt);
 }
 
 .icon-refresh:before {
-  @include content($icon-refresh);
+  @include char-content($icon-refresh);
 }
 
 .icon-remove:before {
-  @include content($icon-remove);
+  @include char-content($icon-remove);
 }
 
 .icon-remove-sign:before {
-  @include content($icon-remove-sign);
+  @include char-content($icon-remove-sign);
 }
 
 .icon-repeat:before {
-  @include content($icon-repeat);
+  @include char-content($icon-repeat);
 }
 
 .icon-reply:before {
-  @include content($icon-reply);
+  @include char-content($icon-reply);
 }
 
 .icon-reply-all:before {
-  @include content($icon-reply-all);
+  @include char-content($icon-reply-all);
 }
 
 .icon-report:before {
-  @include content($icon-report);
+  @include char-content($icon-report);
 }
 
 .icon-resize-full:before {
-  @include content($icon-resize-full);
+  @include char-content($icon-resize-full);
 }
 
 .icon-resize-small:before {
-  @include content($icon-resize-small);
+  @include char-content($icon-resize-small);
 }
 
 .icon-retweet:before {
-  @include content($icon-retweet);
+  @include char-content($icon-retweet);
 }
 
 .icon-robot:before {
-  @include content($icon-robot);
+  @include char-content($icon-robot);
 }
 
 .icon-rss:before {
-  @include content($icon-rss);
+  @include char-content($icon-rss);
 }
 
 .icon-salesforce:before {
-  @include content($icon-salesforce);
+  @include char-content($icon-salesforce);
 }
 
 .icon-search:before {
-  @include content($icon-search);
+  @include char-content($icon-search);
 }
 
 .icon-select:before {
-  @include content($icon-select);
+  @include char-content($icon-select);
 }
 
 .icon-share:before {
-  @include content($icon-share);
+  @include char-content($icon-share);
 }
 
 .icon-share-alt:before {
-  @include content($icon-share-alt);
+  @include char-content($icon-share-alt);
 }
 
 .icon-share-alt-square:before {
-  @include content($icon-share-alt-square);
+  @include char-content($icon-share-alt-square);
 }
 
 .icon-shield:before {
-  @include content($icon-shield);
+  @include char-content($icon-shield);
 }
 
 .icon-sign-blank:before {
-  @include content($icon-sign-blank);
+  @include char-content($icon-sign-blank);
 }
 
 .icon-signin:before {
-  @include content($icon-signin);
+  @include char-content($icon-signin);
 }
 
 .icon-signout:before {
-  @include content($icon-signout);
+  @include char-content($icon-signout);
 }
 
 .icon-skull:before {
-  @include content($icon-skull);
+  @include char-content($icon-skull);
 }
 
 .icon-skype:before {
-  @include content($icon-skype);
+  @include char-content($icon-skype);
 }
 
 .icon-smile:before {
-  @include content($icon-smile);
+  @include char-content($icon-smile);
 }
 
 .icon-source:before {
-  @include content($icon-source);
+  @include char-content($icon-source);
 }
 
 .icon-spam:before {
-  @include content($icon-spam);
+  @include char-content($icon-spam);
 }
 
 .icon-star:before {
-  @include content($icon-star);
+  @include char-content($icon-star);
 }
 
 .icon-star-empty:before {
-  @include content($icon-star-empty);
+  @include char-content($icon-star-empty);
 }
 
 .icon-star-half-empty:before {
-  @include content($icon-star-half-empty);
+  @include char-content($icon-star-half-empty);
 }
 
 .icon-steam:before {
-  @include content($icon-steam);
+  @include char-content($icon-steam);
 }
 
 .icon-steam-alt:before {
-  @include content($icon-steam-alt);
+  @include char-content($icon-steam-alt);
 }
 
 .icon-strikethrough:before {
-  @include content($icon-strikethrough);
+  @include char-content($icon-strikethrough);
 }
 
 .icon-subscript:before {
-  @include content($icon-subscript);
+  @include char-content($icon-subscript);
 }
 
 .icon-superscript:before {
-  @include content($icon-superscript);
+  @include char-content($icon-superscript);
 }
 
 .icon-table:before {
-  @include content($icon-table);
+  @include char-content($icon-table);
 }
 
 .icon-tag:before {
-  @include content($icon-tag);
+  @include char-content($icon-tag);
 }
 
 .icon-tags:before {
-  @include content($icon-tags);
+  @include char-content($icon-tags);
 }
 
 .icon-th:before {
-  @include content($icon-th);
+  @include char-content($icon-th);
 }
 
 .icon-th-large:before {
-  @include content($icon-th-large);
+  @include char-content($icon-th-large);
 }
 
 .icon-th-list:before {
-  @include content($icon-th-list);
+  @include char-content($icon-th-list);
 }
 
 .icon-thumbs-down:before {
-  @include content($icon-thumbs-down);
+  @include char-content($icon-thumbs-down);
 }
 
 .icon-thumbs-up:before {
-  @include content($icon-thumbs-up);
+  @include char-content($icon-thumbs-up);
 }
 
 .icon-ticket:before {
-  @include content($icon-ticket);
+  @include char-content($icon-ticket);
 }
 
 .icon-time:before {
-  @include content($icon-time);
+  @include char-content($icon-time);
 }
 
 .icon-trash:before {
-  @include content($icon-trash);
+  @include char-content($icon-trash);
 }
 
 .icon-troll:before {
-  @include content($icon-troll);
+  @include char-content($icon-troll);
 }
 
 .icon-trophy:before {
-  @include content($icon-trophy);
+  @include char-content($icon-trophy);
 }
 
 .icon-tumblr:before {
-  @include content($icon-tumblr);
+  @include char-content($icon-tumblr);
 }
 
 .icon-tumblr-alt:before {
-  @include content($icon-tumblr-alt);
+  @include char-content($icon-tumblr-alt);
 }
 
 .icon-twitter:before {
-  @include content($icon-twitter);
+  @include char-content($icon-twitter);
 }
 
 .icon-twitter-alt:before {
-  @include content($icon-twitter-alt);
+  @include char-content($icon-twitter-alt);
 }
 
 .icon-underline:before {
-  @include content($icon-underline);
+  @include char-content($icon-underline);
 }
 
 .icon-undo:before {
-  @include content($icon-undo);
+  @include char-content($icon-undo);
 }
 
 .icon-unlink:before {
-  @include content($icon-unlink);
+  @include char-content($icon-unlink);
 }
 
 .icon-unlock:before {
-  @include content($icon-unlock);
+  @include char-content($icon-unlock);
 }
 
 .icon-user:before {
-  @include content($icon-user);
+  @include char-content($icon-user);
 }
 
 .icon-vcard:before {
-  @include content($icon-vcard);
+  @include char-content($icon-vcard);
 }
 
 .icon-video:before {
-  @include content($icon-video);
+  @include char-content($icon-video);
 }
 
 .icon-vimeo:before {
-  @include content($icon-vimeo);
+  @include char-content($icon-vimeo);
 }
 
 .icon-vimeo-alt:before {
-  @include content($icon-vimeo-alt);
+  @include char-content($icon-vimeo-alt);
 }
 
 .icon-vine:before {
-  @include content($icon-vine);
+  @include char-content($icon-vine);
 }
 
 .icon-warn:before {
-  @include content($icon-warn);
+  @include char-content($icon-warn);
 }
 
 .icon-warning-sign:before {
-  @include content($icon-warning-sign);
+  @include char-content($icon-warning-sign);
 }
 
 .icon-windows:before {
-  @include content($icon-windows);
+  @include char-content($icon-windows);
 }
 
 .icon-wordpress:before {
-  @include content($icon-wordpress);
+  @include char-content($icon-wordpress);
 }
 
 .icon-wtf:before {
-  @include content($icon-wtf);
+  @include char-content($icon-wtf);
 }
 
 .icon-yahoo:before {
-  @include content($icon-yahoo);
+  @include char-content($icon-yahoo);
 }
 
 .icon-yelp:before {
-  @include content($icon-yelp);
+  @include char-content($icon-yelp);
 }
 
 .icon-youtube:before {
-  @include content($icon-youtube);
+  @include char-content($icon-youtube);
 }
 
 .icon-youtube-alt:before {
-  @include content($icon-youtube-alt);
+  @include char-content($icon-youtube-alt);
 }
 
 .icon-zendesk:before {
-  @include content($icon-zendesk);
+  @include char-content($icon-zendesk);
 }
 

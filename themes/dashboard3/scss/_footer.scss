@@ -1,0 +1,68 @@
+.footer {
+  @extend .row;
+  justify-content: space-between;
+  align-items: center;
+
+  font-color: $black;
+  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+}
+
+
+.vanilla-logo {
+  @include text-hide();
+  display: block;
+  width: 4rem;
+  height: 2rem;
+  background: 0;
+  background-image: url('images/vanilla-black.png');
+  background-image: url('images/vanilla-black.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@mixin rule($font-size, $line-height, $color) {
+  position: absolute;
+  display: block;
+  top: (($font-size * $line-height) / 2) - ($border-width-rem / 2);
+  width: 100%;
+  height: $border-width-rem;
+  background-color: $color;
+  z-index: -1;
+}
+
+//.footer-logo-powered-rule {
+//  @include rule(.425rem, $line-height-lg, $black);
+//}
+
+.footer-logo-powered-text {
+  background-color: $body-bg;
+  font-size: .425rem;
+  line-height: $line-height-lg;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 1;
+}
+
+.footer-logo-powered {
+  position: relative;
+  display: block;
+}
+
+.footer-logo {
+  padding-top: .375rem;
+  padding-bottom: .375rem;
+  opacity: .3;
+}
+
+.footer-nav {
+  opacity: .3;
+}
+
+.footer-nav-item {
+  font-size: $font-size-xs;
+  line-height: $line-height-lg;
+  display: inline-block;
+  padding-left: $spacer;
+  border-left: 1px solid $border-color;
+}

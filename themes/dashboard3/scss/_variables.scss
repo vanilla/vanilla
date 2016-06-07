@@ -196,9 +196,12 @@ $nav-navbar-active-link-active-bg:          #0cb0f8;
 // Checkbox toggles
 $toggle-border-width:                       $border-width-rem;
 $toggle-height:                             2rem;
-$toggle-padding:                            $toggle-height / 16;
+$toggle-padding:                            $toggle-height / 32;
 
 // Padding
 $padding-default:                           $grid-gutter-width / 2;
 
+$border-color: rgba(0,0,0,.125);
 $input-border-color: #ccc;
+
+$font-size-tables:                          .8125rem; //13px

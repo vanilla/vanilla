@@ -90,7 +90,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
 
             ?>
             <tr <?php echo 'id="'.Gdn_Format::url(strtolower($PluginName)).'-plugin"', ' class="More '.$RowClass.'"'; ?>>
-                <td rowspan="2" class="Less"><?php echo img($IconPath, array('class' => 'PluginIcon')); ?></td>
+                <td rowspan="2" class="Less"><?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?></td>
                 <th><?php echo $ScreenName; ?></th>
                 <td class="Alt"><?php echo Gdn_Format::Html(t(val('Name', $PluginInfo, $PluginName).' Description', val('Description', $PluginInfo, ''))); ?></td>
             </tr>

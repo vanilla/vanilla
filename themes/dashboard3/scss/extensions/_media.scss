@@ -19,11 +19,7 @@
   @extend .media;
 
   .IconWrap {
-    @extend .media-left;
-
-    img {
-      @extend .media-object;
-    }
+    margin-right: $spacer / 2;
   }
 
   .Connection-Info {

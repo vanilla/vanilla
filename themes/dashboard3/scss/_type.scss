@@ -72,21 +72,41 @@ p {
   margin-bottom: ($spacer / 2);
 }
 
-
 .main {
   h1 {
-    @extend .heading-block;
+    @extend .h1-block;
   }
 }
 
-.heading-block {
+.full-border {
   display: block;
-  margin-left: -$spacer;
-  margin-right: -$spacer;
-  margin-bottom: $padding-default;
-  padding-right: $spacer;
-  padding-bottom: $spacer;
+  margin-left: -$padding-default;
+  margin-right: -$padding-default;
+  padding-left: $padding-default;
+  padding-right: $padding-default;
   padding-left: $spacer;
-  font-size: $font-size-lg;
   border-bottom: 1px solid $grey-light;
+}
+
+.h1-block {
+  @extend .full-border;
+  font-size: $font-size-lg;
+  margin-bottom: $padding-default;
+  padding-bottom: $padding-default;
+}
+
+.header-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $padding-default / 2;
+  padding-bottom: $padding-default / 2;
+  margin-bottom: $padding-default;
+  @extend .full-border;
+
+  h1 {
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+  }
 }

@@ -203,3 +203,54 @@ input[type="button"] {
     margin-right: -$input-btn-border-width;
   }
 }
+
+.btn-icon {
+  @extend .btn-link;
+  @include text-hide();
+  width: $font-size-lg + .5rem;
+  height: $font-size-lg;
+  padding: 0 0 0 .5rem;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:hover {
+    @include text-hide();
+    text-decoration: none;
+  }
+
+  &:before {
+    @extend %icon;
+    display: block;
+    font-size: $font-size-lg;
+    color: $grey-dark;
+  }
+}
+
+// Icon buttons
+
+.btn-edit {
+  @extend .btn-icon;
+
+  &:before {
+    @include char-content($icon-edit);
+  }
+}
+
+.btn-delete {
+  @extend .btn-icon;
+
+
+  &:before {
+    @include char-content($icon-trash);
+  }
+}
+
+.btn-settings {
+  @extend .btn-icon;
+
+  &:before {
+    @include char-content($icon-cog);
+  }
+}

@@ -13,6 +13,8 @@
  */
 class ProfileController extends Gdn_Controller {
 
+    const AVATAR_FOLDER = 'userpics';
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form', 'UserModel');
 
@@ -436,10 +438,12 @@ class ProfileController extends Gdn_Controller {
 
             // Don't allow non-mods to set an explicit photo.
             if ($photo = $this->Form->getFormValue('Photo')) {
-                if (!checkPermission('Garden.Users.Edit')) {
-                    $this->Form->removeFormValue('Photo');
-                } elseif (!filter_var($photo, FILTER_VALIDATE_URL)) {
-                    $this->Form->addError('Invalid photo URL.');
+                if (!Gdn_Upload::isUploadUri($photo)) {
+                    if (!checkPermission('Garden.Users.Edit')) {
+                        $this->Form->removeFormValue('Photo');
+                    } elseif (!filter_var($photo, FILTER_VALIDATE_URL)) {
+                        $this->Form->addError('Invalid photo URL.');
+                    }
                 }
             }
 
@@ -473,8 +477,12 @@ class ProfileController extends Gdn_Controller {
      * @param int $UserID Unique ID.
      */
     public function index($User = '', $Username = '', $UserID = '', $Page = false) {
+        $this->addJsFile('cropimage.js');
+        $this->addCssFile('cropimage.css');
+        
         $this->editMode(false);
         $this->getUserInfo($User, $Username, $UserID);
+
 
         if ($this->User->Admin == 2 && $this->Head) {
             // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
@@ -700,28 +708,34 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Unique identifier, possible username or ID.
-     * @param string $Username .
+     *
+     * @param mixed $userReference Unique identifier, possible username or ID.
+     * @param string $username The username.
+     * @param string $userID The user's ID.
+     *
+     * @throws Exception
+     * @throws Gdn_UserException
      */
-    public function picture($UserReference = '', $Username = '', $UserID = '') {
+    public function picture($userReference = '', $username = '', $userID = '') {
+        $this->addJsFile('profile.js');
+
         if (!$this->CanEditPhotos) {
             throw forbiddenException('@Editing user photos has been disabled.');
         }
 
         // Permission checks
         $this->permission(array('Garden.Profiles.Edit', 'Moderation.Profiles.Edit', 'Garden.ProfilePicture.Edit'), false);
-        $Session = Gdn::session();
-        if (!$Session->isValid()) {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
         }
 
         // Check ability to manipulate image
-        $ImageManipOk = false;
         if (function_exists('gd_info')) {
-            $GdInfo = gd_info();
-            $GdVersion = preg_replace('/[a-z ()]+/i', '', $GdInfo['GD Version']);
-            if ($GdVersion < 2) {
-                throw new Exception(sprintf(t("This installation of GD is too old (v%s). Vanilla requires at least version 2 or compatible."), $GdVersion));
+            $gdInfo = gd_info();
+            $gdVersion = preg_replace('/[a-z ()]+/i', '', $gdInfo['GD Version']);
+            if ($gdVersion < 2) {
+                throw new Exception(sprintf(t("This installation of GD is too old (v%s). Vanilla requires at least version 2 or compatible."), $gdVersion));
             }
         } else {
             throw new Exception(sprintf(t("Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.")));
@@ -729,96 +743,173 @@ class ProfileController extends Gdn_Controller {
 
         // Get user data & prep form.
         if ($this->Form->authenticatedPostBack() && $this->Form->getFormValue('UserID')) {
-            $UserID = $this->Form->getFormValue('UserID');
+            $userID = $this->Form->getFormValue('UserID');
         }
-        $this->getUserInfo($UserReference, $Username, $UserID, true);
+        $this->getUserInfo($userReference, $username, $userID, true);
 
-        $this->Form->setModel($this->UserModel);
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $this->Form->setModel($configurationModel);
+        $avatar = $this->User->Photo;
+        if ($avatar === null) {
+            $avatar = UserModel::getDefaultAvatarUrl();
+        }
 
-        if ($this->Form->authenticatedPostBack() === true) {
-            $this->Form->setFormValue('UserID', $this->User->UserID);
+        $source = '';
+        $crop = null;
 
-            // Set user's Photo attribute to a URL, provided the current user has proper permission to do so.
-            $photoUrl = $this->Form->getFormValue('Url', false);
-            if ($photoUrl && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                if (isUrl($photoUrl) && filter_var($photoUrl, FILTER_VALIDATE_URL)) {
-                    $UserPhoto = $photoUrl;
-                } else {
-                    $this->Form->addError('Invalid photo URL.');
-                }
-            } else {
-                $UploadImage = new Gdn_UploadImage();
-                try {
-                    // Validate the upload
-                    $TmpImage = $UploadImage->ValidateUpload('Picture');
+        if ($this->isUploadedAvatar($avatar)) {
+            //Get the image source so we can manipulate it in the crop module.
+            $upload = new Gdn_UploadImage();
+            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+            $basename = changeBasename($avatar, "p%s");
+            $source = $upload->copyLocal($basename);
 
-                    // Generate the target image name.
-                    $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', true);
-                    $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
-                    $Subdir = stringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', false, true);
+            //Set up cropping.
+            $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+            $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
+            $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
+            $this->setData('crop', $crop);
+        } else {
+            $this->setData('avatar', $avatar);
+        }
 
-                    // Delete any previously uploaded image.
-                    $UploadImage->delete(changeBasename($this->User->Photo, 'p%s'));
-
-                    // Save the uploaded image in profile size.
-                    $Props = $UploadImage->SaveImageAs(
-                        $TmpImage,
-                        "userpics/$Subdir/p$Basename",
-                        c('Garden.Profile.MaxHeight', 1000),
-                        c('Garden.Profile.MaxWidth', 250),
-                        array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                    );
-                    $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
-
-//            // Save the uploaded image in preview size
-//            $UploadImage->SaveImageAs(
-//               $TmpImage,
-//               'userpics/t'.$ImageBaseName,
-//               Gdn::config('Garden.Preview.MaxHeight', 100),
-//               Gdn::config('Garden.Preview.MaxWidth', 75)
-//            );
-
-                    // Save the uploaded image in thumbnail size
-                    $ThumbSize = Gdn::config('Garden.Thumbnail.Size', 40);
-                    $UploadImage->saveImageAs(
-                        $TmpImage,
-                        "userpics/$Subdir/n$Basename",
-                        $ThumbSize,
-                        $ThumbSize,
-                        array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'))
-                    );
-
-                } catch (Exception $Ex) {
-                    // Throw the exception on API calls.
-                    if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
-                        throw $Ex;
-                    }
-                    $this->Form->addError($Ex);
-                }
+        if (!$this->Form->authenticatedPostBack()) {
+            $this->Form->setData($configurationModel->Data);
+        } else if ($this->Form->save() !== false) {
+            $upload = new Gdn_UploadImage();
+            $newAvatar = false;
+            if ($tmpAvatar = $upload->validateUpload('Avatar', false)) {
+                // New upload
+                $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions, $upload);
+            } else if ($avatar && $crop && $crop->isCropped()) {
+                // New thumbnail
+                $tmpAvatar = $source;
+                $thumbOptions = array('Crop' => true,
+                    'SourceX' => $crop->getCropXValue(),
+                    'SourceY' => $crop->getCropYValue(),
+                    'SourceWidth' => $crop->getCropWidth(),
+                    'SourceHeight' => $crop->getCropHeight());
+                $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions);
             }
-            // If there were no errors, associate the image with the user
             if ($this->Form->errorCount() == 0) {
-                if (!$this->UserModel->save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => true))) {
-                    $this->Form->setValidationResults($this->UserModel->validationResults());
-                } else {
-                    $this->User->Photo = $UserPhoto;
-                    setValue('Photo', $this->Data['Profile'], $UserPhoto);
-                    setValue('PhotoUrl', $this->Data['Profile'], Gdn_Upload::url(changeBasename($UserPhoto, 'n%s')));
+                if ($newAvatar !== false) {
+                    $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+                    // Update crop properties.
+                    $basename = changeBasename($newAvatar, "p%s");
+                    $source = $upload->copyLocal($basename);
+                    $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+                    $crop->setSize($thumbnailSize, $thumbnailSize);
+                    $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($newAvatar, "n%s")));
+                    $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($newAvatar, "p%s")));
+                    $this->setData('crop', $crop);
                 }
             }
-            // If there were no problems, redirect back to the user account
-            if ($this->Form->errorCount() == 0 && $this->deliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->informMessage(sprite('Check', 'InformSprite').t('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-                redirect($this->deliveryType() == DELIVERY_TYPE_VIEW ? userUrl($this->User) : userUrl($this->User, '', 'picture'));
+            if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+                $this->jsonTarget('', '', 'Refresh');
+
+                $this->RedirectUrl = userUrl($this->User);
             }
+            $this->informMessage(t("Your settings have been saved."));
         }
-        if ($this->Form->errorCount() > 0 && $this->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $this->deliveryType(DELIVERY_TYPE_ALL);
+
+        if (val('SideMenuModule', val('Panel', val('Assets', $this)))) {
+            /** @var SideMenuModule $sidemenu */
+            $sidemenu = $this->Assets['Panel']['SideMenuModule'];
+            $sidemenu->highlightRoute('/profile/picture');
         }
 
         $this->title(t('Change Picture'));
         $this->_setBreadcrumbs(t('Change My Picture'), userUrl($this->User, '', 'picture'));
-        $this->render();
+        $this->render('picture', 'profile', 'dashboard');
+    }
+
+
+    /**
+     * Deletes uploaded avatars in the profile size format.
+     *
+     * @param string $avatar The avatar to delete.
+     */
+    private function deleteAvatars($avatar = '') {
+        if ($avatar && $this->isUploadedAvatar($avatar)) {
+            $upload = new Gdn_Upload();
+            $subdir = stringBeginsWith(dirname($avatar), PATH_UPLOADS.'/', false, true);
+            $upload->delete($subdir.'/'.basename(changeBasename($avatar, 'p%s')));
+        }
+    }
+
+    /**
+     * Test whether a path is a relative path to the proper uploads directory.
+     *
+     * @param string $avatar The path to the avatar image to test
+     * @return bool Whether the avatar has been uploaded from the dashboard.
+     */
+    private function isUploadedAvatar($avatar) {
+        return (!isUrl($avatar) && strpos($avatar, self::AVATAR_FOLDER.'/') !== false);
+    }
+
+
+    /**
+     * Saves the avatar to /uploads in two sizes:
+     *   p* : The profile-sized image, which is constrained by Garden.Profile.MaxWidth and Garden.Profile.MaxHeight.
+     *   n* : The thumbnail-sized image, which is constrained and cropped according to Garden.Thumbnail.Size.
+     * Also deletes the old avatars.
+     *
+     * @param string $source The path to the local copy of the image.
+     * @param array $thumbOptions The options to save the thumbnail-sized avatar with.
+     * @param Gdn_UploadImage|null $upload The upload object.
+     * @return bool Whether the saves were successful.
+     */
+    private function saveAvatars($source, $thumbOptions, $upload = null) {
+        try {
+            $ext = '';
+            if (!$upload) {
+                $upload = new Gdn_UploadImage();
+                $ext = 'jpg';
+            }
+
+            // Generate the target image name
+            $targetImage = $upload->generateTargetName(PATH_UPLOADS, $ext, true);
+            $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+            $subdir = stringBeginsWith(dirname($targetImage), PATH_UPLOADS.'/', false, true);
+
+            // Save the profile size image.
+            $parts = Gdn_UploadImage::saveImageAs(
+                $source,
+                self::AVATAR_FOLDER."/$subdir/p$imageBaseName",
+                c('Garden.Profile.MaxHeight', 1000),
+                c('Garden.Profile.MaxWidth', 250),
+                array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+            );
+
+            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+
+            // Save the thumbnail size image.
+            Gdn_UploadImage::saveImageAs(
+                $source,
+                self::AVATAR_FOLDER."/$subdir/n$imageBaseName",
+                $thumbnailSize,
+                $thumbnailSize,
+                $thumbOptions
+            );
+        } catch (Exception $ex) {
+            $this->Form->addError($ex);
+            return false;
+        }
+
+        $bak = $this->User->Photo;
+
+        $userPhoto = sprintf($parts['SaveFormat'], self::AVATAR_FOLDER."/$subdir/$imageBaseName");
+        if (!$this->UserModel->save(array('UserID' => $this->User->UserID, 'Photo' => $userPhoto), array('CheckExisting' => true))) {
+            $this->Form->setValidationResults($this->UserModel->validationResults());
+        } else {
+            $this->User->Photo = $userPhoto;
+        }
+
+        $this->deleteAvatars($bak);
+
+        return $userPhoto;
     }
 
     /**
@@ -1032,7 +1123,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      * @param string $tk Security token.
      */
-    public function removePicture($UserReference = '', $Username = '', $tk = '') {
+    public function removePicture($UserReference = '', $Username = '', $tk = '', $deliveryType = '') {
         $this->permission('Garden.SignIn.Allow');
         $Session = Gdn::session();
         if (!$Session->isValid()) {
@@ -1042,7 +1133,6 @@ class ProfileController extends Gdn_Controller {
         // Get user data & another permission check.
         $this->getUserInfo($UserReference, $Username, '', true);
 
-        $RedirectUrl = userUrl($this->User, '', 'picture');
         if ($Session->validateTransientKey($tk) && is_object($this->User)) {
             $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
@@ -1052,12 +1142,12 @@ class ProfileController extends Gdn_Controller {
             }
         }
 
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($RedirectUrl);
+        if ($deliveryType === DELIVERY_TYPE_VIEW) {
+            $redirectUrl = userUrl($this->User);
         } else {
-            $this->RedirectUrl = url($RedirectUrl);
-            $this->render();
+            $redirectUrl = userUrl($this->User, '', 'picture');
         }
+        redirect($redirectUrl);
     }
 
     /**
@@ -1119,105 +1209,7 @@ class ProfileController extends Gdn_Controller {
      * @param string $Username .
      */
     public function thumbnail($UserReference = '', $Username = '') {
-        if (!$this->CanEditPhotos) {
-            throw forbiddenException('@Editing user photos has been disabled.');
-        }
-
-        // Initial permission checks (valid user)
-        $this->permission('Garden.SignIn.Allow');
-        $Session = Gdn::session();
-        if (!$Session->isValid()) {
-            $this->Form->addError('You must be authenticated in order to use this form.');
-        }
-
-        // Need some extra JS
-        // jcrop update jan28, 2014 as jQuery upgrade to 1.10.2 no longer
-        // supported browser()
-        $this->addJsFile('jquery.jcrop.min.js');
-        $this->addJsFile('profile.js');
-
-        $this->getUserInfo($UserReference, $Username, '', true);
-
-        // Permission check (correct user)
-        if ($this->User->UserID != $Session->UserID && !checkPermission('Garden.Users.Edit') && !checkPermission('Moderation.Profiles.Edit')) {
-            throw new Exception(t('You cannot edit the thumbnail of another member.'));
-        }
-
-        // Form prep
-        $this->Form->setModel($this->UserModel);
-        $this->Form->addHidden('UserID', $this->User->UserID);
-
-        // Confirm we have a photo to manipulate
-        if (!$this->User->Photo) {
-            $this->Form->addError('You must first upload a picture before you can create a thumbnail.');
-        }
-
-        // Define the thumbnail size
-        $this->ThumbSize = Gdn::config('Garden.Thumbnail.Size', 40);
-
-        // Define the source (profile sized) picture & dimensions.
-        $Basename = changeBasename($this->User->Photo, 'p%s');
-        $Upload = new Gdn_UploadImage();
-        $PhotoParsed = Gdn_Upload::Parse($Basename);
-        $Source = $Upload->CopyLocal($Basename);
-
-        if (!$Source) {
-            $this->Form->addError('You cannot edit the thumbnail of an externally linked profile picture.');
-        } else {
-            $this->SourceSize = getimagesize($Source);
-        }
-
-        // We actually need to upload a new file to help with cdb ttls.
-        $NewPhoto = $Upload->generateTargetName(
-            'userpics',
-            trim(pathinfo($this->User->Photo, PATHINFO_EXTENSION), '.'),
-            true
-        );
-
-        // Add some more hidden form fields for jcrop
-        $this->Form->addHidden('x', '0');
-        $this->Form->addHidden('y', '0');
-        $this->Form->addHidden('w', $this->ThumbSize);
-        $this->Form->addHidden('h', $this->ThumbSize);
-        $this->Form->addHidden('HeightSource', $this->SourceSize[1]);
-        $this->Form->addHidden('WidthSource', $this->SourceSize[0]);
-        $this->Form->addHidden('ThumbSize', $this->ThumbSize);
-        if ($this->Form->authenticatedPostBack() === true) {
-            try {
-                // Get the dimensions from the form.
-                Gdn_UploadImage::SaveImageAs(
-                    $Source,
-                    changeBasename($NewPhoto, 'n%s'),
-                    $this->ThumbSize,
-                    $this->ThumbSize,
-                    array('Crop' => true, 'SourceX' => $this->Form->getValue('x'), 'SourceY' => $this->Form->getValue('y'), 'SourceWidth' => $this->Form->getValue('w'), 'SourceHeight' => $this->Form->getValue('h'))
-                );
-
-                // Save new profile picture.
-                $Parsed = $Upload->SaveAs($Source, changeBasename($NewPhoto, 'p%s'));
-                $UserPhoto = sprintf($Parsed['SaveFormat'], $NewPhoto);
-                // Save the new photo info.
-                Gdn::userModel()->setField($this->User->UserID, 'Photo', $UserPhoto);
-
-                // Remove the old profile picture.
-                $Upload->delete($Basename);
-            } catch (Exception $Ex) {
-                $this->Form->addError($Ex);
-            }
-            // If there were no problems, redirect back to the user account
-            if ($this->Form->errorCount() == 0) {
-                redirect(userUrl($this->User, '', 'picture'));
-                $this->informMessage(sprite('Check', 'InformSprite').t('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-            }
-        }
-        // Delete the source image if it is externally hosted.
-        if ($PhotoParsed['Type']) {
-            safeUnlink($Source);
-        }
-
-        $this->title(t('Edit My Thumbnail'));
-        $this->_setBreadcrumbs(t('Edit My Thumbnail'), '/profile/thumbnail');
-        $this->render();
+        $this->picture($UserReference, $Username);
     }
 
     /**
@@ -1349,11 +1341,6 @@ class ProfileController extends Gdn_Controller {
             $Module->addLink('Options', sprite('SpProfile').' '.t('Edit Profile'), userUrl($this->User, '', 'edit'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup EditAccountLink'));
             $Module->addLink('Options', sprite('SpProfile').' '.t('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
             $Module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
-
-            if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
-            }
-
             $Module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
 
             // Add profile options for everyone
@@ -1387,14 +1374,6 @@ class ProfileController extends Gdn_Controller {
             $Module->addLink('Options', sprite('SpPreferences').' '.t('Notification Preferences'), userUrl($this->User, '', 'preferences'), false, array('class' => 'Popup PreferencesLink'));
             if ($AllowImages) {
                 $Module->addLink('Options', sprite('SpPicture').' '.t('Change My Picture'), '/profile/picture', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'PictureLink'));
-            }
-
-            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-                $Module->addLink('Options', sprite('SpThumbnail').' '.t('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
-            }
-
-            if ($this->User->Photo != '' && $AllowImages) {
-                $Module->addLink('Options', sprite('SpDelete').' '.t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->transientKey(), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
             }
         }
 

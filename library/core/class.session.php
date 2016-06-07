@@ -15,6 +15,11 @@
  */
 class Gdn_Session {
 
+    /**
+     * Parameter name for incoming CSRF tokens.
+     */
+    const CSRF_NAME = 'TransientKey';
+
     /** @var int Unique user identifier. */
     public $UserID;
 

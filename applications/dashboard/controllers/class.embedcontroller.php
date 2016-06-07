@@ -116,7 +116,6 @@ class EmbedController extends DashboardController {
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(
             array(
-                'Garden.TrustedDomains',
                 'Garden.Embed.RemoteUrl',
                 'Garden.Embed.ForceDashboard',
                 'Garden.Embed.ForceForum',
@@ -126,30 +125,13 @@ class EmbedController extends DashboardController {
         );
 
         $this->Form->setModel($ConfigurationModel);
-        if ($this->Form->authenticatedPostBack() === false) {
-            // Format trusted domains as a string
-            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
-            if (is_array($TrustedDomains)) {
-                $TrustedDomains = implode("\n", $TrustedDomains);
-            }
-
-            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
-
-            // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
-        } else {
-            // Format the trusted domains as an array based on newlines & spaces
-            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
-            $TrustedDomains = explode("\n", $TrustedDomains);
-            $TrustedDomains = array_unique(array_filter(array_map('trim', $TrustedDomains)));
-            $TrustedDomains = implode("\n", $TrustedDomains);
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+        if ($this->Form->authenticatedPostBack()) {
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));
             }
-
-            // Reformat array as string so it displays properly in the form
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+        } else {
+            // Apply the config settings to the form.
+            $this->Form->setData($ConfigurationModel->Data);
         }
 
         $this->permission('Garden.Settings.Manage');
@@ -166,7 +148,7 @@ class EmbedController extends DashboardController {
      */
     private function toggle($Toggle = '', $TransientKey = '') {
         if (in_array($Toggle, array('enable', 'disable')) && Gdn::session()->validateTransientKey($TransientKey)) {
-            if ($Toggle == 'enable' && array_key_exists('embedvanilla', Gdn::pluginManager()->enabledPlugins())) {
+            if ($Toggle == 'enable' && Gdn::addonManager()->isEnabled('embedvanilla', \Vanilla\Addon::TYPE_ADDON)) {
                 throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
             }
 

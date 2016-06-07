@@ -800,7 +800,7 @@ EOT;
         } elseif ($CheckPopup || $this->data('CheckPopup')) {
             $this->addDefinition('CheckPopup', true);
         } else {
-            redirect(url($this->RedirectUrl));
+            safeRedirect(url($this->RedirectUrl));
         }
     }
 
@@ -1891,7 +1891,7 @@ EOT;
         if ($Target === false) {
             $Target = $this->Form->getFormValue('Target', false);
             if (!$Target) {
-                $Target = $this->Request->get('Target', '/');
+                $Target = $this->Request->get('Target', $this->Request->get('target', '/'));
             }
         }
 
@@ -1903,44 +1903,8 @@ EOT;
             if (preg_match('`^/entry/signin`i', $Target)) {
                 $Target = '/';
             }
-        } else {
-            $MyHostname = parse_url(Gdn::request()->domain(), PHP_URL_HOST);
-            $TargetHostname = parse_url($Target, PHP_URL_HOST);
-
-            // Only allow external redirects to trusted domains.
-            $TrustedDomains = c('Garden.TrustedDomains', true);
-            // Trusted domains were previously saved in config as an array.
-            if ($TrustedDomains && $TrustedDomains !== true && !is_array($TrustedDomains)) {
-                $TrustedDomains = explode("\n", $TrustedDomains);
-            }
-
-            if (is_array($TrustedDomains)) {
-                // Add this domain to the trusted hosts.
-                $TrustedDomains[] = $MyHostname;
-                $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
-                $this->fireEvent('BeforeTargetReturn');
-            }
-
-            if ($TrustedDomains === true) {
-                return $Target;
-            } elseif (count($TrustedDomains) == 0) {
-                // Only allow http redirects if they are to the same host name.
-                if ($MyHostname != $TargetHostname) {
-                    $Target = '';
-                }
-            } else {
-                // Loop the trusted domains looking for a match
-                $Match = false;
-                foreach ($TrustedDomains as $TrustedDomain) {
-                    if (stringEndsWith($TargetHostname, $TrustedDomain, true)) {
-                        $Match = true;
-                    }
-                }
-                if (!$Match) {
-                    $Target = '';
-                }
-            }
         }
+
         return $Target;
     }
 }

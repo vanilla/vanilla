@@ -24,6 +24,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     const COLUMN_NAME = 'Name';
 
     /**
+     * @var array The default authentication provider.
+     */
+    private static $default = null;
+
+    /**
      *
      */
     public function __construct() {
@@ -54,11 +59,15 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @return array
      */
     public static function getDefault() {
-        $Rows = self::getWhereStatic(array('IsDefault' => 1));
-        if (empty($Rows)) {
-            return false;
+        if (self::$default === null) {
+            $Rows = self::getWhereStatic(array('IsDefault' => 1));
+            if (empty($Rows)) {
+                self::$default = false;
+            } else {
+                self::$default = array_pop($Rows);
+            }
         }
-        return array_pop($Rows);
+        return self::$default;
     }
 
     /**

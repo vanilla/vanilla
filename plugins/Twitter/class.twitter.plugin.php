@@ -960,6 +960,13 @@ class TwitterPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('This plugin requires curl.');
         }
 
+        $this->structure();
+    }
+
+    /**
+     * Perform any necessary database or configuration updates.
+     */
+    public function structure() {
         // Save the twitter provider type.
         Gdn::sql()->replace(
             'UserAuthenticationProvider',

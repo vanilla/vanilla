@@ -21,7 +21,6 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function dbaController_countJobs_Handler($Sender) {
         $Counts = array(
             'Conversation' => array('CountMessages', 'CountParticipants', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID')
-//          'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID')
         );
 
         foreach ($Counts as $Table => $Columns) {
@@ -57,8 +56,6 @@ class ConversationsHooks implements Gdn_IPlugin {
                 ->set('Format', 'Deleted')
                 ->where('InsertUserID', $UserID)
                 ->put();
-        } else {
-            // Leave conversation messages
         }
         // Remove the user's profile information related to this application
         $Sender->SQL->update('User')
@@ -174,36 +171,6 @@ class ConversationsHooks implements Gdn_IPlugin {
     }
 
     /**
-     * Load some information into the BuzzData collection (for Dashboard report).
-     *
-     * @since 2.0.?
-     * @access public
-     */
-    //public function settingsController_dashboardData_handler($Sender) {
-        /*
-        $ConversationModel = new ConversationModel();
-        // Number of Conversations
-        $CountConversations = $ConversationModel->getCountWhere();
-        $Sender->addDefinition('CountConversations', $CountConversations);
-        $Sender->BuzzData[T('Conversations')] = number_format($CountConversations);
-        // Number of New Conversations in the last day
-        $Sender->BuzzData[T('New conversations in the last day')] = number_format($ConversationModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 day')))));
-        // Number of New Conversations in the last week
-        $Sender->BuzzData[T('New conversations in the last week')] = number_format($ConversationModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 week')))));
-
-        $ConversationMessageModel = new ConversationMessageModel();
-        // Number of Messages
-        $CountMessages = $ConversationMessageModel->getCountWhere();
-        $Sender->addDefinition('CountConversationMessages', $CountMessages);
-        $Sender->BuzzData[T('Conversation Messages')] = number_format($CountMessages);
-        // Number of New Messages in the last day
-        $Sender->BuzzData[T('New messages in the last day')] = number_format($ConversationMessageModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 day')))));
-        // Number of New Messages in the last week
-        $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->getCountWhere(array('DateInserted >=' => Gdn_Format::toDateTime(strtotime('-1 week')))));
-        */
-    //}
-
-    /**
      * Database & config changes to be done upon enable.
      *
      * @since 2.0.0
@@ -212,7 +179,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function setup() {
         $Database = Gdn::database();
         $Config = Gdn::factory(Gdn::AliasConfig);
-        $Drop = false; //c('Conversations.Version') === FALSE ? TRUE : FALSE;
+        $Drop = false;
         $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'structure.php');
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'stub.php');

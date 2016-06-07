@@ -281,6 +281,18 @@ class Gdn_Upload extends Gdn_Pluggable {
     }
 
     /**
+     * Determine if a URI matches the format of a valid type/domain upload.
+     *
+     * @param string $uri The URI to test. This would be the value saved in the database (ex. GDN_User.Photo).
+     * @return bool Returns **true** if {@link uri} looks like an uploaded file or **false** otherwise.
+     */
+    public static function isUploadUri($uri) {
+        $parsed = Gdn_Upload::parse($uri);
+
+        return !empty($parsed['Url']) && val('Type', $parsed) !== 'external';
+    }
+
+    /**
      *
      *
      * @param $Source

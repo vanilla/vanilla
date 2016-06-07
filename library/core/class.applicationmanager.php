@@ -9,6 +9,8 @@
  * @package Core
  * @since 2.0
  */
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 
 /**
  * Manages available applications, enabling and disabling them.
@@ -23,6 +25,18 @@ class Gdn_ApplicationManager {
 
     /** @var array The valid paths to search for applications. */
     public $Paths = array(PATH_APPLICATIONS);
+
+    /**
+     * @var AddonManager
+     */
+    private $addonManager;
+
+    /**
+     *
+     */
+    public function __construct(AddonManager $addonManager = null) {
+        $this->addonManager = $addonManager;
+    }
 
     /**
      * Get a list of the available applications.
@@ -169,11 +183,20 @@ class Gdn_ApplicationManager {
      * Get an list of enabled application folders.
      *
      * @return array Returns an array of all of the enabled application folders.
+     * @deprecated
      */
     public function enabledApplicationFolders() {
-        $EnabledApplications = c('EnabledApplications', array());
-        $EnabledApplications['Dashboard'] = 'dashboard';
-        return array_values($EnabledApplications);
+        deprecated('Gdn_ApplicationManager->enabledApplicationFolders()');
+
+        $addons = $this->addonManager->getEnabled();
+        $applications = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'application']));
+
+        $result = ['dashboard'];
+        /* @var Addon $application */
+        foreach ($applications as $application) {
+            $result[] = $application->getKey();
+        }
+        return array_unique($result);
     }
 
     /**
@@ -204,21 +227,12 @@ class Gdn_ApplicationManager {
         $applicationName = $ApplicationInfo['Index'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
 
-        SaveToConfig('EnabledApplications'.'.'.$applicationName, $ApplicationFolder);
+        saveToConfig('EnabledApplications'.'.'.$applicationName, $ApplicationFolder);
         Logger::event(
             'addon_enabled',
             Logger::NOTICE,
             'The {addonName} application was enabled.',
             array('addonName' => $applicationName)
-        );
-
-        // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, true);
-        $Locale = Gdn::locale();
-        $Locale->set(
-            $Locale->current(),
-            $this->enabledApplicationFolders(),
-            Gdn::pluginManager()->enabledPluginFolders(),
-            true
         );
 
         $this->EventArguments['AddonName'] = $applicationName;
@@ -244,7 +258,7 @@ class Gdn_ApplicationManager {
         }
 
         // Hook directly into the autoloader and force it to load the newly tested application
-        Gdn_Autoloader::attachApplication($ApplicationFolder);
+        $this->addonManager->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
 
         // Call the application's setup method
         $hooks = $applicationName.'Hooks';
@@ -273,43 +287,23 @@ class Gdn_ApplicationManager {
      * @throws \Exception Throws an exception if the application can't be disabled.
      */
     public function disableApplication($applicationName) {
+        $addon = $this->addonManager->lookupAddon($applicationName);
+        if (!$addon) {
+            throw notFoundException('Application');
+        }
+
+        $applicationName = $addon->getRawKey();
+
         // 1. Check to make sure that this application is allowed to be disabled
-        $ApplicationInfo = (array)arrayValueI($applicationName, $this->availableApplications(), array());
-        $applicationName = $ApplicationInfo['Index'];
-        if (!val('AllowDisable', $ApplicationInfo, true)) {
+        if (!$addon->getInfoValue('allowDisable', true)) {
             throw new Exception(sprintf(t('You cannot disable the %s application.'), $applicationName));
         }
 
-        // 2. Check to make sure that no other enabled applications rely on this one
-        foreach ($this->enabledApplications() as $CheckingName => $CheckingInfo) {
-            $RequiredApplications = val('RequiredApplications', $CheckingInfo, false);
-            if (is_array($RequiredApplications) && array_key_exists($applicationName, $RequiredApplications) === true) {
-                throw new Exception(
-                    sprintf(
-                        t('You cannot disable the %1$s application because the %2$s application requires it in order to function.'),
-                        $applicationName,
-                        $CheckingName
-                    )
-                );
-            }
-        }
-
-        // 3. Check to make sure that no other enabled plugins rely on this one
-        $DependendPlugins = array();
-        foreach (Gdn::pluginManager()->enabledPlugins() as $CheckingName => $CheckingInfo) {
-            $RequiredApplications = val('RequiredApplications', $CheckingInfo, false);
-            if (is_array($RequiredApplications) && array_key_exists($applicationName, $RequiredApplications) === true) {
-            	$DependendPlugins[] = $CheckingName;
-            }
-        }
-        if (!empty($DependendPlugins)) {
-            throw new Exception(
-                sprintf(
-                    t('You cannot disable the %1$s application because the following plugins require it in order to function: %2$s'),
-                    $applicationName,
-                    implode(', ', $DependendPlugins)
-                )
-            );
+        // 2. Check to make sure that no other enabled applications rely on this one.
+        try {
+            $this->addonManager->checkDependants($addon, true);
+        } catch (Exception $ex) {
+            throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }
         
         // 2. Disable it
@@ -323,19 +317,7 @@ class Gdn_ApplicationManager {
         );
 
         // Clear the object caches.
-        Gdn_Autoloader::smartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);
-
-        // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, true);
-        $Locale = Gdn::locale();
-        $Locale->set(
-            $Locale->current(),
-            $this->enabledApplicationFolders(),
-            Gdn::pluginManager()->enabledPluginFolders(),
-            true
-        );
-
-        $this->EventArguments['AddonName'] = $applicationName;
-        Gdn::pluginManager()->callEventHandlers($this, 'ApplicationManager', 'AddonDisabled');
+        $this->addonManager->stopAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
     }
 
     /**
@@ -344,10 +326,11 @@ class Gdn_ApplicationManager {
      * @param string $Name The name of the application.
      * @return bool Whether or not the application is enabled.
      * @since 2.2
+     * @deprecated
      */
     public function isEnabled($Name) {
-        $Enabled = $this->enabledApplications();
-        return isset($Enabled[$Name]) && $Enabled[$Name];
+        deprecated('Gdn_ApplicationManager->isEnabled()', 'AddonManager->isEnabled()');
+        return $this->addonManager->isEnabled($Name, Addon::TYPE_ADDON);
     }
 
     /**
@@ -356,11 +339,10 @@ class Gdn_ApplicationManager {
      * @param string $applicationName The name of the application.
      */
     public function registerPermissions($applicationName) {
-        $ApplicationInfo = val($applicationName, $this->availableApplications(), array());
-        $PermissionName = val('RegisterPermissions', $ApplicationInfo, false);
-        if ($PermissionName != false) {
-            $PermissionModel = Gdn::permissionModel();
-            $PermissionModel->define($PermissionName);
+        $addon = $this->addonManager->lookupAddon($applicationName);
+
+        if ($permissions = $addon->getInfoValue('registerPermissions')) {
+            Gdn::permissionModel()->define($permissions);
         }
     }
 }

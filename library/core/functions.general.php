@@ -261,20 +261,17 @@ if (!function_exists('assetVersion')) {
 
                 switch ($type) {
                     case 'plugins':
-                        $pluginInfo = Gdn::pluginManager()->getPluginInfo($key);
-                        $version = val('Version', $pluginInfo, $version);
-                        break;
                     case 'applications':
-                        $applicationInfo = Gdn::applicationManager()->getApplicationInfo(ucfirst($key));
-                        $version = val('Version', $applicationInfo, $version);
+                        $addon = Gdn::addonManager()->lookupAddon($key);
+                        if ($addon) {
+                            $version = $addon->getVersion();
+                        }
                         break;
                     case 'themes':
                         if ($themeVersion === null) {
-                            $themeInfo = Gdn::themeManager()->getThemeInfo(Theme());
-                            if ($themeInfo !== false) {
-                                $themeVersion = val('Version', $themeInfo, $version);
-                            } else {
-                                $themeVersion = $version;
+                            $theme = Gdn::addonManager()->lookupTheme(theme());
+                            if ($theme) {
+                                $themeVersion = $theme->getVersion();
                             }
                         }
                         $version = $themeVersion;
@@ -439,44 +436,6 @@ if (!function_exists('multiCheckPermission')) {
     function multiCheckPermission($PermissionName) {
         $Result = Gdn::session()->checkPermission($PermissionName, false);
         return $Result;
-    }
-}
-
-if (!function_exists('checkRequirements')) {
-    /**
-     * Check an addon's requirements.
-     *
-     * @param string $ItemName The name of the item checking requirements.
-     * @param array $RequiredItems An array of requirements.
-     * @param array $EnabledItems An array of currently enabled items to check against.
-     * @throws Gdn_UserException Throws an exception if there are missing requirements.
-     */
-    function checkRequirements($ItemName, $RequiredItems, $EnabledItems) {
-        // 1. Make sure that $RequiredItems are present
-        if (is_array($RequiredItems)) {
-            $MissingRequirements = array();
-
-            foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
-                if (!array_key_exists($RequiredItemName, $EnabledItems)) {
-                    $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
-                    // If the item exists and is enabled, check the version
-                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
-                    // Compare the versions.
-                    if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
-                        $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                    }
-                }
-            }
-            if (count($MissingRequirements) > 0) {
-                $Msg = sprintf(
-                    "%s is missing the following requirement(s): %s.",
-                    $ItemName,
-                    implode(', ', $MissingRequirements)
-                );
-                throw new Gdn_UserException($Msg);
-            }
-        }
     }
 }
 
@@ -1577,7 +1536,7 @@ if (!function_exists('getRecord')) {
                     $Discussion = $Model->getID($Row['DiscussionID']);
                     if ($Discussion) {
                         $Discussion->Url = DiscussionUrl($Discussion);
-                        $Row['ShareUrl'] = $Discussion->Url;
+                        $Row['ShareUrl'] = $Row['Url'];
                         $Row['Name'] = $Discussion->Name;
                         $Row['Discussion'] = (array)$Discussion;
                     }
@@ -1904,7 +1863,7 @@ if (!function_exists('isWritable')) {
         fclose($File);
 
         if (!$KeepPath) {
-            unlink($Path);
+            safeUnlink($Path);
         }
 
         return true;
@@ -2993,11 +2952,24 @@ if (!function_exists('safeRedirect')) {
             $Destination = Url($Destination, true);
         }
 
-        $Domain = parse_url($Destination, PHP_URL_HOST);
-        if (in_array($Domain, TrustedDomains())) {
-            Redirect($Destination, $StatusCode);
+        $trustedDomains = TrustedDomains();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $Destination)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        if ($isTrustedDomain) {
+            redirect($Destination, $StatusCode);
         } else {
-            throw PermissionException();
+            Logger::notice('Redirect to untrusted domain: {url}.', [
+                'url' => $Destination
+            ]);
+
+            redirect(url("/home/leaving?Target=".urlencode($Destination)));
         }
     }
 }
@@ -3377,15 +3349,47 @@ if (!function_exists('trustedDomains')) {
      * @return array
      */
     function trustedDomains() {
-        $Result = c('Garden.TrustedDomains', array());
-        if (!is_array($Result)) {
-            $Result = explode("\n", $Result);
+        // This domain is safe.
+        $trustedDomains = [Gdn::request()->host()];
+
+        $configuredDomains = c('Garden.TrustedDomains', []);
+        if (!is_array($configuredDomains)) {
+            $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
+        }
+        $configuredDomains = array_filter($configuredDomains);
+
+        $trustedDomains = array_merge($trustedDomains, $configuredDomains);
+
+        // Build a collection of authentication provider URLs.
+        $authProviderModel = new Gdn_AuthenticationProviderModel();
+        $providers = $authProviderModel->getProviders();
+        $providerUrls = [
+            'PasswordUrl',
+            'ProfileUrl',
+            'RegisterUrl',
+            'SignInUrl',
+            'SignOutUrl',
+            'URL'
+        ];
+
+        // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
+        if (is_array($providers) && count($providers) > 0) {
+            foreach ($providers as $key => $record) {
+                foreach ($providerUrls as $urlKey) {
+                    $providerUrl = $record[$urlKey];
+                    if ($providerUrl && $providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
+                        if (!in_array($providerDomain, $trustedDomains)) {
+                            $trustedDomains[] = $providerDomain;
+                        }
+                    }
+                }
+            }
         }
 
-        // This domain is safe.
-        $Result[] = Gdn::Request()->Host();
+        Gdn::pluginManager()->EventArguments['TrustedDomains'] = &$trustedDomains;
+        Gdn::pluginManager()->fireAs('EntryController')->fireEvent('BeforeTargetReturn');
 
-        return array_unique($Result);
+        return array_unique($trustedDomains);
     }
 }
 
@@ -3725,5 +3729,60 @@ if (!function_exists('slugify')) {
         }
 
         return $text;
+    }
+}
+
+if (!function_exists('urlMatch')) {
+
+    /**
+     * Match a URL against a pattern.
+     *
+     * @param string $pattern The URL pattern.
+     * @param string $url The URL to test.
+     * @return bool Returns **true** if {@link $url} matches against {@link $pattern} or **false** otherwise.
+     */
+    function urlMatch($pattern, $url) {
+        $urlParts = parse_url($url);
+        $patternParts = parse_url($pattern);
+
+        if ($urlParts === false || $patternParts === false) {
+            return false;
+        }
+        $urlParts += ['scheme' => '', 'host' => '', 'path' => ''];
+
+        // Fix a pattern with no path.
+        if (empty($patternParts['host'])) {
+            $pathParts = explode('/', val('path', $patternParts), 2);
+            $patternParts['host'] = $pathParts[0];
+            $patternParts['path'] = '/'.trim(val(1, $pathParts), '/');
+        }
+
+        if (!empty($patternParts['scheme']) && $patternParts['scheme'] !== $urlParts['scheme']) {
+            return false;
+        }
+
+        if (!empty($patternParts['host'])) {
+            $p = $patternParts['host'];
+            $host = $urlParts['host'];
+
+            if (!fnmatch($p, $host)) {
+                if (substr($p, 0, 2) !== '*.' || !fnmatch(substr($p, 2), $host)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!empty($patternParts['path']) && $patternParts['path'] !== '/') {
+            $p = $patternParts['path'];
+            $path = '/'.trim(val('path', $urlParts), '/');
+
+            if (!fnmatch($p, $path)) {
+                if (substr($p, -2) !== '/*' || !fnmatch(substr($p, 0, -2), $path)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -209,6 +209,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $Indexes = array();
         $Keys = '';
         $Sql = '';
+        $TableName = Gdn_Format::alphaNumeric($this->_TableName);
 
         $ForceDatabaseEngine = c('Database.ForceStorageEngine');
         if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
@@ -248,11 +249,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
         // Build unique keys.
         if (count($UniqueKey) > 0) {
-            $Keys .= ",\nunique index `".Gdn_Format::alphaNumeric('UX_'.$this->_TableName).'` (`'.implode('`, `', $UniqueKey)."`)";
+            $Keys .= ",\nunique index `UX_{$TableName}` (`".implode('`, `', $UniqueKey)."`)";
         }
         // Build full text index.
         if (count($FullTextKey) > 0) {
-            $Keys .= ",\nfulltext index `".Gdn_Format::alphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
+            $Keys .= ",\nfulltext index `TX_{$TableName}` (`".implode('`, `', $FullTextKey)."`)";
         }
         // Build the rest of the keys.
         foreach ($Indexes as $IndexType => $IndexGroups) {
@@ -260,15 +261,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
                 if (!$IndexGroup) {
                     foreach ($ColumnNames as $ColumnName) {
-                        $Keys .= ",\n{$CreateString} `{$IndexType}_{$this->_TableName}_{$ColumnName}` (`{$ColumnName}`)";
+                        $Keys .= ",\n{$CreateString} `{$IndexType}_{$TableName}_{$ColumnName}` (`{$ColumnName}`)";
                     }
                 } else {
-                    $Keys .= ",\n{$CreateString} `{$IndexType}_{$this->_TableName}_{$IndexGroup}` (`".implode('`, `', $ColumnNames).'`)';
+                    $Keys .= ",\n{$CreateString} `{$IndexType}_{$TableName}_{$IndexGroup}` (`".implode('`, `', $ColumnNames).'`)';
                 }
             }
         }
 
-        $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
+        $Sql = 'create table `'.$this->_DatabasePrefix.$TableName.'` ('
             .$Sql
             .$Keys
             ."\n)";
@@ -508,7 +509,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             // table that are NOT in $this->_Columns.
             $RemoveColumns = array_diff(array_keys($existingColumns), array_keys($columns));
             foreach ($RemoveColumns as $Column) {
-                $AlterSql[] = "drop column `{$columns[$Column]}`";
+                $AlterSql[] = "drop column `$Column`";
             }
         }
 

@@ -149,6 +149,13 @@
         }
     });
 
+    $(document).ajaxComplete(function(event, jqXHR, ajaxOptions) {
+        var csrfToken = jqXHR.getResponseHeader("X-CSRF-Token");
+        if (csrfToken) {
+            gdn.setMeta("TransientKey", csrfToken);
+            $("input[name=TransientKey]").val(csrfToken);
+        }
+    });
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
@@ -657,7 +664,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.htmlTrigger(data);
+                    $elem.html($.parseHTML(data + '')).trigger('contentLoad');
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
@@ -668,7 +675,7 @@ jQuery(document).ready(function($) {
             });
         });
     };
-    $('.Popin').not('.Message .Popin').popin();
+    $('.Popin, .js-popin').not('.Message .Popin, .Message .js-popin').popin();
 
     var hijackClick = function(e) {
         var $elem = $(this);
@@ -1532,10 +1539,10 @@ jQuery(document).ready(function($) {
         gdn.atempty = gdn.atempty || {};
 
         // Set minimum characters to type for @mentions to fire
-        var min_characters = 2;
+        var min_characters = gdn.getMeta('mentionMinChars', 2);
 
         // Max suggestions to show in dropdown.
-        var max_suggestions = 5;
+        var max_suggestions = gdn.getMeta('mentionSuggestionCount', 5);
 
         // Server response limit. This should match the limit set in
         // *UserController->TagSearch* and UserModel->TagSearch

@@ -54,6 +54,8 @@ Vanilla 2.2 requires PHP 5.3. Running `master` branch requires PHP 5.4, as will 
 
 Vanilla is compatible up to PHP 5.6 (the current release) and we always recommend using the lastest stable PHP release whenever possible. PHP 7.0 compatibility is expected in 2.3.
 
+To use our social plugins, PHP's [OpenSSL support](http://php.net/manual/en/openssl.installation.php) must be enabled.
+
 Vanilla ships with a `.htaccess` file required for Apache support. Nginx and IIS require additional configuration.
 
 On the client side, Vanilla should run & look good in just about any modern browser.

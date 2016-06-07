@@ -1,0 +1,3 @@
+<?php
+
+$Definition['foo'] = 'bar';

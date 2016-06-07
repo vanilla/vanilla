@@ -1336,25 +1336,25 @@ class Gdn_Form extends Gdn_Pluggable {
         $RowCount = count($Rows);
         $ColCount = count($Cols);
         for ($j = 0; $j < $RowCount; ++$j) {
-            $Alt = 1;
+            $Alt = true;
             for ($i = 0; $i < $ColCount; ++$i) {
-                $Alt = $Alt == 0 ? 1 : 0;
                 $ColName = $Cols[$i];
                 $RowName = $Rows[$j];
 
                 if ($j == 0) {
-                    $Headings .= '<td'.($Alt == 0 ? ' class="Alt"' : '').
+                    $Headings .= '<td'.($Alt ? ' class="Alt"' : '').
                     '>'.T($ColName).'</td>';
                 }
 
                 if (array_key_exists($RowName, $Group[$ColName])) {
-                    $Cells .= '<td'.($Alt == 0 ? ' class="Alt"' : '').
+                    $Cells .= '<td'.($Alt ? ' class="Alt"' : '').
                         '>'.$Group[$ColName][$RowName].
                         '</td>';
                 } else {
-                    $Cells .= '<td'.($Alt == 0 ? ' class="Alt"' : '').
+                    $Cells .= '<td'.($Alt ? ' class="Alt"' : '').
                         '>&#160;</td>';
                 }
+                $Alt = !$Alt;
             }
             if ($Headings != '') {
                 $Return .= "<thead><tr><th>".t($GroupName)."</th>".
@@ -2007,7 +2007,7 @@ PASSWORDMETER;
         $result = Gdn::session()->validateTransientKey($postBackKey);
 
         if (!$result && $throw && Gdn::request()->isPostBack()) {
-            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
         }
 
         return $result;

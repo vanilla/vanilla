@@ -291,7 +291,7 @@ jQuery(document).ready(function($) {
         var parent = $(container).find('div.Comment');
         var msg = $(parent).find('div.Message').first();
         $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
-        if ($(msg).is(':visible')) {
+        if (!parent.find('.EditCommentForm').length) {
             $.ajax({
                 type: "GET",
                 url: $(btn).attr('href'),

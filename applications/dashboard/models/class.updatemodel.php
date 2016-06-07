@@ -7,6 +7,7 @@
  * @package Dashboard
  * @since 2.0
  */
+use Vanilla\Addon;
 
 /**
  * Handles updating.
@@ -502,185 +503,107 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
+     * Deprecated.
      *
-     *
-     * @param bool $Enabled
-     * @return array
+     * @param bool $Enabled Deprecated.
+     * @return array Deprecated.
      */
     public function getAddons($Enabled = false) {
-        $Addons = array();
-
-        // Get the core.
-        self::addAddon(array('AddonKey' => 'vanilla', 'AddonType' => 'core', 'Version' => APPLICATION_VERSION, 'Folder' => '/'), $Addons);
-
-        // Get a list of all of the applications.
-        $ApplicationManager = new Gdn_ApplicationManager();
-        if ($Enabled) {
-            $Applications = $ApplicationManager->availableApplications();
-        } else {
-            $Applications = $ApplicationManager->enabledApplications();
-        }
-
-        foreach ($Applications as $Key => $Info) {
-            // Exclude core applications.
-            if (in_array(strtolower($Key), array('conversations', 'dashboard', 'skeleton', 'vanilla'))) {
-                continue;
-            }
-
-            $Addon = array('AddonKey' => $Key, 'AddonType' => 'application', 'Version' => val('Version', $Info, '0.0'), 'Folder' => '/applications/'.GetValue('Folder', $Info, strtolower($Key)));
-            self::addAddon($Addon, $Addons);
-        }
-
-        // Get a list of all of the plugins.
-        $PluginManager = Gdn::pluginManager();
-        if ($Enabled) {
-            $Plugins = $PluginManager->enabledPlugins();
-        } else {
-            $Plugins = $PluginManager->availablePlugins();
-        }
-
-        foreach ($Plugins as $Key => $Info) {
-            // Exclude core plugins.
-            if (in_array(strtolower($Key), array())) {
-                continue;
-            }
-
-            $Addon = [
-                'AddonKey' => $Key,
-                'AddonType' => 'plugin',
-                'Version' => val('Version', $Info, '0.0'),
-                'Folder' => '/applications/'.GetValue('Folder', $Info, $Key)
-            ];
-            self::addAddon($Addon, $Addons);
-        }
-
-        // Get a list of all the themes.
-        $ThemeManager = new Gdn_ThemeManager();
-        if ($Enabled) {
-            $Themes = $ThemeManager->enabledThemeInfo(true);
-        } else {
-            $Themes = $ThemeManager->availableThemes();
-        }
-
-        foreach ($Themes as $Key => $Info) {
-            // Exclude core themes.
-            if (in_array(strtolower($Key), array('default'))) {
-                continue;
-            }
-
-            $Addon = [
-                'AddonKey' => $Key,
-                'AddonType' => 'theme',
-                'Version' => val('Version', $Info, '0.0'),
-                'Folder' => '/themes/'.GetValue('Folder', $Info, $Key)
-            ];
-            self::addAddon($Addon, $Addons);
-        }
-
-        // Get a list of all locales.
-        $LocaleModel = new LocaleModel();
-        if ($Enabled) {
-            $Locales = $LocaleModel->enabledLocalePacks(true);
-        } else {
-            $Locales = $LocaleModel->availableLocalePacks();
-        }
-
-        foreach ($Locales as $Key => $Info) {
-            // Exclude core themes.
-            if (in_array(strtolower($Key), array('skeleton'))) {
-                continue;
-            }
-
-            $Addon = [
-                'AddonKey' => $Key,
-                'AddonType' => 'locale',
-                'Version' => val('Version', $Info, '0.0'),
-                'Folder' => '/locales/'.GetValue('Folder', $Info, $Key)
-            ];
-            self::addAddon($Addon, $Addons);
-        }
-
-        return $Addons;
+        deprecated('UpdateModel->getAddons()');
+        return [];
     }
 
     /**
+     * Deprecated.
      *
-     *
-     * @param bool $Enabled
-     * @return array|bool
-     * @throws Exception
+     * @param bool $Enabled Deprecated.
+     * @return array|bool Deprecated.
+     * @deprecated
      */
     public function getAddonUpdates($Enabled = false) {
-        // Get the addons on this site.
-        $MyAddons = $this->getAddons($Enabled);
-
-        // Build the query for them.
-        $Slugs = array_keys($MyAddons);
-        array_map('urlencode', $Slugs);
-        $SlugsString = implode(',', $Slugs);
-
-        $Url = $this->AddonSiteUrl.'/addon/getlist.json?ids='.$SlugsString;
-        $SiteAddons = proxyRequest($Url);
-        $UpdateAddons = array();
-
-        if ($SiteAddons) {
-            $SiteAddons = val('Addons', json_decode($SiteAddons, true));
-            $UpdateAddons = $this->compareAddons($MyAddons, $SiteAddons);
-        }
-        return $UpdateAddons;
+        deprecated('UpdateModel->getAddonUpdates()');
     }
 
     /**
+     * Run the structure for all addons.
      *
-     * @throws Exception
+     * The structure runs the addons in priority order so that higher priority addons override lower priority ones.
+     *
+     * @param bool $captureOnly Run the structure or just capture the SQL changes.
+     * @throws Exception Throws an exception if in debug mode and something goes wrong.
      */
-    public function runStructure() {
-        // Get the structure files for all of the enabled applications.
-        $ApplicationManager = new Gdn_ApplicationManager();
-        $Apps = $ApplicationManager->enabledApplications();
-        $AppNames = array_column($Apps, 'Folder');
-        $Paths = array();
-        foreach ($Apps as $Key => $AppInfo) {
-            $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
-            if (file_exists($Path)) {
-                $Paths[] = $Path;
-            }
+    public function runStructure($captureOnly) {
+        $addons = array_reverse(Gdn::addonManager()->getEnabled());
 
-            Gdn::applicationManager()->registerPermissions($Key);
-        }
-
-        // Execute the structures.
+        // These variables are required for included structure files.
         $Database = Gdn::database();
-        $SQL = Gdn::sql();
+        $SQL = $this->SQL;
+        $SQL->CaptureModifications = $captureOnly;
         $Structure = Gdn::structure();
+        $Structure->CaptureOnly = $captureOnly;
 
-        foreach ($Paths as $Path) {
-            include $Path;
-        }
+        /* @var Addon $addon */
+        foreach ($addons as $addon) {
+            // Look for a structure file.
+            if ($structure = $addon->getSpecial('structure')) {
+                Logger::event(
+                    'addon_structure',
+                    Logger::INFO,
+                    "Executing structure for {addonKey}.",
+                    ['addonKey' => $addon->getKey(), 'structureType' => 'file']
+                );
 
-        // Execute the structures for all of the plugins.
-        $PluginManager = Gdn::pluginManager();
-
-        $Registered = $PluginManager->registeredPlugins();
-
-        foreach ($Registered as $ClassName => $Enabled) {
-            if (!$Enabled) {
-                continue;
+                try {
+                    include $addon->path($structure);
+                } catch (\Exception $ex) {
+                    if (debug()) {
+                        throw $ex;
+                    }
+                }
             }
 
-            try {
-                $Plugin = $PluginManager->getPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
-                if (method_exists($Plugin, 'Structure')) {
-                    trace("{$ClassName}->Structure()");
-                    $Plugin->structure();
+            // Look for a structure method on the plugin.
+            if ($addon->getPluginClass()) {
+                $plugin = Gdn::pluginManager()->getPluginInstance(
+                    $addon->getPluginClass(),
+                    Gdn_PluginManager::ACCESS_CLASSNAME
+                );
+
+                if (is_object($plugin) && method_exists($plugin, 'structure')) {
+                    Logger::event(
+                        'addon_structure',
+                        Logger::INFO,
+                        "Executing structure for {addonKey}.",
+                        ['addonKey' => $addon->getKey(), 'structureType' => 'method']
+                    );
+
+                    try {
+                        call_user_func([$plugin, 'structure']);
+                    } catch (\Exception $ex) {
+                        if (debug()) {
+                            throw $ex;
+                        }
+                    }
                 }
-            } catch (Exception $Ex) {
-                // Do nothing, plugin wouldn't load/structure.
-                if (debug()) {
-                    throw $Ex;
-                }
+            }
+
+            // Register permissions.
+            $permissions = $addon->getInfoValue('registerPermissions');
+            if (!empty($permissions)) {
+                Logger::event(
+                    'addon_permissions',
+                    Logger::INFO,
+                    "Defining permissions for {addonKey}.",
+                    ['addonKey' => $addon->getKey(), 'permissions' => $permissions]
+                );
+                Gdn::permissionModel()->define($permissions);
             }
         }
         $this->fireEvent('AfterStructure');
+
+        if ($captureOnly && property_exists($Structure->Database, 'CapturedSql')) {
+            return $Structure->Database->CapturedSql;
+        }
+        return [];
     }
 }

@@ -284,7 +284,7 @@ class CategoriesController extends VanillaController {
             // We don't wan't child categories in announcements.
             $Wheres['d.CategoryID'] = $CategoryID;
             $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
-            $this->setData('AnnounceData', $AnnounceData, true);
+            $this->AnnounceData = $this->setData('Announcements', $AnnounceData);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
             $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));

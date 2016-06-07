@@ -15,5 +15,5 @@
  */
 function smarty_function_event($Params, &$Smarty) {
 	 $Name = val('name', $Params);
-	 $Smarty->Controller->fireEvent($Name);
+	 Gdn::controller()->fireEvent($Name);
 }

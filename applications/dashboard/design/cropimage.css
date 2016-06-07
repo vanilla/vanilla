@@ -54,13 +54,17 @@
     float: left;
 }
 
-.box-crop::after {
+.box-crop::after,
+.box-crop::before {
     display: table;
-    clear: both;
     content: '';
 }
 
+.box-crop::after {
+  clear: both;
+}
+
 .box-crop {
-    float: left;
+    zoom: 1;
     width: 100%;
 }

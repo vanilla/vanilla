@@ -256,27 +256,13 @@ if (!class_exists('SideMenuModule', false)) {
         }
 
         /**
-         *
+         * Render the menu.
          *
          * @param string $HighlightRoute
          * @return string
          * @throws Exception
          */
         public function toString($HighlightRoute = '') {
-            Gdn::controller()->EventArguments['SideMenu'] = $this;
-            if ($this->EventName) {
-                if (strcasecmp($this->EventName, 'getAppSettingsMenuItems') === 0) {
-                    // Add the heading here so that they sort properly.
-                    $this->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
-                    $this->addItem('Appearance', t('Appearance'), false, array('class' => 'Appearance'));
-                    $this->addItem('Users', t('Users'), false, array('class' => 'Users'));
-                    $this->addItem('Moderation', t('Moderation'), false, array('class' => 'Moderation'));
-                }
-
-                Gdn::controller()->fireEvent($this->EventName);
-            }
-
-
             if ($HighlightRoute == '') {
                 $HighlightRoute = $this->_HighlightRoute;
             }

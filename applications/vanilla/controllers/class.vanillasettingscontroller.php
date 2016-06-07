@@ -159,20 +159,39 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Configures navigation sidebar in Dashboard.
+     * Build and add the Dashboard's side navigation menu.
+     *
+     * EXACT COPY OF DashboardController::addSideMenu(). KEEP IN SYNC.
+     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
      *
      * @since 2.0.0
      * @access public
      *
      */
     public function addSideMenu() {
+        if (!$CurrentUrl) {
+            $CurrentUrl = strtolower($this->SelfUrl);
+        }
+
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
 
             $nav = new DashboardNavModule();
+            $SideMenu->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
+            $SideMenu->addItem('Appearance', t('Appearance'), false, array('class' => 'Appearance'));
             // Configure SideMenu module.
             $navAdapter = new NestedCollectionAdapter($nav);
+
+            // Hook for initial setup. Do NOT use this for addons.
             $this->EventArguments['SideMenu'] = $navAdapter;
+            $this->fireEvent('earlyAppSettingsMenuItems');
+
+            // Module setup.
+            $SideMenu->HtmlId = '';
+            $SideMenu->highlightRoute($CurrentUrl);
+            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
+
+            // Hook for adding to menu. USE THIS FOR YOUR ADDON.
             $this->fireAs('SettingsController');
             $this->fireEvent('GetAppSettingsMenuItems');
 

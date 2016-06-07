@@ -182,10 +182,6 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
         }
     </style>
     <h1><?php echo t('Getting Started with Vanilla'); ?></h1>
-<?php
-echo $this->Form->open();
-echo $this->Form->errors();
-?>
     <div class="Info">
         <div class="Welcome">
             <h2><?php echo t('Getting Started with Vanilla'); ?></h2>
@@ -241,31 +237,8 @@ echo $this->Form->errors();
             <div class="NumberPoint"><?= t('4'); ?></div>
             <h2><?php echo t('Encourage your friends to join your new community!'); ?></h2>
 
-            <div class="TextBoxWrapper">
-                <?php
-                $Attribs = array('Multiline' => true, 'class' => 'Message');
-                if (!$this->Form->authenticatedPostBack())
-                    $Attribs['value'] = t('Check out the new community forum I\'ve just set up.');
-                echo $this->Form->textBox('InvitationMessage', $Attribs);
-                echo $this->Form->textBox('Recipients', array('class' => 'RecipientBox'));
-                ?>
-            </div>
-            <script type="text/javascript">
-                jQuery(document).ready(function($) {
-                    if ($('input.RecipientBox').val() == '')
-                        $('input.RecipientBox').val("<?php echo $this->TextEnterEmails; ?>");
-
-                    $('input.RecipientBox').focus(function() {
-                        if ($(this).val() == "<?php echo $this->TextEnterEmails; ?>")
-                            $(this).val('');
-                    });
-                    $('input.RecipientBox').blur(function() {
-                        if ($(this).val() == '')
-                            $(this).val("<?php echo $this->TextEnterEmails; ?>");
-                    });
-                });
-            </script>
-            <?php echo $this->Form->button(t('Send Invitations!')); ?>
+            <p><?php echo t('Invite your friends to register to your new forum!'); ?></p>
+            <?php $registrationURL = url('entry/register', true); ?>
+            <p><?php echo sprintf(t('Simply tell them to go to the following URL and register: %s'), anchor($registrationURL, $registrationURL)); ?></p>
         </div>
     </div>
-<?php echo $this->Form->close(); ?>

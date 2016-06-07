@@ -42,7 +42,7 @@ module.exports = function(grunt) {
         sass: {
             dist: {
                 options: {
-                    sourceComments: 'map'
+                    sourceMap: true
                 }
                 , files: [{
                     expand: true
